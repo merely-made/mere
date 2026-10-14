@@ -1,0 +1,2784 @@
+{
+  "schema": "mere.c1-resident-qualification/v2",
+  "date": "2026-10-14",
+  "status": "H/f7ec/N source checkpoints published; bounded CPU/native/browser fresh/live/archive proofs independently qualified within scopes; complete wall and final phase verdict pending",
+  "packet_root": "/Users/markik/Code/testing/cleromancy/c1-20261013",
+  "revisions": {
+    "supplier_H": "a1309431f935427607da35844376a7511656fea4",
+    "portable_validator": "f7ec0db556ca69a4f1d5a2b917409d7b2d861ec8",
+    "native_N": "04bd24094301b91f1d39ee541554be9f1b9c5081",
+    "Genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+    "Knot": "8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+  },
+  "publication": {
+    "supplier_H": {
+      "packet_path": "supplier-H-branch-publication.json",
+      "sha256": "daf34a810f3feb89ba064c08bba93fe138218445bf1ea90a940347c78f2994cb",
+      "bytes": 1283
+    },
+    "portable_validator": {
+      "packet_path": "core-H-publication.json",
+      "sha256": "393935678a55246314d889bf58b74bfbf3947968a8ed3b0a7b2946d48d2f4c7d",
+      "bytes": 1871
+    },
+    "native_N": {
+      "packet_path": "native-N-branch-publication.json",
+      "sha256": "0dfd6b6435db9f3251c5386b3a0b84020c727e67dc309bb2cc99ef3b30f0a3a3",
+      "bytes": 624
+    },
+    "final_docs": "pending",
+    "main_merge": false,
+    "bounded_docs_checkpoint": "ready for commit/push; separate final wall documentation pending"
+  },
+  "toolchains": {
+    "cpu_msrv": "Cargo1.99.0 drives explicit rustc/rustdoc1.97.1",
+    "shipping": "Cargo/rustc1.99.0 wasm shipping profile",
+    "not_claimed": "Cargo1.97 lock stability; OS/device matrices beyond recorded macOS fixtures"
+  },
+  "float_replay_repair_checkpoint": {
+    "source": "a1309431f935427607da35844376a7511656fea4",
+    "predecessor": "4a50998205a34693a84076f6d0db4edec5faee38",
+    "observed_failure": "original Scene Save was rejected by exact graph/facet replay guard; decimal JSON float parse changed captured cartography coordinates by one and two ULPs",
+    "repair": "graph-kernel serde_json float_roundtrip feature, plus exact captured-facet and persisted/reopened typed scene regressions",
+    "guard_unchanged": true,
+    "temporary_diagnostic_removed": true,
+    "shared_tests": {
+      "passed": 877,
+      "failed": 0,
+      "ignored": 19
+    },
+    "stock_owner_tests": {
+      "passed": 505,
+      "failed": 0,
+      "ignored": 12
+    },
+    "native_binaries_rebuilt": 7,
+    "shipping_browser_packages_rebuilt": 4,
+    "CPU_viewer_caps_unchanged_and_pass": true,
+    "GPU_viewer_cap_claim": false,
+    "native_consumer_repin_pending": false,
+    "headed_original_scene_pending": false,
+    "fresh_H_full_wall_pending": true,
+    "publication_pending": false,
+    "F_disk_compatibility": {
+      "same_semantic_inventory": true,
+      "warm_all_byte_guard_pass": true,
+      "cold_open_writes_recorded": true,
+      "fresh_H_or_GUI_claim": false
+    },
+    "proofs": {
+      "supplier-H-checkpoint-preparation.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/supplier-H-checkpoint-preparation.json",
+        "sha256": "45001f9142759565eb3c577bb547e06b661f5b066143add254b1e19844a6a636"
+      },
+      "browser-G-scene-replay-independent-diagnosis.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-G-scene-replay-independent-diagnosis.json",
+        "sha256": "bd919fb1b1c964d1bea9214c2d7c77b27bd2776630796f4bf406b290a03bf985"
+      },
+      "native-preparation/H-float-replay-owner-runtime-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/H-float-replay-owner-runtime-review.json",
+        "sha256": "285f020f42c2fae29b182296e1fd7e88327cb954159ada0ddc02eb6273f3bc4b"
+      },
+      "native-preparation/H-sealed-component-independent-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/H-sealed-component-independent-review.json",
+        "sha256": "da1c7e050b7b7980c93c37a850840eafc7a2b64e743230db08279c19336b65b7"
+      },
+      "native-preparation/H-F-disk-compatibility-independent-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/H-F-disk-compatibility-independent-review.json",
+        "sha256": "b4102c136bfe3890b0ac11ed2e4e3cfed42335c1e80263c9a8057a9428a1afda"
+      },
+      "native-H-F-disk-compatibility/receipt.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-F-disk-compatibility/receipt.json",
+        "sha256": "89e11c2445910a7ffea1635828ce62def7583b7eb95f10f1f3158341b60b5ae1"
+      },
+      "supplier-H-branch-publication.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/supplier-H-branch-publication.json",
+        "sha256": "daf34a810f3feb89ba064c08bba93fe138218445bf1ea90a940347c78f2994cb"
+      },
+      "native-preparation/H-final-rebind-independent-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/H-final-rebind-independent-review.json",
+        "sha256": "09e8c859781c7286677182aa6a3f4b69029cad4747b223b36f14369f63b956fe"
+      },
+      "native-preparation/H-all-shipping-float-feature-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/H-all-shipping-float-feature-review.json",
+        "sha256": "4e76ed3980332043b8fc76814dae881452a3d4e24e7ec6d4f5808bad58b024e5"
+      },
+      "browser-H-scene-root-independent-visual-review-r2.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-H-scene-root-independent-visual-review-r2.json",
+        "sha256": "d3d9da7644a7fbd0b50985edd5b461a6a2adda33dab2b91ce1e4a83151a9ac7a"
+      },
+      "browser-H-scene-cleromancy-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-H-scene-cleromancy-independent-visual-review.json",
+        "sha256": "89718c6629a2511c52ce373706f636e3fcc7c85aba2581c36111ccf643746d9a"
+      },
+      "cleromancy-H-scene-review-write-correction.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-H-scene-review-write-correction.json",
+        "sha256": "b90cdf155f2a5349ef502a5b537a88c9fc68fec73de19ec3fc6b92c4a4dbe60d"
+      },
+      "supplier-H-publication-proof-addendum.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/supplier-H-publication-proof-addendum.json",
+        "sha256": "32c6759dea3b4dd49a4fd4b44e1b44880904f370c2bfe40be4f12151880d64cf"
+      },
+      "core-H-publication.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/core-H-publication.json",
+        "sha256": "393935678a55246314d889bf58b74bfbf3947968a8ed3b0a7b2946d48d2f4c7d"
+      },
+      "native-cleromancy-immutable-H-build-identity.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-cleromancy-immutable-H-build-identity.json",
+        "sha256": "75cbc3e97b4e1334aa78af51da520df390fd0d1b4311d8267dfc94cefb4e4bd6"
+      },
+      "nativeN-04bd240-compiled-input-gitblob-addendum.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/nativeN-04bd240-compiled-input-gitblob-addendum.json",
+        "sha256": "fb20adf355c1d7eb8e6ad76ce16ce3205801419084e73b5c2b8e83ab94ae7f5f"
+      },
+      "cleromancy-agent-native-H-N04bd240-independent-source-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-H-N04bd240-independent-source-review.json",
+        "sha256": "4ae8f3ca7ad19c4c1a7e3210761f184242e088a7babc691b4ffeeb4dc00ca21a"
+      },
+      "native-preparation/owner-capsule-H-C2-native-lock-attempt1-receipts/qualification.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/owner-capsule-H-C2-native-lock-attempt1-receipts/qualification.json",
+        "sha256": "b6e6d90c6b5eff3775ac2098e906a82e30ac75204a488b5757f49f749e2fdda1"
+      },
+      "native-preparation/H-C2-owner-capsule-final-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/H-C2-owner-capsule-final-review.json",
+        "sha256": "aa8574eee5c8953da0df129fc89ff41d1de699ae7c7996050ea2a2266b902133"
+      },
+      "cleromancy-agent-native-H-seed-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-H-seed-independent-visual-review.json",
+        "sha256": "65d2157d053a9995f14267001e66ba8462e8ed497cd94d6faf8301423bce69c0"
+      },
+      "cleromancy-agent-native-H-reopen-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-H-reopen-independent-visual-review.json",
+        "sha256": "f70403dac8793cba75705fa4c4473c5d75bf57b7c89e230bc44aecf9d14ac92e"
+      },
+      "cleromancy-agent-native-H-compact-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-H-compact-independent-visual-review.json",
+        "sha256": "de5dba1eb81f0847e83325bf58d18de235913ec62e9acbb4698a2a13a951a839"
+      },
+      "cleromancy-agent-native-H-retained-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-H-retained-independent-visual-review.json",
+        "sha256": "33d87759825fc683d88a2a1465406cdcefa3b8c87c8b73115cbfca947e2ce729"
+      },
+      "cleromancy-agent-native-H-ordinary-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-H-ordinary-independent-visual-review.json",
+        "sha256": "4986ecf99841a19bef077b57bdb8bcc33918f3ed39941eca598b7eb6c950928d"
+      },
+      "native-H-ordinary-second-owner/receipt.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-ordinary-second-owner/receipt.json",
+        "sha256": "025e1a42bfdb5bb8b66905cbe8e42c157e8278ba219331deff4f0eb92f0fc27d"
+      },
+      "native-H-ordinary-inspection-warm/receipt.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-ordinary-inspection-warm/receipt.json",
+        "sha256": "5a5e18c05a24e72ebc4ef9b6c8163d898ea5f7fe09c28ba10c6a4aade9bb55e1"
+      },
+      "native-H-ordinary-readonly-thaw-inspection/receipt.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-ordinary-readonly-thaw-inspection/receipt.json",
+        "sha256": "6a25b0e381c564e42d7478f05f4001fa007b00d3c7816f7f9a988011513fb3be"
+      },
+      "native-H-ordinary-handoff-warm/receipt.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-ordinary-handoff-warm/receipt.json",
+        "sha256": "5a5e18c05a24e72ebc4ef9b6c8163d898ea5f7fe09c28ba10c6a4aade9bb55e1"
+      },
+      "native-ordinary-H-terminal/failure-classification.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-ordinary-H-terminal/failure-classification.json",
+        "sha256": "a2be2186db7ad41b6881ea867b58f9f3ec4a1272fa421c8176d629e935f82517"
+      },
+      "native-preparation/actual-H-C1-be4907df-independent-signoff.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/actual-H-C1-be4907df-independent-signoff.json",
+        "sha256": "3d2fc63db2420272065eceb9370a35e60ea5013102729921e8dc04c81b4e1da1"
+      },
+      "cleromancy-agent-native-Graphshell-H-witness-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-Graphshell-H-witness-independent-visual-review.json",
+        "sha256": "4949008b3765904aaa76d622f0c6e2bac3070a14c9e0d7f26f56242b9e1b1b9c"
+      },
+      "native-H-after-graphshell-witness-inspection/phase-comparison.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-graphshell-witness-inspection/phase-comparison.json",
+        "sha256": "817f0c9aec6905240fea3257ea12ea842bae1fcf5cf252d46c27df98df82a79d"
+      },
+      "cleromancy-agent-H-ordinary-file-count-confirmation.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-H-ordinary-file-count-confirmation.json",
+        "sha256": "5f613da36eee71406473efaff24761653a0f0b1b554e427f82b648ea567c698a"
+      },
+      "cleromancy-agent-native-Graphshell-H-reopen-independent-visual-review.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-native-Graphshell-H-reopen-independent-visual-review.json",
+        "sha256": "247aaea55aad1c053a5f98c3987f803cebc7c4212371c3fb32bb85b337d83c1d"
+      },
+      "native-H-after-graphshell-reopen-inspection/phase-comparison.json": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-graphshell-reopen-inspection/phase-comparison.json",
+        "sha256": "0ace83efad8e9ab8201886cd8dd80d695f6b596280f44a2c41345f6c32bdb015"
+      }
+    },
+    "bounded_original_scene_pass": true,
+    "fresh_process_scene_reopen_claim": false,
+    "published_supplier_branch": "codex/c1-resident-divination-20261014",
+    "final_docs_publication_pending": true,
+    "review_supersession": {
+      "earlier_root_review_sha256": "573e485da100ad0f43b4a479dbdbb9e656e143065404f34c56da9b4023363383",
+      "earlier_root_bytes_unavailable": true,
+      "agent_accidental_review_packet_overwrite": true,
+      "original_source_capture_and_result_unchanged": true,
+      "additive_current_root_review": "browser-H-scene-root-independent-visual-review-r2.json"
+    },
+    "portable_core_intake": {
+      "revision": "f7ec0db556ca69a4f1d5a2b917409d7b2d861ec8",
+      "published_branch": "codex/c1-float-roundtrip-core-20261014",
+      "tests": {
+        "default": 18,
+        "legacy": 19,
+        "legacy_sky": 20,
+        "failed": 0,
+        "ignored": 0
+      },
+      "only_manifest_and_core_lock_changed": true,
+      "final_native_qualification_pending": true
+    },
+    "fresh_native_consumer_checkpoint": {
+      "native_source": "04bd24094301b91f1d39ee541554be9f1b9c5081",
+      "portable_validator": "f7ec0db556ca69a4f1d5a2b917409d7b2d861ec8",
+      "source_publication_pending": true,
+      "binary_sha256": "537c6d7bbc870190b297b42f547dad4d8b7be9b7ae856d2ebac29e592d1a5cf1",
+      "default_tests": 87,
+      "legacy_tests": 125,
+      "failed": 0,
+      "ignored": 0,
+      "both_all_target_checks_and_build_pass": true,
+      "compiled_inputs_gitblob_matches": 145,
+      "independent_positive_original_PNGs": 19,
+      "actual_original_session": "be4907df-6abe-402f-90a0-116a270e0422",
+      "actual_readonly_thaw": "50008acd-2bb4-4948-8fd5-528ee80faaed",
+      "Cleromancy_focus": "cleromancy://reading/8ec8d5bcc8807d7f4f9c6d603233a7964f0ca7cede6e6e3d90572906da333b7b",
+      "ordinary_scope": "real production encrypted terminal fallback in fresh owned PTY, childPATH=/bin only",
+      "host_graphical_backend_available": true,
+      "graphical_unlock_qualified": false,
+      "whole_startup_zero_write_claim": false,
+      "second_owner_refusal_and_warm_full_byte_guards_pass": true,
+      "current_cross_application_native_browser_pending": true,
+      "full_wall_pending": true
+    },
+    "patched_final_owner_capsule": {
+      "test_inventory": 29,
+      "stock_passed": 24,
+      "embedded_passed": 24,
+      "intentional_ignored_children_each": 5,
+      "dedicated_three_owner_replay_passed": 1,
+      "registry_common_names": 846,
+      "registry_version_mismatches": 0,
+      "strict_H_portable_singletons_float_feature_pass": true
+    },
+    "current_H_native_Graphshell_witness": {
+      "passed": true,
+      "presented_frames": 49,
+      "original_captures": 5,
+      "independent_review_pass": true,
+      "original_mere": "be4907df-6abe-402f-90a0-116a270e0422",
+      "own_ReadingSession_focus_and_Grid_saved": true,
+      "entire_Cleromancy_Fool_view_map_preserved": true,
+      "only_legitimate_two_Graphshell_view_files_changed": true,
+      "other_bytes_and_sentinel_preserved": true,
+      "inspector_itself_zero_writes": true,
+      "fresh_reopen_independent_guard_pending": false,
+      "native_Graphshell_binary": "67418f29ba31ced796ef56c18107d11b12f8c575d8ef51efb883ef2cbb8d932d",
+      "performance_claim": false,
+      "fresh_reopen_presented_frames": 19,
+      "fresh_reopen_original_captures": 1,
+      "total_native_Graphshell_originals": 6,
+      "all36_shared_files_and_sentinel_match_through_reopen": true,
+      "no_extra_fork_or_view_write_on_reopen": true
+    },
+    "current_H_browser_witness": {
+      "status": "H actual mounted witness accepted within visual and owner guard scopes; fresh browser reopen/live/staged archive pending",
+      "supplier": "a1309431f935427607da35844376a7511656fea4",
+      "product_wasm_sha256": "8f1beabc914f62ac219b5fe8a8fa6bfc25571955564605350a3fda5d00a662a6",
+      "witness": {
+        "captures": 5,
+        "originals": [
+          {
+            "path": "receipts/c1_20261014/H_N/c1-browser-witness-switch/0001_01_browser_resident_own_view.png",
+            "sha256": "9c92bb73194209aff5e4e055811051ab409ce339be2989e52537a1813d1a01ea",
+            "bytes": 426866
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-browser-witness-switch/0001_02_browser_context_record.png",
+            "sha256": "05005c64424473a1eea94e21be90dea0e5c3d4faa6b1c5a880905cbeee67322f",
+            "bytes": 419152
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-browser-witness-switch/0001_03_browser_refreshed_record.png",
+            "sha256": "bbbb7a3ac8f5ea73d7d1758eaff054b788cca7c89266c699e430a85ce3962609",
+            "bytes": 426801
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-browser-witness-switch/0001_04_browser_closed_purge.png",
+            "sha256": "b097cc134f0a616718c0baa1fb4c35e6d4b1899145376c702cdfa30f2e9eb0a6",
+            "bytes": 224033
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-browser-witness-switch/0001_05_browser_rejoined_own_view.png",
+            "sha256": "b7d76b9b2ebd85d4d63c4cc8c1e81d55bfeb06a9b21279b1851097f849dbc11d",
+            "bytes": 426851
+          }
+        ],
+        "verified_environment": {
+          "viewport": [
+            1400,
+            900
+          ],
+          "DPR": 2,
+          "Chrome": 155,
+          "adapter": "Apple Metal3",
+          "actualPNG": [
+            2800,
+            1800
+          ]
+        },
+        "executed_derived_SCN": {
+          "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-preparation/source-refresh-a1309431f-c1-be4907df/c1/witness-switch.scn",
+          "sha256": "dae22e57dfa90d066f83d3746bec3b46a159b949391325302d949ba45809f8c5",
+          "bytes": 2140
+        },
+        "retained_baseline_SCN": {
+          "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-preparation/source-refresh-a1309431f-c1-be4907df/c1/mere_divination_browser_witness.scn",
+          "sha256": "93b48ccae615f3603ac5bfb883467350a80be5329cbdce50001561093dc4dd5f",
+          "bytes": 1482
+        },
+        "physical_process_quit": {
+          "pid": 85736,
+          "exec_session": 65392,
+          "physical_Chrome_menu_Quit": true,
+          "exit_code": 0
+        },
+        "proofs": {
+          "visual": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-browser-H-witness-independent-visual-review.json",
+            "sha256": "1a2c28fbdf7855f29156021c734a6f62f61a20c84dfc9cad467a41faa5477dec",
+            "bytes": 12229
+          },
+          "owner": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-browser-witness-inspection/phase-comparison.json",
+            "sha256": "7fc13438fe8716e77fa2d2feed6ee8b4e07dc65d219d9464a0a45176d543a2f4",
+            "bytes": 5453
+          },
+          "raw_result": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-receipts-final-a1309431f/c1-browser-witness-switch/result-0001.json",
+            "sha256": "d63b3ff1061138ad777dee56fcbfd679bfa6e507ede48e0b635be1cfa743ad0c",
+            "bytes": 36465
+          },
+          "execution_addendum": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-receipts-final-a1309431f/c1-browser-witness-switch/execution-addendum.json",
+            "sha256": "ee423c015a91736a73322e11fcaba3c18b9d7285d8d1abcf14c85f80e35caa97",
+            "bytes": 2490
+          }
+        },
+        "owner_scope": {
+          "complete_inventory_unchanged": true,
+          "scoped_Graphshell_view_history_appended": true,
+          "other_shared_files_unchanged": 35,
+          "inspection_all_36_files_and_sentinel_identical": true,
+          "complete_Cleromancy_Fool_view_map_preserved": true
+        },
+        "pixel_limits": "Lower session, field and foundation fields clip in browser details; exact parity is actual Chrome AX/semantic evidence, not full pixel readability."
+      }
+    },
+    "native_N_published_source_checkpoint": {
+      "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-N-branch-publication.json",
+      "sha256": "0dfd6b6435db9f3251c5386b3a0b84020c727e67dc309bb2cc99ef3b30f0a3a3"
+    },
+    "current_H_browser_phases": {
+      "c1-browser-reopen-switch": {
+        "status": "PASS bounded actual fresh Chrome H own Grid/focus restoration",
+        "owner_status": "passed complete inventory and every durable byte through fresh browser reopen and inspection",
+        "proofs": {
+          "independent_visual": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-browser-H-reopen-independent-visual-review.json",
+            "sha256": "3b502753321c932cb8102b96f026470fa7e7c35a29d469d4cdc2b7a71ccc2902",
+            "bytes": 7583
+          },
+          "owner_guard": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-browser-reopen-inspection/phase-comparison.json",
+            "sha256": "4ad41d37420125a0e3b7e9dcd13498b46874901935529a91e001f6846f6995b2",
+            "bytes": 4847
+          }
+        },
+        "local_originals": [
+          {
+            "path": "receipts/c1_20261014/H_N/c1-browser-reopen-switch/0001_01_browser_fresh_own_view.png",
+            "sha256": "14d66cf22fb737315f8d8d479c3e4e3705f16f6406024683f86718bea5bf7856",
+            "bytes": 426765
+          }
+        ],
+        "captures": 1,
+        "scope": "Original review and owner guard have separate stated scopes; no full wall or C1 verdict inferred."
+      },
+      "c1-connected-live": {
+        "status": "PASS bounded connected cross-process own-view notice and readable shared record witness; owner byte guard separate.",
+        "owner_status": "passed only acknowledged scoped Graphshell strategy Grid to Spiral changed; all other authority and bytes preserved",
+        "proofs": {
+          "independent_visual": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-H-connected-live-independent-visual-review.json",
+            "sha256": "c7c9dced43250fdb761e9bb9c9c7164e636b5c1b3d5f1912d31deb510052d82b",
+            "bytes": 13693
+          },
+          "owner_guard": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-live-update-inspection/phase-comparison.json",
+            "sha256": "1055d63122584c61fe0def6d2687d2d3741368219383c9efd0ad4e03cc6650c9",
+            "bytes": 7248
+          }
+        },
+        "local_originals": [
+          {
+            "path": "receipts/c1_20261014/H_N/c1-connected-live/01_external_saved_spiral_view.png",
+            "sha256": "28379994d3e855e6c6b0de1c4569af00a74abb253b233f97b8b988c1b7352a91",
+            "bytes": 798972
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-connected-live/0001_00_browser_live_before_native_update.png",
+            "sha256": "4108dedc13eaeb9f758bbb7891d8239174d4b72e10e4dfb69b52345b6f826e51",
+            "bytes": 426730
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-connected-live/0002_00_browser_live_before_native_update.png",
+            "sha256": "4108dedc13eaeb9f758bbb7891d8239174d4b72e10e4dfb69b52345b6f826e51",
+            "bytes": 426730
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-connected-live/0002_01_browser_live_external_view.png",
+            "sha256": "f481aefbbf0d47bba07797765515ec4f3d6b3429472b9c55f0a6f725c58c4cef",
+            "bytes": 429085
+          }
+        ],
+        "captures": 4,
+        "distinct_capture_hashes": 3,
+        "capture_count_scope": {
+          "files_reviewed": 4,
+          "distinct_content_hashes": 3,
+          "browser_grid_copy": "0002_00 is byte-identical retained baseline from result0001; not a new Grid event or extra independent observation."
+        },
+        "scope": "Original review and owner guard have separate stated scopes; no full wall or C1 verdict inferred."
+      },
+      "c1-staged-archive": {
+        "status": "PASS bounded H archive Save/Open, read-only transient controls/purge/rejoin, and original writable-view restoration. All three H staged results pass; no H scene failures in this packet.",
+        "owner_status": "passed original writable session and complete application views restored; every durable byte unchanged on Switch and inspection",
+        "proofs": {
+          "independent_visual": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-browser-H-archive-independent-visual-review.json",
+            "sha256": "9a95876666a001fe83f519234f9f7fedae925c23902783d55f2e4c24261eef92",
+            "bytes": 21642
+          },
+          "owner_guard": {
+            "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-final-original-after-archive-inspection/phase-comparison.json",
+            "sha256": "c77e866352e3e600557a8904482c2c980d4baf223538a63ee5acc7f0538f1c4b",
+            "bytes": 4383
+          }
+        },
+        "local_originals": [
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0001_01_browser_saved_archive.png",
+            "sha256": "91e2b3fdd4974e453e24d4cce37445a153fa46aca850d5b747c09bfdf674fbc5",
+            "bytes": 429076
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_02_browser_read_only_archive.png",
+            "sha256": "574e35d45308c8edffa22f66b82361f26c9f0da34969e4b66f6ed10af23c5d10",
+            "bytes": 423171
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_03_browser_transient_archive_record.png",
+            "sha256": "60cfa899d376486c1d4b1c7caf712d47903480c5ac3c3b8b2c2e6ac0bfb7067b",
+            "bytes": 416154
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_04_browser_transient_archive_grid.png",
+            "sha256": "68cdf4f397ab86aaa655f6c8a83acde9f50bf5a17d9cbc9edcdc8d4054c4e323",
+            "bytes": 414245
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_05_browser_transient_archive_spiral.png",
+            "sha256": "0a66d592b6adddf39cd04387f05962271f3620a47c2bb2d15875cc205998ea77",
+            "bytes": 416189
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_06_browser_refreshed_archive.png",
+            "sha256": "2d5cabe46fe1c4431abecc5d34cdfc00061fe5d7d2d0644e69300b743548fe9f",
+            "bytes": 416267
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_07_browser_purged_archive.png",
+            "sha256": "ebea463e27819b9ddc3e36377eca684a77e10bc7e073f4f550d8110203cc53f5",
+            "bytes": 224049
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0002_08_browser_rejoined_archive.png",
+            "sha256": "85839ac9e585e02e3063ea11b83e011b06bcc26071d7459801bdf4ae63a80535",
+            "bytes": 423163
+          },
+          {
+            "path": "receipts/c1_20261014/H_N/c1-staged-archive/0003_09_browser_original_preserved_view.png",
+            "sha256": "0610f0bc555acb298d12c24ad50039b09476013e91eb34a8a942a029c5493c8f",
+            "bytes": 417132
+          }
+        ],
+        "captures": 9,
+        "distinct_capture_hashes": 9,
+        "capture_count_scope": null,
+        "scope": "Original review and owner guard have separate stated scopes; no full wall or C1 verdict inferred."
+      }
+    },
+    "current_H_staged_archive_owner_preparation": {
+      "status": "Save/exactOpen, transient full45fileguard, originalReturn and independent9original review passed",
+      "new_codicil": "blake3:11119317b895f7532a76c2c0bf84a154138a9d19dba2b136246060f1d3546215",
+      "new_readonly_thaw": "a8066413-a60f-4c96-af85-33d88d7a9e7f",
+      "native_existing_thaw_50008_is_distinct": true,
+      "sessions": 5,
+      "records": 8,
+      "edges": 6,
+      "archives": 2,
+      "shared_durable_file_count_after_Open": 45,
+      "retired_sentinel_count": 1,
+      "full_Cleromancy_Fool_map_and_Graphshell_d420_Spiral_maps_preserved": true,
+      "proofs": {
+        "Save": {
+          "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-archive-save-inspection/phase-comparison.json",
+          "sha256": "9275eda541c7583122898a197da08e889f2d9e4aacd799d70201a7dbe1acefb5"
+        },
+        "exactOpen": {
+          "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-archive-thaw-before-controls/phase-comparison.json",
+          "sha256": "ecdcbdbaa811ac0e0ad962a156f6a2b3d3a05eafd144ac62bf22ce9788cbfa36"
+        }
+      },
+      "no_automatic_visual_or_zero_write_Open_claim": true
+    },
+    "current_H_staged_archive_owner_chain": {
+      "live_baseline": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-before-live-update-inspection/phase-comparison.json",
+        "sha256": "12688d9ab7913038395a553eb8fae386d7b29632438dd598318a392a8102a6f2",
+        "bytes": 3876
+      },
+      "live_update": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-live-update-inspection/phase-comparison.json",
+        "sha256": "1055d63122584c61fe0def6d2687d2d3741368219383c9efd0ad4e03cc6650c9",
+        "bytes": 7248
+      },
+      "archiveSave": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-after-archive-save-inspection/phase-comparison.json",
+        "sha256": "9275eda541c7583122898a197da08e889f2d9e4aacd799d70201a7dbe1acefb5",
+        "bytes": 5932
+      },
+      "exactOpen": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-archive-thaw-before-controls/phase-comparison.json",
+        "sha256": "ecdcbdbaa811ac0e0ad962a156f6a2b3d3a05eafd144ac62bf22ce9788cbfa36",
+        "bytes": 6449
+      },
+      "readonly_transient": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-archive-thaw-after-controls/phase-comparison.json",
+        "sha256": "b1c91373ef102d07cd6f0eec4c320e0f17266dc6289c79cc2fa6ae3d9ad8a360",
+        "bytes": 6325
+      },
+      "returnOriginal": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-final-original-after-archive-inspection/phase-comparison.json",
+        "sha256": "c77e866352e3e600557a8904482c2c980d4baf223538a63ee5acc7f0538f1c4b",
+        "bytes": 4383
+      }
+    },
+    "bounded_H_C1_cross_application_complete": true
+  },
+  "pending": [
+    "Remaining143 H canonical cases and all mandatory supplements",
+    "Final phase verdict and final canonical qualification documentation update"
+  ],
+  "qualification_limits": [
+    "Source checkpoint publication does not close C1,V2b or Graphshell phase4.",
+    "Native terminal fallback is process-local PATH=/bin on actual encrypted production prompt; graphical handling remains unqualified.",
+    "Lower browser IDs clip in pixels; exact IDs are separate actualChromeAX/semantic proof.",
+    "Local ignored originals are retained and hash-bound, not claimed published in Git.",
+    "Historical F/G artifacts keep exact sources/profiles/binaries/failures and do not count as freshH acceptance."
+  ],
+  "historical_F_G_checkpoint": {
+    "schema": "mere.c1-resident-divination-qualification/v1",
+    "date": "2026-10-14",
+    "status": "bounded CPU, native and C51 browser C1 proofs qualified within recorded scopes; repaired G frontend full wall and final publication pending",
+    "packet_root": "/Users/markik/Code/testing/cleromancy/c1-20261013",
+    "revisions": {
+      "mere_F": "c51e1913cc52cc161815b97939a46452495747e0",
+      "portable_cleromancy_C": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+      "historical_daemon_core_locator": "2851e6b0e3dda4b5b558c515579dede9daf1ec2d",
+      "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+      "murm_shared_transport_carrier": "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9",
+      "murm_independent_wire": "80d9959000fcd913634fd223538dfdbbec1f5e4f",
+      "dramatis": "0234e7eea6f2ddf2330a71b9425da01b06ae0391",
+      "knot": "8ed49d43f049921d56ab5a0c091a2c37c0970ee7",
+      "native_source_commit": "400ce312fd2b2c135449282cbb9e7a1463ab8e97"
+    },
+    "publication": {
+      "supplier_branch": {
+        "packet_path": "supplier-c51-branch-publication.json",
+        "sha256": "3509719f802be82b18e64cc2d75588d449d19a01fcf88da6ac9b8528863540c0",
+        "bytes": 464
+      },
+      "F_branch": "codex/c1-resident-divination-20261014",
+      "F_exact_remote_verified_in_saved_receipt": true,
+      "C_scope": "Published portable acceptance checkpoint, not final native D publication",
+      "native_D": {
+        "commit": "400ce312fd2b2c135449282cbb9e7a1463ab8e97",
+        "status": "locally committed; unpublished",
+        "compiled_inputs": "All145 recorded compiled-input hashes independently match current checkout; no rebuild or binary change claimed",
+        "portable_C_is_distinct": "Imported pure validator remains published A3; local native D is not substituted as validator"
+      }
+    },
+    "toolchains": {
+      "cpu_msrv": "Cargo1.99.0 drives explicit rustc/rustdoc1.97.1",
+      "shipping": "Cargo/rustc1.99.0 wasm shipping profile",
+      "not_claimed": "Cargo1.97 lock stability; OS/device matrices beyond recorded macOS fixtures"
+    },
+    "owner_contracts": [
+      "Stock daemon and embedded resident use product-owned published validate_divination_graph authority; absent authority refuses divination admission.",
+      "SessionGraphV1 reads are bound to admitted application/session/resource address; explicit graph/facets disclose only that application views; ambient cannot read complete graph media.",
+      "Checked edits replay and validate the complete captured candidate before staged durable commit; stale revision/application tamper refuses without partial graph/history/view installation.",
+      "Staged graph/history/view persistence refusal retains committed graph, journal, projection revision and durable bytes; retry and competing durable-head tests call actual production owner APIs.",
+      "Archive save/open/compose, read-only thaw and explicit fork retain source identity; read-only view browsing uses transient client state and cannot silently fork.",
+      "A second reservoir owner refuses; grant/access revocation and no implicit ambient authority remain enforced."
+    ],
+    "primary_cpu_gates": [
+      {
+        "name": "djinn-pandect-stock-c1-msrv-frozenc51",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-p",
+          "djinn",
+          "-p",
+          "pandect",
+          "-p",
+          "mere-fetch",
+          "--features",
+          "djinn/custody-receipt-host",
+          "-j",
+          "2",
+          "--",
+          "--test-threads",
+          "1"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": {
+          "passed": 504,
+          "failed": 0,
+          "ignored": 12,
+          "result_lines": 44
+        },
+        "receipt": {
+          "packet_path": "shared/djinn-pandect-stock-c1-msrv-frozenc51.json",
+          "sha256": "6e410c71704838cdf841a2f9455a99e905d0e40a365a9b21d22d5c84700d00f1",
+          "bytes": 1004
+        },
+        "log": {
+          "packet_path": "shared/djinn-pandect-stock-c1-msrv-frozenc51.log",
+          "sha256": "62648c79c42724e1b865e5107ebf0fff6a803bea1a0b1bf5ff01672dbe8b8691",
+          "bytes": 96887
+        }
+      },
+      {
+        "name": "shared-c1-msrv-frozenc51",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-p",
+          "djinn",
+          "-p",
+          "graphshell",
+          "-p",
+          "mere-view",
+          "-p",
+          "graphshell-client",
+          "--no-default-features",
+          "--features",
+          "graphshell/mere-view-host,graphshell/webrtc-session",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": {
+          "passed": 877,
+          "failed": 0,
+          "ignored": 19,
+          "result_lines": 59
+        },
+        "receipt": {
+          "packet_path": "shared/shared-c1-msrv-frozenc51.json",
+          "sha256": "9cb3cb19ab57f4bb6998ddeab8b98fab1d81184d425e9311438eaf5fb4209773",
+          "bytes": 1054
+        },
+        "log": {
+          "packet_path": "shared/shared-c1-msrv-frozenc51.log",
+          "sha256": "57925d61b094f82724340b3ce51d7c338a007ff7b511d6a185138cfbbabb3e87",
+          "bytes": 144373
+        }
+      }
+    ],
+    "patched_consumer_owner_gates": [
+      {
+        "name": "owner-capsule-c51-native-lock-compile",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2",
+          "--tests",
+          "--no-run"
+        ],
+        "workdir": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/owner-capsule-c51-a3-native-lock",
+        "source_head": "86c03e8d435788e6f75ccf7cd46b6e83f1978176",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-compile.json",
+          "sha256": "e43d6d537026df827d7594f88b6a4670c753ce74bdb8bb4cd0c32c8295c54d42",
+          "bytes": 904
+        },
+        "log": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-compile.log",
+          "sha256": "00f940a56e33436bae12856acf9b22bb6643ac1dab6e54f3135a046b18debee5",
+          "bytes": 31011
+        }
+      },
+      {
+        "name": "owner-capsule-c51-native-lock-published-replay",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2",
+          "--test",
+          "embedded_reservoir_validation",
+          "published_replay_regression::published_reading_replay_and_same_schema_tamper_survive_three_real_owners",
+          "--",
+          "--exact",
+          "--test-threads",
+          "1",
+          "--nocapture"
+        ],
+        "workdir": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/owner-capsule-c51-a3-native-lock",
+        "source_head": "86c03e8d435788e6f75ccf7cd46b6e83f1978176",
+        "test_summary": {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "result_lines": 1
+        },
+        "receipt": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-published-replay.json",
+          "sha256": "84c41b7d795b6e50f949eb1aaab348f815839a75b13d4c612ba07ebdf6115842",
+          "bytes": 1107
+        },
+        "log": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-published-replay.log",
+          "sha256": "0f08b951a27559d82cf8c931b371db5b8dca9c2137c6631c24e303b04316e637",
+          "bytes": 5908
+        }
+      },
+      {
+        "name": "owner-capsule-c51-native-lock-stock",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2",
+          "--test",
+          "embedded_reservoir_validation",
+          "--test",
+          "embedded_reservoir_two_process",
+          "--test",
+          "mere_two_process",
+          "--test",
+          "reservoir_access",
+          "--test",
+          "reservoir_two_process",
+          "--test",
+          "resident_owner_contracts",
+          "--test",
+          "owner_storage_rollback",
+          "--test",
+          "pandect_owner_contracts",
+          "--",
+          "--test-threads",
+          "1",
+          "--nocapture"
+        ],
+        "workdir": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/owner-capsule-c51-a3-native-lock",
+        "source_head": "86c03e8d435788e6f75ccf7cd46b6e83f1978176",
+        "test_summary": {
+          "passed": 23,
+          "failed": 0,
+          "ignored": 5,
+          "result_lines": 8
+        },
+        "receipt": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-stock.json",
+          "sha256": "3827bc4e13333a2a335ff114e9c0c641fd6bb13466b2d196d4b71dc3af5612e2",
+          "bytes": 1288
+        },
+        "log": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-stock.log",
+          "sha256": "fe39ed796f9b00c7e44bbef03e5ce77d5f4a501be01bf13ac58230b7835749d5",
+          "bytes": 14814
+        }
+      },
+      {
+        "name": "owner-capsule-c51-native-lock-embedded",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2",
+          "--no-default-features",
+          "--features",
+          "native",
+          "--test",
+          "embedded_reservoir_validation",
+          "--test",
+          "embedded_reservoir_two_process",
+          "--test",
+          "mere_two_process",
+          "--test",
+          "reservoir_access",
+          "--test",
+          "reservoir_two_process",
+          "--test",
+          "resident_owner_contracts",
+          "--test",
+          "owner_storage_rollback",
+          "--test",
+          "pandect_owner_contracts",
+          "--",
+          "--test-threads",
+          "1",
+          "--nocapture"
+        ],
+        "workdir": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-preparation/owner-capsule-c51-a3-native-lock",
+        "source_head": "86c03e8d435788e6f75ccf7cd46b6e83f1978176",
+        "test_summary": {
+          "passed": 23,
+          "failed": 0,
+          "ignored": 5,
+          "result_lines": 8
+        },
+        "receipt": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-embedded.json",
+          "sha256": "32f184e3a1b7dda20e2edf6c94240da9bff35ed2790d59748ce8884a52ff956b",
+          "bytes": 1350
+        },
+        "log": {
+          "packet_path": "shared/owner-capsule-c51-native-lock-embedded.log",
+          "sha256": "17bef9eb34b9bfcfe56afecadd7f97594c4c4740cf6f36f3b8b61bab3c9f9823",
+          "bytes": 17620
+        }
+      }
+    ],
+    "owner_capsule": {
+      "source_binding": {
+        "packet_path": "native-preparation/owner-capsule-c51-a3-native-lock/source-binding.json",
+        "sha256": "129d6f59ce6e0d9820d22c39d09a15f08afb663a47c91d558153032b4e35419d",
+        "bytes": 9953
+      },
+      "independent_review": {
+        "packet_path": "native-preparation/owner_capsule_final_c51_a3_review.json",
+        "sha256": "e16cb8fffd241621a2276d5dfba272cf221300fc3d920980db708a7b41a47a41",
+        "bytes": 13089
+      },
+      "test_inventory": {
+        "targets": [
+          "embedded_reservoir_validation",
+          "embedded_reservoir_two_process",
+          "mere_two_process",
+          "reservoir_access",
+          "reservoir_two_process",
+          "resident_owner_contracts",
+          "owner_storage_rollback",
+          "pandect_owner_contracts"
+        ],
+        "test_list_count": 28,
+        "active": 23,
+        "intentional_child_ignores": 5
+      },
+      "metadata": {
+        "locked": {
+          "verifier": {
+            "phase": "native",
+            "selected_packages": 1095,
+            "families": {
+              "https://github.com/mark-ik/p2panda.git": [
+                [
+                  null,
+                  "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65"
+                ]
+              ],
+              "https://github.com/mark-ik/vello": [
+                [
+                  "2eae6243881d5b24c984d5ee35dde509ca5db782",
+                  "2eae6243881d5b24c984d5ee35dde509ca5db782"
+                ]
+              ],
+              "https://github.com/merely-made/dramatis.git": [
+                [
+                  "0234e7eea6f2ddf2330a71b9425da01b06ae0391",
+                  "0234e7eea6f2ddf2330a71b9425da01b06ae0391"
+                ]
+              ],
+              "https://github.com/merely-made/genet.git": [
+                [
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+                ]
+              ],
+              "https://github.com/merely-made/knot-editor.git": [
+                [
+                  "8ed49d43f049921d56ab5a0c091a2c37c0970ee7",
+                  "8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+                ]
+              ],
+              "https://github.com/merely-made/murm.git": [
+                [
+                  "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9",
+                  "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9"
+                ],
+                [
+                  "80d9959000fcd913634fd223538dfdbbec1f5e4f",
+                  "80d9959000fcd913634fd223538dfdbbec1f5e4f"
+                ]
+              ],
+              "https://github.com/merely-made/netrender.git": [
+                [
+                  "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+                  "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+                ]
+              ],
+              "https://www.github.com/merely-made/cleromancy.git": [
+                [
+                  "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+                  "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957"
+                ]
+              ],
+              "https://www.github.com/merely-made/genet.git": [
+                [
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+                ]
+              ],
+              "https://www.github.com/merely-made/mere.git": [
+                [
+                  "c51e1913cc52cc161815b97939a46452495747e0",
+                  "c51e1913cc52cc161815b97939a46452495747e0"
+                ]
+              ]
+            },
+            "shared_singletons": [
+              "chartulary",
+              "chirograph",
+              "command-menu",
+              "graphshell",
+              "graphshell-client",
+              "luggage",
+              "mere",
+              "mere-curation",
+              "mere-forme",
+              "mere-kernel",
+              "mere-proofs",
+              "mere-transport",
+              "mere-view",
+              "mere-webrtc-carrier",
+              "muniment",
+              "murm-wire",
+              "notochord",
+              "numen",
+              "pandect",
+              "personae",
+              "sceno",
+              "scenotime",
+              "servitor"
+            ],
+            "passed": true
+          },
+          "graph_package_ids": [
+            "git+https://www.github.com/merely-made/mere.git?rev=c51e1913cc52cc161815b97939a46452495747e0#mere-kernel@0.0.2"
+          ],
+          "core_source": [
+            "git+https://www.github.com/merely-made/cleromancy.git?rev=a3d96b62f2f4f908cc0267cbb7bbc29683d9a957#a3d96b62f2f4f908cc0267cbb7bbc29683d9a957"
+          ],
+          "metadata_sha256": "2e4730ed0024f7f2cb8c139442c1176a00b908ff06334aa3ccbddccae8651823"
+        },
+        "embedded-locked": {
+          "verifier": {
+            "phase": "native",
+            "selected_packages": 1094,
+            "families": {
+              "https://github.com/mark-ik/p2panda.git": [
+                [
+                  null,
+                  "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65"
+                ]
+              ],
+              "https://github.com/mark-ik/vello": [
+                [
+                  "2eae6243881d5b24c984d5ee35dde509ca5db782",
+                  "2eae6243881d5b24c984d5ee35dde509ca5db782"
+                ]
+              ],
+              "https://github.com/merely-made/dramatis.git": [
+                [
+                  "0234e7eea6f2ddf2330a71b9425da01b06ae0391",
+                  "0234e7eea6f2ddf2330a71b9425da01b06ae0391"
+                ]
+              ],
+              "https://github.com/merely-made/genet.git": [
+                [
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+                ]
+              ],
+              "https://github.com/merely-made/knot-editor.git": [
+                [
+                  "8ed49d43f049921d56ab5a0c091a2c37c0970ee7",
+                  "8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+                ]
+              ],
+              "https://github.com/merely-made/murm.git": [
+                [
+                  "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9",
+                  "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9"
+                ],
+                [
+                  "80d9959000fcd913634fd223538dfdbbec1f5e4f",
+                  "80d9959000fcd913634fd223538dfdbbec1f5e4f"
+                ]
+              ],
+              "https://github.com/merely-made/netrender.git": [
+                [
+                  "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e",
+                  "c74b7cb28090c28b1c6d80b08dcdea18aff48d3e"
+                ]
+              ],
+              "https://www.github.com/merely-made/cleromancy.git": [
+                [
+                  "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+                  "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957"
+                ]
+              ],
+              "https://www.github.com/merely-made/genet.git": [
+                [
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+                  "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+                ]
+              ],
+              "https://www.github.com/merely-made/mere.git": [
+                [
+                  "c51e1913cc52cc161815b97939a46452495747e0",
+                  "c51e1913cc52cc161815b97939a46452495747e0"
+                ]
+              ]
+            },
+            "shared_singletons": [
+              "chartulary",
+              "chirograph",
+              "command-menu",
+              "graphshell",
+              "graphshell-client",
+              "luggage",
+              "mere",
+              "mere-curation",
+              "mere-forme",
+              "mere-kernel",
+              "mere-proofs",
+              "mere-transport",
+              "mere-view",
+              "mere-webrtc-carrier",
+              "muniment",
+              "murm-wire",
+              "notochord",
+              "numen",
+              "pandect",
+              "personae",
+              "sceno",
+              "scenotime",
+              "servitor"
+            ],
+            "passed": true
+          },
+          "graph_package_ids": [
+            "git+https://www.github.com/merely-made/mere.git?rev=c51e1913cc52cc161815b97939a46452495747e0#mere-kernel@0.0.2"
+          ],
+          "core_source": [
+            "git+https://www.github.com/merely-made/cleromancy.git?rev=a3d96b62f2f4f908cc0267cbb7bbc29683d9a957#a3d96b62f2f4f908cc0267cbb7bbc29683d9a957"
+          ],
+          "metadata_sha256": "f993dff1c1b0063f16c78882f479a0c69495fca4aca5f940b7d1fef2c0f55e1d"
+        }
+      },
+      "registry_parity": {
+        "common_registry_names": 846,
+        "all_capsule_common_versions_are_native_versions": true,
+        "native_metadata": "immutable-closure-c51-receipts/native-default.json",
+        "capsule_metadata": "owner-capsule-c51-a3-native-lock-receipts/locked.json",
+        "git_source_families_verified_separately": true,
+        "independently_recomputed_common_names": 846,
+        "independently_recomputed_mismatches": {}
+      },
+      "original_tests": "Five whole integration files and unchanged supplier fixture/test fragments; actual production libraries imported at WWW F, not copied/stubbed. Child test module paths retained.",
+      "stock_private_tests": "Private Pandect corruption tests remain in stock F gate; capsule is bounded and does not replace entire supplier suite.",
+      "counts_are_not_additive": "504 and877 overlap; exact replay is repeated in23-test matrices; stock/embedded23 are same bounded test inventory under different features."
+    },
+    "shipping_gates": [
+      {
+        "name": "graphshell-viewer-shipping-frozenc51",
+        "exit": 0,
+        "argv": [
+          "python3",
+          "scripts/build-viewer.py",
+          "--cargo",
+          "/Users/markik/Code/testing/cleromancy/c1-20261013/tools/cargo-1.99.0",
+          "--out-dir",
+          "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-viewer-shipping-frozenc51-package",
+          "--target-dir",
+          "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target",
+          "--wasm-bindgen",
+          "/Users/markik/Code/testing/cleromancy/c1-20261013/tools/wasm-bindgen"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/graphshell-viewer-shipping-frozenc51.json",
+          "sha256": "c980a4152237467dd9328f2f66fd8e92de1eb8da94cd1f645de719a8937b77d0",
+          "bytes": 1046
+        },
+        "log": {
+          "packet_path": "shared/graphshell-viewer-shipping-frozenc51.log",
+          "sha256": "95045bad5cd418f6d1e2651b89805f7ed27a55f9027eacda65684100a223944c",
+          "bytes": 25512
+        }
+      },
+      {
+        "name": "graphshell-viewer-gpu-shipping-frozenc51",
+        "exit": 0,
+        "argv": [
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "--profile",
+          "viewer",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--no-default-features",
+          "--features",
+          "canvas-gpu",
+          "--target-dir",
+          "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/graphshell-viewer-gpu-shipping-frozenc51.json",
+          "sha256": "330ead300a317926cfa0259799895fecf321749a01b34ec699f44f401d774ca3",
+          "bytes": 913
+        },
+        "log": {
+          "packet_path": "shared/graphshell-viewer-gpu-shipping-frozenc51.log",
+          "sha256": "609f724bc7eb6037fe18e100dd6acbf8a8c1ca016917367e4dd7f3d286abe2e9",
+          "bytes": 25333
+        }
+      },
+      {
+        "name": "graphshell-web-shipping-product-frozenc51",
+        "exit": 0,
+        "argv": [
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--release",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/graphshell-web-shipping-product-frozenc51.json",
+          "sha256": "888608312bbf06e19690eff5708b13d0a10b138c1b509c4a889444ee2c19f143",
+          "bytes": 735
+        },
+        "log": {
+          "packet_path": "shared/graphshell-web-shipping-product-frozenc51.log",
+          "sha256": "be78acb1ea53212e1133bd14810ce83501645d3ca362410596cc125652aa422a",
+          "bytes": 26297
+        }
+      },
+      {
+        "name": "graphshell-web-shipping-moot-frozenc51",
+        "exit": 0,
+        "argv": [
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--release",
+          "-j",
+          "2",
+          "--features",
+          "moot-resources"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/graphshell-web-shipping-moot-frozenc51.json",
+          "sha256": "3715a717e4a60841c76bfe8ce39d728c19552ae12874118121907c193d7e4f95",
+          "bytes": 774
+        },
+        "log": {
+          "packet_path": "shared/graphshell-web-shipping-moot-frozenc51.log",
+          "sha256": "b02a0a016428fd98514e566411fc6a9e7834b4671b610a0346bbf5840bc8b3af",
+          "bytes": 26297
+        }
+      }
+    ],
+    "viewer_delivery": {
+      "evidence": {
+        "packet_path": "browser-viewer-shipping-frozenc51-package/viewer-delivery.json",
+        "sha256": "85d1849ecbd3c3211830d9e5f0b156b2aead5e8ec838350810eb8b229caec9f5",
+        "bytes": 1591
+      },
+      "profile": "viewer",
+      "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+      "sizes": {
+        "wasm": {
+          "raw_bytes": 9251210,
+          "sha256": "4ddc8e279dbe733fba72da4d4de653a917e60b1ce6da5c35c6006a07f4fe052a",
+          "cap_bytes": 3407872,
+          "gzip6_bytes": 3283057,
+          "gzip9_bytes": 3268596,
+          "cap_pass": true
+        },
+        "glue": {
+          "raw_bytes": 126880,
+          "sha256": "c59abc528fd910f27bdd9a54a3b696db8b66f08ceee60ca178385bb1d40abe08",
+          "cap_bytes": 20480,
+          "gzip6_bytes": 19864,
+          "gzip9_bytes": 19307,
+          "cap_pass": true
+        },
+        "mount": {
+          "raw_bytes": 998,
+          "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f",
+          "cap_bytes": 8192,
+          "gzip6_bytes": 588,
+          "gzip9_bytes": 588,
+          "cap_pass": true
+        },
+        "history": {
+          "raw_bytes": 271932,
+          "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d",
+          "cap_bytes": 131072,
+          "gzip6_bytes": 6704,
+          "gzip9_bytes": 6254,
+          "cap_pass": true
+        }
+      },
+      "all_caps_pass": true,
+      "scope": "Existing compressed viewer delivery caps only; no cap widening and no browser runtime acceptance implied."
+    },
+    "additional_cpu_gates": [
+      {
+        "name": "graphshell-web-all-msrv-frozenc51",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "check",
+          "--locked",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--all-features",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/graphshell-web-all-msrv-frozenc51.json",
+          "sha256": "8119694a6aa028e913d08a049f424740252c07e25ed604c9c5b5385144ef0050",
+          "bytes": 925
+        },
+        "log": {
+          "packet_path": "shared/graphshell-web-all-msrv-frozenc51.log",
+          "sha256": "3874f1eba56e1b7a8348337a4f07a1abdc4fc22edd46a6b27c5bf0277614bb60",
+          "bytes": 47029
+        }
+      },
+      {
+        "name": "browser-owners-msrv-frozenc51",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "-p",
+          "mere-moot",
+          "--features",
+          "resource-handlers",
+          "--example",
+          "moot_resource_owner",
+          "--example",
+          "moot_resource_handlers",
+          "--example",
+          "commons_practice_peer",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/browser-owners-msrv-frozenc51.json",
+          "sha256": "3a4112e13d542e2761c957ebc2270bc6dbbee6962062265815e02c005ada7804",
+          "bytes": 1042
+        },
+        "log": {
+          "packet_path": "shared/browser-owners-msrv-frozenc51.log",
+          "sha256": "bed1d9be6d361c74974dc6bf30e98164de93fada47f78e54d1e61eff5ad14c37",
+          "bytes": 7994
+        }
+      },
+      {
+        "name": "browser-chronicle-msrv-frozenc51",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "-p",
+          "djinn",
+          "--no-default-features",
+          "--features",
+          "distillery-chronicle-receipt-host",
+          "--bin",
+          "distillery_chronicle_receipt_host",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/browser-chronicle-msrv-frozenc51.json",
+          "sha256": "5db5925f5551a4cfc0fd0fb90ee852bcb9f81142eb984607887246a06987daf9",
+          "bytes": 1000
+        },
+        "log": {
+          "packet_path": "shared/browser-chronicle-msrv-frozenc51.log",
+          "sha256": "84e183b6c0ad3e1bf721d1e04f07e70f64a4ba896ec525222c9285c699c40a68",
+          "bytes": 30906
+        }
+      },
+      {
+        "name": "c1-helper-msrv-frozenc51",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "-p",
+          "djinn",
+          "--features",
+          "custody-receipt-host",
+          "--bin",
+          "c1-receipt-host",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin",
+        "source_head": "c51e1913cc52cc161815b97939a46452495747e0",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/c1-helper-msrv-frozenc51.json",
+          "sha256": "d59748e8ae7aeaa8190bce1794f3bc6cc4d14cc497ed572c0f1b8ed9f14b49d3",
+          "bytes": 939
+        },
+        "log": {
+          "packet_path": "shared/c1-helper-msrv-frozenc51.log",
+          "sha256": "82645150caf728bbb967583b28ef6b2f695a9d70ab90a7a332a211476b730012",
+          "bytes": 27020
+        }
+      },
+      {
+        "name": "cleromancy-core-immutable-c51-default",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy/core",
+        "source_head": "e2e9c277166d3d715e069777dce8e58b944ee354",
+        "test_summary": {
+          "passed": 18,
+          "failed": 0,
+          "ignored": 0,
+          "result_lines": 6
+        },
+        "receipt": {
+          "packet_path": "shared/cleromancy-core-immutable-c51-default.json",
+          "sha256": "246459a254ac333a1e7c3ecd2ce95254b1792ef5b5fa4e7e4c25e8f423d61dfa",
+          "bytes": 811
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-core-immutable-c51-default.log",
+          "sha256": "cd7b62a1954aceb9e2a87c60bec4ed58222d9512e43252c3b8834bf3844acccc",
+          "bytes": 9831
+        }
+      },
+      {
+        "name": "cleromancy-core-immutable-c51-legacy",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2",
+          "--features",
+          "legacy-receipts"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy/core",
+        "source_head": "e2e9c277166d3d715e069777dce8e58b944ee354",
+        "test_summary": {
+          "passed": 19,
+          "failed": 0,
+          "ignored": 0,
+          "result_lines": 6
+        },
+        "receipt": {
+          "packet_path": "shared/cleromancy-core-immutable-c51-legacy.json",
+          "sha256": "e76cc5c4cb8d0438921cc6b38302dc014c3b7e8c5d4c16b7e55eb3de787849d4",
+          "bytes": 850
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-core-immutable-c51-legacy.log",
+          "sha256": "e90bfc8cc00a1921a8a846318d72bca45fe88c2941734ad677adf357df212091",
+          "bytes": 3468
+        }
+      },
+      {
+        "name": "cleromancy-core-immutable-c51-legacy-sky",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "-j",
+          "2",
+          "--features",
+          "legacy-receipts,sky-timeline"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy/core",
+        "source_head": "e2e9c277166d3d715e069777dce8e58b944ee354",
+        "test_summary": {
+          "passed": 20,
+          "failed": 0,
+          "ignored": 0,
+          "result_lines": 6
+        },
+        "receipt": {
+          "packet_path": "shared/cleromancy-core-immutable-c51-legacy-sky.json",
+          "sha256": "8296aed9abf7eaa6207a87cba582e46981d3a5231c39a76fe0c0899b498da067",
+          "bytes": 865
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-core-immutable-c51-legacy-sky.log",
+          "sha256": "260021f11f89a76d0a2693cda7af9859bdf2910007d63e928d48383dd0ffd43b",
+          "bytes": 5436
+        }
+      },
+      {
+        "name": "cleromancy-native-immutable-c51-default-check",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "check",
+          "--locked",
+          "--all-targets",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy",
+        "source_head": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-default-check.json",
+          "sha256": "5c34cbecef4576d24eccd43e15da171bf0c382af6e19834dffcb7afd74e8f314",
+          "bytes": 827
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-default-check.log",
+          "sha256": "cded7ca2aa083d9cf0a1383722594ef8b7a2c28c8e4cf5864db8d493ef3a739f",
+          "bytes": 38283
+        }
+      },
+      {
+        "name": "cleromancy-native-immutable-c51-default-test",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "--lib",
+          "--tests",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy",
+        "source_head": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+        "test_summary": {
+          "passed": 87,
+          "failed": 0,
+          "ignored": 0,
+          "result_lines": 47
+        },
+        "receipt": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-default-test.json",
+          "sha256": "08b77bc8ebfcac9aa05bc0cc3ce6c8886c356a1302baffbe9f923b9d41a400b6",
+          "bytes": 835
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-default-test.log",
+          "sha256": "eb3d701cf32ecc7111d702aefe29f40a42cd6c46610555df9e9b546399fee80c",
+          "bytes": 59282
+        }
+      },
+      {
+        "name": "cleromancy-native-immutable-c51-legacy-check",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "check",
+          "--locked",
+          "--all-targets",
+          "-j",
+          "2",
+          "--features",
+          "legacy-receipts,personal-sync,graphshell-admission"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy",
+        "source_head": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-legacy-check.json",
+          "sha256": "aa2f570c4944cf0173d8943655f9d4fb7dfafcd1a79acf638ed1ccea856c70cd",
+          "bytes": 903
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-legacy-check.log",
+          "sha256": "7fb8869b0df920c20dabe73ddfb16d9698031374cedcfe1bfa73e9fe8972646c",
+          "bytes": 3228
+        }
+      },
+      {
+        "name": "cleromancy-native-immutable-c51-legacy-test",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "test",
+          "--locked",
+          "--lib",
+          "--tests",
+          "-j",
+          "2",
+          "--features",
+          "legacy-receipts,personal-sync,graphshell-admission"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy",
+        "source_head": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+        "test_summary": {
+          "passed": 125,
+          "failed": 0,
+          "ignored": 0,
+          "result_lines": 58
+        },
+        "receipt": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-legacy-test.json",
+          "sha256": "b8682b04213546e98e5cf594ff39b0a599cdcc5c613c164c577288d2ef3af5dc",
+          "bytes": 911
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-legacy-test.log",
+          "sha256": "72df748f4dcb4ecf65192240fe2832d8f53ea42542bb3ca91d995684fbfc6142",
+          "bytes": 25939
+        }
+      },
+      {
+        "name": "cleromancy-native-immutable-c51-build",
+        "exit": 0,
+        "argv": [
+          "env",
+          "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+          "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+          "cargo",
+          "+1.99.0",
+          "build",
+          "--locked",
+          "--bin",
+          "cleromancy",
+          "-j",
+          "2"
+        ],
+        "workdir": "/Users/markik/Code/repos/cleromancy",
+        "source_head": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+        "test_summary": null,
+        "receipt": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-build.json",
+          "sha256": "9784494eca76caa7f2abe93377fc7db81879a6e6fd6019cedbdfd03c35c78969",
+          "bytes": 837
+        },
+        "log": {
+          "packet_path": "shared/cleromancy-native-immutable-c51-build.log",
+          "sha256": "95a0eabef518fc02abfac98c327380c458469cf5591c8e6ab69ce72dacd2968b",
+          "bytes": 3159
+        }
+      }
+    ],
+    "native_evidence": [
+      {
+        "evidence": {
+          "packet_path": "native-cleromancy-frozenc51-seed-independent-visual-review.json",
+          "sha256": "47b65d5bc1f6c18aa60bc435d57d47f121bcdafe48d6dd8e7143184f935ea332",
+          "bytes": 9791
+        },
+        "verdict": {
+          "result": "PASS",
+          "scope": "final frozen-source seed lifecycle + wide readable reading/Mere + visual mint clearing/restoration",
+          "not_claimed": [
+            "final fresh-process reopen",
+            "compact lifecycle reachability or numeric control bounds",
+            "C2 compact reading layout completion",
+            "cross-app witness",
+            "ordinary absent-endpoint startup",
+            "full shared wall or final C1 publication"
+          ]
+        },
+        "binary_sha256": "3510d3edffaf42a15d800b5942fdfc978145b06507e023771ff4ab1120be0026",
+        "receipt": {
+          "schema": "cleromancy.headed-scenario/v1",
+          "phase": "first",
+          "ok": true,
+          "status": "Viewing session: be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+          "catalog_ready": true,
+          "sessions": 1,
+          "readings": 3,
+          "reflections": 1,
+          "ids": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "reflection_id": "2f6820d9739da1cc31867a0a7015f47815c99c7f35d985e68172315701cf5377"
+          },
+          "log": [
+            "waited 0 frames",
+            "waited 3 frames",
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured reading-and-mere",
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured minted-empty",
+            "waited 1 frames",
+            "captured switched-original",
+            "waited 0 frames",
+            "captured compact-reading-and-mere",
+            "waited 0 frames",
+            "waited 1 frames",
+            "captured archived",
+            "waited 1 frames",
+            "captured forked",
+            "waited 0 frames",
+            "waited 1 frames",
+            "waited 0 frames",
+            "captured restored"
+          ]
+        },
+        "presentation": {
+          "presented_frames": 66,
+          "redraws": 859,
+          "unpresented_redraws": 793,
+          "captured_frames": 7,
+          "blank_captures": 0,
+          "distinct_digests": 7,
+          "source": "lane.done"
+        },
+        "reviewer_source": "Saved independent visual-review record; captures not re-reviewed while authoring this draft"
+      },
+      {
+        "evidence": {
+          "packet_path": "native-cleromancy-frozenc51-reopen-r2-independent-visual-review.json",
+          "sha256": "a48d4e92519817c91929091d01d61b2f373d7af626b2c829ed37e43acf255a01",
+          "bytes": 8114
+        },
+        "verdict": {
+          "result": "PASS",
+          "scope": "final fresh-process retained reading, archive inspection without extra live session, and return to original"
+        },
+        "binary_sha256": "3510d3edffaf42a15d800b5942fdfc978145b06507e023771ff4ab1120be0026",
+        "receipt": {
+          "schema": "cleromancy.headed-scenario/v1",
+          "phase": "reopen",
+          "ok": true,
+          "status": "Viewing session: be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+          "catalog_ready": true,
+          "sessions": 1,
+          "readings": 3,
+          "reflections": 1,
+          "ids": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "reflection_id": "2f6820d9739da1cc31867a0a7015f47815c99c7f35d985e68172315701cf5377"
+          },
+          "log": [
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured recovered",
+            "waited 2 frames",
+            "waited 0 frames",
+            "captured archive-thaw",
+            "waited 0 frames",
+            "captured compact-archive-reading",
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured original-after-archive"
+          ]
+        },
+        "presentation": {
+          "presented_frames": 39,
+          "redraws": 752,
+          "unpresented_redraws": 713,
+          "captures": 4,
+          "blank": 0,
+          "distinct": 4,
+          "source": "lane.done"
+        },
+        "reviewer_source": "Saved independent visual-review record; captures not re-reviewed while authoring this draft"
+      },
+      {
+        "evidence": {
+          "packet_path": "native-cleromancy-frozenc51-compact-independent-visual-review.json",
+          "sha256": "09886309992c1cb66cfcddc187f56a50913315538dedb7390e8a20aca433fbbe",
+          "bytes": 8691
+        },
+        "verdict": {
+          "result": "PASS",
+          "scope": "final native compact reachability of 4 shared owner controls via actual scrolling, observed numeric bounds and unchanged IDs/count baseline"
+        },
+        "binary_sha256": "3510d3edffaf42a15d800b5942fdfc978145b06507e023771ff4ab1120be0026",
+        "receipt": {
+          "schema": "cleromancy.headed-scenario/v1",
+          "phase": "reopen",
+          "ok": true,
+          "status": "Viewing session: be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+          "catalog_ready": true,
+          "sessions": 1,
+          "readings": 3,
+          "reflections": 1,
+          "ids": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "reflection_id": "2f6820d9739da1cc31867a0a7015f47815c99c7f35d985e68172315701cf5377"
+          },
+          "log": [
+            "waited 0 frames",
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured compact-reachable-fork",
+            "captured compact-reachable-trash",
+            "captured compact-reachable-save",
+            "captured compact-reachable-archive-open",
+            "waited 0 frames"
+          ]
+        },
+        "presentation": {
+          "presented_frames": 46,
+          "redraws": 810,
+          "unpresented_redraws": 764,
+          "captures": 4,
+          "blank": 0,
+          "distinct": 4,
+          "source": "lane.done"
+        },
+        "reviewer_source": "Saved independent visual-review record; captures not re-reviewed while authoring this draft"
+      },
+      {
+        "evidence": {
+          "packet_path": "native-ordinary-frozenc51-terminal-independent-visual-review.json",
+          "sha256": "4d8ddce6ea5ec1f8b230b2ccb097aece59e6dec19e4324059cd468cc1fa89434",
+          "bytes": 13850
+        },
+        "verdict": {
+          "result": "PASS",
+          "scope": "final ordinary absent-endpoint branch with actual production terminal unlock mechanism and retained wide/compact native reading captures; exact records survive owner handoff/reopen through separately scoped warm inspection",
+          "not_claimed": [
+            "native graphical unlock prompt availability",
+            "SCN acceptance for initial invalid environment launch",
+            "all durable bytes unchanged during first cold projection hydration",
+            "C2 compact layout completion",
+            "complete shared wall, cross-app browser/native witness or D publication"
+          ]
+        },
+        "binary_sha256": "3510d3edffaf42a15d800b5942fdfc978145b06507e023771ff4ab1120be0026",
+        "receipt": {
+          "schema": "cleromancy.headed-scenario/v1",
+          "phase": "reopen",
+          "ok": true,
+          "status": "Viewing session: be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+          "catalog_ready": true,
+          "sessions": 1,
+          "readings": 3,
+          "reflections": 1,
+          "ids": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "reflection_id": "2f6820d9739da1cc31867a0a7015f47815c99c7f35d985e68172315701cf5377"
+          },
+          "log": [
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured retained-reading-and-mere",
+            "waited 0 frames",
+            "captured compact-retained-reading-and-mere",
+            "waited 0 frames"
+          ]
+        },
+        "presentation": {
+          "presented_frames": 20,
+          "redraws": 1160,
+          "unpresented_redraws": 1140,
+          "captures": 2,
+          "blank": 0,
+          "distinct": 2,
+          "source": "lane.done"
+        },
+        "reviewer_source": "Saved independent visual-review record; captures not re-reviewed while authoring this draft"
+      },
+      {
+        "evidence": {
+          "packet_path": "native-cleromancy-frozenc51-retained-independent-visual-review.json",
+          "sha256": "a72d0bee9ad65473bd7dd46b3060d8e3141d396104ddab21b9ded1a70b867891",
+          "bytes": 4750
+        },
+        "verdict": {
+          "result": "PASS",
+          "scope": "final retained fresh-process wide/compact reading and exact record/card recovery",
+          "not_claimed": [
+            "new lifecycle writes or new archive thaw",
+            "independent GUI proof of resident disk restart chronology",
+            "cross-app witness or full shared wall",
+            "publication"
+          ]
+        },
+        "binary_sha256": "3510d3edffaf42a15d800b5942fdfc978145b06507e023771ff4ab1120be0026",
+        "receipt": {
+          "schema": "cleromancy.headed-scenario/v1",
+          "phase": "reopen",
+          "ok": true,
+          "status": "Viewing session: be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+          "catalog_ready": true,
+          "sessions": 1,
+          "readings": 3,
+          "reflections": 1,
+          "ids": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "reflection_id": "2f6820d9739da1cc31867a0a7015f47815c99c7f35d985e68172315701cf5377"
+          },
+          "log": [
+            "waited 0 frames",
+            "waited 0 frames",
+            "captured retained-reading-and-mere",
+            "waited 0 frames",
+            "captured compact-retained-reading-and-mere",
+            "waited 0 frames"
+          ]
+        },
+        "presentation": {
+          "presented_frames": 20,
+          "redraws": 720,
+          "unpresented_redraws": 700,
+          "captures": 2,
+          "blank": 0,
+          "distinct": 2,
+          "source": "lane.done"
+        },
+        "reviewer_source": "Saved independent visual-review record; captures not re-reviewed while authoring this draft"
+      }
+    ],
+    "admitted_read_and_exclusive_owner_evidence": [
+      {
+        "evidence": {
+          "packet_path": "native-c51-handoff-inspection-warm/receipt.json",
+          "sha256": "b61ed5447b258ce76baba4d758554f211d6e29afe085859f8fe13f03919c2d58",
+          "bytes": 994
+        },
+        "outcome": {
+          "durable_bytes_unchanged": true,
+          "graph_seeded_by_verifier": false,
+          "helper_sha256": "254bc72be0fb0f3ef6b739a54c310c131a1e19132fa090f3225926ab308460d6",
+          "inspections": {
+            "cleromancy": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            },
+            "graphshell": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            }
+          },
+          "native_gui_acceptance": false,
+          "passed": true,
+          "schema": "cleromancy.c1-native-preparation/v1",
+          "target_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+        }
+      },
+      {
+        "evidence": {
+          "packet_path": "native-c51-ordinary-inspection-warm/receipt.json",
+          "sha256": "b61ed5447b258ce76baba4d758554f211d6e29afe085859f8fe13f03919c2d58",
+          "bytes": 994
+        },
+        "outcome": {
+          "durable_bytes_unchanged": true,
+          "graph_seeded_by_verifier": false,
+          "helper_sha256": "254bc72be0fb0f3ef6b739a54c310c131a1e19132fa090f3225926ab308460d6",
+          "inspections": {
+            "cleromancy": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            },
+            "graphshell": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            }
+          },
+          "native_gui_acceptance": false,
+          "passed": true,
+          "schema": "cleromancy.c1-native-preparation/v1",
+          "target_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+        }
+      },
+      {
+        "evidence": {
+          "packet_path": "native-c51-ordinary-retained-inspection-warm/receipt.json",
+          "sha256": "b61ed5447b258ce76baba4d758554f211d6e29afe085859f8fe13f03919c2d58",
+          "bytes": 994
+        },
+        "outcome": {
+          "durable_bytes_unchanged": true,
+          "graph_seeded_by_verifier": false,
+          "helper_sha256": "254bc72be0fb0f3ef6b739a54c310c131a1e19132fa090f3225926ab308460d6",
+          "inspections": {
+            "cleromancy": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            },
+            "graphshell": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            }
+          },
+          "native_gui_acceptance": false,
+          "passed": true,
+          "schema": "cleromancy.c1-native-preparation/v1",
+          "target_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+        }
+      },
+      {
+        "evidence": {
+          "packet_path": "native-c51-ordinary-second-owner/receipt.json",
+          "sha256": "025e1a42bfdb5bb8b66905cbe8e42c157e8278ba219331deff4f0eb92f0fc27d",
+          "bytes": 168
+        },
+        "outcome": {
+          "durable_bytes_unchanged": true,
+          "exit_code": 101,
+          "original_owner_stopped": false,
+          "passed": true,
+          "schema": "cleromancy.c1-second-owner-preparation/v1"
+        }
+      }
+    ],
+    "failures_preserved": {
+      "cold_projection_hydration": "First cold inspection byte-equality gates failed because projection epoch changed. Passing warm same-session inspection does not erase those failures or exclude epoch from durable bytes.",
+      "ordinary_review_includes_failed_initial_environment_attempt_and_cold_outcomes": {
+        "packet_path": "native-ordinary-frozenc51-terminal-independent-visual-review.json",
+        "sha256": "4d8ddce6ea5ec1f8b230b2ccb097aece59e6dec19e4324059cd468cc1fa89434",
+        "bytes": 13850
+      },
+      "prior_failed_attempts": "External packet preserves prior browser, presentation, qualification and cold inspection failures; this receipt does not reclassify them."
+    },
+    "pending": [
+      "The original F canonical wall has four preserved diagnostic runs and zero strict acceptances; renewed G canonical wall execution is in progress, not complete.",
+      "All 164 canonical scenes and mandatory supplements, including fresh-process profile chains and actual signed/cooperative owner fixtures, remain required.",
+      "Reservoir V2b steps4\u20135 and full Graphshell one-tree UI qualification remain in their owning plan.",
+      "Cleromancy owns the final C1 consumer verdict and native D publication; this supplier receipt is not that verdict.",
+      "Card ambient presentation remains later C4; C2 compact reading-layout debt remains explicitly separate."
+    ],
+    "doc_integration_pending": [
+      "Final post-qualification documentation reconciliation and audit refresh remain root-owned; the canonical DOC_README index and D2 batch78 entry are already prepared."
+    ],
+    "documentation_integration": {
+      "new_receipt_indexed": true,
+      "D2_batch": 78,
+      "new_mechanical_findings": 0,
+      "baseline_debt_preserved": true,
+      "D2_new_receipt_covered": true,
+      "inherited_D2_errors_unchanged": true,
+      "audits": {
+        "doc-audit-baseline-c51.json": {
+          "sha256": "cf2e3c5e99533bbc22c6b7a3fc33cc2d7249842ac1448e126c289942ab846e7a",
+          "bytes": 267945
+        },
+        "doc-audit-candidate-c51.json": {
+          "sha256": "b9cd289864f5cf20c93a9b2835ecce05a5b713da858c0a609c2d0711ead5c457",
+          "bytes": 264072
+        },
+        "doc-audit-comparison-c51.json": {
+          "sha256": "deb0d1705977f24052bc1eede7bf8b4c1ebb257861a18aca1aed3aaf7438ff77",
+          "bytes": 1835
+        },
+        "doc-judgment-baseline-c51.json": {
+          "sha256": "629a4e46c240a1bdae7c9f460cfde17d9922646ad65160bd00887ae659f89105",
+          "bytes": 10451
+        },
+        "doc-judgment-candidate-c51.json": {
+          "sha256": "6352354b5b726292ab2e9f6780de15ac16a80cdb01a6d6be3d421b5cd2230cc3",
+          "bytes": 10451
+        },
+        "doc-judgment-comparison-c51.json": {
+          "sha256": "5f17d15db3e3741a354daefa1db25bf6fa2a7e5af127a06b08641cb1c7ae10e1",
+          "bytes": 1304
+        }
+      }
+    },
+    "native_capture_summary": {
+      "reviewed_processes": 5,
+      "original_PNGs": 19,
+      "count_scope": "Cleromancy final seed7 + fresh reopen4 + compact4 + ordinary2 + retained2; excludes Graphshell/browser later witness",
+      "tracked_curated_ledger": {
+        "repository_path": "cleromancy/receipts/c1-resident-qualification_20261014.json",
+        "sha256": "fe8e4acc5f9da331f1d74e2f98541960d524aa3b7e263a2ee8569917a034b034"
+      },
+      "evidence_publication": {
+        "curated_manifest": "receipts/c1-resident-qualification_20261014.json",
+        "source_build_manifest": "receipts/c1-resident-source-build_20261014.json",
+        "captures_and_generated_comparison_copies": "local retained artifacts under receipts/c1_20261014 and Code/testing/cleromancy/c1-20261013",
+        "repository_rule": ".gitignore keeps generated stores, screenshots and byte-stability comparison copies local; curated textual receipts are tracked"
+      },
+      "artifact_policy": "Curated JSON and source-build manifests are tracked. Generated headed image files remain local and ignored under Cleromancy headed evidence policy. Local images are not Git-published artifacts."
+    },
+    "native_cross_application": {
+      "status": "PASS within final native Graphshell witness/fresh-reopen scope",
+      "target_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6",
+      "graphshell_binary_sha256": "36883e87a037d69fef12fdea8db052a7942149d6385485a6c52d38620c111bdc",
+      "processes": 2,
+      "original_PNGs": 6,
+      "reviews": [
+        {
+          "evidence": {
+            "packet_path": "native-graphshell-witness-final-c51-independent-visual-review.json",
+            "sha256": "01e4f98e836c640ccecb6f8d3526738084721a6eb1fbba0063b1f186912b814e",
+            "bytes": 6874
+          },
+          "verdict": {
+            "result": "PASS",
+            "scope": "final native Graphshell same-mere cross-app context/session witness, refresh and own Grid save",
+            "not_claimed": [
+              "browser acceptance",
+              "full164-scene wall",
+              "all record bytes or other-app own-view unchanged",
+              "general startup reliability",
+              "fullC1 publication"
+            ]
+          },
+          "process": {
+            "launch_method": "LaunchServices temporary application bundle",
+            "launcher_exit": 0,
+            "timeout": false,
+            "success": true,
+            "elapsed_seconds": 27.533,
+            "binary_sha256": "36883e87a037d69fef12fdea8db052a7942149d6385485a6c52d38620c111bdc",
+            "scenario_sha256": "6f2453a838ade674994b2d872b84178398f22062eb3a450144846bcf465261f5",
+            "receipt": "scenario.done",
+            "captures": 5
+          },
+          "presentation": {
+            "presented_frames": 49,
+            "redraws": 878,
+            "unpresented_redraws": 829,
+            "captures": 5,
+            "blank": 0,
+            "distinct": 5,
+            "source": "scenario.done"
+          },
+          "own_view": "Graphshell Grid + Reading session focus saved and restored through shared owner route; separate Cleromancy view parity awaits supplementary inspection if claimed.",
+          "visible_record_parity": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "foundation_reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "context_digest": "ab89a4602526b70e60052e66b63760a1f6fec5ad362c4efb669246f17550df85",
+            "field_digest": "49e610f7e49ef8842c39deaf323c7d28da718c9a1c433e81cd1e14c8c42b0c2b",
+            "question": "What deserves attention as these projects become something I can use?"
+          },
+          "reviewer_source": "Saved independent original-image review; not re-reviewed by receipt author"
+        },
+        {
+          "evidence": {
+            "packet_path": "native-graphshell-reopen-final-c51-independent-visual-review.json",
+            "sha256": "9b9c8eb1eae21ee41b137a3b5cacf7a7bac88687469e216309c1374cc6439a23",
+            "bytes": 4386
+          },
+          "verdict": {
+            "result": "PASS",
+            "scope": "final native Graphshell fresh-process own Grid/Reading-session view restoration",
+            "not_claimed": [
+              "browser acceptance",
+              "full164-scene wall",
+              "all record bytes or other-app own-view unchanged",
+              "general startup reliability",
+              "fullC1 publication"
+            ]
+          },
+          "process": {
+            "launch_method": "LaunchServices temporary application bundle",
+            "launcher_exit": 0,
+            "timeout": false,
+            "success": true,
+            "elapsed_seconds": 26.964,
+            "binary_sha256": "36883e87a037d69fef12fdea8db052a7942149d6385485a6c52d38620c111bdc",
+            "scenario_sha256": "3836cde8e02c3f0d4ecb511b59938674ff162697b5d90f0654f245351972a480",
+            "receipt": "scenario.done",
+            "captures": 1
+          },
+          "presentation": {
+            "presented_frames": 19,
+            "redraws": 949,
+            "unpresented_redraws": 930,
+            "captures": 1,
+            "blank": 0,
+            "distinct": 1,
+            "source": "scenario.done"
+          },
+          "own_view": "Graphshell Grid + Reading session focus saved and restored through shared owner route; separate Cleromancy view parity awaits supplementary inspection if claimed.",
+          "visible_record_parity": {
+            "session_id": "be162bdb00442942cb1d68cef8e852f7a3541c8de5be4c4e591ba394145f4d93",
+            "foundation_reading_id": "39227f004090d2235f8e026be64fbc450028a805b057a8b80e72e6d2821c47db",
+            "context_digest": "ab89a4602526b70e60052e66b63760a1f6fec5ad362c4efb669246f17550df85",
+            "field_digest": "49e610f7e49ef8842c39deaf323c7d28da718c9a1c433e81cd1e14c8c42b0c2b",
+            "question": "What deserves attention as these projects become something I can use?"
+          },
+          "reviewer_source": "Saved independent original-image review; not re-reviewed by receipt author"
+        }
+      ],
+      "owner_read_guard": {
+        "evidence": {
+          "packet_path": "native-c51-graphshell-witness-reopen-inspection/receipt.json",
+          "sha256": "b61ed5447b258ce76baba4d758554f211d6e29afe085859f8fe13f03919c2d58",
+          "bytes": 994
+        },
+        "receipt": {
+          "durable_bytes_unchanged": true,
+          "graph_seeded_by_verifier": false,
+          "helper_sha256": "254bc72be0fb0f3ef6b739a54c310c131a1e19132fa090f3225926ab308460d6",
+          "inspections": {
+            "cleromancy": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            },
+            "graphshell": {
+              "attachment_action": {
+                "acknowledged": true,
+                "from_session": "b15a7908-fc40-459a-af5a-1e08aaa6b90a",
+                "intent": "mere.sessions.attach",
+                "scope": "connection-local",
+                "to_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+              },
+              "intent_count": 1
+            }
+          },
+          "native_gui_acceptance": false,
+          "passed": true,
+          "schema": "cleromancy.c1-native-preparation/v1",
+          "target_session": "f6e0689c-2633-47c1-be0d-d745e3c30ae6"
+        },
+        "inventory": {
+          "packet_path": "native-c51-graphshell-witness-reopen-inspection/inventory.json",
+          "sha256": "8ad1bd1b1c30fc8e16b5d128b0839146830560d42b1f2a8411a6d760901bdd23",
+          "bytes": 6173
+        },
+        "comparison_baseline": {
+          "packet_path": "native-c51-handoff-inspection-warm/inventory.json",
+          "sha256": "9df6b84ceefd1a7906d6d40ee47cb011c2b18d39c71dd4e500620ddd5a2c00aa",
+          "bytes": 5644
+        },
+        "observed": "Both apps agree on same writable UUID, four sessions / one archive / eight records / six edges. Graphshell own Grid/Reading-session focus persisted; entire Cleromancy own_views unchanged. Inspection itself changes no durable shared/sentinel bytes and leaves unused paths absent."
+      },
+      "remaining": [
+        "Browser same-owner witness/reopen/live/archive acceptance and full 164-case canonical wall remain pending.",
+        "These native tests do not establish general startup reliability or final C1/native D publication."
+      ]
+    },
+    "native_source_commit_evidence": {
+      "source_build_manifest": "cleromancy/receipts/c1-resident-source-build_20261014.json",
+      "manifest_sha256": "e3418a281e04966af5206b2a571f9b6696e7842e7e44e0e76b3717accff4b240",
+      "compiled_source_base": "a3d96b62f2f4f908cc0267cbb7bbc29683d9a957",
+      "native_source_commit": "400ce312fd2b2c135449282cbb9e7a1463ab8e97",
+      "checked_inputs": 145,
+      "mismatches": [],
+      "binary_sha256": "3510d3edffaf42a15d800b5942fdfc978145b06507e023771ff4ab1120be0026"
+    },
+    "browser_repair_checkpoint": {
+      "source": "4a50998205a34693a84076f6d0db4edec5faee38",
+      "runtime_source": "c51e1913cc52cc161815b97939a46452495747e0",
+      "scope": "wasm-only snapshot face observation, no rendering/controller/persistence/protocol change",
+      "native_runtime_rebuilt": false,
+      "source_review": "/Users/markik/Code/testing/cleromancy/c1-20261013/graphshell-G4a509982-face-source-independent-review.json",
+      "source_review_sha256": "8a695b1b29b43a4c5aed55c2b7017e1a3b332b623e48eaf4079c388edd3146d8",
+      "wasm_gates": {
+        "graphshell-web-all-msrv": {
+          "receipt": "/Users/markik/Code/testing/cleromancy/c1-20261013/shared/graphshell-web-all-msrv-frozen4a5099820.json",
+          "receipt_sha256": "c7d8c2efd30eca13453a021f53af9751602176db40d2a229985aab27b8ec86af",
+          "evidence": {
+            "argv": [
+              "env",
+              "RUSTC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+              "RUSTDOC=/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc",
+              "cargo",
+              "+1.99.0",
+              "check",
+              "--locked",
+              "--target",
+              "wasm32-unknown-unknown",
+              "--all-features",
+              "-j",
+              "2"
+            ],
+            "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+            "exit": 0,
+            "seconds": 5.287,
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "profile": {
+              "TMPDIR": "/tmp",
+              "CARGO_PROFILE_DEV_DEBUG": "0",
+              "CARGO_INCREMENTAL": "0",
+              "CARGO_TARGET_DIR": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target"
+            },
+            "log_sha256": "3b100fba63ce79d2f02d3cca4e62d34500e8d1deceacf810db36fdc46cd024ca"
+          }
+        },
+        "graphshell-web-shipping-product": {
+          "receipt": "/Users/markik/Code/testing/cleromancy/c1-20261013/shared/graphshell-web-shipping-product-frozen4a5099820.json",
+          "receipt_sha256": "6c82cbefc61102a2f8c046429e251f5ba4d1ab4fc538fbb715dff0cefb23d3dd",
+          "evidence": {
+            "argv": [
+              "cargo",
+              "+1.99.0",
+              "build",
+              "--locked",
+              "--target",
+              "wasm32-unknown-unknown",
+              "--release",
+              "-j",
+              "2"
+            ],
+            "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+            "exit": 0,
+            "seconds": 97.103,
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "profile": {
+              "TMPDIR": "/tmp",
+              "CARGO_PROFILE_DEV_DEBUG": "0",
+              "CARGO_INCREMENTAL": "0",
+              "CARGO_TARGET_DIR": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target"
+            },
+            "log_sha256": "161dc665bc285d434f47b09a79018941b1f6f1dd019ed1048789f7a77dd62498"
+          }
+        },
+        "graphshell-web-shipping-moot": {
+          "receipt": "/Users/markik/Code/testing/cleromancy/c1-20261013/shared/graphshell-web-shipping-moot-frozen4a5099820.json",
+          "receipt_sha256": "7e07e3b4f35f40c0621b0849bc8a318fbda057c2f1ed4ab598363df59984c633",
+          "evidence": {
+            "argv": [
+              "cargo",
+              "+1.99.0",
+              "build",
+              "--locked",
+              "--target",
+              "wasm32-unknown-unknown",
+              "--release",
+              "-j",
+              "2",
+              "--features",
+              "moot-resources"
+            ],
+            "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+            "exit": 0,
+            "seconds": 99.149,
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "profile": {
+              "TMPDIR": "/tmp",
+              "CARGO_PROFILE_DEV_DEBUG": "0",
+              "CARGO_INCREMENTAL": "0",
+              "CARGO_TARGET_DIR": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target"
+            },
+            "log_sha256": "a4f420bbc2c3254218ebb0e8cec429ea59b2906e9876133cdae95ff2d25aceaf"
+          }
+        },
+        "graphshell-viewer-shipping": {
+          "receipt": "/Users/markik/Code/testing/cleromancy/c1-20261013/shared/graphshell-viewer-shipping-frozen4a5099820.json",
+          "receipt_sha256": "7e9662444a01a3182b448cce772f212b9e5814189c003faaf05f28dcb8e839a5",
+          "evidence": {
+            "argv": [
+              "python3",
+              "scripts/build-viewer.py",
+              "--cargo",
+              "/Users/markik/Code/testing/cleromancy/c1-20261013/tools/cargo-1.99.0",
+              "--out-dir",
+              "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-viewer-shipping-frozen4a5099820-package",
+              "--target-dir",
+              "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target",
+              "--wasm-bindgen",
+              "/Users/markik/Code/testing/cleromancy/c1-20261013/tools/wasm-bindgen"
+            ],
+            "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+            "exit": 0,
+            "seconds": 51.504,
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "profile": {
+              "TMPDIR": "/tmp",
+              "CARGO_PROFILE_DEV_DEBUG": "0",
+              "CARGO_INCREMENTAL": "0",
+              "CARGO_TARGET_DIR": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target"
+            },
+            "log_sha256": "8b48bd768d1ea81a1bc722ed9480e94c4f6273105b944e4f4100289c612691bb"
+          }
+        },
+        "graphshell-viewer-gpu-shipping": {
+          "receipt": "/Users/markik/Code/testing/cleromancy/c1-20261013/shared/graphshell-viewer-gpu-shipping-frozen4a5099820.json",
+          "receipt_sha256": "f2ba8ad3dceace167f8761a35fbd9b5ee2003598a4fde116b460a2ce3a270229",
+          "evidence": {
+            "argv": [
+              "cargo",
+              "+1.99.0",
+              "build",
+              "--locked",
+              "--profile",
+              "viewer",
+              "--target",
+              "wasm32-unknown-unknown",
+              "--no-default-features",
+              "--features",
+              "canvas-gpu",
+              "--target-dir",
+              "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target",
+              "-j",
+              "2"
+            ],
+            "workdir": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin/ports/graphshell/web",
+            "exit": 0,
+            "seconds": 90.058,
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "profile": {
+              "TMPDIR": "/tmp",
+              "CARGO_PROFILE_DEV_DEBUG": "0",
+              "CARGO_INCREMENTAL": "0",
+              "CARGO_TARGET_DIR": "/Users/markik/Code/testing/stack-state-20261011/mere-knot-repin-target"
+            },
+            "log_sha256": "f557c41e61ec413d7a104f23c174521ed9a15557553fe5c5fadd56d5613d2f0e"
+          }
+        }
+      },
+      "packages": {
+        "product": {
+          "identity": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-product-shipping-frozen4a5099820-identity.json",
+          "identity_sha256": "1e98479bc1977b056a02aa0c1162a7b6d59d195d618e64d7dcae1bfcdd3d2e9e",
+          "evidence": {
+            "schema": "graphshell.sealed-package/v1",
+            "sealed": true,
+            "experimental": false,
+            "gate": "shared/graphshell-web-shipping-product-frozen4a5099820.json",
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "supplier_murm": "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9",
+            "supplier_genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+            "metadata_sha256": "51fd228038d2489a7bf768073a04361eeea2ef61d77fbafaf81da73958c5eae2",
+            "metadata_argv": [
+              "cargo",
+              "+1.99.0",
+              "metadata",
+              "--locked",
+              "--format-version",
+              "1"
+            ],
+            "sealer_sha256": "c89e0512ed47fb1d6c3c1456c8a6f22ac5301f1899617328eaa89663ea4bbe3c",
+            "raw_wasm_sha256": "4c5e347630e6f4180883fc982371511a059d4c1c09ef71f30e61271f09bda42b",
+            "wasm_bindgen_sha256": "6ad2f953d8abcb36d6b084df221fb2f0716217854c1b8df938aa2f5678d1b948",
+            "artifacts": {
+              "graphshell_web.d.ts": {
+                "sha256": "71553e25f0e5e207380c8b56806d1a88fec6cde146c49037e9c211fce892b5cf",
+                "bytes": 5296
+              },
+              "graphshell_web.js": {
+                "sha256": "fac0dd674bdc10a75af1ef3c0c1b5dbe03fdf41421c092f2cceb0cf000e50c7e",
+                "bytes": 149828
+              },
+              "graphshell_web_bg.wasm": {
+                "sha256": "8c64f5dab057a9115c5cb47942acdac5bac333062c33ad76c15cd9e1497fbcf3",
+                "bytes": 29604462
+              },
+              "graphshell_web_bg.wasm.d.ts": {
+                "sha256": "e636ac1a3e108335e007048b47afb9edb029f55410298998f69fad04ca7e6081",
+                "bytes": 3029
+              }
+            }
+          }
+        },
+        "moot": {
+          "identity": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-moot-shipping-frozen4a5099820-identity.json",
+          "identity_sha256": "7a7c5919aaebca93a5cdf89fca36ff3a3993d8c6156cc24fbfe7792313a39af2",
+          "evidence": {
+            "schema": "graphshell.sealed-package/v1",
+            "sealed": true,
+            "experimental": false,
+            "gate": "shared/graphshell-web-shipping-moot-frozen4a5099820.json",
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "supplier_murm": "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9",
+            "supplier_genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+            "metadata_sha256": "3569992dc2481f0052bd647ac47b357ce152ac24d9421892a36af48baae1fef6",
+            "metadata_argv": [
+              "cargo",
+              "+1.99.0",
+              "metadata",
+              "--locked",
+              "--format-version",
+              "1",
+              "--features",
+              "moot-resources"
+            ],
+            "sealer_sha256": "c89e0512ed47fb1d6c3c1456c8a6f22ac5301f1899617328eaa89663ea4bbe3c",
+            "raw_wasm_sha256": "b06bec3b7f3e4335f9e1e7b062ac2684abae8c774056bf1d944deda52d68a51d",
+            "wasm_bindgen_sha256": "6ad2f953d8abcb36d6b084df221fb2f0716217854c1b8df938aa2f5678d1b948",
+            "artifacts": {
+              "graphshell_web.d.ts": {
+                "sha256": "831d70b9b40e3b85efc02f7114eb6b54ab7dda4e32f39b5e7ae22c8f1e369964",
+                "bytes": 6696
+              },
+              "graphshell_web.js": {
+                "sha256": "e6a027fb112c0d3b4b77deaa6ca6beba8ff1164d37ac26778620d80516b6d886",
+                "bytes": 155961
+              },
+              "graphshell_web_bg.wasm": {
+                "sha256": "7f8bd027fab29136278202f6880de94cb6e9ef1c923c714a4eb4a0d5a0cef968",
+                "bytes": 29812664
+              },
+              "graphshell_web_bg.wasm.d.ts": {
+                "sha256": "7bd0f203ed18c117894409dbb47cb9840af3042cd5a2e9c315787c6a55f36e9b",
+                "bytes": 3777
+              }
+            }
+          }
+        },
+        "viewer": {
+          "identity": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-viewer-shipping-frozen4a5099820-identity.json",
+          "identity_sha256": "7dfd73ea52b133a500af2a485fd65f01d04eeda17a158cc77e02f18f148476d0",
+          "evidence": {
+            "schema": "graphshell.sealed-viewer-package/v1",
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+            "shipping_toolchain": "1.99.0",
+            "profile": "viewer",
+            "no_default_features": true,
+            "features": "",
+            "gate": "shared/graphshell-viewer-shipping-frozen4a5099820.json",
+            "metadata_sha256": "f479f4e18e91560ad3d2d02a08022c2593532bb59fa229f952cde9b075d7011f",
+            "raw_wasm_sha256": "126f890c52c9041daeac760094e2b66b09794b68ff5d6c91633483ee587f1309",
+            "wasm_bindgen_sha256": "6ad2f953d8abcb36d6b084df221fb2f0716217854c1b8df938aa2f5678d1b948",
+            "artifacts": {
+              "graphshell_web.d.ts": {
+                "sha256": "c82b67c897e263b20b364aaf5f5143d4bb5ce836d902dcdf4272fad89cb2e194",
+                "bytes": 4511
+              },
+              "graphshell_web.js": {
+                "sha256": "c59abc528fd910f27bdd9a54a3b696db8b66f08ceee60ca178385bb1d40abe08",
+                "bytes": 126880
+              },
+              "graphshell_web_bg.wasm": {
+                "sha256": "c8730eb20de19976938f38b55662f207334edab70fdf4071778295049e6e139c",
+                "bytes": 9251210
+              },
+              "graphshell_web_bg.wasm.d.ts": {
+                "sha256": "0addf3a49fc65e6dcb1ee9f291a4e4ef3f9fd72629425179647d743359baf109",
+                "bytes": 2563
+              },
+              "viewer-delivery.json": {
+                "sha256": "ef6a9511b6ef0da21c22c04a5f551529feb07b26faf3401fea3df55bae9b2d24",
+                "bytes": 1591
+              }
+            },
+            "shipping_delivery_cap_claim": true
+          }
+        },
+        "viewer-gpu": {
+          "identity": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-viewer-gpu-shipping-frozen4a5099820-identity.json",
+          "identity_sha256": "22d2585a305cdd0990a988c72cf63fceaf544e9636af191bd5a7144401b4cc56",
+          "evidence": {
+            "schema": "graphshell.sealed-viewer-package/v1",
+            "source_head": "4a50998205a34693a84076f6d0db4edec5faee38",
+            "tracked_diff_sha256": "c953307aed26f2aa32c364c76c7fbc0d07fbd0875efe8912528b83b404766fb6",
+            "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+            "shipping_toolchain": "1.99.0",
+            "profile": "viewer",
+            "no_default_features": true,
+            "features": "canvas-gpu",
+            "gate": "shared/graphshell-viewer-gpu-shipping-frozen4a5099820.json",
+            "metadata_sha256": "defea713b3c6f701bf683da0961694aa0e5cd91122bff8bb54d2433820681cb3",
+            "raw_wasm_sha256": "3e745032ffe8fd86f619a0424a81d84b01139ac94411575cd96cac8fbfe07dbd",
+            "wasm_bindgen_sha256": "6ad2f953d8abcb36d6b084df221fb2f0716217854c1b8df938aa2f5678d1b948",
+            "artifacts": {
+              "graphshell_web.d.ts": {
+                "sha256": "4e62031f90fe95bc069de32649f2df26f3141456b61317bca4406003207d6bb1",
+                "bytes": 4605
+              },
+              "graphshell_web.js": {
+                "sha256": "70dc7b57b9fc427aadb91b787e07f50712d047a190c13c1cb2246368d6b3af9d",
+                "bytes": 130384
+              },
+              "graphshell_web_bg.wasm": {
+                "sha256": "693edf308644f5aa1d71ca89c5db0e4279395ce9d0762e18b8eb02bc3cc06d01",
+                "bytes": 13750389
+              },
+              "graphshell_web_bg.wasm.d.ts": {
+                "sha256": "6b11e9b7225b40b672ccaefe3feb5c80532e6616f2ba54f95b69df8cd1b79013",
+                "bytes": 2657
+              }
+            },
+            "shipping_delivery_cap_claim": false
+          }
+        }
+      },
+      "canonical_accepted": 0,
+      "wall_status": "fresh strict rerun underway; no full-wall qualification claim",
+      "targeted_face_acceptance": {
+        "status": "bounded original D3 and selected Bare face cases independently qualified at G; full canonical wall remains pending",
+        "source": "4a50998205a34693a84076f6d0db4edec5faee38",
+        "runtime_source": "c51e1913cc52cc161815b97939a46452495747e0",
+        "d3_review": {
+          "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-G-d3-independent-visual-review.json",
+          "sha256": "37656622de5f0a7c40f8eef7fb16e98ec24b1e2038b7e2bd2f2106bd811eabe5"
+        },
+        "selected_bare_review": {
+          "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-G-p4-tree-detail-actions-independent-visual-review.json",
+          "sha256": "85ad2bfdf798e8eec2e9fe4d5c2bcadce08f508c8a69249ba4402501336c1e69"
+        },
+        "scope": "Original scenario source and actual PNG hashes/physical profile/1400x900 Desktop DPR2 package bindings reviewed; no changed assertions or thresholds; no native rebuild claim."
+      }
+    },
+    "bounded_C51_archive_owner_guard_chain": {
+      "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/owner-guard-chain-final-c51.json",
+      "sha256": "3757bccd394b68358d9ebe6e19a3627e022279baa00e63aca8c7d6f1149a02dc",
+      "stages": 7,
+      "readonly_epoch_and_every_durable_byte_unchanged": true,
+      "browser_independent_review": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-archive-final-c51-independent-visual-review.json",
+      "review_sha256": "0aac3454563ebd9fa51bd1d2b4245bace4c7dada1efe024c00f2a1b9b6dd2f70"
+    }
+  },
+  "historical_exact_bytes": {
+    "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/Mere-receipt-before-H-top-level-consolidation.json",
+    "sha256": "3e9d7242b8fa65668a2948f3908b0d982fa199f92fbfb5c6191a951eb99a1451"
+  },
+  "shared_wall": {
+    "status": "First H positive controls batch independently qualified; full wall remains open",
+    "cases": 21,
+    "canonical_total": 164,
+    "remaining": 143,
+    "captures": 43,
+    "new_profiles": 20,
+    "preserved_original_Scene_profile": 1,
+    "geometry": {
+      "wide_2800x1800": 41,
+      "narrow_840x1600": 2
+    },
+    "proofs": {
+      "execution": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/browser-wall-a1309431f-receipts/H01-controls-execution-closure.json",
+        "sha256": "4bd024cd8c917b5256b990a18fbcc0641834d093d99e642bf3b64f2ca8e38503",
+        "bytes": 28906
+      },
+      "independent_original_reviews": {
+        "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/cleromancy-agent-browser-H-canonical01-independent-closure.json",
+        "sha256": "958cef78b72330925a5b549513423c5813816ace1f51d1bfc5447acd2dc28097",
+        "bytes": 56377
+      }
+    },
+    "limits": "Per-case clipping, unmeasured zero GPU/NaN values, slow CPU timing and bounded busy waits retained. Reader planted negatives and all remaining mandatory supplements unexecuted."
+  },
+  "final_resident_disk_reopen": {
+    "status": "Actual clean same-disk H resident restart preserves complete inventories/views; separate warm all45+sentinel guards pass",
+    "new_owner_PID": 98930,
+    "new_owner_exec": 74081,
+    "proof": {
+      "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/native-H-final-resident-disk-reopen/qualification.json",
+      "sha256": "847086c1835c4bee7b5a5747350e31cb2d57afc8f31f641a73200395c6b3c81e",
+      "bytes": 11037
+    },
+    "cold_changes": "Release/startup change archive.redb/reservoir.redb; first cold original guard fails solely on Graphshell epoch8\u219210, verbatim failure retained. No zero-write cold claim or epoch exclusion.",
+    "sessions": 5,
+    "archives": 2,
+    "records": 8,
+    "edges": 6,
+    "warm_shared_files": 45,
+    "sentinel": 1
+  },
+  "documentation_audit": {
+    "path": "/Users/markik/Code/testing/cleromancy/c1-20261013/doc-audit-H-bounded-checkpoint-20261014/comparison.json",
+    "sha256": "f0a48b6a578f23c086bf934b0dbbb9cb59554a7c67dd5e0618a09f9ff0fb6665",
+    "bytes": 883
+  }
+}
