@@ -433,7 +433,7 @@ fn font_scene_receipt(scene: &Scene) -> Result<Value, String> {
         })
         .sum();
     let fonts: Vec<_> = scene.fonts.iter().filter(|font| !font.data.as_ref().is_empty())
-        .map(|font| json!({"bytes":font.data.as_ref().len(),"sha256":format!("{:x}",Sha256::digest(font.data.as_ref()))})).collect();
+        .map(|font| json!({"bytes":font.data.as_ref().len(),"sha256":digest_bytes(font.data.as_ref())})).collect();
     if glyphs == 0 || fonts.is_empty() {
         return Err("actual retained producer contains no shaped glyphs/font resources".into());
     }
@@ -644,9 +644,12 @@ fn adapter_identity(core: &RenderCore) -> Value {
         "source":"actual fixture RenderCore adapter; browser fields may be redacted"})
 }
 fn digest(frame: &Frame) -> String {
+    digest_bytes(&frame.rgba)
+}
+fn digest_bytes(bytes: &[u8]) -> String {
     use std::fmt::Write as _;
     let mut hexadecimal = String::with_capacity(64);
-    for byte in Sha256::digest(&frame.rgba) {
+    for byte in Sha256::digest(bytes) {
         write!(&mut hexadecimal, "{byte:02x}").expect("writing to String cannot fail");
     }
     hexadecimal
