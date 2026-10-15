@@ -2199,6 +2199,7 @@ dependencies = [
  "egui",
  "egui-wgpu",
  "epaint",
+ "genet-document-resources",
  "genet-livery",
  "genet-render",
  "genet-render-host",
