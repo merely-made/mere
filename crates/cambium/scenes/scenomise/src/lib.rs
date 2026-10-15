@@ -33,6 +33,9 @@
 //! dimensionality reduction — the adapter computes it once and discloses it on
 //! the item, rather than shipping source truth for a solver to re-derive.
 
+pub mod arrangement;
+#[cfg(feature = "authoring")]
+pub mod authoring;
 pub mod catalog;
 pub mod facet;
 mod families;

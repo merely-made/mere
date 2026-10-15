@@ -488,6 +488,12 @@ host recipes go to their domains.
 *Done when:* Knot's `recipe/editor.rs` uses the shared helpers and its tests
 pass; Graphshell's editor uses the same; no `chronicle_definition` or
 `default_definition` remains in a shared path.
+*Landed 2026-10-15 on the Mere side:* `scenomise::arrangement` (always on),
+`scenomise::authoring` (feature `authoring`, R1), and Chronicle's recipe in
+`distillery::chronicle_recipe` (Progress). *Held:* Knot's side. Reading
+Knot's `recipe/editor.rs` against the shared helpers showed they are siblings,
+not copies (Progress), so "delete Knot's copies" is a copy decision for Knot's
+owner, not a mechanical step.
 
 **P4. L2, the serving half.** Builds on P1 (the stack crate takes
 `AdmittedEndpointContext`, which `endpoint_catalog` already names). R4 ruled: `graphshell-host`. Needs
@@ -817,3 +823,57 @@ fast-forward of local main; nothing built).**
     `frame_budget` (L7) still wait for a second host. The receipt is open: a
     Woodshed native surface driving the controls with only `canvas` enabled,
     after its repin onto a Mere revision that has them.
+- **2026-10-15 (P3, Mere side, L4 and L4b landed; Knot held):**
+  - `scenomise::arrangement` holds the five option helpers
+    (`arrangement_options`, `arrangement_defaults`, `option_placeholder`,
+    `with_option`, `with_kind`), always compiled, with their four tests.
+  - `scenomise::authoring`, behind the new `authoring` feature (optional
+    `workbench` and `edit-history`), holds the reducer: `ProjectionEditor`,
+    `EditorAction`, `ReduceResult`, `ProjectionPanel`, `COALESCE_WINDOW_MS`,
+    `ProjectionDefinitionSink`, `SaveError`, and the dotted-name `edit_field`
+    adapter, with its sixteen tests. Two deliberate changes: `edit_field` takes
+    the host's `&SolverRegistry` (it had reached for Graphshell's own
+    `practice_compiler`, which a stack crate cannot name), and the panel tile
+    kind is the public `PROJECTION_EDITOR_PANEL_KIND`, now
+    `scenomise.projection-editor.panel` (it was a private
+    `graphshell.projection-editor.panel`; nothing else in the tree, scenarios
+    or receipts names it, and the workbench layout is not persisted). The module
+    re-exports nothing from `scenograph`.
+  - `distillery::chronicle_recipe` holds `chronicle_definition`,
+    `chronicle_era_bands_off_variant` and their constants and three tests;
+    `ports/djinn`'s chronicle receipt host imports it from there.
+  - `ports/graphshell`: `projection_editor.rs` is deleted with no re-export.
+    `initial_projection_draft` (the reference host's starting draft, with its
+    "phyllotaxis.default" recipe) moved to `projection_compile.rs` beside
+    `default_definition`; the other importers (`local_projection`,
+    `host_dataset_view`, `projection_compare`, `projection_dynamics_*`,
+    `practice_disclosure`, `web_practice`, `web_tree/product/projection*`, the
+    `projection_compile_perf` example, `tests/local_projection.rs`) import
+    `scenograph`, `scenomise::arrangement` and `scenomise::authoring` directly.
+    `graphshell-web`'s manifest names `scenograph` and `scenomise` (with
+    `authoring`). `default_definition` (the Woodshed-flavoured practice recipe)
+    stays in `projection_compile.rs`: moving it to Woodshed needs Woodshed to
+    publish the recipe with its dataset, which this pass did not ask of it.
+  - Checks: `graphshell` lib 452 passed (23 fewer than before: the moved
+    tests), `local_projection` and `projection_round_trip` pass,
+    `scenomise` 187 passed with `authoring` and 171 without, `distillery` lib 27
+    passed, `mere` lib 53 passed, the `projection_compile_perf` example and the
+    Djinn chronicle receipt host build, `graphshell-web` checks for wasm32, the
+    boundary script passes.
+  - Knot's helpers are not copies of the shared ones. Its `option_default`
+    says "automatic" for an automatic default and nothing for an empty one
+    where `option_placeholder` says "auto" and "none", and writes
+    `{number} ({words})` differently; `default_description` has no
+    counterpart; `declared_options` over `Family` and `Measure` overlaps
+    `arrangement_options` plus `arrangement_defaults`. Adopting the shared
+    ones changes Knot's copy, so Knot's owner decides it. The earlier claim
+    that Knot duplicates the helpers (finding 3, L4's receipt) was too strong.
+  - Open for Mark: `scenomise` is published (0.0.4) and its `authoring` feature
+    names `edit-history`, which is `publish = false` ("publishing is a separate
+    decision" in its manifest). The next `scenomise` publish needs `edit-history`
+    published, or the feature dropped from the published manifest, the way
+    `mere-curation` was published for forme (SE78).
+  - Turnstone, read from GitHub earlier, imports scenograph types through
+    `graphshell::projection_editor` in `knot_authoring.rs`; at its repin those
+    lines become `scenograph::...`. No other repository on this machine names
+    the module.

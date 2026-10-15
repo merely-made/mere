@@ -11,6 +11,12 @@ readme = "../README.md"
 keywords = ["layout", "projection", "scene", "graph"]
 categories = ["visualization", "algorithms"]
 
+[features]
+# The projection editor's reducer (`authoring`): a draft, its undo history and
+# a panel workbench. It carries state between calls, which the closed-form
+# solvers do not, so a consumer that only places scenes does not take it.
+authoring = ["dep:edit-history", "dep:workbench"]
+
 [dependencies]
 sceno = { version = "0.0.4", path = "../sceno" }
 scenograph = { version = "0.0.4", path = "../scenograph" }
@@ -18,6 +24,8 @@ scenograph = { version = "0.0.4", path = "../scenograph" }
 # config is the opaque `serde_json::Value` the score already carries.
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
+edit-history = { version = "0.1.0", path = "../../edit-history", optional = true }
+workbench = { version = "0.1.0", path = "../../workbench", optional = true }
 
 [dev-dependencies]
 # A composed facet opens as a scenotime snapshot (Scenograph editor plan, S1).

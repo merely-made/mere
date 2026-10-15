@@ -7,33 +7,28 @@
 //! Host-neutral projection authoring state.
 //!
 //! The editor owns a draft and the validation needed to turn it into a
-//! definition. Its panels are ordinary [`workbench::Tile`]s, so Graphshell can
+//! definition. Its panels are ordinary [`workbench::Tile`]s, so a host can
 //! split, stack, and tear them out through the same reusable workspace contract
-//! as another Genet host. It deliberately has no graph, endpoint, or authority
+//! as any other Genet host. It deliberately has no graph, endpoint, or authority
 //! handle. A host supplies [`ProjectionDefinitionSink`] when it elects to
 //! persist a valid definition.
+//!
+//! Behind the `authoring` feature: the editor carries state between calls
+//! (a draft, an undo history, a workbench), which the closed-form solvers do
+//! not, so a consumer that only places scenes does not take it.
 
-pub use scenograph::relationship::{
-    RecipeEdit, RelationshipRecipe, RelationshipRecipeDraft, RelationshipRequirements,
-    RelationshipSnapshot, relationship_recipe,
-};
-use std::collections::BTreeMap;
 use std::mem::{Discriminant, discriminant};
 
 use edit_history::History;
-
-pub use scenograph::options::{OptionDefault, OptionKind, OptionSpec};
-pub use scenograph::{
-    Appearance, Arrangement, AuthoredDefinitionError, AuthoredProjectionDefinition, Channel,
-    DynamicsSlot, Encoding, Interaction, PROJECTION_DEFINITION_VERSION, ProjectionDefinition,
-    ProjectionDraft, ProjectionInputBinding, ProjectionVariant, Provenance, PublicSourceRevision,
-    Reading, RevisionEvidence, RuntimeProjectionBinding, RuntimeSourceBinding, SelectionMode,
-    SourceBinding, ValidationIssue, ValidationSeverity,
+use scenograph::{
+    Appearance, Arrangement, Channel, DynamicsSlot, Encoding, Interaction, ProjectionDefinition,
+    ProjectionDraft, Provenance, Reading, RevisionEvidence, SourceBinding, ValidationIssue,
 };
-use scenomise::catalog::{Family, Measure};
-use scenomise::registry::SolverRegistry;
 use serde::{Deserialize, Serialize};
 use workbench::{ContentSource, Tile, TileEvent, TileId, TileTree, Workbench, WorkbenchOutcome};
+
+use crate::arrangement::with_kind;
+use crate::registry::SolverRegistry;
 
 /// The plain panels a host may expose for projection authoring.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
@@ -85,7 +80,7 @@ impl ProjectionPanel {
         })
     }
 
-    /// Open content-lane id resolved by the Graphshell host.
+    /// Open content-lane id the host resolves to the panel's contents.
     pub const fn content_id(self) -> &'static str {
         match self {
             Self::Source => "source",
@@ -113,7 +108,9 @@ impl ProjectionPanel {
     }
 }
 
-const PROJECTION_EDITOR_PANEL_KIND: &str = "graphshell.projection-editor.panel";
+/// The `ContentSource::Open` kind every editor panel tile carries; the host
+/// resolves it with [`ProjectionPanel::content_id`].
+pub const PROJECTION_EDITOR_PANEL_KIND: &str = "scenomise.projection-editor.panel";
 
 fn projection_editor_workbench() -> Workbench {
     let tabs = ProjectionPanel::ALL
@@ -129,72 +126,6 @@ fn projection_editor_workbench() -> Workbench {
         })
         .collect();
     Workbench::new(TileTree::stack(tabs, 0))
-}
-
-/// Chronicle's stable authored definition id.
-pub const CHRONICLE_DEFINITION_ID: &str = "distillery.chronicle";
-/// The arrangement-owned guide toggle used by Chronicle.
-pub const CHRONICLE_ERA_BANDS_OPTION: &str = "era_bands";
-
-/// Build the one Chronicle recipe used for its named Distillery and Djinn
-/// inputs. The caller supplies source locators and authority-emitted
-/// generations; this authoring seam never acquires either authority.
-pub fn chronicle_definition(
-    sources: BTreeMap<String, ProjectionInputBinding>,
-    author: impl Into<String>,
-    definition_revision: impl Into<String>,
-) -> AuthoredProjectionDefinition {
-    AuthoredProjectionDefinition {
-        dynamics: None,
-        version: PROJECTION_DEFINITION_VERSION,
-        id: CHRONICLE_DEFINITION_ID.to_owned(),
-        label: "Job Chronicle".to_owned(),
-        sources,
-        reading: Reading {
-            kind: "mesh.jobs".to_owned(),
-            key: "job_id".to_owned(),
-            value: Some("state".to_owned()),
-        },
-        encoding: Encoding {
-            x: Channel::Field("observation_tick".to_owned()),
-            y: Channel::Field("lease_epoch".to_owned()),
-            color: Some(Channel::Field("state".to_owned())),
-            label: Some(Channel::Field("job_id".to_owned())),
-        },
-        arrangement: Arrangement {
-            kind: "timeline.default".to_owned(),
-            direction: "observation_tick".to_owned(),
-            spacing: 180,
-            options: BTreeMap::from([(CHRONICLE_ERA_BANDS_OPTION.to_owned(), "true".to_owned())]),
-        },
-        interaction: Interaction::default(),
-        appearance: Appearance {
-            realization: "portable-card".to_owned(),
-            title: "Job Chronicle".to_owned(),
-            theme: "chronicle".to_owned(),
-        },
-        provenance: Provenance {
-            author: author.into(),
-            source_revision: Some(PublicSourceRevision::from(definition_revision.into())),
-            revision_evidence: RevisionEvidence::PublicGeneration,
-            note: "One read-only job-board recipe; source bindings carry authority generation expectations."
-                .to_owned(),
-        },
-    }
-}
-
-/// The Chronicle variant that hides lease-epoch guide bands while preserving
-/// the base definition and every non-arrangement field.
-pub fn chronicle_era_bands_off_variant() -> ProjectionVariant {
-    ProjectionVariant {
-        dynamics: None,
-        definition_id: CHRONICLE_DEFINITION_ID.to_owned(),
-        id: "era-bands-off".to_owned(),
-        arrangement_options: BTreeMap::from([(
-            CHRONICLE_ERA_BANDS_OPTION.to_owned(),
-            "false".to_owned(),
-        )]),
-    }
 }
 
 /// Typed messages understood by the reducer. Hosts can map these to any UI.
@@ -267,7 +198,7 @@ impl ProjectionEditor {
     /// Apply a Workbench gesture without granting graph or persistence authority.
     ///
     /// A valid outside drop is returned as a typed host effect and retains the
-    /// panel until Graphshell accepts tearout custody.
+    /// panel until the host accepts tearout custody.
     pub fn apply_workspace(&mut self, event: &TileEvent) -> WorkbenchOutcome {
         let outcome = self.workspace.apply(event);
         if outcome.changed() {
@@ -458,76 +389,6 @@ fn first_active_panel(tree: &TileTree) -> Option<ProjectionPanel> {
     }
 }
 
-/// The options an arrangement id declares: a built-in family's, else a
-/// registered solver's; `None` when the id names neither (track E5).
-pub fn arrangement_options(kind: &str, registry: &SolverRegistry) -> Option<Vec<OptionSpec>> {
-    Family::resolve(kind).map(Family::options).or_else(|| {
-        registry
-            .resolve(kind)
-            .map(|solver| solver.capability().options)
-    })
-}
-
-/// A built-in family's defaults resolved for these items, by option key;
-/// empty for anything else (SE43).
-pub fn arrangement_defaults(
-    kind: &str,
-    card: sceno::Size2,
-    count: usize,
-    spacing: f32,
-) -> BTreeMap<String, String> {
-    Family::resolve(kind)
-        .map(|family| {
-            family.resolved_defaults(&Measure {
-                largest: card,
-                count,
-                spacing,
-                coordinates: None,
-            })
-        })
-        .unwrap_or_default()
-}
-
-/// What a row shows when its option is left out: the value, "auto", "none",
-/// or a measured default as its number and its words when the items are known.
-pub fn option_placeholder(spec: &OptionSpec, resolved: Option<&str>) -> String {
-    match &spec.default {
-        OptionDefault::Value(value) => value.clone(),
-        OptionDefault::Auto => "auto".to_string(),
-        OptionDefault::Empty => "none".to_string(),
-        OptionDefault::Measured(words) => match resolved {
-            Some(number) => format!("{number} ({words})"),
-            None => words.clone(),
-        },
-    }
-}
-
-/// `arrangement` with `key` set to `value`, or left out when `value` is
-/// blank, so clearing a row returns the option to its default.
-pub fn with_option(arrangement: &Arrangement, key: &str, value: &str) -> Arrangement {
-    let mut next = arrangement.clone();
-    if value.trim().is_empty() {
-        next.options.remove(key);
-    } else {
-        next.options
-            .insert(key.to_string(), value.trim().to_string());
-    }
-    next
-}
-
-/// `arrangement` switched to `kind`, keeping only the options `kind`
-/// declares (SE44); the editor's history can undo the switch. While `kind`
-/// names nothing known (an id being typed), every option is kept.
-pub fn with_kind(arrangement: &Arrangement, kind: &str, registry: &SolverRegistry) -> Arrangement {
-    let mut next = arrangement.clone();
-    next.kind = kind.to_string();
-    if let Some(declared) = arrangement_options(kind, registry) {
-        next.options
-            .retain(|key, _| declared.iter().any(|spec| &spec.key == key));
-    }
-    next
-}
-
 /// Host persistence is the only effect exposed by the editor.
 pub trait ProjectionDefinitionSink {
     type Error;
@@ -541,9 +402,102 @@ pub enum SaveError<E> {
     Sink(E),
 }
 
+impl ProjectionEditor {
+    /// Host-neutral conversion of a field edit to a reducer action.
+    /// Set one draft field by its dotted name, as a form's text box does.
+    /// `registry` is the host's, so switching `arrangement.kind` keeps only the
+    /// options the new arrangement declares, custom solvers included. An unknown
+    /// field changes nothing.
+    pub fn edit_field(
+        &mut self,
+        field: &str,
+        value: &str,
+        now_ms: u64,
+        registry: &SolverRegistry,
+    ) -> Result<(), String> {
+        let mut draft = self.draft().clone();
+        let action = match field {
+            "dynamics.spec" => EditorAction::SetDynamics(if value.trim().is_empty() {
+                None
+            } else {
+                Some(
+                    DynamicsSlot::from_json(1, value).unwrap_or_else(|_| DynamicsSlot {
+                        version: 1,
+                        spec: value.to_string(),
+                    }),
+                )
+            }),
+            "source.authority" => {
+                draft.source.authority = value.to_string();
+                EditorAction::SetSource(draft.source)
+            },
+            "source.domain" => {
+                draft.source.domain = value.to_string();
+                EditorAction::SetSource(draft.source)
+            },
+            "source.resource" => {
+                draft.source.resource = value.to_string();
+                EditorAction::SetSource(draft.source)
+            },
+            "reading.key" => {
+                draft.reading.key = value.to_string();
+                EditorAction::SetReading(draft.reading)
+            },
+            "encoding.x" => {
+                draft.encoding.x = Channel::Field(value.to_string());
+                EditorAction::SetEncoding(draft.encoding)
+            },
+            "encoding.y" => {
+                draft.encoding.y = Channel::Field(value.to_string());
+                EditorAction::SetEncoding(draft.encoding)
+            },
+            "encoding.label" => {
+                draft.encoding.label = Some(Channel::Field(value.to_string()));
+                EditorAction::SetEncoding(draft.encoding)
+            },
+            "arrangement.kind" => {
+                EditorAction::SetArrangement(with_kind(&draft.arrangement, value, registry))
+            },
+            "arrangement.direction" => {
+                draft.arrangement.direction = value.to_string();
+                EditorAction::SetArrangement(draft.arrangement)
+            },
+            "arrangement.spacing" => {
+                draft.arrangement.spacing = value.parse().unwrap_or(0);
+                EditorAction::SetArrangement(draft.arrangement)
+            },
+            "appearance.realization" => {
+                draft.appearance.realization = value.to_string();
+                EditorAction::SetAppearance(draft.appearance)
+            },
+            "appearance.title" => {
+                draft.appearance.title = value.to_string();
+                EditorAction::SetAppearance(draft.appearance)
+            },
+            "provenance.author" => {
+                draft.provenance.author = value.to_string();
+                EditorAction::SetProvenance(draft.provenance)
+            },
+            "provenance.source_revision" => {
+                draft.provenance.source_revision = Some(value.into());
+                draft.provenance.revision_evidence = RevisionEvidence::PublicGeneration;
+                EditorAction::SetProvenance(draft.provenance)
+            },
+            "provenance.note" => {
+                draft.provenance.note = value.to_string();
+                EditorAction::SetProvenance(draft.provenance)
+            },
+            _ => return Err(format!("Unknown projection field: {field}")),
+        };
+        self.reduce(action, now_ms);
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use scenograph::PROJECTION_DEFINITION_VERSION;
     use workbench::{DropTarget, WorkbenchEffect};
 
     #[test]
@@ -568,7 +522,7 @@ mod tests {
         assert_eq!(sink.0.unwrap().dynamics, Some(slot));
     }
 
-    fn valid_draft() -> ProjectionDraft {
+    pub(super) fn valid_draft() -> ProjectionDraft {
         ProjectionDraft {
             dynamics: None,
             version: PROJECTION_DEFINITION_VERSION,
@@ -604,127 +558,6 @@ mod tests {
                 note: "fixture".into(),
             },
         }
-    }
-
-    fn chronicle_sources() -> BTreeMap<String, ProjectionInputBinding> {
-        BTreeMap::from([
-            (
-                "distillery".to_owned(),
-                ProjectionInputBinding {
-                    source: SourceBinding {
-                        authority: "distillery.endpoint".to_owned(),
-                        domain: "mesh.job-board".to_owned(),
-                        resource: "distillery.chronicle".to_owned(),
-                    },
-                    expects_generation: Some("generation:distillery-fixture".into()),
-                    revision_evidence: RevisionEvidence::PublicGeneration,
-                },
-            ),
-            (
-                "djinn".to_owned(),
-                ProjectionInputBinding {
-                    source: SourceBinding {
-                        authority: "djinn.resident".to_owned(),
-                        domain: "mesh.job-board".to_owned(),
-                        resource: "distillery.chronicle".to_owned(),
-                    },
-                    expects_generation: Some("generation:djinn-fixture".into()),
-                    revision_evidence: RevisionEvidence::PublicGeneration,
-                },
-            ),
-        ])
-    }
-
-    #[test]
-    fn every_family_and_a_registered_solver_have_rows() {
-        let empty = SolverRegistry::new();
-        for family in scenomise::catalog::FAMILIES {
-            assert_eq!(
-                arrangement_options(family.id(), &empty),
-                Some(family.options())
-            );
-        }
-        assert_eq!(arrangement_options("nothing.like.it", &empty), None);
-
-        struct Line;
-        impl scenomise::registry::Solver for Line {
-            fn capability(&self) -> scenomise::registry::SolverCapability {
-                let mut capability =
-                    scenomise::registry::SolverCapability::new("test.line", "Line");
-                capability.options = vec![OptionSpec::new(
-                    "step",
-                    "Step",
-                    OptionKind::Positive,
-                    OptionDefault::Value("10".into()),
-                )];
-                capability
-            }
-            fn place(
-                &self,
-                _config: &serde_json::Value,
-                items: &[&sceno::ScoreItem],
-            ) -> Result<Vec<sceno::Vec2>, scenomise::registry::SolveError> {
-                Ok(vec![sceno::Vec2::ZERO; items.len()])
-            }
-        }
-        let mut registry = SolverRegistry::new();
-        registry.register(std::sync::Arc::new(Line)).unwrap();
-        let rows = arrangement_options("test.line", &registry).expect("the solver's rows");
-        assert_eq!(rows.len(), 1);
-        assert_eq!(rows[0].key, "step");
-    }
-
-    #[test]
-    fn placeholders_show_the_default_and_measured_numbers() {
-        let card = sceno::Size2::new(164.0, 68.0);
-        let defaults = arrangement_defaults("grid", card, 9, 16.0);
-        let width = Family::Grid
-            .options()
-            .into_iter()
-            .find(|spec| spec.key == "cell_width")
-            .unwrap();
-        assert_eq!(
-            option_placeholder(&width, defaults.get("cell_width").map(String::as_str)),
-            "164 (the largest item's width)"
-        );
-        assert_eq!(option_placeholder(&width, None), "the largest item's width");
-        let curve = Family::Spiral
-            .options()
-            .into_iter()
-            .find(|s| s.key == "curve")
-            .unwrap();
-        assert_eq!(option_placeholder(&curve, None), "square_root");
-        let depth = Family::LSystem
-            .options()
-            .into_iter()
-            .find(|s| s.key == "depth")
-            .unwrap();
-        assert_eq!(option_placeholder(&depth, None), "auto");
-    }
-
-    #[test]
-    fn switching_arrangement_drops_options_the_new_one_does_not_declare() {
-        let registry = SolverRegistry::new();
-        let grid = with_option(
-            &with_option(&Arrangement::default(), "columns", "3"),
-            "cell_width",
-            "200",
-        );
-        let spiral = with_kind(&grid, "spiral", &registry);
-        assert_eq!(spiral.kind, "spiral");
-        assert!(spiral.options.is_empty());
-        let typing = with_kind(&grid, "gri", &registry);
-        assert_eq!(typing.options, grid.options, "an id being typed keeps them");
-        let back = with_kind(&typing, "grid", &registry);
-        assert_eq!(back.options, grid.options);
-    }
-
-    #[test]
-    fn a_blank_row_returns_the_option_to_its_default() {
-        let set = with_option(&Arrangement::default(), "columns", " 4 ");
-        assert_eq!(set.options.get("columns").map(String::as_str), Some("4"));
-        let cleared = with_option(&set, "columns", "");
-        assert!(cleared.options.is_empty());
     }
 
     fn label(editor: &ProjectionEditor) -> &str {
@@ -937,244 +770,25 @@ mod tests {
         assert!(matches!(error, SaveError::Invalid(_)));
         assert!(sink.saved.is_empty());
     }
-
-    #[test]
-    fn chronicle_is_one_recipe_bound_to_two_checkable_sources() {
-        let authored = chronicle_definition(
-            chronicle_sources(),
-            "Distillery W2",
-            "chronicle-definition-v1",
-        );
-        authored.validate().expect("complete authored definition");
-        let distillery = authored.bind("distillery", None).expect("distillery bind");
-        let djinn = authored.bind("djinn", None).expect("djinn bind");
-
-        assert_eq!(authored.id, CHRONICLE_DEFINITION_ID);
-        assert_eq!(distillery.id, authored.id);
-        assert_eq!(djinn.id, authored.id);
-        assert_ne!(distillery.source, djinn.source);
-        assert_eq!(distillery.reading, djinn.reading);
-        assert_eq!(distillery.encoding, djinn.encoding);
-        assert_eq!(distillery.arrangement, djinn.arrangement);
-        assert_eq!(distillery.interaction, djinn.interaction);
-        assert_eq!(distillery.appearance, djinn.appearance);
-        assert_eq!(
-            distillery.provenance.source_revision,
-            Some(PublicSourceRevision::from("generation:distillery-fixture"))
-        );
-        assert_eq!(
-            djinn.provenance.source_revision,
-            Some(PublicSourceRevision::from("generation:djinn-fixture"))
-        );
-
-        let first = authored.to_json_bytes().expect("authoring bytes");
-        let second = authored.to_json_bytes().expect("authoring bytes");
-        assert_eq!(first, second);
-        assert_eq!(
-            serde_json::from_slice::<AuthoredProjectionDefinition>(&first).expect("authoring wire"),
-            authored
-        );
-    }
-
-    #[test]
-    fn chronicle_era_bands_off_is_a_variant_not_another_recipe() {
-        let authored = chronicle_definition(
-            chronicle_sources(),
-            "Distillery W2",
-            "chronicle-definition-v1",
-        );
-        let base = authored.bind("distillery", None).expect("base bind");
-        let variant = chronicle_era_bands_off_variant();
-        let without_bands = authored
-            .bind("distillery", Some(&variant))
-            .expect("variant bind");
-
-        assert_eq!(variant.definition_id, authored.id);
-        assert_eq!(base.id, without_bands.id);
-        assert_eq!(base.source, without_bands.source);
-        assert_eq!(base.reading, without_bands.reading);
-        assert_eq!(base.encoding, without_bands.encoding);
-        assert_eq!(base.interaction, without_bands.interaction);
-        assert_eq!(base.appearance, without_bands.appearance);
-        assert_eq!(base.provenance, without_bands.provenance);
-        assert_eq!(
-            base.arrangement.options.get(CHRONICLE_ERA_BANDS_OPTION),
-            Some(&"true".to_owned())
-        );
-        assert_eq!(
-            without_bands
-                .arrangement
-                .options
-                .get(CHRONICLE_ERA_BANDS_OPTION),
-            Some(&"false".to_owned())
-        );
-    }
-
-    #[test]
-    fn authored_definition_refuses_a_variant_for_another_recipe() {
-        let authored = chronicle_definition(
-            chronicle_sources(),
-            "Distillery W2",
-            "chronicle-definition-v1",
-        );
-        let variant = ProjectionVariant {
-            dynamics: None,
-            definition_id: "other.recipe".to_owned(),
-            id: "era-bands-off".to_owned(),
-            arrangement_options: BTreeMap::new(),
-        };
-        assert_eq!(
-            authored.bind("distillery", Some(&variant)),
-            Err(AuthoredDefinitionError::VariantForAnotherDefinition(
-                "other.recipe".to_owned()
-            ))
-        );
-    }
-}
-
-pub fn initial_projection_draft() -> ProjectionDraft {
-    ProjectionDraft {
-        dynamics: None,
-        version: PROJECTION_DEFINITION_VERSION,
-        id: "graphshell-reference".to_string(),
-        label: "Graphshell reference projection".to_string(),
-        source: SourceBinding {
-            authority: "graphshell-reference-host".to_string(),
-            domain: "mere.graph".to_string(),
-            resource: "fixture.graphshell/reference".to_string(),
-        },
-        reading: Reading {
-            kind: "nodes".to_string(),
-            key: "title".to_string(),
-            value: None,
-        },
-        encoding: Encoding {
-            x: Channel::Field("x".to_string()),
-            y: Channel::Field("y".to_string()),
-            color: Some(Channel::Field("kind".to_string())),
-            label: Some(Channel::Field("title".to_string())),
-        },
-        arrangement: Arrangement {
-            kind: "phyllotaxis.default".to_string(),
-            direction: "horizontal".to_string(),
-            spacing: 16,
-            options: Default::default(),
-        },
-        interaction: Interaction {
-            selection: SelectionMode::Single,
-            pan: true,
-            zoom: true,
-        },
-        appearance: Appearance {
-            realization: "canvas".to_string(),
-            title: "Graphshell reference projection".to_string(),
-            theme: "dark".to_string(),
-        },
-        provenance: Provenance {
-            author: "Graphshell reference host".to_string(),
-            source_revision: Some("fixture-v1".into()),
-            revision_evidence: RevisionEvidence::PublicGeneration,
-            note: "Host-owned editor fixture".to_string(),
-        },
-    }
-}
-
-impl ProjectionEditor {
-    /// Host-neutral conversion of a field edit to a reducer action.
-    pub fn edit_field(&mut self, field: &str, value: &str, now_ms: u64) -> Result<(), String> {
-        let mut draft = self.draft().clone();
-        let action = match field {
-            "dynamics.spec" => EditorAction::SetDynamics(if value.trim().is_empty() {
-                None
-            } else {
-                Some(
-                    DynamicsSlot::from_json(1, value).unwrap_or_else(|_| DynamicsSlot {
-                        version: 1,
-                        spec: value.to_string(),
-                    }),
-                )
-            }),
-            "source.authority" => {
-                draft.source.authority = value.to_string();
-                EditorAction::SetSource(draft.source)
-            },
-            "source.domain" => {
-                draft.source.domain = value.to_string();
-                EditorAction::SetSource(draft.source)
-            },
-            "source.resource" => {
-                draft.source.resource = value.to_string();
-                EditorAction::SetSource(draft.source)
-            },
-            "reading.key" => {
-                draft.reading.key = value.to_string();
-                EditorAction::SetReading(draft.reading)
-            },
-            "encoding.x" => {
-                draft.encoding.x = Channel::Field(value.to_string());
-                EditorAction::SetEncoding(draft.encoding)
-            },
-            "encoding.y" => {
-                draft.encoding.y = Channel::Field(value.to_string());
-                EditorAction::SetEncoding(draft.encoding)
-            },
-            "encoding.label" => {
-                draft.encoding.label = Some(Channel::Field(value.to_string()));
-                EditorAction::SetEncoding(draft.encoding)
-            },
-            "arrangement.kind" => {
-                EditorAction::SetArrangement(crate::projection_editor::with_kind(
-                    &draft.arrangement,
-                    value,
-                    crate::projection_compile::practice_compiler().registry(),
-                ))
-            },
-            "arrangement.direction" => {
-                draft.arrangement.direction = value.to_string();
-                EditorAction::SetArrangement(draft.arrangement)
-            },
-            "arrangement.spacing" => {
-                draft.arrangement.spacing = value.parse().unwrap_or(0);
-                EditorAction::SetArrangement(draft.arrangement)
-            },
-            "appearance.realization" => {
-                draft.appearance.realization = value.to_string();
-                EditorAction::SetAppearance(draft.appearance)
-            },
-            "appearance.title" => {
-                draft.appearance.title = value.to_string();
-                EditorAction::SetAppearance(draft.appearance)
-            },
-            "provenance.author" => {
-                draft.provenance.author = value.to_string();
-                EditorAction::SetProvenance(draft.provenance)
-            },
-            "provenance.source_revision" => {
-                draft.provenance.source_revision = Some(value.into());
-                draft.provenance.revision_evidence = RevisionEvidence::PublicGeneration;
-                EditorAction::SetProvenance(draft.provenance)
-            },
-            "provenance.note" => {
-                draft.provenance.note = value.to_string();
-                EditorAction::SetProvenance(draft.provenance)
-            },
-            _ => return Err(format!("Unknown projection field: {field}")),
-        };
-        self.reduce(action, now_ms);
-        Ok(())
-    }
 }
 
 #[cfg(test)]
 mod field_adapter_tests {
+    use super::tests::valid_draft;
     use super::*;
+    use crate::arrangement::with_option;
 
     #[test]
     fn field_edit_uses_the_draft_history_and_rejects_unknown_fields_atomically() {
-        let mut editor = ProjectionEditor::new(initial_projection_draft());
+        let mut editor = ProjectionEditor::new(valid_draft());
         let original = editor.draft().clone();
         editor
-            .edit_field("appearance.title", "Retained title", 1)
+            .edit_field(
+                "appearance.title",
+                "Retained title",
+                1,
+                &SolverRegistry::new(),
+            )
             .unwrap();
         assert_eq!(editor.draft().appearance.title, "Retained title");
         assert!(editor.undo());
@@ -1182,7 +796,7 @@ mod field_adapter_tests {
         let before = editor.draft().clone();
         assert!(
             editor
-                .edit_field("appearance.unknown", "ignored", 2)
+                .edit_field("appearance.unknown", "ignored", 2, &SolverRegistry::new())
                 .is_err()
         );
         assert_eq!(editor.draft(), &before);
@@ -1190,9 +804,11 @@ mod field_adapter_tests {
 
     #[test]
     fn dynamics_field_preserves_slot_history_and_refuses_invalid_json() {
-        let mut editor = ProjectionEditor::new(initial_projection_draft());
+        let mut editor = ProjectionEditor::new(valid_draft());
         let json = r#"{"root":{"preset":"spring.rapier"}}"#;
-        editor.edit_field("dynamics.spec", json, 1).unwrap();
+        editor
+            .edit_field("dynamics.spec", json, 1, &SolverRegistry::new())
+            .unwrap();
         let slot = editor.draft().dynamics.clone();
         assert_eq!(slot, Some(DynamicsSlot::from_json(1, json).unwrap()));
         assert!(editor.undo());
@@ -1201,12 +817,14 @@ mod field_adapter_tests {
         assert_eq!(editor.draft().dynamics, slot);
         editor.break_run();
         editor
-            .edit_field("dynamics.spec", "not JSON", 1000)
+            .edit_field("dynamics.spec", "not JSON", 1000, &SolverRegistry::new())
             .unwrap();
         assert_eq!(editor.draft().dynamics.as_ref().unwrap().spec, "not JSON");
         assert!(editor.draft().to_definition().is_err());
         editor.break_run();
-        editor.edit_field("dynamics.spec", "", 2000).unwrap();
+        editor
+            .edit_field("dynamics.spec", "", 2000, &SolverRegistry::new())
+            .unwrap();
         assert_eq!(editor.draft().dynamics, None);
         assert!(editor.undo());
         assert!(editor.draft().to_definition().is_err());
@@ -1214,17 +832,22 @@ mod field_adapter_tests {
 
     #[test]
     fn arrangement_field_switch_uses_declared_options_and_invalid_input_stays_refused() {
-        let mut editor = ProjectionEditor::new(initial_projection_draft());
+        let mut editor = ProjectionEditor::new(valid_draft());
         editor.reduce(
             EditorAction::SetArrangement(with_option(&editor.draft().arrangement, "columns", "3")),
             1,
         );
         editor
-            .edit_field("arrangement.kind", "spiral", 1000)
+            .edit_field("arrangement.kind", "spiral", 1000, &SolverRegistry::new())
             .unwrap();
         assert!(!editor.draft().arrangement.options.contains_key("columns"));
         editor
-            .edit_field("arrangement.spacing", "not a number", 2000)
+            .edit_field(
+                "arrangement.spacing",
+                "not a number",
+                2000,
+                &SolverRegistry::new(),
+            )
             .unwrap();
         assert!(editor.draft().to_definition().is_err());
     }

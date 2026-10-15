@@ -46,6 +46,7 @@
 
 mod authority;
 mod chronicle;
+pub mod chronicle_recipe;
 
 #[cfg(feature = "flora")]
 pub mod flora;
