@@ -1372,4 +1372,26 @@ fast-forward of local main; nothing built).**
   blocks either; `scenomise` also needs `workbench` published, and `cambium`
   has other dependencies this entry did not check. Publishing either is Mark's
   call.
+- **2026-10-15 (publishing scope for `scenomise` and `cambium`; read from crates.io
+  and the published tarballs, nothing published or changed):** `workbench` is on
+  crates.io only as 0.0.1; the local 0.1.0 has byte-identical `src`, so it is a
+  plain publish of 0.1.0. More generally, a crate's local version often equals the
+  published one while its source differs, so each of those needs a version bump
+  before it can go up (a published version cannot be replaced). Drift of source
+  from the published tarball, counting changed lines ignoring whitespace:
+  `sceno` 0.0.4 (328), `scenomise` 0.0.4 (406), `mere-curation` 0.1.0 (19: a
+  `SubgraphKind::Sparql` variant, so a 0.x minor bump), `tinct` 0.1.2 (280),
+  `sprigging` 0.2.1 (291), `illume` 0.0.2 (74), `cambium` 0.3.3 (about 6,000).
+  Local versions never published: `scenograph` 0.0.4 (crates.io has 0.0.3),
+  `meristem` 0.2.0 (has 0.1.1), `mere-surface-api` 0.1.0 (absent), `workbench`
+  0.1.0. Order for `scenomise` with `authoring`: `workbench` 0.1.0; `mere-curation`
+  0.2.0; `sceno` 0.0.5 (its dependents' version requirements in the workspace move
+  with it); `scenograph` 0.0.4; `scenomise` 0.0.5; `backstep` is already up. For
+  `cambium`, past that: `meristem` 0.2.0, `tinct`, `sprigging`, `illume` and
+  `mere-surface-api` (publishable once `workbench` is up), and two blockers that are
+  not version bumps: `command-menu` is still `publish = false` (unclaimed name,
+  SE13 and SE46, so it wants Mark's naming call) and `genet-text`, which current
+  Cambium needs and which is not on crates.io (the published Cambium 0.3.3 did not
+  use it; the Genet repository owns that decision). `genet-scripted-dom` `=0.1.2`
+  and `layout-dom-api` `=0.1.1` are published at the versions Cambium names.
 
