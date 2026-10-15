@@ -1,8 +1,8 @@
 # Link model: assertions are the truth, links are readings
 
 **Date:** 2026-10-15
-**Status:** design with a bounded P1 implementation and independent P5 CPU
-probe in progress; phase acceptance remains open. Mark ruled L1–L4 on
+**Status:** design with a bounded-tested P1 first slice and independent P5
+CPU probe; phase acceptance remains open. Mark ruled L1–L4 on
 2026-10-15 and L5–L6
 (formerly O2 and O3) later the same day (§4). It was amended the same day after
 an implementing agent's review (§11): the phases are reordered, source and

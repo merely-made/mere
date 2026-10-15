@@ -1,9 +1,9 @@
 # Link model: bounded shared reading and responsive-path probe
 
 **Date:** 2026-10-15
-**Status:** in progress. Mark authorized orchestration with cheaper subagents.
-P1 implementation and an independent P5 fixture probe are the first slice;
-neither phase is complete. The source baseline is `d4d2f88c4`.
+**Status:** in progress. The bounded P1 reading and independent P5 CPU probe
+are implemented and bounded-tested; phase acceptance remains open. Work began at `d4d2f88c4`; the combined source
+commit `339a86c9e` is based on published `39035965a` after renderer adoption.
 
 ## Authority and scope
 
@@ -89,8 +89,8 @@ repeated broad builds while the shared API is moving. Recheck the exact
 combined source after integration and record failures as well as passes.
 
 Before commits, compare documentation audits against the pre-edit revision.
-The baseline judgment ledger already has 13 missing records and a snapshot
-digest mismatch; this plan adds a covered record without relabeling that debt
+The initial judgment ledger had 13 missing records and a snapshot digest
+mismatch. The updated upstream baseline `39035965a` has 14 missing records; this plan adds a covered record without relabeling that debt
 as a passing global gate. Publish source and receipts with exact revisions;
 keep fixture, package, host, native and persistence claims separate.
 
@@ -151,3 +151,52 @@ keep fixture, package, host, native and persistence claims separate.
   flow and vortex path samples for field-only, compatible-only and combined
   response. This is CPU fixture evidence; it does not establish P5's visual
   or integrated Graphshell acceptance.
+
+- **2026-10-15, integration setup:** the P1-focused checks passed Scenograph
+  **2/2**, shared-reader **2/2** and Pictograph topology **8/8**. The first
+  Graphshell web-feature test compile exposed two existing sibling Woodshed
+  fixture includes unavailable in the worktree layout, plus a test macro
+  import removed with the old grouping helper. The macro import is restored
+  under `cfg(test)`. The final run uses the existing Woodshed fixture via a
+  temporary sibling-repository symlink; it does not alter fixture bytes.
+  The first combined offline check then stopped at the uncached newly pinned
+  Genet revision. `cargo fetch --locked --target aarch64-apple-darwin`
+  populated the cache before the final offline checks. Neither setup failure
+  is recorded as a test pass.
+
+## Combined check receipt and next review
+
+The [compact check receipt](../../../support/receipts/link-model-20261015/checks.json)
+pins source commit `339a86c9e52dcd7985c364ae7ff569fa88cc54e9`, upstream
+`39035965aa5c98c368eff58bc404e9d150034e04`, each changed Rust source's
+SHA-256, the lockfile and the unchanged sibling fixture. The final commands
+ran locked/offline with one build job and the isolated P1 target.
+
+| Check | Command after the common `cargo` prefix | Result |
+|---|---|---|
+| Core library suites | `test --locked --offline -j 1 -p mere-kernel -p mere-linked-data -p scenograph -p numen --lib` | Kernel 431, linked-data 75, Scenograph 27, Numen 65 passed |
+| Pictograph canvas library | `test --locked --offline -j 1 -p pictograph --features canvas --lib` | 448 passed; 18 existing release/probe tests ignored |
+| Graphshell link inspection, host CPU with web feature | `test --locked --offline -j 1 -p graphshell --no-default-features --features web --lib link_inspection` | 10 passed; 287 unrelated tests filtered |
+| Responsive path example | `run --locked --offline -j 1 -p numen --example responsive_paths` | exited successfully; all nine field/compatibility configurations printed |
+
+These are **1,056 passing tests** across the named suites. New and substantive
+changed Rust files pass scoped formatting checks. Scenograph's root module
+and Pictograph's canvas module retain their pre-existing formatting debt;
+each differs from the baseline only by its intended module declaration.
+
+The first slice is implemented and bounded-tested. Phase acceptance remains
+open for receiving-host review: supply verified source binding/revision
+through the reader and Graphshell entry point, exercise the ordinary consumer
+inspection flows, and keep P5's real-link adapter and capture comparison
+separate. P2's pending assertion/evidence choice is not treated as ruled.
+No new snapshot format, withdrawal state, opened-link layout or fan retirement
+is claimed by this delivery.
+
+Documentation audits against upstream `39035965a` add one indexed and covered
+plan, with **no new finding** in any active-doc audit category. Active/indexed
+counts move **284/283 → 285/284**; judgment coverage moves
+**270/284 → 271/285**. The judgment command still exits 1 for the same 14
+uncovered upstream documents and snapshot digest mismatch. The 16 broken
+relative links, 151 missing known-root paths, six stale historical annotations
+and 61 unheaded owned sources are unchanged baseline debt, not passing global
+gates. `git diff --check` passes for this delivery.
