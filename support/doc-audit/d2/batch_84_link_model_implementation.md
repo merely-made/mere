@@ -28,7 +28,7 @@ behavior and source binding before declaring wider acceptance.
 
 Checked the baseline revision, existing semantic statement IDs/reifiers,
 Pictograph's kernel/scenograph dependency seam and Numen's path declarations.
-The combined receipt records 1,056 passing tests, 18 existing Pictograph
+The combined receipt records 1,066 passing tests at `4f4678522`, 18 existing Pictograph
 release/probe tests ignored, and a passing responsive-path example. The
 active-doc audit adds no finding; judgment errors match upstream exactly.
 The existing global judgment-ledger gaps remain outside this new record.
