@@ -1153,3 +1153,12 @@ fast-forward of local main; nothing built).**
   and knot-site pass, 624 tests. Mere's `knot-editor`, `knot-document` and
   Djinn's `knot-site` rows move to `b0feec9`; `cargo tree -p djinn` names no
   package from `mere.git`, and Djinn's tests pass (180 passed, 11 ignored).
+- **2026-10-15 (P4, Turnstone):** Turnstone `667ba6a` (on `origin/main`) is
+  on Knot `b0feec9` and Mere `71761a553`, one Mere source (all 300 Mere
+  packages in its tree at that revision). Its place projection host and place
+  lanes take admission, the carrier, dialling, the catalog and the projection
+  host from `graphshell-host` (`native`); `graphshell` stays for `view` and
+  `sessions`. Its `edit-history` patch row is `backstep`. `cargo check
+  --all-targets` and `cargo test` pass (942 passed, 10 ignored,
+  `TMPDIR=/tmp`). Still open for P4: Cleromancy's receipt (it pins
+  `graphshell` at `a1309431` and was not touched here).
