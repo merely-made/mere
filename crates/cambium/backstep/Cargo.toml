@@ -10,10 +10,8 @@ license = "MPL-2.0"
 repository.workspace = true
 keywords = ["undo", "redo", "history", "editor"]
 categories = ["gui", "data-structures"]
-# Renamed from `edit-history` on 2026-10-15 (Mark); `backstep` is free on
-# crates.io. Publishable (description, license, repository, no path-only
-# dependencies), but publishing is a separate decision.
-publish = false
+# Renamed from `edit-history` on 2026-10-15 (Mark), who then cleared it for
+# publishing; `backstep` was free on crates.io at that date. No dependencies.
 
 [lib]
 name = "backstep"
