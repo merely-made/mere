@@ -31,7 +31,7 @@ use sceno::{
 };
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 
-use crate::identity_projection::{
+use crate::door::identity_projection::{
     IdentityProjectionAction, SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT,
     SIGNING_DENY_INTENT, project_identity,
 };
@@ -41,9 +41,11 @@ use graphshell_endpoint::door::identity::IdentitySurfaceSnapshot;
 /// the secret-free snapshot the cards project, and typed intents applied
 /// back.
 ///
-/// Djinn's `ResidentIdentity` (its doors' authority, stack lift plan P5)
-/// extends this with door keys, native actions and custody; the endpoint
-/// needs only these two, so it stays in this port without naming Djinn.
+/// [`crate::door::resident_identity::ResidentIdentity`] (the doors'
+/// authority) extends this with door keys, native actions and custody; the
+/// endpoint needs only these two, so its tests can stand up an authority with
+/// no keys. It was Graphshell's until the endpoint moved here with the stack
+/// lift plan's P5.
 pub trait IdentityAuthority: Send + Sync + 'static {
     /// The secret-free read model the identity cards project.
     fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot>;
@@ -705,10 +707,170 @@ mod tests {
 
     use super::test_support::{FixedIdentity, fixed_snapshot};
     use super::*;
-    use crate::identity_projection::{
+    use crate::door::identity_projection::{
         GenerateSshKeyIntentV1, SSH_GENERATE_INTENT, SshUnlockPolicyIntentV1,
     };
     use graphshell_endpoint::door::identity::{ProfileView, SshKeyView};
+
+    /// The identity projection Graphshell's `app` test pins into a scene and
+    /// reopens (`h4_exportable_identity_cards_and_access_survive_scene_reopen_as_projections`):
+    /// a keeper with one profile, one leased device, its grant and one signing
+    /// record, after an unconfirmed revocation is refused and a confirmed one
+    /// reaches the authority. The endpoint is Djinn's and Graphshell cannot
+    /// depend on Djinn, so the port reads this projection from its committed
+    /// fixture, and this test fails when the endpoint's output drifts from
+    /// it. `DJINN_WRITE_IDENTITY_CARDS_FIXTURE=1` rewrites the fixture.
+    #[test]
+    fn graphshells_identity_cards_fixture_is_this_endpoints_projection() {
+        use crate::door::identity_projection::{DEVICE_REVOKE_INTENT, RevokeDeviceIntentV1};
+        use chirograph::{IntentInvocation, ResourceRequest};
+        use graphshell_endpoint::door::identity::{DeviceGrantView, DeviceView};
+        use personae::signing::{
+            ApprovalSource, SigningPolicy, SigningRecord, SigningRecordResult, SigningRequest,
+        };
+
+        // The public read model a keeper with one profile, one leased device,
+        // its grant and one signing record shows. The keeper itself (wallet,
+        // agent, revocation) is djinn's to exercise; this test is about the
+        // cards surviving a scene reopen as projections.
+        let device_id = uuid::Uuid::from_u128(0x45);
+        let mut fixed = fixed_snapshot();
+        fixed.profiles.push(ProfileView {
+            id: "mixed-scene".to_string(),
+            display_name: "Mixed scene".to_string(),
+            selected: true,
+            slot_count: 1,
+            master_public_fingerprint: "fixture".to_string(),
+        });
+        fixed.carry.devices.push(DeviceView {
+            device_id: device_id.to_string(),
+            label: "Pocket relay".to_string(),
+            mode: "remote-auth".to_string(),
+            exposure: "hidden-client".to_string(),
+            public_key_fingerprint: "fixture".to_string(),
+            revoked: false,
+            grant_ref: Some("grant-ref".to_string()),
+        });
+        fixed.carry.grants.push(DeviceGrantView {
+            device_id: device_id.to_string(),
+            grant_ref: Some("grant-ref".to_string()),
+            signature_valid: Some(true),
+            issued_at_ms: 1_700_000_000_000,
+            expires_at_ms: Some(1_800_000_000_000),
+            personas: vec!["default".to_string()],
+            scopes: vec!["identity.act".to_string()],
+            attenuations: vec!["no-subdelegation".to_string()],
+            wrapped_epoch_count: 0,
+        });
+        let mut request = SigningRequest::new(
+            "mixed-scene",
+            "SHA256:mixed-scene-key",
+            "ssh.sign",
+            b"graphshell mixed scene",
+            "ssh-agent",
+        );
+        // Fixed, so the committed fixture is the same bytes on every run.
+        request.request_id = uuid::Uuid::from_u128(0x5167_0001);
+        fixed.signing_history.push(SigningRecord {
+            request,
+            policy: SigningPolicy::Session,
+            approval_source: Some(ApprovalSource::SessionPolicy),
+            result: SigningRecordResult::Signed {
+                signature_ref: "sig-1".to_string(),
+            },
+            completed_at_ms: 1_700_000_000_500,
+        });
+        let authority = FixedIdentity::with_snapshot(fixed);
+
+        let mut endpoint = IdentityEndpoint::new(authority);
+        let before = endpoint
+            .snapshot(endpoint.request())
+            .expect("identity projection before revocation");
+        let device_source = format!("identity:device:{device_id}");
+        let device_instance = before
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .find_map(|(instance, item)| {
+                before.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .filter(|source| source.id == device_source)
+                    .map(|_| instance)
+            })
+            .expect("projected device");
+        let unconfirmed = endpoint
+            .invoke(IntentInvocation {
+                session: before.session.clone(),
+                target: device_instance,
+                observed_epoch: before.scene.epoch,
+                observed_revision: before.scene.revision,
+                intent: DEVICE_REVOKE_INTENT.to_string(),
+                payload: serde_json::to_vec(&RevokeDeviceIntentV1 {
+                    device_id,
+                    confirmed: false,
+                })
+                .unwrap(),
+            })
+            .expect("bounded rejection");
+        assert!(matches!(unconfirmed, IntentResult::Rejected { .. }));
+        let revoked = endpoint
+            .invoke(IntentInvocation {
+                session: before.session,
+                target: device_instance,
+                observed_epoch: before.scene.epoch,
+                observed_revision: before.scene.revision,
+                intent: DEVICE_REVOKE_INTENT.to_string(),
+                payload: serde_json::to_vec(&RevokeDeviceIntentV1 {
+                    device_id,
+                    confirmed: true,
+                })
+                .unwrap(),
+            })
+            .expect("typed revocation");
+        assert_eq!(revoked, IntentResult::Accepted);
+        assert!(
+            endpoint
+                .host()
+                .intents
+                .lock()
+                .unwrap()
+                .contains(&DEVICE_REVOKE_INTENT.to_string()),
+            "the revocation reached the resident authority, the mutation authority"
+        );
+
+        let snapshot = endpoint
+            .snapshot(endpoint.request())
+            .expect("identity projection after revocation");
+        assert_eq!(snapshot.cache_policy.retention, CacheRetention::Exportable);
+        let resources = snapshot
+            .presentation
+            .offers
+            .values()
+            .flatten()
+            .map(|offer| {
+                endpoint
+                    .resource(ResourceRequest {
+                        session: snapshot.session.clone(),
+                        resource: offer.resource,
+                    })
+                    .expect("identity card resource")
+            })
+            .collect::<Vec<_>>();
+        let fixture = serde_json::json!({ "snapshot": snapshot, "resources": resources });
+        let rendered = format!("{}\n", serde_json::to_string_pretty(&fixture).unwrap());
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../graphshell/tests/fixtures/identity_cards.json");
+        if std::env::var_os("DJINN_WRITE_IDENTITY_CARDS_FIXTURE").is_some() {
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            std::fs::write(&path, &rendered).unwrap();
+        }
+        let committed = std::fs::read_to_string(&path).unwrap_or_default();
+        assert!(
+            committed == rendered,
+            "Graphshell's identity cards fixture drifted from this endpoint's projection; \
+             rerun with DJINN_WRITE_IDENTITY_CARDS_FIXTURE=1 and commit the fixture"
+        );
+    }
 
     /// Content a card names but nothing staged is read through to the store.
     /// This is what lets a receipt's captures be opened without holding every

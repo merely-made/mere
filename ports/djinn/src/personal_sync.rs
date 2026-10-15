@@ -16,6 +16,7 @@ use std::sync::Arc;
 use personae::{IdentityProvider, ProfileId};
 
 use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
+use crate::door::identity_endpoint::TransferDecision;
 use crate::resident_blobs::{LEGACY_PERSONAL_LEASE, LegacyBlobMigration, ResidentBlobCustody};
 use crate::resident_devices::DeviceDirectorySource;
 use crate::settings::{
@@ -25,7 +26,6 @@ use crate::sync::personal_sync_host::{
     PersonalSyncHost, PersonalSyncHostConfig, PersonalSyncHostError,
 };
 use crate::sync::transfer_staging::{receive_transfer, released_blobs_for};
-use graphshell::identity_endpoint::TransferDecision;
 use graphshell::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
 
 const PERSONAL_GRAPH_DOMAIN: &[u8] = b"mere.graphshell/personal-graph/v1";

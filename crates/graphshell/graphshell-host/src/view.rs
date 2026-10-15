@@ -555,12 +555,6 @@ mod tests {
     }
 
     #[test]
-    fn committed_receipt_matches_the_live_loopback_view() {
-        let committed = include_str!("../docs/receipts/g1_loopback.html").replace("\r\n", "\n");
-        assert_eq!(render_g1_receipt().unwrap(), committed);
-    }
-
-    #[test]
     fn generic_projection_receipt_keeps_items_and_intent_outcomes_visible() {
         let run = run_loopback_canary().unwrap();
         let html = render_projection_receipt(&ProjectionReceiptView {

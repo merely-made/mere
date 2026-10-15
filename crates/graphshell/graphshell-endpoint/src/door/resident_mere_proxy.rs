@@ -7,17 +7,23 @@
 //! Carrier-only bridge to an already admitted resident mere. Browser admission
 //! happens before its host constructs this endpoint; browsers cannot choose an
 //! application, persona, route, store or alternate authority through it.
+//!
+//! An endpoint whose verbs forward over the application door
+//! ([`crate::door::app_client::AppBrokerClient`]), so it is the door's client
+//! side: a host composes it into its own catalog. It was Graphshell's
+//! `native::resident_mere_proxy`, then briefly Djinn's, until Mark's ruling
+//! after the stack lift plan's P5 put it here.
 
+use crate::door::app_admission::{AppId, AppRouteId};
+use crate::door::app_client::AppBrokerClient;
+use crate::{
+    IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
+    ResumableProjectionSource,
+};
 use chirograph::{
     CarrierNotice, CarrierRequestBody, CarrierResponseBody, EndpointDescriptor, IntentInvocation,
     IntentResult, ProjectionRequest, ProjectionSnapshot, ResourceChunkRequest,
     ResourceChunkResponse, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
-};
-use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::app_client::AppBrokerClient;
-use graphshell_endpoint::{
-    IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
-    ResumableProjectionSource,
 };
 use std::sync::mpsc::{self, Sender};
 use std::thread::JoinHandle;

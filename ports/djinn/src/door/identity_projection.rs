@@ -9,13 +9,13 @@
 //!
 //! The cards are portable resources. Actions carry only public, typed fields;
 //! authorization and all private key handling stay with the resident
-//! authority behind [`crate::identity_endpoint::IdentityAuthority`] (Djinn's
-//! `ResidentIdentity`).
+//! authority behind [`crate::door::identity_endpoint::IdentityAuthority`]
+//! (the doors' `ResidentIdentity`).
 //!
-//! Home again since the dramatis repo plan's DR-C (ruling D15): the cards
-//! lived in castellan from the keeper founding (2026-08-14), but they are a
-//! pure function of the secret-free snapshot, and Graphshell no longer names
-//! castellan. The intent names and their typed payloads live in
+//! The cards lived in castellan from the keeper founding (2026-08-14), came
+//! home to Graphshell with the dramatis repo plan's DR-C (ruling D15), since
+//! they are a pure function of the secret-free snapshot, and moved here with
+//! the identity endpoint after the stack lift plan's P5. The intent names and their typed payloads live in
 //! [`dramatis::intents`] (ruling D24) and are re-exported here.
 
 use std::fmt::Write;

@@ -30,6 +30,7 @@ pub mod identity;
 pub mod local_endpoint;
 pub mod profile;
 pub mod quarantine;
+pub mod resident_mere_proxy;
 pub mod route;
 pub mod tasks;
 pub mod wire;

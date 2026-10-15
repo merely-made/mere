@@ -8,9 +8,10 @@
 //! `graphshell_host`'s admitted session loop.
 //!
 //! It was a test in `session_loop` until that loop moved to
-//! `graphshell-host` (Graphshell stack lift plan, L2). The loop is the
-//! host's; the browser carrier, the identity endpoint and the fixed resident
-//! authority are this port's, so the composed receipt stays here.
+//! `graphshell-host` (Graphshell stack lift plan, L2), then in Graphshell's
+//! port until the browser carrier and the identity endpoint moved here after
+//! P5. The loop is the host's; the carrier, the endpoint and the fixed
+//! authority are Djinn's door.
 
 use std::sync::{Arc, RwLock};
 
@@ -34,11 +35,11 @@ use notochord::{
 use personae::delegation::Issue;
 use personae::{IdentityProvider, InMemoryProvider};
 
-use crate::browser_carrier::{
+use crate::door::browser_carrier::{
     BrowserLauncher, BrowserLink, BrowserMessage, CHROMIUM_EXTENSION_ID, admit_browser_session,
 };
-use crate::identity_endpoint::IdentityEndpoint;
-use crate::identity_projection::{SIGNING_APPROVE_ONCE_INTENT, SigningDecisionIntentV1};
+use crate::door::identity_endpoint::IdentityEndpoint;
+use crate::door::identity_projection::{SIGNING_APPROVE_ONCE_INTENT, SigningDecisionIntentV1};
 
 const NOW_MS: u64 = 50;
 const EXPIRY_MS: u64 = 100;
@@ -100,7 +101,7 @@ async fn browser_carrier_delivers_public_identity_cards_and_an_approval() {
         "ssh-agent",
     );
     let pending_id = pending.request_id;
-    let mut fixed = crate::identity_endpoint::test_support::fixed_snapshot();
+    let mut fixed = crate::door::identity_endpoint::test_support::fixed_snapshot();
     fixed
         .pending_signing
         .push(personae::signing::PendingSigningRequest {
@@ -108,7 +109,7 @@ async fn browser_carrier_delivers_public_identity_cards_and_an_approval() {
             policy: personae::signing::SigningPolicy::PerUse,
             expires_at_ms: u64::MAX,
         });
-    let host = crate::identity_endpoint::test_support::FixedIdentity::with_snapshot(fixed);
+    let host = crate::door::identity_endpoint::test_support::FixedIdentity::with_snapshot(fixed);
 
     let launcher =
         BrowserLauncher::parse(&[format!("chrome-extension://{CHROMIUM_EXTENSION_ID}/")]).unwrap();
@@ -169,11 +170,12 @@ async fn browser_carrier_delivers_public_identity_cards_and_an_approval() {
 
     let server_task = tokio::spawn(async move {
         let revocations = RwLock::new(RevocationLedger::default());
-        let mut resume =
-            |_: &mut IdentityEndpoint<crate::identity_endpoint::test_support::FixedIdentity>,
-             _: ResumeRequest| {
-                Err("identity resume is not implemented".to_string())
-            };
+        let mut resume = |_: &mut IdentityEndpoint<
+            crate::door::identity_endpoint::test_support::FixedIdentity,
+        >,
+                          _: ResumeRequest| {
+            Err("identity resume is not implemented".to_string())
+        };
         serve_admitted_session(
             &mut admitted,
             &authority,

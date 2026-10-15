@@ -30,8 +30,8 @@ use crate::door::browser_host::now_ms;
 use crate::sync::graph_keys::{GraphKeyError, GraphKeyGroup};
 use graphshell::transfer_offer::{TransferOfferV1, offers_in, transfer_offer_rule};
 
-use graphshell::identity_endpoint::{SupplementalCard, TRANSFER_ACCEPT_INTENT, TRANSFER_ACCEPT_SCHEMA};
-use graphshell::identity_projection::IdentityProjectionAction;
+use crate::door::identity_endpoint::{SupplementalCard, TRANSFER_ACCEPT_INTENT, TRANSFER_ACCEPT_SCHEMA};
+use crate::door::identity_projection::IdentityProjectionAction;
 use graphshell::personal_sync::{
     KeyAgreementEvent, KeyAgreementStep, PersonalGraphError, PersonalGraphEvent, PersonalGraphExt,
     PersonalGraphIdentityError, PersonalGraphReplica, SyncRoster, SyncSelection, accept_into,

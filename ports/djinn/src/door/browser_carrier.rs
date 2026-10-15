@@ -36,7 +36,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncRead, AsyncWrite, DuplexStream};
 
-use crate::identity_projection::SshUnlockPolicyIntentV1;
+use crate::door::identity_projection::SshUnlockPolicyIntentV1;
 use graphshell_host::admission::{PROJECTION_PROTOCOL, open_network_bound_session};
 use graphshell_host::carrier::{ProjectionAcceptError, ProjectionRefusal, admit_stream};
 use graphshell_host::line::{self, LineReader};

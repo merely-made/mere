@@ -33,7 +33,7 @@
 //!
 //! | Feature | Modules |
 //! |---|---|
-//! | none | [`resume`], [`live_endpoint`] (fixture endpoints) |
+//! | none | [`resume`], [`live_endpoint`] and [`canary`] (fixture endpoints), [`view`] (the projection receipt views) and [`sessions`] (the session switcher's receipt; its endpoint spawning needs `native`) |
 //! | `admission` | [`admission`] |
 //! | `webrtc-join` (default) | [`webrtc_door`], [`webrtc_join`] |
 //! | `native` | [`carrier`], [`line`], [`lifecycle`], [`session_loop`], [`session_notices`], [`endpoint_catalog`], [`projection_host`], [`network_carrier`], [`policy_projection`], and the host halves of [`webrtc_door`] |
@@ -47,6 +47,7 @@
 
 #[cfg(feature = "admission")]
 pub mod admission;
+pub mod canary;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod carrier;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
@@ -67,6 +68,8 @@ pub mod resume;
 pub mod session_loop;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod session_notices;
+pub mod sessions;
+pub mod view;
 #[cfg(feature = "webrtc-join")]
 pub mod webrtc_door;
 #[cfg(feature = "webrtc-join")]

@@ -2668,7 +2668,8 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {
-        use crate::door::{app_broker::serve_app_broker, resident_mere_proxy::ResidentMereProxy};
+        use crate::door::app_broker::serve_app_broker;
+        use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},

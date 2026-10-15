@@ -44,7 +44,7 @@ use castellan::custody::roster;
 use castellan::custody::ssh_slot::{protocol_key_for, slot_for};
 use castellan::custody::{IdentityStorage, IdentityVault, Profile};
 use castellan::view::VaultProtectionView;
-use graphshell::identity_projection::{
+use djinn::door::identity_projection::{
     CreateProfileIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT, SwitchProfileIntentV1,
     project_identity, render_identity_surface,
 };

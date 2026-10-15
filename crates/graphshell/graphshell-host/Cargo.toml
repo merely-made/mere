@@ -39,8 +39,8 @@ native = [
     "webrtc-join",
     "graphshell-endpoint/door",
     "graphshell-endpoint/network",
+    "graphshell-endpoint/stdio",
     "notochord/tokio",
-    "dep:base64",
     "dep:pandect",
     "dep:rand_core",
     "dep:tokio",
@@ -52,6 +52,7 @@ native = [
 webrtc-session = ["native", "webrtc-carrier/native"]
 
 [dependencies]
+base64.workspace = true
 chirograph.workspace = true
 graphshell-client.workspace = true
 graphshell-endpoint.workspace = true
@@ -70,7 +71,6 @@ getrandom = { version = "0.3", optional = true }
 webrtc-carrier = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-base64 = { workspace = true, optional = true }
 pandect = { workspace = true, optional = true }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 tokio = { version = "1", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"], optional = true }
