@@ -1,14 +1,18 @@
 # Link model: assertions are the truth, links are readings
 
 **Date:** 2026-10-15
-**Status:** design, no code changed. Mark ruled L1–L4 on 2026-10-15 and L5–L6
+**Status:** design with a bounded P1 implementation and independent P5 CPU
+probe in progress; phase acceptance remains open. Mark ruled L1–L4 on
+2026-10-15 and L5–L6
 (formerly O2 and O3) later the same day (§4). It was amended the same day after
 an implementing agent's review (§11): the phases are reordered, source and
 origin are added, replay rules are stated, and a list arrangement is added.
 Mark then clarified the dynamics purpose: links respond to fields and perhaps
 to compatible links, making different dynamics legible (§7.3). P5 explores
-that response independently of the other phases. Phases P1–P6 (§8) are
-unscheduled; open rulings O1 and O4–O8 (§9) remain open.
+that response independently of the other phases. The
+[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
+owns current assignments, evidence and limits. P2–P4/P6 (§8) are unscheduled;
+open rulings O1 and O4–O8 (§9) remain open.
 
 **Inputs.** The verified seven-agent survey of 2026-10-15
 (`testing/mere/link-edge-survey-20261015/survey.json`, outside this repo,
@@ -464,7 +468,8 @@ current storage, so a consumer benefits before any persistence change.
   assertions, both directions, both strata, lifted Resource links, exact ids,
   id-less sidecar members (§7.1) and incomplete coverage. Includes the
   linked-data every-arc fix. Proof: **Graphshell's link inspector** reads it
-  with unchanged output. Deletes Graphshell's own pair grouping (`LinkTarget`
+  preserving existing record fields and adding explicit source/revision
+  availability. Deletes Graphshell's own pair grouping (`LinkTarget`
   expansion). A second consumer (roster `LinkCard`/`LinkBundle`, or
   pictograph `PairInputs`/`EdgeCell`) adopts it and deletes its grouping
   before the phase is called done.
@@ -534,8 +539,8 @@ Keep persistence and the portable contract under one owner at a time. Give
 the probe separate worktree and output ownership if it runs concurrently.
 Qualify the combined consumer once the source and adapter changes are in
 place; retain the distinction between a fixture probe, an integrated host
-and reviewed native behavior. This is proposed work routing, not a claim
-that implementation lanes have been started.
+and reviewed native behavior. This routing does not claim phase acceptance. Execution began on 2026-10-15 under the
+[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md).
 
 ## 9. Open rulings for Mark
 
@@ -613,3 +618,13 @@ integration sequence and an isolated P5 probe in parallel, with a stable P1
 contract and serialized shared host edits. The recommendation preserves P5's
 independence without making persistence or consumer adoption follow a moving
 experimental interface.
+
+
+**2026-10-15, bounded implementation started.** The shared scenograph reading,
+Pictograph reader and two consumer adapters are implemented as a first slice,
+alongside the outgoing parallel-bucket export fix and an isolated Numen path
+probe. P1 preserves existing records while adding explicit source availability
+to Graphshell's output; graph-only consumers report missing source context
+rather than inventing public identity or revision. The
+[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
+records checks and open gates. P2–P4/P6 and P5's host/visual proof remain open.

@@ -305,6 +305,19 @@ impl Graph {
             .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
     }
 
+    /// Held Surface buckets outgoing from `from`, including every parallel
+    /// bucket without expanding its assertions. Cost is proportional to the
+    /// node's out-degree.
+    pub fn surface_outgoing_relation_buckets(
+        &self,
+        from: NodeKey,
+    ) -> impl Iterator<Item = (EdgeKey, NodeKey, NodeKey, &EdgePayload)> + '_ {
+        self.inner
+            .inner()
+            .edges_directed(from, Direction::Outgoing)
+            .map(|edge| (edge.id(), edge.source(), edge.target(), edge.weight()))
+    }
+
     /// Surface relations followed by content relations lifted to every pair of
     /// surfaces showing their endpoints. The handle retains its owning store;
     /// projection does not copy resource assertions into the surface graph.

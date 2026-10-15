@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 pub mod dataset;
 pub mod dynamics;
 pub use dynamics::{DynamicsSlot, DynamicsVariant, DYNAMICS_SLOT_VERSION};
+pub mod link;
 pub mod options;
 pub mod presentation;
 pub mod relationship;

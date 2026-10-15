@@ -802,6 +802,7 @@ mod derived_face;
 mod gloss;
 mod framing;
 mod lifecycle;
+pub mod link_reading;
 mod nodes;
 mod reader;
 mod roles;

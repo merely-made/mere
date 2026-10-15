@@ -5,11 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 //! The exact relation-cell input seam shared by the controller and inspector.
 //! Cell multiplicity is not assertion multiplicity or a measured force value.
-use kernel::graph::{
-    EdgeFamily, Graph, GraphStratum, NodeKey, RelationKey, RelationKind, RelationSelector,
-};
+use kernel::graph::{EdgeFamily, Graph, GraphStratum, NodeKey, RelationKind, RelationSelector};
+use scenograph::link::{LinkLegacyMember, LinkSource};
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 use uuid::Uuid;
 
 pub fn selector_for_relation_kind(kind: RelationKind) -> RelationSelector {
@@ -56,6 +55,7 @@ pub struct CellInput {
 pub struct PairInputs {
     pub first: Uuid,
     pub second: Uuid,
+    pub source: LinkSource,
     pub held_rows: usize,
     pub visible_rows: usize,
     pub cells: Vec<CellInput>,
@@ -66,71 +66,85 @@ pub fn inspect_pair(
     second: Uuid,
     hidden: impl Fn(NodeKey, NodeKey, RelationSelector) -> bool,
 ) -> Result<PairInputs, String> {
-    let a = graph
+    graph
         .get_node_key_by_id(first)
         .ok_or_else(|| format!("Access {first} is absent from this view"))?;
-    let b = graph
+    graph
         .get_node_key_by_id(second)
         .ok_or_else(|| format!("Access {second} is absent from this view"))?;
     let mut cells = BTreeMap::<String, CellInput>::new();
-    let mut read_assertions = HashSet::new();
-    for (key, row) in graph
-        .projected_relations()
-        .filter(|(_, row)| (row.from == a && row.to == b) || (row.from == b && row.to == a))
-    {
-        let from = graph
-            .get_node(row.from)
-            .ok_or("Input endpoint departed")?
-            .id;
-        let to = graph.get_node(row.to).ok_or("Input endpoint departed")?.id;
-        let (stratum, source_from, source_to) = match key {
-            RelationKey::Surface(_) => (GraphStratum::Surface, from, to),
-            RelationKey::Resource(_) => (
-                GraphStratum::Resource,
-                graph
-                    .shown_resource_id(row.from)
-                    .ok_or("Resource source binding absent")?,
-                graph
-                    .shown_resource_id(row.to)
-                    .ok_or("Resource target binding absent")?,
-            ),
+    let source = LinkSource::Unavailable {
+        reason: "Pictograph receives a kernel graph without its owning source authority or public revision".into(),
+    };
+    let pair_reading = super::link_reading::read_link(graph, first, second, source)?;
+    let source = pair_reading.source.clone();
+    for reading in pair_reading.links {
+        let stratum = match reading.key.stratum {
+            scenograph::link::LinkStratum::Surface => GraphStratum::Surface,
+            scenograph::link::LinkStratum::Resource => GraphStratum::Resource,
         };
-        let selector = selector_for_relation_kind(row.kind);
-        let owner = CellOwner {
-            from,
-            to,
-            stratum,
-            source_from,
-            source_to,
-            selector,
-        };
-        let group = cells
-            .entry(serde_json::to_string(&owner).unwrap())
-            .or_insert_with(|| CellInput {
-                owner,
-                rows: 0,
-                hidden: hidden(row.from, row.to, selector),
-                assertions: BTreeSet::new(),
-            });
-        group.rows += 1;
-        // Each semantic statement supplies a row. Read its owning bucket only
-        // once per displayed direction and kind, while still counting every row.
-        // Resource self-links may project in both directions between repeated
-        // accesses, so the displayed endpoints belong in this read key.
-        if matches!(
-            row.kind,
-            RelationKind::Semantic(_) | RelationKind::OpenPredicate
-        ) && read_assertions.insert((key, row.from, row.to, row.kind))
-            && let Some(payload) = graph.get_relation(key)
-        {
-            for statement in payload.semantic_statements() {
-                let matches = match row.kind {
-                    RelationKind::Semantic(sub) => statement.recognized_sub_kind == Some(sub),
-                    RelationKind::OpenPredicate => statement.recognized_sub_kind.is_none(),
-                    _ => false,
+        for bucket in reading.buckets {
+            let from: Uuid = bucket
+                .displayed_from
+                .parse()
+                .map_err(|_| "Invalid displayed source identity")?;
+            let to: Uuid = bucket
+                .displayed_to
+                .parse()
+                .map_err(|_| "Invalid displayed target identity")?;
+            let from_key = graph
+                .get_node_key_by_id(from)
+                .ok_or("Input endpoint departed")?;
+            let to_key = graph
+                .get_node_key_by_id(to)
+                .ok_or("Input endpoint departed")?;
+            let source_from = bucket
+                .source_from
+                .id
+                .parse()
+                .map_err(|_| "Invalid source endpoint identity")?;
+            let source_to = bucket
+                .source_to
+                .id
+                .parse()
+                .map_err(|_| "Invalid target endpoint identity")?;
+            let mut rows = Vec::<(RelationKind, Option<String>)>::new();
+            rows.extend(bucket.assertions.into_iter().map(|assertion| {
+                let kind = assertion
+                    .recognized_kind
+                    .and_then(|kind| serde_json::from_value(serde_json::Value::String(kind)).ok())
+                    .map(RelationKind::Semantic)
+                    .unwrap_or(RelationKind::OpenPredicate);
+                (kind, Some(assertion.id))
+            }));
+            rows.extend(
+                bucket
+                    .legacy_members
+                    .iter()
+                    .filter_map(legacy_relation_kind)
+                    .map(|kind| (kind, None)),
+            );
+            for (kind, assertion) in rows {
+                let selector = selector_for_relation_kind(kind);
+                let owner = CellOwner {
+                    from,
+                    to,
+                    stratum,
+                    source_from,
+                    source_to,
+                    selector,
                 };
-                if matches {
-                    group.assertions.insert(statement.statement_id.clone());
+                let group = cells
+                    .entry(serde_json::to_string(&owner).unwrap())
+                    .or_insert_with(|| CellInput {
+                        owner,
+                        rows: 0,
+                        hidden: hidden(from_key, to_key, selector),
+                        assertions: BTreeSet::new(),
+                    });
+                group.rows += 1;
+                if let Some(assertion) = assertion {
+                    group.assertions.insert(assertion);
                 }
             }
         }
@@ -139,6 +153,7 @@ pub fn inspect_pair(
     Ok(PairInputs {
         first: first.min(second),
         second: first.max(second),
+        source,
         held_rows: cells.iter().map(|cell| cell.rows).sum(),
         visible_rows: cells
             .iter()
@@ -147,6 +162,22 @@ pub fn inspect_pair(
             .sum(),
         cells,
     })
+}
+
+fn legacy_relation_kind(member: &LinkLegacyMember) -> Option<RelationKind> {
+    if member.family == "Traversal" {
+        return Some(RelationKind::Traversal);
+    }
+    let sub_kind = member.sub_kind.as_ref()?;
+    let variant = match member.family.as_str() {
+        "Semantic" => "Semantic",
+        "Containment" => "Containment",
+        "Arrangement" => "Arrangement",
+        "Imported" => "Imported",
+        "Provenance" => "Provenance",
+        _ => return None,
+    };
+    serde_json::from_value(serde_json::json!({ (variant): sub_kind })).ok()
 }
 #[cfg(test)]
 #[path = "relationship_topology_tests.rs"]
