@@ -940,4 +940,11 @@ fast-forward of local main; nothing built).**
   checks for wasm32; the boundary script passes. Graphshell's page code now
   dereferences its `RefMut<Canvas>` (`&mut *canvas`) at ten call sites, because
   generic parameters do not auto-deref the way a `&mut Canvas` parameter did.
+- **2026-10-15 (pins synced after P2 and P3):** Mere `8357b00d0` moves the
+  `knot-editor`, `knot-document` and `knot-site` pins to Knot `c487a7c`
+  (Knot's repin to Mere `e92572a4e`). Turnstone `c191a56` is on Knot `c487a7c`
+  and Mere `e92572a4e`, so it resolves one Mere source; its `projection_editor`
+  imports in `knot_authoring.rs` now come from `scenograph`, and its 940 tests
+  pass (reported by the Knot adoption session, not rerun here). Woodshed is on
+  Mere `8357b00d0` (woodshed `25acaa0`).
 
