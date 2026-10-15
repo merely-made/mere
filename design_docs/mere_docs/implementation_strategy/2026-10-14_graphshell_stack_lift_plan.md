@@ -1300,6 +1300,62 @@ fast-forward of local main; nothing built).**
   - What `graphshell` is still needed for outside the port: Djinn only, for the
     sync hosts' replica, transfer, offer and receipt types (L13). Knot and
     Turnstone need nothing from it once they repin.
+- **2026-10-15 (pass (b), the remote mere route, in Mere):** the
+  [remote mere route admission note](../technical_architecture/2026-10-15_remote_mere_route_admission.md)
+  sets out the ambient and explicit grant shapes first (T4), then:
+  - T5 needs no dramatis change. The application rides in the requested
+    path under the projection service (`/services/projection/mere/<domain>/app/<app>`,
+    `connect`; `/services/projection/ambient/<domain>/app/<app>`, the new
+    `ambient` action), which Notochord's structural service rules and
+    Insigne's attenuation already govern, and the host accepts it only when
+    the delegation's leaf names it. `mere_overmap::wire::RemoteMereRequest`
+    is the one spelling.
+  - `graphshell_host`: `admission::AMBIENT_ACTION` and `open_session_for`;
+    `carrier::{admit_stream_with, accept_projection_session_with}` take a
+    host's own `ActionCheck` (the default is still `serves_action`, unchanged);
+    `projection_host::ResidentProjectionHost::selecting` with a
+    `RouteSelector` chooses each session's route and binds its application
+    into the endpoint context; the host's catalog is a shared handle
+    (`catalog()`).
+  - T3's pump: `graphshell_client::pump::LinePump` (feature `pump`, Tokio's
+    `io-util` only): open a session over an admitted stream and drive any
+    `LineDriven` session (now implemented by `MereRouteSession`) until it
+    settles.
+  - T7: `djinn::resident_projection` (`ResidentDialHost`, `dial_policy`,
+    `select_mere_route`, `bind_dial_transport` on the key derived with
+    `mere.djinn/resident-projection/v1`); `MereRoutes::with_remote_catalog`
+    registers each mere's two routes in the dial host's catalog. The Djinn
+    binary does not start it yet (below).
+  - The Murm in-process kind: `TransportKind::InProcess` and
+    `IngressContext::in_process` on Murm `38e9c9b8` (branch
+    `agent/transport-in-process`, cut from `3d9e799f`, the revision every
+    consumer pinned, which is on `codex/c1-webrtc-callback-lifetime-20261014`
+    and not on Murm's main). Djinn's local doors now admit through
+    `admit_accepted_session` with it. Mere names Murm through the
+    `www.github.com` alias and forwards the plain URL to it, the way it
+    handles Mere itself, so a consumer still on the old pin resolves to one
+    Murm source; consumers name the alias at their repin.
+  - Receipt (in Mere): Djinn's
+    `a_device_reads_a_mere_through_the_dialable_host_as_its_granted_application`
+    dials the host over a memory transport as a same-persona device whose
+    grant names `turnstone`, opens `mere/divination`, and reads the sessions
+    and graph with `MereRouteSession` over the pump, as `turnstone`;
+    `the_dialable_host_serves_only_what_the_grant_and_the_owner_name` refuses
+    a grant naming another application, a grant naming none, an explicit
+    grant used for ambient, and ambient without the owner's opt-in, and reads
+    the graph alone once opted in. Checks (`TMPDIR=/tmp`): graphshell-host
+    (all features), graphshell-client (`pump`), mere-overmap, djinn and
+    graphshell (`webrtc-session`, `personal-sync`,
+    `distillery-chronicle-fixture`) pass, 840 tests; mere-transport's lib tests
+    pass in Murm (67); the workspace check fails only at the known examples;
+    the shared crates and `graphshell-web` check for wasm32; the boundary
+    script passes.
+  - Open: the Djinn binary starting `ResidentDialHost` (it needs the trusted
+    roots: how a device grant becomes a delegation from the persona root, and
+    how a joined place's root is configured; note §7); Turnstone's overmap
+    pane mounting a remote mere over `LinePump` (the receipt above uses the
+    same panel and pump in Djinn's tests); the Knot, Turnstone and Woodshed
+    repins onto this revision and Murm `38e9c9b8`.
 - **2026-10-15 (`backstep` cleared for publishing):** Mark said `backstep` can be
   published. `publish = false` is removed from its manifest (crates.io had no
   `backstep` at that date, HTTP 404 on the crate page) and `cargo publish

@@ -51,7 +51,10 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::task::JoinHandle;
 use transport::Transport;
 
-use crate::carrier::{ProjectionAcceptError, ProjectionRefusal, accept_projection_session};
+use crate::carrier::{
+    ProjectionAcceptError, ProjectionRefusal, accept_projection_session,
+    accept_projection_session_with,
+};
 use crate::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointSession,
 };
@@ -61,6 +64,8 @@ use crate::session_notices::serve_admitted_session_notifying;
 #[cfg(feature = "webrtc-session")]
 use crate::webrtc_session::{HostedInvite, JoinError, ServedJoin, serve_webrtc_join};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use insigne::delegation::SignedDelegationCertificate;
+use notochord::AdmittedPrincipal;
 #[cfg(feature = "webrtc-session")]
 use personae::IdentityProvider;
 #[cfg(feature = "webrtc-session")]
@@ -82,6 +87,47 @@ pub enum ResidentProjectionError {
     /// The serving task did not finish.
     #[error("a served projection did not finish: {0}")]
     Join(String),
+    /// A route-selecting host found no route it serves for what the peer was
+    /// admitted for. [`ResidentProjectionHost::accept_one`] refuses such a
+    /// peer at admission; this is a pre-admitted session handed to
+    /// [`ResidentProjectionHost::serve_admitted`].
+    #[error("no served route for this session: {0}")]
+    Route(String),
+}
+
+/// The route a route-selecting host serves one session, and the application
+/// the session's grant names, if any.
+#[derive(Clone, Debug)]
+pub struct SelectedRoute {
+    pub route: ResidentEndpointRoute,
+    /// Bound into the session's [`crate::lifecycle::AdmittedEndpointContext`],
+    /// as the application door binds the application its hello named.
+    pub application: Option<String>,
+}
+
+/// Chooses a session's route from what it was admitted for: the admitted
+/// principal (its requested action) and the delegation chain the conclusion
+/// was drawn from. `Err` is the reason this host serves nothing for it, and
+/// the host also uses it as its action check at admission, so a peer it would
+/// not serve is refused before any endpoint opens.
+pub type RouteSelector = Arc<
+    dyn Fn(&AdmittedPrincipal, &[SignedDelegationCertificate]) -> Result<SelectedRoute, String>
+        + Send
+        + Sync,
+>;
+
+/// A host's catalog, shared with whatever registers routes into it. The lock
+/// is held only to register or to open one session's endpoint, never across
+/// an await.
+pub type SharedCatalog = Arc<std::sync::Mutex<ResidentEndpointCatalog>>;
+
+/// How a host picks the route it serves.
+#[derive(Clone)]
+enum Routing {
+    /// One route for every session, under Graphshell's own action check.
+    Fixed(ResidentEndpointRoute),
+    /// A route per session, chosen from what it was admitted for.
+    Selected(RouteSelector),
 }
 
 /// One admitted session, already being served in the background.
@@ -199,11 +245,13 @@ impl Drop for LiveSession {
     }
 }
 
-/// A resident host serving one catalog route to admitted network peers.
+/// A resident host serving catalog routes to admitted network peers: one
+/// fixed route ([`ResidentProjectionHost::new`]), or a route per session
+/// ([`ResidentProjectionHost::selecting`]).
 pub struct ResidentProjectionHost {
     policy: LocalNetworkPolicy,
-    route: ResidentEndpointRoute,
-    catalog: ResidentEndpointCatalog,
+    routing: Routing,
+    catalog: SharedCatalog,
     revocations: Arc<RwLock<RevocationLedger>>,
     live: Arc<AtomicU32>,
 }
@@ -216,11 +264,35 @@ impl ResidentProjectionHost {
     ) -> Self {
         Self {
             policy,
-            route,
-            catalog,
+            routing: Routing::Fixed(route),
+            catalog: Arc::new(std::sync::Mutex::new(catalog)),
             revocations: Arc::new(RwLock::new(RevocationLedger::new())),
             live: Arc::new(AtomicU32::new(0)),
         }
+    }
+
+    /// A host that serves each session the route `selector` chooses from
+    /// what it was admitted for, and admits only sessions it chooses one for.
+    pub fn selecting(
+        policy: LocalNetworkPolicy,
+        catalog: ResidentEndpointCatalog,
+        selector: RouteSelector,
+    ) -> Self {
+        Self {
+            policy,
+            routing: Routing::Selected(selector),
+            catalog: Arc::new(std::sync::Mutex::new(catalog)),
+            revocations: Arc::new(RwLock::new(RevocationLedger::new())),
+            live: Arc::new(AtomicU32::new(0)),
+        }
+    }
+
+    /// The catalog the host opens routes from, shared, for a host that
+    /// registers routes as they come to exist (a resident serving a new
+    /// mere). A route registered here opens for the next session that
+    /// selects it.
+    pub fn catalog(&self) -> SharedCatalog {
+        Arc::clone(&self.catalog)
     }
 
     /// The ledger every live session re-reads before each request.
@@ -259,9 +331,34 @@ impl ResidentProjectionHost {
             .expect("the revocation ledger lock is never poisoned by this host")
             .clone();
         let live = self.live.load(Ordering::SeqCst);
-        let outcome =
-            accept_projection_session(transport, &self.policy, &admission_ledger, now_ms(), live)
-                .await?;
+        let outcome = match &self.routing {
+            Routing::Fixed(_) => {
+                accept_projection_session(
+                    transport,
+                    &self.policy,
+                    &admission_ledger,
+                    now_ms(),
+                    live,
+                )
+                .await?
+            },
+            Routing::Selected(selector) => {
+                let selector = Arc::clone(selector);
+                let serves =
+                    move |principal: &AdmittedPrincipal, chain: &[SignedDelegationCertificate]| {
+                        selector(principal, chain).is_ok()
+                    };
+                accept_projection_session_with(
+                    transport,
+                    &self.policy,
+                    &admission_ledger,
+                    now_ms(),
+                    live,
+                    &serves,
+                )
+                .await?
+            },
+        };
         let admitted = match outcome {
             Ok(session) => session,
             Err(refusal) => return Ok(Err(refusal)),
@@ -301,15 +398,30 @@ impl ResidentProjectionHost {
         // `retain_admitted` rather than `retain`, so the session cannot lose
         // the chain its conclusion was drawn from and go blind to revocation.
         let authority = SessionAuthority::retain_admitted(&admitted);
-        let context = authority.endpoint_context();
+        let (route, application) = match &self.routing {
+            Routing::Fixed(route) => (route.clone(), None),
+            Routing::Selected(selector) => {
+                let selected = selector(&admitted.principal, &admitted.claims.delegations)
+                    .map_err(ResidentProjectionError::Route)?;
+                (selected.route, selected.application)
+            },
+        };
+        let mut context = authority.endpoint_context();
+        if let Some(application) = application {
+            context = context.with_application(application);
+        }
         let subject = context.subject();
         let session = context.session().clone();
 
         // Opened before the session is counted live: a route that cannot open
         // must not leave a phantom in the session count.
-        let mut endpoint = self.catalog.open(self.route.id(), &context)?;
+        let mut endpoint = self
+            .catalog
+            .lock()
+            .expect("the catalog lock is never poisoned by this host")
+            .open(route.id(), &context)?;
 
-        let interval = self.route.notice_poll_interval();
+        let interval = route.notice_poll_interval();
         let revocations = Arc::clone(&self.revocations);
         let live = LiveSession::enter(Arc::clone(&self.live));
         let handle = tokio::spawn(async move {
