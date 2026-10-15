@@ -157,7 +157,7 @@ pub enum InferenceModelSettings {
     Library {
         /// Self-describing content reference of an `esp.inference-model/v1` row.
         row: String,
-        /// Execution device. GPU remains refused until the reclaim gate lands.
+        /// Execution device. GPU requires the `inference-gpu` build feature.
         device: InferenceDeviceSettings,
         /// Maximum generated tokens per ask, stated by the owner.
         max_tokens: usize,
@@ -169,7 +169,7 @@ pub enum InferenceModelSettings {
 pub enum InferenceDeviceSettings {
     /// Burn's portable NdArray backend.
     Cpu,
-    /// Reserved device word; refused until I2's arbitration gate lands.
+    /// First discrete wgpu adapter, probed before device construction.
     Gpu,
 }
 

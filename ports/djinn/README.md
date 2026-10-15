@@ -134,6 +134,29 @@ djinn-devices --json
 The directory is read-only and lists paired devices only. The broker endpoint
 follows `GRAPHSHELL_APP_ENDPOINT`, as `djinn-site` does.
 
+## Resident inference
+
+Build with `--features inference` for a CPU model-library lane, or
+`--features inference-gpu` for the first discrete GPU. GPU selection is
+probed and refused when that adapter class is unavailable. Owner settings
+name the exact imported row and output limit:
+
+```json
+{"inference":{"model":{"library":{"row":"blake3:<row hash>","device":"gpu","max_tokens":256}}}}
+```
+
+The lane requires a `distillery` block and shares its persona's model library.
+`esp`'s `import_inference_model` example imports a local checkpoint and declared
+template into that library. Its printed settings select CPU; change `device`
+to `gpu` for the GPU build. The `inference.ask` route is granted to Turnstone.
+
+A GPU ask preempts the GPU trainer through owner reclaim. The offer is
+withdrawn while inference waits or runs; inference loads device tensors for
+each ask and releases them before returning the GPU. CPU inference retains
+its loaded model. Closing the lane cancels a pending device wait. Durable
+asks and pause on lock belong to I3 of the
+[resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+
 ## Publishing
 
 `0.0.2` is the source version of this workspace resident, not a crates.io

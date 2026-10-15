@@ -1,8 +1,9 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-15):** in progress. I1 done (§7); I2's strictness step
-landed; its CPU model/template row passes on O-PC, with GPU reclaim still open. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
+**Status (2026-10-15):** in progress. I1 and I2 done (§7): strict decoder,
+declared templates, CPU and GPU model rows, and native trainer owner reclaim
+pass on O-PC. I3 is next. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
 
@@ -535,6 +536,8 @@ default-feature djinn build is unchanged.
 
 ### I2. A real model and its template
 
+**Status (2026-10-15): done.** Receipts are in §7.
+
 R3 and the real provider path: resolve a manifest from the model library,
 build a `DecoderProvider` (or session-bound provider) on the probed device,
 render the template.
@@ -803,7 +806,7 @@ Stop and record the reason if any of these happen:
     real app-broker tests pass, including a synthetic library-backed decoder
     with no trainer, exact session/template identity in the served run table,
     Turnstone-only access and clean shutdown. The real 360M row and the real
-    app-broker row are separate receipts. Final default-feature, Distillery
+    app-broker row are separate receipts. At that CPU checkpoint, default-feature, Distillery
     recheck and import-example checks did not start: a separate `cargo metadata`
     on the primary checkout held the shared package-cache lock for over fifteen
     minutes. Only this lane's queued checks were stopped; the other process was
@@ -814,8 +817,55 @@ Stop and record the reason if any of these happen:
     --example import_inference_model`. Formatting and diff checks pass. The
     documentation audit reports no new changed-source/plan findings; existing
     repository-wide findings remain. No installed resident binary was run.
-  - *Still open in I2:* the GPU provider row and inference/trainer owner-reclaim
-    handshake, including withholding `HostFacts.gpu` and waiting for the
-    trainer's clean cancellation before inference binds the GPU. GPU settings
-    are refused pending that work. This continuation does **not** close I2,
-    claim an installed-binary run, or change I3's durable asks and lock posture.
+  - *Open at that CPU checkpoint:* the GPU row and owner-reclaim handshake.
+    The continuation below closes them. This CPU receipt does not claim an
+    installed-binary run or change I3's durable asks and lock posture.
+
+- **2026-10-15, I2 GPU loading and trainer reclaim qualified.**
+  `distillery/inference-gpu` and `djinn/inference-gpu` add a probed first-discrete
+  adapter path. GPU settings require that feature; an unavailable adapter is
+  refused. The actor retains resolved host buffers, loads device tensors for
+  each ask, and drops and synchronizes them before returning the GPU. CPU
+  inference retains its loaded provider. Both use the same declared template
+  and exact model-library row; generation borrows no store lock.
+  - *One holder.* `distillery::gpu::GpuAccess` withdraws the GPU offer as soon
+    as an ask requests it. The mesh host initiates existing lease-owner reclaim
+    for GPU work. The trainer's guard lives inside its blocking computation,
+    through device synchronization, so an async task detached after lease loss
+    cannot falsely free the device. Shutdown also waits for that actual guard.
+    Both trainer arms check owner stop signals between tensor operations. A
+    checkpoint request cancels these non-resuming trainer arms cleanly; it
+    never claims a saved checkpoint. This does not implement I3's durable asks.
+  - *Real model.* The pinned SmolLM2-360M-Instruct row passes all 39 independent
+    greedy token comparisons (7/16/16), including a second generation through
+    the provider seam for each question, on O-PC's RTX 4060 Laptop GPU, Vulkan,
+    driver 610.88, 8188 MiB total GPU memory. Load was 2.53 s and measured first
+    generations were 4.29/2.10/1.69 s; this is a correctness receipt, not a
+    benchmark. Session `blake3:e98a2d6d857bbeea8f431367885d4a5ddee51d3751f69e9ade6943c19314f925`
+    binds the same template hash as the CPU row. Peak GPU memory was not
+    measured. The first prompt reaches EOS; the other two reach the 16-token
+    test cap. Exact identities, source and binary hashes, and native reclaim
+    rows are in [the GPU receipt](../../../support/receipts/resident_inference_gpu.json).
+  - *Native reclaim.* Three Djinn resident tests use the real GPU trainer
+    resource over a tiny model: finite-difference and autodiff jobs posted as
+    restartable, plus a job posted as checkpointable. Each observes a live
+    lease, withdrawn `HostFacts.gpu`, denied background GPU access, a clean
+    `Step::Reclaimed { reason: ForegroundActivity }`, a finished GPU ask, a
+    restored offer, and drained GPU ownership after shutdown. No lease-loss or
+    failed-release result substitutes for owner reclaim. These call the native
+    in-process lane; the real SmolLM2 row and the app-broker receipt remain
+    separate harnesses. No installed resident binary or headed application ran.
+  - *Checks.* ESP: 169 release unit tests, six template/library/corridor tests,
+    and 82 no-default-feature tests pass. Distillery: 34 unit tests, including
+    close while waiting for GPU ownership, and the real two-host supervised
+    reclaim test pass. Djinn: five inference/GPU settings tests and four
+    default-feature settings tests pass; the three real app-broker tests also
+    pass in the GPU-capable build. The import example now builds with
+    its redb dev feature declared. All four commands blocked at the CPU
+    checkpoint have completed. The two device-gate tests pass 20 repeated
+    runs; a generated copy that ignores occupied ownership fails its intended
+    detached-worker assertion. The checkout was never mutated for that
+    negative control. Formatting and documentation checks retain the existing
+    repository baseline; this continuation adds no new audit findings.
+  - *Next:* I3's durable ask checkpoints and lock pause/resume. I2 is closed;
+    the installed-binary and headed answer-card gates are still separate.

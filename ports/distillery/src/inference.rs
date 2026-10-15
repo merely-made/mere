@@ -43,6 +43,11 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "inference-gpu")]
+mod gpu;
+#[cfg(feature = "inference-gpu")]
+pub use gpu::{discrete_gpu_inference_device, open_gpu_library_lane};
+
 #[cfg(feature = "inference-model")]
 pub use esp::infer::decoder::DecoderDevice as InferenceDevice;
 /// The provider seam a host builds a lane from, re-exported so a host
@@ -779,6 +784,65 @@ mod tests {
         assert_eq!(run(&runs, "a").state, RunStateV1::Failed);
         assert!(run(&runs, "a").text.is_empty());
         lane.close().unwrap();
+    }
+
+    #[test]
+    fn close_cancels_an_ask_waiting_for_a_gpu_worker_to_stop() {
+        struct WaitingProvider {
+            stub: StubInferenceProvider,
+            access: crate::gpu::GpuAccess,
+        }
+        impl InferenceProvider for WaitingProvider {
+            fn capability(&self) -> &esp::infer::ModelCapability {
+                self.stub.capability()
+            }
+            fn generate_streaming(
+                &self,
+                _: &GenerationRequest,
+                _: &mut dyn FnMut(&str) -> std::ops::ControlFlow<()>,
+            ) -> Result<String, esp::infer::InferError> {
+                unreachable!("actor must supply cooperative cancellation")
+            }
+            fn generate_streaming_controlled(
+                &self,
+                _: &GenerationRequest,
+                _: &mut dyn FnMut(&str) -> std::ops::ControlFlow<()>,
+                cancelled: &mut dyn FnMut() -> bool,
+            ) -> Result<String, esp::infer::InferError> {
+                let request = self.access.request();
+                assert!(
+                    request.acquire(cancelled).is_none(),
+                    "the worker still owns the GPU"
+                );
+                Ok(String::new())
+            }
+        }
+        let access = crate::gpu::GpuAccess::default();
+        let worker = access.try_background().unwrap();
+        let provider_access = access.clone();
+        let lane = InferenceLane::open(move || {
+            Box::new(WaitingProvider {
+                stub: StubInferenceProvider::new(),
+                access: provider_access,
+            })
+        });
+        lane.ask(ask("waiting", "why?")).unwrap();
+        for _ in 0..100 {
+            if access.foreground_requested() {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(access.foreground_requested());
+        lane.close().unwrap();
+        assert_eq!(run(&lane.runs(), "waiting").state, RunStateV1::Cancelled);
+        assert!(!access.foreground_requested());
+        assert!(
+            access.try_background().is_none(),
+            "close cannot release another worker's guard"
+        );
+        drop(worker);
+        assert!(access.try_background().is_some());
     }
 
     #[test]

@@ -54,8 +54,10 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
         distillery::inference::parse_model_row(row)?;
         #[cfg(not(feature = "inference"))]
         let _ = row;
-        if *device == crate::settings::InferenceDeviceSettings::Gpu {
-            return Err("inference.model.library.device gpu is unavailable until I2's resident GPU reclaim gate is implemented and qualified; select cpu".into());
+        if *device == crate::settings::InferenceDeviceSettings::Gpu
+            && !cfg!(feature = "inference-gpu")
+        {
+            return Err("inference.model.library.device gpu requires the `inference-gpu` feature; rebuild with it or select cpu".into());
         }
     }
     Ok(())
@@ -109,19 +111,40 @@ mod lane {
         pub fn open(
             settings: &InferenceLaneSettings,
             library: Option<std::sync::Arc<tokio::sync::Mutex<muniment::RedbBackend>>>,
+            gpu_access: distillery::gpu::GpuAccess,
         ) -> Self {
+            #[cfg(not(feature = "inference-gpu"))]
+            let _ = gpu_access;
             let lane = match &settings.model {
                 InferenceModelSettings::Stub => {
                     InferenceLane::open(|| Box::new(StubInferenceProvider::new()))
                 },
+                #[cfg(feature = "inference-gpu")]
                 InferenceModelSettings::Library {
-                    row, max_tokens, ..
+                    row,
+                    max_tokens,
+                    device: crate::settings::InferenceDeviceSettings::Gpu,
+                } => distillery::inference::open_gpu_library_lane(
+                    library.expect("resident opens the model library first"),
+                    distillery::inference::parse_model_row(row).expect("validated model row"),
+                    *max_tokens,
+                    gpu_access,
+                ),
+                InferenceModelSettings::Library {
+                    row,
+                    max_tokens,
+                    device: crate::settings::InferenceDeviceSettings::Cpu,
                 } => distillery::inference::open_library_lane(
                     library.expect("resident opens the model library first"),
                     distillery::inference::parse_model_row(row)
                         .expect("validated before opening lanes"),
                     *max_tokens,
                 ),
+                #[cfg(not(feature = "inference-gpu"))]
+                InferenceModelSettings::Library {
+                    device: crate::settings::InferenceDeviceSettings::Gpu,
+                    ..
+                } => unreachable!("validate refuses GPU settings without inference-gpu"),
             };
             Self { lane }
         }
@@ -269,7 +292,11 @@ mod tests {
         owner.inference = set_model(row.clone(), InferenceDeviceSettings::Cpu, 0);
         assert!(validate(&owner).unwrap_err().contains("max_tokens"));
         owner.inference = set_model(row.clone(), InferenceDeviceSettings::Gpu, 32);
-        assert!(validate(&owner).unwrap_err().contains("GPU reclaim gate"));
+        if cfg!(feature = "inference-gpu") {
+            assert!(validate(&owner).is_ok());
+        } else {
+            assert!(validate(&owner).unwrap_err().contains("inference-gpu"));
+        }
         owner.inference = set_model(row, InferenceDeviceSettings::Cpu, 32);
         assert!(validate(&owner).is_ok());
     }

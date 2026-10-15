@@ -46,6 +46,7 @@
 
 mod authority;
 mod chronicle;
+pub mod gpu;
 
 #[cfg(feature = "flora")]
 pub mod flora;

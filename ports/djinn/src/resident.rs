@@ -183,7 +183,14 @@ impl DjinnResident {
                 } else {
                     None
                 };
-                Some(ResidentInference::open(settings, library))
+                Some(ResidentInference::open(
+                    settings,
+                    library,
+                    distillery
+                        .as_ref()
+                        .expect("validated Distillery lane")
+                        .gpu_access(),
+                ))
             },
             None => None,
         };

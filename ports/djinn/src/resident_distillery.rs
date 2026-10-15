@@ -108,6 +108,7 @@ pub struct ResidentDistillery {
     /// on one redb file. Opened for a trainer or a library-backed inference
     /// lane; `None` when neither consumer needs it.
     model_library: Option<Arc<Mutex<RedbBackend>>>,
+    gpu_access: distillery::gpu::GpuAccess,
     /// The adapter the composed trainer actually runs on, when this lane
     /// composed a GPU trainer.
     ///
@@ -259,6 +260,8 @@ impl ResidentDistillery {
         #[cfg(feature = "trainer-gpu")]
         let mut trainer_adapter: Option<distillery::GpuAdapterFacts> = None;
 
+        let gpu_access = distillery::gpu::GpuAccess::default();
+
         // Registering is fallible, and the closure below cannot be, so the
         // registry is assembled here and only *installed* there.
         #[cfg(feature = "trainer")]
@@ -293,12 +296,17 @@ impl ResidentDistillery {
                     },
                     _ => distillery::TrainerDevice::ndarray(),
                 };
+                let mut resource = distillery::TrainerResource::new(Arc::clone(store), device);
+                if lane
+                    .trainer
+                    .as_ref()
+                    .is_some_and(|trainer| trainer.device.trim() == "gpu")
+                {
+                    resource = resource.with_gpu_access(gpu_access.clone());
+                }
                 let mut registry = mesh::ResourceRegistry::builtin();
                 registry
-                    .register(Arc::new(distillery::TrainerResource::new(
-                        Arc::clone(store),
-                        device,
-                    )))
+                    .register(Arc::new(resource))
                     .map_err(|error| format!("register the trainer resource: {error}"))?;
                 Some(registry)
             },
@@ -313,7 +321,7 @@ impl ResidentDistillery {
         let composed_gpu = false;
         let facts = host_facts(composed_gpu)?;
 
-        let resident = authority
+        let mut resident = authority
             .bind_resident(mesh_id, store, resident_settings(&lane), move |space| {
                 let mut config = distillery::mesh_host::HostConfig::supervised(space);
                 config.policy = policy;
@@ -346,6 +354,11 @@ impl ResidentDistillery {
             .await
             .map_err(|error| format!("bind the Distillery resident: {error}"))?;
 
+        resident
+            .authority_mut()
+            .host_mut()
+            .set_gpu_access(gpu_access.clone());
+
         // Chronicle needs a board snapshot but owns neither the board nor its
         // lifecycle. Take that snapshot only after the resident authority is
         // completely assembled, then retain the observer beside the works so
@@ -369,9 +382,15 @@ impl ResidentDistillery {
             profile: profile_name,
             mesh_root,
             model_library,
+            gpu_access,
             #[cfg(feature = "trainer-gpu")]
             trainer_adapter,
         })
+    }
+
+    /// The single local device gate, shared with the registered trainer.
+    pub fn gpu_access(&self) -> distillery::gpu::GpuAccess {
+        self.gpu_access.clone()
     }
 
     /// The mesh this works joined, derived rather than configured.
