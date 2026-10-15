@@ -1,10 +1,9 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-14):** plan; nothing moved. The census below was read from
+**Status (2026-10-15):** plan; nothing moved. The census below was read from
 the source at `0aade8668` and corrects the first pass in several places
-(§2). Seven rulings from Mark are needed before the phases that name them
-(§5); phases P1 to P3 need none. No code, manifest or other plan changed with
-this document.
+(§2). Mark ruled R1 to R7 and the `Page` split on 2026-10-15 (§5). No code,
+manifest or other plan changed with this document.
 
 **Origin.** Mark noticed that the Graphshell reference host is about 100k
 lines and asked what could be generalized into the stack. Knot, Cleromancy
@@ -246,8 +245,8 @@ Djinn runs.
 
 | ID | Modules (lines) | Home | Receipt |
 |---|---|---|---|
-| L1 | **App-facing half**: `native/app_admission` (586), `app_client` (452), `custody` (496), `custody_client` (558), `custody_identity` (449), `quarantine` (60), `local_endpoint` (277), `tasks` (103); the wire types in `app_broker` (`APP_CONNECT_SCHEMA`, `AppMessage`, `AppHostMessage`, `AppBrokerError`); the NDJSON frame functions in `browser_carrier` (`read_native_message_async`, `write_native_message_async`); `identity::*` re-exports from `dramatis::view`; `profile::env_profile` (240). About 3.6k lines | A new small crate under `crates/graphshell/` (working name `app-door`; Mark names it, R3) | Woodshed's `woodshed-genet` and Hocket, Knot's `startup.rs`, Signalman and `ports/dramatis` depend on it alone and build with no `graphshell` package in their cone. Woodshed narrowed `graphshell` to `default-features = false, features = ["native"]` on its main (`c11571b`, relayed by its session), which already drops the retained-content cone; the crate then replaces the `graphshell` dependency itself in its three manifests |
-| L2 | **Serving half**: `admission` (372), `lifecycle` (718, with `AdmittedEndpointContext`, `BindAdmittedSession`, `SessionAuthority`), `native/endpoint_catalog` (635), `carrier` (694), `network_carrier` (271), `session_loop` (943), `session_notices` (398), `resume` (447), `live_endpoint` (738), `native/projection_host` (836), `native/resident_identity` (136, the `ResidentIdentity` trait), `policy_projection` (391); `webrtc_door` and `webrtc_session` follow or are feature-gated | A second crate under `crates/graphshell/` beside `graphshell-endpoint`; that crate's README already says admission and the serve loops "live in `ports/graphshell`" and names this as the not-yet-extracted half | Cleromancy registers an endpoint with `ResidentEndpointCatalog` and `AdmittedEndpointContext` without `graphshell`; Knot's `place_projection` test serves a projection with it; both build for their target features |
+| L1 | **App-facing half**: `native/app_admission` (586), `app_client` (452), `custody` (496), `custody_client` (558), `custody_identity` (449), `quarantine` (60), `local_endpoint` (277), `tasks` (103); the wire types in `app_broker` (`APP_CONNECT_SCHEMA`, `AppMessage`, `AppHostMessage`, `AppBrokerError`); the NDJSON frame functions in `browser_carrier` (`read_native_message_async`, `write_native_message_async`); `identity::*` re-exports from `dramatis::view`; `profile::env_profile` (240). About 3.6k lines | A `door` feature on `graphshell-endpoint` (ruled, R3) | Woodshed's `woodshed-genet` and Hocket, Knot's `startup.rs`, Signalman and `ports/dramatis` depend on it alone and build with no `graphshell` package in their cone. Woodshed narrowed `graphshell` to `default-features = false, features = ["native"]` on its main (`c11571b`, relayed by its session), which already drops the retained-content cone; the crate then replaces the `graphshell` dependency itself in its three manifests |
+| L2 | **Serving half**: `admission` (372), `lifecycle` (718, with `AdmittedEndpointContext`, `BindAdmittedSession`, `SessionAuthority`), `native/endpoint_catalog` (635), `carrier` (694), `network_carrier` (271), `session_loop` (943), `session_notices` (398), `resume` (447), `live_endpoint` (738), `native/projection_host` (836), `native/resident_identity` (136, the `ResidentIdentity` trait), `policy_projection` (391); `webrtc_door` and `webrtc_session` follow or are feature-gated | `graphshell-host`, a new crate under `crates/graphshell/` beside `graphshell-endpoint` (ruled, R4); that crate's README already says admission and the serve loops "live in `ports/graphshell`" and names this as the not-yet-extracted half | Cleromancy registers an endpoint with `ResidentEndpointCatalog` and `AdmittedEndpointContext` without `graphshell`; Knot's `place_projection` test serves a projection with it; both build for their target features |
 | L3 | **Server halves Djinn runs**: `native/app_broker` (522), `device_broker` (285), `browser_host` (668), `local_session` (243), `resident_mere_proxy` (218), `personal_sync_host` (2,319), `carriage_host` (564 + 290), `transfer_staging` (673), `graph_keys` (840) | `ports/djinn`, which is the only caller of `serve_app_broker` (three call sites) | Knot's `resident_app_route` test and the `graphshell_native_host` binary run against Djinn's broker or a small fixture host; `graphshell` no longer holds a broker |
 | L13 | `personal_sync` (3,693), `receipts` (1,368), `transfer_offer` (363) | Waits. A stack home (Pandect or a dedicated crate) for the replica, event and projection types Cleromancy imports | The facet shapes in `access` and `product` that `personal_sync.rs:41-42` reads must be settled (see the [facet dissolution brief](../research/2026-10-08_facet_dissolution_brief.md)) | Cleromancy builds `PersonalGraphReplica` with no `graphshell` package |
 
@@ -264,7 +263,7 @@ below were read from source.
 
 | ID | Modules (lines) | Home | Receipt |
 |---|---|---|---|
-| L14 | `mere_route` (452), `mere_route_session` (715), and the wire half of `session_item` (about 250 of 320 lines: the `djinn.mere/v1/*` route names, intent and schema constants, `SessionGraphV1`, `SetViewV1`, `ApplyEditsV1`, `SessionsActionV1`, `ArchiveActionV1`) | A sibling crate to `mere-view` (R7), depending on `mere-view`, `graphshell-client` and `chirograph`; not a feature of `mere-view` | Turnstone's overmap pane mounts a remote mere's graph as `mere-view` over an admitted session and shows its sessions, with Turnstone's own identity and window. Single route only |
+| L14 | `mere_route` (452), `mere_route_session` (715), and the wire half of `session_item` (about 250 of 320 lines: the `djinn.mere/v1/*` route names, intent and schema constants, `SessionGraphV1`, `SetViewV1`, `ApplyEditsV1`, `SessionsActionV1`, `ArchiveActionV1`) | `mere-overmap`, a sibling crate to `mere-view` under `crates/cambium/` (ruled, R7), depending on `mere-view`, `graphshell-client` and `chirograph`; not a feature of `mere-view` | Turnstone's overmap pane mounts a remote mere's graph as `mere-view` over an admitted session and shows its sessions, with Turnstone's own identity and window. Single route only |
 
 What source shows: `mere_route` fills `MereViewModel` from a route's two
 projections (sessions and the attached graph) and turns `MereViewRequest`s
@@ -345,41 +344,67 @@ Woodshed also asks for the Cambium views in `web_tree`. That is finding 12:
 a design pass over `Page`, and it belongs behind L5 and L12, because those
 views are the thin layer over the state those lifts expose.
 
-## 5. Rulings needed
+## 5. Rulings
 
-Each carries a recommendation and the evidence. None is needed for P1 to P3.
+Mark ruled R1 to R7 and the `Page` split on 2026-10-15. The options and
+evidence put to him are kept under each ruling.
 
-- **R1, where whole-definition authoring state lives.** Options: keep the
-  reducer in Graphshell until a second host needs it (recommended: no second
-  host exists, finding 3); a new crate under `crates/cambium/scenes/` (the
-  reducer needs `scenograph`, `scenomise`, `workbench` and `edit-history`, so
-  it cannot sit in `scenograph`, whose docs say hosts own editor UI and which
-  scenomise depends on); `scenomise` itself. Moving it ahead of a consumer
-  would add `workbench` and `edit-history` to a crate whose header says it has
-  no runtime or widget dependency.
-- **R2, where Forme workspace and session live.** Options: `platen` behind a
-  feature (recommended once the three canvas-touching pieces are cut: it
-  already holds `TileLayout`, the bridge and `TreeGeometry`; adding
-  `muniment`, whose core dependencies are `async-trait`, `blake3` and serde,
-  is small); the `mere` facade (the only crate that sees pictograph too, so
-  it needs no cut, but its header excludes session-host concerns); stay until
-  a second host. `crates/forme/forme` is excluded by the cycle.
-- **R3, the app-facing crate's name and location.** Working name `app-door`
-  under `crates/graphshell/`. Mark names crates. The custody-scoping task, if
-  it exists, may already have a name.
-- **R4, the serving half: stack crate or Djinn.** Recommended: a stack crate,
-  because Knot and Cleromancy would otherwise depend on a port that links
-  castellan. Ports may depend on ports (Djinn depends on `graphshell`); the
-  cost is the external repos' dependency cone.
-- **R5, whether `personal_sync` types move before the facet work settles.**
-  Recommended: no.
-- **R6, `appearance`.** Recommended: stays; it is the application's preference
-  record, which Tabard's division gives to the application.
-- **R7, the remote overmap crate's home and name (L14).** Recommended: a
-  sibling crate to `mere-view`, under `crates/cambium/` beside it or under
-  `crates/graphshell/` beside `graphshell-client`; the dependency set
+- **R1, where whole-definition authoring state lives. Ruled: `scenomise`.**
+  Mark: "it seems obvious this will end up in turnstone, knot, woodshed,
+  anything with an engine and ambient data." The reducer lifts ahead of a
+  second host; its first adopter (Knot's recipe editor or Turnstone) is the
+  receipt. It cannot go in `scenograph`: the reducer compiles through
+  `scenomise`, which depends on `scenograph`, so that would be a cycle.
+  `workbench` (serde optional) and `edit-history` carry no runtime, so adding
+  them does not break scenomise's no-runtime header. The reducer does carry
+  state between calls, unlike the closed-form solvers, so it goes behind a
+  feature (working name `authoring`), and solver-only consumers stay as they
+  are. Options considered: keep it in Graphshell until a second host; a new
+  crate under `crates/cambium/scenes/`.
+- **R2, where Forme workspace and session live. Ruled: `platen`**, behind a
+  feature, once the three canvas-touching pieces are cut. Platen already
+  depends on `workbench`, which is a stack crate (split-and-tab workspace
+  organization; Platen, Cambium, Pelt and the `mere` facade use it).
+  `crates/forme/forme` is excluded by the cycle.
+- **R3, the app-facing half (L1). Ruled: a `door` feature on
+  `graphshell-endpoint`; no new crate.** Apps already depend on the
+  endpoint crate, and its carriers are already features (folded in
+  2026-09-24), so the default build stays wasm-clean. The dramatis repository
+  cannot host it: L1 names `pandect` and `chirograph` types, and Mere depends
+  on dramatis. `custodian` was considered and set aside: the family
+  composition thesis brief already uses it for a delegated holder of bytes,
+  and the door carries admission, route ids and quarantine as well as
+  custody.
+- **R4, the serving half (L2). Ruled: a new stack crate, `graphshell-host`,
+  under `crates/graphshell/`.** Mark: "Clear boundaries and efficient use of
+  components." Knot, Cleromancy and Turnstone serve through it without
+  Djinn. Djinn keeps only the brokers (L3), and its `graphshell` dependency
+  goes once they move. Djinn stays where it is (`ports/djinn`). Castellan
+  stays its own port: Djinn already links its keeper, and its credential UI is
+  not the resident's. Options considered: a `serve` feature on
+  `graphshell-endpoint` (one crate spanning wasm-clean app and Tokio host
+  sides); Djinn owning it.
+- **R5, `personal_sync` and the facets. Ruled: move, and adapt when the
+  facet brief rules.** The [facet dissolution brief](../research/2026-10-08_facet_dissolution_brief.md)
+  is still open (waiting on graph semantics' owner since 2026-10-08), and no
+  node-facet change has landed since except float preservation in replay
+  (`a1309431f`). Mark asked for a nudge to that owner if one could reach it.
+  None can from this lane, because the owner is the ThinkPad Codex lane, so
+  the nudge is left to Mark. L13 no longer waits on the brief.
+- **R6, `appearance`. Stays** (recommendation stood; Mark asked what it is).
+  It is Graphshell's preference record: which Tabard theme and mode
+  Graphshell uses and how its visual roles map. Tabard owns theme
+  definitions, validation and derivation; each application owns its own
+  record, as Knot does for its font roles.
+- **R7, the remote overmap crate (L14). Ruled: `mere-overmap`, under
+  `crates/cambium/` beside `mere-view`.** Mark named it. The dependency set
   (`mere-view`, `graphshell-client`, `chirograph`, `pandect`, `kernel`) is
-  the same either way. Mark names crates.
+  the same in either location; it sits with the view it fills.
+- **The `Page` split (P9). Ruled: views become components.** Each
+  `web_tree` view becomes a Cambium component with narrow typed inputs and
+  moves with the lift that owns its state (L5, L12, L11). No separate
+  sub-state pass happens first. Options considered: sub-states inside the
+  port first; leaving `Page` until a native host asks.
 
 ## 6. Phases
 
@@ -387,7 +412,8 @@ Ordered by value and risk. A phase that lands code ends with the second-host
 receipt named for it; a receipt in this repository's tests does not stand in
 for the other repository's build.
 
-**P0. Rulings and ledger.** Settle R3 and R4, reconcile with any custody task,
+**P0. Rulings and ledger.** R3 and R4 are ruled (§5); the custody-scoping
+task was proposed but never started, and L1 under R3 supersedes it. Remaining:
 and record each phase's baseline: the `graphshell` dependency cone per
 consumer (`cargo tree` on each external consumer, not measured here because
 the git dependencies need network access), and the per-module `crate::`
@@ -395,17 +421,19 @@ import graph in §2 (method in Findings).
 *Done when:* R3 and R4 are ruled or explicitly deferred; the baseline numbers
 are in Findings; the custody task is referenced or recorded as absent.
 
-**P1. L1, the app-facing crate.** Highest value: five consumers outside the
+**P1. L1, the `door` feature on `graphshell-endpoint`.** Highest value: five consumers outside the
 port, and the most expensive current dependency. Split the wire types out of
 `app_broker` and the framing out of `browser_carrier` first (the two real
 tangles: `app_client` imports both), then move the files. Update Djinn,
 Signalman, `ports/dramatis` and `graphshell_native_host`'s imports in the same
 change. No re-export from `graphshell::native`.
-*Done when:* the crate builds for native and has no `graphshell` dependency;
+*Done when:* `graphshell-endpoint` with `door` builds for native, the
+default feature set stays wasm-clean, and neither pulls `graphshell`;
 Signalman and `ports/dramatis` build against it alone; `custody_client` and
 `app_client` tests pass in the crate; the boundary script passes; Woodshed's
 (root, `ports/hocket`, `validation/relationship-recipe`) and Knot's next repin
-name the crate in place of `graphshell`, recorded in their plans.
+name `graphshell-endpoint/door` in place of `graphshell`, recorded in their
+plans.
 
 **P2. L5, L8 and the `ProjectionClock` cut.** Canvas controls, faces and
 gesture parity into pictograph; `coupling_edit`; move `ProjectionClock` out of
@@ -418,7 +446,7 @@ feature; `web_tree/gestures.rs` and `controls.rs` call the pictograph functions.
 
 **P2a. L14, the remote overmap client.** Independent of P1 and P4: it needs
 only `graphshell-client`, which is already a stack crate, and an admitted
-session the host obtains itself. Needs R7. First split `session_item`'s wire
+session the host obtains itself. R7 ruled: `mere-overmap`. First split `session_item`'s wire
 half from its server builders, then move `mere_route`, `mere_route_session`
 and the wire half.
 *Done when:* the new crate builds with no `graphshell` dependency and its
@@ -436,8 +464,8 @@ pass; Graphshell's editor uses the same; no `chronicle_definition` or
 `default_definition` remains in a shared path.
 
 **P4. L2, the serving half.** Builds on P1 (the stack crate takes
-`AdmittedEndpointContext`, which `endpoint_catalog` already names). Needs R4
-and a decision on the WebRTC door's placement.
+`AdmittedEndpointContext`, which `endpoint_catalog` already names). R4 ruled: `graphshell-host`. Needs
+a decision on the WebRTC door's placement.
 *Done when:* the crate is wasm32-clean for `admission`, `webrtc_door` and
 `webrtc_join` and the web cone check passes; Cleromancy registers an endpoint
 through it; Knot's `place_projection` test serves through it; the port keeps
@@ -449,7 +477,7 @@ only `identity_endpoint`, `identity_projection` and the generic adapters.
 `resident_app_route` pass; `graphshell_native_host` and the C4 host fixture
 build against Djinn or a fixture host.
 
-**P6. L12, forme.** Needs R2 and a second host (Turnstone's workbench or
+**P6. L12, forme.** R2 ruled: `platen`. Needs a second host (Turnstone's workbench or
 Knot's workspace) that names its done condition.
 *Done when:* that host unlocks, drafts, discards and applies a forme through
 the lifted session; the lifted crate's tests carry the lifecycle cases that
@@ -467,7 +495,8 @@ commands.
 *Done when:* Cleromancy builds with no `graphshell` package; `product.rs`
 holds no operation Pandect now owns.
 
-**P9. The `web_tree` views.** A design pass over `Page`; start with the
+**P9. The `web_tree` views.** Ruled: views become components (§5), each
+moving with the lift that owns its state; start with the
 least-coupled files (`speed.rs` names only `Shared`). Woodshed's view needs
 (its `woodshed-views` already builds for wasm as `woodshed-web`) set the
 constraint: model and reducer crates wasm-clean, native-only view pieces
@@ -583,3 +612,10 @@ fast-forward of local main; nothing built).**
   P2a; Woodshed's interim narrowing (`c11571b`) recorded; Turnstone read from
   GitHub, adding it as a production consumer of L1 and L2 and confirming it is
   not a reducer consumer of the projection editor.
+- **2026-10-15:** Mark ruled R1 to R7 and the `Page` split (§5): the
+  authoring reducer goes to `scenomise` behind a feature; Forme goes to
+  `platen`; the app door becomes a `door` feature on `graphshell-endpoint`;
+  the serving half becomes `graphshell-host`; `personal_sync` moves and
+  adapts later; `appearance` stays; the remote overmap is `mere-overmap`
+  beside `mere-view`; `web_tree` views become components. The custody-scoping
+  task is withdrawn as superseded by L1.
