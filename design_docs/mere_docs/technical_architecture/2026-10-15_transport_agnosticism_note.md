@@ -21,7 +21,7 @@ similar profiles/methods...". He doubts one transport is enough.
 the stack has, tabulates what each implements itself, names the duplication,
 and proposes layers that carriers assemble instead of re-implementing. The
 remote mere route is the worked example. It ends with ranked
-recommendations and open rulings (§9). It moves no code.
+recommendations and Mark's rulings (§9). It moves no code.
 
 ## 1. The worked example: a remote mere route
 
@@ -329,29 +329,33 @@ transport.
    p2panda endpoint across sync lanes; Knot's publish carrier on the shared
    admission entry if Knot wants it.
 
-## 9. Open rulings for Mark
+## 9. Rulings
 
-- **T1, the seam.** An admitted byte stream or line channel plus ingress
-  facts (recommended), or a new carrier trait in chirograph or
-  `graphshell-endpoint`.
-- **T2, framing.** NDJSON inside every stream, with length prefixes only as
-  platform envelopes below admission (recommended), or one length-prefixed
-  framing everywhere.
-- **T3, notices.** Push on every carrier that can, retiring `TakeNotice`,
-  `WaitNotice` and Discover-as-poll where push exists; and where the native
-  pump lives (`graphshell-client` or `mere-overmap`).
-- **T4, who can dial a remote mere route.** Same-persona devices by device
-  grant only, or also other people's Turnstone as place members by
-  delegation, and whether `ambient/mere/<domain>` is ever exposed remotely.
-- **T5, the remote application identity.** How a dialer proves which
-  application it is (an application claim in the delegation, a route grant
-  naming the app, or a fixed "remote" application with its own view state).
-- **T6, where the shared layers live.** Server side in `graphshell-host` (R4)
-  and client side in `graphshell-client`, or a dedicated carrier crate.
-- **T7, whether Djinn runs a dialable projection host**, and on which key: the
-  personal-sync transport key, a dedicated resident key, or per-place keys as
-  Turnstone uses.
-- **T8, WebRTC signalling.** Keep HTTP, or carry it over an admitted carrier.
+Mark ruled T1 to T8 on 2026-10-15. Every recommendation stood except T4,
+where he chose the widest option.
+
+- **T1, the seam. Ruled: an admitted byte stream or line channel plus
+  ingress facts.** No new carrier trait.
+- **T2, framing. Ruled: NDJSON inside every stream.** Length prefixes are
+  used only as platform envelopes below admission.
+- **T3, notices. Ruled: push on every carrier that can.** Where push exists,
+  `TakeNotice`, `WaitNotice` and Discover-as-poll retire. The native
+  stream-to-lines pump lives in `graphshell-client`, so every remote session
+  can use it, not only the overmap.
+- **T4, who can dial a remote mere route. Ruled: same-persona devices by
+  device grant, other people's Turnstone as place members by delegation,
+  and `ambient/mere/<domain>` exposed remotely as well.** This was the widest
+  option offered. Exposing ambient remotely needs its own admission and
+  grant shape, which the implementing pass must set out before serving it.
+- **T5, the remote application identity. Ruled: an application claim in the
+  delegation.** The persona's delegation names the application that may act.
+- **T6, where the shared layers live. Ruled: server side in
+  `graphshell-host` (R4), client side in `graphshell-client`.** No dedicated
+  carrier crate.
+- **T7, Djinn's dialable projection host. Ruled: yes, on a dedicated
+  resident key.** It does not share personal sync's key or per-place keys.
+- **T8, WebRTC signalling. Ruled: keep HTTP for now.** Moving it onto an
+  admitted carrier stays in the later tier.
 
 ## Findings
 
