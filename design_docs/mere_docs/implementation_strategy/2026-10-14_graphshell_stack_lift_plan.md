@@ -346,7 +346,7 @@ views are the thin layer over the state those lifts expose.
 
 ## 5. Rulings
 
-Mark ruled R1 to R7 and the `Page` split on 2026-10-15. The options and
+Mark ruled R1 to R8 and the `Page` split on 2026-10-15. The options and
 evidence put to him are kept under each ruling.
 
 - **R1, where whole-definition authoring state lives. Ruled: `scenomise`.**
@@ -379,11 +379,20 @@ evidence put to him are kept under each ruling.
   under `crates/graphshell/`.** Mark: "Clear boundaries and efficient use of
   components." Knot, Cleromancy and Turnstone serve through it without
   Djinn. Djinn keeps only the brokers (L3), and its `graphshell` dependency
-  goes once they move. Djinn stays where it is (`ports/djinn`). Castellan
-  stays its own port: Djinn already links its keeper, and its credential UI is
-  not the resident's. Options considered: a `serve` feature on
+  goes once they move. Djinn stays where it is (`ports/djinn`). Options considered: a `serve` feature on
   `graphshell-endpoint` (one crate spanning wasm-clean app and Tokio host
   sides); Djinn owning it.
+- **R8, Castellan's place. Ruled: a component crate under Djinn,
+  `ports/djinn/castellan`**, laid out like `ports/distillery/athanor`.
+  Mark: "castellan does not need to keep credential manager screens when
+  dramatis exists." Castellan has no screens. Its secret-free views moved to
+  `dramatis::view` (dramatis repo plan D24), `dramatis-app` is the persona
+  and quarantine UI, and `deny.toml` lets only Djinn link `castellan` (D4,
+  D16). It stays its own crate, so the secret-custody code keeps its
+  dependency boundary and the `deny.toml` wrapper check; only its location
+  changes. Its `lib.rs` header still describes an "embeddable half" and is
+  corrected with the move. This supersedes the 2026-08-22 census line giving
+  Castellan the identity and credential product surface.
 - **R5, `personal_sync` and the facets. Ruled: move, and adapt when the
   facet brief rules.** The [facet dissolution brief](../research/2026-10-08_facet_dissolution_brief.md)
   is still open (waiting on graph semantics' owner since 2026-10-08), and no
@@ -619,3 +628,6 @@ fast-forward of local main; nothing built).**
   adapts later; `appearance` stays; the remote overmap is `mere-overmap`
   beside `mere-view`; `web_tree` views become components. The custody-scoping
   task is withdrawn as superseded by L1.
+- **2026-10-15 (later):** R8: Castellan moves to `ports/djinn/castellan` as
+  a component crate. The R4 note that Castellan keeps a credential UI is
+  withdrawn; Castellan has none.
