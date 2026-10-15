@@ -23,6 +23,10 @@ pub struct MereViewModel {
     /// Where the sessions and archives show: beside the graph, as an overmap
     /// band above it, or as an overmap tier on its canvas.
     pub placement: SessionPlacement,
+    /// In a tier, the most archives a session or the shelf shows one by one;
+    /// past it they collapse into one "+N" node. `None` takes
+    /// [`DEFAULT_MAX_ARCHIVE_NODES`](crate::DEFAULT_MAX_ARCHIVE_NODES), 3.
+    pub max_archive_nodes: Option<usize>,
     pub graph: GraphModel,
     /// The layout in use: one of cartography's graph-only strategy ids.
     pub layout: String,

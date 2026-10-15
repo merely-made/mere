@@ -118,8 +118,10 @@ fn root(harness: &Harness) -> Child {
     mere_view(
         harness.view_of(),
         |harness: &mut Harness, event| {
-            harness.view.apply(event);
-            // An opened or closed tier card changes the graph's area.
+            let (width, height) = harness.tile;
+            harness
+                .view
+                .apply_and_lay_out(event, &harness.model, width, height);
             harness.relayout();
         },
         |harness: &mut Harness, request| harness.carry_out(request),

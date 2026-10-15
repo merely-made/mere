@@ -15,7 +15,7 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
 use uuid::Uuid;
 
 use super::*;
-use crate::tier::{MAX_ARCHIVE_NODES, ON_SHELF, SHELF_NODE_KEY, more_node_key};
+use crate::tier::{DEFAULT_MAX_ARCHIVE_NODES, ON_SHELF, SHELF_NODE_KEY, more_node_key};
 
 struct Host {
     model: MereViewModel,
@@ -49,8 +49,8 @@ fn render(host: &Host) -> MereViewElement<Host, ()> {
             height: host.height,
         },
         |host: &mut Host, event| {
-            host.view.apply(event);
-            host.view.lay_out(&host.model, host.width, host.height);
+            host.view
+                .apply_and_lay_out(event, &host.model, host.width, host.height)
         },
         |host: &mut Host, request| host.requests.push(request),
     )
@@ -1597,7 +1597,7 @@ fn past_a_few_archives_a_session_shows_one_more_node_that_opens_its_card() {
         // Morning's single archive still shows as its own node.
         assert!(find(&dom, root, "data-key", &archive_node_key("saved")).is_some());
     }
-    assert!(MAX_ARCHIVE_NODES < 4);
+    assert!(DEFAULT_MAX_ARCHIVE_NODES < 4);
     let more = find(&dom.borrow(), root, "data-key", &more_key).unwrap();
     runner.dispatch_click(more, PointerClick::at((1., 1.)));
     assert_eq!(
@@ -1625,4 +1625,63 @@ fn past_a_few_archives_a_session_shows_one_more_node_that_opens_its_card() {
     runner.dispatch_key(escape());
     let chip = find(&dom.borrow(), root, "data-archive-chip", "evening-2").unwrap();
     assert_eq!(runner.focus(), Some(chip));
+}
+
+#[test]
+fn the_host_sets_how_many_archives_show_before_they_collapse() {
+    let mut model = tier_model();
+    let archive = model.archive.as_mut().unwrap();
+    for n in 0..4 {
+        archive.entries.push(ArchiveEntry {
+            key: format!("evening-{n}"),
+            name: format!("Codicil blake3:e{n}"),
+            detail: "Read-only archive".into(),
+            can_open: true,
+            session: Some(session_id(2)),
+        });
+    }
+    let nodes = |model: &MereViewModel| {
+        let host = Host::new(model.clone(), 900, 600);
+        tier_view(&host)
+            .swatch()
+            .graph
+            .nodes
+            .iter()
+            .map(|node| node.id.clone())
+            .collect::<Vec<_>>()
+    };
+    let more = more_node_key(TierCard::Session(session_id(2)));
+    assert!(
+        nodes(&model).contains(&more),
+        "four pass the default of three"
+    );
+    model.max_archive_nodes = Some(4);
+    let shown = nodes(&model);
+    assert!(!shown.contains(&more), "the host lets four show");
+    assert!(shown.contains(&archive_node_key("evening-3")));
+    model.max_archive_nodes = Some(0);
+    assert!(
+        nodes(&model).contains(&more_node_key(TierCard::Session(session_id(1)))),
+        "even one collapses at zero"
+    );
+}
+
+#[test]
+fn apply_and_lay_out_lays_the_graph_out_again_for_an_open_card() {
+    let model = tier_model();
+    let mut state = MereViewState::default();
+    state.lay_out(&model, 900, 600);
+    let before = state.position("a");
+    state.apply_and_lay_out(
+        MereViewEvent::Expand(Some(TierCard::Session(session_id(1)))),
+        &model,
+        900,
+        600,
+    );
+    assert_eq!(state.expanded, Some(TierCard::Session(session_id(1))));
+    assert_ne!(
+        state.position("a"),
+        before,
+        "laid out again below the grown tier"
+    );
 }

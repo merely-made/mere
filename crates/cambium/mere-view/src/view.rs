@@ -144,10 +144,12 @@ pub enum MereViewEvent {
 }
 
 /// The view's own state: hover, focus and the last layout. The host stores
-/// it beside its own, applies [`MereViewEvent`]s to it, and calls
-/// [`lay_out`](Self::lay_out) before rendering: an opened or closed tier
-/// card changes the area the graph is laid out in. (Until it does, the view
-/// fits the last layout into the area it has.)
+/// it beside its own and hands it each [`MereViewEvent`] with
+/// [`apply_and_lay_out`](Self::apply_and_lay_out), and calls
+/// [`lay_out`](Self::lay_out) whenever the model or tile changes: an opened
+/// or closed tier card changes the area the graph is laid out in. (A host
+/// that only [`apply`](Self::apply)s sees the last layout fitted into the
+/// area it has until it lays out again.)
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct MereViewState {
     pub hovered: Option<String>,
@@ -239,6 +241,21 @@ impl MereViewState {
                 }
             },
         }
+    }
+
+    /// Apply `event`, then lay the view out again for `model` in a tile of
+    /// `width` by `height`: the one call a host makes per event, since
+    /// opening or closing a tier card changes the area the graph is laid out
+    /// in. Laying out again is free when nothing it reads changed.
+    pub fn apply_and_lay_out(
+        &mut self,
+        event: MereViewEvent,
+        model: &MereViewModel,
+        width: u32,
+        height: u32,
+    ) {
+        self.apply(event);
+        self.lay_out(model, width, height);
     }
 
     /// Lay the model's graph out for a tile of `width` by `height`, unless its
