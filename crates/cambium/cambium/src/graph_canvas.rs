@@ -1683,6 +1683,24 @@ pub enum GraphCanvasEvent<Id> {
 
 impl<Id> crate::Action for GraphCanvasEvent<Id> {}
 
+/// What [`graph_canvas_with_wheel`] reports: the established
+/// [`GraphCanvasEvent`]s, with the wheel passed through whole in place of
+/// [`GraphCanvasEvent::Zoom`]. A separate type, as [`GraphAtlasEvent`] is, so a
+/// consumer that matches [`GraphCanvasEvent`] exhaustively keeps compiling.
+#[derive(Clone, Debug)]
+pub enum GraphCanvasInput<Id> {
+    /// Any event [`graph_canvas`] reports other than a wheel notch.
+    Event(GraphCanvasEvent<Id>),
+    /// A wheel notch over the canvas, untouched: both axes of `delta`, the
+    /// pointer's canvas-local position (`local`, in the canvas's `size`) and the
+    /// modifiers. The host's own scroll default is not suppressed; the consumer
+    /// calls [`WheelEvent::prevent_default`] when its policy takes the notch,
+    /// and leaves it alone when the page should scroll.
+    Wheel(WheelEvent),
+}
+
+impl<Id> crate::Action for GraphCanvasInput<Id> {}
+
 /// Atlas-only interaction events. Kept separate from [`GraphCanvasEvent`] so
 /// the established generic graph callback remains source-compatible.
 #[derive(Clone, Debug, PartialEq)]
@@ -1736,6 +1754,72 @@ where
     Kind: Clone + PartialEq + 'static,
     F: Fn(&mut State, GraphCanvasEvent<Id>) -> Output + 'static,
 {
+    graph_canvas_core(
+        swatch,
+        |event| event,
+        |event: WheelEvent| {
+            // A notch toward the top zooms in, matching every map surface; the
+            // host's own scroll default is suppressed so the page does not
+            // scroll under the zoom.
+            if event.delta.1 == 0.0 {
+                return None;
+            }
+            event.prevent_default();
+            Some(GraphCanvasEvent::Zoom {
+                factor: if event.delta.1 > 0.0 { 1.2 } else { 1.0 / 1.2 },
+            })
+        },
+        on_event,
+    )
+}
+
+/// [`graph_canvas`] with the wheel passed through whole, for a consumer that
+/// applies its own wheel policy (a wheel-mode choice, pointer-anchored zoom, a
+/// modifier that always zooms) instead of taking a fixed zoom factor.
+///
+/// Every other event is the same [`GraphCanvasEvent`] [`graph_canvas`] reports,
+/// wrapped in [`GraphCanvasInput::Event`].
+pub fn graph_canvas_with_wheel<State, A, Output, Id, Kind, F>(
+    swatch: &GraphCanvasSwatch<Id, Kind>,
+    on_event: F,
+) -> impl View<State, A, GenetCtx, Element = GenetElement> + use<State, A, Output, Id, Kind, F>
+where
+    State: 'static,
+    A: 'static,
+    Output: OptionalAction<A> + 'static,
+    Id: Clone + PartialEq + 'static,
+    Kind: Clone + PartialEq + 'static,
+    F: Fn(&mut State, GraphCanvasInput<Id>) -> Output + 'static,
+{
+    graph_canvas_core(
+        swatch,
+        GraphCanvasInput::Event,
+        |event: WheelEvent| Some(GraphCanvasInput::Wheel(event)),
+        on_event,
+    )
+}
+
+/// The graph canvas, generic over the event a child reports to its own
+/// component boundary: `lift` wraps each [`GraphCanvasEvent`] and `wheel` turns
+/// a wheel notch into one (or none).
+fn graph_canvas_core<State, A, Output, Id, Kind, E, Lift, Wheel, F>(
+    swatch: &GraphCanvasSwatch<Id, Kind>,
+    lift: Lift,
+    wheel: Wheel,
+    on_event: F,
+) -> impl View<State, A, GenetCtx, Element = GenetElement>
++ use<State, A, Output, Id, Kind, E, Lift, Wheel, F>
+where
+    State: 'static,
+    A: 'static,
+    Output: OptionalAction<A> + 'static,
+    Id: Clone + PartialEq + 'static,
+    Kind: Clone + PartialEq + 'static,
+    E: crate::Action + 'static,
+    Lift: Fn(GraphCanvasEvent<Id>) -> E + Clone + 'static,
+    Wheel: Fn(WheelEvent) -> Option<E> + Clone + 'static,
+    F: Fn(&mut State, E) -> Output + 'static,
+{
     component(
         swatch.clone(),
         |_props: &GraphCanvasSwatch<Id, Kind>| GraphCanvasLocal {
@@ -1749,7 +1833,9 @@ where
         |_prev: &GraphCanvasSwatch<Id, Kind>,
          _next: &GraphCanvasSwatch<Id, Kind>,
          _local: &mut GraphCanvasLocal<Id>| {},
-        |props: &GraphCanvasSwatch<Id, Kind>, local: &GraphCanvasLocal<Id>| {
+        move |props: &GraphCanvasSwatch<Id, Kind>, local: &GraphCanvasLocal<Id>| {
+            let lift = lift.clone();
+            let wheel = wheel.clone();
             let mut swatch = props.clone();
             swatch.hovered = local.hovered.clone();
             swatch.focus = local.focus.clone();
@@ -1762,18 +1848,33 @@ where
             }
             Box::new(graph_canvas_swatch_with_focus_and_drag_and_relations(
                 &swatch,
-                |_: &mut GraphCanvasLocal<Id>, id: Id| GraphCanvasEvent::Activate(id),
+                {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>, id: Id| lift(GraphCanvasEvent::Activate(id))
+                },
                 |local: &mut GraphCanvasLocal<Id>, id: Option<Id>| local.hovered = id,
                 |local: &mut GraphCanvasLocal<Id>, id: Option<Id>| local.focus = id,
-                |_: &mut GraphCanvasLocal<Id>, drag: GraphCanvasNodeDrag<Id>| {
-                    GraphCanvasEvent::Drag(drag)
+                {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>, drag: GraphCanvasNodeDrag<Id>| {
+                        lift(GraphCanvasEvent::Drag(drag))
+                    }
                 },
-                |_: &mut GraphCanvasLocal<Id>, id: String| GraphCanvasEvent::RelationActivate(id),
+                {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>, id: String| {
+                        lift(GraphCanvasEvent::RelationActivate(id))
+                    }
+                },
                 |local: &mut GraphCanvasLocal<Id>, id: Option<String>| {
                     local.hovered_relation = id;
                 },
-                |_: &mut GraphCanvasLocal<Id>| GraphCanvasEvent::Expand,
                 {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>| lift(GraphCanvasEvent::Expand)
+                },
+                {
+                    let lift = lift.clone();
                     let width = (props.width as f32).max(1.0);
                     let height = (props.height as f32).max(1.0);
                     move |local: &mut GraphCanvasLocal<Id>, event: PointerEvent| match event.phase {
@@ -1790,9 +1891,9 @@ where
                             if delta == (0.0, 0.0) {
                                 return None;
                             }
-                            Some(GraphCanvasEvent::Pan {
+                            Some(lift(GraphCanvasEvent::Pan {
                                 delta: (delta.0 / width, delta.1 / height),
-                            })
+                            }))
                         },
                         PointerPhase::Up | PointerPhase::Cancel => {
                             local.pan_anchor = None;
@@ -1800,19 +1901,8 @@ where
                         },
                     }
                 },
-                |_: &mut GraphCanvasLocal<Id>, event: WheelEvent| {
-                    // A notch toward the top zooms in, matching every map
-                    // surface; the host's own scroll default is suppressed so
-                    // the page does not scroll under the zoom.
-                    if event.delta.1 == 0.0 {
-                        return None;
-                    }
-                    event.prevent_default();
-                    Some(GraphCanvasEvent::Zoom {
-                        factor: if event.delta.1 > 0.0 { 1.2 } else { 1.0 / 1.2 },
-                    })
-                },
-            )) as ComponentView<GraphCanvasLocal<Id>, GraphCanvasEvent<Id>>
+                move |_: &mut GraphCanvasLocal<Id>, event: WheelEvent| wheel(event),
+            )) as ComponentView<GraphCanvasLocal<Id>, E>
         },
         on_event,
     )
@@ -2071,6 +2161,95 @@ mod tests {
         runner.dispatch_wheel(canvas, WheelEvent::new((0.0, 3.0), (5.0, 5.0), size));
         runner.dispatch_wheel(canvas, WheelEvent::new((0.0, -3.0), (5.0, 5.0), size));
         assert_eq!(runner.state().zooms, vec![1.2, 1.0 / 1.2]);
+    }
+
+    #[derive(Default)]
+    struct WheelState {
+        wheels: Vec<((f32, f32), (f32, f32), (f32, f32), bool, bool)>,
+        others: usize,
+        take: bool,
+    }
+
+    type WheelView = Box<dyn AnyView<WheelState, (), GenetCtx, GenetElement>>;
+
+    fn wheel_view(state: &WheelState) -> WheelView {
+        let swatch = model(None, None);
+        let _ = state;
+        Box::new(graph_canvas_with_wheel(
+            &swatch,
+            |state: &mut WheelState, input: GraphCanvasInput<u8>| match input {
+                GraphCanvasInput::Wheel(event) => {
+                    state.wheels.push((
+                        event.delta,
+                        event.local,
+                        event.size,
+                        event.modifiers.ctrl,
+                        event.modifiers.meta,
+                    ));
+                    if state.take {
+                        event.prevent_default();
+                    }
+                },
+                GraphCanvasInput::Event(_) => state.others += 1,
+            },
+        ))
+    }
+
+    /// A consumer that opts in sees the whole wheel notch (both axes, where the
+    /// pointer was, the modifiers) and decides whether the host's scroll default
+    /// runs. A wheel that is not asked for as a zoom is not turned into one.
+    #[test]
+    fn the_wheel_reaches_an_opting_in_consumer_whole() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), wheel_view, WheelState::default());
+        let root = runner.root();
+        let canvas = find_attr(&dom.borrow(), root, "class", "graph-canvas-swatch")
+            .expect("canvas root element");
+        let size = (240.0, 112.0);
+
+        let mut event = WheelEvent::new((7.0, -3.0), (100.0, 40.0), size);
+        event.modifiers.ctrl = true;
+        runner.dispatch_wheel(canvas, event);
+        assert_eq!(
+            runner.state().wheels,
+            vec![((7.0, -3.0), (100.0, 40.0), size, true, false)]
+        );
+        assert!(!runner.default_prevented(), "the consumer did not take it");
+
+        runner.update(|state| state.take = true);
+        runner.dispatch_wheel(canvas, WheelEvent::new((0.0, 0.0), (1.0, 2.0), size));
+        assert_eq!(
+            runner.state().wheels.len(),
+            2,
+            "a zero notch is still reported"
+        );
+        assert!(runner.default_prevented(), "the consumer took it");
+        assert_eq!(runner.state().others, 0);
+    }
+
+    /// The established form is unchanged: a notch is a fixed zoom factor, the
+    /// host's scroll default is suppressed, and a zero notch reports nothing.
+    #[test]
+    fn the_established_wheel_zoom_is_unchanged() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            viewport_view,
+            ViewportState::default(),
+        );
+        let root = runner.root();
+        let canvas = find_attr(&dom.borrow(), root, "class", "graph-canvas-swatch")
+            .expect("canvas root element");
+        let size = (240.0, 112.0);
+        runner.dispatch_wheel(canvas, WheelEvent::new((9.0, 3.0), (5.0, 5.0), size));
+        assert!(runner.default_prevented());
+        runner.dispatch_wheel(canvas, WheelEvent::new((9.0, 0.0), (5.0, 5.0), size));
+        assert!(
+            !runner.default_prevented(),
+            "a zero notch is left to the host"
+        );
+        assert_eq!(runner.state().zooms, vec![1.2]);
     }
 
     fn attr<'a>(dom: &'a ScriptedDom, node: NodeId, name: &str) -> Option<&'a str> {
