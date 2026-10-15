@@ -2023,6 +2023,117 @@ mod tests {
         );
     }
 
+    /// Knot's overmap layer (knot-editor `mere_overlay`) saves the attached
+    /// session to the archive and opens it again, through the first-party
+    /// door as `knot-editor`, and reads the codicil back from the route.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn knot_overlay_saves_and_opens_an_archive_through_the_door() {
+        use castellan::{
+            authority::PersonaeHost,
+            custody::{IdentityVault, InMemoryStorage, Profile},
+        };
+        use graphshell::native::app_broker::serve_app_broker;
+        use graphshell_endpoint::door::tasks::ResidentTasks;
+        use knot_editor::mere_overlay::MereOverlay;
+        use mere_view::{ArchiveRequest, MereViewRequest};
+        use personae::{Ed25519Keypair, ProfileId};
+        let fixture = fixture(35, "divination").await;
+        let mut writer = fixture.attach("turnstone").await;
+        let initial = graph(&mut writer);
+        assert_eq!(
+            writer.invoke(apply(&initial, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let host = Arc::new(PersonaeHost::new(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("knot-overlay".into()),
+                    "Knot overlay fixture",
+                    Ed25519Keypair::from_seed([0x4b; 32]),
+                ),
+            ),
+            None,
+            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
+        ));
+        #[cfg(not(windows))]
+        let address = format!("/tmp/knov-{}.sock", Uuid::new_v4());
+        #[cfg(windows)]
+        let address = format!(r"\\.\pipe\knov-{}", Uuid::new_v4());
+        let tasks = ResidentTasks::new();
+        let (scope, door, grants, socket) = (
+            tasks.clone(),
+            fixture.catalog.clone(),
+            fixture.grants.clone(),
+            address.clone(),
+        );
+        let server = tokio::spawn(async move {
+            scope
+                .scope(serve_app_broker(
+                    &socket,
+                    Arc::new(crate::keeper::Keeper::new(host)),
+                    grants,
+                    60_000,
+                    None,
+                    door,
+                ))
+                .await
+        });
+        for _ in 0..100 {
+            if graphshell_endpoint::door::local_endpoint::connect_local(&address)
+                .await
+                .is_ok()
+            {
+                break;
+            }
+            assert!(!server.is_finished());
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+
+        let mut overlay = MereOverlay::open_at(&address, "divination").await.unwrap();
+        let before = overlay.read().await.unwrap();
+        let attached = before
+            .sessions
+            .iter()
+            .find(|session| session.attached)
+            .expect("the route marks the attached session")
+            .id;
+        let archive = before.archive.expect("the route advertises its archive");
+        assert!(archive.entries.is_empty());
+        assert!(archive.save_sessions.contains(&attached));
+
+        let saved = overlay
+            .take(&MereViewRequest::Archive(ArchiveRequest::Save(attached)))
+            .await
+            .unwrap();
+        assert_eq!(saved, None, "the route accepts Knot's save");
+        let after = overlay.read().await.unwrap();
+        let entries = after.archive.expect("the archive stays advertised").entries;
+        assert_eq!(entries.len(), 1, "the saved codicil is read back");
+        assert!(entries[0].can_open);
+
+        let opened = overlay
+            .take(&MereViewRequest::Archive(ArchiveRequest::Open(
+                entries[0].key.clone(),
+            )))
+            .await
+            .unwrap();
+        assert_eq!(opened, None, "the route accepts Knot's open");
+        assert!(
+            overlay
+                .take(&MereViewRequest::Archive(ArchiveRequest::Compose(vec![
+                    "unknown".into(),
+                    "unknown".into(),
+                ])))
+                .await
+                .unwrap()
+                .is_some(),
+            "an unadvertised compose is declined before it reaches the route"
+        );
+        tasks.cancel_and_join().await;
+        server.abort();
+    }
+
     #[tokio::test(flavor = "multi_thread")]
     async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {
         use castellan::{

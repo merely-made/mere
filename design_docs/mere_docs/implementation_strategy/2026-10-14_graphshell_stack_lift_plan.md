@@ -750,3 +750,25 @@ fast-forward of local main; nothing built).**
   not reach: `tabard-desktop`'s `native_shared_recovery` example on main, and
   `mere-mesh` examples and Graphshell's `practice_*` tests that `include!`
   sibling checkouts (`murm`, `woodshed`) by a path a worktree does not have.
+- **2026-10-15 (P1 closed, shim gone):** Knot repinned (knot-editor
+  `a27911ad`, on Mere `19573b51`): its library imports custody, admission and
+  the identity views from `graphshell_endpoint::door`, and `graphshell` is a
+  Knot dev-dependency only. Mere's workspace and Djinn's `knot-site` move to
+  that revision, and the transitional `graphshell::native` re-export is
+  deleted, so P1 now holds without exception. Knot's repin also carried a
+  `mere-view` change (archive controls) under Mark's ruling "catalog, route as
+  overmap": Knot's catalog stays the graph, and knot-editor's new
+  `mere_overlay` (feature `mere-overlay`) reads a resident mere's `mere/<domain>`
+  route as `knot-editor` through the door, using `mere-overmap`'s mapping, for
+  the sessions and archive above it (knot-editor
+  `design_docs/2026-10-15_knot_mere_overmap_layer.md`). Mere's patch tables gain
+  `mere-overmap`, which Knot now names, and Djinn's tests take knot-editor
+  with `mere-overlay`. New receipt: `resident_mere`
+  `knot_overlay_saves_and_opens_an_archive_through_the_door` (Save, read back,
+  Open, unadvertised Compose declined). Checks: `TMPDIR=/tmp cargo test` on
+  `graphshell-endpoint` (`door`), `graphshell`, `djinn`, `mere-signalman`,
+  `dramatis-app` and `mere-overmap` passes (841 passed, 22 ignored);
+  `cargo build --workspace` and the boundary script pass; `cargo check
+  --workspace --all-targets` fails only at the pre-existing `tabard-desktop`
+  example and the `mere-mesh` examples noted above. Still open: Woodshed's and
+  Turnstone's repins (the P1 entry lists what they need).

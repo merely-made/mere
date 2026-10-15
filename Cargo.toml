@@ -260,8 +260,11 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # embedded contracts resolve locally through the complete patch table below.
 # The receipt records supplier graph and compile qualification. Djinn's `knot-site`
 # row moves with these two pins so all Knot packages share one source.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "8ed49d43f049921d56ab5a0c091a2c37c0970ee7" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "8ed49d43f049921d56ab5a0c091a2c37c0970ee7" }
+# On 2026-10-15 both move to a27911ad, which imports custody and admission from
+# `graphshell-endpoint`'s `door` (stack lift plan P1) and adds `mere_overlay`,
+# Knot's overmap layer over a resident mere's route; Knot pins Mere 19573b51.
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "a27911ada2f7c5b88ac9b3d05de80bc61040fc8b" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "a27911ada2f7c5b88ac9b3d05de80bc61040fc8b" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -682,6 +685,7 @@ mere-fleece = { path = "crates/fleece" }
 mere-forme = { path = "crates/forme/forme" }
 mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-page-load = { path = "crates/system/page-load" }
+mere-overmap = { path = "crates/cambium/mere-overmap" }
 mere-view = { path = "crates/cambium/mere-view" }
 mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
 meristem = { path = "crates/cambium/meristem" }
@@ -759,6 +763,7 @@ mere-fleece = { path = "crates/fleece" }
 mere-forme = { path = "crates/forme/forme" }
 mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-page-load = { path = "crates/system/page-load" }
+mere-overmap = { path = "crates/cambium/mere-overmap" }
 mere-view = { path = "crates/cambium/mere-view" }
 mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
 meristem = { path = "crates/cambium/meristem" }
