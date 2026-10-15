@@ -6,11 +6,10 @@
 
 //! K2: product endpoints served to network peers by one resident host.
 //!
-//! The `graphshell` port's `native::browser_host` (there until the stack lift
-//! plan's P5) serves a catalog route to a browser that admitted itself over
-//! native messaging. This serves the same catalog to a peer that dialled over
-//! a transport, which is what a place member reaching the document's holder
-//! actually is.
+//! Djinn's `door::browser_host` serves a catalog route to a browser that
+//! admitted itself over native messaging. This serves the same catalog to a
+//! peer that dialled over a transport, which is what a place member reaching
+//! the document's holder actually is.
 //!
 //! Everything below the accept is already built and none of it is repeated
 //! here: [`crate::carrier::accept_projection_session`] decides who is admitted,

@@ -27,6 +27,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use crate::door::app_broker::AppEndpointCatalog;
 use crate::resident_reservoir::ResidentReservoir;
 use chirograph::{
     AdvertisedAction, BoundsRelationship, CachePolicy, CardValueV1, CarrierNotice, ContentHash,
@@ -39,7 +40,6 @@ use chirograph::{
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
-use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{
@@ -2395,11 +2395,11 @@ mod tests {
     /// door as `knot-editor`, and reads the codicil back from the route.
     #[tokio::test(flavor = "multi_thread")]
     async fn knot_overlay_saves_and_opens_an_archive_through_the_door() {
+        use crate::door::app_broker::serve_app_broker;
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
         };
-        use graphshell::native::app_broker::serve_app_broker;
         use graphshell_endpoint::door::tasks::ResidentTasks;
         use knot_editor::mere_overlay::MereOverlay;
         use mere_view::{ArchiveRequest, MereViewRequest};
@@ -2537,12 +2537,10 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {
+        use crate::door::{app_broker::serve_app_broker, resident_mere_proxy::ResidentMereProxy};
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
-        };
-        use graphshell::native::{
-            app_broker::serve_app_broker, resident_mere_proxy::ResidentMereProxy,
         };
         use graphshell_endpoint::door::tasks::ResidentTasks;
         use personae::{Ed25519Keypair, ProfileId};

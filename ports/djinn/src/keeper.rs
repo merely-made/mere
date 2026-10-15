@@ -17,11 +17,12 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::door::local_session::{DoorIdentity, door_salts};
+use crate::door::resident_identity::{CustodyFuture, ResidentIdentity};
 use castellan::authority::PersonaeHost;
 use castellan::custody::IdentityStorage;
 use graphshell::browser_carrier::{NativeIdentityAction, NativeIdentityResult};
-use graphshell::native::local_session::{DoorIdentity, door_salts};
-use graphshell::native::resident_identity::{CustodyFuture, ResidentIdentity};
+use graphshell::identity_endpoint::IdentityAuthority;
 use graphshell_endpoint::door::app_admission::AppId;
 use graphshell_endpoint::door::custody::CustodyCall;
 use graphshell_endpoint::door::identity::IdentitySurfaceSnapshot;
@@ -192,7 +193,7 @@ impl<S: IdentityStorage + 'static> DoorIdentity for Keeper<S> {
     }
 }
 
-impl<S: IdentityStorage + 'static> ResidentIdentity for Keeper<S> {
+impl<S: IdentityStorage + 'static> IdentityAuthority for Keeper<S> {
     fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot> {
         self.host.snapshot()
     }
@@ -203,7 +204,9 @@ impl<S: IdentityStorage + 'static> ResidentIdentity for Keeper<S> {
             .map(|_| ())
             .map_err(|error| error.to_string())
     }
+}
 
+impl<S: IdentityStorage + 'static> ResidentIdentity for Keeper<S> {
     fn native_action(&self, action: NativeIdentityAction) -> NativeIdentityResult {
         apply_native_identity_action(&self.host, self.ui.as_ref(), action)
     }

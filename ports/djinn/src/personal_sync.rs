@@ -15,17 +15,17 @@ use std::sync::Arc;
 
 use personae::{IdentityProvider, ProfileId};
 
+use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
 use crate::resident_blobs::{LEGACY_PERSONAL_LEASE, LegacyBlobMigration, ResidentBlobCustody};
 use crate::resident_devices::DeviceDirectorySource;
 use crate::settings::{
     self as owner_settings, DataRootMigration, OwnerSettings, OwnerSettingsError, SyncOverrides,
 };
-use graphshell::identity_endpoint::TransferDecision;
-use graphshell::native::device_broker::{DeviceSurface, DeviceSurfaceHandle};
-use graphshell::native::personal_sync_host::{
+use crate::sync::personal_sync_host::{
     PersonalSyncHost, PersonalSyncHostConfig, PersonalSyncHostError,
 };
-use graphshell::native::transfer_staging::{receive_transfer, released_blobs_for};
+use crate::sync::transfer_staging::{receive_transfer, released_blobs_for};
+use graphshell::identity_endpoint::TransferDecision;
 use graphshell::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
 
 const PERSONAL_GRAPH_DOMAIN: &[u8] = b"mere.graphshell/personal-graph/v1";
@@ -317,7 +317,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     // uses, so the blocking call moves off the async worker rather than
     // stalling it.
     let reader_host = Arc::clone(&host);
-    let blob_reader: Arc<graphshell::native::device_broker::BlobReader> =
+    let blob_reader: Arc<crate::door::device_broker::BlobReader> =
         Arc::new(move |resource: &chirograph::ContentHash| {
             let host = Arc::clone(&reader_host);
             let hash = transport::BlobHash::from_bytes(resource.0);

@@ -10,10 +10,8 @@
 //! exact extension allow-list, and relays native-messaging frames. It never
 //! opens Personae or holds a signing identity.
 
+use djinn::door::device_broker::{configured_device_endpoint, relay_browser_native_messages};
 use graphshell::browser_carrier::{AllowedExtensions, BrowserLauncher};
-use graphshell::native::device_broker::{
-    configured_device_endpoint, relay_browser_native_messages,
-};
 
 const EXTRA_EXTENSIONS_ENV: &str = "GRAPHSHELL_EXTENSION_IDS";
 

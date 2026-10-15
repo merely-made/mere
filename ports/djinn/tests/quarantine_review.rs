@@ -12,11 +12,9 @@ use castellan::{
     resident::{CastellanResident, CredentialSalts},
 };
 use chatelaine::ItemState;
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::{identity_ui::NativeIdentityUi, keeper::Keeper};
-use graphshell::{
-    browser_carrier::NativeIdentityFailure,
-    native::app_broker::{AppEndpointCatalog, serve_app_broker},
-};
+use graphshell::browser_carrier::NativeIdentityFailure;
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
     custody::CustodyRefusal,

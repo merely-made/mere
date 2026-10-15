@@ -10,14 +10,12 @@ use castellan::{
     custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
     resident::{CastellanResident, CredentialSalts},
 };
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::{
     identity_ui::{NativeIdentityUi, SystemNativeIdentityUi},
     keeper::Keeper,
 };
-use graphshell::{
-    browser_carrier::NativeIdentityFailure,
-    native::app_broker::{AppEndpointCatalog, serve_app_broker},
-};
+use graphshell::browser_carrier::NativeIdentityFailure;
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
     custody_client::CustodyClient,

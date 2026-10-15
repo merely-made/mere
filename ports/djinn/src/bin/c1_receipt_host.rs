@@ -17,11 +17,11 @@ use chirograph::{
     CarrierRequestBody, CarrierResponseBody, ContentHash, IntentInvocation, IntentResult,
     PortableCardV1, PresentationCodec, ProjectionRequest, ProjectionSnapshot,
 };
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::{
     embedded_reservoir::reservoir_applications, keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
     app_client::AppBrokerClient,
