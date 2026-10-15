@@ -738,3 +738,15 @@ fast-forward of local main; nothing built).**
   - *Turnstone*: its L1 imports take the same rename; its
     `view::ProjectionReceiptView` imports still need `graphshell` until L2.
   - Any `AppClientError::Carrier` match becomes `AppClientError::Frame`.
+
+  Checks: `graphshell-endpoint --features door` builds and its 41 tests pass
+  (the `custody_client` and `app_client` ones among them); the default
+  feature set checks for wasm32; `cargo test` on `graphshell-endpoint`,
+  `graphshell`, `djinn`, `mere-signalman`, `dramatis-app` and `mere-overmap`
+  passes (840 passed, 22 ignored) with a short `TMPDIR`, since Djinn's socket
+  receipts exceed macOS's 104-byte socket path under the default one (as the
+  P2a entry notes); `cargo build --workspace` and the boundary script pass.
+  `cargo check --workspace --all-targets` fails only where this change does
+  not reach: `tabard-desktop`'s `native_shared_recovery` example on main, and
+  `mere-mesh` examples and Graphshell's `practice_*` tests that `include!`
+  sibling checkouts (`murm`, `woodshed`) by a path a worktree does not have.
