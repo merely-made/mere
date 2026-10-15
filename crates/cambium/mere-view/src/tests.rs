@@ -168,6 +168,7 @@ fn model() -> MereViewModel {
             HostAction::new("open", "Open"),
         ],
         notice: None,
+        ..MereViewModel::default()
     }
 }
 
@@ -694,4 +695,93 @@ fn the_graph_only_layouts_match_their_goldens() {
         "no goldens recorded yet: paste the lines above"
     );
     assert_eq!(taken, GOLDENS, "a graph-only layout moved from its golden");
+}
+
+#[test]
+fn the_shared_panel_hides_only_its_duplicate_graph_and_keeps_requests_out() {
+    let mut model = model();
+    model.hide_graph = true;
+    model.archive = Some(ArchiveModel {
+        entries: vec![
+            ArchiveEntry {
+                key: "one".into(),
+                name: "Morning archive".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+            },
+            ArchiveEntry {
+                key: "two".into(),
+                name: "Evening archive".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+            },
+        ],
+        save_sessions: vec![session_id(1)],
+        can_compose: true,
+    });
+    let before = model.clone();
+    let (dom, mut runner) = runner(Host::new(model, 280, 700));
+    let root = runner.root();
+    assert_eq!(attr(&dom.borrow(), root, "data-graph"), Some("hidden"));
+    assert!(
+        find(&dom.borrow(), root, "data-key", "a").is_none(),
+        "the host's main canvas owns node targets"
+    );
+    let save = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Save Morning reading to archive",
+    )
+    .unwrap();
+    runner.dispatch_click(save, PointerClick::at((1., 1.)));
+    let open = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Open Morning archive as session",
+    )
+    .unwrap();
+    runner.dispatch_click(open, PointerClick::at((1., 1.)));
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests.len(),
+        2,
+        "fewer than two sources cannot compose"
+    );
+    for name in ["Morning archive", "Evening archive"] {
+        let selection = find(
+            &dom.borrow(),
+            root,
+            "aria-label",
+            &format!("Select {name} for composition"),
+        )
+        .unwrap();
+        runner.dispatch_click(selection, PointerClick::at((1., 1.)));
+    }
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Archive(ArchiveRequest::Save(session_id(1))),
+            MereViewRequest::Archive(ArchiveRequest::Open("one".into())),
+            MereViewRequest::Archive(ArchiveRequest::Compose(vec!["one".into(), "two".into()]))
+        ]
+    );
+    assert_eq!(
+        runner.state().model,
+        before,
+        "controls are requests, never a store"
+    );
+    runner.update(|host| {
+        host.model.archive.as_mut().unwrap().entries.remove(0);
+        host.view.lay_out(&host.model, 280, 700);
+    });
+    assert_eq!(
+        runner.state().view.selected_archives,
+        ["two"],
+        "refresh removes vanished stable identifiers"
+    );
 }

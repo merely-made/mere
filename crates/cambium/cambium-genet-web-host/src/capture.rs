@@ -5,12 +5,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Browser captures use the shared nonblocking, loss-cancellable readback.
-use cambium_rootstock::{CaptureFn, Frame, Surface};
+use cambium_rootstock::{CaptureFn, CaptureFrame, Frame, PresentedFrame};
 use std::{cell::RefCell, rc::Rc};
 
 pub struct PendingFrame {
-    inner: RefCell<Option<cambium_rootstock::PendingFrame>>,
-    result: RefCell<Option<Result<Frame, String>>>,
+    inner: RefCell<Option<CaptureFrame>>,
+    result: RefCell<Option<Result<(PresentedFrame, Frame), String>>>,
 }
 impl PendingFrame {
     pub fn ready(&self) -> bool {
@@ -31,6 +31,9 @@ impl PendingFrame {
         }
     }
     pub fn take(self) -> Result<Frame, String> {
+        self.take_stamped().map(|(_, pixels)| pixels)
+    }
+    pub fn take_stamped(self) -> Result<(PresentedFrame, Frame), String> {
         self.ready();
         self.result
             .into_inner()
@@ -42,20 +45,15 @@ pub fn capture_into(slot: Rc<RefCell<Option<Result<PendingFrame, String>>>>) -> 
         *slot.borrow_mut() = Some(
             capture
                 .map_err(|error| error.to_string())
-                .and_then(|frame| start(frame.surface, frame.view, frame.width, frame.height)),
+                .map(PendingFrame::new),
         );
     })
 }
-pub(crate) fn start(
-    surface: &dyn Surface,
-    view: &wgpu::TextureView,
-    width: u32,
-    height: u32,
-) -> Result<PendingFrame, String> {
-    cambium_rootstock::start_frame_readback(surface, view, width, height).map(|inner| {
-        PendingFrame {
+impl PendingFrame {
+    pub(crate) fn new(inner: CaptureFrame) -> Self {
+        Self {
             inner: RefCell::new(Some(inner)),
             result: RefCell::new(None),
         }
-    })
+    }
 }

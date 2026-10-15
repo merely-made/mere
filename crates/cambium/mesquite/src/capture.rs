@@ -5,9 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Platform readback, leaving capture scheduling and completion in the lane.
-use cambium_rootstock::{
-    CaptureFn, Frame, PendingFrame, PresentedFrame, StampedCaptureFn, start_frame_readback,
-};
+use cambium_rootstock::{CaptureFn, CaptureFrame, Frame, PresentedFrame, StampedCaptureFn};
 use std::{
     cell::RefCell,
     rc::Rc,
@@ -64,15 +62,7 @@ impl CaptureBackend for NativeCapture {
                     return;
                 },
             };
-            let (surface, view, presentation) = (frame.surface, frame.view, frame.presentation);
-            let armed = Instant::now();
-            *sink.borrow_mut() = Some(
-                start_frame_readback(surface, view, presentation.width, presentation.height).map(
-                    |pending| {
-                        stamp_readback(native_readback(pending, armed), identity, presentation)
-                    },
-                ),
-            );
+            *sink.borrow_mut() = Some(Ok(stamp_readback(frame, identity, Instant::now())));
         }));
         let mut started: Option<StampedReadback> = None;
         Ok(Box::new(move || {
@@ -100,13 +90,7 @@ impl CaptureBackend for NativeCapture {
                     return;
                 },
             };
-            let (surface, view, width, height) =
-                (frame.surface, frame.view, frame.width, frame.height);
-            let armed = Instant::now();
-            *sink.borrow_mut() = Some(
-                start_frame_readback(surface, view, width, height)
-                    .map(|pending| native_readback(pending, armed)),
-            );
+            *sink.borrow_mut() = Some(Ok(native_readback(frame, Instant::now())));
         }));
         let mut started: Option<Readback> = None;
         Box::new(move || {
@@ -125,28 +109,34 @@ impl CaptureBackend for NativeCapture {
     }
 }
 
-fn native_readback(mut pending: PendingFrame, armed: Instant) -> Readback {
+fn native_readback(mut pending: CaptureFrame, armed: Instant) -> Readback {
     Box::new(move || {
         poll_native(armed, Instant::now(), || {
-            pending
-                .poll()
-                .map(|result| result.map_err(|error| error.to_string()))
+            pending.poll().map(|result| {
+                result
+                    .map(|(_, pixels)| pixels)
+                    .map_err(|error| error.to_string())
+            })
         })
     })
 }
 
-// Freeze the identity beside the original queued copy, before any later redraw.
+// The job returns its original presentation beside the original queued pixels.
 fn stamp_readback(
-    mut readback: Readback,
+    mut pending: CaptureFrame,
     identity: crate::CaptureRequest,
-    presentation: PresentedFrame,
+    armed: Instant,
 ) -> StampedReadback {
     Box::new(move || {
-        readback().map(|result| {
-            result.map(|pixels| StampedFrame {
-                identity: identity.clone(),
-                presentation,
-                pixels,
+        poll_native(armed, Instant::now(), || {
+            pending.poll().map(|result| {
+                result
+                    .map(|(presentation, pixels)| StampedFrame {
+                        identity: identity.clone(),
+                        presentation,
+                        pixels,
+                    })
+                    .map_err(|error| error.to_string())
             })
         })
     })
@@ -198,30 +188,47 @@ mod tests {
             request: 7,
         };
         let presentation = PresentedFrame {
+            context_generation: cambium_rootstock::ContextGeneration(1),
             host: 3,
             sequence: 11,
             width: 1,
             height: 1,
             layout_scale: 2.0,
         };
-        let mut calls = 0;
-        let pixels: Readback = Box::new(move || {
-            calls += 1;
-            (calls == 2).then(|| {
-                Ok(Frame {
-                    width: 1,
-                    height: 1,
-                    rgba: vec![18, 52, 86, 255],
+        struct Delayed {
+            calls: u8,
+            stamp: PresentedFrame,
+        }
+        impl cambium_rootstock::PendingPresentationCapture for Delayed {
+            fn poll(
+                &mut self,
+            ) -> Option<Result<(PresentedFrame, Frame), cambium_rootstock::CaptureRefusal>>
+            {
+                self.calls += 1;
+                (self.calls == 2).then(|| {
+                    Ok((
+                        self.stamp,
+                        Frame {
+                            width: 1,
+                            height: 1,
+                            rgba: vec![18, 52, 86, 255],
+                        },
+                    ))
                 })
-            })
+            }
+        }
+        let pixels: CaptureFrame = Box::new(Delayed {
+            calls: 0,
+            stamp: presentation,
         });
-        let mut stamped = stamp_readback(pixels, identity.clone(), presentation);
+        let mut stamped = stamp_readback(pixels, identity.clone(), Instant::now());
         assert!(
             stamped().is_none(),
             "a pending copy must not invent a stamp"
         );
         // A different window/frame can present before the original map lands.
         let later_presentation = PresentedFrame {
+            context_generation: cambium_rootstock::ContextGeneration(1),
             host: 9,
             sequence: 22,
             ..presentation

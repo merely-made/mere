@@ -95,7 +95,16 @@ where
         };
         shared.producers.suspend_except(
             &elsewhere,
-            self.s.surface.as_ref().map(|surface| surface.renderer()),
+            self.s
+                .surface
+                .as_deref()
+                .or_else(|| {
+                    self.s
+                        .presentation_driver
+                        .as_ref()
+                        .and_then(|driver| driver.wgpu_surface())
+                })
+                .map(|surface| surface.renderer()),
         );
         if held.is_empty() {
             shared.producers.forget_device();
@@ -108,7 +117,12 @@ where
             self.s.shared.producers.bind_core(core);
         }
         let (Some(surface), Some(layout), Some(runner)) = (
-            self.s.surface.as_deref(),
+            self.s.surface.as_deref().or_else(|| {
+                self.s
+                    .presentation_driver
+                    .as_ref()
+                    .and_then(|driver| driver.wgpu_surface())
+            }),
             self.s.layout.as_ref(),
             self.s.runner.as_ref(),
         ) else {

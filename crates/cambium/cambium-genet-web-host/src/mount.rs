@@ -12,25 +12,24 @@
 //! application is mounted, and the listeners and frame callback it installed
 //! keep it alive.
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use cambium_rootstock::{
-    A11yAction, A11yRequest, Host, HostHooks, HostOptions, HostState, HostWake, HostWindow, Init,
-    Runner, ScriptedDom, meristem_bounds::RootView,
+    Host, HostHooks, HostOptions, HostState, HostWake, HostWindow, Init, Runner, ScriptedDom,
+    meristem_bounds::RootView,
 };
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::Closure;
 use web_sys::HtmlCanvasElement;
 
-use crate::a11y::{DomAccessibility, MirrorHandle};
+use crate::MountLifetime;
+use crate::a11y::DomAccessibility;
+use crate::events::install_listeners;
 use crate::files::WebFileChooser;
-use crate::input::{
-    CompositionKind, composition_from_dom, key_press_from_dom, wheel_delta_from_dom,
-};
+use crate::presentation::boot::{WebGpuFactory, default_factory};
 use crate::recovery::{self, WakeBridge};
 use crate::surface::{WebSurface, WebWindow};
-use crate::{MountLifetime, WHEEL_LINE_PX, WHEEL_PAGE_PX};
 
 /// A mounted application, kept alive by the closures it installed.
 ///
@@ -64,6 +63,10 @@ where
     /// Request idempotent disposal. Observe lifetime.status() for completion.
     pub fn dispose(&self) -> bool {
         self.lifetime.dispose()
+    }
+    /// Disposal has been requested; callbacks and frames no longer run.
+    pub fn is_disposed(&self) -> bool {
+        !self.lifetime.admitted()
     }
 
     /// The canvas frame.
@@ -144,6 +147,7 @@ where
                 canvas,
                 options,
                 None,
+                default_factory(),
                 init,
                 hooks,
                 lifetime.clone(),
@@ -209,6 +213,42 @@ where
                 canvas,
                 options,
                 Some(Box::pin(acquire)),
+                default_factory(),
+                init,
+                hooks,
+                lifetime.clone(),
+            ))
+            .await?
+    })
+}
+
+/// Mount with a caller-supplied WebGPU boot attempt. Backend policy still
+/// controls attempts, and application initialization follows selection once.
+/// The lifetime cancels startup and owns disposal as for `mount_with_lifetime`.
+pub fn mount_with_webgpu_factory<State, Logic, V>(
+    canvas: HtmlCanvasElement,
+    options: HostOptions,
+    lifetime: MountLifetime,
+    init: impl FnOnce(
+        &dyn HostWindow,
+        &cambium_rootstock::WindowCommands,
+        &HostWake,
+    ) -> Init<State, Logic>,
+    hooks: HostHooks<State, Logic, V>,
+    factory: WebGpuFactory,
+) -> std::pin::Pin<Box<impl std::future::Future<Output = Result<Mounted<State, Logic, V>, String>>>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    Box::pin(async move {
+        lifetime
+            .startup(mount_inner(
+                canvas,
+                options,
+                None,
+                factory,
                 init,
                 hooks,
                 lifetime.clone(),
@@ -229,6 +269,7 @@ async fn mount_inner<State, Logic, V>(
             >,
         >,
     >,
+    mut factory: WebGpuFactory,
     init: impl FnOnce(
         &dyn HostWindow,
         &cambium_rootstock::WindowCommands,
@@ -243,32 +284,50 @@ where
     V: RootView<State>,
 {
     lifetime.check()?;
-    let window = WebWindow::new(canvas.clone());
-    let (width, height) = window.physical_size();
-    // The backing store is sized in physical pixels so a fragment lands on a
-    // device pixel, the same contract a desktop surface is configured under.
-    canvas.set_width(width);
-    canvas.set_height(height);
-
-    let private_acquisition = acquire.is_none();
-    let core = match acquire {
-        Some(acquire) => acquire.await?,
-        None => std::sync::Arc::new(
-            genet_render_host::RenderCore::boot_async((options.netrender)()).await?,
-        ),
+    // A caller-supplied core is a shared WebGPU device: it presents through
+    // the host surface and the group recovery owner, never a private driver.
+    // Otherwise backend policy selects and boots a private presentation route.
+    let (canvas, surface, driver, core) = match acquire {
+        Some(acquire) => {
+            let window = WebWindow::new(canvas.clone());
+            let (width, height) = window.physical_size();
+            // The backing store is sized in physical pixels so a fragment lands
+            // on a device pixel, the contract a desktop surface is configured under.
+            canvas.set_width(width.max(1));
+            canvas.set_height(height.max(1));
+            let core = acquire.await?;
+            // Caller-provided futures/cores can share a device and must never
+            // be destroyed here.
+            lifetime.check()?;
+            let surface = WebSurface::from_core(canvas.clone(), core, width, height)?;
+            (canvas, Some(surface), None, None)
+        },
+        None => {
+            let mut selected = crate::presentation::boot::select(
+                canvas,
+                options.presentation_choice,
+                &*options.netrender,
+                &mut factory,
+            )
+            .await?;
+            // A selected route is a fresh private device or context, not yet
+            // lent to a host. Only that ownership permits explicit destruction.
+            let refused = lifetime.check().err().or_else(|| {
+                (!selected.canvas.is_connected()).then(|| "appearance boot cancelled".into())
+            });
+            if let Some(error) = refused {
+                if let Some(driver) = selected.driver.as_mut() {
+                    driver.dispose();
+                }
+                if let Some(core) = selected.core.take() {
+                    core.renderer().wgpu_device.core.device.destroy();
+                }
+                return Err(error);
+            }
+            (selected.canvas, None, selected.driver, selected.core)
+        },
     };
-    // A default acquisition is a fresh private device, not yet lent to a
-    // host. Only that ownership permits explicit destruction. Caller-provided
-    // futures/cores can share a device and must never be destroyed here.
-    if let Err(error) = lifetime.check() {
-        if private_acquisition {
-            core.renderer().wgpu_device.core.device.destroy();
-        }
-        drop(core);
-        return Err(error);
-    }
-    let surface = WebSurface::from_core(canvas.clone(), core, width, height)?;
-    lifetime.check()?;
+    let window = WebWindow::new(canvas.clone());
     let label = options.title.clone();
     // The wake flag the host reads, and the signal that gets a frame drawn.
     // Both are atomics: the host's wake handle is `Send + Sync` because a
@@ -302,8 +361,14 @@ where
         &canvas, &lifetime,
     )?));
     s.window = Some(Box::new(window.clone()));
-    s.shared.render_core = Some(surface.shared_core());
-    s.surface = Some(Box::new(surface));
+    if let Some(surface) = surface {
+        s.shared.render_core = Some(surface.shared_core());
+        s.surface = Some(Box::new(surface));
+    }
+    if let Some(core) = core {
+        s.shared.render_core = Some(core);
+    }
+    s.presentation_driver = driver;
 
     let host = Rc::new(RefCell::new(Host::new(options, None, hooks, s, wake)));
     let cleanup_host = host.clone();
@@ -326,6 +391,64 @@ where
     lifetime.on_dispose(move || drop(cleanup_bridge));
     bridge.attach(&host, &window, &lifetime);
     recovery::drain(&host, &window);
+
+    // A direct WebGL2 context reports loss and restoration on its canvas. Loss
+    // invalidates owned captures at once; the frame loop suspends GPU work and
+    // rebuilds at a new context generation after restoration.
+    let restore_pending = Rc::new(Cell::new(false));
+    let lost_pending = Rc::new(Cell::new(false));
+    let generation = Rc::new(Cell::new(
+        host.borrow()
+            .s
+            .presentation_driver
+            .as_ref()
+            .map_or(cambium_rootstock::ContextGeneration(0), |driver| {
+                driver.generation()
+            }),
+    ));
+    if host
+        .borrow()
+        .s
+        .presentation_driver
+        .as_ref()
+        .is_some_and(|driver| driver.backend() == cambium_rootstock::PresentationBackend::WebGl2)
+    {
+        let captures = host.borrow().s.capture_owner.scope();
+        let pending = lost_pending.clone();
+        let restore = restore_pending.clone();
+        let current = generation.clone();
+        let lost_lifetime = lifetime.clone();
+        let lost = Closure::<dyn FnMut(web_sys::Event)>::new(move |event: web_sys::Event| {
+            if !lost_lifetime.admitted() {
+                return;
+            }
+            event.prevent_default();
+            restore.set(false);
+            pending.set(true);
+            captures.invalidate(cambium_rootstock::CaptureRefusal::ContextLost {
+                backend: cambium_rootstock::PresentationBackend::WebGl2,
+                generation: current.get(),
+            });
+        });
+        let callback = lost.as_ref().clone();
+        lifetime.listen(canvas.as_ref(), "webglcontextlost", &callback, move || {
+            drop(lost)
+        })?;
+        let pending = restore_pending.clone();
+        let restored_lifetime = lifetime.clone();
+        let restored = Closure::<dyn FnMut(web_sys::Event)>::new(move |_| {
+            if restored_lifetime.admitted() {
+                pending.set(true);
+            }
+        });
+        let callback = restored.as_ref().clone();
+        lifetime.listen(
+            canvas.as_ref(),
+            "webglcontextrestored",
+            &callback,
+            move || drop(restored),
+        )?;
+    }
 
     let document = web_sys::window()
         .and_then(|w| w.document())
@@ -361,7 +484,15 @@ where
     lifetime.check()?;
 
     install_listeners(&canvas, &mirror, &host, &window, &lifetime)?;
-    schedule_frames(&host, &window, bridge, &lifetime)?;
+    schedule_frames(
+        &host,
+        &window,
+        bridge,
+        &lifetime,
+        lost_pending,
+        restore_pending,
+        generation,
+    )?;
     lifetime.activate()?;
 
     Ok(Mounted {
@@ -382,6 +513,9 @@ fn schedule_frames<State, Logic, V>(
     window: &WebWindow,
     bridge: Rc<WakeBridge>,
     lifetime: &MountLifetime,
+    lost_pending: Rc<Cell<bool>>,
+    restore_pending: Rc<Cell<bool>>,
+    generation: Rc<Cell<cambium_rootstock::ContextGeneration>>,
 ) -> Result<(), String>
 where
     State: 'static,
@@ -408,6 +542,7 @@ where
     let host = host.clone();
     let window = window.clone();
     let mut last_size = window.physical_size();
+    let mut attempts = 0u64;
 
     *next.borrow_mut() = Some(Closure::new(move |timestamp_ms: f64| {
         request.set(None);
@@ -419,24 +554,80 @@ where
         // the mounted application, even after Mounted itself is dropped.
         let _keep_bridge = &bridge;
         recovery::drain(&host, &window);
-        // A CSS-driven resize has no event of its own that also covers zoom
-        // and device-pixel-ratio changes, so the frame loop watches the one
-        // number that captures all three.
-        let size = window.physical_size();
-        if size != last_size {
-            last_size = size;
-            window.canvas().set_width(size.0);
-            window.canvas().set_height(size.1);
-            let mut h = host.borrow_mut();
-            if let Some(surface) = h.s.surface.as_mut() {
-                surface.resize(size.0, size.1);
+        if let Ok(mut host) = host.try_borrow_mut() {
+            if lost_pending.replace(false) {
+                host.lose_presentation_context();
             }
-            let (lw, lh) = h.logical_size();
-            h.relayout(lw, lh);
-            window.request_redraw();
-        }
-        if !host.borrow().s.hidden && window.take_pending_frame() {
-            draw_at(&mut host.borrow_mut(), timestamp_ms);
+            if restore_pending.get()
+                && let Some(driver) = host.s.presentation_driver.as_mut()
+            {
+                match driver.restore() {
+                    Ok(true) => {
+                        generation.set(driver.generation());
+                        restore_pending.set(false);
+                        window.request_redraw();
+                    },
+                    Ok(false) => {},
+                    Err(error) => {
+                        restore_pending.set(false);
+                        host.refuse_presentation(error);
+                    },
+                }
+            }
+            // A CSS-driven resize has no event of its own that also covers zoom
+            // and device-pixel-ratio changes, so the frame loop watches the one
+            // number that captures all three. A zero-size canvas defers.
+            let size = window.physical_size();
+            if size != last_size {
+                last_size = size;
+                if size.0 > 0
+                    && size.1 > 0
+                    && let Some(surface) = host.s.surface.as_mut()
+                {
+                    window.canvas().set_width(size.0);
+                    window.canvas().set_height(size.1);
+                    surface.resize(size.0, size.1);
+                }
+                if size.0 > 0
+                    && size.1 > 0
+                    && let Some(driver) = host.s.presentation_driver.as_mut()
+                {
+                    // The WebGL2 session records its complete frame before it
+                    // resizes the canvas it owns.
+                    if driver.backend() == cambium_rootstock::PresentationBackend::Wgpu {
+                        window.canvas().set_width(size.0);
+                        window.canvas().set_height(size.1);
+                    }
+                    if let Err(error) = driver.resize(size.0, size.1) {
+                        host.refuse_presentation(error);
+                    }
+                }
+                window.request_redraw();
+            }
+            if !host.s.hidden && window.take_pending_frame() {
+                draw_at(&mut host, timestamp_ms);
+                if window
+                    .canvas()
+                    .has_attribute("data-presentation-diagnostics")
+                {
+                    attempts = attempts.saturating_add(1);
+                    let _ = window
+                        .canvas()
+                        .set_attribute("data-redraw-attempts", &attempts.to_string());
+                    let _ = window.canvas().set_attribute(
+                        "data-last-presentation-failure",
+                        &host
+                            .s
+                            .last_presentation_failure
+                            .as_ref()
+                            .map_or_else(|| "None".to_owned(), ToString::to_string),
+                    );
+                    let _ = window.canvas().set_attribute(
+                        "data-last-producer-profile",
+                        &format!("{:?}", host.frame_profile().map(|p| p.producers)),
+                    );
+                }
+            }
         }
         if let Some(browser) = web_sys::window()
             && let Some(callback) = frame.borrow().as_ref()
@@ -461,7 +652,7 @@ where
 }
 
 /// Draw a frame and mirror it for a reader.
-fn draw<State, Logic, V>(host: &mut Host<State, Logic, V>)
+pub(crate) fn draw<State, Logic, V>(host: &mut Host<State, Logic, V>)
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
@@ -490,327 +681,4 @@ where
     host.redraw_at(timestamp);
     host.sync_a11y();
     host.with_ctx(cambium_rootstock::Hook::AfterFrame);
-}
-
-/// Carry out what a reader asked of a mirror element, and draw the result
-/// before returning, so the reader hears it without waiting on a frame.
-fn reader_act<State, Logic, V>(host: &Rc<RefCell<Host<State, Logic, V>>>, request: A11yRequest)
-where
-    State: 'static,
-    Logic: FnMut(&State) -> V + 'static,
-    V: RootView<State>,
-{
-    let mut host = host.borrow_mut();
-    host.apply_a11y_requests(&[request]);
-    draw(&mut host);
-}
-
-/// A key, from the canvas or from a mirror element a reader focused.
-fn on_key<State, Logic, V>(
-    host: &Rc<RefCell<Host<State, Logic, V>>>,
-    window: &WebWindow,
-) -> impl FnMut(web_sys::KeyboardEvent) + 'static
-where
-    State: 'static,
-    Logic: FnMut(&State) -> V + 'static,
-    V: RootView<State>,
-{
-    let h = host.clone();
-    let w = window.clone();
-    move |e: web_sys::KeyboardEvent| {
-        let press = key_press_from_dom(&e);
-        // Tab moves focus inside the application, not out of it; the arrows
-        // and Space scroll the page unless claimed.
-        if !press.modifiers.is_command_chord() {
-            e.prevent_default();
-        }
-        h.borrow_mut().key(&press);
-        w.request_redraw();
-    }
-}
-
-/// Attach the DOM listeners that drive the host.
-///
-/// Every one of these is the same shape: read the event, say what happened in
-/// the host's vocabulary, let the host decide. The ordering rules that used to
-/// live in each event source are inside `pointer_moved` now, so this cannot
-/// get them subtly wrong.
-fn install_listeners<State, Logic, V>(
-    canvas: &HtmlCanvasElement,
-    mirror: &MirrorHandle,
-    host: &Rc<RefCell<Host<State, Logic, V>>>,
-    window: &WebWindow,
-    lifetime: &MountLifetime,
-) -> Result<(), String>
-where
-    State: 'static,
-    Logic: FnMut(&State) -> V + 'static,
-    V: RootView<State>,
-{
-    /// Where a pointer event landed, in the layout's own coordinates.
-    ///
-    /// The browser reports CSS pixels relative to the viewport; the canvas
-    /// rect makes them canvas-relative, and `zoom` carries them the rest of
-    /// the way into the space the layout was built in. The desktop source
-    /// divides physical pixels by the whole layout scale for the same reason —
-    /// here the device half is already gone, so only the zoom is left.
-    fn local(canvas: &HtmlCanvasElement, x: i32, y: i32, zoom: f32) -> (f32, f32) {
-        let rect = canvas.get_bounding_client_rect();
-        (
-            ((x as f64 - rect.x()) as f32) / zoom,
-            ((y as f64 - rect.y()) as f32) / zoom,
-        )
-    }
-
-    macro_rules! listen {
-        ($target:expr, $name:literal, $ty:ty, $handler:expr) => {{
-            let listener_lifetime = lifetime.clone();
-            let mut handler = $handler;
-            let closure = Closure::<dyn FnMut($ty)>::new(move |event| {
-                if listener_lifetime.admitted() {
-                    handler(event);
-                }
-            });
-            let callback = closure.as_ref().clone();
-            lifetime.listen($target.as_ref(), $name, &callback, move || drop(closure))?;
-        }};
-    }
-
-    let h = host.clone();
-    let c = canvas.clone();
-    let w = window.clone();
-    listen!(
-        canvas,
-        "pointerdown",
-        web_sys::PointerEvent,
-        move |e: web_sys::PointerEvent| {
-            let mut host = h.borrow_mut();
-            host.s.pointer_id = e.pointer_id();
-            host.s.modifiers = cambium_rootstock::Modifiers {
-                shift: e.shift_key(),
-                ctrl: e.ctrl_key(),
-                alt: e.alt_key(),
-                meta: e.meta_key(),
-            };
-            let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
-            host.pointer_moved(x, y);
-            match e.button() {
-                0 => host.click(),
-                1 => host.pointer_press(cambium::PointerButton::Auxiliary),
-                2 => host.secondary_press(),
-                _ => return,
-            }
-            let _ = c.set_pointer_capture(e.pointer_id());
-            w.request_redraw();
-        }
-    );
-
-    let h = host.clone();
-    let c = canvas.clone();
-    let w = window.clone();
-    listen!(
-        canvas,
-        "pointermove",
-        web_sys::PointerEvent,
-        move |e: web_sys::PointerEvent| {
-            let mut host = h.borrow_mut();
-            host.s.pointer_id = e.pointer_id();
-            host.s.modifiers = cambium_rootstock::Modifiers {
-                shift: e.shift_key(),
-                ctrl: e.ctrl_key(),
-                alt: e.alt_key(),
-                meta: e.meta_key(),
-            };
-            let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
-            host.pointer_moved(x, y);
-            w.request_redraw();
-        }
-    );
-
-    let h = host.clone();
-    let c = canvas.clone();
-    let w = window.clone();
-    listen!(
-        canvas,
-        "pointerup",
-        web_sys::PointerEvent,
-        move |e: web_sys::PointerEvent| {
-            let mut host = h.borrow_mut();
-            host.s.pointer_id = e.pointer_id();
-            host.s.modifiers = cambium_rootstock::Modifiers {
-                shift: e.shift_key(),
-                ctrl: e.ctrl_key(),
-                alt: e.alt_key(),
-                meta: e.meta_key(),
-            };
-            let (x, y) = local(&c, e.client_x(), e.client_y(), host.ui_zoom());
-            host.pointer_moved(x, y);
-            match e.button() {
-                0 => host.release(),
-                1 => host.release_button(cambium::PointerButton::Auxiliary),
-                2 => host.release_button(cambium::PointerButton::Secondary),
-                _ => return,
-            }
-            let _ = c.release_pointer_capture(e.pointer_id());
-            w.request_redraw();
-        }
-    );
-
-    let h = host.clone();
-    let w = window.clone();
-    listen!(
-        canvas,
-        "pointercancel",
-        web_sys::PointerEvent,
-        move |e: web_sys::PointerEvent| {
-            let mut host = h.borrow_mut();
-            if host
-                .s
-                .runner
-                .as_ref()
-                .and_then(|r| r.pointer_capture_owner())
-                .is_some_and(|(id, _)| id == e.pointer_id())
-            {
-                host.cancel_pointer();
-                w.request_redraw();
-            }
-        }
-    );
-
-    let h = host.clone();
-    let w = window.clone();
-    listen!(
-        canvas,
-        "wheel",
-        web_sys::WheelEvent,
-        move |e: web_sys::WheelEvent| {
-            // The page must not scroll underneath an application that handles the
-            // notch itself.
-            e.prevent_default();
-            let (dx, dy) = wheel_delta_from_dom(&e, WHEEL_LINE_PX, WHEEL_PAGE_PX);
-            let mut host = h.borrow_mut();
-            host.s.modifiers = cambium_rootstock::Modifiers {
-                shift: e.shift_key(),
-                ctrl: e.ctrl_key(),
-                alt: e.alt_key(),
-                meta: e.meta_key(),
-            };
-            host.wheel(dx, dy);
-            w.request_redraw();
-        }
-    );
-
-    // Keys reach the host from the canvas, or from the mirror element that
-    // holds focus for a reader.
-    let root = &mirror.root;
-    listen!(
-        canvas,
-        "keydown",
-        web_sys::KeyboardEvent,
-        on_key(host, window)
-    );
-    listen!(
-        root,
-        "keydown",
-        web_sys::KeyboardEvent,
-        on_key(host, window)
-    );
-
-    // A Tab tap must leave held-Tab spatial navigation. Own these listeners
-    // in the same phase-admitted lifetime as keydown, including the mirror
-    // that receives keyboard focus after accessibility routing.
-    let key_targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
-    for target in key_targets {
-        let h = host.clone();
-        let release_lifetime = lifetime.clone();
-        let release =
-            Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
-                if !release_lifetime.admitted() {
-                    return;
-                }
-                let key = key_press_from_dom(&e).key;
-                h.borrow_mut().key_released(&key);
-            });
-        let callback = release.as_ref().clone();
-        lifetime.listen(target, "keyup", &callback, move || drop(release))?;
-    }
-
-    let targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
-    for target in targets {
-        for (name, kind) in [
-            ("compositionstart", CompositionKind::Start),
-            ("compositionupdate", CompositionKind::Update),
-            ("compositionend", CompositionKind::End),
-        ] {
-            let h = host.clone();
-            let w = window.clone();
-            let listener_lifetime = lifetime.clone();
-            let closure = Closure::<dyn FnMut(web_sys::CompositionEvent)>::new(
-                move |e: web_sys::CompositionEvent| {
-                    if !listener_lifetime.admitted() {
-                        return;
-                    }
-                    h.borrow_mut()
-                        .ime(composition_from_dom(kind, e.data().unwrap_or_default()));
-                    w.request_redraw();
-                },
-            );
-            let callback = closure.as_ref().clone();
-            lifetime.listen(target, name, &callback, move || drop(closure))?;
-        }
-    }
-
-    // A reader's click on a mirror element activates its node, and a
-    // reader's focus on one focuses it.
-    let h = host.clone();
-    let m = mirror.clone();
-    listen!(
-        root,
-        "click",
-        web_sys::MouseEvent,
-        move |e: web_sys::MouseEvent| {
-            if let Some(target) = m.request_target_of(e.target()) {
-                let action = A11yAction::Click;
-                reader_act(&h, A11yRequest { action, target });
-            }
-        }
-    );
-    let h = host.clone();
-    let m = mirror.clone();
-    // Following host focus can synchronously emit another focusin. The guard
-    // below answers that nested event; an FnMut trampoline refuses it before
-    // the guard can run.
-    let focus_lifetime = lifetime.clone();
-    let focus_listener =
-        Closure::<dyn Fn(web_sys::FocusEvent)>::new(move |e: web_sys::FocusEvent| {
-            if !focus_lifetime.admitted() {
-                return;
-            }
-            // The mirror moving focus to follow the tree is not a reader asking.
-            if m.moving.get() {
-                return;
-            }
-            if let Some(target) = m.request_target_of(e.target()) {
-                let action = A11yAction::Focus;
-                reader_act(&h, A11yRequest { action, target });
-            }
-        });
-    let callback = focus_listener.as_ref().clone();
-    lifetime.listen(root.as_ref(), "focusin", &callback, move || {
-        drop(focus_listener)
-    })?;
-
-    // The canvas takes focus from Tab or a press, and hands it to the mirror,
-    // where a reader hears what has it.
-    let m = mirror.clone();
-    listen!(
-        canvas,
-        "focus",
-        web_sys::FocusEvent,
-        move |_: web_sys::FocusEvent| m.take_focus()
-    );
-
-    // The canvas has to be focusable to receive keys at all.
-    let _ = canvas.set_attribute("tabindex", "0");
-    Ok(())
 }

@@ -1035,6 +1035,7 @@ mod presentation_tests {
     }
     fn frame(sequence: u64) -> PresentedFrame {
         PresentedFrame {
+            context_generation: cambium_rootstock::ContextGeneration(1),
             host: 1,
             sequence,
             width: 100,

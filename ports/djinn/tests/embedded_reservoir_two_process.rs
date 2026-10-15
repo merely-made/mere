@@ -484,7 +484,8 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
         catalog.clone(),
         grants.clone(),
         config.applications.clone(),
-    );
+    )
+    .with_divination_authority();
     routes.load_access(&reservoir).await.unwrap();
     for mere in reservoir.meres().await {
         routes

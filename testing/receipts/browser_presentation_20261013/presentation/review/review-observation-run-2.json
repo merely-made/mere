@@ -1,0 +1,11 @@
+{
+  "result": "pass",
+  "controls": [
+    "ordinary refusal is observable without capture",
+    "ordinary refusal keeps owned context healthy",
+    "ordinary refusal does not fall back or replace context",
+    "successful retry retains canvas"
+  ],
+  "errors": [],
+  "refusal": "WebGl2 context 1 source None: portable preparation refused: Bundle(InvalidScene { reason: \"nonzero extent exceeds dimension contract\" })"
+}

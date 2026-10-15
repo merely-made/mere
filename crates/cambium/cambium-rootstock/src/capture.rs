@@ -21,12 +21,63 @@
 
 use crate::Surface;
 use netrender::ExternalTexturePlacement;
+mod scope;
+pub use scope::{CaptureOwner, CaptureScope};
 
 /// A presented frame, read back through the shared render-host machinery.
 pub type Frame = genet_render_host::RgbaFrame;
 
 /// An owned readback that can be polled without waiting on the shared GPU.
 pub type PendingFrame = genet_render_host::PendingRgbaReadback;
+
+struct NativePresentationReadback {
+    pending: PendingFrame,
+    stamp: crate::PresentedFrame,
+}
+impl crate::PendingPresentationCapture for NativePresentationReadback {
+    fn poll(&mut self) -> Option<Result<(crate::PresentedFrame, Frame), crate::CaptureRefusal>> {
+        self.pending.poll().map(|result| {
+            result
+                .map(|pixels| (self.stamp, pixels))
+                .map_err(|error| match error {
+                    genet_render_host::ReadbackFailure::DeviceLost(loss) => {
+                        crate::CaptureRefusal::DeviceLost(loss)
+                    },
+                    error => crate::CaptureRefusal::PresentationError {
+                        backend: crate::PresentationBackend::Wgpu,
+                        generation: self.stamp.context_generation,
+                        source_key: None,
+                        error: error.to_string(),
+                    },
+                })
+        })
+    }
+}
+
+/// Queue owned pixels immediately and retain their original presentation identity.
+pub fn start_presentation_readback(
+    surface: &dyn Surface,
+    view: &wgpu::TextureView,
+    stamp: crate::PresentedFrame,
+) -> Result<crate::CaptureFrame, crate::CaptureRefusal> {
+    if let Some(loss) = surface.core().loss_notice() {
+        return Err(crate::CaptureRefusal::DeviceLost(loss));
+    }
+    let pending =
+        start_frame_readback(surface, view, stamp.width, stamp.height).map_err(|error| {
+            surface
+                .core()
+                .loss_notice()
+                .map(crate::CaptureRefusal::DeviceLost)
+                .unwrap_or(crate::CaptureRefusal::PresentationError {
+                    backend: crate::PresentationBackend::Wgpu,
+                    generation: stamp.context_generation,
+                    source_key: None,
+                    error,
+                })
+        })?;
+    Ok(Box::new(NativePresentationReadback { pending, stamp }))
+}
 
 /// Compose the presented view and start copying it into host memory.
 /// Poll the returned frame on later event-loop turns; it retains the original

@@ -27,23 +27,21 @@ path = "../src/web.rs"
 [features]
 moot-resources = ["graphshell/moot-resources", "dep:moot"]
 dynamics-receipt = []
-default = ["main-page", "product", "remote", "canvas-gpu", "image-decode"]
-# The H5 reference host and its `mount` export (`src/web_main.rs`). It drives
-# the product modules and the remote link, so it needs both.
-main-page = ["product", "remote"]
+default = ["product", "remote", "canvas-gpu", "image-decode"]
 # What a page saves: IndexedDB, saved scenes, the tree's product mode,
 # `web_product` and `web_practice`.
 product = ["muniment/indexeddb", "dep:sha2", "graphshell/document-layout", "graphshell/retained-content", "graphshell/query-views", "mere/query", "dep:mere-document-lanes", "dep:fleece"]
 applets = ["graphshell/applets", "muniment/indexeddb"]
 # The WebRTC door and the remote board: `web_remote`, `web_rtc_link`, the tree's
 # remote board.
-remote = ["graphshell/webrtc-browser", "dep:futures-channel", "dep:futures-util"]
+remote = ["graphshell/webrtc-browser", "graphshell/mere-route", "dep:mere-view", "dep:futures-channel", "dep:futures-util"]
 # The canvas's repulsion on the page's own WebGPU device (physics catalog P5c).
 canvas-gpu = ["graphshell/canvas-gpu", "mere/canvas-gpu"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
 image-decode = ["genet-render/image-decode", "taproot/image-decode", "cambium-rootstock/image-decode", "mesquite/image-decode", "cambium-genet-web-host/image-decode", "graphshell/image-decode", "mere/image-decode"]
 
 [dependencies]
+mere-view = { path="../../../crates/cambium/mere-view", optional=true }
 mere-document-lanes = { path = "../../../crates/system/document-lanes", features = ["retained-clips"], optional = true }
 fleece = { package = "mere-fleece", path = "../../../crates/fleece", features = ["portable-clip"], optional = true }
 eidetic = { path = "../../../crates/eidetic/eidetic-core", default-features = false }
@@ -69,7 +67,7 @@ cambium = { path = "../../../crates/cambium/cambium" }
 tabard = { path = "../../../crates/system/tabard" }
 # The one-tree page (`src/web_tree.rs`): Cambium's web host mounts the tree,
 # and rootstock carries the host types and the canvas's texture producer.
-cambium-genet-web-host = { path = "../../../crates/cambium/cambium-genet-web-host", default-features = false }
+cambium-genet-web-host = { path = "../../../crates/cambium/cambium-genet-web-host", default-features = false, features = ["webgl"] }
 cambium-rootstock = { path = "../../../crates/cambium/cambium-rootstock", default-features = false }
 mesquite = { path = "../../../crates/cambium/mesquite", default-features = false }
 genet-render = { git = "https://github.com/merely-made/genet.git", rev = "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084", default-features = false, features = ["livery", "accesskit"] }
@@ -87,8 +85,8 @@ layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "b6bf
 # Named genet-probe until genet 7baa554c (2026-09-14).
 taproot = { git = "https://github.com/merely-made/genet.git", rev = "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084", default-features = false }
 js-sys = "0.3"
-netrender = { git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
-netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
+netrender = { git = "https://www.github.com/merely-made/netrender.git", rev = "68bcddc063636056d1c8c9669f58e5acc499a542" }
+netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "68bcddc063636056d1c8c9669f58e5acc499a542" }
 serde_json = "1"
 # The remote link's outbound queue: the host enqueues lines synchronously,
 # a task drains them onto the channel.
@@ -232,14 +230,14 @@ vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "2eae6243881d5
 cubecl-runtime = { path = "../../../support/patches/cubecl-runtime" }
 
 # Match the root retained/admitted owner supplier closure.
-mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
-p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261011" }
+mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
 
 [workspace.package]
 rust-version = "1.97.1"
@@ -247,6 +245,9 @@ rust-version = "1.97.1"
 # The standalone host uses the same release-identity contract as the parent
 # workspace when Murm's carrier names its published compatibility dependency.
 [patch."https://github.com/merely-made/mere.git"]
+muniment = { path = "../../../crates/eidetic/muniment" }
+stickleback = { path = "../../../crates/stickleback" }
+mere-proofs = { path = "../../../crates/system/proofs" }
 luggage = { path = "../../../crates/system/luggage" }
 
 # Published shadow-resource repair across Genet and host renderer contracts.
@@ -254,7 +255,7 @@ luggage = { path = "../../../crates/system/luggage" }
 # runtime family to one immutable Git source identity. Standalone roots must
 # repeat this bridge. Retire after coordinated Genet supplier adoption.
 [patch."https://github.com/merely-made/netrender.git"]
-netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
-netrender_device = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
-paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
-paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "6a24ae08f55129b474282b8e4911564f875ce5fd" }
+netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "68bcddc063636056d1c8c9669f58e5acc499a542" }
+netrender_device = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "68bcddc063636056d1c8c9669f58e5acc499a542" }
+paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "68bcddc063636056d1c8c9669f58e5acc499a542" }
+paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "68bcddc063636056d1c8c9669f58e5acc499a542" }

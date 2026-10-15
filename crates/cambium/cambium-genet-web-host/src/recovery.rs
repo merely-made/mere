@@ -108,6 +108,17 @@ where
     let owner = {
         let mut host = host.borrow_mut();
         match host.poll_device_recovery() {
+            RecoveryStatus::Ready { .. }
+                if host.s.needs_recovery_surface && host.s.presentation_driver.is_some() =>
+            {
+                // An installed driver rebuilds its own surface from the ready
+                // core when the next frame is prepared; never attach a second.
+                host.s.needs_recovery_surface = false;
+                if !host.s.hidden {
+                    window.request_redraw();
+                }
+                None
+            },
             RecoveryStatus::Ready { generation } if host.s.needs_recovery_surface => {
                 let core = host.s.shared.render_core.clone().expect("ready core");
                 let (width, height) = window.physical_size();
