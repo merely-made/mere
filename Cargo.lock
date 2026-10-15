@@ -5177,7 +5177,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "az",
  "byteorder",
@@ -5189,7 +5189,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "az",
  "byteorder",
@@ -10094,7 +10094,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10138,7 +10138,7 @@ dependencies = [
 [[package]]
 name = "mere-webrtc-carrier"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -10478,7 +10478,7 @@ dependencies = [
 [[package]]
 name = "murm"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "async-trait",
  "blake3",
@@ -12222,7 +12222,7 @@ dependencies = [
 [[package]]
 name = "outrider"
 version = "0.3.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "hkdf 0.13.0",
  "retinue",
@@ -13736,7 +13736,7 @@ dependencies = [
 [[package]]
 name = "postilion"
 version = "0.3.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
@@ -14211,7 +14211,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "embedded-graphics",
 ]
@@ -14219,7 +14219,7 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "heapless 0.9.3",
  "hmac 0.13.0",
@@ -14885,7 +14885,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -15716,7 +15716,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 
 [[package]]
 name = "semver"
@@ -15737,7 +15737,7 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 [[package]]
 name = "seneschal"
 version = "0.2.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
@@ -17828,7 +17828,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.2.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=38e9c9b8dffe19ff374bd226375e27eea2eb98f6#38e9c9b8dffe19ff374bd226375e27eea2eb98f6"
+source = "git+https://www.github.com/merely-made/murm.git?rev=fb6360c12b37ab5ce896184a055d203779d0244b#fb6360c12b37ab5ce896184a055d203779d0244b"
 dependencies = [
  "selvage",
  "serial2-tokio",
