@@ -2,7 +2,7 @@
 
 **Status (2026-10-14):** plan; nothing moved. The census below was read from
 the source at `0aade8668` and corrects the first pass in several places
-(§2). Five rulings from Mark are needed before the phases that name them
+(§2). Seven rulings from Mark are needed before the phases that name them
 (§5); phases P1 to P3 need none. No code, manifest or other plan changed with
 this document.
 
@@ -43,12 +43,14 @@ Who actually compiles the `graphshell` package from outside the port
 | Knot (production source) | `native::app_admission`, `native::custody`, `native::custody_client`, `identity::VaultLockView` |
 | Knot (tests and examples only) | the serving stack: `admission`, `carrier`, `network_carrier`, `session_notices`, `lifecycle`, `native::projection_host`, `native::endpoint_catalog`, `native::app_broker`, `native::local_session`, `sessions` |
 | Cleromancy | `personal_sync` (`PersonalGraphReplica`, `PersonalGraphEvent`, `SyncProjection`, `SyncRoster`, `SyncSelection`), `native::endpoint_catalog`, `lifecycle::AdmittedEndpointContext`, `native::app_admission`, `view` |
+| Turnstone (`f14d2091`, pins Mere `77fd235f`; read from GitHub) | Production source: `native::app_admission`, `native::app_client`, `native::custody_client`, `native::custody_identity`, `admission`, `carrier`, `network_carrier` (`dial_projection_session`), `native::endpoint_catalog`, `native::projection_host`, `sessions`, `view`, `identity::VaultLockView`. `place/projection_host.rs` (482 lines) serves projections with the serving stack. Its `graphshell::projection_editor` imports are the scenograph types the module re-exports (`SourceBinding`, `AuthoredProjectionDefinition` and others), not the reducer |
 | Signalman, `ports/dramatis` | `native::custody_client`, `native::app_admission`, `native::quarantine`, `native::custody` |
 | Djinn | a dozen `native::*` modules, `session_item`, `mere_route_session`, `mere_route::archive_intent`, `browser_carrier`, `identity*`, `lifecycle` |
 
-So the demand is concentrated: five external or sibling consumers want a
-few thousand lines of custody and application-door code, and Djinn runs the
-server halves. Nobody outside the port imports the canvas reducers, the
+So the demand is concentrated: six external or sibling consumers want a
+few thousand lines of custody and application-door code, two of them
+(Turnstone, and Knot in tests) also serve projections with the serving half,
+and Djinn runs the server halves. Nobody outside the port imports the canvas reducers, the
 editors or the Forme session today. Woodshed names them as wanted.
 
 ## 2. Corrections to the first-pass census
@@ -244,7 +246,7 @@ Djinn runs.
 
 | ID | Modules (lines) | Home | Receipt |
 |---|---|---|---|
-| L1 | **App-facing half**: `native/app_admission` (586), `app_client` (452), `custody` (496), `custody_client` (558), `custody_identity` (449), `quarantine` (60), `local_endpoint` (277), `tasks` (103); the wire types in `app_broker` (`APP_CONNECT_SCHEMA`, `AppMessage`, `AppHostMessage`, `AppBrokerError`); the NDJSON frame functions in `browser_carrier` (`read_native_message_async`, `write_native_message_async`); `identity::*` re-exports from `dramatis::view`; `profile::env_profile` (240). About 3.6k lines | A new small crate under `crates/graphshell/` (working name `app-door`; Mark names it, R3) | Woodshed's `woodshed-genet` and Hocket, Knot's `startup.rs`, Signalman and `ports/dramatis` depend on it alone and build with no `graphshell` package in their cone. Today Woodshed's default features compile the whole retained-content cone for these imports |
+| L1 | **App-facing half**: `native/app_admission` (586), `app_client` (452), `custody` (496), `custody_client` (558), `custody_identity` (449), `quarantine` (60), `local_endpoint` (277), `tasks` (103); the wire types in `app_broker` (`APP_CONNECT_SCHEMA`, `AppMessage`, `AppHostMessage`, `AppBrokerError`); the NDJSON frame functions in `browser_carrier` (`read_native_message_async`, `write_native_message_async`); `identity::*` re-exports from `dramatis::view`; `profile::env_profile` (240). About 3.6k lines | A new small crate under `crates/graphshell/` (working name `app-door`; Mark names it, R3) | Woodshed's `woodshed-genet` and Hocket, Knot's `startup.rs`, Signalman and `ports/dramatis` depend on it alone and build with no `graphshell` package in their cone. Woodshed narrowed `graphshell` to `default-features = false, features = ["native"]` on its main (`c11571b`, relayed by its session), which already drops the retained-content cone; the crate then replaces the `graphshell` dependency itself in its three manifests |
 | L2 | **Serving half**: `admission` (372), `lifecycle` (718, with `AdmittedEndpointContext`, `BindAdmittedSession`, `SessionAuthority`), `native/endpoint_catalog` (635), `carrier` (694), `network_carrier` (271), `session_loop` (943), `session_notices` (398), `resume` (447), `live_endpoint` (738), `native/projection_host` (836), `native/resident_identity` (136, the `ResidentIdentity` trait), `policy_projection` (391); `webrtc_door` and `webrtc_session` follow or are feature-gated | A second crate under `crates/graphshell/` beside `graphshell-endpoint`; that crate's README already says admission and the serve loops "live in `ports/graphshell`" and names this as the not-yet-extracted half | Cleromancy registers an endpoint with `ResidentEndpointCatalog` and `AdmittedEndpointContext` without `graphshell`; Knot's `place_projection` test serves a projection with it; both build for their target features |
 | L3 | **Server halves Djinn runs**: `native/app_broker` (522), `device_broker` (285), `browser_host` (668), `local_session` (243), `resident_mere_proxy` (218), `personal_sync_host` (2,319), `carriage_host` (564 + 290), `transfer_staging` (673), `graph_keys` (840) | `ports/djinn`, which is the only caller of `serve_app_broker` (three call sites) | Knot's `resident_app_route` test and the `graphshell_native_host` binary run against Djinn's broker or a small fixture host; `graphshell` no longer holds a broker |
 | L13 | `personal_sync` (3,693), `receipts` (1,368), `transfer_offer` (363) | Waits. A stack home (Pandect or a dedicated crate) for the replica, event and projection types Cleromancy imports | The facet shapes in `access` and `product` that `personal_sync.rs:41-42` reads must be settled (see the [facet dissolution brief](../research/2026-10-08_facet_dissolution_brief.md)) | Cleromancy builds `PersonalGraphReplica` with no `graphshell` package |
@@ -252,6 +254,60 @@ Djinn runs.
 `identity_endpoint`, `identity_projection`, `browser_carrier`'s browser
 bridge, `webrtc_join`, `webrtc_browser`, `sessions`, `canary` and `view` stay
 (finding 9; they are the generic adapter and the G-series receipts).
+
+### Group 3b: remote overmap (requested by Mark, 2026-10-14)
+
+Mark: "it would be nice to have a remote overmap capability, especially for
+the consumers that would have the required dependencies anyway. like
+turnstone probably." Relayed by the session that started this one; the pieces
+below were read from source.
+
+| ID | Modules (lines) | Home | Receipt |
+|---|---|---|---|
+| L14 | `mere_route` (452), `mere_route_session` (715), and the wire half of `session_item` (about 250 of 320 lines: the `djinn.mere/v1/*` route names, intent and schema constants, `SessionGraphV1`, `SetViewV1`, `ApplyEditsV1`, `SessionsActionV1`, `ArchiveActionV1`) | A sibling crate to `mere-view` (R7), depending on `mere-view`, `graphshell-client` and `chirograph`; not a feature of `mere-view` | Turnstone's overmap pane mounts a remote mere's graph as `mere-view` over an admitted session and shows its sessions, with Turnstone's own identity and window. Single route only |
+
+What source shows: `mere_route` fills `MereViewModel` from a route's two
+projections (sessions and the attached graph) and turns `MereViewRequest`s
+into route intents; `mere_route_session` is the event-driven panel over one
+admitted endpoint on `graphshell_client::SessionDriver`. Their imports are
+stack crates (`chirograph`, `mere::canvas::MERE_GRAPH_ADAPTER`, `mere_view`,
+`pandect::SessionId`, `sceno`, `graphshell_client`, `uuid`) plus
+`session_item`. `session_item` is the one tangle: its wire constants and
+types are what the client needs, but it also holds server-side builders
+(`card<B: Backend>(&GraphSession<B>)`, `actions()`), and `mere_host` imports
+it (group 4). The wire half moves; the builders stay with group 4. The wire
+types name `pandect::SessionId`, `pandect::ViewIntent`, and
+`kernel::CapturedDelta`, so the new crate depends on `pandect` and `kernel`,
+both stack crates.
+
+Why a sibling and not a `mere-view` feature: `mere-view` depends on
+`cambium`, `cartography`, `pictograph` (`signals`), `incipit`, `kernel`,
+`sprigging` and `uuid`, and not on `chirograph` or `graphshell-client`. Its
+header says every application embeds it, including hosts with a local mere
+and no session. A feature would put the session client on every embedder's
+feature list.
+
+Why Turnstone: it already depends on `graphshell`, `graphshell-client`
+(with `accesskit`), `graphshell-endpoint`, `notochord`, `personae`,
+`transport` and `pandect`, and already dials projection sessions
+(`network_carrier::dial_projection_session`) and opens the app door
+(`app_client::AppRouteCarrier`). Its `src/overmap.rs` (189 lines) is local
+only: it projects its own `ManifestStore` into a kernel `Graph`. The suite
+census (§2) says Turnstone may mount granted projections through Graphshell.
+
+What is not here: nothing composes several remote routes into one overmap
+graph. `sessions.rs` is a switcher proof harness. Multi-route composition is
+a design (identity of nodes across meres, whose authority a merged view
+shows), not a lift, and no code moves for it. Not confirmed: whether a
+mere route is registered on a network-carrier catalog. Source shows Djinn
+registering `mere/<domain>` routes on the local application door
+(`djinn/src/resident_mere.rs`) and the C4 fixture serving a divination route
+through `native::resident_mere_proxy` over the WebRTC door
+(`bin/c4_webrtc_host.rs`); `djinn/src/bin/djinn.rs` registers Knot, site,
+device directory, status and reservoir routes in its shared catalog, and
+this plan found no mere-route registration on a carrier a remote device can
+dial. That registration is Djinn-side work that the receipt needs, and it is
+a P5-adjacent step, not part of L14.
 
 ### Group 4: product truth
 
@@ -319,6 +375,11 @@ Each carries a recommendation and the evidence. None is needed for P1 to P3.
   Recommended: no.
 - **R6, `appearance`.** Recommended: stays; it is the application's preference
   record, which Tabard's division gives to the application.
+- **R7, the remote overmap crate's home and name (L14).** Recommended: a
+  sibling crate to `mere-view`, under `crates/cambium/` beside it or under
+  `crates/graphshell/` beside `graphshell-client`; the dependency set
+  (`mere-view`, `graphshell-client`, `chirograph`, `pandect`, `kernel`) is
+  the same either way. Mark names crates.
 
 ## 6. Phases
 
@@ -343,8 +404,8 @@ change. No re-export from `graphshell::native`.
 *Done when:* the crate builds for native and has no `graphshell` dependency;
 Signalman and `ports/dramatis` build against it alone; `custody_client` and
 `app_client` tests pass in the crate; the boundary script passes; Woodshed's
-and Knot's next repin names the crate and their cones lose the
-retained-content cone, recorded in their plans.
+(root, `ports/hocket`, `validation/relationship-recipe`) and Knot's next repin
+name the crate in place of `graphshell`, recorded in their plans.
 
 **P2. L5, L8 and the `ProjectionClock` cut.** Canvas controls, faces and
 gesture parity into pictograph; `coupling_edit`; move `ProjectionClock` out of
@@ -354,6 +415,19 @@ receipt.
 (one wheel and zoom path); Graphshell's web page calls them from pictograph;
 a Woodshed (or fixture) native surface drives them with only the `canvas`
 feature; `web_tree/gestures.rs` and `controls.rs` call the pictograph functions.
+
+**P2a. L14, the remote overmap client.** Independent of P1 and P4: it needs
+only `graphshell-client`, which is already a stack crate, and an admitted
+session the host obtains itself. Needs R7. First split `session_item`'s wire
+half from its server builders, then move `mere_route`, `mere_route_session`
+and the wire half.
+*Done when:* the new crate builds with no `graphshell` dependency and its
+tests (today's `mere_route` and `mere_route_session` tests) pass there;
+`graphshell_mere` and Djinn import it; Turnstone's overmap pane mounts a
+remote mere through it, over a session Turnstone admitted itself, and shows
+sessions and graph. Turnstone's own `overmap.rs` keeps the local case.
+Registering a mere route on a carrier a remote device can dial is the Djinn
+step the receipt needs, and is recorded here if it lands first.
 
 **P3. L4 and L4c.** Option helpers into `scenomise`; Knot's copies deleted;
 host recipes go to their domains.
@@ -417,9 +491,12 @@ Relayed by the Woodshed session on 2026-10-14 and checked against source:
 3. The Woodshed survey read Mere HEAD, not its pin; its claim that
    `canvas_physics` is host-neutral is wrong (finding 5), and its list of
    editors and the Forme session is as §2 corrects.
-4. Woodshed, Hocket and Redshank will repin to Mere main; the repin has not
-   started and a separate session is narrowing Woodshed's `graphshell`
-   features. This plan targets main and does not touch Woodshed's manifests.
+4. Woodshed, Hocket and Redshank will repin to Mere main; the repin is
+   proposed but not started. Woodshed main `c11571b` has already narrowed
+   `graphshell` to `native` only in its root, `ports/hocket` and
+   `validation/relationship-recipe`. The repin is the natural point to adopt
+   P1 if P1 is on main by then. This plan targets main and does not touch
+   Woodshed's manifests.
 
 ## Findings
 
@@ -479,13 +556,30 @@ fast-forward of local main; nothing built).**
   counting production and test lines separately. It is saved with this
   session's notes, not in the repository (DOC_POLICY §1: no file for a
   one-time analysis); rerun it at P0.
+- Turnstone (`f14d2091`, read from GitHub, 185 `.rs` files under `src/`):
+  production imports of `graphshell` are the L1 and L2 sets and
+  `view::{ProjectionLayoutView, ProjectionReceiptView, render_projection_receipt}`.
+  Its `graphshell::projection_editor` imports in `knot_authoring.rs` are
+  `ProjectionInputBinding`, `PublicSourceRevision`, `RevisionEvidence`,
+  `RuntimeSourceBinding`, `SourceBinding` and the `AuthoredProjectionDefinition`
+  family, all scenograph types the module re-exports; none is the reducer, so
+  finding 3 stands and Turnstone's side of L4b is a one-line repoint to
+  `scenograph`. It pins Mere `77fd235f`.
+- `session_item.rs` (320 lines) holds route names, intent and schema constants
+  and wire types, and two server-side builders (`card`, `actions`);
+  `mere_host` imports it. `mere-view` has no `chirograph` or
+  `graphshell-client` dependency.
 - Not verified: dependency cones were not measured (`cargo tree --offline`
   fails on git dependencies); no consumer repository was built; Turnstone's
-  source is not local, so Turnstone-side receipts are named but their
-  readiness is unchecked; the custody-scoping task was not found.
+  receipts (L12, L14) are named but its readiness to run them is unchecked,
+  though its imports were read; the custody-scoping task was not found.
 
 ## Progress
 
 - **2026-10-14:** plan written from the census; indexed in `DOC_README.md`.
-  No code moved. Open: R1 to R6 (§5), P0 baselines, whether a custody-scoping
+  No code moved. Open: R1 to R7 (§5), P0 baselines, whether a custody-scoping
   task exists.
+- **2026-10-14 (later):** Mark's remote-overmap request added as L14, R7 and
+  P2a; Woodshed's interim narrowing (`c11571b`) recorded; Turnstone read from
+  GitHub, adding it as a production consumer of L1 and L2 and confirming it is
+  not a reducer consumer of the projection editor.
