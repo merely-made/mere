@@ -91,6 +91,11 @@ with the per-model prompt template and an answer-card surface.
 Done when: one host sends a prompt through the actor and renders the answer,
 with cancellation, headed; the prompt template is per-model data, not code.
 
+**2026-10-15:** Mark chose djinn's resident as the host, with recall over
+retained material as the forcing consumer. The
+[resident inference and recall plan](2026-10-15_resident_inference_and_recall_plan.md)
+carries M2; its I5 closes this phase.
+
 ### M3. Distillery operations
 
 Model manifest browsing and the streaming console as a Distillery surface;

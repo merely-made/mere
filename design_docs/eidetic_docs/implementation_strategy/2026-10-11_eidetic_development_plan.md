@@ -774,6 +774,10 @@ The implementation proposals still need these concrete decisions:
    the [native session-store plan](../../mere_docs/implementation_strategy/2026-06-23_native_session_store_plan.md).
 3. The first engine pair, embedding-envelope consumer and Distillery inference
    host, including device injection and browser executor support.
+   *2026-10-15:* the host is ruled: djinn's resident, with recall over
+   retained material as its forcing consumer and first envelope consumer
+   ([resident inference and recall plan](../../mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md)).
+   The engine pair and browser executor remain open.
 4. Deletion/reference semantics, any demonstrated backend gap, accepted-schema
    discovery and the first exchange consumer. These are named checkpoints;
    the plan does not choose a universal database or automatic sharing policy.
