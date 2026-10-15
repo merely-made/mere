@@ -272,8 +272,14 @@ the branch case with the thaw as parent, and needs nothing extra.
   target is the branch's parent, or the session that parent was merged into,
   or the part's `picked_from`. A clean merge applies at once. One with
   conflicts is held by the resident and shown as the card until it is
-  resolved or cancelled. A resolve missing a choice stays pending; any other
-  refusal drops the plan, and the person merges again. Undoing or redoing a
+  resolved or cancelled. A resolve missing a choice stays pending. Any other
+  failure (a session moved, a value given by hand that does not fit) plans
+  the merge again (Mark, 2026-10-15). A clean new plan applies; otherwise it
+  waits with the choices that still apply carried over
+  (`PendingMerge::carry_choices`). The card's material lists the carried and
+  the dropped choices, each dropped one with its reason ("no longer in
+  conflict", "adding as new no longer applies", "the value given by hand does
+  not fit"). The view lists the dropped ones on the card as "Dropped choices". Undoing or redoing a
   merge through the session item reloads the source's mark in any host
   holding it open, and moves the sessions list. `MereHost` gained
   `plan_merge`, `apply_merge` and `reload_merged_mark`.
@@ -287,6 +293,12 @@ the branch case with the thaw as parent, and needs nothing extra.
   Apply is disabled until every conflict has a choice; Cancel is always
   available. Requests are `MereViewRequest::Merge(MergeRequest::{Choose,
   Apply, Cancel})`.
+- `MereViewRequest` and `SessionStep` are `#[non_exhaustive]` (Mark,
+  2026-10-15), so a new request or step does not break a host. In-repo hosts
+  keep a wildcard arm. Knot's merge wiring comes with its next repin.
+- `graphshell_mere`, the native viewer, completes Branch and Merge too: it
+  reads the pending merge's material, keeps choices until Apply, and adopts a
+  new plan's carried and dropped choices.
 - **Route adapter** (`mere_overmap::route`, `route_session`): reads the merge
   card's media, words each part (`Title of One`, `Relations from A to B`),
   keeps the choices made in the panel until Apply, and sends them as one

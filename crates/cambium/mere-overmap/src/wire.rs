@@ -112,6 +112,13 @@ pub struct PendingMergeV1 {
     pub target: SessionId,
     pub target_name: String,
     pub conflicts: Vec<pandect::MergeConflict>,
+    /// Choices the resident carried over from an earlier plan of this merge
+    /// that could not apply (a session moved): the view starts from these.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub carried: Vec<MergeChoiceV1>,
+    /// Choices from that earlier plan the new one could not take, and why.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub dropped: Vec<pandect::DroppedChoice>,
 }
 
 /// One conflict's choice, naming its part.
