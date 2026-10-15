@@ -8762,7 +8762,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8770,7 +8770,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8790,7 +8790,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
 dependencies = [
  "cambium",
  "illume",
@@ -8806,7 +8806,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8815,7 +8815,6 @@ dependencies = [
  "eidetic",
  "esp",
  "fleece",
- "graphshell",
  "graphshell-endpoint",
  "inker",
  "insigne",
@@ -8825,9 +8824,11 @@ dependencies = [
  "knot-document",
  "knot-file-catalog",
  "mere-fetch",
+ "mere-overmap",
  "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
+ "mere-view",
  "mora",
  "mora-cmudict",
  "muniment",
@@ -8875,7 +8876,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8888,7 +8889,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=8ed49d43f049921d56ab5a0c091a2c37c0970ee7#8ed49d43f049921d56ab5a0c091a2c37c0970ee7"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
 dependencies = [
  "blake3",
  "gemini-protocol",
