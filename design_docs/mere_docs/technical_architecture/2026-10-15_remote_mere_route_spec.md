@@ -209,7 +209,7 @@ for wasm32; `scripts/check_port_boundaries.py` passes.
 
 ## 7. The one repin round (to do)
 
-Pin order, one source throughout: **Murm (settled by §11 Q1) → Mere →
+Pin order, one source throughout: **Murm (`main` `fb6360c12b`, §11 Q1) → Mere →
 Knot → Mere's Knot pin → Turnstone → Woodshed.** Each consumer names Mere
 through `https://www.github.com/merely-made/mere.git` and Murm through
 `https://www.github.com/merely-made/murm.git`, both at the revisions below.
@@ -404,33 +404,31 @@ Tests: each step's carrier test asserts a notice reaches the client without
 a request; a C4-chain test asserts one notice crosses Djinn, the door and the
 proxy with no poll interval in the path.
 
-## 11. Questions for Mark
+## 11. Rulings (Mark, 2026-10-15)
 
-1. **Q1, Murm's line.** Mere and every consumer pin Murm on
-   `codex/c1-webrtc-callback-lifetime-20261014`, which is not on Murm's
-   `main` (Murm `main` lacks its browser-initiator fix and differs in 241
-   files). The in-process kind sits on `agent/transport-in-process`, cut from
-   that pin. Options: **(a)** merge both branches into Murm `main` and pin
-   that (recommended: one line, per the family's merge-into-main practice);
-   **(b)** keep pinning the branch until a Murm lane reconciles it.
-2. **Q2, the host's trusted roots.** For same-persona devices the policy needs
-   a root that issues device delegations. Options: **(a)** a resident root
-   derived from the persona (salt `mere.djinn/device-root/v1`), with the
-   pairing flow (`pandect::wallet_grant` enrollment) issuing each paired
-   device an explicit grant of §2 per application the owner allows;
-   **(b)** the persona's master key as the root's issuer directly, grants
-   issued by hand until pairing names them. For places: **(a)** add a joined
-   place's root when Turnstone's place host admits the owner, read from the
-   place record; **(b)** a resident setting listing place roots.
-3. **Q3, on by default?** Options: **(a)** the binary starts the host when at
-   least one trusted root besides the persona's exists (so a resident with no
-   paired device opens no listener); **(b)** opt-in setting; **(c)** always on.
-4. **Q4, keeping pass (b)'s Mere commit.** It landed (`8b08c98b2`, green)
-   before the scope change reached the Claude lane. Options: **(a)** keep it
-   and let Codex start from §7 (recommended); **(b)** revert it and have Codex
-   implement §§2–6 from this spec.
+1. **Q1, Murm's line. Ruled: one line, on `main`.** Done the same day:
+   Murm `main` is `fb6360c12b`, a merge of both
+   `codex/c1-webrtc-callback-lifetime-20261014` (`3d9e799f`) and
+   `agent/transport-in-process` (`38e9c9b8`), and both branches are
+   deleted. The 58,702-commit gap was upstream history imported through
+   about 33 merges on main; the branch was main's `b49df894` plus one
+   commit. Main had changed 2 lines in `transport` and `webrtc-carrier`
+   since. `mere-transport`'s lib tests pass on the merge (57). The repin
+   round (§7) pins Murm `main` at `fb6360c12b`, not a branch.
+2. **Q2, trusted roots. Ruled: (a) for both.** Same-persona devices use
+   a resident root derived from the persona (salt
+   `mere.djinn/device-root/v1`). Pairing (`pandect::wallet_grant`
+   enrollment) issues each paired device an explicit §2 grant per
+   application the owner allows. Places: add a joined place's root when
+   Turnstone's place host admits the owner, read from the place record.
+3. **Q3, on by default. Ruled: (a).** The binary starts the host only
+   when at least one trusted root besides the persona's exists, so a
+   resident with no paired device opens no listener.
+4. **Q4. Ruled: (a), keep `8b08c98b2`.** Codex starts from §7.
 
 ## Progress
 
 - **2026-10-15:** written after the scope change; §§2–6 describe Mere
   `8b08c98b2` and Murm `38e9c9b8`; §§7–10 are the Codex lanes' work.
+- **2026-10-15 (rulings):** Mark ruled Q1–Q4 (§11). Murm is merged to
+  `main` `fb6360c12b`; the repin round starts there.
