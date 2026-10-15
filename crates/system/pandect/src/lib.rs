@@ -105,6 +105,8 @@ pub mod notochord_policy_store;
 #[cfg(test)]
 mod resource_content_merge_tests;
 pub mod snapshot_merge;
+// The merge rules Compose and session merge-in share (session merge-in note, M8).
+pub mod merge_rules;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod station_grant;
 // The frame.json pane-layout store moved OUT with the pane model at
@@ -189,8 +191,9 @@ pub use facet_store::{
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
-    MereSessions, Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
-    forked_session_name, picked_session_name,
+    MereSessions, MergeConflict, MergeMatch, MergeSide, Pending, PendingMerge, Reverted,
+    SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey, branched_session_name, forked_session_name,
+    picked_session_name,
 };
 pub use identity::StartupUnlockMode;
 pub use wallet_sealed_backend::WalletSealedBackend;
@@ -205,8 +208,8 @@ pub use live_view::{
     open_live_view_record, save_live_view_record, save_live_view_record_sealed,
 };
 pub use manifest::{
-    CodicilId, EngineProfileBinding, GraphSessionManifest, MANIFEST_SCHEMA_VERSION, PersonaId,
-    PickedFrom, SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
+    CodicilId, EngineProfileBinding, GraphSessionManifest, Lineage, MANIFEST_SCHEMA_VERSION,
+    MergedMark, PersonaId, PickedFrom, SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
 };
 pub use manifest_store::{LoadFailure, LoadReport, MANIFEST_FILE, ManifestStore, TRASH_DIR};
 #[cfg(not(target_arch = "wasm32"))]

@@ -45,7 +45,7 @@ pub const fn built_in_relation_stratum(kind: RelationKind) -> GraphStratum {
             | SemanticSubKind::NextStep => GraphStratum::Resource,
         },
         RelationKind::Provenance(kind) => match kind {
-            ProvenanceSubKind::CopiedFrom => GraphStratum::Surface,
+            ProvenanceSubKind::CopiedFrom | ProvenanceSubKind::MergedFrom => GraphStratum::Surface,
             ProvenanceSubKind::ClippedFrom
             | ProvenanceSubKind::ExcerptedFrom
             | ProvenanceSubKind::SummarizedFrom
@@ -109,6 +109,7 @@ mod tests {
         let surfaces = [
             RelationKind::Semantic(SemanticSubKind::UserGrouped),
             RelationKind::Provenance(ProvenanceSubKind::CopiedFrom),
+            RelationKind::Provenance(ProvenanceSubKind::MergedFrom),
             RelationKind::Imported(ImportedSubKind::BookmarkFolder),
             RelationKind::Imported(ImportedSubKind::HistoryImport),
             RelationKind::Imported(ImportedSubKind::SessionImport),
@@ -126,7 +127,7 @@ mod tests {
             .chain(ContainmentSubKind::iter().map(RelationKind::Containment))
             .chain(ArrangementSubKind::iter().map(RelationKind::Arrangement))
             .collect();
-        assert_eq!(kinds.len(), 43);
+        assert_eq!(kinds.len(), 44);
         let mut resource_count = 0;
         let mut surface_count = 0;
         for kind in kinds {
@@ -139,7 +140,7 @@ mod tests {
             };
             assert_eq!(built_in_relation_stratum(kind), expected, "{kind:?}");
         }
-        assert_eq!((resource_count, surface_count), (32, 11));
+        assert_eq!((resource_count, surface_count), (32, 12));
         assert_eq!(
             built_in_relation_stratum(RelationKind::Traversal),
             GraphStratum::Surface

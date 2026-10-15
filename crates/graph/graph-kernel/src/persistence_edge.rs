@@ -164,6 +164,9 @@ pub enum PersistedProvenanceSubKind {
     /// Verbatim duplicate (cross-graph copy / tear-out fork). Appended last to
     /// keep existing ordinals stable. Mirrors `ProvenanceSubKind::CopiedFrom`.
     CopiedFrom,
+    /// Brought in by a session merge-in. Appended last to keep ordinals
+    /// stable. Mirrors `ProvenanceSubKind::MergedFrom`.
+    MergedFrom,
 }
 
 #[derive(Archive, Serialize, Deserialize, Clone, Debug, PartialEq, serde::Deserialize)]

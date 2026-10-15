@@ -477,6 +477,7 @@ fn persisted_edge_with_ids(
                             PersistedProvenanceSubKind::ImportedFromSource
                         },
                         ProvenanceSubKind::CopiedFrom => PersistedProvenanceSubKind::CopiedFrom,
+                        ProvenanceSubKind::MergedFrom => PersistedProvenanceSubKind::MergedFrom,
                     })
                     .collect(),
             }),

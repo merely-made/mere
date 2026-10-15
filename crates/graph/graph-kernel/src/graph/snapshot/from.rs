@@ -522,6 +522,9 @@ pub(crate) fn restore_persisted_payload(payload: &mut EdgePayload, pedge: &Persi
                 PersistedProvenanceSubKind::CopiedFrom => EdgeAssertion::Provenance {
                     sub_kind: ProvenanceSubKind::CopiedFrom,
                 },
+                PersistedProvenanceSubKind::MergedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::MergedFrom,
+                },
             };
             structural_changes += usize::from(payload.assert_relation(assertion));
         }
