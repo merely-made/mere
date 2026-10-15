@@ -1697,3 +1697,84 @@ fn apply_and_lay_out_lays_the_graph_out_again_for_an_open_card() {
         "laid out again below the grown tier"
     );
 }
+
+#[test]
+fn tier_labels_show_the_name_and_keep_clear_of_the_tier_controls() {
+    let host = Host::new(tier_model(), 900, 600);
+    let swatch = tier_view(&host).swatch();
+    let visible = |key: &str| {
+        swatch
+            .visible_labels
+            .iter()
+            .find(|(id, _)| id == key)
+            .map(|(_, text)| text.as_str())
+    };
+    let morning = session_node_key(session_id(1));
+    assert_eq!(visible(&morning), Some("Morning reading"));
+    assert_eq!(
+        visible(&archive_node_key("composed")),
+        Some("Codicil blake3:0c0de")
+    );
+    assert_eq!(visible(SHELF_NODE_KEY), Some("Archive"));
+    let node = swatch
+        .graph
+        .nodes
+        .iter()
+        .find(|node| node.id == morning)
+        .unwrap();
+    assert_eq!(
+        node.label, "Session Morning reading, shown here",
+        "the accessible name keeps the words"
+    );
+    // The shelf sits in the last slot, against the tier's controls: its
+    // codicils' labels go left; the first session's stays right.
+    let placement = |key: &str| {
+        swatch
+            .label_placements
+            .iter()
+            .find(|(id, _)| id == key)
+            .map(|(_, placement)| *placement)
+    };
+    assert_eq!(
+        placement(&archive_node_key("forgotten")),
+        Some(cambium::GraphLabelPlacement::Left)
+    );
+    assert_eq!(placement(&morning), None);
+}
+
+#[test]
+fn the_sheet_pins_the_rows_a_card_and_a_popover_are_measured_by() {
+    use crate::tier::{BUTTON_HEIGHT, CARD_BORDER, CARD_HEAD, ROW_GAP};
+    use crate::view::{CONTAINER_PAD, LINE};
+    let sheet = MERE_VIEW_CSS;
+    for rule in [
+        format!(
+            ".mere-view-card {{ position: absolute; z-index: 3; border-width: {CARD_BORDER}px; padding: {CONTAINER_PAD}px;"
+        ),
+        format!(
+            ".mere-view-card-head {{ display: flex; flex-wrap: nowrap; align-items: center; gap: {ROW_GAP}px; height: {CARD_HEAD}px;"
+        ),
+        format!(".mere-view-card .mere-view-session-steps > button {{ height: {BUTTON_HEIGHT}px;"),
+        format!(
+            ".mere-view-card .mere-view-session-steps {{ gap: {ROW_GAP}px; padding: 0 0 {ROW_GAP}px 0;"
+        ),
+        format!(
+            ".mere-view-popover-layer .mere-view-archive-steps > button {{ height: {BUTTON_HEIGHT}px;"
+        ),
+    ] {
+        assert!(sheet.contains(&rule), "the sheet pins {rule}");
+    }
+    // Morning's card: border and padding, head, state, Fork and Trash then
+    // Save (two rows of controls), and its one codicil.
+    let host = Host::new(tier_model(), 900, 600);
+    let view = tier_view(&host);
+    let expected = 2 * (CARD_BORDER + CONTAINER_PAD)
+        + CARD_HEAD
+        + LINE
+        + (ROW_GAP + 2 * BUTTON_HEIGHT + ROW_GAP)
+        + 28;
+    assert_eq!(
+        crate::tier::card_height(view.model, TierCard::Session(session_id(1))),
+        expected
+    );
+}

@@ -225,6 +225,15 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     /// returns focus to. Holding the same request does not steal focus on
     /// later rebuilds.
     pub focus_request: Option<Id>,
+    /// Shorter visible text for individual nodes' labels, as `(id, text)`.
+    /// A node's [`GraphCanvasNode::label`] stays its accessible name; the
+    /// visible label can say less, such as a name without the state words the
+    /// accessible name carries. See [`with_visible_label`](Self::with_visible_label).
+    pub visible_labels: Vec<(Id, String)>,
+    /// Where individual nodes' visible labels go, overriding the canvas's own
+    /// choice: for a node beside an app-owned control the label must not run
+    /// under. See [`with_label_placement`](Self::with_label_placement).
+    pub label_placements: Vec<(Id, GraphLabelPlacement)>,
     /// Optional fixed-world atlas beneath the graph labels and callouts.
     /// Geographic field identity refers to existing graph node ids, while the
     /// atlas's paint and picking geometry remain caller-produced projection data.
@@ -275,6 +284,8 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             node_footprints: Vec::new(),
             node_attrs: Vec::new(),
             focus_request: None,
+            visible_labels: Vec::new(),
+            label_placements: Vec::new(),
             atlas: None,
             selected: None,
             focus: None,
@@ -401,6 +412,34 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
             .retain(|(peer, peer_name, _)| !(*peer == id && *peer_name == name));
         self.node_attrs.push((id, name, value.into()));
         self
+    }
+
+    /// Show `text` as one node's visible label instead of its accessible
+    /// name (see [`Self::visible_labels`]). Repeating an id replaces it.
+    #[must_use]
+    pub fn with_visible_label(mut self, id: Id, text: impl Into<String>) -> Self {
+        self.visible_labels.retain(|(peer, _)| *peer != id);
+        self.visible_labels.push((id, text.into()));
+        self
+    }
+
+    /// Put one node's visible label at `placement` (see
+    /// [`Self::label_placements`]). Repeating an id replaces it.
+    #[must_use]
+    pub fn with_label_placement(mut self, id: Id, placement: GraphLabelPlacement) -> Self {
+        self.label_placements.retain(|(peer, _)| *peer != id);
+        self.label_placements.push((id, placement));
+        self
+    }
+
+    /// The text a node's visible label shows: its own visible text, or its
+    /// accessible name.
+    fn label_text(&self, index: usize) -> &str {
+        let node = &self.graph.nodes[index];
+        self.visible_labels
+            .iter()
+            .find(|(id, _)| *id == node.id)
+            .map_or(node.label.as_str(), |(_, text)| text.as_str())
     }
 
     /// Ask for keyboard focus on one node's target (see
@@ -608,7 +647,7 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         // The boxes `GraphLabelPlacement::style` lays out.
         let rect = |index: usize| {
             let (x, y) = positions[index];
-            let width = label_text_width(&self.graph.nodes[index].label);
+            let width = label_text_width(self.label_text(index));
             match self.label_placement(index) {
                 placement @ (GraphLabelPlacement::Above | GraphLabelPlacement::Below) => {
                     let top = if placement == GraphLabelPlacement::Above {
@@ -653,6 +692,9 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         let Some(node) = self.graph.nodes.get(index) else {
             return GraphLabelPlacement::Right;
         };
+        if let Some((_, placement)) = self.label_placements.iter().find(|(id, _)| *id == node.id) {
+            return *placement;
+        }
         let mut horizontal = 0.0_f32;
         let mut vertical = 0.0_f32;
         let mut add_neighbor = |neighbor: &Id| {
@@ -953,8 +995,9 @@ fn label_text_width(label: &str) -> f32 {
     (label.chars().count() as f32 * CHAR_WIDTH + 2.0).min(GRAPH_LABEL_WIDTH)
 }
 
+/// Where a node's visible label sits against its node.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum GraphLabelPlacement {
+pub enum GraphLabelPlacement {
     Above,
     Below,
     Left,
@@ -1424,7 +1467,7 @@ where
                     class.push_str(" hovered");
                 }
                 let placement = swatch.label_placement(index);
-                el::<_, State, AppAction>("span", node.label.clone())
+                el::<_, State, AppAction>("span", swatch.label_text(index).to_string())
                     .attr("class", class)
                     .attr("aria-hidden", "true")
                     .attr("data-label-placement", placement.name())
@@ -1435,7 +1478,7 @@ where
                             y,
                             swatch.node_radius + 7.0,
                             size,
-                            label_text_width(&node.label),
+                            label_text_width(swatch.label_text(index)),
                         ),
                     )
             })
@@ -2366,6 +2409,65 @@ mod tests {
         for child in dom.dom_children(root) {
             classes_of(dom, child, base, out);
         }
+    }
+
+    fn short_labelled_view(_state: &State) -> TestView {
+        let swatch = model(None, None)
+            .with_node_labels(true)
+            .with_visible_label(2, "Second")
+            .with_label_placement(1, GraphLabelPlacement::Left);
+        Box::new(graph_canvas_swatch_with_focus(
+            &swatch,
+            |state: &mut State, id| state.clicked.push(id),
+            |state: &mut State, id| state.hovered = id,
+            |state: &mut State, id| state.focused = id,
+            |state: &mut State| state.expanded = true,
+        ))
+    }
+
+    /// A node's visible label can say less than its accessible name, and a
+    /// host can put a label on the side it needs.
+    #[test]
+    fn a_visible_label_can_be_shorter_and_placed_by_the_host() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), short_labelled_view, State::default());
+        let root = runner.root();
+        let dom = dom.borrow();
+        let second = find_attr(&dom, root, "aria-label", "Second node")
+            .expect("the accessible name stays whole");
+        assert_eq!(attr(&dom, second, "aria-label"), Some("Second node"));
+        let left = find_attr(&dom, root, "data-label-placement", "left")
+            .expect("node 1's label goes left as asked");
+        assert_eq!(
+            dom.text(dom.dom_children(left).next().unwrap()),
+            Some("First node")
+        );
+        let mut labels = Vec::new();
+        classes_of(&dom, root, "graph-canvas-swatch-label", &mut labels);
+        assert_eq!(labels.len(), 2);
+        let texts: Vec<String> = {
+            fn walk(dom: &ScriptedDom, node: NodeId, out: &mut Vec<String>) {
+                if attr(dom, node, "class")
+                    .is_some_and(|c| c.starts_with("graph-canvas-swatch-label "))
+                    || attr(dom, node, "class") == Some("graph-canvas-swatch-label")
+                {
+                    let text = dom
+                        .dom_children(node)
+                        .filter_map(|child| dom.text(child).map(str::to_string))
+                        .collect::<String>();
+                    out.push(text);
+                }
+                for child in dom.dom_children(node).collect::<Vec<_>>() {
+                    walk(dom, child, out);
+                }
+            }
+            let mut out = Vec::new();
+            walk(&dom, root, &mut out);
+            out
+        };
+        assert!(texts.contains(&"Second".to_string()), "{texts:?}");
+        assert!(!texts.contains(&"Second node".to_string()), "{texts:?}");
     }
 
     /// A node an overlay occupies shows the overlay, not its label too, with

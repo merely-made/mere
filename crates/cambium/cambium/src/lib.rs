@@ -119,9 +119,10 @@ pub use disclosure::{
 };
 pub use editor::{EditHistory, History, pair_close, wrap_selection};
 pub use graph_canvas::{
-    GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasInput, GraphCanvasNode,
-    GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion, GraphCanvasRelation,
-    GraphCanvasSubgraph, GraphCanvasSwatch, graph_atlas_swatch, graph_canvas, graph_canvas_swatch,
+    GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasInput,
+    GraphCanvasNode, GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion,
+    GraphCanvasRelation, GraphCanvasSubgraph, GraphCanvasSwatch, GraphLabelPlacement,
+    graph_atlas_swatch, graph_canvas, graph_canvas_swatch,
     graph_canvas_swatch_with_drag, graph_canvas_swatch_with_drag_and_relations,
     graph_canvas_swatch_with_focus, graph_canvas_swatch_with_focus_and_drag,
     graph_canvas_swatch_with_focus_and_drag_and_relations, graph_canvas_with_wheel,
