@@ -677,6 +677,7 @@ impl HeldMerge {
         }
     }
 }
+
 /// A card of the sessions projection and what it is served as.
 #[derive(Clone)]
 struct SessionsCard {
