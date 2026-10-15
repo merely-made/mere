@@ -804,8 +804,16 @@ Stop and record the reason if any of these happen:
     with no trainer, exact session/template identity in the served run table,
     Turnstone-only access and clean shutdown. The real 360M row and the real
     app-broker row are separate receipts. Final default-feature, Distillery
-    recheck and import-example checks are queued behind another process's Cargo
-    package-cache lock. No installed resident binary was run.
+    recheck and import-example checks did not start: a separate `cargo metadata`
+    on the primary checkout held the shared package-cache lock for over fifteen
+    minutes. Only this lane's queued checks were stopped; the other process was
+    preserved. Unrun commands: `cargo test --locked -p distillery --features
+    inference-model --lib inference`; `cargo test --locked -p djinn --lib
+    resident_inference`; `cargo test --locked -p esp --no-default-features --lib`;
+    `cargo build --locked -p esp --release --features decoder,model-session
+    --example import_inference_model`. Formatting and diff checks pass. The
+    documentation audit reports no new changed-source/plan findings; existing
+    repository-wide findings remain. No installed resident binary was run.
   - *Still open in I2:* the GPU provider row and inference/trainer owner-reclaim
     handshake, including withholding `HostFacts.gpu` and waiting for the
     trainer's clean cancellation before inference binds the GPU. GPU settings
