@@ -909,4 +909,35 @@ fast-forward of local main; nothing built).**
   text as before: the catalog resolves every option for a built-in family
   (`Auto` resolves to `auto`, `Empty` to the empty string), which is why the
   enum carries `resolved` for `Auto` as well as `Measured`.
+- **2026-10-15 (P2, generic over the host, at Woodshed's request; Mark chose
+  the route):** Woodshed's three hosting surfaces (Session Mere overview,
+  Related, relationship recipe editor) render through `cambium::graph_canvas`
+  with a `GraphViewport`, not a `Canvas`, so the lifted helpers could not serve
+  them. `pictograph::canvas::camera_host` adds three small traits, portable and
+  with no runtime: `CameraHost` (`camera`, `set_camera`, `zoom_range`,
+  `set_view_follow`, plus `wheel_zoom_px` and `pan_step` with generic defaults),
+  `FitHost: CameraHost` (the fit and physics verbs, each defaulting to nothing)
+  and `FaceGeometry` (`zoom`, `faces`). `Canvas` implements all three, so
+  existing callers change nothing. `CanvasCommand::apply`, `wheel_zoom`,
+  `two_finger`, `pan_at_once` and `FaceAlignment::measure` are generic over
+  them. `Canvas` keeps its own paths for the two behaviors that differ from the
+  generic arithmetic: it zooms through `cursor_moved`, `set_ctrl` and `wheel`
+  (projection-aware, the canvas's per-notch factor) and it pans as an impulse
+  into its inertia, so Knot and Graphshell behave as before. A host that takes
+  the defaults zooms by the same per-notch factor, keeps the world point under
+  the pointer and clamps to its `zoom_range`, and pans at once by the distance
+  the canvas's glide covers (`PAN_GLIDE`). Tests: a plain host agrees with the
+  canvas on wheel zoom and two-finger gestures, stays in its range, reaches
+  commands through its own verbs (absent verbs do nothing) and feeds
+  `FaceAlignment`. A trait defined here cannot be implemented for a foreign
+  camera type, so Woodshed wraps its `GraphViewport` in a newtype per surface.
+  Checks: pictograph (`canvas`) lib 435 passed, 1 failed, 18 ignored; the one
+  failure, `arrangement_goldens::every_arrangement_matches_its_golden_on_both_fixtures`
+  ("topic radial weighted focus 0 moved from its golden"), fails the same way at
+  `e92572a4e` without these changes (run in a clean worktree), so it predates
+  them and is not touched here. `graphshell` lib 453 passed; `graphshell-web`
+  checks for wasm32 with default features and with none; pictograph's `canvas`
+  checks for wasm32; the boundary script passes. Graphshell's page code now
+  dereferences its `RefMut<Canvas>` (`&mut *canvas`) at ten call sites, because
+  generic parameters do not auto-deref the way a `&mut Canvas` parameter did.
 
