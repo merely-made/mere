@@ -50,6 +50,17 @@ pub struct SceneProducer<T> {
     layout_scale: f32,
     revision: u64,
     generation: u64,
+    prepared: Option<PreparedSceneTexture>,
+}
+
+struct PreparedSceneTexture {
+    texture: wgpu::Texture,
+    physical_size: [u32; 2],
+    logical_size: (u32, u32),
+    layout_scale: f32,
+    source_identity: u64,
+    revision: u64,
+    generation: u64,
 }
 
 impl<T> SceneProducer<T> {
@@ -73,6 +84,7 @@ impl<T> SceneProducer<T> {
             layout_scale: 0.0,
             revision: 0,
             generation: 0,
+            prepared: None,
         }
     }
 
@@ -83,6 +95,7 @@ impl<T> SceneProducer<T> {
             return false;
         }
         self.source = source;
+        self.prepared = None;
         self.source_identity = source_identity();
         self.revision = 0;
         self.texture = None;
@@ -99,6 +112,84 @@ impl<T> SceneProducer<T> {
 }
 
 impl<T> TextureProducer for SceneProducer<T> {
+    fn prepare_checked(
+        &mut self,
+        cx: &ProducerContext<'_>,
+        #[cfg(target_arch = "wasm32")] commands: &genet_render_host::BrowserFrameCommands<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        self.prepared = None;
+        let logical_size = (
+            cx.frame.logical_size.0.round().max(1.0) as u32,
+            cx.frame.logical_size.1.round().max(1.0) as u32,
+        );
+        if !cx.frame.needs_frame && self.texture.is_some()
+            && self.revision == self.source_revision()
+            && self.physical_size == cx.frame.physical_size
+            && self.logical_size == logical_size
+            && self.layout_scale == cx.frame.layout_scale
+        { return Ok(None); }
+        let generation = self.generation.checked_add(1)
+            .ok_or_else(|| crate::producer::staged_producer_refusal("scene producer generation exhausted"))?;
+        let scene = self.scene(logical_size.0, logical_size.1);
+        let revision = self.source_revision();
+        let [width, height] = cx.frame.physical_size;
+        #[cfg(not(target_arch = "wasm32"))]
+        let raster = cx.core.try_rasterize_scaled_for(
+            self.raster_key, &scene, width, height,
+            ColorLoad::Clear(wgpu::Color::TRANSPARENT), cx.frame.layout_scale,
+        );
+        #[cfg(target_arch = "wasm32")]
+        let raster = commands.rasterize_scaled_for(
+            self.raster_key, &scene, width, height,
+            ColorLoad::Clear(wgpu::Color::TRANSPARENT), cx.frame.layout_scale,
+        );
+        let (texture, view) = raster?;
+        self.prepared = Some(PreparedSceneTexture {
+            texture, physical_size:cx.frame.physical_size, logical_size,
+            layout_scale:cx.frame.layout_scale, source_identity:self.source_identity,
+            revision, generation,
+        });
+        Ok(Some(ProducedTexture { view, generation, alpha:SourceAlpha::Straight, encoding:SourceEncoding::Srgb }))
+    }
+
+    fn supports_deferred_acceptance(&self) -> bool { true }
+
+    fn prepared_is_current(&self) -> bool {
+        match &self.prepared {
+            Some(prepared) => prepared.source_identity == self.source_identity && prepared.revision == self.source_revision(),
+            None => self.texture.is_some() && self.revision == self.source_revision(),
+        }
+    }
+
+    fn commit_prepared(&mut self) {
+        if let Some(prepared) = self.prepared.take() {
+            self.texture = Some(prepared.texture);
+            self.physical_size = prepared.physical_size;
+            self.logical_size = prepared.logical_size;
+            self.layout_scale = prepared.layout_scale;
+            self.revision = prepared.revision;
+            self.generation = prepared.generation;
+        }
+    }
+
+    fn commit_prepared_retiring(&mut self) -> Option<Box<dyn std::any::Any>> {
+        if self.prepared.is_none() { return None; }
+        let retired = self.texture.take();
+        self.commit_prepared();
+        retired.map(|texture| Box::new(texture) as Box<dyn std::any::Any>)
+    }
+
+    fn abort_prepared(&mut self) { self.prepared = None; }
+
+    fn take_prepared(&mut self) -> Option<Box<dyn std::any::Any>> {
+        self.prepared.take().map(|prepared| Box::new(prepared) as Box<dyn std::any::Any>)
+    }
+
+    fn take_suspended_resources(&mut self) -> Option<Box<dyn std::any::Any>> {
+        let resources = (self.texture.take(),self.prepared.take());
+        Some(Box::new(resources))
+    }
+
     fn portable_scene(
         &mut self,
         frame: &ProducerFrameInfo,
@@ -166,6 +257,7 @@ impl<T> TextureProducer for SceneProducer<T> {
     }
 
     fn suspend(&mut self) {
+        self.prepared = None;
         self.texture = None;
     }
 

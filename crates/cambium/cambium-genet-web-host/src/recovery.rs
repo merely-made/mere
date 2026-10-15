@@ -105,13 +105,29 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    // Hidden documents may not receive RAF. Loss/visibility wakes retire
+    // provisional GPU handles outside RefMut before detached acknowledgement.
+    {
+        let retired = {
+            let mut host = host.borrow_mut();
+            host.cancel_browser_frame_on_loss();
+            host.take_browser_retirements()
+        };
+        drop(retired);
+    }
     let owner = {
+        let retired = {
+            let mut current = host.borrow_mut();
+            let _ = current.poll_device_recovery();
+            current.take_browser_retirements()
+        };
+        drop(retired);
         let mut host = host.borrow_mut();
         match host.poll_device_recovery() {
             RecoveryStatus::Ready { generation } if host.s.needs_recovery_surface => {
                 let core = host.s.shared.render_core.clone().expect("ready core");
                 let (width, height) = window.physical_size();
-                match WebSurface::from_core(window.canvas().clone(), core, width, height) {
+                match WebSurface::from_core_for_window(window.canvas().clone(),core,width,height,window) {
                     Ok(surface) => {
                         host.s.surface = Some(Box::new(surface));
                         host.s.needs_recovery_surface = false;

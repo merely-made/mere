@@ -168,6 +168,36 @@ impl TitlebarInsets {
     }
 }
 
+/// A CPU-only identity for one browser surface configuration. Retaining a
+/// stamp keeps its identity allocation alive without retaining GPU resources
+/// or a RenderCore. Surface owners mint a fresh Arc identity for each surface.
+#[cfg(target_arch = "wasm32")]
+#[derive(Clone, Debug)]
+pub struct BrowserSurfaceStamp {
+    identity: std::sync::Arc<()>,
+    configuration_revision: u64,
+}
+
+#[cfg(target_arch = "wasm32")]
+impl BrowserSurfaceStamp {
+    pub fn new(identity: std::sync::Arc<()>, configuration_revision: u64) -> Self {
+        Self { identity, configuration_revision }
+    }
+
+    pub fn configuration_revision(&self) -> u64 { self.configuration_revision }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl PartialEq for BrowserSurfaceStamp {
+    fn eq(&self, other: &Self) -> bool {
+        std::sync::Arc::ptr_eq(&self.identity, &other.identity)
+            && self.configuration_revision == other.configuration_revision
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl Eq for BrowserSurfaceStamp {}
+
 /// What the host presents onto.
 ///
 /// The present core beneath this is already windowing-neutral: a
@@ -181,6 +211,24 @@ impl TitlebarInsets {
 /// four methods are required; the rest reach the core, which every
 /// implementation has.
 pub trait Surface {
+    /// Explicit diagnostic surfaces may need scoped COPY_SRC configuration
+    /// even on an unarmed initial/resize frame. Ordinary surfaces stay false.
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    fn wants_acquired_surface_readback_diagnostics(&self) -> bool { false }
+    /// Runs synchronously within the original frame owner/scopes, before its
+    /// prepared surface stamp. Unsupported capture is separate from rendering.
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    fn prepare_acquired_surface_capture(&self,_commands:&genet_render_host::BrowserFrameCommands<'_>)
+        -> Result<genet_render_host::SurfaceCaptureConfiguration,genet_render_host::SurfaceReadbackFailure> {
+        Err(genet_render_host::SurfaceReadbackFailure::Unsupported("surface capture diagnostics unsupported"))
+    }
+
+    /// Copied configuration identity for qualified browser target work.
+    /// None means unsupported or exhausted; qualified callers must return a
+    /// typed refusal rather than assume this surface can be stamped.
+    #[cfg(target_arch = "wasm32")]
+    fn browser_frame_surface_stamp(&self) -> Option<BrowserSurfaceStamp> { None }
+
     /// The present core: wgpu device, queue, and the netrender renderer.
     fn core(&self) -> &genet_render_host::RenderCore;
 
@@ -208,9 +256,10 @@ pub trait Surface {
     }
 
     /// The netrender renderer.
-    fn renderer(&self) -> &netrender::Renderer {
-        self.core().renderer()
-    }
+    #[cfg(not(target_arch = "wasm32"))]
+    fn renderer(&self) -> &netrender::Renderer { self.core().renderer() }
+    #[cfg(target_arch = "wasm32")]
+    fn renderer(&self) -> genet_render_host::RendererAccess<'_> { self.core().renderer() }
 
     /// The wgpu device backing the renderer.
     fn device(&self) -> &wgpu::Device {
@@ -1142,3 +1191,16 @@ pub use tree::HostTree;
 pub use wake::HostWake;
 pub use window_dom::WindowDom;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};
+
+#[cfg(target_arch = "wasm32")]
+pub use frame::BrowserFrameProgress;
+#[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+pub use frame::acquired_capture::{BrowserAcquiredCaptureFence,BrowserAcquiredCaptureFrame,
+    BrowserSurfaceCaptureFn,BrowserSurfaceCaptureRequestFailure,BrowserSurfaceCaptureDiagnostics,
+    BrowserSurfaceCapturePending,BrowserSurfaceCaptureStage,BrowserSurfaceCaptureSource};
+
+#[cfg(feature = "browser-frame-diagnostics")]
+pub use host::BrowserWorkCounts;
+
+#[cfg(all(target_arch = "wasm32", feature = "browser-frame-diagnostics"))]
+pub use host::{BrowserSurfaceControlFn,BrowserSurfaceControlPoint};

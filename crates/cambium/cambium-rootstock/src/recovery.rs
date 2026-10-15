@@ -52,6 +52,11 @@ where
         };
         self.s.last_redraw_presentation = None;
         self.s.last_raster_failure = Some(failure.clone());
+        #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+        self.cancel_browser_surface_request(match &failure {
+            genet_render_host::RasterizeFailure::DeviceLost(loss)=>genet_render_host::SurfaceReadbackFailure::DeviceLost(loss.clone()),
+            _=>genet_render_host::SurfaceReadbackFailure::FrameRejected(failure.clone()),
+        });
         match failure {
             genet_render_host::RasterizeFailure::DeviceLost(loss) => {
                 self.refuse_pending_captures(CaptureRefusal::DeviceLost(loss));
@@ -112,16 +117,43 @@ where
         }
         let status = owner.status();
         if let Some(loss) = status.loss() {
+            #[cfg(target_arch = "wasm32")]
+            {
+                self.cancel_browser_frame();
+                #[cfg(feature = "browser-frame-diagnostics")]
+                self.cancel_browser_surface_request(genet_render_host::SurfaceReadbackFailure::DeviceLost(loss.clone()));
+                if self.has_browser_retirements() {
+                    // Event source releases these outside Host RefMut before
+                    // invoking us again; never acknowledge live frame resources.
+                    return status;
+                }
+            }
             if self.s.detached_generation != Some(loss.generation) {
                 self.s.last_redraw_presentation = None;
                 // Clear every producer in this shared core, including leaves
                 // held by another window. Per-window suspension is insufficient.
-                self.s.shared.producers.suspend_all(None);
-                self.s.shared.leaf_fragments.clear();
-                self.s.surface = None;
-                self.s.shared.render_core = None;
-                self.s.needs_recovery_surface = true;
-                self.s.detached_generation = Some(loss.generation);
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    self.s.shared.producers.suspend_all(None);
+                    self.s.shared.leaf_fragments.clear();
+                    self.s.surface = None;
+                    self.s.shared.render_core = None;
+                    self.s.needs_recovery_surface = true;
+                    self.s.detached_generation = Some(loss.generation);
+                }
+                #[cfg(target_arch = "wasm32")]
+                {
+                    self.s.shared.producers.suspend_browser_except(&|_,_| false,None);
+                    self.s.shared.producers.forget_device();
+                    self.s.browser_retirements.push(Box::new(crate::frame::LostBrowserSession {
+                        core:self.s.shared.render_core.take(), surface:self.s.surface.take(),
+                        fragments:std::mem::take(&mut self.s.shared.leaf_fragments),
+                    }));
+                    self.s.needs_recovery_surface = true;
+                    self.s.detached_generation = Some(loss.generation);
+                    // The next call, after outside-borrow drop, acknowledges.
+                    return status;
+                }
             }
             self.refuse_pending_captures(CaptureRefusal::DeviceLost(loss.clone()));
             owner.acknowledge_detached(

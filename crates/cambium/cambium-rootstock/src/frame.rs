@@ -14,6 +14,14 @@
 //! ordinary `cargo test`.
 
 use std::collections::HashMap;
+#[cfg(target_arch = "wasm32")]
+mod browser;
+#[cfg(target_arch = "wasm32")]
+pub use browser::BrowserFrameProgress;
+#[cfg(target_arch = "wasm32")]
+pub(crate) use browser::{LostBrowserSession, PreparedBrowserFrame};
+#[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+pub(crate) mod acquired_capture;
 
 use crate::A11yAction;
 use cambium::PointerClick;
@@ -192,10 +200,17 @@ struct SpriggingSource<'a> {
     rendered: &'a sprigging::RenderedLeaves,
     producers: &'a crate::ProducerRegistry,
     portable: Option<&'a crate::producer::registry::PortablePlan>,
+    #[cfg(target_arch = "wasm32")]
+    prepared: Option<&'a crate::producer::registry::PreparedProducerWindow>,
 }
 
 impl SpriggingSource<'_> {
     fn leaf_commands(&self, key: u64) -> Option<Vec<paint_list_api::PaintCmd>> {
+        #[cfg(target_arch = "wasm32")]
+        if let Some(plan) = self.prepared {
+            return plan.commands(key).or_else(|| self.producers.contains(key).then(Vec::new))
+                .or_else(|| self.rendered.get(key).map(<[_]>::to_vec));
+        }
         if let Some(plan) = self.portable {
             return plan
                 .commands(key)
@@ -319,6 +334,8 @@ where
     }
 
     pub fn relayout(&mut self, lw: f32, lh: f32) -> bool {
+        #[cfg(feature = "browser-frame-diagnostics")]
+        self.record_browser_work(crate::host::WorkEntry::Relayout);
         if self.s.runner.is_none() {
             return false;
         }
@@ -334,6 +351,8 @@ where
         }
         let runner = self.s.runner.as_mut().expect("checked above");
         let mut muts: Vec<DomMutation<NodeId>> = Vec::new();
+        #[cfg(target_arch = "wasm32")]
+        muts.append(&mut self.s.browser_pending_mutations);
         runner.drain_mutations(&mut muts);
         let dom = runner.dom();
         let mount = runner.mount();
@@ -456,6 +475,7 @@ where
     /// carrying `DrawExternalTexture` or `DrawShadow` keeps the inline path,
     /// because composite textures and blurred shadow masks are rebuilt per
     /// frame by the host painter and cannot be retained in a lowering.
+    #[cfg(not(target_arch = "wasm32"))]
     fn sync_leaf_fragments(&mut self) {
         use paint_list_api::PaintCmd;
 
@@ -468,6 +488,60 @@ where
         };
         let renderer = surface.core().renderer();
 
+        let mut seen: Vec<u64> = Vec::new();
+        for (key, epoch, splice) in self.s.shared.rendered.path_a_entries() {
+            let fragmentable = !splice.iter().any(|cmd| {
+                matches!(
+                    cmd,
+                    PaintCmd::DrawExternalTexture(_) | PaintCmd::DrawShadow(_)
+                )
+            });
+            if !fragmentable {
+                if let Some((id, _)) = self.s.shared.leaf_fragments.remove(&key) {
+                    let _ = renderer.remove_fragment(id);
+                }
+                continue;
+            }
+            seen.push(key);
+            match self.s.shared.leaf_fragments.get(&key) {
+                Some((_, e)) if *e == epoch => {},
+                Some(&(id, _)) => {
+                    let fragment =
+                        paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
+                    if renderer.update_fragment(id, fragment) == Some(true) {
+                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
+                    }
+                },
+                None => {
+                    let fragment =
+                        paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
+                    if let Some(id) = renderer.register_fragment(fragment) {
+                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
+                    }
+                },
+            }
+        }
+        // Sweep leaves that no longer render (removed from the registry or
+        // not laid out): their retained lowerings go with them.
+        let stale: Vec<u64> = self
+            .s
+            .shared
+            .leaf_fragments
+            .keys()
+            .copied()
+            .filter(|k| !seen.contains(k))
+            .collect();
+        for key in stale {
+            if let Some((id, _)) = self.s.shared.leaf_fragments.remove(&key) {
+                let _ = renderer.remove_fragment(id);
+            }
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn sync_leaf_fragments_scoped(&mut self, commands:&genet_render_host::BrowserFrameCommands<'_>) {
+        use paint_list_api::PaintCmd;
+        let renderer = commands.renderer();
         let mut seen: Vec<u64> = Vec::new();
         for (key, epoch, splice) in self.s.shared.rendered.path_a_entries() {
             let fragmentable = !splice.iter().any(|cmd| {
@@ -609,6 +683,17 @@ where
         lh: f32,
         portable: Option<&crate::producer::registry::PortablePlan>,
     ) -> Option<genet_livery::LiveryPaintList> {
+        #[cfg(not(target_arch = "wasm32"))]
+        { self.emit_paint_list_with_plan(lw, lh, portable) }
+        #[cfg(target_arch = "wasm32")]
+        { self.emit_paint_list_with_plan(lw, lh, portable, None) }
+    }
+
+    fn emit_paint_list_with_plan(
+        &mut self, lw:f32, lh:f32,
+        portable:Option<&crate::producer::registry::PortablePlan>,
+        #[cfg(target_arch = "wasm32")] prepared:Option<&crate::producer::registry::PreparedProducerWindow>,
+    ) -> Option<genet_livery::LiveryPaintList> {
         let focused_overlay = self.focused_overlay();
         let runner = self.s.runner.as_ref()?;
         let layout = self.s.layout.as_mut()?;
@@ -619,6 +704,8 @@ where
             rendered: &self.s.shared.rendered,
             producers: &self.s.shared.producers,
             portable,
+            #[cfg(target_arch = "wasm32")]
+            prepared,
         };
         let mut list = layout.emit_paint_list_with_leaves(
             &view,
@@ -730,6 +817,14 @@ where
     }
 
     pub fn redraw(&mut self) {
+        #[cfg(target_arch = "wasm32")]
+        { let _ = self.redraw_browser_turn(None); }
+        #[cfg(not(target_arch = "wasm32"))]
+        self.redraw_synchronous();
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn redraw_synchronous(&mut self) {
         let trace = FrameTrace::new(self.s.presentation_host, self.s.presentation_sequence);
         macro_rules! trace {
             ($phase:expr, $($args:tt)*) => {
@@ -1067,6 +1162,8 @@ where
     /// cursor here" and only moves focus. Collapsing them would fire every
     /// control a reader navigates across.
     pub fn sync_a11y(&mut self) {
+        #[cfg(feature = "browser-frame-diagnostics")]
+        self.record_browser_work(crate::host::WorkEntry::Accessibility);
         // A screen reader is told physical client pixels, and the tree it is
         // told them about is laid out in layout pixels: the transform between
         // them is the layout scale, zoom included. A reader that read the

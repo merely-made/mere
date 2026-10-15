@@ -11,6 +11,15 @@
 //! differs is grafted on: an event source converts platform events into this
 //! crate's vocabulary and drives the methods below.
 
+#[cfg(feature = "browser-frame-diagnostics")]
+mod work_observation;
+#[cfg(feature = "browser-frame-diagnostics")]
+pub use work_observation::BrowserWorkCounts;
+#[cfg(all(target_arch = "wasm32", feature = "browser-frame-diagnostics"))]
+pub use work_observation::{BrowserSurfaceControlFn,BrowserSurfaceControlPoint};
+#[cfg(feature = "browser-frame-diagnostics")]
+pub(crate) use work_observation::WorkEntry;
+
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -1051,6 +1060,10 @@ impl Default for AppShared {
 /// and retained fragment IDs are retired. Shared-forest disposal is not qualified.
 #[must_use = "drop the disposal guard outside the host borrow"]
 pub struct HostDisposal {
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    browser_surface_control: Option<BrowserSurfaceControlFn>,
+    #[cfg(target_arch = "wasm32")]
+    browser_retirements: Vec<Box<dyn std::any::Any>>,
     producers: Option<crate::ProducerRegistry>,
     fragments: std::collections::HashMap<u64, (u64, u64)>,
     surface: Option<Box<dyn Surface>>,
@@ -1063,13 +1076,20 @@ pub struct HostDisposal {
 }
 impl Drop for HostDisposal {
     fn drop(&mut self) {
+        #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+        drop(self.browser_surface_control.take());
+        #[cfg(target_arch = "wasm32")]
+        drop(std::mem::take(&mut self.browser_retirements));
         // Registry cleanup uses its weak core while the detached core is live.
         // Release all owned GPU resources before opening the detach barrier.
         drop(self.producers.take());
         let fragments = std::mem::take(&mut self.fragments);
         if let Some(core) = &self.core {
             for &(id, _) in fragments.values() {
+                #[cfg(not(target_arch = "wasm32"))]
                 let _ = core.renderer().remove_fragment(id);
+                #[cfg(target_arch = "wasm32")]
+                core.retire_owned_fragment(id);
             }
         }
         drop(fragments);
@@ -1211,6 +1231,26 @@ where
     /// each attempt. Separate from the monotonic sequence, which survives a
     /// failed acquisition and a surface suspension.
     pub last_redraw_presentation: Option<PresentedFrame>,
+    #[cfg(feature = "browser-frame-diagnostics")]
+    pub(crate) browser_work: Option<BrowserWorkCounts>,
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    pub(crate) pending_browser_surface_capture: Option<crate::frame::acquired_capture::BrowserSurfaceCaptureRequest>,
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    pub(crate) browser_surface_capture_deliveries: Vec<crate::frame::acquired_capture::BrowserSurfaceCaptureDelivery>,
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    pub(crate) last_browser_surface_capture_observation: Option<crate::BrowserSurfaceCaptureDiagnostics>,
+    #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+    pub(crate) browser_surface_control: Option<BrowserSurfaceControlFn>,
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) browser_frame: Option<crate::frame::PreparedBrowserFrame>,
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) browser_retirements: Vec<Box<dyn std::any::Any>>,
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) browser_frame_epoch: Option<u64>,
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) browser_redraw_after_pending: bool,
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) browser_pending_mutations: Vec<layout_dom_api::DomMutation<NodeId>>,
     pub pending_paint_capture: Option<PaintCaptureFn>,
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
@@ -1293,6 +1333,26 @@ where
             presentation_host: next_host_identity(),
             presentation_sequence: 0,
             last_redraw_presentation: None,
+            #[cfg(feature = "browser-frame-diagnostics")]
+            browser_work: None,
+            #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+            pending_browser_surface_capture: None,
+            #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+            browser_surface_capture_deliveries: Vec::new(),
+            #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+            last_browser_surface_capture_observation: None,
+            #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+            browser_surface_control: None,
+            #[cfg(target_arch = "wasm32")]
+            browser_frame: None,
+            #[cfg(target_arch = "wasm32")]
+            browser_retirements: Vec::new(),
+            #[cfg(target_arch = "wasm32")]
+            browser_frame_epoch: Some(0),
+            #[cfg(target_arch = "wasm32")]
+            browser_redraw_after_pending: false,
+            #[cfg(target_arch = "wasm32")]
+            browser_pending_mutations: Vec::new(),
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
             pending_scroll: Vec::new(),
@@ -1354,11 +1414,22 @@ where
     /// The registry and fragment map must belong to this independent host;
     /// disposing a window while lending a shared forest is not qualified.
     pub fn take_disposal(&mut self) -> HostDisposal {
+        #[cfg(target_arch = "wasm32")]
+        self.cancel_browser_frame();
+        #[cfg(target_arch = "wasm32")]
+        { self.s.browser_redraw_after_pending = false; }
+        #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+        self.cancel_browser_surface_request(genet_render_host::SurfaceReadbackFailure::Cancelled(
+            genet_render_host::SurfaceCaptureCancellation::Disposed));
         self.s.hidden = true;
         self.s.needs_recovery_surface = false;
         self.s.last_redraw_presentation = None;
         self.s.pending_presentation_observer = None;
         HostDisposal {
+            #[cfg(all(target_arch = "wasm32",feature = "browser-frame-diagnostics"))]
+            browser_surface_control: self.s.browser_surface_control.take(),
+            #[cfg(target_arch = "wasm32")]
+            browser_retirements: self.take_browser_retirements(),
             producers: Some(std::mem::take(&mut self.s.shared.producers)),
             fragments: std::mem::take(&mut self.s.shared.leaf_fragments),
             surface: self.s.surface.take(),
@@ -1524,6 +1595,8 @@ where
         if zoom == self.s.user_zoom {
             return false;
         }
+        #[cfg(target_arch = "wasm32")]
+        self.invalidate_browser_frame();
         self.s.user_zoom = zoom;
         self.note_zoom_change();
         true
@@ -1676,6 +1749,8 @@ where
     /// Swap the application's stylesheet: this window lays out afresh under
     /// it, and the generation tells every other window to.
     pub(crate) fn swap_sheet(&mut self, sheet: String) {
+        #[cfg(target_arch = "wasm32")]
+        self.invalidate_browser_frame();
         self.s.shared.sheet = sheet;
         self.s.shared.sheet_generation += 1;
         self.s.layout = None;
@@ -1706,6 +1781,8 @@ where
         if !self.wake.take_pending() {
             return false;
         }
+        #[cfg(target_arch = "wasm32")]
+        self.invalidate_browser_frame();
         self.with_ctx(Hook::AfterWake);
         if !self.s.hidden {
             if let Some(window) = self.s.window.as_ref() {
@@ -1723,6 +1800,8 @@ where
     /// booted should succeed. Reacting to `Hide` and `KeepVisible` needs a real
     /// window, so that half lives with the event source.
     pub fn decide_close(&mut self, request: CloseRequest) -> Option<CloseDisposition> {
+        #[cfg(target_arch = "wasm32")]
+        self.invalidate_browser_frame();
         let disposition = {
             let logical_size = self.logical_size();
             let (ui_zoom, zoom_changed) = self.take_zoom_edge();
@@ -1815,6 +1894,8 @@ where
     /// The tail of every input dispatch: the application hook, then the
     /// host-owned IME and repaint policy.
     pub fn after_dispatch(&mut self) {
+        #[cfg(target_arch = "wasm32")]
+        self.invalidate_browser_frame();
         self.with_ctx(Hook::AfterDispatch);
         self.open_requested_file();
         let Some(window) = self.s.window.as_ref() else {
@@ -1944,6 +2025,29 @@ mod disposal_controls {
             self.suspensions.set(self.suspensions.get() + 1);
         }
     }
+    #[cfg(feature = "browser-frame-diagnostics")]
+    #[test]
+    fn opt_in_work_observation_counts_actual_host_entries_without_resetting_authority() {
+        let mut state: HostState<App, Logic, Child> = HostState::new();
+        state.runner = Some(Runner::new(Rc::new(RefCell::new(ScriptedDom::new())),root as Logic,
+            App { draft:"retained diagnostic authority".into() }));
+        let wake = HostWake::new(state.wake_pending.clone(),Arc::new(|| {}));
+        let mut host = Host::new(HostOptions::default(),None,HostHooks::inert(),state,wake);
+        assert_eq!(host.browser_work_counts(),None);
+        host.enable_browser_work_observation();
+        host.relayout(32.0,24.0); host.sync_a11y();
+        let first = host.browser_work_counts().unwrap();
+        assert_eq!((first.relayout,first.accessibility,first.preparation),(1,1,0));
+        host.enable_browser_work_observation(); // observation cannot erase work.
+        assert_eq!(host.browser_work_counts(),Some(first));
+        host.relayout(32.0,24.0);
+        let second = host.browser_work_counts().unwrap();
+        assert_eq!((second.relayout,second.accessibility,second.preparation),(2,1,0));
+        assert!(!second.saturated);
+        assert_eq!(host.s.runner.as_ref().unwrap().state().draft,"retained diagnostic authority");
+        assert_eq!(host.s.presentation_sequence,0);
+    }
+
     #[test]
     fn disposed_actual_host_releases_retained_producer_and_refuses_captures_outside_borrow_once() {
         let mut state: HostState<App, Logic, Child> = HostState::new();

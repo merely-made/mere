@@ -160,6 +160,7 @@ fn remap_gpu_display_list(
     Ok(())
 }
 
+#[derive(Clone)]
 struct Image {
     output: ProducedTexture,
     size: [u32; 2],
@@ -205,6 +206,8 @@ pub struct ProducerRegistry {
     pending_retire: Vec<u64>,
     device: Option<wgpu::Device>,
     device_generation: Option<u64>,
+    #[cfg(target_arch = "wasm32")]
+    browser_retirements: Vec<Box<dyn std::any::Any>>,
     next_stamp: u64,
     render_failure: Option<ProducerRenderFailure>,
     gpu_remap_failure: Option<ProducerGpuRemapError>,
@@ -214,7 +217,22 @@ pub struct ProducerRegistry {
     pub(super) timestamp: Option<std::time::Duration>,
 }
 
+#[cfg(target_arch = "wasm32")]
+mod staged;
+#[cfg(target_arch = "wasm32")]
+pub(crate) use staged::PreparedProducerWindow;
+
+#[cfg(target_arch = "wasm32")]
+pub(crate) fn allocate_frame_image_key() -> Result<u64, ProducerRegistrationError> {
+    allocate_renderer_key(&NEXT_PHYSICAL_PRODUCER)
+}
+
 impl ProducerRegistry {
+    #[cfg(target_arch = "wasm32")]
+    pub(crate) fn set_frame_timestamp(&mut self, timestamp: Option<std::time::Duration>) {
+        self.timestamp = timestamp;
+    }
+
     pub fn new() -> Self {
         Self::default()
     }
@@ -312,7 +330,10 @@ impl ProducerRegistry {
             if Arc::ptr_eq(&previous, core) {
                 return;
             }
+            #[cfg(not(target_arch = "wasm32"))]
             self.retire_renderer_images(previous.renderer());
+            #[cfg(target_arch = "wasm32")]
+            self.retire_core_images(&previous);
         }
         self.cleanup_core = Arc::downgrade(core);
     }
@@ -370,7 +391,10 @@ impl ProducerRegistry {
     }
 
     pub(crate) fn suspend_all(&mut self, renderer: Option<&netrender::Renderer>) {
+        #[cfg(not(target_arch = "wasm32"))]
         self.suspend_except(&|_, _| false, renderer);
+        #[cfg(target_arch = "wasm32")]
+        { let _ = renderer; self.suspend_browser_except(&|_,_| false,None); }
         self.device = None;
         self.device_generation = None;
     }
@@ -507,7 +531,7 @@ impl ProducerRegistry {
             let image_key = entry.renderer_key;
             let Some(node) = *owner else {
                 entry.error = Some(ProducerError::DuplicateDomKey);
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, &renderer, &mut stats);
                 stats.invalid_frames += 1;
                 continue;
             };
@@ -516,7 +540,7 @@ impl ProducerRegistry {
                 .is_some_and(|previous| previous != node && elsewhere(key, Some(previous)))
             {
                 entry.error = Some(ProducerError::DuplicateDomKey);
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, &renderer, &mut stats);
                 stats.invalid_frames += 1;
                 continue;
             }
@@ -529,12 +553,12 @@ impl ProducerRegistry {
             }
             entry.owner = Some(node);
             let Some(geometry) = layout.element_geometry(dom, node) else {
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, &renderer, &mut stats);
                 continue;
             };
             let logical_size = geometry.content_size();
             if logical_size.0 == 0.0 || logical_size.1 == 0.0 {
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, &renderer, &mut stats);
                 continue;
             }
             let Some(size) = physical_size(
@@ -543,7 +567,7 @@ impl ProducerRegistry {
                 surface.device().limits().max_texture_dimension_2d,
             ) else {
                 entry.error = Some(ProducerError::InvalidExtent);
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, &renderer, &mut stats);
                 stats.invalid_frames += 1;
                 continue;
             };
@@ -634,10 +658,22 @@ impl ProducerRegistry {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+impl ProducerRegistry {
+    fn retire_core_images(&self, core:&genet_render_host::RenderCore) {
+        for key in self.entries.values().map(|entry| entry.renderer_key).chain(self.pending_retire.iter().copied()) {
+            core.retire_owned_external_image(key);
+        }
+    }
+}
+
 impl Drop for ProducerRegistry {
     fn drop(&mut self) {
         if let Some(core) = self.cleanup_core.upgrade() {
+            #[cfg(not(target_arch = "wasm32"))]
             self.retire_renderer_images(core.renderer());
+            #[cfg(target_arch = "wasm32")]
+            self.retire_core_images(&core);
         }
         for entry in self.entries.values_mut() {
             entry.producer.retire();
