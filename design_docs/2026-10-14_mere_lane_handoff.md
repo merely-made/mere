@@ -2,8 +2,8 @@
 
 **Status, 2026-10-14:** Remote `main` is the only live line. Every branch and
 worktree on the ThinkPad was landed, archived as a tag, or removed. The WebGL
-presentation lane landed later the same day (below), with two acceptance limits
-left for Mark. The resident-host port on O-PC remains open.
+presentation lane landed later the same day (below); both of its acceptance
+limits were closed on 2026-10-15. The resident-host port on O-PC remains open.
 
 ## Landed on main today
 
@@ -50,28 +50,18 @@ WebGL portable, 28 Netrender; Chrome WebGL2, Auto without WebGPU, Firefox and
 SwiftShader pass 32 viewer controls, native Vulkan WebGPU 26. Receipt:
 `testing/receipts/browser_presentation_20261013/presentation/integration-20261014/`.
 
-**Limits follow-up (Mark's choice "A. 2 / B. 2, 1 if needed"):** B is cleared
-by option 2. Browser WebGPU now presents the same portable scene as WebGL2,
-drawing the graph producer in the page pass; the 125% comparison passes at RGB
-RMS 0.258/0.332/0.328 (was 1.265/1.190) under the unchanged contract, and all
-five browser routes still pass. A is not cleared: Wasm gzip6 is 3,661,762
-against 3,407,872 (pre-merge main was 3,394,183). Attribution in
-`testing/receipts/browser_presentation_20261013/presentation/limits-followup-20261014/`
-shows the removable duplication sits in suppliers (Genet layout's second Taffy
-instantiation, about −113 KB; per-pen outline instantiations in Netrender and
-the Vello fork, about −56 KB) and still falls about 85 KB short; the remainder
-is the WebGL2 renderer. Supplier de-generification then landed (Genet
-`e8b8606f5`, Vello fork `276b4664`, Netrender `5fbc7b2ba`): 3,523,495 with those
-changes alone, 3,620,876 at Genet main, which also carries about 97 KB of other
-work. Mark chose to split the viewer into WebGPU-only and WebGL2-only artifacts;
-estimates put each under the cap, but only with feature gating that makes the
-other route's code statically unreachable (see the plan's 2026-10-15 entry).
-Split landed: Netrender `without-classic-vello` and per-route artifacts chosen
-by `mount.js`. WebGL2 artifact 3,244,444 (passes); WebGPU artifact 3,454,488,
-46,616 over the cap, reported for Mark rather than cut. All browser routes and
-both scale comparisons pass on their own artifacts.
-Human assistive-technology and asynchronous browser WebGPU device replacement
-remain separate gates.
+**Limits, closed 2026-10-15.** The 125% scale gap was fixed by aligning
+composition: browser WebGPU presents the same portable scene as WebGL2, so
+the comparison passes at RGB RMS 0.258/0.332/0.328. The delivery limit was
+closed in three steps: supplier de-generification (Genet `e8b8606f5`, Vello
+fork `276b4664`, Netrender `5fbc7b2ba`); per-route viewer artifacts loaded by
+`mount.js`, with Classic Vello an opt-out in the suppliers (Netrender
+`f4f9c0d87`, Genet `ae3d9f5d972`); and Mark's ruling amending R157's Wasm cap
+to 3,460,300 B. Final gzip6: WebGPU 3,359,673, WebGL2 3,322,091, both passing.
+Receipts: `testing/receipts/browser_presentation_20261013/presentation/limits-followup-20261014/`.
+Recorded options, not tasks: slim Genet's recent browser-capture work in the
+viewer, align genet-parley onto one read-fonts. Human assistive-technology and
+asynchronous browser WebGPU device replacement remain separate gates.
 
 ## Open: resident-host port (O-PC)
 
