@@ -1711,21 +1711,49 @@ impl<B: Backend> GraphSession<B> {
     }
 }
 
+/// The suffixes this crate gives a derived session's name: a fork's, a
+/// picked-off part's and a codicil thaw's.
+const DERIVED_NAME_SUFFIXES: [&str; 3] = [" (fork of ", " (picked from ", " (from "];
+
+/// A session name without the suffix a fork, a pick-off or a codicil thaw
+/// gave it, or `Session` when it has none: the base a fork's name starts
+/// from, so suffixes never double.
+fn derived_name_base(name: &str) -> &str {
+    name.strip_suffix(')')
+        .and_then(|inner| {
+            DERIVED_NAME_SUFFIXES
+                .iter()
+                .filter_map(|suffix| inner.find(suffix))
+                .min()
+        })
+        .map(|at| &name[..at])
+        .filter(|base| !base.is_empty())
+        .unwrap_or(name)
+}
+
 /// The name a fork carries, so it never reads as its parent (the fork of
-/// "Session" was a second "Session"): the parent's name without an earlier
-/// fork's suffix, or `Session`, and the parent it was forked from, such as
-/// `Session (fork of Session)`. It matches how a session opened from a
-/// codicil names its source
+/// "Session" was a second "Session"). A fork copies the whole session at a
+/// point and goes its own way. Its name is the parent's without an earlier
+/// fork's, pick-off's or thaw's suffix, or `Session`, and the parent it was
+/// forked from, such as `Session (fork of Session)`. A fork of a fork nests,
+/// and a fork of a codicil thaw names the thaw whole:
+/// `Session (fork of Session (from blake3:f612a))`. It matches how a session
+/// opened from a codicil names its source
 /// ([`opened_codicil_session_name`](crate::graph_codicil::opened_codicil_session_name)).
 pub fn forked_session_name(parent: Option<&str>) -> String {
     let parent = parent.unwrap_or("Session");
-    let base = parent
-        .strip_suffix(')')
-        .and_then(|inner| inner.find(" (fork of "))
-        .map(|at| &parent[..at])
-        .filter(|base| !base.is_empty())
-        .unwrap_or(parent);
-    format!("{base} (fork of {parent})")
+    format!("{} (fork of {parent})", derived_name_base(parent))
+}
+
+/// The name a picked-off part carries: the session made by picking off the
+/// connected component around one node of another
+/// ([`MereSessions::fork_component`], Turnstone's tear-out). Picking off is
+/// not forking: the part is not the whole session and starts with no session
+/// history, its nodes carrying only their derivation provenance. So it does
+/// not take the source's name; it names where it was picked from:
+/// `Session (picked from Evening reading)`.
+pub fn picked_session_name(source: Option<&str>) -> String {
+    format!("Session (picked from {})", source.unwrap_or("Session"))
 }
 
 /// The graph a component fork starts from: the connected component around
@@ -2023,6 +2051,9 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut manifest = GraphSessionManifest::new(SessionId::new(), fork_graph_id);
         manifest.parent_session = Some(parent.id());
         manifest.forked_at = Some(at.0);
+        manifest.display_name = Some(picked_session_name(
+            parent.manifest().display_name.as_deref(),
+        ));
         manifest.source_codicil = parent.manifest().source_codicil.clone();
         let kind = ChangeKind::Forked {
             from: parent.id(),
@@ -3391,6 +3422,14 @@ mod tests {
             fork.flush(wall_clock_now()).await.unwrap();
             assert_eq!(fork.manifest().parent_session, Some(thaw_id));
             assert_eq!(
+                fork.manifest().display_name,
+                Some(format!(
+                    "Kept reading (fork of Kept reading (from {}))",
+                    &archived.to_string()[..12]
+                )),
+                "a fork of a thaw names the thaw whole, without a doubled from"
+            );
+            assert_eq!(
                 fork.manifest().source_codicil,
                 thaw.manifest().source_codicil
             );
@@ -4196,6 +4235,34 @@ mod tests {
         });
     }
 
+    #[test]
+    fn derived_names_start_from_one_base_and_name_their_source_whole() {
+        assert_eq!(forked_session_name(None), "Session (fork of Session)");
+        assert_eq!(
+            forked_session_name(Some("Session (fork of Session)")),
+            "Session (fork of Session (fork of Session))",
+            "a fork of a fork nests"
+        );
+        assert_eq!(
+            forked_session_name(Some("Session (from blake3:f612a)")),
+            "Session (fork of Session (from blake3:f612a))",
+            "a fork of a codicil thaw never doubles its from"
+        );
+        assert_eq!(picked_session_name(None), "Session (picked from Session)");
+        assert_eq!(
+            picked_session_name(Some("Evening reading")),
+            "Session (picked from Evening reading)"
+        );
+        assert_eq!(
+            picked_session_name(Some("Session (from blake3:f612a)")),
+            "Session (picked from Session (from blake3:f612a))"
+        );
+        assert_eq!(
+            forked_session_name(Some("Session (picked from Evening reading)")),
+            "Session (fork of Session (picked from Evening reading))"
+        );
+    }
+
     #[cfg(not(target_arch = "wasm32"))]
     #[test]
     fn a_component_fork_takes_only_the_seed_s_component() {
@@ -4212,6 +4279,11 @@ mod tests {
                 .fork_component(&parent, Uuid::from_u128(1), knot())
                 .await
                 .unwrap();
+            assert_eq!(
+                fork.display_name.as_deref(),
+                Some("Session (picked from Session)"),
+                "a picked-off part names where it was picked from"
+            );
             let fork = mere.open(fork.session_id).await.unwrap();
             assert_eq!(
                 fork.graph().node_count(),
