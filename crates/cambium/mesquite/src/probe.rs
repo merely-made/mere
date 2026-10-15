@@ -8,7 +8,7 @@
 //! retained surface, host-owned selector geometry, pointer delivery through the
 //! host's own routing, and the shared verbs (`remember`,
 //! `same`/`differs`/`more`/`dropped`, `capture`s comparison, pixel checks,
-//! `zoom`, `opacity`, `resize`, `input-text`, `cost-begin`/`cost-end`).
+//! `zoom`, `opacity`, `resize`, `input-text`, `wheel`, `cost-begin`/`cost-end`).
 
 use cambium_rootstock::{HostPointer, WindowCommand};
 use taproot::{Automatable, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector, SelectorTarget};
@@ -168,6 +168,19 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                 let mut event = KeyEvent::new(key);
                 event.mods.shift = *name == "Shift+Tab";
                 self.ctx.runner.dispatch_key(event);
+            },
+            ["wheel", ..] => {
+                let step = crate::wheel::parse(line)?;
+                let (x, y) = match &step.at {
+                    crate::wheel::WheelAt::Point(x, y) => (*x, *y),
+                    crate::wheel::WheelAt::Selector(selector) => {
+                        match self.selector_target(selector) {
+                            SelectorTarget::Hit(hit) => hit.point,
+                            _ => return Err(format!("no current DOM target for {selector:?}")),
+                        }
+                    },
+                };
+                self.ctx.pointer.push(step.at_point(x, y));
             },
             ["resize", width, height] => {
                 let dimension = |value: &str| {

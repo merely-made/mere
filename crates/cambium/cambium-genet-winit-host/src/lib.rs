@@ -73,13 +73,13 @@ pub use windows_snap::SnapLayoutBridge;
 mod x11_frame;
 
 pub use cambium_rootstock::{
-    AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CaptureFrame, CloseDisposition,
+    HOST_WHEEL_LINE_PX, AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CaptureFrame, CloseDisposition,
     CloseRequest, CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook,
     FrameProfile, Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostWake,
     HostWindow, IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey,
-    PaintCaptureFn, RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand,
-    WindowCommands, WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step,
-    read_frame,
+    PaintCaptureFn, RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WheelUnit,
+    WindowCommand, WindowCommands, WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom,
+    ladder_step, read_frame,
 };
 pub use caption_controls::{CaptionLabels, platform_caption_controls, window_caption_controls};
 pub use files::{DialogFileChooser, choose_save_path, read_file};

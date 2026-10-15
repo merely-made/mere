@@ -669,7 +669,45 @@ pub enum HostPointer {
     SecondaryRelease(f32, f32),
     /// Cancel the current capture without delivering an activating release.
     Cancel,
+    /// Turn the wheel with the cursor at this point and these modifiers held.
+    ///
+    /// The notch runs through [`Host::wheel`](crate::Host::wheel): the nearest
+    /// `on_wheel` ancestor of the hit node gets a genuine
+    /// [`WheelEvent`](cambium::WheelEvent) (both axes, the cursor-local
+    /// position, the modifiers), and what no handler took falls to the host's
+    /// scroll and Ctrl-zoom defaults. The modifiers are held for this notch
+    /// only; the host's own modifier state is restored after it.
+    Wheel {
+        /// Where the cursor is, in logical window coordinates.
+        x: f32,
+        y: f32,
+        /// The scroll delta in the direction the content moves, as
+        /// [`Host::wheel`](crate::Host::wheel) takes it: a positive `dy`
+        /// advances toward the end of the document.
+        dx: f32,
+        dy: f32,
+        /// Whether `dx` and `dy` are logical pixels or wheel lines.
+        unit: WheelUnit,
+        /// The modifiers held while it turns.
+        modifiers: Modifiers,
+    },
 }
+
+/// What a [`HostPointer::Wheel`] delta counts.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum WheelUnit {
+    /// Logical pixels: a trackpad's pixel delta.
+    #[default]
+    Pixels,
+    /// Wheel lines: a mouse wheel's notches, each [`HOST_WHEEL_LINE_PX`] logical
+    /// pixels, as the desktop host converts a winit `LineDelta`.
+    Lines,
+}
+
+/// Logical pixels a wheel line is worth under the desktop host. It restates
+/// `genet_winit_host::WHEEL_LINE_PX`, which this crate does not depend on; a
+/// test in `cambium-genet-winit-host` holds the two equal.
+pub const HOST_WHEEL_LINE_PX: f32 = 48.0;
 
 /// A request to bring one retained DOM node into view, queued by
 /// [`AppCtx::scroll_into_view`] and resolved on the host's next layout.
@@ -1836,6 +1874,23 @@ where
                     self.release_button(cambium::PointerButton::Secondary);
                 },
                 HostPointer::Cancel => self.cancel_pointer(),
+                HostPointer::Wheel {
+                    x,
+                    y,
+                    dx,
+                    dy,
+                    unit,
+                    modifiers,
+                } => {
+                    self.s.cursor = (x, y);
+                    let scale = match unit {
+                        WheelUnit::Pixels => 1.0,
+                        WheelUnit::Lines => HOST_WHEEL_LINE_PX,
+                    };
+                    let held = std::mem::replace(&mut self.s.modifiers, modifiers);
+                    self.wheel(dx * scale, dy * scale);
+                    self.s.modifiers = held;
+                },
             }
         }
     }

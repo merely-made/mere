@@ -999,4 +999,28 @@ fast-forward of local main; nothing built).**
     have no native input in Woodshed. Mark chose to defer touch rather than wire
     it to synthetic events. The helpers stay generic and tested; the receipt for
     them waits for host touch input.
+- **2026-10-15 (P2 receipt support: wheel input drivable in native scenarios):**
+  Woodshed now takes the whole notch through `graph_canvas_with_wheel`, but the
+  native host's scripted input had no wheel, so a wheel could only be checked by
+  hand. `cambium_rootstock::HostPointer::Wheel { x, y, dx, dy, unit, modifiers }`
+  (with `WheelUnit::{Pixels, Lines}` and `HOST_WHEEL_LINE_PX`, 48, a restatement
+  of `genet_winit_host::WHEEL_LINE_PX` that a test holds equal) is drained by
+  `Host::drain_pointer` through `Host::wheel`, so the nearest `on_wheel`
+  ancestor of the hit node gets a genuine `WheelEvent` and what no handler takes
+  falls to the host's scroll and Ctrl-zoom defaults. The modifiers are held for
+  that notch only. Mesquite's `Probe::app_step` gains the verb
+  `wheel <dx> <dy> [lines|px] [shift] [ctrl] [alt] [meta] (at <x> <y> | on <selector>)`;
+  `dy > 0` advances toward the end of the content, as the host's `wheel` takes
+  it, and `on` uses `click`'s selector grammar. Taproot parses `click`'s selector
+  privately and unknown verbs pass to `app_step` as raw lines, so `mesquite::wheel`
+  restates that grammar (five parse tests hold it). End to end, headless, in
+  `cambium-genet-winit-host/tests/wheel_scenario.rs`: a `graph_canvas_with_wheel`
+  view receives the notch with both axes, the cursor-local position at the
+  swatch centre, and the modifiers; lines convert to 48 px each; modifiers do not
+  leak into the next notch; Shift turns a vertical notch sideways as a real wheel
+  does; a point off the canvas reaches nobody; a missing target or a typo fails
+  the receipt. Checks: mesquite 34 passed, rootstock lib 103, the winit-host
+  `wheel_scenario`, `scenario` and `input_routing` suites pass, `graphshell`,
+  `mere-view`, `mere-overmap` and `djinn` build with all targets, `graphshell-web`
+  checks for wasm32, the boundary script passes. Touch remains deferred.
 

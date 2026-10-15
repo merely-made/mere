@@ -72,6 +72,7 @@ mod cost;
 mod lane;
 mod pixels;
 mod probe;
+mod wheel;
 
 pub use checkpoints::{Checkpoint, Checkpoints};
 pub use cost::{CostObservation, Costs, Totals};
