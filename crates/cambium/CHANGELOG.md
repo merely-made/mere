@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Rename the `edit-history` crate to `backstep` (`crates/cambium/backstep`, lib
+  `backstep`; Mark, 2026-10-15). `cambium::History` is unchanged, re-exported
+  from the renamed crate; only a direct `edit_history::` import changes, to
+  `backstep::`. The crate stays standalone and `publish = false`, now with a
+  description, license and no path-only dependencies, so it can be published
+  when that is decided.
 - Let a graph canvas carry a consumer's node kinds, and split the detail
   popover's panel from its trigger, for widgets that live on graph nodes.
   `GraphCanvasSwatch::with_node_attr(id, name, value)` sets an attribute on

@@ -955,6 +955,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "backstep"
+version = "0.1.0"
+
+[[package]]
 name = "backtrace"
 version = "0.3.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2115,8 +2119,8 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
+ "backstep",
  "command-menu",
- "edit-history",
  "genet-scripted-dom",
  "genet-text",
  "illume",
@@ -5024,10 +5028,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "edit-history"
-version = "0.1.0"
-
-[[package]]
 name = "egui"
 version = "0.36.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6914,6 +6914,7 @@ version = "0.0.2"
 dependencies = [
  "accesskit",
  "async-trait",
+ "backstep",
  "base64 0.22.1",
  "blake3",
  "cambium",
@@ -6926,7 +6927,6 @@ dependencies = [
  "command-menu",
  "distillery",
  "dramatis",
- "edit-history",
  "eidetic",
  "gemot",
  "genet-render-host",
@@ -15367,7 +15367,7 @@ dependencies = [
 name = "scenomise"
 version = "0.0.4"
 dependencies = [
- "edit-history",
+ "backstep",
  "libm",
  "sceno",
  "scenograph",
@@ -15381,7 +15381,7 @@ dependencies = [
 name = "scenotime"
 version = "0.0.4"
 dependencies = [
- "edit-history",
+ "backstep",
  "sceno",
  "serde",
  "serde_json",
