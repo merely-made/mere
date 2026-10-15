@@ -252,6 +252,16 @@ enum Adopted {
     Folded(Progress<Outcome>),
 }
 
+/// A session driven by lines: it hands over what to send and takes what
+/// arrives, and owns no I/O. A browser's data channel or the native pump
+/// (`pump`, feature `pump`) carries the lines.
+pub trait LineDriven {
+    /// Lines the session wants sent, in order, without their newlines.
+    fn take_outgoing(&mut self) -> Vec<String>;
+    /// One line that arrived. An error ends whatever is carrying the lines.
+    fn on_line(&mut self, line: &str) -> Result<(), String>;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

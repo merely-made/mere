@@ -331,3 +331,188 @@ pub fn advertised(
         effect,
     }
 }
+
+// ── Remote admission ────────────────────────────────────────────────────────
+//
+// A mere route reached over a dialled carrier names its route and the
+// application acting in the session's requested action path, under
+// Graphshell's projection service (remote mere route admission note, §2). The
+// host serves the route the path names; the application is accepted only when
+// the session's grant names it too (§4). The spelling lives here, beside the
+// route names, so a dialler and the host parse one grammar.
+
+/// Graphshell's action domain, as `graphshell_host::admission` names it.
+pub const REMOTE_DOMAIN: &str = "mere.graphshell";
+/// Where a mere's explicit route is requested.
+pub const REMOTE_MERE_SERVICE: &str = "/services/projection/mere";
+/// Where a mere's ambient route is requested, apart from the explicit one.
+pub const REMOTE_AMBIENT_SERVICE: &str = "/services/projection/ambient";
+/// The action that opens the explicit route (`graphshell_host`'s `connect`).
+pub const REMOTE_MERE_ACTION: &str = "connect";
+/// The action that opens the ambient route (`graphshell_host`'s `ambient`).
+pub const REMOTE_AMBIENT_ACTION: &str = "ambient";
+
+/// Which of a mere's two routes a remote session opens.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RemoteRoute {
+    /// `mere/<domain>`: the mere's sessions and graph, with its intents.
+    Explicit,
+    /// `ambient/mere/<domain>`: the read-only ambient crossing.
+    Ambient,
+}
+
+/// What a remote session asks for: a mere's route, as one application.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RemoteMereRequest {
+    pub route: RemoteRoute,
+    pub domain: String,
+    pub application: String,
+}
+
+impl RemoteMereRequest {
+    /// The explicit route of `domain`, as `application`.
+    pub fn explicit(domain: impl Into<String>, application: impl Into<String>) -> Self {
+        Self {
+            route: RemoteRoute::Explicit,
+            domain: domain.into(),
+            application: application.into(),
+        }
+    }
+
+    /// The ambient route of `domain`, as `application`.
+    pub fn ambient(domain: impl Into<String>, application: impl Into<String>) -> Self {
+        Self {
+            route: RemoteRoute::Ambient,
+            domain: domain.into(),
+            application: application.into(),
+        }
+    }
+
+    /// The requested path, which is also the narrowest grant's path prefix.
+    pub fn path(&self) -> String {
+        let service = match self.route {
+            RemoteRoute::Explicit => REMOTE_MERE_SERVICE,
+            RemoteRoute::Ambient => REMOTE_AMBIENT_SERVICE,
+        };
+        format!("{service}/{}/app/{}", self.domain, self.application)
+    }
+
+    /// The requested action.
+    pub fn action(&self) -> &'static str {
+        match self.route {
+            RemoteRoute::Explicit => REMOTE_MERE_ACTION,
+            RemoteRoute::Ambient => REMOTE_AMBIENT_ACTION,
+        }
+    }
+
+    /// The catalog route the host serves for it.
+    pub fn route_id(&self) -> String {
+        match self.route {
+            RemoteRoute::Explicit => format!("mere/{}", self.domain),
+            RemoteRoute::Ambient => format!("ambient/mere/{}", self.domain),
+        }
+    }
+
+    /// Read a requested action back. `None` for anything that is not one of
+    /// the two routes in exactly this spelling, with the action that route
+    /// takes: an ambient path under `connect`, or an explicit one under
+    /// `ambient`, is not a request either route serves.
+    pub fn parse(domain: &str, path: &str, action: &str) -> Option<Self> {
+        if domain != REMOTE_DOMAIN {
+            return None;
+        }
+        let (route, rest) = if let Some(rest) = path.strip_prefix(REMOTE_MERE_SERVICE) {
+            (RemoteRoute::Explicit, rest)
+        } else if let Some(rest) = path.strip_prefix(REMOTE_AMBIENT_SERVICE) {
+            (RemoteRoute::Ambient, rest)
+        } else {
+            return None;
+        };
+        let mut parts = rest.strip_prefix('/')?.split('/');
+        let (mere, app, application, end) =
+            (parts.next()?, parts.next()?, parts.next()?, parts.next());
+        if end.is_some() || app != "app" || !segment(mere) || !segment(application) {
+            return None;
+        }
+        let request = Self {
+            route,
+            domain: mere.to_string(),
+            application: application.to_string(),
+        };
+        (request.action() == action).then_some(request)
+    }
+
+    /// Whether a grant whose scope selects `path_prefix` names this request's
+    /// application: the prefix sits at or under this request's path, so the
+    /// grant cannot be used as another application, or for another mere.
+    pub fn named_by(&self, path_prefix: &str) -> bool {
+        let path = self.path();
+        path_prefix == path
+            || path_prefix
+                .strip_prefix(&path)
+                .is_some_and(|rest| rest.starts_with('/'))
+    }
+}
+
+fn segment(value: &str) -> bool {
+    !value.is_empty() && !value.contains('/')
+}
+
+#[cfg(test)]
+mod remote_tests {
+    use super::*;
+
+    #[test]
+    fn a_request_reads_back_as_itself_and_names_its_route() {
+        for request in [
+            RemoteMereRequest::explicit("divination", "turnstone"),
+            RemoteMereRequest::ambient("divination", "turnstone"),
+        ] {
+            let read = RemoteMereRequest::parse(REMOTE_DOMAIN, &request.path(), request.action());
+            assert_eq!(read.as_ref(), Some(&request));
+        }
+        assert_eq!(
+            RemoteMereRequest::explicit("divination", "turnstone").route_id(),
+            "mere/divination"
+        );
+        assert_eq!(
+            RemoteMereRequest::ambient("divination", "turnstone").route_id(),
+            "ambient/mere/divination"
+        );
+    }
+
+    #[test]
+    fn a_route_does_not_take_the_other_routes_action_or_a_loose_spelling() {
+        let explicit = RemoteMereRequest::explicit("divination", "turnstone");
+        assert!(RemoteMereRequest::parse(REMOTE_DOMAIN, &explicit.path(), "ambient").is_none());
+        let ambient = RemoteMereRequest::ambient("divination", "turnstone");
+        assert!(RemoteMereRequest::parse(REMOTE_DOMAIN, &ambient.path(), "connect").is_none());
+        for path in [
+            "/services/projection",
+            "/services/projection/mere/divination",
+            "/services/projection/mere/divination/app",
+            "/services/projection/mere/divination/app/",
+            "/services/projection/mere//app/turnstone",
+            "/services/projection/mere/divination/app/turnstone/extra",
+            "/services/projection/mere/divination/apps/turnstone",
+            "/services/projection/merely/divination/app/turnstone",
+        ] {
+            assert!(
+                RemoteMereRequest::parse(REMOTE_DOMAIN, path, "connect").is_none(),
+                "{path} is not a remote mere request"
+            );
+        }
+        assert!(RemoteMereRequest::parse("mere.other", &explicit.path(), "connect").is_none());
+    }
+
+    #[test]
+    fn only_a_grant_at_or_under_the_application_names_it() {
+        let request = RemoteMereRequest::explicit("divination", "turnstone");
+        assert!(request.named_by("/services/projection/mere/divination/app/turnstone"));
+        assert!(request.named_by("/services/projection/mere/divination/app/turnstone/x"));
+        assert!(!request.named_by("/services/projection/mere/divination"));
+        assert!(!request.named_by("/services/projection/mere"));
+        assert!(!request.named_by("/services/projection/mere/divination/app/turnstone-x"));
+        assert!(!request.named_by("/services/projection/mere/divination/app/knot"));
+    }
+}
