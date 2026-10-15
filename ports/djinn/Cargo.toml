@@ -256,8 +256,9 @@ insigne = { workspace = true, features = ["verify"] }
 # `sync::transfer_staging` moved here). `src/resident_distillery.rs` speaks
 # only `muniment::RedbBackend` and distillery's own re-exported trainer
 # vocabulary.
-# The identity endpoint's tests read its cards back as a client does.
-graphshell-client.workspace = true
+# The identity endpoint's tests read its cards back as a client does; the
+# dialable host's tests drive the route panel over the native line pump.
+graphshell-client = { workspace = true, features = ["pump"] }
 # The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
