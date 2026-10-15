@@ -1,7 +1,8 @@
 # Merging back into a session: branches and picked-off parts
 
-Status: design note, 2026-10-15. Nothing built. Options M1–M8 are open for
-Mark.
+Status: design note, 2026-10-15. Mark ruled M1–M8 the same day (see
+Rulings). The `picked_from` record (M2) is built (Mere `1cf67cf15`);
+merge-in itself is not.
 
 ## Problem
 
@@ -18,8 +19,10 @@ A session can be copied in two ways today, and neither can come back.
   ids. Each one carries a `provenance.derivations` record,
   `NodeDerivation { sub_kind: CopiedFrom, source_node, source_graph }`, naming
   the donor node and the donor's container. It has no session history of its
-  own beyond its first change, and is named `Session (picked from Evening
-  reading)` (`pandect::picked_session_name`).
+  own beyond its first change (`ChangeKind::Picked`), records
+  `picked_from { session, at, container }` in its manifest rather than the
+  fork fields, and is named `Evening reading (picked from Evening reading)`
+  (`pandect::picked_session_name`).
 
 Mark's vocabulary (2026-10-15, now in [TERMINOLOGY.md](../../TERMINOLOGY.md))
 adds a third: a **branch**, which also copies the whole session at a point but
@@ -64,7 +67,9 @@ produces one change on the target's journal:
 journal cursor that was merged. The source is left as it is; whether it is
 then trashed is a host decision (M6).
 
-The two cases differ only in how a source node finds its target node.
+The two cases differ only in how a source node finds its target node. A
+branch is told apart from a fork by its manifest's `lineage` (M1); only a
+branch, a picked-off part, or a thaw's branch can be merged in.
 
 - **Branch: by id.** A branch keeps its parent's node ids, so matching is the
   identity, the same rule Compose uses for surfaces.
@@ -82,9 +87,7 @@ A three-way merge needs the state both sides started from.
 - For a branch the base is the parent's graph at `forked_at`.
 - For a picked-off part the base is the part's own baseline, mapped back into
   the target's ids through its derivations. That is the donor component as it
-  was when it was picked. Its pick cursor should be recorded for this
-  (today `fork_component` records `forked_at` as the parent's live cursor, so
-  that exists, but under the fork's name; see M2).
+  was when it was picked, at `picked_from.at`.
 
 For each matched node, edge and facet, compare base, source and target:
 
@@ -146,7 +149,50 @@ the branch case with the thaw as parent, and needs nothing extra.
 - mere-view: a Merge step on a branch's or picked part's card in the overmap
   tier, and a conflict view. Out of scope until the rulings land.
 
-## Options for Mark
+## Rulings (Mark, 2026-10-15)
+
+- **M1, branch in the manifest:** a `lineage: Fork | Branch` field on the
+  session manifest, set at creation. A fork is never merged in; a branch is.
+  Existing sessions read as `Fork`.
+- **M2, the pick record:** `picked_from { session, at, container }`, in place
+  of `parent_session`, `forked_at` and `ChangeKind::Forked`; a pick's first
+  change is `ChangeKind::Picked`. Built: `pandect::PickedFrom`. Parts picked
+  before it carry the fork fields and still load; merge-in treats one whose
+  nodes carry `CopiedFrom` derivations into its `parent_session`'s container
+  as a pick.
+- **M3, picks of picks:** transitive. A part picked from a part merges into
+  the original by walking derivations to the target's container.
+- **M4, provenance:** each merged target node gets a `MergedFrom` derivation
+  (a new `ProvenanceSubKind`, appended to keep ordinals).
+- **M5, conflicts:** a pending merge with a choice per item, as proposed.
+- **M6, the source after merge:** kept and **marked merged, with its history
+  intact** (Mark revised his first reading, "Do we need the history? If not,
+  trash after move", to "keep and mark the history"). The question his first
+  reading asked has this answer: per-node `MergedFrom` provenance and the
+  target's one `MergedIn` change say *that* a node came from the source and
+  when, but not *how* it got there. The source's journal is the only record
+  of the steps, authors and intermediate states behind a merged node, and of
+  edits that were made and then undone before the merge. So the history is
+  needed if anyone is to see why a merged node is the way it is, and keeping
+  it costs only the source's existing storage.
+
+  The mark is option (b): `merged: { into, through, at }` on the source's
+  manifest, and the source read-only from then on, as a codicil thaw is
+  (`codicil_read_only`). Read-only raises **one problem**: it ends the
+  "merge a branch more than once" path above, where the previous `through` is
+  the next base. The fix keeps (b): an edit to a merged, read-only branch
+  makes a **new branch from it**, as a thaw's first edit makes a fork. Its
+  lineage is the same target, and its base is the merge point, which the
+  target holds at `through`, so the three-way base is still exact. A picked
+  part has no such path, and none is wanted: picking again from the target
+  gives a fresh part.
+- **M7, deletions:** three-way. A source deletion deletes in the target; a
+  deletion against an edit is a conflict.
+- **M8, shared rules:** factor the per-facet merge rules out of
+  `snapshot_merge` when merge-in is built, so Compose and merge-in share them.
+
+## The options as they were put to Mark
+
 
 1. **M1, what a branch is in the manifest.**
    - (a) A `lineage: Fork | Branch` field on the session manifest, set at
