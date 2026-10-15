@@ -26,6 +26,7 @@ pub(crate) async fn select(
     choice: PresentationChoice,
     options: &dyn Fn() -> NetrenderOptions,
     factory: &mut WebGpuFactory,
+    wgpu_portable_scene: bool,
 ) -> Result<Selected, String> {
     let mut failures = Vec::new();
     for (index, backend) in backend_attempts(choice).iter().enumerate() {
@@ -51,6 +52,11 @@ pub(crate) async fn select(
                                 })
                             }),
                         );
+                        let driver = if wgpu_portable_scene {
+                            portable_wgpu(driver)?
+                        } else {
+                            driver
+                        };
                         return Ok(Selected {
                             canvas,
                             driver: Some(Box::new(driver)),
@@ -83,6 +89,31 @@ pub(crate) async fn select(
         }
     }
     Err(failures.join("; "))
+}
+/// The WebGPU route presents the same flattened portable scene as WebGL2, so
+/// producer scenes draw in the page pass with no resampled intermediate.
+#[cfg(feature = "webgl")]
+fn portable_wgpu(
+    driver: cambium_rootstock::WgpuDriver,
+) -> Result<cambium_rootstock::WgpuDriver, String> {
+    Ok(
+        driver.with_portable_scene(Box::new(|capture, width, height, scale| {
+            crate::portable::materialize(
+                capture,
+                width,
+                height,
+                scale,
+                netrender::vello_backends::SparseResourceLimits::default(),
+            )
+            .map_err(|error| (error.source_key, error.message))
+        })),
+    )
+}
+#[cfg(not(feature = "webgl"))]
+fn portable_wgpu(
+    _: cambium_rootstock::WgpuDriver,
+) -> Result<cambium_rootstock::WgpuDriver, String> {
+    Err("portable WebGPU presentation is not compiled into this host".into())
 }
 fn fresh_canvas(old: &HtmlCanvasElement) -> Result<HtmlCanvasElement, String> {
     let document = old.owner_document().ok_or("canvas has no document")?;

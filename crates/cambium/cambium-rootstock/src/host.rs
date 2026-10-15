@@ -211,6 +211,10 @@ impl AppFrameInsets {
 pub struct HostOptions {
     /// Browser presentation preference. Native hosts retain their wgpu route.
     pub presentation_choice: crate::PresentationChoice,
+    /// Browser WebGPU presents the same portable scene as direct WebGL2,
+    /// composing producer scenes in the page pass instead of sampling their
+    /// textures. For applications whose producers supply portable scenes.
+    pub wgpu_portable_scene: bool,
     /// The window title.
     pub title: String,
     /// The layer responsible for the window frame.
@@ -285,6 +289,7 @@ impl Default for HostOptions {
     fn default() -> Self {
         Self {
             presentation_choice: crate::PresentationChoice::Auto,
+            wgpu_portable_scene: false,
             title: String::new(),
             window_frame: WindowFrame::Host,
             decorations: true,
