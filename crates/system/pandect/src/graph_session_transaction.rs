@@ -54,6 +54,40 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         .map(|(applied, generation)| (applied, generation.expect("published write")))
     }
 
+    /// Preflight observed stable-ID commands against this complete writer, then
+    /// apply their live deltas and the resulting addressable publication in one
+    /// atomic write. Every refusal comes before anything is written: a stale
+    /// observation, a missing target, an unqualified session or a storage
+    /// refusal leaves graph, history, capture and storage as they were. Returns
+    /// the published generation with the application.
+    pub async fn transact_live(
+        &mut self,
+        author: Author,
+        commands: Vec<crate::live_graph::ObservedCommand>,
+        at: SystemTime,
+    ) -> Result<(crate::live_graph::LiveApplied, String), crate::live_graph::LiveEditError> {
+        use crate::live_graph::{LiveApplied, preflight};
+        self.ensure_writable()?;
+        // The complete current records are what external observations were
+        // taken against; the resident graph's filtered copy is never hashed.
+        let source = self.prepare_resident_publication()?;
+        let program = preflight(&self.graph, &source, &author, commands)?;
+        let created = program.created.clone();
+        let (applied, generation) = self
+            .transact_change(at, true, move |candidate| {
+                candidate
+                    .edit_as(author.clone(), ChangeKind::Edit, |graph| {
+                        program.apply(graph, &author)
+                    })
+                    .map(|(_, applied)| applied)
+            })
+            .await?;
+        Ok((
+            LiveApplied { applied, created },
+            generation.expect("published write"),
+        ))
+    }
+
     /// The same staged/acknowledged boundary for this author's saved history.
     pub async fn transact_history(
         &mut self,
