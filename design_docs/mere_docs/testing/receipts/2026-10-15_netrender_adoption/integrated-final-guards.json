@@ -1,0 +1,47 @@
+{
+  "source_commit": "16104bbddc5d8827cb9c28a364d1f7db23dbacd9",
+  "source_and_locks_unchanged": true,
+  "rust_source_dirty": false,
+  "checked_files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "dc26462c66a11ca9ffc1a90ff0c2d4443775d4f744ca7fddc8f7a24d8ed533dd"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.toml",
+      "sha256": "0fcfbf60019c384430367b4a82b500826a330696b09ef702fac4ec88b4ee7476"
+    },
+    {
+      "path": "crates/cambium/examples/genet_web_smoke/Cargo.toml",
+      "sha256": "8ec381d244c03f6c21599b7ebb9936d5aec80edf689af5c2a6daa41bad58171d"
+    },
+    {
+      "path": "ports/distillery/probe/Cargo.toml",
+      "sha256": "3e58bcd6b4d164c51750f1d91350f8a3b053b56324d3127d51c5f2cea8141857"
+    },
+    {
+      "path": "ports/graphshell/web/.cargo/config.toml",
+      "sha256": "54b55c6f0871084517dcfb7543afc365c398b15250fcc3e0f736c12e53c7f2ef"
+    },
+    {
+      "path": "crates/cambium/examples/genet_web_smoke/.cargo/config.toml",
+      "sha256": "41b30e7676eb3505b8c332467fb66817b08fb8729579298f6f7f76dce619326f"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "d4c355c93455bc008571aa74b501dc8704cb4b390e57fb0144d190af308c7acf"
+    },
+    {
+      "path": "ports\\graphshell\\web\\Cargo.lock",
+      "sha256": "9afb61ed3366f90ed0937a72710099bceeef50b9e20f72c8b43aca31158da1ae"
+    },
+    {
+      "path": "crates\\cambium\\examples\\genet_web_smoke\\Cargo.lock",
+      "sha256": "092bcda7bc983f69d18c060eb823801e6ec82e20594eb5ed7117d9877f4363e3"
+    },
+    {
+      "path": "ports\\distillery\\probe\\Cargo.lock",
+      "sha256": "d936ba3a549583a3667eee272912bb64ce0256e569ed083924c7f8521c5711d4"
+    }
+  ]
+}

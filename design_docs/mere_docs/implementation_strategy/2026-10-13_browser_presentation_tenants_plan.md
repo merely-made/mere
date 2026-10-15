@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:executing-plans for inline execution or superpowers:subagent-driven-development if the owner selects delegation. Complete each task's checks before moving to the next.
 
-**Status:** browser presentation integrated; coordinated Genet/Netrender supplier adoption qualified and landed, 2026-10-15. All four temporary Netrender bridge tables are retired. Fresh native and wasm compilation receipts are recorded below; existing browser runtime and delivery-size receipts retain their measured source identities.
+**Status:** coordinated adoption qualified, 2026-10-15, including merged upstream version/supplier updates. All four temporary Netrender bridge tables are retired. Earlier gate tuples remain explicit below.
 
 **Goal:** Run Graphshell's viewer through the shared Cambium host on direct WebGL2 when WebGPU is unavailable, including content updates, resize, recovery, capture, input and accessibility.
 
@@ -381,3 +381,20 @@ Viewer size levers remain options. Forms C and three-lanes are outside scope.
   the unnecessary duplicate Forms B archive tag was removed at Mark's request.
   Build output remains in stable `C:/t/cargo-targets/genet` and
   `C:/t/cargo-targets/mere`; no isolated Cargo home or worktree was created.
+
+- 2026-10-15: Upstream Mere advanced to `75a2e6ae` during qualification.
+  Rebase preserves its Murm `fb6360c12b`, script-engine-api minimum version,
+  package version bumps and other published work. Conflicts were restricted to
+  the shared manifest and index; both owners' changes are retained. Fresh
+  four-root metadata audits and all receiving gates are running on merged
+  source. Original `99ecfdee` receipts remain unchanged as prior evidence.
+
+- 2026-10-15: Merged-source qualification passes on `16104bbd` over upstream
+  `75a2e6ae`: four dependency identity audits, 336 native tests with zero
+  failures and 11 existing ignores, both viewer wasm routes and standalone
+  web smoke. Six manifest/config and four lock hashes remain unchanged.
+  The earlier interrupted lock wait ran zero tests. The final receiving
+  receipt separates this integrated run from the original `99ecfdee` run.
+  `C:/t/cargo-targets/mere/netrender-adoption` is retained for this gate:
+  automatic approval review blocked cleanup after its Cargo marker and lack
+  of live owners were verified. No isolated Cargo home or worktree was made.
