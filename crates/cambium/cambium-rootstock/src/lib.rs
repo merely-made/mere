@@ -1150,6 +1150,8 @@ mod spatial_tests {
 
 #[cfg(test)]
 mod accessibility_tests;
+#[cfg(test)]
+mod mount_probe_tests;
 mod capture;
 mod frame;
 mod host;

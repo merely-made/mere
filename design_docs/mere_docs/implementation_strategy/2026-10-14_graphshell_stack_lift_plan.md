@@ -877,3 +877,21 @@ fast-forward of local main; nothing built).**
     `graphshell::projection_editor` in `knot_authoring.rs`; at its repin those
     lines become `scenograph::...`. No other repository on this machine names
     the module.
+- **2026-10-15 (P2 and P3 on main; receipts and Knot):** P2 and the Mere side
+  of P3 are in Mere `e92572a4e` on `origin/main`. Woodshed (Hocket Looper
+  integration session) reports it has no code using `CanvasCommand`, the
+  gesture helpers or `FaceAlignment`: its Session Mere overview drives
+  pictograph's canvas directly, so the P2 receipt is new adoption work in
+  `woodshed-views`, plus a repin of its roots from `90ce8f12d`, plus a native
+  foreground run. That is a scope change for Woodshed and is with Mark; until
+  then Woodshed is the planned second consumer without a receipt. Knot was
+  repinned locally to `e92572a4e` (knot-editor `c487a7c`, rows only, no source
+  change): `cargo check --workspace --all-targets` and the document, editor
+  (`mere-overlay`), desktop and site suites pass (knot-site's export tests
+  refuse a temp directory reached through a symlink, so run them with a
+  symlink-free `TMPDIR`; macOS's `/tmp` and `/var` are symlinks). Knot's option
+  helpers were left alone (see the P3 entry). Not done: pushing Knot, the
+  Mere-side `knot-editor`, `knot-document` and `knot-site` pin bump, and
+  Turnstone's move to the same Mere and Knot revisions (which also needs its
+  `graphshell::projection_editor` imports changed to `scenograph`).
+

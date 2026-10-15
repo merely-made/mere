@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE91 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
+**Status (2026-10-10):** tracks E1 to E5 and C1 complete, each with headed checks in Chrome and Firefox (Safari not run); C2 landed (SE45 to SE51; F11 to F13), with headed checks in Chrome and Firefox; its label revision (SE52) landed with the web host's genet repin. S1, the swatch grid, landed 2026-10-09 (SE53 to SE83), its dynamics axis implemented in `e2543cee` (SE69, SE89; F200 to F202), with native/wasm fixture identity qualified against Genet `7422e906` and Vello `491c376c`; the handoff records browser qualification and its open Firefox gate. Rulings SE1 to SE91 (§1). Waiting: genet branch `value-engine` (SE39 to SE42) for Mark or genet's lane to land, then mere's rhai `ValueEngine` and the rule runner after a coordinated repin. *(2026-10-15: landed and repinned; rhai `ValueEngine` and the rule runner are track R2, built and unpushed.)* The Turnstone follow-up (SE32, SE35) is on Turnstone main at `d0775a1` (§3). Mapped, not opened: wallpapers and props, the style editors, authored motion (§3).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 **2026-10-09 addition:** R1's first declarative slice is implemented and qualified: the cross-app design conversation
@@ -9,6 +9,18 @@ agreed target → condition → effect authoring, the six presentation examples,
 explicit precedence and match explanations, and an interactive aesthetic study.
 The Rhai runner still waits on SE39–SE42's coordinated Genet repin. The
 declarative model and study do not reopen S2/B1 or claim their completion.
+
+**2026-10-15 annotation (the repin happened):** the coordinated Genet repin
+that SE42 waited for landed as a side effect of the WebGL/viewer work: mere
+`0bb5facf` moves all 30 Genet dependencies in the root `Cargo.toml` to Genet
+`ae3d9f5`, which carries `ValueEngine` (Genet `f0a91f7`, "Land ValueEngine, the
+value-level script contract beside ScriptEngine") in `script-engine-api`. The
+trait is the one branch `value-engine` held (`27477d3e`; F10); only the crate's
+`rust-version` line differs. SE42's wait is over, and the status line's
+"Waiting" clause and the paragraph above keep their original words as the
+2026-10-09 and 2026-10-10 record. When the annotation was written nothing in
+mere used `ValueEngine`; track [R2](#r2--the-rule-runner-se92-to-se97)
+(2026-10-15) now carries rhai's implementation and the rule runner.
 
 **2026-10-10 continuation:** the bounded Graphshell Forme draft and saved layout
 undo are implemented in `69f17908`, with native/build qualification and an open
@@ -299,6 +311,85 @@ changes. Its UI, persistence and the exact boundary of qualifying interaction
 remain to be specified. No automatic hover retention or recency timeout is
 introduced. This ruling records behavior, not viewer implementation.
 
+### 1.8 The rule runner's rulings (2026-10-15)
+
+Evidence put after the repin (see the 2026-10-15 annotation above): the landed
+`ValueEngine` matches branch `value-engine`; `crates/script/rhai` (264 lines)
+has `base_engine()` over rhai's standard packages, which load the float-maths
+package SE40 forbids, and no `script-engine-api` or `libm` dependency; this
+plan carries no rule-runner task list. Mark answered six questions in a row.
+
+**SE92, the runner's shape.** Options: (a) rhai expressions inside the declarative
+`RuleSet`, as a script `Condition` and perhaps a script `Effect`, keeping the
+resolver, precedence, traces and hysteresis; (b) whole rules as rhai scripts that
+return effects; (c) region and field rules first (field plan P4). Mark: **"a"**.
+*Follows:* the runner is a `Condition::Script` in `scenograph::presentation`,
+evaluated through `ValueEngine` only (SE39). A script `Effect` is not ruled in
+and is not built here. *Reading, not ruled:* a script that fails, runs past its
+budget or returns a non-bool leaves its rule unmatched with the reason in the
+trace, so one bad rule does not stop the rest; and `resolve` without an engine
+refuses a set that carries a script condition.
+*Annotation 2026-10-15:* SE99 rules the failure reading; SE98 puts the running
+of scripts, and the `script-engine-api` dependency, behind a cargo feature.
+
+**SE93, dependencies.** Question: may `libm = "0.2"` join the workspace
+dependencies and `script-rhai`, and `script-engine-api` join `script-rhai`
+(neither downloads). Mark: **"yes"**. *Follows:* both are added; `libm` without
+default features. *Reading, not ruled:* `scenograph` also takes
+`script-engine-api` (the trait only; no rhai).
+
+**SE94, the maths host functions.** Options: the probe's exp, sin, cos, sqrt, pow;
+those plus tan, atan2, ln, floor, abs, min and max, all on `libm`. Mark:
+**"sure"** (to the recommended larger set). *Follows:* `script-rhai` registers
+that set on request; nothing loads rhai's maths package (SE40).
+
+**SE95, scope across evaluations.** Options: persist `let` bindings between
+`eval` calls; a fresh scope per eval with only globals persisting. Mark:
+**"fresh scope"**. *Follows:* a rule cannot leak state into the next.
+
+**SE96, registering a name twice.** Options: refuse; replace. Mark: **"refuse"**.
+*Follows:* `register` returns `ValueError::Host` for a name already registered.
+
+**SE97, where the determinism test lives.** Options: (a) in tree, a native test
+that hashes `to_bits()` against a stored constant, with the wasm32 run a script
+invoked under Node; (b) keep the probe harness outside the tree. Mark: **"a"**.
+*Follows:* the test, the example it shares code with and the script live under
+`crates/script/rhai`; any `getrandom` setting wasm32 needs stays in that
+crate's own build, not the root manifest.
+
+**Review of the first build (2026-10-15).** Four more questions went to Mark
+with the built track R2. The coordinating session relayed his chosen options
+verbatim; the other options are as put there.
+
+**SE98, publishing.** Evidence put: `scenograph` gained a git dependency on
+`script-engine-api`, which a crates.io release of `scenograph` cannot carry
+until Genet publishes that crate. Options: accept the block; feature-gate the
+dependency. Mark: **"Feature-gate it"**. *Follows:* `script-engine-api` is an
+optional dependency of `scenograph`, behind the cargo feature `scripts`, off by
+default; `RuleSet::resolve_with_scripts` and the evaluation code exist only with
+it, and `script-rhai` enables it for its tests. *Reading, not ruled:* the
+`Condition::Script` variant itself stays in the data model under every build,
+because an enum variant behind a feature changes what an exhaustive `match` in a
+dependent crate must cover with whichever crate in the graph unified the feature
+on; without the feature `resolve` refuses a set carrying one, and `validate` and
+serde treat it as any other condition.
+
+**SE99, a script that fails.** Options: leave the rule unmatched with the reason
+in the trace; fail the whole resolve. Mark: **"Rule unmatched, traced
+(Recommended)"**. *Follows:* a script that errors, runs past its budget or
+returns a non-bool leaves its rule unmatched, with the reason in the trace. This
+turns SE92's reading into a ruling.
+
+**SE100, a missing fact.** Options: keep rhai's behavior, which mirrors `Not`;
+make a missing fact an error. Mark: **"Keep, mirrors Not (Recommended)"**.
+*Follows:* an absent fact reads as `()` and `facts.weight > 2.0` is false;
+presence is checked with `"weight" in facts`.
+
+**SE101, push.** Options: check Graphshell, then push; push now; hold. Mark:
+**"Check graphshell, then push (Recommended)"**. *Follows:* after SE98's change,
+`cargo check -p graphshell`, then rebase, re-run the touched tests and push to
+main.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -333,6 +424,60 @@ SE36–SE42. This first declarative slice adds no replacement scripting seam.
 The study exercises the model locally; its browser resolver is a study host,
 not production Graphshell adoption. Broader style editors and live resource
 rendering remain with their existing owners.
+
+### R2 — the rule runner (SE92 to SE97)
+
+**Status (2026-10-15):** implemented on branch `rhai-valueengine`. Based on mere
+`90ce8f12` (Genet `ae3d9f5`). Mark's SE92 to SE101 rulings (§1.8) fix the shape;
+this track is their done-conditions.
+
+Scope:
+- `script-rhai` implements Genet's `ValueEngine` as `RhaiValueEngine`, a raw rhai
+  engine with only the language, iterator, array and map packages (SE39, SE40),
+  the sandbox of `base_engine()` re-applied from one shared function, a fresh
+  scope per evaluation (SE95) and a refusal for a name registered twice (SE96).
+- `register_libm_maths` supplies `exp`, `ln`, `sin`, `cos`, `tan`, `atan2`, `sqrt`,
+  `pow`, `floor`, `abs`, `min` and `max` on `libm` (SE94).
+- `scenograph::presentation` gains `Condition::Script`, always present as data,
+  and, behind the `scripts` feature (SE98), `RuleSet::resolve_with_scripts`
+  (SE92). Scenograph depends on the trait only. `resolve` without an engine, or
+  without the feature, refuses a set carrying a script condition.
+
+Done when, and what holds it:
+- Engine behavior: values cross both ways, including nested maps and
+  non-finite floats; built-in maths is absent, with a positive control that the
+  same call resolves once registered; a runaway is `ValueError::Budget` and the
+  engine survives; an empty budget runs nothing; failures come back as script,
+  host, value and budget errors. `crates/script/rhai/src/value.rs`, 17 tests; 16 were
+  seen failing against a stub first and the 17th (the sandbox) passed against it.
+- Rule maths is bit-identical on native and wasm32: `crates/script/rhai/tests/maths_bits.rs`
+  holds the native build to `028dc38fdcbf650d` (F8's recorded prefix) and
+  `crates/script/rhai/tests/wasm_maths_bits.mjs` builds
+  `crates/script/rhai/examples/maths_bits.rs` for `wasm32-unknown-unknown`, runs it under
+  Node 24 (V8) and compares against the same constant, with controls that the
+  module ran the rule.
+- The runner, both ways (SE98): `crates/cambium/scenes/scenograph/src/presentation.rs` with the
+  feature off (25 tests, two of them new: refusal without an engine, validation
+  and round trip) and on (29: four more on a scripted stand-in engine, for
+  precedence, the globals a script sees, failure isolation and composition under
+  `All`/`Any`/`Not`) and `crates/script/rhai/tests/scenograph_rules.rs` (8 tests on real rhai: facts and
+  states, a missing fact, hysteresis written in the script, host maths, a
+  narrower binding set, a runaway, no state between occurrences, repeatability).
+
+Not done here, and not claimed:
+- A script `Effect` (SE92 said "perhaps"; not ruled in).
+- Graphshell adoption: its rule editor's vocabulary offers no script condition, and
+  `BoundContext::resolve` calls the engine-less `resolve`, so a set with a script
+  is refused there with an issue. No host registers an engine yet.
+- Which bindings a shared scene's rules get (SE36's "narrower binding set"). The
+  mechanism is the engine's registrations, tested with and without maths; the
+  policy per trust tier is not decided.
+- Region and field rules (the field plan's P4) and piccolo's `ValueEngine`.
+- Browser parity: the study host's JavaScript resolver does not know the
+  `script` condition.
+- Publishing is unblocked by SE98: the default `scenograph` build has no
+  `script-engine-api` in its tree (`cargo tree -p scenograph -e normal`). A
+  release with the `scripts` feature on waits for Genet to publish the crate.
 
 ### E1 — one history in Cambium (A, SE5)
 
@@ -1109,6 +1254,12 @@ Verified 2026-10-07 against mere's origin unless named.
   | `nav:reload` | Reload | registry `toolbar:navigate_reload`; Turnstone (new, shared) |
   | `nav:stop` | Stop loading | Turnstone (new, shared) |
   Registry: 21 of its 34 default bindings land on these ids. The other 13 have no shared verb: `graph:select_all`, `graph:select_visible`, `graph:clear`, `graph:reheat_physics`, `graph:zoom_reset`, the two fit locks, `workbench:help_open`, `workbench:open_camera_controls`, `workbench:toggle_semantic_tab_group`, and the stale or dropped `graph:toggle_overview_plane`, `graph:radial_menu_open` and `graph:cycle_focus_region`. Of its 46 constants, 4 are binding ids and 42 action ids; the 8 action ids no default binds are `toolbar:submit`, `graph:view_confirm` and the six `radial_menu:*`.
+- **F14, the value engine on real rhai (R2, 2026-10-15).** `crates/script/rhai/src/value.rs` against Genet `ae3d9f5`.
+  - *The trait is the branch's.* `ae3d9f5`'s `value.rs` differs from `27477d3e` only by a `rust-version` line in the crate manifest (F10).
+  - *The probe's two sharp edges.* It took each host-function argument out of its slot (`mem::take`), which would empty the caller's own variable under a method-style call (`a.first()`); the engine now copies, and a test pins it. And it reported a host function's refusal as a script error; the engine now carries the `ValueError` through rhai's runtime error, so `Host` comes back as `Host`.
+  - *Rhai reads an absent map key as `()`, and `() > 2.0` is `false`.* A rule on `facts.weight` for a fact the occurrence lacks is a quiet non-match, as the declarative conditions say "fact: missing", and `!(facts.weight > 2.0)` matches, as `Not` does there. A script wanting the fact to exist asks `"weight" in facts`.
+  - *The identical bits.* The rule hashes to `028dc38fdcbf650d` natively (Windows, `libm` 0.2.16, no default features) and under Node 24 on wasm32, which is F8's recorded `028dc38f…` for rhai on `libm`. The wasm build needs `--cfg getrandom_backend="wasm_js"` (getrandom 0.3 through rhai's `ahash`), which the runner passes and the root manifest does not carry; `wasm-bindgen` 0.2.129 matches the lock.
+  - *No new packages.* The lock gained six dependency edges (`script-engine-api`, `libm`, `scenograph`, `getrandom` 0.3, `wasm-bindgen`) and no packages; every build ran `--offline`.
 - **2026-10-07.** Plan written from the chat assessment; rulings SE1 to SE9 recorded. The balaur brief and the projection grammar handoff carry dated pointers here.
 - **2026-10-07, E1 built on `sceno-editor-e1`, not merged.** `cambium::History<S, K>` in `crates/cambium/cambium/src/editor.rs`: key-and-window coalescing on a host-supplied millisecond time, a saved marker that shifts with the cap and is lost when its state falls off the cap or sat on a discarded redo stack. `EditHistory` is a newtype over `History<TextSnapshot>`, since `TextSnapshot` is crate-private; its API is unchanged and `TextInput` calls it as before. Eight new tests; `cargo test -p cambium --lib` passes, 257 tests. Two controls failed where they should: dropping the redo-discard reset, and dropping the cap shift, each fails one test. A first version of the redo-discard test passed under its control, because it never returned to the saved depth; it was fixed before the control was rerun. Found in passing: Cambium is not `cargo fmt`-clean at origin (`atlas.rs`, `graph_canvas.rs`, `lib.rs`, `workspace.rs`); `editor.rs` is.
 - **2026-10-07, E1 landed.** Mark: **"Merge E1, then E2 (Recommended)"** (options: that; E2 on the same branch first; stop). Rebased on origin with no change, `cargo test -p cambium --lib` rerun (257 pass) and `cargo check -p graphshell` clean, then fast-forwarded to main at `de06e4f0`.
@@ -1121,6 +1272,7 @@ Verified 2026-10-07 against mere's origin unless named.
 - **2026-10-07, SE39 written.** `ValueEngine` is on genet branch `value-engine` (`27477d3e`), pushed as a branch only, for Mark or genet's lane to land (SE41); mere waits for the repin (SE42).
 - **2026-10-08, E3 and E4 built.** E3: `scenograph::options` (`OptionSpec` with key, label, kind and default; `OptionKind`, the seven readers' kinds, with `refusal` in their words; `OptionDefault`: value, measured, auto, empty), deterministic JSON, two tests. E4: each of the eleven families declares its options (`Family::options`), its choice tables now named constants shared by the readers and the declaration; `Options` checks each read against the declaration (a debug assertion) and records the default it uses, so `Family::resolved_defaults(measure)` reports the numbers; `finish` refuses what the declaration does not name, with the same messages as before; `SolverCapability` gains `options`, empty by default and absent from older JSON; `validate_arrangement` refuses a registered solver's undeclared key and a value of the wrong kind before solving. The test solver `Line` now declares its `step`. Three catalog tests (each family reads exactly what it declares; every option left out resolves, matching declared values; an undeclared key is refused) and one compile test for solvers. scenomise passes 119 and scenograph 10; Graphshell still checks. Controls: dropping LSystem's `rotation` from its declaration fails three tests, and removing the solver refusal fails one. rustfmt was run over `catalog.rs`, which also normalized nine hunks that were unformatted on main before this change. E5, the editor's rows, is next.
 - **2026-10-08, E5 built.** The graphshell library gains `arrangement_options` (a family's declaration, else a registered solver's), `arrangement_defaults` (resolved numbers for given items), `option_placeholder`, `with_option` (blank leaves the option out) and `with_kind` (SE44), with four tests; the projection editor's tests pass 19. The page's new `web_options.rs` draws one row per declared option in the arrangement panel: number-like inputs, a select for a choice and for a flag (default, true, false), text for a list; the placeholder is the default, with a measured default's number and words when the executable dataset gives items to measure and its words alone otherwise; a row's refusal shows beneath it in `OptionKind::refusal`'s words, the compiler's own. Rows rebuild when the arrangement changes and otherwise update without disturbing a focused row; edits go through `SetArrangement`, so E2's undo covers them. Headed: `projection_options.scn` (28 steps: Grid's measured placeholders, `columns` 0 refused and the projection not executable, 3 accepted, a switch to Spiral rebuilds the rows and a choice applies, an unknown id says so) passes in Firefox 157 and Chrome. Findings: in the narrow layout the rows' placeholders are cut by the panel's width, and the editor's button row (seven buttons since E2 and E2b) is crowded. Tracks E1 to E5 are complete.
+- **2026-10-15, R2 built: rhai implements `ValueEngine`, and scripts are a rule condition.** Mark answered six questions (SE92 to SE97). `RhaiValueEngine` and `register_libm_maths` in `script-rhai`; `Condition::Script` and `RuleSet::resolve_with_scripts` in `scenograph::presentation`; the determinism check on native and wasm32 (F14). `script-rhai` passes 26 library tests, 3 in `maths_bits` and 8 in `scenograph_rules`; `scenograph` passes 25 with `scripts` off and 29 with it on; the wasm32 run under Node matches the native hash. Mark then ruled SE98 to SE101 (§1.8): the script-running code and the `script-engine-api` dependency moved behind the `scripts` feature, off by default. Open items are listed under R2.
 - **2026-10-08, the Turnstone follow-up landed in Turnstone.** At `d0775a1`, by its unusual-protocols lane (§3, dated note). Nothing here moved; the plan stops listing it as waiting.
 - **2026-10-08, C2 landed.** `crates/cambium/command-menu` holds `Command`, `CommandChoices` (serde; pandect's `CommandMenuView` is now this type, and a stored view reads back unchanged, with a control), `CommandSet` (`menu` returns commands; cambium draws them as `CommandItem`), `MenuSession`, and `catalogue`: the 33 shared ids of F13 with one label each. graph-kernel's `ActionId` is their typed form, 33 variants held one for one against the catalogue; its unread categories, input modes and persist keys went. mere-chrome's `CommandPaletteSession`, `CommandAuthorityMut`, `FrameViewModel.command_palette` and shell-state's re-export were removed. registry's default bindings name catalogue ids (21), 13 were dropped, and the two Enter actions stay (SE51). Graphshell registers its eight shared verbs under catalogue ids with its own surfaces. Tests: command-menu 13, cambium 251, mere-kernel 296, ux-events 38, mere-chrome 63, registry 134, pandect 309. Headed in Chrome: canvas_commands and its reopen, projection_session, h3_boot, role_controls, d3_derived_faces_detail, physics_framing_control, face_zoom, physics_still; in Firefox: canvas_commands and its reopen. Findings: physics_framing_control counts nodes, so it needs a fresh store after projection_session adds one; `graph::revert::tests::a_removed_node_comes_back_whole` flaked once on a wall-clock millisecond (3 of 3 green alone; offered as its own task); after rebasing onto main, the Graphshell web host does not build on main itself: `632c1d29` repinned genet to `e84f9c7f` in the root manifest and left `ports/graphshell/web/Cargo.toml` at `965b64e2`, so two taproots meet (reported, not fixed here).
 - **2026-10-08, SE52 built, held.** Branch `c2-labels` (`cddf72ac`): the four labels, Graphshell's buttons and pills on the catalogue, and [button_labels.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/tests/button_labels.rs) with its control. command-menu 13 and button_labels 2 pass; the wasm build and the headed check wait on main's genet pin split.
