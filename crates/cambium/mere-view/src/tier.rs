@@ -15,7 +15,8 @@
 //! - an archive node peeks its detail on hover and pins a popover on click
 //!   (Open as session, Select for composition, Compose), through Cambium's
 //!   [`detail_popover_panel`]; Escape or an outside click dismisses it.
-//! - past [`MAX_ARCHIVE_NODES`] archives, a session's or the shelf's archives
+//! - past the host's [`MereViewModel::max_archive_nodes`] archives (by
+//!   default [`DEFAULT_MAX_ARCHIVE_NODES`]), a session's or the shelf's archives
 //!   collapse into one "+N" node that opens the card holding them.
 //!
 //! New session and Compose are controls of the tier itself, at its right end.
@@ -58,9 +59,14 @@ const POPOVER_WIDTH: f32 = 232.0;
 const CARD_CLEARANCE: u32 = 22;
 const ARCHIVE_ROOM: u32 = 24;
 
-/// The most archives a session or the shelf shows one by one; past it they
+/// The most archives a session or the shelf shows one by one unless the host
+/// says otherwise ([`MereViewModel::max_archive_nodes`]); past it they
 /// collapse into one "+N" node that opens the card holding them.
-pub const MAX_ARCHIVE_NODES: usize = 3;
+pub const DEFAULT_MAX_ARCHIVE_NODES: usize = 3;
+
+fn max_archive_nodes(model: &MereViewModel) -> usize {
+    model.max_archive_nodes.unwrap_or(DEFAULT_MAX_ARCHIVE_NODES)
+}
 
 /// The relation kinds joining an archive node to the session it was saved
 /// from, and to the shelf: each relation cell's `data-kind`.
@@ -405,7 +411,7 @@ impl MereView<'_> {
                     emphasized: false,
                 });
             };
-            if archives.len() > MAX_ARCHIVE_NODES {
+            if archives.len() > max_archive_nodes(model) {
                 let more = more_node_key(card);
                 let label = match card {
                     TierCard::Session(_) => format!("+{} archives of {owner}", archives.len()),
