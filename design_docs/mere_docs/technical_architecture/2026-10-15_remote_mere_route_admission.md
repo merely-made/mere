@@ -122,3 +122,5 @@ one action check (`admission::serves_action`, which now also serves the
   `graphshell_host`'s `RouteSelector` and `AMBIENT_ACTION`, and
   `djinn::resident_projection`, with Djinn's two dialable-host receipts (lift
   plan Progress). Not yet: the binary starting the host, which waits on §7.
+- **2026-10-15 (later):** the [implementation spec](2026-10-15_remote_mere_route_spec.md)
+  carries the remaining work to the Codex lanes.
