@@ -104,7 +104,7 @@ where
                         .as_ref()
                         .and_then(|driver| driver.wgpu_surface())
                 })
-                .map(|surface| surface.renderer()),
+                .map(|surface| surface.core()),
         );
         if held.is_empty() {
             shared.producers.forget_device();
@@ -149,7 +149,7 @@ where
         if self.s.hidden {
             shared
                 .producers
-                .suspend_except(&elsewhere, Some(surface.renderer()));
+                .suspend_except(&elsewhere, Some(surface.core()));
             if held.is_empty() {
                 shared.producers.forget_device();
             }

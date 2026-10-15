@@ -321,7 +321,7 @@ where
                     driver.dispose();
                 }
                 if let Some(core) = selected.core.take() {
-                    core.renderer().wgpu_device.core.device.destroy();
+                    core.device().destroy();
                 }
                 return Err(error);
             }

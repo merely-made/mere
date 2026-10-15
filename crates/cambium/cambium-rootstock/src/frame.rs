@@ -466,7 +466,11 @@ where
             // the resume and are kept, not forgotten.
             return;
         };
-        let renderer = surface.core().renderer();
+        // One operation over this window's leaves; nothing below rasterizes
+        // or calls a producer while the browser frame gate is held.
+        let Ok(renderer) = crate::try_renderer(surface.core()) else {
+            return;
+        };
 
         let mut seen: Vec<u64> = Vec::new();
         for (key, epoch, splice) in self.s.shared.rendered.path_a_entries() {

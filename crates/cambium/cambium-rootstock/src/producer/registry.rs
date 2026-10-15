@@ -312,19 +312,19 @@ impl ProducerRegistry {
             if Arc::ptr_eq(&previous, core) {
                 return;
             }
-            self.retire_renderer_images(previous.renderer());
+            self.retire_renderer_images(&previous);
         }
         self.cleanup_core = Arc::downgrade(core);
     }
 
-    fn retire_renderer_images(&self, renderer: &netrender::Renderer) {
+    fn retire_renderer_images(&self, core: &genet_render_host::RenderCore) {
         for key in self
             .entries
             .values()
             .map(|entry| entry.renderer_key)
             .chain(self.pending_retire.iter().copied())
         {
-            renderer.unregister_external_image(key);
+            crate::retire_external_image(core, key);
         }
     }
 
@@ -369,8 +369,8 @@ impl ProducerRegistry {
         })])
     }
 
-    pub(crate) fn suspend_all(&mut self, renderer: Option<&netrender::Renderer>) {
-        self.suspend_except(&|_, _| false, renderer);
+    pub(crate) fn suspend_all(&mut self, core: Option<&genet_render_host::RenderCore>) {
+        self.suspend_except(&|_, _| false, core);
         self.device = None;
         self.device_generation = None;
     }
@@ -380,7 +380,7 @@ impl ProducerRegistry {
     pub(crate) fn suspend_except(
         &mut self,
         elsewhere: Elsewhere<'_>,
-        renderer: Option<&netrender::Renderer>,
+        core: Option<&genet_render_host::RenderCore>,
     ) {
         for (&key, entry) in &mut self.entries {
             let native_here = !elsewhere(key, entry.owner);
@@ -399,14 +399,14 @@ impl ProducerRegistry {
             if native_here {
                 entry.active = false;
                 entry.image = None;
-                if let Some(renderer) = renderer {
-                    renderer.unregister_external_image(entry.renderer_key);
+                if let Some(core) = core {
+                    crate::retire_external_image(core, entry.renderer_key);
                 }
             }
         }
-        if let Some(renderer) = renderer {
+        if let Some(core) = core {
             for key in self.pending_retire.drain(..) {
-                renderer.unregister_external_image(key);
+                crate::retire_external_image(core, key);
             }
         }
     }
@@ -423,7 +423,7 @@ impl ProducerRegistry {
     pub(crate) fn retire_orphans(
         &mut self,
         in_document: impl Fn(NodeId) -> bool,
-        renderer: Option<&netrender::Renderer>,
+        core: Option<&genet_render_host::RenderCore>,
     ) -> usize {
         let orphans: Vec<u64> = self
             .entries
@@ -439,8 +439,8 @@ impl ProducerRegistry {
         for &key in &orphans {
             let renderer_key = self.entries[&key].renderer_key;
             self.remove(key);
-            if let Some(renderer) = renderer {
-                renderer.unregister_external_image(renderer_key);
+            if let Some(core) = core {
+                crate::retire_external_image(core, renderer_key);
             }
         }
         orphans.len()
@@ -472,7 +472,9 @@ impl ProducerRegistry {
         self.render_failure = None;
         self.gpu_remap_failure = None;
         let mut stats = ProducerFrameStats::default();
-        let renderer = surface.renderer();
+        // Producer callbacks below rasterize on this core, so renderer access
+        // is taken per operation rather than held across the window.
+        let core = surface.core();
         if self
             .device_generation
             .is_some_and(|generation| generation != surface.core().generation())
@@ -486,7 +488,7 @@ impl ProducerRegistry {
         self.device = Some(surface.device().clone());
         self.device_generation = Some(surface.core().generation());
         for key in self.pending_retire.drain(..) {
-            renderer.unregister_external_image(key);
+            crate::retire_external_image(core, key);
             stats.retirements += 1;
         }
         if self.entries.is_empty() {
@@ -511,7 +513,7 @@ impl ProducerRegistry {
         for key in absent {
             let renderer_key = self.entries[&key].renderer_key;
             self.remove(key);
-            renderer.unregister_external_image(renderer_key);
+            crate::retire_external_image(core, renderer_key);
             stats.retirements += 1;
         }
         self.pending_retire.clear();
@@ -522,7 +524,7 @@ impl ProducerRegistry {
             let image_key = entry.renderer_key;
             let Some(node) = *owner else {
                 entry.error = Some(ProducerError::DuplicateDomKey);
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, core, &mut stats);
                 stats.invalid_frames += 1;
                 continue;
             };
@@ -531,7 +533,7 @@ impl ProducerRegistry {
                 .is_some_and(|previous| previous != node && elsewhere(key, Some(previous)))
             {
                 entry.error = Some(ProducerError::DuplicateDomKey);
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, core, &mut stats);
                 stats.invalid_frames += 1;
                 continue;
             }
@@ -539,17 +541,17 @@ impl ProducerRegistry {
                 entry.producer.retire();
                 entry.active = false;
                 entry.image = None;
-                renderer.unregister_external_image(image_key);
+                crate::retire_external_image(core, image_key);
                 stats.retirements += 1;
             }
             entry.owner = Some(node);
             let Some(geometry) = layout.element_geometry(dom, node) else {
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, core, &mut stats);
                 continue;
             };
             let logical_size = geometry.content_size();
             if logical_size.0 == 0.0 || logical_size.1 == 0.0 {
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, core, &mut stats);
                 continue;
             }
             let Some(size) = physical_size(
@@ -558,7 +560,7 @@ impl ProducerRegistry {
                 surface.device().limits().max_texture_dimension_2d,
             ) else {
                 entry.error = Some(ProducerError::InvalidExtent);
-                suspend_entry(entry, image_key, renderer, &mut stats);
+                suspend_entry(entry, image_key, core, &mut stats);
                 stats.invalid_frames += 1;
                 continue;
             };
@@ -566,7 +568,7 @@ impl ProducerRegistry {
                 !entry.active || entry.image.as_ref().is_none_or(|image| image.size != size);
             if needs_frame {
                 entry.image = None;
-                renderer.unregister_external_image(image_key);
+                crate::retire_external_image(core, image_key);
             }
             entry.active = true;
             entry.logical_size = logical_size;
@@ -592,7 +594,7 @@ impl ProducerRegistry {
                 Ok(output) => output,
                 Err(failure) => {
                     refuse_render_entry(entry);
-                    renderer.unregister_external_image(image_key);
+                    crate::retire_external_image(core, image_key);
                     stats.invalid_frames += 1;
                     self.render_failure = Some(ProducerRenderFailure {
                         source_key: key,
@@ -607,7 +609,7 @@ impl ProducerRegistry {
             if let Err(error) = validate_output(&output, size) {
                 entry.error = Some(error);
                 entry.image = None;
-                renderer.unregister_external_image(image_key);
+                crate::retire_external_image(core, image_key);
                 stats.invalid_frames += 1;
                 continue;
             }
@@ -623,7 +625,7 @@ impl ProducerRegistry {
             }
             let Some(next_stamp) = self.next_stamp.checked_add(1) else {
                 refuse_render_entry(entry);
-                renderer.unregister_external_image(image_key);
+                crate::retire_external_image(core, image_key);
                 self.gpu_remap_failure =
                     Some(ProducerGpuRemapError::StampExhausted { local_key: key });
                 stats.invalid_frames += 1;
@@ -631,6 +633,14 @@ impl ProducerRegistry {
             };
             self.next_stamp = next_stamp;
             let phase = crate::Instant::now();
+            let Ok(renderer) = crate::try_renderer(core) else {
+                // Loss or another frame owner: the frame itself is refused,
+                // so this producer keeps no image staged on the old access.
+                refuse_render_entry(entry);
+                crate::retire_external_image(core, image_key);
+                stats.invalid_frames += 1;
+                continue;
+            };
             renderer.stage_external_image(
                 image_key,
                 &output.view,
@@ -638,6 +648,7 @@ impl ProducerRegistry {
                 output.alpha,
                 self.next_stamp,
             );
+            drop(renderer);
             stats.stage_us += micros(phase.elapsed());
             stats.stages += 1;
             entry.image = Some(Image {
@@ -653,7 +664,7 @@ impl ProducerRegistry {
 impl Drop for ProducerRegistry {
     fn drop(&mut self) {
         if let Some(core) = self.cleanup_core.upgrade() {
-            self.retire_renderer_images(core.renderer());
+            self.retire_renderer_images(&core);
         }
         for entry in self.entries.values_mut() {
             entry.producer.retire();
@@ -668,7 +679,7 @@ fn micros(duration: crate::Duration) -> u64 {
 fn suspend_entry(
     entry: &mut Entry,
     key: u64,
-    renderer: &netrender::Renderer,
+    core: &genet_render_host::RenderCore,
     stats: &mut ProducerFrameStats,
 ) {
     if entry.active {
@@ -677,7 +688,7 @@ fn suspend_entry(
     }
     entry.active = false;
     entry.image = None;
-    renderer.unregister_external_image(key);
+    crate::retire_external_image(core, key);
 }
 
 // The same invalidation path is exercised by CPU registry controls and

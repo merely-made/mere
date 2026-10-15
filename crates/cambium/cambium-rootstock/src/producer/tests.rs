@@ -389,7 +389,7 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
     assert!(registry.commands(7).unwrap().is_empty());
     layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
-    registry.suspend_all(Some(surface.renderer()));
+    registry.suspend_all(Some(surface.core()));
     assert!(registry.commands(7).unwrap().is_empty());
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
 
@@ -601,7 +601,7 @@ fn gpu_a_closed_windows_producers_retire() {
     let document = dom.document();
     let retired = registry.retire_orphans(
         |n| crate::window_dom::ancestor_or_self(&dom, n, document),
-        Some(surface.renderer()),
+        Some(surface.core()),
     );
     assert_eq!(retired, 1);
     assert!(!registry.contains(7) && registry.contains(8));
