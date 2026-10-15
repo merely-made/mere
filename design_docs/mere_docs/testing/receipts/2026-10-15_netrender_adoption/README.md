@@ -1,6 +1,6 @@
 # Coordinated Genet/Netrender receiving adoption, 2026-10-15
 
-Status: qualified, 2026-10-15. All four source audits, native host suites and browser compile gates pass.
+Status: qualified on implementation `16104bbd`, integrated over upstream `75a2e6ae`. All four graph audits, 336 native tests and all three wasm compilation gates pass. Initial `99ecfdee` logs retain their original tuple.
 
 All four edited manifests select published Genet
 `7ffe66208ca3059283ef8770de7d17aa8834ecc8` and Netrender
@@ -14,9 +14,9 @@ patch and required crates.io supplier patches retain their separate purpose.
 
 ## Source audit
 
-[Identities and lock hashes](identities.json) cover all four roots. The
-[main lock movement](workspace-lock-movement.json) contains only Genet and
-Netrender source replacements. The [standalone lock movement](standalone-lock-movement.json)
+[Integrated identities and lock hashes](integrated-identities.json) cover all four roots. The
+[integrated lock movement](integrated-lock-movement.json) shows only Genet and Netrender source replacements in the workspace lock.
+Standalone locks also retain the published Murm revision and Sceno version updates. The [standalone lock movement](standalone-lock-movement.json)
 also records the older probe's existing `edit-history` to `backstep` workspace
 rename, required Gloo timer edge and coordinated Vello provider update.
 The ignored web-smoke lock is frozen as [web-smoke-resolved-lock.toml](web-smoke-resolved-lock.toml);
@@ -26,18 +26,38 @@ the other three locks are tracked beside their manifests.
 
 | Gate | Result | Evidence |
 |---|---|---|
-| Four portable dependency graphs | One canonical Netrender family per root; Genet `7ffe66208ca` throughout | [Identities](identities.json) |
-| Native shared hosts | 336 passed, zero failed, 11 ignored (four doctests) | [Raw log](native-hosts.log), [package counts](native-package-counts.json) |
-| Viewer WebGPU wasm | Passed, viewer features only | [Log](viewer-webgpu.log) |
-| Viewer WebGL2 with forwarded Classic opt-out | Passed, viewer features only | [Log](viewer-webgl-opt-out.log) |
-| Standalone web smoke wasm | Passed, including the default browser host/image cone | [Log](web-smoke.log) |
+| Four portable dependency graphs | One canonical Netrender family per root; Genet `7ffe66208ca` throughout | [Identities](integrated-identities.json) |
+| Native shared hosts | 336 passed, zero failed, 11 ignored (four doctests) | [Raw log](resumed-integrated-native-hosts.log), [counts](integrated-native-counts.json) |
+| Viewer WebGPU wasm | Passed, viewer features only | [Log](resumed-integrated-viewer-webgpu.log) |
+| Viewer WebGL2 with forwarded Classic opt-out | Passed, viewer features only | [Log](resumed-integrated-viewer-webgl-opt-out.log) |
+| Standalone web smoke wasm | Passed, including the default browser host/image cone | [Log](resumed-integrated-web-smoke.log) |
 
 Each gate has an adjacent `.result.json` with the exact command and outcome.
-The [source basis](source-basis.json) records the Mere base, manifest/config
-hashes and inherited flags. Every final lock hash and tested manifest/config
-hash was rechecked unchanged after the gates. All compilation uses the stable
-target directory and debug/incremental settings in
-[native-hosts.result.json](native-hosts.result.json).
+The [integrated source basis](integrated-source-basis.json) records the Mere
+implementation/base and six manifest/config hashes. The [final guards](integrated-final-guards.json)
+confirm all four locks and all six source/config files stayed unchanged, with
+no Rust source edits. Exact commands and environments are in the adjacent
+`resumed-integrated-*.result.json` files.
+
+The initial `99ecfdee` qualification remains in the original logs,
+[identities](identities.json) and [source basis](source-basis.json). These are
+historical evidence, separate from the integrated run above.
+The first integrated native attempt was interrupted while waiting for the
+shared artifact lock; [its result](integrated-native-hosts.result.json) records
+zero tests executed. The successful rerun used a separate artifact directory
+under the approved Mere target and reused the stable build cache.
+
+Cleanup: `C:/t/cargo-targets/mere/netrender-adoption` remains owned by this
+adoption gate. Its Cargo marker and lack of live process owners were verified;
+automatic approval review blocked recursive removal with the reason
+"blocked by policy". It holds generated artifacts only. The regular stable
+Genet/Mere build caches remain reusable; no isolated Cargo home or source
+worktree was created.
+
+Publication integration: upstream `d4d2f88c` adds link-model documentation and
+index changes only. Its index conflict was resolved by preserving that update
+and the adoption entry. Comparison with the qualified tree confirms that
+production source, manifests, configs and locks are unchanged.
 
 ## Qualification scope
 

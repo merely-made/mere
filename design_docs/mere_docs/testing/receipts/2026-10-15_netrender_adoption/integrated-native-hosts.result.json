@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "--manifest-path",
+    "repos/mere/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-j2",
+    "--no-fail-fast",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-genet-winit-host",
+    "-p",
+    "mesquite"
+  ],
+  "exit_code": 4294967295,
+  "elapsed_seconds": 314.8,
+  "outcome": "Interrupted while waiting for shared artifact directory lock; compilation and tests did not begin.",
+  "tests_executed": 0
+}
