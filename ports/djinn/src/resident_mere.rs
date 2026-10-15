@@ -282,6 +282,7 @@ impl MereRoutes {
             persona: self.inner.persona,
             hosts: Mutex::new(HashMap::new()),
             lifecycle: AtomicU64::new(1),
+            codicil_sessions: Mutex::new(HashMap::new()),
         });
         let opened = Arc::clone(&shared);
         let ambient_opened = Arc::clone(&shared);
@@ -547,6 +548,9 @@ struct MereShared {
     hosts: Mutex<HashMap<SessionId, SharedHost>>,
     /// The sessions projection's revision: it moves with every lifecycle step.
     lifecycle: AtomicU64,
+    /// The sessions each codicil was saved from, by codicil id. A codicil
+    /// is immutable, so each is read once.
+    codicil_sessions: Mutex<HashMap<String, Vec<SessionId>>>,
 }
 
 impl MereShared {
@@ -571,6 +575,32 @@ impl MereShared {
 
     fn moved(&self) {
         self.lifecycle.fetch_add(1, Ordering::SeqCst);
+    }
+
+    /// The sessions the codicil `id` was saved from, read once. A codicil
+    /// this resident cannot read names none.
+    async fn codicil_sessions(&self, store: &mut RedbBackend, id: &str) -> Vec<SessionId> {
+        if let Some(sessions) = self.codicil_sessions.lock().await.get(id) {
+            return sessions.clone();
+        }
+        let mut sessions = Vec::new();
+        if let Ok(parsed) = pandect::graph_codicil::parse_codicil_id(id)
+            && let Ok(Some(codicil)) =
+                pandect::graph_codicil::load_profiled_graph_codicil_sealed(store, None, parsed)
+                    .await
+        {
+            sessions = codicil
+                .codicil
+                .sessions
+                .iter()
+                .map(|session| session.manifest.session_id)
+                .collect();
+        }
+        self.codicil_sessions
+            .lock()
+            .await
+            .insert(id.to_owned(), sessions.clone());
+        sessions
     }
 
     /// The one host of session `id`, opened once and shared by every
@@ -900,6 +930,16 @@ impl MereEndpoint {
             }];
             for manifest in manifests {
                 let id = manifest.id.to_string();
+                // Each session the codicil was saved from, so a view can put
+                // the codicil on its session.
+                let saved_from = shared
+                    .codicil_sessions(&mut store, &id)
+                    .await
+                    .into_iter()
+                    .map(|session| CardValueV1 {
+                        label: mere_overmap::wire::ARCHIVE_SESSION_LABEL.into(),
+                        value: session.as_uuid().to_string(),
+                    });
                 let card = PortableCardV1 {
                     title: format!("Codicil {}", pandect::graph_codicil::codicil_short_id(&id)),
                     values: vec![
@@ -917,7 +957,10 @@ impl MereEndpoint {
                                 .collect::<Vec<_>>()
                                 .join(", "),
                         },
-                    ],
+                    ]
+                    .into_iter()
+                    .chain(saved_from)
+                    .collect(),
                     badges: vec!["Read-only archive".into()],
                     media: Vec::new(),
                 };
@@ -2111,6 +2154,11 @@ mod tests {
         let entries = after.archive.expect("the archive stays advertised").entries;
         assert_eq!(entries.len(), 1, "the saved codicil is read back");
         assert!(entries[0].can_open);
+        assert_eq!(
+            entries[0].session,
+            Some(attached),
+            "the codicil names the session it was saved from"
+        );
 
         let opened = overlay
             .take(&MereViewRequest::Archive(ArchiveRequest::Open(
