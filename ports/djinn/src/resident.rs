@@ -144,10 +144,49 @@ impl DjinnResident {
             },
             None => None,
         };
-        // Infallible once validated: the actor builds its provider on its own
+        #[cfg(feature = "inference")]
+        let mut distillery = distillery;
+        // The actor builds its provider on its own
         // thread, and a provider that fails to build fails each run instead.
         #[cfg(feature = "inference")]
-        let inference = owner.inference.as_ref().map(ResidentInference::open);
+        let inference = match owner.inference.as_ref() {
+            Some(settings) => {
+                let library = if matches!(
+                    settings.model,
+                    crate::settings::InferenceModelSettings::Library { .. }
+                ) {
+                    match distillery
+                        .as_mut()
+                        .expect("validated Distillery lane")
+                        .inference_model_library(data_root)
+                    {
+                        Ok(library) => Some(library),
+                        Err(open_error) => {
+                            let mut message = format!("open inference model library: {open_error}");
+                            if let Some(lane) = distillery {
+                                if let Err(error) = lane.close().await {
+                                    message.push_str(&format!("; close Distillery: {error}"));
+                                }
+                            }
+                            if let Some(lane) = knot {
+                                if let Err(error) = lane.close().await {
+                                    message.push_str(&format!("; close Knot: {error}"));
+                                }
+                            }
+                            drop(site);
+                            if let Err(error) = blobs.shutdown().await {
+                                message.push_str(&format!("; close blob custody: {error}"));
+                            }
+                            return Err(message);
+                        },
+                    }
+                } else {
+                    None
+                };
+                Some(ResidentInference::open(settings, library))
+            },
+            None => None,
+        };
         #[cfg(not(feature = "inference"))]
         let inference: Option<ResidentInference> = None;
         let knot_reopen = match (&knot, knot_settings) {

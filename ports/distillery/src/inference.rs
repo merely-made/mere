@@ -15,8 +15,8 @@
 //! table changes. The route's notice poll interval is therefore the rate at
 //! which streamed fragments reach a client.
 //!
-//! What this slice does not do yet: pause and resume (I3), recall and
-//! citations (I4), and any model other than the one the caller builds.
+//! `inference-model` adds local model-library resolution and a session-bound
+//! declared template. Pause/resume (I3) and recall/citations (I4) follow.
 
 use std::collections::HashMap;
 use std::sync::mpsc::Receiver;
@@ -32,7 +32,7 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use esp::infer::{GenerationRequest, InferCommand, InferUpdate, spawn_inference_actor};
+use esp::infer::{GenerationRequest, InferCommand, InferUpdate, spawn_inference_actor_fallible};
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
@@ -43,9 +43,45 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "inference-model")]
+pub use esp::infer::decoder::DecoderDevice as InferenceDevice;
 /// The provider seam a host builds a lane from, re-exported so a host
 /// composes the lane without naming esp.
 pub use esp::infer::{InferenceProvider, StubInferenceProvider};
+#[cfg(feature = "inference-model")]
+pub use esp::infer::{
+    library::{InferenceModelRow, load_library_session},
+    prompt::PromptTemplate,
+};
+
+/// Parse the self-describing content reference from owner settings.
+#[cfg(feature = "inference-model")]
+pub fn parse_model_row(row: &str) -> Result<eidetic::ManifestId, String> {
+    eidetic::Hash::parse(row)
+        .map(eidetic::ManifestId::from_hash)
+        .map_err(|error| format!("inference model row {row:?}: {error}"))
+}
+
+/// The library lock covers resolution only. Generation never holds it, so a
+/// trainer can publish another artifact while an ask is running on the CPU.
+#[cfg(feature = "inference-model")]
+pub fn open_library_lane<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    row: eidetic::ManifestId,
+    max_tokens: usize,
+) -> InferenceLane {
+    InferenceLane::try_open_with_max_tokens(max_tokens, move || {
+        let resolved = {
+            let mut store = library.blocking_lock();
+            pollster::block_on(esp::infer::library::resolve_library_session(
+                &mut *store,
+                row,
+            ))?
+        };
+        let provider = resolved.load(&InferenceDevice::ndarray(), "burn-ndarray", max_tokens)?;
+        Ok(Box::new(provider))
+    })
+}
 
 /// The first-party route an application asks through.
 pub const INFERENCE_ASK_ROUTE: &str = "inference.ask";
@@ -70,7 +106,7 @@ pub const CANCEL_INTENT: &str = "distillery.inference/cancel-v1";
 pub struct AskRequestV1 {
     /// Caller-chosen run name, unique within this lane.
     pub run: String,
-    /// The question, as the prompt the provider receives.
+    /// The raw question; a library provider renders its declared template.
     pub question: String,
 }
 
@@ -118,6 +154,8 @@ pub struct RunV1 {
     pub text: String,
     /// Why a failed run failed.
     pub error: Option<String>,
+    /// Exact session used for this run, absent for a stub or failed load.
+    pub session: Option<esp::infer::provider::SessionIdentity>,
 }
 
 /// The run table, as the route serves it.
@@ -127,6 +165,10 @@ pub struct InferenceRunsV1 {
     pub schema: String,
     /// The provider's model id, once the actor has built it.
     pub model: Option<String>,
+    /// Exact loaded session and template, absent for an unbound stub.
+    pub session: Option<esp::infer::provider::SessionIdentity>,
+    /// Provider construction error; asks fail with this instead of falling back.
+    pub load_error: Option<String>,
     /// Runs in the order they were asked.
     pub runs: Vec<RunV1>,
 }
@@ -156,6 +198,8 @@ struct RunRecord {
 #[derive(Default)]
 struct RunTable {
     model: Option<String>,
+    session: Option<esp::infer::provider::SessionIdentity>,
+    load_error: Option<String>,
     runs: Vec<RunRecord>,
     by_actor_id: HashMap<u64, usize>,
     next_actor_id: u64,
@@ -168,6 +212,8 @@ impl RunTable {
         InferenceRunsV1 {
             schema: INFERENCE_RUNS_SCHEMA.into(),
             model: self.model.clone(),
+            session: self.session.clone(),
+            load_error: self.load_error.clone(),
             runs: self.runs.iter().map(|record| record.view.clone()).collect(),
         }
     }
@@ -182,6 +228,13 @@ impl RunTable {
     fn apply(&mut self, update: InferUpdate) {
         match update {
             InferUpdate::Ready { capability } => self.model = Some(capability.model_id),
+            InferUpdate::Session { identity } => {
+                for record in &mut self.runs {
+                    record.view.session = Some(identity.clone());
+                }
+                self.session = Some(identity);
+            },
+            InferUpdate::LoadFailed { error } => self.load_error = Some(error.to_string()),
             InferUpdate::Started { id } => {
                 if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
                     run.state = RunStateV1::Running;
@@ -218,6 +271,7 @@ struct Shared {
     table: Mutex<RunTable>,
     actor: Mutex<Option<ActorHandle<InferCommand>>>,
     bridge: Mutex<Option<JoinHandle<()>>>,
+    max_tokens: usize,
 }
 
 impl Shared {
@@ -240,14 +294,30 @@ impl InferenceLane {
     where
         F: FnOnce() -> Box<dyn InferenceProvider> + Send + 'static,
     {
+        Self::try_open(move || Ok(build()))
+    }
+
+    /// Start a model-backed actor; load failures remain visible on the route.
+    pub fn try_open<F>(build: F) -> Self
+    where
+        F: FnOnce() -> Result<Box<dyn InferenceProvider>, esp::infer::InferError> + Send + 'static,
+    {
+        Self::try_open_with_max_tokens(GenerationRequest::default().max_tokens, build)
+    }
+
+    fn try_open_with_max_tokens<F>(max_tokens: usize, build: F) -> Self
+    where
+        F: FnOnce() -> Result<Box<dyn InferenceProvider>, esp::infer::InferError> + Send + 'static,
+    {
         // The bridge thread blocks on the update channel, so the actor's
         // wake has nothing to do.
         let wake: Wake = Arc::new(|| {});
-        let (actor, updates) = spawn_inference_actor(wake, build);
+        let (actor, updates) = spawn_inference_actor_fallible(wake, build);
         let shared = Arc::new(Shared {
             table: Mutex::new(RunTable::default()),
             actor: Mutex::new(Some(actor)),
             bridge: Mutex::new(None),
+            max_tokens,
         });
         let bridge = std::thread::Builder::new()
             .name("inference-bridge".into())
@@ -289,6 +359,7 @@ impl InferenceLane {
         table.next_actor_id += 1;
         let generation = GenerationRequest {
             prompt: request.question.clone(),
+            max_tokens: self.shared.max_tokens,
             ..GenerationRequest::default()
         };
         if !actor.command(InferCommand::Generate {
@@ -298,6 +369,7 @@ impl InferenceLane {
             return Err(InferenceLaneError::Closed);
         }
         let index = table.runs.len();
+        let session = table.session.clone();
         table.runs.push(RunRecord {
             view: RunV1 {
                 run: request.run,
@@ -305,6 +377,7 @@ impl InferenceLane {
                 state: RunStateV1::Queued,
                 text: String::new(),
                 error: None,
+                session,
             },
             actor_id,
         });
@@ -683,6 +756,28 @@ mod tests {
         assert_eq!(a.state, RunStateV1::Finished);
         assert_eq!(a.text, "because it is so");
         assert_eq!(runs.model.as_deref(), Some("stub/echo"));
+        lane.close().unwrap();
+    }
+
+    #[test]
+    fn a_load_failure_is_visible_and_each_ask_fails() {
+        let lane = InferenceLane::try_open(|| {
+            Err(esp::infer::InferError::InvalidConfig(
+                "missing template".into(),
+            ))
+        });
+        lane.ask(ask("a", "why?")).unwrap();
+        let runs = wait_for(&lane, |runs| run(runs, "a").state.is_terminal());
+        assert!(runs.model.is_none());
+        assert!(runs.session.is_none());
+        assert!(
+            runs.load_error
+                .as_deref()
+                .unwrap()
+                .contains("missing template")
+        );
+        assert_eq!(run(&runs, "a").state, RunStateV1::Failed);
+        assert!(run(&runs, "a").text.is_empty());
         lane.close().unwrap();
     }
 

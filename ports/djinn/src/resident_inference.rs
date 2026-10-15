@@ -38,6 +38,26 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
                 .into(),
         );
     }
+    if let Some(crate::settings::InferenceLaneSettings {
+        model:
+            crate::settings::InferenceModelSettings::Library {
+                row,
+                device,
+                max_tokens,
+            },
+    }) = &owner.inference
+    {
+        if *max_tokens == 0 {
+            return Err("inference.max_tokens must be greater than zero".into());
+        }
+        #[cfg(feature = "inference")]
+        distillery::inference::parse_model_row(row)?;
+        #[cfg(not(feature = "inference"))]
+        let _ = row;
+        if *device == crate::settings::InferenceDeviceSettings::Gpu {
+            return Err("inference.model.library.device gpu is unavailable until I2's resident GPU reclaim gate is implemented and qualified; select cpu".into());
+        }
+    }
     Ok(())
 }
 
@@ -86,11 +106,22 @@ mod lane {
 
     impl ResidentInference {
         /// Start the actor on the model the settings name.
-        pub fn open(settings: &InferenceLaneSettings) -> Self {
-            let lane = match settings.model {
+        pub fn open(
+            settings: &InferenceLaneSettings,
+            library: Option<std::sync::Arc<tokio::sync::Mutex<muniment::RedbBackend>>>,
+        ) -> Self {
+            let lane = match &settings.model {
                 InferenceModelSettings::Stub => {
                     InferenceLane::open(|| Box::new(StubInferenceProvider::new()))
                 },
+                InferenceModelSettings::Library {
+                    row, max_tokens, ..
+                } => distillery::inference::open_library_lane(
+                    library.expect("resident opens the model library first"),
+                    distillery::inference::parse_model_row(row)
+                        .expect("validated before opening lanes"),
+                    *max_tokens,
+                ),
             };
             Self { lane }
         }
@@ -177,5 +208,69 @@ mod tests {
             serde_json::from_str::<OwnerSettings>(r#"{"inference": {"model": "llama-70b"}}"#)
                 .is_err()
         );
+    }
+
+    #[test]
+    fn library_settings_are_explicit_and_refuse_unknown_fields() {
+        let row = format!("blake3:{}", "00".repeat(32));
+        let value = serde_json::json!({"inference": {"model": {"library": {"row": row, "device": "cpu", "max_tokens": 32}}}});
+        let owner: OwnerSettings = serde_json::from_value(value.clone()).unwrap();
+        assert!(matches!(
+            owner.inference.unwrap().model,
+            InferenceModelSettings::Library { max_tokens: 32, .. }
+        ));
+        let mut bad = value.clone();
+        bad["inference"]["model"]["library"]["unknown"] = true.into();
+        assert!(serde_json::from_value::<OwnerSettings>(bad).is_err());
+        for field in ["row", "device", "max_tokens"] {
+            let mut bad = value.clone();
+            bad["inference"]["model"]["library"]
+                .as_object_mut()
+                .unwrap()
+                .remove(field);
+            assert!(
+                serde_json::from_value::<OwnerSettings>(bad).is_err(),
+                "{field} must be stated"
+            );
+        }
+    }
+
+    #[cfg(feature = "inference")]
+    #[test]
+    fn invalid_library_rows_limits_and_gpu_are_refused_before_opening() {
+        use crate::settings::{DistilleryLaneSettings, InferenceDeviceSettings};
+        let mut owner = OwnerSettings {
+            distillery: Some(DistilleryLaneSettings {
+                tick_every_ms: 25,
+                maintenance_every_ms: None,
+                blob_gc_every_ms: 1000,
+                collect_after_checkpoint: true,
+                retention_revision: "00".repeat(32),
+                promised_floor: "forever".into(),
+                privacy_ceiling: "until-checkpoint".into(),
+                erase_terminal_at_checkpoint: true,
+                max_skew_ms: 0,
+                trainer: None,
+            }),
+            ..Default::default()
+        };
+        let set_model = |row: String, device, max_tokens| {
+            Some(InferenceLaneSettings {
+                model: InferenceModelSettings::Library {
+                    row,
+                    device,
+                    max_tokens,
+                },
+            })
+        };
+        owner.inference = set_model("bad".into(), InferenceDeviceSettings::Cpu, 32);
+        assert!(validate(&owner).unwrap_err().contains("model row"));
+        let row = format!("blake3:{}", "00".repeat(32));
+        owner.inference = set_model(row.clone(), InferenceDeviceSettings::Cpu, 0);
+        assert!(validate(&owner).unwrap_err().contains("max_tokens"));
+        owner.inference = set_model(row.clone(), InferenceDeviceSettings::Gpu, 32);
+        assert!(validate(&owner).unwrap_err().contains("GPU reclaim gate"));
+        owner.inference = set_model(row, InferenceDeviceSettings::Cpu, 32);
+        assert!(validate(&owner).is_ok());
     }
 }

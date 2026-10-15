@@ -61,6 +61,7 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 # actor and provider seam, the run table and the `inference.ask` endpoint. No
 # model runtime: the host supplies the provider.
 inference = ["dep:esp", "esp/actor", "dep:armillary"]
+inference-model = ["inference", "esp/decoder", "esp/model-session", "dep:eidetic", "dep:pollster"]
 
 [dev-dependencies]
 notochord = { workspace = true, features = ["tokio"] }
