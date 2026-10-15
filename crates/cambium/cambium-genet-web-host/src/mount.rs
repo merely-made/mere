@@ -147,6 +147,7 @@ where
                 init,
                 hooks,
                 lifetime.clone(),
+                false,
             ))
             .await?
     })
@@ -212,8 +213,24 @@ where
                 init,
                 hooks,
                 lifetime.clone(),
+                false,
             ))
             .await?
+    })
+}
+
+/// Explicit acquired-surface diagnostic mount on an actual Core acquisition.
+/// Same lifetime authority as ordinary mounting; no opt-in leaks to other APIs.
+#[cfg(feature = "current-frame-controls")]
+pub fn mount_with_core_future_and_readback_diagnostics<State,Logic,V>(
+    canvas:HtmlCanvasElement,options:HostOptions,lifetime:MountLifetime,
+    acquire:impl std::future::Future<Output=Result<std::sync::Arc<genet_render_host::RenderCore>,String>> + 'static,
+    init:impl FnOnce(&dyn HostWindow,&cambium_rootstock::WindowCommands,&HostWake)->Init<State,Logic>,
+    hooks:HostHooks<State,Logic,V>,
+) -> std::pin::Pin<Box<impl std::future::Future<Output=Result<Mounted<State,Logic,V>,String>>>>
+where State:'static,Logic:FnMut(&State)->V + 'static,V:RootView<State> {
+    Box::pin(async move {
+        lifetime.startup(mount_inner(canvas,options,Some(Box::pin(acquire)),init,hooks,lifetime.clone(),true)).await?
     })
 }
 
@@ -236,6 +253,7 @@ async fn mount_inner<State, Logic, V>(
     ) -> Init<State, Logic>,
     hooks: HostHooks<State, Logic, V>,
     lifetime: MountLifetime,
+    readback_diagnostics:bool,
 ) -> Result<Mounted<State, Logic, V>, String>
 where
     State: 'static,
@@ -243,7 +261,14 @@ where
     V: RootView<State>,
 {
     lifetime.check()?;
-    let window = WebWindow::new(canvas.clone());
+    #[cfg(feature = "current-frame-controls")]
+    let window=if readback_diagnostics { WebWindow::for_readback_diagnostics(canvas.clone()) }
+        else { WebWindow::new(canvas.clone()) };
+    #[cfg(not(feature = "current-frame-controls"))]
+    let window={
+        if readback_diagnostics { return Err("surface readback diagnostic feature is disabled".into()); }
+        WebWindow::new(canvas.clone())
+    };
     let (width, height) = window.physical_size();
     // The backing store is sized in physical pixels so a fragment lands on a
     // device pixel, the same contract a desktop surface is configured under.
@@ -267,7 +292,7 @@ where
         drop(core);
         return Err(error);
     }
-    let surface = WebSurface::from_core(canvas.clone(), core, width, height)?;
+    let surface = WebSurface::from_core_for_window(canvas.clone(),core,width,height,&window)?;
     lifetime.check()?;
     let label = options.title.clone();
     // The wake flag the host reads, and the signal that gets a frame drawn.
@@ -357,7 +382,10 @@ where
     // Visible mounts paint immediately. Hidden mounts still lay out and publish
     // their accessibility mirror, without advancing texture producers.
     lifetime.check()?;
-    draw(&mut host.borrow_mut());
+    draw(&mut host.borrow_mut(), &window);
+    let retired = host.borrow_mut().take_browser_retirements();
+    drop(retired);
+    host.borrow_mut().flush_browser_redraw();
     lifetime.check()?;
 
     install_listeners(&canvas, &mirror, &host, &window, &lifetime)?;
@@ -428,6 +456,7 @@ where
             window.canvas().set_width(size.0);
             window.canvas().set_height(size.1);
             let mut h = host.borrow_mut();
+            h.invalidate_browser_frame();
             if let Some(surface) = h.s.surface.as_mut() {
                 surface.resize(size.0, size.1);
             }
@@ -435,9 +464,16 @@ where
             h.relayout(lw, lh);
             window.request_redraw();
         }
-        if !host.borrow().s.hidden && window.take_pending_frame() {
-            draw_at(&mut host.borrow_mut(), timestamp_ms);
+        // A hidden owed flag stays owed without making every RAF perform
+        // layout/a11y work. set_hidden cancels its submitted frame; any
+        // remaining retirement gets its one turn and drains below regardless.
+        let requested = !host.borrow().s.hidden && window.take_pending_frame();
+        if requested || host.borrow().has_pending_browser_frame() {
+            draw_at(&mut host.borrow_mut(), &window, timestamp_ms, requested);
         }
+        let retired = host.borrow_mut().take_browser_retirements();
+        drop(retired);
+        host.borrow_mut().flush_browser_redraw();
         if let Some(browser) = web_sys::window()
             && let Some(callback) = frame.borrow().as_ref()
         {
@@ -461,7 +497,7 @@ where
 }
 
 /// Draw a frame and mirror it for a reader.
-fn draw<State, Logic, V>(host: &mut Host<State, Logic, V>)
+fn draw<State, Logic, V>(host: &mut Host<State, Logic, V>, window: &WebWindow)
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
@@ -470,16 +506,20 @@ where
     let timestamp_ms = web_sys::window()
         .and_then(|w| w.performance())
         .map_or(0.0, |performance| performance.now());
-    draw_at(host, timestamp_ms);
+    draw_at(host, window, timestamp_ms, window.take_pending_frame());
 }
 
-fn draw_at<State, Logic, V>(host: &mut Host<State, Logic, V>, timestamp_ms: f64)
+fn draw_at<State, Logic, V>(host: &mut Host<State, Logic, V>, window: &WebWindow, timestamp_ms: f64, requested: bool)
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    let was_pending = host.has_pending_browser_frame();
+    if requested && was_pending { host.defer_browser_redraw(); }
     if host.s.hidden {
+        // A hidden turn cannot satisfy a fresh preparation request.
+        if requested { window.request_redraw(); }
         let (width, height) = host.logical_size();
         host.relayout(width, height);
         host.sync_a11y();
@@ -487,14 +527,23 @@ where
     }
     let timestamp =
         std::time::Duration::try_from_secs_f64(timestamp_ms / 1000.0).unwrap_or_default();
-    host.redraw_at(timestamp);
-    host.sync_a11y();
-    host.with_ctx(cambium_rootstock::Hook::AfterFrame);
+    let progress = host.redraw_browser_turn(Some(timestamp));
+    if !was_pending && host.has_submitted_browser_frame() {
+        // The synchronous preparation just consumed its triggering request,
+        // including redraws from its own hooks/layout. No browser event can
+        // interleave in this turn. Requests set on later turns are preserved
+        // as exactly one follow-up; do not restore this initial sticky flag.
+        let _ = window.take_pending_frame();
+    }
+    if matches!(progress,cambium_rootstock::BrowserFrameProgress::Presented) {
+        host.sync_a11y();
+        host.with_ctx(cambium_rootstock::Hook::AfterFrame);
+    }
 }
 
 /// Carry out what a reader asked of a mirror element, and draw the result
 /// before returning, so the reader hears it without waiting on a frame.
-fn reader_act<State, Logic, V>(host: &Rc<RefCell<Host<State, Logic, V>>>, request: A11yRequest)
+fn reader_act<State, Logic, V>(host: &Rc<RefCell<Host<State, Logic, V>>>, window: &WebWindow, request: A11yRequest)
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
@@ -502,7 +551,7 @@ where
 {
     let mut host = host.borrow_mut();
     host.apply_a11y_requests(&[request]);
-    draw(&mut host);
+    draw(&mut host, window);
 }
 
 /// A key, from the canvas or from a mirror element a reader focused.
@@ -764,6 +813,7 @@ where
     // reader's focus on one focuses it.
     let h = host.clone();
     let m = mirror.clone();
+    let reader_window = window.clone();
     listen!(
         root,
         "click",
@@ -771,12 +821,13 @@ where
         move |e: web_sys::MouseEvent| {
             if let Some(target) = m.request_target_of(e.target()) {
                 let action = A11yAction::Click;
-                reader_act(&h, A11yRequest { action, target });
+                reader_act(&h, &reader_window, A11yRequest { action, target });
             }
         }
     );
     let h = host.clone();
     let m = mirror.clone();
+    let reader_window = window.clone();
     // Following host focus can synchronously emit another focusin. The guard
     // below answers that nested event; an FnMut trampoline refuses it before
     // the guard can run.
@@ -792,7 +843,7 @@ where
             }
             if let Some(target) = m.request_target_of(e.target()) {
                 let action = A11yAction::Focus;
-                reader_act(&h, A11yRequest { action, target });
+                reader_act(&h, &reader_window, A11yRequest { action, target });
             }
         });
     let callback = focus_listener.as_ref().clone();

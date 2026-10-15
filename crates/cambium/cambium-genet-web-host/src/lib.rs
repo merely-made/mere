@@ -114,6 +114,8 @@ pub use mount::{
     Mounted, mount, mount_with_core_future_and_lifetime, mount_with_lifetime,
     mount_with_render_core, mount_with_render_core_and_lifetime,
 };
+#[cfg(all(target_arch = "wasm32", feature = "current-frame-controls"))]
+pub use mount::mount_with_core_future_and_readback_diagnostics;
 #[cfg(target_arch = "wasm32")]
 pub use start::run_static_constructors_once;
 #[cfg(target_arch = "wasm32")]

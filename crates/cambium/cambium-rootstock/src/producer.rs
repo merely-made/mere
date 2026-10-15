@@ -127,6 +127,46 @@ pub trait TextureProducer {
         Ok(self.render(cx))
     }
 
+    /// Prepare a private candidate without changing accepted cache/generation.
+    /// The complete host frame owns Core scopes and shader-counter attribution.
+    /// A legacy producer cannot promise deferred publication: refuse explicitly.
+    fn prepare_checked(
+        &mut self,
+        _cx: &ProducerContext<'_>,
+        #[cfg(target_arch = "wasm32")] _commands: &genet_render_host::BrowserFrameCommands<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        Err(staged_producer_refusal("producer does not support deferred frame acceptance"))
+    }
+
+    /// Recheck source identity/revision before any image/stamp publication.
+    fn supports_deferred_acceptance(&self) -> bool { false }
+
+    fn prepared_is_current(&self) -> bool { false }
+
+    /// Invoked only after full plan preflight and accepted-frame verification,
+    /// on one synchronous turn. No GPU work or application callback is allowed.
+    fn commit_prepared(&mut self) {}
+
+    /// Commit without dropping displaced GPU handles under Host RefMut.
+    /// Deferred producers with accepted GPU caches must transfer old handles
+    /// in this return value; the adapter drops them outside the host borrow.
+    fn commit_prepared_retiring(&mut self) -> Option<Box<dyn std::any::Any>> {
+        self.commit_prepared(); None
+    }
+
+    /// Release provisional GPU handles without changing accepted state.
+    fn abort_prepared(&mut self) {}
+
+    /// Transfer provisional GPU resources to cleanup outside Host RefMut.
+    /// An opt-in producer must override this when aborting releases GPU handles.
+    fn take_prepared(&mut self) -> Option<Box<dyn std::any::Any>> {
+        self.abort_prepared(); None
+    }
+
+    fn take_suspended_resources(&mut self) -> Option<Box<dyn std::any::Any>> {
+        self.suspend(); None
+    }
+
     /// Export the currently bound application scene without acquiring a device.
     /// GPU-only producers explicitly refuse; a capture never substitutes pixels
     /// or removes their authored external-texture command.
@@ -163,6 +203,15 @@ pub trait TextureProducer {
         let _ = (key, id);
         false
     }
+}
+
+pub(crate) fn staged_producer_refusal(message: &str) -> genet_render_host::RasterizeFailure {
+    genet_render_host::RasterizeFailure::ProviderError(std::sync::Arc::new(
+        netrender::VelloError::WgpuErrorFromScope(wgpu::Error::Internal {
+            source: Box::new(std::io::Error::other(message.to_owned())),
+            description: message.to_owned(),
+        }),
+    ))
 }
 
 /// A producer's accessible description of its slot. See
@@ -253,6 +302,26 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
         self.borrow_mut().render_checked(cx)
     }
+    fn prepare_checked(
+        &mut self, cx: &ProducerContext<'_>,
+        #[cfg(target_arch = "wasm32")] commands: &genet_render_host::BrowserFrameCommands<'_>,
+    ) -> Result<Option<ProducedTexture>, genet_render_host::RasterizeFailure> {
+        #[cfg(not(target_arch = "wasm32"))]
+        { self.borrow_mut().prepare_checked(cx) }
+        #[cfg(target_arch = "wasm32")]
+        { self.borrow_mut().prepare_checked(cx, commands) }
+    }
+    fn supports_deferred_acceptance(&self) -> bool { self.borrow().supports_deferred_acceptance() }
+    fn prepared_is_current(&self) -> bool { self.borrow().prepared_is_current() }
+    fn commit_prepared(&mut self) { self.borrow_mut().commit_prepared(); }
+    fn commit_prepared_retiring(&mut self) -> Option<Box<dyn std::any::Any>> {
+        self.borrow_mut().commit_prepared_retiring()
+    }
+    fn abort_prepared(&mut self) { self.borrow_mut().abort_prepared(); }
+    fn take_prepared(&mut self) -> Option<Box<dyn std::any::Any>> { self.borrow_mut().take_prepared() }
+    fn take_suspended_resources(&mut self) -> Option<Box<dyn std::any::Any>> {
+        self.borrow_mut().take_suspended_resources()
+    }
     fn portable_scene(
         &mut self,
         frame: &ProducerFrameInfo,
@@ -311,3 +380,68 @@ pub struct ProducerFrameStats {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod deferred_handle_controls {
+    use super::*;
+    use std::cell::Cell;
+
+    struct Resource { drops: Rc<Cell<usize>> }
+    impl Drop for Resource { fn drop(&mut self) { self.drops.set(self.drops.get() + 1); } }
+    struct OptIn {
+        accepted: u64,
+        candidate: Option<(u64, Resource)>,
+        retired: Option<Resource>,
+    }
+    impl TextureProducer for OptIn {
+        fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+            panic!("deferred control must never use legacy render")
+        }
+        fn supports_deferred_acceptance(&self) -> bool { true }
+        fn prepared_is_current(&self) -> bool { self.candidate.is_some() }
+        fn commit_prepared_retiring(&mut self) -> Option<Box<dyn std::any::Any>> {
+            let (revision, resource) = self.candidate.take().expect("actual control candidate");
+            self.accepted = revision;
+            self.retired.replace(resource).map(|old| Box::new(old) as Box<dyn std::any::Any>)
+        }
+        fn take_prepared(&mut self) -> Option<Box<dyn std::any::Any>> {
+            self.candidate.take().map(|candidate| Box::new(candidate) as Box<dyn std::any::Any>)
+        }
+        fn take_suspended_resources(&mut self) -> Option<Box<dyn std::any::Any>> {
+            Some(Box::new((self.candidate.take(),self.retired.take())))
+        }
+    }
+    #[test]
+    fn shared_producer_handle_cancel_preserves_accepted_revision_and_transfers_cleanup() {
+        let drops = Rc::new(Cell::new(0));
+        let source = Rc::new(RefCell::new(OptIn {
+            accepted:7,candidate:Some((8,Resource { drops:drops.clone() })),retired:None,
+        }));
+        let mut registered = source.clone();
+        assert!(registered.supports_deferred_acceptance());
+        assert!(registered.prepared_is_current());
+        let cleanup = registered.take_prepared().expect("candidate transferred through registered Rc");
+        assert_eq!(source.borrow().accepted,7);
+        assert!(!registered.prepared_is_current());
+        assert_eq!(drops.get(),0);
+        // The registered source is no longer borrowed when actual cleanup runs.
+        let borrow = source.try_borrow_mut().expect("no retained producer borrow");
+        drop(borrow); drop(cleanup);
+        assert_eq!(drops.get(),1);
+    }
+    #[test]
+    fn shared_producer_handle_commit_and_suspend_retire_each_resource_once() {
+        let drops = Rc::new(Cell::new(0));
+        let source = Rc::new(RefCell::new(OptIn {
+            accepted:7,candidate:Some((8,Resource { drops:drops.clone() })),
+            retired:Some(Resource { drops:drops.clone() }),
+        }));
+        let mut registered = source.clone();
+        let old = registered.commit_prepared_retiring().expect("old accepted resource transferred");
+        assert_eq!(source.borrow().accepted,8);
+        assert_eq!(drops.get(),0); drop(old); assert_eq!(drops.get(),1);
+        let suspended = registered.take_suspended_resources().expect("accepted source resource transferred");
+        assert_eq!(drops.get(),1); drop(suspended); assert_eq!(drops.get(),2);
+        drop(registered); drop(source); assert_eq!(drops.get(),2);
+    }
+}

@@ -468,9 +468,13 @@ where
         router.forget(id);
         let dom = self.dom.borrow();
         let renderer = self.shared.render_core.as_ref().map(|core| core.renderer());
+        #[cfg(not(target_arch = "wasm32"))]
+        let renderer_ref = renderer;
+        #[cfg(target_arch = "wasm32")]
+        let renderer_ref = renderer.as_deref();
         self.shared.producers.retire_orphans(
             |node| crate::window_dom::ancestor_or_self(&dom, node, dom.document()),
-            renderer,
+            renderer_ref,
         );
         drop(dom);
         self.windows.get_mut(id.0).and_then(Option::take)

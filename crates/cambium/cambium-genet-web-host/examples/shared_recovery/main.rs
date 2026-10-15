@@ -40,6 +40,28 @@ use wasm_bindgen::{JsCast, prelude::*};
 use wasm_bindgen_futures::JsFuture;
 use web_sys::HtmlCanvasElement;
 
+#[cfg(feature = "current-frame-controls")]
+mod quality_controls;
+
+#[cfg(feature = "current-frame-controls")]
+mod acquired_controls;
+
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub async fn run_current_frame_quality(first_canvas:String, second_canvas:String, run:String) -> Result<JsValue,JsValue> {
+    if USED.with(|u| u.replace(true)) { return Err(JsValue::from_str("fixture is one-shot")); }
+    if run.is_empty() || run.len() > 128 { return Err(JsValue::from_str("bounded run identifier required")); }
+    match quality_controls::execute(&first_canvas,&second_canvas,&run).await {
+        Ok(receipt) => { STATUS.with(|s| *s.borrow_mut()=receipt.clone()); js_sys::JSON::parse(&receipt.to_string()) },
+        Err(error) => {
+            let cleanup = dispose_lifetimes().await;
+            let receipt = json!({"status":"fail","run":run,"error":error,"cleanup":format!("{cleanup:?}"),
+                "current_frame_async_quality_qualified":false,"current_frame_async_error_scopes_qualified":false});
+            STATUS.with(|s| *s.borrow_mut()=receipt.clone()); Err(JsValue::from_str(&receipt.to_string()))
+        },
+    }
+}
+
 type Logic = Box<dyn FnMut(&WorkshopState) -> WorkshopView>;
 type Application = Host<WorkshopState, Logic, WorkshopView>;
 type BrowserMount = Mounted<WorkshopState, Logic, WorkshopView>;
@@ -610,16 +632,9 @@ async fn sources(mount: &BrowserMount, index: usize) -> Result<Vec<Capture>, Str
             0,
             NO_CLIP,
         );
-        let (texture, view) = core
-            .try_rasterize_scaled_for(
-                0x6272_6f77_7365_7200 + (index * 2 + slot) as u64,
-                &scene,
-                w,
-                h,
-                ColorLoad::Clear(wgpu::Color::TRANSPARENT),
-                1.,
-            )
-            .map_err(|e| format!("complete producer sample refused: {e:?}"))?;
+        let (texture, view) = owned_raster(&core,
+            0x6272_6f77_7365_7200 + (index * 2 + slot) as u64,&scene,w,h,
+            ColorLoad::Clear(wgpu::Color::TRANSPARENT),1.).await?;
         let started = now()?;
         let pending = core.start_rgba8_readback(&texture, w, h)?;
         drop(view);
@@ -636,6 +651,27 @@ async fn sources(mount: &BrowserMount, index: usize) -> Result<Vec<Capture>, Str
     }
     Ok(captures)
 }
+// Source sampling participates in the same actual FIFO/scope owner as hosts;
+// legacy synchronous Wasm raster cannot establish this attribution boundary.
+async fn owned_raster(core:&Arc<RenderCore>, key:u64, scene:&Scene, width:u32,height:u32,
+    clear:ColorLoad,scale:f32) -> Result<(wgpu::Texture,wgpu::TextureView),String> {
+    let mut submission = None;
+    wait(|| match core.try_begin_browser_frame() {
+        Ok(frame) => { submission=Some(frame); Ok(true) },
+        Err(genet_render_host::BrowserFrameStartError::Busy) => Ok(false),
+        Err(error) => Err(format!("owned source admission: {error:?}")),
+    }).await?;
+    let mut submission=submission.ok_or("owned source admission absent")?;
+    let output=submission.submit(|commands| commands.rasterize_scaled_for(key,scene,width,height,clear,scale));
+    let mut pending=submission.seal().map_err(|e|format!("owned source seal: {e:?}"))?;
+    let mut accepted=None;
+    wait(|| if let Some(result)=pending.poll() { accepted=Some(result); Ok(true) } else { Ok(false) }).await?;
+    let accepted=accepted.ok_or("owned source completion absent")?.map_err(|e|format!("owned source quality: {e:?}"))?;
+    accepted.check_current().map_err(|e|format!("owned source acceptance stale: {e:?}"))?;
+    drop(accepted);
+    output.map_err(|e|format!("owned source raster refused: {e:?}"))
+}
+
 fn adapter_identity(core: &RenderCore) -> Value {
     let info = core.renderer().wgpu_device.core.adapter.get_info();
     json!({"name":info.name,"backend":format!("{:?}",info.backend),
@@ -1259,4 +1295,64 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
         "scope":"explicit Device.destroy of the fixture-exclusive replacement group after completed mount disposal; excludes physical driver reset"
     });
     Ok(receipt)
+}
+
+// Explicit diagnostic entrypoint, separate from root/reference-only gates.
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub async fn run_acquired_surface_recovery(first_canvas:String,second_canvas:String,run:String)->Result<JsValue,JsValue>{
+    if USED.with(|u|u.replace(true)){return Err(JsValue::from_str("fixture is one-shot"))}
+    if run.is_empty() || run.len()>128{return Err(JsValue::from_str("bounded run identifier required"))}
+    let result=acquired_controls::execute_recovery(&first_canvas,&second_canvas,&run).await;
+    match result {
+        Ok(receipt)=>{STATUS.with(|s|*s.borrow_mut()=receipt.clone());js_sys::JSON::parse(&receipt.to_string())},
+        Err(error)=>{let cleanup=dispose_lifetimes().await;let remaining=acquired_controls::clear();
+            let receipt=json!({"status":"fail","run":run,"error":error,"cleanup":format!("{cleanup:?}"),"remaining_capture_budget_bytes":remaining});
+            STATUS.with(|s|*s.borrow_mut()=receipt.clone());Err(JsValue::from_str(&receipt.to_string()))}
+    }
+}
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub fn capture_acquired_rgba(name:String)->Result<js_sys::Uint8Array,JsValue>{
+    acquired_controls::export(&name).map_err(|e|JsValue::from_str(&e))
+}
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub fn admit_acquired_comparison(first:String,second:String)->Result<(),JsValue>{
+    acquired_controls::compare_admission(&first,&second).map_err(|e|JsValue::from_str(&e))
+}
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub fn release_acquired_work(){acquired_controls::release_work()}
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub fn clear_acquired_artifacts()->u64{acquired_controls::clear()}
+
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub async fn run_acquired_surface_lifetime(first_canvas:String,second_canvas:String,run:String)->Result<JsValue,JsValue>{
+    if USED.with(|u|u.replace(true)){return Err(JsValue::from_str("fixture is one-shot"))}
+    if run.is_empty()||run.len()>128{return Err(JsValue::from_str("bounded run identifier required"))}
+    finish_acquired_batch(acquired_controls::execute_lifetime(&first_canvas,&second_canvas,&run).await,&run).await
+}
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub async fn run_acquired_surface_faults(first_canvas:String,second_canvas:String,run:String)->Result<JsValue,JsValue>{
+    if USED.with(|u|u.replace(true)){return Err(JsValue::from_str("fixture is one-shot"))}
+    if run.is_empty()||run.len()>128{return Err(JsValue::from_str("bounded run identifier required"))}
+    finish_acquired_batch(acquired_controls::execute_faults(&first_canvas,&second_canvas,&run).await,&run).await
+}
+#[cfg(feature = "current-frame-controls")]
+async fn finish_acquired_batch(result:Result<Value,String>,run:&str)->Result<JsValue,JsValue>{
+    match result {Ok(receipt)=>{STATUS.with(|s|*s.borrow_mut()=receipt.clone());js_sys::JSON::parse(&receipt.to_string())},
+        Err(error)=>{let cleanup=dispose_lifetimes().await;let remaining=acquired_controls::clear();let receipt=json!({"status":"fail","run":run,"error":error,
+            "cleanup":format!("{cleanup:?}"),"remaining_capture_budget_bytes":remaining});STATUS.with(|s|*s.borrow_mut()=receipt.clone());Err(JsValue::from_str(&receipt.to_string()))}}
+}
+
+#[cfg(feature = "current-frame-controls")]
+#[wasm_bindgen]
+pub async fn run_acquired_surface_lost(first_canvas:String,second_canvas:String,run:String)->Result<JsValue,JsValue>{
+    if USED.with(|u|u.replace(true)){return Err(JsValue::from_str("fixture is one-shot"))}
+    if run.is_empty()||run.len()>128{return Err(JsValue::from_str("bounded run identifier required"))}
+    finish_acquired_batch(acquired_controls::execute_lost(&first_canvas,&second_canvas,&run).await,&run).await
 }
