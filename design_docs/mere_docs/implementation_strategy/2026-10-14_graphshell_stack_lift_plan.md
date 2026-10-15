@@ -1,9 +1,12 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-15):** plan; nothing moved. The census below was read from
-the source at `0aade8668` and corrects the first pass in several places
-(§2). Mark ruled R1 to R7 and the `Page` split on 2026-10-15 (§5). No code,
-manifest or other plan changed with this document.
+**Status (2026-10-15):** in progress. P2a's code landed: `mere-overmap`
+holds the remote overmap client (L14); its Turnstone receipt and the Djinn
+route registration it needs are open, with the transport design in the
+[transport agnosticism note](../technical_architecture/2026-10-15_transport_agnosticism_note.md).
+Nothing else has moved. The census below was read from the source at
+`0aade8668` and corrects the first pass in several places (§2). Mark ruled R1
+to R8 and the `Page` split on 2026-10-15 (§5).
 
 **Origin.** Mark noticed that the Graphshell reference host is about 100k
 lines and asked what could be generalized into the stack. Knot, Cleromancy
@@ -306,7 +309,9 @@ through `native::resident_mere_proxy` over the WebRTC door
 device directory, status and reservoir routes in its shared catalog, and
 this plan found no mere-route registration on a carrier a remote device can
 dial. That registration is Djinn-side work that the receipt needs, and it is
-a P5-adjacent step, not part of L14.
+a P5-adjacent step, not part of L14. The [transport agnosticism note](../technical_architecture/2026-10-15_transport_agnosticism_note.md)
+designs it: besides the registration, a dialled session has no application
+identity today, and `AccessEndpoint::open` refuses one without it.
 
 ### Group 4: product truth
 
@@ -465,6 +470,9 @@ remote mere through it, over a session Turnstone admitted itself, and shows
 sessions and graph. Turnstone's own `overmap.rs` keeps the local case.
 Registering a mere route on a carrier a remote device can dial is the Djinn
 step the receipt needs, and is recorded here if it lands first.
+*Landed 2026-10-15:* the crate, the split, the moved tests and both
+importers (Progress). *Open:* the Turnstone receipt, which waits on the
+transport note's rulings T4, T5 and T7 and a native stream-to-lines pump.
 
 **P3. L4 and L4c.** Option helpers into `scenomise`; Knot's copies deleted;
 host recipes go to their domains.
@@ -631,3 +639,29 @@ fast-forward of local main; nothing built).**
 - **2026-10-15 (later):** R8: Castellan moves to `ports/djinn/castellan` as
   a component crate. The R4 note that Castellan keeps a credential UI is
   withdrawn; Castellan has none.
+- **2026-10-15 (P2a, L14):** `crates/cambium/mere-overmap` landed. `wire`
+  holds `session_item`'s wire half (route names, intents, schemas,
+  `SessionGraphV1`, `SetViewV1`, `ApplyEditsV1`, `StepV1`, `SessionsActionV1`,
+  `ArchiveActionV1`, `archive_action`, and `advertised`, the action shape the
+  builders share); `route` and `route_session` are `mere_route` and
+  `mere_route_session`, behind the default `view` feature. Without `view` the
+  crate is the wire alone (chirograph, kernel, pandect, scenotime, serde), so
+  Graphshell's `web` feature takes it without the view's Cambium cone; with
+  it, it adds `mere-view`, `graphshell-client`, `cartography` (the graph
+  adapter id, which `mere::canvas` re-exported), `sceno` and `uuid`.
+  `session_item` keeps `card`, `actions` and its docs, for `mere_host`.
+  Graphshell's `mere-route` feature is removed: `mere-view-host` names
+  `mere-overmap/view`, `graphshell-web`'s `remote` takes `mere-overmap`
+  directly, and Djinn's `custody-receipt-host` needs nothing extra. One change
+  beyond the move: `MereRouteSession::from_descriptor` takes the application
+  it reads as, because the panel had `graphshell` and `graphshell.mere`
+  hard-coded and a second host must read its own view state; Graphshell's
+  callers pass `"graphshell"`. Checks: `mere-overmap` builds with and without
+  `view` and has no `graphshell` in its tree; its two `route_session` tests
+  pass; Djinn's `resident_mere` (16), `embedded_reservoir_validation`,
+  `embedded_reservoir_two_process` and `mere_two_process` pass;
+  `graphshell` `mere_host` tests (12) pass; `graphshell_mere` and
+  `graphshell-web` (wasm32) build; the boundary script passes.
+  `mere_two_process` fails on macOS when `TMPDIR` makes its socket path longer
+  than 104 bytes (it passes with a short `TMPDIR`); that predates this change.
+  Open: the Turnstone receipt and the Djinn registration (P2a).
