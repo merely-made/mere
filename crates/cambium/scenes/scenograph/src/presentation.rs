@@ -11,14 +11,15 @@
 //! Effects never mutate source authority, coordinates, pins or selection.
 //! The host fills the existing `sceno::Representation` slots, implements relation
 //! forms and overlays, and keeps hysteresis matches per view and occurrence.
-//! Conditions are declarative, plus `Condition::Script` (SE92): a script run
-//! through the `ValueEngine` contract, which this module depends on and rhai
-//! implements elsewhere.
+//! Conditions are declarative, plus `Condition::Script` (SE92). The condition
+//! is data and always present, so a rule set with a script validates and
+//! round-trips in any host. Running one needs the `scripts` feature, which adds
+//! the `ValueEngine` contract (Genet's `script-engine-api`) and
+//! `RuleSet::resolve_with_scripts`; without it `resolve` refuses such a set.
 
 use std::collections::{BTreeMap, BTreeSet};
 
 use sceno::Representation;
-use script_engine_api::{Budget, ScriptValue, ValueEngine, ValueError};
 use serde::{Deserialize, Serialize};
 
 pub const PRESENTATION_RULE_VERSION: u16 = 1;
@@ -26,8 +27,28 @@ const MAX_RULES: usize = 256;
 const MAX_CONDITIONS: usize = 256;
 const MAX_DEPTH: usize = 32;
 const MAX_SCRIPT_BYTES: usize = 4096;
-/// The budget one script condition runs under, in the engine's own steps.
-pub const SCRIPT_STEP_BUDGET: u64 = 100_000;
+
+#[cfg(feature = "scripts")]
+mod scripts;
+#[cfg(feature = "scripts")]
+pub use scripts::SCRIPT_STEP_BUDGET;
+
+/// Without the `scripts` feature there is no engine to run: the same entry
+/// points as `scripts.rs`, doing nothing.
+#[cfg(not(feature = "scripts"))]
+mod scripts {
+    use super::Context;
+
+    pub(super) type Engine<'a> = Option<&'a mut ()>;
+
+    pub(super) fn bind(_: &mut Engine<'_>, _: &Context, _: bool) -> Result<(), String> {
+        Ok(())
+    }
+
+    pub(super) fn run(_: &str, _: &mut Engine<'_>) -> (bool, String) {
+        (false, "script: no script engine".into())
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -143,11 +164,11 @@ pub enum Condition {
     Not {
         condition: Box<Condition>,
     },
-    /// A script that returns a bool (Scenograph editor plan, SE92). It runs
-    /// through a [`ValueEngine`] under [`SCRIPT_STEP_BUDGET`] and sees only the
-    /// globals listed on [`RuleSet::resolve_with_scripts`]. A script that fails,
-    /// runs past its budget or returns anything else leaves its rule unmatched,
-    /// with the reason in the trace.
+    /// A script that returns a bool (Scenograph editor plan, SE92). With the
+    /// `scripts` feature it runs through a `ValueEngine` under a fixed step
+    /// budget and sees only the globals listed on `RuleSet::resolve_with_scripts`.
+    /// A script that fails, runs past its budget or returns anything else leaves
+    /// its rule unmatched, with the reason in the trace.
     Script {
         source: String,
     },
@@ -354,33 +375,19 @@ impl RuleSet {
     }
 
     /// Resolve with no script engine. A set that carries a script condition is
-    /// refused: use [`resolve_with_scripts`](Self::resolve_with_scripts).
+    /// refused; the `scripts` feature adds `resolve_with_scripts`.
     pub fn resolve(&self, context: &Context) -> Result<Resolution, Vec<Issue>> {
         self.resolve_inner(context, None)
-    }
-
-    /// Resolve with script conditions run on `engine` (SE92). Before each
-    /// script rule the engine's globals are set to the occurrence:
-    /// `id` and `kind` (text), `facts` (a map; numbers are floats), `states`
-    /// (a list of names), `screen_size` (a float, or unit when unmeasured) and
-    /// `previously_matched` (a bool, for a script's own hysteresis). What a
-    /// script may call is whatever the host registered on `engine`.
-    pub fn resolve_with_scripts(
-        &self,
-        context: &Context,
-        engine: &mut dyn ValueEngine,
-    ) -> Result<Resolution, Vec<Issue>> {
-        self.resolve_inner(context, Some(engine))
     }
 
     fn resolve_inner(
         &self,
         context: &Context,
-        mut scripts: Option<&mut dyn ValueEngine>,
+        mut engine: scripts::Engine<'_>,
     ) -> Result<Resolution, Vec<Issue>> {
         self.validate()?;
         let mut issues = Vec::new();
-        if scripts.is_none() {
+        if engine.is_none() {
             for (index, rule) in self.rules.iter().enumerate() {
                 if contains_script(&rule.condition) {
                     issue(
@@ -430,14 +437,13 @@ impl RuleSet {
                 (false, "target does not include this occurrence".into())
             } else {
                 let previously_matched = context.previous_matches.contains(&rule.id);
-                let bound = match scripts.as_deref_mut() {
-                    Some(engine) if contains_script(&rule.condition) => {
-                        bind_globals(engine, context, previously_matched)
-                    },
-                    _ => Ok(()),
+                let bound = if contains_script(&rule.condition) {
+                    scripts::bind(&mut engine, context, previously_matched)
+                } else {
+                    Ok(())
                 };
                 match bound {
-                    Ok(()) => evaluate(&rule.condition, context, previously_matched, &mut scripts),
+                    Ok(()) => evaluate(&rule.condition, context, previously_matched, &mut engine),
                     Err(error) => (
                         false,
                         format!("script: could not bind the occurrence: {error}"),
@@ -576,7 +582,7 @@ fn evaluate(
     condition: &Condition,
     context: &Context,
     previously_matched: bool,
-    scripts: &mut Option<&mut dyn ValueEngine>,
+    engine: &mut scripts::Engine<'_>,
 ) -> (bool, String) {
     match condition {
         Condition::Always => (true, "always".into()),
@@ -646,7 +652,7 @@ fn evaluate(
         Condition::All { conditions } | Condition::Any { conditions } => {
             let results: Vec<_> = conditions
                 .iter()
-                .map(|child| evaluate(child, context, previously_matched, scripts))
+                .map(|child| evaluate(child, context, previously_matched, engine))
                 .collect();
             let all = matches!(condition, Condition::All { .. });
             let matched = if all {
@@ -668,20 +674,10 @@ fn evaluate(
             )
         },
         Condition::Not { condition } => {
-            let (matched, reason) = evaluate(condition, context, previously_matched, scripts);
+            let (matched, reason) = evaluate(condition, context, previously_matched, engine);
             (!matched, format!("not: {reason}"))
         },
-        Condition::Script { source } => match scripts {
-            None => (false, "script: no script engine".into()),
-            Some(engine) => match engine.eval(source, Budget::Steps(SCRIPT_STEP_BUDGET)) {
-                Ok(ScriptValue::Bool(matched)) => (matched, format!("script: {matched}")),
-                Ok(other) => (
-                    false,
-                    format!("script: returned {}, wanted a bool", other.kind()),
-                ),
-                Err(error) => (false, format!("script: {error}")),
-            },
-        },
+        Condition::Script { source } => scripts::run(source, engine),
     }
 }
 
@@ -696,58 +692,11 @@ fn contains_script(condition: &Condition) -> bool {
     }
 }
 
-/// The occurrence as a script sees it. Facts keep their types; states are the
-/// snake_case names `ViewState` serializes to.
-fn bind_globals(
-    engine: &mut dyn ValueEngine,
-    context: &Context,
-    previously_matched: bool,
-) -> Result<(), ValueError> {
-    let scalar = |value: &Scalar| match value {
-        Scalar::Bool(value) => ScriptValue::Bool(*value),
-        Scalar::Number(value) => ScriptValue::Float(*value),
-        Scalar::Text(value) => ScriptValue::Str(value.clone()),
-    };
-    let text = |value: &str| ScriptValue::Str(value.to_string());
-    let kind = serde_json::to_value(context.kind)
-        .ok()
-        .and_then(|value| value.as_str().map(str::to_owned))
-        .unwrap_or_default();
-    engine.set_global("id", text(&context.id))?;
-    engine.set_global("kind", text(&kind))?;
-    engine.set_global(
-        "facts",
-        ScriptValue::Map(
-            context
-                .facts
-                .iter()
-                .map(|(name, value)| (name.clone(), scalar(value)))
-                .collect(),
-        ),
-    )?;
-    engine.set_global(
-        "states",
-        ScriptValue::List(
-            context
-                .states
-                .iter()
-                .filter_map(|state| serde_json::to_value(state).ok())
-                .filter_map(|value| value.as_str().map(|name| text(name)))
-                .collect(),
-        ),
-    )?;
-    engine.set_global(
-        "screen_size",
-        context
-            .screen_size
-            .map_or(ScriptValue::Unit, ScriptValue::Float),
-    )?;
-    engine.set_global("previously_matched", ScriptValue::Bool(previously_matched))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "scripts")]
+    use script_engine_api::{Budget, HostFunction, ScriptValue, ValueEngine, ValueError};
 
     fn context(id: &str) -> Context {
         Context {
@@ -965,6 +914,7 @@ mod tests {
 
     /// A scripted stand-in for an engine: the source names the outcome, and the
     /// globals and budgets it was given are kept for inspection.
+    #[cfg(feature = "scripts")]
     #[derive(Default)]
     struct Scripted {
         globals: BTreeMap<String, ScriptValue>,
@@ -972,17 +922,13 @@ mod tests {
         sources: Vec<String>,
     }
 
+    #[cfg(feature = "scripts")]
     impl ValueEngine for Scripted {
         fn set_global(&mut self, name: &str, value: ScriptValue) -> Result<(), ValueError> {
             self.globals.insert(name.into(), value);
             Ok(())
         }
-        fn register(
-            &mut self,
-            _: &str,
-            _: usize,
-            _: script_engine_api::HostFunction,
-        ) -> Result<(), ValueError> {
+        fn register(&mut self, _: &str, _: usize, _: HostFunction) -> Result<(), ValueError> {
             Ok(())
         }
         fn eval(&mut self, source: &str, budget: Budget) -> Result<ScriptValue, ValueError> {
@@ -1009,6 +955,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "scripts")]
     #[test]
     fn a_script_condition_wins_by_the_same_precedence_as_any_other() {
         let set = rules(vec![
@@ -1037,6 +984,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "scripts")]
     #[test]
     fn the_script_sees_the_occurrence() {
         let mut item = context("node-7");
@@ -1083,6 +1031,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "scripts")]
     #[test]
     fn a_failing_script_leaves_its_rule_unmatched_and_the_rest_resolve() {
         let set = rules(vec![
@@ -1101,6 +1050,7 @@ mod tests {
         assert_eq!(reasons[2], "script: returned int, wanted a bool");
     }
 
+    #[cfg(feature = "scripts")]
     #[test]
     fn scripts_compose_inside_all_any_and_not() {
         let set = rules(vec![rule(
