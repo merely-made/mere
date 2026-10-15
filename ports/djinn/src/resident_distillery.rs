@@ -60,9 +60,8 @@ use distillery::{
     ChronicleObserver, ChronicleRevision, Distillery, InstalledAuthority, InstalledSettings,
     ResidentAuthority, ResidentReceipt, ResidentSettings, RetentionSettings,
 };
-use graphshell::native::endpoint_catalog::{
-    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
-};
+use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use mesh::spec::JobSpec;
 use mesh::{AvailabilityPolicy, DevicePolicy, ErasurePolicy, JobBoard, MeshRetentionPolicy};
 use muniment::RedbBackend;

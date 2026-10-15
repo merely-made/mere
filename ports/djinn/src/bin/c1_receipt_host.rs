@@ -21,16 +21,16 @@ use djinn::{
     embedded_reservoir::reservoir_applications, keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
+use graphshell::native::{
+    app_broker::{AppEndpointCatalog, serve_app_broker},
+    endpoint_catalog::ResidentEndpointCatalog,
+};
 use graphshell::session_item::{self, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
-use graphshell::{
+use graphshell_endpoint::door::{
+    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
+    app_client::AppBrokerClient,
     identity::VaultProtectionView,
-    native::{
-        app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
-        app_broker::{AppEndpointCatalog, serve_app_broker},
-        app_client::AppBrokerClient,
-        endpoint_catalog::ResidentEndpointCatalog,
-        tasks::ResidentTasks,
-    },
+    tasks::ResidentTasks,
 };
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{
@@ -560,7 +560,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if graphshell::native::local_endpoint::connect_local(&endpoint)
+        if graphshell_endpoint::door::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

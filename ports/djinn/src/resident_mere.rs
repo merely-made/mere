@@ -40,15 +40,15 @@ use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::mere_host::{MereHost, SelectedPersonaRef};
-use graphshell::native::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::AppEndpointCatalog;
-use graphshell::native::endpoint_catalog::ResidentEndpointRoute;
 use graphshell::session_item::{
     self, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1, ArchiveActionV1,
     COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS,
     MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT,
     SESSIONS_SCHEMA, SESSIONS_SOURCE, SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
 };
+use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
@@ -1492,8 +1492,8 @@ impl ProjectionNoticeSource for MereEndpoint {
 mod tests {
     use super::*;
     use graphshell::mere_route;
-    use graphshell::native::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
+    use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     use mere_view::{MereViewModel, MereViewRequest, SessionStep};
     use pandect::{Change, ChangeKind, mere_dir};
@@ -2030,8 +2030,8 @@ mod tests {
         };
         use graphshell::native::{
             app_broker::serve_app_broker, resident_mere_proxy::ResidentMereProxy,
-            tasks::ResidentTasks,
         };
+        use graphshell_endpoint::door::tasks::ResidentTasks;
         use personae::{Ed25519Keypair, ProfileId};
         let fixture = fixture(33, "divination").await;
         fixture
@@ -2047,7 +2047,7 @@ mod tests {
                 ),
             ),
             None,
-            graphshell::identity::VaultProtectionView::Ephemeral,
+            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
         ));
         #[cfg(not(windows))]
         let address = format!("/tmp/c1px-{}.sock", Uuid::new_v4());
@@ -2073,7 +2073,7 @@ mod tests {
                 .await
         });
         for _ in 0..100 {
-            if graphshell::native::local_endpoint::connect_local(&address)
+            if graphshell_endpoint::door::local_endpoint::connect_local(&address)
                 .await
                 .is_ok()
             {

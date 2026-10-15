@@ -28,8 +28,8 @@ use castellan::custody::IdentityStorage;
 use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
-use graphshell::native::app_admission::AppId;
-use graphshell::native::custody::{
+use graphshell_endpoint::door::app_admission::AppId;
+use graphshell_endpoint::door::custody::{
     CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey,
     ReleasedKey, ResidentStatus, StationGrantRequest,
 };
@@ -59,10 +59,10 @@ pub const CUSTODY_APPS: &[&str] = &[
 
 /// Grant the custody route to [`CUSTODY_APPS`].
 pub fn grant(
-    grants: &graphshell::native::app_admission::AppRouteGrants,
-) -> Result<(), graphshell::native::endpoint_catalog::ResidentEndpointRouteError> {
-    let route = graphshell::native::endpoint_catalog::ResidentEndpointRoute::new(
-        graphshell::native::custody::CUSTODY_ROUTE,
+    grants: &graphshell_endpoint::door::app_admission::AppRouteGrants,
+) -> Result<(), graphshell_endpoint::door::route::ResidentEndpointRouteError> {
+    let route = graphshell_endpoint::door::route::ResidentEndpointRoute::new(
+        graphshell_endpoint::door::custody::CUSTODY_ROUTE,
         std::time::Duration::from_millis(50),
     )?;
     for app in CUSTODY_APPS {
@@ -786,7 +786,7 @@ fn roster<S: IdentityStorage + 'static>(keeper: &Keeper<S>) -> Result<Roster, Cu
         .iter()
         .find(|entry| entry.chosen)
         .map(|entry| entry.id.clone())
-        .or_else(graphshell::profile::env_profile)
+        .or_else(graphshell_endpoint::door::profile::env_profile)
         .unwrap_or_else(|| ProfileId(castellan::custody::roster::DEFAULT_PROFILE.into()));
     Ok(Roster {
         entries,

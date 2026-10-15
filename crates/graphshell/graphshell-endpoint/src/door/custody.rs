@@ -10,7 +10,7 @@
 //! Every application reaches identity and secrets by calling djinn on the
 //! first-party door, never by opening a vault, storage or wallet (D5). The
 //! route is [`CUSTODY_ROUTE`]; the server half is the resident's
-//! [`ResidentIdentity::custody`](super::resident_identity::ResidentIdentity::custody),
+//! `ResidentIdentity::custody` (in Graphshell's `native::resident_identity`),
 //! the client half [`super::custody_client`]. Both name these types, so they
 //! cannot drift.
 //!
@@ -57,13 +57,13 @@ pub enum CustodyCall {
     /// Older imports requiring an explicit profile association.
     UnassignedImports,
     /// Djinn asks the owner to associate one exact older import namespace.
-    AssignImport(crate::native::quarantine::AssignImportRequest),
+    AssignImport(crate::door::quarantine::AssignImportRequest),
     /// Lock authority without supplying a secret.
     LockVault,
     /// Public cards belonging to a named identity profile.
     Quarantine { profile: ProfileId },
     /// Request one action; Djinn obtains its own consent.
-    ReviewQuarantine(crate::native::quarantine::ReviewRequest),
+    ReviewQuarantine(crate::door::quarantine::ReviewRequest),
     /// The lock, the protection and the public roots. Answered Locked or
     /// not; an application uses it to decide whether to show the identity
     /// as pending (D12).
@@ -276,10 +276,10 @@ impl Drop for ReleasedKey {
 #[serde(tag = "answer", rename_all = "snake_case")]
 pub enum CustodyAnswer {
     Quarantine {
-        cards: Vec<crate::native::quarantine::QuarantineCard>,
+        cards: Vec<crate::door::quarantine::QuarantineCard>,
     },
     UnassignedImports {
-        imports: Vec<crate::native::quarantine::UnassignedImport>,
+        imports: Vec<crate::door::quarantine::UnassignedImport>,
     },
     /// Public CA installation material. The terminal executes SSH after the
     /// keeper releases its mutex, allowing the resident agent to authenticate.

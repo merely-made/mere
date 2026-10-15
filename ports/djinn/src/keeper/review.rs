@@ -6,9 +6,9 @@
 
 //! Quarantine routes, with native resident consent and stale-item refusal.
 use super::*;
-use graphshell::native::custody::{CustodyAnswer, CustodyRefusal};
+use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyRefusal};
 #[cfg(feature = "cxf")]
-use graphshell::native::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
+use graphshell_endpoint::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 #[cfg(feature = "cxf")]
 use personae::ProfileId;
 
@@ -33,7 +33,7 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
     #[cfg(feature = "cxf")]
     pub(crate) fn unassigned_imports(
         &self,
-    ) -> Result<Vec<graphshell::native::quarantine::UnassignedImport>, CustodyRefusal> {
+    ) -> Result<Vec<graphshell_endpoint::door::quarantine::UnassignedImport>, CustodyRefusal> {
         let profile = self.host.current_profile_id();
         self.host
             .with_profile_authority(&profile, || {
@@ -44,7 +44,7 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
                 let mut imports = Vec::new();
                 for (store, resident) in stores {
                     for (persona, items) in resident.unassigned_items().map_err(refusal)? {
-                        imports.push(graphshell::native::quarantine::UnassignedImport {
+                        imports.push(graphshell_endpoint::door::quarantine::UnassignedImport {
                             store: store.clone(),
                             persona: *persona.as_uuid(),
                             titles: items.iter().map(|i| i.title.clone()).collect(),
@@ -66,7 +66,7 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
     #[cfg(feature = "cxf")]
     pub(crate) fn assign_import(
         &self,
-        request: graphshell::native::quarantine::AssignImportRequest,
+        request: graphshell_endpoint::door::quarantine::AssignImportRequest,
     ) -> Result<CustodyAnswer, CustodyRefusal> {
         // Confirm against the owner's selected destination, not an app assertion.
         self.host

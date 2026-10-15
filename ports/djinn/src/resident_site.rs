@@ -27,9 +27,8 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use graphshell::native::endpoint_catalog::{
-    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
-};
+use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use knot_site::{MAX_ENCODED_SNAPSHOT_BYTES, Publication, PublishedSnapshotV1, SiteFormat};
 use sceno::{

@@ -20,11 +20,11 @@ use std::sync::Arc;
 use castellan::authority::PersonaeHost;
 use castellan::custody::IdentityStorage;
 use graphshell::browser_carrier::{NativeIdentityAction, NativeIdentityResult};
-use graphshell::identity::IdentitySurfaceSnapshot;
-use graphshell::native::app_admission::AppId;
-use graphshell::native::custody::CustodyCall;
 use graphshell::native::local_session::{DoorIdentity, door_salts};
 use graphshell::native::resident_identity::{CustodyFuture, ResidentIdentity};
+use graphshell_endpoint::door::app_admission::AppId;
+use graphshell_endpoint::door::custody::CustodyCall;
+use graphshell_endpoint::door::identity::IdentitySurfaceSnapshot;
 use personae::{IdentityError, IdentityProvider, RetainedKeys};
 
 use crate::custody::ReleasePolicy;

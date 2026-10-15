@@ -29,12 +29,15 @@ use djinn::resident_status::{
 use graphshell::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
 };
-use graphshell::identity::{VaultLockView, VaultProtectionView};
-use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
+use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell::native::local_session::{DoorIdentity, door_salts};
+use graphshell_endpoint::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
+};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use notochord::{NetworkId, ProfileRef, ProofBinding, SessionHello, TrafficClass};
 use personae::{Ed25519Keypair, IdentityError, IdentityProvider, ProfileId};
 use uuid::Uuid;

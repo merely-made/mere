@@ -26,12 +26,11 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use graphshell::native::app_admission::{AppId, AppRouteGrants};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
-use graphshell::native::endpoint_catalog::{
-    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
-};
+use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use graphshell::native::personal_sync_host::PersonalSyncHost;
+use graphshell_endpoint::door::app_admission::{AppId, AppRouteGrants};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use sceno::{
     Arrangement, Footprint, InstanceId, ProjectedItem, Representation, Scene, Score, Size2,

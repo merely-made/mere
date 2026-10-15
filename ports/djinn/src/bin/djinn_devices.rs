@@ -11,8 +11,8 @@ use djinn::resident_devices::{
     AddrKindV1, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1, PairedDeviceV1,
     not_connected_path_active, read_directory,
 };
-use graphshell::native::app_admission::{AppId, AppRouteId};
-use graphshell::native::app_client::AppBrokerClient;
+use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
+use graphshell_endpoint::door::app_client::AppBrokerClient;
 
 const USAGE: &str = "usage: djinn-devices [--json]";
 

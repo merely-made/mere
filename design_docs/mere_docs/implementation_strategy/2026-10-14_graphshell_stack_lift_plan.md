@@ -1,9 +1,11 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-15):** plan; nothing moved. The census below was read from
-the source at `0aade8668` and corrects the first pass in several places
-(§2). Mark ruled R1 to R7 and the `Page` split on 2026-10-15 (§5). No code,
-manifest or other plan changed with this document.
+**Status (2026-10-15):** plan; P1 (L1) landed: the app door is the `door`
+feature on `graphshell-endpoint`, and Signalman and `ports/dramatis` build
+without the `graphshell` package (Progress). The other lifts have not moved.
+The census below was read from the source at `0aade8668` and corrects the
+first pass in several places (§2). Mark ruled R1 to R8 and the `Page` split
+on 2026-10-15 (§5).
 
 **Origin.** Mark noticed that the Graphshell reference host is about 100k
 lines and asked what could be generalized into the stack. Knot, Cleromancy
@@ -631,3 +633,65 @@ fast-forward of local main; nothing built).**
 - **2026-10-15 (later):** R8: Castellan moves to `ports/djinn/castellan` as
   a component crate. The R4 note that Castellan keeps a credential UI is
   withdrawn; Castellan has none.
+- **2026-10-15 (P1, L1 landed):** the app door is
+  `graphshell_endpoint::door`, feature `door` (native only; the module is
+  compiled out on wasm32). Moved from `ports/graphshell`: `native/`
+  `app_admission`, `app_client`, `custody`, `custody_client`,
+  `custody_identity`, `quarantine`, `local_endpoint` and `tasks`; `identity`
+  (the `dramatis::view` re-export) and `profile` (`GraphshellIdentity`,
+  `env_profile`, `session_salt`). Old path `graphshell::native::X` (or
+  `graphshell::identity`, `graphshell::profile`) is now
+  `graphshell_endpoint::door::X`. The two tangles were split first:
+  - `door::wire` holds `APP_CONNECT_SCHEMA`, `AppMessage`, `AppHostMessage`
+    and the host challenge (`BrowserChallenge`, which `AppHostMessage`
+    carries; the name and its schema string are unchanged, so both doors'
+    wire is byte-identical). `browser_carrier` keeps its own nonce check.
+  - `door::frame` holds the frame functions (sync and async) and
+    `MAX_NATIVE_MESSAGE_BYTES`, with their own `FrameError`.
+    `browser_carrier`'s four frame functions are now one-line wrappers that
+    keep `BrowserCarrierError`. The frames are length-prefixed
+    native-messaging JSON, not NDJSON as §4 says.
+  - `door::route` holds `ResidentEndpointRoute` and its error, moved out of
+    `native::endpoint_catalog`, because `app_admission`'s grants map to it.
+  - `AppBrokerError` did **not** move: it wraps server errors
+    (`BrowserHostError`, `ResidentEndpointCatalogError`) and stays with
+    `app_broker`. `AppClientError::Broker`, never constructed, is removed;
+    `AppClientError::Carrier(BrowserCarrierError)` is now
+    `AppClientError::Frame(FrameError)`.
+  - The app-endpoint-differs-from-browser-endpoint test moved to
+    `native::device_broker`, since it compares the two doors.
+
+  Djinn (`graphshell-endpoint` with `door`), Signalman and `ports/dramatis`
+  (both now `graphshell-endpoint` with `door` in place of `graphshell`) and
+  Graphshell's binaries import the new paths; `scripts/dr_c_receipts.py`
+  hashes the moved files at their new paths. `cargo tree` shows no
+  `graphshell` package for `graphshell-endpoint` (default or `door`),
+  `mere-signalman` or `dramatis-app`.
+
+  **One transitional re-export remains**, against the plan's "no re-export
+  from `graphshell::native`": `native/mod.rs` re-exports `app_admission`,
+  `custody` and `custody_client` from the door, `#[doc(hidden)]`, because
+  Djinn depends on `knot-editor` at `8ed49d4`, whose `src/startup.rs` imports
+  those three paths and resolves `graphshell` to this port through the
+  workspace patch. Without it Djinn, and so the workspace, does not build.
+  Nothing in this repository uses it. It goes when Djinn's Knot pin moves.
+
+  **What the external repins need** (out of scope here):
+  - *Knot* (`knot-editor`): `startup.rs`, `bin/knot_sync_host.rs`,
+    `tests/resident_ownership.rs` and `tests/resident_app_route.rs` import
+    `graphshell::native::{app_admission, app_client, custody,
+    custody_client}`, `graphshell::identity` and
+    `graphshell::native::endpoint_catalog::ResidentEndpointRoute`; each
+    becomes `graphshell_endpoint::door::...` (`ResidentEndpointRoute` is
+    `door::route`). Its `graphshell-endpoint` dependency gains `door`; the
+    library then needs `graphshell` only for its tests and examples
+    (`place_projection`, `revision_bell`, `rosette_projection`, `k2_peer`,
+    and `resident_app_route`'s `serve_app_broker`, which is L2 and L3). Then
+    Mere repins `knot-editor` and deletes the re-export above.
+  - *Woodshed* (root, `ports/hocket`, `validation/relationship-recipe`): the
+    same path change; `graphshell = { default-features = false, features =
+    ["native"] }` becomes `graphshell-endpoint = { features = ["door"] }`
+    wherever only L1 is named.
+  - *Turnstone*: its L1 imports take the same rename; its
+    `view::ProjectionReceiptView` imports still need `graphshell` until L2.
+  - Any `AppClientError::Carrier` match becomes `AppClientError::Frame`.
