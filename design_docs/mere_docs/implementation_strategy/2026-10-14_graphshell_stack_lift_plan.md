@@ -894,4 +894,19 @@ fast-forward of local main; nothing built).**
   Mere-side `knot-editor`, `knot-document` and `knot-site` pin bump, and
   Turnstone's move to the same Mere and Knot revisions (which also needs its
   `graphshell::projection_editor` imports changed to `scenograph`).
+- **2026-10-15 (Mark's rulings on P2's receipt and option wording; option
+  helpers return values):** Mark ruled that Woodshed adopts the P2 controls as
+  that phase's receipt (the Hocket Looper session has been told by the Knot
+  adoption session), and that option labels are per host. So
+  `scenomise::arrangement::option_placeholder`, which returned Graphshell's
+  words, is replaced by `option_fallback` returning `OptionFallback`
+  (`Value`, `Measured { resolved, words }`, `Auto { resolved }`, `Empty`): the
+  facts a label is made from. Graphshell's words ("auto", "none", "n (words)")
+  moved to `graphshell::projection_compile::option_placeholder` with the old
+  test; Knot's own labels ("automatic", the empty label, "Default: ...") become
+  a mapping over the same enum, and its `declared_options` becomes
+  `arrangement_options` plus `arrangement_defaults`. Both hosts show the same
+  text as before: the catalog resolves every option for a built-in family
+  (`Auto` resolves to `auto`, `Empty` to the empty string), which is why the
+  enum carries `resolved` for `Auto` as well as `Measured`.
 
