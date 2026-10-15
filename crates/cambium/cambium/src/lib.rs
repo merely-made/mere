@@ -110,6 +110,7 @@ pub use context::GenetCtx;
 pub use detail_panel::{DetailRow, DetailSection, detail_panel};
 pub use detail_popover::{
     DetailPopoverEvent, DetailPopoverMode, DetailPopoverState, detail_popover,
+    detail_popover_panel,
 };
 pub use disclosure::{
     AccordionConfig, AccordionItem, AccordionMode, AccordionState, DisclosureState, TreeItem,

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Let a graph canvas carry a consumer's node kinds, and split the detail
+  popover's panel from its trigger, for widgets that live on graph nodes.
+  `GraphCanvasSwatch::with_node_attr(id, name, value)` sets an attribute on
+  one node's target (`aria-expanded`, `aria-haspopup`, a `data-*` kind); the
+  canvas's own class, label, key and style are never overridden.
+  `GraphCanvasSwatch::with_focus_request(id)` hands keyboard focus to one
+  node's target when the request first appears, as a closed card or a
+  dismissed popover returns it. `detail_popover_panel` renders a
+  `detail_popover`'s peek or pinned panel for a trigger the caller already
+  renders, such as a canvas node; `detail_popover` is built on it. mere-view's
+  overmap tier is the first consumer. Additive.
 - Remove the `nematic` feature and its `cambium::nematic` views
   (`gemtext_view`, `gopher_view`, `nex_view`, `feed_view`, `SmolwebTheme`,
   `stylesheet`), with the optional `errand` and `tabard` dependencies only it

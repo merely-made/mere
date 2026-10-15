@@ -22,7 +22,7 @@ use crate::component::{ComponentView, component};
 use crate::{
     FocusEvent, FocusPhase, GenetCtx, GenetElement, HoverEvent, HoverPhase, OptionalAction,
     PointerClick, PointerEvent, PointerPhase, View, WheelEvent, custom_leaf, el, focusable,
-    on_click, on_focus, on_hover, on_pointer, on_wheel,
+    on_click, on_focus, on_hover, on_pointer, on_wheel, request_focus,
 };
 
 /// Structural classes emitted by [`graph_canvas_swatch`]. Hosts own the palette.
@@ -215,6 +215,16 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     pub relation_lines: Vec<(String, RelationLine)>,
     /// App-owned rectangular overlays currently occupying graph nodes.
     pub node_footprints: Vec<GraphCanvasNodeFootprint<Id>>,
+    /// Extra attributes on individual node targets, as `(id, name, value)`:
+    /// what a consumer's node kind says that the shared target cannot, such
+    /// as `aria-expanded` on a node that opens a card or `aria-haspopup` on
+    /// one that opens a popover. See [`with_node_attr`](Self::with_node_attr).
+    pub node_attrs: Vec<(Id, String, String)>,
+    /// The node whose target takes keyboard focus when this request first
+    /// appears, such as the trigger a dismissed popover or a collapsed card
+    /// returns focus to. Holding the same request does not steal focus on
+    /// later rebuilds.
+    pub focus_request: Option<Id>,
     /// Optional fixed-world atlas beneath the graph labels and callouts.
     /// Geographic field identity refers to existing graph node ids, while the
     /// atlas's paint and picking geometry remain caller-produced projection data.
@@ -263,6 +273,8 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             relations: Vec::new(),
             relation_lines: Vec::new(),
             node_footprints: Vec::new(),
+            node_attrs: Vec::new(),
+            focus_request: None,
             atlas: None,
             selected: None,
             focus: None,
@@ -370,6 +382,32 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         self.node_footprints.retain(|footprint| footprint.id != id);
         self.node_footprints
             .push(GraphCanvasNodeFootprint { id, width, height });
+        self
+    }
+
+    /// Set an attribute on one node's target (see [`Self::node_attrs`]).
+    /// Repeating a name on the same node replaces its earlier value. The
+    /// target's own `class`, `type`, `aria-label`, `data-node-index`,
+    /// `data-key` and `style` are the canvas's and are not overridden.
+    #[must_use]
+    pub fn with_node_attr(
+        mut self,
+        id: Id,
+        name: impl Into<String>,
+        value: impl Into<String>,
+    ) -> Self {
+        let name = name.into();
+        self.node_attrs
+            .retain(|(peer, peer_name, _)| !(*peer == id && *peer_name == name));
+        self.node_attrs.push((id, name, value.into()));
+        self
+    }
+
+    /// Ask for keyboard focus on one node's target (see
+    /// [`Self::focus_request`]).
+    #[must_use]
+    pub fn with_focus_request(mut self, id: Option<Id>) -> Self {
+        self.focus_request = id;
         self
     }
 
@@ -1486,6 +1524,22 @@ where
             if let Some(key) = &node.key {
                 target = target.attr("data-key", key.clone());
             }
+            const OWN: [&str; 6] = [
+                "class",
+                "type",
+                "aria-label",
+                "data-node-index",
+                "data-key",
+                "style",
+            ];
+            for (_, name, value) in swatch
+                .node_attrs
+                .iter()
+                .filter(|(id, name, _)| *id == node.id && !OWN.contains(&name.as_str()))
+            {
+                target = target.attr(name.clone(), value.clone());
+            }
+            let target = request_focus(target, swatch.focus_request.as_ref() == Some(&node.id));
 
             let click = on_node_click.clone();
             let click_id = node.id.clone();
@@ -1924,6 +1978,7 @@ mod tests {
         relation_clicked: Vec<String>,
         relation_hovered: Option<String>,
         expanded: bool,
+        focus_request: Option<u8>,
     }
 
     type TestView = Box<dyn AnyView<State, (), GenetCtx, GenetElement>>;
@@ -2051,6 +2106,54 @@ mod tests {
             find_attr(&dom.borrow(), root, "aria-label", "Expand graph").expect("expand target");
         runner.dispatch_click(expand, PointerClick::at((2.0, 2.0)));
         assert!(runner.state().expanded);
+    }
+
+    fn attributed_view(state: &State) -> TestView {
+        let swatch = model(state.hovered, state.focused)
+            .with_node_attr(2, "aria-expanded", "false")
+            .with_node_attr(2, "aria-expanded", "true")
+            .with_node_attr(2, "data-tier", "session")
+            .with_node_attr(2, "aria-label", "Not the canvas's name")
+            .with_focus_request(state.focus_request);
+        Box::new(graph_canvas_swatch_with_focus(
+            &swatch,
+            |state: &mut State, id| state.clicked.push(id),
+            |state: &mut State, id| state.hovered = id,
+            |state: &mut State, id| state.focused = id,
+            |state: &mut State| state.expanded = true,
+        ))
+    }
+
+    /// A consumer's node kind rides on the shared target as attributes, and a
+    /// requested node takes focus once, without the canvas's own attributes
+    /// being overridden.
+    #[test]
+    fn node_attrs_and_a_focus_request_reach_one_nodes_target() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), attributed_view, State::default());
+        let root = runner.root();
+        let second = find_attr(&dom.borrow(), root, "aria-label", "Second node")
+            .expect("the canvas keeps its own accessible name");
+        let first = find_attr(&dom.borrow(), root, "aria-label", "First node").unwrap();
+        {
+            let dom = dom.borrow();
+            assert_eq!(attr(&dom, second, "aria-expanded"), Some("true"));
+            assert_eq!(attr(&dom, second, "data-tier"), Some("session"));
+            assert_eq!(attr(&dom, first, "aria-expanded"), None);
+        }
+        assert_eq!(runner.focus(), None);
+        runner.update(|state| state.focus_request = Some(2));
+        let second = find_attr(&dom.borrow(), root, "aria-label", "Second node").unwrap();
+        assert_eq!(runner.focus(), Some(second), "the request takes focus");
+        let first = find_attr(&dom.borrow(), root, "aria-label", "First node").unwrap();
+        runner.set_focus(Some(first));
+        runner.update(|state| state.hovered = Some(1));
+        assert_eq!(
+            runner.focus(),
+            Some(first),
+            "a held request does not steal focus again"
+        );
     }
 
     fn labelled_view(state: &State) -> TestView {
