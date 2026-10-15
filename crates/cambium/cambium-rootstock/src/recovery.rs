@@ -17,7 +17,7 @@ where
     V: RootView<State>,
     T: HostTree<State>,
 {
-    fn refuse_pending_captures(&mut self, refusal: CaptureRefusal) {
+    pub(crate) fn refuse_pending_captures(&mut self, refusal: CaptureRefusal) {
         if let Some(capture) = self.s.pending_capture.take() {
             capture(Err(refusal.clone()));
         }
@@ -28,6 +28,62 @@ where
             capture(Err(refusal));
         }
         self.s.pending_presentation_observer = None;
+    }
+    /// Browser context loss invalidates the current frame and captures before
+    /// producers or presentation can run again. The retained runner survives.
+    pub fn lose_presentation_context(&mut self) {
+        let Some(driver) = self.s.presentation_driver.as_mut() else {
+            return;
+        };
+        driver.lose();
+        let refusal = CaptureRefusal::ContextLost {
+            backend: driver.backend(),
+            generation: driver.generation(),
+        };
+        self.s.capture_owner.scope().invalidate(refusal.clone());
+        self.s.last_redraw_presentation = None;
+        self.suspend_producers();
+        self.refuse_pending_captures(refusal);
+    }
+    pub fn refuse_presentation(&mut self, failure: crate::PresentationFailure) {
+        self.s.last_redraw_presentation = None;
+        self.s.last_presentation_failure = Some(failure.clone());
+        match failure.native {
+            Some(crate::NativePresentationFailure::Rasterize(cause)) => {
+                self.refuse_rasterization(cause, failure.producer_key)
+            },
+            Some(crate::NativePresentationFailure::DeviceLost(_)) => {
+                self.poll_device_recovery();
+            },
+            Some(crate::NativePresentationFailure::SurfaceLost) => {
+                self.suspend_producers();
+                if let Some(driver) = self.s.presentation_driver.as_mut() {
+                    driver.lose();
+                }
+                self.s.surface = None;
+                self.s.needs_recovery_surface = true;
+                if let Some(window) = &self.s.window {
+                    window.request_redraw();
+                }
+            },
+            None if self
+                .s
+                .presentation_driver
+                .as_ref()
+                .is_some_and(|driver| driver.state() != crate::PresentationState::Ready) =>
+            {
+                self.refuse_pending_captures(CaptureRefusal::ContextLost {
+                    backend: failure.backend,
+                    generation: failure.generation,
+                });
+            },
+            None => self.refuse_pending_captures(CaptureRefusal::PresentationError {
+                backend: failure.backend,
+                generation: failure.generation,
+                source_key: failure.producer_key,
+                error: failure.message,
+            }),
+        }
     }
     /// Refuse the current frame explicitly. Only an actual installed loss
     /// notice enters recovery; healthy provider refusal preserves this core.
@@ -112,12 +168,19 @@ where
         }
         let status = owner.status();
         if let Some(loss) = status.loss() {
+            self.s
+                .capture_owner
+                .scope()
+                .invalidate(CaptureRefusal::DeviceLost(loss.clone()));
             if self.s.detached_generation != Some(loss.generation) {
                 self.s.last_redraw_presentation = None;
                 // Clear every producer in this shared core, including leaves
                 // held by another window. Per-window suspension is insufficient.
                 self.s.shared.producers.suspend_all(None);
                 self.s.shared.leaf_fragments.clear();
+                if let Some(driver) = self.s.presentation_driver.as_mut() {
+                    driver.lose();
+                }
                 self.s.surface = None;
                 self.s.shared.render_core = None;
                 self.s.needs_recovery_surface = true;

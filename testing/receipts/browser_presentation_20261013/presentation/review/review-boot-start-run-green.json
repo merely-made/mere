@@ -1,0 +1,8 @@
+{
+  "result": "pass",
+  "controls": [
+    "provider start refused",
+    "provider start failure releases context"
+  ],
+  "errors": []
+}

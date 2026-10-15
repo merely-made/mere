@@ -383,16 +383,25 @@ impl ProducerRegistry {
         renderer: Option<&netrender::Renderer>,
     ) {
         for (&key, entry) in &mut self.entries {
-            if elsewhere(key, entry.owner) {
-                continue;
-            }
-            if entry.active {
+            let native_here = !elsewhere(key, entry.owner);
+            let portable_here = entry
+                .portable
+                .as_ref()
+                .is_some_and(|slot| !elsewhere(key, Some(slot.owner)));
+            let portable_active =
+                portable_here && entry.portable.as_ref().is_some_and(|slot| slot.active);
+            if (native_here && entry.active) || portable_active {
                 entry.producer.suspend();
             }
-            entry.active = false;
-            entry.image = None;
-            if let Some(renderer) = renderer {
-                renderer.unregister_external_image(entry.renderer_key);
+            if portable_here && let Some(slot) = &mut entry.portable {
+                slot.active = false;
+            }
+            if native_here {
+                entry.active = false;
+                entry.image = None;
+                if let Some(renderer) = renderer {
+                    renderer.unregister_external_image(entry.renderer_key);
+                }
             }
         }
         if let Some(renderer) = renderer {
@@ -419,7 +428,13 @@ impl ProducerRegistry {
         let orphans: Vec<u64> = self
             .entries
             .iter()
-            .filter_map(|(&key, entry)| entry.owner.is_some_and(|n| !in_document(n)).then_some(key))
+            .filter_map(|(&key, entry)| {
+                entry
+                    .owner
+                    .or_else(|| entry.portable.as_ref().map(|slot| slot.owner))
+                    .is_some_and(|n| !in_document(n))
+                    .then_some(key)
+            })
             .collect();
         for &key in &orphans {
             let renderer_key = self.entries[&key].renderer_key;
@@ -556,6 +571,7 @@ impl ProducerRegistry {
             entry.active = true;
             entry.logical_size = logical_size;
             let frame = ProducerFrameInfo {
+                purpose: ProducerFramePurpose::Presentation,
                 logical_size,
                 timestamp: self.timestamp,
                 physical_size: size,
@@ -770,6 +786,7 @@ mod checked_refusal_tests {
         let portable = entry
             .producer
             .portable_scene(&ProducerFrameInfo {
+                purpose: ProducerFramePurpose::Export,
                 logical_size: (12.0, 9.0),
                 physical_size: [12, 9],
                 layout_scale: 1.0,

@@ -1,0 +1,7 @@
+{
+  "result": "fail",
+  "controls": [],
+  "errors": [
+    "Error: pending fallback cancellation removes replacement canvas\n    at assert (http://127.0.0.1:8975/:1:345)\n    at http://127.0.0.1:8975/:1:1220"
+  ]
+}

@@ -2145,6 +2145,8 @@ dependencies = [
  "layout-dom-api",
  "mesquite",
  "netrender",
+ "paint_list_api",
+ "paint_list_render",
  "serde_json",
  "sha2 0.11.0",
  "tabard",
@@ -2720,7 +2722,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -3409,7 +3411,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -4549,7 +4551,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5432,7 +5434,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -10859,7 +10861,7 @@ dependencies = [
 [[package]]
 name = "netrender"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=68bcddc063636056d1c8c9669f58e5acc499a542#68bcddc063636056d1c8c9669f58e5acc499a542"
 dependencies = [
  "glifo 0.4.0",
  "log",
@@ -10874,6 +10876,8 @@ dependencies = [
  "vello_common 0.3.0",
  "vello_cpu 0.3.0",
  "vello_gpu",
+ "wasm-bindgen",
+ "web-sys",
  "web-time",
  "wgpu",
 ]
@@ -10899,7 +10903,7 @@ dependencies = [
 [[package]]
 name = "netrender_device"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=68bcddc063636056d1c8c9669f58e5acc499a542#68bcddc063636056d1c8c9669f58e5acc499a542"
 dependencies = [
  "log",
  "pollster 1.0.1",
@@ -11183,7 +11187,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -12439,7 +12443,7 @@ dependencies = [
  "oxiri",
  "oxrdf",
  "ryu-js",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -12452,7 +12456,7 @@ dependencies = [
  "oxiri",
  "oxsdatatypes",
  "rand 0.9.5",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -12462,7 +12466,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c17c2ae62ac34fda465f6331105906c0e17b4e088dac3249e1f229b962062503"
 dependencies = [
  "js-sys",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -12475,7 +12479,7 @@ dependencies = [
  "oxilangtag",
  "oxiri",
  "oxrdf",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -12624,7 +12628,7 @@ dependencies = [
 [[package]]
 name = "paint_list_api"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=68bcddc063636056d1c8c9669f58e5acc499a542#68bcddc063636056d1c8c9669f58e5acc499a542"
 dependencies = [
  "euclid",
  "serde",
@@ -12633,7 +12637,7 @@ dependencies = [
 [[package]]
 name = "paint_list_render"
 version = "0.1.2"
-source = "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+source = "git+https://www.github.com/merely-made/netrender.git?rev=68bcddc063636056d1c8c9669f58e5acc499a542#68bcddc063636056d1c8c9669f58e5acc499a542"
 dependencies = [
  "log",
  "netrender",
@@ -13420,7 +13424,7 @@ dependencies = [
  "combine",
  "downcast-rs 2.0.2",
  "dyn-clone",
- "hashbrown 0.17.1",
+ "hashbrown 0.13.2",
  "hi_sparse_bitset",
  "indexmap",
  "inventory",
@@ -14087,7 +14091,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15098,7 +15102,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15166,7 +15170,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -16201,7 +16205,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16271,7 +16275,7 @@ dependencies = [
  "memchr",
  "oxrdf",
  "quick-xml 0.37.5",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -16290,11 +16294,11 @@ dependencies = [
  "regex",
  "rustc-hash 2.1.3",
  "sha1 0.11.0",
- "sha2 0.11.0",
+ "sha2 0.10.9",
  "sparesults",
  "spargebra",
  "sparopt",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -16308,7 +16312,7 @@ dependencies = [
  "oxrdf",
  "peg",
  "rand 0.9.5",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -16515,7 +16519,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16721,7 +16725,7 @@ version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c2499c2d826531388872b2268718aed907a39bd785ab0dcfe57fab26283f92e"
 dependencies = [
- "skrifa 0.44.0",
+ "skrifa 0.42.1",
  "yazi",
  "zeno",
 ]
@@ -16997,10 +17001,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -17046,7 +17050,7 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8c27177b12a6399ffc08b98f76f7c9a1f4fe9fc967c784c5a071fa8d93cf7e1"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -17793,7 +17797,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -18257,10 +18261,12 @@ dependencies = [
  "bytemuck",
  "glifo 0.4.0",
  "hashbrown 0.17.1",
+ "js-sys",
  "log",
  "thiserror 2.0.21",
  "vello_common 0.3.0",
  "vello_gpu_shaders",
+ "web-sys",
  "wgpu",
 ]
 
@@ -19414,7 +19420,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
