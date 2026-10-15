@@ -17,9 +17,11 @@
 //! - the app broker served at `<endpoint>` with a Keeper whose wallet root is
 //!   the fixture's shared root, so custody releases Knot's epoch keys.
 //!
-//! Usage: `knot_overmap_live_host <endpoint> <new-absolute-root>`. It writes
-//! `<root>/ready.json` once it serves, and stops on a line on stdin. Knot's
-//! receipt `docs/receipts/2026-10-15_mere_overmap_live/` has the commands.
+//! Usage: `knot_overmap_live_host <endpoint> <new-absolute-root>`. The root
+//! also holds two linked documents, `essay.djot` and `field_notes.djot`, for
+//! Knot's catalog. It writes `<root>/ready.json` once it serves, and stops on
+//! a line on stdin. Knot's receipt `docs/receipts/2026-10-15_mere_overmap_live/`
+//! has the commands.
 
 use std::{path::PathBuf, sync::Arc, time::Duration};
 
@@ -109,6 +111,13 @@ async fn main() {
     std::fs::write(
         root.join("essay.djot"),
         "# Night light\n\nNight light by the river.\n",
+    )
+    .unwrap();
+    // Knot catalogues a document when it opens it, never by scanning the
+    // root, so the receipt names both documents on Knot's command line.
+    std::fs::write(
+        root.join("field_notes.djot"),
+        "# Field notes\n\nThe tide withdrew; see [Night light](essay.djot).\n",
     )
     .unwrap();
     let shared = root.join("shared");
