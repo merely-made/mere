@@ -66,6 +66,10 @@ changes alone, 3,620,876 at Genet main, which also carries about 97 KB of other
 work. Mark chose to split the viewer into WebGPU-only and WebGL2-only artifacts;
 estimates put each under the cap, but only with feature gating that makes the
 other route's code statically unreachable (see the plan's 2026-10-15 entry).
+Split landed: Netrender `without-classic-vello` and per-route artifacts chosen
+by `mount.js`. WebGL2 artifact 3,244,444 (passes); WebGPU artifact 3,454,488,
+46,616 over the cap, reported for Mark rather than cut. All browser routes and
+both scale comparisons pass on their own artifacts.
 Human assistive-technology and asynchronous browser WebGPU device replacement
 remain separate gates.
 
