@@ -12,9 +12,13 @@ one feature each on `graphshell-endpoint`.
 | `graphshell-endpoint::stdio` (feature `stdio`) | `StdioCarrier` plus `serve_basic`, `serve_resumable`, `serve_resumable_notifying`: NDJSON over a child process's standard streams |
 | `graphshell-endpoint::local` (feature `local`) | `LocalCarrier`: an endpoint hosted in this process, still round-tripping the wire encoding |
 | `graphshell-endpoint::network` (feature `network`) | `NetworkCarrier`, `CarrierRuntime`: NDJSON over any `AsyncRead + AsyncWrite` |
+| `graphshell-endpoint::door` (feature `door`, native only) | The application side of the first-party door: `app_admission` (hello, `AppId`, route grants), `route` (`ResidentEndpointRoute`), `wire` and `frame` (the envelope and native-messaging frames both halves speak), `app_client` (`AppBrokerClient`, `AppRouteCarrier`), `custody`, `custody_client`, `custody_identity`, `quarantine`, `local_endpoint`, `tasks`, `identity` (the `dramatis::view` types) and `profile` (`GraphshellIdentity`, `env_profile`) |
 
 The carriers were the separate `graphshell-stdio`, `graphshell-local` and
-`graphshell-network` crates until 2026-09-24.
+`graphshell-network` crates until 2026-09-24. The `door` modules were the
+app-facing half of Graphshell's `native` module until 2026-10-15 (Graphshell
+stack lift plan, L1); an application now reaches djinn's custody and routes
+without the `graphshell` package.
 
 `Carrier::request` returns `Result<CarrierResponseBody, CarrierError>`.
 `CarrierError` is `Refused` (the session is intact) or `Disconnected` (the
@@ -31,15 +35,17 @@ implement `Carrier`.
 | feature `stdio` | adds `serde_json`; uses `std::process` |
 | feature `local` | adds `serde`, `serde_json` |
 | feature `network` | adds `serde_json` and Tokio (`io-util`, `rt`, `rt-multi-thread`) |
+| feature `door` | adds `dramatis`, `personae`, `insigne`, `chatelaine`, `pandect`, `serde`, `serde_json`, `base64`, `rand_core`, `thiserror`, `tracing`, `uuid`, `zeroize`, Tokio (adds `net`, `sync`, `time`) and, on Windows, `windows-sys` |
 
 `chirograph`, `-client`, and `-endpoint` with no carrier feature build for
-`wasm32-unknown-unknown`. `NetworkCarrier`'s `Carrier` methods block, so they
+`wasm32-unknown-unknown`; the `door` module is compiled out on that target. `NetworkCarrier`'s `Carrier` methods block, so they
 must run off a runtime worker thread.
 
 ## Not in these crates
 
 Admission: which peers may open a session, under what grant, and over which
 ALPN. That lives in [`ports/graphshell`](../../ports/graphshell), along with the
-serve loops for admitted sessions, `ResidentEndpointCatalog`, and
-`ResidentProjectionHost`. That port is the reference application: it composes
+serve loops for admitted sessions, `ResidentEndpointCatalog`,
+`ResidentProjectionHost` and the serving half of the first-party door
+(`native::app_broker`, the browser door). That port is the reference application: it composes
 these crates, and they do not depend on it.

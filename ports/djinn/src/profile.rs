@@ -28,7 +28,7 @@ pub fn resolve_selected_profile(
     if let Some(profile) = explicit {
         return Ok(profile.clone());
     }
-    if let Some(profile) = graphshell::profile::env_profile() {
+    if let Some(profile) = graphshell_endpoint::door::profile::env_profile() {
         return Ok(profile);
     }
     roster::resolve_profile(storage, vault_dir)

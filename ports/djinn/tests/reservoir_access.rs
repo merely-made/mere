@@ -13,11 +13,11 @@ use chirograph::ProjectionSession;
 use djinn::resident_mere::{MereRoutes, ambient_mere_route_id, mere_route_id};
 use djinn::resident_reservoir::ResidentReservoir;
 use graphshell::lifecycle::AdmittedEndpointContext;
-use graphshell::native::app_admission::{
-    AllowedAppRoutes, AppId, AppRequest, AppRouteGrants, AppRouteId,
-};
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
+use graphshell_endpoint::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRequest, AppRouteGrants, AppRouteId,
+};
 use graphshell_endpoint::{ProjectionCatalog, ProjectionSource};
 use pandect::{
     Author, DomainId, MereApplicationAccess, MereSessions, ReservoirStore, open_mere_backend,

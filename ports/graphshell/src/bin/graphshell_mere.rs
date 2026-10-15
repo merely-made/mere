@@ -11,7 +11,7 @@ use cambium_genet_winit_host::{AppCtx, HostOptions, Init, inert_hooks, run};
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, ContentHash, PortableCardV1, ProjectionSnapshot,
 };
-use graphshell::native::{
+use graphshell_endpoint::door::{
     app_admission::{AppId, AppRouteId},
     app_client::AppBrokerClient,
 };

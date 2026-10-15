@@ -18,9 +18,8 @@ use castellan::custody::bootstrap::Unlock;
 use castellan::lock::VaultLockHolder;
 use castellan::resident::{CastellanResident, CredentialSalts};
 use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
-use graphshell::native::endpoint_catalog::{
-    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
-};
+use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;
 
@@ -556,7 +555,7 @@ mod tests {
                 IdentityStorage, IdentityVault, Profile, SealedProfileStorage, UnlockMethod,
             },
         };
-        use graphshell::identity::VaultProtectionView;
+        use graphshell_endpoint::door::identity::VaultProtectionView;
         use personae::{Ed25519Keypair, PersonaId};
         let root = tempfile::tempdir().unwrap();
         let storage = SealedProfileStorage::open_with_key(root.path().join("vault"), [0x53; 32]);

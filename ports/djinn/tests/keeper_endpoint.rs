@@ -19,11 +19,11 @@ use castellan::custody::ssh_slot::{protocol_key_for, slot_for};
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{IntentInvocation, IntentResult, ResourceRequest};
 use djinn::keeper::Keeper;
-use graphshell::identity::VaultProtectionView;
 use graphshell::identity_endpoint::IdentityEndpoint;
 use graphshell::identity_projection::{
     GenerateSshKeyIntentV1, SSH_GENERATE_INTENT, SshUnlockPolicyIntentV1,
 };
+use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionSource};
 use personae::{Ed25519Keypair, ProfileId, UnlockTier};
 use ssh_key::{Algorithm, LineEnding};

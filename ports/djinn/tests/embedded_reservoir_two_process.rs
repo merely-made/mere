@@ -27,12 +27,12 @@ use djinn::embedded_reservoir::{
 };
 use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ResidentReservoir;
-use graphshell::identity::VaultProtectionView;
-use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::AppBrokerClient;
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::native::tasks::ResidentTasks;
+use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use graphshell_endpoint::door::app_client::AppBrokerClient;
+use graphshell_endpoint::door::identity::VaultProtectionView;
+use graphshell_endpoint::door::tasks::ResidentTasks;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
@@ -522,7 +522,7 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
             .await
     });
     for _ in 0..100 {
-        if graphshell::native::local_endpoint::connect_local(&config.endpoint)
+        if graphshell_endpoint::door::local_endpoint::connect_local(&config.endpoint)
             .await
             .is_ok()
         {

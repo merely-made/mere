@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant, SystemTime};
 
-use graphshell::identity::VaultLockView;
+use graphshell_endpoint::door::identity::VaultLockView;
 use tokio::sync::watch;
 
 use super::{LockReason, LockSignal, Triggers, load_settings, os};

@@ -15,14 +15,14 @@ use chatelaine::ItemState;
 use djinn::{identity_ui::NativeIdentityUi, keeper::Keeper};
 use graphshell::{
     browser_carrier::NativeIdentityFailure,
+    native::app_broker::{AppEndpointCatalog, serve_app_broker},
+};
+use graphshell_endpoint::door::{
+    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
+    custody::CustodyRefusal,
+    custody_client::{CustodyClient, CustodyClientError},
     identity::VaultProtectionView,
-    native::{
-        app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-        app_broker::{AppEndpointCatalog, serve_app_broker},
-        custody::CustodyRefusal,
-        custody_client::{CustodyClient, CustodyClientError},
-        quarantine::{ReviewAction, ReviewRequest},
-    },
+    quarantine::{ReviewAction, ReviewRequest},
 };
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use serde_json::json;
@@ -484,7 +484,7 @@ async fn older_import_assignment_needs_consent_and_preserves_item_state() {
             .unwrap()
             .contains("MY======")
     );
-    let request = graphshell::native::quarantine::AssignImportRequest {
+    let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),
@@ -512,7 +512,7 @@ async fn older_import_assignment_rechecks_revision_and_lock_after_consent() {
         let persona = older_namespace(&f);
         let mut c = f.client("dramatis").await;
         let import = c.unassigned_imports().await.unwrap().remove(0);
-        let request = graphshell::native::quarantine::AssignImportRequest {
+        let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
             store: ProfileId("family".into()),
             profile: ProfileId("work".into()),
             persona: *persona.as_uuid(),

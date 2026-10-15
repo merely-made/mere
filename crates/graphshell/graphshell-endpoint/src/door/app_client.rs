@@ -9,8 +9,8 @@
 //! What an application holds while talking to the resident host: the
 //! handshake, a request counter, and typed calls for the three things a
 //! reader of receipt cards does — open, snapshot, read a resource. The
-//! server half is `app_broker`; the two share their wire types so they
-//! cannot drift.
+//! server half is Graphshell's `native::app_broker`; the two share the types
+//! in [`super::wire`] and the frames in [`super::frame`] so they cannot drift.
 //!
 //! The wire is strictly request/response, so the client is deliberately
 //! sequential: one call at a time against `&mut self`, no demultiplexer. A
@@ -24,18 +24,16 @@ use chirograph::{
 };
 use rand_core::{OsRng, RngCore};
 
-use crate::browser_carrier::{read_native_message_async, write_native_message_async};
-use crate::native::app_admission::{AppHello, AppId, AppRouteId, configured_app_endpoint};
-use crate::native::app_broker::{APP_CONNECT_SCHEMA, AppBrokerError, AppHostMessage, AppMessage};
-use crate::native::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
-use crate::native::local_endpoint::{LocalStream, connect_local};
+use crate::door::app_admission::{AppHello, AppId, AppRouteId, configured_app_endpoint};
+use crate::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use crate::door::frame::{FrameError, read_native_message_async, write_native_message_async};
+use crate::door::local_endpoint::{LocalStream, connect_local};
+use crate::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
 
 #[derive(Debug, thiserror::Error)]
 pub enum AppClientError {
     #[error(transparent)]
-    Broker(#[from] AppBrokerError),
-    #[error(transparent)]
-    Carrier(#[from] crate::browser_carrier::BrowserCarrierError),
+    Frame(#[from] FrameError),
     #[error("the resident host closed the stream mid-conversation")]
     Closed,
     #[error("the resident host refused: {0}")]
@@ -256,8 +254,8 @@ impl AppBrokerClient {
     }
 
     /// One call on the custody route. Only a client opened on
-    /// [`crate::native::custody::CUSTODY_ROUTE`] is answered; see
-    /// [`crate::native::custody_client`] for the typed calls.
+    /// [`crate::door::custody::CUSTODY_ROUTE`] is answered; see
+    /// [`crate::door::custody_client`] for the typed calls.
     pub async fn custody_call(
         &mut self,
         call: CustodyCall,

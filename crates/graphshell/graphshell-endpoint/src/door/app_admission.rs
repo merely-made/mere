@@ -33,7 +33,7 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
-use super::endpoint_catalog::ResidentEndpointRoute;
+use crate::door::route::ResidentEndpointRoute;
 
 /// Environment override for the first-party application endpoint.
 pub const APP_ENDPOINT_ENV: &str = "GRAPHSHELL_APP_ENDPOINT";
@@ -551,15 +551,11 @@ mod tests {
         );
     }
 
+    // That this endpoint differs from the browser door's is checked beside
+    // the browser door, in Graphshell's `native::device_broker`.
     #[test]
-    fn the_endpoint_is_overridable_and_distinct_from_the_browser_one() {
-        let default = default_app_endpoint();
-        assert!(!default.is_empty());
-        assert_ne!(
-            default,
-            crate::native::device_broker::configured_device_endpoint(),
-            "a first-party app must not land on the browser endpoint",
-        );
+    fn the_default_endpoint_is_named() {
+        assert!(!default_app_endpoint().is_empty());
     }
 
     #[test]
