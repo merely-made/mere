@@ -20,7 +20,7 @@ use personae::{IdentityProvider, ProfileId};
 
 use crate::personal_sync::{DeviceSyncError, personal_graph_id};
 use crate::settings::{self as owner_settings, OwnerSettings, SyncSettings};
-use graphshell::native::personal_sync_host::PersonalSyncHostError;
+use crate::sync::personal_sync_host::PersonalSyncHostError;
 
 /// What a pairing attempt did.
 #[derive(Debug, PartialEq, Eq)]
@@ -163,7 +163,7 @@ pub fn pairing_facts<P: IdentityProvider + ?Sized>(
     let prekey = match data_root {
         Some(root) => {
             let key_root = key_group_root(root, &sync, graph);
-            match graphshell::native::graph_keys::GraphKeyGroup::open(identity, graph, &key_root) {
+            match crate::sync::graph_keys::GraphKeyGroup::open(identity, graph, &key_root) {
                 Ok(opened) => hex(opened.group.published_bundle()),
                 Err(error) => {
                     tracing::warn!(

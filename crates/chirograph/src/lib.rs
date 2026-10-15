@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 // The card vocabulary: neutral, a label for a projected resource rather than a
 // wire message. It was its own crate from 2026-08-14 to 2026-09-23 and is a
 // module again; nothing but chirograph used it.
+pub mod line;
 pub mod titulus;
 pub use titulus::{
     ActionFormChoiceV1, ActionFormError, ActionFormFieldV1, ActionFormV1, CardValueV1, ContentHash,

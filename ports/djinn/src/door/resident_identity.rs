@@ -4,37 +4,34 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The resident identity authority Graphshell's doors serve, as a trait.
+//! The resident identity authority the doors serve, as a trait.
 //!
 //! Graphshell holds no custody (dramatis repo plan, rulings D4 and D15). The
-//! identity endpoint, the browser and application doors and the custody
-//! route are generic over [`ResidentIdentity`], and djinn implements it over
-//! castellan's `PersonaeHost`, which only djinn links. Until DR-C this module
-//! re-exported that authority at its pre-founding path.
+//! browser and application doors and the custody route are generic over
+//! [`ResidentIdentity`], and djinn implements it over castellan's
+//! `PersonaeHost` ([`crate::keeper`]). The identity endpoint, which stays in
+//! Graphshell, reads only the snapshot and intents half,
+//! [`IdentityAuthority`], which this trait extends. It was Graphshell's
+//! `native::resident_identity` until the stack lift plan's P5.
 
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use crate::browser_carrier::{NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult};
-use crate::native::local_session::DoorIdentity;
+use crate::door::local_session::DoorIdentity;
+use graphshell::browser_carrier::{
+    NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
+};
+use graphshell::identity_endpoint::IdentityAuthority;
 use graphshell_endpoint::door::app_admission::AppId;
 use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
-use graphshell_endpoint::door::identity::IdentitySurfaceSnapshot;
 
 /// One custody call in flight.
 pub type CustodyFuture =
     Pin<Box<dyn Future<Output = Result<CustodyAnswer, CustodyRefusal>> + Send + 'static>>;
 
 /// What a resident identity authority answers for Graphshell's doors.
-pub trait ResidentIdentity: DoorIdentity + Send + Sync + 'static {
-    /// The secret-free read model the identity cards project.
-    fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot>;
-
-    /// Apply one typed identity intent from an admitted session. The error
-    /// is the reason shown to the caller.
-    fn apply_intent(&self, intent: &str, payload: &[u8]) -> Result<(), String>;
-
+pub trait ResidentIdentity: DoorIdentity + IdentityAuthority + Send + Sync + 'static {
     /// A native-only identity action, on the resident's own surface (an
     /// unlock prompt, a file picker). An authority without a surface
     /// refuses.
@@ -65,7 +62,8 @@ pub(crate) mod test_support {
 
     use super::*;
     use graphshell_endpoint::door::identity::{
-        AgentListenerView, CarryView, VaultLockView, VaultProtectionView, VaultView,
+        AgentListenerView, CarryView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView,
+        VaultView,
     };
 
     pub(crate) struct FixedIdentity {
@@ -79,14 +77,6 @@ pub(crate) mod test_support {
             Arc::new(Self {
                 provider: InMemoryProvider::from_seed([seed; 32]),
                 snapshot: fixed_snapshot(),
-                intents: Mutex::new(Vec::new()),
-            })
-        }
-
-        pub(crate) fn with_snapshot(seed: u8, snapshot: IdentitySurfaceSnapshot) -> Arc<Self> {
-            Arc::new(Self {
-                provider: InMemoryProvider::from_seed([seed; 32]),
-                snapshot,
                 intents: Mutex::new(Vec::new()),
             })
         }
@@ -113,7 +103,9 @@ pub(crate) mod test_support {
         }
     }
 
-    impl ResidentIdentity for FixedIdentity {
+    impl ResidentIdentity for FixedIdentity {}
+
+    impl IdentityAuthority for FixedIdentity {
         fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot> {
             Ok(self.snapshot.clone())
         }

@@ -16,6 +16,7 @@
 
 pub mod conditions;
 pub mod custody;
+pub mod door;
 pub mod hocket_adoption;
 pub mod embedded_reservoir;
 pub mod enrollment;
@@ -37,3 +38,4 @@ pub mod resident_site;
 pub mod resident_status;
 pub mod settings;
 pub mod startup_vault;
+pub mod sync;

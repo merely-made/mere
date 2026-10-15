@@ -412,3 +412,9 @@ built):
      `mere/<domain>` (and, per T4, `ambient/mere/<domain>` with its own
      admission shape) exposed on it (T7, recommendation 5); the brokers
      moving to Djinn is the lift plan's P5.
+- **2026-10-15 (with the lift plan's P5):** Mark ruled the codec into
+  `chirograph`. `chirograph::line` (with `LineAssembler`) is now the one codec:
+  `graphshell-endpoint`'s stdio and network carriers frame through it, so item
+  3's codec half is closed. Still open from item 3: one client correlator and
+  the native stream-to-lines pump. The brokers are Djinn's `door` module, so
+  push notices (item 2) and the dialable host (item 4) are Djinn work.

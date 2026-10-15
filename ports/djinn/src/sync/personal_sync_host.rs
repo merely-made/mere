@@ -26,13 +26,13 @@ use transport::{
 };
 use uuid::Uuid;
 
-use crate::native::browser_host::now_ms;
-use crate::native::graph_keys::{GraphKeyError, GraphKeyGroup};
-use crate::transfer_offer::{TransferOfferV1, offers_in, transfer_offer_rule};
+use crate::door::browser_host::now_ms;
+use crate::sync::graph_keys::{GraphKeyError, GraphKeyGroup};
+use graphshell::transfer_offer::{TransferOfferV1, offers_in, transfer_offer_rule};
 
-use crate::identity_endpoint::{SupplementalCard, TRANSFER_ACCEPT_INTENT, TRANSFER_ACCEPT_SCHEMA};
-use crate::identity_projection::IdentityProjectionAction;
-use crate::personal_sync::{
+use graphshell::identity_endpoint::{SupplementalCard, TRANSFER_ACCEPT_INTENT, TRANSFER_ACCEPT_SCHEMA};
+use graphshell::identity_projection::IdentityProjectionAction;
+use graphshell::personal_sync::{
     KeyAgreementEvent, KeyAgreementStep, PersonalGraphError, PersonalGraphEvent, PersonalGraphExt,
     PersonalGraphIdentityError, PersonalGraphReplica, SyncRoster, SyncSelection, accept_into,
     personal_graph_identity_salt,
@@ -224,7 +224,7 @@ impl PersonalSyncHost {
         // Catch up on whatever the lane already said about keys. This runs
         // before anything is projected, because until it does this device may
         // hold sealed operations it has the key for and does not know it.
-        let caught_up = crate::personal_sync::key_agreement(&replica.sync_store(), config.graph)
+        let caught_up = graphshell::personal_sync::key_agreement(&replica.sync_store(), config.graph)
             .await
             .map_err(PersonalSyncHostError::Graph)?;
         if !caught_up.is_empty() {
@@ -552,7 +552,7 @@ impl PersonalSyncHost {
         self.blob_authority.retain(self.blob_scope, hash);
         let blob = hash.to_bytes();
         self.author(vec![PersonalGraphEvent::ObserveBlobAvailability {
-            observation: crate::personal_sync::BlobAvailabilityObservation {
+            observation: graphshell::personal_sync::BlobAvailabilityObservation {
                 record_id: Uuid::new_v4(),
                 container_id: container,
                 blob,
@@ -769,12 +769,12 @@ impl PersonalSyncHost {
     pub async fn key_group_exists(&self) -> Result<bool, PersonalSyncHostError> {
         let steps = {
             let replica = self.replica.lock().await;
-            crate::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
+            graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
         };
         Ok(steps.iter().any(|step| {
             matches!(
                 step.step,
-                crate::personal_sync::KeyAgreementEvent::Dispatch(_)
+                graphshell::personal_sync::KeyAgreementEvent::Dispatch(_)
             )
         }))
     }
@@ -828,7 +828,7 @@ impl PersonalSyncHost {
         let roster = self.roster.read().await.clone();
         let steps = {
             let replica = self.replica.lock().await;
-            crate::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
+            graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
         };
         let (report, keyed) = {
             let mut group = self.key_group.lock().await;
@@ -1134,12 +1134,12 @@ impl PersonalSyncHost {
                     .facets()
                     .get(&node.id, &chartulary::FacetId::new(facet))
             };
-            let run = facet_of(crate::receipts::FACET_RUN);
-            if let Some(card) = crate::receipts::receipt_card(
+            let run = facet_of(graphshell::receipts::FACET_RUN);
+            if let Some(card) = graphshell::receipts::receipt_card(
                 &node.title,
                 &node.url(),
                 run,
-                facet_of(crate::receipts::FACET_ARTIFACTS),
+                facet_of(graphshell::receipts::FACET_ARTIFACTS),
             ) {
                 cards.push(SupplementalCard {
                     adapter: "graphshell.receipt".into(),
@@ -1296,8 +1296,8 @@ fn value(label: impl Into<String>, value: impl Into<String>) -> CardValueV1 {
 /// because the correspondence is not required to be one-to-one — a device that
 /// re-publishes under a new seat leaves the old seat still resolvable.
 ///
-/// [`recipient_for_root`]: crate::native::graph_keys::recipient_for_root
-/// [`root_for_recipient`]: crate::native::graph_keys::root_for_recipient
+/// [`recipient_for_root`]: crate::sync::graph_keys::recipient_for_root
+/// [`root_for_recipient`]: crate::sync::graph_keys::root_for_recipient
 #[derive(Default)]
 struct PrekeyDirectory {
     seat_of_root: BTreeMap<[u8; 32], GroupRecipientId>,
@@ -1342,7 +1342,7 @@ fn short_hex(bytes: &[u8; 32]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::transfer_offer::TRANSFER_OFFER_FACET;
+    use graphshell::transfer_offer::TRANSFER_OFFER_FACET;
     use personae::{IdentityProvider, InMemoryProvider};
     use uuid::Uuid;
 
@@ -1371,7 +1371,7 @@ mod tests {
                 title: "Resident graph node".into(),
             },
             PersonalGraphEvent::ObserveBlobAvailability {
-                observation: crate::personal_sync::BlobAvailabilityObservation {
+                observation: graphshell::personal_sync::BlobAvailabilityObservation {
                     record_id: Uuid::from_u128(0x64),
                     container_id: node,
                     blob: [0x65; 32],
@@ -1667,7 +1667,7 @@ mod tests {
         let offer = TransferOfferV1 {
             schema: TRANSFER_OFFER_FACET.to_string(),
             transfer_id: Uuid::from_u128(0x95),
-            operation: crate::transfer::TransferOperation::Copy,
+            operation: graphshell::transfer::TransferOperation::Copy,
             source: endpoint_for(&hosts[0]),
             destination: endpoint_for(&hosts[1]),
             pairing_id: "pairing-live".to_string(),
@@ -1680,7 +1680,7 @@ mod tests {
             offered_at_ms: now_ms(),
         };
         hosts[0]
-            .author(crate::transfer_offer::offer_events(&offer).unwrap())
+            .author(graphshell::transfer_offer::offer_events(&offer).unwrap())
             .await
             .unwrap();
 
@@ -1708,8 +1708,8 @@ mod tests {
         }
     }
 
-    fn endpoint_for(host: &PersonalSyncHost) -> crate::transfer::TransferEndpointV1 {
-        crate::transfer::TransferEndpointV1 {
+    fn endpoint_for(host: &PersonalSyncHost) -> graphshell::transfer::TransferEndpointV1 {
+        graphshell::transfer::TransferEndpointV1 {
             graph: format!("graphshell://graph/{}", hex(&host.graph())),
             persona: "personae://persona/owner".to_string(),
             device: format!("personae://device/{}", hex(&host.node_id())),
@@ -2256,13 +2256,13 @@ mod tests {
         let offer = TransferOfferV1 {
             schema: TRANSFER_OFFER_FACET.to_string(),
             transfer_id: Uuid::from_u128(0xb3),
-            operation: crate::transfer::TransferOperation::Copy,
-            source: crate::transfer::TransferEndpointV1 {
+            operation: graphshell::transfer::TransferOperation::Copy,
+            source: graphshell::transfer::TransferEndpointV1 {
                 graph: "graphshell://graph/accept".to_string(),
                 persona: "personae://persona/owner".to_string(),
                 device: device.clone(),
             },
-            destination: crate::transfer::TransferEndpointV1 {
+            destination: graphshell::transfer::TransferEndpointV1 {
                 graph: "graphshell://graph/accept".to_string(),
                 persona: "personae://persona/owner".to_string(),
                 device,
@@ -2276,7 +2276,7 @@ mod tests {
             blob_bytes: 44,
             offered_at_ms: 1_700_000_000_000,
         };
-        host.author(crate::transfer_offer::offer_events(&offer).unwrap())
+        host.author(graphshell::transfer_offer::offer_events(&offer).unwrap())
             .await
             .unwrap();
 

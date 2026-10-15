@@ -11,7 +11,6 @@ pub mod core;
 pub mod driver;
 pub mod fold;
 pub mod frozen;
-pub mod line;
 pub mod remote;
 pub mod session;
 
