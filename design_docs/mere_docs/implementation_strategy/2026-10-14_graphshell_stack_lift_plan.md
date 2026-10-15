@@ -206,7 +206,7 @@ second-host proof the lift must produce.
 | L5 | `canvas_controls` (113), `canvas_gestures` (271), `canvas_faces` (141) | `pictograph` `canvas` | Reconcile `canvas_gestures` with `canvas/input.rs` (899 lines, already has `wheel`, zoom and pan) rather than copying; scenograph editor plan SE24 already ruled gestures belong in the pictograph canvas | Woodshed's native graph surfaces drive the same controls over `pictograph` with only the `canvas` feature | Medium / low |
 | L6 | `viewer_commands` (232) | Waits | A second host mapping the shared `command-menu` verb ids to canvas operations; SE48 to SE51 say Graphshell and Turnstone both register them | Turnstone maps `view:fit` and its siblings through the same function | Low / low |
 | L7 | `frame_budget` (940) | `pictograph` `canvas` beside `StepBudget` and `FALLBACK_DISPLAY_PERIOD` | A second browser host of the canvas | A second wasm host paces its canvas with `Period` | Low / low, waits |
-| L8 | `coupling_edit` (102 code) | with L5 | Tests rewritten off `app` and `mere_host` | Woodshed or Turnstone edits one coupling's strength through the draft | Low / low |
+| L8 | `coupling_edit` (102 code) | `mere` facade, `graph` feature (landed 2026-10-15; the draft touches no canvas, so pictograph was the wrong home) | Tests rewritten off `app` and `mere_host` | Woodshed or Turnstone edits one coupling's strength through the draft | Low / low |
 | L9 | `appearance` (417) | Stays (§5, R6) | Tabard's division: Tabard owns definitions and derivation, the application owns its preference record and role mapping; `canvas_face_palette` also needs `mere::canvas`, which Tabard cannot depend on | none | n/a |
 
 `canvas_physics` (1,104) stays until `ProjectionClock` leaves `product`; it is
@@ -460,6 +460,12 @@ receipt.
 (one wheel and zoom path); Graphshell's web page calls them from pictograph;
 a Woodshed (or fixture) native surface drives them with only the `canvas`
 feature; `web_tree/gestures.rs` and `controls.rs` call the pictograph functions.
+*Landed 2026-10-15:* the controls, gestures and face alignment are
+`pictograph::canvas::{controls, gestures, face_alignment}`; `ProjectionClock`
+is `scenotime::ProjectionClock`; `StrengthDraft` is `mere::coupling_edit`
+(Progress). *Open:* Woodshed's native surface as the receipt, which waits on
+its repin onto a Mere revision that has these; `canvas_physics` and
+`canvas_reader` have not moved (Progress, "Follows").
 
 **P2a. L14, the remote overmap client.** Independent of P1 and P4: it needs
 only `graphshell-client`, which is already a stack crate, and an admitted
@@ -772,3 +778,42 @@ fast-forward of local main; nothing built).**
   --workspace --all-targets` fails only at the pre-existing `tabard-desktop`
   example and the `mere-mesh` examples noted above. Still open: Woodshed's and
   Turnstone's repins (the P1 entry lists what they need).
+- **2026-10-15 (P2, L5 and L8 landed):** the first three came out of the
+  port as thin policy over the canvas's public API, so there was no second
+  wheel or zoom path to reconcile with `canvas/input.rs`: they call
+  `Canvas::wheel`, `cursor_moved`, `set_ctrl` and `set_camera`, and now sit
+  beside it.
+  - `pictograph::canvas::controls` (`CanvasCommand`), `gestures` (`WheelMode`,
+    `WheelUse`, `wheel_use`, `wheel_zoom`, `TouchUse`, `touch_use`,
+    `two_finger`, `pan_at_once`, `PAN_GLIDE`) and `face_alignment`
+    (`FaceAlignment`). Their eight tests moved with them and pass under
+    pictograph's `canvas` feature alone, which is what Woodshed enables.
+  - `scenotime::ProjectionClock`, out of `product.rs`: the host's elapsed
+    clock for a transition, which `scenotime::transition`'s header already
+    says the host owns. Two new unit tests (pause not charged, time never runs
+    backward). This cuts the one production import `canvas_physics` had of
+    `product`.
+  - `mere::coupling_edit::StrengthDraft`, under the `graph` feature: it reads
+    only `kernel::graph`, so pictograph was the wrong home. `graph_id` is now a
+    public field; the journal channel string (`graphshell.coupling/<id>`) is
+    Graphshell's and moved to `mere_host_coupling.rs` with the host tests
+    (`coupling_edit_tests.rs` became `mere_host_coupling_tests.rs`), since
+    every one of them drives `GraphshellApp`. Four new kernel-only unit tests
+    cover the draft itself.
+  - Graphshell: the three modules and `coupling_edit` are deleted with no
+    re-export; `canvas_physics`, `viewer_commands`, `web_tree`, `web_tree/gestures`,
+    `web_tree/lane`, `web_tree/coupling` and `web_tree/product` import the new
+    paths. Checks: `scenotime` and the pictograph and `mere` tests above pass;
+    `TMPDIR=/tmp cargo test -p graphshell --lib` is 475 passed, 0 failed, 6
+    ignored; `cargo check` of `graphshell-web` for wasm32 passes; the boundary
+    script passes. Not run: the integration tests under `ports/graphshell/tests`
+    and Djinn's, which do not import these modules.
+  - Follows: `canvas_physics` (production part about 490 lines) can now leave
+    `product` behind, but it also names `scenotime::TransitionSchedule`,
+    `SceneOp` and `SceneSnapshot` ten times, and pictograph does not depend on
+    `scenotime`; moving it means pictograph gains that dependency (`sceno` and
+    serde only), which this pass did not take. `canvas_reader`'s production
+    code is clean and can move on its own. `viewer_commands` (L6) and
+    `frame_budget` (L7) still wait for a second host. The receipt is open: a
+    Woodshed native surface driving the controls with only `canvas` enabled,
+    after its repin onto a Mere revision that has them.

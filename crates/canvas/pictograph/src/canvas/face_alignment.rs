@@ -6,10 +6,10 @@
 
 //! Whether each node's face sits on its body, read back from the canvas: the
 //! body where Livery drew it (by hit test), the face where the face layer
-//! paints it. Both pages' `measure-faces` receipts use it (physics catalog
+//! paints it. Hosts' `measure-faces` receipts use it (physics catalog
 //! plan, the face offset ruled 2026-10-04).
 
-use mere::canvas::Canvas;
+use super::Canvas;
 
 /// One measurement over the nodes whose face lies wholly in the viewport.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -93,8 +93,8 @@ impl FaceAlignment {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::canvas_controls::CanvasCommand;
-    use mere::kernel::geometry::PortablePoint;
+    use crate::canvas::controls::CanvasCommand;
+    use kernel::geometry::PortablePoint;
 
     #[test]
     fn every_face_in_view_sits_on_its_body() {
@@ -116,7 +116,7 @@ mod tests {
             })
             .collect();
         canvas.land_paused_positions(&grid);
-        canvas.set_camera(mere::canvas::CameraView {
+        canvas.set_camera(crate::canvas::CameraView {
             offset: (400.0, 300.0),
             zoom: 1.0,
         });
