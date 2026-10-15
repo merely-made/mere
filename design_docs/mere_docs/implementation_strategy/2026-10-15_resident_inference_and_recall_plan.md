@@ -1,8 +1,8 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-15):** plan; nothing started. Rulings 1 to 14 recorded
-(§1). Rulings 9 to 14 widened the plan from a first answering host to
+**Status (2026-10-15):** in progress. I1 done (§7); I2's strictness step
+landed. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
 
@@ -697,3 +697,43 @@ Stop and record the reason if any of these happen:
   tests were not run here (no checkpoint on this machine). Mistral
   7B v0.2 and v0.3, which would compute correctly, are refused too until a
   reference-matched row adds `mistral`.
+- **2026-10-15, I1 done.** The lane core is
+  `ports/distillery/src/inference.rs` behind Distillery's new `inference`
+  feature, beside Chronicle's endpoint, so an embedded resident can compose
+  it; djinn wires it in `ports/djinn/src/resident_inference.rs` behind its own
+  `inference` feature.
+  - *Lane.* `InferenceLane` owns the esp actor and a run table. A plain bridge
+    thread folds the actor's updates into the table, instead of R2's
+    `Wake`-to-`Notify` bridge: it needs no async executor, which keeps the
+    embedded form open. Updates for an ended run are dropped, so nothing
+    reaches a cancelled run. `close` cancels unfinished runs, then joins the
+    actor and the bridge.
+  - *Route.* `inference.ask` serves one card whose media is the run table
+    (`distillery.inference-runs/v1`) and rings when the table moves; its
+    100 ms notice poll is the fragment cadence. `Ask` carries a caller-named
+    run, because an intent result carries no data; `Cancel` names the run.
+    Duplicate and unknown runs, empty fields and other intents are rejected.
+  - *djinn.* `OwnerSettings.inference` (`{"model": "stub"}` in I1, skipped when
+    absent so older builds can still read the file) is refused before anything
+    opens when the build lacks the feature or there is no Distillery lane
+    (ruling 3). The lane closes first at shutdown and is granted to
+    `turnstone` alone (ruling 8).
+  - *Distillery's esp edge.* `decoder-lora` moved from the optional `esp`
+    dependency onto `trainer` and `flora`, so `inference` adds only esp's actor;
+    the trainer and FLoRA features still compile.
+  - *Receipts.* Distillery: six lane tests (streaming to a finished answer, a
+    gated provider cancelled mid-stream keeping its partial text and nothing
+    after, refusals, close cancelling queued runs, the route's ask, stream
+    and ring), 20 of 20 repeated runs clean on the Kubuntu Surface. djinn on
+    O-PC (Windows, Rust 1.98.1): settings tests with and without the feature;
+    `tests/inference_route.rs` opens a real resident with the Distillery and
+    inference lanes, serves the real app broker on a named pipe, asks and
+    reads the answer as Turnstone, refuses three other app labels, and shuts
+    down cleanly; the default-feature djinn binaries build; clippy is clean on
+    the changed files. The installed `djinn` binary's own grant was compiled,
+    not run.
+  - *Low-end note (ruling 9).* djinn does not build on the Kubuntu Surface
+    as it stands: genet's font stack needs `pkg-config` and the fontconfig
+    development package, and its fontique backend does not support
+    fontconfig-sys's runtime-loading mode. Distillery's lane builds there.
+  - *Not in I1.* Pause on lock (ruling 11) is I3.

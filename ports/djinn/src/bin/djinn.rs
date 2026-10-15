@@ -1236,6 +1236,14 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                     .await?;
                 grants.grant(AppId::new("turnstone"), route);
             }
+            // The inference lane, to Turnstone (resident inference plan,
+            // ruling 8).
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_inference_route(catalog))
+                .await?
+            {
+                grants.grant(AppId::new("turnstone"), route);
+            }
             (grants, catalog)
         };
         #[cfg(not(feature = "personal-sync"))]

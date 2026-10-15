@@ -114,6 +114,11 @@ pub struct OwnerSettings {
     pub knot: Option<KnotResidentSettings>,
     /// Absent means this device host does not compose the Distillery works.
     pub distillery: Option<DistilleryLaneSettings>,
+    /// Absent means this device host does not compose the inference lane.
+    /// Skipped when absent, so a file this build writes stays readable by a
+    /// build that predates the lane.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inference: Option<InferenceLaneSettings>,
     /// The reservoir lane. Unlike the lanes above, absent means **on**: meres
     /// are reachable by default (Mark, 2026-09-23), and an owner turns the
     /// lane off here.
@@ -122,6 +127,32 @@ pub struct OwnerSettings {
     /// Physical content custody shared by every lane in this resident.
     #[serde(skip_serializing_if = "ResidentContentSettings::is_default")]
     pub content: ResidentContentSettings,
+}
+
+/// The owner's statement of which model the resident inference lane runs
+/// (resident inference and recall plan, I1).
+///
+/// The lane borrows the Distillery lane's model library (that plan's ruling
+/// 3), so it is refused without a `distillery` block, and refused in a build
+/// without the `inference` feature. I1 runs only the stub; I2 adds models from
+/// the library.
+///
+/// scope=profile; movement=local-only; mutability=restart-required;
+/// security=ordinary (a model choice, no key material).
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct InferenceLaneSettings {
+    /// Which model answers.
+    pub model: InferenceModelSettings,
+}
+
+/// The models the inference lane can be told to run.
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum InferenceModelSettings {
+    /// esp's deterministic stub, which echoes the question: proves the lane
+    /// and its route without a model.
+    Stub,
 }
 
 /// The owner's statement of how the resident Distillery works runs on this
@@ -952,6 +983,7 @@ mod tests {
             }),
             knot: None,
             distillery: None,
+            inference: None,
             reservoir: ReservoirLaneSettings::default(),
             content: ResidentContentSettings::default(),
         };
