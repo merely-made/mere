@@ -1,7 +1,7 @@
 [package]
 rust-version = "1.97.1"
 name = "scenomise"
-version = "0.0.4"
+version = "0.0.5"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
@@ -18,7 +18,7 @@ categories = ["visualization", "algorithms"]
 authoring = ["dep:backstep", "dep:workbench"]
 
 [dependencies]
-sceno = { version = "0.0.4", path = "../sceno" }
+sceno = { version = "0.0.5", path = "../sceno" }
 scenograph = { version = "0.0.4", path = "../scenograph" }
 # The registry's capability records serialize, and a custom arrangement's
 # config is the opaque `serde_json::Value` the score already carries.

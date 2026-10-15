@@ -2127,7 +2127,7 @@ dependencies = [
  "layout-dom-api",
  "mere-surface-api",
  "meristem",
- "sceno",
+ "sceno 0.0.5",
  "sprigging",
  "tinct",
  "workbench",
@@ -2569,7 +2569,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "blake3",
- "sceno",
+ "sceno 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -2662,7 +2662,7 @@ dependencies = [
  "mere",
  "muniment",
  "rand_core 0.6.4",
- "sceno",
+ "sceno 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -4631,9 +4631,9 @@ dependencies = [
  "personae",
  "pollster 0.4.0",
  "safetensors 0.4.5",
- "sceno",
+ "sceno 0.0.5",
  "scenograph",
- "scenomise",
+ "scenomise 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -4693,7 +4693,7 @@ dependencies = [
  "rpassword",
  "rustls",
  "safetensors 0.4.5",
- "sceno",
+ "sceno 0.0.5",
  "scenograph",
  "scenotime",
  "serde",
@@ -6089,8 +6089,8 @@ dependencies = [
  "iri-string",
  "mere-fleece",
  "reqwest 0.12.28",
- "sceno",
- "scenomise",
+ "sceno 0.0.5",
+ "scenomise 0.0.5",
  "serde",
  "serde_json",
  "url",
@@ -6967,9 +6967,9 @@ dependencies = [
  "platen",
  "pollster 0.4.0",
  "rand_core 0.6.4",
- "sceno",
+ "sceno 0.0.5",
  "scenograph",
- "scenomise",
+ "scenomise 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -7003,9 +7003,9 @@ dependencies = [
  "genet-scripted-dom",
  "incipit",
  "layout-dom-api",
- "sceno",
+ "sceno 0.0.5",
  "scenograph",
- "scenomise",
+ "scenomise 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -7026,7 +7026,7 @@ dependencies = [
  "pandect",
  "personae",
  "rand_core 0.6.4",
- "sceno",
+ "sceno 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -7054,7 +7054,7 @@ dependencies = [
  "pandect",
  "personae",
  "rand_core 0.6.4",
- "sceno",
+ "sceno 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -8811,9 +8811,9 @@ dependencies = [
  "knot-capture",
  "quick-xml 0.39.4",
  "reference-data",
- "sceno",
+ "sceno 0.0.4",
  "scenograph",
- "scenomise",
+ "scenomise 0.0.4",
  "scenotime",
  "seiche",
  "serde",
@@ -8878,7 +8878,7 @@ dependencies = [
  "postcard",
  "quinn",
  "rustls",
- "sceno",
+ "sceno 0.0.4",
  "scenotime",
  "script-rhai",
  "serde",
@@ -9721,8 +9721,8 @@ name = "mere-cartography"
 version = "0.0.2"
 dependencies = [
  "mere-kernel",
- "sceno",
- "scenomise",
+ "sceno 0.0.5",
+ "scenomise 0.0.5",
  "serde",
  "serde_json",
  "uuid",
@@ -9982,7 +9982,7 @@ dependencies = [
  "mere-kernel",
  "mere-view",
  "pandect",
- "sceno",
+ "sceno 0.0.5",
  "scenotime",
  "serde",
  "serde_json",
@@ -13372,9 +13372,9 @@ dependencies = [
  "paint_list_api",
  "paint_list_render",
  "petgraph 0.8.3",
- "sceno",
+ "sceno 0.0.5",
  "scenograph",
- "scenomise",
+ "scenomise 0.0.5",
  "scenotime",
  "seiche",
  "serde",
@@ -15380,6 +15380,15 @@ dependencies = [
 [[package]]
 name = "sceno"
 version = "0.0.4"
+source = "git+https://www.github.com/merely-made/mere.git?rev=0c03dff3d324c53e7738722899804309f95d3087#0c03dff3d324c53e7738722899804309f95d3087"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "sceno"
+version = "0.0.5"
 dependencies = [
  "serde",
  "serde_json",
@@ -15390,7 +15399,7 @@ name = "scenograph"
 version = "0.0.4"
 dependencies = [
  "mere-curation",
- "sceno",
+ "sceno 0.0.5",
  "script-engine-api",
  "serde",
  "serde_json",
@@ -15399,10 +15408,22 @@ dependencies = [
 [[package]]
 name = "scenomise"
 version = "0.0.4"
+source = "git+https://www.github.com/merely-made/mere.git?rev=0c03dff3d324c53e7738722899804309f95d3087#0c03dff3d324c53e7738722899804309f95d3087"
+dependencies = [
+ "libm",
+ "sceno 0.0.4",
+ "scenograph",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "scenomise"
+version = "0.0.5"
 dependencies = [
  "backstep",
  "libm",
- "sceno",
+ "sceno 0.0.5",
  "scenograph",
  "scenotime",
  "serde",
@@ -15415,7 +15436,7 @@ name = "scenotime"
 version = "0.0.4"
 dependencies = [
  "backstep",
- "sceno",
+ "sceno 0.0.5",
  "serde",
  "serde_json",
 ]
