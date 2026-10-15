@@ -120,6 +120,7 @@ fn production_routing_all_fixed_families_have_exact_captures_and_controls() {
         (ProvenanceSubKind::ExtractedFrom, true),
         (ProvenanceSubKind::ImportedFromSource, true),
         (ProvenanceSubKind::CopiedFrom, false),
+        (ProvenanceSubKind::MergedFrom, false),
     ] {
         cases.push((
             EdgeAssertion::Provenance { sub_kind: kind },
@@ -138,7 +139,7 @@ fn production_routing_all_fixed_families_have_exact_captures_and_controls() {
             false,
         ));
     }
-    assert_eq!(cases.len(), 43);
+    assert_eq!(cases.len(), 44);
     for (assertion, selector, resource) in cases {
         let (mut graph, a, b) = bound_graph();
         let mut replayed = graph.clone();

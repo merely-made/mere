@@ -28,7 +28,10 @@ use super::{CouplingId, FieldId, Graph, NodeKey};
 use crate::persistence::{PersistedEdge, PersistedResourceFacet, PersistedResourceRecord};
 
 /// One part of the graph a change can alter.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize,
+)]
+#[serde(rename_all = "snake_case")]
 pub enum Part {
     /// A node as a whole: made or removed by the change.
     Node(Uuid),
@@ -777,6 +780,141 @@ pub fn revert_change(
         }
     }
     out
+}
+
+/// The part one revert or merge edit sets: what a caller picking edits by
+/// part (a merge-in applying one side of a conflict) filters on. An edit that
+/// recreates or removes a node is [`Part::Node`]; a whole resource record is
+/// [`Part::Resource`]. `None` for edits revert never writes (traversals,
+/// previews, layout hints and the like).
+pub fn part_of(edit: &CapturedDelta) -> Option<Part> {
+    use CapturedDelta as D;
+    let id = |text: &str| uuid(text);
+    Some(match edit {
+        D::ReplayAddNodeWithIdIfMissing { id: node, .. }
+        | D::ReplayRemoveNodeById { node_id: node } => Part::Node(id(node)?),
+        D::ReplaySetNodeTitleById { node_id, .. } => Part::Title(id(node_id)?),
+        D::ReplaySetNodeUrlById { node_id, .. } => Part::Url(id(node_id)?),
+        D::ReplayInsertNodeTagById { node_id, tag }
+        | D::ReplayRemoveNodeTagById { node_id, tag } => Part::Tag(id(node_id)?, tag.clone()),
+        D::ReplaySetNodeBodyById { node_id, .. } => Part::Body(id(node_id)?),
+        D::ReplaySetNodeContentById { node_id, .. } => Part::Content(id(node_id)?),
+        D::ReplaySetNodeMimeHintById { node_id, .. } => Part::MediaType(id(node_id)?),
+        D::ReplaySetNodeNestedById { node_id, .. } => Part::Nested(id(node_id)?),
+        D::ReplaySetNodeFacetById { node_id, facet, .. }
+        | D::ReplayRemoveNodeFacetById { node_id, facet } => {
+            Part::Facet(id(node_id)?, facet.clone())
+        },
+        D::ReplayUpdateNodeHistoryById { node_id, .. } => Part::History(id(node_id)?),
+        D::ReplaySetEdgesByIds { from_id, to_id, .. } => Part::Edges(id(from_id)?, id(to_id)?),
+        D::ReplaySetImportRecords { .. } => Part::ImportRecords,
+        D::ReplayAddField { field } => Part::Field(id(&field.id)?),
+        D::ReplayRemoveFieldById { field_id } => Part::Field(id(field_id)?),
+        D::ReplayAddCoupling { coupling } => Part::Coupling(id(&coupling.id)?),
+        D::ReplayRetractCouplingById { coupling_id } => Part::Coupling(id(coupling_id)?),
+        D::ReplaySetResourceRecordById { resource_id, .. } => Part::Resource(id(resource_id)?),
+        D::ReplaySetResourceEdgesByIds {
+            from_resource_id,
+            to_resource_id,
+            ..
+        } => Part::ResourceEdges(id(from_resource_id)?, id(to_resource_id)?),
+        D::ReplaySetShownResourceById { surface_id, .. } => Part::ShownResource(id(surface_id)?),
+        _ => return None,
+    })
+}
+
+/// The node a node-scoped part belongs to, if it is one.
+pub fn part_node(part: &Part) -> Option<Uuid> {
+    match part {
+        Part::Node(id)
+        | Part::Title(id)
+        | Part::Url(id)
+        | Part::Tag(id, _)
+        | Part::Body(id)
+        | Part::Content(id)
+        | Part::MediaType(id)
+        | Part::Nested(id)
+        | Part::Facet(id, _)
+        | Part::History(id) => Some(*id),
+        _ => None,
+    }
+}
+
+/// What `part` holds in `graph`, as JSON, or `None` when the graph does not
+/// hold it (a missing node, an absent tag or facet, no relations between two
+/// nodes). Two graphs agree on a part exactly when these are equal: how a
+/// merge-in tells a conflict from two sides making the same change.
+pub fn part_value(graph: &Graph, part: &Part) -> Option<Value> {
+    let node = |id: &Uuid| node_state(graph, *id);
+    match part {
+        Part::Node(id) => node(id).map(|state| {
+            serde_json::json!({
+                "title": state.title,
+                "url": state.url,
+                "tags": state.tags,
+                "body": state.body,
+                "content": state.content.map(|hash| hash.to_vec()),
+                "media_type": state.media_type,
+                "nested": state.nested,
+                "facets": state.facets,
+                "history": state.history,
+            })
+        }),
+        Part::Title(id) => node(id).map(|state| Value::from(state.title)),
+        Part::Url(id) => node(id).map(|state| Value::from(state.url)),
+        Part::Tag(id, tag) => node(id)
+            .filter(|state| state.tags.contains(tag))
+            .map(|_| Value::Bool(true)),
+        Part::Body(id) => node(id).and_then(|state| state.body.map(Value::from)),
+        Part::Content(id) => node(id)
+            .and_then(|state| state.content)
+            .map(|hash| Value::from(hash.to_vec())),
+        Part::MediaType(id) => node(id).and_then(|state| state.media_type.map(Value::from)),
+        Part::Nested(id) => node(id).and_then(|state| state.nested.map(Value::from)),
+        Part::Facet(id, facet) => node(id).and_then(|mut state| state.facets.remove(facet)),
+        Part::History(id) => node(id).map(|state| serde_json::json!(state.history)),
+        Part::Edges(from, to) => {
+            let edges = edges_between(graph, *from, *to);
+            (!edges.is_empty()).then(|| serde_json::to_value(edges).expect("edges encode"))
+        },
+        Part::Field(id) => graph.field(FieldId::from_uuid(*id)).map(|field| {
+            serde_json::to_value(persisted_field_from_field(field)).expect("field encodes")
+        }),
+        Part::Coupling(id) => graph
+            .couplings()
+            .find(|coupling| coupling.id == CouplingId::from_uuid(*id))
+            .map(|coupling| {
+                serde_json::to_value(persisted_coupling_from_coupling(coupling))
+                    .expect("coupling encodes")
+            }),
+        Part::ImportRecords => {
+            let records = graph.import_records();
+            (!records.is_empty()).then(|| serde_json::to_value(records).expect("records encode"))
+        },
+        Part::Resource(id) => graph
+            .resource_record(*id)
+            .map(|record| serde_json::to_value(record).expect("record encodes")),
+        Part::ResourceFacet(id, facet) => graph
+            .resource_record(*id)
+            .and_then(|record| resource_facets(&record).remove(facet)),
+        Part::ResourceEdges(from, to) => {
+            let edges = graph.persisted_resource_edges_between(*from, *to);
+            (!edges.is_empty()).then(|| serde_json::to_value(edges).expect("edges encode"))
+        },
+        Part::ShownResource(id) => {
+            shown_resource(graph, *id).map(|resource| Value::from(resource.to_string()))
+        },
+    }
+}
+
+/// The edits that make node `id` again, whole, as it stands in `graph`: what
+/// a merge-in uses to bring a node across that its target never held. `None`
+/// when `graph` has no such node. Relations are not included.
+pub fn recreate_node_edits(graph: &Graph, id: Uuid) -> Option<Vec<CapturedDelta>> {
+    let state = node_state(graph, id)?;
+    let mut made = Revert::default();
+    made.recreate(id, &state);
+    Some(made.edits)
 }
 
 #[cfg(test)]
