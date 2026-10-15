@@ -47,17 +47,37 @@ pub fn arrangement_defaults(
         .unwrap_or_default()
 }
 
-/// What a row shows when its option is left out: the value, "auto", "none",
-/// or a measured default as its number and its words when the items are known.
-pub fn option_placeholder(spec: &OptionSpec, resolved: Option<&str>) -> String {
+/// What leaving an option out means, as values. A host words it for its own
+/// rows: this carries the facts a label is made from, never the label.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum OptionFallback {
+    /// A fixed default value.
+    Value(String),
+    /// Measured from the items. `resolved` is what it came to for them, when
+    /// the host knows the items; `words` says what is measured.
+    Measured {
+        resolved: Option<String>,
+        words: String,
+    },
+    /// Chosen by the arrangement from the items' shape. `resolved` is what it
+    /// chose for them, when the host knows the items.
+    Auto { resolved: Option<String> },
+    /// No default: leaving the option out leaves it unset.
+    Empty,
+}
+
+/// What `spec` falls back to when left out, given the number or name the items
+/// resolved it to (from [`arrangement_defaults`]) when the host has them.
+pub fn option_fallback(spec: &OptionSpec, resolved: Option<&str>) -> OptionFallback {
+    let resolved = resolved.map(str::to_owned);
     match &spec.default {
-        OptionDefault::Value(value) => value.clone(),
-        OptionDefault::Auto => "auto".to_string(),
-        OptionDefault::Empty => "none".to_string(),
-        OptionDefault::Measured(words) => match resolved {
-            Some(number) => format!("{number} ({words})"),
-            None => words.clone(),
+        OptionDefault::Value(value) => OptionFallback::Value(value.clone()),
+        OptionDefault::Measured(words) => OptionFallback::Measured {
+            resolved,
+            words: words.clone(),
         },
+        OptionDefault::Auto => OptionFallback::Auto { resolved },
+        OptionDefault::Empty => OptionFallback::Empty,
     }
 }
 
@@ -131,31 +151,49 @@ mod tests {
     }
 
     #[test]
-    fn placeholders_show_the_default_and_measured_numbers() {
+    fn a_fallback_carries_the_default_and_what_the_items_resolved_it_to() {
         let card = sceno::Size2::new(164.0, 68.0);
         let defaults = arrangement_defaults("grid", card, 9, 16.0);
-        let width = Family::Grid
-            .options()
-            .into_iter()
-            .find(|spec| spec.key == "cell_width")
-            .unwrap();
+        let option = |family: Family, key: &str| {
+            family
+                .options()
+                .into_iter()
+                .find(|spec| spec.key == key)
+                .unwrap()
+        };
+        let width = option(Family::Grid, "cell_width");
         assert_eq!(
-            option_placeholder(&width, defaults.get("cell_width").map(String::as_str)),
-            "164 (the largest item's width)"
+            option_fallback(&width, defaults.get("cell_width").map(String::as_str)),
+            OptionFallback::Measured {
+                resolved: Some("164".into()),
+                words: "the largest item's width".into(),
+            }
         );
-        assert_eq!(option_placeholder(&width, None), "the largest item's width");
-        let curve = Family::Spiral
-            .options()
-            .into_iter()
-            .find(|s| s.key == "curve")
-            .unwrap();
-        assert_eq!(option_placeholder(&curve, None), "square_root");
-        let depth = Family::LSystem
-            .options()
-            .into_iter()
-            .find(|s| s.key == "depth")
-            .unwrap();
-        assert_eq!(option_placeholder(&depth, None), "auto");
+        assert_eq!(
+            option_fallback(&width, None),
+            OptionFallback::Measured {
+                resolved: None,
+                words: "the largest item's width".into(),
+            }
+        );
+        let curve = option(Family::Spiral, "curve");
+        assert_eq!(
+            option_fallback(&curve, None),
+            OptionFallback::Value("square_root".into())
+        );
+        let depth = option(Family::LSystem, "depth");
+        assert_eq!(
+            option_fallback(&depth, None),
+            OptionFallback::Auto { resolved: None }
+        );
+        assert_eq!(
+            option_fallback(&depth, Some("auto")),
+            OptionFallback::Auto {
+                resolved: Some("auto".into())
+            }
+        );
+        let empty = OptionSpec::new("note", "Note", OptionKind::Positive, OptionDefault::Empty);
+        assert_eq!(option_fallback(&empty, None), OptionFallback::Empty);
     }
 
     #[test]
