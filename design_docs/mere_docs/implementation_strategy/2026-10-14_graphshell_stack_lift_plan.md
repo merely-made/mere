@@ -947,4 +947,22 @@ fast-forward of local main; nothing built).**
   imports in `knot_authoring.rs` now come from `scenograph`, and its 940 tests
   pass (reported by the Knot adoption session, not rerun here). Woodshed is on
   Mere `8357b00d0` (woodshed `25acaa0`).
+- **2026-10-15 (P3, Knot side landed; helpers on main):** Mere `a26ed1caf` on
+  `origin/main` carries `282413cd0` (option values), `2cc10a674` (the P2
+  helpers generic over the host) and the pin-sync note. Knot `601f99b` (on
+  `origin/main`) repins Mere to `a26ed1caf` and takes the arrangement option
+  facts from `scenomise::arrangement` (`option_fallback`, `arrangement_options`,
+  `arrangement_defaults`): `recipe/editor.rs` no longer has its own
+  `option_default`, `declared_options` or `default_description` logic, and keeps
+  only its words ("automatic", the empty label, "Default: ...", "Measured
+  default: ..."). Its rows show the same text as before. Checks: workspace
+  `cargo check --all-targets`; knot-document, knot-editor (`mere-overlay`),
+  knot-desktop (lib, bins, `scenario_lane`, `font_roles`, `typography_fonts`)
+  and knot-site pass, 624 tests, with a symlink-free `TMPDIR`. Graphshell
+  already used the shared helpers through its own labels
+  (`projection_compile::option_placeholder`). P3 is done on both sides. Still
+  open: the P2 receipt (Woodshed adopting `CameraHost`, `FitHost` and
+  `FaceGeometry` on its three surfaces, after its repin to a revision with them);
+  `canvas_physics` and `canvas_reader` have not moved; Knot's pin bumps now
+  belong to the overmap agent.
 
