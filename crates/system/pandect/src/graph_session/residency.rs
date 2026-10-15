@@ -8,6 +8,24 @@
 use super::*;
 use crate::addressable_graph::{AddressableGraphStore, ResidencyRoots, ResidentGraph};
 impl<B: Backend + Clone> GraphSession<B> {
+    /// The addressable publication of this session's graph, prepared without
+    /// storage. The same qualification and completeness rules as
+    /// [`publish_resident_checkpoint`](Self::publish_resident_checkpoint).
+    pub(crate) fn prepare_resident_publication(
+        &self,
+    ) -> Result<crate::addressable_graph::PreparedGraphPublication, SessionError> {
+        if self.placement.is_none() {
+            return Err(SessionError::Validation(
+                "addressable publication requires qualified recorded placement".into(),
+            ));
+        }
+        AddressableGraphStore::new(
+            self.slots.backend().clone(),
+            *self.manifest.root_graph_id.as_uuid(),
+        )
+        .prepare_recorded_graph(&self.graph)
+        .map_err(SessionError::Store)
+    }
     pub async fn publish_resident_checkpoint(&mut self) -> Result<String, SessionError> {
         if self.placement.is_none() {
             return Err(SessionError::Validation(

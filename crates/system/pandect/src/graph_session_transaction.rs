@@ -18,7 +18,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         deltas: Vec<GraphDelta>,
         at: SystemTime,
     ) -> Result<Applied, SessionError> {
-        self.transact_change(at, move |candidate| {
+        self.transact_change(at, false, move |candidate| {
             candidate
                 .edit_as(author, ChangeKind::Edit, |graph| {
                     for delta in deltas {
@@ -28,6 +28,30 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
                 .map(|(_, applied)| applied)
         })
         .await
+        .map(|(applied, _)| applied)
+    }
+
+    /// [`transact_deltas`](Self::transact_deltas), with the addressable
+    /// publication of the resulting graph in the same atomic write. Returns the
+    /// published generation. A reader never sees an edit without its
+    /// publication, and a refused write leaves neither.
+    pub async fn transact_deltas_published(
+        &mut self,
+        author: Author,
+        deltas: Vec<GraphDelta>,
+        at: SystemTime,
+    ) -> Result<(Applied, String), SessionError> {
+        self.transact_change(at, true, move |candidate| {
+            candidate
+                .edit_as(author, ChangeKind::Edit, |graph| {
+                    for delta in deltas {
+                        apply_graph_delta(graph, delta);
+                    }
+                })
+                .map(|(_, applied)| applied)
+        })
+        .await
+        .map(|(applied, generation)| (applied, generation.expect("published write")))
     }
 
     /// The same staged/acknowledged boundary for this author's saved history.
@@ -37,7 +61,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         redo: bool,
         at: SystemTime,
     ) -> Result<Option<Reverted>, SessionError> {
-        self.transact_change(at, move |candidate| {
+        self.transact_change(at, false, move |candidate| {
             if redo {
                 candidate.redo_now(author)
             } else {
@@ -45,6 +69,26 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             }
         })
         .await
+        .map(|(reverted, _)| reverted)
+    }
+
+    /// [`transact_history`](Self::transact_history) with the addressable
+    /// publication of the resulting graph in the same atomic write.
+    pub async fn transact_history_published(
+        &mut self,
+        author: Author,
+        redo: bool,
+        at: SystemTime,
+    ) -> Result<(Option<Reverted>, String), SessionError> {
+        self.transact_change(at, true, move |candidate| {
+            if redo {
+                candidate.redo_now(author)
+            } else {
+                candidate.undo_now(author)
+            }
+        })
+        .await
+        .map(|(reverted, generation)| (reverted, generation.expect("published write")))
     }
 
     /// Stage the application's view and its parallel history together.
@@ -55,17 +99,19 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         state: ViewIntent,
         at: SystemTime,
     ) -> Result<(), SessionError> {
-        self.transact_change(at, move |candidate| {
+        self.transact_change(at, false, move |candidate| {
             candidate.set_view_now(author, key, state)
         })
         .await
+        .map(|(result, _)| result)
     }
 
-    async fn transact_change<R>(
+    pub(crate) async fn transact_change<R>(
         &mut self,
         at: SystemTime,
+        publish: bool,
         change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
-    ) -> Result<R, SessionError> {
+    ) -> Result<(R, Option<String>), SessionError> {
         self.ensure_writable()?;
         if self.has_unstored() {
             return Err(SessionError::Validation(
@@ -106,7 +152,16 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             }
         }
         let pending = candidate.pending(at)?;
-        let ops = pending.ops().to_vec();
+        let mut ops = pending.ops().to_vec();
+        // The publication describes the candidate's graph and joins its write.
+        // Preparation refuses before anything is written or installed.
+        let generation = if publish {
+            let publication = candidate.prepare_resident_publication()?;
+            ops.extend_from_slice(publication.ops());
+            Some(publication.generation().to_owned())
+        } else {
+            None
+        };
         let rejection = Arc::new(Mutex::new(None));
         let rejected = rejection.clone();
         let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
@@ -158,7 +213,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         }
         candidate.stored(pending);
         *self = candidate;
-        Ok(result)
+        Ok((result, generation))
     }
 
     // A private copy with its own recorder. No candidate edit can reach the

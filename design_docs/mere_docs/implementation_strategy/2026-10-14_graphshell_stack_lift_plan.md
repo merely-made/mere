@@ -1139,3 +1139,26 @@ fast-forward of local main; nothing built).**
     --all-targets --keep-going` fails only at the `tabard-desktop` example and
     the `mere-mesh` examples noted under P1; `graphshell-web` checks for wasm32
     with and without default features; the boundary script passes.
+- **2026-10-15 (P4, Knot's receipt and pins):** Knot `b0feec9` (on
+  `origin/main`) repins Mere to `71761a553`, the P4 merge: knot-editor's
+  `place_projection` test and `k2_peer` example take admission, the carrier,
+  the catalog, the projection host and the notifying loop from
+  `graphshell-host` (`native`), so Knot's P4 receipt holds;
+  `resident_app_route` takes the catalog from it and keeps `graphshell` for
+  `serve_app_broker`, `DoorIdentity` and `ResidentIdentity` (P5). The same
+  repin takes `backstep` for `edit-history`. Checks (`TMPDIR=/private/tmp`):
+  Knot `cargo check --workspace --all-targets`; knot-editor (`mere-overlay`,
+  `place_projection` 2 and `resident_app_route` 1 among them), knot-document,
+  knot-desktop (lib, bins, `scenario_lane`, `font_roles`, `typography_fonts`)
+  and knot-site pass, 624 tests. Mere's `knot-editor`, `knot-document` and
+  Djinn's `knot-site` rows move to `b0feec9`; `cargo tree -p djinn` names no
+  package from `mere.git`, and Djinn's tests pass (180 passed, 11 ignored).
+- **2026-10-15 (P4, Turnstone):** Turnstone `667ba6a` (on `origin/main`) is
+  on Knot `b0feec9` and Mere `71761a553`, one Mere source (all 300 Mere
+  packages in its tree at that revision). Its place projection host and place
+  lanes take admission, the carrier, dialling, the catalog and the projection
+  host from `graphshell-host` (`native`); `graphshell` stays for `view` and
+  `sessions`. Its `edit-history` patch row is `backstep`. `cargo check
+  --all-targets` and `cargo test` pass (942 passed, 10 ignored,
+  `TMPDIR=/tmp`). Still open for P4: Cleromancy's receipt (it pins
+  `graphshell` at `a1309431` and was not touched here).
