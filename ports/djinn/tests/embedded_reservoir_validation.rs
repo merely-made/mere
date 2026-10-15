@@ -31,11 +31,11 @@ use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ResidentReservoir;
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::door::tasks::ResidentTasks;
+use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId, GraphValidator, MereId, mere_dir};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use sceno::InstanceId;
@@ -382,7 +382,7 @@ async fn registered_domain_validator_survives_ownership_and_refuses_complete_bat
             .sources
             .iter()
             .flatten()
-            .filter(|source| source.adapter == graphshell::session_item::SESSIONS_SOURCE)
+            .filter(|source| source.adapter == mere_overmap::wire::SESSIONS_SOURCE)
             .filter(|source| Uuid::parse_str(&source.id).is_ok())
             .map(|source| source.id.clone())
             .collect();
@@ -569,7 +569,7 @@ async fn child_serves_the_registered_domain() {
 mod published_replay_regression {
     use super::*;
     use cleromancy_domain::{CleromancyHost, Consultation, ContextDraft, SelectionMode};
-    use graphshell::session_item::{self, SessionGraphV1};
+    use mere_overmap::wire::{self as session_item, SessionGraphV1};
     use muniment::MemoryBackend;
     use serde_json::Value;
     use std::sync::Mutex;

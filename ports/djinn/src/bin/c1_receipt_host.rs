@@ -25,13 +25,13 @@ use graphshell::native::{
     app_broker::{AppEndpointCatalog, serve_app_broker},
     endpoint_catalog::ResidentEndpointCatalog,
 };
-use graphshell::session_item::{self, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
     app_client::AppBrokerClient,
     identity::VaultProtectionView,
     tasks::ResidentTasks,
 };
+use mere_overmap::wire::{self as session_item, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{
     collections::{BTreeMap, HashMap},

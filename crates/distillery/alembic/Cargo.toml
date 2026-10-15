@@ -16,8 +16,8 @@ path = "src/lib.rs"
 
 [features]
 # The memory surfaces without the workshop, for a host that wants recall only.
-# Mirrors castellan's `keeper` split: an embeddable half a host composes, and
-# an authority half that stays with the resident.
+# An embeddable half a host composes, and an authority half that stays with
+# the resident.
 recall = ["dep:kernel", "dep:serde"]
 
 [dependencies]

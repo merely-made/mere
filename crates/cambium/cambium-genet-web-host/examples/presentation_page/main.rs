@@ -113,6 +113,7 @@ pub async fn mount_page(canvas_id: String, choice: String) -> Result<u32, JsValu
         mount_with_webgpu_factory(
             canvas,
             options,
+            cambium_genet_web_host::MountLifetime::new(),
             init,
             HostHooks::inert(),
             Box::new(|canvas, _, _, _| {
