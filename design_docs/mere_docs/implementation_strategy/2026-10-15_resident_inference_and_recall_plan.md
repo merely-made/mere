@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-15
 **Status (2026-10-15):** in progress. I1 done (§7); I2's strictness step
-landed. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
+landed; its CPU model/template row passes on O-PC, with GPU reclaim still open. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
 
@@ -737,3 +737,77 @@ Stop and record the reason if any of these happen:
     development package, and its fontique backend does not support
     fontconfig-sys's runtime-loading mode. Distillery's lane builds there.
   - *Not in I1.* Pause on lock (ruling 11) is I3.
+
+- **2026-10-15, I2 CPU model/template continuation.** The branch continuation
+  adds `esp::infer::prompt`: strict `esp.prompt-template/v1` data with literal
+  role delimiters, BOS, EOS, a context slot and stop strings. The checked-in
+  `crates/intel/esp/templates/smollm2-instruct-v1.json` follows
+  [the upstream tokenizer template](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct/blob/a10cc1512eabd3dde888204e902eca88bddb4951/tokenizer_config.json),
+  including its default system instruction. Tokenizer postprocessing is disabled
+  for declared templates so it cannot silently insert a second BOS. Stop matching
+  holds a possible stop prefix across fragments, flushes an incomplete prefix at
+  a normal token limit, and does not flush it on cancellation.
+  - *Library and session.* An `esp.inference-model/v1` row names the existing
+    `ModelManifest` and a typed template artifact. `infer::library` resolves both
+    with `NoFetcher`, validates the schema and exact bytes, and builds a
+    `SessionProvider<DecoderProvider>` with an immutable `ModelSession`.
+    `InferenceLane` resolves under Distillery's existing library handle, releases
+    the store lock, then loads on its actor thread. It exposes the exact session
+    id and template hash in the table and each run. A fallible actor constructor
+    exposes load failure before any ask and fails later asks with that error;
+    it never announces a ready model or substitutes the stub.
+  - *Composition.* Djinn's opt-in `inference` now enables Distillery's separate
+    `inference-model` feature; bare Distillery `inference` remains actor-only.
+    Settings preserve `{"model":"stub"}` and accept
+    `{"model":{"library":{"row":"blake3:<64 hex digits>","device":"cpu","max_tokens":256}}}`.
+    All three library fields must be written; unknown fields, malformed row
+    references, zero limits and GPU selection are refused. Distillery opens the
+    persona library for inference even without a trainer, and retains its sole
+    handle. Existing trainer library overrides are reused through that handle.
+    An opening failure unwinds Distillery, Knot and blob custody in order.
+  - *Import.* `cargo run -p esp --release --features decoder,model-session
+    --example import_inference_model -- LIBRARY_REDB MODEL_DIR TEMPLATE_JSON
+    MODEL_ID LICENSE` imports local files and prints the inference settings
+    block. Close any resident holding that library before importing; the tool
+    opens the same redb file and does not bypass its writer exclusion. The
+    resident performs neither download nor HTTP fetching.
+  - *Independent basis.* `crates/intel/esp/tests/reference_smollm2.py` runs local Transformers
+    4.57.6 / CPU Torch 2.14.1+cpu in f32 with eager attention, greedy decoding
+    and 16 generated tokens on three questions. The committed
+    `crates/intel/esp/tests/smollm2_360m_reference.json` pins revision
+    `a10cc1512eabd3dde888204e902eca88bddb4951`, SHA-256 for the model/config/
+    tokenizer files, rendered prompts, input/output token ids and elapsed time.
+    `crates/intel/esp/tests/smollm2_library.rs` verifies those artifact hashes before loading
+    through `ModelLibrary`, checks prompt equality and every generated token,
+    and reports the exact ESP session/template identity and completion time.
+  - *CPU receipt.* `support/receipts/resident_inference_cpu.json` records the
+    passing real-checkpoint library row on O-PC (Windows, AMD Ryzen 9 7940HS,
+    Rust 1.98.1). All 39 greedy token ids match the independent reference
+    (7/16/16 across the three prompts). The first answer reaches EOS; the other
+    two reach the configured 16-token cap. Measured generation calls take
+    15.74/33.43/36.17 seconds; the test repeats each through the actor-compatible
+    provider path and finishes in 172.27 seconds. Loading the resolved library
+    row takes 1.07 seconds. A live Windows peak-working-set sample is
+    3,626,852,352 bytes; this test includes an in-memory `MemoryBackend` library,
+    not the resident's redb store. The receipt includes exact session/template
+    identities, the tested parent, source byte hashes and the test-binary hash.
+    Reproduction: set `ESP_SMOLLM2_DIR` to the pinned local snapshot, optionally
+    set `ESP_INFERENCE_RECEIPT` to an output JSON path, then run `cargo test
+    --locked -p esp --release --features decoder,model-session,actor --test
+    smollm2_library -- --ignored --nocapture`. The independent script was rerun
+    against the pinned files and reproduced all artifact hashes, rendered/input
+    prompts and output tokens.
+  - *Other checks.* ESP release: 160 unit tests, three template tests, two
+    library/session tests and the existing Eidetic corridor pass (166 checks).
+    Djinn with `inference`: five settings/validation unit tests and all three
+    real app-broker tests pass, including a synthetic library-backed decoder
+    with no trainer, exact session/template identity in the served run table,
+    Turnstone-only access and clean shutdown. The real 360M row and the real
+    app-broker row are separate receipts. Final default-feature, Distillery
+    recheck and import-example checks are queued behind another process's Cargo
+    package-cache lock. No installed resident binary was run.
+  - *Still open in I2:* the GPU provider row and inference/trainer owner-reclaim
+    handshake, including withholding `HostFacts.gpu` and waiting for the
+    trainer's clean cancellation before inference binds the GPU. GPU settings
+    are refused pending that work. This continuation does **not** close I2,
+    claim an installed-binary run, or change I3's durable asks and lock posture.

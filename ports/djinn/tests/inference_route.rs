@@ -13,6 +13,8 @@
 #![cfg(feature = "inference")]
 
 mod common;
+#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
+mod decoder_fixture;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -28,7 +30,7 @@ use common::{
 };
 use distillery::inference::{
     ASK_INTENT, AskRequestV1, CANCEL_INTENT, CancelRequestV1, INFERENCE_ASK_ROUTE,
-    INFERENCE_RUNS_SCHEMA, InferenceRunsV1, RunStateV1,
+    INFERENCE_RUNS_SCHEMA, InferenceProvider, InferenceRunsV1, RunStateV1,
 };
 use djinn::resident::DjinnResident;
 use djinn::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
@@ -135,12 +137,120 @@ async fn intent(
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_resident_answers_an_ask_on_its_route_and_closes_the_lane() {
+    exercise_route(false).await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_library_model_answers_through_the_resident_app_door_without_a_trainer() {
+    exercise_route(true).await;
+}
+
+async fn exercise_route(library_model: bool) {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
     let (vault_dir, identity) = open_vault(directory.path());
     write_device_settings(&data_root, Some(lending()));
+    let (inference, question, model_id, expected_text, expected_session) = if library_model {
+        use distillery::inference::{
+            InferenceDevice, InferenceModelRow, PromptTemplate, load_library_session,
+        };
+        use eidetic::typed::save_typed;
+        use eidetic::{ModelLibrary, PrivacyClass, ProvenanceRecord, Timestamp, TrustEnvelope};
+        let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        let mut store = muniment::RedbBackend::open(&path).unwrap();
+        let model = ModelLibrary::save_model_with_components(
+            &mut store,
+            "test/tiny-decoder",
+            "llama",
+            "MIT",
+            serde_json::from_str(decoder_fixture::CONFIG_JSON).unwrap(),
+            &decoder_fixture::weights_bytes(),
+            decoder_fixture::tokenizer_json().as_bytes(),
+            vec![],
+            vec![],
+            PrivacyClass::LocalOnly,
+            ProvenanceRecord::self_imported("local"),
+            TrustEnvelope::self_asserted(),
+            Timestamp::ZERO,
+        )
+        .await
+        .unwrap();
+        let mut template = PromptTemplate::from_bytes(include_bytes!(
+            "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+        ))
+        .unwrap();
+        template.system_prompt.clear();
+        template.user.prefix = "t1 ".into();
+        template.user.suffix = " t2 ".into();
+        template.assistant.prefix = "t3 ".into();
+        let template = save_typed(
+            &mut store,
+            &template,
+            vec![],
+            PrivacyClass::LocalOnly,
+            ProvenanceRecord::self_imported("local"),
+            TrustEnvelope::self_asserted(),
+            Timestamp::ZERO,
+        )
+        .await
+        .unwrap();
+        let row = save_typed(
+            &mut store,
+            &InferenceModelRow { model, template },
+            vec![],
+            PrivacyClass::LocalOnly,
+            ProvenanceRecord::self_imported("local"),
+            TrustEnvelope::self_asserted(),
+            Timestamp::ZERO,
+        )
+        .await
+        .unwrap();
+        let provider = load_library_session(
+            &mut store,
+            row,
+            &InferenceDevice::ndarray(),
+            "burn-ndarray",
+            4,
+        )
+        .await
+        .unwrap();
+        let prepared = provider.prepare(&Default::default(), "");
+        assert!(prepared.is_err(), "empty questions stay invalid");
+        let prepared = provider
+            .prepare(
+                &serde_json::from_value(serde_json::json!({
+                    "prompt": "t4", "max_tokens": 4, "temperature": 0.0, "stop": []
+                }))
+                .unwrap(),
+                "",
+            )
+            .unwrap();
+        let expected = provider.bound().generate_prepared(&prepared).unwrap();
+        (
+            Some(InferenceLaneSettings {
+                model: InferenceModelSettings::Library {
+                    row: row.to_string(),
+                    device: djinn::settings::InferenceDeviceSettings::Cpu,
+                    max_tokens: 4,
+                },
+            }),
+            "t4",
+            "test/tiny-decoder",
+            expected,
+            provider.session_identity(),
+        )
+    } else {
+        (
+            stub_lane(),
+            "what does the lane say?",
+            "stub/echo",
+            "echo: what does the lane say?".into(),
+            None,
+        )
+    };
     let settings = OwnerSettings {
-        inference: stub_lane(),
+        inference,
         ..owner(Some(lane()))
     };
     let resident = DjinnResident::open(
@@ -195,7 +305,7 @@ async fn a_resident_answers_an_ask_on_its_route_and_closes_the_lane() {
 
     let ask = AskRequestV1 {
         run: "first".into(),
-        question: "what does the lane say?".into(),
+        question: question.into(),
     };
     assert_eq!(
         intent(
@@ -216,10 +326,16 @@ async fn a_resident_answers_an_ask_on_its_route_and_closes_the_lane() {
         runs = read_runs(&mut client, &request).await;
     }
     assert_eq!(runs.schema, INFERENCE_RUNS_SCHEMA);
-    assert_eq!(runs.model.as_deref(), Some("stub/echo"));
+    assert_eq!(runs.model.as_deref(), Some(model_id));
+    assert_eq!(runs.session, expected_session);
+    assert_eq!(runs.runs[0].session, expected_session);
+    assert_eq!(runs.load_error, None);
+    if library_model {
+        assert!(resident.distillery().unwrap().model_library().is_some());
+    }
     assert_eq!(runs.runs[0].run, "first");
     assert_eq!(runs.runs[0].state, RunStateV1::Finished);
-    assert_eq!(runs.runs[0].text, "echo: what does the lane say?");
+    assert_eq!(runs.runs[0].text, expected_text);
 
     // A cancel of an ended run is accepted and changes nothing; an unknown
     // run and a repeated name are refused.

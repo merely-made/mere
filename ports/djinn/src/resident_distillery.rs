@@ -105,10 +105,8 @@ pub struct ResidentDistillery {
     mesh_root: PathBuf,
     /// The persona-scoped model library the trainer writes artifacts into,
     /// held for the lane's life so the resource and any reader see one handle
-    /// on one redb file. `None` when the owner stated no trainer — and, in a
-    /// build without the `trainer` feature, always `None`, because such a
-    /// build refuses a lane that asks for one rather than opening a store
-    /// nothing would ever write to.
+    /// on one redb file. Opened for a trainer or a library-backed inference
+    /// lane; `None` when neither consumer needs it.
     model_library: Option<Arc<Mutex<RedbBackend>>>,
     /// The adapter the composed trainer actually runs on, when this lane
     /// composed a GPU trainer.
@@ -396,8 +394,8 @@ impl ResidentDistillery {
         self.author.public_key().to_bytes()
     }
 
-    /// The persona-scoped model library the composed trainer publishes into,
-    /// or `None` when this lane composes no trainer.
+    /// The persona-scoped library shared by the trainer and inference,
+    /// or `None` when neither consumer opened it.
     ///
     /// Handing the same handle out rather than a path is deliberate: redb is
     /// single-writer, so a reader that opened the file itself would either
@@ -406,6 +404,21 @@ impl ResidentDistillery {
     /// one open store the trainer is writing.
     pub fn model_library(&self) -> Option<Arc<Mutex<RedbBackend>>> {
         self.model_library.as_ref().map(Arc::clone)
+    }
+
+    /// Borrow the trainer's handle, or open the same persona library when
+    /// inference is its first consumer. Distillery retains the sole owner.
+    #[cfg(feature = "inference")]
+    pub fn inference_model_library(
+        &mut self,
+        data_root: &Path,
+    ) -> Result<Arc<Mutex<RedbBackend>>, String> {
+        if self.model_library.is_none() {
+            self.model_library = Some(open_model_library(data_root, &self.profile, None)?);
+        }
+        Ok(Arc::clone(
+            self.model_library.as_ref().expect("just opened"),
+        ))
     }
 
     /// The GPU adapter this lane's trainer was composed on, or `None` when it
@@ -620,7 +633,7 @@ pub fn model_library_path(
 }
 
 /// Open (creating if absent) the persona's model library.
-#[cfg(feature = "trainer")]
+#[cfg(any(feature = "trainer", feature = "inference"))]
 fn open_model_library(
     data_root: &Path,
     profile: &str,

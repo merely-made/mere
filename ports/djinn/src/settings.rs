@@ -130,12 +130,12 @@ pub struct OwnerSettings {
 }
 
 /// The owner's statement of which model the resident inference lane runs
-/// (resident inference and recall plan, I1).
+/// (resident inference and recall plan, I1/I2).
 ///
 /// The lane borrows the Distillery lane's model library (that plan's ruling
 /// 3), so it is refused without a `distillery` block, and refused in a build
-/// without the `inference` feature. I1 runs only the stub; I2 adds models from
-/// the library.
+/// without the `inference` feature. The model may be the stub or a library row
+/// binding a model manifest to its prompt-template artifact.
 ///
 /// scope=profile; movement=local-only; mutability=restart-required;
 /// security=ordinary (a model choice, no key material).
@@ -147,12 +147,30 @@ pub struct InferenceLaneSettings {
 }
 
 /// The models the inference lane can be told to run.
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub enum InferenceModelSettings {
     /// esp's deterministic stub, which echoes the question: proves the lane
     /// and its route without a model.
     Stub,
+    /// A content-addressed inference row in Distillery's model library.
+    Library {
+        /// Self-describing content reference of an `esp.inference-model/v1` row.
+        row: String,
+        /// Execution device. GPU remains refused until the reclaim gate lands.
+        device: InferenceDeviceSettings,
+        /// Maximum generated tokens per ask, stated by the owner.
+        max_tokens: usize,
+    },
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum InferenceDeviceSettings {
+    /// Burn's portable NdArray backend.
+    Cpu,
+    /// Reserved device word; refused until I2's arbitration gate lands.
+    Gpu,
 }
 
 /// The owner's statement of how the resident Distillery works runs on this
