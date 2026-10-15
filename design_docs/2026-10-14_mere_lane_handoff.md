@@ -63,6 +63,28 @@ Recorded options, not tasks: slim Genet's recent browser-capture work in the
 viewer, align genet-parley onto one read-fonts. Human assistive-technology and
 asynchronous browser WebGPU device replacement remain separate gates.
 
+**Re-verified 2026-10-15 on current main.** `0bb5facfe` was pushed after a
+rebase without a rerun, so main was re-verified at `90ce8f12d`. That found one
+break from a later lane: the Knot repin removed Graphshell's `windows-sys`
+dependency without updating the viewer workspace's lockfile, so
+`build-viewer.py`'s `--locked` build refused. Fixed in `137afc01e`. At that
+source: hosts 337 passed / 11 ignored, portable WebGL 5, Graphshell 493 / 7
+ignored (the P1 door lift moved 22 tests to `graphshell-endpoint`), build
+checks and `presentation-mount.mjs` pass; `build-viewer.py` passes every cap
+(WebGPU 3,359,746, WebGL2 3,322,097 gzip6); Chrome WebGL2 and Auto without
+WebGPU, Firefox and SwiftShader pass 33 controls, WebGPU 27, and Auto with a
+Vulkan WebGPU device loads the WebGPU artifact; same-state comparisons pass at
+both scales with the figures above. Evidence:
+`Code/testing/mere/verify-90ce8f12d-20261015`.
+
+Reproduction notes: hardware GL routes need the desktop display (`DISPLAY=:0`
+with its Xauthority; launched from a bare SSH tty, ANGLE cannot open a display),
+and Vulkan WebGPU needs X11, so leave `WAYLAND_DISPLAY` unset. The Auto
+artifact-choice fixture, the same-state comparison fixtures and
+`run-review-fractional.py` are still uncommitted copies under
+`Code/testing/mere/webgl-integration-20261014/split2`; the committed fixture's
+routes run different control sequences and are not comparable captures.
+
 ## Open: resident-host port (O-PC)
 
 The Oct 9–11 resident-host implementation lane never left the ThinkPad. It is
