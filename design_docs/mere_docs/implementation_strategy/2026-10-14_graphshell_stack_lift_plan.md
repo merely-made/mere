@@ -1300,3 +1300,12 @@ fast-forward of local main; nothing built).**
   - What `graphshell` is still needed for outside the port: Djinn only, for the
     sync hosts' replica, transfer, offer and receipt types (L13). Knot and
     Turnstone need nothing from it once they repin.
+- **2026-10-15 (`backstep` cleared for publishing):** Mark said `backstep` can be
+  published. `publish = false` is removed from its manifest (crates.io had no
+  `backstep` at that date, HTTP 404 on the crate page) and `cargo publish
+  --dry-run -p backstep` passes (5 files, 3.7 KiB compressed, verified build). It
+  is not on crates.io: the actual `cargo publish` needs Mark's crates.io token and
+  cannot be undone, so it waits for his go. Publish order for the crates that name
+  it: `backstep`, then `workbench` (already `publish = true`), then `scenomise`,
+  then `cambium`.
+
