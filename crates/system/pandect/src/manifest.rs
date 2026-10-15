@@ -179,6 +179,38 @@ pub struct GraphSessionManifest {
     /// existed carry those fork fields instead, and still load.
     #[serde(default)]
     pub picked_from: Option<PickedFrom>,
+    /// What a whole-session copy is for, set when it is made (session merge-in
+    /// note, M1): a [`Lineage::Fork`] goes its own way, a [`Lineage::Branch`]
+    /// is meant to merge back into its [`parent_session`](Self::parent_session).
+    /// Sessions made before branches existed read as forks.
+    #[serde(default)]
+    pub lineage: Lineage,
+    /// Set once this session, a branch or a picked-off part, has been merged
+    /// into another (M6). It is kept with its history intact and is read-only
+    /// from then on; an edit makes a new branch from it.
+    #[serde(default)]
+    pub merged: Option<MergedMark>,
+}
+
+/// Whether a whole-session copy goes its own way or is meant to merge back.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Lineage {
+    /// A copy that goes its own way. Never merged in. Every session made
+    /// before lineage was recorded reads as one.
+    #[default]
+    Fork,
+    /// A copy at a point, kept linked to its parent, meant to merge back.
+    Branch,
+}
+
+/// Where a merged session went: the session it was merged into, its own
+/// journal cursor the merge brought in, and when.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MergedMark {
+    pub into: SessionId,
+    pub through: u64,
+    pub at: SystemTime,
 }
 
 /// Where a picked-off part came from: the source session, its journal cursor
@@ -225,6 +257,8 @@ impl GraphSessionManifest {
             source_codicil: None,
             codicil_read_only: false,
             picked_from: None,
+            lineage: Lineage::Fork,
+            merged: None,
         }
     }
 
@@ -339,6 +373,28 @@ mod tests {
         assert_eq!(restored.engine_profile, EngineProfileBinding::PersonaScoped);
         assert_eq!(restored.persona_id, PersonaId::default_persona());
         assert_eq!(restored.picked_from, None);
+        assert_eq!(
+            restored.lineage,
+            Lineage::Fork,
+            "old sessions read as forks"
+        );
+        assert_eq!(restored.merged, None);
+    }
+
+    #[test]
+    fn lineage_and_the_merged_mark_round_trip() {
+        let mut manifest = GraphSessionManifest::new(fixture_session(), fixture_graph());
+        manifest.lineage = Lineage::Branch;
+        manifest.merged = Some(MergedMark {
+            into: SessionId::from_uuid(Uuid::from_u128(5)),
+            through: 4,
+            at: SystemTime::UNIX_EPOCH,
+        });
+        let json = serde_json::to_value(&manifest).expect("serialize");
+        assert_eq!(json["lineage"], "branch");
+        let back: GraphSessionManifest = serde_json::from_value(json).expect("deserialize");
+        assert_eq!(back.lineage, Lineage::Branch);
+        assert_eq!(back.merged, manifest.merged);
     }
 
     #[test]
