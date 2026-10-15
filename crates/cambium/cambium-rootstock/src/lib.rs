@@ -43,9 +43,9 @@ pub use files::{FileAnswer, FileChooser};
 mod presentation;
 pub use presentation::{
     ContextGeneration, FrameContentMode, NativePresentationFailure, PendingPresentationCapture,
-    PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice, PresentationDriver,
-    PresentationFailure, PresentationLifetime, PresentationState, WgpuDriver, WgpuSurfaceFactory,
-    backend_attempts,
+    PortableMaterializer, PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice,
+    PresentationDriver, PresentationFailure, PresentationLifetime, PresentationState, WgpuDriver,
+    WgpuSurfaceFactory, backend_attempts,
 };
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};

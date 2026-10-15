@@ -41,11 +41,6 @@ impl<'a> WgpuPresentation<'a> {
         profile: &mut FrameProfile,
         trace: Option<&crate::frame::FrameTrace>,
     ) -> Result<Option<WgpuOutput>, PresentationFailure> {
-        macro_rules! trace { ($phase:expr, $($args:tt)*) => { if let Some(trace) = trace { trace.mark($phase,format_args!($($args)*)); } }; }
-        let frame = packet;
-        let surface = self.surface;
-        let (pw, ph, scale) = (packet.width, packet.height, packet.scale);
-        let frame_started = packet.started;
         let (PreparedPaint::Native(_), Some(translated)) = (&packet.paint, &packet.native_scene)
         else {
             return Err(PresentationFailure {
@@ -56,13 +51,40 @@ impl<'a> WgpuPresentation<'a> {
                 native: None,
             });
         };
+        self.present_scene(
+            packet,
+            &translated.scene,
+            &translated.box_shadow_masks,
+            packet.scale,
+            profile,
+            trace,
+        )
+    }
+
+    /// Rasterize one complete scene at `raster_scale` and present it. Native
+    /// frames pass the layout scale; a materialized portable scene is already
+    /// in physical pixels and passes 1.
+    pub fn present_scene(
+        &self,
+        packet: &PreparedFrame,
+        scene: &netrender::Scene,
+        box_shadow_masks: &[paint_list_render::BoxShadowMaskRequest],
+        raster_scale: f32,
+        profile: &mut FrameProfile,
+        trace: Option<&crate::frame::FrameTrace>,
+    ) -> Result<Option<WgpuOutput>, PresentationFailure> {
+        macro_rules! trace { ($phase:expr, $($args:tt)*) => { if let Some(trace) = trace { trace.mark($phase,format_args!($($args)*)); } }; }
+        let frame = packet;
+        let surface = self.surface;
+        let (pw, ph, scale) = (packet.width, packet.height, raster_scale);
+        let frame_started = packet.started;
         // Blurred shadows lower to image ops backed by per-frame GPU masks.
         // Keeping only `translated.scene` drops those masks and leaves the
         // image keys unresolved, which makes every blurred CSS box-shadow
         // disappear in this host even though the paint list is correct.
         let phase = crate::Instant::now();
         trace!("shadows-begin", "");
-        for mask in &translated.box_shadow_masks {
+        for mask in box_shadow_masks {
             surface.renderer().build_box_shadow_mask(
                 mask.key,
                 mask.dim,
@@ -74,7 +96,6 @@ impl<'a> WgpuPresentation<'a> {
         }
         profile.shadows_us = elapsed_us(phase.elapsed());
         trace!("shadows-end", "");
-        let scene = &translated.scene;
         let clear = wgpu::Color {
             r: f64::from(frame.clear[0]),
             g: f64::from(frame.clear[1]),

@@ -6,8 +6,19 @@ use crate::{CaptureFrame, CaptureRefusal, FrameProfile, PresentedFrame, Surface}
 use genet_render_host::{RecoveryStatus, RenderCore, SharedRenderCore};
 use std::sync::Arc;
 pub type WgpuSurfaceFactory = Box<dyn Fn(Arc<RenderCore>) -> Result<Box<dyn Surface>, String>>;
+/// Expands a complete portable capture into one physical-pixel scene at the
+/// given extent and scale, composing producer scenes in painter order.
+pub type PortableMaterializer = Box<
+    dyn Fn(
+        &crate::PortablePaintCapture,
+        u32,
+        u32,
+        f32,
+    ) -> Result<netrender::Scene, (Option<u64>, String)>,
+>;
 pub struct WgpuDriver {
     surface: Option<Box<dyn Surface>>,
+    portable: Option<PortableMaterializer>,
     owner: Arc<SharedRenderCore>,
     factory: WgpuSurfaceFactory,
     lifetime: PresentationLifetime,
@@ -24,6 +35,7 @@ impl WgpuDriver {
         let generation = ContextGeneration(surface.core().generation());
         Self {
             surface: Some(surface),
+            portable: None,
             owner,
             factory,
             lifetime: PresentationLifetime::new(generation),
@@ -31,6 +43,14 @@ impl WgpuDriver {
             profile: None,
             captures: crate::CaptureOwner::default(),
         }
+    }
+    /// Present the same portable scene a direct WebGL2 route draws: producer
+    /// scenes are composed in the page pass, never rasterized to an
+    /// intermediate texture and resampled. Same-device texture producers are
+    /// not called on this route.
+    pub fn with_portable_scene(mut self, materialize: PortableMaterializer) -> Self {
+        self.portable = Some(materialize);
+        self
     }
     fn failure(&self, message: impl ToString) -> PresentationFailure {
         PresentationFailure {
@@ -53,7 +73,11 @@ impl PresentationDriver for WgpuDriver {
         self.lifetime.state()
     }
     fn content_mode(&self) -> FrameContentMode {
-        FrameContentMode::NativeTexture
+        if self.portable.is_some() {
+            FrameContentMode::PortableScene
+        } else {
+            FrameContentMode::NativeTexture
+        }
     }
     fn wgpu_surface(&self) -> Option<&dyn Surface> {
         self.surface.as_deref()
@@ -79,7 +103,27 @@ impl PresentationDriver for WgpuDriver {
             return Ok(None);
         };
         let mut profile = frame.profile;
-        let result = super::wgpu::WgpuPresentation::new(surface).present(frame, &mut profile, None);
+        let presenter = super::wgpu::WgpuPresentation::new(surface);
+        let result = match (&frame.paint, &self.portable) {
+            (PreparedPaint::Portable(capture), Some(materialize)) => {
+                let phase = crate::Instant::now();
+                let scene = materialize(capture, frame.width, frame.height, frame.scale).map_err(
+                    |(producer_key, message)| {
+                        let mut failure = self.failure(message);
+                        failure.producer_key = producer_key;
+                        failure
+                    },
+                )?;
+                profile.emit_scene_us = profile
+                    .emit_scene_us
+                    .saturating_add(phase.elapsed().as_micros().min(u64::MAX as u128) as u64);
+                presenter.present_scene(frame, &scene, &[], 1.0, &mut profile, None)
+            },
+            (PreparedPaint::Portable(_), None) => {
+                return Err(self.failure("portable paint without a portable WebGPU route"));
+            },
+            (PreparedPaint::Native(_), _) => presenter.present(frame, &mut profile, None),
+        };
         self.profile = Some(profile);
         let Some(output) = result? else {
             return Ok(None);

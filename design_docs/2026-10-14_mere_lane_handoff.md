@@ -50,12 +50,19 @@ WebGL portable, 28 Netrender; Chrome WebGL2, Auto without WebGPU, Firefox and
 SwiftShader pass 32 viewer controls, native Vulkan WebGPU 26. Receipt:
 `testing/receipts/browser_presentation_20261013/presentation/integration-20261014/`.
 
-**Mark's decision, still open:** both acceptance limits remain unmet and
-unchanged. Wasm gzip6 is 3,661,337 bytes against the 3,407,872 cap (the lane
-measured 3,674,899). At 125% display scale, WebGL2 versus WebGPU RGB RMS is
-1.26451 and 1.19021 against 1.0 (alpha matches; resized and normal-scale
-comparisons pass). Human assistive-technology and asynchronous browser WebGPU
-device replacement remain separate gates.
+**Limits follow-up (Mark's choice "A. 2 / B. 2, 1 if needed"):** B is cleared
+by option 2. Browser WebGPU now presents the same portable scene as WebGL2,
+drawing the graph producer in the page pass; the 125% comparison passes at RGB
+RMS 0.258/0.332/0.328 (was 1.265/1.190) under the unchanged contract, and all
+five browser routes still pass. A is not cleared: Wasm gzip6 is 3,661,762
+against 3,407,872 (pre-merge main was 3,394,183). Attribution in
+`testing/receipts/browser_presentation_20261013/presentation/limits-followup-20261014/`
+shows the removable duplication sits in suppliers (Genet layout's second Taffy
+instantiation, about −113 KB; per-pen outline instantiations in Netrender and
+the Vello fork, about −56 KB) and still falls about 85 KB short; the remainder
+is the WebGL2 renderer. How far to take supplier changes is Mark's decision.
+Human assistive-technology and asynchronous browser WebGPU device replacement
+remain separate gates.
 
 ## Open: resident-host port (O-PC)
 
