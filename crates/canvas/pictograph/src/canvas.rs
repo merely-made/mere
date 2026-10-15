@@ -174,6 +174,8 @@ pub mod controls;
 pub mod gestures;
 /// Whether each node's face sits on its body, read back for receipts.
 pub mod face_alignment;
+/// Arrangement and physics actions a host's controls apply.
+pub mod physics_controls;
 pub mod fold_projection;
 mod frame;
 mod frame_profile;
