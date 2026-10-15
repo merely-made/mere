@@ -410,6 +410,23 @@ pub async fn list_graph_codicils(store: &mut dyn Store) -> Result<Vec<BlobManife
     Ok(manifests)
 }
 
+/// The short form a person reads for a codicil id: its algorithm and the
+/// first digits, such as `blake3:f612a`.
+pub fn codicil_short_id(id: &str) -> &str {
+    id.get(..12).unwrap_or(id)
+}
+
+/// The name a session opened from a codicil carries, so it never reads as
+/// its source: the source session's name (or `Session`) and the codicil it
+/// came from, such as `Session (from blake3:f612a)`.
+pub fn opened_codicil_session_name(source: Option<&str>, codicil: &str) -> String {
+    format!(
+        "{} (from {})",
+        source.unwrap_or("Session"),
+        codicil_short_id(codicil)
+    )
+}
+
 /// Parse Eidetic's self-describing id (and its legacy bare BLAKE3 digest).
 pub fn parse_codicil_id(id: &str) -> std::result::Result<ManifestId, String> {
     eidetic::Hash::parse(id)
@@ -767,6 +784,22 @@ mod tests {
     // The in-memory test store is muniment's (2026-07-12): the
     // hand-rolled one was the same map behind the same seam.
     use muniment::MemoryBackend as InMemoryStore;
+
+    #[test]
+    fn an_opened_codicil_names_its_source_and_the_codicil() {
+        let id = "blake3:f612a0c4d9e8b7a6";
+        assert_eq!(codicil_short_id(id), "blake3:f612a");
+        assert_eq!(codicil_short_id("short"), "short");
+        assert_eq!(
+            opened_codicil_session_name(None, id),
+            "Session (from blake3:f612a)",
+            "an unnamed source still reads apart from the session it came from"
+        );
+        assert_eq!(
+            opened_codicil_session_name(Some("Evening reading"), id),
+            "Evening reading (from blake3:f612a)"
+        );
+    }
 
     #[test]
     fn codicil_recorded_profile_survives_thaw_and_composition_with_unqualified_controls() {

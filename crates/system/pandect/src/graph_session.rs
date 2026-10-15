@@ -1895,10 +1895,15 @@ impl<B: Backend + Clone> MereSessions<B> {
         let payload = input.codicil;
         validate(&graph).map_err(SessionError::Validation)?;
         let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
-        manifest.display_name = payload
-            .sessions
-            .first()
-            .and_then(|source| source.manifest.display_name.clone());
+        // The thaw is a new session: it names its source and the codicil, so
+        // it never reads as the session it was saved from.
+        manifest.display_name = Some(crate::graph_codicil::opened_codicil_session_name(
+            payload
+                .sessions
+                .first()
+                .and_then(|source| source.manifest.display_name.as_deref()),
+            &id.to_string(),
+        ));
         manifest.source_codicil = Some(crate::manifest::CodicilId(id.to_string()));
         let mut session = GraphSession::new(
             self.backend.clone(),
@@ -3322,6 +3327,14 @@ mod tests {
             assert_eq!(
                 thaw.manifest().source_codicil.as_ref().unwrap().0,
                 archived.to_string()
+            );
+            assert_eq!(
+                thaw.manifest().display_name,
+                Some(format!(
+                    "Kept reading (from {})",
+                    &archived.to_string()[..12]
+                )),
+                "an opened codicil is named apart from its source"
             );
             assert!(thaw.manifest().codicil_read_only);
             let frozen = stored_bytes(&store).await;
