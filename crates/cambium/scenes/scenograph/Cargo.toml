@@ -21,4 +21,10 @@ serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 # The value-level script contract, the trait only (Scenograph editor plan, SE39,
 # SE92). The engine behind it is the host's choice; scenograph links none.
-script-engine-api = { workspace = true }
+# Optional (SE98): a git dependency would block a crates.io release.
+script-engine-api = { workspace = true, optional = true }
+
+[features]
+# Run `Condition::Script` (`RuleSet::resolve_with_scripts`). Off by default: the
+# condition is data and always present, and `resolve` refuses a set carrying one.
+scripts = ["dep:script-engine-api"]

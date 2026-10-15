@@ -329,6 +329,8 @@ and is not built here. *Reading, not ruled:* a script that fails, runs past its
 budget or returns a non-bool leaves its rule unmatched with the reason in the
 trace, so one bad rule does not stop the rest; and `resolve` without an engine
 refuses a set that carries a script condition.
+*Annotation 2026-10-15:* SE99 rules the failure reading; SE98 puts the running
+of scripts, and the `script-engine-api` dependency, behind a cargo feature.
 
 **SE93, dependencies.** Question: may `libm = "0.2"` join the workspace
 dependencies and `script-rhai`, and `script-engine-api` join `script-rhai`
@@ -354,6 +356,39 @@ invoked under Node; (b) keep the probe harness outside the tree. Mark: **"a"**.
 *Follows:* the test, the example it shares code with and the script live under
 `crates/script/rhai`; any `getrandom` setting wasm32 needs stays in that
 crate's own build, not the root manifest.
+
+**Review of the first build (2026-10-15).** Four more questions went to Mark
+with the built track R2. The coordinating session relayed his chosen options
+verbatim; the other options are as put there.
+
+**SE98, publishing.** Evidence put: `scenograph` gained a git dependency on
+`script-engine-api`, which a crates.io release of `scenograph` cannot carry
+until Genet publishes that crate. Options: accept the block; feature-gate the
+dependency. Mark: **"Feature-gate it"**. *Follows:* `script-engine-api` is an
+optional dependency of `scenograph`, behind the cargo feature `scripts`, off by
+default; `RuleSet::resolve_with_scripts` and the evaluation code exist only with
+it, and `script-rhai` enables it for its tests. *Reading, not ruled:* the
+`Condition::Script` variant itself stays in the data model under every build,
+because an enum variant behind a feature changes what an exhaustive `match` in a
+dependent crate must cover with whichever crate in the graph unified the feature
+on; without the feature `resolve` refuses a set carrying one, and `validate` and
+serde treat it as any other condition.
+
+**SE99, a script that fails.** Options: leave the rule unmatched with the reason
+in the trace; fail the whole resolve. Mark: **"Rule unmatched, traced
+(Recommended)"**. *Follows:* a script that errors, runs past its budget or
+returns a non-bool leaves its rule unmatched, with the reason in the trace. This
+turns SE92's reading into a ruling.
+
+**SE100, a missing fact.** Options: keep rhai's behavior, which mirrors `Not`;
+make a missing fact an error. Mark: **"Keep, mirrors Not (Recommended)"**.
+*Follows:* an absent fact reads as `()` and `facts.weight > 2.0` is false;
+presence is checked with `"weight" in facts`.
+
+**SE101, push.** Options: check Graphshell, then push; push now; hold. Mark:
+**"Check graphshell, then push (Recommended)"**. *Follows:* after SE98's change,
+`cargo check -p graphshell`, then rebase, re-run the touched tests and push to
+main.
 
 ## 2. Tracks
 
@@ -392,9 +427,9 @@ rendering remain with their existing owners.
 
 ### R2 — the rule runner (SE92 to SE97)
 
-**Status (2026-10-15):** implemented on branch `rhai-valueengine`, not pushed. Based
-on mere `90ce8f12` (Genet `ae3d9f5`). Mark's SE92 to SE97 rulings (§1.8) fix the
-shape; this track is their done-conditions.
+**Status (2026-10-15):** implemented on branch `rhai-valueengine`. Based on mere
+`90ce8f12` (Genet `ae3d9f5`). Mark's SE92 to SE101 rulings (§1.8) fix the shape;
+this track is their done-conditions.
 
 Scope:
 - `script-rhai` implements Genet's `ValueEngine` as `RhaiValueEngine`, a raw rhai
@@ -403,9 +438,10 @@ Scope:
   scope per evaluation (SE95) and a refusal for a name registered twice (SE96).
 - `register_libm_maths` supplies `exp`, `ln`, `sin`, `cos`, `tan`, `atan2`, `sqrt`,
   `pow`, `floor`, `abs`, `min` and `max` on `libm` (SE94).
-- `scenograph::presentation` gains `Condition::Script` and
-  `RuleSet::resolve_with_scripts` (SE92). Scenograph depends on the trait only.
-  `resolve` without an engine refuses a set carrying a script condition.
+- `scenograph::presentation` gains `Condition::Script`, always present as data,
+  and, behind the `scripts` feature (SE98), `RuleSet::resolve_with_scripts`
+  (SE92). Scenograph depends on the trait only. `resolve` without an engine, or
+  without the feature, refuses a set carrying a script condition.
 
 Done when, and what holds it:
 - Engine behavior: values cross both ways, including nested maps and
@@ -420,10 +456,11 @@ Done when, and what holds it:
   `crates/script/rhai/examples/maths_bits.rs` for `wasm32-unknown-unknown`, runs it under
   Node 24 (V8) and compares against the same constant, with controls that the
   module ran the rule.
-- The runner: `crates/cambium/scenes/scenograph/src/presentation.rs` (6 new tests on a scripted
-  stand-in engine: precedence, the globals a script sees, failure isolation,
-  composition under `All`/`Any`/`Not`, refusal without an engine, validation and
-  round trip) and `crates/script/rhai/tests/scenograph_rules.rs` (8 tests on real rhai: facts and
+- The runner, both ways (SE98): `crates/cambium/scenes/scenograph/src/presentation.rs` with the
+  feature off (25 tests, two of them new: refusal without an engine, validation
+  and round trip) and on (29: four more on a scripted stand-in engine, for
+  precedence, the globals a script sees, failure isolation and composition under
+  `All`/`Any`/`Not`) and `crates/script/rhai/tests/scenograph_rules.rs` (8 tests on real rhai: facts and
   states, a missing fact, hysteresis written in the script, host maths, a
   narrower binding set, a runaway, no state between occurrences, repeatability).
 
@@ -438,8 +475,9 @@ Not done here, and not claimed:
 - Region and field rules (the field plan's P4) and piccolo's `ValueEngine`.
 - Browser parity: the study host's JavaScript resolver does not know the
   `script` condition.
-- Publishing: `scenograph` now has a git dependency on `script-engine-api`, which
-  a crates.io release of `scenograph` cannot carry until Genet publishes it.
+- Publishing is unblocked by SE98: the default `scenograph` build has no
+  `script-engine-api` in its tree (`cargo tree -p scenograph -e normal`). A
+  release with the `scripts` feature on waits for Genet to publish the crate.
 
 ### E1 — one history in Cambium (A, SE5)
 
@@ -1234,7 +1272,7 @@ Verified 2026-10-07 against mere's origin unless named.
 - **2026-10-07, SE39 written.** `ValueEngine` is on genet branch `value-engine` (`27477d3e`), pushed as a branch only, for Mark or genet's lane to land (SE41); mere waits for the repin (SE42).
 - **2026-10-08, E3 and E4 built.** E3: `scenograph::options` (`OptionSpec` with key, label, kind and default; `OptionKind`, the seven readers' kinds, with `refusal` in their words; `OptionDefault`: value, measured, auto, empty), deterministic JSON, two tests. E4: each of the eleven families declares its options (`Family::options`), its choice tables now named constants shared by the readers and the declaration; `Options` checks each read against the declaration (a debug assertion) and records the default it uses, so `Family::resolved_defaults(measure)` reports the numbers; `finish` refuses what the declaration does not name, with the same messages as before; `SolverCapability` gains `options`, empty by default and absent from older JSON; `validate_arrangement` refuses a registered solver's undeclared key and a value of the wrong kind before solving. The test solver `Line` now declares its `step`. Three catalog tests (each family reads exactly what it declares; every option left out resolves, matching declared values; an undeclared key is refused) and one compile test for solvers. scenomise passes 119 and scenograph 10; Graphshell still checks. Controls: dropping LSystem's `rotation` from its declaration fails three tests, and removing the solver refusal fails one. rustfmt was run over `catalog.rs`, which also normalized nine hunks that were unformatted on main before this change. E5, the editor's rows, is next.
 - **2026-10-08, E5 built.** The graphshell library gains `arrangement_options` (a family's declaration, else a registered solver's), `arrangement_defaults` (resolved numbers for given items), `option_placeholder`, `with_option` (blank leaves the option out) and `with_kind` (SE44), with four tests; the projection editor's tests pass 19. The page's new `web_options.rs` draws one row per declared option in the arrangement panel: number-like inputs, a select for a choice and for a flag (default, true, false), text for a list; the placeholder is the default, with a measured default's number and words when the executable dataset gives items to measure and its words alone otherwise; a row's refusal shows beneath it in `OptionKind::refusal`'s words, the compiler's own. Rows rebuild when the arrangement changes and otherwise update without disturbing a focused row; edits go through `SetArrangement`, so E2's undo covers them. Headed: `projection_options.scn` (28 steps: Grid's measured placeholders, `columns` 0 refused and the projection not executable, 3 accepted, a switch to Spiral rebuilds the rows and a choice applies, an unknown id says so) passes in Firefox 157 and Chrome. Findings: in the narrow layout the rows' placeholders are cut by the panel's width, and the editor's button row (seven buttons since E2 and E2b) is crowded. Tracks E1 to E5 are complete.
-- **2026-10-15, R2 built: rhai implements `ValueEngine`, and scripts are a rule condition.** Mark answered six questions (SE92 to SE97). `RhaiValueEngine` and `register_libm_maths` in `script-rhai`; `Condition::Script` and `RuleSet::resolve_with_scripts` in `scenograph::presentation`; the determinism check on native and wasm32 (F14). `script-rhai` passes 26 library tests, 3 in `maths_bits` and 8 in `scenograph_rules`; `scenograph` passes 29; the wasm32 run under Node matches the native hash. Not pushed: Mark's go comes first. Open items are listed under R2.
+- **2026-10-15, R2 built: rhai implements `ValueEngine`, and scripts are a rule condition.** Mark answered six questions (SE92 to SE97). `RhaiValueEngine` and `register_libm_maths` in `script-rhai`; `Condition::Script` and `RuleSet::resolve_with_scripts` in `scenograph::presentation`; the determinism check on native and wasm32 (F14). `script-rhai` passes 26 library tests, 3 in `maths_bits` and 8 in `scenograph_rules`; `scenograph` passes 25 with `scripts` off and 29 with it on; the wasm32 run under Node matches the native hash. Mark then ruled SE98 to SE101 (§1.8): the script-running code and the `script-engine-api` dependency moved behind the `scripts` feature, off by default. Open items are listed under R2.
 - **2026-10-08, the Turnstone follow-up landed in Turnstone.** At `d0775a1`, by its unusual-protocols lane (§3, dated note). Nothing here moved; the plan stops listing it as waiting.
 - **2026-10-08, C2 landed.** `crates/cambium/command-menu` holds `Command`, `CommandChoices` (serde; pandect's `CommandMenuView` is now this type, and a stored view reads back unchanged, with a control), `CommandSet` (`menu` returns commands; cambium draws them as `CommandItem`), `MenuSession`, and `catalogue`: the 33 shared ids of F13 with one label each. graph-kernel's `ActionId` is their typed form, 33 variants held one for one against the catalogue; its unread categories, input modes and persist keys went. mere-chrome's `CommandPaletteSession`, `CommandAuthorityMut`, `FrameViewModel.command_palette` and shell-state's re-export were removed. registry's default bindings name catalogue ids (21), 13 were dropped, and the two Enter actions stay (SE51). Graphshell registers its eight shared verbs under catalogue ids with its own surfaces. Tests: command-menu 13, cambium 251, mere-kernel 296, ux-events 38, mere-chrome 63, registry 134, pandect 309. Headed in Chrome: canvas_commands and its reopen, projection_session, h3_boot, role_controls, d3_derived_faces_detail, physics_framing_control, face_zoom, physics_still; in Firefox: canvas_commands and its reopen. Findings: physics_framing_control counts nodes, so it needs a fresh store after projection_session adds one; `graph::revert::tests::a_removed_node_comes_back_whole` flaked once on a wall-clock millisecond (3 of 3 green alone; offered as its own task); after rebasing onto main, the Graphshell web host does not build on main itself: `632c1d29` repinned genet to `e84f9c7f` in the root manifest and left `ports/graphshell/web/Cargo.toml` at `965b64e2`, so two taproots meet (reported, not fixed here).
 - **2026-10-08, SE52 built, held.** Branch `c2-labels` (`cddf72ac`): the four labels, Graphshell's buttons and pills on the catalogue, and [button_labels.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/tests/button_labels.rs) with its control. command-menu 13 and button_labels 2 pass; the wasm build and the headed check wait on main's genet pin split.
