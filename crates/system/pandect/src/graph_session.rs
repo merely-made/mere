@@ -189,6 +189,12 @@ pub enum ChangeKind {
     OpenedCodicil {
         codicil: String,
     },
+    /// Picked off session `from` at its journal cursor `at`: the component
+    /// around one node, as a new session. Not a fork.
+    Picked {
+        from: SessionId,
+        at: Seq,
+    },
 }
 
 /// One view of one application over a session: `views/<app>/<view>`.
@@ -1749,11 +1755,12 @@ pub fn forked_session_name(parent: Option<&str>) -> String {
 /// connected component around one node of another
 /// ([`MereSessions::fork_component`], Turnstone's tear-out). Picking off is
 /// not forking: the part is not the whole session and starts with no session
-/// history, its nodes carrying only their derivation provenance. So it does
-/// not take the source's name; it names where it was picked from:
-/// `Session (picked from Evening reading)`.
+/// history, its nodes carrying only their derivation provenance. Its name
+/// starts from the source's, as a fork's does, and names where it was picked
+/// from: `Evening reading (picked from Evening reading)`.
 pub fn picked_session_name(source: Option<&str>) -> String {
-    format!("Session (picked from {})", source.unwrap_or("Session"))
+    let source = source.unwrap_or("Session");
+    format!("{} (picked from {source})", derived_name_base(source))
 }
 
 /// The graph a component fork starts from: the connected component around
@@ -2049,13 +2056,16 @@ impl<B: Backend + Clone> MereSessions<B> {
         parent.validate(&graph)?;
         let at = parent.journal().live_cursor();
         let mut manifest = GraphSessionManifest::new(SessionId::new(), fork_graph_id);
-        manifest.parent_session = Some(parent.id());
-        manifest.forked_at = Some(at.0);
+        manifest.picked_from = Some(crate::manifest::PickedFrom {
+            session: parent.id(),
+            at: at.0,
+            container: *parent.manifest().root_graph_id.as_uuid(),
+        });
         manifest.display_name = Some(picked_session_name(
             parent.manifest().display_name.as_deref(),
         ));
         manifest.source_codicil = parent.manifest().source_codicil.clone();
-        let kind = ChangeKind::Forked {
+        let kind = ChangeKind::Picked {
             from: parent.id(),
             at,
         };
@@ -4251,15 +4261,15 @@ mod tests {
         assert_eq!(picked_session_name(None), "Session (picked from Session)");
         assert_eq!(
             picked_session_name(Some("Evening reading")),
-            "Session (picked from Evening reading)"
+            "Evening reading (picked from Evening reading)"
         );
         assert_eq!(
             picked_session_name(Some("Session (from blake3:f612a)")),
             "Session (picked from Session (from blake3:f612a))"
         );
         assert_eq!(
-            forked_session_name(Some("Session (picked from Evening reading)")),
-            "Session (fork of Session (picked from Evening reading))"
+            forked_session_name(Some("Evening reading (picked from Evening reading)")),
+            "Evening reading (fork of Evening reading (picked from Evening reading))"
         );
     }
 
@@ -4284,7 +4294,25 @@ mod tests {
                 Some("Session (picked from Session)"),
                 "a picked-off part names where it was picked from"
             );
+            // A pick records where it came from, and is not a fork.
+            assert_eq!(
+                fork.picked_from,
+                Some(crate::manifest::PickedFrom {
+                    session: id,
+                    at: parent.journal().live_cursor().0,
+                    container: *parent.manifest().root_graph_id.as_uuid(),
+                })
+            );
+            assert_eq!(fork.parent_session, None);
+            assert_eq!(fork.forked_at, None);
             let fork = mere.open(fork.session_id).await.unwrap();
+            assert_eq!(
+                fork.changes()[0].kind,
+                ChangeKind::Picked {
+                    from: id,
+                    at: parent.journal().live_cursor()
+                }
+            );
             assert_eq!(
                 fork.graph().node_count(),
                 2,

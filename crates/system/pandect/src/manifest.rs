@@ -172,6 +172,23 @@ pub struct GraphSessionManifest {
     /// A thaw is browsed read-only; its first edit must create a separate fork.
     #[serde(default)]
     pub codicil_read_only: bool,
+    /// For a part picked off another session (the component around one node,
+    /// Turnstone's tear-out), where it was picked from. A pick is not a fork:
+    /// it leaves [`parent_session`](Self::parent_session) and
+    /// [`forked_at`](Self::forked_at) unset. Parts picked before this record
+    /// existed carry those fork fields instead, and still load.
+    #[serde(default)]
+    pub picked_from: Option<PickedFrom>,
+}
+
+/// Where a picked-off part came from: the source session, its journal cursor
+/// when the part was picked, and the source graph's container that each
+/// picked node's `CopiedFrom` derivation names as its `source_graph`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PickedFrom {
+    pub session: SessionId,
+    pub at: u64,
+    pub container: uuid::Uuid,
 }
 
 /// Who put a session in the trash, and when.
@@ -207,6 +224,7 @@ impl GraphSessionManifest {
             trashed: None,
             source_codicil: None,
             codicil_read_only: false,
+            picked_from: None,
         }
     }
 
@@ -320,6 +338,40 @@ mod tests {
         assert!(restored.consolidated_codicils.is_empty());
         assert_eq!(restored.engine_profile, EngineProfileBinding::PersonaScoped);
         assert_eq!(restored.persona_id, PersonaId::default_persona());
+        assert_eq!(restored.picked_from, None);
+    }
+
+    #[test]
+    fn a_part_picked_before_the_pick_record_still_loads_with_its_fork_fields() {
+        let parent = SessionId::from_uuid(uuid::Uuid::from_u128(7));
+        let legacy = format!(
+            r#"{{
+                "schema_version": 1,
+                "session_id": "{}",
+                "root_graph_id": "{}",
+                "created_at": {{ "secs_since_epoch": 0, "nanos_since_epoch": 0 }},
+                "updated_at": {{ "secs_since_epoch": 0, "nanos_since_epoch": 0 }},
+                "parent_session": "{}",
+                "forked_at": 3
+            }}"#,
+            fixture_session().as_uuid(),
+            fixture_graph().as_uuid(),
+            parent.as_uuid(),
+        );
+        let restored: GraphSessionManifest =
+            serde_json::from_str(&legacy).expect("legacy pick deserialize");
+        assert_eq!(restored.parent_session, Some(parent));
+        assert_eq!(restored.forked_at, Some(3));
+        assert_eq!(restored.picked_from, None);
+        let mut picked = restored.clone();
+        picked.picked_from = Some(PickedFrom {
+            session: parent,
+            at: 3,
+            container: uuid::Uuid::from_u128(9),
+        });
+        let json = serde_json::to_string(&picked).expect("serialize");
+        let back: GraphSessionManifest = serde_json::from_str(&json).expect("round trip");
+        assert_eq!(back.picked_from, picked.picked_from);
     }
 
     #[test]

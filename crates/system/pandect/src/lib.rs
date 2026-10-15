@@ -206,7 +206,7 @@ pub use live_view::{
 };
 pub use manifest::{
     CodicilId, EngineProfileBinding, GraphSessionManifest, MANIFEST_SCHEMA_VERSION, PersonaId,
-    SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
+    PickedFrom, SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
 };
 pub use manifest_store::{LoadFailure, LoadReport, MANIFEST_FILE, ManifestStore, TRASH_DIR};
 #[cfg(not(target_arch = "wasm32"))]
