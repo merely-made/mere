@@ -1256,3 +1256,14 @@ fast-forward of local main; nothing built).**
   (`mere-overlay`), knot-document, knot-desktop (lib, bins, `scenario_lane`,
   `font_roles`, `typography_fonts`) and knot-site pass, 623 tests
   (`TMPDIR=/private/tmp`); `djinn --features c4-host` 230 passed, 11 ignored.
+- **2026-10-15 (P5, Turnstone):** Turnstone `79f5f87` (on `origin/main`) is
+  on Knot `b19eebf` and Mere `0c03dff3d`, one source (301 Mere packages at
+  that revision). It names `graphshell-client` and `chirograph` directly in
+  place of `graphshell::client` and `graphshell::protocol`, so `graphshell`
+  is left for `view` (the projection receipt views) and `sessions`
+  (`spawn_endpoint_session`). It matches neither `MereViewRequest` nor
+  `SessionStep`, so `#[non_exhaustive]` asks nothing of it. `cargo check
+  --all-targets` and `cargo test` pass (942 passed, 10 ignored). P5 is done:
+  Knot and Turnstone need `graphshell` for `view` and `sessions` only (Knot
+  as a dev-dependency); moving those two (Group 5, "stays") would let both
+  drop it.
