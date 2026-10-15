@@ -6,10 +6,12 @@
 
 //! Canvas operations a host's controls and keyboard bindings share.
 //!
-//! Controls and keyboard bindings choose their own distances. The canvas owns
-//! camera and physics state; this seam does not read a DOM or duplicate it.
+//! Controls and keyboard bindings choose their own distances. The host owns
+//! camera and physics state (the canvas, or any [`FitHost`]); this seam does
+//! not read a DOM or duplicate that state.
 
-use super::{CameraView, Canvas};
+use super::CameraView;
+use super::camera_host::FitHost;
 
 /// A presentation command that does not change graph authority.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -37,49 +39,46 @@ pub enum CanvasCommand {
 }
 
 impl CanvasCommand {
-    pub fn apply(self, canvas: &mut Canvas, viewport: (u32, u32)) {
+    /// Carry the command out on any host that offers the verbs it needs; the
+    /// canvas is one. `viewport` is the host's logical size in px.
+    pub fn apply<H: FitHost>(self, host: &mut H, viewport: (u32, u32)) {
+        let centre = (viewport.0 as f32 * 0.5, viewport.1 as f32 * 0.5);
         match self {
-            Self::Pan { dx, dy } => {
-                canvas.wheel(dx, dy);
-            },
-            Self::Zoom { delta } => {
-                canvas.cursor_moved(viewport.0 as f32 * 0.5, viewport.1 as f32 * 0.5);
-                canvas.set_ctrl(true);
-                canvas.wheel(0.0, delta);
-                canvas.set_ctrl(false);
-            },
+            Self::Pan { dx, dy } => host.pan_step(dx, dy),
+            Self::Zoom { delta } => host.wheel_zoom_px(centre, delta),
             Self::SetZoom { zoom } => {
-                // The canvas camera is top-down: screen = world * zoom + offset.
-                let before = canvas.camera();
-                canvas.set_camera(CameraView { zoom, ..before });
-                let scale = canvas.camera().zoom / before.zoom;
-                let centre = (viewport.0 as f32 * 0.5, viewport.1 as f32 * 0.5);
-                canvas.set_camera(CameraView {
+                // The camera is top-down: screen = world * zoom + offset.
+                let before = host.camera();
+                let (low, high) = host.zoom_range();
+                host.set_camera(CameraView {
+                    zoom: zoom.clamp(low, high),
+                    ..before
+                });
+                let zoom = host.camera().zoom;
+                let scale = zoom / before.zoom;
+                host.set_camera(CameraView {
                     offset: (
                         centre.0 - (centre.0 - before.offset.0) * scale,
                         centre.1 - (centre.1 - before.offset.1) * scale,
                     ),
-                    zoom: canvas.camera().zoom,
+                    zoom,
                 });
             },
             // Fitting resumes following the layout; a pan or zoom (both reach
             // the canvas's wheel) or a node drag stops it.
             Self::Fit => {
-                canvas.fit_to_content();
-                canvas.set_view_follow(true);
+                host.fit_to_content();
+                host.set_view_follow(true);
             },
-            Self::FitVisible => {
-                canvas.fit_visible();
-            },
-            Self::FitSelection => {
-                canvas.fit_selection();
-            },
-            Self::RestoreArrangement => {
-                canvas.restore_arrangement();
-            },
-            Self::SetPhysicsPaused(paused) => canvas.set_physics_paused(paused),
+            Self::FitVisible => host.fit_visible(),
+            Self::FitSelection => host.fit_selection(),
+            Self::RestoreArrangement => host.restore_arrangement(),
+            Self::SetPhysicsPaused(paused) => host.set_physics_paused(paused),
             // An arrangement can pause the canvas independently of the UI.
-            Self::TogglePhysics => canvas.set_physics_paused(!canvas.physics_paused()),
+            Self::TogglePhysics => {
+                let paused = host.physics_paused();
+                host.set_physics_paused(!paused);
+            },
         }
     }
 }
@@ -87,6 +86,7 @@ impl CanvasCommand {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::canvas::Canvas;
 
     #[test]
     fn set_zoom_lands_exactly_and_keeps_the_centre_world_point() {

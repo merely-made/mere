@@ -16,7 +16,8 @@
 //! motion moves the camera at once rather than gliding. This module is the
 //! policy and the camera arithmetic; the browser listeners are the page's.
 
-use super::{CameraView, Canvas};
+use super::CameraView;
+use super::camera_host::CameraHost;
 
 /// What a wheel notch over the graph is for.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -74,11 +75,8 @@ pub fn wheel_use(mode: WheelMode, ctrl: bool, meta: bool) -> WheelUse {
 
 /// Zoom by a DOM wheel notch `dy` (positive down, logical px) about canvas-local
 /// `at`, translating to the canvas's positive-up cursor-anchored zoom.
-pub fn wheel_zoom(canvas: &mut Canvas, at: (f32, f32), dy: f32) {
-    canvas.cursor_moved(at.0, at.1);
-    canvas.set_ctrl(true);
-    canvas.wheel(0.0, -dy);
-    canvas.set_ctrl(false);
+pub fn wheel_zoom<H: CameraHost>(host: &mut H, at: (f32, f32), dy: f32) {
+    host.wheel_zoom_px(at, -dy);
 }
 
 /// What a touch that starts on the graph is for.
@@ -119,30 +117,31 @@ fn spread(fingers: Fingers) -> f32 {
 /// Move the camera as two fingers moved from `from` to `to`: the world point
 /// under their old centre goes under their new one, scaled by how far they
 /// spread. The canvas clamps the zoom, and the pan follows the clamped zoom.
-pub fn two_finger(canvas: &mut Canvas, from: Fingers, to: Fingers) {
-    let before = canvas.camera();
+pub fn two_finger<H: CameraHost>(host: &mut H, from: Fingers, to: Fingers) {
+    let before = host.camera();
     let (old_spread, new_spread) = (spread(from), spread(to));
     let scale = if old_spread > 1.0 && new_spread > 1.0 {
         new_spread / old_spread
     } else {
         1.0
     };
-    canvas.set_camera(CameraView {
-        zoom: before.zoom * scale,
+    let (low, high) = host.zoom_range();
+    host.set_camera(CameraView {
+        zoom: (before.zoom * scale).clamp(low, high),
         ..before
     });
-    let zoom = canvas.camera().zoom;
+    let zoom = host.camera().zoom;
     let (old_centre, new_centre) = (centre(from), centre(to));
     let world = (
         (old_centre.0 - before.offset.0) / before.zoom,
         (old_centre.1 - before.offset.1) / before.zoom,
     );
-    canvas.set_camera(CameraView {
+    host.set_camera(CameraView {
         offset: (new_centre.0 - world.0 * zoom, new_centre.1 - world.1 * zoom),
         zoom,
     });
     // A gesture is the reader's camera now, as a wheel pan or zoom is.
-    canvas.set_view_follow(false);
+    host.set_view_follow(false);
 }
 
 /// How far one keyboard pan step travels once its glide is done: the canvas
@@ -152,21 +151,22 @@ pub const PAN_GLIDE: f32 = 1.0 / (1.0 - 0.85);
 
 /// Pan by a keyboard step `(dx, dy)` at once, covering the distance the glide
 /// would: the reduced-motion pan.
-pub fn pan_at_once(canvas: &mut Canvas, dx: f32, dy: f32) {
-    let camera = canvas.camera();
-    canvas.set_camera(CameraView {
+pub fn pan_at_once<H: CameraHost>(host: &mut H, dx: f32, dy: f32) {
+    let camera = host.camera();
+    host.set_camera(CameraView {
         offset: (
             camera.offset.0 + dx * PAN_GLIDE,
             camera.offset.1 + dy * PAN_GLIDE,
         ),
         ..camera
     });
-    canvas.set_view_follow(false);
+    host.set_view_follow(false);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::canvas::Canvas;
 
     fn world_at(canvas: &Canvas, at: (f32, f32)) -> (f32, f32) {
         let view = canvas.camera();

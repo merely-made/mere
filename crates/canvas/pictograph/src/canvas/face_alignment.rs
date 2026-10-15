@@ -4,12 +4,13 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Whether each node's face sits on its body, read back from the canvas: the
+//! Whether each node's face sits on its body, read back from the host (the
+//! canvas, or any [`FaceGeometry`]): the
 //! body where Livery drew it (by hit test), the face where the face layer
 //! paints it. Hosts' `measure-faces` receipts use it (physics catalog
 //! plan, the face offset ruled 2026-10-04).
 
-use super::Canvas;
+use super::camera_host::FaceGeometry;
 
 /// One measurement over the nodes whose face lies wholly in the viewport.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -27,22 +28,19 @@ pub struct FaceAlignment {
 }
 
 impl FaceAlignment {
-    pub fn measure(canvas: &Canvas, viewport: (u32, u32)) -> Self {
+    pub fn measure<H: FaceGeometry + ?Sized>(host: &H, viewport: (u32, u32)) -> Self {
         let (w, h) = (viewport.0 as f32, viewport.1 as f32);
         let mut out = Self {
-            zoom: canvas.camera().zoom,
+            zoom: host.zoom(),
             ratio_min: f32::INFINITY,
             ratio_max: 0.0,
             ..Self::default()
         };
-        for (key, _) in canvas.graph().nodes() {
-            let Some(face) = canvas.node_face_rect(key) else {
-                continue;
-            };
+        for (face, body) in host.faces() {
             if face.0 < 0.0 || face.1 < 0.0 || face.2 > w || face.3 > h {
                 continue;
             }
-            let Some(body) = canvas.node_body_rect(key) else {
+            let Some(body) = body else {
                 out.missing += 1;
                 continue;
             };
@@ -93,6 +91,7 @@ impl FaceAlignment {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::canvas::Canvas;
     use crate::canvas::controls::CanvasCommand;
     use kernel::geometry::PortablePoint;
 
