@@ -49,6 +49,9 @@ mod chronicle;
 
 #[cfg(feature = "flora")]
 pub mod flora;
+/// The resident inference lane and its `inference.ask` route.
+#[cfg(feature = "inference")]
+pub mod inference;
 mod installed;
 /// Shutdown ordering shared by long-lived residents; Djinn uses it too.
 pub mod lifecycle;

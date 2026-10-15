@@ -4582,6 +4582,7 @@ dependencies = [
 name = "distillery"
 version = "0.0.1"
 dependencies = [
+ "armillary",
  "burn-backend",
  "burn-flex",
  "burn-ir",

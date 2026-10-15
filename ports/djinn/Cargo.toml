@@ -25,6 +25,10 @@ custody-receipt-host = []
 # settings name a trainer this build does not carry is refused loudly rather
 # than composed diminished.
 trainer = ["distillery/trainer"]
+# The resident inference lane (`src/resident_inference.rs`; resident inference
+# and recall plan, I1). Gated for the trainer's reason: a default build stays
+# light, and settings naming the lane in a build without it are refused.
+inference = ["distillery/inference"]
 # The same trainer, composed on this machine's discrete GPU. Additive over
 # `trainer`, and honest about the difference: a lane that says `device: "gpu"`
 # on a build without this feature refuses `open` by name rather than quietly

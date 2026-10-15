@@ -26,6 +26,7 @@ use transport::BlobScope;
 
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
+use crate::resident_inference::{self, ResidentInference};
 use crate::resident_knot::{KnotGate, ResidentKnot};
 use crate::resident_mere::MereRoutes;
 use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
@@ -50,6 +51,9 @@ pub struct DjinnResident {
     /// its route was registered over (vault lock ruling 48).
     knot_reopen: Option<(PathBuf, KnotResidentSettings, KnotGate)>,
     distillery: Option<ResidentDistillery>,
+    /// The inference lane, which borrows the Distillery lane's model
+    /// library and so closes before it.
+    inference: Option<ResidentInference>,
     reservoir_settings: ReservoirLaneSettings,
     /// Off until [`DjinnResident::open_reservoir`] opens it under a shared
     /// root the caller names.
@@ -76,6 +80,8 @@ impl DjinnResident {
         vault_dir: &Path,
         unlock: Unlock,
     ) -> Result<Self, String> {
+        // Before anything opens, so a refusal leaves nothing to unwind.
+        resident_inference::validate(&owner)?;
         let credentials = claim_credentials(identity, data_root, profile)?;
         let blobs = ResidentBlobCustody::open(data_root, &owner.content).await?;
         let site_root = published_site_profile_root(data_root, profile);
@@ -138,6 +144,12 @@ impl DjinnResident {
             },
             None => None,
         };
+        // Infallible once validated: the actor builds its provider on its own
+        // thread, and a provider that fails to build fails each run instead.
+        #[cfg(feature = "inference")]
+        let inference = owner.inference.as_ref().map(ResidentInference::open);
+        #[cfg(not(feature = "inference"))]
+        let inference: Option<ResidentInference> = None;
         let knot_reopen = match (&knot, knot_settings) {
             (Some(knot), Some(settings)) => Some((data_root.to_path_buf(), settings, knot.gate())),
             _ => None,
@@ -150,6 +162,7 @@ impl DjinnResident {
             knot,
             knot_reopen,
             distillery,
+            inference,
             reservoir_settings: owner.reservoir,
             reservoir: ReservoirLane::Off,
         })
@@ -247,6 +260,22 @@ impl DjinnResident {
         Ok(Some(ResidentKnot::route()))
     }
 
+    /// Register the inference route when this run composes the lane.
+    pub fn register_inference_route(
+        &self,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<Option<ResidentEndpointRoute>, ResidentEndpointCatalogError> {
+        self.inference
+            .as_ref()
+            .map(|inference| inference.register(catalog))
+            .transpose()
+    }
+
+    /// The open inference lane, when this run composes it.
+    pub fn inference(&self) -> Option<&ResidentInference> {
+        self.inference.as_ref()
+    }
+
     /// Refresh mutable Knot pairing and evidence-reader authority.
     pub async fn refresh(&mut self) -> Result<bool, String> {
         match self.knot.as_mut() {
@@ -342,10 +371,23 @@ impl DjinnResident {
             knot,
             knot_reopen: _,
             distillery,
+            inference,
             reservoir_settings: _,
             reservoir,
         } = self;
         let report = close_all(vec![
+            (
+                // Before the Distillery lane, whose model library it borrows.
+                "inference",
+                Box::new(move || {
+                    Box::pin(async move {
+                        match inference {
+                            Some(inference) => inference.close().await,
+                            None => Ok(()),
+                        }
+                    }) as CloseFuture<'static>
+                }) as CloseAction<'static>,
+            ),
             (
                 // First: the works borrow nothing from blob custody or
                 // credentials, and stopping work the ring believes is running

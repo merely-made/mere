@@ -23,7 +23,10 @@ sceno.workspace = true
 scenomise.workspace = true
 scenotime.workspace = true
 eidetic = { workspace = true, optional = true }
-esp = { workspace = true, features = ["decoder-lora"], optional = true }
+# The decoder half is named by the features that need it (`trainer`,
+# `flora`), so `inference` can carry the actor without the Burn stack.
+esp = { workspace = true, optional = true }
+armillary = { workspace = true, optional = true }
 safetensors = { version = "0.4", optional = true }
 pollster = { version = "0.4", optional = true }
 mere-surface-api = { workspace = true }
@@ -41,7 +44,7 @@ iroh = { version = "1.0.3", optional = true }
 [features]
 default = []
 remote = ["dep:burn-backend", "dep:burn-ir", "dep:burn-remote", "dep:iroh"]
-trainer = ["dep:esp", "dep:eidetic", "dep:pollster", "dep:safetensors", "tokio/rt"]
+trainer = ["dep:esp", "esp/decoder-lora", "dep:eidetic", "dep:pollster", "dep:safetensors", "tokio/rt"]
 # The trainer on the local discrete GPU. Additive over `trainer`: it turns on
 # esp's wgpu decoder backend and the adapter probe that comes with it, so a
 # host can ask which adapter the runtime would bind *before* composing a
@@ -53,7 +56,11 @@ trainer-gpu = ["trainer", "esp/decoder-wgpu"]
 # runs either arm on either device. Without it the autodiff request arm still
 # deserializes, and the job refuses it by name.
 trainer-autodiff = ["trainer", "esp/decoder-autodiff"]
-flora = ["dep:eidetic", "dep:esp", "dep:safetensors"]
+flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
+# The resident inference lane (resident inference and recall plan, I1): esp's
+# actor and provider seam, the run table and the `inference.ask` endpoint. No
+# model runtime: the host supplies the provider.
+inference = ["dep:esp", "esp/actor", "dep:armillary"]
 
 [dev-dependencies]
 notochord = { workspace = true, features = ["tokio"] }
