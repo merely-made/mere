@@ -1308,4 +1308,12 @@ fast-forward of local main; nothing built).**
   cannot be undone, so it waits for his go. Publish order for the crates that name
   it: `backstep`, then `workbench` (already `publish = true`), then `scenomise`,
   then `cambium`.
+- **2026-10-15 (`backstep` 0.1.0 published):** Mark ran `cargo login` and approved
+  the publish; `cargo publish -p backstep` uploaded `backstep` 0.1.0 to crates.io
+  (verified build, 5 files). Its packaged `.cargo_vcs_info.json` names the Mere
+  commit it was cut from, a local commit when published and not yet on
+  `origin/main`. `cambium` and `scenomise` depend on it, so it no longer
+  blocks either; `scenomise` also needs `workbench` published, and `cambium`
+  has other dependencies this entry did not check. Publishing either is Mark's
+  call.
 
