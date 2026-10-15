@@ -195,6 +195,7 @@ impl Harness {
             MereViewRequest::Host(key) => format!("run {key}"),
             MereViewRequest::Layout(id) => format!("lay out by {id}"),
             MereViewRequest::Merge(request) => format!("merge {request:?}"),
+            other => format!("{other:?}"),
         };
         self.events.push(format!("request {what}"));
         if std::mem::take(&mut self.decline_next) {
@@ -250,6 +251,8 @@ impl Harness {
             },
             MereViewRequest::Layout(id) => self.model.layout = id,
             MereViewRequest::Archive(_) => self.decline("The fixture offers no archive.".into()),
+            // A request or step this harness does not know yet.
+            _ => self.decline("This harness does not carry that out.".into()),
         }
         for session in &mut self.model.sessions {
             session.steps = steps_for(session.attached, session.trashed);

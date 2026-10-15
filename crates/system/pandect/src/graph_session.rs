@@ -626,7 +626,7 @@ mod transaction;
 
 #[path = "graph_session_merge.rs"]
 mod merge;
-pub use merge::{MergeChoice, MergeConflict, MergeMatch, PendingMerge};
+pub use merge::{DroppedChoice, MergeChoice, MergeConflict, MergeMatch, PendingMerge};
 
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as

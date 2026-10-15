@@ -119,11 +119,15 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-merge-conflict { display: flex; flex-direction: column; gap: 2px; } \
     .mere-view-merge-conflict > p { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } \
     .mere-view-merge-part { font-weight: bold; } \
+    .mere-view-merge-dropped { margin: 0; padding-left: 16px; } \
     .mere-view-merge-choices, .mere-view-merge-actions { display: flex; flex-wrap: wrap; gap: 4px; } \
     .mere-view-merge-hand { border: 1px solid currentColor; padding: 2px 4px; min-height: 24px; box-sizing: border-box; white-space: pre; overflow-x: auto; overflow-y: hidden; }";
 
-/// What the person asked for. The host carries it out or declines it.
+/// What the person asked for. The host carries it out or declines it. More
+/// requests may come, so a host matching on them keeps a wildcard arm that
+/// declines what it does not carry out.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum MereViewRequest {
     /// Open or activate the node with this key.
     Activate(String),
@@ -1390,6 +1394,24 @@ where
         format!("Merge {} into {}", merge.source_name, merge.target_name),
     )
     .attr("class", "mere-view-merge-title");
+    let dropped: MereViewElement<State, Action> = if merge.dropped.is_empty() {
+        Box::new(el::<_, State, Action>("div", ()).attr("style", "display:none"))
+    } else {
+        let items: Vec<MereViewElement<State, Action>> = merge
+            .dropped
+            .iter()
+            .map(|words| {
+                Box::new(el::<_, State, Action>("li", words.clone()))
+                    as MereViewElement<State, Action>
+            })
+            .collect();
+        Box::new(
+            el::<_, State, Action>("ul", items)
+                .attr("class", "mere-view-merge-dropped")
+                .attr("role", "status")
+                .attr("aria-label", "Dropped choices"),
+        )
+    };
     let conflicts: Vec<MereViewElement<State, Action>> = merge
         .conflicts
         .iter()
@@ -1422,7 +1444,7 @@ where
     let actions =
         el::<_, State, Action>("div", (apply, cancel)).attr("class", "mere-view-merge-actions");
     Box::new(
-        el::<_, State, Action>("section", (title, list, actions))
+        el::<_, State, Action>("section", (title, dropped, list, actions))
             .attr("class", "mere-view-merge")
             .attr("style", format!("top:{top}px"))
             .attr("role", "group")
