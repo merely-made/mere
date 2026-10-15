@@ -33,6 +33,7 @@ pub mod resident_distillery;
 pub mod resident_events;
 pub mod resident_knot;
 pub mod resident_mere;
+pub mod resident_projection;
 pub mod resident_reservoir;
 pub mod resident_site;
 pub mod resident_status;

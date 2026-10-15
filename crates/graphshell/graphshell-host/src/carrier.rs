@@ -48,13 +48,14 @@
 //! Every stream-carried session is admitted by [`admit_stream`]: an admitted
 //! byte stream plus the ingress facts the carrier can honestly report is the
 //! seam every carrier reaches (transport agnosticism note, ruling T1). A
-//! transport stream gets its facts from [`AcceptedSession`] through
-//! [`admit_accepted_session`]; an in-process door, which has no transport and
-//! so no `AcceptedSession`, states its own facts (no peer, the derived link)
-//! and calls [`admit_stream`] directly. A carrier that hands over the hello as
-//! bytes rather than a stream (the WebRTC door) uses the sans-I/O twin,
-//! [`crate::admission::admit_session`]. All of them end in
-//! [`crate::admission::serves_action`].
+//! stream's facts come from its [`AcceptedSession`] through
+//! [`admit_accepted_session`]: a transport's, or an in-process door's duplex
+//! named `TransportKind::InProcess` (no peer, the derived link). A carrier
+//! that hands over the hello as bytes rather than a stream (the WebRTC door)
+//! uses the sans-I/O twin, [`crate::admission::admit_session`]. All of them
+//! end in one action check: [`crate::admission::serves_action`], or the
+//! host's own [`ActionCheck`] (`*_with`) for a host serving a vocabulary of
+//! its own under the projection service.
 //!
 //! ## Why the action check is not a second admission
 //!
@@ -63,9 +64,11 @@
 //! the service implementation remains authoritative about what it actually
 //! serves even when the owner's serialized vocabulary changes.
 
+use insigne::delegation::SignedDelegationCertificate;
 use notochord::{
-    AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,
-    RevocationLedger, ServiceAccess, ServiceRule, SessionFacts, TrustedRoot, admit_session,
+    AdmittedPrincipal, AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy,
+    NetworkId, ProfileRef, RevocationLedger, ServiceAccess, ServiceRule, SessionFacts, TrustedRoot,
+    admit_session,
 };
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
 use transport::{AcceptedSession, Alpn, Transport, TransportError};
@@ -158,8 +161,53 @@ pub async fn accept_projection_session<T: Transport>(
     now_ms: u64,
     active_sessions: u32,
 ) -> Result<Result<AdmittedSession<T::Stream>, ProjectionRefusal>, ProjectionAcceptError> {
+    accept_projection_session_with(
+        transport,
+        policy,
+        ledger,
+        now_ms,
+        active_sessions,
+        &serves_admitted,
+    )
+    .await
+}
+
+/// [`accept_projection_session`] with the host's own action check in place
+/// of [`serves_action`]. For a host that serves a vocabulary of its own under
+/// the projection service, such as a route-selecting host
+/// ([`crate::projection_host::RouteSelector`]).
+pub async fn accept_projection_session_with<T: Transport>(
+    transport: &T,
+    policy: &LocalNetworkPolicy,
+    ledger: &RevocationLedger,
+    now_ms: u64,
+    active_sessions: u32,
+    serves: ActionCheck<'_>,
+) -> Result<Result<AdmittedSession<T::Stream>, ProjectionRefusal>, ProjectionAcceptError> {
     let accepted = transport.accept(projection_alpn()).await?;
-    admit_accepted_session(accepted, policy, ledger, now_ms, active_sessions).await
+    let (stream, facts) = accepted.into_session();
+    admit_stream_with(
+        stream,
+        &facts,
+        policy,
+        ledger,
+        now_ms,
+        active_sessions,
+        serves,
+    )
+    .await
+}
+
+/// Whether this host serves what an admitted principal was admitted for,
+/// given the delegation chain the conclusion was drawn from. The chain is
+/// there for checks that read the grant itself, such as an application its
+/// leaf must name.
+pub type ActionCheck<'a> =
+    &'a (dyn Fn(&AdmittedPrincipal, &[SignedDelegationCertificate]) -> bool + Send + Sync);
+
+/// [`serves_action`] as an [`ActionCheck`].
+fn serves_admitted(principal: &AdmittedPrincipal, _chain: &[SignedDelegationCertificate]) -> bool {
+    serves_action(principal)
 }
 
 /// Admit and action-check a session this carrier did not accept itself.
@@ -198,10 +246,9 @@ where
 /// carrier reports.
 ///
 /// The one entry every stream-carried admission runs (module docs). `facts`
-/// must be what the carrier can honestly say: a transport's come from
-/// [`AcceptedSession::into_session`] (use [`admit_accepted_session`]); an
-/// in-process door reports no peer and the link both ends derived. Nothing
-/// here trusts a fact the hello carries.
+/// must be what the carrier can honestly say, which is what
+/// [`AcceptedSession::into_session`] gives (use [`admit_accepted_session`]).
+/// Nothing here trusts a fact the hello carries.
 ///
 /// A refusal is finished, never dropped, and a refused stream never reaches
 /// the caller: on `Ok(Ok(session))` the stream cleared admission and carries
@@ -217,13 +264,38 @@ pub async fn admit_stream<S>(
 where
     S: AsyncRead + AsyncWrite + Unpin,
 {
+    admit_stream_with(
+        stream,
+        facts,
+        policy,
+        ledger,
+        now_ms,
+        active_sessions,
+        &serves_admitted,
+    )
+    .await
+}
+
+/// [`admit_stream`] with the host's own [`ActionCheck`].
+pub async fn admit_stream_with<S>(
+    stream: S,
+    facts: &SessionFacts,
+    policy: &LocalNetworkPolicy,
+    ledger: &RevocationLedger,
+    now_ms: u64,
+    active_sessions: u32,
+    serves: ActionCheck<'_>,
+) -> Result<Result<AdmittedSession<S>, ProjectionRefusal>, ProjectionAcceptError>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+{
     let admitted = admit_session(stream, policy, ledger, facts, now_ms, active_sessions).await?;
     let mut session = match admitted {
         Ok(session) => session,
         Err(reason) => return Ok(Err(ProjectionRefusal::NotAdmitted(reason))),
     };
 
-    if !serves_action(&session.principal) {
+    if !serves(&session.principal, &session.claims.delegations) {
         let action = session.principal.action.action.clone();
         // Finish rather than drop, for the same reason a refused handshake is
         // finished. Both arms happen to drain on drop today, through two Drop

@@ -27,9 +27,8 @@ use graphshell_endpoint::door::wire::{
 };
 use insigne::delegation::SignedDelegationCertificate;
 use notochord::{
-    AdmittedSession, CarrierKind, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId,
-    ProfileRef, ProofBinding, RevocationLedger, SessionFacts, SessionReply, TrafficClass,
-    initiate_session,
+    AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,
+    ProofBinding, RevocationLedger, SessionReply, TrafficClass, initiate_session,
 };
 use personae::IdentityProvider;
 use serde::de::DeserializeOwned;
@@ -38,8 +37,9 @@ use tokio::io::{AsyncRead, AsyncWrite, DuplexStream};
 
 use crate::door::identity_projection::SshUnlockPolicyIntentV1;
 use graphshell_host::admission::{PROJECTION_PROTOCOL, open_network_bound_session};
-use graphshell_host::carrier::{ProjectionAcceptError, ProjectionRefusal, admit_stream};
+use graphshell_host::carrier::{ProjectionAcceptError, ProjectionRefusal, admit_accepted_session};
 use graphshell_host::line::{self, LineReader};
+use transport::{AcceptedSession, Alpn, IngressContext};
 
 /// Native messaging host name shared by the extension and installer.
 pub const NATIVE_HOST_NAME: &str = "org.mere.graphshell";
@@ -520,16 +520,19 @@ pub async fn admit_local_session<P: IdentityProvider>(
         delegations,
     )
     .map_err(|error| BrowserCarrierError::Handshake(IoHandshakeError::Frame(error)))?;
-    let facts = SessionFacts::new(PROJECTION_PROTOCOL, CarrierKind::Other)
-        .with_ingress(None, Some(link.shared_link));
+    // The in-process duplex as an accepted session, like any carrier's: no
+    // peer, the link both ends derived (`TransportKind::InProcess`).
+    let accepted = AcceptedSession::new(
+        server,
+        Alpn::from_bytes(PROJECTION_PROTOCOL),
+        None,
+        IngressContext::in_process(link.shared_link),
+    );
     let limits = policy.limits.clamped();
 
     let initiator = async { initiate_session(&mut client, &hello, &limits).await };
-    // The host's one admission entry, as every stream-carried session takes:
-    // the in-process duplex has no transport, so the door states its facts
-    // (no peer, the link both ends derived) rather than reading them off an
-    // `AcceptedSession`.
-    let responder = async { admit_stream(server, &facts, policy, ledger, now_ms, 0).await };
+    // The host's one admission entry, as every stream-carried session takes.
+    let responder = async { admit_accepted_session(accepted, policy, ledger, now_ms, 0).await };
     let (reply, admitted) = tokio::join!(initiator, responder);
     let reply = reply?;
     let admitted = match admitted {
@@ -669,6 +672,7 @@ mod tests {
         CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
     };
     use notochord::TrustedRoot;
+    use notochord::{CarrierKind, SessionFacts};
     use notochord::{HandshakeLimits, ServiceAccess, ServiceRule};
     use personae::InMemoryProvider;
     use personae::delegation::Issue;
