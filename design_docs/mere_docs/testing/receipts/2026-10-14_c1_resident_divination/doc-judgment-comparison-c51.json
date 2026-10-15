@@ -1,0 +1,18 @@
+{
+  "baseline_commit": "c51e1913cc52cc161815b97939a46452495747e0",
+  "new_receipt_has_valid_D2_record": true,
+  "inherited_errors_unchanged": [
+    "snapshot aggregate digest changed: 8aab8eccd5f724577dabd435627e9ae174a10d1474cb4f0a8e5d65001437eeb0 != f0b64eef4cd5514157bb1b49d389b84db29a1e823d6f3e2cebf827337fe56abf",
+    "active document lacks D2 record: cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/browser-r6/README.md",
+    "active document lacks D2 record: cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/git-only-integration-r3/README.md",
+    "active document lacks D2 record: cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/native-shared-r2/README.md",
+    "active document lacks D2 record: mere_docs/testing/2026-10-13_turnstone_integration_qualification.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/README.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_classic_browser_gates/browser-preparation.md",
+    "active document lacks D2 record: mere_docs/testing/receipts/2026-10-11_producer_gates/README.md"
+  ],
+  "baseline_active_docs": 272,
+  "candidate_active_docs": 273,
+  "baseline_covered": 265,
+  "candidate_covered": 266
+}

@@ -30,7 +30,7 @@ use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell::native::tasks::ResidentTasks;
 use pandect::DomainId;
-use personae::PersonaId;
+use personae::{PersonaId, ProfileId};
 use sceno::InstanceId;
 use tokio::sync::oneshot;
 
@@ -55,6 +55,29 @@ pub struct ReservoirAttachmentOptions {
     pub domain: DomainId,
     /// Lease length selected by the owner for an embedded application door.
     pub session_duration: Duration,
+}
+
+/// Product startup inputs. Identity custody and the family profile selection
+/// stay inside Djinn, and are never opened on a live resident attachment.
+#[derive(Clone)]
+pub struct ApplicationReservoirOptions {
+    pub endpoint: String,
+    pub application: AppId,
+    pub domain: DomainId,
+    pub shared_root: PathBuf,
+    pub vault_dir: PathBuf,
+    pub profile: Option<ProfileId>,
+    /// The same requested/sole-wallet resolution used by the resident daemon.
+    pub persona: Option<PersonaId>,
+    pub session_duration: Duration,
+}
+
+/// Applications admitted by the shared reservoir's standard composition.
+pub fn reservoir_applications() -> Vec<AppId> {
+    ["turnstone", "knot-editor", "cleromancy", "graphshell"]
+        .into_iter()
+        .map(AppId::new)
+        .collect()
 }
 
 /// Why attachment or embedded ownership could not complete.
@@ -85,6 +108,130 @@ pub struct ReservoirAttachment {
 }
 
 impl ReservoirAttachment {
+    /// Attach using the resident's disclosed persona, or unlock the family
+    /// identity through Djinn before embedding on genuine endpoint absence.
+    /// A refusal, malformed response, lock or timeout never triggers fallback.
+    pub async fn open_application<C, CFut>(
+        options: ApplicationReservoirOptions,
+        prompt: &mut dyn crate::startup_vault::Prompt,
+        configure: C,
+    ) -> Result<Self, ReservoirAttachmentError>
+    where
+        C: FnOnce(MereRoutes) -> CFut,
+        CFut: Future<Output = Result<MereRoutes, String>>,
+    {
+        let route = AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).expect("valid reservoir route");
+        let initial = tokio::time::timeout(
+            ATTACH_TIMEOUT,
+            AppBrokerClient::open_route_at(&options.endpoint, options.application.clone(), route),
+        )
+        .await
+        .map_err(|_| ReservoirAttachmentError::Timeout)?;
+        match initial {
+            Ok(mut reservoir) => {
+                let attach = tokio::time::timeout(ATTACH_TIMEOUT, async {
+                    let persona = disclosed_persona(&mut reservoir).await?;
+                    if let Some(expected) = options.persona {
+                        if persona != expected {
+                            return Err(ReservoirAttachmentError::Persona {
+                                expected: expected.as_uuid().to_string(),
+                                found: persona.as_uuid().to_string(),
+                            });
+                        }
+                    }
+                    ensure(&mut reservoir, &options.domain).await?;
+                    let route = AppRouteId::new(mere_route_id(options.domain.as_str()))
+                        .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
+                    AppBrokerClient::open_route_at(
+                        &options.endpoint,
+                        options.application.clone(),
+                        route,
+                    )
+                    .await
+                    .map_err(Into::into)
+                })
+                .await
+                .unwrap_or(Err(ReservoirAttachmentError::Timeout));
+                let _ = tokio::time::timeout(ATTACH_TIMEOUT, reservoir.close()).await;
+                attach.map(|client| Self {
+                    client: Some(client),
+                    embedded: None,
+                })
+            },
+            Err(AppClientError::Io(error))
+                if matches!(
+                    error.kind(),
+                    ErrorKind::NotFound | ErrorKind::ConnectionRefused
+                ) =>
+            {
+                if !matches!(
+                    tokio::runtime::Handle::current().runtime_flavor(),
+                    tokio::runtime::RuntimeFlavor::MultiThread
+                ) {
+                    return Err(ReservoirAttachmentError::Embedded(
+                        "embedded resident requires a multi-thread Tokio runtime".into(),
+                    ));
+                }
+                // Resolve the existing wallet namespace, rather than minting a
+                // product-specific identity beside the user's selected one.
+                let persona =
+                    pandect::wallet_store::resolve_persona(&options.shared_root, options.persona)
+                        .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
+                let choice = crate::startup_vault::choose(&options.vault_dir, false);
+                let mut quiet = |_: &str, _: serde_json::Value| {};
+                let started = crate::startup_vault::open(
+                    &options.vault_dir,
+                    choice,
+                    prompt,
+                    &mut quiet,
+                    &mut std::thread::sleep,
+                )
+                .map_err(ReservoirAttachmentError::Embedded)?;
+                let profile_id = crate::profile::resolve_selected_profile(
+                    &*started.opened.storage,
+                    &options.vault_dir,
+                    options.profile.as_ref(),
+                )
+                .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
+                let (profile, _) = castellan::custody::bootstrap::load_or_create_profile(
+                    &*started.opened.storage,
+                    &profile_id,
+                )
+                .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
+                let protection = match choice {
+                    crate::startup_vault::VaultChoice::Passphrase => {
+                        graphshell::identity::VaultProtectionView::Passphrase
+                    },
+                    crate::startup_vault::VaultChoice::AutoOs => {
+                        graphshell::identity::VaultProtectionView::OsProtected
+                    },
+                };
+                let host = Arc::new(
+                    PersonaeHost::new(
+                        castellan::custody::IdentityVault::with_profile(
+                            started.opened.storage,
+                            profile,
+                        ),
+                        None,
+                        protection,
+                    )
+                    .with_vault_dir(options.vault_dir.clone())
+                    .with_persisted_lock(options.vault_dir),
+                );
+                let attached = ReservoirAttachmentOptions {
+                    endpoint: options.endpoint,
+                    application: options.application,
+                    applications: reservoir_applications(),
+                    shared_root: options.shared_root,
+                    persona,
+                    domain: options.domain,
+                    session_duration: options.session_duration,
+                };
+                Self::open_with(attached, || async { Ok(host) }, configure).await
+            },
+            Err(error) => Err(error.into()),
+        }
+    }
     /// Attach to Djinn, or compose its reservoir lane if the endpoint is absent.
     pub async fn open<S, F, Fut>(
         options: ReservoirAttachmentOptions,
@@ -95,7 +242,10 @@ impl ReservoirAttachment {
         F: FnOnce() -> Fut,
         Fut: Future<Output = Result<Arc<PersonaeHost<S>>, String>>,
     {
-        Self::open_with(options, identity, |routes| async { Ok(routes) }).await
+        Self::open_with(options, identity, |routes| async {
+            Ok(routes.with_divination_authority())
+        })
+        .await
     }
 
     /// As [`Self::open`], with the owner's domain registration hook.
@@ -219,6 +369,17 @@ async fn check_persona(
     client: &mut AppBrokerClient,
     expected: PersonaId,
 ) -> Result<(), ReservoirAttachmentError> {
+    let found = disclosed_persona(client).await?.as_uuid().to_string();
+    let expected = expected.as_uuid().to_string();
+    if found != expected {
+        return Err(ReservoirAttachmentError::Persona { expected, found });
+    }
+    Ok(())
+}
+
+async fn disclosed_persona(
+    client: &mut AppBrokerClient,
+) -> Result<PersonaId, ReservoirAttachmentError> {
     let found = client
         .read_cards()
         .await?
@@ -227,11 +388,8 @@ async fn check_persona(
         .find(|value| value.label == "Persona")
         .map(|value| value.value)
         .ok_or(ReservoirAttachmentError::MissingPersona)?;
-    let expected = expected.as_uuid().to_string();
-    if found != expected {
-        return Err(ReservoirAttachmentError::Persona { expected, found });
-    }
-    Ok(())
+    let id = uuid::Uuid::parse_str(&found).map_err(|_| ReservoirAttachmentError::MissingPersona)?;
+    Ok(PersonaId::from_uuid(id))
 }
 
 async fn ensure(

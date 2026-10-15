@@ -161,6 +161,15 @@ impl FileChooser for WebFileChooser {
     }
 }
 
+impl Drop for WebFileChooser {
+    /// The chooser's input belongs to its appearance. Lifetime-owned listeners
+    /// are removed by mount disposal; the element and any waiting answer go here.
+    fn drop(&mut self) {
+        self.pending.borrow_mut().take();
+        self.input.remove();
+    }
+}
+
 /// One chosen file's bytes and what the browser says of it.
 async fn read(file: web_sys::File) -> Option<OpenedFile> {
     let buffer = wasm_bindgen_futures::JsFuture::from(file.array_buffer())

@@ -1199,7 +1199,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             // The reservoir admits this door's first-party clients. Each
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
-            let first_party = vec![AppId::new("turnstone"), AppId::new("knot-editor")];
+            let first_party = vec![AppId::new("turnstone"), AppId::new("knot-editor"), AppId::new("cleromancy"), AppId::new("graphshell")];
             let routes = resident.reservoir().reservoir().map(|reservoir| {
                 MereRoutes::new(
                     pandect::shared_root::shared_root(),
@@ -1208,6 +1208,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                     grants.clone(),
                     first_party.clone(),
                 )
+                .with_divination_authority()
             });
             if let Some(route) = catalog
                 .update(|catalog| resident.register_reservoir_route(catalog, routes.clone()))

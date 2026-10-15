@@ -59,6 +59,16 @@ pub enum CaptureRefusal {
         generation: u64,
         error: crate::ProducerGpuRemapError,
     },
+    PresentationError {
+        backend: crate::PresentationBackend,
+        generation: crate::ContextGeneration,
+        source_key: Option<u64>,
+        error: String,
+    },
+    ContextLost {
+        backend: crate::PresentationBackend,
+        generation: crate::ContextGeneration,
+    },
     DeviceLost(genet_render_host::DeviceLossNotice),
     SurfaceUnavailable {
         generation: u64,
@@ -76,19 +86,16 @@ impl std::fmt::Display for CaptureRefusal {
     }
 }
 impl std::error::Error for CaptureRefusal {}
-pub struct CaptureFrame<'a> {
-    pub surface: &'a dyn Surface,
-    pub view: &'a wgpu::TextureView,
-    pub width: u32,
-    pub height: u32,
-}
-pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame<'_>, CaptureRefusal>) + 'static>;
+pub type CaptureFrame = Box<dyn crate::PendingPresentationCapture>;
+pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame, CaptureRefusal>) + 'static>;
 
 /// Identity of one successful queue presentation in this host/window lifetime.
 /// Host numbers are process-local; a receipt must also carry its product run.
 /// This certifies submission of the rasterized source, not compositor visibility.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PresentedFrame {
+    /// Graphics lifetime that produced these pixels, scoped to `host`.
+    pub context_generation: crate::ContextGeneration,
     pub host: u64,
     pub sequence: u64,
     pub width: u32,
@@ -97,13 +104,8 @@ pub struct PresentedFrame {
 }
 
 /// A readback of that exact rasterized source, branded at presentation.
-pub struct StampedCaptureFrame<'a> {
-    pub surface: &'a dyn Surface,
-    pub view: &'a wgpu::TextureView,
-    pub presentation: PresentedFrame,
-}
-pub type StampedCaptureFn =
-    Box<dyn FnOnce(Result<StampedCaptureFrame<'_>, CaptureRefusal>) + 'static>;
+pub type StampedCaptureFrame = CaptureFrame;
+pub type StampedCaptureFn = Box<dyn FnOnce(Result<StampedCaptureFrame, CaptureRefusal>) + 'static>;
 
 /// One-shot read-only observation, before capture callbacks and pointer/AT input.
 pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> =
@@ -207,6 +209,8 @@ impl AppFrameInsets {
 
 /// Window and pipeline configuration.
 pub struct HostOptions {
+    /// Browser presentation preference. Native hosts retain their wgpu route.
+    pub presentation_choice: crate::PresentationChoice,
     /// The window title.
     pub title: String,
     /// The layer responsible for the window frame.
@@ -280,6 +284,7 @@ pub struct HostOptions {
 impl Default for HostOptions {
     fn default() -> Self {
         Self {
+            presentation_choice: crate::PresentationChoice::Auto,
             title: String::new(),
             window_frame: WindowFrame::Host,
             decorations: true,
@@ -1053,6 +1058,7 @@ impl Default for AppShared {
 pub struct HostDisposal {
     producers: Option<crate::ProducerRegistry>,
     fragments: std::collections::HashMap<u64, (u64, u64)>,
+    driver: Option<Box<dyn crate::PresentationDriver>>,
     surface: Option<Box<dyn Surface>>,
     core: Option<Arc<RenderCore>>,
     subscription: Option<genet_render_host::RecoverySubscription>,
@@ -1073,6 +1079,10 @@ impl Drop for HostDisposal {
             }
         }
         drop(fragments);
+        // An installed driver owns its context/surface and outstanding output.
+        if let Some(mut driver) = self.driver.take() {
+            driver.dispose();
+        }
         drop(self.surface.take());
         drop(self.core.take());
         drop(self.subscription.take());
@@ -1108,8 +1118,12 @@ where
     /// The presentation surface behind the neutral seam. A browser event
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
+    /// A browser presenter with optional same-device services.
+    pub presentation_driver: Option<Box<dyn crate::PresentationDriver>>,
     pub recovery_status: Option<genet_render_host::RecoveryStatus>,
     /// Current checked raster refusal; cleared at the next redraw admission.
+    /// Most recent refused presentation, including portable backend failures.
+    pub last_presentation_failure: Option<crate::PresentationFailure>,
     pub last_raster_failure: Option<genet_render_host::RasterizeFailure>,
     pub(crate) detached_generation: Option<u64>,
     pub needs_recovery_surface: bool,
@@ -1203,6 +1217,7 @@ where
     /// the same deferral `pending_sheet` gets, and for the same reason.
     pub pending_ui_zoom: Option<f32>,
     pub pending_capture: Option<CaptureFn>,
+    pub capture_owner: crate::CaptureOwner,
     pub pending_presentation_observer: Option<PresentationObserver<State, Logic, V, T>>,
     pub pending_stamped_capture: Option<StampedCaptureFn>,
     pub presentation_host: u64,
@@ -1240,7 +1255,9 @@ where
             titlebar_published: None,
             titlebar_sheet: String::new(),
             surface: None,
+            presentation_driver: None,
             recovery_status: None,
+            last_presentation_failure: None,
             last_raster_failure: None,
             recovery_subscription: None,
             detached_generation: None,
@@ -1288,6 +1305,7 @@ where
             pending_sheet: None,
             pending_ui_zoom: None,
             pending_capture: None,
+            capture_owner: crate::CaptureOwner::default(),
             pending_presentation_observer: None,
             pending_stamped_capture: None,
             presentation_host: next_host_identity(),
@@ -1348,7 +1366,8 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
-    /// Detach an independent host's rendering lifetime. The application runner
+    /// Detach an independent host's rendering lifetime, including an installed
+    /// presentation driver and its owned captures. The application runner
     /// and CPU authority remain inspectable. Drop the returned guard only after
     /// releasing the host borrow. This is disposal, not a recovery transition.
     /// The registry and fragment map must belong to this independent host;
@@ -1358,9 +1377,13 @@ where
         self.s.needs_recovery_surface = false;
         self.s.last_redraw_presentation = None;
         self.s.pending_presentation_observer = None;
+        // Owned in-flight captures are refused now; this needs no host loan
+        // and keeps later frame preparation from presenting.
+        self.s.capture_owner.scope().dispose();
         HostDisposal {
             producers: Some(std::mem::take(&mut self.s.shared.producers)),
             fragments: std::mem::take(&mut self.s.shared.leaf_fragments),
+            driver: self.s.presentation_driver.take(),
             surface: self.s.surface.take(),
             core: self.s.shared.render_core.take(),
             subscription: self.s.recovery_subscription.take(),

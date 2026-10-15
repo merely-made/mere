@@ -1,0 +1,23 @@
+[
+  {
+    "name": "before-loss",
+    "rgb_rms": 0.25225019462247533,
+    "max_rgb_delta": 11,
+    "alpha": 0,
+    "pass": true
+  },
+  {
+    "name": "after-restore",
+    "rgb_rms": 0.29987438315895804,
+    "max_rgb_delta": 11,
+    "alpha": 0,
+    "pass": true
+  },
+  {
+    "name": "odd-resize",
+    "rgb_rms": 0.2990475115952969,
+    "max_rgb_delta": 11,
+    "alpha": 0,
+    "pass": true
+  }
+]

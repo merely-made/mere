@@ -43,7 +43,8 @@ impl WebSurface {
     }
 
     /// Configure the same canvas from an existing shared device owner.
-    /// Used both by additional mounts and after the all-host loss barrier.
+    /// Used by additional mounts, after the all-host loss barrier, and by an
+    /// installed driver's restoration. A zero-size canvas configures at 1x1.
     pub fn from_core(
         canvas: HtmlCanvasElement,
         core: Arc<RenderCore>,
@@ -51,7 +52,11 @@ impl WebSurface {
         height: u32,
     ) -> Result<Self, String> {
         // The one browser-specific line in the whole presentation path.
-        let surface = core.create_surface(wgpu::SurfaceTarget::Canvas(canvas), width, height)?;
+        let surface = core.create_surface(
+            wgpu::SurfaceTarget::Canvas(canvas),
+            width.max(1),
+            height.max(1),
+        )?;
         Ok(Self { core, surface })
     }
 
@@ -133,8 +138,7 @@ impl WebWindow {
 
     /// The size to configure the surface at, in physical pixels.
     pub fn physical_size(&self) -> (u32, u32) {
-        let (w, h) = self.inner_size();
-        (w.max(1), h.max(1))
+        self.inner_size()
     }
 }
 
@@ -150,8 +154,8 @@ impl HostWindow for WebWindow {
         let rect = self.canvas.get_bounding_client_rect();
         let scale = self.scale_factor();
         (
-            (rect.width() * scale).round().max(1.0) as u32,
-            (rect.height() * scale).round().max(1.0) as u32,
+            (rect.width() * scale).round().max(0.0) as u32,
+            (rect.height() * scale).round().max(0.0) as u32,
         )
     }
 

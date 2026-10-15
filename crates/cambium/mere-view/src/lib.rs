@@ -36,10 +36,10 @@ mod tests;
 
 pub use layout::{DEFAULT_LAYOUT, lay_out};
 pub use model::{
-    GraphModel, HostAction, MereViewModel, NodeEntry, NodeState, Provenance, RelationEntry,
+    ArchiveEntry, ArchiveModel, GraphModel, HostAction, MereViewModel, NodeEntry, NodeState, Provenance, RelationEntry,
     SessionEntry, SessionStep, StatusNote, ViewStatus,
 };
 pub use view::{
-    MERE_VIEW_CSS, MereView, MereViewElement, MereViewEvent, MereViewRequest, MereViewState,
+    ArchiveRequest, MERE_VIEW_CSS, MereView, MereViewElement, MereViewEvent, MereViewRequest, MereViewState,
     mere_view,
 };

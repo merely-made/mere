@@ -1,0 +1,136 @@
+{
+  "supplier": "b6dfa3eb71e55d48251bd8709b4a8eb5a340940c",
+  "vello": "2eae6243881d5b24c984d5ee35dde509ca5db782",
+  "wesl": "0.4.0",
+  "reason": "Vello GL shader provider requires exact0.4.0; Tenant kiss3d accepts^0.4. Native Tenant qualification remains pending.",
+  "runs": [
+    {
+      "command": [
+        "/usr/bin/python3",
+        "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/resolve-consumer.py"
+      ],
+      "resource": "complete",
+      "payload_exit": 1,
+      "source_unchanged": true,
+      "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/consumer-webgl-resolution-2/cgroup/resource.json",
+      "label": "consumer-webgl-resolution-2",
+      "stderr_sha256": "9e396d23b4789281e7d3105dc13452bb97c9d539b84d1c4498f0afa13ce85f29"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "update",
+        "-p",
+        "wesl",
+        "--precise",
+        "0.4.0"
+      ],
+      "resource": "complete",
+      "payload_exit": 0,
+      "source_unchanged": false,
+      "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/consumer-webgl-resolution-3/cgroup/resource.json",
+      "label": "consumer-webgl-resolution-3",
+      "stderr_sha256": "50a439821748fe61d0c0486478b476e92bf5a5343514dfc9f93d35c48f8eaa9a"
+    },
+    {
+      "command": [
+        "python3",
+        "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/resolve-consumer.py"
+      ],
+      "resource": "complete",
+      "payload_exit": 0,
+      "source_unchanged": false,
+      "resource_path": "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/consumer-webgl-resolution-4/cgroup/resource.json",
+      "label": "consumer-webgl-resolution-4",
+      "stderr_sha256": "44cb4b30513817ec8d0fa971ccb24790a9ac1937999b436ef4576b0eea77b2c7"
+    }
+  ],
+  "sources": {
+    "root": {
+      "netrender": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "netrender_device": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "netrender_text": [],
+      "paint_list_api": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "paint_list_render": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "vello_common": [
+        {
+          "version": "0.3.0",
+          "source": "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+        }
+      ],
+      "vello_gpu": [],
+      "wesl": [
+        {
+          "version": "0.4.0",
+          "source": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ]
+    },
+    "viewer": {
+      "netrender": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "netrender_device": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "netrender_text": [],
+      "paint_list_api": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "paint_list_render": [
+        {
+          "version": "0.1.2",
+          "source": "git+https://www.github.com/merely-made/netrender.git?rev=b6dfa3eb71e55d48251bd8709b4a8eb5a340940c#b6dfa3eb71e55d48251bd8709b4a8eb5a340940c"
+        }
+      ],
+      "vello_common": [
+        {
+          "version": "0.3.0",
+          "source": "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+        }
+      ],
+      "vello_gpu": [
+        {
+          "version": "0.3.0",
+          "source": "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782"
+        }
+      ],
+      "wesl": [
+        {
+          "version": "0.4.0",
+          "source": "registry+https://github.com/rust-lang/crates.io-index"
+        }
+      ]
+    }
+  }
+}

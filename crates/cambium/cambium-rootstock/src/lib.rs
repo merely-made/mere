@@ -40,6 +40,13 @@ use genet_render::VisualMovement;
 
 mod files;
 pub use files::{FileAnswer, FileChooser};
+mod presentation;
+pub use presentation::{
+    ContextGeneration, FrameContentMode, NativePresentationFailure, PendingPresentationCapture,
+    PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice, PresentationDriver,
+    PresentationFailure, PresentationLifetime, PresentationState, WgpuDriver, WgpuSurfaceFactory,
+    backend_attempts,
+};
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
@@ -49,10 +56,10 @@ mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
     ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
-    ProducerFrameInfo, ProducerFrameStats, ProducerGpuRemapError, ProducerImageIdentity,
-    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
-    ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
-    TextureProducer,
+    ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats, ProducerGpuRemapError,
+    ProducerImageIdentity, ProducerNode, ProducerRegistrationError, ProducerRegistry,
+    ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource, ResolvedAppearance,
+    SourceAlpha, SourceEncoding, TextureProducer,
 };
 pub use scene_producer::SceneProducer;
 
@@ -1127,7 +1134,10 @@ pub mod meristem_bounds {
     }
 }
 
-pub use capture::{Frame, PendingFrame, read_frame, start_frame_readback};
+pub use capture::{
+    CaptureOwner, CaptureScope, Frame, PendingFrame, read_frame, start_frame_readback,
+    start_presentation_readback,
+};
 pub use host::{
     AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
