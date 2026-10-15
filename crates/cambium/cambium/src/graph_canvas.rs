@@ -583,11 +583,19 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
     /// source label.
     /// Which nodes' labels show, in node order: all of them unless
     /// [`Self::cull_labels`] is on. Label boxes are estimated from the label's
-    /// length at the label's 10 px size.
+    /// length at the label's 10 px size. A node an app-owned overlay occupies
+    /// ([`Self::node_footprints`]) shows the overlay, never its label as well,
+    /// which would print across the overlay's edge.
     fn shown_labels(&self) -> Vec<bool> {
         let count = self.graph.nodes.len();
+        let occupied = |index: usize| {
+            let id = &self.graph.nodes[index].id;
+            self.node_footprints
+                .iter()
+                .any(|footprint| &footprint.id == id)
+        };
         if !self.cull_labels {
-            return vec![true; count];
+            return (0..count).map(|index| !occupied(index)).collect();
         }
         const HEIGHT: f32 = 14.0;
         let clearance = self.node_radius + 7.0;
@@ -631,7 +639,7 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
             .chain((0..count).filter(|&index| !pinned(index)));
         let mut shown = vec![false; count];
         let mut kept = Vec::new();
-        for index in order {
+        for index in order.filter(|&index| !occupied(index)) {
             let boxed = rect(index);
             if pinned(index) || !kept.iter().any(|&other| overlaps(boxed, other)) {
                 shown[index] = true;
@@ -2357,6 +2365,19 @@ mod tests {
         }
         for child in dom.dom_children(root) {
             classes_of(dom, child, base, out);
+        }
+    }
+
+    /// A node an overlay occupies shows the overlay, not its label too, with
+    /// and without culling.
+    #[test]
+    fn an_occupied_node_draws_no_label() {
+        for cull in [false, true] {
+            let swatch = model(None, None)
+                .with_node_labels(true)
+                .with_label_culling(cull)
+                .with_node_footprint(1, 120.0, 60.0);
+            assert_eq!(swatch.shown_labels(), [false, true], "cull {cull}");
         }
     }
 
