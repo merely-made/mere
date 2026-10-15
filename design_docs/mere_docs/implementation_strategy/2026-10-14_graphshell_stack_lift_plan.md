@@ -1394,4 +1394,23 @@ fast-forward of local main; nothing built).**
   Cambium needs and which is not on crates.io (the published Cambium 0.3.3 did not
   use it; the Genet repository owns that decision). `genet-scripted-dom` `=0.1.2`
   and `layout-dom-api` `=0.1.1` are published at the versions Cambium names.
+- **2026-10-15 (`workbench` 0.1.0 published; the rest of the chain held):** Mark
+  approved publishing the `scenomise` chain. `workbench` 0.1.0 is on crates.io (its
+  source equals the published 0.0.1; dry run and publish passed). `sceno`,
+  `scenograph` and `scenomise` are held: `sceno` and `scenomise` must bump (0.0.5
+  each) because crates.io's 0.0.4 sources differ, and a version bump in this
+  workspace stops Mere's `[patch]` rows applying to anything pinned to an older
+  Mere (a `^0.0.4` requirement does not accept 0.0.5), which breaks Djinn's
+  dev-dependency on Knot until Knot repins onto the bumped revision and Mere bumps
+  its Knot pins. The bump is saved as a patch, not committed, and the Knot repin
+  agents were asked how to sequence it. `mere-curation` does not need a bump for this
+  chain (`scenograph` uses only `SubgraphSpec`, which 0.1.0 has). More `cambium`
+  blockers found: current `sprigging` needs `netrender-vello` `^0.11` (crates.io has
+  0.10.1; the published `sprigging` 0.2.1 had no such dependency), and `genet-text`
+  is publishable as it stands (no `publish = false`, one registry dependency, name
+  free; `cargo publish --dry-run -p genet-text` passes in the Genet repository).
+  `command-menu` is the model behind menus, not the drawn context menu: the
+  commands a host registers, a person's added, removed and recent choices, the
+  order a surface shows them in, the palette's session state, and the shared
+  command ids.
 
