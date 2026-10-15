@@ -7,7 +7,7 @@ No native or integrated dynamics acceptance is certified.
 ## mere_docs/implementation_strategy/2026-10-15_link_model_plan.md
 
 - disposition: current
-- status line: "in progress. Mark authorized orchestration with cheaper subagents." - accurate: yes
+- status line: "in progress. The bounded P1 reading and independent P5 CPU probe are implemented and bounded-tested; phase acceptance remains open." - accurate: yes
 - claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -28,12 +28,15 @@ behavior and source binding before declaring wider acceptance.
 
 Checked the baseline revision, existing semantic statement IDs/reifiers,
 Pictograph's kernel/scenograph dependency seam and Numen's path declarations.
+The combined receipt records 1,056 passing tests, 18 existing Pictograph
+release/probe tests ignored, and a passing responsive-path example. The
+active-doc audit adds no finding; judgment errors match upstream exactly.
 The existing global judgment-ledger gaps remain outside this new record.
 
 ## mere_docs/technical_architecture/2026-10-15_link_model.md
 
 - disposition: current
-- status line: "design with a bounded P1 implementation and independent P5 CPU probe in progress; phase acceptance remains open." - accurate: yes
+- status line: "design with a bounded-tested P1 first slice and independent P5 CPU probe; phase acceptance remains open." - accurate: yes
 - claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
