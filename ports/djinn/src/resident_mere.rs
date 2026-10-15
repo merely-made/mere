@@ -2330,27 +2330,23 @@ mod tests {
         );
     }
 
-    /// Knot's overmap layer (knot-editor `mere_overlay`) saves the attached
-    /// session to the archive and opens it again, through the first-party
-    /// door as `knot-editor`, and reads the codicil back from the route.
-    #[tokio::test(flavor = "multi_thread")]
-    async fn knot_overlay_saves_and_opens_an_archive_through_the_door() {
+    /// Djinn's application door over `fixture`'s catalog, admitting Knot's
+    /// overlay as `knot-editor`, with a keeper over a fixed fixture profile.
+    /// Returns the door's address, its task scope and the server task.
+    async fn knot_door(
+        fixture: &Fixture,
+    ) -> (
+        String,
+        graphshell_endpoint::door::tasks::ResidentTasks,
+        tokio::task::JoinHandle<Result<(), crate::door::app_broker::AppBrokerError>>,
+    ) {
         use crate::door::app_broker::serve_app_broker;
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
         };
         use graphshell_endpoint::door::tasks::ResidentTasks;
-        use knot_editor::mere_overlay::MereOverlay;
-        use mere_view::{ArchiveRequest, MereViewRequest};
         use personae::{Ed25519Keypair, ProfileId};
-        let fixture = fixture(35, "divination").await;
-        let mut writer = fixture.attach("turnstone").await;
-        let initial = graph(&mut writer);
-        assert_eq!(
-            writer.invoke(apply(&initial, vec![node(1)])).unwrap(),
-            IntentResult::Accepted
-        );
         let host = Arc::new(PersonaeHost::new(
             IdentityVault::with_profile(
                 InMemoryStorage::new(),
@@ -2396,6 +2392,24 @@ mod tests {
             assert!(!server.is_finished());
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
+        (address, tasks, server)
+    }
+
+    /// Knot's overmap layer (knot-editor `mere_overlay`) saves the attached
+    /// session to the archive and opens it again, through the first-party
+    /// door as `knot-editor`, and reads the codicil back from the route.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn knot_overlay_saves_and_opens_an_archive_through_the_door() {
+        use knot_editor::mere_overlay::MereOverlay;
+        use mere_view::{ArchiveRequest, MereViewRequest};
+        let fixture = fixture(35, "divination").await;
+        let mut writer = fixture.attach("turnstone").await;
+        let initial = graph(&mut writer);
+        assert_eq!(
+            writer.invoke(apply(&initial, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let (address, tasks, server) = knot_door(&fixture).await;
 
         let mut overlay = MereOverlay::open_at(&address, "divination").await.unwrap();
         let before = overlay.read().await.unwrap();
@@ -2470,6 +2484,123 @@ mod tests {
                 .unwrap()
                 .is_some(),
             "an unadvertised compose is declined before it reaches the route"
+        );
+        tasks.cancel_and_join().await;
+        server.abort();
+    }
+
+    /// Knot's overmap layer carries a merge to the route: it asks the branch
+    /// to merge into its source, reads the pending merge back as its card,
+    /// keeps a choice for the conflict, is told Apply waits for one, and
+    /// applies, through the first-party door as `knot-editor`.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn knot_overlay_merges_a_branch_through_the_door() {
+        use knot_editor::mere_overlay::MereOverlay;
+        use mere_view::{MereViewRequest, MergeOption, MergeRequest, SessionStep};
+        let fixture = fixture(37, "readings").await;
+        let mut turnstone = fixture.attach("turnstone").await;
+        let mut knot = fixture.attach("knot-editor").await;
+        let start = graph(&mut turnstone);
+        assert_eq!(
+            turnstone
+                .invoke(apply(&start, vec![node(1), retitle(1, "One")]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let listed = projection(&mut turnstone, 0);
+        let parent = session_ids(&listed)[0];
+        let branch = sessions_step(&listed, BRANCH_SESSION_INTENT, SessionsActionV1::on(parent));
+        assert_eq!(turnstone.invoke(branch).unwrap(), IntentResult::Accepted);
+        let listed = projection(&mut knot, 0);
+        let branch = session_ids(&listed)[1];
+        assert_eq!(
+            knot.invoke(sessions_step(
+                &listed,
+                ATTACH_SESSION_INTENT,
+                SessionsActionV1::on(branch)
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        let in_branch = graph(&mut knot);
+        assert_eq!(
+            knot.invoke(apply(&in_branch, vec![retitle(1, "Branch")]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let in_parent = graph(&mut turnstone);
+        assert_eq!(
+            turnstone
+                .invoke(apply(&in_parent, vec![retitle(1, "Parent")]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+
+        let (address, tasks, server) = knot_door(&fixture).await;
+        let mut overlay = MereOverlay::open_at(&address, "readings").await.unwrap();
+        let before = overlay.read().await.unwrap();
+        assert_eq!(before.merge, None, "nothing is merging yet");
+        assert_eq!(
+            overlay
+                .take(&MereViewRequest::Session(branch, SessionStep::Merge))
+                .await
+                .unwrap(),
+            None,
+            "the route takes Knot's merge into source"
+        );
+        let pending = overlay.read().await.unwrap().merge.expect("a pending merge");
+        assert_eq!(pending.source, branch);
+        assert_eq!(pending.conflicts.len(), 1, "the title conflicts");
+        let key = pending.conflicts[0].key.clone();
+        assert_eq!(pending.conflicts[0].chosen, None);
+
+        assert!(
+            overlay
+                .take(&MereViewRequest::Merge(MergeRequest::Apply))
+                .await
+                .unwrap()
+                .is_some(),
+            "Apply waits for a choice on every conflict"
+        );
+        assert!(
+            overlay
+                .take(&MereViewRequest::Merge(MergeRequest::Choose(
+                    "unknown".into(),
+                    MergeOption::Source
+                )))
+                .await
+                .unwrap()
+                .is_some(),
+            "a choice for a conflict that is not pending is declined"
+        );
+        assert_eq!(
+            overlay
+                .take(&MereViewRequest::Merge(MergeRequest::Choose(
+                    key.clone(),
+                    MergeOption::Source
+                )))
+                .await
+                .unwrap(),
+            None
+        );
+        let chosen = overlay.read().await.unwrap().merge.unwrap();
+        assert_eq!(chosen.conflicts[0].chosen, Some(MergeOption::Source));
+        assert!(chosen.resolved());
+
+        assert_eq!(
+            overlay
+                .take(&MereViewRequest::Merge(MergeRequest::Apply))
+                .await
+                .unwrap(),
+            None,
+            "the route applies the merge"
+        );
+        assert_eq!(overlay.read().await.unwrap().merge, None);
+        let read = read_route(&mut turnstone);
+        assert_eq!(
+            label_of(&read.model, 1).as_deref(),
+            Some("Branch"),
+            "the branch's title wins, as chosen"
         );
         tasks.cancel_and_join().await;
         server.abort();

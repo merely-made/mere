@@ -1236,3 +1236,23 @@ fast-forward of local main; nothing built).**
     fails only at the `tabard-desktop` and `mere-mesh` examples noted under P1;
     the shared crates and `graphshell-web` (with and without defaults) check for
     wasm32; the boundary script passes.
+- **2026-10-15 (P5, Knot):** Knot `b19eebf` (on `origin/main`) is on Mere
+  `0c03dff3d`. It deletes its `resident_app_route` test (Djinn's
+  `knot_app_route` is the receipt now) and takes its client state from
+  `graphshell-client`, so `graphshell` is a Knot dev-dependency for `view`
+  (`rosette_projection`) and `sessions` (`revision_bell`) only; no Knot
+  library code names it. The same repin carries the overmap's merge-in:
+  `is_overlay_request` and the desktop's `carry_graph_request` route
+  `MereViewRequest::Merge` to the route, and `MereOverlay` reads the pending
+  merge through its card's material, keeps each conflict's choice until
+  Apply and sends Apply or Cancel with `mere-overmap`'s `merge_intent`; the
+  desktop's request match has a wildcard arm ahead of `#[non_exhaustive]`.
+  Djinn's `knot_overlay_merges_a_branch_through_the_door` drives it end to
+  end (merge into source, the pending card read back, Apply declined until
+  chosen, an unknown conflict declined, Choose, Apply, the branch's title
+  wins). Mere's Knot rows move to `b19eebf`; Djinn names no `mere.git`
+  package. Checks: Knot workspace `cargo check --all-targets` (and
+  knot-editor with `mere-overlay`, knot-desktop with all features); knot-editor
+  (`mere-overlay`), knot-document, knot-desktop (lib, bins, `scenario_lane`,
+  `font_roles`, `typography_fonts`) and knot-site pass, 623 tests
+  (`TMPDIR=/private/tmp`); `djinn --features c4-host` 230 passed, 11 ignored.
