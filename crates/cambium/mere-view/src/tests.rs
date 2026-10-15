@@ -1310,14 +1310,26 @@ fn an_archive_node_peeks_on_hover_and_pins_a_popover_on_click() {
     )
     .unwrap();
     runner.dispatch_click(select, PointerClick::at((1., 1.)));
-    runner.dispatch_click(open, PointerClick::at((1., 1.)));
-
     // Escape dismisses and hands focus back to the archive's node.
     runner.set_focus(Some(open));
     runner.dispatch_key(escape());
     assert!(find(&dom.borrow(), root, "role", "dialog").is_none());
     let saved = find(&dom.borrow(), root, "data-key", &saved_key).unwrap();
     assert_eq!(runner.focus(), Some(saved));
+
+    // Open as session asks for the session and closes the popover, so the
+    // next click reaches the canvas rather than the dismiss layer.
+    runner.dispatch_click(saved, PointerClick::at((1., 1.)));
+    let open = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Open Codicil blake3:f612a as session",
+    )
+    .unwrap();
+    runner.dispatch_click(open, PointerClick::at((1., 1.)));
+    assert!(find(&dom.borrow(), root, "role", "dialog").is_none());
+    assert_eq!(runner.state().view.archive_popover, None);
 
     // A second archive's popover composes the two; an outside click closes it.
     let composed = find(

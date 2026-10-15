@@ -13,7 +13,7 @@ capture r10_card
 click .graph-canvas-swatch-node @data-key=mere-archive:saved
 settle 2
 capture r10_popover
-key escape
+click .overlay-surface-dismiss-layer
 settle 1
 assert snap focus == data-key=mere-archive:saved
 click role:button @aria-label=Close session Morning notes

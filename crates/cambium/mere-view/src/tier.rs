@@ -808,9 +808,20 @@ where
     if entry.can_open {
         let request = MereViewRequest::Archive(ArchiveRequest::Open(entry.key.clone()));
         let on_request = on_request.clone();
+        let close = on_change.clone();
+        let opened = entry.key.clone();
         controls.push(Box::new(request_focus(
             button("Open as session", move |state: &mut State, _| {
-                on_request(state, request.clone())
+                on_request(state, request.clone());
+                // Opening leaves the archive for the session it opens, so its
+                // popover closes, rather than catching the next click.
+                close(
+                    state,
+                    MereViewEvent::ArchivePopover(
+                        opened.clone(),
+                        DetailPopoverEvent::Dismiss(cambium::OverlayDismiss::OutsideClick),
+                    ),
+                )
             })
             .attr("data-step", "open-archive")
             .attr("data-archive", entry.key.clone())
