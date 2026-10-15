@@ -20,6 +20,11 @@ amends AC5's scope class. Genet's accessibility walk gets a fix lane.
 Compound documents are the use of the forest mount that AC1 left unnamed.
 Accessible app sharing is AC6's motivating consumer.
 
+**Amended 2026-10-15:** the AC7 mount probe ran and passed, and Mark ruled
+AC11 and AC12 on its findings. `OwnedLayout` must discover style resources,
+and the forest mount's owner is the shadow host. See the
+[probe note and AC11 to AC12](#progress-mount-probe-ac7-run-2026-10-15) in §12.
+
 Read against Mere `362c5d5a` (main moved during the read; no commit in that
 window touched `crates/cambium`), Turnstone `032463ae` (the committed tree:
 another session is repinning its working tree, which was not used), Knot
@@ -1135,3 +1140,45 @@ made.
    covered by Genet's tests, not a WPT or screen-reader run). Only
    `RetainedMount::new` and `new_at` were exercised unchanged; the owner's
    `width:100%; height:100%` took the host's 300 by 100 box.
+
+### Rulings on the probe's findings (2026-10-15)
+
+**AC11. How should the production host path scope a guest sheet?** The fork was
+put with the probe's first finding. `OwnedLayout::new`
+(`cambium-rootstock/src/owned_layout.rs`, line 99) calls
+`StyleSet::cambium(sheets)`, so every sheet is document-scope and no `<style>`
+element is read. The probe passed only by building its own style set. Options:
+- **(a)** `OwnedLayout` discovers resources. It builds its `StyleSet` from
+  `ResolvedDocumentResources::discover`, keeping the host's `sheet` strings as
+  ownerless document sheets. A Rootstock-only change; the probe's pipeline moves
+  in as the failing-first test. The cost of discovery per relayout is unmeasured.
+- (b) The mount registers its own sheet: `RetainedMount` takes the guest's CSS
+  and the host registers it with the shadow root as owner node, with no scan.
+- (c) Defer until the first compound-document consumer forces it.
+
+Mark: **"OwnedLayout discovers resources (Recommended)"**. *Follows:* the
+production host path builds its style set from discovered resources, so a
+guest's `<style>` in a shadow root is scoped as the probe shows. This is
+Rootstock work and has no plan yet. *Reading, not ruled:* measure the cost of
+discovery per relayout before it lands, and keep the host's `sheet` strings as
+ownerless document sheets, as option (a) described.
+
+**AC12. Which shape is the forest mount?** The fork was put with the probe's
+second finding. `RetainedMount::withdraw_from` walks `parent()`, and a shadow
+root has no parent. In the run, `withdraw_from(host)` was `false` with the owner
+inside a host's shadow root and `true` when the owner was the host. Options:
+- **(a)** The owner is the shadow host, as AC7(a) worded it. The owner stays in
+  the light DOM, so withdrawal, station reparenting and teardown work unchanged,
+  and `new_at` mounts at the owner's shadow root. `RetainedMount` must attach or
+  expose that shadow root, a small Cambium change.
+- (b) The owner sits inside a host's shadow root, as the brief's probe text had
+  it. `withdraw_from`, and any other `parent()` walker, must walk composed
+  parents through shadow hosts.
+- (c) Leave open until a consumer.
+
+Mark: **"Owner is the shadow host (Recommended)"**. *Follows:* AC7(a)'s wording
+stands: the owner is the shadow host and the guest runner mounts at its shadow
+root. The probe-text shape is not adopted. *Reading, not ruled:* the Cambium
+change is that `RetainedMount` attaches or exposes the owner's shadow root; its
+form (attach inside `RetainedMount::new`, or a constructor option) is open, and
+it has no plan yet. The guest's `<style>` goes in that shadow root.
