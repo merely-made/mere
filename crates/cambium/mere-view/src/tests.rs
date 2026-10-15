@@ -1754,12 +1754,20 @@ fn the_sheet_pins_the_rows_a_card_and_a_popover_are_measured_by() {
         format!(
             ".mere-view-card-head {{ display: flex; flex-wrap: nowrap; align-items: center; gap: {ROW_GAP}px; height: {CARD_HEAD}px;"
         ),
-        format!(".mere-view-card .mere-view-session-steps > button {{ height: {BUTTON_HEIGHT}px;"),
+        // Each pinned button's line is its height less its 1px borders, so its
+        // text sits in the middle rather than at the top.
+        format!(
+            ".mere-view-card .mere-view-session-steps > button {{ height: {BUTTON_HEIGHT}px; line-height: {}px;",
+            BUTTON_HEIGHT - 2
+        ),
+        ".mere-view-card .mere-view-card-close { height: 28px; line-height: 26px;".to_string(),
+        ".mere-view-archive-chip { height: 24px; line-height: 22px;".to_string(),
         format!(
             ".mere-view-card .mere-view-session-steps {{ gap: {ROW_GAP}px; padding: 0 0 {ROW_GAP}px 0;"
         ),
         format!(
-            ".mere-view-popover-layer .mere-view-archive-steps > button {{ height: {BUTTON_HEIGHT}px;"
+            ".mere-view-popover-layer .mere-view-archive-steps > button {{ height: {BUTTON_HEIGHT}px; line-height: {}px;",
+            BUTTON_HEIGHT - 2
         ),
     ] {
         assert!(sheet.contains(&rule), "the sheet pins {rule}");
