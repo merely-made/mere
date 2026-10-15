@@ -52,7 +52,7 @@ use crate::facet_store::{NODE_FACETS_FILE, NodeFacetStore};
 use crate::graph_placement::{
     FrozenGraph, LegacyTranslationReceipt, PlacementProfile, SessionPlacement, source_digest,
 };
-use crate::manifest::{GraphSessionManifest, Lineage, TrashMark};
+use crate::manifest::{GraphSessionManifest, Lineage, MergedMark, TrashMark};
 #[cfg(not(target_arch = "wasm32"))]
 use crate::scene_facets::copy_scene_facets;
 use crate::view_intent_store::ViewIntent;
@@ -85,6 +85,11 @@ const BASELINE: &str = "baseline.json";
 const PLACEMENT: &str = "placement.json";
 const TRANSLATION: &str = "legacy-translation.json";
 const PENDING_LINKS: &str = "pending-links.json";
+/// A merged session's mark (merge-in note, M6), kept beside its manifest so a
+/// target's undo of the merge can clear it without reading the source first.
+/// It is the authority for [`GraphSessionManifest::merged`] whenever a session
+/// is read.
+const MERGED: &str = "merged.json";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -566,6 +571,8 @@ pub struct Pending {
     /// Views written, with the log position each was written through.
     views: Vec<(ViewKey, Seq)>,
     pending_links: Option<(u64, kernel::graph::PendingLinkState)>,
+    /// How many queued merged marks the batch writes.
+    merge_marks: usize,
 }
 
 impl Pending {
@@ -609,6 +616,9 @@ pub struct GraphSession<B> {
     saved_pending_links: kernel::graph::PendingLinkState,
     saved_pending_links_revision: u64,
     retained_pending_links_revision: u64,
+    /// Merged marks to write on other sessions: an undone merge clears its
+    /// source's, a redone one sets it again.
+    merge_marks: Vec<(SessionId, Option<MergedMark>)>,
 }
 
 #[path = "graph_session_transaction.rs"]
@@ -616,7 +626,7 @@ mod transaction;
 
 #[path = "graph_session_merge.rs"]
 mod merge;
-pub use merge::{MergeConflict, MergeMatch, MergeSide, PendingMerge};
+pub use merge::{MergeChoice, MergeConflict, MergeMatch, PendingMerge};
 
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as
@@ -672,6 +682,7 @@ impl<B: Backend> GraphSession<B> {
             saved_pending_links: Default::default(),
             saved_pending_links_revision: 0,
             retained_pending_links_revision: 1,
+            merge_marks: Vec::new(),
         }
     }
 
@@ -694,9 +705,10 @@ impl<B: Backend> GraphSession<B> {
     pub async fn open(backend: B, id: SessionId) -> Result<Self, SessionError> {
         let slots = JsonSlots::new(backend);
         let keys = Keys::new(id);
-        let manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
+        let mut manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
             .await?
             .ok_or(SessionError::Missing(id))?;
+        manifest.merged = read(&slots, &keys.at(MERGED)).await?;
         let placement: Option<SessionPlacement> = read(&slots, &keys.at(PLACEMENT)).await?;
         let recorded = placement
             .as_ref()
@@ -868,6 +880,7 @@ impl<B: Backend> GraphSession<B> {
             saved_pending_links,
             saved_pending_links_revision: 1,
             retained_pending_links_revision: 1,
+            merge_marks: Vec::new(),
         };
         session.load_views().await?;
         record_into(&mut session.graph, &session.pending);
@@ -1299,6 +1312,7 @@ impl<B: Backend> GraphSession<B> {
     /// Whether anything waits for the next store, without building the batch.
     pub fn has_unstored(&self) -> bool {
         !self.head_stored
+            || !self.merge_marks.is_empty()
             || self.retained_pending_links_revision > self.saved_pending_links_revision
             || self.graph.retained_pending_link_state() != self.saved_pending_links
             || self.journal.live_cursor() > self.saved
@@ -1383,6 +1397,13 @@ impl<B: Backend> GraphSession<B> {
                 )?,
             ]);
         }
+        for (source, mark) in &self.merge_marks {
+            let key = Keys::new(*source).at(MERGED);
+            ops.push(match mark {
+                Some(mark) => pretty(key, mark)?,
+                None => WriteOp::Delete { key },
+            });
+        }
         let mut views = Vec::new();
         for (key, view) in &self.views {
             let through = view.log.next_seq();
@@ -1403,11 +1424,14 @@ impl<B: Backend> GraphSession<B> {
             updated_at,
             views,
             pending_links,
+            merge_marks: self.merge_marks.len(),
         })
     }
 
     /// Mark a [`Pending`] batch as stored, once it has committed.
     pub fn stored(&mut self, pending: Pending) {
+        let written = pending.merge_marks.min(self.merge_marks.len());
+        self.merge_marks.drain(..written);
         if let Some((revision, state)) = pending.pending_links {
             if revision >= self.saved_pending_links_revision {
                 self.saved_pending_links = state;
@@ -1573,12 +1597,41 @@ impl<B: Backend> GraphSession<B> {
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
+        let mark = self.merge_mark_after(&kind);
         let (_, applied) = self.edit_as(author, kind, |graph| {
             for delta in deltas {
                 let _ = apply_graph_delta(graph, delta);
             }
         })?;
+        self.merge_marks.extend(mark);
         Ok(Reverted { of, applied, kept })
+    }
+
+    /// The merged mark an undo or redo of a merge-in leaves on its source:
+    /// undoing a `MergedIn` clears it, so the source is editable and
+    /// mergeable again; redoing it sets it again.
+    fn merge_mark_after(&self, kind: &ChangeKind) -> Option<(SessionId, Option<MergedMark>)> {
+        let merged_in = |of: &Seq| match self.changes.get(*of).map(|change| &change.kind) {
+            Some(ChangeKind::MergedIn { from, through }) => Some((*from, *through)),
+            _ => None,
+        };
+        match kind {
+            ChangeKind::Undo { of } => merged_in(of).map(|(from, _)| (from, None)),
+            ChangeKind::Redo { of } => match self.changes.get(*of).map(|change| &change.kind) {
+                Some(ChangeKind::Undo { of }) => merged_in(of).map(|(from, through)| {
+                    (
+                        from,
+                        Some(MergedMark {
+                            into: self.id(),
+                            through: through.0,
+                            at: wall_clock_now(),
+                        }),
+                    )
+                }),
+                _ => None,
+            },
+            _ => None,
+        }
     }
 
     /// Who, after change `of`, made a change that reached `part`.
@@ -1873,8 +1926,9 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut manifests = Vec::new();
         for key in slots.keys(&format!("{SESSIONS_PREFIX}/")).await? {
             if key.ends_with(&format!("/{MANIFEST}"))
-                && let Some(manifest) = read::<B, GraphSessionManifest>(&slots, &key).await?
+                && let Some(mut manifest) = read::<B, GraphSessionManifest>(&slots, &key).await?
             {
+                manifest.merged = read(&slots, &Keys::new(manifest.session_id).at(MERGED)).await?;
                 manifests.push(manifest);
             }
         }

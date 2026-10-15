@@ -917,6 +917,174 @@ pub fn recreate_node_edits(graph: &Graph, id: Uuid) -> Option<Vec<CapturedDelta>
     Some(made.edits)
 }
 
+/// A node state read back from [`part_value`]'s `Part::Node` form.
+fn node_state_from(value: &Value) -> Option<NodeState> {
+    let text = |key: &str| value.get(key).and_then(Value::as_str).map(str::to_string);
+    let content = match value.get("content") {
+        None | Some(Value::Null) => None,
+        Some(bytes) => Some(
+            serde_json::from_value::<Vec<u8>>(bytes.clone())
+                .ok()?
+                .try_into()
+                .ok()?,
+        ),
+    };
+    Some(NodeState {
+        title: text("title")?,
+        url: text("url")?,
+        tags: serde_json::from_value(value.get("tags")?.clone()).ok()?,
+        body: text("body"),
+        content,
+        media_type: text("media_type"),
+        nested: text("nested"),
+        facets: serde_json::from_value(value.get("facets")?.clone()).ok()?,
+        history: serde_json::from_value(value.get("history")?.clone()).ok()?,
+    })
+}
+
+/// The edits that make `part` in `graph` read as `value`, given in
+/// [`part_value`]'s form, `None` for absent: how a merge-in applies a value
+/// someone supplied by hand. An error names a value that does not fit the
+/// part.
+pub fn part_edits(
+    graph: &Graph,
+    part: &Part,
+    value: Option<&Value>,
+) -> Result<Vec<CapturedDelta>, String> {
+    use CapturedDelta as D;
+    let unfit = || format!("{value:?} does not fit {part:?}");
+    fn decode<T: serde::de::DeserializeOwned>(value: &Value) -> Result<T, String> {
+        serde_json::from_value(value.clone()).map_err(|error| error.to_string())
+    }
+    let text = || value.and_then(Value::as_str).map(str::to_string);
+    Ok(match part {
+        Part::Node(id) => match value {
+            None => graph
+                .get_node_by_id(*id)
+                .map(|_| D::ReplayRemoveNodeById {
+                    node_id: id.to_string(),
+                })
+                .into_iter()
+                .collect(),
+            Some(value) => {
+                let wanted = node_state_from(value).ok_or_else(unfit)?;
+                let mut out = Revert::default();
+                match node_state(graph, *id) {
+                    Some(now) => out.node_parts(*id, &wanted, &now, &now, false),
+                    None => out.recreate(*id, &wanted),
+                }
+                out.edits
+            },
+        },
+        Part::Title(id) => vec![D::ReplaySetNodeTitleById {
+            node_id: id.to_string(),
+            title: text().ok_or_else(unfit)?,
+        }],
+        Part::Url(id) => vec![D::ReplaySetNodeUrlById {
+            node_id: id.to_string(),
+            new_url: text().ok_or_else(unfit)?,
+        }],
+        Part::Tag(id, tag) => {
+            let node_id = id.to_string();
+            let tag = tag.clone();
+            if value.is_some_and(|value| value != &Value::Bool(false)) {
+                vec![D::ReplayInsertNodeTagById { node_id, tag }]
+            } else {
+                vec![D::ReplayRemoveNodeTagById { node_id, tag }]
+            }
+        },
+        Part::Body(id) => vec![D::ReplaySetNodeBodyById {
+            node_id: id.to_string(),
+            body: text(),
+        }],
+        Part::Content(id) => vec![D::ReplaySetNodeContentById {
+            node_id: id.to_string(),
+            content: match value {
+                None => None,
+                Some(bytes) => Some(decode::<Vec<u8>>(bytes)?.try_into().map_err(|_| unfit())?),
+            },
+        }],
+        Part::MediaType(id) => vec![D::ReplaySetNodeMimeHintById {
+            node_id: id.to_string(),
+            mime_hint: text(),
+        }],
+        Part::Nested(id) => vec![D::ReplaySetNodeNestedById {
+            node_id: id.to_string(),
+            nested: text(),
+        }],
+        Part::Facet(id, facet) => vec![match value {
+            Some(value) => D::ReplaySetNodeFacetById {
+                node_id: id.to_string(),
+                facet: facet.clone(),
+                value_json: value.to_string(),
+            },
+            None => D::ReplayRemoveNodeFacetById {
+                node_id: id.to_string(),
+                facet: facet.clone(),
+            },
+        }],
+        Part::History(id) => {
+            let (entries, current_index): (Vec<String>, usize) = decode(value.ok_or_else(unfit)?)?;
+            vec![D::ReplayUpdateNodeHistoryById {
+                node_id: id.to_string(),
+                entries,
+                current_index,
+            }]
+        },
+        Part::Edges(from, to) => vec![D::ReplaySetEdgesByIds {
+            from_id: from.to_string(),
+            to_id: to.to_string(),
+            edges: value.map(decode).transpose()?.unwrap_or_default(),
+        }],
+        Part::Field(id) => vec![match value {
+            Some(value) => D::ReplayAddField {
+                field: decode(value)?,
+            },
+            None => D::ReplayRemoveFieldById {
+                field_id: id.to_string(),
+            },
+        }],
+        Part::Coupling(id) => vec![match value {
+            Some(value) => D::ReplayAddCoupling {
+                coupling: decode(value)?,
+            },
+            None => D::ReplayRetractCouplingById {
+                coupling_id: id.to_string(),
+            },
+        }],
+        Part::ImportRecords => vec![D::ReplaySetImportRecords {
+            import_records: value.map(decode).transpose()?.unwrap_or_default(),
+        }],
+        Part::Resource(id) => vec![D::ReplaySetResourceRecordById {
+            resource_id: id.to_string(),
+            record: value.map(decode).transpose()?,
+        }],
+        Part::ResourceFacet(id, facet) => {
+            let mut record = graph.resource_record(*id).ok_or_else(unfit)?;
+            record.facets.retain(|held| &held.facet != facet);
+            if let Some(value) = value {
+                record.facets.push(PersistedResourceFacet {
+                    facet: facet.clone(),
+                    value_json: value.to_string(),
+                });
+            }
+            vec![D::ReplaySetResourceRecordById {
+                resource_id: id.to_string(),
+                record: Some(record),
+            }]
+        },
+        Part::ResourceEdges(from, to) => vec![D::ReplaySetResourceEdgesByIds {
+            from_resource_id: from.to_string(),
+            to_resource_id: to.to_string(),
+            edges: value.map(decode).transpose()?.unwrap_or_default(),
+        }],
+        Part::ShownResource(id) => vec![D::ReplaySetShownResourceById {
+            surface_id: id.to_string(),
+            resource_id: text(),
+        }],
+    })
+}
+
 #[cfg(test)]
 pub(super) mod tests {
     use std::sync::{Arc, Mutex};

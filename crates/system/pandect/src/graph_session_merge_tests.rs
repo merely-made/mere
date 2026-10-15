@@ -250,8 +250,25 @@ fn a_branch_round_trips_into_its_parent_and_is_kept_merged() {
         );
         assert_eq!(source.manifest().lineage, Lineage::Branch);
 
-        // Undo takes the whole merge back in one step.
+        // Undo takes the whole merge back in one step, and frees the source.
         target.undo(person()).await.unwrap().unwrap();
+        let mut freed = mere.open(branch.id()).await.unwrap();
+        assert_eq!(freed.manifest().merged, None, "undo clears the mark");
+        assert!(
+            mere.list()
+                .await
+                .unwrap()
+                .iter()
+                .all(|manifest| manifest.merged.is_none())
+        );
+        freed
+            .apply(other(), vec![tag(id(1), "after")])
+            .await
+            .unwrap();
+        assert!(
+            mere.merge_in(&target, &freed).await.is_ok(),
+            "mergeable again"
+        );
         assert_eq!(title(target.graph(), id(1)).as_deref(), Some("One"));
         assert!(target.graph().get_node_by_id(id(4)).is_none());
         assert!(target.graph().get_node_by_id(id(3)).is_some());
@@ -350,9 +367,13 @@ async fn conflicted(
 }
 
 #[test]
-fn a_conflict_waits_for_a_choice_and_takes_either_side() {
+fn a_conflict_waits_for_a_choice_and_takes_either_side_or_a_hand_edit() {
     pollster::block_on(async {
-        for side in [MergeSide::Source, MergeSide::Target] {
+        for (side, want) in [
+            (MergeChoice::Source, "Branch"),
+            (MergeChoice::Target, "Target"),
+            (MergeChoice::Hand(Value::from("By hand")), "By hand"),
+        ] {
             let mere = MereSessions::new(MemoryBackend::new());
             let (mut target, mut branch) = conflicted(&mere).await;
             let plan = mere.merge_in(&target, &branch).await.unwrap();
@@ -363,6 +384,7 @@ fn a_conflict_waits_for_a_choice_and_takes_either_side() {
                     base: Some(Value::from("One")),
                     source: Some(Value::from("Branch")),
                     target: Some(Value::from("Target")),
+                    add_as_new: false,
                 }],
                 "an equal change on both sides is no conflict"
             );
@@ -381,14 +403,28 @@ fn a_conflict_waits_for_a_choice_and_takes_either_side() {
                 branch.manifest().merged.is_none(),
                 "a refusal writes nothing"
             );
+            let unfit = BTreeMap::from([(Part::Title(id(1)), MergeChoice::Hand(Value::from(7)))]);
+            assert!(matches!(
+                mere.apply_merge(&mut target, &mut branch, plan.clone(), &unfit, person())
+                    .await,
+                Err(SessionError::NotMergeable(_))
+            ));
+            let not_a_pick = BTreeMap::from([(Part::Title(id(1)), MergeChoice::AddAsNew)]);
+            assert!(matches!(
+                mere.apply_merge(
+                    &mut target,
+                    &mut branch,
+                    plan.clone(),
+                    &not_a_pick,
+                    person()
+                )
+                .await,
+                Err(SessionError::NotMergeable(_))
+            ));
             let choices = BTreeMap::from([(Part::Title(id(1)), side)]);
             mere.apply_merge(&mut target, &mut branch, plan, &choices, person())
                 .await
                 .unwrap();
-            let want = match side {
-                MergeSide::Source => "Branch",
-                MergeSide::Target => "Target",
-            };
             assert_eq!(title(target.graph(), id(1)).as_deref(), Some(want));
             assert_eq!(title(target.graph(), id(2)).as_deref(), Some("Same"));
         }
@@ -405,7 +441,7 @@ fn a_plan_goes_stale_when_either_side_moves() {
             .apply(person(), vec![tag(id(2), "later")])
             .await
             .unwrap();
-        let choices = BTreeMap::from([(Part::Title(id(1)), MergeSide::Source)]);
+        let choices = BTreeMap::from([(Part::Title(id(1)), MergeChoice::Source)]);
         assert!(matches!(
             mere.apply_merge(&mut target, &mut branch, plan, &choices, person())
                 .await,
@@ -419,12 +455,15 @@ fn deletions_merge_three_way_against_the_base() {
     pollster::block_on(async {
         // The branch deletes 2 while the parent retitles it: delete against
         // edit. And the parent deletes 3 while the branch tags it.
-        for side in [MergeSide::Source, MergeSide::Target] {
+        for side in [MergeChoice::Source, MergeChoice::Target] {
             let mere = MereSessions::new(MemoryBackend::new());
             let mut target = parent(&mere).await;
             let mut branch = branch_of(&mere, &target).await;
             branch
-                .apply(other(), vec![remove(id(2)), tag(id(3), "wanted")])
+                .apply(
+                    other(),
+                    vec![remove(id(2)), tag(id(3), "wanted"), relate(id(1), id(3))],
+                )
                 .await
                 .unwrap();
             target
@@ -441,25 +480,36 @@ fn deletions_merge_three_way_against_the_base() {
                 .find(|conflict| conflict.part == Part::Node(id(2)))
                 .unwrap();
             assert!(deleted.source.is_none() && deleted.target.is_some());
-            let choices: BTreeMap<Part, MergeSide> = plan
+            assert_eq!(
+                parts.len(),
+                2,
+                "relations of a node in conflict follow its choice: {parts:?}"
+            );
+            let choices: BTreeMap<Part, MergeChoice> = plan
                 .conflicts()
                 .iter()
-                .map(|conflict| (conflict.part.clone(), side))
+                .map(|conflict| (conflict.part.clone(), side.clone()))
                 .collect();
             mere.apply_merge(&mut target, &mut branch, plan, &choices, person())
                 .await
                 .unwrap();
             let graph = target.graph();
             match side {
-                MergeSide::Source => {
+                MergeChoice::Source => {
                     assert!(graph.get_node_by_id(id(2)).is_none(), "the deletion wins");
                     let (_, node) = graph.get_node_by_id(id(3)).expect("resurrected");
                     assert!(node.tags.contains("wanted"));
+                    assert!(related(graph, id(1), id(3)), "with its relations");
                 },
-                MergeSide::Target => {
+                MergeChoice::Target => {
                     assert_eq!(title(graph, id(2)).as_deref(), Some("Edited"));
+                    assert!(
+                        related(graph, id(1), id(2)),
+                        "a node kept keeps its relations"
+                    );
                     assert!(graph.get_node_by_id(id(3)).is_none(), "stays deleted");
                 },
+                _ => unreachable!(),
             }
         }
 
@@ -578,9 +628,24 @@ fn a_pick_of_a_pick_merges_into_the_original() {
             .fork_component(&original, id(1), person())
             .await
             .unwrap();
-        let first = mere.open(first.session_id).await.unwrap();
+        let mut first = mere.open(first.session_id).await.unwrap();
         let first_container = *first.manifest().root_graph_id.as_uuid();
         let one = copy_of(first.graph(), id(1), container);
+        // The part between changes what the second part will hold before it
+        // is picked: a retitle and a node of its own.
+        let made = id(55);
+        first
+            .apply(
+                other(),
+                vec![
+                    retitle(copy_of(first.graph(), id(2), container), "Retitled between"),
+                    add_id(made),
+                    retitle(made, "Made between"),
+                    relate(one, made),
+                ],
+            )
+            .await
+            .unwrap();
         let second = mere.fork_component(&first, one, person()).await.unwrap();
         let mut second = mere.open(second.session_id).await.unwrap();
         let one_again = copy_of(second.graph(), one, first_container);
@@ -589,11 +654,9 @@ fn a_pick_of_a_pick_merges_into_the_original() {
             copy_of(first.graph(), id(2), container),
             first_container,
         );
+        let _ = two_again;
         second
-            .apply(
-                other(),
-                vec![retitle(one_again, "Twice picked"), remove(two_again)],
-            )
+            .apply(other(), vec![retitle(one_again, "Twice picked")])
             .await
             .unwrap();
         original
@@ -609,10 +672,18 @@ fn a_pick_of_a_pick_merges_into_the_original() {
             .unwrap();
         let graph = original.graph();
         assert_eq!(title(graph, id(1)).as_deref(), Some("Twice picked"));
-        assert!(
-            graph.get_node_by_id(id(2)).is_none(),
-            "the deletion walks back too"
+        assert_eq!(
+            title(graph, id(2)).as_deref(),
+            Some("Retitled between"),
+            "everything since the first pick comes back"
         );
+        let between = graph
+            .nodes()
+            .find(|(_, node)| node.title == "Made between")
+            .map(|(_, node)| node.id)
+            .expect("the node made between");
+        assert_ne!(between, made);
+        assert!(related(graph, id(1), between));
         assert!(
             graph
                 .get_node_by_id(id(1))
@@ -717,6 +788,99 @@ fn merge_in_and_compose_join_resource_facets_by_one_rule() {
     assert!(error.0.contains("test.review") && error.0.contains("conflicting"));
 }
 
+#[test]
+fn redoing_an_undone_merge_marks_the_source_again() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut target = parent(&mere).await;
+        let mut branch = branch_of(&mere, &target).await;
+        branch
+            .apply(other(), vec![retitle(id(1), "Branch")])
+            .await
+            .unwrap();
+        let plan = mere.merge_in(&target, &branch).await.unwrap();
+        mere.apply_merge(&mut target, &mut branch, plan, &BTreeMap::new(), person())
+            .await
+            .unwrap();
+        // A host that writes its own batches: undo_now, then pending/stored.
+        target.undo_now(person()).unwrap().unwrap();
+        let batch = target.pending(wall_clock_now()).unwrap();
+        assert!(
+            batch
+                .ops()
+                .iter()
+                .any(|op| matches!(op, WriteOp::Delete { key } if key.ends_with("/merged.json")))
+        );
+        mere.backend.apply(batch.ops()).await.unwrap();
+        target.stored(batch);
+        assert!(!target.has_unstored());
+        assert_eq!(
+            mere.open(branch.id()).await.unwrap().manifest().merged,
+            None
+        );
+        target.redo(person()).await.unwrap().unwrap();
+        assert_eq!(title(target.graph(), id(1)).as_deref(), Some("Branch"));
+        let mark = mere
+            .open(branch.id())
+            .await
+            .unwrap()
+            .manifest()
+            .merged
+            .clone();
+        assert_eq!(mark.map(|mark| mark.into), Some(target.id()));
+    });
+}
+
+#[test]
+fn a_picked_node_the_target_deleted_can_be_added_as_new() {
+    pollster::block_on(async {
+        for choice in [
+            MergeChoice::AddAsNew,
+            MergeChoice::Source,
+            MergeChoice::Target,
+        ] {
+            let mere = MereSessions::new(MemoryBackend::new());
+            let mut target = parent(&mere).await;
+            let container = *target.manifest().root_graph_id.as_uuid();
+            let part = mere.fork_component(&target, id(1), person()).await.unwrap();
+            let mut part = mere.open(part.session_id).await.unwrap();
+            let two = copy_of(part.graph(), id(2), container);
+            part.apply(other(), vec![retitle(two, "Kept in the part")])
+                .await
+                .unwrap();
+            target.apply(person(), vec![remove(id(2))]).await.unwrap();
+            let plan = mere.merge_in(&target, &part).await.unwrap();
+            assert_eq!(plan.conflicts().len(), 1, "{:?}", plan.conflicts());
+            let conflict = &plan.conflicts()[0];
+            assert_eq!(conflict.part, Part::Node(id(2)));
+            assert!(conflict.add_as_new, "the vanished source offers add as new");
+            let choices = BTreeMap::from([(Part::Node(id(2)), choice.clone())]);
+            mere.apply_merge(&mut target, &mut part, plan, &choices, person())
+                .await
+                .unwrap();
+            let graph = target.graph();
+            let titled = graph
+                .nodes()
+                .find(|(_, node)| node.title == "Kept in the part")
+                .map(|(_, node)| node.id);
+            match choice {
+                MergeChoice::AddAsNew => {
+                    let fresh = titled.expect("added as new");
+                    assert_ne!(fresh, id(2));
+                    assert!(graph.get_node_by_id(id(2)).is_none(), "the deletion stands");
+                    assert!(related(graph, id(1), fresh), "with its relations");
+                    assert_eq!(merged_from(graph, fresh)[0].source_node, two.to_string());
+                },
+                MergeChoice::Source => {
+                    assert_eq!(titled, Some(id(2)), "resurrected under its own id");
+                    assert!(related(graph, id(1), id(2)), "with its relations");
+                },
+                _ => assert_eq!(titled, None, "the deletion stands"),
+            }
+        }
+    });
+}
+
 fn properties_record(iri: &str, facets: &[(&str, Value)]) -> CapturedDelta {
     CapturedDelta::ReplaySetResourceRecordById {
         resource_id: chartulary::resource_id(iri).to_string(),
@@ -805,7 +969,7 @@ fn resource_facets_merge_by_the_rules_compose_uses() {
         );
         let choices = BTreeMap::from([(
             Part::ResourceFacet(resource, "test.review".into()),
-            MergeSide::Source,
+            MergeChoice::Source,
         )]);
         mere.apply_merge(&mut target, &mut branch, plan, &choices, person())
             .await
