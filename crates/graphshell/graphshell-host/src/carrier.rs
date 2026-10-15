@@ -11,7 +11,7 @@
 //! real accept path), and it deliberately owns none of the machinery it uses:
 //!
 //! - the carrier facts come from [`transport::AcceptedSession::into_session`],
-//!   the one audited adapter (N1), so this port never hand-builds a
+//!   the one audited adapter (N1), so this crate never hand-builds a
 //!   [`SessionFacts`](notochord::SessionFacts);
 //! - the framing and the admitted conclusion come from
 //!   [`notochord::admit_session`], so a refusal is finished rather than
@@ -43,6 +43,19 @@
 //! [`admit_accepted_session`] carries everything after it, for a caller that
 //! already holds an accepted session and has no `&T` to borrow from.
 //!
+//! ## One admission entry
+//!
+//! Every stream-carried session is admitted by [`admit_stream`]: an admitted
+//! byte stream plus the ingress facts the carrier can honestly report is the
+//! seam every carrier reaches (transport agnosticism note, ruling T1). A
+//! transport stream gets its facts from [`AcceptedSession`] through
+//! [`admit_accepted_session`]; an in-process door, which has no transport and
+//! so no `AcceptedSession`, states its own facts (no peer, the derived link)
+//! and calls [`admit_stream`] directly. A carrier that hands over the hello as
+//! bytes rather than a stream (the WebRTC door) uses the sans-I/O twin,
+//! [`crate::admission::admit_session`]. All of them end in
+//! [`crate::admission::serves_action`].
+//!
 //! ## Why the action check is not a second admission
 //!
 //! The owner policy allows only named admission actions. Graphshell checks the
@@ -52,7 +65,7 @@
 
 use notochord::{
     AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,
-    RevocationLedger, ServiceAccess, ServiceRule, TrustedRoot, admit_session,
+    RevocationLedger, ServiceAccess, ServiceRule, SessionFacts, TrustedRoot, admit_session,
 };
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
 use transport::{AcceptedSession, Alpn, Transport, TransportError};
@@ -178,8 +191,33 @@ where
     // N1's adapter, not a local copy: every fact below is read off the
     // acceptance record before any application byte is read.
     let (stream, facts) = accepted.into_session();
+    admit_stream(stream, &facts, policy, ledger, now_ms, active_sessions).await
+}
 
-    let admitted = admit_session(stream, policy, ledger, &facts, now_ms, active_sessions).await?;
+/// Admit and action-check a session over `stream`, given the facts its
+/// carrier reports.
+///
+/// The one entry every stream-carried admission runs (module docs). `facts`
+/// must be what the carrier can honestly say: a transport's come from
+/// [`AcceptedSession::into_session`] (use [`admit_accepted_session`]); an
+/// in-process door reports no peer and the link both ends derived. Nothing
+/// here trusts a fact the hello carries.
+///
+/// A refusal is finished, never dropped, and a refused stream never reaches
+/// the caller: on `Ok(Ok(session))` the stream cleared admission and carries
+/// an action this service serves.
+pub async fn admit_stream<S>(
+    stream: S,
+    facts: &SessionFacts,
+    policy: &LocalNetworkPolicy,
+    ledger: &RevocationLedger,
+    now_ms: u64,
+    active_sessions: u32,
+) -> Result<Result<AdmittedSession<S>, ProjectionRefusal>, ProjectionAcceptError>
+where
+    S: AsyncRead + AsyncWrite + Unpin,
+{
+    let admitted = admit_session(stream, policy, ledger, facts, now_ms, active_sessions).await?;
     let mut session = match admitted {
         Ok(session) => session,
         Err(reason) => return Ok(Err(ProjectionRefusal::NotAdmitted(reason))),

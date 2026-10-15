@@ -18,8 +18,8 @@ use castellan::custody::bootstrap::Unlock;
 use castellan::lock::VaultLockHolder;
 use castellan::resident::{CastellanResident, CredentialSalts};
 use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;
 

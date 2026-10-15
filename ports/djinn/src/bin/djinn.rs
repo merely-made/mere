@@ -53,8 +53,6 @@ use graphshell::native::device_broker::serve_browser_broker_with_cards;
 use graphshell::native::device_broker::{
     configured_device_endpoint, default_device_endpoint, serve_browser_broker,
 };
-#[cfg(feature = "personal-sync")]
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
     default_app_endpoint,
@@ -64,6 +62,8 @@ use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
 #[cfg(feature = "personal-sync")]
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::door::tasks::ResidentTasks;
+#[cfg(feature = "personal-sync")]
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{ProfileId, default_vault_dir};
 use serde_json::json;
 use ssh_agent_lib::agent::listen;

@@ -7,9 +7,9 @@
 //! The Graphshell request/response loop over an admitted stream.
 //!
 //! [`crate::carrier`] gets a peer admitted; this is what happens next. The
-//! wire stays NDJSON, the same lines `graphshell-stdio` speaks, because the
-//! carriers differ in who they can prove and how long they last, not in what
-//! a `Snapshot` request means. Converting Graphshell to length-prefixed frames
+//! wire stays NDJSON ([`crate::line`]), the same lines the stdio carrier
+//! speaks, because the carriers differ in who they can prove and how long
+//! they last, not in what a `Snapshot` request means. Converting Graphshell to length-prefixed frames
 //! merely to match Murm and Notochord would be alignment for its own sake.
 //!
 //! ## Where the two carriers actually differ
@@ -45,9 +45,10 @@ use notochord::{AdmittedSession, RevocationLedger};
 use std::fmt::Display;
 use std::sync::RwLock;
 use std::time::Duration;
-use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt, BufReader};
+use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
 
 use crate::lifecycle::{Lapse, SessionAuthority};
+use crate::line::{self, LineReader};
 
 /// Why a session loop stopped.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -168,7 +169,7 @@ where
     P: FnMut(&mut E) -> Result<Option<CarrierNotice>, String>,
 {
     let (reader, mut writer) = tokio::io::split(&mut session.stream);
-    let mut lines = BufReader::new(reader).lines();
+    let mut lines = LineReader::new(reader);
     let mut answered = 0u64;
 
     let end = loop {
@@ -181,26 +182,25 @@ where
         }
 
         let read = match notices.as_ref() {
-            None => lines.next_line().await?,
-            // `Lines::next_line` is cancel safe, so a timed-out read keeps
+            None => lines.next::<CarrierRequest>().await?,
+            // `LineReader::next` is cancel safe, so a timed-out read keeps
             // whatever it had buffered and the next call resumes the same
             // line. A partial frame is never lost or re-read.
-            Some((interval, _)) => match tokio::time::timeout(*interval, lines.next_line()).await {
-                Ok(read) => read?,
-                Err(_elapsed) => continue,
+            Some((interval, _)) => {
+                match tokio::time::timeout(*interval, lines.next::<CarrierRequest>()).await {
+                    Ok(read) => read?,
+                    Err(_elapsed) => continue,
+                }
             },
         };
-        let Some(line) = read else {
+        let Some(read) = read else {
             // The peer stopped without a verb. Not an error: a dropped link
             // and a rude client look identical from here, and neither is this
             // module's to judge.
             break SessionEnd::Disconnected;
         };
-        if line.trim().is_empty() {
-            continue;
-        }
 
-        let request: CarrierRequest = match serde_json::from_str(&line) {
+        let request = match read {
             Ok(request) => request,
             Err(error) => {
                 write_line(
@@ -303,11 +303,7 @@ async fn write_line<W>(writer: &mut W, response: &CarrierResponse) -> Result<(),
 where
     W: AsyncWrite + Unpin,
 {
-    let mut line = serde_json::to_vec(response).map_err(std::io::Error::other)?;
-    line.push(b'\n');
-    writer.write_all(&line).await?;
-    writer.flush().await?;
-    Ok(())
+    Ok(line::write(writer, response).await?)
 }
 
 /// Write one revision bell.
@@ -320,44 +316,31 @@ async fn write_notice<W>(writer: &mut W, notice: &CarrierNotice) -> Result<(), S
 where
     W: AsyncWrite + Unpin,
 {
-    let mut line = serde_json::to_vec(&CarrierOutput::Notice(notice.clone()))
-        .map_err(std::io::Error::other)?;
-    line.push(b'\n');
-    writer.write_all(&line).await?;
-    writer.flush().await?;
-    Ok(())
+    Ok(line::write(writer, &CarrierOutput::Notice(notice.clone())).await?)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::admission::{CONNECT_ACTION, GRAPHSHELL_DOMAIN, PROJECTION_SERVICE};
-    use crate::browser_carrier::{
-        BrowserLauncher, BrowserLink, BrowserMessage, CHROMIUM_EXTENSION_ID, admit_browser_session,
-    };
-    use crate::identity_endpoint::IdentityEndpoint;
-    use crate::identity_projection::{SIGNING_APPROVE_ONCE_INTENT, SigningDecisionIntentV1};
     use chirograph::{
         CapabilityProfile, CarrierRequestBody, EndpointDescriptor, IntentInvocation, IntentResult,
-        PresentationCapability, ProjectionRequest, ProjectionSnapshot, ProtocolVersion,
-        ResourceRequest, ResourceResponse, Revision, SceneEpoch, SessionOpen,
+        ProjectionRequest, ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse,
+        Revision, SceneEpoch, SessionOpen,
     };
-    use graphshell_client::{ClientState, PresentationResolution, ResolvedContent};
-    use graphshell_endpoint::door::wire::BrowserChallenge;
     use insigne::delegation::{
         CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
         SignedDelegationCertificate, SignedDelegationRevocation,
     };
     use notochord::{
-        AdmittedPrincipal, CarrierKind, LocalNetworkPolicy, NetworkId, ProfileRef, RequestedAction,
-        ServiceAccess, ServiceRule, SessionClaims, SessionFacts, TrafficClass, TrustedRoot,
+        AdmittedPrincipal, CarrierKind, NetworkId, ProfileRef, RequestedAction, SessionClaims,
+        SessionFacts, TrafficClass,
     };
     use personae::delegation::Issue;
     use personae::{IdentityProvider, InMemoryProvider};
     use sceno::InstanceId;
-    use std::sync::Arc;
     use std::sync::atomic::{AtomicU64, Ordering};
-    use tokio::io::BufReader as TokioBufReader;
+    use tokio::io::{AsyncBufReadExt, BufReader as TokioBufReader};
 
     const NOW_MS: u64 = 50;
     const EXPIRY_MS: u64 = 100;
@@ -569,266 +552,6 @@ mod tests {
 
     async fn run(script: &str, ledger: RevocationLedger) -> (Vec<CarrierResponse>, SessionSummary) {
         run_with(script, ledger, || NOW_MS).await
-    }
-
-    #[tokio::test]
-    async fn browser_carrier_delivers_public_identity_cards_and_an_approval() {
-        use base64::Engine;
-        use ssh_key::{Algorithm, LineEnding};
-
-        // A fixed authority holding one pending signing request: the carrier
-        // and endpoint are what is under test here. The keeper's own approval
-        // path (agent, broker, signature) is castellan's and djinn's to prove.
-        let mut private =
-            ssh_key::PrivateKey::random(&mut rand_core::OsRng, Algorithm::Ed25519).unwrap();
-        private.set_comment("admitted-identity");
-        let private_openssh = private.to_openssh(LineEnding::LF).unwrap().to_string();
-        let pending = personae::signing::SigningRequest::new(
-            "research",
-            "SHA256:admitted-identity",
-            "ssh.sign",
-            b"approved by admitted browser client",
-            "ssh-agent",
-        );
-        let pending_id = pending.request_id;
-        let mut fixed = crate::native::resident_identity::test_support::fixed_snapshot();
-        fixed
-            .pending_signing
-            .push(personae::signing::PendingSigningRequest {
-                request: pending,
-                policy: personae::signing::SigningPolicy::PerUse,
-                expires_at_ms: u64::MAX,
-            });
-        let host = crate::native::resident_identity::test_support::FixedIdentity::with_snapshot(
-            0x7c, fixed,
-        );
-
-        let launcher =
-            BrowserLauncher::parse(&[format!("chrome-extension://{CHROMIUM_EXTENSION_ID}/")])
-                .unwrap();
-        let challenge = BrowserChallenge::fresh();
-        let link = BrowserLink::accept(
-            launcher,
-            &challenge,
-            BrowserMessage::Connect {
-                schema: "mere.graphshell/browser-connect/v1".to_string(),
-                host_nonce: challenge.host_nonce.clone(),
-                client_nonce: base64::engine::general_purpose::URL_SAFE_NO_PAD.encode([0x31; 32]),
-            },
-        )
-        .unwrap();
-        let mut policy = LocalNetworkPolicy::closed(NetworkId(NETWORK));
-        policy.accepted_profiles = vec![ProfileRef {
-            id: "mere.base".into(),
-            revision: 1,
-        }];
-        policy.trusted_roots = vec![TrustedRoot {
-            authority: ROOT_AUTHORITY,
-            issuer: owner().master_public_key().to_bytes(),
-        }];
-        policy.services.insert(
-            PROJECTION_SERVICE.to_string(),
-            ServiceRule::new(
-                ServiceAccess::MemberOnly,
-                GRAPHSHELL_DOMAIN,
-                [CONNECT_ACTION],
-                false,
-                None,
-            ),
-        );
-        let (mut browser, mut admitted) = admit_browser_session(
-            &viewer(),
-            NetworkId(NETWORK),
-            ProfileRef {
-                id: "mere.base".into(),
-                revision: 1,
-            },
-            vec![grant()],
-            &link,
-            &policy,
-            &RevocationLedger::default(),
-            NOW_MS,
-        )
-        .await
-        .unwrap();
-        let authority = SessionAuthority::retain_admitted(&admitted);
-        let mut endpoint = IdentityEndpoint::for_admitted(Arc::clone(&host), &authority);
-        let projection = endpoint.request();
-        let expected_session = projection.session.clone();
-        assert_eq!(
-            projection.session,
-            authority.session().clone(),
-            "the browser cannot choose the projection session id"
-        );
-
-        let server_task = tokio::spawn(async move {
-            let revocations = RwLock::new(RevocationLedger::default());
-            let mut resume = |_: &mut IdentityEndpoint<
-                crate::native::resident_identity::test_support::FixedIdentity,
-            >,
-                              _: ResumeRequest| {
-                Err("identity resume is not implemented".to_string())
-            };
-            serve_admitted_session(
-                &mut admitted,
-                &authority,
-                &revocations,
-                &mut endpoint,
-                &mut resume,
-                || NOW_MS,
-            )
-            .await
-            .unwrap()
-        });
-
-        let opened = browser
-            .request(&carrier_request(
-                1,
-                CarrierRequestBody::Open(Box::new(SessionOpen {
-                    version: ProtocolVersion { major: 1, minor: 0 },
-                    capabilities: CapabilityProfile::default(),
-                })),
-            ))
-            .await
-            .unwrap();
-        assert!(matches!(opened.body, Ok(CarrierResponseBody::Opened(_))));
-
-        let snapshot_response = browser
-            .request(&carrier_request(
-                2,
-                CarrierRequestBody::Snapshot(projection),
-            ))
-            .await
-            .unwrap();
-        let snapshot = match snapshot_response.body {
-            Ok(CarrierResponseBody::Snapshot(snapshot)) => *snapshot,
-            other => panic!("expected identity snapshot, got {other:?}"),
-        };
-        assert_eq!(snapshot.session, expected_session);
-        assert!(
-            !serde_json::to_string(&snapshot)
-                .unwrap()
-                .contains(&private_openssh)
-        );
-
-        let resources = snapshot
-            .presentation
-            .offers
-            .values()
-            .flatten()
-            .map(|offer| offer.resource)
-            .collect::<Vec<_>>();
-        let session = snapshot.session.clone();
-        let mut client = ClientState::default();
-        client.apply_snapshot(snapshot).unwrap();
-        for (offset, resource) in resources.into_iter().enumerate() {
-            let response = browser
-                .request(&carrier_request(
-                    3 + offset as u64,
-                    CarrierRequestBody::Resource(ResourceRequest {
-                        session: session.clone(),
-                        resource,
-                    }),
-                ))
-                .await
-                .unwrap();
-            let resource = match response.body {
-                Ok(CarrierResponseBody::Resource(resource)) => resource,
-                other => panic!("expected identity resource, got {other:?}"),
-            };
-            let text = String::from_utf8(resource.bytes.clone()).unwrap();
-            assert!(!text.contains(&private_openssh));
-            assert!(!text.contains("BEGIN OPENSSH PRIVATE KEY"));
-            client.apply_resource(resource).unwrap();
-        }
-
-        let first = client
-            .mounted(&session)
-            .unwrap()
-            .scene
-            .active_items_in_order()[0]
-            .0;
-        let resolved = client
-            .resolve(
-                &session,
-                first,
-                &CapabilityProfile::new([PresentationCapability::PortableCard]),
-            )
-            .unwrap();
-        assert!(matches!(
-            resolved,
-            PresentationResolution::Ready(resolved)
-                if matches!(resolved.content, ResolvedContent::PortableCard(_))
-        ));
-
-        let mounted = client.mounted(&session).unwrap();
-        let target = mounted
-            .presentation
-            .bindings
-            .iter()
-            .find(|binding| {
-                mounted.presentation.offers.get(&binding.key).unwrap()[0]
-                    .semantics
-                    .actions
-                    .iter()
-                    .any(|action| action.intent.0 == SIGNING_APPROVE_ONCE_INTENT)
-            })
-            .unwrap()
-            .instance;
-        let request_id = match client
-            .resolve(
-                &session,
-                target,
-                &CapabilityProfile::new([PresentationCapability::PortableCard]),
-            )
-            .unwrap()
-        {
-            PresentationResolution::Ready(resolved) => match resolved.content {
-                ResolvedContent::PortableCard(card) => card
-                    .values
-                    .iter()
-                    .find(|value| value.label == "Request")
-                    .and_then(|value| uuid::Uuid::parse_str(&value.value).ok())
-                    .expect("pending card discloses its public request id"),
-                other => panic!("expected pending portable card, got {other:?}"),
-            },
-            other => panic!("expected ready pending card, got {other:?}"),
-        };
-        let acknowledgement = client.acknowledgement(&session).unwrap();
-        let intent = browser
-            .request(&carrier_request(
-                90,
-                CarrierRequestBody::Intent(IntentInvocation {
-                    session: session.clone(),
-                    target,
-                    observed_epoch: acknowledgement.epoch,
-                    observed_revision: acknowledgement.revision,
-                    intent: SIGNING_APPROVE_ONCE_INTENT.to_string(),
-                    payload: serde_json::to_vec(&SigningDecisionIntentV1 { request_id }).unwrap(),
-                }),
-            ))
-            .await
-            .unwrap();
-        assert!(matches!(
-            intent.body,
-            Ok(CarrierResponseBody::Intent(IntentResult::Accepted))
-        ));
-        assert_eq!(
-            request_id, pending_id,
-            "the card disclosed the pending request"
-        );
-        assert_eq!(
-            host.intents.lock().unwrap().as_slice(),
-            [SIGNING_APPROVE_ONCE_INTENT.to_string()],
-            "the approval reached the resident authority"
-        );
-
-        let closed = browser
-            .request(&carrier_request(100, CarrierRequestBody::Close))
-            .await
-            .unwrap();
-        assert!(matches!(closed.body, Ok(CarrierResponseBody::Closed)));
-        assert_eq!(server_task.await.unwrap().end, SessionEnd::Closed);
     }
 
     /// The inverse of stdio's refusal, and the reason this carrier exists: the

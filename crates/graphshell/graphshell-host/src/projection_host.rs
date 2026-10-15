@@ -6,14 +6,15 @@
 
 //! K2: product endpoints served to network peers by one resident host.
 //!
-//! [`crate::native::browser_host`] serves a catalog route to a browser that
-//! admitted itself over native messaging. This serves the same catalog to a
-//! peer that dialled over a transport, which is what a place member reaching
-//! the document's holder actually is.
+//! The `graphshell` port's `native::browser_host` (there until the stack lift
+//! plan's P5) serves a catalog route to a browser that admitted itself over
+//! native messaging. This serves the same catalog to a peer that dialled over
+//! a transport, which is what a place member reaching the document's holder
+//! actually is.
 //!
 //! Everything below the accept is already built and none of it is repeated
 //! here: [`crate::carrier::accept_projection_session`] decides who is admitted,
-//! [`crate::native::endpoint_catalog`] decides which endpoint they reach, and
+//! [`crate::endpoint_catalog`] decides which endpoint they reach, and
 //! [`crate::session_notices`] serves and rings. What was missing was a host
 //! that holds those together and outlives any one session, rather than an
 //! accept loop living inside a receipt binary where nothing could consume it.
@@ -52,10 +53,10 @@ use tokio::task::JoinHandle;
 use transport::Transport;
 
 use crate::carrier::{ProjectionAcceptError, ProjectionRefusal, accept_projection_session};
-use crate::lifecycle::SessionAuthority;
-use crate::native::endpoint_catalog::{
+use crate::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointSession,
 };
+use crate::lifecycle::SessionAuthority;
 use crate::session_loop::{SessionLoopError, SessionSummary};
 use crate::session_notices::serve_admitted_session_notifying;
 #[cfg(feature = "webrtc-session")]
