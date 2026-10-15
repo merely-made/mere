@@ -30,7 +30,6 @@ use graphshell::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
 };
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell::native::local_session::{DoorIdentity, door_salts};
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
@@ -38,6 +37,7 @@ use graphshell_endpoint::door::app_admission::{
 use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
 use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use notochord::{NetworkId, ProfileRef, ProofBinding, SessionHello, TrafficClass};
 use personae::{Ed25519Keypair, IdentityError, IdentityProvider, ProfileId};
 use uuid::Uuid;
@@ -201,7 +201,7 @@ fn the_door_keeps_two_keys_and_every_other_salt_is_locked() {
             id: "mere.base".into(),
             revision: 1,
         },
-        graphshell::admission::connect_action(),
+        graphshell_host::admission::connect_action(),
         TrafficClass::Interactive,
         [1; 32],
         &ProofBinding::initiator(b"mere/graphshell/v1", None, None),

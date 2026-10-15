@@ -228,7 +228,7 @@ mod tests {
 
     #[test]
     fn the_carrier_speaks_to_the_served_loop_it_will_meet_in_production() {
-        // The re-exported carrier against this port's own served loop. If the
+        // The re-exported carrier against this crate's own served loop. If the
         // two halves ever disagree about framing, this is where it surfaces,
         // and it stays here rather than in the carrier crate because the
         // served loop is the port's.

@@ -36,19 +36,18 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use castellan::custody::IdentityVault;
 use castellan::custody::bootstrap::{self, Unlock};
 use chirograph::ProjectionSession;
+use distillery::chronicle_recipe::{chronicle_definition, chronicle_era_bands_off_variant};
 use distillery::{
     ChronicleEndpoint, ChronicleObserver, ChronicleRevision, ResidentReceipt,
     chronicle_shelfmark_input, verify_chronicle_shelfmark_input,
 };
-use distillery::chronicle_recipe::{chronicle_definition, chronicle_era_bands_off_variant};
 use djinn::resident::DjinnResident;
 use djinn::resident_distillery::ResidentDistillery;
 use djinn::settings::{DistilleryLaneSettings, OwnerSettings};
-use graphshell::carrier::projection_policy;
-use graphshell::native::projection_host::{ResidentProjectionHost, admit_webrtc_catalog};
-use scenograph::{ProjectionInputBinding, PublicSourceRevision, RevisionEvidence, SourceBinding};
-use graphshell::webrtc_door::{InviteTerms, issue_invite};
-use graphshell::webrtc_session::HostedInvite;
+use graphshell_host::carrier::projection_policy;
+use graphshell_host::projection_host::{ResidentProjectionHost, admit_webrtc_catalog};
+use graphshell_host::webrtc_door::{InviteTerms, issue_invite};
+use graphshell_host::webrtc_session::HostedInvite;
 use incipit::ShelfmarkV1;
 use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{Job, JobBoard, JobBoardSnapshot, ResourceId};
@@ -56,6 +55,7 @@ use notochord::{NetworkId, ProfileRef, TrustedRoot};
 use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
 use personae::{IdentityProvider, InMemoryProvider, ProfileId};
 use rand_core::{OsRng, RngCore};
+use scenograph::{ProjectionInputBinding, PublicSourceRevision, RevisionEvidence, SourceBinding};
 use serde::Deserialize;
 use serde_json::json;
 use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};

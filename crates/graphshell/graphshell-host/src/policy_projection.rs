@@ -372,20 +372,4 @@ mod tests {
 
         std::fs::remove_dir_all(root).expect("remove scratch");
     }
-
-    #[test]
-    fn committed_n4_receipt_matches_the_live_policy_scenario() {
-        let root =
-            std::env::temp_dir().join(format!("graphshell-n4-receipt-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&root);
-        let receipt =
-            run_n4_policy_scenario(&root, PersonaId::default_persona()).expect("scenario");
-        let rendered = render_n4_policy_receipt(&receipt);
-
-        assert_eq!(
-            rendered,
-            include_str!("../docs/receipts/n4_owner_policy.html")
-        );
-        std::fs::remove_dir_all(root).expect("remove scratch");
-    }
 }

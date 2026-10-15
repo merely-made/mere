@@ -13,9 +13,11 @@
 //! (`c4b1_live_board`, `c4b3_reconnect`) with the WebRTC link taken out.
 
 use chirograph::{CapabilityProfile, CarrierOutput, CarrierRequest, PresentationCapability};
-use graphshell::live_endpoint::{ADMITTED_INTENT, COLOURED_INTENT, LiveEndpoint, REFUSED_INTENT};
 use graphshell_client::RemoteSession;
 use graphshell_endpoint::{ProjectionNoticeSource, ResumableProjectionSource, dispatch_common};
+use graphshell_host::live_endpoint::{
+    ADMITTED_INTENT, COLOURED_INTENT, LiveEndpoint, REFUSED_INTENT,
+};
 
 fn profile() -> CapabilityProfile {
     CapabilityProfile::new([
@@ -45,8 +47,7 @@ impl Host {
         };
         let response = dispatch_common(&mut self.endpoint, request, &mut resume)
             .expect("only common verbs are asked");
-        let mut lines =
-            vec![serde_json::to_string(&CarrierOutput::Response(response)).unwrap()];
+        let mut lines = vec![serde_json::to_string(&CarrierOutput::Response(response)).unwrap()];
         while let Some(notice) = self.endpoint.poll_notice().unwrap() {
             lines.push(serde_json::to_string(&CarrierOutput::Notice(notice)).unwrap());
         }
@@ -104,26 +105,43 @@ fn the_live_board_receipts_hold_without_a_browser() {
         .into_iter()
         .map(|(_, action)| action.label)
         .collect();
-    assert!(labels.iter().any(|label| label == "Append a card"), "{labels:?}");
-    assert!(labels.iter().any(|label| label == "Forbidden action"), "{labels:?}");
+    assert!(
+        labels.iter().any(|label| label == "Append a card"),
+        "{labels:?}"
+    );
+    assert!(
+        labels.iter().any(|label| label == "Forbidden action"),
+        "{labels:?}"
+    );
 
     // c4b1: the forbidden intent is refused and the revision stands still,
     // measured by a resnapshot.
     remote.invoke_action(intent(&remote, REFUSED_INTENT));
     pump(&mut remote, &mut host);
-    assert!(remote.form.status.starts_with("Rejected"), "{}", remote.form.status);
+    assert!(
+        remote.form.status.starts_with("Rejected"),
+        "{}",
+        remote.form.status
+    );
     assert_eq!(remote.revision(), Some(1));
     assert_eq!(host.count("Snapshot"), 2);
 
     // The admitted one is accepted; its bell resumes by diff.
     remote.invoke_action(intent(&remote, ADMITTED_INTENT));
     pump(&mut remote, &mut host);
-    assert!(remote.form.status.starts_with("Accepted"), "{}", remote.form.status);
+    assert!(
+        remote.form.status.starts_with("Accepted"),
+        "{}",
+        remote.form.status
+    );
     assert_eq!(remote.revision(), Some(2));
     assert_eq!(cards(&remote), 2);
     assert_eq!(remote.last_resume(), "diff · 1 → 2");
     let events = remote.take_events();
-    assert!(events.contains(&"remote-bell revision 2".to_string()), "{events:?}");
+    assert!(
+        events.contains(&"remote-bell revision 2".to_string()),
+        "{events:?}"
+    );
     assert!(!remote.in_flight());
 
     // c4b3: down; the host moves natively; back as the same subject.
@@ -139,10 +157,20 @@ fn the_live_board_receipts_hold_without_a_browser() {
     assert_eq!(remote.revision(), Some(3));
     assert_eq!(cards(&remote), 3);
     assert_eq!(remote.last_resume(), "diff · 2 → 3");
-    assert_eq!(host.count("Snapshot"), 2, "the mount was kept: no re-snapshot");
+    assert_eq!(
+        host.count("Snapshot"),
+        2,
+        "the mount was kept: no re-snapshot"
+    );
     let events = remote.take_events();
-    assert!(events.contains(&"remote-rejoined".to_string()), "{events:?}");
-    assert!(events.contains(&"remote-bell revision 3".to_string()), "{events:?}");
+    assert!(
+        events.contains(&"remote-rejoined".to_string()),
+        "{events:?}"
+    );
+    assert!(
+        events.contains(&"remote-bell revision 3".to_string()),
+        "{events:?}"
+    );
     assert!(!remote.in_flight());
 }
 
@@ -162,7 +190,11 @@ fn the_coloured_intent_proves_the_draft_form() {
         .collect();
     assert_eq!(
         labels,
-        ["Append a card", "Forbidden action", "Append a coloured card"],
+        [
+            "Append a card",
+            "Forbidden action",
+            "Append a coloured card"
+        ],
         "the bounded intent comes last"
     );
 
@@ -174,14 +206,22 @@ fn the_coloured_intent_proves_the_draft_form() {
     // Unset, it is refused here, before the endpoint is asked.
     remote.submit_draft();
     assert!(remote.take_outgoing().is_empty());
-    assert!(remote.form.status.starts_with("Choose required values"), "{}", remote.form.status);
+    assert!(
+        remote.form.status.starts_with("Choose required values"),
+        "{}",
+        remote.form.status
+    );
     assert_eq!(remote.status(), "open");
 
     // Chosen, the endpoint accepts and the card carries the colour.
     remote.form.choose("colour", "blue");
     remote.submit_draft();
     pump(&mut remote, &mut host);
-    assert!(remote.form.status.starts_with("Accepted"), "{}", remote.form.status);
+    assert!(
+        remote.form.status.starts_with("Accepted"),
+        "{}",
+        remote.form.status
+    );
     assert_eq!(remote.revision(), Some(2));
     assert_eq!(cards(&remote), 2);
     assert_eq!(

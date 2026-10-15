@@ -31,10 +31,10 @@ use chirograph::{
     ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion,
     ResourceRequest, ResourceResponse, SemanticRole,
 };
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use graphshell_endpoint::door::app_admission::AppId;
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
+use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use muniment::RedbBackend;
 use pandect::wallet_store::resolve_persona;
 use pandect::{
@@ -552,7 +552,7 @@ impl IntentSink for ReservoirEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell::lifecycle::AdmittedEndpointContext;
+    use graphshell_host::lifecycle::AdmittedEndpointContext;
     use uuid::Uuid;
 
     fn persona(n: u128) -> PersonaId {

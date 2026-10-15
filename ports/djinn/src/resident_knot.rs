@@ -29,11 +29,11 @@ use chirograph::{
     ProjectionSnapshot, ResourceChunkRequest, ResourceChunkResponse, ResourceRequest,
     ResourceResponse, ResumeReply, ResumeRequest,
 };
-use graphshell::lifecycle::AdmittedEndpointContext;
-use graphshell::native::endpoint_catalog::{ResidentEndpoint, ResidentEndpointSession};
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
+use graphshell_host::endpoint_catalog::{ResidentEndpoint, ResidentEndpointSession};
+use graphshell_host::lifecycle::AdmittedEndpointContext;
 
 use knot_editor::{
     KnotContentRetentionPort, KnotResidentSource, KnotRosetteConfig, KnotSettings,
@@ -44,8 +44,8 @@ use transport::BlobScope;
 
 use crate::resident_blobs::{LEGACY_KNOT_LEASE, LegacyBlobMigration, ResidentBlobCustody};
 use crate::settings::KnotResidentSettings;
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 
 /// Stable first-party route for the resident Djot vault.
 pub const RESIDENT_KNOT_ROUTE: &str = "knot";
@@ -69,7 +69,9 @@ struct GateState {
 
 impl KnotGate {
     fn lock(&self) -> std::sync::MutexGuard<'_, GateState> {
-        self.0.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+        self.0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
     fn arm(&self, source: KnotResidentSource, rosette: KnotRosetteConfig) {
@@ -91,7 +93,9 @@ impl KnotGate {
         let mut cut = 0;
         for session in state.sessions.drain(..) {
             if let Some(session) = session.upgrade() {
-                let mut held = session.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+                let mut held = session
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner);
                 cut += usize::from(held.take().is_some());
             }
         }
@@ -120,8 +124,14 @@ impl KnotGate {
 struct GatedSession(Arc<Mutex<Option<ResidentEndpointSession>>>);
 
 impl GatedSession {
-    fn with<R>(&self, f: impl FnOnce(&mut ResidentEndpointSession) -> Result<R, String>) -> Result<R, String> {
-        let mut held = self.0.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    fn with<R>(
+        &self,
+        f: impl FnOnce(&mut ResidentEndpointSession) -> Result<R, String>,
+    ) -> Result<R, String> {
+        let mut held = self
+            .0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         f(held.as_mut().ok_or_else(|| CLOSED.to_string())?)
     }
 }
@@ -309,7 +319,9 @@ impl ResidentKnot {
         catalog: &mut ResidentEndpointCatalog,
     ) -> Result<(), ResidentEndpointCatalogError> {
         let gate = self.gate.clone();
-        catalog.register_erased(RESIDENT_KNOT_ROUTE, "Knot", move |context| gate.open(context))
+        catalog.register_erased(RESIDENT_KNOT_ROUTE, "Knot", move |context| {
+            gate.open(context)
+        })
     }
 
     /// The gate the route is served through.
@@ -400,12 +412,12 @@ mod tests {
     use sceno::InstanceId;
     use transport::BlobReadAuthorizer;
 
-    use graphshell::lifecycle::AdmittedEndpointContext;
+    use graphshell_host::lifecycle::AdmittedEndpointContext;
 
     use super::*;
 
     fn editable_resource(
-        endpoint: &mut graphshell::native::endpoint_catalog::ResidentEndpointSession,
+        endpoint: &mut graphshell_host::endpoint_catalog::ResidentEndpointSession,
         snapshot: &chirograph::ProjectionSnapshot,
         address_suffix: &str,
     ) -> (InstanceId, EditableTextV1, AdvertisedAction) {
