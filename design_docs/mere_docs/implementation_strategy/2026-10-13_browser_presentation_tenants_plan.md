@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:executing-plans for inline execution or superpowers:subagent-driven-development if the owner selects delegation. Complete each task's checks before moving to the next.
 
-**Status:** in progress, 2026-10-13. The owner approved the written design and selected inline execution. Shared preparation and presentation policy are implemented; supplier WebGL runtime qualification and browser host integration are active.
+**Status:** browser presentation integrated; coordinated Genet/Netrender supplier adoption qualified and landed, 2026-10-15. All four temporary Netrender bridge tables are retired. Fresh native and wasm compilation receipts are recorded below; existing browser runtime and delivery-size receipts retain their measured source identities.
 
 **Goal:** Run Graphshell's viewer through the shared Cambium host on direct WebGL2 when WebGPU is unavailable, including content updates, resize, recovery, capture, input and accessibility.
 
@@ -292,3 +292,92 @@ presentation stamp contains the generation added in Task 2.
 - 2026-10-15: Supplier de-generification (Mark's go-ahead). Genet `e8b8606f5` runs layout over a context-free `AlgorithmCore`, so Taffy is instantiated once per style type; the Vello fork (`mark-ik/all-vellos` `276b4664`) and Netrender `5fbc7b2ba` draw every glyph outline through `Vec<PathElement>`, one Skrifa interpreter copy. Measured gzip6: 3,661,762 before; 3,523,495 with only these changes (local Genet = old pin + `e8b8606`); 3,620,876 at the real pin, because Genet main also brings nine other commits (about +97 KB). Mere adopts Genet's browser `RendererAccess` frame-gate guard per operation: checked `try_renderer`, loss-safe `retire_owned_*` cleanup, no guard across producer callbacks. Native 855 passed; five browser routes and both scale comparisons unchanged. The single bundle stays over the cap; the split's estimated savings and required gating are in `limits-followup-20261014/limits-followup.json`.
 - 2026-10-15: Per-route viewer artifacts (Mark: split, with Classic Vello optional in the suppliers). Netrender `81c8337a4` adds the subtractive `without-classic-vello`: Renderer cannot be constructed and every method is statically unreachable, so Classic's code and shaders are not linked. The web host gains `webgpu` and `portable` features; `build-viewer.py` builds `pkg/webgpu/` (`presentation-webgpu`) and `pkg/webgl2/` (`presentation-webgl2` + `without-classic-vello`) and holds each to the unchanged caps. `mount.js` loads one artifact: explicit policy loads its route; Auto probes for an actual WebGPU device and remounts on WebGL2 if the WebGPU artifact refuses at boot. gzip6: WebGL2 3,244,444 (passes); WebGPU 3,454,488 (46,616 over, reported, not cut). All routes pass on their own artifact (WebGL2/Auto/Firefox/SwiftShader 33 controls, WebGPU 27, Auto with WebGPU loads the WebGPU artifact); both scale comparisons pass. Genet render host's matching feature is the Genet lane's.
 - 2026-10-15: Closed. Mark kept Classic Vello as an opt-out in the suppliers and amended R157's viewer Wasm cap to 3,460,300 B (3.30 MiB) per route artifact. Pins: Genet `ae3d9f5d972` (genet-render-host `without-classic-vello`), Netrender `f4f9c0d87` (the opt-out is a compile error off wasm32). gzip6: WebGPU 3,359,673, WebGL2 3,322,091; both pass the amended cap and, at these pins, also the earlier 3,407,872 B one. Fat-LTO layout varies by about 95 KB between builds with only cfg-level changes, so the extra headroom is real margin. All routes pass on their own artifacts; scale 1 and 125% comparisons pass; native 855 passed. Recorded options, not tasks: slim Genet main's recent browser-capture work in the viewer, align genet-parley onto one read-fonts.
+
+
+## Coordinated supplier adoption, 2026-10-15
+
+**Scope:** Genet adopts Netrender `f4f9c0d87e6a6030b61075a45118055dfe6a12df`
+and its maintained Vello `276b46648c08f3d2062e70559afa999842e1873c` source.
+Genet forwards `genet-render-host/without-classic-vello` to the renderer.
+Mere then adopts that published Genet revision and removes the temporary
+Netrender patch family from its root, viewer, web smoke and Distillery probe.
+Direct renderer dependencies use the canonical supplier URL and one revision.
+Viewer size levers remain options. Forms C and three-lanes are outside scope.
+
+### Phases and done-conditions
+
+1. Reconcile the primary Genet checkout with the newer published Phase B.
+   Done when the older local snapshot is verified as superseded by the
+   qualified upstream implementation, without replaying duplicate work.
+   Mark clarified that a duplicate archive tag is unnecessary.
+2. Update Genet's coordinated renderer/provider pins, feature forwarding and
+   standalone smoke. Run render, render-host and Livery suites, the wasm opt-out
+   check and its expected native rejection. Done when actual results and source
+   identities are recorded, with any platform limits stated.
+3. Publish the Genet supplier and adopt it in the four active Mere roots.
+   Remove their bridge tables, refresh portable locks and inspect resolved
+   identities. Run native consumer tests and browser host/viewer compilation,
+   including the viewer's opt-out. Done when each root resolves one canonical
+   Netrender family without the bridge and the owned changes are published.
+
+### Findings
+
+- 2026-10-15: Windows main held `b5813e22291`, an older Forms B snapshot.
+  Remote main already contains qualified Phase B `a0d95ebd6e2`, additional
+  validation fixes and subsequent Forms work. The older snapshot was not
+  replayed over main. Its temporary duplicate archive tag was removed locally
+  and remotely at Mark's clarification.
+- 2026-10-15: The renderer bridge occurs in four active Cargo roots, not only
+  the workspace and viewer. The web smoke and Distillery probe still used
+  `6a24ae08f`; all four must move together before removing their bridges.
+- 2026-10-15: Gates run from `Code` with explicit manifest paths, so the
+  Genet checkout's ignored local supplier patches cannot replace published
+  sources. Build output uses stable `C:/t/cargo-targets/genet` and
+  `C:/t/cargo-targets/mere` paths. Existing unrelated builds are left alone.
+
+### Progress
+
+- 2026-10-15: Original Forms B snapshot tagged; primary Genet reconciled to
+  remote main `8649c0c3200`. Mere fast-forwarded to published `99ecfdee`.
+  Genet's renderer and provider pin updates and feature forwarding are prepared.
+
+- 2026-10-15: Genet supplier published as `7ffe66208ca3059283ef8770de7d17aa8834ecc8`.
+  Fresh Windows gates: Livery 678 passed/9 ignored, render 51 passed,
+  render-host 17 passed/4 ignored, zero failures; wasm opt-out and standalone
+  compile pass, and native opt-out is rejected by Netrender as intended.
+  Receipt: `genet/design_docs/receipts/2026-10-15_netrender_adoption/README.md`.
+  Prepublication rebase preserved upstream Forms documentation and one
+  Documents regression test (`cb735d928a8`, `273431eff73`); gated production
+  source and the qualified manifests are unchanged by that rebase.
+  All four Mere roots now select this published Genet supplier; portable lock
+  refresh and consumer qualification are in progress.
+
+- 2026-10-15: All four portable metadata audits pass: exactly one canonical
+  Netrender family at `f4f9c0d87`, and every resolved Genet Git package at
+  `7ffe66208ca`. The main lock changes only Genet/Netrender source identities.
+  The older Distillery probe lock also reconciles the existing workspace
+  `edit-history` -> `backstep` rename, adds the Genet host's Gloo timer edge,
+  and adopts the same Vello provider. Native host suites are compiling.
+
+- 2026-10-15: Receiving native host suites pass 336 tests, zero failures,
+  with 11 existing ignores (including four doctests). Viewer WebGPU/WebGL2
+  and standalone web smoke wasm checks are running against the frozen locks.
+
+- 2026-10-15: Mark clarified to drop the duplicate snapshot and follow published
+  main. The temporary Forms B archive tag was removed locally and remotely;
+  Genet main fast-forwarded to `eeb9774ada9`. The qualified Netrender adoption
+  source stays pinned at `7ffe66208ca`; subsequent accessibility changes retain
+  their separate upstream receipts. Both viewer wasm routes compile; the
+  standalone web smoke gate is running.
+
+- 2026-10-15: Coordinated adoption complete. All four portable roots resolve
+  one canonical Netrender family at `f4f9c0d87` and published Genet
+  `7ffe66208ca`. Native receiving tests: 336 passed, zero failed, 11 ignored.
+  Both viewer wasm routes (WebGPU and WebGL2 with the forwarded Classic
+  opt-out) and standalone web smoke compile against locked public suppliers.
+  Source/config and lock hashes are unchanged after qualification. Receipt:
+  [receiving audit and logs](../testing/receipts/2026-10-15_netrender_adoption/README.md).
+  Viewer size levers remain options. Forms C and three-lanes were untouched;
+  the unnecessary duplicate Forms B archive tag was removed at Mark's request.
+  Build output remains in stable `C:/t/cargo-targets/genet` and
+  `C:/t/cargo-targets/mere`; no isolated Cargo home or worktree was created.
