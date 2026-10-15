@@ -50,30 +50,12 @@ distillery-chronicle-receipt-host = [
     "graphshell-host/webrtc-session",
     "dep:webrtc-carrier",
 ]
-# Graphshell's C4a WebRTC host fixture (`c4_webrtc_host`) and its signaling
-# test. It moved here with `door::resident_mere_proxy` (stack lift plan P5);
-# the str0m lane stays out of the ordinary resident build.
-c4-host = [
-    "graphshell-host/webrtc-session",
-    "dep:webrtc-carrier",
-    "webrtc-carrier/native",
-]
-
-[[bin]]
-name = "c4_webrtc_host"
-path = "src/bin/c4_webrtc_host.rs"
-required-features = ["c4-host"]
-
 # The browser-launched native-messaging relay to the device broker, moved
 # from Graphshell with `door::device_broker` (stack lift plan P5). The binary
 # name stays: the extension's host manifest names its path.
 [[bin]]
 name = "graphshell_native_host"
 path = "src/bin/graphshell_native_host.rs"
-
-[[test]]
-name = "c4_host_signaling"
-required-features = ["c4-host"]
 
 [[bin]]
 name = "c1-receipt-host"
@@ -274,7 +256,7 @@ insigne = { workspace = true, features = ["verify"] }
 # `sync::transfer_staging` moved here). `src/resident_distillery.rs` speaks
 # only `muniment::RedbBackend` and distillery's own re-exported trainer
 # vocabulary.
-# The C4 host's signaling test drives the binary as a peer would.
+# The identity endpoint's tests read its cards back as a client does.
 graphshell-client.workspace = true
 # The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
@@ -300,7 +282,7 @@ stickleback.workspace = true
 safetensors = "0.4"
 scenotime.workspace = true
 tempfile = "3"
-tokio = { version = "1", features = ["macros", "process", "rt", "rt-multi-thread", "sync", "time"] }
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
 
 # Vault lock rulings 48 and 49: what Knot leaves of its seed, strict on the
 # paths that open no network and judged against iroh's and p2panda-net's own

@@ -19,14 +19,14 @@ use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::sync::RwLock;
 
-use crate::door::browser_host::{BrowserHostError, serve_identity_native_messages_with_cards};
-use crate::door::resident_identity::ResidentIdentity;
-use chirograph::ContentHash;
-use graphshell::browser_carrier::{
+use crate::door::browser_carrier::{
     AllowedExtensions, BrowserCarrierError, BrowserLauncher, read_native_message_async,
     write_native_message_async,
 };
-use graphshell::identity_endpoint::{SupplementalCard, TransferDecisions};
+use crate::door::browser_host::{BrowserHostError, serve_identity_native_messages_with_cards};
+use crate::door::identity_endpoint::{SupplementalCard, TransferDecisions};
+use crate::door::resident_identity::ResidentIdentity;
+use chirograph::ContentHash;
 use graphshell_endpoint::door::local_endpoint::{LocalStream, connect_local, serve_local};
 
 pub const DEVICE_ENDPOINT_ENV: &str = "GRAPHSHELL_DEVICE_ENDPOINT";

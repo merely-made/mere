@@ -12,8 +12,8 @@ one feature each on `graphshell-endpoint`.
 | `graphshell-endpoint::stdio` (feature `stdio`) | `StdioCarrier` plus `serve_basic`, `serve_resumable`, `serve_resumable_notifying`: NDJSON over a child process's standard streams |
 | `graphshell-endpoint::local` (feature `local`) | `LocalCarrier`: an endpoint hosted in this process, still round-tripping the wire encoding |
 | `graphshell-endpoint::network` (feature `network`) | `NetworkCarrier`, `CarrierRuntime`: NDJSON over any `AsyncRead + AsyncWrite` |
-| `graphshell-host` | The serving half: `admission` (the action triple, the hello builders, the sans-I/O admission and its action check), `carrier` (accept, `admit_accepted_session`, `admit_stream`), `line` (the codec over Tokio streams), `lifecycle` (`SessionAuthority`, `AdmittedEndpointContext`, `BindAdmittedSession`), `session_loop`, `session_notices`, `endpoint_catalog` (`ResidentEndpointCatalog`), `projection_host` (`ResidentProjectionHost`), `network_carrier` (dialling), `policy_projection`, `resume` and `live_endpoint` (fixture endpoints), and the WebRTC door (`webrtc_door`, `webrtc_join`, `webrtc_session`) |
-| `graphshell-endpoint::door` (feature `door`, native only) | The application side of the first-party door: `app_admission` (hello, `AppId`, route grants), `route` (`ResidentEndpointRoute`), `wire` and `frame` (the envelope and native-messaging frames both halves speak), `app_client` (`AppBrokerClient`, `AppRouteCarrier`), `custody`, `custody_client`, `custody_identity`, `quarantine`, `local_endpoint`, `tasks`, `identity` (the `dramatis::view` types) and `profile` (`GraphshellIdentity`, `env_profile`) |
+| `graphshell-host` | The serving half: `admission` (the action triple, the hello builders, the sans-I/O admission and its action check), `carrier` (accept, `admit_accepted_session`, `admit_stream`), `line` (the codec over Tokio streams), `lifecycle` (`SessionAuthority`, `AdmittedEndpointContext`, `BindAdmittedSession`), `session_loop`, `session_notices`, `endpoint_catalog` (`ResidentEndpointCatalog`), `projection_host` (`ResidentProjectionHost`), `network_carrier` (dialling), `policy_projection`, `canary`, `resume` and `live_endpoint` (fixture endpoints), `view` and `sessions` (the projection receipt views and session switcher), and the WebRTC door (`webrtc_door`, `webrtc_join`, `webrtc_session`) |
+| `graphshell-endpoint::door` (feature `door`, native only) | The application side of the first-party door: `app_admission` (hello, `AppId`, route grants), `route` (`ResidentEndpointRoute`), `wire` and `frame` (the envelope and native-messaging frames both halves speak), `app_client` (`AppBrokerClient`, `AppRouteCarrier`), `resident_mere_proxy` (an endpoint that forwards over the door), `custody`, `custody_client`, `custody_identity`, `quarantine`, `local_endpoint`, `tasks`, `identity` (the `dramatis::view` types) and `profile` (`GraphshellIdentity`, `env_profile`) |
 
 The carriers were the separate `graphshell-stdio`, `graphshell-local` and
 `graphshell-network` crates until 2026-09-24. The `door` modules were the
@@ -66,8 +66,8 @@ own facts, and a carrier that hands over the hello as bytes uses the sans-I/O
 ## Not in these crates
 
 The servers Djinn runs (the application door's broker, the browser door's
-host, the device broker, the local session, `ResidentIdentity` and the sync
-hosts) are Djinn's `door` and `sync` modules since the stack lift plan's P5.
-The browser carrier and the identity endpoint stay in
-[`ports/graphshell`](../../ports/graphshell), the reference application: it
+host and its native-messaging envelope, the device broker, the local session,
+the identity endpoint, `ResidentIdentity` and the sync hosts) are Djinn's
+`door` and `sync` modules since the stack lift plan's P5.
+[`ports/graphshell`](../../ports/graphshell), the reference application,
 composes these crates, and they do not depend on it.

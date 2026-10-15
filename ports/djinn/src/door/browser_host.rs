@@ -13,17 +13,17 @@ use base64::Engine;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, ResumeRequest};
 use personae::delegation::DelegationError;
 
-use crate::door::device_broker::DeviceSurface;
-use crate::door::local_session::{
-    DoorIdentity, LocalSession, admit_local_client, identity_endpoint_for,
-};
-use crate::door::resident_identity::ResidentIdentity;
-use graphshell::browser_carrier::{
+use crate::door::browser_carrier::{
     BrowserCarrierError, BrowserHostMessage, BrowserLauncher, BrowserLink, BrowserMessage,
     NativeIdentityFailure, NativeIdentityResult, read_native_message_async,
     write_native_message_async,
 };
-use graphshell::identity_endpoint::IdentityEndpoint;
+use crate::door::device_broker::DeviceSurface;
+use crate::door::identity_endpoint::IdentityEndpoint;
+use crate::door::local_session::{
+    DoorIdentity, LocalSession, admit_local_client, identity_endpoint_for,
+};
+use crate::door::resident_identity::ResidentIdentity;
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::door::tasks::spawn_tracked_with_handle;
 use graphshell_endpoint::door::wire::BrowserChallenge;
@@ -319,8 +319,8 @@ mod tests {
     use personae::InMemoryProvider;
 
     use super::*;
+    use crate::door::browser_carrier::{BrowserHostMessage, CHROMIUM_EXTENSION_ID};
     use crate::door::resident_identity::test_support::FixedIdentity;
-    use graphshell::browser_carrier::{BrowserHostMessage, CHROMIUM_EXTENSION_ID};
     use graphshell_host::endpoint_catalog::ResidentEndpoint;
     use graphshell_host::lifecycle::AdmittedEndpointContext;
 
@@ -354,7 +354,7 @@ mod tests {
         let launcher =
             BrowserLauncher::parse(&[format!("chrome-extension://{CHROMIUM_EXTENSION_ID}/")])
                 .unwrap();
-        let supplemental = graphshell::identity_endpoint::SupplementalCard {
+        let supplemental = crate::door::identity_endpoint::SupplementalCard {
             adapter: "graphshell.personal-sync".into(),
             source_id: "receipt-graph".into(),
             card: PortableCardV1 {

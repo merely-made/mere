@@ -42,14 +42,14 @@ use graphshell_endpoint::door::wire::{
 };
 use tokio::io::{AsyncRead, AsyncWrite};
 
-use crate::door::browser_host::BrowserHostError;
-use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
-use crate::door::local_session::{LocalSession, admit_local_client, identity_endpoint_for};
-use crate::door::resident_identity::ResidentIdentity;
-use graphshell::browser_carrier::{
+use crate::door::browser_carrier::{
     LocalLink, read_native_message_async, write_native_message_async,
 };
-use graphshell::identity_endpoint::IdentityEndpoint;
+use crate::door::browser_host::BrowserHostError;
+use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
+use crate::door::identity_endpoint::IdentityEndpoint;
+use crate::door::local_session::{LocalSession, admit_local_client, identity_endpoint_for};
+use crate::door::resident_identity::ResidentIdentity;
 use graphshell_host::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointSession,
 };
@@ -66,7 +66,7 @@ pub enum AppBrokerError {
     #[error(transparent)]
     Catalog(#[from] ResidentEndpointCatalogError),
     #[error(transparent)]
-    Carrier(#[from] graphshell::browser_carrier::BrowserCarrierError),
+    Carrier(#[from] crate::door::browser_carrier::BrowserCarrierError),
     #[error("the application stream ended before its hello")]
     MissingHello,
     #[error("the first application message must answer the host challenge")]

@@ -1267,3 +1267,36 @@ fast-forward of local main; nothing built).**
   Knot and Turnstone need `graphshell` for `view` and `sessions` only (Knot
   as a dev-dependency); moving those two (Group 5, "stays") would let both
   drop it.
+- **2026-10-15 (Mark's rulings after P5):** `view` and `sessions` lift into
+  `graphshell-host`, so Knot and Turnstone can drop the port; the browser
+  carrier and the identity endpoint pair (`identity_endpoint`,
+  `identity_projection`) move into Djinn; L13's replica, transfer and receipt
+  types wait for the facet brief; `resident_mere_proxy` moves into
+  `graphshell-endpoint`'s `door`, and the C4 fixture returns to the port.
+  Knot's and Turnstone's repins wait for pass (b)'s single round.
+- **2026-10-15 (those rulings landed in Mere):**
+  - `graphshell_host::{view, sessions, canary}`: `canary` came too, because
+    `view::render_g1_receipt` runs its loopback canary and Djinn's broker tests
+    and `GraphshellApp`'s fixture remote use its `FixtureEndpoint`. All three
+    are in the crate's base build (wasm-clean; `base64` is now a plain
+    dependency); `sessions`' endpoint spawning needs `native`, which now adds
+    `graphshell-endpoint/stdio`. The two receipt checks that read this port's
+    committed HTML (`g1_loopback.html`, `g4_session_switch.html`) are the
+    port's `tests/g1_g4_receipts.rs`.
+  - `djinn::door::{browser_carrier, identity_endpoint, identity_projection}`,
+    with the browser identity session test. `IdentityAuthority` stays the
+    endpoint's half of `ResidentIdentity`. `GraphshellApp`'s
+    `h4_exportable_identity_cards_and_access_survive_scene_reopen_as_projections`
+    needed a live identity endpoint; the port cannot depend on Djinn, so it
+    now reads the projection (snapshot and card resources, after the
+    revocation) from `ports/graphshell/tests/fixtures/identity_cards.json`, and
+    Djinn's `graphshells_identity_cards_fixture_is_this_endpoints_projection`
+    runs the revocation and fails if the endpoint's output drifts from that
+    file (`DJINN_WRITE_IDENTITY_CARDS_FIXTURE=1` rewrites it). The fixture's
+    signing request id is pinned so it is the same bytes every run.
+  - `graphshell_endpoint::door::resident_mere_proxy`; `c4_webrtc_host`, its
+    `c4_host_signaling` test and the `distillery-chronicle-fixture` feature are
+    the port's again, and Djinn's `c4-host` feature is gone.
+  - What `graphshell` is still needed for outside the port: Djinn only, for the
+    sync hosts' replica, transfer, offer and receipt types (L13). Knot and
+    Turnstone need nothing from it once they repin.

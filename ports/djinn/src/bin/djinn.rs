@@ -23,6 +23,7 @@ use castellan::custody::bootstrap;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use djinn::door::browser_carrier::AllowedExtensions;
 #[cfg(feature = "personal-sync")]
 use djinn::door::device_broker::serve_browser_broker_with_cards;
 use djinn::door::device_broker::{
@@ -52,7 +53,6 @@ use djinn::resident_status::{
 #[cfg(feature = "personal-sync")]
 use djinn::settings::{self as owner_settings, SyncOverrides};
 use djinn::startup_vault;
-use graphshell::browser_carrier::AllowedExtensions;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
     default_app_endpoint,
@@ -955,12 +955,12 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 djinn::identity_ui::apply_native_identity_action(
                     &personae,
                     &SystemNativeIdentityUi::default(),
-                    graphshell::browser_carrier::NativeIdentityAction::UnlockVault,
+                    djinn::door::browser_carrier::NativeIdentityAction::UnlockVault,
                 )
             };
             // A dialog blocks; the worker it holds is handed over meanwhile.
             match tokio::task::block_in_place(prompt) {
-                graphshell::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
+                djinn::door::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
                 other => Err(format!("the native unlock ended: {other:?}")),
             }
         })

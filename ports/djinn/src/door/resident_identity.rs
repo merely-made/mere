@@ -9,20 +9,20 @@
 //! Graphshell holds no custody (dramatis repo plan, rulings D4 and D15). The
 //! browser and application doors and the custody route are generic over
 //! [`ResidentIdentity`], and djinn implements it over castellan's
-//! `PersonaeHost` ([`crate::keeper`]). The identity endpoint, which stays in
-//! Graphshell, reads only the snapshot and intents half,
-//! [`IdentityAuthority`], which this trait extends. It was Graphshell's
+//! `PersonaeHost` ([`crate::keeper`]). The identity endpoint reads only the
+//! snapshot and intents half, [`IdentityAuthority`], which this trait
+//! extends. It was Graphshell's
 //! `native::resident_identity` until the stack lift plan's P5.
 
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use crate::door::local_session::DoorIdentity;
-use graphshell::browser_carrier::{
+use crate::door::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
 };
-use graphshell::identity_endpoint::IdentityAuthority;
+use crate::door::identity_endpoint::IdentityAuthority;
+use crate::door::local_session::DoorIdentity;
 use graphshell_endpoint::door::app_admission::AppId;
 use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
 

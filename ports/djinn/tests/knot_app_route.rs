@@ -17,9 +17,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use djinn::door::identity_endpoint::IdentityAuthority;
 use djinn::door::local_session::DoorIdentity;
 use djinn::door::resident_identity::ResidentIdentity;
-use graphshell::identity_endpoint::IdentityAuthority;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
