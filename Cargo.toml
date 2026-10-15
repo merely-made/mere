@@ -278,8 +278,11 @@ graphshell-host = { version = "0.0.2", path = "crates/graphshell/graphshell-host
 # Then to b0feec9: Knot on Mere 71761a553 (the stack lift's P4: knot-editor's
 # place projection test and k2 peer serve through `graphshell-host`) and on
 # `backstep`, `edit-history`'s new name.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "b0feec98f4e89faa29522024bb9e1029cec87feb" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "b0feec98f4e89faa29522024bb9e1029cec87feb" }
+# Then to b19eebf: Knot on Mere 0c03dff3 (P5: the app-route receipt is
+# Djinn's, `graphshell` is Knot's dev-dependency for `view` and `sessions`
+# only) with merges carried from its overlay to the route.
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "b19eebfffe08f31a035f2695a44f516c9afce274" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "b19eebfffe08f31a035f2695a44f516c9afce274" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
