@@ -33,7 +33,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use forme::FoldRecord;
+use curation::FoldRecord;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -118,8 +118,10 @@ impl Default for CameraSnapshot {
 pub struct ViewIntent {
     #[serde(default)]
     pub hidden_relations: BTreeSet<HiddenRelationRecord>,
-    /// Local collapsed summaries. Their members remain source graph members;
-    /// this record only tells a projection to replace them with a summary node.
+    /// The view's folds (mer3ly site plan, Rulings 163 to 165): several,
+    /// never sharing a member. Their members remain source graph members; a
+    /// record only tells a projection to draw them as one stand-in. A saved
+    /// version 1 record migrates as it loads (Ruling 164).
     #[serde(default)]
     pub folds: Vec<FoldRecord>,
     /// Substrate camera snapshot (pan + zoom). `None` when the pane
@@ -311,9 +313,10 @@ mod tests {
         let frame = fixture_frame();
         let mut intent = ViewIntent::new();
         intent.folds.push(
-            forme::FoldRecord::from_selection(
+            FoldRecord::selection(
+                curation::FoldId::new(Uuid::from_u128(1).to_string()),
                 "session:alpha/graph:current",
-                [Uuid::from_u128(7), Uuid::from_u128(3)],
+                [Uuid::from_u128(7), Uuid::from_u128(3)].map(|id| id.to_string()),
             )
             .expect("two members form a fold"),
         );
@@ -321,6 +324,47 @@ mod tests {
         save_view_intent(&dir, &frame, 1, &intent).unwrap();
         let restored = load_view_intent(&dir, &frame, 1).unwrap().unwrap();
         assert_eq!(restored.folds, intent.folds);
+        fs::remove_dir_all(&dir).ok();
+    }
+
+    /// A sidecar saved with forme's version 1 fold loads with the fold
+    /// migrated (Ruling 164): the same id and members, a summary stand-in,
+    /// no rule and no label. The next save writes version 2.
+    #[test]
+    fn a_saved_version_one_fold_migrates_on_load() {
+        let dir = temp_session_dir("fold-v1");
+        let frame = fixture_frame();
+        let path = view_intent_path(&dir, &frame, 3);
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        let (fold, a, b) = (
+            Uuid::from_u128(0xf0),
+            Uuid::from_u128(1),
+            Uuid::from_u128(2),
+        );
+        fs::write(
+            &path,
+            format!(
+                r#"{{"hidden_relations":[],"folds":[{{"version":1,"id":"{fold}","source_scope":"session:alpha","members":["{a}","{b}"],"boundary_policy":"BundleByRelationFamily"}}]}}"#
+            ),
+        )
+        .unwrap();
+        let restored = load_view_intent(&dir, &frame, 3).unwrap().unwrap();
+        let migrated = &restored.folds[0];
+        assert_eq!(migrated.version, curation::FOLD_RECORD_VERSION);
+        assert_eq!(migrated.id.as_str(), fold.to_string());
+        assert_eq!(migrated.members, vec![a.to_string(), b.to_string()]);
+        assert_eq!(
+            migrated.stand_in,
+            curation::FoldStandIn::Summary { label: None }
+        );
+        assert_eq!((&migrated.rule, &migrated.label), (&None, &None));
+        save_view_intent(&dir, &frame, 3, &restored).unwrap();
+        let written = fs::read_to_string(&path).unwrap();
+        assert!(written.contains(r#""version": 2"#), "{written}");
+        assert_eq!(
+            load_view_intent(&dir, &frame, 3).unwrap().unwrap(),
+            restored
+        );
         fs::remove_dir_all(&dir).ok();
     }
 

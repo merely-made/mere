@@ -9755,7 +9755,7 @@ dependencies = [
 
 [[package]]
 name = "mere-curation"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -9848,7 +9848,7 @@ dependencies = [
 
 [[package]]
 name = "mere-forme"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "mere-curation",
  "mere-kernel",
@@ -12767,7 +12767,7 @@ dependencies = [
  "incipit",
  "insigne",
  "mere-alembic",
- "mere-forme",
+ "mere-curation",
  "mere-kernel",
  "muniment",
  "notochord",
@@ -13363,6 +13363,7 @@ dependencies = [
  "layout-dom-api",
  "libm",
  "mere-cartography",
+ "mere-curation",
  "mere-forme",
  "mere-kernel",
  "netrender",

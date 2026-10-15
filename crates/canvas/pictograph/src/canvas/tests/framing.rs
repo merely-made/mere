@@ -139,3 +139,95 @@ fn single_selection_centers_at_natural_size_and_respects_narrow_viewport() {
     assert!((x - 110.0).abs() < 0.01 && (y - 85.0).abs() < 0.01);
     assert!(canvas.camera.zoom > 0.1 && canvas.camera.zoom < 1.0);
 }
+
+#[test]
+fn visible_fit_frames_every_summary_without_hidden_extents() {
+    let (mut canvas, keys) = placed(&[
+        (-20_000.0, 0.0),
+        (18_000.0, 0.0),
+        (-18_000.0, 0.0),
+        (20_000.0, 0.0),
+    ]);
+    for pair in keys.chunks(2) {
+        canvas.selected.extend(pair.iter().copied());
+        canvas.fold_selected("framing-test").unwrap();
+    }
+    assert!(canvas.fit_visible());
+    for center in [(-1000.0, 0.0), (1000.0, 0.0)] {
+        let (x, y) = canvas.screen_point_of(center);
+        assert!((0.0..800.0).contains(&x) && (0.0..600.0).contains(&y));
+    }
+    assert!(
+        canvas.camera.zoom > 0.3,
+        "hidden extents must not determine framing"
+    );
+    assert_eq!(canvas.fold_records().len(), 2);
+}
+
+#[test]
+fn member_stand_ins_remain_visible_and_selectable_for_framing() {
+    use curation::{FoldId, FoldRecord, FoldStandIn};
+    let (mut canvas, keys) = placed(&[(-200.0, 0.0), (-9000.0, 0.0), (200.0, 0.0), (9000.0, 0.0)]);
+    let records = keys
+        .chunks(2)
+        .enumerate()
+        .map(|(i, pair)| {
+            let members: Vec<_> = pair
+                .iter()
+                .map(|&key| canvas.graph.get_node(key).unwrap().id.to_string())
+                .collect();
+            FoldRecord::new(
+                FoldId::new(format!("fold:{i}")),
+                "framing-test",
+                members.clone(),
+                FoldStandIn::Member(members[0].clone()),
+                None,
+                None,
+            )
+            .unwrap()
+        })
+        .collect::<Vec<_>>();
+    assert!(canvas.restore_folds(records).is_empty());
+    assert!(canvas.fit_visible());
+    inside(&canvas, keys[0]);
+    inside(&canvas, keys[2]);
+    assert_eq!(canvas.camera.zoom, 1.0);
+    canvas.selected.extend([keys[0], keys[1]]);
+    assert!(canvas.can_fit_selection());
+    assert!(canvas.fit_selection());
+    let (x, _) = canvas.screen_position_of(keys[0]).unwrap();
+    assert!(
+        (x - 400.0).abs() < 0.01,
+        "only the visible root is selected for framing"
+    );
+    canvas.selected.clear();
+    canvas.selected.insert(keys[1]);
+    assert!(!canvas.can_fit_selection());
+    assert!(!canvas.fit_selection());
+}
+
+#[test]
+fn a_scope_hides_a_fold_without_losing_its_record_or_partial_members() {
+    let (mut canvas, keys) = placed(&[(-9000.0, 0.0), (9000.0, 0.0), (100.0, 0.0)]);
+    canvas.selected.extend(keys[..2].iter().copied());
+    canvas.fold_selected("framing-test").unwrap();
+    let roster = [keys[0], keys[2]].map(|key| canvas.graph.get_node(key).unwrap().id);
+    canvas.scope_to_exact_members(roster);
+    assert!(
+        canvas.fold_projections().is_empty(),
+        "no partial fold projection"
+    );
+    assert!(canvas.fold_badges().is_empty());
+    assert!(
+        canvas.node_in_scope(keys[0]),
+        "the scoped member is no longer hidden"
+    );
+    assert_eq!(canvas.fold_records().len(), 1);
+    canvas.scope_to_exact_members([]);
+    assert!(
+        !canvas.fit_visible(),
+        "an exact empty scope stays empty with saved folds"
+    );
+    canvas.clear_scope();
+    assert_eq!(canvas.fold_projections().len(), 1);
+}
