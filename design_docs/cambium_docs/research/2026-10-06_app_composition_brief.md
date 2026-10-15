@@ -1062,3 +1062,76 @@ has an owner yet.
   application's `PaintEnvelope` and its AccessKit `TreeUpdate`, for the first
   frame and for a steady-state frame after a keystroke, with fonts and images
   counted separately.
+
+### Progress: mount probe (AC7), run 2026-10-15
+
+The disk precondition above is met (1.1 TB free on 2026-10-15). Mark approved
+the probe on 2026-10-15 and ruled "Approve dev-dep (Recommended)" on its one
+fork. It ran against Mere `90ce8f12` with Genet `ae3d9f5`, which contains the
+accessibility fix `85252e20`. The code is
+`crates/cambium/cambium-rootstock/src/mount_probe_tests.rs`, declared in
+`lib.rs` as a test-only module, with `genet-document-resources` added as a
+dev-dependency of `cambium-rootstock` (already a workspace dependency and in
+`Cargo.lock`). It sits in Rootstock because `WindowDom` lives there. It changes
+no library code in Cambium or Rootstock.
+
+**Result: AC7's boundary holds. All five done-conditions pass and both controls
+fail where they should.** `cargo test -p cambium-rootstock --lib mount_probe`:
+5 passed. The whole Rootstock lib suite: 103 passed, 1 ignored, 0 failed.
+
+Setup: a `ScriptedDom` whose document sheet colours `#host` blue and italicises
+`button, .note`. The host `div` has an open shadow root. The guest is a
+`GenetAppRunner::new_at` runner (a `section` with a button and a `.note` span)
+owned by a `RetainedMount`. The guest's `<style>` is in the shadow root and
+makes `button` green, bold, 120 by 30. The values below are those the runs
+printed.
+
+| Done-condition | Shadow root, owner inside it | Shadow root, owner is the host |
+|---|---|---|
+| Guest's rule applies inside | pass: button `rgb(0, 128, 0)`, bold | pass |
+| Document's rule does not cross in | pass: guest button and note `normal`; outside note `italic` | pass |
+| Inheritance still crosses | pass: guest note `rgb(0, 0, 255)`, the host's colour | pass |
+| Guest's rule does not leak out | pass: outside button `rgb(0, 0, 0)`, `normal` | pass |
+| Hit test in the guest's rectangle | pass: centre of the button's 120 by 30 box returns the button node | pass |
+| Guest's button in the projection | pass: `document_a11y_projection_with_style` lists "Guest action" as a button, after "Outside action" | pass |
+
+Controls:
+
+| Control | Observed | Reads as |
+|---|---|---|
+| Plain `div` mount | guest button `font-style: italic`, note `italic`; outside button also turns green and bold | **fails as required.** The document's rule leaks in, and the guest's sheet, being document-scope, leaks out. |
+| Guest `<style>` in the document, outside the shadow root | outside button turns green and bold; guest button stays blue and `normal` weight | **fails as required.** It leaks out, and it also cannot reach in, because a document-scope sheet does not cross the boundary. |
+
+Two probe shapes ran because AC7(a) and the probe text differ. The probe text
+puts the runner's owner inside a separate host's shadow root. AC7(a) says the
+owner "becomes a shadow host", so the runner mounts at the owner's shadow root
+(`new_at` accepts a shadow-root node). Both scope identically.
+
+**Findings for adoption.** These are the things the probe found, not changes it
+made.
+
+1. **The production host path cannot scope a guest sheet yet.**
+   `OwnedLayout::new` (`cambium-rootstock/src/owned_layout.rs`, line 99) calls
+   `StyleSet::cambium(sheets)`. Genet's `cambium()` (`genet-livery/src/style.rs`,
+   line 338 at `ae3d9f5`) builds every sheet with `owner_node: None`, so every
+   sheet is document-scope and the `<style>` elements a DOM carries are never
+   read. Genet's tree-scope boundary keys on the owner node. The probe therefore
+   built its own pipeline: `ResolvedDocumentResources::discover`, then
+   `StyleSet::cambium_resources`, `resolve_styles`, `layout_with_text_system`,
+   `hit_test_with_scroll` and `document_a11y_projection_with_style`, with the
+   closures `OwnedLayout` passes. Before a shadow-root mount can be scoped in a
+   real host, `OwnedLayout` must build its `StyleSet` from discovered resources.
+   That is Rootstock work and was not done here.
+2. **`RetainedMount::withdraw_from` does not work from inside a shadow tree.** It
+   finds its source by walking `parent()`, and a shadow root has no parent
+   (`genet-scripted-dom/shadow.rs`). In the run, `withdraw_from(host)` returned
+   `false` with the owner inside the host's shadow root and `true` when the owner
+   was the host. So AC7(a)'s shape (the owner is the shadow host, in the light
+   DOM) keeps station reparenting and teardown working with no change, and the
+   probe-text shape does not. This favours the owner-is-host shape for adoption.
+3. **What the probe did not test:** the residuals in F14 (`:host-context()`,
+   focus delegation and per-scope focus, `getComposedRanges`), real fonts, a
+   mount moving between stations, and a screen-reader run (the F15 fix is
+   covered by Genet's tests, not a WPT or screen-reader run). Only
+   `RetainedMount::new` and `new_at` were exercised unchanged; the owner's
+   `width:100%; height:100%` took the host's 300 by 100 box.

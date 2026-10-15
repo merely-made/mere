@@ -263,8 +263,10 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # On 2026-10-15 both move to a27911ad, which imports custody and admission from
 # `graphshell-endpoint`'s `door` (stack lift plan P1) and adds `mere_overlay`,
 # Knot's overmap layer over a resident mere's route; Knot pins Mere 19573b51.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "a27911ada2f7c5b88ac9b3d05de80bc61040fc8b" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "a27911ada2f7c5b88ac9b3d05de80bc61040fc8b" }
+# On 2026-10-15 both move again to c487a7c, which repins Knot onto Mere
+# e92572a4 for the lift plan's P2 and P3; Knot's sources are unchanged.
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "c487a7c256421d7c3d4335b9f8b442d6a1173edd" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "c487a7c256421d7c3d4335b9f8b442d6a1173edd" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -424,6 +426,9 @@ document-session-api = { git = "https://github.com/merely-made/genet.git", rev =
 cambium-genet-winit-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-winit-host" }
 script-runtime-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 script-engine-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+# Deterministic maths for scripted rules (Scenograph editor plan, SE40, SE93). No
+# default features: the host functions must give the same bits on every target.
+libm = { version = "0.2", default-features = false }
 script-engine-boa = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 script-engine-nova = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # `servo-paint` was retired in genet 5af76a0cb8c; its platform compositor half

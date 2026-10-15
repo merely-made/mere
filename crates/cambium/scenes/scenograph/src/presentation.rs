@@ -11,7 +11,11 @@
 //! Effects never mutate source authority, coordinates, pins or selection.
 //! The host fills the existing `sceno::Representation` slots, implements relation
 //! forms and overlays, and keeps hysteresis matches per view and occurrence.
-//! This module is declarative; the Rhai runner remains at the SE39–SE42 seam.
+//! Conditions are declarative, plus `Condition::Script` (SE92). The condition
+//! is data and always present, so a rule set with a script validates and
+//! round-trips in any host. Running one needs the `scripts` feature, which adds
+//! the `ValueEngine` contract (Genet's `script-engine-api`) and
+//! `RuleSet::resolve_with_scripts`; without it `resolve` refuses such a set.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -22,6 +26,29 @@ pub const PRESENTATION_RULE_VERSION: u16 = 1;
 const MAX_RULES: usize = 256;
 const MAX_CONDITIONS: usize = 256;
 const MAX_DEPTH: usize = 32;
+const MAX_SCRIPT_BYTES: usize = 4096;
+
+#[cfg(feature = "scripts")]
+mod scripts;
+#[cfg(feature = "scripts")]
+pub use scripts::SCRIPT_STEP_BUDGET;
+
+/// Without the `scripts` feature there is no engine to run: the same entry
+/// points as `scripts.rs`, doing nothing.
+#[cfg(not(feature = "scripts"))]
+mod scripts {
+    use super::Context;
+
+    pub(super) type Engine<'a> = Option<&'a mut ()>;
+
+    pub(super) fn bind(_: &mut Engine<'_>, _: &Context, _: bool) -> Result<(), String> {
+        Ok(())
+    }
+
+    pub(super) fn run(_: &str, _: &mut Engine<'_>) -> (bool, String) {
+        (false, "script: no script engine".into())
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -136,6 +163,14 @@ pub enum Condition {
     },
     Not {
         condition: Box<Condition>,
+    },
+    /// A script that returns a bool (Scenograph editor plan, SE92). With the
+    /// `scripts` feature it runs through a `ValueEngine` under a fixed step
+    /// budget and sees only the globals listed on `RuleSet::resolve_with_scripts`.
+    /// A script that fails, runs past its budget or returns anything else leaves
+    /// its rule unmatched, with the reason in the trace.
+    Script {
+        source: String,
     },
 }
 
@@ -339,9 +374,30 @@ impl RuleSet {
         }
     }
 
+    /// Resolve with no script engine. A set that carries a script condition is
+    /// refused; the `scripts` feature adds `resolve_with_scripts`.
     pub fn resolve(&self, context: &Context) -> Result<Resolution, Vec<Issue>> {
+        self.resolve_inner(context, None)
+    }
+
+    fn resolve_inner(
+        &self,
+        context: &Context,
+        mut engine: scripts::Engine<'_>,
+    ) -> Result<Resolution, Vec<Issue>> {
         self.validate()?;
         let mut issues = Vec::new();
+        if engine.is_none() {
+            for (index, rule) in self.rules.iter().enumerate() {
+                if contains_script(&rule.condition) {
+                    issue(
+                        &mut issues,
+                        &format!("rules[{index}].condition"),
+                        "a script condition needs a script engine",
+                    );
+                }
+            }
+        }
         if context.id.trim().is_empty() {
             issue(&mut issues, "context.id", "an occurrence ID is required");
         }
@@ -380,11 +436,19 @@ impl RuleSet {
             {
                 (false, "target does not include this occurrence".into())
             } else {
-                evaluate(
-                    &rule.condition,
-                    context,
-                    context.previous_matches.contains(&rule.id),
-                )
+                let previously_matched = context.previous_matches.contains(&rule.id);
+                let bound = if contains_script(&rule.condition) {
+                    scripts::bind(&mut engine, context, previously_matched)
+                } else {
+                    Ok(())
+                };
+                match bound {
+                    Ok(()) => evaluate(&rule.condition, context, previously_matched, &mut engine),
+                    Err(error) => (
+                        false,
+                        format!("script: could not bind the occurrence: {error}"),
+                    ),
+                }
             };
             if matched {
                 result.matched_rules.insert(rule.id.clone());
@@ -504,11 +568,22 @@ fn validate_condition(
             count,
             issues,
         ),
+        Condition::Script { source } if source.trim().is_empty() => {
+            issue(issues, path, "a script condition needs source")
+        },
+        Condition::Script { source } if source.len() > MAX_SCRIPT_BYTES => {
+            issue(issues, path, "script conditions are at most 4096 bytes")
+        },
         _ => {},
     }
 }
 
-fn evaluate(condition: &Condition, context: &Context, previously_matched: bool) -> (bool, String) {
+fn evaluate(
+    condition: &Condition,
+    context: &Context,
+    previously_matched: bool,
+    engine: &mut scripts::Engine<'_>,
+) -> (bool, String) {
     match condition {
         Condition::Always => (true, "always".into()),
         Condition::State { state } => {
@@ -577,7 +652,7 @@ fn evaluate(condition: &Condition, context: &Context, previously_matched: bool) 
         Condition::All { conditions } | Condition::Any { conditions } => {
             let results: Vec<_> = conditions
                 .iter()
-                .map(|child| evaluate(child, context, previously_matched))
+                .map(|child| evaluate(child, context, previously_matched, engine))
                 .collect();
             let all = matches!(condition, Condition::All { .. });
             let matched = if all {
@@ -599,15 +674,29 @@ fn evaluate(condition: &Condition, context: &Context, previously_matched: bool) 
             )
         },
         Condition::Not { condition } => {
-            let (matched, reason) = evaluate(condition, context, previously_matched);
+            let (matched, reason) = evaluate(condition, context, previously_matched, engine);
             (!matched, format!("not: {reason}"))
         },
+        Condition::Script { source } => scripts::run(source, engine),
+    }
+}
+
+fn contains_script(condition: &Condition) -> bool {
+    match condition {
+        Condition::Script { .. } => true,
+        Condition::All { conditions } | Condition::Any { conditions } => {
+            conditions.iter().any(contains_script)
+        },
+        Condition::Not { condition } => contains_script(condition),
+        _ => false,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "scripts")]
+    use script_engine_api::{Budget, HostFunction, ScriptValue, ValueEngine, ValueError};
 
     fn context(id: &str) -> Context {
         Context {
@@ -821,5 +910,209 @@ mod tests {
         let mut item = context("a");
         item.screen_size = Some(f64::NAN);
         assert!(rules(vec![base]).resolve(&item).is_err());
+    }
+
+    /// A scripted stand-in for an engine: the source names the outcome, and the
+    /// globals and budgets it was given are kept for inspection.
+    #[cfg(feature = "scripts")]
+    #[derive(Default)]
+    struct Scripted {
+        globals: BTreeMap<String, ScriptValue>,
+        budgets: Vec<Budget>,
+        sources: Vec<String>,
+    }
+
+    #[cfg(feature = "scripts")]
+    impl ValueEngine for Scripted {
+        fn set_global(&mut self, name: &str, value: ScriptValue) -> Result<(), ValueError> {
+            self.globals.insert(name.into(), value);
+            Ok(())
+        }
+        fn register(&mut self, _: &str, _: usize, _: HostFunction) -> Result<(), ValueError> {
+            Ok(())
+        }
+        fn eval(&mut self, source: &str, budget: Budget) -> Result<ScriptValue, ValueError> {
+            self.budgets.push(budget);
+            self.sources.push(source.into());
+            match source {
+                "yes" => Ok(ScriptValue::Bool(true)),
+                "no" => Ok(ScriptValue::Bool(false)),
+                "number" => Ok(ScriptValue::Int(1)),
+                "over" => Err(ValueError::Budget),
+                _ => Err(ValueError::Script(format!("cannot run {source}"))),
+            }
+        }
+    }
+
+    fn scripted(id: &str, priority: i32, source: &str, representation: Representation) -> Rule {
+        rule(
+            id,
+            priority,
+            Condition::Script {
+                source: source.into(),
+            },
+            representation,
+        )
+    }
+
+    #[cfg(feature = "scripts")]
+    #[test]
+    fn a_script_condition_wins_by_the_same_precedence_as_any_other() {
+        let set = rules(vec![
+            rule("base", 0, Condition::Always, Representation::Card),
+            scripted("by-script", 5, "yes", Representation::Sprite),
+            scripted("quiet", 9, "no", Representation::Glyph),
+        ]);
+        let mut engine = Scripted::default();
+        let resolved = set
+            .resolve_with_scripts(&context("a"), &mut engine)
+            .unwrap();
+        assert_eq!(
+            resolved.winners[&Property::Representation].rule_id,
+            "by-script"
+        );
+        assert!(resolved.matched_rules.contains("by-script"));
+        assert!(!resolved.matched_rules.contains("quiet"));
+        assert_eq!(resolved.traces[1].reason, "script: true");
+        // The budget is the fixed one, and only script rules reach the engine.
+        assert_eq!(engine.sources, ["yes", "no"]);
+        assert!(
+            engine
+                .budgets
+                .iter()
+                .all(|b| *b == Budget::Steps(SCRIPT_STEP_BUDGET))
+        );
+    }
+
+    #[cfg(feature = "scripts")]
+    #[test]
+    fn the_script_sees_the_occurrence() {
+        let mut item = context("node-7");
+        item.facts
+            .insert("mime".into(), Scalar::Text("image/png".into()));
+        item.facts.insert("weight".into(), Scalar::Number(2.5));
+        item.facts.insert("pinned".into(), Scalar::Bool(true));
+        item.states.insert(ViewState::Selected);
+        item.states.insert(ViewState::Overview);
+        item.previous_matches.insert("s".into());
+        let mut engine = Scripted::default();
+        rules(vec![scripted("s", 0, "yes", Representation::Card)])
+            .resolve_with_scripts(&item, &mut engine)
+            .unwrap();
+        let text = |s: &str| ScriptValue::Str(s.into());
+        assert_eq!(engine.globals["id"], text("node-7"));
+        assert_eq!(engine.globals["kind"], text("node"));
+        assert_eq!(
+            engine.globals["facts"],
+            ScriptValue::Map(BTreeMap::from([
+                ("mime".to_string(), text("image/png")),
+                ("pinned".to_string(), ScriptValue::Bool(true)),
+                ("weight".to_string(), ScriptValue::Float(2.5)),
+            ]))
+        );
+        assert_eq!(
+            engine.globals["states"],
+            ScriptValue::List(vec![text("selected"), text("overview")])
+        );
+        assert_eq!(engine.globals["screen_size"], ScriptValue::Float(100.0));
+        assert_eq!(
+            engine.globals["previously_matched"],
+            ScriptValue::Bool(true)
+        );
+        item.screen_size = None;
+        item.previous_matches.clear();
+        rules(vec![scripted("s", 0, "yes", Representation::Card)])
+            .resolve_with_scripts(&item, &mut engine)
+            .unwrap();
+        assert_eq!(engine.globals["screen_size"], ScriptValue::Unit);
+        assert_eq!(
+            engine.globals["previously_matched"],
+            ScriptValue::Bool(false)
+        );
+    }
+
+    #[cfg(feature = "scripts")]
+    #[test]
+    fn a_failing_script_leaves_its_rule_unmatched_and_the_rest_resolve() {
+        let set = rules(vec![
+            scripted("broken", 9, "boom", Representation::Glyph),
+            scripted("slow", 8, "over", Representation::Glyph),
+            scripted("wrong", 7, "number", Representation::Glyph),
+            rule("base", 0, Condition::Always, Representation::Card),
+        ]);
+        let resolved = set
+            .resolve_with_scripts(&context("a"), &mut Scripted::default())
+            .unwrap();
+        assert_eq!(resolved.winners[&Property::Representation].rule_id, "base");
+        let reasons: Vec<_> = resolved.traces.iter().map(|t| t.reason.as_str()).collect();
+        assert_eq!(reasons[0], "script: script error: cannot run boom");
+        assert_eq!(reasons[1], "script: the script ran past its budget");
+        assert_eq!(reasons[2], "script: returned int, wanted a bool");
+    }
+
+    #[cfg(feature = "scripts")]
+    #[test]
+    fn scripts_compose_inside_all_any_and_not() {
+        let set = rules(vec![rule(
+            "r",
+            0,
+            Condition::All {
+                conditions: vec![
+                    Condition::Always,
+                    Condition::Not {
+                        condition: Box::new(Condition::Script {
+                            source: "no".into(),
+                        }),
+                    },
+                ],
+            },
+            Representation::Card,
+        )]);
+        let resolved = set
+            .resolve_with_scripts(&context("a"), &mut Scripted::default())
+            .unwrap();
+        assert!(resolved.matched_rules.contains("r"));
+    }
+
+    #[test]
+    fn without_an_engine_a_set_with_a_script_is_refused() {
+        let set = rules(vec![
+            rule("base", 0, Condition::Always, Representation::Card),
+            scripted("s", 1, "yes", Representation::Sprite),
+        ]);
+        let issues = set.resolve(&context("a")).unwrap_err();
+        assert_eq!(issues[0].field, "rules[1].condition");
+        assert!(issues[0].message.contains("script engine"));
+        // A set without one resolves as it always did.
+        assert!(
+            rules(vec![rule("b", 0, Condition::Always, Representation::Card)])
+                .resolve(&context("a"))
+                .is_ok()
+        );
+    }
+
+    #[test]
+    fn script_conditions_validate_and_round_trip() {
+        assert!(
+            rules(vec![scripted("s", 0, "  ", Representation::Card)])
+                .validate()
+                .is_err()
+        );
+        let long = "1".repeat(MAX_SCRIPT_BYTES + 1);
+        assert!(
+            rules(vec![scripted("s", 0, &long, Representation::Card)])
+                .validate()
+                .is_err()
+        );
+        let set = rules(vec![scripted(
+            "s",
+            0,
+            "facts.weight > 2.0",
+            Representation::Card,
+        )]);
+        assert!(set.validate().is_ok());
+        let json = serde_json::to_string(&set).unwrap();
+        assert!(json.contains(r#""kind":"script""#));
+        assert_eq!(serde_json::from_str::<RuleSet>(&json).unwrap(), set);
     }
 }

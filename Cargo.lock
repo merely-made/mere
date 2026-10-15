@@ -2199,6 +2199,7 @@ dependencies = [
  "egui",
  "egui-wgpu",
  "epaint",
+ "genet-document-resources",
  "genet-livery",
  "genet-render",
  "genet-render-host",
@@ -8764,7 +8765,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=c487a7c256421d7c3d4335b9f8b442d6a1173edd#c487a7c256421d7c3d4335b9f8b442d6a1173edd"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8772,7 +8773,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=c487a7c256421d7c3d4335b9f8b442d6a1173edd#c487a7c256421d7c3d4335b9f8b442d6a1173edd"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8792,7 +8793,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=c487a7c256421d7c3d4335b9f8b442d6a1173edd#c487a7c256421d7c3d4335b9f8b442d6a1173edd"
 dependencies = [
  "cambium",
  "illume",
@@ -8808,7 +8809,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=c487a7c256421d7c3d4335b9f8b442d6a1173edd#c487a7c256421d7c3d4335b9f8b442d6a1173edd"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8878,7 +8879,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=c487a7c256421d7c3d4335b9f8b442d6a1173edd#c487a7c256421d7c3d4335b9f8b442d6a1173edd"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8891,7 +8892,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=a27911ada2f7c5b88ac9b3d05de80bc61040fc8b#a27911ada2f7c5b88ac9b3d05de80bc61040fc8b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=c487a7c256421d7c3d4335b9f8b442d6a1173edd#c487a7c256421d7c3d4335b9f8b442d6a1173edd"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -15356,6 +15357,7 @@ version = "0.0.4"
 dependencies = [
  "mere-curation",
  "sceno",
+ "script-engine-api",
  "serde",
  "serde_json",
 ]
@@ -15432,8 +15434,13 @@ dependencies = [
 name = "script-rhai"
 version = "0.0.1"
 dependencies = [
+ "getrandom 0.3.4",
  "inker",
+ "libm",
  "rhai",
+ "scenograph",
+ "script-engine-api",
+ "wasm-bindgen",
 ]
 
 [[package]]
