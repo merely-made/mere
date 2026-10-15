@@ -231,9 +231,11 @@ Each names its evidence; a later phase may correct one.
   mismatches. So Qwen2 and 2.5 load without their q/k/v biases, Qwen3 8B and
   14B load without QK-norm, Gemma 2B runs GELU as SiLU, Llama 3.1 and later
   ignore `rope_scaling`, and Mistral v0.1 ignores its sliding window past
-  4,096 tokens: each produces wrong output with no error.
+  4,096 tokens: each produces wrong output with no error. *Fixed
+  2026-10-15:* I2's strictness step now refuses these by name (§7).
 - **Coverage by family** (a model family "runs" only with a
-  reference-matched row):
+  reference-matched row; "Today" was the state before the 2026-10-15
+  strictness step, after which every row but the first is refused by name):
 
   | Family | Today | Gap |
   |---|---|---|
@@ -676,3 +678,22 @@ Stop and record the reason if any of these happen:
   weights and quadratic prefill memory. R9, R10 and R12 and the done-conditions
   of I2, I3, I6, I7 and I9 now carry what it found; making the decoder refuse
   what it cannot run is part of I2.
+- **2026-10-15, I2 strictness step landed.** The decoder now refuses, with a
+  typed `InferError::Unsupported { feature, detail }` naming the config field
+  or tensor: a `model_type` other than `llama` or an `architectures` entry
+  other than `LlamaForCausalLM` (absent fields are allowed, for synthetic
+  configs); `text_config` nesting; non-null `rope_scaling`;
+  `partial_rotary_factor` other than 1; an explicit `head_dim` that differs
+  from hidden / heads; `attention_bias` or `mlp_bias` true; a `sliding_window`
+  shorter than the context unless `use_sliding_window` is false;
+  `hidden_act` or `hidden_activation` other than SiLU; logit soft-capping;
+  any expert count. The loader refuses any tensor it would not read (biases,
+  QK-norm, experts, extra norms, layers beyond the config), tolerating only
+  RoPE `inv_freq` buffers. Nineteen new unit tests cover the refusals and
+  the real Llama-block fields; esp's 83 inference tests, its Eidetic corridor
+  and trainer-forcing tests, and Distillery's trainer mesh-job test pass on
+  CPU. The real SmolLM2-135M-Instruct config and all 272 of its tensors
+  satisfy the rules (checked from its header on O-PC); the real TinyLlama
+  tests were not run here (no checkpoint on this machine). Mistral
+  7B v0.2 and v0.3, which would compute correctly, are refused too until a
+  reference-matched row adds `mistral`.
