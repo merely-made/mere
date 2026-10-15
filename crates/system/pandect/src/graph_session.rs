@@ -1711,6 +1711,23 @@ impl<B: Backend> GraphSession<B> {
     }
 }
 
+/// The name a fork carries, so it never reads as its parent (the fork of
+/// "Session" was a second "Session"): the parent's name without an earlier
+/// fork's suffix, or `Session`, and the parent it was forked from, such as
+/// `Session (fork of Session)`. It matches how a session opened from a
+/// codicil names its source
+/// ([`opened_codicil_session_name`](crate::graph_codicil::opened_codicil_session_name)).
+pub fn forked_session_name(parent: Option<&str>) -> String {
+    let parent = parent.unwrap_or("Session");
+    let base = parent
+        .strip_suffix(')')
+        .and_then(|inner| inner.find(" (fork of "))
+        .map(|at| &parent[..at])
+        .filter(|base| !base.is_empty())
+        .unwrap_or(parent);
+    format!("{base} (fork of {parent})")
+}
+
 /// The graph a component fork starts from: the connected component around
 /// `seed`, copied with its facets through the id remap, and the donor
 /// container's scene settings carried to the fork's container. The
@@ -1959,7 +1976,9 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
         manifest.parent_session = Some(parent.id());
         manifest.forked_at = Some(at.0);
-        manifest.display_name = parent.manifest().display_name.clone();
+        manifest.display_name = Some(forked_session_name(
+            parent.manifest().display_name.as_deref(),
+        ));
         manifest.source_codicil = parent.manifest().source_codicil.clone();
         let mut session = GraphSession::new(
             self.backend.clone(),
@@ -4010,6 +4029,31 @@ mod tests {
 
             let fork = mere.fork_at(&parent, Seq(1), knot()).await.unwrap();
             assert_eq!(fork.parent_session, Some(parent_id));
+            assert_eq!(
+                fork.display_name.as_deref(),
+                Some("parent (fork of parent)"),
+                "a fork never reads as its parent"
+            );
+            let unnamed = mere.mint(person(), None).await.unwrap();
+            let unnamed = mere.open(unnamed.session_id).await.unwrap();
+            let unnamed_fork = mere
+                .fork_at(&unnamed, unnamed.journal().live_cursor(), knot())
+                .await
+                .unwrap();
+            assert_eq!(
+                unnamed_fork.display_name.as_deref(),
+                Some("Session (fork of Session)")
+            );
+            let refork = mere.open(unnamed_fork.session_id).await.unwrap();
+            assert_eq!(
+                mere.fork_at(&refork, refork.journal().live_cursor(), knot())
+                    .await
+                    .unwrap()
+                    .display_name
+                    .as_deref(),
+                Some("Session (fork of Session (fork of Session))"),
+                "a fork of a fork keeps one base and names its own parent"
+            );
             assert_eq!(fork.forked_at, Some(1));
             let mut fork = mere.open(fork.session_id).await.unwrap();
             assert_eq!(
