@@ -308,6 +308,7 @@ where
                 options.presentation_choice,
                 &*options.netrender,
                 &mut factory,
+                options.wgpu_portable_scene,
             )
             .await?;
             // A selected route is a fresh private device or context, not yet

@@ -1,0 +1,287 @@
+{
+  "date": "2026-10-14",
+  "host": "ThinkPad, AMD Radeon (Renoir)",
+  "B_scale_parity": {
+    "change": "Browser WebGPU presents the same materialized portable scene as direct WebGL2 (HostOptions.wgpu_portable_scene, WgpuDriver::with_portable_scene); the graph producer scene is composed in the page pass with no intermediate texture or bilinear resample. Graphshell opts in; its GPU-physics device binding moved to the frame hook.",
+    "contracts_unchanged": [
+      "webgl-webgpu-comparison-contract.json",
+      "fractional-comparison-contract.json"
+    ],
+    "normal_scale": [
+      {
+        "name": "before-loss",
+        "rgb_rms": 0.252248907772846,
+        "max_rgb_delta": 11,
+        "max_alpha_delta": 0,
+        "size": [
+          801,
+          641
+        ],
+        "pass": true
+      },
+      {
+        "name": "after-restore",
+        "rgb_rms": 0.2998776305735631,
+        "max_rgb_delta": 11,
+        "max_alpha_delta": 0,
+        "size": [
+          801,
+          641
+        ],
+        "pass": true
+      },
+      {
+        "name": "odd-resize",
+        "rgb_rms": 0.2990367174098147,
+        "max_rgb_delta": 11,
+        "max_alpha_delta": 0,
+        "size": [
+          803,
+          643
+        ],
+        "pass": true
+      }
+    ],
+    "fractional_1_25": [
+      {
+        "name": "before-loss",
+        "rgb_rms": 0.257782983247666,
+        "max_rgb_delta": 11,
+        "max_alpha_delta": 0,
+        "size": [
+          1001,
+          801
+        ],
+        "pass": true
+      },
+      {
+        "name": "after-restore",
+        "rgb_rms": 0.331799499462728,
+        "max_rgb_delta": 11,
+        "max_alpha_delta": 0,
+        "size": [
+          1001,
+          801
+        ],
+        "pass": true
+      },
+      {
+        "name": "odd-resize",
+        "rgb_rms": 0.3284839819955044,
+        "max_rgb_delta": 11,
+        "max_alpha_delta": 0,
+        "size": [
+          1004,
+          804
+        ],
+        "pass": true
+      }
+    ],
+    "before": {
+      "fractional_rgb_rms": [
+        1.26451,
+        1.19021,
+        0.5431
+      ],
+      "normal_rgb_rms": [
+        0.25225,
+        0.29989,
+        0.29905
+      ]
+    },
+    "comparator": "../integration-20261014/compare.py"
+  },
+  "browser": {
+    "chrome-webgl2": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (radeonsi renoir ACO), OpenGL ES 3.2)"
+      },
+      "policy": {
+        "backend": "webgl2",
+        "disable_webgpu": false,
+        "force_context_loss": true,
+        "angle": null
+      },
+      "bundle_sha256": "08df500fe6afedde4db9f614b4a1974890e800acb3e3d138e36546d6be949b23"
+    },
+    "chrome-auto-nowebgpu": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (radeonsi renoir ACO), OpenGL ES 3.2)"
+      },
+      "policy": {
+        "backend": "auto",
+        "disable_webgpu": true,
+        "force_context_loss": true,
+        "angle": null
+      },
+      "bundle_sha256": "08df500fe6afedde4db9f614b4a1974890e800acb3e3d138e36546d6be949b23"
+    },
+    "chrome-webgpu": {
+      "result": "pass",
+      "controls": 26,
+      "renderer": null,
+      "policy": {
+        "backend": "webgpu",
+        "disable_webgpu": false,
+        "force_context_loss": false,
+        "angle": null
+      },
+      "bundle_sha256": "08df500fe6afedde4db9f614b4a1974890e800acb3e3d138e36546d6be949b23"
+    },
+    "firefox-webgl2": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "AMD",
+        "renderer": "Radeon HD 3200 Graphics, or similar"
+      },
+      "policy": {
+        "backend": "webgl2",
+        "disable_webgpu": false,
+        "force_context_loss": true,
+        "angle": null
+      },
+      "bundle_sha256": "08df500fe6afedde4db9f614b4a1974890e800acb3e3d138e36546d6be949b23"
+    },
+    "chrome-swiftshader": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "Google Inc. (Google)",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+      },
+      "policy": {
+        "backend": "webgl2",
+        "disable_webgpu": false,
+        "force_context_loss": true,
+        "angle": "swiftshader"
+      },
+      "bundle_sha256": "08df500fe6afedde4db9f614b4a1974890e800acb3e3d138e36546d6be949b23"
+    }
+  },
+  "physics_device_note": "The read-only viewer is built without canvas-gpu; physics-device reports off on WebGPU both before and after this change. The full default page compiles with the frame-hook binding but was not browser-verified here.",
+  "native_tests": {
+    "cambium-rootstock + mesquite + winit host + web host": "337 passed, 0 failed, 11 ignored",
+    "web host --features webgl portable_presentation": "5 passed",
+    "graphshell": "513 passed, 0 failed, 7 ignored"
+  },
+  "A_delivery": {
+    "wasm": {
+      "raw_bytes": 10730660,
+      "gzip6_bytes": 3661762,
+      "gzip9_bytes": 3615657,
+      "cap_bytes": 3407872,
+      "cap_pass": false
+    },
+    "glue": {
+      "raw_bytes": 68799,
+      "gzip6_bytes": 18446,
+      "gzip9_bytes": 18823,
+      "cap_bytes": 20480,
+      "cap_pass": true
+    },
+    "mount": {
+      "raw_bytes": 998,
+      "gzip6_bytes": 592,
+      "gzip9_bytes": 590,
+      "cap_bytes": 8192,
+      "cap_pass": true
+    },
+    "history": {
+      "raw_bytes": 271932,
+      "gzip6_bytes": 6490,
+      "gzip9_bytes": 6292,
+      "cap_bytes": 131072,
+      "cap_pass": true
+    }
+  },
+  "A_attribution": {
+    "method": "viewer profile rebuilt with CARGO_PROFILE_VIEWER_STRIP=none; wasm_sizes.py attributes code-section bytes to demangled names; pre-merge main 189df27bc built the same way",
+    "premerge_gzip6": 3394183,
+    "merged_gzip6": 3662979,
+    "cap": 3407872,
+    "gap_after_B": 253890,
+    "code_bytes": {
+      "premerge": 8282850,
+      "merged": 9428000
+    },
+    "functions": {
+      "premerge": 21467,
+      "merged": 23553
+    },
+    "growth_by_crate_top": [
+      [
+        "genet_livery",
+        219009
+      ],
+      [
+        "taffy",
+        117994
+      ],
+      [
+        "vello_common",
+        113261
+      ],
+      [
+        "core",
+        86347
+      ],
+      [
+        "read_fonts",
+        80316
+      ],
+      [
+        "netrender",
+        73029
+      ],
+      [
+        "vello_gpu",
+        67910
+      ],
+      [
+        "skrifa",
+        49815
+      ],
+      [
+        "paint_list_render",
+        39568
+      ],
+      [
+        "cambium_genet_web_host",
+        37951
+      ],
+      [
+        "buckram",
+        35582
+      ],
+      [
+        "glifo",
+        26025
+      ],
+      [
+        "fearless_simd",
+        24814
+      ],
+      [
+        "cambium_rootstock",
+        20735
+      ]
+    ],
+    "duplication_estimates_gzip6": {
+      "genet_livery InlineMeasure layout/Taffy instantiation (Genet)": 113271,
+      "outline pens to one (Netrender CountingPen, Vello fork glifo/encoding pens, ControlBoundsPen)": 55945,
+      "Netrender CountingPen alone": 12108
+    },
+    "notes": [
+      "Taffy grid/flex solvers are instantiated per genet_livery measure type (TextMeasure, InlineMeasure); under fat LTO the InlineMeasure copies doubled (138,761 -> 272,830 raw) with the merge.",
+      "Skrifa/read-fonts CFF and glyf outline code is instantiated once per pen type: six pens at ~47 KB each.",
+      "The WebGL2 renderer stack (vello_common, vello_gpu, fearless_simd fallback, glifo, Netrender WebGL session) is the added capability itself."
+    ]
+  }
+}
