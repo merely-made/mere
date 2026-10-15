@@ -19,7 +19,7 @@
 
 $ErrorActionPreference = "Stop"
 $bin = "$env:LOCALAPPDATA\personae\bin"
-$mere = (Resolve-Path "$PSScriptRoot\..\..").Path
+$mere = (Resolve-Path "$PSScriptRoot\..\..\..").Path
 
 Write-Host "building the personae bins (castellan, release, agent feature) from $mere"
 Push-Location $mere
