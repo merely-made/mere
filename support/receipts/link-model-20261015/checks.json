@@ -1,13 +1,13 @@
 {
   "kind": "bounded_link_reading_and_cpu_path_probe",
   "date": "2026-10-15",
-  "tested_source_commit": "339a86c9e52dcd7985c364ae7ff569fa88cc54e9",
-  "upstream_basis": "39035965aa5c98c368eff58bc404e9d150034e04",
-  "cargo_lock_sha256": "fe99ebf279d7cacd32ac46ed19c56564fc2084f62eddb23f04b9ea5b9b44528d",
+  "tested_source_commit": "4f4678522cfb1bbf64655ddbd44cb7fa18919de6",
+  "upstream_basis": "2d0d38f7c4f414e802c44e918ca0db41b03ed153",
+  "cargo_lock_sha256": "9010098bb784f8ee3e52378a1cef248838537941109ef9ef2282c4f940802b82",
   "source_files_sha256": {
     "crates/cambium/scenes/scenograph/src/lib.rs": "921494c0de389cc417812e03e2c67b145fd7b6ac7ec23f7bea1910f8b7145891",
     "crates/cambium/scenes/scenograph/src/link.rs": "b203b70c81643430220332b1b3502767779364af22587aec17717f778cf2865f",
-    "crates/canvas/pictograph/src/canvas.rs": "ea3a43f191f244162d001517c7d49ac8f061b3368ab9008248acce5ced748015",
+    "crates/canvas/pictograph/src/canvas.rs": "3790d533c672615a3d187e822cc9f50fbfda36a3e5e068fa4917b1256bb4acd4",
     "crates/canvas/pictograph/src/canvas/link_reading.rs": "c232d564177458894889274fe8d92085f9c9a161eef09270496d5920e5f03676",
     "crates/canvas/pictograph/src/canvas/link_reading_tests.rs": "97aca3620d8783d131c2e2b23082cb212700aa9884f90160fcb74282f5148baa",
     "crates/canvas/pictograph/src/canvas/relationship_topology.rs": "0459471603765396fe449d4276199891f85a57cf059f3b2b17277ccb19113fe1",
@@ -55,7 +55,7 @@
       ],
       "exit_code": 0,
       "test_summaries": [
-        "test result: ok. 431 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s",
+        "test result: ok. 432 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s",
         "test result: ok. 75 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
         "test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
         "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
@@ -78,7 +78,7 @@
       ],
       "exit_code": 0,
       "test_summaries": [
-        "test result: ok. 448 passed; 0 failed; 18 ignored; 0 measured; 0 filtered out; finished in 32.52s"
+        "test result: ok. 457 passed; 0 failed; 18 ignored; 0 measured; 0 filtered out; finished in 29.67s"
       ]
     },
     {
@@ -122,7 +122,7 @@
     }
   ],
   "qualification": {
-    "passed_tests": 1056,
+    "passed_tests": 1066,
     "ignored_pictograph_release_or_probe_tests": 18,
     "p1_phase_acceptance": false,
     "p5_phase_acceptance": false,
@@ -145,7 +145,7 @@
     "P5 real-link host adapter, bounded Graphshell fixture and reviewed dynamics captures."
   ],
   "documentation_audits": {
-    "comparison_baseline": "39035965aa5c98c368eff58bc404e9d150034e04",
+    "comparison_baseline": "2d0d38f7c4f414e802c44e918ca0db41b03ed153",
     "active_doc_counts": {
       "active_docs": 285,
       "indexed_active_docs": 284,
@@ -176,5 +176,12 @@
     "judgment_errors_identical_to_upstream": true,
     "existing_uncovered_documents": 14,
     "existing_snapshot_digest_mismatch": true
+  },
+  "previous_qualification": {
+    "receipt_commit": "34027873fdfd6ff03c92d32e405ea49af269198f",
+    "tested_source_commit": "339a86c9e52dcd7985c364ae7ff569fa88cc54e9",
+    "upstream_basis": "39035965aa5c98c368eff58bc404e9d150034e04",
+    "passed_tests": 1056,
+    "reason_for_requalification": "Upstream native multi-fold integration changed Pictograph and kernel dependencies."
   }
 }
