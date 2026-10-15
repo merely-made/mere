@@ -9,7 +9,6 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use personae::Ed25519Keypair;
 use insigne::DerivedKeyAttestation;
 use mesh::{
     BlobSink, BlobSource, DevicePolicy, HostFacts, HostOffer, JobControl, JobId, LeaseId,
@@ -19,6 +18,7 @@ use mesh::{
     spec::CheckpointClass,
 };
 use muniment::Backend;
+use personae::Ed25519Keypair;
 
 use crate::mesh_host::courier::{BlobCourier, NoCourier, deliver_inputs};
 use crate::mesh_host::inflight::{InFlight, Reclaiming, RunOutcome, release_reason, still_held};
@@ -151,6 +151,7 @@ pub struct MeshHost<B: Backend + Clone + Send + Sync + 'static> {
     me: [u8; 32],
     config: HostConfig,
     inflight: BTreeMap<JobId, InFlight>,
+    gpu: Option<crate::gpu::GpuAccess>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
@@ -162,6 +163,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             me,
             config,
             inflight: BTreeMap::new(),
+            gpu: None,
         }
     }
 
@@ -187,15 +189,30 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
         &self.config.policy
     }
 
-    /// What this device advertises about itself, as the composer installed it.
+    /// The composed device offer, with the GPU withdrawn while foreground
+    /// inference waits for or holds it.
     ///
     /// Exposed for the same reason [`policy`](Self::policy) is: a composition
     /// that claims it reached the supervisor is making a claim somebody has to
     /// be able to check. `HostFacts` decides which jobs this device will admit
     /// at all, so a receipt that asserts on the composed facts is asserting on
     /// the offer the ring actually sees.
-    pub fn facts(&self) -> &HostFacts {
-        &self.config.facts
+    pub fn facts(&self) -> HostFacts {
+        let mut facts = self.config.facts;
+        if self
+            .gpu
+            .as_ref()
+            .is_some_and(|gpu| gpu.foreground_requested())
+        {
+            facts.gpu = false;
+        }
+        facts
+    }
+
+    /// Compose the same ownership gate into the GPU resource and foreground
+    /// lane. CPU resources retain their normal admission and reclaim policy.
+    pub fn set_gpu_access(&mut self, gpu: crate::gpu::GpuAccess) {
+        self.gpu = Some(gpu);
     }
 
     /// Replace the owner's settings. The new policy governs the very next tick:
@@ -264,6 +281,14 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
         for (_, flight) in inflight {
             let _ = flight.task.await;
         }
+        // Aborting an async job cannot abort its spawn_blocking worker. A
+        // cancelled GPU trainer releases this guard only after its tensors
+        // drop and the device synchronizes. Include lost-lease workers too.
+        if let Some(gpu) = &self.gpu {
+            while gpu.is_occupied() {
+                tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+            }
+        }
         self.synced.leave().await?;
         Ok(())
     }
@@ -287,7 +312,29 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
     /// most one new action. Never awaits a job's execution.
     pub async fn tick(&mut self) -> Result<Vec<Step>, HostError> {
         let now_ms = self.config.clock.now_ms();
-        let mut steps = self.reap(now_ms).await?;
+        let mut steps = Vec::new();
+        if self
+            .gpu
+            .as_ref()
+            .is_some_and(|gpu| gpu.foreground_requested())
+        {
+            let board = self.synced.board().await?;
+            let jobs: Vec<_> = self
+                .inflight
+                .keys()
+                .filter_map(|job| {
+                    let spec = board.job(*job)?.spec.as_ref()?;
+                    let resource = self.config.registry.get(&spec.resource)?;
+                    (resource.descriptor().requires.compute == mesh::spec::ComputeClass::Gpu)
+                        .then_some((*job, spec.checkpoint))
+                })
+                .collect();
+            for (job, class) in jobs {
+                self.begin_reclaim(job, ReclaimReason::ForegroundActivity, class, now_ms);
+                steps.push(Step::AwaitingStop { job });
+            }
+        }
+        steps.extend(self.reap(now_ms).await?);
         let board = self.synced.board().await?;
         steps.extend(self.abandon_lost_leases(&board, now_ms));
         self.escalate_reclaims(now_ms);
@@ -298,15 +345,11 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             // talk the device past its own concurrency limit.
             conditions.running_jobs = self.inflight.len() as u32;
             let running: Vec<JobId> = self.inflight.keys().copied().collect();
-            let offer = HostOffer::new(
-                &self.config.registry,
-                self.config.facts,
-                &self.config.policy,
-            )
-            .at(now_ms)
-            .observing(conditions)
-            .running(&running)
-            .with_lease_policy(self.config.lease);
+            let offer = HostOffer::new(&self.config.registry, self.facts(), &self.config.policy)
+                .at(now_ms)
+                .observing(conditions)
+                .running(&running)
+                .with_lease_policy(self.config.lease);
             next_action(&board, &self.me, &offer)
         };
 
