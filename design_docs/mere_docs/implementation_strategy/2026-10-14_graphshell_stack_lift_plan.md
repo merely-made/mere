@@ -1162,3 +1162,23 @@ fast-forward of local main; nothing built).**
   --all-targets` and `cargo test` pass (942 passed, 10 ignored,
   `TMPDIR=/tmp`). Still open for P4: Cleromancy's receipt (it pins
   `graphshell` at `a1309431` and was not touched here).
+- **2026-10-15 (P2 leftover, L5: `canvas_physics` into pictograph):** the
+  arrangement and physics actions Graphshell's old page and tree panel share
+  are `pictograph::canvas::physics_controls` (`mere::canvas::physics_controls`):
+  `apply_physics`, `apply_profile`, `apply_arrangement`,
+  `advance_arrangement`, `ArrangementTransition`, `LawStart`,
+  `layout_line`, `framing_fields`, the picker catalogs and constants. Their
+  code is unchanged apart from paths. pictograph's `canvas` feature now
+  depends on `scenotime` (`sceno`, serde and serde_json only) for
+  `ProjectionClock`, `TransitionSchedule`, `SceneOp` and `SceneSnapshot`.
+  Seven tests that need only `Canvas::with_sample_graph` moved with the
+  module. The six that open `GraphshellApp`'s reference fixture (the P2
+  fixture's Kinds and Orbit bars and two diagnostics) stay with the host as
+  `ports/graphshell/src/canvas_physics_tests.rs`. Graphshell's module is
+  deleted with no re-export; `local_scene`, `forme_session_lifecycle_tests`
+  and `web_tree` (`lane`, `physics`, `product/scenes`) import the new path.
+  `canvas_reader` stays in the port until a host needs it. Checks
+  (`TMPDIR=/tmp`): pictograph (`canvas`) lib 446 passed, 18 ignored, and it
+  checks for wasm32; `graphshell` lib 365 passed, 6 ignored, the moved host
+  tests among them (2 passed, 4 ignored); `graphshell-web` checks for wasm32 (its lockfile, like the root's, gains only pictograph's `scenotime` row); the boundary
+  script passes.
