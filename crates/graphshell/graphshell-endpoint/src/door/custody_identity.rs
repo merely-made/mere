@@ -40,10 +40,10 @@ use personae::{
     Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider, ProfileId, RetainedKeys,
 };
 
-use crate::native::app_admission::{AppId, configured_app_endpoint};
-use crate::native::app_client::AppClientError;
-use crate::native::custody::{CustodyAnswer, CustodyCall, KeySource, ResidentStatus};
-use crate::native::custody_client::{BlockingCustodyClient, CustodyClient, CustodyClientError};
+use crate::door::app_admission::{AppId, configured_app_endpoint};
+use crate::door::app_client::AppClientError;
+use crate::door::custody::{CustodyAnswer, CustodyCall, KeySource, ResidentStatus};
+use crate::door::custody_client::{BlockingCustodyClient, CustodyClient, CustodyClientError};
 
 type Job = Box<dyn FnOnce(Option<&mut BlockingCustodyClient>) -> bool + Send>;
 
@@ -124,7 +124,7 @@ impl CustodyIdentity {
             .filter(|_| status.lock == VaultLockView::Unlocked)
         else {
             return Err(CustodyClientError::Refused(
-                crate::native::custody::CustodyRefusal::Locked,
+                crate::door::custody::CustodyRefusal::Locked,
             ));
         };
         let master = Ed25519PublicKey::from_bytes(&master).map_err(CustodyClientError::Release)?;

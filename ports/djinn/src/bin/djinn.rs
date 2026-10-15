@@ -47,21 +47,23 @@ use djinn::resident_status::{
 use djinn::settings::{self as owner_settings, SyncOverrides};
 use djinn::startup_vault;
 use graphshell::browser_carrier::AllowedExtensions;
-use graphshell::identity::{VaultLockView, VaultProtectionView};
-use graphshell::native::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
-    default_app_endpoint,
-};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::AppBrokerClient;
 #[cfg(feature = "personal-sync")]
 use graphshell::native::device_broker::serve_browser_broker_with_cards;
 use graphshell::native::device_broker::{
     configured_device_endpoint, default_device_endpoint, serve_browser_broker,
 };
 #[cfg(feature = "personal-sync")]
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
-use graphshell::native::tasks::ResidentTasks;
+use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
+use graphshell_endpoint::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
+    default_app_endpoint,
+};
+use graphshell_endpoint::door::app_client::AppBrokerClient;
+use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
+#[cfg(feature = "personal-sync")]
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_endpoint::door::tasks::ResidentTasks;
 use personae::{ProfileId, default_vault_dir};
 use serde_json::json;
 use ssh_agent_lib::agent::listen;

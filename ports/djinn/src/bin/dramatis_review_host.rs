@@ -16,12 +16,12 @@ use djinn::{
 };
 use graphshell::{
     browser_carrier::NativeIdentityFailure,
+    native::app_broker::{AppEndpointCatalog, serve_app_broker},
+};
+use graphshell_endpoint::door::{
+    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
+    custody_client::CustodyClient,
     identity::VaultProtectionView,
-    native::{
-        app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-        app_broker::{AppEndpointCatalog, serve_app_broker},
-        custody_client::CustodyClient,
-    },
 };
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use serde_json::json;

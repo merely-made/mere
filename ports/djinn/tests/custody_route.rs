@@ -15,11 +15,11 @@ use std::time::Duration;
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
 use djinn::keeper::Keeper;
-use graphshell::identity::{VaultLockView, VaultProtectionView};
-use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
-use graphshell::native::custody_client::{CustodyClient, CustodyClientError};
+use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
+use graphshell_endpoint::door::custody_client::{CustodyClient, CustodyClientError};
+use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
 use personae::{Ed25519Keypair, IdentityProvider, ProfileId};
 use uuid::Uuid;
 
@@ -135,7 +135,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
 
     // Signing happens inside djinn: the signature verifies under the derived
     // key, which never crossed.
-    let session = graphshell::profile::session_salt("receipt");
+    let session = graphshell_endpoint::door::profile::session_salt("receipt");
     let (public_key, signature) = client
         .sign(
             KeySource::Persona,

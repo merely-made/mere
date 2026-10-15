@@ -4844,7 +4844,7 @@ dependencies = [
  "cambium-genet-winit-host",
  "chatelaine",
  "dramatis",
- "graphshell",
+ "graphshell-endpoint",
  "image",
  "luggage",
  "mere-persona-picker",
@@ -6979,7 +6979,6 @@ dependencies = [
  "url",
  "uuid",
  "wgpu",
- "windows-sys 0.59.0",
  "workbench",
  "zeroize",
 ]
@@ -7007,12 +7006,24 @@ dependencies = [
 name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
+ "base64 0.22.1",
+ "chatelaine",
  "chirograph",
+ "dramatis",
+ "insigne",
+ "pandect",
+ "personae",
+ "rand_core 0.6.4",
  "sceno",
  "scenotime",
  "serde",
  "serde_json",
+ "thiserror 1.0.69",
  "tokio",
+ "tracing",
+ "uuid",
+ "windows-sys 0.59.0",
+ "zeroize",
 ]
 
 [[package]]
@@ -10001,7 +10012,7 @@ name = "mere-signalman"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "graphshell",
+ "graphshell-endpoint",
  "insigne",
  "outrider",
  "p2panda-core",

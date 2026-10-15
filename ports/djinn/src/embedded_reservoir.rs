@@ -24,11 +24,13 @@ use std::time::Duration;
 use castellan::authority::PersonaeHost;
 use castellan::custody::IdentityStorage;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
-use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::native::tasks::ResidentTasks;
+use graphshell_endpoint::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
+};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::tasks::ResidentTasks;
 use pandect::DomainId;
 use personae::{PersonaId, ProfileId};
 use sceno::InstanceId;
@@ -200,10 +202,10 @@ impl ReservoirAttachment {
                 .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
                 let protection = match choice {
                     crate::startup_vault::VaultChoice::Passphrase => {
-                        graphshell::identity::VaultProtectionView::Passphrase
+                        graphshell_endpoint::door::identity::VaultProtectionView::Passphrase
                     },
                     crate::startup_vault::VaultChoice::AutoOs => {
-                        graphshell::identity::VaultProtectionView::OsProtected
+                        graphshell_endpoint::door::identity::VaultProtectionView::OsProtected
                     },
                 };
                 let host = Arc::new(
@@ -527,7 +529,7 @@ impl EmbeddedOwner {
                     "resident stopped before listening".into(),
                 ));
             }
-            if graphshell::native::local_endpoint::connect_local(&options.endpoint)
+            if graphshell_endpoint::door::local_endpoint::connect_local(&options.endpoint)
                 .await
                 .is_ok()
             {

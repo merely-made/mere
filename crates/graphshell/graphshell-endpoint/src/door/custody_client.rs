@@ -29,9 +29,9 @@ use pandect::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::carry::DeviceGrantSet;
 use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, ProfileId, RetainedKeys};
 
-use crate::native::app_admission::{AppId, AppRouteId, configured_app_endpoint};
-use crate::native::app_client::{AppBrokerClient, AppClientError};
-use crate::native::custody::{
+use crate::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
+use crate::door::app_client::{AppBrokerClient, AppClientError};
+use crate::door::custody::{
     CUSTODY_ROUTE, CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource,
     ReleasedEpochKey, ResidentStatus, StationGrantRequest,
 };
@@ -122,7 +122,7 @@ impl CustodyClient {
     /// The resident's secret-free quarantine cards.
     pub async fn unassigned_imports(
         &mut self,
-    ) -> Result<Vec<crate::native::quarantine::UnassignedImport>, CustodyClientError> {
+    ) -> Result<Vec<crate::door::quarantine::UnassignedImport>, CustodyClientError> {
         match self.call(CustodyCall::UnassignedImports).await? {
             CustodyAnswer::UnassignedImports { imports } => Ok(imports),
             other => Err(mismatch("unassigned_imports", &other)),
@@ -130,14 +130,14 @@ impl CustodyClient {
     }
     pub async fn assign_import(
         &mut self,
-        request: crate::native::quarantine::AssignImportRequest,
+        request: crate::door::quarantine::AssignImportRequest,
     ) -> Result<(), CustodyClientError> {
         expect_done(self.call(CustodyCall::AssignImport(request)).await?)
     }
     pub async fn quarantine(
         &mut self,
         profile: ProfileId,
-    ) -> Result<Vec<crate::native::quarantine::QuarantineCard>, CustodyClientError> {
+    ) -> Result<Vec<crate::door::quarantine::QuarantineCard>, CustodyClientError> {
         match self.call(CustodyCall::Quarantine { profile }).await? {
             CustodyAnswer::Quarantine { cards } => Ok(cards),
             other => Err(mismatch("quarantine", &other)),
@@ -146,7 +146,7 @@ impl CustodyClient {
     /// Request a decision, approved only by the resident's own native UI.
     pub async fn review_quarantine(
         &mut self,
-        request: crate::native::quarantine::ReviewRequest,
+        request: crate::door::quarantine::ReviewRequest,
     ) -> Result<(), CustodyClientError> {
         expect_done(self.call(CustodyCall::ReviewQuarantine(request)).await?)
     }
@@ -503,7 +503,7 @@ mod tests {
     use personae::{IdentityProvider, InMemoryProvider};
 
     use super::*;
-    use crate::native::custody::ReleasedKey;
+    use crate::door::custody::ReleasedKey;
 
     fn release_of(provider: &InMemoryProvider, salts: &[&[u8]]) -> CustodyAnswer {
         CustodyAnswer::Released {

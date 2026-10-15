@@ -18,7 +18,7 @@
 //! Graphshell opens no vault. Its session keys are namespaced derived keys
 //! djinn releases on the custody route, each with the master's attestation;
 //! the master never leaves djinn. With djinn absent or Locked the identity is
-//! pending ([`crate::native::custody_client::CustodyClientError::is_pending`]),
+//! pending ([`crate::door::custody_client::CustodyClientError::is_pending`]),
 //! never a key of Graphshell's own: a peer pins the key it reached, and a
 //! silently different one is indistinguishable from an impostor. The vault
 //! and the profile selection this module once held moved to djinn in DR-C.
@@ -36,8 +36,8 @@ use insigne::DerivedKeyAttestation;
 use personae::vault::ProfileId;
 use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider, RetainedKeys};
 
-use crate::native::custody::{CustodyRefusal, KeySource};
-use crate::native::custody_client::{CustodyClient, CustodyClientError};
+use crate::door::custody::{CustodyRefusal, KeySource};
+use crate::door::custody_client::{CustodyClient, CustodyClientError};
 
 pub const PROFILE_ENV: &str = "GRAPHSHELL_PROFILE";
 
