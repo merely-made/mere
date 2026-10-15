@@ -75,12 +75,73 @@ pub const MINT_SESSION_INTENT: &str = "mere.sessions.mint";
 pub const ATTACH_SESSION_INTENT: &str = "mere.sessions.attach";
 /// Fork a session at its live cursor.
 pub const FORK_SESSION_INTENT: &str = "mere.sessions.fork";
+/// Branch a session at its live cursor: a copy meant to merge back.
+pub const BRANCH_SESSION_INTENT: &str = "mere.sessions.branch";
+/// Merge a branch or picked-off session back into the session it came from.
+/// A clean merge applies at once; one with conflicts becomes a pending merge.
+pub const MERGE_SESSION_INTENT: &str = "mere.sessions.merge";
 /// Put a session in the trash.
 pub const TRASH_SESSION_INTENT: &str = "mere.sessions.trash";
 /// Take a session back out of the trash.
 pub const RESTORE_SESSION_INTENT: &str = "mere.sessions.restore";
 /// Schema of [`SessionsActionV1`].
 pub const SESSIONS_SCHEMA: &str = "mere.sessions/v1";
+
+/// The scene source kind of a pending merge's card in the sessions
+/// projection, keyed by the source session's id. Its card's first media
+/// resource is the [`PendingMergeV1`].
+pub const MERGE_SOURCE: &str = "mere.merge";
+/// Apply a pending merge with a choice for each conflict.
+pub const RESOLVE_MERGE_INTENT: &str = "mere.merge.resolve";
+/// Drop a pending merge, writing nothing.
+pub const CANCEL_MERGE_INTENT: &str = "mere.merge.cancel";
+/// Schema of [`MergeResolutionV1`].
+pub const MERGE_SCHEMA: &str = "mere.merge/v1";
+/// Schema of [`PendingMergeV1`].
+pub const PENDING_MERGE_SCHEMA: &str = "mere.merge.pending/v1";
+
+/// A pending merge as its card's media discloses it: which session merges
+/// into which, and each conflict with its three values (session merge-in
+/// note, M5).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PendingMergeV1 {
+    pub schema: String,
+    pub source: SessionId,
+    pub source_name: String,
+    pub target: SessionId,
+    pub target_name: String,
+    pub conflicts: Vec<pandect::MergeConflict>,
+}
+
+/// One conflict's choice, naming its part.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MergeChoiceV1 {
+    pub part: kernel::graph::Part,
+    pub choice: pandect::MergeChoice,
+}
+
+/// Payload of [`RESOLVE_MERGE_INTENT`] and [`CANCEL_MERGE_INTENT`]: the
+/// pending merge, by its source session, and the choices (none to cancel).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MergeResolutionV1 {
+    pub schema: String,
+    pub source: SessionId,
+    #[serde(default)]
+    pub choices: Vec<MergeChoiceV1>,
+}
+
+impl MergeResolutionV1 {
+    pub fn new(source: SessionId, choices: Vec<MergeChoiceV1>) -> Self {
+        Self {
+            schema: MERGE_SCHEMA.to_string(),
+            source,
+            choices,
+        }
+    }
+}
 
 /// The reservoir archive projection and source vocabulary.
 pub const MERE_ARCHIVE: &str = "djinn.mere/v1/archive";
@@ -227,7 +288,7 @@ pub struct SessionsActionV1 {
 }
 
 impl SessionsActionV1 {
-    /// A step on session `id`: attach, fork, trash or restore.
+    /// A step on session `id`: attach, fork, branch, merge, trash or restore.
     pub fn on(id: SessionId) -> Self {
         Self {
             schema: SESSIONS_SCHEMA.to_string(),

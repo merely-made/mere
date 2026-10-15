@@ -1786,3 +1786,186 @@ fn the_sheet_pins_the_rows_a_card_and_a_popover_are_measured_by() {
         expected
     );
 }
+
+#[test]
+fn branch_sits_beside_fork_and_merge_into_source_on_a_branch() {
+    let mut model = model();
+    model.sessions[1].steps = vec![
+        SessionStep::Switch,
+        SessionStep::Fork,
+        SessionStep::Branch,
+        SessionStep::Merge,
+        SessionStep::Trash,
+    ];
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let evening =
+            find(&dom, root, "data-session", &Uuid::from_u128(2).to_string()).expect("2");
+        let mut steps = Vec::new();
+        find_all(&dom, evening, "data-step", &mut steps);
+        let tokens: Vec<_> = steps.iter().map(|&s| attr(&dom, s, "data-step")).collect();
+        assert_eq!(
+            tokens,
+            [
+                Some("switch"),
+                Some("fork"),
+                Some("branch"),
+                Some("merge"),
+                Some("trash")
+            ]
+        );
+    }
+    for label in ["Branch Evening reading", "Merge into source Evening reading"] {
+        let step = find(&dom.borrow(), root, "aria-label", label).expect(label);
+        runner.dispatch_click(step, PointerClick::at((1.0, 1.0)));
+    }
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Session(session_id(2), SessionStep::Branch),
+            MereViewRequest::Session(session_id(2), SessionStep::Merge),
+        ]
+    );
+}
+
+fn merge_model() -> MereViewModel {
+    let mut model = model();
+    model.merge = Some(MergeModel {
+        source: session_id(2),
+        source_name: "Evening reading".into(),
+        target_name: "Morning reading".into(),
+        conflicts: vec![
+            MergeConflictEntry {
+                key: "title-1".into(),
+                label: "Title of One".into(),
+                base: "One".into(),
+                source: "Branch".into(),
+                target: "Target".into(),
+                add_as_new: false,
+                chosen: None,
+            },
+            MergeConflictEntry {
+                key: "node-2".into(),
+                label: "Two".into(),
+                base: "Two".into(),
+                source: "Two, edited".into(),
+                target: String::new(),
+                add_as_new: true,
+                chosen: Some(MergeOption::Target),
+            },
+        ],
+    });
+    model
+}
+
+#[test]
+fn a_pending_merge_lists_each_conflict_with_its_choices_then_apply() {
+    let (dom, mut runner) = runner(Host::new(merge_model(), 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let card = find(
+            &dom,
+            root,
+            "aria-label",
+            "Pending merge: Evening reading into Morning reading",
+        )
+        .expect("merge card");
+        assert_eq!(attr(&dom, card, "data-resolved"), Some("false"));
+        let title = find(&dom, card, "data-key", "title-1").expect("conflict");
+        let words = text(&dom, title);
+        for want in ["Title of One", "Base: One", "Source: Branch", "Target: Target"] {
+            assert!(words.contains(want), "{words}");
+        }
+        assert_eq!(count(&dom, title, "data-choice", "add-as-new"), 0);
+        let vanished = find(&dom, card, "data-key", "node-2").expect("conflict");
+        assert!(text(&dom, vanished).contains("Target: absent"));
+        assert_eq!(attr(&dom, vanished, "data-chosen"), Some("target"));
+        assert!(find(&dom, vanished, "aria-label", "Add Two as new").is_some());
+        let target = find(&dom, vanished, "aria-label", "Keep the target's Two").unwrap();
+        assert_eq!(attr(&dom, target, "aria-pressed"), Some("true"));
+        let apply = find(&dom, card, "aria-label", "Apply merge").expect("apply");
+        assert_eq!(attr(&dom, apply, "aria-disabled"), Some("true"));
+    }
+    let apply = find(&dom.borrow(), root, "aria-label", "Apply merge").unwrap();
+    runner.dispatch_click(apply, PointerClick::at((1.0, 1.0)));
+    assert!(runner.state().requests.is_empty(), "nothing to apply yet");
+    for label in ["Take the source's Title of One", "Add Two as new", "Cancel merge"] {
+        let control = find(&dom.borrow(), root, "aria-label", label).expect(label);
+        runner.dispatch_click(control, PointerClick::at((1.0, 1.0)));
+    }
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Merge(MergeRequest::Choose(
+                "title-1".into(),
+                MergeOption::Source
+            )),
+            MereViewRequest::Merge(MergeRequest::Choose(
+                "node-2".into(),
+                MergeOption::AddAsNew
+            )),
+            MereViewRequest::Merge(MergeRequest::Cancel),
+        ]
+    );
+
+    let mut resolved = merge_model();
+    resolved.merge.as_mut().unwrap().conflicts[0].chosen = Some(MergeOption::Source);
+    let (dom, mut resolved) = self::runner(Host::new(resolved, 900, 600));
+    let root = resolved.root();
+    let apply = find(&dom.borrow(), root, "aria-label", "Apply merge").unwrap();
+    assert_eq!(attr(&dom.borrow(), apply, "aria-disabled"), None);
+    resolved.dispatch_click(apply, PointerClick::at((1.0, 1.0)));
+    assert_eq!(
+        resolved.state().requests,
+        [MereViewRequest::Merge(MergeRequest::Apply)]
+    );
+}
+
+#[test]
+fn a_hand_value_is_typed_in_place_and_reported_by_edit_by_hand() {
+    let (dom, mut runner) = runner(Host::new(merge_model(), 900, 600));
+    let root = runner.root();
+    let field = find(&dom.borrow(), root, "aria-label", "Hand value for Title of One")
+        .expect("hand field");
+    assert_eq!(
+        attr(&dom.borrow(), field, "data-cambium-text-value"),
+        Some("Target"),
+        "the draft starts from the target's value"
+    );
+    runner.set_focus(Some(field));
+    for key in [
+        cambium::Key::Named(cambium::NamedKey::Backspace),
+        cambium::Key::Character("!".into()),
+    ] {
+        runner.dispatch_key(cambium::KeyEvent::new(key));
+    }
+    assert_eq!(
+        runner.state().view.merge_drafts["title-1"].text(),
+        "Targe!"
+    );
+    let hand = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Use the hand value for Title of One",
+    )
+    .expect("edit by hand");
+    runner.dispatch_click(hand, PointerClick::at((1.0, 1.0)));
+    assert_eq!(
+        runner.state().requests,
+        [MereViewRequest::Merge(MergeRequest::Choose(
+            "title-1".into(),
+            MergeOption::Hand("Targe!".into())
+        ))]
+    );
+
+    // A draft goes with its merge.
+    let mut view = runner.state().view.clone();
+    let mut model = merge_model();
+    model.merge = None;
+    view.lay_out(&model, 900, 600);
+    assert!(view.merge_drafts.is_empty());
+}

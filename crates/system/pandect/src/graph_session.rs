@@ -1607,6 +1607,21 @@ impl<B: Backend> GraphSession<B> {
         Ok(Reverted { of, applied, kept })
     }
 
+    /// The source of the merge-in the latest change undid or redid, if it
+    /// did: a host holding that source open reads its mark again
+    /// ([`reload_merged_mark`](Self::reload_merged_mark)).
+    pub fn merge_stepped(&self) -> Option<SessionId> {
+        let last = self.changes.entries().last()?;
+        self.merge_mark_after(&last.kind).map(|(source, _)| source)
+    }
+
+    /// Read this session's merged mark again, after a target's undo or redo
+    /// of the merge changed it (M6).
+    pub async fn reload_merged_mark(&mut self) -> Result<(), SessionError> {
+        self.manifest.merged = read(&self.slots, &self.keys.at(MERGED)).await?;
+        Ok(())
+    }
+
     /// The merged mark an undo or redo of a merge-in leaves on its source:
     /// undoing a `MergedIn` clears it, so the source is editable and
     /// mergeable again; redoing it sets it again.

@@ -14,32 +14,40 @@
 //! and the session cards' bytes here. A relation shows its kernel family as
 //! its kind (§7 item 43).
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use cartography::MERE_GRAPH_ADAPTER;
 use chirograph::{
     ContentHash, EndpointDescriptor, IntentInvocation, IntentResult, PortableCardV1,
     PresentationOffer, ProjectionRequest, ProjectionSnapshot, ResourceRequest,
 };
+use kernel::graph::Part;
 use mere_view::{
     ArchiveEntry, ArchiveModel, ArchiveRequest, GraphModel, MereViewModel, MereViewRequest,
-    NodeEntry, NodeState, Provenance, RelationEntry, SessionEntry, SessionStep,
+    MergeConflictEntry, MergeModel, MergeOption, MergeRequest, NodeEntry, NodeState, Provenance,
+    RelationEntry, SessionEntry, SessionStep,
 };
+use pandect::MergeChoice;
 use pandect::SessionId;
 use sceno::{InstanceId, SourceRef};
+use serde_json::Value;
 use uuid::Uuid;
 
 use crate::wire::{
     ARCHIVE_SESSION_LABEL, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ArchiveActionV1,
-    COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS,
-    MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT,
-    SESSION_ITEM_SOURCE, SESSIONS_SOURCE, SessionsActionV1, TRASH_SESSION_INTENT,
+    BRANCH_SESSION_INTENT, CANCEL_MERGE_INTENT, COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT,
+    MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS, MERGE_SESSION_INTENT, MERGE_SOURCE,
+    MINT_SESSION_INTENT, MergeChoiceV1, MergeResolutionV1, OPEN_CODICIL_INTENT, PendingMergeV1,
+    RESOLVE_MERGE_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSION_ITEM_SOURCE,
+    SESSIONS_SOURCE, SessionsActionV1, TRASH_SESSION_INTENT,
 };
 
 /// Each step a session's card can offer, and the intent that takes it.
-const STEPS: [(&str, SessionStep); 4] = [
+const STEPS: [(&str, SessionStep); 6] = [
     (ATTACH_SESSION_INTENT, SessionStep::Switch),
     (FORK_SESSION_INTENT, SessionStep::Fork),
+    (BRANCH_SESSION_INTENT, SessionStep::Branch),
+    (MERGE_SESSION_INTENT, SessionStep::Merge),
     (TRASH_SESSION_INTENT, SessionStep::Trash),
     (RESTORE_SESSION_INTENT, SessionStep::Restore),
 ];
@@ -358,6 +366,7 @@ pub fn intent(
             (intent, SessionsActionV1::on(*id), card)
         },
         MereViewRequest::Archive(_)
+        | MereViewRequest::Merge(_)
         | MereViewRequest::Activate(_)
         | MereViewRequest::Host(_)
         | MereViewRequest::Layout(_) => {
@@ -371,6 +380,159 @@ pub fn intent(
         observed_revision: sessions.scene.revision,
         intent: intent.into(),
         payload: serde_json::to_vec(&payload).expect("SessionsActionV1 always serializes"),
+    })
+}
+
+/// The pending merge's card in the sessions projection, and the material
+/// request its first media names. The card is read with the others
+/// ([`card_requests`]); this names what it discloses.
+pub fn merge_cards(sessions: &ProjectionSnapshot) -> Vec<InstanceId> {
+    items(sessions, MERGE_SOURCE)
+        .map(|(instance, _)| instance)
+        .collect()
+}
+
+/// A conflict's stable key: its part, as the wire spells it.
+pub fn conflict_key(part: &Part) -> String {
+    serde_json::to_string(part).expect("a part encodes")
+}
+
+/// A part in words, naming a node by its label in `graph` when shown.
+fn part_words(part: &Part, graph: &GraphModel) -> String {
+    let name = |id: &uuid::Uuid| {
+        let key = id.to_string();
+        graph
+            .nodes
+            .iter()
+            .find(|node| node.key == key)
+            .map(|node| node.label.clone())
+            .unwrap_or_else(|| key[..8].to_string())
+    };
+    match part {
+        Part::Node(id) => name(id),
+        Part::Title(id) => format!("Title of {}", name(id)),
+        Part::Url(id) => format!("Address of {}", name(id)),
+        Part::Tag(id, tag) => format!("Tag {tag} on {}", name(id)),
+        Part::Body(id) => format!("Body of {}", name(id)),
+        Part::Content(id) => format!("Content of {}", name(id)),
+        Part::MediaType(id) => format!("Media type of {}", name(id)),
+        Part::Nested(id) => format!("World of {}", name(id)),
+        Part::Facet(id, facet) => format!("{facet} of {}", name(id)),
+        Part::History(id) => format!("History of {}", name(id)),
+        Part::Edges(from, to) => format!("Relations from {} to {}", name(from), name(to)),
+        Part::Field(id) => format!("Field {}", &id.to_string()[..8]),
+        Part::Coupling(id) => format!("Coupling {}", &id.to_string()[..8]),
+        Part::ImportRecords => "Import records".to_string(),
+        Part::Resource(id) => format!("Resource {}", &id.to_string()[..8]),
+        Part::ResourceFacet(id, facet) => {
+            format!("{facet} of resource {}", &id.to_string()[..8])
+        },
+        Part::ResourceEdges(from, to) => format!(
+            "Resource relations from {} to {}",
+            &from.to_string()[..8],
+            &to.to_string()[..8]
+        ),
+        Part::ShownResource(id) => format!("Resource shown by {}", name(id)),
+    }
+}
+
+/// A part's value in words: text as it is, a node by its title, anything
+/// else as compact JSON; empty for absent.
+fn value_words(value: Option<&Value>) -> String {
+    match value {
+        None | Some(Value::Null) => String::new(),
+        Some(Value::String(text)) => text.clone(),
+        Some(Value::Object(fields)) if fields.get("title").is_some_and(Value::is_string) => {
+            fields["title"].as_str().unwrap_or_default().to_string()
+        },
+        Some(other) => other.to_string(),
+    }
+}
+
+/// The pending merge as the view shows it, with the choices made so far by
+/// conflict key. `None` clears it.
+pub fn fill_merge(
+    model: &mut MereViewModel,
+    pending: Option<&PendingMergeV1>,
+    chosen: &BTreeMap<String, MergeOption>,
+) {
+    model.merge = pending.map(|pending| MergeModel {
+        source: pending.source,
+        source_name: pending.source_name.clone(),
+        target_name: pending.target_name.clone(),
+        conflicts: pending
+            .conflicts
+            .iter()
+            .map(|conflict| {
+                let key = conflict_key(&conflict.part);
+                MergeConflictEntry {
+                    label: part_words(&conflict.part, &model.graph),
+                    base: value_words(conflict.base.as_ref()),
+                    source: value_words(conflict.source.as_ref()),
+                    target: value_words(conflict.target.as_ref()),
+                    add_as_new: conflict.add_as_new,
+                    chosen: chosen.get(&key).cloned(),
+                    key,
+                }
+            })
+            .collect(),
+    });
+}
+
+/// The resolve or cancel intent for a merge request on `pending`'s card. A
+/// hand value reads as text where the conflict's values are text, and as
+/// JSON otherwise (text when it does not parse); empty is absent. `None` for
+/// a choice (the host keeps those) or an unresolved Apply.
+pub fn merge_intent(
+    request: &MereViewRequest,
+    sessions: &ProjectionSnapshot,
+    pending: &PendingMergeV1,
+    chosen: &BTreeMap<String, MergeOption>,
+) -> Option<IntentInvocation> {
+    let MereViewRequest::Merge(request) = request else {
+        return None;
+    };
+    let (intent, choices) = match request {
+        MergeRequest::Choose(..) => return None,
+        MergeRequest::Cancel => (CANCEL_MERGE_INTENT, Vec::new()),
+        MergeRequest::Apply => {
+            let mut choices = Vec::with_capacity(pending.conflicts.len());
+            for conflict in &pending.conflicts {
+                let choice = match chosen.get(&conflict_key(&conflict.part))? {
+                    MergeOption::Source => MergeChoice::Source,
+                    MergeOption::Target => MergeChoice::Target,
+                    MergeOption::AddAsNew => MergeChoice::AddAsNew,
+                    MergeOption::Hand(text) if text.is_empty() => MergeChoice::Hand(Value::Null),
+                    MergeOption::Hand(text) => {
+                        let textual = [&conflict.source, &conflict.target, &conflict.base]
+                            .into_iter()
+                            .flatten()
+                            .any(Value::is_string);
+                        MergeChoice::Hand(if textual {
+                            Value::String(text.clone())
+                        } else {
+                            serde_json::from_str(text).unwrap_or(Value::String(text.clone()))
+                        })
+                    },
+                };
+                choices.push(MergeChoiceV1 {
+                    part: conflict.part.clone(),
+                    choice,
+                });
+            }
+            (RESOLVE_MERGE_INTENT, choices)
+        },
+    };
+    let (target, _) = items(sessions, MERGE_SOURCE)
+        .find(|(_, source)| Uuid::parse_str(&source.id).ok() == Some(*pending.source.as_uuid()))?;
+    Some(IntentInvocation {
+        session: sessions.session.clone(),
+        target,
+        observed_epoch: sessions.scene.epoch,
+        observed_revision: sessions.scene.revision,
+        intent: intent.into(),
+        payload: serde_json::to_vec(&MergeResolutionV1::new(pending.source, choices))
+            .expect("MergeResolutionV1 always serializes"),
     })
 }
 

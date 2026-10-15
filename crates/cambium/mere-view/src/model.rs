@@ -36,6 +36,66 @@ pub struct MereViewModel {
     pub actions: Vec<HostAction>,
     /// The reason the host gave for the last request it declined.
     pub notice: Option<String>,
+    /// A merge waiting for a choice on each conflict, shown as its card.
+    pub merge: Option<MergeModel>,
+}
+
+/// A pending merge: a branch or picked-off session merging back into the
+/// session it came from, and the conflicts that wait for a choice.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MergeModel {
+    pub source: SessionId,
+    pub source_name: String,
+    pub target_name: String,
+    pub conflicts: Vec<MergeConflictEntry>,
+}
+
+impl MergeModel {
+    /// Whether every conflict has a choice, so the merge can apply.
+    pub fn resolved(&self) -> bool {
+        self.conflicts
+            .iter()
+            .all(|conflict| conflict.chosen.is_some())
+    }
+}
+
+/// One part both sides changed differently, as the host words it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MergeConflictEntry {
+    /// Stable across readings; the conflict's `data-key`.
+    pub key: String,
+    /// What the part is, such as "Title of One".
+    pub label: String,
+    /// Each side's value in words; empty for absent.
+    pub base: String,
+    pub source: String,
+    pub target: String,
+    /// Whether "Add as new" applies: a picked node the target deleted.
+    pub add_as_new: bool,
+    /// The choice the host holds for it so far.
+    pub chosen: Option<MergeOption>,
+}
+
+/// What a conflict takes.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum MergeOption {
+    Source,
+    Target,
+    /// A value given by hand, as text.
+    Hand(String),
+    AddAsNew,
+}
+
+impl MergeOption {
+    /// The `data-chosen` token.
+    pub fn token(&self) -> &'static str {
+        match self {
+            Self::Source => "source",
+            Self::Target => "target",
+            Self::Hand(_) => "hand",
+            Self::AddAsNew => "add-as-new",
+        }
+    }
 }
 
 /// Where the view puts a mere's sessions and archives.
@@ -165,6 +225,10 @@ pub struct SessionEntry {
 pub enum SessionStep {
     Switch,
     Fork,
+    /// A copy meant to merge back.
+    Branch,
+    /// Merge a branch or picked-off session into the session it came from.
+    Merge,
     Trash,
     Restore,
 }
@@ -175,6 +239,8 @@ impl SessionStep {
         match self {
             Self::Switch => "switch",
             Self::Fork => "fork",
+            Self::Branch => "branch",
+            Self::Merge => "merge",
             Self::Trash => "trash",
             Self::Restore => "restore",
         }
@@ -184,6 +250,8 @@ impl SessionStep {
         match self {
             Self::Switch => "Switch to",
             Self::Fork => "Fork",
+            Self::Branch => "Branch",
+            Self::Merge => "Merge into source",
             Self::Trash => "Trash",
             Self::Restore => "Restore",
         }
