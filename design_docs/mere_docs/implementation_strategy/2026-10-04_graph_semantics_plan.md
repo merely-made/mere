@@ -4399,6 +4399,11 @@ A candidate needs four answers before extending the model:
 4. Who may edit it, and how do persistence, replay, sharing and partial residency
    preserve that identity and ownership?
 
+The [link model](../technical_architecture/2026-10-15_link_model.md)
+(2026-10-15) answers the Assertions and pair-level Occurrences rows without a
+stratum. Assertions gain time spans, withdrawal and basis, and a pair's dated
+events become occurrences inside an assertion.
+
 Defining a new type, filter or visual layer does not by itself answer these
 questions. Additional strata are appropriate when these contracts establish a
 distinct role. A future extensible registry would also need stable stratum
