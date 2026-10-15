@@ -14,6 +14,12 @@ The [current reconciliation](#11-current-consumers-and-design-direction-2026-10-
 links the design language, actual consumer progress, ambient-context proposal
 and the separate Moot applet experiment. It changes no ownership or release bar.
 
+**Amended 2026-10-14:** [§12](#12-mount-boundary-compound-documents-and-networked-sharing-2026-10-14)
+records AC7 to AC10. A forest mount's boundary is a shadow root, which
+amends AC5's scope class. Genet's accessibility walk gets a fix lane.
+Compound documents are the use of the forest mount that AC1 left unnamed.
+Accessible app sharing is AC6's motivating consumer.
+
 Read against Mere `362c5d5a` (main moved during the read; no commit in that
 window touched `crates/cambium`), Turnstone `032463ae` (the committed tree:
 another session is repinning its working tree, which was not used), Knot
@@ -885,3 +891,158 @@ CPU raster output can provide an independent visual control and export path;
 host upload/presentation and recovery after a driver reset need separate
 qualification. Backend selection must preserve guest/session authority, drafts
 and selection; it must not turn a rendering failure into a new applet grant.
+
+## 12. Mount boundary, compound documents and networked sharing (2026-10-14)
+
+**Status:** research, ruled (AC7 to AC10). Read against Mere `83450968`,
+Genet `origin/main` `b6bfbeb5`, netrender `6a24ae08` and Turnstone `c7a828eb`.
+These are static reads only. Nothing was built or run: the workspace disk had
+222 GB free that day, below the cleanup threshold. A main-session conversation
+with Mark raised the forks, after reviewing an outside research atlas of the
+stack.
+
+### Findings
+
+**F13. The mount exists, and it is unscoped.** `Runner::new_at`
+(`crates/cambium/cambium/src/runner.rs`, line 1246) builds beneath a live mount
+owned by the caller. `RetainedMount` (`crates/cambium/cambium/src/retained_mount.rs`,
+landed in `d5850920` on 2026-10-14) hosts a runner inline in a shared forest
+document. It reparents the owner container between stations and keeps its DOM
+and state intact. Graphshell's port uses it
+(`ports/graphshell/docs/receipts/query_views_20261013/`). The owner
+container is a plain `div`, `cambium-retained-owner`, so a guest inherits the
+host's sheet. AC5's scope class has not been applied. Rootstock's `WindowDom`
+already limits `shadow_roots()` to its own window
+(`crates/cambium/cambium-rootstock/src/window_dom.rs`, line 129).
+
+**F14. Genet's Shadow DOM supplies the boundary.** It landed 2026-09-07/08
+(`genet/design_docs/2026-09-07_shadow_dom_plan.md`). The flat tree spans both
+DOMs, and Livery's style walk, box construction and hit testing follow
+`flat_children`. Style scoping is met:
+- a shadow tree's sheets apply inside it, and the document's sheets do not cross in;
+- inheritance follows the flat tree;
+- Cadency matches `:host`, `:host()`, `::slotted()` and `::part()` across tree
+  scopes (`genet/components/cadency/README.md`).
+
+Four of that plan's residuals touch a mount:
+- `:host-context()` is unsupported.
+- `adoptedStyleSheets` waits on constructable sheets. A guest's sheet would be
+  a `<style>` element in the shadow root instead.
+- Focus delegation is missing: focusing a host does not move focus, and focus
+  is not tracked per tree scope.
+- `getComposedRanges` ignores its `shadowRoots` argument
+  (`genet/design_docs/2026-09-07_selection_range_plan.md`, residual 4). That
+  is the piece selection across the boundary needs.
+
+**F15. Genet's accessibility projection does not enter shadow trees.**
+`projection_walk` (`genet/components/genet-render/src/a11y.rs`, line 774 at
+`b6bfbeb5`) recurses through `dom_children`, and so does `descendant_text`
+(line 214). A shadow root is not a DOM child of its host. So shadow-tree
+content never reaches the AccessKit tree, on any page, and names built from
+descendant text miss it. The Shadow DOM plan moved style, boxes and hit
+testing onto the flat tree, but its list did not include the accessibility
+walk. This comes from reading the code and has not been confirmed by a run.
+
+**F16. Networked sharing has its parts but no measurement.** `PaintEnvelope`
+is the wire form (F7). It carries invisible `HitTest` items with tags the
+producer chooses (`netrender/paint_list_api/src/lib.rs`, line 272), so a
+receiving host can hit-test without a round trip. AccessKit 0.24 has a `serde`
+feature, which Genet enables (`genet/Cargo.toml`). No document records how
+many bytes a real frame takes. Two existing plans bear on this:
+- Turnstone P4 shares presence, follow and pointer signals over the same
+  addressed objects; each peer renders the resource itself
+  (`turnstone/design_docs/2026-07-28_turnstone_peer_web_reframe.md`, P4).
+- The Commons calls plan makes screen sharing a later product, and its first
+  slice "must not create abstractions for them"
+  (`mere_docs/implementation_strategy/2026-07-27_commons_calls_plan.md`).
+
+**F17. Prior art.** *Reading, not ruled.* B2 corresponds to the iframe and B3
+to a custom element with a shadow root. The web made this choice once already,
+with the same trade: isolation against taking part in find, selection, flow
+and accessibility. A2 is Chromium's site-isolation architecture. Renderer
+processes send display lists and serialized accessibility tree updates, and
+out-of-process frames graft in by child-tree id. AccessKit's `TreeId` and
+graft follow that lineage. OpenDoc and OLE compound documents are the
+warning: their parts failed on versioning and coordination, which is F10's
+pin-set problem.
+
+### Forks and rulings (2026-10-14)
+
+**AC7. Where is a forest mount's boundary?** The forks were put with F13 and
+F14. Options:
+- **(a)** A shadow root. `RetainedMount`'s owner becomes a shadow host, and
+  the guest's sheet lives in its shadow root, scoped by Livery's existing
+  cascade. A windowless probe gates it.
+- (b) A scope class, as AC5 ruled.
+- (c) Unscoped, until a consumer is hurt by it.
+
+Mark: **"Shadow root (Recommended)"**. *Follows:* B3's mount boundary is a
+shadow root. This amends AC5's "a guest's sheet carries a scope class". AC5's
+mount reservation and U17's per-session registries stand. The probe below
+gates adoption.
+
+**AC8. What happens to Genet's accessibility walk (F15)?** Options:
+- **(a)** Record a residual in Genet's Shadow DOM plan, and give a fix lane a
+  failing-first test, followed by a walk over the flat tree.
+- (b) Fix it in the main session, now.
+- (c) Note it only.
+
+Mark: **"Residual + fix lane (Recommended)"**. *Follows:* the residual is
+residual 11 of Genet's Shadow DOM plan. A Genet lane works on branch
+`shadow-a11y-walk` in its own worktree. It writes the failing test first: a
+button inside an open shadow root must reach the projection, and the same
+button in light DOM is the control. Then it fixes the walk. Under Mark's
+accessibility-first ruling (Turnstone U2) this bug sits ahead of any mount
+work, since every web page with shadow content is affected.
+
+**AC9. Is compound documents the use of forest mounts that AC1 left
+unnamed?** Here "compound documents" means find, selection, flowing layout and
+reading order that cross from host content into guest content. Options:
+- **(a)** Yes; record it under AC1.
+- (b) Record it as one candidate; the question stays open.
+- (c) No.
+
+Mark: **"Yes, that's it (Recommended)"**. *Follows:* the forest mount is for
+compound documents: a host document that carries a guest's live content inline.
+The guest's content then flows and fragments with the host's layout. Find and
+selection cross the boundary, and a screen reader reads host and guest in one
+order. A retained session cannot give any of these, because its document is
+its own. B3's first consumer is such a document, for example a live Woodshed
+fretboard inline in a Knot document. The known risk is F10 and F17's
+version coordination. Selection across the boundary waits on F14's
+`getComposedRanges` residual.
+
+**AC10. What is AC6's motivating consumer?** Options:
+- **(a)** Accessible app sharing, plus a probe of frame sizes. A peer receives
+  paint lists and the AccessKit tree, renders them crisply, and reads them
+  with the viewer's own screen reader. This is the shape of Commons' later
+  screen-sharing product.
+- (b) The same, recorded without a measurement.
+- (c) Leave AC6 as local research.
+
+Mark: **"Record, plus size probe (Recommended)"**. *Follows:* AC6's research
+target now has a consumer: accessible app sharing to a peer. It covers what P4
+co-browsing cannot, a view of state the peer does not hold. It is presentation
+only and never authority, as P4 rules for live sessions. The calls slice gains
+no abstraction for it. AC6's ordering stands: after AC1's path is proven.
+
+### Probes authorised by AC7 and AC10
+
+Both wait until the workspace disk is back above its cleanup threshold. Neither
+has an owner yet.
+
+- **Mount probe (AC7), windowless.** It needs a `ScriptedDom` with a document
+  sheet, plus a host element with an open shadow root. The shadow root holds a
+  `<style>` and a runner owned by a `RetainedMount`. Done when:
+  - the guest's rule applies inside;
+  - the document's rule does not cross in, but inheritance still does;
+  - the guest's rule does not leak out;
+  - a hit test inside the guest's rectangle returns the guest's node;
+  - once AC8 lands, the guest's button is in the AccessKit tree.
+
+  Controls, which must fail: a plain-`div` mount (the host's rule leaks in);
+  and the guest's `<style>` placed outside the shadow root (it leaks out).
+- **Frame-size probe (AC10).** Measure the postcard bytes of one real Cambium
+  application's `PaintEnvelope` and its AccessKit `TreeUpdate`, for the first
+  frame and for a steady-state frame after a keystroke, with fonts and images
+  counted separately.
