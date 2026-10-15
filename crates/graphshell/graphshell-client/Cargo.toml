@@ -15,13 +15,19 @@ accesskit = { workspace = true, optional = true }
 scenotime.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+tokio = { version = "1", features = ["io-util"], optional = true }
 
 [features]
 # Off by default: a client that only reads scenes should not carry an
 # accessibility tree builder. Hosts that drive a screen reader turn it on.
 accesskit = ["dep:uxtree", "dep:accesskit"]
+# The native stream-to-lines pump (`pump`): an admitted Tokio stream as NDJSON
+# lines for the line-driven sessions (transport agnosticism note, T3). Off by
+# default, so the client keeps no runtime and stays wasm-clean.
+pump = ["dep:tokio"]
 
 [dev-dependencies]
+tokio = { version = "1", features = ["io-util", "macros", "rt"] }
 # Test-only: a shelfmark cites a portable capture by its content address
 # (site canvas plan, S6). The shipped client takes no incipit edge.
 incipit.workspace = true

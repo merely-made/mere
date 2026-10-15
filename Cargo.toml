@@ -499,14 +499,18 @@ misfin = { version = "0.0.4", features = ["ring"] }
 # transport all consume it). Domains keep their own operation grammar,
 # addressing, authorization, and materialization.
 stickleback = { version = "0.1.1", path = "crates/stickleback" }
-murm = { version = "0.0.1", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-transport = { package = "mere-transport", version = "0.0.2", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+# Murm at 38e9c9b8 (branch `agent/transport-in-process`, on 3d9e799f, the
+# browser initiator's callback-lifetime fix): `TransportKind::InProcess`, so
+# Djinn's local doors hand admission an `AcceptedSession` (lift plan pass (b)).
+# Named through the `www` alias; see the Murm patch table below.
+murm = { version = "0.0.1", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+transport = { package = "mere-transport", version = "0.0.2", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 # The Wasm-clean half of the browser WebRTC carrier: bounded frames, invite
 # ids, role-tagged DTLS fingerprints, and the link-challenge transcript that
 # derives Notochord's `shared_link`. It depends on neither `transport` nor
 # `notochord` on purpose; the browser build stays free of both, and the
 # admission layers receive only a `[u8; 16]`.
-webrtc-carrier = { package = "mere-webrtc-carrier", version = "0.0.1", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+webrtc-carrier = { package = "mere-webrtc-carrier", version = "0.0.1", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 
 gemot = { version = "0.1.1", path = "crates/moot/gemot" }
 commons-spine = { path = "crates/moot/commons" }
@@ -614,12 +618,12 @@ tincture = { package = "tinct", version = "=0.1.2", path = "crates/cambium/tinct
 # could not parse ratcheted announces from real RNS). Since the 2026-07-23 radio
 # merge the repo is one workspace (retinue, tulle, sennet, tucket, firmware), so
 # this is an immutable source-revision pin rather than a relative path.
-retinue = { version = "0.3.0", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+retinue = { version = "0.3.0", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 # Signalman's station crates come from the same Retinue revision, so one
 # rev governs all four (device pairing plan, rulings 42 and 44).
-outrider = { version = "=0.3.0", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-postilion = { version = "=0.3.0", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-radio-hand = { version = "=0.0.1", git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+outrider = { version = "=0.3.0", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+postilion = { version = "=0.3.0", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+radio-hand = { version = "=0.0.1", git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 
 # Reticulum identity derivation: HKDF-SHA256 stretches Mere's 32-byte master seed
 # into retinue's 64-byte dual-key private identity. retinue owns the X25519/RNG
@@ -648,7 +652,7 @@ all = "warn"
 # names them through dramatis.git needs no entry, only the same revision
 # (Cargo refuses a patch from dramatis.git to dramatis.git).
 [patch."https://github.com/merely-made/mere.git"]
-murm = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+murm = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { path = "crates/eidetic/chartulary" }
@@ -666,7 +670,7 @@ insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7ee
 knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { path = "crates/system/proofs" }
 mere-surface-api = { path = "crates/system/surface-api" }
-mere-transport = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 mora-cmudict = { path = "crates/intel/mora-cmudict" }
 reference-data = { path = "crates/intel/reference-data" }
 muniment = { path = "crates/eidetic/muniment" }
@@ -709,7 +713,7 @@ mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-page-load = { path = "crates/system/page-load" }
 mere-overmap = { path = "crates/cambium/mere-overmap" }
 mere-view = { path = "crates/cambium/mere-view" }
-mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+mere-webrtc-carrier = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 meristem = { path = "crates/cambium/meristem" }
 mesquite = { path = "crates/cambium/mesquite" }
 mien = { path = "crates/moot/mien" }
@@ -727,7 +731,7 @@ workbench = { path = "crates/cambium/workbench" }
 # Canonical-www consumer pins must share the same workspace contracts as
 # the portable Cleromancy domain validator composed into Djinn.
 [patch."https://www.github.com/merely-made/mere.git"]
-murm = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+murm = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { path = "crates/eidetic/chartulary" }
@@ -745,7 +749,7 @@ insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7ee
 knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { path = "crates/system/proofs" }
 mere-surface-api = { path = "crates/system/surface-api" }
-mere-transport = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 mora-cmudict = { path = "crates/intel/mora-cmudict" }
 reference-data = { path = "crates/intel/reference-data" }
 muniment = { path = "crates/eidetic/muniment" }
@@ -788,7 +792,7 @@ mere-kernel = { path = "crates/graph/graph-kernel" }
 mere-page-load = { path = "crates/system/page-load" }
 mere-overmap = { path = "crates/cambium/mere-overmap" }
 mere-view = { path = "crates/cambium/mere-view" }
-mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+mere-webrtc-carrier = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 meristem = { path = "crates/cambium/meristem" }
 mesquite = { path = "crates/cambium/mesquite" }
 mien = { path = "crates/moot/mien" }
@@ -934,22 +938,41 @@ opt-level = 3
 fleece = { version = "=0.5.0", git = "https://www.github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 layout-dom-api = { version = "=0.1.1", git = "https://www.github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 
+# Murm through the HTTPS alias, as Mere is (lift plan pass (b), 2026-10-15).
+# This workspace names Murm at `www.github.com`; a supplier pinned through the
+# plain URL (Knot before its repin, older suppliers) is forwarded to the same
+# revision, so the graph keeps one Murm source. Consumers name the alias.
+[patch."https://github.com/merely-made/murm.git"]
+embedded-graphics = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+embedded-graphics-core = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+mere-webrtc-carrier = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+murm = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+outrider = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+postilion = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+radio-face = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+radio-hand = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+retinue = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+selvage = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+seneschal = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+tulle = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+
 # Compatibility source keys for immutable suppliers published before the
 # repository rename. Targets and current direct dependencies use Murm.
 [patch."https://github.com/merely-made/retinue.git"]
-embedded-graphics = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-embedded-graphics-core = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-mere-transport = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-mere-webrtc-carrier = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-murm = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-outrider = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-postilion = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-radio-face = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-radio-hand = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-retinue = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-selvage = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-seneschal = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
-tulle = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a58754569b8dc11b2dbc7d506e9" }
+embedded-graphics = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+embedded-graphics-core = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+mere-webrtc-carrier = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+murm = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+outrider = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+postilion = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+radio-face = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+radio-hand = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+retinue = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+selvage = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+seneschal = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
+tulle = { git = "https://www.github.com/merely-made/murm.git", rev = "38e9c9b8dffe19ff374bd226375e27eea2eb98f6" }
 
 # Published shadow-resource repair across Genet and host renderer contracts.
 # Genet retains its qualified source pin; this root redirects the complete

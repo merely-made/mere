@@ -110,6 +110,9 @@ struct Routes {
     grants: AppRouteGrants,
     apps: Vec<AppId>,
     validators: BTreeMap<String, pandect::GraphValidator>,
+    /// The dialable projection host's catalog, when one serves these routes
+    /// to remote peers (remote mere route admission note, §6).
+    remote: Option<graphshell_host::projection_host::SharedCatalog>,
     served: Mutex<BTreeMap<String, Arc<MereShared>>>,
     access: Mutex<BTreeMap<(MereId, AppId), MereApplicationAccess>>,
     access_loaded: AtomicBool,
@@ -145,6 +148,7 @@ impl MereRoutes {
                 grants,
                 apps,
                 validators: BTreeMap::new(),
+                remote: None,
                 served: Mutex::new(BTreeMap::new()),
                 access: Mutex::new(BTreeMap::new()),
                 access_loaded: AtomicBool::new(false),
@@ -232,6 +236,21 @@ impl MereRoutes {
         });
     }
 
+    /// Also register each mere's two routes in `catalog`, the dialable
+    /// projection host's (`crate::resident_projection`), as each is served.
+    /// The routes there are the same endpoints under the same owner
+    /// decisions; what a remote session may open is that host's admission.
+    /// Set before cloning or serving routes.
+    pub fn with_remote_catalog(
+        mut self,
+        catalog: graphshell_host::projection_host::SharedCatalog,
+    ) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("set the remote catalog before cloning or serving routes")
+            .remote = Some(catalog);
+        self
+    }
+
     /// Register product authority before serving routes. The callback is reused
     /// for edits, archive save/open/compose and loaded sessions.
     pub fn with_domain_validator(
@@ -287,46 +306,27 @@ impl MereRoutes {
             codicil_sessions: Mutex::new(HashMap::new()),
             pending_merges: Mutex::new(BTreeMap::new()),
         });
-        let opened = Arc::clone(&shared);
-        let ambient_opened = Arc::clone(&shared);
-        let explicit_grants = self.inner.grants.clone();
-        let ambient_grants = self.inner.grants.clone();
-        let explicit_id = route.id().to_string();
         let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
-        let ambient_id = ambient.id().to_string();
+        let grants = self.inner.grants.clone();
         self.inner
             .catalog
-            .update(|catalog| {
-                catalog.register_resumable_notifying(
-                    route.id(),
-                    format!("Mere: {domain}"),
-                    move |context| {
-                        AccessEndpoint::open(
-                            Arc::clone(&opened),
-                            context,
-                            explicit_grants.clone(),
-                            &explicit_id,
-                            false,
-                        )
-                    },
-                )?;
-                catalog.register_resumable_notifying(
-                    ambient.id(),
-                    format!("Ambient mere: {domain}"),
-                    move |context| {
-                        AccessEndpoint::open(
-                            Arc::clone(&ambient_opened),
-                            context,
-                            ambient_grants.clone(),
-                            &ambient_id,
-                            true,
-                        )
-                    },
-                )
-            })
+            .update(|catalog| register_mere_routes(catalog, &route, &ambient, &shared, &grants))
             .await
             .map_err(|error| error.to_string())?;
+        if let Some(remote) = &self.inner.remote {
+            let mut remote = remote
+                .lock()
+                .map_err(|_| "the remote catalog lock is poisoned".to_string())?;
+            register_mere_routes(
+                &mut remote,
+                &route,
+                &ambient,
+                &shared,
+                &grants,
+            )
+            .map_err(|error| error.to_string())?;
+        }
         for app in &self.inner.apps {
             self.inner.grants.grant(app.clone(), route.clone());
         }
@@ -339,6 +339,47 @@ impl MereRoutes {
         served.insert(domain, shared);
         Ok(route)
     }
+}
+
+/// Register `shared`'s explicit and ambient routes in `catalog`, each opening
+/// an [`AccessEndpoint`] that rechecks `grants`.
+fn register_mere_routes(
+    catalog: &mut graphshell_host::endpoint_catalog::ResidentEndpointCatalog,
+    route: &ResidentEndpointRoute,
+    ambient: &ResidentEndpointRoute,
+    shared: &Arc<MereShared>,
+    grants: &AppRouteGrants,
+) -> Result<(), graphshell_host::endpoint_catalog::ResidentEndpointCatalogError> {
+    let (opened, explicit_grants, explicit_id) =
+        (Arc::clone(shared), grants.clone(), route.id().to_string());
+    catalog.register_resumable_notifying(
+        route.id(),
+        format!("Mere: {}", shared.domain),
+        move |context| {
+            AccessEndpoint::open(
+                Arc::clone(&opened),
+                context,
+                explicit_grants.clone(),
+                &explicit_id,
+                false,
+            )
+        },
+    )?;
+    let (ambient_opened, ambient_grants, ambient_id) =
+        (Arc::clone(shared), grants.clone(), ambient.id().to_string());
+    catalog.register_resumable_notifying(
+        ambient.id(),
+        format!("Ambient mere: {}", shared.domain),
+        move |context| {
+            AccessEndpoint::open(
+                Arc::clone(&ambient_opened),
+                context,
+                ambient_grants.clone(),
+                &ambient_id,
+                true,
+            )
+        },
+    )
 }
 
 /// Recheck live owner policy before factory construction and on every read
@@ -1915,6 +1956,17 @@ mod tests {
         domain: &str,
         validator: Option<pandect::GraphValidator>,
     ) -> Fixture {
+        fixture_serving(persona_n, domain, validator, None).await
+    }
+
+    /// The fixture, with its routes also registered in a dialable host's
+    /// catalog (`crate::resident_projection`).
+    async fn fixture_serving(
+        persona_n: u128,
+        domain: &str,
+        validator: Option<pandect::GraphValidator>,
+        remote: Option<graphshell_host::projection_host::SharedCatalog>,
+    ) -> Fixture {
         let root = tempfile::tempdir().unwrap();
         let reservoir = ResidentReservoir::open(root.path(), Some(persona(persona_n)))
             .await
@@ -1932,6 +1984,10 @@ mod tests {
             routes.with_domain_validator(domain, validator)
         } else {
             routes.with_divination_authority()
+        };
+        let routes = match remote {
+            Some(remote) => routes.with_remote_catalog(remote),
+            None => routes,
         };
         catalog
             .update(|catalog| reservoir.register(catalog, Some(routes.clone())))
@@ -2388,6 +2444,277 @@ mod tests {
             disclosed_graph(&mut first, &first_again).views["reading"],
             state
         );
+    }
+
+    /// A device of the persona, holding a grant for one route as one
+    /// application, dials the resident's dialable host.
+    struct RemoteDialler {
+        owner: personae::InMemoryProvider,
+        device: personae::InMemoryProvider,
+        network: notochord::NetworkId,
+        /// The host ends of each dial, kept for the test's life: a transport
+        /// must outlive the sessions it carries (`graphshell_host::carrier`).
+        hosts: std::sync::Mutex<Vec<transport::memory::MemoryTransport>>,
+    }
+
+    const REMOTE_ROOT: [u8; 32] = [0x64; 32];
+
+    fn remote_profile() -> notochord::ProfileRef {
+        notochord::ProfileRef {
+            id: "mere.base".into(),
+            revision: 1,
+        }
+    }
+
+    impl RemoteDialler {
+        fn new() -> Self {
+            Self {
+                owner: personae::InMemoryProvider::from_seed([0x61; 32]),
+                device: personae::InMemoryProvider::from_seed([0x62; 32]),
+                network: notochord::NetworkId([0x63; 32]),
+                hosts: std::sync::Mutex::new(Vec::new()),
+            }
+        }
+
+        fn host(&self) -> crate::resident_projection::ResidentDialHost {
+            use personae::IdentityProvider;
+            crate::resident_projection::ResidentDialHost::new(
+                crate::resident_projection::dial_policy(
+                    self.network,
+                    vec![notochord::TrustedRoot {
+                        authority: REMOTE_ROOT,
+                        issuer: self.owner.master_public_key().to_bytes(),
+                    }],
+                    vec![remote_profile()],
+                    None,
+                ),
+            )
+        }
+
+        /// The persona's device grant: `path_prefix` under `action`.
+        fn grant(
+            &self,
+            path_prefix: &str,
+            action: &str,
+        ) -> insigne::delegation::SignedDelegationCertificate {
+            use insigne::delegation::{
+                CapabilityScope, DelegationCertificate, DelegationParent,
+                SignedDelegationCertificate,
+            };
+            use personae::IdentityProvider;
+            use personae::delegation::Issue;
+            SignedDelegationCertificate::issue(
+                &self.owner,
+                DelegationCertificate::new(
+                    DelegationParent::Root(REMOTE_ROOT),
+                    self.owner.master_public_key().to_bytes(),
+                    self.device.master_public_key().to_bytes(),
+                    CapabilityScope {
+                        domain: graphshell_host::admission::GRAPHSHELL_DOMAIN.into(),
+                        resource: self.network.0.to_vec(),
+                        path_prefix: path_prefix.into(),
+                        actions: [action.to_string()].into_iter().collect(),
+                    },
+                    0,
+                    0,
+                    None,
+                    0,
+                    [0x65; 32],
+                ),
+            )
+            .expect("issue the device grant")
+        }
+
+        /// Dial `host` over a fresh memory pair, asking for `request` under
+        /// `grant`, and serve the host's side of the one session. `Ok` is the
+        /// admitted stream; `Err` is a handshake refusal.
+        async fn dial(
+            &self,
+            host: &mut crate::resident_projection::ResidentDialHost,
+            request: &mere_overmap::wire::RemoteMereRequest,
+            grant: insigne::delegation::SignedDelegationCertificate,
+        ) -> Result<tokio::io::DuplexStream, notochord::DenyReason> {
+            use personae::IdentityProvider;
+            use transport::PeerID;
+            let device_peer =
+                PeerID::from_bytes(&self.device.master_public_key().to_bytes()).unwrap();
+            let host_peer =
+                PeerID::from_bytes(&personae::InMemoryProvider::from_seed([0x66; 32])
+                    .master_public_key()
+                    .to_bytes())
+                .unwrap();
+            let (server, client) = transport::memory::MemoryTransport::pair(host_peer, device_peer);
+            let hello = graphshell_host::admission::open_session_for(
+                &self.device,
+                self.network,
+                remote_profile(),
+                notochord::RequestedAction {
+                    domain: graphshell_host::admission::GRAPHSHELL_DOMAIN.into(),
+                    path: request.path(),
+                    action: request.action().into(),
+                },
+                notochord::TrafficClass::Interactive,
+                [0x67; 32],
+                &graphshell_host::network_carrier::projection_binding(device_peer),
+                vec![grant],
+            )
+            .unwrap();
+            let limits = notochord::HandshakeLimits::default();
+            let (accepted, dialled) = tokio::join!(
+                host.accept_one(&server, || 1_000),
+                graphshell_host::network_carrier::dial_projection_session(
+                    &client, host_peer, &hello, &limits,
+                )
+            );
+            // The host's side: a refusal or a served session; either way
+            // the transport stays up while the dialler reads.
+            let _ = accepted;
+            self.hosts.lock().unwrap().push(server);
+            dialled.expect("the dial reaches a decision")
+        }
+    }
+
+    /// T4, T5 and T7 together: a same-persona device whose grant names
+    /// `turnstone` for `mere/divination` reads the mere's sessions and graph
+    /// through the dialable host, as `turnstone`, with the shared route panel
+    /// over the native line pump.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_device_reads_a_mere_through_the_dialable_host_as_its_granted_application() {
+        use graphshell_client::pump::LinePump;
+        use mere_overmap::route_session::MereRouteSession;
+        use mere_overmap::wire::RemoteMereRequest;
+        let dialler = RemoteDialler::new();
+        let mut host = dialler.host();
+        let fixture = fixture_serving(41, "divination", None, Some(host.catalog())).await;
+        let mut writer = fixture.attach("turnstone").await;
+        let start = graph(&mut writer);
+        assert_eq!(
+            writer.invoke(apply(&start, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+
+        let request = RemoteMereRequest::explicit("divination", "turnstone");
+        let grant = dialler.grant(&request.path(), request.action());
+        let stream = dialler
+            .dial(&mut host, &request, grant)
+            .await
+            .expect("the device is admitted");
+        let profile = chirograph::CapabilityProfile::new([
+            chirograph::PresentationCapability::PortableCard,
+        ]);
+        let mut pump = LinePump::new(stream);
+        let opened = pump.open(profile.clone()).await.expect("the route opens");
+        let mut panel =
+            MereRouteSession::from_descriptor(opened.descriptor, profile, "turnstone").unwrap();
+        pump.drive(&mut panel, |panel| !panel.in_flight())
+            .await
+            .expect("the panel reads the route");
+        let model = panel.model();
+        assert!(!model.sessions.is_empty(), "the mere's sessions are read");
+        assert!(
+            model
+                .graph
+                .nodes
+                .iter()
+                .any(|node| node.key == Uuid::from_u128(1).to_string()),
+            "the attached session's graph is read: {:?}",
+            model.graph.nodes
+        );
+        assert_eq!(panel.view_name(), "turnstone.mere");
+    }
+
+    /// What the dialable host refuses: a grant naming another application,
+    /// an explicit grant used for ambient, and ambient for an application the
+    /// owner has not opted in; and that ambient, once opted in, reads the
+    /// graph alone.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn the_dialable_host_serves_only_what_the_grant_and_the_owner_name() {
+        use graphshell_client::pump::LinePump;
+        use mere_overmap::wire::RemoteMereRequest;
+        let dialler = RemoteDialler::new();
+        let mut host = dialler.host();
+        let fixture = fixture_serving(43, "divination", None, Some(host.catalog())).await;
+        // A live session, so the ambient route has material to read.
+        let mut writer = fixture.attach("turnstone").await;
+        let start = graph(&mut writer);
+        assert_eq!(
+            writer.invoke(apply(&start, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let profile = chirograph::CapabilityProfile::new([
+            chirograph::PresentationCapability::PortableCard,
+        ]);
+
+        // The grant names knot-editor; the hello asks as turnstone. The chain
+        // covers the path no more than it covers the application: refused at
+        // the handshake.
+        let asked = RemoteMereRequest::explicit("divination", "turnstone");
+        let named = RemoteMereRequest::explicit("divination", "knot-editor");
+        let grant = dialler.grant(&named.path(), named.action());
+        assert!(
+            dialler.dial(&mut host, &asked, grant).await.is_err(),
+            "a grant for another application does not admit this one"
+        );
+
+        // A broad grant (every mere) admits nothing here: the leaf must name
+        // the application.
+        let grant = dialler.grant(mere_overmap::wire::REMOTE_MERE_SERVICE, "connect");
+        let stream = dialler.dial(&mut host, &asked, grant).await.expect("admitted");
+        assert!(
+            LinePump::new(stream).open(profile.clone()).await.is_err(),
+            "a grant that names no application serves no route"
+        );
+
+        // An explicit grant does not reach the ambient route.
+        let ambient = RemoteMereRequest::ambient("divination", "turnstone");
+        let grant = dialler.grant(&asked.path(), asked.action());
+        assert!(
+            dialler.dial(&mut host, &ambient, grant).await.is_err(),
+            "an explicit grant does not confer ambient"
+        );
+
+        // An ambient grant for an application the owner has not opted in:
+        // admitted, but the route will not open for it.
+        let grant = dialler.grant(&ambient.path(), ambient.action());
+        let stream = dialler.dial(&mut host, &ambient, grant).await.expect("admitted");
+        assert!(
+            LinePump::new(stream).open(profile.clone()).await.is_err(),
+            "ambient needs the owner's opt-in"
+        );
+
+        // Opted in, the ambient route offers the graph alone.
+        let mere = fixture
+            .reservoir
+            .meres()
+            .await
+            .into_iter()
+            .find(|mere| mere.domain.as_str() == "divination")
+            .unwrap();
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                AppId::new("turnstone"),
+                false,
+                true,
+                AppId::new("turnstone"),
+            )
+            .await
+            .unwrap();
+        let grant = dialler.grant(&ambient.path(), ambient.action());
+        let stream = dialler.dial(&mut host, &ambient, grant).await.expect("admitted");
+        let opened = LinePump::new(stream)
+            .open(profile)
+            .await
+            .expect("the ambient route opens once opted in");
+        let sessions: Vec<_> = opened
+            .descriptor
+            .projections
+            .iter()
+            .map(|offer| offer.request.session.0.clone())
+            .collect();
+        assert_eq!(sessions, vec![mere_overmap::wire::MERE_GRAPH.to_string()]);
     }
 
     /// Djinn's application door over `fixture`'s catalog, admitting Knot's
