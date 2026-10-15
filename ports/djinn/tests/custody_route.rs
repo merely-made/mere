@@ -183,7 +183,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
         .is_err()
     );
     let import = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../castellan/tests/fixtures/ssh/ed25519");
+        .join("castellan/tests/fixtures/ssh/ed25519");
     assert!(matches!(cli.call(CustodyCall::VaultCommand {
         profile: ProfileId("default".into()), command: "add-ssh".into(),
         args: vec![import.display().to_string()],

@@ -78,7 +78,7 @@ Every real gap is in **crypto agility**, not in crypto choice.
 
 Verified in code, 2026-08-24:
 
-- `ports/castellan/src/custody/passphrase_storage.rs` — the on-disk
+- `ports/djinn/castellan/src/custody/passphrase_storage.rs` — the on-disk
   `EncryptedFile` carries `version`, `salt`, `profiles`. It does **not** carry
   the Argon2 cost parameters; `grep` for `m_cost`/`t_cost`/`p_cost` across both
   `passphrase_storage.rs` and `passphrase_root.rs` returns nothing. The module
@@ -714,12 +714,12 @@ recorded in §1, §3.3, §5, §6 and §8.
 | WATCH | Cryptoki — the cryptographic token interface | PKCS #11 Specification Version 3.2 (and PKCS #11 Profiles v3.2) | castellan's authority half, in two opposite directions. **As a consumer**: a YubiKey PIV applet, a smartcard, or a Nitrokey holding a persona's root … |
 | PULL | TPM 2.0 NV monotonic counters (the standard that closes the rollback gap) | TCG TPM 2.0 Library Specification, Family 2.0, Level 00, Revision 01.83 (published as ISO/IEC 11889) | **personae sealed_record_storage::freshness::FileFreshnessLedger** — directly and specifically. The castellan README states the gap in its own words: … |
 | PULL | Credential Exchange Format and Protocol | CXF v1.0 (Proposed Standard, 2025-08-21, with Errata 2026-03-09) / CXP v1.0 (Working Draft, 2024-10-03) | castellan's import path. The README states plainly: 'CXF import remains follow-on work.' The 2026-08-10 credential-port brief already identified CXF … |
-| ADOPT | FIDO Credential Exchange Format | CXF v1.0 Proposed Standard with Errata, 2026-03-09 | repos/mere/ports/castellan — the README's own open item, 'CXF import remains follow-on work'. Second consumer: repos/mere/crates/import, which today … |
+| ADOPT | FIDO Credential Exchange Format | CXF v1.0 Proposed Standard with Errata, 2026-03-09 | repos/mere/ports/djinn/castellan — the README's own open item, 'CXF import remains follow-on work'. Second consumer: repos/mere/crates/import, which today … |
 | WATCH | FIDO Credential Exchange Protocol | CXP v1.0 Working Draft, 2024-10-03 | castellan's authority half — it is the only component that would ever hold the HPKE private half. Speculatively distillery/moot if credential handoff … |
 | PULL | KDBX (KeePass database format) | KDBX 4.1 File Format Specification (format version 0x00040001) | castellan import. KeePassXC is also the closest architectural sibling to castellan's local-first, no-account posture, so its users are the most … |
 | PULL | 1Password Unencrypted Export (1PUX) and OPVault | 1PUX export format; OPVault design | castellan import, as the pre-CXF fallback for 1Password users. |
 | PULL | De-facto vault and browser export formats (Bitwarden JSON, Chrome/Firefox CSV, Apple Passwords CSV) | Bitwarden export .json / .csv; Chromium password CSV; Firefox password CSV; Apple Passwords CSV export | castellan import — specifically the long tail of users who are not on any platform that brokers CXP and are not KeePass users. |
-| ADOPT | Freedesktop Secret Service API | Secret Service 0.2 DRAFT (publication date 2026-04-08) | repos/mere/ports/castellan, feature secret-service — already shipped: the resident owns org.freedesktop.secrets without replacement, implements the … |
+| ADOPT | Freedesktop Secret Service API | Secret Service 0.2 DRAFT (publication date 2026-04-08) | repos/mere/ports/djinn/castellan, feature secret-service — already shipped: the resident owns org.freedesktop.secrets without replacement, implements the … |
 | PULL | XDG Desktop Portal Secret interface | org.freedesktop.portal.Secret, interface version 1 (xdg-desktop-portal ≥ 1.5.0) | Only a hypothetical Flatpak or Snap build of pelt/graphshell/castellan. No such build exists today. |
 | ADOPT | HTML autofill field names (autocomplete tokens) | WHATWG HTML Standard, Living Standard — Autofill / autocomplete attribute | repos/genet (the engine and pelt), paired with castellan's embeddable half. This is the entry where owning the engine changes the verdict. |
 | PULL | Credential Management API | Credential Management Level 1, W3C Working Draft 2026-02-13 | repos/genet, if and only if WebAuthn support lands there; castellan would be the credential store behind it. |

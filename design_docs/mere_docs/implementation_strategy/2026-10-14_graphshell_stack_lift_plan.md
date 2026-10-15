@@ -1,8 +1,8 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-15):** plan; nothing moved. The census below was read from
+**Status (2026-10-15):** plan; only Castellan has moved (R8). The census below was read from
 the source at `0aade8668` and corrects the first pass in several places
-(§2). Mark ruled R1 to R7 and the `Page` split on 2026-10-15 (§5). No code,
+(§2). Mark ruled R1 to R8 and the `Page` split on 2026-10-15 (§5). No code,
 manifest or other plan changed with this document.
 
 **Origin.** Mark noticed that the Graphshell reference host is about 100k
@@ -631,3 +631,11 @@ fast-forward of local main; nothing built).**
 - **2026-10-15 (later):** R8: Castellan moves to `ports/djinn/castellan` as
   a component crate. The R4 note that Castellan keeps a credential UI is
   withdrawn; Castellan has none.
+- **2026-10-15 (R8 done):** Castellan moved from its own port directory to
+  `ports/djinn/castellan`; the package stays `castellan`. The workspace
+  member and dependency path, `.gitattributes`, the install scripts' repo
+  root, the DR-C and Dramatis review receipt scripts, and the live docs that
+  cited the old path followed. Its `lib.rs` header, README and manifest
+  description now say it is Djinn's secret-custody component with no
+  screens: the views are `dramatis::view` (D24), the UI is `dramatis-app`.
+  The `deny.toml` wrapper rule keys on the crate name and still holds.
