@@ -16,11 +16,11 @@
 
 use std::collections::HashMap;
 
+use cartography::MERE_GRAPH_ADAPTER;
 use chirograph::{
     ContentHash, EndpointDescriptor, IntentInvocation, IntentResult, PortableCardV1,
     PresentationOffer, ProjectionRequest, ProjectionSnapshot, ResourceRequest,
 };
-use mere::canvas::MERE_GRAPH_ADAPTER;
 use mere_view::{
     ArchiveEntry, ArchiveModel, ArchiveRequest, GraphModel, MereViewModel, MereViewRequest,
     NodeEntry, NodeState, Provenance, RelationEntry, SessionEntry, SessionStep,
@@ -29,7 +29,7 @@ use pandect::SessionId;
 use sceno::{InstanceId, SourceRef};
 use uuid::Uuid;
 
-use crate::session_item::{
+use crate::wire::{
     ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ArchiveActionV1, COMPOSE_CODICILS_INTENT,
     FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS, MINT_SESSION_INTENT,
     OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSION_ITEM_SOURCE,
@@ -403,7 +403,7 @@ fn mere_card(sessions: &ProjectionSnapshot) -> InstanceId {
 /// fields as text without interpreting or rewriting a domain's sealed values.
 pub fn add_node_facets(
     cards: &mut HashMap<String, PortableCardV1>,
-    facets: &mere::kernel::graph::NodeFacetStore,
+    facets: &kernel::graph::NodeFacetStore,
 ) -> Result<(), String> {
     for (key, card) in cards {
         let id = Uuid::parse_str(key).map_err(|e| e.to_string())?;

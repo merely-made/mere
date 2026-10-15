@@ -80,7 +80,7 @@ members = [
     "ports/graphshell",
     "ports/djinn",
     "ports/dramatis",
-    "ports/castellan",
+    "ports/djinn/castellan",
     "ports/distillery",
     "ports/moot",
     "ports/distillery/athanor",
@@ -131,6 +131,8 @@ members = [
     "crates/cambium/workbench",
     # The mere view every application embeds (reservoir plan V2b).
     "crates/cambium/mere-view",
+    # A mere route read remotely, filling the mere view (stack lift plan L14, R7).
+    "crates/cambium/mere-overmap",
     # The application host contract genet's P1 split out of genet-host-api. A
     # host contract rather than a widget, so it lands beside `fetch`.
     "crates/system/surface-api",
@@ -263,7 +265,7 @@ knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
-castellan = { version = "0.0.3", path = "ports/castellan" }
+castellan = { version = "0.0.3", path = "ports/djinn/castellan" }
 # The model-works port; first real consumer of the mesh host supervisor.
 distillery = { version = "0.0.1", path = "ports/distillery" }
 # The places port: one port, two surfaces (murmur = conversation, moot =
@@ -320,9 +322,9 @@ document-canvas = { version = "0.1.0", path = "crates/inker/document-canvas" }
 # `crates/inker/knot-editor-host` opts back into `html-fragment` explicitly, and
 # so does the external knot-editor.
 nematic = { version = "0.1.1", path = "crates/nematic/nematic", default-features = false }
-fleece-extract = { package = "fleece", version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+fleece-extract = { package = "fleece", version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 fleece = { package = "mere-fleece", path = "crates/fleece", version = "0.0.1" }
-genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # Landed here from genet 2026-09-03 (platform boundary plan, P3): a workspace
 # member now, so it is a path dep and must NOT appear in .cargo/config.toml's
 # genet patch table — patching a git source at a path that is also a workspace
@@ -355,13 +357,13 @@ weld-engine = { version = "0.2.0", path = "crates/inker/engines/weld-engine" }
 # full git spec, so a genet bump meant editing fifteen files and a missed one
 # silently forked the lineage. Stated once here; members inherit with
 # `foo.workspace = true` and add only their own features/optional flags.
-genet-scripted-dom = { version = "=0.1.2", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-layout-dom-api = { version = "=0.1.1", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-layout_dom_api = { package = "layout-dom-api", version = "=0.1.1", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-genet-livery = { version = "0.0.4", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", default-features = false }
+genet-scripted-dom = { version = "=0.1.2", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+layout-dom-api = { version = "=0.1.1", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+layout_dom_api = { package = "layout-dom-api", version = "=0.1.1", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+genet-livery = { version = "0.0.4", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", default-features = false }
 # Named genet-probe until genet 7baa554c (2026-09-14); same crate, new name.
-taproot = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", default-features = false }
-genet-static-dom = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+taproot = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", default-features = false }
+genet-static-dom = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # The application half of the former `genet-host-api` — the settings
 # projection and the surface admission vocabulary. Genet's P1 split it out as
 # `mere-surface-api` (genet 57bcc38fdae, platform boundary plan §9.3), leaving
@@ -370,6 +372,7 @@ genet-static-dom = { git = "https://github.com/merely-made/genet.git", rev = "e8
 mere-surface-api = { version = "0.1.0", path = "crates/system/surface-api" }
 workbench = { version = "=0.1.0", path = "crates/cambium/workbench" }
 mere-view = { version = "0.1.0", path = "crates/cambium/mere-view" }
+mere-overmap = { version = "0.1.0", path = "crates/cambium/mere-overmap", default-features = false }
 errand = { version = "0.4.0", path = "crates/system/errand" }
 # Errand's wire layer: one spec-faithful crate per protocol, published under
 # names that belong to the protocols' communities rather than to the engine
@@ -387,7 +390,7 @@ scroll-protocol = { version = "=0.1.0" }
 finger-protocol = { version = "=0.1.1", default-features = false, features = [
     "client",
 ] }
-netfetcher = { version = "0.1.1", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+netfetcher = { version = "0.1.1", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # ─── Landed from genet 2026-09-03 (platform boundary plan, P3) ───────────────
 # Workspace members, so path deps. None of these may appear in
 # .cargo/config.toml's genet patch table.
@@ -404,31 +407,31 @@ mere-document-lanes = { version = "0.1.0", path = "crates/system/document-lanes"
 # `components/`; here they are git pins at the same single revision as every
 # other genet.git line in this file — the source-identity invariant (plan §8.7,
 # §9.4). Package names that differ from the key are spelled out.
-genet-host-api = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-genet-documents = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", default-features = false }
-genet-document-resources = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-genet-render = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", default-features = false, features = ["livery", "accesskit"] }
+genet-host-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+genet-documents = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", default-features = false }
+genet-document-resources = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+genet-render = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", default-features = false, features = ["livery", "accesskit"] }
 # The present core (wgpu boot, surface format, Scene rasterization) every host
 # stands on. Named here because the landed Cambium hosts reached it by relative
 # path inside genet and now reach genet.git like the rest of the family.
-genet-render-host = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-genet-winit-host = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-genet-scripted = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", default-features = false }
-document-session-api = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+genet-render-host = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+genet-winit-host = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+genet-scripted = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", default-features = false }
+document-session-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 cambium-genet-winit-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-winit-host" }
-script-runtime-api = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-script-engine-api = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-script-engine-boa = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-script-engine-nova = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+script-runtime-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+script-engine-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+script-engine-boa = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+script-engine-nova = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # `servo-paint` was retired in genet 5af76a0cb8c; its platform compositor half
 # (DXGI, CALayer, Wayland, HostWgpuContext, `default_compositor_for_window`)
 # is `genet-compositor` with the public names unchanged, so the `paint` key
 # and Pelt's `paint::` paths stay as they are.
-paint = { package = "genet-compositor", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-webgl_wgpu = { package = "servo-webgl-wgpu", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+paint = { package = "genet-compositor", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+webgl_wgpu = { package = "servo-webgl-wgpu", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # Tabard's dev-dependency: the owned static CSS/layout engine it renders its
 # generated stylesheets through.
-livery = { version = "0.0.5", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+livery = { version = "0.0.5", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # The seed-palette engine, under its published name. `tincture` below is the
 # SAME package under mere's historical alias; both must stay on this one
 # source and version or the graph carries two incompatible `Tinct`s — which is
@@ -436,9 +439,9 @@ livery = { version = "0.0.5", git = "https://github.com/merely-made/genet.git", 
 # neither may be patched: tinct is a workspace member as of 2026-09-03.
 tinct = { version = "=0.1.2", path = "crates/cambium/tinct" }
 
-netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
-paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
-paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
+netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
+paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
+paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
 
 # Published as `mere-forme`: the crates.io name `forme` is owned by someone else
 # (an HTML template engine). The `package =` alias keeps every `use forme::...`
@@ -549,7 +552,7 @@ peniko = "0.6"
 # fork carries `AlignmentOptions::last_line_alignment` and
 # `StyleProperty::TabSize`, which published parley 0.10.0 lacks at the same
 # version number.
-parley = { package = "genet-parley", version = "0.10.0", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+parley = { package = "genet-parley", version = "0.10.0", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 skrifa = "0.42"
 color = "0.3"
 
@@ -778,7 +781,7 @@ workbench = { path = "crates/cambium/workbench" }
 # cone has no root patch in this workspace.
 [patch.crates-io]
 # Pictograph's published dev dependency shares the renderer's device source.
-netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
+netrender_device = { git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
 # gaz (dramatis) takes muniment from crates.io so dramatis never pins mere;
 # this swaps in mere's own, so the graph holds one muniment and castellan's
 # stores and gaz's agree on its types.
@@ -834,11 +837,11 @@ cubecl-runtime = { path = "support/patches/cubecl-runtime" }
 # Remove when upstream provides equivalent control and passes the lifecycle
 # receipt, including reclaim and recovery.
 burn-remote = { path = "support/patches/burn-remote" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", version = "=0.1.1" }
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee", version = "=0.1.2" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1", version = "=0.1.2" }
 # Livery/Buckram require Genet's Taffy fork. Genet's workspace patch is not
 # inherited by consumers, so Mere restates the same immutable Genet revision.
-taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 # No parley/fontique patch rows: as of genet 5ae30cad the forks are published as
 # `genet-parley` and `genet-fontique`, so nothing in genet answers to the name
 # `parley` and a patch row here would match no package and fail resolution.
@@ -900,8 +903,8 @@ opt-level = 3
 # Forward only this closed two-package cone to the host revision. The HTTPS
 # alias avoids Cargo's same-source patch restriction; both remain immutable.
 [patch."https://github.com/merely-made/genet.git"]
-fleece = { version = "=0.5.0", git = "https://www.github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
-layout-dom-api = { version = "=0.1.1", git = "https://www.github.com/merely-made/genet.git", rev = "e8b8606f51101906c3e3d1d075c608ef530940ee" }
+fleece = { version = "=0.5.0", git = "https://www.github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
+layout-dom-api = { version = "=0.1.1", git = "https://www.github.com/merely-made/genet.git", rev = "ae3d9f5d9721fc6b0d5faa58bb6798ee63307be1" }
 
 # Compatibility source keys for immutable suppliers published before the
 # repository rename. Targets and current direct dependencies use Murm.
@@ -925,7 +928,7 @@ tulle = { git = "https://github.com/merely-made/murm.git", rev = "3d9e799fe06d2a
 # runtime family to one immutable Git source identity. Standalone roots must
 # repeat this bridge. Retire after coordinated Genet supplier adoption.
 [patch."https://github.com/merely-made/netrender.git"]
-netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
-netrender_device = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
-paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
-paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "5fbc7b2ba44e40d613974fa7994558d66cf76c5a" }
+netrender = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
+netrender_device = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
+paint_list_api = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }
+paint_list_render = { version = "=0.1.2", git = "https://www.github.com/merely-made/netrender.git", rev = "f4f9c0d87e6a6030b61075a45118055dfe6a12df" }

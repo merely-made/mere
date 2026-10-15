@@ -1,13 +1,16 @@
 # castellan
 
-**Castellan**, the credential-keeper port of the Mere platform.
+**Castellan**, Djinn's secret-custody component.
 
 A castellan holds a keep in trust for its lord: custody without ownership, and
-the office of the gate. This port is that keeper for your credentials. It
+the office of the gate. This crate is that keeper for your credentials. It
 holds secret custody inside djinn (release, signing, presentation), answering
-participant-gate petitions over an agent-style channel. Secret-free views live
-in graphshell. Applications call djinn's custody route; only djinn links
-castellan, as enforced by Mere's `deny.toml`.
+participant-gate petitions over an agent-style channel. It has no screens: the
+secret-free views live in `dramatis::view` (dramatis repo plan, ruling D24),
+and the persona and quarantine UI is `dramatis-app` (`ports/dramatis`).
+Applications call djinn's custody route; only djinn links castellan, as
+enforced by Mere's `deny.toml`. It stays its own crate so the custody code
+keeps that dependency boundary.
 
 The vocabulary it keeps, per the dramatis tier model:
 
@@ -25,7 +28,8 @@ public presentation and gazette announces it (ruled 2026-09-30), so the port
 that holds secrets never grows a public listener.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
-`ports/castellan`.
+`ports/djinn/castellan`, nested under the Djinn port (graphshell stack lift
+plan, ruling R8, 2026-10-15).
 
 ## State (2026-08-21)
 
@@ -62,8 +66,8 @@ Implemented:
   runs under a disposable session bus.
 - The Reticulum station derivation that began here is `personae::reticulum`
   now, and the station grant policy `pandect::station_grant` (DR-C, D17).
-- feature `keeper` — the two halves made real, moved home from graphshell
-  where they first grew: `view` (the secret-free read model) and `authority`
+- feature `keeper` — moved home from graphshell where it first grew: `view`
+  (re-exports `dramatis::view` and loads the public carry lane) and `authority`
   (`PersonaeHost`, the resident keeper that holds the vault, serves the SSH
   agent, and brokers approvals).
 

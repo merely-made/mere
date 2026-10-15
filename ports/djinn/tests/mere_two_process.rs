@@ -33,13 +33,13 @@ use djinn::resident_reservoir::{
 use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
-use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
+use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, mere_dir};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use sceno::InstanceId;

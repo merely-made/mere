@@ -14,7 +14,7 @@
 //! session attaches to one of the mere's sessions, the live one changed last
 //! unless it asks for another (§7 item 24), and sees two projections: the
 //! mere's sessions, with the lifecycle as intents that name their session by
-//! id (§7 item 33) in `graphshell::session_item`'s vocabulary (§7 item 37),
+//! id (§7 item 33) in `mere_overmap::wire`'s vocabulary (§7 item 37),
 //! and the attached session's graph, served through `MereHost` with its
 //! session item (§7 items 21, 22 and 31). Every application attached to one
 //! session shares one host, so each sees the others' edits, told by a
@@ -41,17 +41,18 @@ use graphshell::handlers::HandlerRegistry;
 use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::mere_host::{MereHost, SelectedPersonaRef};
 use graphshell::native::app_broker::AppEndpointCatalog;
-use graphshell::session_item::{
-    self, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1, ArchiveActionV1,
-    COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS,
-    MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT,
-    SESSIONS_SCHEMA, SESSIONS_SOURCE, SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
-};
 use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
+};
+use mere_overmap::wire::{
+    self as session_item, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1,
+    ArchiveActionV1, COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH,
+    MERE_SESSIONS, MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT,
+    SAVE_CODICIL_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE, SessionsActionV1, SetViewV1, StepV1,
+    TRASH_SESSION_INTENT,
 };
 use muniment::{DirectoryBackend, RedbBackend};
 use pandect::{
@@ -1491,10 +1492,10 @@ impl ProjectionNoticeSource for MereEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell::mere_route;
     use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
     use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
+    use mere_overmap::route as mere_route;
     use mere_view::{MereViewModel, MereViewRequest, SessionStep};
     use pandect::{Change, ChangeKind, mere_dir};
     use uuid::Uuid;
@@ -1911,7 +1912,7 @@ mod tests {
         let list = projection(&mut app, 0);
         let id = session_ids(&list)[0];
         let archive = projection(&mut app, 2);
-        let save = graphshell::mere_route::archive_intent(
+        let save = mere_overmap::route::archive_intent(
             &MereViewRequest::Archive(ArchiveRequest::Save(id)),
             &list,
             &archive,
@@ -1920,7 +1921,7 @@ mod tests {
         assert_eq!(app.invoke(save).unwrap(), IntentResult::Accepted);
         let archive = projection(&mut app, 2);
         let codicil = archive_ids(&archive)[0].clone();
-        let open = graphshell::mere_route::archive_intent(
+        let open = mere_overmap::route::archive_intent(
             &MereViewRequest::Archive(ArchiveRequest::Open(codicil)),
             &list,
             &archive,
@@ -1933,7 +1934,7 @@ mod tests {
         assert!(material.read_only);
         assert_eq!(material.into_graph().unwrap().node_count(), 1);
         assert!(
-            graphshell::mere_route::archive_intent(
+            mere_overmap::route::archive_intent(
                 &MereViewRequest::Archive(ArchiveRequest::Compose(vec![
                     "unknown".into(),
                     "unknown".into()
@@ -2205,7 +2206,7 @@ mod tests {
     }
 
     fn drive_common_panel(
-        panel: &mut graphshell::mere_route_session::MereRouteSession,
+        panel: &mut mere_overmap::route_session::MereRouteSession,
         endpoint: &mut ResidentEndpointSession,
         wrong_role: bool,
     ) {
@@ -2265,7 +2266,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn common_panel_controller_runs_lifecycle_then_purges_on_denial_and_rejoins() {
-        use graphshell::mere_route_session::MereRouteSession;
+        use mere_overmap::route_session::MereRouteSession;
         let fixture = fixture(34, "divination").await;
         fixture
             .grants
@@ -2274,6 +2275,7 @@ mod tests {
         let mut panel = MereRouteSession::from_descriptor(
             endpoint.describe(),
             chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+            "graphshell",
         )
         .unwrap();
         drive_common_panel(&mut panel, &mut endpoint, false);
@@ -2385,6 +2387,7 @@ mod tests {
         let mut rejoined = MereRouteSession::from_descriptor(
             endpoint.describe(),
             chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+            "graphshell",
         )
         .unwrap();
         drive_common_panel(&mut rejoined, &mut endpoint, false);
@@ -2399,9 +2402,10 @@ mod tests {
             .grants
             .grant(AppId::new("graphshell"), ResidentReservoir::route());
         let mut endpoint = fixture.attach("graphshell").await;
-        let mut panel = graphshell::mere_route_session::MereRouteSession::from_descriptor(
+        let mut panel = mere_overmap::route_session::MereRouteSession::from_descriptor(
             endpoint.describe(),
             chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+            "graphshell",
         )
         .unwrap();
         drive_common_panel(&mut panel, &mut endpoint, true);
@@ -2437,7 +2441,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn common_panel_saves_own_view_and_reopens_archive_without_implicit_writes() {
-        use graphshell::mere_route_session::MereRouteSession;
+        use mere_overmap::route_session::MereRouteSession;
         use mere_view::ArchiveRequest;
         let fixture = fixture(36, "divination").await;
         fixture
@@ -2450,7 +2454,9 @@ mod tests {
             IntentResult::Accepted
         );
         let profile = || chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]);
-        let mut panel = MereRouteSession::from_descriptor(endpoint.describe(), profile()).unwrap();
+        let mut panel =
+            MereRouteSession::from_descriptor(endpoint.describe(), profile(), "graphshell")
+                .unwrap();
         drive_common_panel(&mut panel, &mut endpoint, false);
         let key = Uuid::from_u128(1).to_string();
         assert!(panel.records().contains_key(&key));
@@ -2477,7 +2483,9 @@ mod tests {
         drop(panel);
         drop(endpoint);
         let mut endpoint = fixture.attach("graphshell").await;
-        let mut panel = MereRouteSession::from_descriptor(endpoint.describe(), profile()).unwrap();
+        let mut panel =
+            MereRouteSession::from_descriptor(endpoint.describe(), profile(), "graphshell")
+                .unwrap();
         drive_common_panel(&mut panel, &mut endpoint, false);
         assert_eq!(panel.saved_view(), &saved);
         assert_eq!(panel.focus_key().as_deref(), Some(key.as_str()));
@@ -2595,7 +2603,8 @@ mod tests {
         drop(endpoint);
         let mut endpoint = fixture.attach("graphshell").await;
         let mut reopened =
-            MereRouteSession::from_descriptor(endpoint.describe(), profile()).unwrap();
+            MereRouteSession::from_descriptor(endpoint.describe(), profile(), "graphshell")
+                .unwrap();
         drive_common_panel(&mut reopened, &mut endpoint, false);
         // A fresh route chooses latest_live, which can already be this
         // thaw. Switch only if its actual card advertises attachment.
@@ -2655,7 +2664,7 @@ mod tests {
     /// fixture as authority. Envelope faults rebind both content addresses so
     /// they test role/binding checks after successful hash verification.
     fn drive_common_panel_media_fault(
-        panel: &mut graphshell::mere_route_session::MereRouteSession,
+        panel: &mut mere_overmap::route_session::MereRouteSession,
         endpoint: &mut ResidentEndpointSession,
         fault: MediaFault,
     ) {
@@ -2770,7 +2779,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn common_panel_refuses_media_with_wrong_namespace_application_session_or_hash() {
-        use graphshell::mere_route_session::MereRouteSession;
+        use mere_overmap::route_session::MereRouteSession;
         let fixture = fixture(37, "divination").await;
         fixture
             .grants
@@ -2789,6 +2798,7 @@ mod tests {
             let mut panel = MereRouteSession::from_descriptor(
                 endpoint.describe(),
                 chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+                "graphshell",
             )
             .unwrap();
             drive_common_panel_media_fault(&mut panel, &mut endpoint, fault);
@@ -2809,6 +2819,7 @@ mod tests {
         let mut panel = MereRouteSession::from_descriptor(
             endpoint.describe(),
             chirograph::CapabilityProfile::new([PresentationCapability::PortableCard]),
+            "graphshell",
         )
         .unwrap();
         drive_common_panel(&mut panel, &mut endpoint, false);

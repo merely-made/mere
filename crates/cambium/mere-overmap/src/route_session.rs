@@ -8,8 +8,8 @@
 //! owns wire correlation and resource validation; this adapter sequences the
 //! sessions, graph and optional archive readings and never owns a store.
 use crate::{
-    mere_route,
-    session_item::{MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS},
+    route as mere_route,
+    wire::{MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS},
 };
 use chirograph::{
     CapabilityProfile, ContentHash, EndpointDescriptor, ProjectionSession, ProjectionSnapshot,
@@ -29,6 +29,9 @@ enum Task {
     Media(ProjectionSession, InstanceId),
 }
 pub struct MereRouteSession {
+    /// The admitted application this panel reads as. The owner discloses
+    /// only that application's own parallel view state.
+    application: String,
     driver: SessionDriver,
     indices: Vec<usize>,
     sessions: ProjectionSession,
@@ -44,15 +47,19 @@ pub struct MereRouteSession {
     primary: Option<MountedScene>,
     saved_view: pandect::ViewIntent,
     read_only: bool,
-    material: Option<crate::session_item::SessionGraphV1>,
+    material: Option<crate::wire::SessionGraphV1>,
     records: HashMap<String, chirograph::PortableCardV1>,
     inspected: Option<String>,
     transient_layout: Option<String>,
 }
 impl MereRouteSession {
+    /// A panel over the route `descriptor` describes, read as `application`:
+    /// the id the host was admitted under. Its saved view is the
+    /// application's `<application>.mere` view.
     pub fn from_descriptor(
         descriptor: EndpointDescriptor,
         profile: CapabilityProfile,
+        application: &str,
     ) -> Result<Self, String> {
         let find = |name: &str| -> Result<Option<usize>, String> {
             let matching: Vec<_> = descriptor
@@ -85,6 +92,7 @@ impl MereRouteSession {
             .flatten()
             .collect();
         let mut result = Self {
+            application: application.to_owned(),
             driver: SessionDriver::from_descriptor(descriptor, profile),
             indices,
             sessions,
@@ -115,6 +123,10 @@ impl MereRouteSession {
         };
         result.refresh()?;
         Ok(result)
+    }
+    /// The application's view of the mere that this panel keeps.
+    pub fn view_name(&self) -> String {
+        format!("{}.mere", self.application)
     }
     pub fn show_notice(&mut self, reason: String) {
         self.model.notice = Some(reason);
@@ -324,7 +336,7 @@ impl MereRouteSession {
                         primary.scene.tables.sources[item.source.0 as usize]
                             .as_ref()
                             .is_some_and(|source| {
-                                source.adapter == crate::session_item::SESSION_ITEM_SOURCE
+                                source.adapter == crate::wire::SESSION_ITEM_SOURCE
                             })
                     })
                     .map(|(instance, _)| instance.0 as usize)
@@ -483,9 +495,7 @@ impl MereRouteSession {
             .find(|(_, item)| {
                 snapshot.scene.tables.sources[item.source.0 as usize]
                     .as_ref()
-                    .is_some_and(|source| {
-                        source.adapter == crate::session_item::SESSION_ITEM_SOURCE
-                    })
+                    .is_some_and(|source| source.adapter == crate::wire::SESSION_ITEM_SOURCE)
             })
             .map(|(instance, _)| instance)
             .ok_or("The owner offers no session view target.")?;
@@ -494,12 +504,9 @@ impl MereRouteSession {
             target,
             observed_epoch: snapshot.scene.epoch,
             observed_revision: snapshot.scene.revision,
-            intent: crate::session_item::SET_VIEW_INTENT.into(),
-            payload: serde_json::to_vec(&crate::session_item::SetViewV1::new(
-                "graphshell.mere",
-                view,
-            ))
-            .map_err(|e| e.to_string())?,
+            intent: crate::wire::SET_VIEW_INTENT.into(),
+            payload: serde_json::to_vec(&crate::wire::SetViewV1::new(self.view_name(), view))
+                .map_err(|e| e.to_string())?,
         }))
     }
     fn drain_notices(&mut self) -> Result<bool, String> {
@@ -574,7 +581,7 @@ impl MereRouteSession {
                                             .as_ref()
                                     })
                                     .is_some_and(|source| {
-                                        source.adapter == crate::session_item::SESSION_ITEM_SOURCE
+                                        source.adapter == crate::wire::SESSION_ITEM_SOURCE
                                     });
                             if is_session {
                                 if card.media.is_empty() {
@@ -591,7 +598,7 @@ impl MereRouteSession {
                         }
                     },
                     (Task::Media(_, instance), Outcome::MediaResource(resource)) => {
-                        let material: crate::session_item::SessionGraphV1 =
+                        let material: crate::wire::SessionGraphV1 =
                             serde_json::from_slice(&resource.bytes)
                                 .map_err(|e| format!("Invalid scoped graph material: {e}"))?;
                         let graph = self.snapshot(&self.graph)?;
@@ -602,8 +609,8 @@ impl MereRouteSession {
                             })
                             .and_then(|source| uuid::Uuid::parse_str(&source.id).ok())
                             .ok_or("The material card names no attached session.")?;
-                        if material.schema != crate::session_item::SESSION_GRAPH_SCHEMA
-                            || material.application != "graphshell"
+                        if material.schema != crate::wire::SESSION_GRAPH_SCHEMA
+                            || material.application != self.application
                             || *material.session.as_uuid() != attached
                             || material.epoch != graph.scene.epoch
                             || material.revision != graph.scene.revision
@@ -620,7 +627,7 @@ impl MereRouteSession {
                         }
                         self.saved_view = material
                             .views
-                            .get("graphshell.mere")
+                            .get(&self.view_name())
                             .cloned()
                             .unwrap_or_default();
                         self.read_only = material.read_only;
@@ -666,6 +673,7 @@ mod busy_tests {
         let mut panel = MereRouteSession::from_descriptor(
             descriptor,
             CapabilityProfile::new([PresentationCapability::PortableCard]),
+            "graphshell",
         )
         .unwrap();
         panel.fail("The resident route closed.".into());
