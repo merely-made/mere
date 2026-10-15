@@ -216,6 +216,10 @@ same seam knot links ride).
    *why* it asserted `SameEntityAs`, make statements about statements), an edge
    must become a node. RDF reification vs a lightweight "edge has a targetable id".
    The biggest fork; the open-predicate model already leans toward it.
+   **Answered 2026-10-15** by the [link model](../technical_architecture/2026-10-15_link_model.md)
+   (L1, L3): every family's facts become addressable assertions, and the pair is
+   their derived reading, not a node. Thread 4's unified strength is that
+   doc's view rule. Code is unchanged.
 3. **Symmetric relations on a directed store.** `SameEntityAs` / `DuplicateOf` are
    symmetric but stored directed. Write both directions, canonicalize to one, or
    rely on the read-time `UndirectedAdaptor`? Each has costs (double-write vs query
