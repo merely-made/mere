@@ -77,13 +77,24 @@ Vulkan WebGPU device loads the WebGPU artifact; same-state comparisons pass at
 both scales with the figures above. Evidence:
 `Code/testing/mere/verify-90ce8f12d-20261015`.
 
-Reproduction notes: hardware GL routes need the desktop display (`DISPLAY=:0`
-with its Xauthority; launched from a bare SSH tty, ANGLE cannot open a display),
-and Vulkan WebGPU needs X11, so leave `WAYLAND_DISPLAY` unset. The Auto
-artifact-choice fixture, the same-state comparison fixtures and
-`run-review-fractional.py` are still uncommitted copies under
-`Code/testing/mere/webgl-integration-20261014/split2`; the committed fixture's
-routes run different control sequences and are not comparable captures.
+Reproduction is now committed. `ports/graphshell/web/tests/README.md` gives
+the whole sequence: `build-viewer.py` with wasm-bindgen 0.2.129 and Terser
+5.51.2, the six routes, then the scale 1 and 1.25 comparisons. The fixture's
+`?mode=compare` and `?mode=auto-choice` replace the uncommitted per-route HTML
+copies, `run-presentation-webgl.py` takes `--mode` and `--device-scale-factor`
+in place of `run-review-fractional.py`, and
+`compare-presentation-captures.py` holds the RMS 1.0 / max 16 / alpha 0
+contract. Re-run from those pieces alone on 2026-10-15 (evidence
+`Code/testing/mere/repro-committed-20261015`): all six routes pass (33, 33, 33,
+33, 27 and 3 controls), Auto with a Vulkan device loads the WebGPU artifact,
+and the comparisons pass at RMS 0.252/0.300/0.299 at scale 1 and
+0.258/0.332/0.328 at 1.25, max 11, alpha 0. Environment: hardware GL routes
+need the desktop display (`DISPLAY=:0` with its Xauthority; launched from a
+bare SSH tty, ANGLE cannot open a display), and Vulkan WebGPU needs X11, so
+leave `WAYLAND_DISPLAY` unset. Compare WebGL2 and WebGPU only in
+`?mode=compare`; the default mode's routes run different control sequences.
+The copies under `Code/testing/mere/webgl-integration-20261014/split2` are
+superseded.
 
 ## Open: resident-host port (O-PC)
 
