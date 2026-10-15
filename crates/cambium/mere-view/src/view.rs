@@ -97,12 +97,12 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-card > * { flex-shrink: 0; margin: 0; } \
     .mere-view-card-head { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; height: 34px; } \
     .mere-view-card-head .mere-view-session-name { flex: 1 1 auto; min-width: 0; } \
-    .mere-view-card .mere-view-card-close { height: 28px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; } \
+    .mere-view-card .mere-view-card-close { height: 28px; line-height: 26px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; } \
     .mere-view-card .mere-view-session-state { height: 20px; line-height: 20px; } \
     .mere-view-card .mere-view-session-steps { gap: 4px; padding: 0 0 4px 0; } \
-    .mere-view-card .mere-view-session-steps > button { height: 30px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; } \
+    .mere-view-card .mere-view-session-steps > button { height: 30px; line-height: 28px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; } \
     .mere-view-card .mere-view-archive { height: 28px; } \
-    .mere-view-archive-chip { height: 24px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } \
+    .mere-view-archive-chip { height: 24px; line-height: 22px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } \
     .mere-view-popover-layer { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 4; } \
     .mere-view-popover-layer .overlay-surface-panel { box-sizing: border-box; overflow: hidden; border: 1px solid currentColor; border-radius: 8px; } \
     .mere-view-popover-layer .detail-popover-preview > *, .mere-view-popover-layer .detail-popover-content > * { margin: 0; } \
@@ -110,7 +110,7 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-popover-layer .mere-view-archive-name, .mere-view-popover-layer .mere-view-archive-from, .mere-view-popover-layer .mere-view-archive-detail { height: 20px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; } \
     .mere-view-popover-layer .mere-view-archive-name { font-weight: bold; } \
     .mere-view-popover-layer .mere-view-archive-steps { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 0 0; flex-shrink: 0; } \
-    .mere-view-popover-layer .mere-view-archive-steps > button { height: 30px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; flex-shrink: 0; }";
+    .mere-view-popover-layer .mere-view-archive-steps > button { height: 30px; line-height: 28px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; flex-shrink: 0; }";
 
 /// What the person asked for. The host carries it out or declines it.
 #[derive(Clone, Debug, PartialEq, Eq)]
