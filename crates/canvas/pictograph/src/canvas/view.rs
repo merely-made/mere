@@ -157,6 +157,7 @@ impl Canvas {
         for &key in &self.selected {
             scope.extend(self.graph.neighbors_undirected(key));
         }
+        self.exact_scope = None;
         self.scope = Some(scope.into_iter().collect());
     }
 
@@ -170,11 +171,32 @@ impl Canvas {
             .into_iter()
             .filter_map(|id| self.graph.get_node_by_id(id).map(|(key, _)| key))
             .collect();
+        self.exact_scope = None;
         self.scope = (!keys.is_empty()).then_some(keys);
+    }
+
+    /// Scope the canvas to an authored roster, exactly. Unlike
+    /// [`scope_to_members`](Self::scope_to_members) an empty roster stays empty
+    /// (nothing is shown) rather than clearing to Show all, and members that are
+    /// not in the graph yet are remembered and appear once the graph holds them,
+    /// including after [`set_graph`](Self::set_graph). Only
+    /// [`clear_scope`](Self::clear_scope) shows everything again.
+    pub fn scope_to_exact_members(&mut self, members: impl IntoIterator<Item = uuid::Uuid>) {
+        let roster: std::collections::BTreeSet<uuid::Uuid> = members.into_iter().collect();
+        self.scope = Some(self.resolve_exact_scope(&roster));
+        self.exact_scope = Some(roster);
+    }
+
+    pub(super) fn resolve_exact_scope(&self, roster: &std::collections::BTreeSet<uuid::Uuid>) -> Vec<NodeKey> {
+        roster
+            .iter()
+            .filter_map(|id| self.graph.get_node_by_id(*id).map(|(key, _)| key))
+            .collect()
     }
 
     /// Drop the scope lens — show the whole graph again. (Curated canvas.)
     pub fn clear_scope(&mut self) {
+        self.exact_scope = None;
         self.scope = None;
     }
 
@@ -183,6 +205,9 @@ impl Canvas {
     /// per-window scope override (a branch window scoping to its subgraph) and restores it
     /// after. (Per-window branch scope.)
     pub fn scope_members(&self) -> Option<Vec<uuid::Uuid>> {
+        if let Some(roster) = &self.exact_scope {
+            return Some(roster.iter().copied().collect());
+        }
         self.scope.as_ref().map(|keys| {
             keys.iter()
                 .filter_map(|&k| self.graph.get_node(k).map(|n| n.id))

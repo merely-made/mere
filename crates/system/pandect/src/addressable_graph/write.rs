@@ -7,10 +7,43 @@
 use super::*;
 use kernel::graph::{CoverageLayer, ResourceNode};
 use muniment::WriteOp;
+/// A complete publication prepared without touching storage. The caller owns
+/// when, and in which batch, its writes are applied.
+pub struct PreparedGraphPublication {
+    ops: Vec<WriteOp>,
+    generation: String,
+    catalog: Catalog,
+}
+impl PreparedGraphPublication {
+    pub fn ops(&self) -> &[WriteOp] {
+        &self.ops
+    }
+    pub fn generation(&self) -> &str {
+        &self.generation
+    }
+    /// The content hash of the complete stored record at `address`.
+    pub fn record_digest(&self, address: GraphAddress) -> Option<&str> {
+        self.catalog.row(address).map(|row| row.hash.as_str())
+    }
+    /// The Resource a Surface shows, from the complete catalog.
+    pub fn shown_resource(&self, surface: Uuid) -> Option<Uuid> {
+        self.catalog.row(GraphAddress::Surface(surface))?.shown
+    }
+}
 impl<B: Backend> AddressableGraphStore<B> {
     /// Publish immutable records and catalog, then their head pointer. Existing
     /// resident readers retain their prior generation until an explicit refresh.
     pub async fn write_recorded_graph(&self, graph: &Graph) -> Result<String, StoreError> {
+        let prepared = self.prepare_recorded_graph(graph)?;
+        self.backend.apply(&prepared.ops).await?;
+        Ok(prepared.generation)
+    }
+    /// Encode a complete publication without writing. Refuses a residency-limited
+    /// view, which cannot become complete truth.
+    pub fn prepare_recorded_graph(
+        &self,
+        graph: &Graph,
+    ) -> Result<PreparedGraphPublication, StoreError> {
         if graph
             .known_coverage()
             .limits
@@ -143,8 +176,11 @@ impl<B: Backend> AddressableGraphStore<B> {
             key: self.key("head"),
             value: encode(&generation)?,
         });
-        self.backend.apply(&ops).await?;
-        Ok(generation)
+        Ok(PreparedGraphPublication {
+            ops,
+            generation,
+            catalog,
+        })
     }
     fn append_node(
         &self,
