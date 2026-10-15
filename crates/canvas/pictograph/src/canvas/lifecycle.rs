@@ -103,7 +103,7 @@ impl Canvas {
         self.field_drag = None;
         self.marquee = None;
         self.middle_drag = None;
-        self.fold = None;
+        self.folds.clear();
         self.fold_press = None;
         self.fold_undo.clear();
         self.fold_redo.clear();
@@ -247,8 +247,9 @@ impl Canvas {
             restored_score_hold: None,
             scope: None,
             exact_scope: None,
-            fold: None,
+            folds: Vec::new(),
             fold_press: None,
+            fold_badge_nodes: Vec::new(),
             fold_undo: Vec::new(),
             fold_redo: Vec::new(),
             render_gnodes_as_dom: false,
@@ -428,6 +429,7 @@ impl Canvas {
         );
         self.gnode_of = gnode_of;
         self.stage_node = stage_node;
+        self.fold_badge_nodes.clear();
         self.resync_view_to_graph();
         // Degree-based sizes shift when the topology changes, so re-push radii (also
         // seeds them for newly-spawned bodies). No re-settle here: the structural
@@ -645,9 +647,10 @@ impl Canvas {
     /// refresh, this rebuilds derived data without restarting the settled layout.
     pub fn refresh_same_topology_graph(&mut self, source: &Graph) -> Result<(), String> {
         if self.graph.node_count() != source.node_count()
-            || self.graph.nodes().any(|(key, node)| {
-                source.get_node(key).is_none_or(|next| next.id != node.id)
-            })
+            || self
+                .graph
+                .nodes()
+                .any(|(key, node)| source.get_node(key).is_none_or(|next| next.id != node.id))
         {
             return Err("owner metadata changes the canvas node topology".into());
         }
