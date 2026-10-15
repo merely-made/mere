@@ -1,7 +1,7 @@
 [package]
 rust-version = "1.97.1"
 name = "sceno"
-version = "0.0.4"
+version = "0.0.5"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true

@@ -223,8 +223,8 @@ armillary = { version = "0.1.1", path = "crates/armillary" }
 # footprints, spaces, measurements) — git sibling consumed one-way, local
 # checkout via the gitignored `.cargo/config.toml` patch. cartography emits
 # sceno scenes (the P2 consumption slice; projection_proofs_plan).
-sceno = { version = "0.0.4", path = "crates/cambium/scenes/sceno" }
-scenomise = { version = "0.0.4", path = "crates/cambium/scenes/scenomise" }
+sceno = { version = "0.0.5", path = "crates/cambium/scenes/sceno" }
+scenomise = { version = "0.0.5", path = "crates/cambium/scenes/scenomise" }
 scenotime = { version = "0.0.4", path = "crates/cambium/scenes/scenotime" }
 scenograph = { version = "0.0.4", path = "crates/cambium/scenes/scenograph" }
 # The remaining families absorbed 2026-07-23. Consumers keep using
