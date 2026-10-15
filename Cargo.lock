@@ -4666,6 +4666,7 @@ dependencies = [
  "light-file-dialog",
  "mere-kernel",
  "mere-mesh",
+ "mere-overmap",
  "mere-p2panda-net",
  "mere-transport",
  "mere-view",
@@ -6939,6 +6940,7 @@ dependencies = [
  "mere-fleece",
  "mere-mesh",
  "mere-moot",
+ "mere-overmap",
  "mere-proofs",
  "mere-transport",
  "mere-view",
@@ -9921,6 +9923,23 @@ dependencies = [
  "servitor",
  "stickleback",
  "tokio",
+]
+
+[[package]]
+name = "mere-overmap"
+version = "0.1.0"
+dependencies = [
+ "chirograph",
+ "graphshell-client",
+ "mere-cartography",
+ "mere-kernel",
+ "mere-view",
+ "pandect",
+ "sceno",
+ "scenotime",
+ "serde",
+ "serde_json",
+ "uuid",
 ]
 
 [[package]]

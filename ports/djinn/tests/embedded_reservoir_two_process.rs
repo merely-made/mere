@@ -33,7 +33,7 @@ use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::app_client::AppBrokerClient;
 use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell::native::tasks::ResidentTasks;
-use graphshell::session_item::{APPLY_EDITS_INTENT, ApplyEditsV1};
+use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use sceno::InstanceId;

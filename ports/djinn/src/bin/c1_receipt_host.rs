@@ -21,7 +21,6 @@ use djinn::{
     embedded_reservoir::reservoir_applications, keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
-use graphshell::session_item::{self, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
 use graphshell::{
     identity::VaultProtectionView,
     native::{
@@ -32,6 +31,7 @@ use graphshell::{
         tasks::ResidentTasks,
     },
 };
+use mere_overmap::wire::{self as session_item, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{
     collections::{BTreeMap, HashMap},
