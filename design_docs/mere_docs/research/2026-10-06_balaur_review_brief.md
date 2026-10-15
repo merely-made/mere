@@ -46,7 +46,7 @@ and seiche keeps two generators (`emitter.rs`, `laws/mod.rs`).
   document, timed by the host's clock, so no editor builds its own.
   *Annotation, 2026-10-08:* built. The Scenograph editor plan's E1 landed it as
   Cambium's one undo `History` over any snapshot (`de06e4f0`, 2026-10-07), and
-  SE10 to SE13 moved it to the leaf crate `crates/cambium/edit-history`
+  SE10 to SE13 moved it to the leaf crate `crates/cambium/backstep` (then `edit-history`)
   (`bfaf0191`). The mer3ly site's Ruling 133 builds on it: scenotime's
   `SceneTrace` is a pure, serializable record (a base, labelled steps, chain
   validation, replay to any step) with no cursor of its own, and moving the

@@ -19,7 +19,7 @@
 
 use std::mem::{Discriminant, discriminant};
 
-use edit_history::History;
+use backstep::History;
 use scenograph::{
     Appearance, Arrangement, Channel, DynamicsSlot, Encoding, Interaction, ProjectionDefinition,
     ProjectionDraft, Provenance, Reading, RevisionEvidence, SourceBinding, ValidationIssue,

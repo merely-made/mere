@@ -1049,4 +1049,26 @@ fast-forward of local main; nothing built).**
   receipt window size), so it has a CPU test only; (3) touch stays deferred. P2's
   done-condition (a second host's native surface drives the controls with only
   `canvas` enabled) holds, through the host traits and not through a `Canvas`.
+- **2026-10-15 (the `edit-history` question ruled: renamed `backstep`):** Mark
+  renamed the crate to `backstep` (free on crates.io) rather than folding it into
+  Cambium (the scene crates would then depend on the UI toolkit) or into
+  scenotime (the wrong layer for a text field). It stays standalone and
+  `publish = false`, now publishable: a description, license, repository and no
+  path-only dependencies (`cargo package --list` accepts it; `cargo publish
+  --dry-run` refuses only because of `publish = false`). Renamed: the directory
+  (`crates/cambium/backstep`), the package and `[lib]` name, the workspace member,
+  dependency and two patch rows, and every dependent: `cambium` (still
+  re-exporting `History`; `EditHistory` is unchanged), `scenotime` (its test
+  dev-dependency, now with a version), `scenomise` (`authoring`), `graphshell`, and
+  the six receipt harness manifests that build live under
+  `ports/graphshell/docs/receipts/*/harness`. Recorded evidence (receipt logs and
+  JSON, the dated plan sections) keeps the old name. TERMINOLOGY gains **backstep**;
+  `crates/cambium/CHANGELOG.md` notes the rename; the scenograph editor plan's SE13
+  and the two path citations were updated. This closes the open `scenomise`
+  publish question above: its `authoring` feature no longer names an unpublishable
+  crate, though `workbench` and `backstep` still have to be published before
+  `scenomise` can be. Knot and Turnstone follow at their next repin through Mere.
+  Checks: `backstep` 8 tests, `scenotime`, `scenomise` (`authoring`) and cambium's
+  editor tests pass; `graphshell`, `cambium`, `mere-view` and `djinn` build with all
+  targets; `graphshell-web` checks for wasm32; the boundary script passes.
 

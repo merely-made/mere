@@ -89,7 +89,7 @@ Mark opened the lane: "i'm most curious about scenograph, honestly. wallpapers, 
 
 **SE12, the save path (2026-10-07).** Question: the editor's web sink saves definitions to browser localStorage, outside any mere ([web_main.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_main.rs), `BrowserProjectionSink`), against the 2026-09-23 ambiance ruling that apps keep their session data in a mere. Options: yes, as track E2b; yes, before E2; not now, recorded. Mark: **"Yes, as track E2b (Recommended)"**. *Follows:* track E2b.
 
-**SE13, the crate's name (2026-10-07).** Question: the leaf crate's name; `edit-history`, `undo-history` and `cambium-history` were each checked free on crates.io. Mark: **"edit-history (Recommended)"**. *Follows:* `crates/cambium/edit-history`, `publish = false` until a publish is decided, so the name is chosen but not claimed.
+**SE13, the crate's name (2026-10-07).** Question: the leaf crate's name; `edit-history`, `undo-history` and `cambium-history` were each checked free on crates.io. Mark: **"edit-history (Recommended)"**. *Follows:* `crates/cambium/edit-history`, `publish = false` until a publish is decided, so the name is chosen but not claimed. *Renamed 2026-10-15 (Mark): the crate is `backstep`, at `crates/cambium/backstep`, free on crates.io; it stays a standalone crate (folded into Cambium it would make the scene crates depend on the UI toolkit, and scenotime is the wrong layer for a text field). Still `publish = false`, now publishable. Later sections keep the old name where they record what was said then.*
 
 **SE14 to SE17, E2b's shape (2026-10-07).** Mark said "Proceed" to E2b; these were put with the evidence: Graphshell saves scenes as a node at an address carrying a JSON facet (`save_product_scene`, `graphshell.saved-scene/v3`), a journaled edit pandect can undo; the editor has two localStorage writers, the plain sink and the executable practice path (definition plus selected occurrence), which `projection_authoring.scn` and `projection_reopen.scn` reopen through; the browser host calls `MereHost::persist` only at open, and `GraphSession::edit_now` holds an edit "not stored until the next flush", so a browser save appears never to reach IndexedDB (read in code, not seen at runtime); the web UI calls no session undo.
 - **SE14, where a definition lives.** Options: a node and facet, like scenes; a view intent; a facet on the session item. Mark: **"Node + facet, like scenes (Recommended)"**. *Follows:* a node at `mere://projection/<definition id>` carrying a `graphshell.projection-definition/v1` facet.
@@ -644,7 +644,7 @@ Graphshell's arrangement panel builds one row per declared option of the chosen 
 
 Done when the rows match the declaration for all eleven families and a test solver, and a headed check in real Chromium shows a family's rows and a refusal.
 
-*Annotation 2026-10-07 (SE10):* E1's `History` lives in `crates/cambium/edit-history`; the cambium crate depends on it and re-exports `History`, and `EditHistory` stays in `crates/cambium/cambium/src/editor.rs`.
+*Annotation 2026-10-07 (SE10):* E1's `History` lives in `crates/cambium/backstep` (then `edit-history`); the cambium crate depends on it and re-exports `History`, and `EditHistory` stays in `crates/cambium/cambium/src/editor.rs`.
 
 ## 3. Mapped, not opened
 
@@ -1068,7 +1068,7 @@ or changing another lane's assignment.
   working layout. `to_arrangement` constructs fresh local arrangement-node
   IDs; a persistent field bridge must deliberately retain/map its owning
   identities rather than treat each preview conversion as a new forme.
-- Cambium's dependency-free [History](../../../crates/cambium/edit-history/src/lib.rs)
+- Cambium's dependency-free [History](../../../crates/cambium/backstep/src/lib.rs)
   already records snapshots, coalesces gestures and provides undo/redo. Its
   draft history is separate from the host's durable saved-change history.
   The existing projection editor applies that separation to recipe edits;

@@ -121,7 +121,7 @@ members = [
     "crates/cambium/tabard-workshop",
     "crates/cambium/cambium-genet-web-host",
     "crates/cambium/command-menu",
-    "crates/cambium/edit-history",
+    "crates/cambium/backstep",
     "crates/cambium/meristem",
     "crates/cambium/sprigging",
     # The scenario lane over a Cambium document host. Landed 2026-09-14 from
@@ -352,7 +352,7 @@ cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-genet-web-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
 command-menu = { version = "0.1.0", path = "crates/cambium/command-menu" }
-edit-history = { version = "0.1.0", path = "crates/cambium/edit-history" }
+backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.2.1", path = "crates/cambium/sprigging" }
 # The three engine adapters, unpublished. Their version was genet's
@@ -679,7 +679,7 @@ cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { path = "crates/cambium/cambium-winit-a11y" }
 command-menu = { path = "crates/cambium/command-menu" }
 document-canvas = { path = "crates/inker/document-canvas" }
-edit-history = { path = "crates/cambium/edit-history" }
+backstep = { path = "crates/cambium/backstep" }
 errand = { path = "crates/system/errand" }
 graphshell-client = { path = "crates/graphshell/graphshell-client" }
 incipit = { path = "crates/incipit" }
@@ -757,7 +757,7 @@ cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { path = "crates/cambium/cambium-winit-a11y" }
 command-menu = { path = "crates/cambium/command-menu" }
 document-canvas = { path = "crates/inker/document-canvas" }
-edit-history = { path = "crates/cambium/edit-history" }
+backstep = { path = "crates/cambium/backstep" }
 errand = { path = "crates/system/errand" }
 graphshell-client = { path = "crates/graphshell/graphshell-client" }
 incipit = { path = "crates/incipit" }
