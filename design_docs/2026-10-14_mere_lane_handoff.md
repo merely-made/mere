@@ -1,10 +1,9 @@
 # Mere lane handoff and branch reconciliation, 2026-10-14
 
-**Status, 2026-10-14:** Remote `main` is the only live line except the WebGL
-presentation lane below. Every other branch and worktree on the ThinkPad was
-landed, archived as a tag, or removed. Two continuations are open, each meant
-for its own session: WebGL presentation integration on the ThinkPad, and the
-resident-host port on O-PC.
+**Status, 2026-10-14:** Remote `main` is the only live line. Every branch and
+worktree on the ThinkPad was landed, archived as a tag, or removed. The WebGL
+presentation lane landed later the same day (below), with two acceptance limits
+left for Mark. The resident-host port on O-PC remains open.
 
 ## Landed on main today
 
@@ -23,18 +22,40 @@ resident-host port on O-PC.
   `web_projection`, `web_remote`, `web_view`, `web_gpu`, `web_options`,
   `web_commands`) in favour of the one-tree route.
 
-## Open: WebGL presentation integration (ThinkPad)
+## Landed: WebGL presentation integration (ThinkPad)
 
-Branches `webgl-presentation` (closed PR #8, 12 commits, about 14.7k lines)
-and `codex/site-viewer-startup` (two mount-cancellation fixes) remain on the
-remote. Against current main they conflict in 15 files, mostly
-`cambium-genet-web-host` and `cambium-rootstock` against main's 10/13
-mount-disposal and producer-binding work (`a6f20359d`, `e50c4e266`, `9b4a5b2af`;
-main added its own `lifetime.rs`). Two acceptance limits are unmet and are
-Mark's call, not the integrator's: Wasm gzip6 3,674,899 bytes against the
-3,407,872 cap, and 125% display-scale RGB RMS 1.26/1.19 against 1.0. Its
-earlier evidence came from Chrome/AMD Vulkan; the ThinkPad's Renoir GPU
-reproduces that setup. Its spec is already on main (`30445d2db`).
+`webgl-presentation` (closed PR #8) is merged onto main. Netrender's lane
+(closed Netrender PR #1, `cbdbf1e6`) was merged onto Netrender main as
+`68bcddc06`; Mere pins that one revision, so the shadow-helper repair and the
+direct WebGL2 session travel together. Both branches are deleted and kept as
+`archive/webgl-presentation` (Mere and Netrender). `codex/site-viewer-startup`
+was not merged: main already carries its root-removal cancellation and late
+device destruction (`MountLifetime` with a root liveness check). It is
+`archive/codex/site-viewer-startup`.
+
+Conflict decisions: main's `MountLifetime` is the only browser disposal
+authority; the lane's `Appearance` was retired and its listener, frame and
+capture ownership moved onto the lifetime. `HostDisposal` now also releases an
+installed presentation driver and refuses its owned captures. The lane's
+tenant model, context generations, backend selection and WebGL loss/restore
+are kept. Main's producer GPU-binding remap now runs once during native frame
+preparation. A caller-supplied shared core still presents through the host
+surface and group recovery; an installed driver restores its own surface, so
+browser recovery no longer attaches a second one. Graphshell's one-tree route
+keeps the lane's `dispose_tree` and boot epochs, and its startup liveness checks
+both the root and the epoch.
+
+Verified 2026-10-14 on the Renoir: 336 native host tests, 513 Graphshell, 5
+WebGL portable, 28 Netrender; Chrome WebGL2, Auto without WebGPU, Firefox and
+SwiftShader pass 32 viewer controls, native Vulkan WebGPU 26. Receipt:
+`testing/receipts/browser_presentation_20261013/presentation/integration-20261014/`.
+
+**Mark's decision, still open:** both acceptance limits remain unmet and
+unchanged. Wasm gzip6 is 3,661,337 bytes against the 3,407,872 cap (the lane
+measured 3,674,899). At 125% display scale, WebGL2 versus WebGPU RGB RMS is
+1.26451 and 1.19021 against 1.0 (alpha matches; resized and normal-scale
+comparisons pass). Human assistive-technology and asynchronous browser WebGPU
+device replacement remain separate gates.
 
 ## Open: resident-host port (O-PC)
 
@@ -82,8 +103,9 @@ Prompt for the O-PC session:
 `archive/codex-0903-preference-adapter` (the unmerged ESP preference-adapter
 experiment), `archive/codex-knot-editor-extraction-20260901`,
 `archive/a11y-mirror-prevent-scroll`, `archive/codex-burn-022-turnstone-base`,
-`archive/codex-three-lanes-upstream-20261010` and
-`archive/resident-current-main-20261010`. Eleven more remote branches were
+`archive/codex-three-lanes-upstream-20261010`,
+`archive/resident-current-main-20261010`, `archive/webgl-presentation` and
+`archive/codex/site-viewer-startup`. Eleven more remote branches were
 already merged and were deleted outright.
 
 ## ThinkPad state

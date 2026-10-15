@@ -1404,10 +1404,10 @@ remain with their respective owners.
 
 ### Browser WebGL2 presentation tenants design (2026-10-13)
 
-**Status:** written design for owner review. The owner approved tenancy as the
-ownership model and authorized this design. Written-design review precedes
-implementation planning. This continues the embedding draft above; native
-egui/Iced integration keeps its separate gates.
+**Status:** written design approved by the owner, 2026-10-13. Implementation
+planning is recorded in the [browser presentation tenants plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md).
+This continues the embedding draft above; native egui/Iced integration keeps
+its separate gates.
 
 #### Purpose and first consumer
 

@@ -1,0 +1,90 @@
+{
+  "result": "pass",
+  "controls": [
+    "actual viewer selected webgl2",
+    "compute availability disclosed",
+    "graph picking and keyboard actions: RESULT ok\ngpu timestamps: no",
+    "before-loss: RESULT ok\ncaptured before-loss\ngpu timestamps: no",
+    "capture emitted before-loss",
+    "tight capture rows before-loss",
+    "opaque last pixel after presentation before-loss",
+    "nonblank graph and chrome before-loss",
+    "odd-width actual viewer capture",
+    "actual viewer semantic mirror",
+    "graph command action target",
+    "start timing: RESULT ok\ngpu timestamps: no",
+    "context loss extension",
+    "restoration increases context generation once",
+    "state changed while lost survives restoration",
+    "stop timing across loss: RESULT ok\ntiming across-loss frames=4 interval_ms p50=72.200 p95=420.500 max=420.500 cpu_ms p50=37.900 p95=38.600 max=38.600 gpu_ms none producer_render_us p50=0.000 p95=0.000 max=0.000 producer_stage_us p50=0.000 p95=0.000 max=0.000 cull p50=0.000 p95=0.000 max=0.000 dom_frame p50=1.800 p95=7.200 max=7.200 dom_mutate p50=2.300 p95=2.700 max=2.700 dom_prepare p50=0.100 p95=0.100 max=0.100 faces p50=0.100 p95=0.200 max=0.200 lower p50=0.100 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.000 physics p50=0.000 p95=0.500 max=0.500 prepare p50=0.100 p95=0.100 max=0.100 underlay p50=0.300 p95=0.500 max=0.500\ngpu timestamps: no",
+    "after-restore: RESULT ok\ncaptured after-restore\ntiming across-loss frames=4 interval_ms p50=72.200 p95=420.500 max=420.500 cpu_ms p50=37.900 p95=38.600 max=38.600 gpu_ms none producer_render_us p50=0.000 p95=0.000 max=0.000 producer_stage_us p50=0.000 p95=0.000 max=0.000 cull p50=0.000 p95=0.000 max=0.000 dom_frame p50=1.800 p95=7.200 max=7.200 dom_mutate p50=2.300 p95=2.700 max=2.700 dom_prepare p50=0.100 p95=0.100 max=0.100 faces p50=0.100 p95=0.200 max=0.200 lower p50=0.100 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.000 physics p50=0.000 p95=0.500 max=0.500 prepare p50=0.100 p95=0.100 max=0.100 underlay p50=0.300 p95=0.500 max=0.500\ngpu timestamps: no",
+    "capture emitted after-restore",
+    "tight capture rows after-restore",
+    "opaque last pixel after presentation after-restore",
+    "nonblank graph and chrome after-restore",
+    "zero CSS extent suspends presentation",
+    "odd-resize: RESULT ok\ncaptured odd-resize\ntiming across-loss frames=4 interval_ms p50=72.200 p95=420.500 max=420.500 cpu_ms p50=37.900 p95=38.600 max=38.600 gpu_ms none producer_render_us p50=0.000 p95=0.000 max=0.000 producer_stage_us p50=0.000 p95=0.000 max=0.000 cull p50=0.000 p95=0.000 max=0.000 dom_frame p50=1.800 p95=7.200 max=7.200 dom_mutate p50=2.300 p95=2.700 max=2.700 dom_prepare p50=0.100 p95=0.100 max=0.100 faces p50=0.100 p95=0.200 max=0.200 lower p50=0.100 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.000 physics p50=0.000 p95=0.500 max=0.500 prepare p50=0.100 p95=0.100 max=0.100 underlay p50=0.300 p95=0.500 max=0.500\ngpu timestamps: no",
+    "capture emitted odd-resize",
+    "tight capture rows odd-resize",
+    "opaque last pixel after presentation odd-resize",
+    "nonblank graph and chrome odd-resize",
+    "removal releases owned context",
+    "removal clears owned semantic mirror",
+    "removal clears owned canvas",
+    "removal clears appearance color probe",
+    "remount owns a new canvas"
+  ],
+  "errors": [],
+  "renderer": "WebKit WebGL",
+  "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+  "rendererDebug": {
+    "vendor": "Google Inc. (Google)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "log": "RESULT ok\ncaptured odd-resize\ntiming across-loss frames=4 interval_ms p50=72.200 p95=420.500 max=420.500 cpu_ms p50=37.900 p95=38.600 max=38.600 gpu_ms none producer_render_us p50=0.000 p95=0.000 max=0.000 producer_stage_us p50=0.000 p95=0.000 max=0.000 cull p50=0.000 p95=0.000 max=0.000 dom_frame p50=1.800 p95=7.200 max=7.200 dom_mutate p50=2.300 p95=2.700 max=2.700 dom_prepare p50=0.100 p95=0.100 max=0.100 faces p50=0.100 p95=0.200 max=0.200 lower p50=0.100 p95=0.100 max=0.100 overlays p50=0.000 p95=0.000 max=0.000 physics p50=0.000 p95=0.500 max=0.500 prepare p50=0.100 p95=0.100 max=0.100 underlay p50=0.300 p95=0.500 max=0.500\ngpu timestamps: no",
+  "captures": [
+    {
+      "name": "before-loss",
+      "width": 801,
+      "height": 641,
+      "lastPixel": [
+        9,
+        12,
+        26,
+        255
+      ],
+      "png_sha256": "ffae91bf3882b025e62c81a4aa4f66e40f7cc97bbddec2092c1a802bf61a042f"
+    },
+    {
+      "name": "after-restore",
+      "width": 801,
+      "height": 641,
+      "lastPixel": [
+        9,
+        12,
+        26,
+        255
+      ],
+      "png_sha256": "e448992adf307b557c0b74dede9f9ebc3ccc142a8f872579fe6399bffa1434cd"
+    },
+    {
+      "name": "odd-resize",
+      "width": 803,
+      "height": 643,
+      "lastPixel": [
+        9,
+        12,
+        26,
+        255
+      ],
+      "png_sha256": "d2f56e951906d7ac677416b8ef565d3e2786d10ef323e929a6c3f7ed0565fc48"
+    }
+  ],
+  "bundle_sha256": "20606ba0acc6cc8be39a73fa6432920a38871768c6cd05c9199c928df39ad036",
+  "policy": {
+    "backend": "webgl2",
+    "disable_webgpu": false,
+    "force_context_loss": true,
+    "angle": "swiftshader"
+  }
+}

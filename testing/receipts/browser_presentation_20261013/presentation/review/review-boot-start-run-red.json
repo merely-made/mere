@@ -1,0 +1,9 @@
+{
+  "result": "fail",
+  "controls": [
+    "provider start refused"
+  ],
+  "errors": [
+    "Error: provider start failure releases context\n    at assert (http://127.0.0.1:8975/:1:348)\n    at http://127.0.0.1:8975/:1:885"
+  ]
+}

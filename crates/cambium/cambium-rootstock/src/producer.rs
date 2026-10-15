@@ -70,9 +70,17 @@ impl ResolvedAppearance {
     }
 }
 
+/// Presentation advances application time; export observes its current scene.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProducerFramePurpose {
+    Presentation,
+    Export,
+}
+
 /// The laid-out content extent for this producer invocation.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ProducerFrameInfo {
+    pub purpose: ProducerFramePurpose,
     pub logical_size: (f32, f32),
     pub physical_size: [u32; 2],
     /// Physical pixels per CSS pixel, including host UI zoom.

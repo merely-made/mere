@@ -1,0 +1,227 @@
+{
+  "runs": [
+    {
+      "label": "portable-composition-red-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--features",
+        "webgl",
+        "--test",
+        "portable_presentation",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 2646200320,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-ddd2eddce0964b198fd4bd04a80619dd.service",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "047fb01f0736aace975601b7b5c0b54d4b779a5b18b3a25776bb23a2b2177f5d",
+      "summaries": []
+    },
+    {
+      "label": "portable-composition-green-2",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--features",
+        "webgl",
+        "--test",
+        "portable_presentation",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 287133696,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-8b550ec6e7454d16a6e7ead9bf4be487.service",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "fcf28f240638e569b9078034c5d1d0b8b7377a3d3e5602fac88b020535d6e022",
+      "summaries": []
+    },
+    {
+      "label": "portable-composition-green-3",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--features",
+        "webgl",
+        "--test",
+        "portable_presentation",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 467718144,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-9c0a610bfb6f4988ae1a0a641590660e.service",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "bdb3e7bd9b2923a64500131105d00ed01c1d49afe3a97ba4aa6651e27ed65435",
+      "summaries": []
+    },
+    {
+      "label": "portable-composition-green-4",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--features",
+        "webgl",
+        "--test",
+        "portable_presentation",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 644235264,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-c8c27e7384b1493384b0b1199b147a29.service",
+      "stdout_sha256": "8f214965a4d7cab95124e32eb059a8087bb908ce202c7083e9519c05baee08c3",
+      "stderr_sha256": "ce901aae0b58d9e4ef64b4b730f5051bb95b2e628922193c7c3fb59062d6d916",
+      "summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "label": "portable-order-red-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--features",
+        "webgl",
+        "--test",
+        "portable_presentation",
+        "producer_ledger_order",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 533860352,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-1d713c98519e4ff39db886235db50996.service",
+      "stdout_sha256": "12b370669fba7021f3d68a7953f0c65d017e32d9757c2ec3bff4fbcc9f3bc642",
+      "stderr_sha256": "25b7bea569df8e496568fcb931887d1761ab3f5d7860965a19d31115cd247149",
+      "summaries": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "label": "portable-composition-green-5",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--features",
+        "webgl",
+        "--test",
+        "portable_presentation",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 533331968,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-441f8b56a20146a095cee0f2e99c9c66.service",
+      "stdout_sha256": "c90a4300d155db1b36ea3f7fc585986153dcf76758e8194dbfedac6bc96ebccc",
+      "stderr_sha256": "eddee920bb8c87819729553efd76b2c6b5cd1075a56f8a35d97fdce4eab064f6",
+      "summaries": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    }
+  ]
+}

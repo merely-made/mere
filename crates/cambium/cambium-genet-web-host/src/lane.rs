@@ -22,37 +22,35 @@ impl CaptureBackend for WebCapture {
         let slot = Rc::new(RefCell::new(None));
         let sink = slot.clone();
         *capture = Some(Box::new(move |capture| {
-            *sink.borrow_mut() = Some(capture.map_err(|error| error.to_string()).and_then(
-                |frame| {
-                    crate::capture::start(
-                        frame.surface,
-                        frame.view,
-                        frame.presentation.width,
-                        frame.presentation.height,
-                    )
-                    .map(|pending| (frame.presentation, pending))
-                },
-            ));
+            *sink.borrow_mut() = Some(
+                capture
+                    .map_err(|error| error.to_string())
+                    .map(PendingFrame::new),
+            );
         }));
         Ok(Box::new(move || {
             if !slot
                 .borrow()
                 .as_ref()
-                .is_some_and(|result: &Result<(_, PendingFrame), String>| {
-                    result.is_err() || result.as_ref().is_ok_and(|(_, frame)| frame.ready())
+                .is_some_and(|result: &Result<PendingFrame, String>| {
+                    result.is_err() || result.as_ref().is_ok_and(|frame| frame.ready())
                 })
             {
                 return None;
             }
-            let (presentation, frame) = match slot.borrow_mut().take()? {
+            let frame = match slot.borrow_mut().take()? {
                 Ok(frame) => frame,
                 Err(error) => return Some(Err(error)),
             };
-            Some(frame.take().map(|pixels| StampedFrame {
-                identity: identity.clone(),
-                presentation,
-                pixels,
-            }))
+            Some(
+                frame
+                    .take_stamped()
+                    .map(|(presentation, pixels)| StampedFrame {
+                        identity: identity.clone(),
+                        presentation,
+                        pixels,
+                    }),
+            )
         }))
     }
     fn arm(&mut self, capture: &mut Option<CaptureFn>) -> Readback {

@@ -1,0 +1,38 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "mesquite",
+    "-p",
+    "cambium-genet-winit-host",
+    "-j1",
+    "--",
+    "--test-threads=1"
+  ],
+  "counts": {
+    "passed": 294,
+    "failed": 0,
+    "ignored": 11
+  },
+  "source_unchanged": true,
+  "resource_status": "complete",
+  "kernel_memory_peak_bytes": 3878330368,
+  "memory_events": {
+    "low": "0",
+    "high": "0",
+    "max": "0",
+    "oom": "0",
+    "oom_kill": "0",
+    "oom_group_kill": "0",
+    "sock_throttled": "0"
+  },
+  "stdout_sha256": "85c12016b5cb786508bfa43c13d8ae600bbed13ebc91639a56cdf040440dfb0d",
+  "stderr_sha256": "60b26876d4ace4e3c10c4c2229bd4b0ee40b9d2d8a0abe52a74b9e5bb5a561a8",
+  "cleanup_verified": "inactive, MainPID 0"
+}

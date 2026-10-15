@@ -1,0 +1,11 @@
+{
+  "result": "pass",
+  "controls": [
+    "consumer root paint includes owned red image",
+    "consumer replacement includes blue image",
+    "consumer replacement retires red image",
+    "consumer removal removes blue image",
+    "image consumer context disposed"
+  ],
+  "errors": []
+}
