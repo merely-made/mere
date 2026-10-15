@@ -892,7 +892,7 @@ mod tests {
             !policy.allows(KeySource::Persona, &install),
             "and never releases its key"
         );
-        for door in graphshell::native::local_session::door_salts([7; 32]) {
+        for door in crate::door::local_session::door_salts([7; 32]) {
             assert!(
                 !policy.allows(KeySource::Persona, &door),
                 "door keys stay in djinn"

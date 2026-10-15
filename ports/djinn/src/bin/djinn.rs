@@ -22,6 +22,12 @@ use castellan::custody::IdentityVault;
 use castellan::custody::bootstrap;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+#[cfg(feature = "personal-sync")]
+use djinn::door::device_broker::serve_browser_broker_with_cards;
+use djinn::door::device_broker::{
+    configured_device_endpoint, default_device_endpoint, serve_browser_broker,
+};
 use djinn::identity_ui::SystemNativeIdentityUi;
 use djinn::keeper::Keeper;
 #[cfg(feature = "personal-sync")]
@@ -47,12 +53,6 @@ use djinn::resident_status::{
 use djinn::settings::{self as owner_settings, SyncOverrides};
 use djinn::startup_vault;
 use graphshell::browser_carrier::AllowedExtensions;
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-#[cfg(feature = "personal-sync")]
-use graphshell::native::device_broker::serve_browser_broker_with_cards;
-use graphshell::native::device_broker::{
-    configured_device_endpoint, default_device_endpoint, serve_browser_broker,
-};
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
     default_app_endpoint,
@@ -86,7 +86,7 @@ struct Args {
     agent: AgentEndpoint,
     browser_endpoint: String,
     /// Where first-party applications connect. A separate door from the
-    /// browser one, on purpose: see `native::app_admission`.
+    /// browser one, on purpose: see `graphshell_endpoint::door::app_admission`.
     app_endpoint: String,
     data_root: Option<PathBuf>,
     log_file: Option<PathBuf>,
@@ -935,8 +935,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // The doors' kept keys are captured now, while unlocked, so the doors
     // stay open through any later lock (rulings 40, 46). A resident that
     // starts locked (ruling 42, L3) captures them at its first unlock.
-    if let Err(error) = graphshell::native::local_session::DoorIdentity::door_keys(keeper.as_ref())
-    {
+    if let Err(error) = djinn::door::local_session::DoorIdentity::door_keys(keeper.as_ref()) {
         tracing::warn!(%error, "door keys not captured at start");
     }
     // `djinn --unlock` arrives here over the control route (ruling 41).
@@ -1156,7 +1155,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(feature = "personal-sync")]
         let app_surface = supplemental_cards.clone();
         #[cfg(not(feature = "personal-sync"))]
-        let app_surface: Option<graphshell::native::device_broker::DeviceSurfaceHandle> = None;
+        let app_surface: Option<djinn::door::device_broker::DeviceSurfaceHandle> = None;
         // The catalog and grants are shared with the door, so a mere ensured
         // while it serves gets its route then (reservoir plan §7 item 20).
         #[cfg(feature = "personal-sync")]
@@ -1396,7 +1395,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             let since = std::time::Instant::now();
                             if now == VaultLockView::Unlocked {
                                 // Kept from the first unlock on (ruling 46).
-                                let _ = graphshell::native::local_session::DoorIdentity::door_keys(
+                                let _ = djinn::door::local_session::DoorIdentity::door_keys(
                                     keeper.as_ref(),
                                 );
                             }

@@ -42,12 +42,14 @@ use graphshell_endpoint::door::wire::{
 };
 use tokio::io::{AsyncRead, AsyncWrite};
 
-use crate::browser_carrier::{LocalLink, read_native_message_async, write_native_message_async};
-use crate::identity_endpoint::IdentityEndpoint;
-use crate::native::browser_host::BrowserHostError;
-use crate::native::device_broker::{DeviceSurface, DeviceSurfaceHandle};
-use crate::native::local_session::{LocalSession, admit_local_client, identity_endpoint_for};
-use crate::native::resident_identity::ResidentIdentity;
+use crate::door::browser_host::BrowserHostError;
+use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
+use crate::door::local_session::{LocalSession, admit_local_client, identity_endpoint_for};
+use crate::door::resident_identity::ResidentIdentity;
+use graphshell::browser_carrier::{
+    LocalLink, read_native_message_async, write_native_message_async,
+};
+use graphshell::identity_endpoint::IdentityEndpoint;
 use graphshell_host::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointSession,
 };
@@ -64,7 +66,7 @@ pub enum AppBrokerError {
     #[error(transparent)]
     Catalog(#[from] ResidentEndpointCatalogError),
     #[error(transparent)]
-    Carrier(#[from] crate::browser_carrier::BrowserCarrierError),
+    Carrier(#[from] graphshell::browser_carrier::BrowserCarrierError),
     #[error("the application stream ended before its hello")]
     MissingHello,
     #[error("the first application message must answer the host challenge")]
@@ -287,7 +289,7 @@ where
                 &revocations,
                 &mut endpoint,
                 &mut resume,
-                crate::native::browser_host::now_ms,
+                crate::door::browser_host::now_ms,
             )
             .await
         })
@@ -308,7 +310,7 @@ where
                 &revocations,
                 &mut endpoint,
                 &mut resume,
-                crate::native::browser_host::now_ms,
+                crate::door::browser_host::now_ms,
                 notice_poll_interval,
             )
             .await

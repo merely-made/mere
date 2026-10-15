@@ -206,8 +206,8 @@ mod lane {
 /// endpoint, both lanes converging over one connection per device.
 mod attached {
     use super::*;
-    use crate::native::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
-    use crate::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
+    use crate::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
+    use graphshell::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
     use personae::{IdentityProvider, InMemoryProvider};
     use uuid::Uuid;
 

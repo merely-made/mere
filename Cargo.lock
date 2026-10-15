@@ -4648,8 +4648,10 @@ dependencies = [
 name = "djinn"
 version = "0.0.2"
 dependencies = [
+ "base64 0.22.1",
  "blake3",
  "castellan",
+ "chartulary",
  "chatelaine",
  "chirograph",
  "chrono",
@@ -4662,6 +4664,7 @@ dependencies = [
  "futures-util",
  "gemini-protocol",
  "graphshell",
+ "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
  "incipit",
@@ -4681,6 +4684,7 @@ dependencies = [
  "muniment",
  "notochord",
  "p2panda-core",
+ "p2panda-store",
  "pandect",
  "personae",
  "pollster 0.4.0",

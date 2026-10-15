@@ -28,11 +28,11 @@ use personae::delegation::DelegationError;
 use personae::{IdentityError, IdentityProvider, InMemoryProvider, RetainedKeys};
 use tokio::io::DuplexStream;
 
-use crate::browser_carrier::{BrowserSessionClient, LocalLink, admit_local_session};
-use crate::identity_endpoint::IdentityEndpoint;
-use crate::native::browser_host::{BrowserHostError, now_ms};
-use crate::native::device_broker::DeviceSurface;
-use crate::native::resident_identity::ResidentIdentity;
+use crate::door::browser_host::{BrowserHostError, now_ms};
+use crate::door::device_broker::DeviceSurface;
+use crate::door::resident_identity::ResidentIdentity;
+use graphshell::browser_carrier::{BrowserSessionClient, LocalLink, admit_local_session};
+use graphshell::identity_endpoint::IdentityEndpoint;
 use graphshell_host::admission::{CONNECT_ACTION, GRAPHSHELL_DOMAIN, PROJECTION_SERVICE};
 use graphshell_host::lifecycle::SessionAuthority;
 
@@ -222,7 +222,7 @@ fn local_grant<P: IdentityProvider>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::browser_carrier::BrowserMessage;
+    use graphshell::browser_carrier::BrowserMessage;
     use graphshell_endpoint::door::wire::BrowserChallenge;
 
     /// The transcript binds the client label, so two clients answering the

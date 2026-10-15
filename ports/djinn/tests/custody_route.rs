@@ -14,8 +14,8 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::keeper::Keeper;
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
 use graphshell_endpoint::door::custody_client::{CustodyClient, CustodyClientError};

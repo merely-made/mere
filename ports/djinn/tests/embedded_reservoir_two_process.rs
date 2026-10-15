@@ -22,12 +22,12 @@ use castellan::custody::{
     IdentityStorage, IdentityVault, InMemoryStorage, Profile, SealedProfileStorage,
 };
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::embedded_reservoir::{
     ReservoirAttachment, ReservoirAttachmentError, ReservoirAttachmentOptions,
 };
 use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ResidentReservoir;
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;

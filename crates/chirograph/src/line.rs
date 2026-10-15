@@ -4,16 +4,17 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! NDJSON, the wire inside every Graphshell session stream.
+//! NDJSON, the wire inside every session stream.
 //!
 //! Every carrier, whatever envelope it needs below admission, carries the same
 //! lines once a session is admitted: one JSON value per line, a
-//! `CarrierRequest` one way and a `CarrierOutput` the other (transport
-//! agnosticism note, ruling T2). This is the codec both ends share, with no
-//! I/O beneath it, so a browser build runs the same functions a native host
-//! does. A host that reads and writes Tokio streams uses
-//! `graphshell_host::line`, which is these functions over an async reader and
-//! writer.
+//! [`crate::CarrierRequest`] one way and a [`crate::CarrierOutput`] the other
+//! (transport agnosticism note, ruling T2). This is the codec every end
+//! shares, with no I/O beneath it: `graphshell-endpoint`'s stdio and network
+//! carriers, `graphshell-client`'s session driver, the browser's WebRTC
+//! session, and `graphshell_host::line`, which runs it over Tokio streams. It
+//! lives here, beside the types it frames, so none of them takes a dependency
+//! on another to share it (Mark's ruling, 2026-10-15).
 //!
 //! A line here is the text without its newline. [`encode`] never produces a
 //! newline inside a value (compact JSON escapes them), and [`decode`] treats a

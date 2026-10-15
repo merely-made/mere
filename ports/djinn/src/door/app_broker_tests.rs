@@ -14,17 +14,17 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 use tokio::sync::RwLock;
 
-use crate::browser_carrier::{read_native_message_async, write_native_message_async};
-use crate::identity_endpoint::SupplementalCard;
-use crate::native::app_broker::{
+use crate::door::app_broker::{
     AppEndpointCatalog, serve_app_broker, serve_app_connection_for_tests,
 };
-use crate::native::device_broker::DeviceSurface;
-use crate::native::resident_identity::test_support::FixedIdentity;
+use crate::door::device_broker::DeviceSurface;
+use crate::door::resident_identity::test_support::FixedIdentity;
 use chirograph::{
     CapabilityProfile, CarrierRequest, CarrierRequestBody, CarrierResponseBody, ContentHash,
     PortableCardV1, ProtocolVersion, ResourceRequest, SessionOpen,
 };
+use graphshell::browser_carrier::{read_native_message_async, write_native_message_async};
+use graphshell::identity_endpoint::SupplementalCard;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppHello, AppId, AppRouteGrants, AppRouteId,
 };
@@ -432,7 +432,7 @@ async fn the_client_reads_cards_over_the_served_endpoint() {
 /// item 20).
 #[tokio::test(flavor = "multi_thread")]
 async fn a_route_granted_while_serving_opens_for_the_next_connection() {
-    use crate::canary::FixtureEndpoint;
+    use graphshell::canary::FixtureEndpoint;
     use graphshell_endpoint::door::route::ResidentEndpointRoute;
 
     let personae = resident_host();

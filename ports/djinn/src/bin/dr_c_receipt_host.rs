@@ -10,8 +10,8 @@ use castellan::{
     authority::PersonaeHost,
     custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
 };
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::keeper::Keeper;
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
     custody_client::CustodyClient,

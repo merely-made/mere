@@ -30,6 +30,7 @@ use castellan::{
     custody::{IdentityVault, InMemoryStorage, Profile},
 };
 use chirograph::{IntentInvocation, IntentResult, ProjectionSession};
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::{
     embedded_reservoir::reservoir_applications,
     keeper::Keeper,
@@ -38,7 +39,6 @@ use djinn::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     },
 };
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppRouteGrants},
     identity::VaultProtectionView,

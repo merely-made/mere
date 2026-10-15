@@ -26,9 +26,9 @@ use eidetic::Hash;
 use muniment::{Backend, BlobStore};
 use transport::BlobHash;
 
-use crate::native::personal_sync_host::{PersonalSyncHost, PersonalSyncHostError};
-use crate::transfer::{TransferManifestV1, TransferOperation};
-use crate::transfer_offer::{OfferError, TransferOfferV1, offer_events, offer_for};
+use crate::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostError};
+use graphshell::transfer::{TransferManifestV1, TransferOperation};
+use graphshell::transfer_offer::{OfferError, TransferOfferV1, offer_events, offer_for};
 
 #[derive(Debug, thiserror::Error)]
 pub enum StagingError {
@@ -255,17 +255,17 @@ fn hex(bytes: &[u8; 32]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::access::AccessContext;
-    use crate::mere_host::{MereHost, SelectedPersonaRef, fixture_handlers};
-    use crate::native::personal_sync_host::PersonalSyncHostConfig;
-    use crate::personal_sync::{SyncRoster, SyncSelection};
-    use crate::product::{EditableRelation, ExportRequest, LocalFileMetadata, TransferScope};
-    use crate::transfer::{
+    use crate::sync::personal_sync_host::PersonalSyncHostConfig;
+    use eidetic::PrivacyClass;
+    use graphshell::access::AccessContext;
+    use graphshell::mere_host::{MereHost, SelectedPersonaRef, fixture_handlers};
+    use graphshell::personal_sync::{SyncRoster, SyncSelection};
+    use graphshell::product::{EditableRelation, ExportRequest, LocalFileMetadata, TransferScope};
+    use graphshell::transfer::{
         AccessTransferPolicy, ApplyTransferContext, TransferAuthorization, TransferEndpointV1,
         TransferRequest, TransferRouteV1, apply_transfer, prepare_transfer,
     };
-    use crate::transfer_offer::TRANSFER_OFFER_FACET;
-    use eidetic::PrivacyClass;
+    use graphshell::transfer_offer::TRANSFER_OFFER_FACET;
     use muniment::MemoryBackend;
     use personae::{IdentityProvider, InMemoryProvider};
     use sha2::{Digest, Sha256};
@@ -410,7 +410,7 @@ mod tests {
                 access_policy: AccessTransferPolicy::ExcludeSourceHistory,
                 privacy: PrivacyClass::TrustedPeersOnly,
             },
-            vec![crate::transfer::TransferBlobInput {
+            vec![graphshell::transfer::TransferBlobInput {
                 node_id: file,
                 role: "primary".to_string(),
                 media_type: "text/plain".to_string(),
@@ -454,7 +454,7 @@ mod tests {
             .unwrap();
         assert_eq!(fetched.transfer_id, manifest.transfer_id);
 
-        let normalize_edges = |graph: &mere::kernel::graph::Graph| {
+        let normalize_edges = |graph: &kernel::graph::Graph| {
             let mut edges: Vec<_> = graph
                 .to_snapshot()
                 .resource_edges
@@ -555,13 +555,10 @@ mod tests {
             .projected_relations_between(file_key, url_key)
             .next()
             .unwrap();
-        assert!(matches!(
-            handle,
-            mere::kernel::graph::RelationKey::Resource(_)
-        ));
+        assert!(matches!(handle, kernel::graph::RelationKey::Resource(_)));
         assert!(
-            payload.has_relation(mere::kernel::graph::RelationSelector::Semantic(
-                mere::kernel::graph::SemanticSubKind::Cites
+            payload.has_relation(kernel::graph::RelationSelector::Semantic(
+                kernel::graph::SemanticSubKind::Cites
             ))
         );
         assert_eq!(
@@ -639,7 +636,7 @@ mod tests {
                 access_policy: AccessTransferPolicy::ExcludeSourceHistory,
                 privacy: PrivacyClass::TrustedPeersOnly,
             },
-            vec![crate::transfer::TransferBlobInput {
+            vec![graphshell::transfer::TransferBlobInput {
                 node_id: file,
                 role: "primary".to_string(),
                 media_type: "text/plain".to_string(),

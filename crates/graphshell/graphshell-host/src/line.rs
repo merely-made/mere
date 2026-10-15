@@ -8,7 +8,7 @@
 //!
 //! Inside every admitted stream the wire is one JSON value per line
 //! (transport agnosticism note, ruling T2). The codec itself is
-//! [`graphshell_client::line`], which a browser build shares; this module is
+//! [`chirograph::line`], which every end shares; this module is
 //! that codec over an async reader and writer, for both ends of a native
 //! stream: the session loop reads requests and writes responses and notices,
 //! and an in-process client (the local doors' duplex) writes requests and
@@ -19,7 +19,7 @@
 //! partial line buffered and the next call resumes it. The session loop's
 //! notice arm depends on that.
 
-use graphshell_client::line;
+use chirograph::line;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt, BufReader, Lines};

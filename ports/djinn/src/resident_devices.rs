@@ -19,6 +19,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
 
+use crate::sync::personal_sync_host::PersonalSyncHost;
 use chirograph::{
     BoundsRelationship, CachePolicy, CardValueV1, ContentHash, EndpointDescriptor,
     IntentInvocation, IntentResult, PortableCardV1, PresentationBinding, PresentationCapability,
@@ -26,7 +27,6 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use graphshell::native::personal_sync_host::PersonalSyncHost;
 use graphshell_endpoint::door::app_admission::{AppId, AppRouteGrants};
 use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
