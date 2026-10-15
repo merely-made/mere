@@ -190,6 +190,7 @@ pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
     MereSessions, Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    forked_session_name,
 };
 pub use identity::StartupUnlockMode;
 pub use wallet_sealed_backend::WalletSealedBackend;
