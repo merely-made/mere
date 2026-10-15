@@ -30,15 +30,15 @@ use djinn::resident_mere::{MereRoutes, mere_route_id};
 use djinn::resident_reservoir::{
     EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
 };
-use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+use graphshell_host::lifecycle::AdmittedEndpointContext;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, mere_dir};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};

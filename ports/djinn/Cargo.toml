@@ -47,6 +47,7 @@ trainer-autodiff = ["trainer", "distillery/trainer-autodiff"]
 distillery-chronicle-receipt-host = [
     "personal-sync",
     "graphshell/webrtc-session",
+    "graphshell-host/webrtc-session",
     "dep:webrtc-carrier",
 ]
 
@@ -78,6 +79,9 @@ graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
 graphshell-endpoint = { workspace = true, features = ["door"] }
+# The serving half: the endpoint catalog and its admitted context, the
+# projection host, admission and the session loop (stack lift plan, L2).
+graphshell-host = { workspace = true, features = ["native"] }
 # The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
 mere-overmap.workspace = true
 knot-editor.workspace = true

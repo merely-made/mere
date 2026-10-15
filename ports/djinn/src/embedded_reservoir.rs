@@ -25,12 +25,12 @@ use castellan::authority::PersonaeHost;
 use castellan::custody::IdentityStorage;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
 use graphshell_endpoint::door::tasks::ResidentTasks;
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
 use personae::{PersonaId, ProfileId};
 use sceno::InstanceId;

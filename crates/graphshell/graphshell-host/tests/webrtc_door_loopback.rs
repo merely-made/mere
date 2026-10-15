@@ -6,7 +6,7 @@
 
 //! The C2 receipt: a real WebRTC channel carries a real browser join.
 //!
-//! The module tests in `graphshell::webrtc_door` fabricate their DTLS
+//! The module tests in `graphshell_host::webrtc_door` fabricate their DTLS
 //! fingerprints, because a pure test has no handshake to read one off. This
 //! one does not. Two str0m peers over a loopback UDP pair run a real ICE and
 //! DTLS handshake and open a real SCTP data channel; the link challenge binds
@@ -30,9 +30,9 @@
 use std::net::SocketAddr;
 use std::time::{Duration, Instant};
 
-use graphshell::admission::{CONNECT_ACTION, PROJECTION_PROTOCOL, connect_action};
-use graphshell::carrier::projection_policy;
-use graphshell::webrtc_door::{
+use graphshell_host::admission::{CONNECT_ACTION, PROJECTION_PROTOCOL, connect_action};
+use graphshell_host::carrier::projection_policy;
+use graphshell_host::webrtc_door::{
     InviteTerms, RedemptionState, SignedInviteDescriptor, admit_webrtc_session,
     build_redemption_proof, issue_invite, mint_delegation, open_webrtc_session, redeem,
     sign_challenge, verify_host_challenge,

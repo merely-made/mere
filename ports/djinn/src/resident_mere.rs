@@ -38,7 +38,6 @@ use chirograph::{
 };
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
-use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::mere_host::{MereHost, SelectedPersonaRef};
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
@@ -47,6 +46,7 @@ use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
 };
+use graphshell_host::lifecycle::AdmittedEndpointContext;
 use mere_overmap::wire::{
     self as session_item, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1,
     ArchiveActionV1, COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH,
@@ -1535,8 +1535,8 @@ impl ProjectionNoticeSource for MereEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
     use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
+    use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     use mere_overmap::route as mere_route;
     use mere_view::{MereViewModel, MereViewRequest, SessionStep};

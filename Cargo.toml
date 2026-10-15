@@ -77,6 +77,7 @@ members = [
     "crates/chirograph",
     "crates/graphshell/graphshell-client",
     "crates/graphshell/graphshell-endpoint",
+    "crates/graphshell/graphshell-host",
     "ports/graphshell",
     "ports/djinn",
     "ports/dramatis",
@@ -250,6 +251,10 @@ chirograph = { version = "0.0.2", path = "crates/chirograph" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
 graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
 graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-endpoint" }
+# The serving half: admission, the session loop, the catalog and the projection
+# host (Graphshell stack lift plan, L2, ruling R4). Default features off here;
+# each consumer names the half it serves.
+graphshell-host = { version = "0.0.2", path = "crates/graphshell/graphshell-host", default-features = false }
 # Knot is an independent document product that Mere embeds rather than owns
 # (knot-editor `design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`).
 # Its sources left this repository on 2026-09-04 under that plan's E2; Djinn and
@@ -648,6 +653,7 @@ mere-fetch = { path = "crates/system/fetch" }
 gemot = { path = "crates/moot/gemot" }
 graphshell = { path = "ports/graphshell" }
 graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
+graphshell-host = { path = "crates/graphshell/graphshell-host" }
 illume = { path = "crates/nematic/illume" }
 inker = { path = "crates/inker/inker" }
 insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }
@@ -726,6 +732,7 @@ mere-fetch = { path = "crates/system/fetch" }
 gemot = { path = "crates/moot/gemot" }
 graphshell = { path = "ports/graphshell" }
 graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
+graphshell-host = { path = "crates/graphshell/graphshell-host" }
 illume = { path = "crates/nematic/illume" }
 inker = { path = "crates/inker/inker" }
 insigne = { git = "https://github.com/merely-made/dramatis.git", rev = "0234e7eea6f2ddf2330a71b9425da01b06ae0391" }

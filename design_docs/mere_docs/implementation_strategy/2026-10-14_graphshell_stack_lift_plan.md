@@ -502,6 +502,13 @@ a decision on the WebRTC door's placement.
 `webrtc_join` and the web cone check passes; Cleromancy registers an endpoint
 through it; Knot's `place_projection` test serves through it; the port keeps
 only `identity_endpoint`, `identity_projection` and the generic adapters.
+*Landed 2026-10-15 on the Mere side:* `crates/graphshell/graphshell-host`,
+with the WebRTC door and join in the crate (default feature `webrtc-join`,
+wasm-clean) and the live lane behind `webrtc-session`; the transport note's
+shared admission entry and line codec came with it (Progress). *Kept in the
+port:* `native::resident_identity`, whose trait names the browser carrier's
+native-identity vocabulary and `identity_projection`'s unlock policy (Progress).
+*Open:* Cleromancy's receipt.
 
 **P5. L3, Djinn takes the server halves.** After P4, because `app_broker` and
 `browser_host` use `session_loop` and `session_notices`.
@@ -1071,4 +1078,64 @@ fast-forward of local main; nothing built).**
   Checks: `backstep` 8 tests, `scenotime`, `scenomise` (`authoring`) and cambium's
   editor tests pass; `graphshell`, `cambium`, `mere-view` and `djinn` build with all
   targets; `graphshell-web` checks for wasm32; the boundary script passes.
-
+- **2026-10-15 (P4, L2 landed in Mere):** the serving half is
+  `crates/graphshell/graphshell-host` (R4), with no re-export left in the port.
+  Old path `graphshell::X` is `graphshell_host::X` for `admission`,
+  `lifecycle`, `carrier`, `network_carrier`, `session_loop`,
+  `session_notices`, `resume`, `live_endpoint`, `policy_projection`,
+  `webrtc_door`, `webrtc_join` and `webrtc_session`; `graphshell::native::
+  endpoint_catalog` and `native::projection_host` are
+  `graphshell_host::endpoint_catalog` and `graphshell_host::projection_host`.
+  - Features: none (the `resume` and `live_endpoint` fixture endpoints), then
+    `admission`, `webrtc-join` (default: the door's sans-I/O core and the join,
+    the WebRTC decision P4 asked for), `native` (accept, the line codec,
+    lifecycle, the loop and notices, the catalog, the projection host, dialling,
+    the policy file, the door's host halves) and `webrtc-session` (str0m). The
+    default build, `admission` alone and no features check for wasm32;
+    `native` is native only. The port names `graphshell-host` with default
+    features off and forwards `native`, `webrtc-join` and `webrtc-session`, so
+    the read-only viewer's cone gains the crate and nothing under it.
+  - Transport note recommendation 3, one admission entry:
+    `carrier::admit_stream(stream, facts, policy, ledger, now, active)` is
+    what every stream-carried admission runs, ending in
+    `admission::serves_action`. `admit_accepted_session` is
+    `AcceptedSession::into_session` plus that entry; the port's local doors
+    (`browser_carrier::admit_local_session`, which the app door's
+    `admit_local_client` also takes) state their own facts and call it, so the
+    in-process duplex now gets the action check it lacked; the WebRTC door's
+    message path keeps the sans-I/O twin, `admission::admit_session`.
+    `mere-transport` has no `TransportKind` for an in-process door, so the
+    local doors build `SessionFacts` directly rather than an `AcceptedSession`
+    (as before).
+  - Recommendation 4, the line codec (T2, T6): `graphshell_client::line`
+    (`encode`, `encode_terminated`, `decode`, and `LineAssembler`, moved from
+    `webrtc_join`) is the sans-I/O codec both ends share;
+    `graphshell_host::line` (`LineReader`, `write`) runs it over Tokio
+    streams. `SessionDriver`, the session loop and `BrowserSessionClient`
+    use it. Not yet on it: `graphshell-endpoint`'s `stdio` and `network`
+    carriers, which cannot depend on `graphshell-host` and would need
+    `graphshell-client`; the client correlator and the native
+    stream-to-lines pump (T3) are not started.
+  - Kept in the port: `native::resident_identity`. Its trait names
+    `browser_carrier`'s `NativeIdentityAction`, `NativeIdentityResult` and
+    `NativeIdentityFailure` and, through them, `identity_projection`'s
+    `SshUnlockPolicyIntentV1`, and nothing in L2 uses it in production; its
+    consumers are `identity_endpoint` (stays) and the brokers (P5). `DoorIdentity`
+    stays in `native::local_session` with them.
+  - Tests that compose port pieces stayed: the browser identity card test that
+    was in `session_loop` is `identity_session_tests` in the port, and the
+    committed N4 receipt check is the port's `tests/n4_owner_policy_receipt.rs`
+    (the receipt and its binary are the port's). `webrtc_door_loopback`,
+    `webrtc_join_loopback`, `projection_round_trip` and `remote_session_live`
+    moved to the crate.
+  - Djinn names `graphshell-host` with `native` (and `webrtc-session` for the
+    chronicle receipt host); its `graphshell` dependency stays for the brokers
+    until P5. Graphshell's binaries import the new paths.
+  - Checks (`TMPDIR=/tmp`): `graphshell-host` (`webrtc-session`) 88 lib tests
+    and its four integration suites pass; `graphshell-client` 78 lib tests and
+    its suites pass; `graphshell` (`webrtc-session`) 365 lib tests and its
+    integration suites pass; `djinn` 180 passed, 11 ignored; `mere-overmap`
+    and `graphshell-endpoint` (all features) pass; `cargo check --workspace
+    --all-targets --keep-going` fails only at the `tabard-desktop` example and
+    the `mere-mesh` examples noted under P1; `graphshell-web` checks for wasm32
+    with and without default features; the boundary script passes.
