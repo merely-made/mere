@@ -24,6 +24,9 @@ scenograph = { version = "0.0.4", path = "../scenograph" }
 # config is the opaque `serde_json::Value` the score already carries.
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
+# The solvers' transcendentals (`math`): the same bits on every target, so an
+# arrangement does not depend on the machine that solved it (ruling S4).
+libm = { workspace = true }
 edit-history = { version = "0.1.0", path = "../../edit-history", optional = true }
 workbench = { version = "0.1.0", path = "../../workbench", optional = true }
 
