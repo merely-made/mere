@@ -103,6 +103,7 @@ rand_core = { version = "0.6", features = ["getrandom"] }
 # The H4d receipt host verifies the approved signature.
 signature = "2"
 sceno.workspace = true
+scenograph.workspace = true
 scenotime.workspace = true
 serde = { version = "1", features = ["derive"] }
 # `lock.toml`, the per-device lock settings a person edits (vault lock ruling 77).

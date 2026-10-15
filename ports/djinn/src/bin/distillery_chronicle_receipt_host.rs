@@ -40,15 +40,13 @@ use distillery::{
     ChronicleEndpoint, ChronicleObserver, ChronicleRevision, ResidentReceipt,
     chronicle_shelfmark_input, verify_chronicle_shelfmark_input,
 };
+use distillery::chronicle_recipe::{chronicle_definition, chronicle_era_bands_off_variant};
 use djinn::resident::DjinnResident;
 use djinn::resident_distillery::ResidentDistillery;
 use djinn::settings::{DistilleryLaneSettings, OwnerSettings};
 use graphshell::carrier::projection_policy;
 use graphshell::native::projection_host::{ResidentProjectionHost, admit_webrtc_catalog};
-use graphshell::projection_editor::{
-    ProjectionInputBinding, PublicSourceRevision, RevisionEvidence, SourceBinding,
-    chronicle_definition, chronicle_era_bands_off_variant,
-};
+use scenograph::{ProjectionInputBinding, PublicSourceRevision, RevisionEvidence, SourceBinding};
 use graphshell::webrtc_door::{InviteTerms, issue_invite};
 use graphshell::webrtc_session::HostedInvite;
 use incipit::ShelfmarkV1;

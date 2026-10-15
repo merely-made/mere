@@ -21,6 +21,7 @@ cambium.workspace = true
 chirograph.workspace = true
 graphshell-endpoint.workspace = true
 sceno.workspace = true
+scenograph.workspace = true
 scenomise.workspace = true
 scenotime.workspace = true
 eidetic = { workspace = true, optional = true }
