@@ -72,8 +72,14 @@ fn initial_ring(scale: f32) -> Vec<Triangle> {
                     TriangleKind::Obtuse
                 },
                 a: Vec2::ZERO,
-                b: Vec2::new(scale * angle_a.cos(), scale * angle_a.sin()),
-                c: Vec2::new(scale * angle_b.cos(), scale * angle_b.sin()),
+                b: Vec2::new(
+                    scale * crate::math::cos(angle_a),
+                    scale * crate::math::sin(angle_a),
+                ),
+                c: Vec2::new(
+                    scale * crate::math::cos(angle_b),
+                    scale * crate::math::sin(angle_b),
+                ),
             }
         })
         .collect()

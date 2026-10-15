@@ -948,3 +948,13 @@ fast-forward of local main; nothing built).**
   pass (reported by the Knot adoption session, not rerun here). Woodshed is on
   Mere `8357b00d0` (woodshed `25acaa0`).
 
+- **2026-10-15 (the arrangement goldens):** the golden failure noted under P2
+  was never a regression: aarch64 macOS prints the same 22 hashes at
+  `5d04c2d60` (where the goldens arrived), `e5a24a4af`, `768a2a94f` and
+  `a26ed1caf`, and they match neither the historical table nor `768a2a94f`'s
+  Linux one. The Spiral's and Radial's angles went through the platform's
+  `sinf` and `cosf`. scenomise's solvers (and the spectral producer's start
+  vector) now take their transcendentals from `libm`, so the positions have
+  the same bits on every target, and one table replaces the two. Against the
+  platform maths, 71 of 500 Spiral positions and 8 of 500 Radial ones move,
+  by at most two ulps (0.0002 px).

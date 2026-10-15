@@ -207,7 +207,9 @@ fn orthonormalize(vector: &mut [f64], found: &[Vec<f64>]) {
 /// cosines — varied by index so successive starts are not parallel.
 fn start_value(i: usize, eigen_index: usize, n: usize) -> f64 {
     let t = i as f64 / n.max(1) as f64;
-    ((eigen_index + 1) as f64 * std::f64::consts::PI * t).cos()
+    // `libm`, not the platform's `cos`, so the start (and the converged
+    // vector) has the same bits on every target.
+    libm::cos((eigen_index + 1) as f64 * std::f64::consts::PI * t)
 }
 
 /// The graph's own enumeration order: what every score's ordinal follows, and

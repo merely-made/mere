@@ -114,7 +114,7 @@ pub(crate) fn stable_hash(item: &ScoreItem) -> u64 {
 
 /// Rotate `offset` by `radians` and translate by `origin`.
 pub(crate) fn place_rotated(origin: Vec2, offset: Vec2, radians: f32) -> Vec2 {
-    let (sin, cos) = radians.sin_cos();
+    let (sin, cos) = crate::math::sin_cos(radians);
     Vec2::new(
         origin.x + offset.x * cos - offset.y * sin,
         origin.y + offset.x * sin + offset.y * cos,

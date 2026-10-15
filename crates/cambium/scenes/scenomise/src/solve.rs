@@ -300,12 +300,12 @@ fn spiral_position(spiral: &Spiral, spacing: f32, ordinal: usize) -> Vec2 {
             SpiralCurve::SquareRoot => n.sqrt(),
             SpiralCurve::Linear => n,
             SpiralCurve::Quadratic => n * n,
-            SpiralCurve::Logarithmic => (1.0 + n).ln(),
+            SpiralCurve::Logarithmic => crate::math::ln(1.0 + n),
         };
     let angle = n * spiral.angle_radians;
     Vec2::new(
-        spiral.center.x + radius * angle.cos(),
-        spiral.center.y + radius * angle.sin(),
+        spiral.center.x + radius * crate::math::cos(angle),
+        spiral.center.y + radius * crate::math::sin(angle),
     )
 }
 

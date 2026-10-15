@@ -13329,6 +13329,7 @@ dependencies = [
  "genet-livery",
  "genet-scripted-dom",
  "layout-dom-api",
+ "libm",
  "mere-cartography",
  "mere-forme",
  "mere-kernel",
@@ -15367,6 +15368,7 @@ name = "scenomise"
 version = "0.0.4"
 dependencies = [
  "edit-history",
+ "libm",
  "sceno",
  "scenograph",
  "scenotime",
