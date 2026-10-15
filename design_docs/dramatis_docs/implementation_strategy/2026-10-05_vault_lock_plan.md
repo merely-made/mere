@@ -1233,7 +1233,7 @@ breaking change is built, Knot first.
 **2026-10-05, L1 checkpoint A reached** (Opus lane, branch
 `worktree-agent-a014d67042870a2b4`, base `24bfe7be`, not merged):
 - `fea481a3` adds the no-residue instrument
-  (`ports/castellan/tests/no_residue.rs`). It is a test-only
+  (`ports/djinn/castellan/tests/no_residue.rs`). It is a test-only
   tracking allocator with three canaries: the master seed, a slot payload,
   and a DPAPI root in a temp dir. It is red on purpose at that commit.
 - `ffd3279b` adds the residue fixes:
