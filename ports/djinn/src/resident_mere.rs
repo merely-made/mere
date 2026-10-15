@@ -901,7 +901,7 @@ impl MereEndpoint {
             for manifest in manifests {
                 let id = manifest.id.to_string();
                 let card = PortableCardV1 {
-                    title: format!("Codicil {}", &id[..12]),
+                    title: format!("Codicil {}", pandect::graph_codicil::codicil_short_id(&id)),
                     values: vec![
                         CardValueV1 {
                             label: "Codicil".into(),
@@ -2119,6 +2119,35 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(opened, None, "the route accepts Knot's open");
+        let names: Vec<String> = overlay
+            .read()
+            .await
+            .unwrap()
+            .sessions
+            .into_iter()
+            .map(|session| session.name)
+            .collect();
+        let source = before
+            .sessions
+            .iter()
+            .find(|session| session.id == attached)
+            .unwrap()
+            .name
+            .clone();
+        assert_eq!(source, "Session");
+        let thaw = format!(
+            "Session (from {})",
+            pandect::graph_codicil::codicil_short_id(&entries[0].key)
+        );
+        assert!(
+            names.contains(&thaw),
+            "the opened session is named apart from its source: {names:?}"
+        );
+        assert_eq!(
+            names.iter().filter(|name| **name == source).count(),
+            1,
+            "only the source keeps its name: {names:?}"
+        );
         assert!(
             overlay
                 .take(&MereViewRequest::Archive(ArchiveRequest::Compose(vec![
