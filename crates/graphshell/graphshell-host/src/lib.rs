@@ -26,8 +26,8 @@
 //!
 //! The application side is elsewhere: the door an application dials is
 //! `graphshell_endpoint::door`, and the client state and session drivers are
-//! `graphshell_client`. The brokers Djinn runs (the app door's server, the
-//! browser host) are still in the `graphshell` port until the plan's P5.
+//! `graphshell_client`. The brokers a resident runs over this crate (the app
+//! door's server, the browser host) are Djinn's `door` module.
 //!
 //! ## Features
 //!

@@ -26,11 +26,11 @@ use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSession,
     ProjectionSnapshot,
 };
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::resident_mere::{MereRoutes, mere_route_id};
 use djinn::resident_reservoir::{
     EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
 };
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };

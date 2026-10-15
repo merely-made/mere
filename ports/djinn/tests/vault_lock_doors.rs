@@ -19,6 +19,8 @@ use castellan::authority::PersonaeHost;
 use castellan::custody::{
     IdentityStorage, IdentityVault, OsPresence, Profile, SealedProfileStorage, UnlockMethod,
 };
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use djinn::door::local_session::{DoorIdentity, door_salts};
 use djinn::identity_ui::{NativeIdentityUi, apply_native_identity_action};
 use djinn::resident_status::{
     self, AgentListenerV1, ControlUnlock, LockStateV1, NativeUnlocker, RESIDENT_APP,
@@ -29,8 +31,6 @@ use djinn::resident_status::{
 use graphshell::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
 };
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::local_session::{DoorIdentity, door_salts};
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };

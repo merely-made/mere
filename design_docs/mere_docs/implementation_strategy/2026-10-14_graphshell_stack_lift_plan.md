@@ -515,6 +515,9 @@ native-identity vocabulary and `identity_projection`'s unlock policy (Progress).
 *Done when:* `graphshell` holds no broker; Djinn's tests and Knot's
 `resident_app_route` pass; `graphshell_native_host` and the C4 host fixture
 build against Djinn or a fixture host.
+*Landed 2026-10-15 in Mere:* Djinn's `door` and `sync` modules, with
+`ResidentIdentity` (Mark's ruling), the native host relay, the C4 fixture and
+Knot's app-route receipt (Progress).
 
 **P6. L12, forme.** R2 ruled: `platen`. Needs a second host (Turnstone's workbench or
 Knot's workspace) that names its done condition.
@@ -1162,3 +1165,54 @@ fast-forward of local main; nothing built).**
   --all-targets` and `cargo test` pass (942 passed, 10 ignored,
   `TMPDIR=/tmp`). Still open for P4: Cleromancy's receipt (it pins
   `graphshell` at `a1309431` and was not touched here).
+- **2026-10-15 (Mark's rulings after P4):** `ResidentIdentity` moves to Djinn
+  with the brokers in P5; the I/O-free line codec and `LineAssembler` move into
+  `chirograph`, so `graphshell-endpoint`'s carriers and `graphshell-client`
+  share it with no new dependency edge; the in-process transport kind goes to
+  `mere-transport` in Murm, batched into the remote-route pass with one repin
+  round.
+- **2026-10-15 (P5, L3 landed in Mere):** `graphshell` holds no broker and no
+  `native` module. Old path `graphshell::native::X` is `djinn::door::X` for
+  `app_broker` (with its tests), `browser_host`, `device_broker`,
+  `local_session` (with `DoorIdentity`), `resident_identity` and
+  `resident_mere_proxy`, and `djinn::sync::X` for `personal_sync_host`,
+  `carriage_host` (with its commissioning half and tests), `graph_keys` and
+  `transfer_staging`.
+  - `ResidentIdentity` is Djinn's and extends the port's new
+    `identity_endpoint::IdentityAuthority` (`snapshot`, `apply_intent`), the
+    half the identity endpoint reads, so the endpoint stays in the port without
+    naming Djinn (Djinn depends on the port; the reverse would be a cycle).
+    Djinn's keeper implements both. The port keeps a test-only fixed authority;
+    Djinn keeps its own for the broker tests.
+  - Binaries: `graphshell_native_host` is Djinn's (name unchanged; the
+    extension README now builds it with `-p djinn`). `c4_webrtc_host` and its
+    `c4_host_signaling` test are Djinn's under the new feature `c4-host`,
+    because its resident-mere endpoint is `door::resident_mere_proxy`; Djinn
+    always carries Distillery, so the port's `distillery-chronicle-fixture`
+    feature and optional `distillery` and `mesh` dependencies are gone.
+  - Knot's `resident_app_route` receipt is Djinn's `tests/knot_app_route.rs`,
+    against `knot_editor::KnotEndpoint::fixture()`: Knot cannot depend on
+    Djinn, which embeds it. Knot deletes its copy at its next repin.
+  - Codec: `chirograph::line` (`encode`, `encode_terminated`, `decode`,
+    `LineAssembler`); `graphshell-client`'s `line` module is gone. The stdio and
+    network carriers in `graphshell-endpoint` now frame through it (they
+    already depended on `chirograph`), as do `SessionDriver`,
+    `graphshell_host::line` and the browser's WebRTC session. Two behavior
+    notes: `StdioCarrier` and `NetworkCarrier` now skip a blank output line
+    rather than failing on it (`NetworkCarrier` already did), and stdio's
+    request parser reports a blank line it is handed as malformed (its callers
+    skip blanks first, as before).
+  - What still needs `graphshell` outside the port: Djinn, for
+    `browser_carrier` (the browser's envelope and `BrowserSessionClient`),
+    `identity_endpoint` and `identity_projection`, and the replica, transfer
+    and receipt types the sync hosts serve (L13). Knot and Turnstone need it for
+    `view` and `sessions` only, once their repins land.
+  - Checks (`TMPDIR=/tmp`): chirograph 52, graphshell-client 77,
+    graphshell-endpoint 45 and graphshell-host 88 lib tests and all their
+    suites pass (all features); `graphshell` (`webrtc-session`,
+    `personal-sync`) 419 lib tests and its suites pass; `djinn --features
+    c4-host` 229 passed, 11 ignored (lib 170, `c4_host_signaling` 2,
+    `knot_app_route` 1); `cargo check --workspace --all-targets --keep-going`
+    fails only at the `tabard-desktop` and `mere-mesh` examples noted under P1;
+    the shared crates and `graphshell-web` (with and without defaults) check for
+    wasm32; the boundary script passes.

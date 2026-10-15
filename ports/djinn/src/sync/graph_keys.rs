@@ -27,7 +27,9 @@ use stickleback::{
     GroupSessionId,
 };
 
-use crate::personal_sync::{KeyAgreementEvent, KeyAgreementStep, PersonalGraphEvent, SyncRoster};
+use graphshell::personal_sync::{
+    KeyAgreementEvent, KeyAgreementStep, PersonalGraphEvent, SyncRoster,
+};
 
 /// Domain for the key that protects session state at rest.
 ///

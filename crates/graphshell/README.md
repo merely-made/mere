@@ -6,8 +6,8 @@ one feature each on `graphshell-endpoint`.
 
 | Crate | Contents |
 |---|---|
-| `chirograph` | Session messages (score, scene, presentation, resource, resume, status, intent); the `Carrier` trait; `CarrierError` |
-| `graphshell-client` | `ClientState` (snapshots, diffs, resume, resource cache, cache policy), `RetainedEndpointSession`, `ActionDraft`, `SessionDriver`, and `line` (the NDJSON codec and `LineAssembler` both ends share) |
+| `chirograph` | Session messages (score, scene, presentation, resource, resume, status, intent); the `Carrier` trait; `CarrierError`; `line`, the NDJSON codec and `LineAssembler` every end shares |
+| `graphshell-client` | `ClientState` (snapshots, diffs, resume, resource cache, cache policy), `RetainedEndpointSession`, `ActionDraft`, `SessionDriver` |
 | `graphshell-endpoint` | `ProjectionCatalog`, `ProjectionSource`, `PresentationSource`, `IntentSink`, `ResumableProjectionSource`, `ProjectionNoticeSource`, `LiveViewReferenceGate`, `dispatch_common`; and the carriers below |
 | `graphshell-endpoint::stdio` (feature `stdio`) | `StdioCarrier` plus `serve_basic`, `serve_resumable`, `serve_resumable_notifying`: NDJSON over a child process's standard streams |
 | `graphshell-endpoint::local` (feature `local`) | `LocalCarrier`: an endpoint hosted in this process, still round-tripping the wire encoding |
@@ -55,8 +55,9 @@ worker thread.
 Every carrier ends at the same seam: an admitted byte stream, or a line
 channel where the platform gives no stream, plus the ingress facts admission
 read (transport agnosticism note, ruling T1). Above it the wire is NDJSON on
-every carrier (T2): `graphshell_client::line` is the codec, and
-`graphshell_host::line` runs it over Tokio streams. Admission has one entry,
+every carrier (T2): `chirograph::line` is the codec, which the stdio and
+network carriers and `SessionDriver` use directly, and `graphshell_host::line`
+runs it over Tokio streams. Admission has one entry,
 `graphshell_host::carrier::admit_stream`; a transport's accepted session
 reaches it through `admit_accepted_session`, an in-process door states its
 own facts, and a carrier that hands over the hello as bytes uses the sans-I/O
@@ -64,8 +65,9 @@ own facts, and a carrier that hands over the hello as bytes uses the sans-I/O
 
 ## Not in these crates
 
-The brokers Djinn runs (`native::app_broker`, the browser door's host,
-`device_broker`, `local_session`) and the identity endpoint and its
-`ResidentIdentity` authority live in [`ports/graphshell`](../../ports/graphshell)
-until the stack lift plan's P5 moves the brokers to Djinn. That port is the
-reference application: it composes these crates, and they do not depend on it.
+The servers Djinn runs (the application door's broker, the browser door's
+host, the device broker, the local session, `ResidentIdentity` and the sync
+hosts) are Djinn's `door` and `sync` modules since the stack lift plan's P5.
+The browser carrier and the identity endpoint stay in
+[`ports/graphshell`](../../ports/graphshell), the reference application: it
+composes these crates, and they do not depend on it.
