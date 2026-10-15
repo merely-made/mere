@@ -20,8 +20,8 @@ pub struct MereViewModel {
     pub hide_graph: bool,
     /// Archive readings and operations advertised by the host, if available.
     pub archive: Option<ArchiveModel>,
-    /// Where the sessions and archives show: beside the graph, or as an
-    /// overmap layer above it.
+    /// Where the sessions and archives show: beside the graph, as an overmap
+    /// band above it, or as an overmap tier on its canvas.
     pub placement: SessionPlacement,
     pub graph: GraphModel,
     /// The layout in use: one of cartography's graph-only strategy ids.
@@ -46,6 +46,14 @@ pub enum SessionPlacement {
     /// For a host whose graph is not a session's own, such as a file catalog
     /// under a resident mere.
     Overmap,
+    /// An overmap tier on the graph's own canvas, one level up from the
+    /// graph: each session a node across the canvas's top, the shown one
+    /// marked, and each archive a node beside the session it was saved from
+    /// (or with the archive's others). A session node opens in place into its
+    /// card; an archive node peeks on hover and pins a popover on click. New
+    /// session is a control of the tier. The graph's own nodes are laid out
+    /// below the tier.
+    Tier,
 }
 
 impl SessionPlacement {
@@ -54,6 +62,7 @@ impl SessionPlacement {
         match self {
             Self::Beside => "beside",
             Self::Overmap => "overmap",
+            Self::Tier => "tier",
         }
     }
 }

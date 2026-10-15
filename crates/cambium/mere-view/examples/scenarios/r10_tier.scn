@@ -1,0 +1,22 @@
+# Knot's overmap as a tier: sessions and archives are nodes on the graph's own
+# canvas, one level up. A session node opens in place into its card; an
+# archive node peeks on hover and pins a popover on click.
+log overmap tier: sessions and archives on the canvas, card and popover
+settle 2
+act tier
+settle 2
+capture r10_tier
+click .graph-canvas-swatch-node @data-key=mere-session:00000000-0000-0000-0000-000000000001
+settle 2
+assert snap focus == data-request=close-session
+capture r10_card
+click .graph-canvas-swatch-node @data-key=mere-archive:saved
+settle 2
+capture r10_popover
+key escape
+settle 1
+assert snap focus == data-key=mere-archive:saved
+click role:button @aria-label=Close session Morning notes
+settle 1
+assert snap focus == data-key=mere-session:00000000-0000-0000-0000-000000000001
+capture r10_closed
