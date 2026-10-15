@@ -838,6 +838,13 @@ where
         }))
         .chain(archive_items(view, on_change, on_request.clone()))
         .collect();
+    // A band or tier holds the sessions; the hidden column then holds no
+    // second copy of their controls.
+    let items = if overmap_shown(view.model) || tier_shown(view.model) {
+        Vec::new()
+    } else {
+        items
+    };
     let size = if !has_session_content(view.model)
         || overmap_shown(view.model)
         || tier_shown(view.model)
