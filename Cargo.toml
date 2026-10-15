@@ -267,8 +267,10 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # e92572a4 for the lift plan's P2 and P3; Knot's sources are unchanged.
 # On 2026-10-15 both move to 6e3e740, which shows the resident mere as the
 # overmap tier on the catalog's canvas and repins Knot onto Mere 2d6d81804.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "6e3e7408201c689ab044eb86dc7cbe0b48af3ded" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "6e3e7408201c689ab044eb86dc7cbe0b48af3ded" }
+# Then to c1427d2: Knot on Mere 2222917f3 (picks, the "+N" setting,
+# apply_and_lay_out and the native-run fixes), with the tier's native receipt.
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "c1427d231986fccb437f761db9a067ee2cfc7656" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "c1427d231986fccb437f761db9a067ee2cfc7656" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
