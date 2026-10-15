@@ -211,10 +211,11 @@ the branch case with the thaw as parent, and needs nothing extra.
   it (ids remapped), so what the copy changed in passing (visit stamps, its
   own derivation, dropped import provenance) never counts as an edit. A
   pre-`picked_from` part counts as a pick when its nodes carry derivations
-  into its parent's container. In a chain, only the source's own edits merge:
-  what a part between changed before the source was picked from it stays in
-  that part, except nodes it made, which the source holds and which arrive
-  whole. A node the part made arrives under a new id derived from the target's and
+  into its parent's container. In a chain, everything since the first pick
+  comes back (Mark, 2026-10-15): each part between's edits to what the source
+  holds, up to where the next part was picked from it, are replayed before the
+  source's own. A part between's edits to nodes the source does not hold, and
+  its field layer and import records, stay in that part. A node the part made arrives under a new id derived from the target's and
   the source node's ids (`Uuid::new_v5`), so planning again gives the same
   plan.
 - **Three-way (M5, M7):** the comparison is undo's own `revert_change`. It
@@ -222,17 +223,30 @@ the branch case with the thaw as parent, and needs nothing extra.
   source and target agree. What is left is a `MergeConflict { part, base,
   source, target }`, values as JSON (`kernel::graph::part_value`).
   `MereSessions::apply_merge(target, source, pending, choices, author)` takes
-  a `MergeSide` per conflicted `Part` and refuses with `Unresolved(n)` until
-  every conflict has one. It also refuses with `NotMergeable` if either
-  session moved since the plan. A delete against an edit is a `Part::Node`
-  conflict both ways round.
+  a `MergeChoice` per conflicted `Part`: `Source`, `Target`, `Hand(value)`
+  (the part's value in `part_value`'s form, `null` for absent; applied by
+  `kernel::graph::part_edits`) or `AddAsNew`. `AddAsNew` is offered
+  (`MergeConflict::add_as_new`) for a picked node the target has since
+  deleted. It adds the source node under a new id, with its relations, and
+  leaves the deletion standing. `apply_merge` refuses with `Unresolved(n)`
+  until every conflict has a choice, and with `NotMergeable` if either
+  session moved since the plan or a choice does not fit. A delete against an
+  edit is a `Part::Node` conflict both ways round. The node's relations
+  follow its choice, so `Source` brings a deleted node back with them and
+  `Target` keeps a node with them. Only relations between two nodes that are
+  not in conflict are asked about.
 - **M4:** `ProvenanceSubKind::MergedFrom` (and its persisted mirror), appended.
   Every node the merge made or changed records one, naming the source node and
   the source's container.
 - **History:** one `ChangeKind::MergedIn { from, through }` on the target,
   which undo treats as one step. The source gets `ChangeKind::MergedInto` and
   `merged: { into, through, at }` (M6), and `ensure_writable` refuses it from
-  then on. Both sessions are written in one batch.
+  then on. Both sessions are written in one batch. The mark lives in
+  `sessions/<id>/merged.json`, which every read of a manifest lays over
+  `merged`. Undoing the `MergedIn` deletes it in the target's own batch, so
+  the source is editable and mergeable again (Mark, 2026-10-15), and redoing
+  it writes it again. That works on every undo path, including a host that
+  writes its own batches.
 - **M8:** `pandect::merge_rules` holds same-id surface layering, edge
   signatures, `layer_resource_record`, the checked `merge_resource_facet`
   and the assertion-handle check. Compose calls them, and its tests are
@@ -241,8 +255,10 @@ the branch case with the thaw as parent, and needs nothing extra.
   declarations, legacy origins), and asks only if the rule itself refuses.
   Any other facet is compared whole.
 
-Not built: the "hand edit" choice and the vanished source's "add as new"
-choice, which the Conflicts section lists. Only `Source` and `Target` exist.
+Mark's rulings on the first build's open points (2026-10-15): both extra
+choices; everything since the first pick; undo frees the source; derived ids
+for a part's new nodes; a node's relations follow its choice. All are built
+as described above.
 
 ## The options as they were put to Mark
 

@@ -163,7 +163,8 @@ pub use journal::{
 };
 pub use merge::import_edits;
 pub use revert::{
-    Part, Revert, Touched, part_node, part_of, part_value, recreate_node_edits, revert_change,
+    Part, Revert, Touched, part_edits, part_node, part_of, part_value, recreate_node_edits,
+    revert_change,
 };
 pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public

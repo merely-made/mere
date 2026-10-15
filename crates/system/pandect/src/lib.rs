@@ -191,7 +191,7 @@ pub use facet_store::{
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
-    MereSessions, MergeConflict, MergeMatch, MergeSide, Pending, PendingMerge, Reverted,
+    MereSessions, MergeChoice, MergeConflict, MergeMatch, Pending, PendingMerge, Reverted,
     SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey, branched_session_name, forked_session_name,
     picked_session_name,
 };

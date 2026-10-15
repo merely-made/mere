@@ -36,7 +36,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use kernel::graph::{
-    Part, ProvenanceSubKind, part_node, part_of, part_value, recreate_node_edits,
+    Part, ProvenanceSubKind, part_edits, part_node, part_of, part_value, recreate_node_edits,
     replay_captured_deltas_onto,
 };
 use kernel::persistence::PersistedResourceFacet;
@@ -51,14 +51,20 @@ use crate::merge_rules::{FacetMerge, merge_resource_facet, resource_facet_has_ru
 /// gives up on it.
 const MAX_LINEAGE_HOPS: usize = 64;
 
-/// Which side a conflict takes.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum MergeSide {
-    /// What the branch or picked-off part holds.
+/// What a conflict takes (M5).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "choice", content = "value", rename_all = "snake_case")]
+pub enum MergeChoice {
+    /// What the branch or picked-off part holds. For a node, its relations
+    /// come with it.
     Source,
     /// What the session being merged into holds.
     Target,
+    /// A value supplied by hand, in the conflict's own form (`null`: absent).
+    Hand(Value),
+    /// For a picked node the target has since deleted: add the source node
+    /// as a new node, leaving the deletion as it is.
+    AddAsNew,
 }
 
 /// One part both sides changed differently since the base. Values are the
@@ -69,6 +75,10 @@ pub struct MergeConflict {
     pub base: Option<Value>,
     pub source: Option<Value>,
     pub target: Option<Value>,
+    /// Whether [`MergeChoice::AddAsNew`] applies: a picked node whose target
+    /// node has since been deleted (the vanished source).
+    #[serde(default)]
+    pub add_as_new: bool,
 }
 
 /// How a merge matched the source's nodes to the target's.
@@ -220,9 +230,12 @@ fn node_ids(graph: &Graph) -> BTreeSet<Uuid> {
 
 impl<B: Backend + Clone> MereSessions<B> {
     async fn manifest_of(&self, id: SessionId) -> Result<GraphSessionManifest, SessionError> {
-        read(&self.slots(), &Keys::new(id).at(MANIFEST))
+        let slots = self.slots();
+        let mut manifest: GraphSessionManifest = read(&slots, &Keys::new(id).at(MANIFEST))
             .await?
-            .ok_or(SessionError::Missing(id))
+            .ok_or(SessionError::Missing(id))?;
+        manifest.merged = read(&slots, &Keys::new(id).at(MERGED)).await?;
+        Ok(manifest)
     }
 
     /// Plan merging `source`, a branch or a picked-off part, into `target`.
@@ -283,11 +296,27 @@ impl<B: Backend + Clone> MereSessions<B> {
             }
             conflicts.push(MergeConflict {
                 base: part_value(&basis.base, &part),
+                add_as_new: basis.matched == MergeMatch::Pick
+                    && matches!(part, Part::Node(_))
+                    && theirs.is_some()
+                    && ours.is_none(),
                 source: theirs,
                 target: ours,
                 part,
             });
         }
+        // A node in conflict decides its relations: they are asked about
+        // only when neither end is, and wait for the node's choice otherwise.
+        let disputed: BTreeSet<Uuid> = conflicts
+            .iter()
+            .filter_map(|conflict| match conflict.part {
+                Part::Node(id) => Some(id),
+                _ => None,
+            })
+            .collect();
+        let follows = |part: &Part| matches!(part, Part::Edges(from, to) if disputed.contains(from) || disputed.contains(to));
+        conflicts.retain(|conflict| !follows(&conflict.part));
+        edits.retain(|edit| !part_of(edit).is_some_and(|part| follows(&part)));
         if !joined.is_empty() {
             let mut scratch = live.clone();
             replay_captured_deltas_onto(&mut scratch, edits.iter().cloned());
@@ -396,9 +425,13 @@ impl<B: Backend + Clone> MereSessions<B> {
         }))
     }
 
-    /// A picked-off part's basis: ids match through `CopiedFrom` derivations,
-    /// hop by hop to the target; the base is the target where the chain was
-    /// picked; the source is that base with the part's own edits replayed.
+    /// A picked-off part's basis. Ids match through `CopiedFrom` derivations,
+    /// hop by hop to the target (M3); a node made in a part along the way
+    /// gets a new id, derived from the target and that node. The base is the
+    /// target where the chain was first picked. The source is that base with
+    /// everything since replayed: each part between's edits to what the source
+    /// holds, up to where the next part was picked from it, then the source's
+    /// own edits.
     async fn pick_basis(
         &self,
         target: &GraphSession<B>,
@@ -411,106 +444,135 @@ impl<B: Backend + Clone> MereSessions<B> {
                 target.id().as_uuid()
             ))
         };
-        let baseline = source
-            .graph_at(Seq(0))
-            .ok_or_else(|| SessionError::Corrupt("a part's baseline does not load".into()))?;
-        // Each source node's id at the current hop.
-        let mut current: BTreeMap<Uuid, Uuid> = node_ids(&baseline)
-            .union(&node_ids(source.graph()))
-            .map(|id| (*id, *id))
-            .collect();
+        // The chain: hops[i] goes from level i (0: the source) to level i + 1
+        // (the last: the target); middles hold the parts between, opened.
+        let mut hops = Vec::new();
+        let mut middles: Vec<GraphSession<B>> = Vec::new();
         let mut manifest = source.manifest().clone();
-        let mut level: Vec<Graph> = vec![baseline.clone(), source.graph().clone()];
-        let mut root_at = None;
-        for hop_index in 0..MAX_LINEAGE_HOPS {
+        loop {
+            if hops.len() >= MAX_LINEAGE_HOPS {
+                return Err(not_a_pick());
+            }
             let hop = self
                 .pick_hop(&manifest, target)
                 .await?
                 .ok_or_else(not_a_pick)?;
-            let graphs: Vec<&Graph> = level.iter().collect();
-            current = current
-                .into_iter()
-                .filter_map(|(origin, id)| {
-                    copied_from(&graphs, id, hop.container).map(|copied| (origin, copied))
-                })
-                .collect();
-            if hop.legacy && hop_index == 0 && current.is_empty() {
-                // A fork carries no derivations into its parent: not a pick.
-                return Err(not_a_pick());
-            }
+            hops.push(hop);
             if hop.session == target.id() {
-                root_at = Some(hop.at);
                 break;
             }
             let parent = self.open(hop.session).await?;
             manifest = parent.manifest().clone();
-            level = parent
-                .graph_at(hop.at)
-                .into_iter()
-                .chain([parent.graph().clone()])
-                .collect();
+            middles.push(parent);
         }
-        let root_at = root_at.ok_or_else(not_a_pick)?;
+        let levels: Vec<&GraphSession<B>> = std::iter::once(source).chain(&middles).collect();
+        // Every graph a level's nodes are read from: its baseline, where the
+        // level below was picked from it, and now.
+        let graphs_of = |level: usize| -> Vec<Graph> {
+            let session = levels[level];
+            let mut graphs: Vec<Graph> = session.graph_at(Seq(0)).into_iter().collect();
+            if level > 0 {
+                graphs.extend(session.graph_at(hops[level - 1].at));
+            }
+            graphs.push(session.graph().clone());
+            graphs
+        };
+        let target_ns = *target.id().as_uuid();
+        let mint = |id: &Uuid| Uuid::new_v5(&target_ns, id.as_bytes());
+        // Each level's ids to target ids, from the top down.
+        let mut maps: Vec<BTreeMap<Uuid, Uuid>> = vec![BTreeMap::new(); levels.len()];
+        for level in (0..levels.len()).rev() {
+            let graphs = graphs_of(level);
+            let refs: Vec<&Graph> = graphs.iter().collect();
+            let ids: BTreeSet<Uuid> = graphs.iter().flat_map(node_ids).collect();
+            let mut derived = 0;
+            let mut map = BTreeMap::new();
+            for id in ids {
+                let above = copied_from(&refs, id, hops[level].container);
+                derived += usize::from(above.is_some());
+                let mapped = above.and_then(|above| {
+                    if level + 1 == levels.len() {
+                        Some(above)
+                    } else {
+                        maps[level + 1].get(&above).copied()
+                    }
+                });
+                map.insert(id, mapped.unwrap_or_else(|| mint(&id)));
+            }
+            if hops[level].legacy && derived == 0 {
+                // A fork carries no derivations into its parent: not a pick.
+                return Err(not_a_pick());
+            }
+            maps[level] = map;
+        }
+        let root_at = hops.last().expect("a chain has a hop").at;
         let base = target
             .graph_at(root_at)
             .ok_or(SessionError::CursorOutOfRange {
                 cursor: root_at,
                 live: target.journal().live_cursor(),
             })?;
-        // A node the target never held is added under a new id, stable for
-        // this target and source node so a plan can be made again.
-        let target_ns = *target.id().as_uuid();
-        let mut ids = current;
-        for id in node_ids(&baseline).union(&node_ids(source.graph())) {
-            ids.entry(*id)
-                .or_insert_with(|| Uuid::new_v5(&target_ns, id.as_bytes()));
-        }
-        let names: BTreeMap<String, String> = ids
-            .iter()
-            .map(|(from, to)| (from.to_string(), to.to_string()))
-            .collect();
-        // Baseline nodes with no match (made in a part between) arrive whole,
-        // with their relations; then the part's own edits.
+        let names = |map: &BTreeMap<Uuid, Uuid>| -> BTreeMap<String, String> {
+            map.iter()
+                .map(|(from, to)| (from.to_string(), to.to_string()))
+                .collect()
+        };
+        // What the source holds, in target ids: the parts between carry only
+        // their edits to it.
+        let held: BTreeSet<Uuid> = maps[0].values().copied().collect();
         let mut change = Vec::new();
-        let unmatched: Vec<Uuid> = node_ids(&baseline)
+        for level in (1..levels.len()).rev() {
+            let map = &maps[level];
+            let within = |id: &Uuid| map.get(id).is_some_and(|mapped| held.contains(mapped));
+            let names = names(map);
+            for edit in levels[level].edits_in(Seq(0), hops[level - 1].at) {
+                let touched = Touched::of([&edit]);
+                let session_level = !touched.fields.is_empty()
+                    || !touched.couplings.is_empty()
+                    || !touched.coupled_fields.is_empty()
+                    || touched.import_records;
+                if session_level
+                    || !touched.nodes.iter().all(&within)
+                    || !touched
+                        .edges
+                        .iter()
+                        .all(|(from, to)| within(from) && within(to))
+                    || !touched.shown_surfaces.iter().all(&within)
+                {
+                    continue;
+                }
+                change.push(remap_edit(&edit, &names));
+            }
+        }
+        // A node of the source's baseline the replay did not bring (a part
+        // between with no journal for it) arrives whole, with its relations.
+        let names = names(&maps[0]);
+        let baseline = source
+            .graph_at(Seq(0))
+            .ok_or_else(|| SessionError::Corrupt("a part's baseline does not load".into()))?;
+        let mut rebuilt = base.clone();
+        replay_captured_deltas_onto(&mut rebuilt, change.iter().cloned());
+        let missing: Vec<Uuid> = node_ids(&baseline)
             .into_iter()
-            .filter(|id| base.get_node_by_id(ids[id]).is_none())
+            .filter(|id| rebuilt.get_node_by_id(maps[0][id]).is_none())
             .collect();
-        for id in &unmatched {
+        for id in &missing {
             if let Some(made) = recreate_node_edits(&baseline, *id) {
                 change.extend(made.iter().map(|edit| remap_edit(edit, &names)));
             }
         }
-        let mut pairs = BTreeSet::new();
-        for id in &unmatched {
-            let Some((key, _)) = baseline.get_node_by_id(*id) else {
-                continue;
-            };
-            for (other_key, other) in baseline.nodes() {
-                for (from, to) in [
-                    ((key, *id), (other_key, other.id)),
-                    ((other_key, other.id), (key, *id)),
-                ] {
-                    if !pairs.insert((from.1, to.1)) {
-                        continue;
-                    }
-                    let edges = baseline.persisted_edges_between(from.0, to.0);
-                    if !edges.is_empty() {
-                        change.push(remap_edit(
-                            &CapturedDelta::ReplaySetEdgesByIds {
-                                from_id: from.1.to_string(),
-                                to_id: to.1.to_string(),
-                                edges,
-                            },
-                            &names,
-                        ));
-                    }
-                }
-            }
-        }
+        change.extend(
+            incident_edge_edits(&baseline, &missing)
+                .iter()
+                .map(|edit| remap_edit(edit, &names)),
+        );
         let live = source.journal().live_cursor();
-        let own = source.edits_in(Seq(0), live);
-        change.extend(own.iter().map(|edit| remap_edit(edit, &names)));
+        change.extend(
+            source
+                .edits_in(Seq(0), live)
+                .iter()
+                .map(|edit| remap_edit(edit, &names)),
+        );
         let mut source_graph = base.clone();
         replay_captured_deltas_onto(&mut source_graph, change.iter().cloned());
         Ok(Basis {
@@ -518,22 +580,23 @@ impl<B: Backend + Clone> MereSessions<B> {
             base,
             source_graph,
             change,
-            ids,
+            ids: maps.swap_remove(0),
         })
     }
 
     /// Write `pending` into `target` as one `MergedIn` change, taking each
-    /// conflict's side from `choices`, and mark `source` merged: kept, with its
-    /// history, and read-only from then on (M6). Every merged node records a
-    /// `MergedFrom` derivation naming the source node (M4). Both sessions are
-    /// stored in one batch. Refused if either session changed since the plan,
-    /// or a conflict has no choice.
+    /// conflict's choice from `choices`, and mark `source` merged: kept, with
+    /// its history, and read-only until the merge is undone (M6). Every merged
+    /// node records a `MergedFrom` derivation naming the source node (M4).
+    /// Both sessions are stored in one batch. Refused if either session
+    /// changed since the plan, a conflict has no choice, or a choice does not
+    /// fit its conflict.
     pub async fn apply_merge(
         &self,
         target: &mut GraphSession<B>,
         source: &mut GraphSession<B>,
         pending: PendingMerge,
-        choices: &BTreeMap<Part, MergeSide>,
+        choices: &BTreeMap<Part, MergeChoice>,
         author: Author,
     ) -> Result<Applied, SessionError> {
         if target.id() != pending.target || source.id() != pending.source {
@@ -561,17 +624,24 @@ impl<B: Backend + Clone> MereSessions<B> {
         if unresolved > 0 {
             return Err(SessionError::Unresolved(unresolved));
         }
+        let mut origins = pending.origins.clone();
         let mut edits = pending.edits.clone();
         let mut scratch = target.graph().clone();
         replay_captured_deltas_onto(&mut scratch, edits.iter().cloned());
+        let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+            replay_captured_deltas_onto(scratch, more.iter().cloned());
+            edits.extend(more);
+        };
+
+        // Source: the edits that make each taken part read as the source
+        // does. A node brought back or removed takes its relations with it.
         let taken: BTreeSet<&Part> = pending
             .conflicts
             .iter()
             .map(|conflict| &conflict.part)
-            .filter(|part| choices.get(*part) == Some(&MergeSide::Source))
+            .filter(|part| choices.get(*part) == Some(&MergeChoice::Source))
             .collect();
         if !taken.is_empty() {
-            // The edits that make each taken part read as the source does.
             let forced = revert_change(&pending.change, &pending.source_graph, &scratch, &scratch);
             let whole: BTreeSet<Uuid> = taken
                 .iter()
@@ -587,9 +657,12 @@ impl<B: Backend + Clone> MereSessions<B> {
                     part_of(edit).is_some_and(|part| {
                         taken.contains(&part)
                             || part_node(&part).is_some_and(|node| whole.contains(&node))
+                            || matches!(part, Part::Edges(from, to)
+                                if whole.contains(&from) || whole.contains(&to))
                     })
                 })
                 .collect();
+            add(&mut scratch, chosen, &mut edits);
             let mut facets: BTreeMap<Uuid, Vec<(String, Option<Value>)>> = BTreeMap::new();
             for part in &taken {
                 if let Part::ResourceFacet(resource, facet) = part {
@@ -599,22 +672,60 @@ impl<B: Backend + Clone> MereSessions<B> {
                         .push((facet.clone(), part_value(&pending.source_graph, part)));
                 }
             }
-            replay_captured_deltas_onto(&mut scratch, chosen.iter().cloned());
-            edits.extend(chosen);
             for (resource, facets) in facets {
                 let record = record_with(&scratch, resource, facets);
-                replay_captured_deltas_onto(&mut scratch, record.iter().cloned());
-                edits.extend(record);
+                add(&mut scratch, record, &mut edits);
             }
         }
+
+        for conflict in &pending.conflicts {
+            match choices.get(&conflict.part) {
+                // Edit by hand: the part as supplied, `null` for absent.
+                Some(MergeChoice::Hand(value)) => {
+                    let value = (!value.is_null()).then_some(value);
+                    let made = part_edits(&scratch, &conflict.part, value).map_err(|why| {
+                        SessionError::NotMergeable(format!("a hand edit does not fit: {why}"))
+                    })?;
+                    add(&mut scratch, made, &mut edits);
+                },
+                // Add as new: the source node, under a new id, with its
+                // relations, beside the target's choice to have deleted it.
+                Some(MergeChoice::AddAsNew) => {
+                    let Part::Node(node) = &conflict.part else {
+                        return Err(SessionError::NotMergeable(
+                            "only a node can be added as new".into(),
+                        ));
+                    };
+                    if !conflict.add_as_new {
+                        return Err(SessionError::NotMergeable(
+                            "add as new is for a picked node its target deleted".into(),
+                        ));
+                    }
+                    let fresh = Uuid::new_v5(
+                        pending.target.as_uuid(),
+                        format!("add-as-new:{node}").as_bytes(),
+                    );
+                    let names = BTreeMap::from([(node.to_string(), fresh.to_string())]);
+                    let mut made =
+                        recreate_node_edits(&pending.source_graph, *node).unwrap_or_default();
+                    made.extend(incident_edge_edits(&pending.source_graph, &[*node]));
+                    let made = made.iter().map(|edit| remap_edit(edit, &names)).collect();
+                    if let Some(origin) = origins.get(node).copied() {
+                        origins.insert(fresh, origin);
+                    }
+                    add(&mut scratch, made, &mut edits);
+                },
+                _ => {},
+            }
+        }
+
         // Every node the merge made or changed records where it came from.
         let container = Some(pending.source_container.to_string());
-        let merged_nodes = Touched::of(&edits).nodes;
-        for node in merged_nodes {
+        for node in Touched::of(&edits).nodes {
             if scratch.get_node_by_id(node).is_none() {
                 continue;
             }
-            let Some(origin) = pending.origins.get(&node) else {
+            let Some(origin) = origins.get(&node) else {
                 continue;
             };
             edits.push(CapturedDelta::ReplayRecordNodeDerivationById {
@@ -643,11 +754,12 @@ impl<B: Backend + Clone> MereSessions<B> {
             }
         })?;
         let at = wall_clock_now();
-        source.manifest.merged = Some(MergedMark {
+        let mark = MergedMark {
             into: target.id(),
             through: pending.through.0,
             at,
-        });
+        };
+        source.manifest.merged = Some(mark.clone());
         let cursor = source.journal.live_cursor();
         source.changes.append(Change {
             author,
@@ -661,12 +773,44 @@ impl<B: Backend + Clone> MereSessions<B> {
         source.revision += 1;
         let ours = target.pending(at)?;
         let theirs = source.pending(at)?;
-        let ops: Vec<WriteOp> = ours.ops().iter().chain(theirs.ops()).cloned().collect();
+        let mut ops: Vec<WriteOp> = ours.ops().iter().chain(theirs.ops()).cloned().collect();
+        ops.push(pretty(Keys::new(source.id()).at(MERGED), &mark)?);
         self.backend.apply(&ops).await?;
         target.stored(ours);
         source.stored(theirs);
         Ok(applied)
     }
+}
+
+/// The relations between each of `nodes` and every node of `graph`, either
+/// way round, as edits that set them.
+fn incident_edge_edits(graph: &Graph, nodes: &[Uuid]) -> Vec<CapturedDelta> {
+    let mut pairs = BTreeSet::new();
+    let mut edits = Vec::new();
+    for id in nodes {
+        let Some((key, _)) = graph.get_node_by_id(*id) else {
+            continue;
+        };
+        for (other_key, other) in graph.nodes() {
+            for ((from_key, from), (to_key, to)) in [
+                ((key, *id), (other_key, other.id)),
+                ((other_key, other.id), (key, *id)),
+            ] {
+                if !pairs.insert((from, to)) {
+                    continue;
+                }
+                let edges = graph.persisted_edges_between(from_key, to_key);
+                if !edges.is_empty() {
+                    edits.push(CapturedDelta::ReplaySetEdgesByIds {
+                        from_id: from.to_string(),
+                        to_id: to.to_string(),
+                        edges,
+                    });
+                }
+            }
+        }
+    }
+    edits
 }
 
 /// The edit that sets `resource`'s record as `graph` holds it, with each

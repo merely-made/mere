@@ -191,6 +191,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             saved_pending_links: self.saved_pending_links.clone(),
             saved_pending_links_revision: self.saved_pending_links_revision,
             retained_pending_links_revision: self.retained_pending_links_revision,
+            merge_marks: self.merge_marks.clone(),
         }
     }
 }
