@@ -61,6 +61,11 @@ impl Canvas {
             self.physics.unpin(key);
         }
         self.graph = graph;
+        // NodeKeys do not survive a graph swap; an exact scope resolves its
+        // authored IDs again against the replacement.
+        if let Some(roster) = self.exact_scope.clone() {
+            self.scope = Some(self.resolve_exact_scope(&roster));
+        }
         self.meaning.forget_graph();
         self.last_strategy_inputs = None;
         *self
@@ -241,6 +246,7 @@ impl Canvas {
             law_rebuilds: 0,
             restored_score_hold: None,
             scope: None,
+            exact_scope: None,
             fold: None,
             fold_press: None,
             fold_undo: Vec::new(),

@@ -197,3 +197,78 @@ fn park_physics_halts_an_in_progress_settle() {
         "park halts the settle so a backgrounded graph stops ticking and waking the loop",
     );
 }
+
+fn two_node_graph() -> (Graph, uuid::Uuid, uuid::Uuid) {
+    let mut g = Graph::new();
+    let a = g.add_node("https://a.example".to_string(), PortablePoint::new(0.0, 0.0));
+    let b = g.add_node("https://b.example".to_string(), PortablePoint::new(0.0, 0.0));
+    let ids = (g.get_node(a).unwrap().id, g.get_node(b).unwrap().id);
+    (g, ids.0, ids.1)
+}
+
+fn visible(canvas: &Canvas) -> usize {
+    canvas
+        .graph
+        .nodes()
+        .filter(|(key, _)| canvas.node_in_scope(*key))
+        .count()
+}
+
+#[test]
+fn an_empty_exact_scope_shows_nothing_and_only_clear_scope_shows_all() {
+    let (g, _, _) = two_node_graph();
+    let mut canvas = Canvas::with_graph(g);
+    canvas.scope_to_exact_members([]);
+    assert!(canvas.is_scoped());
+    assert_eq!(visible(&canvas), 0, "an empty roster is not Show all");
+    assert_eq!(canvas.scope_members(), Some(vec![]));
+    // The helper that clears on empty must not be the way in.
+    canvas.scope_to_members([]);
+    assert!(!canvas.is_scoped(), "scope_to_members keeps its clearing meaning");
+    canvas.scope_to_exact_members([]);
+    canvas.clear_scope();
+    assert_eq!(visible(&canvas), 2);
+    assert_eq!(canvas.scope_members(), None);
+}
+
+#[test]
+fn an_exact_roster_survives_a_graph_swap_and_appears_when_demanded() {
+    let (g, a, _) = two_node_graph();
+    let mut canvas = Canvas::with_graph(g);
+    let missing = uuid::Uuid::from_u128(77);
+    canvas.scope_to_exact_members([a, missing]);
+    assert_eq!(visible(&canvas), 1, "the unresolved member is skipped, not lost");
+    assert_eq!(canvas.scope_members().unwrap().len(), 2);
+    // The source is replaced by one holding neither node: the scope stays and is empty.
+    canvas.set_graph(Graph::new());
+    assert!(canvas.is_scoped());
+    assert_eq!(visible(&canvas), 0);
+    // The missing member becomes resident under a new graph and is shown.
+    let mut next = Graph::new();
+    let key = next.add_node("https://m.example".to_string(), PortablePoint::new(0.0, 0.0));
+    next.add_node("https://other.example".to_string(), PortablePoint::new(0.0, 0.0));
+    let id = next.get_node(key).unwrap().id;
+    canvas.scope_to_exact_members([id, a]);
+    canvas.set_graph(next);
+    assert_eq!(visible(&canvas), 1, "only the roster member shows");
+    assert_eq!(canvas.scope_members().unwrap().len(), 2);
+}
+
+#[test]
+fn explicit_scope_changes_drop_the_exact_roster() {
+    let (g, a, b) = two_node_graph();
+    let mut canvas = Canvas::with_graph(g);
+    canvas.scope_to_exact_members([a]);
+    canvas.scope_to_members([b]);
+    assert_eq!(canvas.scope_members(), Some(vec![b]));
+    canvas.scope_to_exact_members([a]);
+    canvas.selected.insert(canvas.graph.get_node_by_id(a).unwrap().0);
+    canvas.isolate_selection();
+    let before = canvas.scope_members().unwrap();
+    canvas.set_graph(canvas.graph.clone());
+    assert_eq!(
+        canvas.scope_members().unwrap(),
+        before,
+        "isolate_selection replaced the roster, so a swap does not restore it"
+    );
+}

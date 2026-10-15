@@ -117,6 +117,13 @@ main: `LiveCommand`/`LiveEditError` (typed live edits, `pandect/src/live_graph.r
 `PaneRoots`/`HostRoots`, `DirectoryHostCache`
 (`resident_directory_owner.rs`).
 
+The lane had a Knot companion, also never merged: an optional
+`mere-snapshot-coverage-v1` construction feature in `knot-editor`'s endpoint
+for Chirograph's snapshot coverage field. It is preserved in knot-editor as
+`archive/resident-coverage-compat` and `archive/resident-coverage-current-main-20261010`
+(two variants against different Mere families); port it alongside if the
+coverage field survives the mapping.
+
 Prompt for the O-PC session:
 
 > Port the resident-host lane onto current Mere main. Read
