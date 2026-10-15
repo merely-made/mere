@@ -9,7 +9,7 @@ sources on this machine. Nothing was built; dependency cones were not measured.
 
 - disposition: current
 - status line: "plan; nothing moved" - accurate: yes
-- claims checked: 49 - holds: 46, stale: 0, unverifiable: 3
+- claims checked: 58 - holds: 56, stale: 0, unverifiable: 2
 
 ### Stale claims
 
@@ -27,7 +27,7 @@ Take rulings R1 to R6 to Mark before the phases that name them; run P0 baselines
 
 ### Notes
 
-Unverifiable: dependency cones per consumer (git dependencies need network access),
-Turnstone-side readiness (its source is not local), and whether a custody-scoping task
-exists (none recorded in the doc tree). Line counts come from a script over the source
+Unverifiable: dependency cones per consumer (git dependencies need network access) and
+whether a custody-scoping task exists (none recorded in the doc tree). Turnstone's imports
+were read from GitHub at f14d2091; its readiness to run the named receipts was not checked. Line counts come from a script over the source
 and include in-file tests.
