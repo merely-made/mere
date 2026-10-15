@@ -52,7 +52,7 @@ use crate::facet_store::{NODE_FACETS_FILE, NodeFacetStore};
 use crate::graph_placement::{
     FrozenGraph, LegacyTranslationReceipt, PlacementProfile, SessionPlacement, source_digest,
 };
-use crate::manifest::{GraphSessionManifest, TrashMark};
+use crate::manifest::{GraphSessionManifest, Lineage, TrashMark};
 #[cfg(not(target_arch = "wasm32"))]
 use crate::scene_facets::copy_scene_facets;
 use crate::view_intent_store::ViewIntent;
@@ -119,6 +119,11 @@ pub enum SessionError {
     ReadOnly(SessionId),
     Validation(String),
     Store(StoreError),
+    /// A merge-in cannot go ahead: the source is not a branch or picked-off
+    /// part of the target, was already merged, or changed since the plan.
+    NotMergeable(String),
+    /// A pending merge was applied without a choice for every conflict.
+    Unresolved(usize),
 }
 
 impl std::fmt::Display for SessionError {
@@ -134,11 +139,13 @@ impl std::fmt::Display for SessionError {
             Self::NoSuchNode(id) => write!(f, "no node {id} to fork from"),
             Self::ReadOnly(id) => write!(
                 f,
-                "session {} is a read-only codicil thaw; fork before editing",
+                "session {} is read-only (a codicil thaw, or merged); fork or branch before editing",
                 id.as_uuid()
             ),
             Self::Validation(reason) => write!(f, "candidate graph refused: {reason}"),
             Self::Store(error) => write!(f, "store: {error}"),
+            Self::NotMergeable(why) => write!(f, "cannot merge in: {why}"),
+            Self::Unresolved(count) => write!(f, "{count} merge conflicts have no choice"),
         }
     }
 }
@@ -194,6 +201,25 @@ pub enum ChangeKind {
     Picked {
         from: SessionId,
         at: Seq,
+    },
+    /// Branched from session `from` at its journal cursor `at`: a copy of the
+    /// whole session meant to merge back into it.
+    Branched {
+        from: SessionId,
+        at: Seq,
+    },
+    /// Merged in session `from`, a branch or picked-off part, through its
+    /// journal cursor `through`. The change carries the merge's edits, so
+    /// undo takes the whole merge back in one step.
+    MergedIn {
+        from: SessionId,
+        through: Seq,
+    },
+    /// This session was merged into session `into` through this session's
+    /// own journal cursor `through`. It is read-only from then on.
+    MergedInto {
+        into: SessionId,
+        through: Seq,
     },
 }
 
@@ -587,6 +613,10 @@ pub struct GraphSession<B> {
 
 #[path = "graph_session_transaction.rs"]
 mod transaction;
+
+#[path = "graph_session_merge.rs"]
+mod merge;
+pub use merge::{MergeConflict, MergeMatch, MergeSide, PendingMerge};
 
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as
@@ -1085,7 +1115,7 @@ impl<B: Backend> GraphSession<B> {
     }
 
     pub fn ensure_writable(&self) -> Result<(), SessionError> {
-        if self.manifest.codicil_read_only {
+        if self.manifest.codicil_read_only || self.manifest.merged.is_some() {
             return Err(SessionError::ReadOnly(self.id()));
         }
         Ok(())
@@ -1469,7 +1499,7 @@ impl<B: Backend> GraphSession<B> {
             }
             let index = Seq(index as u64);
             match &change.kind {
-                ChangeKind::Edit => {
+                ChangeKind::Edit | ChangeKind::MergedIn { .. } => {
                     undo.push(index);
                     redo.clear();
                 },
@@ -1489,13 +1519,18 @@ impl<B: Backend> GraphSession<B> {
 
     /// The edits change `of` wrote.
     fn edits_of(&self, change: &Change) -> Vec<CapturedDelta> {
-        self.journal.entries()[change.first.index()..change.end.index()]
+        self.edits_in(change.first, change.end)
+    }
+
+    /// The edits the journal entries `[first, end)` wrote.
+    fn edits_in(&self, first: Seq, end: Seq) -> Vec<CapturedDelta> {
+        self.journal.entries()[first.index()..end.index()]
             .iter()
             .enumerate()
             .flat_map(|(offset, entry)| {
                 self.translation
                     .as_ref()
-                    .and_then(|receipt| receipt.entry_effects.get(change.first.index() + offset))
+                    .and_then(|receipt| receipt.entry_effects.get(first.index() + offset))
                     .cloned()
                     .unwrap_or_else(|| vec![entry.delta.clone()])
             })
@@ -1718,8 +1753,9 @@ impl<B: Backend> GraphSession<B> {
 }
 
 /// The suffixes this crate gives a derived session's name: a fork's, a
-/// picked-off part's and a codicil thaw's.
-const DERIVED_NAME_SUFFIXES: [&str; 3] = [" (fork of ", " (picked from ", " (from "];
+/// branch's, a picked-off part's and a codicil thaw's.
+const DERIVED_NAME_SUFFIXES: [&str; 4] =
+    [" (fork of ", " (branch of ", " (picked from ", " (from "];
 
 /// A session name without the suffix a fork, a pick-off or a codicil thaw
 /// gave it, or `Session` when it has none: the base a fork's name starts
@@ -1749,6 +1785,13 @@ fn derived_name_base(name: &str) -> &str {
 pub fn forked_session_name(parent: Option<&str>) -> String {
     let parent = parent.unwrap_or("Session");
     format!("{} (fork of {parent})", derived_name_base(parent))
+}
+
+/// The name a branch carries: like a fork's, with the parent it is meant to
+/// merge back into, `Session (branch of Session)`.
+pub fn branched_session_name(parent: Option<&str>) -> String {
+    let parent = parent.unwrap_or("Session");
+    format!("{} (branch of {parent})", derived_name_base(parent))
 }
 
 /// The name a picked-off part carries: the session made by picking off the
@@ -2004,6 +2047,43 @@ impl<B: Backend + Clone> MereSessions<B> {
         at: Seq,
         author: Author,
     ) -> Result<GraphSession<B>, SessionError> {
+        self.begin_copy_at(parent, at, author, Lineage::Fork)
+    }
+
+    /// Branch `parent` at journal cursor `at`: a copy of the whole session,
+    /// like a fork, that keeps its lineage link and is meant to merge back
+    /// ([`merge_in`](Self::merge_in)). Its baseline is the parent's graph there
+    /// and its journal starts empty.
+    pub async fn branch_at(
+        &self,
+        parent: &GraphSession<B>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let mut session = self.begin_branch_at(parent, at, author)?;
+        session.flush(wall_clock_now()).await?;
+        Ok(session.manifest().clone())
+    }
+
+    /// Stage a branch without writing it, as [`begin_fork_at`](Self::begin_fork_at)
+    /// stages a fork.
+    pub fn begin_branch_at(
+        &self,
+        parent: &GraphSession<B>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSession<B>, SessionError> {
+        self.begin_copy_at(parent, at, author, Lineage::Branch)
+    }
+
+    /// A whole-session copy of `parent` at `at`, of the given lineage.
+    fn begin_copy_at(
+        &self,
+        parent: &GraphSession<B>,
+        at: Seq,
+        author: Author,
+        lineage: Lineage,
+    ) -> Result<GraphSession<B>, SessionError> {
         let graph = parent.graph_at(at).ok_or(SessionError::CursorOutOfRange {
             cursor: at,
             live: parent.journal().live_cursor(),
@@ -2011,19 +2091,32 @@ impl<B: Backend + Clone> MereSessions<B> {
         let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
         manifest.parent_session = Some(parent.id());
         manifest.forked_at = Some(at.0);
-        manifest.display_name = Some(forked_session_name(
-            parent.manifest().display_name.as_deref(),
-        ));
+        manifest.lineage = lineage;
+        let parent_name = parent.manifest().display_name.as_deref();
+        let (name, kind) = match lineage {
+            Lineage::Fork => (
+                forked_session_name(parent_name),
+                ChangeKind::Forked {
+                    from: parent.id(),
+                    at,
+                },
+            ),
+            Lineage::Branch => (
+                branched_session_name(parent_name),
+                ChangeKind::Branched {
+                    from: parent.id(),
+                    at,
+                },
+            ),
+        };
+        manifest.display_name = Some(name);
         manifest.source_codicil = parent.manifest().source_codicil.clone();
         let mut session = GraphSession::new(
             self.backend.clone(),
             manifest,
             Some(graph),
             author.clone(),
-            ChangeKind::Forked {
-                from: parent.id(),
-                at,
-            },
+            kind,
         );
         for key in parent.views.keys() {
             if let Some(state) = parent.view_at(key, at) {
