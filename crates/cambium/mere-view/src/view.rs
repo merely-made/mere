@@ -82,7 +82,8 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-container-title, .mere-view-container .mere-view-session-name, .mere-view-container .mere-view-session-state, .mere-view-container .mere-view-archive-name { height: 20px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; } \
     .mere-view-container-title, .mere-view-container .mere-view-session-name { font-weight: bold; } \
     .mere-view-container .mere-view-session-steps, .mere-view-container .mere-view-archive-steps { display: flex; flex-wrap: wrap; gap: 4px; padding-bottom: 4px; } \
-    .mere-view-container .mere-view-session-steps > button, .mere-view-container .mere-view-archive-steps > button { flex: 1 1 40%; } \
+    .mere-view-container .mere-view-session-steps > button { flex: 1 1 40%; } \
+    .mere-view-container .mere-view-archive-steps > button { flex: 1 1 auto; white-space: nowrap; } \
     .mere-view-container-archives { list-style: none; margin: 0; padding: 0; } \
     .mere-view-container .mere-view-archive { display: flex; flex-direction: column; }";
 
