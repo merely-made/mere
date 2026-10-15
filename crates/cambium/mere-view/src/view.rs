@@ -7,9 +7,10 @@
 use std::collections::HashMap;
 
 use cambium::{
-    AnyView, GenetCtx, GenetElement, GraphCanvas, GraphCanvasNode, GraphCanvasNodeDrag,
-    GraphCanvasRelation, GraphCanvasSubgraph, GraphCanvasSwatch, PointerEvent, RelationLine,
-    WheelEvent, button, el, graph_canvas_swatch_with_focus_and_drag_and_relations,
+    AnyView, DetailPopoverEvent, DetailPopoverMode, DetailPopoverState, GenetCtx, GenetElement,
+    GraphCanvas, GraphCanvasNode, GraphCanvasNodeDrag, GraphCanvasRelation, GraphCanvasSubgraph,
+    GraphCanvasSwatch, Keyed, PointerEvent, RelationLine, WheelEvent, button, el,
+    graph_canvas_swatch_with_focus_and_drag_and_relations,
 };
 use incipit::SessionId;
 use sprigging::ColorF;
@@ -18,6 +19,10 @@ use crate::layout::{DEFAULT_LAYOUT, SEPARATION, lay_out};
 use crate::model::{
     ArchiveEntry, GraphModel, MereViewModel, NodeState, Provenance, SessionEntry, SessionPlacement,
     SessionStep, StatusNote,
+};
+use crate::tier::{
+    SAVED_FROM, archive_node_key, archive_of_node, session_node_key, session_of_node, tier_card,
+    tier_height, tier_shown, tier_widgets,
 };
 
 /// The erased view the component and its parts are made of.
@@ -38,9 +43,9 @@ const OVERMAP_GAP: u32 = 8;
 /// A container's padding, one line of text, and one row of controls. A
 /// container's height is counted in these, so the band, the canvas below it
 /// and the layout agree before anything renders.
-const CONTAINER_PAD: u32 = 8;
-const LINE: u32 = 20;
-const CONTROL_ROW: u32 = 34;
+pub(crate) const CONTAINER_PAD: u32 = 8;
+pub(crate) const LINE: u32 = 20;
+pub(crate) const CONTROL_ROW: u32 = 34;
 /// The most of the body the overmap band takes; past it the band scrolls.
 const OVERMAP_SHARE: f32 = 0.6;
 
@@ -85,7 +90,20 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-container .mere-view-session-steps > button { flex: 1 1 40%; } \
     .mere-view-container .mere-view-archive-steps > button { flex: 1 1 auto; white-space: nowrap; } \
     .mere-view-container-archives { list-style: none; margin: 0; padding: 0; } \
-    .mere-view-container .mere-view-archive { display: flex; flex-direction: column; }";
+    .mere-view-container .mere-view-archive { display: flex; flex-direction: column; } \
+    .mere-view-tier-rule { position: absolute; left: 0; height: 0; border-top: 1px dashed currentColor; opacity: 0.35; pointer-events: none; } \
+    .mere-view-tier-controls { position: absolute; display: flex; flex-direction: column; gap: 4px; z-index: 2; } \
+    .mere-view-card { position: absolute; z-index: 3; } \
+    .mere-view-card-head { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; height: 34px; flex-shrink: 0; } \
+    .mere-view-card-head .mere-view-session-name { flex: 1 1 auto; min-width: 0; } \
+    .mere-view-card .mere-view-archive { height: 28px; } \
+    .mere-view-archive-chip { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } \
+    .mere-view-popover-layer { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 4; } \
+    .mere-view-popover-layer .overlay-surface-panel { box-sizing: border-box; overflow: hidden; border: 1px solid currentColor; border-radius: 8px; } \
+    .mere-view-popover-layer .detail-popover-preview, .mere-view-popover-layer .detail-popover-content { display: flex; flex-direction: column; padding: 8px; box-sizing: border-box; } \
+    .mere-view-popover-layer .mere-view-archive-name, .mere-view-popover-layer .mere-view-archive-from, .mere-view-popover-layer .mere-view-archive-detail { height: 20px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; } \
+    .mere-view-popover-layer .mere-view-archive-name { font-weight: bold; } \
+    .mere-view-popover-layer .mere-view-archive-steps { display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }";
 
 /// What the person asked for. The host carries it out or declines it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -116,6 +134,12 @@ pub enum MereViewEvent {
     Hover(Option<String>),
     Focus(Option<String>),
     SelectArchive(String),
+    /// Open a session's card in the tier, or close the open one with `None`.
+    /// One card is open at a time.
+    Expand(Option<SessionId>),
+    /// An archive node's popover in the tier, by archive key: hovering peeks,
+    /// activating pins, Escape or an outside click dismisses.
+    ArchivePopover(String, DetailPopoverEvent),
 }
 
 /// The view's own state: hover, focus and the last layout. The host stores
@@ -127,6 +151,13 @@ pub struct MereViewState {
     pub focused: Option<String>,
     /// Presentation-only selection for an explicit Compose request.
     pub selected_archives: Vec<String>,
+    /// The session whose node is open as its card, in a tier.
+    pub expanded: Option<SessionId>,
+    /// The archive whose popover peeks or is pinned, in a tier.
+    pub archive_popover: Option<(String, DetailPopoverState)>,
+    /// The tier node a closed card or a dismissed popover hands keyboard
+    /// focus back to. It clears once any node takes focus.
+    pub focus_return: Option<String>,
     laid: Laid,
 }
 
@@ -142,8 +173,61 @@ struct Laid {
 impl MereViewState {
     pub fn apply(&mut self, event: MereViewEvent) {
         match event {
-            MereViewEvent::Hover(key) => self.hovered = key,
-            MereViewEvent::Focus(key) => self.focused = key,
+            MereViewEvent::Hover(key) => {
+                // Hovering an archive node peeks its popover; leaving it, or
+                // hovering anything else, closes a peek (never a pinned one).
+                match key.as_deref().and_then(archive_of_node) {
+                    Some(archive) => self.apply(MereViewEvent::ArchivePopover(
+                        archive.to_string(),
+                        DetailPopoverEvent::Hover(true),
+                    )),
+                    None => {
+                        if let Some((open, _)) = self.archive_popover.clone() {
+                            self.apply(MereViewEvent::ArchivePopover(
+                                open,
+                                DetailPopoverEvent::Hover(false),
+                            ));
+                        }
+                    },
+                }
+                self.hovered = key;
+            },
+            MereViewEvent::Focus(key) => {
+                if key.is_some() {
+                    self.focus_return = None;
+                }
+                self.focused = key;
+            },
+            MereViewEvent::Expand(session) => {
+                self.focus_return = match (self.expanded, session) {
+                    (Some(closed), None) => Some(session_node_key(closed)),
+                    _ => None,
+                };
+                self.expanded = session;
+            },
+            MereViewEvent::ArchivePopover(key, event) => {
+                let mut popover = match self.archive_popover.take() {
+                    Some((open, popover)) if open == key => popover,
+                    // A pinned popover stays put while another node is hovered.
+                    Some((open, popover))
+                        if popover.mode == DetailPopoverMode::Pinned
+                            && matches!(event, DetailPopoverEvent::Hover(_)) =>
+                    {
+                        self.archive_popover = Some((open, popover));
+                        return;
+                    },
+                    _ => DetailPopoverState::default(),
+                };
+                popover.apply(event);
+                if popover.return_focus {
+                    popover.return_focus = false;
+                    self.focus_return = Some(archive_node_key(&key));
+                } else if popover.mode == DetailPopoverMode::Pinned {
+                    self.focus_return = None;
+                }
+                self.archive_popover =
+                    (popover.mode != DetailPopoverMode::Hidden).then_some((key, popover));
+            },
             MereViewEvent::SelectArchive(key) => {
                 if self.selected_archives.contains(&key) {
                     self.selected_archives.retain(|selected| selected != &key);
@@ -165,11 +249,25 @@ impl MereViewState {
                 .as_ref()
                 .is_some_and(|archive| archive.entries.iter().any(|entry| &entry.key == key))
         });
+        // A card or popover whose session or archive is gone closes.
+        if let Some(id) = self.expanded
+            && !model.sessions.iter().any(|session| session.id == id)
+        {
+            self.expanded = None;
+        }
+        if let Some((key, _)) = &self.archive_popover
+            && !model
+                .archive
+                .as_ref()
+                .is_some_and(|archive| archive.entries.iter().any(|entry| &entry.key == key))
+        {
+            self.archive_popover = None;
+        }
         if model.hide_graph {
             // The host's editing surface owns the geometry in panel mode.
             return;
         }
-        let size = graph_area(model, width, height);
+        let size = catalog_area(model, width, height);
         let nodes: Vec<String> = model.graph.nodes.iter().map(|n| n.key.clone()).collect();
         let relations: Vec<(String, String)> = model
             .graph
@@ -195,7 +293,8 @@ impl MereViewState {
         };
     }
 
-    /// Where the last layout put the node with `key`, normalized to `0..=1`.
+    /// Where the last layout put the node with `key`, normalized to `0..=1`
+    /// within the graph's own area (below the tier, when there is one).
     pub fn position(&self, key: &str) -> Option<(f32, f32)> {
         self.laid.positions.get(key).copied()
     }
@@ -215,7 +314,7 @@ fn body_height(width: u32, height: u32) -> u32 {
     height.saturating_sub(bar).max(1)
 }
 
-fn has_session_content(model: &MereViewModel) -> bool {
+pub(crate) fn has_session_content(model: &MereViewModel) -> bool {
     model.can_mint || !model.sessions.is_empty() || model.archive.is_some()
 }
 
@@ -246,7 +345,7 @@ fn containers(model: &MereViewModel) -> Vec<Container<'_>> {
 /// The archives on `session`, or on the shelf for `None`. An archive sits on
 /// a session only when its owner names that session and the mere still lists
 /// it; every other archive sits on the shelf.
-fn archives_on<'a>(
+pub(crate) fn archives_on<'a>(
     model: &'a MereViewModel,
     session: Option<&SessionEntry>,
 ) -> Vec<&'a ArchiveEntry> {
@@ -269,7 +368,7 @@ fn archives_on<'a>(
 }
 
 /// Rows of controls for `count` controls, two to a row.
-fn control_rows(count: usize) -> u32 {
+pub(crate) fn control_rows(count: usize) -> u32 {
     count.div_ceil(2) as u32
 }
 
@@ -286,7 +385,7 @@ fn chip_height(model: &MereViewModel, entry: &ArchiveEntry) -> u32 {
     }
 }
 
-fn can_save(model: &MereViewModel, session: &SessionEntry) -> bool {
+pub(crate) fn can_save(model: &MereViewModel, session: &SessionEntry) -> bool {
     model
         .archive
         .as_ref()
@@ -346,7 +445,10 @@ fn overmap_band(model: &MereViewModel, width: u32, body: u32) -> u32 {
 
 /// The graph's area, in pixels, for `model` in a tile of `width` by `height`.
 fn graph_area(model: &MereViewModel, width: u32, height: u32) -> (u32, u32) {
-    if overmap_shown(model) {
+    if tier_shown(model) {
+        // The tier is on the graph's own canvas, which keeps the whole body.
+        (width.max(1), body_height(width, height))
+    } else if overmap_shown(model) {
         let body = body_height(width, height);
         (
             width.max(1),
@@ -355,6 +457,16 @@ fn graph_area(model: &MereViewModel, width: u32, height: u32) -> (u32, u32) {
     } else {
         graph_size(width, height, has_session_content(model))
     }
+}
+
+/// The area the graph's own nodes are laid out in: the graph's area, less the
+/// tier across its top when there is one.
+fn catalog_area(model: &MereViewModel, width: u32, height: u32) -> (u32, u32) {
+    let (width, height) = graph_area(model, width, height);
+    (
+        width,
+        height.saturating_sub(tier_height(model, height)).max(1),
+    )
 }
 
 /// The graph's area, in pixels, inside a tile of `width` by `height`.
@@ -393,7 +505,7 @@ pub struct MereView<'a> {
 }
 
 impl MereView<'_> {
-    /// The graph's area, in pixels.
+    /// The graph's area, in pixels. A tier, when there is one, is inside it.
     pub fn graph_size(&self) -> (u32, u32) {
         graph_area(self.model, self.width, self.height)
     }
@@ -471,6 +583,7 @@ impl MereView<'_> {
                 (Provenance::Extracted, RelationLine::Solid),
                 (Provenance::Authored, RelationLine::Heavy),
                 (Provenance::Suggested, RelationLine::Dashed),
+                (Provenance::Other(SAVED_FROM.into()), RelationLine::Dotted),
             ]
             .into_iter()
             .map(|(kind, line)| (kind.token().to_string(), line))
@@ -481,6 +594,9 @@ impl MereView<'_> {
         swatch.hit_size = SEPARATION;
         swatch.focus = self.state.focused.clone();
         swatch.hovered = self.state.hovered.clone();
+        if self.tier_height() > 0 {
+            swatch = self.with_tier(swatch);
+        }
         swatch
     }
 
@@ -516,6 +632,9 @@ where
         // Below the band, over the top of the graph, where it covers no
         // container.
         notice = notice.attr("style", format!("top:{}px", band + 8));
+    } else if tier_shown(model) {
+        // Over the foot of the canvas, clear of the tier across its top.
+        notice = notice.attr("style", "top:auto;bottom:8px");
     }
     let content = match model.status.note() {
         None if model.hide_graph => {
@@ -577,7 +696,7 @@ where
 }
 
 /// A button that reports `request`, carrying `attrs`.
-fn request_button<State, Action, Request>(
+pub(crate) fn request_button<State, Action, Request>(
     label: impl Into<String>,
     request: MereViewRequest,
     on_request: Request,
@@ -689,7 +808,10 @@ where
         }))
         .chain(archive_items(view, on_change, on_request.clone()))
         .collect();
-    let size = if !has_session_content(view.model) || overmap_shown(view.model) {
+    let size = if !has_session_content(view.model)
+        || overmap_shown(view.model)
+        || tier_shown(view.model)
+    {
         "display:none".to_string()
     } else if view.model.hide_graph {
         "width:100%;flex:1;min-height:0;max-height:none".to_string()
@@ -710,7 +832,7 @@ where
 
 /// A session's state in words: whether it is shown here or trashed, and the
 /// host's detail.
-fn session_words(session: &SessionEntry) -> String {
+pub(crate) fn session_words(session: &SessionEntry) -> String {
     let mut words: Vec<&str> = Vec::new();
     if session.attached {
         words.push("Shown here");
@@ -750,7 +872,7 @@ where
 }
 
 /// The steps the host offers on `session`, and Save when the archive takes it.
-fn session_steps<State, Action, Request>(
+pub(crate) fn session_steps<State, Action, Request>(
     session: &SessionEntry,
     can_save: bool,
     on_request: Request,
@@ -842,7 +964,7 @@ where
 }
 
 /// Compose, enabled once two archives are selected.
-fn compose_button<State, Action, Request>(
+pub(crate) fn compose_button<State, Action, Request>(
     view: &MereView<'_>,
     on_request: Request,
 ) -> MereViewElement<State, Action>
@@ -1077,10 +1199,44 @@ where
         let on_change = on_change.clone();
         move |state: &mut State, key: Option<String>| on_change(state, MereViewEvent::Hover(key))
     };
-    let focus =
-        move |state: &mut State, key: Option<String>| on_change(state, MereViewEvent::Focus(key));
-    let activate =
-        move |state: &mut State, key: String| on_request(state, MereViewRequest::Activate(key));
+    let focus = {
+        let on_change = on_change.clone();
+        move |state: &mut State, key: Option<String>| on_change(state, MereViewEvent::Focus(key))
+    };
+    // A tier node opens its own widget; every other node is the host's.
+    let tier = tier_shown(view.model);
+    let sessions: Vec<SessionId> = view.model.sessions.iter().map(|s| s.id).collect();
+    let archives: Vec<String> = view
+        .model
+        .archive
+        .iter()
+        .flat_map(|archive| archive.entries.iter().map(|entry| entry.key.clone()))
+        .collect();
+    let expanded = view.state.expanded;
+    let activate = {
+        let on_change = on_change.clone();
+        let on_request = on_request.clone();
+        move |state: &mut State, key: String| {
+            if tier {
+                if let Some(id) = session_of_node(&key).filter(|id| sessions.contains(id)) {
+                    let open = (expanded != Some(id)).then_some(id);
+                    return on_change(state, MereViewEvent::Expand(open));
+                }
+                if let Some(archive) =
+                    archive_of_node(&key).filter(|key| archives.iter().any(|a| a == key))
+                {
+                    return on_change(
+                        state,
+                        MereViewEvent::ArchivePopover(
+                            archive.to_string(),
+                            DetailPopoverEvent::TogglePinned,
+                        ),
+                    );
+                }
+            }
+            on_request(state, MereViewRequest::Activate(key))
+        }
+    };
     let canvas = graph_canvas_swatch_with_focus_and_drag_and_relations(
         &swatch,
         activate,
@@ -1093,7 +1249,19 @@ where
         |_: &mut State, _: PointerEvent| {},
         |_: &mut State, _: WheelEvent| {},
     );
-    Box::new(el::<_, State, Action>("div", canvas).attr("class", "mere-view-graph"))
+    let (card, widgets) = if tier {
+        (
+            tier_card(view, &swatch, on_change.clone(), on_request.clone()),
+            tier_widgets(view, &swatch, on_change, on_request),
+        )
+    } else {
+        (Keyed::new(Vec::new()), Vec::new())
+    };
+    Box::new(
+        el::<_, State, Action>("div", (canvas, card, widgets))
+            .attr("class", "mere-view-graph")
+            .attr("data-tier", if tier { "shown" } else { "none" }),
+    )
 }
 
 fn status_panel<State, Action, Request>(

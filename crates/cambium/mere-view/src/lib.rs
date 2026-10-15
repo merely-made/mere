@@ -22,6 +22,11 @@
 //! - the host's action slot, and plain empty, unavailable and building states,
 //!   each with the action the host offers.
 //!
+//! The sessions show beside the graph, as a band above it, or as an overmap
+//! tier on the graph's own canvas ([`SessionPlacement`]). In the tier each
+//! session and archive is a canvas node with its own widget: a session node
+//! opens in place into its card, an archive node peeks and pins a popover.
+//!
 //! Like [`cambium::graph_canvas`], the graph paints through a custom leaf the
 //! host registers under the view's leaf key: [`MereView::paint_leaf`] builds it
 //! from the same numbers the view lays out with. [`MERE_VIEW_CSS`] is the
@@ -29,6 +34,7 @@
 
 mod layout;
 mod model;
+mod tier;
 mod view;
 
 #[cfg(test)]
@@ -38,6 +44,9 @@ pub use layout::{DEFAULT_LAYOUT, lay_out};
 pub use model::{
     ArchiveEntry, ArchiveModel, GraphModel, HostAction, MereViewModel, NodeEntry, NodeState,
     Provenance, RelationEntry, SessionEntry, SessionPlacement, SessionStep, StatusNote, ViewStatus,
+};
+pub use tier::{
+    ARCHIVE_NODE_PREFIX, SAVED_FROM, SESSION_NODE_PREFIX, archive_node_key, session_node_key,
 };
 pub use view::{
     ArchiveRequest, MERE_VIEW_CSS, MereView, MereViewElement, MereViewEvent, MereViewRequest,

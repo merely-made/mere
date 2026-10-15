@@ -18,8 +18,9 @@
 //! Beyond taproot's verbs and the lane's `resize`, a scenario may press keys
 //! through the runner's own keyboard path (`key tab`, `key shift+tab`,
 //! `key enter`, `key space`, or `key tab-until <attr>=<value>`), and may
-//! `act` one of `decline-next`, `empty`, `unavailable`, `building`, `ready`
-//! and `theme-dark`.
+//! `act` one of `decline-next`, `empty`, `unavailable`, `building`, `ready`,
+//! `theme-dark` and `tier` (the sessions, and two archives, as an overmap tier
+//! on the graph's canvas).
 
 use mesquite::{CaptureRecord, LaneConfig};
 use std::cell::RefCell;
@@ -35,9 +36,9 @@ use cambium_genet_winit_host::{
 use incipit::SessionId;
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use mere_view::{
-    GraphModel, HostAction, MERE_VIEW_CSS, MereView, MereViewElement, MereViewModel,
-    MereViewRequest, MereViewState, NodeEntry, NodeState, Provenance, RelationEntry, SessionEntry,
-    SessionStep, StatusNote, ViewStatus, mere_view,
+    ArchiveEntry, ArchiveModel, GraphModel, HostAction, MERE_VIEW_CSS, MereView, MereViewElement,
+    MereViewModel, MereViewRequest, MereViewState, NodeEntry, NodeState, Provenance, RelationEntry,
+    SessionEntry, SessionPlacement, SessionStep, StatusNote, ViewStatus, mere_view,
 };
 use sprigging::ColorF;
 use uuid::Uuid;
@@ -67,7 +68,10 @@ const RULES: &str = "\
     .mere-view-session[data-trashed=\"true\"] { color: var(--muted); } \
     .mere-view-session-state { color: var(--muted); font-size: 12px; } \
     .mere-view-state { padding: 16px; } \
-    .graph-canvas-swatch-node:focus-visible { outline: 2px solid var(--accent); }";
+    .graph-canvas-swatch-node:focus-visible { outline: 2px solid var(--accent); } \
+    .mere-view-card, .mere-view-popover-layer .overlay-surface-panel { background: var(--paper); color: var(--ink); } \
+    .mere-view-card[data-attached=\"true\"] .mere-view-session-name { color: var(--accent); } \
+    .mere-view-card .mere-view-session-state, .mere-view-archive-from, .mere-view-archive-detail { color: var(--muted); font-size: 12px; }";
 
 fn sheet(tokens: &str) -> String {
     format!("{GRAPH_CANVAS_SWATCH_CSS}\n{MERE_VIEW_CSS}\n{tokens}\n{RULES}")
@@ -376,6 +380,25 @@ fn catalog() -> MereViewModel {
     }
 }
 
+/// Two archives for the tier: one saved from the shown session, one composed.
+fn archives() -> ArchiveModel {
+    let entry = |key: &str, name: &str, session: Option<SessionId>| ArchiveEntry {
+        key: key.into(),
+        name: name.into(),
+        detail: "Read-only archive".into(),
+        can_open: true,
+        session,
+    };
+    ArchiveModel {
+        entries: vec![
+            entry("saved", "Codicil blake3:f612a", Some(session_id(1))),
+            entry("composed", "Codicil blake3:0c0de", None),
+        ],
+        save_sessions: vec![session_id(1), session_id(2)],
+        can_compose: true,
+    }
+}
+
 // ------------------------------------------------------------------ the lane
 
 struct HarnessLane {
@@ -525,6 +548,14 @@ impl mesquite::Product for HarnessLane {
         match label {
             "decline-next" => {
                 ctx.runner.update(|harness| harness.decline_next = true);
+                true
+            },
+            "tier" => {
+                ctx.runner.update(|harness| {
+                    harness.model.placement = SessionPlacement::Tier;
+                    harness.model.archive = Some(archives());
+                    harness.relayout();
+                });
                 true
             },
             "theme-dark" => {
