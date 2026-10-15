@@ -463,9 +463,9 @@ feature; `web_tree/gestures.rs` and `controls.rs` call the pictograph functions.
 *Landed 2026-10-15:* the controls, gestures and face alignment are
 `pictograph::canvas::{controls, gestures, face_alignment}`; `ProjectionClock`
 is `scenotime::ProjectionClock`; `StrengthDraft` is `mere::coupling_edit`
-(Progress). *Open:* Woodshed's native surface as the receipt, which waits on
-its repin onto a Mere revision that has these; `canvas_physics` and
-`canvas_reader` have not moved (Progress, "Follows").
+(Progress). *Receipt:* Woodshed, native, 2026-10-15 (Progress);
+touch stays blocked on host input. `canvas_physics` and `canvas_reader` have not
+moved (Progress, "Follows").
 
 **P2a. L14, the remote overmap client.** Independent of P1 and P4: it needs
 only `graphshell-client`, which is already a stack crate, and an admitted
@@ -1023,4 +1023,30 @@ fast-forward of local main; nothing built).**
   `wheel_scenario`, `scenario` and `input_routing` suites pass, `graphshell`,
   `mere-view`, `mere-overmap` and `djinn` build with all targets, `graphshell-web`
   checks for wasm32, the boundary script passes. Touch remains deferred.
+- **2026-10-15 (P2's second-host receipt: Woodshed, native):** Woodshed `4005c5a`
+  (checked in its repository: pinned to Mere `39c3c955d`, which holds
+  `a26ed1caf`, `1b4172b25` and `bdef17239`; its receipt reads `RESULT ok` over 241
+  frames). It runs the lifted helpers on three surfaces that render through
+  `cambium::graph_canvas` over a `GraphViewport`, not a `Canvas`:
+  `woodshed-views::stage::canvas_camera`'s `SurfaceCamera` implements
+  `CameraHost` and `FitHost` over the viewport for the Session Mere overview,
+  Related and the relationship editor. `CanvasCommand` drives the camera buttons
+  and the motion toggle; `wheel_use` and the anchored `wheel_zoom` take the notch
+  through `graph_canvas_with_wheel` (and through the lower-level builder's wheel
+  hook on Related); `FaceAlignment` runs through a `FaceGeometry` adapter that
+  compares view-layer hit targets with the bodies of Sprigging's painted leaf.
+  Evidence: 8 adapter tests on the CPU (a cross-surface command and face test, a
+  wheel-anchor test); native `validation/canvas-p2_20261015/receipt.json` with 8
+  distinct captures, buttons clicked through real host hit-testing and scripted
+  wheel notches, plain and Ctrl, on the relationship editor and Related; zoom,
+  face-missing and face-offset asserted per surface plus eleven paint-current
+  assertions. Findings it carries: (1) `FaceAlignment` cannot see stale paint,
+  because it measures a freshly painted leaf, not the host's registered one;
+  Woodshed's relationship and Related leaves did not repaint on camera-only
+  changes, so hit targets moved while the paint stayed, and it now asserts the
+  painted camera against the live one, which another host should also do; (2) the
+  overview's wheel was not driven natively (its canvas is below the fold at the
+  receipt window size), so it has a CPU test only; (3) touch stays deferred. P2's
+  done-condition (a second host's native surface drives the controls with only
+  `canvas` enabled) holds, through the host traits and not through a `Canvas`.
 
