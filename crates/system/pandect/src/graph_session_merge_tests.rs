@@ -999,3 +999,81 @@ fn resource_facets_merge_by_the_rules_compose_uses() {
         );
     });
 }
+
+#[test]
+fn a_new_plan_carries_the_choices_that_still_apply_and_says_why_others_dropped() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut target = parent(&mere).await;
+        let mut branch = branch_of(&mere, &target).await;
+        branch
+            .apply(
+                other(),
+                vec![
+                    retitle(id(1), "Branch"),
+                    retitle(id(2), "B2"),
+                    retitle(id(3), "B3"),
+                ],
+            )
+            .await
+            .unwrap();
+        target
+            .apply(
+                person(),
+                vec![
+                    retitle(id(1), "Target"),
+                    retitle(id(2), "T2"),
+                    retitle(id(3), "T3"),
+                ],
+            )
+            .await
+            .unwrap();
+        let plan = mere.merge_in(&target, &branch).await.unwrap();
+        assert_eq!(plan.conflicts().len(), 3);
+        let choices = BTreeMap::from([
+            (Part::Title(id(1)), MergeChoice::Source),
+            (Part::Title(id(2)), MergeChoice::Target),
+            (Part::Title(id(3)), MergeChoice::Hand(Value::from(7))),
+            (Part::Title(id(4)), MergeChoice::AddAsNew),
+        ]);
+        // The target moves before Apply: it now agrees with the branch on 2.
+        target
+            .apply(person(), vec![retitle(id(2), "B2")])
+            .await
+            .unwrap();
+        assert!(matches!(
+            mere.apply_merge(&mut target, &mut branch, plan, &choices, person())
+                .await,
+            Err(SessionError::NotMergeable(_))
+        ));
+        let again = mere.merge_in(&target, &branch).await.unwrap();
+        let (carried, dropped) = again.carry_choices(&choices);
+        assert_eq!(
+            carried,
+            BTreeMap::from([(Part::Title(id(1)), MergeChoice::Source)])
+        );
+        let why: BTreeMap<Part, &str> = dropped
+            .iter()
+            .map(|dropped| (dropped.part.clone(), dropped.reason.as_str()))
+            .collect();
+        assert_eq!(
+            why,
+            BTreeMap::from([
+                (Part::Title(id(2)), "no longer in conflict"),
+                (Part::Title(id(3)), "the value given by hand does not fit"),
+                (Part::Title(id(4)), "no longer in conflict"),
+            ])
+        );
+        // With the carried choice and a fresh one, the new plan applies.
+        let mut choices = carried;
+        choices.insert(
+            Part::Title(id(3)),
+            MergeChoice::Hand(Value::from("By hand")),
+        );
+        mere.apply_merge(&mut target, &mut branch, again, &choices, person())
+            .await
+            .unwrap();
+        assert_eq!(title(target.graph(), id(1)).as_deref(), Some("Branch"));
+        assert_eq!(title(target.graph(), id(3)).as_deref(), Some("By hand"));
+    });
+}

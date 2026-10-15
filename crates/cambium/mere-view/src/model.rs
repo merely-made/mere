@@ -48,6 +48,9 @@ pub struct MergeModel {
     pub source_name: String,
     pub target_name: String,
     pub conflicts: Vec<MergeConflictEntry>,
+    /// Choices an earlier plan of this merge had that this one could not
+    /// take, each in words with why, so the person can choose again.
+    pub dropped: Vec<String>,
 }
 
 impl MergeModel {
@@ -220,8 +223,10 @@ pub struct SessionEntry {
     pub steps: Vec<SessionStep>,
 }
 
-/// A lifecycle step on one session.
+/// A lifecycle step on one session. More may come, so a host matching on
+/// steps keeps a wildcard arm.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SessionStep {
     Switch,
     Fork,

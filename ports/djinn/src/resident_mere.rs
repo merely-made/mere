@@ -38,7 +38,7 @@ use chirograph::{
 };
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
-use graphshell::mere_host::{MereHost, SelectedPersonaRef};
+use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
@@ -51,7 +51,7 @@ use mere_overmap::wire::{
     self as session_item, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1,
     ArchiveActionV1, BRANCH_SESSION_INTENT, CANCEL_MERGE_INTENT, COMPOSE_CODICILS_INTENT,
     FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS, MERGE_SCHEMA,
-    MERGE_SESSION_INTENT, MERGE_SOURCE, MINT_SESSION_INTENT, MergeResolutionV1,
+    MERGE_SESSION_INTENT, MERGE_SOURCE, MINT_SESSION_INTENT, MergeChoiceV1, MergeResolutionV1,
     OPEN_CODICIL_INTENT, PENDING_MERGE_SCHEMA, PendingMergeV1, RESOLVE_MERGE_INTENT,
     RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE,
     SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
@@ -555,7 +555,7 @@ struct MereShared {
     /// is immutable, so each is read once.
     codicil_sessions: Mutex<HashMap<String, Vec<SessionId>>>,
     /// Merges waiting for a choice on each conflict, by source session.
-    pending_merges: Mutex<BTreeMap<uuid::Uuid, pandect::PendingMerge>>,
+    pending_merges: Mutex<BTreeMap<uuid::Uuid, HeldMerge>>,
 }
 
 impl MereShared {
@@ -656,6 +656,25 @@ impl MereShared {
             .map_err(|error| error.to_string())?;
         self.moved();
         Ok(minted.session_id)
+    }
+}
+
+/// A merge waiting for a choice on each conflict, with what an earlier plan
+/// of it left: the choices carried over and those dropped, and why.
+#[derive(Clone)]
+struct HeldMerge {
+    plan: pandect::PendingMerge,
+    carried: BTreeMap<pandect::Part, pandect::MergeChoice>,
+    dropped: Vec<pandect::DroppedChoice>,
+}
+
+impl HeldMerge {
+    fn new(plan: pandect::PendingMerge) -> Self {
+        Self {
+            plan,
+            carried: BTreeMap::new(),
+            dropped: Vec::new(),
+        }
     }
 }
 
@@ -789,7 +808,7 @@ impl MereEndpoint {
     fn session_cards(&self) -> Result<Vec<SessionsCard>, String> {
         let manifests: Vec<GraphSessionManifest> =
             run(self.shared.sessions().list()).map_err(|error| error.to_string())?;
-        let pending: BTreeMap<uuid::Uuid, pandect::PendingMerge> =
+        let pending: BTreeMap<uuid::Uuid, HeldMerge> =
             run(async { self.shared.pending_merges.lock().await.clone() });
         let mut cards = Vec::with_capacity(manifests.len() + 1);
         let mere = PortableCardV1 {
@@ -855,7 +874,8 @@ impl MereEndpoint {
                 .and_then(|manifest| manifest.display_name.clone())
                 .unwrap_or_else(|| "Session".to_string())
         };
-        for merge in pending.values() {
+        for held in pending.values() {
+            let merge = &held.plan;
             let source = merge.source();
             let material = PendingMergeV1 {
                 schema: PENDING_MERGE_SCHEMA.to_string(),
@@ -864,6 +884,15 @@ impl MereEndpoint {
                 target: merge.target(),
                 target_name: name(merge.target()),
                 conflicts: merge.conflicts().to_vec(),
+                carried: held
+                    .carried
+                    .iter()
+                    .map(|(part, choice)| MergeChoiceV1 {
+                        part: part.clone(),
+                        choice: choice.clone(),
+                    })
+                    .collect(),
+                dropped: held.dropped.clone(),
             };
             let media = serde_json::to_vec(&material).map_err(|error| error.to_string())?;
             let card = PortableCardV1 {
@@ -909,7 +938,7 @@ impl MereEndpoint {
         &self,
         manifests: &[GraphSessionManifest],
         manifest: &GraphSessionManifest,
-        pending: &BTreeMap<uuid::Uuid, pandect::PendingMerge>,
+        pending: &BTreeMap<uuid::Uuid, HeldMerge>,
     ) -> Vec<AdvertisedAction> {
         let mut actions = vec![session_item::archive_action(
             SAVE_CODICIL_INTENT,
@@ -1335,7 +1364,7 @@ impl MereEndpoint {
                             .pending_merges
                             .lock()
                             .await
-                            .insert(*id.as_uuid(), plan);
+                            .insert(*id.as_uuid(), HeldMerge::new(plan));
                     }
                 },
                 (TRASH_SESSION_INTENT, Some(id)) => {
@@ -1392,7 +1421,7 @@ impl MereEndpoint {
         let app = self.app.clone();
         let cancel = intent.intent == CANCEL_MERGE_INTENT;
         let outcome: Result<(), String> = run(async move {
-            let Some(plan) = shared
+            let Some(held) = shared
                 .pending_merges
                 .lock()
                 .await
@@ -1412,6 +1441,7 @@ impl MereEndpoint {
                 .into_iter()
                 .map(|chosen| (chosen.part, chosen.choice))
                 .collect();
+            let plan = held.plan.clone();
             let (target, source) = (
                 shared.host(plan.target()).await?,
                 shared.host(plan.source()).await?,
@@ -1422,22 +1452,52 @@ impl MereEndpoint {
             let applied = target
                 .apply_merge(&sessions, &mut source, plan.clone(), &choices, &app)
                 .await;
-            if let Err(error) = applied {
-                // A missing choice leaves the merge pending; anything else
-                // (a session moved, a hand value that does not fit) asks for
-                // the merge again.
-                if error.to_string().contains("merge conflicts have no choice") {
-                    shared
-                        .pending_merges
-                        .lock()
-                        .await
-                        .insert(*plan.source().as_uuid(), plan);
-                }
+            let Err(error) = applied else {
                 shared.moved();
+                return Ok(());
+            };
+            shared.moved();
+            // A missing choice leaves the merge pending as it was.
+            if matches!(
+                error,
+                MereHostError::Session(pandect::SessionError::Unresolved(_))
+            ) {
+                shared
+                    .pending_merges
+                    .lock()
+                    .await
+                    .insert(*plan.source().as_uuid(), held);
                 return Err(error.to_string());
             }
-            shared.moved();
-            Ok(())
+            // Anything else (a session moved, a value given by hand that does
+            // not fit): plan the merge again and carry over the choices that
+            // still apply, naming the ones dropped.
+            let again = target
+                .plan_merge(&sessions, &source)
+                .await
+                .map_err(|replan| format!("{error}; planning it again failed: {replan}"))?;
+            if again.is_clean() {
+                target
+                    .apply_merge(&sessions, &mut source, again, &BTreeMap::new(), &app)
+                    .await
+                    .map_err(|error| error.to_string())?;
+                return Ok(());
+            }
+            let (carried, dropped) = again.carry_choices(&choices);
+            let reason = format!(
+                "{error}. The merge was planned again: {} of your choices carried over, {} dropped.",
+                carried.len(),
+                dropped.len()
+            );
+            shared.pending_merges.lock().await.insert(
+                *again.source().as_uuid(),
+                HeldMerge {
+                    plan: again,
+                    carried,
+                    dropped,
+                },
+            );
+            Err(reason)
         });
         Ok(match outcome {
             Ok(()) => IntentResult::Accepted,
@@ -3860,6 +3920,120 @@ mod tests {
         let listed = projection(&mut knot, 0);
         assert!(pending_merge(&mut knot, &listed).is_none());
         assert!(offers(&listed, branch).contains(&MERGE_SESSION_INTENT.to_string()));
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_failed_apply_plans_again_and_carries_the_choices_that_still_apply() {
+        let fixture = fixture(24, "readings").await;
+        let mut turnstone = fixture.attach("turnstone").await;
+        let mut knot = fixture.attach("knot-editor").await;
+        let start = graph(&mut turnstone);
+        assert_eq!(
+            turnstone
+                .invoke(apply(
+                    &start,
+                    vec![node(1), retitle(1, "One"), node(2), retitle(2, "Two")]
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let listed = projection(&mut turnstone, 0);
+        let parent = session_ids(&listed)[0];
+        let branch = sessions_step(&listed, BRANCH_SESSION_INTENT, SessionsActionV1::on(parent));
+        assert_eq!(turnstone.invoke(branch).unwrap(), IntentResult::Accepted);
+        let listed = projection(&mut knot, 0);
+        let branch = session_ids(&listed)[1];
+        let step = |listed: &ProjectionSnapshot, intent: &str| {
+            sessions_step(listed, intent, SessionsActionV1::on(branch))
+        };
+        assert_eq!(
+            knot.invoke(step(&listed, ATTACH_SESSION_INTENT)).unwrap(),
+            IntentResult::Accepted
+        );
+        let in_branch = graph(&mut knot);
+        knot.invoke(apply(
+            &in_branch,
+            vec![retitle(1, "Branch one"), retitle(2, "Branch two")],
+        ))
+        .unwrap();
+        let in_parent = graph(&mut turnstone);
+        turnstone
+            .invoke(apply(
+                &in_parent,
+                vec![retitle(1, "Parent one"), retitle(2, "Parent two")],
+            ))
+            .unwrap();
+        assert_eq!(
+            knot.invoke(step(&listed, MERGE_SESSION_INTENT)).unwrap(),
+            IntentResult::Accepted
+        );
+        let listed = projection(&mut knot, 0);
+        let (_, material) = pending_merge(&mut knot, &listed).unwrap();
+        assert_eq!(material.conflicts.len(), 2);
+        let key =
+            |n: u128| mere_route::conflict_key(&kernel::graph::Part::Title(Uuid::from_u128(n)));
+        let chosen = BTreeMap::from([
+            (key(1), mere_view::MergeOption::Source),
+            (key(2), mere_view::MergeOption::Target),
+        ]);
+        let read = read_route(&mut knot);
+        let apply_merge = mere_route::merge_intent(
+            &MereViewRequest::Merge(mere_view::MergeRequest::Apply),
+            &read.sessions,
+            &material,
+            &chosen,
+        )
+        .unwrap();
+
+        // The parent moves before Apply lands: it now agrees on node 2.
+        let in_parent = graph(&mut turnstone);
+        turnstone
+            .invoke(apply(&in_parent, vec![retitle(2, "Branch two")]))
+            .unwrap();
+        match knot.invoke(apply_merge).unwrap() {
+            IntentResult::Rejected { reason } => assert!(
+                reason.contains("planned again")
+                    && reason.contains("1 of your choices carried over, 1 dropped"),
+                "{reason}"
+            ),
+            other => panic!("{other:?}"),
+        }
+
+        // The new plan waits, carrying the choice that still applies and
+        // naming the one dropped; the panel shows both.
+        let listed = projection(&mut knot, 0);
+        let (_, material) = pending_merge(&mut knot, &listed).expect("planned again");
+        assert_eq!(material.conflicts.len(), 1);
+        assert_eq!(material.carried.len(), 1);
+        assert_eq!(material.dropped.len(), 1);
+        assert_eq!(material.dropped[0].reason, "no longer in conflict");
+        let mut chosen = chosen;
+        mere_route::adopt_merge(&mut chosen, &material);
+        assert_eq!(
+            chosen,
+            BTreeMap::from([(key(1), mere_view::MergeOption::Source)])
+        );
+        let mut read = read_route(&mut knot);
+        mere_route::fill_merge(&mut read.model, Some(&material), &chosen);
+        let merge = read.model.merge.as_ref().unwrap();
+        assert_eq!(merge.dropped.len(), 1);
+        assert!(
+            merge.dropped[0].contains("Target (no longer in conflict)"),
+            "{:?}",
+            merge.dropped
+        );
+        assert!(merge.resolved(), "the carried choice resolves the new plan");
+        let apply_merge = mere_route::merge_intent(
+            &MereViewRequest::Merge(mere_view::MergeRequest::Apply),
+            &read.sessions,
+            &material,
+            &chosen,
+        )
+        .unwrap();
+        assert_eq!(knot.invoke(apply_merge).unwrap(), IntentResult::Accepted);
+        let read = read_route(&mut turnstone);
+        assert_eq!(label_of(&read.model, 1).as_deref(), Some("Branch one"));
+        assert_eq!(label_of(&read.model, 2).as_deref(), Some("Branch two"));
     }
 
     fn relate(from: u128, to: u128, assertion: EdgeAssertion) -> pandect::CapturedDelta {

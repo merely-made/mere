@@ -158,6 +158,64 @@ impl PendingMerge {
     pub fn edits(&self) -> &[CapturedDelta] {
         &self.edits
     }
+
+    /// Carry `choices`, made on an earlier plan of this merge, over to this
+    /// one: a choice carries when this plan still has a conflict on its part
+    /// that takes it. The rest are dropped, each with the reason, so the
+    /// person can see what to choose again.
+    pub fn carry_choices(
+        &self,
+        choices: &BTreeMap<Part, MergeChoice>,
+    ) -> (BTreeMap<Part, MergeChoice>, Vec<DroppedChoice>) {
+        let mut carried = BTreeMap::new();
+        let mut dropped = Vec::new();
+        for (part, choice) in choices {
+            let reason = match self
+                .conflicts
+                .iter()
+                .find(|conflict| &conflict.part == part)
+            {
+                None => Some("no longer in conflict"),
+                Some(conflict) if *choice == MergeChoice::AddAsNew && !conflict.add_as_new => {
+                    Some("adding as new no longer applies")
+                },
+                Some(_) => match choice {
+                    MergeChoice::Hand(value)
+                        if !matches!(part, Part::ResourceFacet(..))
+                            && part_edits(
+                                &self.source_graph,
+                                part,
+                                (!value.is_null()).then_some(value),
+                            )
+                            .is_err() =>
+                    {
+                        Some("the value given by hand does not fit")
+                    },
+                    _ => None,
+                },
+            };
+            match reason {
+                None => {
+                    carried.insert(part.clone(), choice.clone());
+                },
+                Some(reason) => dropped.push(DroppedChoice {
+                    part: part.clone(),
+                    choice: choice.clone(),
+                    reason: reason.to_string(),
+                }),
+            }
+        }
+        (carried, dropped)
+    }
+}
+
+/// A choice made on an earlier plan that a new plan of the same merge could
+/// not take, and why.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct DroppedChoice {
+    pub part: Part,
+    pub choice: MergeChoice,
+    pub reason: String,
 }
 
 /// One step of a pick chain: the session picked from, its journal cursor then,
@@ -684,7 +742,10 @@ impl<B: Backend + Clone> MereSessions<B> {
                 Some(MergeChoice::Hand(value)) => {
                     let value = (!value.is_null()).then_some(value);
                     let made = part_edits(&scratch, &conflict.part, value).map_err(|why| {
-                        SessionError::NotMergeable(format!("a hand edit does not fit: {why}"))
+                        SessionError::NotMergeable(format!(
+                            "a hand edit does not fit {:?}: {why}",
+                            conflict.part
+                        ))
                     })?;
                     add(&mut scratch, made, &mut edits);
                 },
