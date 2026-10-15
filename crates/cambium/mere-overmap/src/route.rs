@@ -365,13 +365,9 @@ pub fn intent(
                 .map_or_else(|| mere_card(sessions), |(instance, _)| instance);
             (intent, SessionsActionV1::on(*id), card)
         },
-        MereViewRequest::Archive(_)
-        | MereViewRequest::Merge(_)
-        | MereViewRequest::Activate(_)
-        | MereViewRequest::Host(_)
-        | MereViewRequest::Layout(_) => {
-            return None;
-        },
+        // Archives, merges, nodes, host actions and layouts take other
+        // paths; a request this route does not know names no intent.
+        _ => return None,
     };
     Some(IntentInvocation {
         session: sessions.session.clone(),
@@ -449,6 +445,52 @@ fn value_words(value: Option<&Value>) -> String {
     }
 }
 
+/// A choice in words, for a dropped choice's line.
+fn choice_words(choice: &MergeChoice) -> String {
+    match choice {
+        MergeChoice::Source => "Source".to_string(),
+        MergeChoice::Target => "Target".to_string(),
+        MergeChoice::Hand(value) => format!("by hand, {:?}", value_words(Some(value))),
+        MergeChoice::AddAsNew => "Add as new".to_string(),
+    }
+}
+
+/// A wire choice as the view holds it: a value given by hand as its text.
+pub fn merge_option(choice: &MergeChoice) -> MergeOption {
+    match choice {
+        MergeChoice::Source => MergeOption::Source,
+        MergeChoice::Target => MergeOption::Target,
+        MergeChoice::Hand(value) => MergeOption::Hand(value_words(Some(value))),
+        MergeChoice::AddAsNew => MergeOption::AddAsNew,
+    }
+}
+
+/// Take what the resident says of a re-planned merge into the choices a
+/// panel holds: each carried choice, and no choice for one it dropped.
+pub fn adopt_merge(chosen: &mut BTreeMap<String, MergeOption>, pending: &PendingMergeV1) {
+    for dropped in &pending.dropped {
+        chosen.remove(&conflict_key(&dropped.part));
+    }
+    for carried in &pending.carried {
+        chosen.insert(conflict_key(&carried.part), merge_option(&carried.choice));
+    }
+}
+
+/// The request for a pending merge's material: its card's first media, from
+/// the cards [`card_requests`] read.
+pub fn merge_material_request(
+    sessions: &ProjectionSnapshot,
+    cards: &HashMap<ContentHash, Vec<u8>>,
+) -> Option<ResourceRequest> {
+    let instance = *merge_cards(sessions).first()?;
+    let card: PortableCardV1 =
+        serde_json::from_slice(cards.get(&offer(sessions, instance)?.resource)?).ok()?;
+    Some(ResourceRequest {
+        session: sessions.session.clone(),
+        resource: *card.media.first()?,
+    })
+}
+
 /// The pending merge as the view shows it, with the choices made so far by
 /// conflict key. `None` clears it.
 pub fn fill_merge(
@@ -460,6 +502,18 @@ pub fn fill_merge(
         source: pending.source,
         source_name: pending.source_name.clone(),
         target_name: pending.target_name.clone(),
+        dropped: pending
+            .dropped
+            .iter()
+            .map(|dropped| {
+                format!(
+                    "{}: {} ({})",
+                    part_words(&dropped.part, &model.graph),
+                    choice_words(&dropped.choice),
+                    dropped.reason
+                )
+            })
+            .collect(),
         conflicts: pending
             .conflicts
             .iter()

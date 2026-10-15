@@ -1801,8 +1801,7 @@ fn branch_sits_beside_fork_and_merge_into_source_on_a_branch() {
     let root = runner.root();
     {
         let dom = dom.borrow();
-        let evening =
-            find(&dom, root, "data-session", &Uuid::from_u128(2).to_string()).expect("2");
+        let evening = find(&dom, root, "data-session", &Uuid::from_u128(2).to_string()).expect("2");
         let mut steps = Vec::new();
         find_all(&dom, evening, "data-step", &mut steps);
         let tokens: Vec<_> = steps.iter().map(|&s| attr(&dom, s, "data-step")).collect();
@@ -1817,7 +1816,10 @@ fn branch_sits_beside_fork_and_merge_into_source_on_a_branch() {
             ]
         );
     }
-    for label in ["Branch Evening reading", "Merge into source Evening reading"] {
+    for label in [
+        "Branch Evening reading",
+        "Merge into source Evening reading",
+    ] {
         let step = find(&dom.borrow(), root, "aria-label", label).expect(label);
         runner.dispatch_click(step, PointerClick::at((1.0, 1.0)));
     }
@@ -1856,6 +1858,7 @@ fn merge_model() -> MereViewModel {
                 chosen: Some(MergeOption::Target),
             },
         ],
+        dropped: Vec::new(),
     });
     model
 }
@@ -1876,7 +1879,12 @@ fn a_pending_merge_lists_each_conflict_with_its_choices_then_apply() {
         assert_eq!(attr(&dom, card, "data-resolved"), Some("false"));
         let title = find(&dom, card, "data-key", "title-1").expect("conflict");
         let words = text(&dom, title);
-        for want in ["Title of One", "Base: One", "Source: Branch", "Target: Target"] {
+        for want in [
+            "Title of One",
+            "Base: One",
+            "Source: Branch",
+            "Target: Target",
+        ] {
             assert!(words.contains(want), "{words}");
         }
         assert_eq!(count(&dom, title, "data-choice", "add-as-new"), 0);
@@ -1892,21 +1900,19 @@ fn a_pending_merge_lists_each_conflict_with_its_choices_then_apply() {
     let apply = find(&dom.borrow(), root, "aria-label", "Apply merge").unwrap();
     runner.dispatch_click(apply, PointerClick::at((1.0, 1.0)));
     assert!(runner.state().requests.is_empty(), "nothing to apply yet");
-    for label in ["Take the source's Title of One", "Add Two as new", "Cancel merge"] {
+    for label in [
+        "Take the source's Title of One",
+        "Add Two as new",
+        "Cancel merge",
+    ] {
         let control = find(&dom.borrow(), root, "aria-label", label).expect(label);
         runner.dispatch_click(control, PointerClick::at((1.0, 1.0)));
     }
     assert_eq!(
         runner.state().requests,
         [
-            MereViewRequest::Merge(MergeRequest::Choose(
-                "title-1".into(),
-                MergeOption::Source
-            )),
-            MereViewRequest::Merge(MergeRequest::Choose(
-                "node-2".into(),
-                MergeOption::AddAsNew
-            )),
+            MereViewRequest::Merge(MergeRequest::Choose("title-1".into(), MergeOption::Source)),
+            MereViewRequest::Merge(MergeRequest::Choose("node-2".into(), MergeOption::AddAsNew)),
             MereViewRequest::Merge(MergeRequest::Cancel),
         ]
     );
@@ -1928,8 +1934,13 @@ fn a_pending_merge_lists_each_conflict_with_its_choices_then_apply() {
 fn a_hand_value_is_typed_in_place_and_reported_by_edit_by_hand() {
     let (dom, mut runner) = runner(Host::new(merge_model(), 900, 600));
     let root = runner.root();
-    let field = find(&dom.borrow(), root, "aria-label", "Hand value for Title of One")
-        .expect("hand field");
+    let field = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Hand value for Title of One",
+    )
+    .expect("hand field");
     assert_eq!(
         attr(&dom.borrow(), field, "data-cambium-text-value"),
         Some("Target"),
@@ -1942,10 +1953,7 @@ fn a_hand_value_is_typed_in_place_and_reported_by_edit_by_hand() {
     ] {
         runner.dispatch_key(cambium::KeyEvent::new(key));
     }
-    assert_eq!(
-        runner.state().view.merge_drafts["title-1"].text(),
-        "Targe!"
-    );
+    assert_eq!(runner.state().view.merge_drafts["title-1"].text(), "Targe!");
     let hand = find(
         &dom.borrow(),
         root,
@@ -1968,4 +1976,30 @@ fn a_hand_value_is_typed_in_place_and_reported_by_edit_by_hand() {
     model.merge = None;
     view.lay_out(&model, 900, 600);
     assert!(view.merge_drafts.is_empty());
+}
+
+#[test]
+fn a_replanned_merge_names_the_choices_it_dropped() {
+    let (dom, runner) = runner(Host::new(merge_model(), 900, 600));
+    assert!(
+        find(
+            &dom.borrow(),
+            runner.root(),
+            "aria-label",
+            "Dropped choices"
+        )
+        .is_none(),
+        "nothing dropped, nothing shown"
+    );
+    let mut model = merge_model();
+    model.merge.as_mut().unwrap().dropped =
+        vec!["Title of Two: Target (no longer in conflict)".into()];
+    let (dom, runner) = self::runner(Host::new(model, 900, 600));
+    let dom = dom.borrow();
+    let dropped = find(&dom, runner.root(), "aria-label", "Dropped choices").expect("list");
+    assert_eq!(attr(&dom, dropped, "role"), Some("status"));
+    assert_eq!(
+        text(&dom, dropped),
+        "Title of Two: Target (no longer in conflict)"
+    );
 }

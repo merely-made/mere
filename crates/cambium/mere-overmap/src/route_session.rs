@@ -634,7 +634,8 @@ impl MereRouteSession {
                                 if card.media.is_empty() {
                                     return Err("The explicit session does not disclose its scoped graph material.".into());
                                 }
-                                self.tasks.push_front(Task::Media(session.clone(), instance));
+                                self.tasks
+                                    .push_front(Task::Media(session.clone(), instance));
                             }
                             let is_merge = session == self.sessions
                                 && mere_route::merge_cards(&snapshot).contains(&instance);
@@ -692,6 +693,7 @@ impl MereRouteSession {
                         if merge.schema != crate::wire::PENDING_MERGE_SCHEMA {
                             return Err("The pending merge material has another schema.".into());
                         }
+                        mere_route::adopt_merge(&mut self.merge_choices, &merge);
                         self.merge = Some(merge);
                     },
                     (Task::Invoke(request), Outcome::Intent(result)) => {
