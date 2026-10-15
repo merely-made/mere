@@ -21,16 +21,14 @@ use djinn::{
     embedded_reservoir::reservoir_applications, keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
-use graphshell::native::{
-    app_broker::{AppEndpointCatalog, serve_app_broker},
-    endpoint_catalog::ResidentEndpointCatalog,
-};
+use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
     app_client::AppBrokerClient,
     identity::VaultProtectionView,
     tasks::ResidentTasks,
 };
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{self as session_item, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{

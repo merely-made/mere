@@ -1,0 +1,99 @@
+[package]
+rust-version = "1.97.1"
+name = "graphshell-host"
+version = "0.0.2"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The serving half of a Graphshell session: admission, the admitted session loop, the resident endpoint catalog and the projection host."
+publish = false
+
+# The serving half (Graphshell stack lift plan, L2, ruling R4). Hosts serve
+# projection sessions through this crate without the `graphshell` port.
+#
+# The default build is wasm-clean: admission (sans-I/O) and the WebRTC join's
+# peer and door functions, which a browser build calls. `native` adds what
+# reads and writes: the accept path, the session loop, the catalog, the
+# projection host and the policy file. It is compiled out on wasm32 even with
+# the feature on.
+[features]
+default = ["webrtc-join"]
+# The Graphshell action triple, the hello builders, and the sans-I/O
+# admission with its action check.
+admission = ["dep:insigne", "dep:notochord", "dep:personae"]
+# The WebRTC door's sans-I/O core and the join sequence both peers run.
+# Wasm-clean; a wasm build also needs `--cfg getrandom_backend="wasm_js"`
+# (see personae's manifest in merely-made/dramatis).
+webrtc-join = [
+    "admission",
+    "dep:getrandom",
+    "dep:serde",
+    "dep:thiserror",
+    "dep:webrtc-carrier",
+]
+# The native host: accept, admission over a stream, the line codec, the
+# session loop and its notices, the resident endpoint catalog, the projection
+# host, and the owner's policy file.
+native = [
+    "admission",
+    "webrtc-join",
+    "graphshell-endpoint/door",
+    "graphshell-endpoint/network",
+    "notochord/tokio",
+    "dep:base64",
+    "dep:pandect",
+    "dep:rand_core",
+    "dep:tokio",
+    "dep:transport",
+]
+# The live WebRTC lane: the join over a real carrier and the pump that
+# presents its frames as the session stream. Pulls str0m and the carrier's
+# own tokio driver, so it stays separate from `native`.
+webrtc-session = ["native", "webrtc-carrier/native"]
+
+[dependencies]
+chirograph.workspace = true
+graphshell-client.workspace = true
+graphshell-endpoint.workspace = true
+sceno.workspace = true
+scenotime.workspace = true
+insigne = { workspace = true, optional = true }
+notochord = { workspace = true, optional = true }
+# Without `agent`: the identity core alone, which builds for wasm32.
+personae = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+serde_json.workspace = true
+thiserror = { version = "1", optional = true }
+# The join's nonces; `rand_core` would bring a third `getrandom` major into
+# a wasm graph (see `webrtc_join`'s module docs).
+getrandom = { version = "0.3", optional = true }
+webrtc-carrier = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+base64 = { workspace = true, optional = true }
+pandect = { workspace = true, optional = true }
+rand_core = { version = "0.6", features = ["getrandom"], optional = true }
+tokio = { version = "1", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"], optional = true }
+# The one audited `AcceptedSession -> SessionFacts` adapter (Notochord N1).
+transport = { workspace = true, features = ["notochord"], optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"], optional = true }
+
+[dev-dependencies]
+transport = { workspace = true, features = ["test-identity"] }
+webrtc-carrier = { workspace = true, features = ["native"] }
+tempfile = "3"
+tokio = { version = "1", features = ["io-util", "macros", "net", "rt", "rt-multi-thread", "time"] }
+
+[[test]]
+name = "webrtc_join_loopback"
+required-features = ["webrtc-session"]
+
+[[test]]
+name = "webrtc_door_loopback"
+required-features = ["native"]
+
+[[test]]
+name = "projection_round_trip"
+required-features = ["native"]

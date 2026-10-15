@@ -24,13 +24,13 @@ use djinn::resident_status::{
 };
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell::native::device_broker::default_device_endpoint;
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, default_app_endpoint,
 };
 use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
 use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 

@@ -75,7 +75,6 @@ use notochord::{
 use notochord::{
     HandshakeError, NetworkId, ProfileRef, RequestedAction, SessionHello, TrafficClass,
 };
-use personae::AttestationKeys;
 use personae::delegation::DelegationError;
 use personae::delegation::Issue;
 use personae::{Ed25519Keypair, Ed25519PublicKey, Ed25519Signature};
@@ -134,7 +133,7 @@ impl InviteTerms {
     /// Terms for Graphshell's projection connect action.
     ///
     /// The action is [`crate::admission::connect_action`] rather than a
-    /// parameter, because that is the only action this port's door serves; a
+    /// parameter, because that is the only action this door serves; a
     /// host offering something else builds [`InviteTerms`] directly and takes
     /// responsibility for the policy rule that matches it.
     pub fn projection(
@@ -512,7 +511,7 @@ pub fn mint_delegation<P: IdentityProvider>(
 /// The facts a WebRTC channel can honestly report, from the audited adapter.
 ///
 /// Built through [`AcceptedSession::session_facts`] rather than by hand, which
-/// is the whole point: this port has one place where carrier facts come from,
+/// is the whole point: this crate has one place where carrier facts come from,
 /// and a door that assembled its own [`SessionFacts`] would be a second.
 /// `peer` is `None` because the carrier authenticated nobody, and the link is
 /// the challenge's derived value.
@@ -529,7 +528,7 @@ pub fn webrtc_session_facts(shared_link: [u8; 16]) -> SessionFacts {
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 /// Run Graphshell admission over one hello that arrived on this channel.
 ///
-/// Sans-I/O, exactly as [`crate::browser_carrier`] is: the hello arrives as
+/// Sans-I/O, exactly as the port's browser carrier is: the hello arrives as
 /// bytes and the reply leaves as bytes, so the caller writes the refusal on a
 /// refused session and closes, and no application byte can precede that. The
 /// returned reply is well-formed in both arms.

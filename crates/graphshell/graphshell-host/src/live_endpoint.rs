@@ -42,13 +42,13 @@
 use std::collections::BTreeMap;
 
 use chirograph::{
-    ActionFormChoiceV1, ActionFormFieldV1, ActionFormV1, AdvertisedAction, BoundsRelationship, CachePolicy, CarrierNotice, ContentHash,
-    EndpointDescriptor, IntentEffect, IntentInvocation, IntentReference, IntentResult,
-    PresentationBinding, PresentationCapability, PresentationChange, PresentationCodec,
-    PresentationKey, PresentationManifest, PresentationOffer, PresentationSemantics, ProjectionAck,
-    ProjectionDiff, ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot,
-    ProtocolVersion, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest, SemanticRole,
-    SessionStatus,
+    ActionFormChoiceV1, ActionFormFieldV1, ActionFormV1, AdvertisedAction, BoundsRelationship,
+    CachePolicy, CarrierNotice, ContentHash, EndpointDescriptor, IntentEffect, IntentInvocation,
+    IntentReference, IntentResult, PresentationBinding, PresentationCapability, PresentationChange,
+    PresentationCodec, PresentationKey, PresentationManifest, PresentationOffer,
+    PresentationSemantics, ProjectionAck, ProjectionDiff, ProjectionOffer, ProjectionRequest,
+    ProjectionSession, ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse,
+    ResumeReply, ResumeRequest, SemanticRole, SessionStatus,
 };
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,

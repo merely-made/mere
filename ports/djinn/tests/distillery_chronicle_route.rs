@@ -19,9 +19,9 @@ use common::{lane, lending, now_ms, open_vault, owner, profile, unlock, write_de
 use distillery::ResidentReceipt;
 use djinn::resident::DjinnResident;
 use djinn::resident_distillery::ResidentDistillery;
-use graphshell::admission::open_session;
-use graphshell::carrier::projection_policy;
-use graphshell::network_carrier::{
+use graphshell_host::admission::open_session;
+use graphshell_host::carrier::projection_policy;
+use graphshell_host::network_carrier::{
     CarrierRuntime, NetworkCarrier, dial_projection_session, projection_binding,
 };
 use insigne::delegation::{
@@ -63,10 +63,10 @@ fn grant(subject: [u8; 32]) -> SignedDelegationCertificate {
             route_owner().master_public_key().to_bytes(),
             subject,
             CapabilityScope {
-                domain: graphshell::admission::GRAPHSHELL_DOMAIN.into(),
+                domain: graphshell_host::admission::GRAPHSHELL_DOMAIN.into(),
                 resource: NETWORK.0.to_vec(),
-                path_prefix: graphshell::admission::PROJECTION_SERVICE.into(),
-                actions: [graphshell::admission::CONNECT_ACTION.to_string()]
+                path_prefix: graphshell_host::admission::PROJECTION_SERVICE.into(),
+                actions: [graphshell_host::admission::CONNECT_ACTION.to_string()]
                     .into_iter()
                     .collect(),
             },

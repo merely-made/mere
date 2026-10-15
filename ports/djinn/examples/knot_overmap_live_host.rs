@@ -38,19 +38,16 @@ use djinn::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     },
 };
-use graphshell::{
-    lifecycle::AdmittedEndpointContext,
-    native::{
-        app_broker::{AppEndpointCatalog, serve_app_broker},
-        endpoint_catalog::ResidentEndpointCatalog,
-    },
-};
+use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppRouteGrants},
     identity::VaultProtectionView,
     tasks::ResidentTasks,
 };
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
+use graphshell_host::{
+    endpoint_catalog::ResidentEndpointCatalog, lifecycle::AdmittedEndpointContext,
+};
 use knot_editor::{PersonalVaultKeys, StartupUnlockedPersonalVault, VaultDocument};
 use mere_overmap::wire::{
     APPLY_EDITS_INTENT, ApplyEditsV1, MINT_SESSION_INTENT, SESSION_ITEM_SOURCE, SessionsActionV1,

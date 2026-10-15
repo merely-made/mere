@@ -383,3 +383,32 @@ built):
   mapping and handshake limits beyond their call sites; whether a WebRTC
   rejoin's preserved `ProjectionSession` (`graphshell-client/src/remote.rs:441-451`)
   is the same session the transcript-derived id names after re-admission.
+
+## Progress
+
+- **2026-10-15 (with the stack lift plan's P4):** recommendation 3 and the
+  codec half of recommendation 4 landed in `graphshell-host` and
+  `graphshell-client` (T6). One admission entry:
+  `graphshell_host::carrier::admit_stream` (stream plus facts, T1), which
+  `admit_accepted_session` and the port's local doors call; the WebRTC message
+  path keeps the sans-I/O `admission::admit_session`; both end in
+  `admission::serves_action`. One codec (T2): `graphshell_client::line`
+  (sans-I/O, with `LineAssembler`) and `graphshell_host::line` (Tokio), used
+  by `SessionDriver`, the session loop and `BrowserSessionClient`.
+  Still open, in order of the recommendations:
+  1. The application claim in the delegation (T5, recommendation 1): nothing
+     binds an application outside the app door yet.
+  2. Push notices on every carrier (T3, recommendation 2): the
+     native-messaging host still drops notices and the app door still serves
+     `TakeNotice` and `WaitNotice`; the extension's JavaScript is still unread.
+  3. The rest of recommendation 4: `graphshell-endpoint`'s `stdio` and
+     `network` carriers still frame and correlate by hand (they cannot depend
+     on `graphshell-host`; moving them onto `graphshell_client::line` is a new
+     `graphshell-client` edge for `graphshell-endpoint`); one client correlator
+     for `StdioCarrier`, `NetworkCarrier`, `BrowserSessionClient` and
+     `AppBrokerClient`; the native stream-to-lines pump for `SessionDriver` in
+     `graphshell-client` (T3), which the overmap pane needs.
+  4. Djinn's dialable projection host on a dedicated resident key with
+     `mere/<domain>` (and, per T4, `ambient/mere/<domain>` with its own
+     admission shape) exposed on it (T7, recommendation 5); the brokers
+     moving to Djinn is the lift plan's P5.

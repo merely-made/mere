@@ -151,12 +151,11 @@ impl SessionDriver {
     /// [`SessionCore::resume_from_notice`], because a host may want to coalesce
     /// several bells before resuming once.
     pub fn on_line(&mut self, line: &str) -> Result<Advance, String> {
-        let trimmed = line.trim();
-        if trimmed.is_empty() {
+        let Some(output) = crate::line::decode::<CarrierOutput>(line)
+            .map_err(|error| format!("endpoint sent a line Graphshell could not read: {error}"))?
+        else {
             return Ok(Advance::Noted);
-        }
-        let output: CarrierOutput = serde_json::from_str(trimmed)
-            .map_err(|error| format!("endpoint sent a line Graphshell could not read: {error}"))?;
+        };
         match output {
             CarrierOutput::Notice(notice) => {
                 self.notices.push_back(notice);
@@ -222,7 +221,7 @@ impl SessionDriver {
         }
         let id = self.next_id;
         self.next_id += 1;
-        let line = serde_json::to_string(&CarrierRequest { id, body })
+        let line = crate::line::encode(&CarrierRequest { id, body })
             .map_err(|error| format!("could not encode a Graphshell request: {error}"))?;
         self.inflight = Some(id);
         Ok(Advance::Send(line))
