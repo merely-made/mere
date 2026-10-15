@@ -1,0 +1,77 @@
+    Blocking waiting for file lock on package cache
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df#f4f9c0d8)
+├── netrender feature "default"
+│   ├── cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host)
+│   │   └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web)
+│   │       ├── graphshell-web feature "presentation-webgl2" (command-line)
+│   │       └── graphshell-web feature "without-classic-vello" (command-line)
+│   │   ├── cambium-genet-web-host feature "portable"
+│   │   │   └── cambium-genet-web-host feature "webgl"
+│   │   │       └── graphshell-web feature "presentation-webgl2" (command-line)
+│   │   └── cambium-genet-web-host feature "webgl" (*)
+│   ├── cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+│   │   ├── cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host) (*)
+│   │   ├── graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell)
+│   │   │   └── graphshell feature "web"
+│   │   │       └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   │   ├── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   │   └── mesquite v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mesquite)
+│   │       ├── cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host) (*)
+│   │       └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   ├── genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+│   │   ├── genet-render feature "accesskit"
+│   │   │   ├── cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock) (*)
+│   │   │   └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   │   └── genet-render feature "livery"
+│   │       ├── cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock) (*)
+│   │       └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   ├── genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+│   │   ├── genet-render-host feature "default"
+│   │   │   ├── cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host) (*)
+│   │   │   ├── cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock) (*)
+│   │   │   └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   │   └── genet-render-host feature "without-classic-vello"
+│   │       └── graphshell-web feature "without-classic-vello" (command-line)
+│   ├── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   ├── mere v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\mere)
+│   │   ├── mere feature "canvas"
+│   │   │   ├── graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell) (*)
+│   │   │   └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   │   ├── mere feature "graph"
+│   │   │   ├── graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell) (*)
+│   │   │   └── graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web) (*)
+│   │   │   └── mere feature "canvas" (*)
+│   │   └── mere feature "pictograph"
+│   │       └── mere feature "canvas" (*)
+│   ├── paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df#f4f9c0d8)
+│   │   ├── paint_list_render feature "default"
+│   │   │   ├── cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host) (*)
+│   │   │   ├── cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock) (*)
+│   │   │   ├── genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620) (*)
+│   │   │   └── pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+│   │   │       └── mere v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\mere) (*)
+│   │   │       ├── pictograph feature "canvas"
+│   │   │       │   └── mere feature "canvas" (*)
+│   │   │       ├── pictograph feature "seiche"
+│   │   │       │   └── pictograph feature "canvas" (*)
+│   │   │       └── pictograph feature "signals"
+│   │   │           └── pictograph feature "canvas" (*)
+│   │   └── paint_list_render feature "resource-bundle"
+│   │       ├── cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host) (*)
+│   │       └── cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock) (*)
+│   └── pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph) (*)
+├── netrender feature "serde"
+│   └── paint_list_render feature "resource-bundle" (*)
+├── netrender feature "vello-webgl"
+│   └── cambium-genet-web-host feature "portable" (*)
+├── netrender feature "vello_hybrid"
+│   └── netrender feature "vello-webgl" (*)
+└── netrender feature "without-classic-vello"
+    └── genet-render-host feature "without-classic-vello" (*)

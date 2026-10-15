@@ -70,3 +70,6 @@ support/receipts/tabard_typography_20261012/**/*.log -text -whitespace
 support/receipts/tabard_typography_20261012/**/*.json text eol=lf
 support/receipts/tabard_typography_20261012/**/scenario.done text eol=lf
 support/receipts/tabard_typography_20261012/**/*.png binary
+
+# Preserve raw compiler and test receipts for coordinated supplier adoption.
+design_docs/mere_docs/testing/receipts/2026-10-15_netrender_adoption/*.log -text -whitespace

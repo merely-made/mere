@@ -1,0 +1,13 @@
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://github.com/mark-ik/vello`
+    Updating crates.io index
+    Updating git repository `https://github.com/merely-made/netrender.git`
+warning: patch `sonic-rs v0.5.8 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+     Locking 340 packages to highest compatible versions
+ Downloading crates ...
+  Downloaded font-types v0.12.7
+  Downloaded tokio v1.53.3
