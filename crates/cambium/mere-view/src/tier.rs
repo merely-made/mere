@@ -26,17 +26,17 @@
 
 use cambium::{
     DetailPopoverEvent, DetailPopoverMode, GraphCanvasNode, GraphCanvasRelation, GraphCanvasSwatch,
-    Key, Keyed, NamedKey, OverlaySurface, Placement, button, detail_popover_panel, el, on_key,
-    request_focus,
+    GraphLabelPlacement, Key, Keyed, NamedKey, OverlaySurface, Placement, button,
+    detail_popover_panel, el, on_key, request_focus,
 };
 use incipit::SessionId;
 use uuid::Uuid;
 
 use crate::model::{ArchiveEntry, MereNodeKind, MereViewModel, SessionEntry, TierCard};
 use crate::view::{
-    ArchiveRequest, CONTAINER_PAD, CONTROL_ROW, LINE, MereView, MereViewElement, MereViewEvent,
-    MereViewRequest, archives_on, can_save, compose_button, control_rows, has_session_content,
-    request_button, session_steps, session_words,
+    ArchiveRequest, CONTAINER_PAD, LINE, MereView, MereViewElement, MereViewEvent, MereViewRequest,
+    archives_on, can_save, compose_button, control_rows, has_session_content, request_button,
+    session_steps, session_words,
 };
 
 /// The tier's resting height across the canvas's top, and the most of the
@@ -52,6 +52,15 @@ const TIER_CONTROLS_WIDTH: u32 = 148;
 const CARD_WIDTH: u32 = 232;
 const CARD_TOP: u32 = 8;
 const CHIP_ROW: u32 = 28;
+/// The heights [`MERE_VIEW_CSS`](crate::MERE_VIEW_CSS) pins for an open card
+/// and an archive popover, so their computed heights are their rows exactly:
+/// the card's border, its head (name and Close), a control button, the gap
+/// between and below rows of controls, and the popover panel's border.
+pub(crate) const CARD_BORDER: u32 = 2;
+pub(crate) const CARD_HEAD: u32 = 34;
+pub(crate) const BUTTON_HEIGHT: u32 = 30;
+pub(crate) const ROW_GAP: u32 = 4;
+pub(crate) const PANEL_BORDER: u32 = 1;
 /// An archive popover's width.
 const POPOVER_WIDTH: f32 = 232.0;
 /// The gap between an open card and the archive nodes it moves aside, and the
@@ -194,8 +203,9 @@ pub(crate) fn tier_height(model: &MereViewModel, open: Option<TierCard>, height:
 /// How far below an open card's top its archive chips start: its head (name
 /// and Close), and a session's state and steps or the shelf's Compose.
 fn chips_top(model: &MereViewModel, card: TierCard) -> u32 {
-    CONTAINER_PAD
-        + CONTROL_ROW
+    CARD_BORDER
+        + CONTAINER_PAD
+        + CARD_HEAD
         + match card {
             TierCard::Session(id) => model
                 .sessions
@@ -203,11 +213,11 @@ fn chips_top(model: &MereViewModel, card: TierCard) -> u32 {
                 .find(|session| session.id == id)
                 .map_or(0, |session| {
                     let steps = session.steps.len() + usize::from(can_save(model, session));
-                    LINE + control_rows(steps) * CONTROL_ROW
+                    LINE + controls_height(control_rows(steps) as usize)
                 }),
             TierCard::Shelf => {
                 if can_compose(model) {
-                    CONTROL_ROW
+                    controls_height(1)
                 } else {
                     0
                 }
@@ -215,9 +225,25 @@ fn chips_top(model: &MereViewModel, card: TierCard) -> u32 {
         }
 }
 
-/// An open card's height: its head, its controls and a row per archive.
+/// A block of `rows` rows of controls: each [`BUTTON_HEIGHT`] tall, with
+/// [`ROW_GAP`] between rows and below the last, as the sheet pins them.
+fn controls_height(rows: usize) -> u32 {
+    ROW_GAP + rows as u32 * BUTTON_HEIGHT + rows.saturating_sub(1) as u32 * ROW_GAP
+}
+
+/// An open card's height, exactly its rows: its border and padding, its head,
+/// its controls and a row per archive. Every row's height is pinned by
+/// [`MERE_VIEW_CSS`](crate::MERE_VIEW_CSS), so no host's button style changes it.
 pub(crate) fn card_height(model: &MereViewModel, card: TierCard) -> u32 {
-    chips_top(model, card) + card_archives(model, card).len() as u32 * CHIP_ROW + CONTAINER_PAD
+    chips_top(model, card)
+        + card_archives(model, card).len() as u32 * CHIP_ROW
+        + CONTAINER_PAD
+        + CARD_BORDER
+}
+
+/// A visible label's width as the canvas estimates it, at its 10 px size.
+fn label_width(text: &str) -> f32 {
+    (text.chars().count() as f32 * 5.6 + 2.0).min(160.0)
 }
 
 /// A tier node's accessible name: a session's in words, an archive's own.
@@ -328,6 +354,9 @@ impl MereView<'_> {
             }
         };
 
+        // Each tier node's visible label: its name alone. The accessible name
+        // keeps the words ("Session", "shown here", "in the archive").
+        let mut visible: Vec<(String, String)> = Vec::new();
         for (index, card) in groups.into_iter().enumerate() {
             let key = card_node_key(card);
             let opened = open == Some(card);
@@ -378,6 +407,15 @@ impl MereView<'_> {
                 ),
             };
             attrs.push(("aria-expanded", opened.to_string()));
+            visible.push((
+                key.clone(),
+                match card {
+                    TierCard::Session(_) => {
+                        owner.strip_prefix("Session ").unwrap_or(&owner).to_string()
+                    },
+                    TierCard::Shelf => "Archive".to_string(),
+                },
+            ));
             push(&mut swatch, key.clone(), kind, label, at, attrs);
             if opened {
                 swatch = swatch.with_node_footprint(key.clone(), CARD_WIDTH as f32, height);
@@ -417,6 +455,7 @@ impl MereView<'_> {
                     TierCard::Session(_) => format!("+{} archives of {owner}", archives.len()),
                     TierCard::Shelf => format!("+{} archives in the archive", archives.len()),
                 };
+                visible.push((more.clone(), format!("+{}", archives.len())));
                 push(
                     &mut swatch,
                     more.clone(),
@@ -441,6 +480,7 @@ impl MereView<'_> {
             for (at, entry) in archives.iter().enumerate() {
                 let node = archive_node_key(&entry.key);
                 let pinned = popover == Some((entry.key.as_str(), DetailPopoverMode::Pinned));
+                visible.push((node.clone(), entry.name.clone()));
                 push(
                     &mut swatch,
                     node.clone(),
@@ -459,6 +499,25 @@ impl MereView<'_> {
                 );
                 relate(&mut swatch, node, &entry.key, &entry.name);
             }
+        }
+        // A label that would run under the tier's controls at its right end
+        // goes to its node's left.
+        let room = size.0 - controls;
+        let clearance = swatch.node_radius + 7.0;
+        let positions: Vec<(String, f32)> = swatch
+            .projected_positions()
+            .into_iter()
+            .map(|(id, (x, _))| (id.clone(), x))
+            .collect();
+        for (key, text) in visible {
+            let x = positions
+                .iter()
+                .find(|(id, _)| *id == key)
+                .map_or(0.0, |(_, x)| *x);
+            if controls > 0.0 && x + clearance + label_width(&text) > room {
+                swatch = swatch.with_label_placement(key.clone(), GraphLabelPlacement::Left);
+            }
+            swatch = swatch.with_visible_label(key, text);
         }
         // Every node says what it is, the graph's own included.
         let kinds: Vec<(String, &'static str)> = swatch
@@ -781,10 +840,13 @@ where
         );
     let can_compose = archive.can_compose;
     let rows = usize::from(entry.can_open) + 2 * usize::from(can_compose);
-    let panel_height = match popover.mode {
-        DetailPopoverMode::Pinned => LINE * 3 + rows as u32 * CONTROL_ROW,
-        _ => LINE * 3,
-    } + CONTAINER_PAD * 2;
+    let panel_height = PANEL_BORDER * 2
+        + CONTAINER_PAD * 2
+        + LINE * 3
+        + match popover.mode {
+            DetailPopoverMode::Pinned => controls_height(rows),
+            _ => 0,
+        };
     let surface = OverlaySurface::new(
         trigger,
         (POPOVER_WIDTH, panel_height as f32),
