@@ -4,8 +4,10 @@
 **Status:** design, no code changed. Mark ruled L1–L4 on 2026-10-15 and L5–L6
 (formerly O2 and O3) later the same day (§4). It was amended the same day after
 an implementing agent's review (§11): the phases are reordered, source and
-origin are added, replay rules are stated, the bend is demoted to an
-experiment, and a list arrangement is added. Phases P1–P6 (§8) are
+origin are added, replay rules are stated, and a list arrangement is added.
+Mark then clarified the dynamics purpose: links respond to fields and perhaps
+to compatible links, making different dynamics legible (§7.3). P5 explores
+that response independently of the other phases. Phases P1–P6 (§8) are
 unscheduled; open rulings O1 and O4–O8 (§9) remain open.
 
 **Inputs.** The verified seven-agent survey of 2026-10-15
@@ -37,11 +39,12 @@ The link subsystem records why two things are related, as separate,
 attributed reasons. Each reason is an **assertion**: one asserter's claim,
 with its own identity, meaning, time span and basis. Any view can then answer
 three questions about a pair: what are all the reasons, who gave each one, and
-when and on what basis each held. Everything else is a reading of those
-assertions, computed and never stored: the link that gathers them, the stroke
-that draws it, its weight, its bend, the force it exerts and the timeline it
-opens into. A concept stays only if it records an assertion, states what one
-means, or reads assertions for a view. Any other concept is retired.
+when and on what basis each held. The link that gathers them, its stroke and
+weight, and its opened list or timeline are derived readings. A responsive
+path may also carry temporary simulation state in a view (§7.3). These
+readings and live states are rebuildable; they are never additional
+relationship truth. A concept stays only if it records an assertion, states
+what one means, or reads assertions for a view. Any other concept is retired.
 
 ## 2. Mark's four ideas, evaluated
 
@@ -61,15 +64,16 @@ means, or reads assertions for a view. Any other concept is retired.
    supernode's members. Members sit *inside* the opened link (§7.2), so no
    strokes are needed to show that they belong.
 2. **Members on a timeline of when and why.** *Kept, as the default
-   arrangement of an opened link.* It needs data that does not exist today:
-   first-assertion time, timed withdrawal and a basis (§6). Most members are
-   timeless, so the timeline carries an **undated lane** (§7.2).
-3. **The bend shows force, freed because fanning stops at rest.** *Kept as an
-   experiment.* With one stroke per link (ruling L4), geometry is free. What
-   a bend can honestly show is not yet established. Today's spring acts only
-   along the line between its endpoints, and the link's assertions share its
-   spring by allocation, not by measurement. §7.3 states what is known; P5
-   is a separate dynamics experiment that gates nothing else.
+   arrangement when the disclosed data is dated.* It needs data that does not
+   exist today: first-assertion time, timed withdrawal and a basis (§6). Most
+   members are timeless, so the timeline carries an **undated lane** (§7.2).
+3. **Links respond to fields and perhaps to like links.** *Kept as an
+   experiment.* With one stroke per link (ruling L4), its path can help make
+   different dynamics legible. A field may deflect the path along its length;
+   compatible links may attract, align or respond together to a disturbance.
+   The first proof holds endpoints fixed so these responses can be compared.
+   Endpoint feedback and sympathetic resonance remain experiment choices,
+   rather than consequences of today's endpoint spring. P5 gates nothing else.
 4. **Reification was the original point of families, payloads, kinds and
    types.** *Half supported.* Families (2026-03-14) were **policy** classes:
    persistence, visibility, deletion, layout force and navigator precedence.
@@ -121,7 +125,9 @@ states only what is new.
   yet been compacted. Its key is `(stratum, {a, b})`. For the resource
   stratum the endpoints are canonical-IRI resource ids, so the key is the
   same on every device without being stored. A link is never stored, synced
-  or minted. When a Resource link is drawn between surfaces it is one link
+  or minted as an entity. Its reading can be cached, and a view's responsive
+  path can carry rebuildable live state keyed by the link and its appearance
+  (§7.3). When a Resource link is drawn between surfaces it is one link
   with many appearances, and it keeps its Resource origin (TERMINOLOGY). If
   a pair ever needs an identity of its own, for comments or shared review, it
   is **promoted**: it is frozen into a Resource the way a selection is frozen
@@ -135,7 +141,8 @@ states only what is new.
   so may a link spring's stiffness. Each assertion's term is its
   **allocated share**. That share is not a measured force (§7.3). Strength
   is a setting, not truth (audit thread 4: "the strength projection probably
-  wants to be settings").
+  wants to be settings"). Field response and compatibility between links are
+  declared view/dynamics rules; one strength number does not define them.
 
 Traversal joins this set rather than standing beside it. The pair's
 navigation history is one assertion per direction: predicate
@@ -221,7 +228,7 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | Folds, supernodes, astroid (`forme/fold.rs`, `fold_projection.rs`) | Keep | Node collapse is unchanged. A fold's boundary relations become links read with the fold standing in for its members. This subsumes `fold_projection`'s (outside endpoint, direction, family, count) grouping. |
 | Fan implementations: cambium `FAN_GAP_PX` 12, pictograph `CELL_FAN_GAP` 6 overlay above the collapsed underlay | Retire (L4) | One rest stroke per link. |
 | Query-view DOM stroke (`web_tree/query_view.rs`) | Keep | It is already one stroke per bucket. It re-keys to the link. |
-| Multiplicity as thickness (2026-06-24) and as N spring slots (`seiche_bridge.rs`) | Subsume | Strength. |
+| Multiplicity as thickness (2026-06-24) and as N spring slots (`seiche_bridge.rs`) | Subsume | Strength; a selected link spring may read it as stiffness. Field response and link compatibility have their own declared dynamics rules (§7.3). |
 | Visual edge-collapse "LOD setting" (petgraph plan; swatch design §7, never built as a switch) | Subsume | Rest stroke and opened link. |
 | Swatch design §7 "the addressable edge is a cell" | Retire | The addressable unit is the assertion; the drawable unit is the link. |
 | Hide-only vs retract by authorship | Keep | Withdraw is allowed to the asserter, per the predicate's retractability. Hide is curation. |
@@ -230,11 +237,11 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | `VisualRelationKind` / `StrokeCue` (query view) | Keep | The stratum cue of the rest stroke. |
 | scenomise `DisclosedRelationship` with `RelationshipProvenance` | Keep | The disclosure shape of one assertion from a host. Its fields align with `basis`: method, method version, provider, evidence. |
 | Woodshed `MaterialRelation` | Keep, disclosed | A domain record disclosed as an assertion. `method` is the Woodshed computation and version. Its 0..100 weight is a domain value the strength function may read. |
-| `EdgePath` (`numen/edge_path.rs`) | Keep | Gains its first consumer: the link bend (§7.3). |
-| Field couplings | Keep | Node-targeted, unchanged. |
+| `EdgePath` (`numen/edge_path.rs`) | Keep | Candidate path vocabulary for P5: `Spline` and `FieldLine` are declarations; a responsive-path evaluator remains to be designed (§7.3). |
+| Field couplings | Keep | Existing couplings remain node-targeted. P5 explores a view-local path response without adding an `EdgeFamily` or a stored link entity. |
 | Nested graph | Keep | Node-borne. Not used for links; promotion uses the freeze pattern instead. |
 | Swatch | Keep | Gains a **link** scope (§7.2). |
-| Timeline arrangement (sceno `score.rs`) | Keep | The default arrangement of an opened link. |
+| Timeline arrangement (sceno `score.rs`) | Keep | The default opened-link arrangement for dated data; list is the default for mostly undated data (§7.2). |
 | "Timeline" × 6 | Clarify | In this doc it means only the arrangement family. |
 | Linked-data first-arc surface projection (`linked-data/src/lib.rs`:360) | Retire | Reads every arc through `edges_between_undirected`, as the kernel already does. |
 
@@ -375,31 +382,59 @@ own explanation and actions. Its accessible alternate is the same list, read in 
 with the undated members last. Nothing in it is stored. It is a projection
 of the link, so it inherits the swatch's representation-never-identity rule.
 
-### 7.3 The force-carrying bend (experiment)
+### 7.3 Responsive paths that make dynamics legible (experiment)
 
-What is known:
+The purpose is to understand different dynamics through how links respond.
+A field may influence a path along its length. Compatible links may attract,
+align or respond together to a disturbance: the proposed **sympathetic**
+response. Attraction is a first candidate; resonance or propagation between
+links remains an experiment choice. The bend is one observable of that
+response. It need not be reconstructed from an endpoint spring's force.
 
-- **One spring per link** can replace N spring slots per visible row
-  (`seiche_bridge.rs`). Its stiffness is the link's strength. For this
-  additive linear spring, each assertion's term is an exact **allocated
-  share** of the spring's own force. That share is an allocation, not a
-  measurement. It says nothing about repulsion, fields, pins or any other law
-  acting on the endpoints. The inspector labels it "allocated spring share",
-  never "force". The disclaimer at `dynamics_inspection.rs`:138 stays true
-  for measured per-assertion force.
-- **Seiche's `EdgeSpring` acts only along the line between its endpoints**
-  (`crates/conatus/seiche/src/forces.rs`:184). There is no lateral link state
-  for a sideways deflection to read. Stretch versus rest length is the only
-  link-local quantity today.
+Compatibility is a declared rule in the view's dynamics: for example a shared
+predicate or a source-disclosed affinity. It reads the eligible, disclosed
+assertions and explains how a link with several assertions combines their
+contributions. Shared appearance alone grants no compatibility. Gathering
+paths preserves each link's endpoints, selection identity and distinct
+assertions.
 
-What is not known, and is P5's experiment: whether a bend should read
-stretch (taut when stretched, bowed when slack) or a new per-link
-observable, and whether `EdgePath::Spline { tension }` is the right carrier.
-Hiding a member lowers strength in that instance only, so the spring relaxes
-there and nowhere else (swatch design §8, unchanged). "Relationship
+Start with **fixed endpoints**. Compare the same links under an attractor,
+flow and vortex, first with field response alone, then compatible-link
+attraction alone, then both. The proof asks whether their different effects
+are legible and attributable to the enabled response. Controls disable each
+influence independently and include an incompatible link. Feeding path
+responses back into endpoint motion is a later decision; P5's first proof
+does not require it.
+
+Control points, velocities and other path state belong to an appearance in
+one view, keyed by its link and instance. They are temporary, bounded and
+rebuildable. Authored response settings are view/dynamics configuration.
+Neither the live path nor its motion mints an entity, changes an assertion,
+or becomes shared relationship truth. Hiding a member changes only that
+instance's eligible contributions (swatch design §8). "Relationship
 membership alone does not install a force" (dynamics grammar plan) still
-holds: a predicate's force contribution is declared, and it can be zero. P5's
-outcome gates neither the link model nor the family migration.
+holds: responses must be declared and may be zero.
+
+Current implementation boundaries:
+
+- **Seiche's `EdgeSpring` acts only along the endpoint line**
+  (`crates/conatus/seiche/src/forces.rs`:184). It supplies no lateral path
+  state. A field-responsive path needs its own evaluator and response model.
+  Existing node-targeted couplings do not already act on paths.
+- **Numen declares `EdgePath::Spline` and `EdgePath::FieldLine`**
+  (`crates/conatus/numen/src/edge_path.rs`). These are candidate vocabulary,
+  not an implemented flexible path constrained to both endpoints; spline
+  tension alone does not establish a field response.
+- **One spring per link** can separately replace N spring slots per visible
+  row (`seiche_bridge.rs`) when that law is selected. With additive linear
+  stiffness contributions and a common rest length, an assertion has an
+  exact **allocated spring share**. The inspector labels that allocation
+  separately from measured forces or observed path motion. It does not
+  establish attribution for fields, repulsion, pins or another law. The
+  `dynamics_inspection.rs`:138 limitation on measured per-assertion force
+  remains until such measurement is implemented.
+
+P5's outcome gates neither the link model nor the family migration.
 
 ### 7.4 What falls away
 
@@ -418,10 +453,11 @@ identity machinery its consumers delete.
 
 ## 8. Phases
 
-Each phase lands green before the next. Each has a first proof consumer, and
-each names what it deletes. Reordered 2026-10-15 (§11): the shared reading
-comes first, over current storage, so a consumer benefits before any
-persistence change.
+P1–P4 land in order, followed by P6's family migration. P5 is an independent
+dynamics experiment and is never a prerequisite for P6. Each phase has a
+first proof consumer and names what it deletes or, for P5, what it must
+establish. Reordered 2026-10-15 (§11): the shared reading comes first, over
+current storage, so a consumer benefits before any persistence change.
 
 - **P1. One link reading, bounded (L6).** The shared shape in `scenograph`
   and one `link(stratum, a, b)` over current storage. Covers parallel
@@ -452,9 +488,17 @@ persistence change.
   the scene path (`RoutedRelation` gains its link key). Hit-test resolves the
   link; opening resolves a member. pandect hide is re-keyed. Deletes the three
   fan implementations.
-- **P5. Bend experiment (separate, gates nothing).** One spring per link
-  with allocated shares, labelled as such in the inspector, and a trial of
-  what a bend should read (§7.3). Proof: Graphshell dynamics inspector.
+- **P5. Responsive-path experiment (independent, gates nothing).** Links
+  respond to fields and compatible links under declared rules (§7.3).
+  Proof: a bounded Graphshell canvas fixture with fixed endpoints, compatible
+  and incompatible links, and attractor, flow and vortex comparisons. Done
+  when field response and like-link attraction can each be enabled and
+  disabled independently with reproducible path changes, while endpoint and
+  assertion identities remain intact. Review captures for whether the
+  different dynamics are legible. The inspector distinguishes configured
+  response, observed path motion and any allocated spring share. Record the
+  evaluator, bounds and response rules used; endpoint feedback and resonance
+  are further choices, not completion requirements.
 - **P6. All families as assertions.** The four sidecar families become
   assertion records, `EdgePayload` collapses to one list, `RelationKind` and
   `RelationSelector` become predicate filters, and the tabard style registry
@@ -464,6 +508,34 @@ persistence change.
   family's behavior (visibility, deletion, durability, layout) is unchanged,
   and that reads stay within budget on a graph with substantial withdrawal
   history.
+
+### 8.1 Execution recommendation: a core sequence and an independent probe
+
+Keep **P1 → P2 → P3 → P4 → P6** as one integration sequence. P1 settles the
+portable link key, assertion reference, source/revision and coverage contract
+with two real consumers. P2 then owns persistence, replay, withdrawal and
+query semantics together. P3 and P4 consume those contracts before P6 replaces
+the remaining storage families. Splitting these changes into simultaneous
+kernel migrations would make the shared contract move under its consumers.
+
+**P5 can proceed in parallel as an isolated probe.** Its evaluator can start
+with fixed, disclosed fixtures and ordinary endpoint coordinates. It need not
+wait for timestamp migration, all-family assertions or a new stored shape.
+Once P1's contract is stable, a thin adapter supplies real links and their
+source references. Fixture results alone do not close P5's Graphshell proof.
+
+Opened-link layout and consumer-adapter preparation can overlap P2 after
+P1's contract is stable; their acceptance still waits for P2. Serialize
+changes to shared Graphshell/Pictograph rendering and hit-testing files with
+P3/P4, so the dynamics adapter follows the current link and selection path.
+The dynamics evaluator can be reviewed independently of that host integration.
+
+Keep persistence and the portable contract under one owner at a time. Give
+the probe separate worktree and output ownership if it runs concurrently.
+Qualify the combined consumer once the source and adapter changes are in
+place; retain the distinction between a fixture probe, an integrated host
+and reviewed native behavior. This is proposed work routing, not a claim
+that implementation lanes have been started.
 
 ## 9. Open rulings for Mark
 
@@ -524,3 +596,20 @@ code, and its code claims were checked (`forces.rs`:184,
 Kept against it: the closed link stays one stroke (L4). The review's
 "direction and opposing predicates apparent when closed" is met by marks on
 that stroke, never by extra lines. Mark ruled O2 and O3 as L5 and L6.
+
+**2026-10-15, Mark's dynamics clarification.** Mark described fields and
+perhaps sympathetic forces influencing like links, to help clarify the
+behavior of different dynamics. §2, §3, §7.3 and P5 now frame the experiment
+as responsive paths, beginning with fixed endpoints and independent field
+and compatibility controls. Temporary path state is distinct from stored
+relationship truth; endpoint feedback and resonance remain choices within
+the experiment. The existing source, origin, replay, query, list/timeline
+and migration recommendations stand. The earlier universal timeline-default
+wording and the phase preamble were reconciled with those recommendations.
+No new ruling or implementation is claimed.
+
+**2026-10-15, implementation routing review.** §8.1 recommends the core
+integration sequence and an isolated P5 probe in parallel, with a stable P1
+contract and serialized shared host edits. The recommendation preserves P5's
+independence without making persistence or consumer adoption follow a moving
+experimental interface.
