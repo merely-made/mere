@@ -27,7 +27,7 @@ fork F1 for Mark rather than choosing.
 
 ### Recommended action
 
-Take forks F1 and F2 to Mark before Task 2 or Task 3 start.
+Rulings 1 and 2 (2026-10-15) settle F1 and F2.
 
 ### Notes
 
