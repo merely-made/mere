@@ -13374,6 +13374,7 @@ dependencies = [
  "sceno",
  "scenograph",
  "scenomise",
+ "scenotime",
  "seiche",
  "serde",
  "serde_json",
