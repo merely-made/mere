@@ -97,6 +97,12 @@ fn build_node_sheet() -> Vec<String> {
         ".gcaption { position: absolute; left: 42px; top: 8px; white-space: nowrap; \
             color: var(--node-caption-fg); font-size: 14px; }"
             .to_string(),
+        // A fold stand-in's "+N" (mer3ly site plan, Ruling 166): a pill on the
+        // stage, centred on its stand-in's top-right corner each frame.
+        ".gbadge { position: absolute; left: 0; top: 0; height: 18px; padding: 0 6px; \
+            border-radius: 9px; font-size: 12px; line-height: 18px; white-space: nowrap; \
+            background-color: var(--node-selected-bg); color: var(--node-selected-fg); }"
+            .to_string(),
     ]
 }
 
