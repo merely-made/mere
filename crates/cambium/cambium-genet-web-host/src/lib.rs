@@ -40,7 +40,7 @@
 //! ```
 
 pub mod mirror;
-#[cfg(feature = "webgl")]
+#[cfg(feature = "portable")]
 pub mod portable;
 
 #[cfg(any(target_arch = "wasm32", test))]

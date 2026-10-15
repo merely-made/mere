@@ -19,7 +19,10 @@ pub(crate) struct Selected {
     pub core: Option<std::sync::Arc<genet_render_host::RenderCore>>,
 }
 pub(crate) fn default_factory() -> WebGpuFactory {
-    Box::new(|canvas, w, h, options| Box::pin(WebSurface::boot(canvas, w, h, options)))
+    #[cfg(feature = "webgpu")]
+    return Box::new(|canvas, w, h, options| Box::pin(WebSurface::boot(canvas, w, h, options)));
+    #[cfg(not(feature = "webgpu"))]
+    Box::new(|_, _, _, _| Box::pin(async { Err("not compiled into this host".to_owned()) }))
 }
 pub(crate) async fn select(
     mut canvas: HtmlCanvasElement,
@@ -37,6 +40,12 @@ pub(crate) async fn select(
         canvas.set_width(w.max(1));
         canvas.set_height(h.max(1));
         match backend {
+            #[cfg(not(feature = "webgpu"))]
+            PresentationBackend::Wgpu => {
+                let _ = (&factory, options, wgpu_portable_scene);
+                failures.push("WebGPU: not compiled into this host".to_owned());
+            },
+            #[cfg(feature = "webgpu")]
             PresentationBackend::Wgpu => {
                 match factory(canvas.clone(), w.max(1), h.max(1), options()).await {
                     Ok(surface) => {
@@ -92,7 +101,7 @@ pub(crate) async fn select(
 }
 /// The WebGPU route presents the same flattened portable scene as WebGL2, so
 /// producer scenes draw in the page pass with no resampled intermediate.
-#[cfg(feature = "webgl")]
+#[cfg(all(feature = "webgpu", feature = "portable"))]
 fn portable_wgpu(
     driver: cambium_rootstock::WgpuDriver,
 ) -> Result<cambium_rootstock::WgpuDriver, String> {
@@ -109,7 +118,7 @@ fn portable_wgpu(
         })),
     )
 }
-#[cfg(not(feature = "webgl"))]
+#[cfg(all(feature = "webgpu", not(feature = "portable")))]
 fn portable_wgpu(
     _: cambium_rootstock::WgpuDriver,
 ) -> Result<cambium_rootstock::WgpuDriver, String> {
