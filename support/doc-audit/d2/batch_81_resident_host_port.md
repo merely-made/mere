@@ -10,7 +10,7 @@ design against Mere main `90ce8f12` and the tag `archive/resident-current-main-2
 ## mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md
 
 - disposition: current
-- status line: "Restored onto main for the port ... no code has been ported" - accurate: yes
+- status line: "Restored onto main for the port ... F1 and F2 are ruled" - accurate: yes
 - claims checked: 24 - holds: 24, stale: 0, unverifiable: 0
 
 ### Stale claims

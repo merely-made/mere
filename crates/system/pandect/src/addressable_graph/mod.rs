@@ -90,6 +90,18 @@ impl<B: Backend> AddressableGraphStore<B> {
             .put(&self.key("policy"), &encode(&policy)?)
             .await
     }
+    /// The write that sets `policy`, for a caller that stages it with other
+    /// writes (for example the host's settings) in one batch.
+    pub fn policy_write(&self, policy: ResidencyPolicy) -> Result<muniment::WriteOp, StoreError> {
+        Ok(muniment::WriteOp::Put {
+            key: self.key("policy"),
+            value: encode(&policy)?,
+        })
+    }
+    /// Whether any publication exists to open a reader on.
+    pub async fn is_published(&self) -> Result<bool, StoreError> {
+        Ok(self.backend.get(&self.key("head")).await?.is_some())
+    }
     pub async fn open(self, roots: ResidencyRoots) -> Result<ResidentGraph<B>, StoreError> {
         let policy = match self.backend.get(&self.key("policy")).await? {
             Some(bytes) => decode(&bytes)?,

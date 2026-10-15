@@ -8,6 +8,15 @@
 use super::*;
 use crate::addressable_graph::{AddressableGraphStore, ResidencyRoots, ResidentGraph};
 impl<B: Backend + Clone> GraphSession<B> {
+    /// The addressable store of this session's root graph, for a host that
+    /// stages its own settings writes beside the policy.
+    pub fn resident_store(&self) -> AddressableGraphStore<B> {
+        AddressableGraphStore::new(
+            self.slots.backend().clone(),
+            *self.manifest.root_graph_id.as_uuid(),
+        )
+    }
+
     /// The addressable publication of this session's graph, prepared without
     /// storage. The same qualification and completeness rules as
     /// [`publish_resident_checkpoint`](Self::publish_resident_checkpoint).
