@@ -19,7 +19,7 @@ personal-sync = []
 # it on through the dev-dependency on this package below; release builds keep
 # the prompt only.
 passphrase-fd = []
-custody-receipt-host = ["graphshell/mere-route"]
+custody-receipt-host = []
 # The Distillery trainer resource, composed into the works lane
 # (`src/resident_distillery.rs`). Gated because it pulls the burn stack into
 # the desktop resident: a default build must stay light, and a lane whose
@@ -76,6 +76,8 @@ incipit.workspace = true
 distillery.workspace = true
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
 graphshell-endpoint.workspace = true
+# The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
+mere-overmap.workspace = true
 knot-editor.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from
 # graphshell with the keeper adapters (dramatis repo plan, D15).
@@ -229,9 +231,10 @@ insigne = { workspace = true, features = ["verify"] }
 # `src/resident_distillery.rs` speaks only `muniment::RedbBackend` and
 # distillery's own re-exported trainer vocabulary.
 eidetic.workspace = true
-# The route adapter's test in `resident_mere`: graphshell's `mere_route`, the
+# The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
-graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "mere-route"] }
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint.workspace = true
 kernel.workspace = true
 pollster = "0.4"
