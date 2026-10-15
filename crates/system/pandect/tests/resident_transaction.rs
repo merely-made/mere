@@ -283,3 +283,80 @@ fn undo_and_redo_publish_with_the_history_they_move() {
         assert_eq!(session.graph().node_count(), 1);
     });
 }
+
+fn pin(surface: Uuid, digest: &str) -> pandect::live_graph::ObservedCommand {
+    use pandect::addressable_graph::GraphAddress;
+    use pandect::live_graph::{LiveCheck, LiveCommand, ObservedCommand};
+    ObservedCommand {
+        command: LiveCommand::SetPinned {
+            surface,
+            pinned: true,
+        },
+        checks: vec![LiveCheck::RecordUnchanged {
+            address: GraphAddress::Surface(surface),
+            digest: digest.into(),
+        }],
+    }
+}
+
+#[test]
+fn a_live_edit_is_observed_published_and_refused_whole_on_any_fault() {
+    pollster::block_on(async {
+        let backend = FaultBackend::new();
+        let (mut session, sessions) = durable(&backend).await;
+        let id = Uuid::from_u128(5);
+        session
+            .transact_deltas_published(author(), add(5), SystemTime::UNIX_EPOCH)
+            .await
+            .unwrap();
+        // The observation is read from the published reader, as a display would.
+        let view = sessions
+            .open_resident_graph(session.id(), ResidencyRoots::default())
+            .await
+            .unwrap();
+        let digest = view
+            .record_digest(pandect::addressable_graph::GraphAddress::Surface(id))
+            .unwrap()
+            .to_string();
+        let before = bytes(&backend.inner).await;
+        // A stale observation is refused before any write.
+        let stale = session
+            .transact_live(author(), vec![pin(id, "not-the-record")], SystemTime::UNIX_EPOCH)
+            .await
+            .unwrap_err();
+        assert!(matches!(stale, pandect::live_graph::LiveEditError::Stale(_)), "{stale:?}");
+        // A storage refusal leaves the session, history and storage alone.
+        backend.set(REFUSE);
+        let cursor = session.journal().live_cursor();
+        assert!(
+            session
+                .transact_live(author(), vec![pin(id, &digest)], SystemTime::UNIX_EPOCH)
+                .await
+                .is_err()
+        );
+        assert_eq!(bytes(&backend.inner).await, before);
+        assert_eq!(session.journal().live_cursor(), cursor);
+        let key = session.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(session.graph().node_is_pinned(key), Some(false));
+        // The same observation, once storage accepts, applies and publishes.
+        backend.set(NORMAL);
+        let (live, generation) = session
+            .transact_live(author(), vec![pin(id, &digest)], SystemTime::UNIX_EPOCH)
+            .await
+            .unwrap();
+        assert!(live.applied.end > live.applied.first);
+        let key = session.graph().get_node_key_by_id(id).unwrap();
+        assert_eq!(session.graph().node_is_pinned(key), Some(true));
+        let view = sessions
+            .open_resident_graph(session.id(), ResidencyRoots::default())
+            .await
+            .unwrap();
+        assert_eq!(view.generation(), generation);
+        // The observation is spent: the record changed, so it cannot be replayed.
+        let replay = session
+            .transact_live(author(), vec![pin(id, &digest)], SystemTime::UNIX_EPOCH)
+            .await
+            .unwrap_err();
+        assert!(matches!(replay, pandect::live_graph::LiveEditError::Stale(_)), "{replay:?}");
+    });
+}
