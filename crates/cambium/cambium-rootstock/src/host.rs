@@ -1080,7 +1080,7 @@ impl Drop for HostDisposal {
         let fragments = std::mem::take(&mut self.fragments);
         if let Some(core) = &self.core {
             for &(id, _) in fragments.values() {
-                let _ = core.renderer().remove_fragment(id);
+                crate::retire_fragment(core, id);
             }
         }
         drop(fragments);

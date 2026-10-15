@@ -91,7 +91,7 @@ pub fn start_frame_readback(
     if let Some(loss) = surface.core().loss_notice() {
         return Err(format!("capture refused: DeviceLost({loss:?})"));
     }
-    let target = capture_target(surface, view, width, height);
+    let target = capture_target(surface, view, width, height)?;
     surface.core().start_rgba8_readback(&target, width, height)
 }
 
@@ -105,7 +105,9 @@ pub fn read_frame(
     width: u32,
     height: u32,
 ) -> Option<Frame> {
-    let target = capture_target(surface, view, width, height);
+    let target = capture_target(surface, view, width, height)
+        .map_err(|error| eprintln!("[cambium-host] {error}"))
+        .ok()?;
     surface
         .core()
         .read_rgba8_texture(&target, width, height)
@@ -118,7 +120,7 @@ fn capture_target(
     view: &wgpu::TextureView,
     width: u32,
     height: u32,
-) -> wgpu::Texture {
+) -> Result<wgpu::Texture, String> {
     let target = surface.device().create_texture(&wgpu::TextureDescriptor {
         label: Some("cambium host frame capture"),
         size: wgpu::Extent3d {
@@ -134,13 +136,16 @@ fn capture_target(
         view_formats: &[],
     });
     let target_view = target.create_view(&wgpu::TextureViewDescriptor::default());
-    surface.renderer().compose_external_texture(
-        view,
-        &target_view,
-        wgpu::TextureFormat::Rgba8Unorm,
-        width,
-        height,
-        ExternalTexturePlacement::new([0.0, 0.0, width as f32, height as f32]),
-    );
-    target
+    surface
+        .try_renderer()
+        .map_err(|failure| format!("capture refused: {failure}"))?
+        .compose_external_texture(
+            view,
+            &target_view,
+            wgpu::TextureFormat::Rgba8Unorm,
+            width,
+            height,
+            ExternalTexturePlacement::new([0.0, 0.0, width as f32, height as f32]),
+        );
+    Ok(target)
 }

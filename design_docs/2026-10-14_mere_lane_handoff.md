@@ -60,7 +60,12 @@ against 3,407,872 (pre-merge main was 3,394,183). Attribution in
 shows the removable duplication sits in suppliers (Genet layout's second Taffy
 instantiation, about −113 KB; per-pen outline instantiations in Netrender and
 the Vello fork, about −56 KB) and still falls about 85 KB short; the remainder
-is the WebGL2 renderer. How far to take supplier changes is Mark's decision.
+is the WebGL2 renderer. Supplier de-generification then landed (Genet
+`e8b8606f5`, Vello fork `276b4664`, Netrender `5fbc7b2ba`): 3,523,495 with those
+changes alone, 3,620,876 at Genet main, which also carries about 97 KB of other
+work. Mark chose to split the viewer into WebGPU-only and WebGL2-only artifacts;
+estimates put each under the cap, but only with feature gating that makes the
+other route's code statically unreachable (see the plan's 2026-10-15 entry).
 Human assistive-technology and asynchronous browser WebGPU device replacement
 remain separate gates.
 

@@ -467,10 +467,10 @@ where
         runner.remove_projection(id);
         router.forget(id);
         let dom = self.dom.borrow();
-        let renderer = self.shared.render_core.as_ref().map(|core| core.renderer());
+        let core = self.shared.render_core.clone();
         self.shared.producers.retire_orphans(
             |node| crate::window_dom::ancestor_or_self(&dom, node, dom.document()),
-            renderer,
+            core.as_deref(),
         );
         drop(dom);
         self.windows.get_mut(id.0).and_then(Option::take)

@@ -84,15 +84,21 @@ impl<'a> WgpuPresentation<'a> {
         // disappear in this host even though the paint list is correct.
         let phase = crate::Instant::now();
         trace!("shadows-begin", "");
-        for mask in box_shadow_masks {
-            surface.renderer().build_box_shadow_mask(
-                mask.key,
-                mask.dim,
-                mask.bounds,
-                mask.corner_radius,
-                mask.blur_radius_px,
-                mask.invert,
-            );
+        if !box_shadow_masks.is_empty() {
+            // One renderer access for the masks, released before rasterizing.
+            let renderer = surface
+                .try_renderer()
+                .map_err(|failure| self.failure(packet, refused(failure)))?;
+            for mask in box_shadow_masks {
+                renderer.build_box_shadow_mask(
+                    mask.key,
+                    mask.dim,
+                    mask.bounds,
+                    mask.corner_radius,
+                    mask.blur_radius_px,
+                    mask.invert,
+                );
+            }
         }
         profile.shadows_us = elapsed_us(phase.elapsed());
         trace!("shadows-end", "");
@@ -123,18 +129,18 @@ impl<'a> WgpuPresentation<'a> {
         };
         trace!("raster-end", "");
         profile.raster_us = elapsed_us(phase.elapsed());
-        if let Some(timings) = surface.renderer().last_frame_timings() {
-            let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();
-            profile.raster_total_us = elapsed_us(timings.total);
-            profile.tile_invalidate_us = span("tile_invalidate");
-            profile.dirty_tile_rebuild_us = span("dirty_tile_rebuild");
-            profile.master_compose_us = span("master_compose");
-            profile.vello_render_us = span("vello_render");
+        // Timing is observation only; a refused access leaves it unrecorded.
+        if let Ok(renderer) = surface.try_renderer() {
+            if let Some(timings) = renderer.last_frame_timings() {
+                let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();
+                profile.raster_total_us = elapsed_us(timings.total);
+                profile.tile_invalidate_us = span("tile_invalidate");
+                profile.dirty_tile_rebuild_us = span("dirty_tile_rebuild");
+                profile.master_compose_us = span("master_compose");
+                profile.vello_render_us = span("vello_render");
+            }
+            profile.dirty_tiles = renderer.vello_last_dirty_count().unwrap_or_default() as u64;
         }
-        profile.dirty_tiles = surface
-            .renderer()
-            .vello_last_dirty_count()
-            .unwrap_or_default() as u64;
         let phase = crate::Instant::now();
         trace!("acquire-begin", "");
         let frame = match surface.acquire_status() {
@@ -194,14 +200,24 @@ impl<'a> WgpuPresentation<'a> {
         surface.queue().submit([encoder.finish()]);
         profile.clear_us = elapsed_us(phase.elapsed());
         let phase = crate::Instant::now();
-        surface.renderer().compose_external_texture(
-            &view,
-            &target,
-            surface.format(),
-            pw,
-            ph,
-            ExternalTexturePlacement::new([0.0, 0.0, pw as f32, ph as f32]),
-        );
+        match surface.try_renderer() {
+            Ok(renderer) => renderer.compose_external_texture(
+                &view,
+                &target,
+                surface.format(),
+                pw,
+                ph,
+                ExternalTexturePlacement::new([0.0, 0.0, pw as f32, ph as f32]),
+            ),
+            Err(failure) => {
+                trace!("compose-refused", "{failure}");
+                drop(frame);
+                drop(target);
+                drop(view);
+                drop(_tex);
+                return Err(self.failure(packet, refused(failure)));
+            },
+        }
         trace!("compose-end", "");
         profile.compose_us = elapsed_us(phase.elapsed());
         if let Some(loss) = surface.core().device_failure() {
@@ -222,5 +238,15 @@ impl<'a> WgpuPresentation<'a> {
             _texture: _tex,
             view,
         }))
+    }
+}
+
+/// A refused renderer access keeps device loss distinct from other refusals.
+fn refused(failure: genet_render_host::RasterizeFailure) -> NativePresentationFailure {
+    match failure {
+        genet_render_host::RasterizeFailure::DeviceLost(loss) => {
+            NativePresentationFailure::DeviceLost(loss)
+        },
+        failure => NativePresentationFailure::Rasterize(failure),
     }
 }
