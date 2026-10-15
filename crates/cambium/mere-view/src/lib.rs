@@ -42,8 +42,9 @@ mod tests;
 
 pub use layout::{DEFAULT_LAYOUT, lay_out};
 pub use model::{
-    ArchiveEntry, ArchiveModel, GraphModel, HostAction, MereViewModel, NodeEntry, NodeState,
-    Provenance, RelationEntry, SessionEntry, SessionPlacement, SessionStep, StatusNote, ViewStatus,
+    ArchiveEntry, ArchiveModel, GraphModel, HostAction, MereNodeKind, MereViewModel, NodeEntry,
+    NodeState, Provenance, RelationEntry, SessionEntry, SessionPlacement, SessionStep, StatusNote,
+    TierCard, ViewStatus,
 };
 pub use tier::{
     ARCHIVE_NODE_PREFIX, SAVED_FROM, SESSION_NODE_PREFIX, archive_node_key, session_node_key,

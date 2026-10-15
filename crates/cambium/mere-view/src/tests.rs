@@ -15,6 +15,7 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
 use uuid::Uuid;
 
 use super::*;
+use crate::tier::{MAX_ARCHIVE_NODES, ON_SHELF, SHELF_NODE_KEY, more_node_key};
 
 struct Host {
     model: MereViewModel,
@@ -47,7 +48,10 @@ fn render(host: &Host) -> MereViewElement<Host, ()> {
             width: host.width,
             height: host.height,
         },
-        |host: &mut Host, event| host.view.apply(event),
+        |host: &mut Host, event| {
+            host.view.apply(event);
+            host.view.lay_out(&host.model, host.width, host.height);
+        },
         |host: &mut Host, request| host.requests.push(request),
     )
 }
@@ -1047,9 +1051,8 @@ fn the_tier_puts_sessions_and_archives_on_the_canvas_one_level_up() {
         // Sessions and archives are canvas nodes in the tier; the graph's own
         // nodes are laid out below it.
         let swatch = view.swatch();
-        for (id, (_, y)) in swatch.projected_positions() {
-            let in_tier =
-                id.starts_with(SESSION_NODE_PREFIX) || id.starts_with(ARCHIVE_NODE_PREFIX);
+        for (node, (id, (_, y))) in swatch.graph.nodes.iter().zip(swatch.projected_positions()) {
+            let in_tier = !matches!(node.kind, MereNodeKind::Graph(_));
             if in_tier {
                 assert!(y < tier, "{id} sits in the tier");
             } else {
@@ -1122,7 +1125,10 @@ fn a_session_node_opens_in_place_into_its_card_one_at_a_time() {
     let morning = session_node_key(session_id(1));
     let node = find(&dom.borrow(), root, "data-key", &morning).unwrap();
     runner.dispatch_click(node, PointerClick::at((1., 1.)));
-    assert_eq!(runner.state().view.expanded, Some(session_id(1)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(1)))
+    );
     assert!(
         runner.state().requests.is_empty(),
         "opening a card asks nothing of the host"
@@ -1197,7 +1203,10 @@ fn a_session_node_opens_in_place_into_its_card_one_at_a_time() {
     )
     .unwrap();
     runner.dispatch_click(evening, PointerClick::at((1., 1.)));
-    assert_eq!(runner.state().view.expanded, Some(session_id(2)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(2)))
+    );
     assert_eq!(count(&dom.borrow(), root, "data-container", "session"), 1);
     assert!(find(&dom.borrow(), root, "aria-label", "Session Evening reading").is_some());
 
@@ -1366,7 +1375,10 @@ fn an_archive_node_peeks_on_hover_and_pins_a_popover_on_click() {
 #[test]
 fn a_card_or_popover_closes_when_its_session_or_archive_is_gone() {
     let mut host = Host::new(tier_model(), 900, 600);
-    host.view.apply(MereViewEvent::Expand(Some(session_id(2))));
+    host.view
+        .apply(MereViewEvent::Expand(Some(TierCard::Session(session_id(
+            2,
+        )))));
     host.view.apply(MereViewEvent::ArchivePopover(
         "composed".into(),
         cambium::DetailPopoverEvent::TogglePinned,
@@ -1390,4 +1402,227 @@ fn a_card_or_popover_closes_when_its_session_or_archive_is_gone() {
     let host = Host::new(bare, 900, 600);
     assert_eq!(tier_view(&host).tier_height(), 0);
     assert_eq!(tier_view(&host).graph_size(), (900, 560));
+}
+
+#[test]
+fn every_node_has_a_kind_the_host_colours_by() {
+    let host = Host::new(tier_model(), 900, 600);
+    let swatch = tier_view(&host).swatch();
+    let kind = |key: &str| {
+        swatch
+            .graph
+            .nodes
+            .iter()
+            .find(|node| node.id == key)
+            .map(|node| node.kind)
+    };
+    assert_eq!(kind("b"), Some(MereNodeKind::Graph(NodeState::Unavailable)));
+    assert_eq!(
+        kind(&session_node_key(session_id(1))),
+        Some(MereNodeKind::Session {
+            attached: true,
+            trashed: false
+        })
+    );
+    assert_eq!(
+        kind(&archive_node_key("saved")),
+        Some(MereNodeKind::Archive { held: true })
+    );
+    assert_eq!(
+        kind(&archive_node_key("composed")),
+        Some(MereNodeKind::Archive { held: false })
+    );
+    assert_eq!(kind(SHELF_NODE_KEY), Some(MereNodeKind::Shelf));
+    // A palette that knows only graph states still reads a tier node.
+    assert_eq!(
+        MereNodeKind::Session {
+            attached: true,
+            trashed: false
+        }
+        .state(),
+        NodeState::Open
+    );
+    // The palette sees each kind, and every target says its kind.
+    let seen = RefCell::new(Vec::new());
+    tier_view(&host).paint_leaf(|kind| {
+        seen.borrow_mut().push(kind.token());
+        sprigging::ColorF {
+            r: 0.,
+            g: 0.,
+            b: 0.,
+            a: 1.,
+        }
+    });
+    for token in ["graph", "session", "archive", "shelf"] {
+        assert!(seen.borrow().contains(&token), "the palette sees {token}");
+    }
+    let (dom, runner) = runner(host);
+    let dom = dom.borrow();
+    let shelf = find(&dom, runner.root(), "data-key", SHELF_NODE_KEY).unwrap();
+    assert_eq!(attr(&dom, shelf, "data-node-kind"), Some("shelf"));
+    let alpha = find(&dom, runner.root(), "data-key", "a").unwrap();
+    assert_eq!(attr(&dom, alpha, "data-node-kind"), Some("graph"));
+}
+
+#[test]
+fn loose_archives_hang_off_the_shelf_which_opens_into_its_card() {
+    let (dom, mut runner) = runner(Host::new(tier_model(), 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let shelf = find(&dom, root, "data-key", SHELF_NODE_KEY).expect("a shelf node");
+        assert_eq!(attr(&dom, shelf, "aria-label"), Some("Archive"));
+        for loose in ["composed", "forgotten"] {
+            let route = find(
+                &dom,
+                root,
+                "data-relation-id",
+                &format!("{ON_SHELF}:{loose}"),
+            )
+            .expect("a loose archive joins the shelf");
+            assert_eq!(attr(&dom, route, "data-kind"), Some(ON_SHELF));
+        }
+        assert!(find(&dom, root, "data-relation-id", "on-shelf:saved").is_none());
+        // New session and Compose are the tier's own controls.
+        let mut controls = Vec::new();
+        find_all(&dom, root, "class", &mut controls);
+        let tier_controls = controls
+            .into_iter()
+            .find(|node| attr(&dom, *node, "class") == Some("mere-view-tier-controls"))
+            .expect("the tier's controls");
+        assert!(find(&dom, tier_controls, "data-request", "mint").is_some());
+        assert!(find(&dom, tier_controls, "data-request", "compose-archives").is_some());
+    }
+    let shelf = find(&dom.borrow(), root, "data-key", SHELF_NODE_KEY).unwrap();
+    runner.dispatch_click(shelf, PointerClick::at((1., 1.)));
+    assert_eq!(runner.state().view.expanded, Some(TierCard::Shelf));
+    let dom = dom.borrow();
+    let card = find(&dom, root, "data-container", "shelf").expect("the shelf's card");
+    assert_eq!(attr(&dom, card, "aria-label"), Some("Archive"));
+    assert!(find(&dom, card, "data-request", "compose-archives").is_some());
+    assert!(find(&dom, card, "data-archive-chip", "composed").is_some());
+    assert!(find(&dom, card, "data-archive-chip", "forgotten").is_some());
+    assert!(find(&dom, card, "data-archive-chip", "saved").is_none());
+}
+
+#[test]
+fn an_open_card_grows_the_tier_and_the_graph_is_laid_out_again_below_it() {
+    let (dom, mut runner) = runner(Host::new(tier_model(), 900, 600));
+    let root = runner.root();
+    let (rest, laid_before) = {
+        let host = runner.state();
+        (tier_view(host).tier_height(), host.view.position("a"))
+    };
+    let morning = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &session_node_key(session_id(1)),
+    )
+    .unwrap();
+    runner.dispatch_click(morning, PointerClick::at((1., 1.)));
+    let host = runner.state();
+    let view = tier_view(host);
+    let open = view.tier_height();
+    assert!(
+        open > rest,
+        "the tier grows to hold the card: {rest} to {open}"
+    );
+    assert_ne!(
+        host.view.position("a"),
+        laid_before,
+        "the graph is laid out again in the smaller area"
+    );
+    let swatch = view.swatch();
+    let card = swatch
+        .projected_node_footprint(&session_node_key(session_id(1)))
+        .unwrap();
+    assert!(
+        card.top + card.height <= open as f32,
+        "the card sits in the tier"
+    );
+    for (node, (id, (_, y))) in swatch.graph.nodes.iter().zip(swatch.projected_positions()) {
+        if matches!(node.kind, MereNodeKind::Graph(_)) {
+            assert!(y > open as f32, "{id} sits below the grown tier");
+        } else {
+            assert!(y < open as f32, "{id} sits in the grown tier");
+        }
+    }
+    // Closing it lets the tier rest again.
+    runner.update(|host| {
+        host.view.apply(MereViewEvent::Expand(None));
+        host.view.lay_out(&host.model, host.width, host.height);
+    });
+    assert_eq!(tier_view(runner.state()).tier_height(), rest);
+    assert_eq!(runner.state().view.position("a"), laid_before);
+}
+
+#[test]
+fn past_a_few_archives_a_session_shows_one_more_node_that_opens_its_card() {
+    let mut model = tier_model();
+    let archive = model.archive.as_mut().unwrap();
+    for n in 0..4 {
+        archive.entries.push(ArchiveEntry {
+            key: format!("evening-{n}"),
+            name: format!("Codicil blake3:e{n}"),
+            detail: "Read-only archive".into(),
+            can_open: true,
+            session: Some(session_id(2)),
+        });
+    }
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    let more_key = more_node_key(TierCard::Session(session_id(2)));
+    {
+        let dom = dom.borrow();
+        let more = find(&dom, root, "data-key", &more_key).expect("one +N node");
+        assert_eq!(
+            attr(&dom, more, "aria-label"),
+            Some("+4 archives of Session Evening reading")
+        );
+        assert_eq!(attr(&dom, more, "data-count"), Some("4"));
+        assert!(
+            find(&dom, root, "data-key", &archive_node_key("evening-0")).is_none(),
+            "the four collapse into it"
+        );
+        assert!(
+            find(
+                &dom,
+                root,
+                "data-relation-id",
+                "saved-from:more:00000000-0000-0000-0000-000000000002"
+            )
+            .is_some()
+        );
+        // Morning's single archive still shows as its own node.
+        assert!(find(&dom, root, "data-key", &archive_node_key("saved")).is_some());
+    }
+    assert!(MAX_ARCHIVE_NODES < 4);
+    let more = find(&dom.borrow(), root, "data-key", &more_key).unwrap();
+    runner.dispatch_click(more, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(2)))
+    );
+    // A +N node only opens: a second press keeps the card open.
+    let more = find(&dom.borrow(), root, "data-key", &more_key).unwrap();
+    runner.dispatch_click(more, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(2)))
+    );
+    // The card's chips stand in for the collapsed nodes: one pins its popover
+    // beside the chip, and Escape hands focus back to the chip.
+    let chip = find(&dom.borrow(), root, "data-archive-chip", "evening-2").unwrap();
+    runner.dispatch_click(chip, PointerClick::at((1., 1.)));
+    let open = {
+        let dom = dom.borrow();
+        let dialog = find(&dom, root, "role", "dialog").expect("the chip pins a popover");
+        assert_eq!(attr(&dom, dialog, "aria-label"), Some("Codicil blake3:e2"));
+        find(&dom, dialog, "data-step", "open-archive").unwrap()
+    };
+    runner.set_focus(Some(open));
+    runner.dispatch_key(escape());
+    let chip = find(&dom.borrow(), root, "data-archive-chip", "evening-2").unwrap();
+    assert_eq!(runner.focus(), Some(chip));
 }
