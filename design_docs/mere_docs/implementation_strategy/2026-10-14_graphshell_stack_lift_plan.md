@@ -975,3 +975,28 @@ fast-forward of local main; nothing built).**
   the same bits on every target, and one table replaces the two. Against the
   platform maths, 71 of 500 Spiral positions and 8 of 500 Radial ones move,
   by at most two ulps (0.0002 px).
+- **2026-10-15 (P2, Mark's rulings: the wheel reaches graph_canvas consumers;
+  touch is deferred):**
+  - `cambium::graph_canvas` turned a wheel notch into
+    `GraphCanvasEvent::Zoom { factor: 1.2 or 1/1.2 }`, which drops the
+    pointer position, the pixel delta, the second axis and the modifiers, so no
+    graph-canvas host could apply `wheel_use` or the anchored `wheel_zoom`.
+    `graph_canvas_with_wheel` and `GraphCanvasInput` (`Event(GraphCanvasEvent)`
+    or `Wheel(WheelEvent)`) now carry the whole notch to a consumer that opts
+    in; the consumer calls `WheelEvent::prevent_default` when its policy takes
+    the notch, and a notch it does not take scrolls the host as before. It is a
+    separate type, as `GraphAtlasEvent` is, because Knot's recipe scene and
+    Woodshed's stage match `GraphCanvasEvent` exhaustively, so a new variant (or
+    new fields on `Zoom`) would have broken both. `graph_canvas` itself is
+    unchanged in behavior: a fixed zoom factor, the host scroll default
+    suppressed, a zero notch ignored; both entry points share one private core.
+    Two new tests (the opt-in sees both axes, `local`, `size` and the modifiers
+    and decides the default; the established zoom is unchanged); cambium lib 271
+    passed; `mere-view`, `graphshell` and `cambium-genet-winit-host` build;
+    `graphshell-web` checks for wasm32.
+  - **Touch is blocked on host input.** Neither Cambium nor the Genet desktop
+    host delivers touch or multi-finger events, so `touch_use` and `two_finger`
+    have no native input in Woodshed. Mark chose to defer touch rather than wire
+    it to synthetic events. The helpers stay generic and tested; the receipt for
+    them waits for host touch input.
+
