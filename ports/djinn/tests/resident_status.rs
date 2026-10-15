@@ -22,14 +22,15 @@ use djinn::resident_status::{
     ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal,
     SyncStatusV1, default_endpoints_taken,
 };
-use graphshell::identity::VaultProtectionView;
-use graphshell::native::app_admission::{
+use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
+use graphshell::native::device_broker::default_device_endpoint;
+use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
+use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, default_app_endpoint,
 };
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
-use graphshell::native::device_broker::default_device_endpoint;
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::identity::VaultProtectionView;
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 

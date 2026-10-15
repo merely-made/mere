@@ -98,7 +98,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn pending(error: graphshell::native::custody_client::CustodyClientError) -> Box<dyn Error> {
+fn pending(error: graphshell_endpoint::door::custody_client::CustodyClientError) -> Box<dyn Error> {
     match error.is_pending() {
         true => format!("the Signalman authority is pending: {error}").into(),
         false => error.into(),

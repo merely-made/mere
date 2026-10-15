@@ -11,7 +11,14 @@
 //! and `network` (NDJSON over any async byte stream, bringing Tokio). They were
 //! separate crates until 2026-09-24. With no feature on, the crate stays
 //! wasm-clean.
+//!
+//! The `door` feature is the application side of the first-party door
+//! ([`door`]): admission, the client, custody, quarantine and the local
+//! endpoint, native only. It was Graphshell's `native` app-facing half until
+//! 2026-10-15.
 
+#[cfg(all(feature = "door", not(target_arch = "wasm32")))]
+pub mod door;
 #[cfg(feature = "local")]
 pub mod local;
 #[cfg(feature = "network")]

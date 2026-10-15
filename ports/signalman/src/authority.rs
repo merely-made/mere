@@ -15,9 +15,11 @@
 use std::io;
 use std::sync::Arc;
 
-use graphshell::native::app_admission::{AppId, configured_app_endpoint};
-use graphshell::native::custody::{CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest};
-use graphshell::native::custody_client::{BlockingCustodyClient, CustodyClientError};
+use graphshell_endpoint::door::app_admission::{AppId, configured_app_endpoint};
+use graphshell_endpoint::door::custody::{
+    CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest,
+};
+use graphshell_endpoint::door::custody_client::{BlockingCustodyClient, CustodyClientError};
 use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
 use pandect::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::RetainedKeys;

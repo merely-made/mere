@@ -75,7 +75,9 @@ incipit.workspace = true
 # resident, and `trainer` pulls it deliberately and by the owner's request.
 distillery.workspace = true
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
-graphshell-endpoint.workspace = true
+# The application side of the first-party door: admission, the app client,
+# custody, quarantine, tasks and the identity views (stack lift plan, L1).
+graphshell-endpoint = { workspace = true, features = ["door"] }
 # The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
 mere-overmap.workspace = true
 knot-editor.workspace = true

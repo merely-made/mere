@@ -40,9 +40,9 @@ use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::lifecycle::AdmittedEndpointContext;
 use graphshell::mere_host::{MereHost, SelectedPersonaRef};
-use graphshell::native::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
 use graphshell::native::app_broker::AppEndpointCatalog;
-use graphshell::native::endpoint_catalog::ResidentEndpointRoute;
+use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
@@ -1492,8 +1492,8 @@ impl ProjectionNoticeSource for MereEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell::native::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
+    use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     use mere_overmap::route as mere_route;
     use mere_view::{MereViewModel, MereViewRequest, SessionStep};
@@ -2031,8 +2031,8 @@ mod tests {
         };
         use graphshell::native::{
             app_broker::serve_app_broker, resident_mere_proxy::ResidentMereProxy,
-            tasks::ResidentTasks,
         };
+        use graphshell_endpoint::door::tasks::ResidentTasks;
         use personae::{Ed25519Keypair, ProfileId};
         let fixture = fixture(33, "divination").await;
         fixture
@@ -2048,7 +2048,7 @@ mod tests {
                 ),
             ),
             None,
-            graphshell::identity::VaultProtectionView::Ephemeral,
+            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
         ));
         #[cfg(not(windows))]
         let address = format!("/tmp/c1px-{}.sock", Uuid::new_v4());
@@ -2074,7 +2074,7 @@ mod tests {
                 .await
         });
         for _ in 0..100 {
-            if graphshell::native::local_endpoint::connect_local(&address)
+            if graphshell_endpoint::door::local_endpoint::connect_local(&address)
                 .await
                 .is_ok()
             {
