@@ -1186,13 +1186,13 @@ pub use capture::{
     start_presentation_readback,
 };
 pub use host::{
-    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
+    HOST_WHEEL_LINE_PX, AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
     FrameProfile, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage, HostOptions,
     HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
     PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
-    StampedCaptureFn, StampedCaptureFrame, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
-    ladder_step,
+    StampedCaptureFn, StampedCaptureFrame, WindowFrame, WheelUnit, ZOOM_LADDER, env_size,
+    fit_zoom, ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;
