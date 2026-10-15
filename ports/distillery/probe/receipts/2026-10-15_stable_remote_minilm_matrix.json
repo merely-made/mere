@@ -1,0 +1,87 @@
+{
+  "schema": "distillery.remote-minilm-matrix/v1",
+  "process_timeout_seconds": 120,
+  "rows": [
+    {
+      "name": "local-plain",
+      "mode": "local",
+      "features": "plain",
+      "timed_out": false,
+      "exit_code": 0,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-plain.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-plain.stderr.txt",
+      "passes": true
+    },
+    {
+      "name": "local-fusion-autotune",
+      "mode": "local",
+      "features": "fusion-autotune",
+      "timed_out": false,
+      "exit_code": 0,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-fusion-autotune.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-fusion-autotune.stderr.txt",
+      "passes": true
+    },
+    {
+      "name": "remote-plain",
+      "mode": "remote",
+      "features": "plain",
+      "timed_out": false,
+      "exit_code": 0,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-plain.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-plain.stderr.txt",
+      "passes": true
+    },
+    {
+      "name": "remote-fusion-autotune",
+      "mode": "remote",
+      "features": "fusion-autotune",
+      "timed_out": false,
+      "exit_code": 1,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-fusion-autotune.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-fusion-autotune.stderr.txt",
+      "passes": false
+    },
+    {
+      "name": "local-autotune-only",
+      "mode": "local",
+      "features": "autotune",
+      "timed_out": false,
+      "exit_code": 0,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-autotune-only.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-autotune-only.stderr.txt",
+      "passes": true
+    },
+    {
+      "name": "remote-autotune-only",
+      "mode": "remote",
+      "features": "autotune",
+      "timed_out": false,
+      "exit_code": 1,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-autotune-only.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-autotune-only.stderr.txt",
+      "passes": false
+    },
+    {
+      "name": "local-fusion-only",
+      "mode": "local",
+      "features": "fusion",
+      "timed_out": false,
+      "exit_code": 0,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-fusion-only.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\local-fusion-only.stderr.txt",
+      "passes": true
+    },
+    {
+      "name": "remote-fusion-only",
+      "mode": "remote",
+      "features": "fusion",
+      "timed_out": false,
+      "exit_code": 0,
+      "stdout": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-fusion-only.stdout.json",
+      "stderr": "C:\\t\\m1-remote-minilm\\matrix-artifacts\\remote-fusion-only.stderr.txt",
+      "passes": true
+    }
+  ],
+  "passes": false
+}

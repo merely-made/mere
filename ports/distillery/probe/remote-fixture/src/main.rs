@@ -546,14 +546,22 @@ async fn run_remote(
     let server_key = server_provider
         .derive_keypair(MESH_AUTHOR_SALT)
         .map_err(|error| error.to_string())?;
+    // Each peer answers as its mesh author key, which the lease claim checks
+    // (vault lock plan, ruling 92).
+    let server_author = server_provider
+        .derived_keypair(MESH_AUTHOR_SALT)
+        .map_err(|error| error.to_string())?;
+    let poster_author = poster_provider
+        .derived_keypair(MESH_AUTHOR_SALT)
+        .map_err(|error| error.to_string())?;
     let server_transport = Arc::new(
-        P2pandaTransport::builder(server_provider.master_keypair())
+        P2pandaTransport::builder_for(&server_author)
             .gossip()
             .bind()
             .await
             .map_err(|error| error.to_string())?,
     );
-    let client_transport = P2pandaTransport::builder(poster_provider.master_keypair())
+    let client_transport = P2pandaTransport::builder_for(&poster_author)
         .bind()
         .await
         .map_err(|error| error.to_string())?;
