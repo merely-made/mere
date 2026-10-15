@@ -4,21 +4,22 @@
 
 //! The view: a labelled region holding a bar, the sessions and the graph.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use cambium::{
     AnyView, DetailPopoverEvent, DetailPopoverMode, DetailPopoverState, GenetCtx, GenetElement,
     GraphCanvas, GraphCanvasNode, GraphCanvasNodeDrag, GraphCanvasRelation, GraphCanvasSubgraph,
-    GraphCanvasSwatch, Keyed, PointerEvent, RelationLine, WheelEvent, button, el,
-    graph_canvas_swatch_with_focus_and_drag_and_relations,
+    GraphCanvasSwatch, KeyEvent, Keyed, PointerEvent, RelationLine, TextCommand, TextFieldMode,
+    TextInput, WheelEvent, button, caret_field_children, el,
+    graph_canvas_swatch_with_focus_and_drag_and_relations, on_key, text_command_from_key,
 };
 use incipit::SessionId;
 use sprigging::ColorF;
 
 use crate::layout::{DEFAULT_LAYOUT, SEPARATION, lay_out};
 use crate::model::{
-    ArchiveEntry, GraphModel, MereNodeKind, MereViewModel, Provenance, SessionEntry,
-    SessionPlacement, SessionStep, StatusNote, TierCard,
+    ArchiveEntry, GraphModel, MereNodeKind, MereViewModel, MergeConflictEntry, MergeModel,
+    MergeOption, Provenance, SessionEntry, SessionPlacement, SessionStep, StatusNote, TierCard,
 };
 use crate::tier::{
     ON_SHELF, SAVED_FROM, archive_node_key, archive_of_node, card_listed, card_node_key,
@@ -60,7 +61,7 @@ const OVERMAP_SHARE: f32 = 0.6;
 /// netrender `aba7d837`, a clipped box holding the self-clipping graph and the
 /// positioned notice blanked the whole frame.
 pub const MERE_VIEW_CSS: &str = "\
-    .mere-view { display: flex; flex-direction: column; overflow: hidden; } \
+    .mere-view { position: relative; display: flex; flex-direction: column; overflow: hidden; } \
     .mere-view-bar { display: flex; flex-wrap: nowrap; align-items: center; height: 40px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; box-sizing: border-box; flex-shrink: 0; } \
     .mere-view-title { flex-grow: 1; min-width: 0; margin: 0; font-size: 1em; overflow: hidden; text-overflow: ellipsis; } \
     .mere-view-actions, .mere-view-layouts { display: flex; flex-wrap: nowrap; flex-shrink: 0; } \
@@ -110,7 +111,16 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-popover-layer .mere-view-archive-name, .mere-view-popover-layer .mere-view-archive-from, .mere-view-popover-layer .mere-view-archive-detail { height: 20px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; } \
     .mere-view-popover-layer .mere-view-archive-name { font-weight: bold; } \
     .mere-view-popover-layer .mere-view-archive-steps { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 0 0; flex-shrink: 0; } \
-    .mere-view-popover-layer .mere-view-archive-steps > button { height: 30px; line-height: 28px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; flex-shrink: 0; }";
+    .mere-view-popover-layer .mere-view-archive-steps > button { height: 30px; line-height: 28px; margin: 0; padding-top: 0; padding-bottom: 0; box-sizing: border-box; flex-shrink: 0; } \
+    .mere-view-merge { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 5; display: flex; flex-direction: column; gap: 4px; padding: 8px; box-sizing: border-box; overflow-x: hidden; overflow-y: auto; border: 2px solid currentColor; border-radius: 10px; } \
+    .mere-view-merge > * { flex-shrink: 0; margin: 0; } \
+    .mere-view-merge-title { font-size: 1em; font-weight: bold; } \
+    .mere-view-merge-conflicts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; } \
+    .mere-view-merge-conflict { display: flex; flex-direction: column; gap: 2px; } \
+    .mere-view-merge-conflict > p { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } \
+    .mere-view-merge-part { font-weight: bold; } \
+    .mere-view-merge-choices, .mere-view-merge-actions { display: flex; flex-wrap: wrap; gap: 4px; } \
+    .mere-view-merge-hand { border: 1px solid currentColor; padding: 2px 4px; min-height: 24px; box-sizing: border-box; white-space: pre; overflow-x: auto; overflow-y: hidden; }";
 
 /// What the person asked for. The host carries it out or declines it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -120,10 +130,21 @@ pub enum MereViewRequest {
     Mint,
     Session(SessionId, SessionStep),
     Archive(ArchiveRequest),
+    /// A step on the pending merge.
+    Merge(MergeRequest),
     /// One of the host's actions, by its key.
     Host(String),
     /// Lay the graph out by this strategy id.
     Layout(String),
+}
+
+/// A step on the pending merge: a choice for one conflict, by its key, then
+/// Apply once every conflict has one, or Cancel.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum MergeRequest {
+    Choose(String, MergeOption),
+    Apply,
+    Cancel,
 }
 
 /// Explicit requests to the archive owner. Opening creates a read-only thaw;
@@ -148,6 +169,13 @@ pub enum MereViewEvent {
     /// An archive node's popover in the tier, by archive key: hovering peeks,
     /// activating pins, Escape or an outside click dismisses.
     ArchivePopover(String, DetailPopoverEvent),
+    /// An edit to a merge conflict's hand value, by conflict key. The draft
+    /// starts from `seed` the first time the conflict is edited.
+    MergeDraft {
+        key: String,
+        seed: String,
+        command: TextCommand,
+    },
 }
 
 /// The view's own state: hover, focus and the last layout. The host stores
@@ -170,6 +198,9 @@ pub struct MereViewState {
     /// The tier node a closed card or a dismissed popover hands keyboard
     /// focus back to. It clears once any node takes focus.
     pub focus_return: Option<String>,
+    /// The hand values being written for a pending merge's conflicts, by
+    /// conflict key. Presentation only until Edit by hand reports one.
+    pub merge_drafts: BTreeMap<String, TextInput>,
     laid: Laid,
 }
 
@@ -240,6 +271,12 @@ impl MereViewState {
                 self.archive_popover =
                     (popover.mode != DetailPopoverMode::Hidden).then_some((key, popover));
             },
+            MereViewEvent::MergeDraft { key, seed, command } => {
+                self.merge_drafts
+                    .entry(key)
+                    .or_insert_with(|| TextInput::new(seed))
+                    .apply(command);
+            },
             MereViewEvent::SelectArchive(key) => {
                 if self.selected_archives.contains(&key) {
                     self.selected_archives.retain(|selected| selected != &key);
@@ -290,6 +327,13 @@ impl MereViewState {
         {
             self.archive_popover = None;
         }
+        // A draft whose conflict is gone, or whose merge is, goes with it.
+        self.merge_drafts.retain(|key, _| {
+            model
+                .merge
+                .as_ref()
+                .is_some_and(|merge| merge.conflicts.iter().any(|conflict| &conflict.key == key))
+        });
         if model.hide_graph {
             // The host's editing surface owns the geometry in panel mode.
             return;
@@ -705,13 +749,17 @@ where
             "style",
             format!("width:{width}px;height:{}px", height + band),
         );
+    let merge: MereViewElement<State, Action> = match &model.merge {
+        Some(merge) => merge_card(&view, merge, on_change.clone(), on_request.clone()),
+        None => Box::new(el::<_, State, Action>("div", ()).attr("style", "display:none")),
+    };
     let body = el::<_, State, Action>(
         "div",
         (sessions(&view, on_change, on_request.clone()), main),
     )
     .attr("class", "mere-view-body");
     Box::new(
-        el::<_, State, Action>("section", (bar(&view, on_request), body))
+        el::<_, State, Action>("section", (bar(&view, on_request), body, merge))
             .attr("class", "mere-view")
             .attr(
                 "style",
@@ -1314,6 +1362,200 @@ where
         el::<_, State, Action>("div", (canvas, card, widgets))
             .attr("class", "mere-view-graph")
             .attr("data-tier", if tier { "shown" } else { "none" }),
+    )
+}
+
+/// The pending merge's card, over the view below its bar: each conflict with
+/// its three values, its choices and a hand value to write, then Apply and
+/// Cancel.
+fn merge_card<State, Action, Change, Request>(
+    view: &MereView<'_>,
+    merge: &MergeModel,
+    on_change: Change,
+    on_request: Request,
+) -> MereViewElement<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    Change: Fn(&mut State, MereViewEvent) + Clone + 'static,
+    Request: Fn(&mut State, MereViewRequest) + Clone + 'static,
+{
+    let top = if wide(view.width) {
+        BAR_HEIGHT
+    } else {
+        NARROW_BAR_HEIGHT
+    } + 8;
+    let title = el::<_, State, Action>(
+        "h2",
+        format!("Merge {} into {}", merge.source_name, merge.target_name),
+    )
+    .attr("class", "mere-view-merge-title");
+    let conflicts: Vec<MereViewElement<State, Action>> = merge
+        .conflicts
+        .iter()
+        .map(|conflict| merge_conflict(view, conflict, on_change.clone(), on_request.clone()))
+        .collect();
+    let list = el::<_, State, Action>("ul", conflicts)
+        .attr("class", "mere-view-merge-conflicts")
+        .attr("aria-label", "Conflicts");
+    let resolved = merge.resolved();
+    let apply: MereViewElement<State, Action> = if resolved {
+        request_button(
+            "Apply",
+            MereViewRequest::Merge(MergeRequest::Apply),
+            on_request.clone(),
+            vec![("aria-label", "Apply merge".to_string())],
+        )
+    } else {
+        Box::new(
+            button("Apply", |_: &mut State, _| {})
+                .attr("aria-label", "Apply merge")
+                .attr("aria-disabled", "true"),
+        )
+    };
+    let cancel = request_button(
+        "Cancel",
+        MereViewRequest::Merge(MergeRequest::Cancel),
+        on_request,
+        vec![("aria-label", "Cancel merge".to_string())],
+    );
+    let actions =
+        el::<_, State, Action>("div", (apply, cancel)).attr("class", "mere-view-merge-actions");
+    Box::new(
+        el::<_, State, Action>("section", (title, list, actions))
+            .attr("class", "mere-view-merge")
+            .attr("style", format!("top:{top}px"))
+            .attr("role", "group")
+            .attr(
+                "aria-label",
+                format!(
+                    "Pending merge: {} into {}",
+                    merge.source_name, merge.target_name
+                ),
+            )
+            .attr("data-resolved", resolved.to_string()),
+    )
+}
+
+/// One conflict: its part, its base, source and target values, its choices
+/// and the hand value field.
+fn merge_conflict<State, Action, Change, Request>(
+    view: &MereView<'_>,
+    conflict: &MergeConflictEntry,
+    on_change: Change,
+    on_request: Request,
+) -> MereViewElement<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    Change: Fn(&mut State, MereViewEvent) + Clone + 'static,
+    Request: Fn(&mut State, MereViewRequest) + Clone + 'static,
+{
+    let words = |value: &str| {
+        if value.is_empty() {
+            "absent".to_string()
+        } else {
+            value.to_string()
+        }
+    };
+    let seed = match &conflict.chosen {
+        Some(MergeOption::Hand(text)) => text.clone(),
+        _ => conflict.target.clone(),
+    };
+    let draft = view
+        .state
+        .merge_drafts
+        .get(&conflict.key)
+        .cloned()
+        .unwrap_or_else(|| TextInput::new(seed.clone()));
+    let label = &conflict.label;
+    let mut options = vec![
+        (
+            MergeOption::Source,
+            "Source",
+            format!("Take the source's {label}"),
+        ),
+        (
+            MergeOption::Target,
+            "Target",
+            format!("Keep the target's {label}"),
+        ),
+        (
+            MergeOption::Hand(draft.text().to_string()),
+            "Edit by hand",
+            format!("Use the hand value for {label}"),
+        ),
+    ];
+    if conflict.add_as_new {
+        options.push((
+            MergeOption::AddAsNew,
+            "Add as new",
+            format!("Add {label} as new"),
+        ));
+    }
+    let chosen = conflict.chosen.as_ref().map(MergeOption::token);
+    let choices: Vec<MereViewElement<State, Action>> = options
+        .into_iter()
+        .map(|(option, text, aria)| {
+            let pressed = chosen == Some(option.token());
+            request_button(
+                text,
+                MereViewRequest::Merge(MergeRequest::Choose(conflict.key.clone(), option.clone())),
+                on_request.clone(),
+                vec![
+                    ("aria-label", aria),
+                    ("aria-pressed", pressed.to_string()),
+                    ("data-choice", option.token().to_string()),
+                ],
+            )
+        })
+        .collect();
+    let key = conflict.key.clone();
+    let field = on_key(
+        el::<_, State, Action>("div", caret_field_children::<State, Action>(&draft, &[]))
+            .attr("class", "mere-view-merge-hand")
+            .attr("role", "textbox")
+            .attr("aria-label", format!("Hand value for {label}"))
+            .attr("data-cambium-text-value", draft.text().to_string()),
+        move |state: &mut State, event: KeyEvent| {
+            if let Some(command) = text_command_from_key(&event, TextFieldMode::SingleLine) {
+                on_change(
+                    state,
+                    MereViewEvent::MergeDraft {
+                        key: key.clone(),
+                        seed: seed.clone(),
+                        command,
+                    },
+                );
+            }
+        },
+    );
+    let line =
+        |class: &'static str, text: String| el::<_, State, Action>("p", text).attr("class", class);
+    Box::new(
+        el::<_, State, Action>(
+            "li",
+            (
+                line("mere-view-merge-part", label.clone()),
+                line(
+                    "mere-view-merge-base",
+                    format!("Base: {}", words(&conflict.base)),
+                ),
+                line(
+                    "mere-view-merge-source",
+                    format!("Source: {}", words(&conflict.source)),
+                ),
+                line(
+                    "mere-view-merge-target",
+                    format!("Target: {}", words(&conflict.target)),
+                ),
+                el::<_, State, Action>("div", choices).attr("class", "mere-view-merge-choices"),
+                field,
+            ),
+        )
+        .attr("class", "mere-view-merge-conflict")
+        .attr("data-key", conflict.key.clone())
+        .attr("data-chosen", chosen.unwrap_or("none")),
     )
 }
 

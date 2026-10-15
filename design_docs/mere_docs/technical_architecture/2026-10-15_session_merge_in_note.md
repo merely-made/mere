@@ -2,8 +2,8 @@
 
 Status: design note, 2026-10-15. Mark ruled M1–M8 the same day (see
 Rulings). The `picked_from` record (M2) is built (Mere `1cf67cf15`). The
-pandect core of merge-in is built (see [Built](#built-phase-1-pandect-core));
-the Djinn route and the mere-view cards are not.
+pandect core of merge-in is built (see [Built](#built-phase-1-pandect-core)),
+and so are the Djinn route and the mere-view cards (phase 2).
 
 ## Problem
 
@@ -254,6 +254,44 @@ the branch case with the thaw as parent, and needs nothing extra.
   facet's rule when it has one (properties, classifications, predicate
   declarations, legacy origins), and asks only if the rule itself refuses.
   Any other facet is compared whole.
+
+## Built (phase 2, the route and the view)
+
+2026-10-15.
+
+- **Wire** (`mere_overmap::wire`): `mere.sessions.branch` and
+  `mere.sessions.merge` on a session's card, with the `SessionsActionV1`
+  payload. A pending merge is its own card in the sessions projection,
+  source kind `mere.merge`, keyed by the source session. Its first media is
+  a `PendingMergeV1` (`mere.merge.pending/v1`): the two sessions with their
+  names, and each `MergeConflict`. The card offers `mere.merge.resolve` and
+  `mere.merge.cancel` with a `MergeResolutionV1` (`mere.merge/v1`): the
+  source and one `{ part, choice }` per conflict.
+- **Djinn** (`resident_mere`): every session card offers Branch. A branch
+  or picked-off part with nothing pending also offers Merge into source; its
+  target is the branch's parent, or the session that parent was merged into,
+  or the part's `picked_from`. A clean merge applies at once. One with
+  conflicts is held by the resident and shown as the card until it is
+  resolved or cancelled. A resolve missing a choice stays pending; any other
+  refusal drops the plan, and the person merges again. Undoing or redoing a
+  merge through the session item reloads the source's mark in any host
+  holding it open, and moves the sessions list. `MereHost` gained
+  `plan_merge`, `apply_merge` and `reload_merged_mark`.
+- **View** (`mere-view`): `SessionStep::Branch` ("Branch") and
+  `SessionStep::Merge` ("Merge into source") join the steps, so they render
+  wherever steps do. `MereViewModel::merge` is shown as a card over the view
+  below its bar. Each conflict lists its part, its base, source and target
+  values, and Source, Target, Edit by hand, and Add as new where it applies.
+  Each also has a hand-value field, a `TextInput` draft kept in
+  `MereViewState::merge_drafts` and fed by `MereViewEvent::MergeDraft`.
+  Apply is disabled until every conflict has a choice; Cancel is always
+  available. Requests are `MereViewRequest::Merge(MergeRequest::{Choose,
+  Apply, Cancel})`.
+- **Route adapter** (`mere_overmap::route`, `route_session`): reads the merge
+  card's media, words each part (`Title of One`, `Relations from A to B`),
+  keeps the choices made in the panel until Apply, and sends them as one
+  resolve. A hand value is sent as text where the conflict's values are
+  text, and as JSON otherwise.
 
 Mark's rulings on the first build's open points (2026-10-15): both extra
 choices; everything since the first pick; undo frees the source; derived ids

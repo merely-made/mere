@@ -49,10 +49,12 @@ use graphshell_endpoint::{
 use graphshell_host::lifecycle::AdmittedEndpointContext;
 use mere_overmap::wire::{
     self as session_item, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1,
-    ArchiveActionV1, COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH,
-    MERE_SESSIONS, MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT,
-    SAVE_CODICIL_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE, SessionsActionV1, SetViewV1, StepV1,
-    TRASH_SESSION_INTENT,
+    ArchiveActionV1, BRANCH_SESSION_INTENT, CANCEL_MERGE_INTENT, COMPOSE_CODICILS_INTENT,
+    FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS, MERGE_SCHEMA,
+    MERGE_SESSION_INTENT, MERGE_SOURCE, MINT_SESSION_INTENT, MergeResolutionV1,
+    OPEN_CODICIL_INTENT, PENDING_MERGE_SCHEMA, PendingMergeV1, RESOLVE_MERGE_INTENT,
+    RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE,
+    SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
 };
 use muniment::{DirectoryBackend, RedbBackend};
 use pandect::{
@@ -283,6 +285,7 @@ impl MereRoutes {
             hosts: Mutex::new(HashMap::new()),
             lifecycle: AtomicU64::new(1),
             codicil_sessions: Mutex::new(HashMap::new()),
+            pending_merges: Mutex::new(BTreeMap::new()),
         });
         let opened = Arc::clone(&shared);
         let ambient_opened = Arc::clone(&shared);
@@ -551,6 +554,8 @@ struct MereShared {
     /// The sessions each codicil was saved from, by codicil id. A codicil
     /// is immutable, so each is read once.
     codicil_sessions: Mutex<HashMap<String, Vec<SessionId>>>,
+    /// Merges waiting for a choice on each conflict, by source session.
+    pending_merges: Mutex<BTreeMap<uuid::Uuid, pandect::PendingMerge>>,
 }
 
 impl MereShared {
@@ -661,6 +666,44 @@ struct SessionsCard {
     label: String,
     bytes: Vec<u8>,
     actions: Vec<AdvertisedAction>,
+    /// The scene source kind, when not the projection's own.
+    kind: Option<&'static str>,
+    /// Media the card names, served beside it.
+    media: Vec<Vec<u8>>,
+}
+
+/// The session a branch or picked-off part merges into: a branch's parent,
+/// or the session its parent was merged into; a part's source. `None` for a
+/// fork, a minted session or one already merged.
+fn merge_target(
+    manifests: &[GraphSessionManifest],
+    manifest: &GraphSessionManifest,
+) -> Option<SessionId> {
+    if manifest.merged.is_some() || manifest.trashed.is_some() {
+        return None;
+    }
+    if let Some(picked) = &manifest.picked_from {
+        return Some(picked.session);
+    }
+    if manifest.lineage != pandect::Lineage::Branch {
+        return None;
+    }
+    let mut parent = manifest.parent_session?;
+    for _ in 0..manifests.len() {
+        let held = manifests.iter().find(|held| held.session_id == parent)?;
+        match &held.merged {
+            Some(mark) => parent = mark.into,
+            None => return Some(parent),
+        }
+    }
+    None
+}
+
+fn merge_action(intent: &str, label: &str, explanation: &str) -> AdvertisedAction {
+    AdvertisedAction {
+        payload_schema: MERGE_SCHEMA.to_string(),
+        ..lifecycle_action(intent, label, explanation)
+    }
 }
 
 fn lifecycle_action(intent: &str, label: &str, explanation: &str) -> AdvertisedAction {
@@ -746,6 +789,8 @@ impl MereEndpoint {
     fn session_cards(&self) -> Result<Vec<SessionsCard>, String> {
         let manifests: Vec<GraphSessionManifest> =
             run(self.shared.sessions().list()).map_err(|error| error.to_string())?;
+        let pending: BTreeMap<uuid::Uuid, pandect::PendingMerge> =
+            run(async { self.shared.pending_merges.lock().await.clone() });
         let mut cards = Vec::with_capacity(manifests.len() + 1);
         let mere = PortableCardV1 {
             title: self.shared.domain.clone(),
@@ -765,8 +810,10 @@ impl MereEndpoint {
                 "Mint a session",
                 "Begin a new, empty session in this mere.",
             )],
+            kind: None,
+            media: Vec::new(),
         });
-        for manifest in manifests {
+        for manifest in &manifests {
             let id = manifest.session_id;
             let trashed = manifest.trashed.is_some();
             let mut badges = Vec::new();
@@ -795,15 +842,75 @@ impl MereEndpoint {
                 source: id.as_uuid().to_string(),
                 label: format!("Session {}", id.as_uuid()),
                 bytes: serde_json::to_vec(&card).map_err(|error| error.to_string())?,
-                actions: self.session_actions(&manifest),
+                actions: self.session_actions(&manifests, manifest, &pending),
+                kind: None,
+                media: Vec::new(),
+            });
+        }
+        // Each pending merge, its conflicts disclosed as the card's media.
+        let name = |id: SessionId| {
+            manifests
+                .iter()
+                .find(|manifest| manifest.session_id == id)
+                .and_then(|manifest| manifest.display_name.clone())
+                .unwrap_or_else(|| "Session".to_string())
+        };
+        for merge in pending.values() {
+            let source = merge.source();
+            let material = PendingMergeV1 {
+                schema: PENDING_MERGE_SCHEMA.to_string(),
+                source,
+                source_name: name(source),
+                target: merge.target(),
+                target_name: name(merge.target()),
+                conflicts: merge.conflicts().to_vec(),
+            };
+            let media = serde_json::to_vec(&material).map_err(|error| error.to_string())?;
+            let card = PortableCardV1 {
+                title: format!(
+                    "Merge {} into {}",
+                    material.source_name, material.target_name
+                ),
+                values: vec![CardValueV1 {
+                    label: "Conflicts".to_string(),
+                    value: material.conflicts.len().to_string(),
+                }],
+                badges: vec!["Pending merge".to_string()],
+                media: vec![ContentHash::of(&media)],
+            };
+            cards.push(SessionsCard {
+                source: source.as_uuid().to_string(),
+                label: card.title.clone(),
+                bytes: serde_json::to_vec(&card).map_err(|error| error.to_string())?,
+                actions: vec![
+                    merge_action(
+                        RESOLVE_MERGE_INTENT,
+                        "Apply merge",
+                        "Write the merge with a choice for each conflict.",
+                    ),
+                    merge_action(
+                        CANCEL_MERGE_INTENT,
+                        "Cancel merge",
+                        "Drop the pending merge; nothing is written.",
+                    ),
+                ],
+                kind: Some(MERGE_SOURCE),
+                media: vec![media],
             });
         }
         Ok(cards)
     }
 
     /// The steps a session's card offers as the session stands now: attach
-    /// unless this connection holds it, fork, and trash or restore.
-    fn session_actions(&self, manifest: &GraphSessionManifest) -> Vec<AdvertisedAction> {
+    /// unless this connection holds it, fork, branch, merge into its source
+    /// for a branch or picked-off part with no merge pending, and trash or
+    /// restore.
+    fn session_actions(
+        &self,
+        manifests: &[GraphSessionManifest],
+        manifest: &GraphSessionManifest,
+        pending: &BTreeMap<uuid::Uuid, pandect::PendingMerge>,
+    ) -> Vec<AdvertisedAction> {
         let mut actions = vec![session_item::archive_action(
             SAVE_CODICIL_INTENT,
             "Save as codicil",
@@ -820,6 +927,20 @@ impl MereEndpoint {
             "Fork",
             "Begin a new session from this one as it stands now.",
         ));
+        actions.push(lifecycle_action(
+            BRANCH_SESSION_INTENT,
+            "Branch",
+            "Begin a branch of this session as it stands now, meant to merge back.",
+        ));
+        if merge_target(manifests, manifest).is_some()
+            && !pending.contains_key(manifest.session_id.as_uuid())
+        {
+            actions.push(lifecycle_action(
+                MERGE_SESSION_INTENT,
+                "Merge into source",
+                "Merge this session back into the session it came from.",
+            ));
+        }
         actions.push(if manifest.trashed.is_some() {
             lifecycle_action(
                 RESTORE_SESSION_INTENT,
@@ -851,7 +972,8 @@ impl MereEndpoint {
         let mut scene = Scene::new();
         let mut presentation = PresentationManifest::default();
         for (index, card) in cards.iter().enumerate() {
-            let source = scene.intern_source(SourceRef::new(source_kind, &card.source));
+            let kind = card.kind.unwrap_or(source_kind);
+            let source = scene.intern_source(SourceRef::new(kind, &card.source));
             scene.items.push(ProjectedItem {
                 source,
                 space: Scene::WORLD,
@@ -865,7 +987,10 @@ impl MereEndpoint {
                 hit: None,
                 channels: Vec::new(),
             });
-            let key = PresentationKey(card.source.clone());
+            let key = PresentationKey(match card.kind {
+                Some(kind) => format!("{kind}:{}", card.source),
+                None => card.source.clone(),
+            });
             presentation.bindings.push(PresentationBinding {
                 instance: InstanceId(index as u32),
                 key: key.clone(),
@@ -927,6 +1052,8 @@ impl MereEndpoint {
                     COMPOSE_CODICILS_INTENT,
                     "Compose codicils",
                 )],
+                kind: None,
+                media: Vec::new(),
             }];
             for manifest in manifests {
                 let id = manifest.id.to_string();
@@ -972,6 +1099,8 @@ impl MereEndpoint {
                         OPEN_CODICIL_INTENT,
                         "Open as session",
                     )],
+                    kind: None,
+                    media: Vec::new(),
                 });
             }
             Ok(cards)
@@ -1076,10 +1205,18 @@ impl MereEndpoint {
                 current_revision: self.sessions_revision(),
             });
         }
+        if matches!(
+            intent.intent.as_str(),
+            RESOLVE_MERGE_INTENT | CANCEL_MERGE_INTENT
+        ) {
+            return self.invoke_merge(intent);
+        }
         let names_session = match intent.intent.as_str() {
             MINT_SESSION_INTENT => false,
             ATTACH_SESSION_INTENT
             | FORK_SESSION_INTENT
+            | BRANCH_SESSION_INTENT
+            | MERGE_SESSION_INTENT
             | TRASH_SESSION_INTENT
             | RESTORE_SESSION_INTENT => true,
             other => {
@@ -1103,6 +1240,7 @@ impl MereEndpoint {
         }
         // The named session must be the mere's, and its card must offer the
         // step as the session stands now, whatever the list showed.
+        let mut merge_into = None;
         let target = if names_session {
             let Some(id) = payload.session else {
                 return Ok(IntentResult::Rejected {
@@ -1116,8 +1254,9 @@ impl MereEndpoint {
                     reason: format!("this mere holds no session {}", id.as_uuid()),
                 });
             };
+            let pending = run(async { self.shared.pending_merges.lock().await.clone() });
             if !self
-                .session_actions(manifest)
+                .session_actions(&manifests, manifest, &pending)
                 .iter()
                 .any(|action| action.intent.0 == intent.intent)
             {
@@ -1128,6 +1267,14 @@ impl MereEndpoint {
                         intent.intent
                     ),
                 });
+            }
+            if intent.intent == MERGE_SESSION_INTENT {
+                let Some(into) = merge_target(&manifests, manifest) else {
+                    return Ok(IntentResult::Rejected {
+                        reason: "only a branch or picked-off part merges back".into(),
+                    });
+                };
+                merge_into = Some(into);
             }
             Some(id)
         } else {
@@ -1157,6 +1304,39 @@ impl MereEndpoint {
                         .fork_at(session, session.journal().live_cursor(), author)
                         .await
                         .map_err(|error| error.to_string())?;
+                },
+                (BRANCH_SESSION_INTENT, Some(id)) => {
+                    let parent = shared.host(id).await?;
+                    let parent = parent.lock().await;
+                    let session = parent.graph_session();
+                    shared
+                        .sessions()
+                        .branch_at(session, session.journal().live_cursor(), author)
+                        .await
+                        .map_err(|error| error.to_string())?;
+                },
+                (MERGE_SESSION_INTENT, Some(id)) => {
+                    let into = merge_into.ok_or("a merge names no session to merge into")?;
+                    let (target, source) = (shared.host(into).await?, shared.host(id).await?);
+                    let mut target = target.lock().await;
+                    let mut source = source.lock().await;
+                    let sessions = shared.sessions();
+                    let plan = target
+                        .plan_merge(&sessions, &source)
+                        .await
+                        .map_err(|error| error.to_string())?;
+                    if plan.is_clean() {
+                        target
+                            .apply_merge(&sessions, &mut source, plan, &BTreeMap::new(), &app)
+                            .await
+                            .map_err(|error| error.to_string())?;
+                    } else {
+                        shared
+                            .pending_merges
+                            .lock()
+                            .await
+                            .insert(*id.as_uuid(), plan);
+                    }
                 },
                 (TRASH_SESSION_INTENT, Some(id)) => {
                     let host = shared.host(id).await?;
@@ -1191,6 +1371,78 @@ impl MereEndpoint {
             Ok(None) => Ok(IntentResult::Accepted),
             Err(reason) => Ok(IntentResult::Rejected { reason }),
         }
+    }
+
+    /// Apply or cancel a pending merge, named by its source session.
+    fn invoke_merge(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        let payload: MergeResolutionV1 = match serde_json::from_slice(&intent.payload) {
+            Ok(payload) => payload,
+            Err(error) => {
+                return Ok(IntentResult::Rejected {
+                    reason: format!("invalid merge payload: {error}"),
+                });
+            },
+        };
+        if payload.schema != MERGE_SCHEMA {
+            return Ok(IntentResult::Rejected {
+                reason: format!("unknown merge schema {:?}", payload.schema),
+            });
+        }
+        let shared = Arc::clone(&self.shared);
+        let app = self.app.clone();
+        let cancel = intent.intent == CANCEL_MERGE_INTENT;
+        let outcome: Result<(), String> = run(async move {
+            let Some(plan) = shared
+                .pending_merges
+                .lock()
+                .await
+                .remove(payload.source.as_uuid())
+            else {
+                return Err(format!(
+                    "no merge of {} is pending",
+                    payload.source.as_uuid()
+                ));
+            };
+            if cancel {
+                shared.moved();
+                return Ok(());
+            }
+            let choices: BTreeMap<_, _> = payload
+                .choices
+                .into_iter()
+                .map(|chosen| (chosen.part, chosen.choice))
+                .collect();
+            let (target, source) = (
+                shared.host(plan.target()).await?,
+                shared.host(plan.source()).await?,
+            );
+            let mut target = target.lock().await;
+            let mut source = source.lock().await;
+            let sessions = shared.sessions();
+            let applied = target
+                .apply_merge(&sessions, &mut source, plan.clone(), &choices, &app)
+                .await;
+            if let Err(error) = applied {
+                // A missing choice leaves the merge pending; anything else
+                // (a session moved, a hand value that does not fit) asks for
+                // the merge again.
+                if error.to_string().contains("merge conflicts have no choice") {
+                    shared
+                        .pending_merges
+                        .lock()
+                        .await
+                        .insert(*plan.source().as_uuid(), plan);
+                }
+                shared.moved();
+                return Err(error.to_string());
+            }
+            shared.moved();
+            Ok(())
+        });
+        Ok(match outcome {
+            Ok(()) => IntentResult::Accepted,
+            Err(reason) => IntentResult::Rejected { reason },
+        })
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
@@ -1290,6 +1542,7 @@ impl MereEndpoint {
         }
         let host = Arc::clone(&self.host);
         let app = self.app.clone();
+        let shared = Arc::clone(&self.shared);
         let (result, seen) = run(async move {
             let mut host = host.lock().await;
             if Some(intent.target) != host.session_instance() {
@@ -1350,6 +1603,17 @@ impl MereEndpoint {
                             let step = host
                                 .transact_history(&app, intent.intent == session_item::REDO_INTENT)
                                 .await;
+                            // Undoing a merge frees its source; redoing marks
+                            // it again. A host holding it reads the mark anew.
+                            if step.as_ref().is_ok_and(Option::is_some)
+                                && let Some(source) = host.graph_session().merge_stepped()
+                            {
+                                let held = shared.hosts.lock().await.get(&source).cloned();
+                                if let Some(held) = held {
+                                    let _ = held.lock().await.reload_merged_mark().await;
+                                }
+                                shared.moved();
+                            }
                             step.map(|reverted| reverted.is_some())
                                 .map_err(|error| error.to_string())
                         },
@@ -1454,8 +1718,8 @@ impl PresentationSource for MereEndpoint {
                 };
                 let bytes = cards
                     .into_iter()
-                    .find(|card| ContentHash::of(&card.bytes) == request.resource)
-                    .map(|card| card.bytes)
+                    .flat_map(|card| std::iter::once(card.bytes).chain(card.media))
+                    .find(|bytes| ContentHash::of(bytes) == request.resource)
                     .ok_or("sessions resource is no longer current; request a new snapshot")?;
                 Ok(ResourceResponse {
                     session: request.session,
@@ -3372,6 +3636,232 @@ mod tests {
         ));
     }
 
+    /// The pending merge the sessions list discloses, read through its
+    /// card's media, with the card's instance.
+    fn pending_merge(
+        session: &mut ResidentEndpointSession,
+        listed: &ProjectionSnapshot,
+    ) -> Option<(InstanceId, PendingMergeV1)> {
+        let instance = *mere_route::merge_cards(listed).first()?;
+        let offer = listed.presentation.offers_for(instance)?.first()?.clone();
+        let card: PortableCardV1 = serde_json::from_slice(
+            &session
+                .resource(ResourceRequest {
+                    session: listed.session.clone(),
+                    resource: offer.resource,
+                })
+                .unwrap()
+                .bytes,
+        )
+        .unwrap();
+        let material = session
+            .resource(ResourceRequest {
+                session: listed.session.clone(),
+                resource: card.media[0],
+            })
+            .unwrap();
+        Some((instance, serde_json::from_slice(&material.bytes).unwrap()))
+    }
+
+    fn label_of(model: &MereViewModel, n: u128) -> Option<String> {
+        let key = Uuid::from_u128(n).to_string();
+        model
+            .graph
+            .nodes
+            .iter()
+            .find(|node| node.key == key)
+            .map(|node| node.label.clone())
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_branch_merges_back_through_the_route_with_a_choice_per_conflict() {
+        let fixture = fixture(23, "readings").await;
+        let mut turnstone = fixture.attach("turnstone").await;
+        let mut knot = fixture.attach("knot-editor").await;
+        let start = graph(&mut turnstone);
+        assert_eq!(
+            turnstone
+                .invoke(apply(&start, vec![node(1), retitle(1, "One")]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let listed = projection(&mut turnstone, 0);
+        let parent = session_ids(&listed)[0];
+        let offers = |listed: &ProjectionSnapshot, id: SessionId| -> Vec<String> {
+            let instance = listed
+                .scene
+                .active_items_in_order()
+                .into_iter()
+                .find(|(_, item)| {
+                    listed.scene.tables.sources[item.source.0 as usize]
+                        .as_ref()
+                        .is_some_and(|source| {
+                            source.adapter == SESSIONS_SOURCE
+                                && source.id == id.as_uuid().to_string()
+                        })
+                })
+                .unwrap()
+                .0;
+            listed.presentation.offers_for(instance).unwrap()[0]
+                .semantics
+                .actions
+                .iter()
+                .map(|action| action.intent.0.clone())
+                .collect()
+        };
+        assert!(offers(&listed, parent).contains(&BRANCH_SESSION_INTENT.to_string()));
+        assert!(
+            !offers(&listed, parent).contains(&MERGE_SESSION_INTENT.to_string()),
+            "a session with no source has nothing to merge into"
+        );
+
+        // Turnstone branches; the branch offers Merge into source.
+        let branch = sessions_step(&listed, BRANCH_SESSION_INTENT, SessionsActionV1::on(parent));
+        assert_eq!(turnstone.invoke(branch).unwrap(), IntentResult::Accepted);
+        let listed = projection(&mut knot, 0);
+        let branch = session_ids(&listed)[1];
+        assert!(offers(&listed, branch).contains(&MERGE_SESSION_INTENT.to_string()));
+
+        // Knot retitles in the branch while Turnstone retitles the parent.
+        let step = |listed: &ProjectionSnapshot, intent: &str, id: SessionId| {
+            sessions_step(listed, intent, SessionsActionV1::on(id))
+        };
+        assert_eq!(
+            knot.invoke(step(&listed, ATTACH_SESSION_INTENT, branch))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let in_branch = graph(&mut knot);
+        assert_eq!(
+            knot.invoke(apply(&in_branch, vec![retitle(1, "Branch"), node(2)]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let in_parent = graph(&mut turnstone);
+        assert_eq!(
+            turnstone
+                .invoke(apply(&in_parent, vec![retitle(1, "Parent")]))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+
+        // The merge has a conflict, so it waits as a card with its material.
+        assert_eq!(
+            knot.invoke(step(&listed, MERGE_SESSION_INTENT, branch))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let listed = projection(&mut knot, 0);
+        let (_, material) = pending_merge(&mut knot, &listed).expect("a pending merge");
+        assert_eq!((material.source, material.target), (branch, parent));
+        assert_eq!(material.conflicts.len(), 1);
+        assert_eq!(
+            material.conflicts[0].part,
+            kernel::graph::Part::Title(Uuid::from_u128(1))
+        );
+        assert!(
+            !offers(&listed, branch).contains(&MERGE_SESSION_INTENT.to_string()),
+            "one merge pending at a time"
+        );
+
+        // Through the route adapter: the view's card, a choice, then Apply.
+        let mut read = read_route(&mut turnstone);
+        let chosen = BTreeMap::from([(
+            mere_route::conflict_key(&material.conflicts[0].part),
+            mere_view::MergeOption::Source,
+        )]);
+        mere_route::fill_merge(&mut read.model, Some(&material), &chosen);
+        let merge = read.model.merge.as_ref().unwrap();
+        assert_eq!(merge.conflicts[0].label, "Title of Parent");
+        assert_eq!(
+            (
+                merge.conflicts[0].source.as_str(),
+                merge.conflicts[0].target.as_str()
+            ),
+            ("Branch", "Parent")
+        );
+        assert!(
+            mere_route::merge_intent(
+                &MereViewRequest::Merge(mere_view::MergeRequest::Apply),
+                &read.sessions,
+                &material,
+                &BTreeMap::new(),
+            )
+            .is_none(),
+            "Apply waits for every choice"
+        );
+        let apply_merge = mere_route::merge_intent(
+            &MereViewRequest::Merge(mere_view::MergeRequest::Apply),
+            &read.sessions,
+            &material,
+            &chosen,
+        )
+        .unwrap();
+        assert_eq!(
+            turnstone.invoke(apply_merge).unwrap(),
+            IntentResult::Accepted
+        );
+        let read = read_route(&mut turnstone);
+        assert_eq!(label_of(&read.model, 1).as_deref(), Some("Branch"));
+        assert!(
+            label_of(&read.model, 2).is_some(),
+            "the branch's node arrives"
+        );
+        let listed = projection(&mut turnstone, 0);
+        assert!(pending_merge(&mut turnstone, &listed).is_none());
+        assert!(
+            !offers(&listed, branch).contains(&MERGE_SESSION_INTENT.to_string()),
+            "a merged branch is marked"
+        );
+        // The merged branch is read-only now.
+        let in_branch = graph(&mut knot);
+        assert!(matches!(
+            knot.invoke(apply(&in_branch, vec![retitle(2, "Late")]))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+
+        // Turnstone undoes the merge, which frees the branch to merge again.
+        let in_parent = graph(&mut turnstone);
+        assert_eq!(
+            turnstone.invoke(undo(&in_parent)).unwrap(),
+            IntentResult::Accepted
+        );
+        let read = read_route(&mut turnstone);
+        assert_eq!(label_of(&read.model, 1).as_deref(), Some("Parent"));
+        let listed = projection(&mut turnstone, 0);
+        assert!(offers(&listed, branch).contains(&MERGE_SESSION_INTENT.to_string()));
+        let in_branch = graph(&mut knot);
+        assert_eq!(
+            knot.invoke(apply(&in_branch, vec![retitle(2, "Late")]))
+                .unwrap(),
+            IntentResult::Accepted,
+            "the freed branch is editable"
+        );
+
+        // Merging again and cancelling writes nothing.
+        let listed = projection(&mut knot, 0);
+        assert_eq!(
+            knot.invoke(step(&listed, MERGE_SESSION_INTENT, branch))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let listed = projection(&mut knot, 0);
+        let (_, material) = pending_merge(&mut knot, &listed).unwrap();
+        let read = read_route(&mut knot);
+        let cancel = mere_route::merge_intent(
+            &MereViewRequest::Merge(mere_view::MergeRequest::Cancel),
+            &read.sessions,
+            &material,
+            &BTreeMap::new(),
+        )
+        .unwrap();
+        assert_eq!(knot.invoke(cancel).unwrap(), IntentResult::Accepted);
+        let listed = projection(&mut knot, 0);
+        assert!(pending_merge(&mut knot, &listed).is_none());
+        assert!(offers(&listed, branch).contains(&MERGE_SESSION_INTENT.to_string()));
+    }
+
     fn relate(from: u128, to: u128, assertion: EdgeAssertion) -> pandect::CapturedDelta {
         pandect::CapturedDelta::ReplayAssertRelationByIds {
             from_id: Uuid::from_u128(from).to_string(),
@@ -3467,7 +3957,10 @@ mod tests {
             panic!("{:?}", first.model.sessions)
         };
         assert!(parent.attached && !parent.trashed);
-        assert_eq!(parent.steps, [SessionStep::Fork, SessionStep::Trash]);
+        assert_eq!(
+            parent.steps,
+            [SessionStep::Fork, SessionStep::Branch, SessionStep::Trash]
+        );
         let parent = parent.id;
         let (one, two) = (
             Uuid::from_u128(1).to_string(),

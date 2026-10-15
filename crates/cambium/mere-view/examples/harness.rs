@@ -194,6 +194,7 @@ impl Harness {
             MereViewRequest::Session(id, step) => format!("{} {}", step.token(), self.name_of(*id)),
             MereViewRequest::Host(key) => format!("run {key}"),
             MereViewRequest::Layout(id) => format!("lay out by {id}"),
+            MereViewRequest::Merge(request) => format!("merge {request:?}"),
         };
         self.events.push(format!("request {what}"));
         if std::mem::take(&mut self.decline_next) {
@@ -229,6 +230,13 @@ impl Harness {
             MereViewRequest::Session(id, SessionStep::Fork) => {
                 let name = format!("Fork of {}", self.name_of(id));
                 self.push_session(name);
+            },
+            MereViewRequest::Session(id, SessionStep::Branch) => {
+                let name = format!("Branch of {}", self.name_of(id));
+                self.push_session(name);
+            },
+            MereViewRequest::Session(_, SessionStep::Merge) | MereViewRequest::Merge(_) => {
+                self.decline("This harness keeps no sessions to merge.".to_string());
             },
             MereViewRequest::Session(id, step @ (SessionStep::Trash | SessionStep::Restore)) => {
                 if let Some(session) = self.model.sessions.iter_mut().find(|s| s.id == id) {

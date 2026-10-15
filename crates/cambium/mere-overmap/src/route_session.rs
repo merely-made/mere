@@ -18,15 +18,19 @@ use chirograph::{
 use graphshell_client::core::Outcome;
 use graphshell_client::driver::Advance;
 use graphshell_client::{MountedScene, ResolvedContent, SessionDriver};
-use mere_view::{HostAction, MereViewModel, MereViewRequest, StatusNote, ViewStatus};
+use mere_view::{
+    HostAction, MereViewModel, MereViewRequest, MergeOption, MergeRequest, StatusNote, ViewStatus,
+};
 use sceno::InstanceId;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap, VecDeque};
 #[derive(Clone)]
 enum Task {
     Mount(usize),
     Resolve(ProjectionSession, InstanceId, ContentHash),
     Invoke(MereViewRequest),
     Media(ProjectionSession, InstanceId),
+    /// A pending merge card's material in the sessions projection.
+    MergeMedia(ProjectionSession, InstanceId),
 }
 pub struct MereRouteSession {
     /// The admitted application this panel reads as. The owner discloses
@@ -51,6 +55,10 @@ pub struct MereRouteSession {
     records: HashMap<String, chirograph::PortableCardV1>,
     inspected: Option<String>,
     transient_layout: Option<String>,
+    /// The pending merge the owner discloses, and the choices made on it here
+    /// so far, by conflict key. Choices stay with this panel until Apply.
+    merge: Option<crate::wire::PendingMergeV1>,
+    merge_choices: BTreeMap<String, MergeOption>,
 }
 impl MereRouteSession {
     /// A panel over the route `descriptor` describes, read as `application`:
@@ -120,6 +128,8 @@ impl MereRouteSession {
             records: HashMap::new(),
             inspected: None,
             transient_layout: None,
+            merge: None,
+            merge_choices: BTreeMap::new(),
         };
         result.refresh()?;
         Ok(result)
@@ -226,6 +236,21 @@ impl MereRouteSession {
         if matches!(&request,MereViewRequest::Host(key) if key=="refresh") {
             return self.refresh();
         }
+        // A choice stays with this panel until Apply sends them all.
+        if let MereViewRequest::Merge(MergeRequest::Choose(key, option)) = &request {
+            let known = self.merge.as_ref().is_some_and(|merge| {
+                merge
+                    .conflicts
+                    .iter()
+                    .any(|conflict| &mere_route::conflict_key(&conflict.part) == key)
+            });
+            if !known {
+                return Err("That conflict is no longer pending.".into());
+            }
+            self.merge_choices.insert(key.clone(), option.clone());
+            mere_route::fill_merge(&mut self.model, self.merge.as_ref(), &self.merge_choices);
+            return Ok(());
+        }
         self.notice = None;
         match &request {
             MereViewRequest::Activate(key) => {
@@ -280,6 +305,8 @@ impl MereRouteSession {
         self.records.clear();
         self.inspected = None;
         self.transient_layout = None;
+        self.merge = None;
+        self.merge_choices.clear();
         self.driver.disconnect();
         if let Some(core) = self.driver.core_mut() {
             core.purge();
@@ -310,6 +337,7 @@ impl MereRouteSession {
     }
     fn refresh(&mut self) -> Result<(), String> {
         self.cards.clear();
+        self.merge = None;
         self.tasks
             .extend(self.indices.iter().copied().map(Task::Mount));
         self.advance()
@@ -397,6 +425,15 @@ impl MereRouteSession {
                     let archive = self.snapshot(archive)?;
                     mere_route::fill_archive(&mut self.model, &sessions, &archive, &self.cards);
                 }
+                // Choices hold only for conflicts still pending.
+                let pending: Vec<String> = self
+                    .merge
+                    .iter()
+                    .flat_map(|merge| &merge.conflicts)
+                    .map(|conflict| mere_route::conflict_key(&conflict.part))
+                    .collect();
+                self.merge_choices.retain(|key, _| pending.contains(key));
+                mere_route::fill_merge(&mut self.model, self.merge.as_ref(), &self.merge_choices);
                 self.model.status = ViewStatus::Ready;
                 self.model.notice = self.notice.clone();
                 self.model.actions = vec![HostAction::new("refresh", "Refresh")];
@@ -416,7 +453,7 @@ impl MereRouteSession {
                     .core_mut()
                     .ok_or("The route is closed.")?
                     .resolve(session, *instance)?,
-                Task::Media(session, instance) => self
+                Task::Media(session, instance) | Task::MergeMedia(session, instance) => self
                     .driver
                     .core_mut()
                     .ok_or("The route is closed.")?
@@ -426,6 +463,16 @@ impl MereRouteSession {
                     let invocation = self
                         .view_invocation(request)?
                         .or_else(|| mere_route::intent(request, &sessions))
+                        .or_else(|| {
+                            self.merge.as_ref().and_then(|merge| {
+                                mere_route::merge_intent(
+                                    request,
+                                    &sessions,
+                                    merge,
+                                    &self.merge_choices,
+                                )
+                            })
+                        })
                         .or_else(|| {
                             self.archive
                                 .as_ref()
@@ -587,7 +634,12 @@ impl MereRouteSession {
                                 if card.media.is_empty() {
                                     return Err("The explicit session does not disclose its scoped graph material.".into());
                                 }
-                                self.tasks.push_front(Task::Media(session, instance));
+                                self.tasks.push_front(Task::Media(session.clone(), instance));
+                            }
+                            let is_merge = session == self.sessions
+                                && mere_route::merge_cards(&snapshot).contains(&instance);
+                            if is_merge && !card.media.is_empty() {
+                                self.tasks.push_front(Task::MergeMedia(session, instance));
                             }
                             self.cards.insert(
                                 hash,
@@ -633,8 +685,25 @@ impl MereRouteSession {
                         self.read_only = material.read_only;
                         self.material = Some(material);
                     },
+                    (Task::MergeMedia(..), Outcome::MediaResource(resource)) => {
+                        let merge: crate::wire::PendingMergeV1 =
+                            serde_json::from_slice(&resource.bytes)
+                                .map_err(|e| format!("Invalid pending merge material: {e}"))?;
+                        if merge.schema != crate::wire::PENDING_MERGE_SCHEMA {
+                            return Err("The pending merge material has another schema.".into());
+                        }
+                        self.merge = Some(merge);
+                    },
                     (Task::Invoke(request), Outcome::Intent(result)) => {
                         self.notice = mere_route::declined(&result);
+                        if matches!(
+                            request,
+                            MereViewRequest::Merge(MergeRequest::Apply | MergeRequest::Cancel)
+                        ) && *result == chirograph::IntentResult::Accepted
+                        {
+                            self.merge_choices.clear();
+                        }
+                        self.merge = None;
                         if matches!(request, MereViewRequest::Layout(_)) {
                             self.transient_layout = None;
                         }
