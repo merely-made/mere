@@ -4,12 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Canvas operations shared by Graphshell's browser presentation paths.
+//! Canvas operations a host's controls and keyboard bindings share.
 //!
 //! Controls and keyboard bindings choose their own distances. The canvas owns
 //! camera and physics state; this seam does not read a DOM or duplicate it.
 
-use mere::canvas::{CameraView, Canvas};
+use super::{CameraView, Canvas};
 
 /// A presentation command that does not change graph authority.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -49,7 +49,7 @@ impl CanvasCommand {
                 canvas.set_ctrl(false);
             },
             Self::SetZoom { zoom } => {
-                // Both pages' cameras are top-down: screen = world * zoom + offset.
+                // The canvas camera is top-down: screen = world * zoom + offset.
                 let before = canvas.camera();
                 canvas.set_camera(CameraView { zoom, ..before });
                 let scale = canvas.camera().zoom / before.zoom;

@@ -166,6 +166,12 @@ pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 mod elapsed;
+/// Camera, arrangement and physics commands a host's controls share.
+pub mod controls;
+/// Wheel, touch and keyboard-pan policy and camera arithmetic.
+pub mod gestures;
+/// Whether each node's face sits on its body, read back for receipts.
+pub mod face_alignment;
 pub mod fold_projection;
 mod frame;
 mod frame_profile;

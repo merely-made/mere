@@ -4,8 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! How the plain viewer's canvas shares the page's gestures (mer3ly site
-//! canvas plan, P2 parity with the repository sandbox).
+//! How a canvas host shares its page's or window's gestures (first built for
+//! the plain viewer, mer3ly site canvas plan, P2 parity with the repository
+//! sandbox).
 //!
 //! The wheel zooms at the pointer by default; a host or reader can choose
 //! graph panning or surrounding-page scrolling instead. Ctrl/Meta always
@@ -15,7 +16,7 @@
 //! motion moves the camera at once rather than gliding. This module is the
 //! policy and the camera arithmetic; the browser listeners are the page's.
 
-use mere::canvas::{CameraView, Canvas};
+use super::{CameraView, Canvas};
 
 /// What a wheel notch over the graph is for.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
