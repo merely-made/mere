@@ -17,12 +17,12 @@ use sprigging::ColorF;
 
 use crate::layout::{DEFAULT_LAYOUT, SEPARATION, lay_out};
 use crate::model::{
-    ArchiveEntry, GraphModel, MereViewModel, NodeState, Provenance, SessionEntry, SessionPlacement,
-    SessionStep, StatusNote,
+    ArchiveEntry, GraphModel, MereNodeKind, MereViewModel, Provenance, SessionEntry,
+    SessionPlacement, SessionStep, StatusNote, TierCard,
 };
 use crate::tier::{
-    SAVED_FROM, archive_node_key, archive_of_node, session_node_key, session_of_node, tier_card,
-    tier_height, tier_shown, tier_widgets,
+    ON_SHELF, SAVED_FROM, archive_node_key, archive_of_node, card_listed, card_node_key,
+    card_of_node, tier_card, tier_height, tier_shown, tier_widgets,
 };
 
 /// The erased view the component and its parts are made of.
@@ -134,9 +134,10 @@ pub enum MereViewEvent {
     Hover(Option<String>),
     Focus(Option<String>),
     SelectArchive(String),
-    /// Open a session's card in the tier, or close the open one with `None`.
-    /// One card is open at a time.
-    Expand(Option<SessionId>),
+    /// Open a session's or the shelf's card in the tier, or close the open
+    /// one with `None`. One card is open at a time. The tier grows to hold
+    /// it, so the host lays the view out again after applying this.
+    Expand(Option<TierCard>),
     /// An archive node's popover in the tier, by archive key: hovering peeks,
     /// activating pins, Escape or an outside click dismisses.
     ArchivePopover(String, DetailPopoverEvent),
@@ -144,15 +145,17 @@ pub enum MereViewEvent {
 
 /// The view's own state: hover, focus and the last layout. The host stores
 /// it beside its own, applies [`MereViewEvent`]s to it, and calls
-/// [`lay_out`](Self::lay_out) before rendering.
+/// [`lay_out`](Self::lay_out) before rendering: an opened or closed tier
+/// card changes the area the graph is laid out in. (Until it does, the view
+/// fits the last layout into the area it has.)
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct MereViewState {
     pub hovered: Option<String>,
     pub focused: Option<String>,
     /// Presentation-only selection for an explicit Compose request.
     pub selected_archives: Vec<String>,
-    /// The session whose node is open as its card, in a tier.
-    pub expanded: Option<SessionId>,
+    /// The tier node open as its card: a session's, or the shelf's.
+    pub expanded: Option<TierCard>,
     /// The archive whose popover peeks or is pinned, in a tier.
     pub archive_popover: Option<(String, DetailPopoverState)>,
     /// The tier node a closed card or a dismissed popover hands keyboard
@@ -198,12 +201,12 @@ impl MereViewState {
                 }
                 self.focused = key;
             },
-            MereViewEvent::Expand(session) => {
-                self.focus_return = match (self.expanded, session) {
-                    (Some(closed), None) => Some(session_node_key(closed)),
+            MereViewEvent::Expand(card) => {
+                self.focus_return = match (self.expanded, card) {
+                    (Some(closed), None) => Some(card_node_key(closed)),
                     _ => None,
                 };
-                self.expanded = session;
+                self.expanded = card;
             },
             MereViewEvent::ArchivePopover(key, event) => {
                 let mut popover = match self.archive_popover.take() {
@@ -249,9 +252,9 @@ impl MereViewState {
                 .as_ref()
                 .is_some_and(|archive| archive.entries.iter().any(|entry| &entry.key == key))
         });
-        // A card or popover whose session or archive is gone closes.
-        if let Some(id) = self.expanded
-            && !model.sessions.iter().any(|session| session.id == id)
+        // A card or popover whose session, shelf or archive is gone closes.
+        if let Some(card) = self.expanded
+            && !card_listed(model, card)
         {
             self.expanded = None;
         }
@@ -267,7 +270,7 @@ impl MereViewState {
             // The host's editing surface owns the geometry in panel mode.
             return;
         }
-        let size = catalog_area(model, width, height);
+        let size = catalog_area(model, self.expanded, width, height);
         let nodes: Vec<String> = model.graph.nodes.iter().map(|n| n.key.clone()).collect();
         let relations: Vec<(String, String)> = model
             .graph
@@ -461,11 +464,18 @@ fn graph_area(model: &MereViewModel, width: u32, height: u32) -> (u32, u32) {
 
 /// The area the graph's own nodes are laid out in: the graph's area, less the
 /// tier across its top when there is one.
-fn catalog_area(model: &MereViewModel, width: u32, height: u32) -> (u32, u32) {
+fn catalog_area(
+    model: &MereViewModel,
+    open: Option<TierCard>,
+    width: u32,
+    height: u32,
+) -> (u32, u32) {
     let (width, height) = graph_area(model, width, height);
     (
         width,
-        height.saturating_sub(tier_height(model, height)).max(1),
+        height
+            .saturating_sub(tier_height(model, open, height))
+            .max(1),
     )
 }
 
@@ -526,7 +536,7 @@ impl MereView<'_> {
     }
 
     /// The graph as the canvas swatch the view renders and the leaf paints.
-    pub fn swatch(&self) -> GraphCanvasSwatch<String, NodeState> {
+    pub fn swatch(&self) -> GraphCanvasSwatch<String, MereNodeKind> {
         let GraphModel { nodes, relations } = &self.model.graph;
         let labels: HashMap<&str, &str> = nodes
             .iter()
@@ -536,7 +546,7 @@ impl MereView<'_> {
             .iter()
             .map(|node| GraphCanvasNode {
                 id: node.key.clone(),
-                kind: node.state,
+                kind: MereNodeKind::Graph(node.state),
                 position: self.state.position(&node.key).unwrap_or((0.5, 0.5)),
                 label: match node.state.word() {
                     Some(word) => format!("{}, {word}", node.label),
@@ -584,6 +594,7 @@ impl MereView<'_> {
                 (Provenance::Authored, RelationLine::Heavy),
                 (Provenance::Suggested, RelationLine::Dashed),
                 (Provenance::Other(SAVED_FROM.into()), RelationLine::Dotted),
+                (Provenance::Other(ON_SHELF.into()), RelationLine::Dotted),
             ]
             .into_iter()
             .map(|(kind, line)| (kind.token().to_string(), line))
@@ -602,7 +613,9 @@ impl MereView<'_> {
 
     /// The paint leaf the host registers under [`leaf_key`](Self::leaf_key),
     /// with its palette for each node state.
-    pub fn paint_leaf(&self, palette: impl Fn(&NodeState) -> ColorF) -> GraphCanvas {
+    /// A palette that knows only graph node states can take
+    /// [`MereNodeKind::state`].
+    pub fn paint_leaf(&self, palette: impl Fn(&MereNodeKind) -> ColorF) -> GraphCanvas {
         self.swatch().paint_leaf(palette)
     }
 }
@@ -1205,7 +1218,14 @@ where
     };
     // A tier node opens its own widget; every other node is the host's.
     let tier = tier_shown(view.model);
-    let sessions: Vec<SessionId> = view.model.sessions.iter().map(|s| s.id).collect();
+    let model = view.model;
+    let cards: Vec<TierCard> = model
+        .sessions
+        .iter()
+        .map(|session| TierCard::Session(session.id))
+        .chain([TierCard::Shelf])
+        .filter(|card| card_listed(model, *card))
+        .collect();
     let archives: Vec<String> = view
         .model
         .archive
@@ -1218,8 +1238,10 @@ where
         let on_request = on_request.clone();
         move |state: &mut State, key: String| {
             if tier {
-                if let Some(id) = session_of_node(&key).filter(|id| sessions.contains(id)) {
-                    let open = (expanded != Some(id)).then_some(id);
+                if let Some((card, toggles)) =
+                    card_of_node(&key).filter(|(card, _)| cards.contains(card))
+                {
+                    let open = (!toggles || expanded != Some(card)).then_some(card);
                     return on_change(state, MereViewEvent::Expand(open));
                 }
                 if let Some(archive) =

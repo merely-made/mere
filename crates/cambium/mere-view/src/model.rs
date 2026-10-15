@@ -235,6 +235,62 @@ impl NodeState {
     }
 }
 
+/// What a node on the view's canvas is, so a host colours the graph's own
+/// nodes, a tier's sessions and its archives apart. [`MereView::paint_leaf`]
+/// hands each node's kind to the host's palette.
+///
+/// [`MereView::paint_leaf`]: crate::MereView::paint_leaf
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum MereNodeKind {
+    /// One of the host's graph nodes, in the state the host says.
+    Graph(NodeState),
+    /// A session in the tier.
+    Session { attached: bool, trashed: bool },
+    /// An archive in the tier; `held` when it sits on the session it was
+    /// saved from rather than on the shelf.
+    Archive { held: bool },
+    /// The tier's archive shelf, holding the archives no live session holds.
+    Shelf,
+    /// A "+N" node standing for a session's or the shelf's archives, past
+    /// the few the tier shows one by one.
+    More,
+}
+
+impl MereNodeKind {
+    /// The `data-node-kind` token.
+    pub fn token(self) -> &'static str {
+        match self {
+            Self::Graph(_) => "graph",
+            Self::Session { .. } => "session",
+            Self::Archive { .. } => "archive",
+            Self::Shelf => "shelf",
+            Self::More => "more",
+        }
+    }
+
+    /// The nearest graph node state, for a host whose palette knows only
+    /// those: the shown session reads as open, a trashed one as unavailable,
+    /// every other tier node as available.
+    pub fn state(self) -> NodeState {
+        match self {
+            Self::Graph(state) => state,
+            Self::Session { trashed: true, .. } => NodeState::Unavailable,
+            Self::Session { attached: true, .. } => NodeState::Open,
+            Self::Session { .. } | Self::Archive { .. } | Self::Shelf | Self::More => {
+                NodeState::Available
+            },
+        }
+    }
+}
+
+/// The card a tier node opens in place: a session's, or the archive shelf's.
+/// One is open at a time.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum TierCard {
+    Session(SessionId),
+    Shelf,
+}
+
 /// One relation, never merged with another on the same endpoints.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RelationEntry {
