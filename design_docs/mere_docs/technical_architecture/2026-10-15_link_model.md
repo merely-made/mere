@@ -1,8 +1,12 @@
 # Link model: assertions are the truth, links are readings
 
 **Date:** 2026-10-15
-**Status:** design, no code changed. Mark ruled L1–L4 on 2026-10-15 (§4).
-Phases P1–P6 (§8) are unscheduled, and the open rulings in §9 remain open.
+**Status:** design, no code changed. Mark ruled L1–L4 on 2026-10-15 and L5–L6
+(formerly O2 and O3) later the same day (§4). It was amended the same day after
+an implementing agent's review (§11): the phases are reordered, source and
+origin are added, replay rules are stated, the bend is demoted to an
+experiment, and a list arrangement is added. Phases P1–P6 (§8) are
+unscheduled; open rulings O1 and O4–O8 (§9) remain open.
 
 **Inputs.** The verified seven-agent survey of 2026-10-15
 (`testing/mere/link-edge-survey-20261015/survey.json`, outside this repo,
@@ -60,11 +64,12 @@ means, or reads assertions for a view. Any other concept is retired.
    arrangement of an opened link.* It needs data that does not exist today:
    first-assertion time, timed withdrawal and a basis (§6). Most members are
    timeless, so the timeline carries an **undated lane** (§7.2).
-3. **The bend shows force, freed because fanning stops at rest.** *Kept.* With
-   one stroke per link (ruling L4), geometry is free. Bend and weight read
-   from one per-link spring whose stiffness splits exactly across the link's
-   assertions. That split is what makes per-assertion force attribution
-   possible for the first time (§7.3).
+3. **The bend shows force, freed because fanning stops at rest.** *Kept as an
+   experiment.* With one stroke per link (ruling L4), geometry is free. What
+   a bend can honestly show is not yet established. Today's spring acts only
+   along the line between its endpoints, and the link's assertions share its
+   spring by allocation, not by measurement. §7.3 states what is known; P5
+   is a separate dynamics experiment that gates nothing else.
 4. **Reification was the original point of families, payloads, kinds and
    types.** *Half supported.* Families (2026-03-14) were **policy** classes:
    persistence, visibility, deletion, layout force and navigator precedence.
@@ -94,6 +99,7 @@ states only what is new.
   | `subject`, `object` | direction is kept; the link reading is unordered | pair bucket direction |
   | `predicate` | meaning, as an IRI; recognized predicates carry behavior | `predicate` plus sub-kind sets |
   | `scope` | named graph | `graph_scope` |
+  | `source` | the store that owns the record, and its revision. Edits and withdrawals route to it, and an opened member keeps its source's explanation and actions | kernel graph (implicit); scenomise `source`, `source_revision` |
   | `asserter` | attributed source, else the journal `Author` (ruling 5) | `provenance_iri` |
   | `first_asserted_ms` | set when the assertion is minted, never overwritten | missing |
   | `last_asserted_ms` | updated on reassertion by the same asserter | `asserted_at_ms` (often `None`) |
@@ -125,8 +131,9 @@ states only what is new.
   binding. This design adds no new edge kind.
 - **strength** (view rule): a per-view function from a link's held
   assertions to one number. Its default is the sum over held assertions of
-  each predicate's declared force contribution. Stroke weight and spring
-  stiffness both read it, and it splits exactly across assertions. Strength
+  each predicate's declared force contribution. Stroke weight reads it, and
+  so may a link spring's stiffness. Each assertion's term is its
+  **allocated share**. That share is not a measured force (§7.3). Strength
   is a setting, not truth (audit thread 4: "the strength projection probably
   wants to be settings").
 
@@ -142,7 +149,7 @@ An occurrence is dated support inside an assertion, not an entity.
 
 ## 4. Rulings (Mark, 2026-10-15)
 
-Asked as four questions. Mark took the recommended option each time.
+L1–L4 were asked as four questions, and L5–L6 as two more after the review (§11). Mark took the recommended option each time.
 
 - **L1. Link identity: derived reading.** A link is computed from its
   assertions and keyed by `(stratum, unordered endpoints)`. It is never
@@ -163,7 +170,18 @@ Asked as four questions. Mark took the recommended option each time.
 - **L4. Rest drawing: one stroke per link, fan retired.** A closed link is
   one stroke. Between a surface pair there are at most two strokes, one per
   stratum, with the ruled 2026-10-13 cues. A single member is picked by
-  opening the link. All three fan implementations retire.
+  opening the link. All three fan implementations retire. Direction and
+  opposition (for example one link holding both `Supports` and
+  `Contradicts`) stay legible on the closed stroke as marks: arrowheads, a
+  both-ways mark, an opposition mark. They are never drawn as extra lines.
+- **L5. History in queries (formerly O2).** Default SPARQL, export and held
+  readers see held assertions only. Withdrawn assertions are visible through
+  an explicit history scope.
+- **L6. The shared shape (formerly O3).** The portable assertion and link-key
+  shape lives in `scenograph`, beside the fields of `DisclosedRelationship`.
+  It carries `source` and its revision. The kernel adapts its native
+  assertions into it, and Woodshed and Knot disclose into it through
+  scenomise.
 
 ## 5. Retire, subsume, keep
 
@@ -187,7 +205,7 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | `RelationKey` (pair-bucket handle) | Keep | Internal. Not a link id, not an assertion id. |
 | `StatementId` | Keep | The assertion id, the only member identity. |
 | `decay_progress` (written, then discarded: `edge_ops.rs`:104, snapshot constant 0.0) | Retire | Strength (view rule) and lifecycle (predicate). |
-| `RelationOrigin` (deferred 2026-05-11, never built); Woodshed `RelationAuthority` {Catalog, Computed, Evidence}; forme member `Provenance`; "explicit / computed / inferred" | Subsume | One derived **authority reading**: `computed` when `basis.method` is set, `evidence` when evidence or occurrences are set, otherwise `explicit`. The asserter tells whose. No stored authority field. |
+| `RelationOrigin` (deferred 2026-05-11, never built); Woodshed `RelationAuthority` {Catalog, Computed, Evidence}; forme member `Provenance`; "explicit / computed / inferred" | Subsume | One derived **origin** reading, a set: `computed` when `basis.method` is set, `evidence` when evidence or occurrences are set, `explicit` when neither is. A claim can be both computed and evidenced. Origin says how a claim arose and grants nothing; edit and withdraw rights come from the source and the predicate's retractability. The asserter tells whose. No stored origin field. |
 | `GraphScope` | Keep | Unchanged. |
 | Journal `Author {kind, id, version, via}` | Keep | Records who recorded the assertion. For Rule, Script and Engine, `id` and `version` are copied into `basis.method` at write time (ruling 5 already keeps the version). |
 | RDF 1.2 reifier per assertion | Keep | Gains first/last time, invalidation and basis terms (§6.3). |
@@ -223,8 +241,8 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 **Count.** Of 47 rows, 23 are retired or subsumed and two were already
 retired. They include three fans, three bundle
 keys, four identity schemes, two Link Cards, the style registry, the
-authority enums and the dead decay field. Added: three fields
-(`first_asserted_ms`, `withdrawn`, `basis`), one read model that replaces four,
+authority enums and the dead decay field. Added: four fields
+(`source`, `first_asserted_ms`, `withdrawn`, `basis`), one read model that replaces four,
 and one swatch scope. No new stratum, entity, edge kind or stored type.
 
 ## 6. Time and why
@@ -254,16 +272,34 @@ as 1970.
 | `evidence` | IRIs of supporting resources, captures or other assertions | Knot `evidence`; scenomise `evidence` refs |
 | `occurrences` | dated events plus rollup (count, first, last) for event-backed predicates | `TraversalData` + `EdgeMetrics`; Woodshed `Engagement` |
 
-There is no stored confidence, weight or authority field. The authority
-reading (§5) and strength (§3) are both derived. Knot's `qualification` maps to
+There is no stored confidence, weight or origin field. The origin reading
+(§5) and strength (§3) are both derived. Knot's `qualification` maps to
 `note` until a consumer needs it separately.
 
-### 6.3 Minimal write-path changes
+### 6.3 Write-path changes
 
-1. **Stamp every route.** `apply.rs` (`AssertRelation`, replay deltas),
+This is a persistence change, not a field addition. It touches snapshots,
+replay, sync, query projection and compaction, and these rules bind every
+item below:
+
+- **Replay never invents a time.** A time is fixed once, when the change is
+  first written, and is carried in the recorded change. Replay, snapshot
+  restore and sync fold reproduce it and never stamp again.
+- **Wall clocks never decide causal order.** Journal sequence and causal
+  parents decide order. Times are informative, as Knot's already are.
+- **A stale delivery cannot revive a withdrawn assertion.** Assert and
+  withdraw match by assertion id. A late assert for an id that is already
+  withdrawn is a no-op.
+- **Old records stay undated.** Migration does not guess times.
+- **Compaction follows checkpoints for shared assertions** (L2 and the
+  deletion plan §3.3). Local compaction windows are open ruling O8.
+
+1. **Stamp every route at first write.** `apply.rs` (`AssertRelation`),
    `edge_ops.rs` (`assert_relation`, predicate setter) and graphshell personal
-   sync stop passing `None`. P1's existing test that enumerates production
-   writers is extended to assert that each writes a time.
+   sync stop passing `None` and record the time in the change. Replay deltas
+   carry the recorded time and do not stamp. The graph semantics plan's P1
+   test that enumerates production writers is extended to assert that each
+   records a time.
 2. **First and last.** `assert_statement` sets `first_asserted_ms` on mint and
    leaves it alone on reassertion. Today's `asserted_at_ms` becomes the last
    time, and its persisted name stays. Legacy records load with `first = last =`
@@ -273,15 +309,19 @@ reading (§5) and strength (§3) are both derived. Knot's `qualification` maps t
    `edge_data.rs`). Held readers filter it out. The bucket is removed only when
    it holds no record at all. Graphshell's `RetractAssertion` event gains a
    time. Compaction is per predicate lifecycle (statement kernel brief) or by
-   accepted checkpoint for shared assertions.
+   accepted checkpoint for shared assertions. A late assert or withdraw is
+   resolved by id, as the rules above state.
 4. **Basis.** Persist `note`, `method`, `evidence` and `occurrences` in
    `PersistedSemanticStatement`. Ingest and export round-trip them.
 5. **RDF.** On the reifier: `prov:generatedAtTime` = first;
-   `mere:lastAssertedAt` = last; `prov:invalidatedAtTime` and
-   `prov:wasInvalidatedBy` for a withdrawal; `prov:wasGeneratedBy` for the
-   method; `prov:wasDerivedFrom` for evidence. Ingest lifts all of them, not
-   only today's three (`ingest.rs`:507-531). Whether default SPARQL sees
-   withdrawn assertions is open ruling O2.
+   `mere:lastAssertedAt` = last; `prov:invalidatedAtTime` for a withdrawal;
+   `prov:wasGeneratedBy` for the method; `prov:wasDerivedFrom` for evidence.
+   `prov:wasInvalidatedBy` points to an activity, not an agent
+   ([PROV-O](https://www.w3.org/TR/prov-o/#wasInvalidatedBy)), so the
+   withdrawer is a withdrawal activity node: `prov:wasInvalidatedBy` that
+   activity, which is `prov:wasAssociatedWith` the withdrawer. Ingest lifts
+   all of these, not only today's three (`ingest.rs`:507-531). Withdrawn
+   reifiers appear only in the history scope (L5).
 6. **All families (P6).** The four sidecar families write assertions through
    the same `assert` and `withdraw`. Their compatibility reads become predicate
    filters.
@@ -296,14 +336,27 @@ through `projected_relations` (`query.rs`). It yields assertions grouped by
 nothing else. Direction, predicate, asserter and family are attributes of
 members, not levels. There is one implementation, which every consumer reads:
 Graphshell, roster, pictograph, cambium and Woodshed. Hosts outside the kernel
-(Woodshed and Knot via scenomise) disclose assertions in the same shape.
-Where that shared shape lives is open ruling O3.
+(Woodshed and Knot via scenomise) disclose assertions in the same shape,
+which lives in `scenograph` (L6). Until P6, members from the four sidecar
+families have no id: the shape admits an id-less `(family, sub-kind)`
+member, read-only and labelled as such, so the reading never falls back to
+cells. A reading over a partly resident graph reports its coverage (ruling 4),
+so "no more assertions" and "not loaded" stay distinct.
 
 ### 7.2 The opened link, which is the "nested link"
 
 Opening a link (select, or zoom past a threshold) shows a **swatch at link
 scope**. That is the existing swatch with one new scope value, compiled to a
-scene in the existing Timeline family:
+scene in one of two arrangements, chosen from the disclosed data and
+switchable:
+
+- **List**, grouped by meaning (predicate family) or by source, with
+  direction shown per row. This is the default when few members are dated,
+  as with theory, containment and imported relations.
+- **Timeline**, the default when members are dated, as with traversal,
+  practice evidence and authored claims.
+
+On the timeline:
 
 - x is `first_asserted_ms`, with a span drawn to the withdrawal or to now;
   withdrawn members show as ended spans.
@@ -317,28 +370,36 @@ scene in the existing Timeline family:
 This one surface replaces roster's Link Card, Graphshell's link inspector
 panel and Woodshed's relation inventory for a pair. Selecting, hiding,
 withdrawing and auditioning one member (Woodshed P4f) all act on the
-assertion id. Its accessible alternate is the same list, read in time order
+assertion id. Withdrawing routes to the member's source, which keeps its
+own explanation and actions. Its accessible alternate is the same list, read in time order
 with the undated members last. Nothing in it is stored. It is a projection
 of the link, so it inherits the swatch's representation-never-identity rule.
 
-### 7.3 The force-carrying bend
+### 7.3 The force-carrying bend (experiment)
 
-At rest a link is one stroke and one spring. Stiffness is the link's
-strength, which splits exactly across held assertions (§3), so a force
-measured on the spring is attributed to each assertion in proportion to its
-share. The dynamics inspector's "Per-assertion force attribution … not
-available" (`dynamics_inspection.rs`:138) closes. It does not close by
-measuring per assertion; it closes because the model makes the split
-definitional. This replaces N spring slots per visible row (`seiche_bridge.rs`).
+What is known:
 
-The bend reads the spring's state. A link stretched past its rest length runs
-straight and tightens. A slack link bows. Lateral load, from fields or a
-neighbor, deflects it. Width shows strength. The bend uses `EdgePath::Spline
-{ tension }`, its first consumer. Hiding a member lowers strength in that
-instance only, so the spring relaxes there and nowhere else (swatch design §8,
-unchanged). "Relationship membership alone does not install a force"
-(dynamics grammar plan) still holds: a predicate's force contribution is
-declared, and it can be zero.
+- **One spring per link** can replace N spring slots per visible row
+  (`seiche_bridge.rs`). Its stiffness is the link's strength. For this
+  additive linear spring, each assertion's term is an exact **allocated
+  share** of the spring's own force. That share is an allocation, not a
+  measurement. It says nothing about repulsion, fields, pins or any other law
+  acting on the endpoints. The inspector labels it "allocated spring share",
+  never "force". The disclaimer at `dynamics_inspection.rs`:138 stays true
+  for measured per-assertion force.
+- **Seiche's `EdgeSpring` acts only along the line between its endpoints**
+  (`crates/conatus/seiche/src/forces.rs`:184). There is no lateral link state
+  for a sideways deflection to read. Stretch versus rest length is the only
+  link-local quantity today.
+
+What is not known, and is P5's experiment: whether a bend should read
+stretch (taut when stretched, bowed when slack) or a new per-link
+observable, and whether `EdgePath::Spline { tension }` is the right carrier.
+Hiding a member lowers strength in that instance only, so the spring relaxes
+there and nowhere else (swatch design §8, unchanged). "Relationship
+membership alone does not install a force" (dynamics grammar plan) still
+holds: a predicate's force contribution is declared, and it can be zero. P5's
+outcome gates neither the link model nor the family migration.
 
 ### 7.4 What falls away
 
@@ -350,40 +411,59 @@ cell count). The audit's thread 2, edge reification, is answered: assertions
 are addressable, and the pair is their reading. Thread 4, unified strength,
 is answered as a view rule.
 
+Simplification is proved by deleted responsibilities, not by rows in §5.
+Several jobs survive as registry properties, filters, adapters and lifecycle
+rules. Each phase's done condition names the grouping, selection and
+identity machinery its consumers delete.
+
 ## 8. Phases
 
-Each phase lands green before the next. Each has a first proof consumer, in
-the order the survey ranked them.
+Each phase lands green before the next. Each has a first proof consumer, and
+each names what it deletes. Reordered 2026-10-15 (§11): the shared reading
+comes first, over current storage, so a consumer benefits before any
+persistence change.
 
-- **P1. Time and withdrawal (kernel, linked-data).** Implements §6.3 items 1
-  to 5 for semantic assertions. Proof: **Graphshell's link inspector** lists
-  a pair's assertions sorted by first time, with withdrawn spans and the
-  undated ones last. A Knot assertion and retraction round-trip with their
-  times. Done when no writer leaves time empty, reassertion keeps the first
-  time, and withdraw-then-reassert yields two intervals.
-- **P2. One link reading.** `link(stratum, a, b)` in one place. Graphshell
-  `LinkInspection`, roster `LinkCard`/`LinkBundle` and pictograph
-  `PairInputs`/`EdgeCell` read it, and their own groupings are deleted. Proof:
-  Graphshell inspector unchanged in output, roster card gains asserter and
-  time. Includes the linked-data every-arc fix.
-- **P3. Opened link.** Swatch link scope plus Timeline with lanes and an
-  undated lane. Proof: Graphshell, then **Woodshed** (selection,
-  explanation, method provenance, P4f audition per assertion), then **Knot**
-  (authored time and retraction).
-- **P4. Rest stroke, fan retired.** One stroke per link in pictograph,
-  cambium `graph_canvas` and the scene path (`RoutedRelation` gains its link
-  key). Hit-test resolves the link; opening resolves a member. pandect hide
-  is re-keyed. Proof: **Woodshed's relationship editor**, the surface that
-  started this lane, then the Graphshell canvas.
-- **P5. Force-carrying bend.** One spring per link with split stiffness, a
-  per-link force readout from seiche, the `EdgePath` spline bend, and
-  inspector attribution per assertion. Proof: Graphshell dynamics inspector.
+- **P1. One link reading, bounded (L6).** The shared shape in `scenograph`
+  and one `link(stratum, a, b)` over current storage. Covers parallel
+  assertions, both directions, both strata, lifted Resource links, exact ids,
+  id-less sidecar members (§7.1) and incomplete coverage. Includes the
+  linked-data every-arc fix. Proof: **Graphshell's link inspector** reads it
+  with unchanged output. Deletes Graphshell's own pair grouping (`LinkTarget`
+  expansion). A second consumer (roster `LinkCard`/`LinkBundle`, or
+  pictograph `PairInputs`/`EdgeCell`) adopts it and deletes its grouping
+  before the phase is called done.
+- **P2. Time and withdrawal (kernel, linked-data).** §6.3 items 1 to 5 for
+  semantic assertions, under §6.3's rules. Proof: Graphshell's inspector
+  sorts by first time, shows withdrawn spans and lists undated assertions
+  last. A Knot assertion and retraction round-trip with their times. Done
+  when no writer leaves time empty, replay reproduces recorded times exactly,
+  reassertion keeps the first time, withdraw-then-reassert yields two
+  intervals, a stale assert does not revive a withdrawal, and default SPARQL
+  shows held assertions only (L5).
+- **P3. Opened link.** Swatch link scope with list and timeline arrangements
+  (§7.2). Proof: Graphshell, then **Woodshed** (selection, explanation,
+  method provenance, withdraw routed to Woodshed's source, P4f audition per
+  assertion), then **Knot** (authored time and retraction). Deletes Woodshed's
+  `compact_relation_summaries`, `SetGraphRelationChoice` and
+  `StageRelationKey` identity.
+- **P4. Rest stroke, fan retired.** One stroke per link with direction and
+  opposition marks (L4) in **Woodshed's relationship editor** first, the
+  surface that started this lane. Then pictograph, cambium `graph_canvas` and
+  the scene path (`RoutedRelation` gains its link key). Hit-test resolves the
+  link; opening resolves a member. pandect hide is re-keyed. Deletes the three
+  fan implementations.
+- **P5. Bend experiment (separate, gates nothing).** One spring per link
+  with allocated shares, labelled as such in the inspector, and a trial of
+  what a bend should read (§7.3). Proof: Graphshell dynamics inspector.
 - **P6. All families as assertions.** The four sidecar families become
   assertion records, `EdgePayload` collapses to one list, `RelationKind` and
   `RelationSelector` become predicate filters, and the tabard style registry
   retires. Persistence migration loads old snapshots, with asserters from
   journal replay as in ruling 9. Proof: roster and pandect hide one
-  containment assertion of two on a pair.
+  containment assertion of two on a pair. Done also requires that every
+  family's behavior (visibility, deletion, durability, layout) is unchanged,
+  and that reads stay within budget on a graph with substantial withdrawal
+  history.
 
 ## 9. Open rulings for Mark
 
@@ -391,19 +471,13 @@ the order the survey ranked them.
   in the world, beyond record time? Recommended: not yet. When a consumer
   needs it, add it as one optional `basis` interval, never as the timeline's
   default axis.
-- **O2. History in SPARQL.** Should default SPARQL and export see only held
-  assertions, with withdrawn ones behind an explicit history scope?
-  Recommended: held only by default.
-- **O3. Where the shared link shape lives.** The kernel cannot depend on
-  scenomise, and Woodshed reaches Mere through chartulary and scenomise.
-  Recommended: the portable assertion-disclosure and link-key shape in
-  `scenograph`, beside `DisclosedRelationship`'s fields, with the kernel
-  adapting its native assertions into it. Decide before P2.
+- **O2, O3.** Ruled as L5 and L6 (§4).
 - **O4. Chartulary convergence.** Chartulary models one edge per relation
   with `EdgeId(writer, counter)`, which is already an assertion with an id,
   and the kernel models a bucket of statements. Should chartulary relations
   gain asserter, span and basis so Woodshed's links have time? Recommended:
-  yes, in P3, with chartulary's `EdgeId` as the assertion id.
+  yes, before P3's Woodshed proof, with chartulary's `EdgeId` as the
+  assertion id.
 - **O5. Strength defaults.** Each recognized predicate's force contribution,
   and whether traversal counts or recency feed it. Recommended: settle with
   the dynamics grammar plan's G-phases rather than here.
@@ -427,3 +501,26 @@ keyed by stratum and unordered endpoints, never stored). "Linking factor" is
 recorded as Mark's word for an assertion. **Cell** and the roster sense of
 **bundle** retire from design language. Code identifiers keep their names
 until touched, under the `edge` rule.
+
+## 11. Amendments
+
+**2026-10-15, after an implementing agent's review.** The review read the
+doc at `a9765ad01` against the kernel, inspection, disclosure and dynamics
+code, and its code claims were checked (`forces.rs`:184,
+`scenomise/src/projection.rs`:43). Accepted:
+
+- `source` on the assertion; withdrawals route to their source (§3, L6).
+- "Authority reading" renamed **origin** and made a set (§5).
+- §6.3 recast as a persistence change, with replay, clock, stale-delivery and
+  undated rules.
+- The bend demoted to a separate experiment; allocated share distinguished
+  from measured force (§2, §7.3, P5).
+- List as well as timeline for the opened link (§7.2).
+- Simplification measured by deleted responsibilities (§7.4, §8).
+- PROV mapping corrected: `prov:wasInvalidatedBy` points to an activity
+  (§6.3).
+- Phases reordered so the bounded shared reading comes first (§8).
+
+Kept against it: the closed link stays one stroke (L4). The review's
+"direction and opposing predicates apparent when closed" is met by marks on
+that stroke, never by extra lines. Mark ruled O2 and O3 as L5 and L6.
