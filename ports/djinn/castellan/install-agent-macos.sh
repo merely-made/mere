@@ -31,7 +31,7 @@
 
 set -euo pipefail
 
-MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 BIN="$HOME/Library/Application Support/personae/bin"
 LOGDIR="$HOME/Library/Logs/personae"
 PLIST="$HOME/Library/LaunchAgents/org.merely.personae-agent.plist"

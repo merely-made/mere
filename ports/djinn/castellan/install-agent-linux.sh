@@ -38,7 +38,7 @@
 
 set -euo pipefail
 
-MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+MERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 BIN="${XDG_DATA_HOME:-$HOME/.local/share}/personae/bin"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 UNIT="$UNIT_DIR/personae-agent.service"

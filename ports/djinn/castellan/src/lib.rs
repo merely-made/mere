@@ -4,19 +4,22 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! **Castellan**, the credential-keeper port of the Mere platform.
+//! **Castellan**, Djinn's secret-custody component.
 //!
 //! A castellan holds a keep in trust for its lord: custody without ownership,
-//! and the office of the gate. This port is that keeper for your credentials.
-//! It splits in two:
+//! and the office of the gate. This crate is that keeper for your
+//! credentials, and it has no screens. It lives at `ports/djinn/castellan`
+//! (graphshell stack lift plan, ruling R8, 2026-10-15), and only djinn links
+//! it. Credential release, signing and presentation happen here, inside the
+//! resident: requests arrive as participant-gate petitions and are answered
+//! over an agent-style channel, the way the personae ssh-agent already works.
+//! Apps talk to a pipe; apps never see the key.
 //!
-//! - an **embeddable half** any host app composes: vault browse, credential
-//!   status, code tiles. These views render *about* secrets and never contain
-//!   them.
-//! - an **authority half** that lives with the resident: credential release,
-//!   signing, presentation. Requests arrive as participant-gate petitions and
-//!   are answered over an agent-style channel, the way the personae ssh-agent
-//!   already works. Apps talk to a pipe; apps never see the key.
+//! The secret-free views (vault browse, credential status, code tiles) live
+//! in `dramatis::view` (dramatis repo plan, ruling D24). The persona and
+//! quarantine UI is `dramatis-app` (`ports/dramatis`). Castellan stays its
+//! own crate so the custody code keeps its dependency boundary and the
+//! `deny.toml` wrapper check.
 //!
 //! The vocabulary it keeps (per the dramatis tier model):
 //!
@@ -39,10 +42,11 @@
 //! `personae::reticulum` and the station grant policy to
 //! `pandect::station_grant` in DR-C (D17); djinn signs the grant.
 //!
-//! The **keeper surface** (feature `keeper`, founded 2026-08-14) is the two
-//! halves made real, moved home from graphshell where they first grew:
+//! The **keeper surface** (feature `keeper`, founded 2026-08-14) moved home
+//! from graphshell where it first grew:
 //!
-//! - [`view`] — the secret-free read model. What a host may know.
+//! - [`view`] — re-exports `dramatis::view` at its old paths and loads the
+//!   public carry lane into it.
 //! - [`authority`] — [`authority::PersonaeHost`], the resident keeper. What
 //!   only the castellan does.
 //!

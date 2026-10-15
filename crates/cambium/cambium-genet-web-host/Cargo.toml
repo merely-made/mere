@@ -13,9 +13,16 @@ repository.workspace = true
 publish = false
 
 [features]
-default = ["image-decode"]
+default = ["image-decode", "webgpu"]
+# The WebGPU presentation route. A WebGL2-only artifact leaves it out, so its
+# boot path, and with Netrender's `without-classic-vello` the Classic
+# renderer, are not linked.
+webgpu = []
+# Composition of portable scenes into one page scene (Netrender's sparse
+# fragment resolver). Direct WebGL2 presents through it; WebGPU can too.
+portable = ["netrender/vello-webgl"]
 # Direct WebGL2 presentation, independently of optional WebGPU compute.
-webgl = ["netrender/vello-webgl"]
+webgl = ["portable"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
 image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
 

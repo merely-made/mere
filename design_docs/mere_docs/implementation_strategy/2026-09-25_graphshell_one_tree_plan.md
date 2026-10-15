@@ -1210,6 +1210,12 @@ is inferred from these debug packages.
 
 ### Viewer delivery budget (2026-10-13; published)
 
+**Amended 2026-10-15 (Mark's ruling):** R157's viewer Wasm cap is now
+3,460,300 B (3.30 MiB) gzip, held for each per-route artifact (`webgpu/`,
+`webgl2/`; see the browser presentation tenants plan). Glue, mount and history
+caps are unchanged. Measurements below were taken against the earlier
+3,407,872 B cap and are kept as recorded.
+
 Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
 (3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
 `codex/viewer-size-budget` from published `ea9239a3f`, preserving the accepted

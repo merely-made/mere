@@ -7,7 +7,7 @@
 //! SSH agent backend serving the vault's `ssh` slots.
 //!
 //! V2 of the identity-vault-ssh-agent plan
-//! ([`mere/design_docs/mere_docs/implementation_strategy/2026-07-22_identity-vault-ssh-agent_plan.md`](../../../../../../design_docs/mere_docs/implementation_strategy/2026-07-22_identity-vault-ssh-agent_plan.md)):
+//! ([`mere/design_docs/mere_docs/implementation_strategy/2026-07-22_identity-vault-ssh-agent_plan.md`](../../../../../design_docs/mere_docs/implementation_strategy/2026-07-22_identity-vault-ssh-agent_plan.md)):
 //! a [`ssh_agent_lib::agent::Session`] implementation over an
 //! [`IdentityVault`], so stock `ssh` / `ssh-add` use vault-held keys through
 //! the standard agent protocol. The `personae-agent` bin is the thin

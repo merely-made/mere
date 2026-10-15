@@ -1,8 +1,9 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-15):** in progress. P2a's code landed: `mere-overmap`
-holds the remote overmap client (L14); its Turnstone receipt and the Djinn
-route registration it needs are open, with the transport design in the
+**Status (2026-10-15):** in progress. Castellan has moved (R8), and P2a's
+code landed: `mere-overmap` holds the remote overmap client (L14); its
+Turnstone receipt and the Djinn route registration it needs are open, with
+the transport design in the
 [transport agnosticism note](../technical_architecture/2026-10-15_transport_agnosticism_note.md).
 Nothing else has moved. The census below was read from the source at
 `0aade8668` and corrects the first pass in several places (§2). Mark ruled R1
@@ -639,6 +640,14 @@ fast-forward of local main; nothing built).**
 - **2026-10-15 (later):** R8: Castellan moves to `ports/djinn/castellan` as
   a component crate. The R4 note that Castellan keeps a credential UI is
   withdrawn; Castellan has none.
+- **2026-10-15 (R8 done):** Castellan moved from its own port directory to
+  `ports/djinn/castellan`; the package stays `castellan`. The workspace
+  member and dependency path, `.gitattributes`, the install scripts' repo
+  root, the DR-C and Dramatis review receipt scripts, and the live docs that
+  cited the old path followed. Its `lib.rs` header, README and manifest
+  description now say it is Djinn's secret-custody component with no
+  screens: the views are `dramatis::view` (D24), the UI is `dramatis-app`.
+  The `deny.toml` wrapper rule keys on the crate name and still holds.
 - **2026-10-15 (P2a, L14):** `crates/cambium/mere-overmap` landed. `wire`
   holds `session_item`'s wire half (route names, intents, schemas,
   `SessionGraphV1`, `SetViewV1`, `ApplyEditsV1`, `StepV1`, `SessionsActionV1`,
