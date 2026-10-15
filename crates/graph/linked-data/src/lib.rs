@@ -357,11 +357,8 @@ fn node_direct_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
     // Semantic edges -> predicate IRIs -> target `@id`s, sorted by
     // (predicate, target, graph) for a stable dataset.
     let mut edges: Vec<(String, String, GraphScope)> = Vec::new();
-    for target in graph.out_neighbors(key) {
-        let Some(edge_key) = graph.find_edge_key(key, target) else {
-            continue;
-        };
-        let Some(semantic) = graph.get_edge(edge_key).and_then(|p| p.semantic_data()) else {
+    for (_, _, target, payload) in graph.surface_outgoing_relation_buckets(key) {
+        let Some(semantic) = payload.semantic_data() else {
             continue;
         };
         let Some(target_node) = graph.get_node(target) else {
@@ -709,6 +706,110 @@ mod tests {
         node_a.title = "Article A".to_string();
         node_a.tags.insert("research".to_string());
         graph
+    }
+
+    #[test]
+    fn node_direct_quads_export_each_outgoing_parallel_bucket_without_reversing_incoming() {
+        let mut source = Graph::new();
+        let a = source.add_node("https://a.test".to_string(), Default::default());
+        let b = source.add_node("https://b.test".to_string(), Default::default());
+
+        source.assert_relation(
+            a,
+            b,
+            EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::UserGrouped,
+                label: None,
+                decay_progress: None,
+            },
+        );
+        source.assert_relation(
+            b,
+            a,
+            EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::UserGrouped,
+                label: None,
+                decay_progress: None,
+            },
+        );
+
+        let mut snapshot = source.to_snapshot();
+        let mut parallel = snapshot
+            .edges
+            .iter()
+            .find(|edge| edge.from_node_id == source.get_node(a).unwrap().id.to_string())
+            .expect("outgoing source bucket")
+            .clone();
+        let statement = parallel
+            .semantic
+            .as_mut()
+            .and_then(|semantic| semantic.statements.first_mut())
+            .expect("persisted outgoing assertion");
+        statement.statement_id = "parallel-outgoing-assertion".into();
+        statement.predicate = "https://example.test/parallel-outgoing".into();
+        statement.recognized_sub_kind = None;
+        statement.graph_scope = GraphScope::Custom("urn:graph:parallel".into());
+        parallel
+            .semantic
+            .as_mut()
+            .expect("semantic sidecar")
+            .sub_kinds
+            .clear();
+        snapshot.edges.push(parallel);
+
+        let incoming = snapshot
+            .edges
+            .iter_mut()
+            .find(|edge| edge.from_node_id == source.get_node(b).unwrap().id.to_string())
+            .expect("incoming-only bucket")
+            .semantic
+            .as_mut()
+            .and_then(|semantic| semantic.statements.first_mut())
+            .expect("persisted incoming assertion");
+        incoming.statement_id = "incoming-only-assertion".into();
+        incoming.predicate = "https://example.test/incoming-only".into();
+        incoming.recognized_sub_kind = None;
+        incoming.graph_scope = GraphScope::Custom("urn:graph:incoming".into());
+
+        let graph = Graph::try_from_recorded_snapshot(&snapshot).expect("restore parallel buckets");
+        let (a, node_a) = graph.get_node_by_url("https://a.test").expect("node A");
+        let outgoing = super::node_direct_quads(&graph, a, node_a);
+        let predicates: Vec<_> = outgoing
+            .iter()
+            .map(|quad| quad.predicate.as_str())
+            .collect();
+
+        assert!(
+            predicates.contains(&kernel::graph::predicate_iri(SemanticSubKind::UserGrouped)),
+            "outgoing predicates: {predicates:?}"
+        );
+        assert!(predicates.contains(&"https://example.test/parallel-outgoing"));
+        assert!(!predicates.contains(&"https://example.test/incoming-only"));
+
+        let a_id = oxrdf::NamedNode::new("https://a.test").unwrap();
+        let b_id = oxrdf::NamedNode::new("https://b.test").unwrap();
+        let parallel_graph =
+            oxrdf::GraphName::NamedNode(oxrdf::NamedNode::new("urn:graph:parallel").unwrap());
+        let incoming_graph =
+            oxrdf::GraphName::NamedNode(oxrdf::NamedNode::new("urn:graph:incoming").unwrap());
+        let dataset = super::dataset_quads(&graph);
+        assert!(dataset.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(a_id.clone())
+                && quad.predicate.as_str() == "https://example.test/parallel-outgoing"
+                && quad.object == oxrdf::Term::from(b_id.clone())
+                && quad.graph_name == parallel_graph
+        }));
+        assert!(dataset.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(b_id.clone())
+                && quad.predicate.as_str() == "https://example.test/incoming-only"
+                && quad.object == oxrdf::Term::from(a_id.clone())
+                && quad.graph_name == incoming_graph
+        }));
+        assert!(!dataset.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(a_id.clone())
+                && quad.predicate.as_str() == "https://example.test/incoming-only"
+                && quad.object == oxrdf::Term::from(b_id.clone())
+        }));
     }
 
     fn assert_property_fields(
