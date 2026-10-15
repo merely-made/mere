@@ -45,6 +45,13 @@ pub const PROJECTION_SERVICE: &str = "/services/projection";
 /// Opening a projection session.
 pub const CONNECT_ACTION: &str = "connect";
 
+/// Opening a read-only ambient crossing of a route, under a path of its own.
+///
+/// A separate action, not a flavour of [`CONNECT_ACTION`], so a grant for
+/// one never confers the other: attenuation can narrow an action set but not
+/// swap its members (remote mere route admission note, §3).
+pub const AMBIENT_ACTION: &str = "ambient";
+
 /// The ALPN-ish protocol label a Graphshell session is accepted for. It is part
 /// of the signed transcript, so a proof minted for another protocol on the same
 /// connection does not verify here.
@@ -77,11 +84,38 @@ pub fn open_session<P: IdentityProvider>(
     binding: &ProofBinding,
     delegations: Vec<SignedDelegationCertificate>,
 ) -> Result<SessionHello, HandshakeError> {
-    SessionHello::issue(
+    open_session_for(
         identity,
         network,
         profile,
         connect_action(),
+        class,
+        nonce,
+        binding,
+        delegations,
+    )
+}
+
+/// [`open_session`] for an action other than [`connect_action`]: a child of
+/// the projection service a route-selecting host serves, such as a remote
+/// mere route naming its application. The host's action check decides
+/// whether it serves it.
+#[allow(clippy::too_many_arguments)]
+pub fn open_session_for<P: IdentityProvider>(
+    identity: &P,
+    network: NetworkId,
+    profile: ProfileRef,
+    action: RequestedAction,
+    class: TrafficClass,
+    nonce: [u8; 32],
+    binding: &ProofBinding,
+    delegations: Vec<SignedDelegationCertificate>,
+) -> Result<SessionHello, HandshakeError> {
+    SessionHello::issue(
+        identity,
+        network,
+        profile,
+        action,
         class,
         nonce,
         binding,

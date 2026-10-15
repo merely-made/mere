@@ -720,6 +720,27 @@ impl MereRouteSession {
     }
 }
 
+/// The panel over a native admitted stream: `graphshell_client::pump`
+/// carries its lines (transport agnosticism note, T3), as a browser's data
+/// channel does. A failure is the panel's own (`fail`), so the pump goes on
+/// only while the panel is open.
+impl graphshell_client::LineDriven for MereRouteSession {
+    fn take_outgoing(&mut self) -> Vec<String> {
+        MereRouteSession::take_outgoing(self)
+    }
+
+    fn on_line(&mut self, line: &str) -> Result<(), String> {
+        MereRouteSession::on_line(self, line);
+        if !self.closed {
+            return Ok(());
+        }
+        Err(match &self.model.status {
+            ViewStatus::Unavailable(note) => note.message.clone(),
+            _ => "The resident mere is unavailable.".into(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod busy_tests {
     use super::*;

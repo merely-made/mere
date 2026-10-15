@@ -418,3 +418,12 @@ built):
   3's codec half is closed. Still open from item 3: one client correlator and
   the native stream-to-lines pump. The brokers are Djinn's `door` module, so
   push notices (item 2) and the dialable host (item 4) are Djinn work.
+- **2026-10-15 (pass (b)):** T5, T7, the native pump (T3) and the Murm
+  in-process kind landed; the remote route's admission is the
+  [remote mere route admission note](2026-10-15_remote_mere_route_admission.md).
+  Item 1 (the application claim) holds on the dialable host by the
+  requested path and the delegation's leaf, with no dramatis change; item 3's
+  pump is `graphshell_client::pump`; item 4's host is
+  `djinn::resident_projection`, not yet started by the binary. Still open:
+  push notices (item 2), one client correlator (item 3), and the binary's
+  trusted roots.
