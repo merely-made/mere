@@ -187,7 +187,10 @@ impl Canvas {
         self.exact_scope = Some(roster);
     }
 
-    pub(super) fn resolve_exact_scope(&self, roster: &std::collections::BTreeSet<uuid::Uuid>) -> Vec<NodeKey> {
+    pub(super) fn resolve_exact_scope(
+        &self,
+        roster: &std::collections::BTreeSet<uuid::Uuid>,
+    ) -> Vec<NodeKey> {
         roster
             .iter()
             .filter_map(|id| self.graph.get_node_by_id(*id).map(|(key, _)| key))
@@ -216,14 +219,12 @@ impl Canvas {
     }
 
     /// Whether `key` is individually visible in the current Canvas view. The
-    /// scope lens is applied first; an active fold then substitutes its source
-    /// members with a synthetic summary body. The host's gnode builder uses this
-    /// too, so its DOM path matches the scene paint path. (Graph curation C3.)
+    /// scope lens is applied first; a current fold then hides its members but
+    /// a member stand-in, which stays drawn with its "+N". The host's gnode
+    /// builder uses this too, so its DOM path matches the scene paint path.
+    /// (Graph curation C3; mer3ly site plan, Ruling 166.)
     pub fn node_in_scope(&self, key: NodeKey) -> bool {
-        self.scope.as_ref().is_none_or(|s| s.contains(&key))
-            && self
-                .active_fold_projection()
-                .is_none_or(|projection| !projection.members.contains(&key))
+        self.scope.as_ref().is_none_or(|s| s.contains(&key)) && !self.fold_hides(key)
     }
 
     /// Zoom by `factor`, keeping the world point under `anchor` (screen px) fixed.
@@ -449,7 +450,12 @@ impl Canvas {
         let view = self.world_viewport();
         let mut framing = LayoutFraming {
             view: [view.min.x, view.min.y, view.max.x, view.max.y],
-            extent: [f32::INFINITY, f32::INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY],
+            extent: [
+                f32::INFINITY,
+                f32::INFINITY,
+                f32::NEG_INFINITY,
+                f32::NEG_INFINITY,
+            ],
             ..LayoutFraming::default()
         };
         for (_, p) in self.view.positions() {
@@ -618,7 +624,10 @@ mod tests {
         });
         let world = canvas.world_point_at((410.0, 275.0));
         let back = canvas.screen_point_of(world);
-        assert!((back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3, "{back:?}");
+        assert!(
+            (back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3,
+            "{back:?}"
+        );
         let (key, _) = canvas.graph.nodes().next().unwrap();
         canvas.selected = [key].into_iter().collect();
         let at = canvas.focused_world_position().unwrap();

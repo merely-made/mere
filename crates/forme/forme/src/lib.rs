@@ -38,7 +38,6 @@
 
 // ── v1 canonical core ────────────────────────────────────────────────────────
 pub mod arrangement;
-pub mod fold;
 pub mod forme_document;
 
 /// Native on-disk persistence of [`FormeDocument`]s. Gated by the `store`
@@ -51,11 +50,9 @@ pub use arrangement::{
     Arrangement, ArrangementEdge, ArrangementEdgeKind, ArrangementNode, ArrangementNodeId,
     ArrangementNodeKind, GraphMemberId,
 };
-pub use fold::{FOLD_RECORD_VERSION, FoldBoundaryPolicy, FoldId, FoldRecord};
 pub use forme_document::{FormeDocument, FormeId, FormeRef};
 
 // ── Parked graphshell-era machinery (git-revivable; pending removal) ─────────
-mod subgraph;
 mod layout;
 mod lens;
 mod member;
@@ -64,16 +61,17 @@ pub mod parity;
 pub mod pressure;
 mod query;
 pub mod reconciliation;
+mod subgraph;
 mod topology;
 mod tree;
 mod ux;
 
-pub use subgraph::*;
 pub use layout::*;
 pub use lens::*;
 pub use member::*;
 pub use nav::*;
 pub use query::*;
+pub use subgraph::*;
 pub use topology::*;
 pub use tree::*;
 pub use ux::*;
