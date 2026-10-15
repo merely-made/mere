@@ -20,6 +20,9 @@ pub struct MereViewModel {
     pub hide_graph: bool,
     /// Archive readings and operations advertised by the host, if available.
     pub archive: Option<ArchiveModel>,
+    /// Where the sessions and archives show: beside the graph, or as an
+    /// overmap layer above it.
+    pub placement: SessionPlacement,
     pub graph: GraphModel,
     /// The layout in use: one of cartography's graph-only strategy ids.
     pub layout: String,
@@ -29,6 +32,30 @@ pub struct MereViewModel {
     pub actions: Vec<HostAction>,
     /// The reason the host gave for the last request it declined.
     pub notice: Option<String>,
+}
+
+/// Where the view puts a mere's sessions and archives.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum SessionPlacement {
+    /// A column beside the graph, or above it when the tile is narrow.
+    #[default]
+    Beside,
+    /// An overmap layer across the top of the graph's area, one level up
+    /// from the graph: each session a container node with the archives
+    /// saved from it on it, an archive shelf for the rest, and minting last.
+    /// For a host whose graph is not a session's own, such as a file catalog
+    /// under a resident mere.
+    Overmap,
+}
+
+impl SessionPlacement {
+    /// The `data-sessions` token.
+    pub fn token(self) -> &'static str {
+        match self {
+            Self::Beside => "beside",
+            Self::Overmap => "overmap",
+        }
+    }
 }
 
 /// An immutable archive catalog. These are readings, never a second store.
@@ -46,6 +73,9 @@ pub struct ArchiveEntry {
     pub name: String,
     pub detail: String,
     pub can_open: bool,
+    /// The session this archive was saved from, when its owner says. The
+    /// overmap puts the archive on that session; `None` puts it on the shelf.
+    pub session: Option<SessionId>,
 }
 
 /// Whether there is a graph to show, and if not, why not.

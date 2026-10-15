@@ -708,12 +708,14 @@ fn the_shared_panel_hides_only_its_duplicate_graph_and_keeps_requests_out() {
                 name: "Morning archive".into(),
                 detail: "Read-only archive".into(),
                 can_open: true,
+                session: None,
             },
             ArchiveEntry {
                 key: "two".into(),
                 name: "Evening archive".into(),
                 detail: "Read-only archive".into(),
                 can_open: true,
+                session: None,
             },
         ],
         save_sessions: vec![session_id(1)],
@@ -783,5 +785,210 @@ fn the_shared_panel_hides_only_its_duplicate_graph_and_keeps_requests_out() {
         runner.state().view.selected_archives,
         ["two"],
         "refresh removes vanished stable identifiers"
+    );
+}
+
+fn overmap_model() -> MereViewModel {
+    let mut model = model();
+    model.placement = SessionPlacement::Overmap;
+    model.archive = Some(ArchiveModel {
+        entries: vec![
+            ArchiveEntry {
+                key: "saved".into(),
+                name: "Codicil blake3:f612a".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+                session: Some(session_id(1)),
+            },
+            ArchiveEntry {
+                key: "composed".into(),
+                name: "Codicil blake3:0c0de".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+                session: None,
+            },
+            ArchiveEntry {
+                key: "forgotten".into(),
+                name: "Codicil blake3:90ne0".into(),
+                detail: "Read-only archive".into(),
+                can_open: false,
+                session: Some(session_id(99)),
+            },
+        ],
+        save_sessions: vec![session_id(1), session_id(2)],
+        can_compose: true,
+    });
+    model
+}
+
+fn container_of(dom: &ScriptedDom, root: NodeId, archive: &str) -> Option<String> {
+    let mut containers = Vec::new();
+    find_all(dom, root, "data-container", &mut containers);
+    containers.into_iter().find_map(|container| {
+        find(dom, container, "data-archive", archive).map(|_| {
+            attr(dom, container, "aria-label")
+                .unwrap_or_default()
+                .to_string()
+        })
+    })
+}
+
+#[test]
+fn the_overmap_puts_sessions_in_containers_above_the_graph_with_their_archives_on_them() {
+    let model = overmap_model();
+    let before = model.clone();
+    let beside = {
+        let mut beside = model.clone();
+        beside.placement = SessionPlacement::Beside;
+        MereView {
+            model: &beside,
+            state: &MereViewState::default(),
+            leaf_key: 7,
+            width: 900,
+            height: 600,
+        }
+        .graph_size()
+    };
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        assert_eq!(attr(&dom, root, "data-sessions"), Some("overmap"));
+        let view = MereView {
+            model: &runner.state().model,
+            state: &runner.state().view,
+            leaf_key: 7,
+            width: 900,
+            height: 600,
+        };
+        let band = view.overmap_height();
+        assert!(band > 0, "the overmap takes a band");
+        assert_eq!(
+            view.graph_size(),
+            (900, 600 - 40 - band),
+            "the graph keeps the full width, below the band"
+        );
+        assert!(view.graph_size().0 > beside.0, "no column beside the graph");
+
+        // One container per session, then the shelf, then minting.
+        let mut containers = Vec::new();
+        find_all(&dom, root, "data-container", &mut containers);
+        let kinds: Vec<_> = containers
+            .iter()
+            .map(|node| attr(&dom, *node, "data-container").unwrap())
+            .collect();
+        assert_eq!(kinds, ["session", "session", "session", "shelf", "mint"]);
+        let attached = find(&dom, root, "aria-label", "Session Morning reading").unwrap();
+        assert_eq!(attr(&dom, attached, "data-attached"), Some("true"));
+        assert!(text(&dom, attached).contains("Shown here"));
+
+        // An archive sits on the session it was saved from; one no live
+        // session holds sits on the shelf.
+        assert_eq!(
+            container_of(&dom, root, "saved").as_deref(),
+            Some("Session Morning reading")
+        );
+        assert_eq!(
+            container_of(&dom, root, "composed").as_deref(),
+            Some("Archive")
+        );
+        assert_eq!(
+            container_of(&dom, root, "forgotten").as_deref(),
+            Some("Archive")
+        );
+
+        // The side column is gone; the notice sits below the band.
+        let mut lists = Vec::new();
+        find_all(&dom, root, "aria-label", &mut lists);
+        let sessions = lists
+            .into_iter()
+            .find(|node| attr(&dom, *node, "aria-label") == Some("Sessions"))
+            .unwrap();
+        assert!(
+            attr(&dom, sessions, "style")
+                .unwrap()
+                .contains("display:none"),
+            "no column of sessions beside the graph"
+        );
+    }
+
+    // The containers' controls are the panel's requests.
+    for label in [
+        "Save Morning reading to archive",
+        "Switch to Evening reading",
+        "Open Codicil blake3:f612a as session",
+    ] {
+        let control = find(&dom.borrow(), root, "aria-label", label).unwrap();
+        runner.dispatch_click(control, PointerClick::at((1., 1.)));
+    }
+    for name in ["Codicil blake3:f612a", "Codicil blake3:0c0de"] {
+        let select = find(
+            &dom.borrow(),
+            root,
+            "aria-label",
+            &format!("Select {name} for composition"),
+        )
+        .unwrap();
+        runner.dispatch_click(select, PointerClick::at((1., 1.)));
+    }
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    let mint = find(&dom.borrow(), root, "data-request", "mint").unwrap();
+    runner.dispatch_click(mint, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Archive(ArchiveRequest::Save(session_id(1))),
+            MereViewRequest::Session(session_id(2), SessionStep::Switch),
+            MereViewRequest::Archive(ArchiveRequest::Open("saved".into())),
+            MereViewRequest::Archive(ArchiveRequest::Compose(vec![
+                "saved".into(),
+                "composed".into()
+            ])),
+            MereViewRequest::Mint,
+        ]
+    );
+    assert_eq!(
+        runner.state().model,
+        before,
+        "controls are requests, never a store"
+    );
+}
+
+#[test]
+fn the_overmap_band_wraps_and_stops_at_its_share() {
+    let model = overmap_model();
+    let wide = MereView {
+        model: &model,
+        state: &MereViewState::default(),
+        leaf_key: 7,
+        width: 1400,
+        height: 900,
+    };
+    let narrow = MereView { width: 600, ..wide };
+    assert!(
+        narrow.overmap_height() > wide.overmap_height(),
+        "fewer containers to a row take more rows"
+    );
+    let short = MereView {
+        height: 200,
+        ..wide
+    };
+    assert!(
+        short.overmap_height() <= ((200 - 40) as f32 * 0.6) as u32,
+        "the band stops at its share of the body"
+    );
+    let mut without = model.clone();
+    without.sessions.clear();
+    without.archive = None;
+    without.can_mint = false;
+    assert_eq!(
+        MereView {
+            model: &without,
+            ..wide
+        }
+        .overmap_height(),
+        0,
+        "no sessions, no band"
     );
 }
