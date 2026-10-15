@@ -13,11 +13,10 @@ use cambium_genet_web_host::{
     mount_with_render_core,
 };
 use cambium_rootstock::{
-    AppCtx, CaptureRefusal, FocusedTextSlot, Frame, Host, HostFont, HostHooks, HostOptions,
-    HostWindow, Init, KeyPress, NamedKey, PendingFrame, PresentedFrame, ProducerImageIdentity,
-    start_frame_readback,
+    AppCtx, CaptureFrame, CaptureRefusal, FocusedTextSlot, Frame, Host, HostFont, HostHooks,
+    HostOptions, HostWindow, Init, KeyPress, NamedKey, PresentedFrame, ProducerImageIdentity,
 };
-use genet_render_host::{ReadbackFailure, RecoveryStatus, RenderCore};
+use genet_render_host::{RecoveryStatus, RenderCore};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use netrender::{ColorLoad, NO_CLIP, Scene};
 use serde_json::{Value, json};
@@ -492,13 +491,16 @@ struct Capture {
     frame: Frame,
     seal: Value,
 }
-async fn collect(mut pending: PendingFrame, started: f64) -> Result<Frame, String> {
+async fn collect(
+    mut poll: impl FnMut() -> Option<Result<Frame, String>>,
+    started: f64,
+) -> Result<Frame, String> {
     let mut frame = None;
     wait(|| {
         if now()? - started >= 5000. {
             return Err("copied readback exceeded five seconds from admission".into());
         }
-        if let Some(result) = pending.poll() {
+        if let Some(result) = poll() {
             if now()? - started >= 5000. {
                 return Err("readback ready after admission deadline".into());
             }
@@ -523,16 +525,13 @@ async fn capture(mount: &BrowserMount) -> Result<Capture, String> {
             *out.borrow_mut() = Some(seal(ctx, p))
         }));
         let out = copied.clone();
+        // The host starts an owned, stamped readback of the presented frame.
         host.s.pending_stamped_capture = Some(Box::new(move |result| {
-            *out.borrow_mut() = Some(result.map_err(|e| e.to_string()).and_then(|c| {
-                let p = c.presentation;
-                frame_bytes(p.width, p.height)?;
-                Ok((
-                    p,
-                    now()?,
-                    start_frame_readback(c.surface, c.view, p.width, p.height)?,
-                ))
-            }));
+            *out.borrow_mut() = Some(
+                result
+                    .map_err(|e| e.to_string())
+                    .and_then(|capture| Ok((now()?, capture))),
+            );
         }));
     }
     mount.window().request_redraw();
@@ -543,7 +542,24 @@ async fn capture(mount: &BrowserMount) -> Result<Capture, String> {
         h.s.pending_presentation_observer = None;
         return Err(e);
     }
-    let (p, started, pending) = copied.borrow_mut().take().ok_or("missing capture")??;
+    let (started, mut pending) = copied.borrow_mut().take().ok_or("missing capture")??;
+    let mut stamp = None;
+    let frame = collect(
+        || {
+            pending.poll().map(|result| {
+                result
+                    .map(|(presented, frame)| {
+                        stamp = Some(presented);
+                        frame
+                    })
+                    .map_err(|e| e.to_string())
+            })
+        },
+        started,
+    )
+    .await?;
+    let p = stamp.ok_or("capture lacks its presentation stamp")?;
+    frame_bytes(p.width, p.height)?;
     let seal = observed
         .borrow_mut()
         .take()
@@ -551,20 +567,16 @@ async fn capture(mount: &BrowserMount) -> Result<Capture, String> {
     if seal["presentation"] != presentation(p) {
         return Err("capture does not match presentation seal".into());
     }
-    let frame = collect(pending, started).await?;
     if frame.width != p.width || frame.height != p.height {
         return Err("readback extent mismatch".into());
     }
     Ok(Capture { frame, seal })
 }
-async fn loss_readback(mount: &BrowserMount) -> Result<PendingFrame, String> {
+async fn loss_readback(mount: &BrowserMount) -> Result<CaptureFrame, String> {
     let copied = Rc::new(RefCell::new(None));
     let out = copied.clone();
     mount.host().borrow_mut().s.pending_capture = Some(Box::new(move |result| {
-        *out.borrow_mut() = Some(result.map_err(|e| e.to_string()).and_then(|c| {
-            frame_bytes(c.width, c.height)?;
-            start_frame_readback(c.surface, c.view, c.width, c.height)
-        }));
+        *out.borrow_mut() = Some(result.map_err(|e| e.to_string()));
     }));
     mount.window().request_redraw();
     if let Err(e) = wait(|| Ok(copied.borrow().is_some())).await {
@@ -625,7 +637,16 @@ async fn sources(mount: &BrowserMount, index: usize) -> Result<Vec<Capture>, Str
         drop(view);
         drop(texture);
         drop(core);
-        let frame = collect(pending, started).await?;
+        let mut pending = pending;
+        let frame = collect(
+            || {
+                pending
+                    .poll()
+                    .map(|result| result.map_err(|e| e.to_string()))
+            },
+            started,
+        )
+        .await?;
         if frame.width != w || frame.height != h {
             return Err("complete producer extent mismatch".into());
         }
@@ -1054,15 +1075,15 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
     {
         return Err("loss captures not exactly-once and generation-branded".into());
     }
-    if !matches!(cancelled_readback.poll(), Some(Err(ReadbackFailure::DeviceLost(notice))) if notice == loss)
+    if !matches!(cancelled_readback.poll(), Some(Err(CaptureRefusal::DeviceLost(notice))) if notice == loss)
     {
         return Err(
             "queued browser readback did not refuse with actual old-generation loss".into(),
         );
     }
-    if !matches!(
+    if matches!(
         cancelled_readback.poll(),
-        Some(Err(ReadbackFailure::AlreadyCollected))
+        Some(Err(CaptureRefusal::DeviceLost(_)))
     ) {
         return Err("queued browser readback replayed its loss after collection".into());
     }
