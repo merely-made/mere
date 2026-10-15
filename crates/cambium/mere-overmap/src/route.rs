@@ -30,10 +30,10 @@ use sceno::{InstanceId, SourceRef};
 use uuid::Uuid;
 
 use crate::wire::{
-    ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ArchiveActionV1, COMPOSE_CODICILS_INTENT,
-    FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS, MINT_SESSION_INTENT,
-    OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSION_ITEM_SOURCE,
-    SESSIONS_SOURCE, SessionsActionV1, TRASH_SESSION_INTENT,
+    ARCHIVE_SESSION_LABEL, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ArchiveActionV1,
+    COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS,
+    MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT,
+    SESSION_ITEM_SOURCE, SESSIONS_SOURCE, SessionsActionV1, TRASH_SESSION_INTENT,
 };
 
 /// Each step a session's card can offer, and the intent that takes it.
@@ -110,9 +110,24 @@ pub fn fill_archive(
                 .map(|card| card.badges.join(", "))
                 .unwrap_or_default(),
             can_open: advertises(archive, instance, OPEN_CODICIL_INTENT),
+            session: card.as_ref().and_then(archive_session),
         });
     }
     model.archive = Some(result);
+}
+
+/// The one session a codicil card says it was saved from. A card naming
+/// none, or more than one (a composition), names no single session.
+pub fn archive_session(card: &PortableCardV1) -> Option<SessionId> {
+    let mut sessions = card
+        .values
+        .iter()
+        .filter(|value| value.label == ARCHIVE_SESSION_LABEL)
+        .map(|value| Uuid::parse_str(&value.value).ok());
+    let first = sessions.next()??;
+    sessions
+        .all(|other| other == Some(first))
+        .then_some(SessionId(first))
 }
 
 /// Translate an archive request against the exact advertised projection.
@@ -448,5 +463,49 @@ fn record_values(
                 .map(str::to_owned)
                 .unwrap_or_else(|| value.to_string()),
         }),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use chirograph::CardValueV1;
+
+    use super::*;
+
+    fn card(values: &[(&str, &str)]) -> PortableCardV1 {
+        PortableCardV1 {
+            title: "Codicil blake3:f612a".into(),
+            values: values
+                .iter()
+                .map(|(label, value)| CardValueV1 {
+                    label: (*label).into(),
+                    value: (*value).into(),
+                })
+                .collect(),
+            badges: Vec::new(),
+            media: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn a_codicil_card_names_the_one_session_it_was_saved_from() {
+        let one = "00000000-0000-0000-0000-000000000001";
+        let two = "00000000-0000-0000-0000-000000000002";
+        assert_eq!(
+            archive_session(&card(&[("Codicil", "blake3:f612a"), ("Session", one)])),
+            Some(SessionId(Uuid::parse_str(one).unwrap()))
+        );
+        assert_eq!(
+            archive_session(&card(&[("Session", one), ("Session", one)])),
+            Some(SessionId(Uuid::parse_str(one).unwrap())),
+            "the same session twice is still one"
+        );
+        assert_eq!(
+            archive_session(&card(&[("Session", one), ("Session", two)])),
+            None,
+            "a composition names no single session"
+        );
+        assert_eq!(archive_session(&card(&[("Codicil", "blake3:f612a")])), None);
+        assert_eq!(archive_session(&card(&[("Session", "not a uuid")])), None);
     }
 }

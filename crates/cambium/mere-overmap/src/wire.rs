@@ -89,6 +89,9 @@ pub const SAVE_CODICIL_INTENT: &str = "mere.archive.save";
 pub const OPEN_CODICIL_INTENT: &str = "mere.archive.open";
 pub const COMPOSE_CODICILS_INTENT: &str = "mere.archive.compose";
 pub const ARCHIVE_SCHEMA: &str = "mere.archive/v1";
+/// The label of a codicil card's value naming a session the codicil was
+/// saved from, by its uuid. A codicil saved from one session carries one.
+pub const ARCHIVE_SESSION_LABEL: &str = "Session";
 
 /// Archive operations name ids, never positions in the current projection.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
