@@ -15357,6 +15357,7 @@ version = "0.0.4"
 dependencies = [
  "mere-curation",
  "sceno",
+ "script-engine-api",
  "serde",
  "serde_json",
 ]
@@ -15433,8 +15434,13 @@ dependencies = [
 name = "script-rhai"
 version = "0.0.1"
 dependencies = [
+ "getrandom 0.3.4",
  "inker",
+ "libm",
  "rhai",
+ "scenograph",
+ "script-engine-api",
+ "wasm-bindgen",
 ]
 
 [[package]]
