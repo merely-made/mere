@@ -995,6 +995,22 @@ button in light DOM is the control. Then it fixes the walk. Under Mark's
 accessibility-first ruling (Turnstone U2) this bug sits ahead of any mount
 work, since every web page with shadow content is affected.
 
+**Landed 2026-10-14.** F15 was confirmed by a run. The light-DOM button
+projected and its shadow-root twin produced `[]`. The fix is on Genet main at
+`85252e20`, with Mark's rulings 11.1 to 11.3 recorded in residual 11 of
+`genet/design_docs/2026-09-07_shadow_dom_plan.md`:
+- Projection, AccName name-from-content and scroll-ancestor climbs follow the
+  flat tree.
+- `aria-labelledby`, `aria-describedby` and `<label for>` resolve within
+  their own tree.
+- `descendant_text`, which supplies only the textarea and input value, stays
+  on DOM children.
+
+genet-render passes 48 of 48 tests. With only the old walk restored, the four
+shadow tests fail. F15's remark about descendant-text names was wrong: names
+come from `a11y/name.rs`. No WPT or screen-reader run covers the fix yet.
+AC7's mount probe needs a Mere pin that includes `85252e20`.
+
 **AC9. Is compound documents the use of forest mounts that AC1 left
 unnamed?** Here "compound documents" means find, selection, flowing layout and
 reading order that cross from host content into guest content. Options:
