@@ -894,4 +894,75 @@ fast-forward of local main; nothing built).**
   Mere-side `knot-editor`, `knot-document` and `knot-site` pin bump, and
   Turnstone's move to the same Mere and Knot revisions (which also needs its
   `graphshell::projection_editor` imports changed to `scenograph`).
+- **2026-10-15 (Mark's rulings on P2's receipt and option wording; option
+  helpers return values):** Mark ruled that Woodshed adopts the P2 controls as
+  that phase's receipt (the Hocket Looper session has been told by the Knot
+  adoption session), and that option labels are per host. So
+  `scenomise::arrangement::option_placeholder`, which returned Graphshell's
+  words, is replaced by `option_fallback` returning `OptionFallback`
+  (`Value`, `Measured { resolved, words }`, `Auto { resolved }`, `Empty`): the
+  facts a label is made from. Graphshell's words ("auto", "none", "n (words)")
+  moved to `graphshell::projection_compile::option_placeholder` with the old
+  test; Knot's own labels ("automatic", the empty label, "Default: ...") become
+  a mapping over the same enum, and its `declared_options` becomes
+  `arrangement_options` plus `arrangement_defaults`. Both hosts show the same
+  text as before: the catalog resolves every option for a built-in family
+  (`Auto` resolves to `auto`, `Empty` to the empty string), which is why the
+  enum carries `resolved` for `Auto` as well as `Measured`.
+- **2026-10-15 (P2, generic over the host, at Woodshed's request; Mark chose
+  the route):** Woodshed's three hosting surfaces (Session Mere overview,
+  Related, relationship recipe editor) render through `cambium::graph_canvas`
+  with a `GraphViewport`, not a `Canvas`, so the lifted helpers could not serve
+  them. `pictograph::canvas::camera_host` adds three small traits, portable and
+  with no runtime: `CameraHost` (`camera`, `set_camera`, `zoom_range`,
+  `set_view_follow`, plus `wheel_zoom_px` and `pan_step` with generic defaults),
+  `FitHost: CameraHost` (the fit and physics verbs, each defaulting to nothing)
+  and `FaceGeometry` (`zoom`, `faces`). `Canvas` implements all three, so
+  existing callers change nothing. `CanvasCommand::apply`, `wheel_zoom`,
+  `two_finger`, `pan_at_once` and `FaceAlignment::measure` are generic over
+  them. `Canvas` keeps its own paths for the two behaviors that differ from the
+  generic arithmetic: it zooms through `cursor_moved`, `set_ctrl` and `wheel`
+  (projection-aware, the canvas's per-notch factor) and it pans as an impulse
+  into its inertia, so Knot and Graphshell behave as before. A host that takes
+  the defaults zooms by the same per-notch factor, keeps the world point under
+  the pointer and clamps to its `zoom_range`, and pans at once by the distance
+  the canvas's glide covers (`PAN_GLIDE`). Tests: a plain host agrees with the
+  canvas on wheel zoom and two-finger gestures, stays in its range, reaches
+  commands through its own verbs (absent verbs do nothing) and feeds
+  `FaceAlignment`. A trait defined here cannot be implemented for a foreign
+  camera type, so Woodshed wraps its `GraphViewport` in a newtype per surface.
+  Checks: pictograph (`canvas`) lib 435 passed, 1 failed, 18 ignored; the one
+  failure, `arrangement_goldens::every_arrangement_matches_its_golden_on_both_fixtures`
+  ("topic radial weighted focus 0 moved from its golden"), fails the same way at
+  `e92572a4e` without these changes (run in a clean worktree), so it predates
+  them and is not touched here. `graphshell` lib 453 passed; `graphshell-web`
+  checks for wasm32 with default features and with none; pictograph's `canvas`
+  checks for wasm32; the boundary script passes. Graphshell's page code now
+  dereferences its `RefMut<Canvas>` (`&mut *canvas`) at ten call sites, because
+  generic parameters do not auto-deref the way a `&mut Canvas` parameter did.
+- **2026-10-15 (pins synced after P2 and P3):** Mere `8357b00d0` moves the
+  `knot-editor`, `knot-document` and `knot-site` pins to Knot `c487a7c`
+  (Knot's repin to Mere `e92572a4e`). Turnstone `c191a56` is on Knot `c487a7c`
+  and Mere `e92572a4e`, so it resolves one Mere source; its `projection_editor`
+  imports in `knot_authoring.rs` now come from `scenograph`, and its 940 tests
+  pass (reported by the Knot adoption session, not rerun here). Woodshed is on
+  Mere `8357b00d0` (woodshed `25acaa0`).
+- **2026-10-15 (P3, Knot side landed; helpers on main):** Mere `a26ed1caf` on
+  `origin/main` carries `282413cd0` (option values), `2cc10a674` (the P2
+  helpers generic over the host) and the pin-sync note. Knot `601f99b` (on
+  `origin/main`) repins Mere to `a26ed1caf` and takes the arrangement option
+  facts from `scenomise::arrangement` (`option_fallback`, `arrangement_options`,
+  `arrangement_defaults`): `recipe/editor.rs` no longer has its own
+  `option_default`, `declared_options` or `default_description` logic, and keeps
+  only its words ("automatic", the empty label, "Default: ...", "Measured
+  default: ..."). Its rows show the same text as before. Checks: workspace
+  `cargo check --all-targets`; knot-document, knot-editor (`mere-overlay`),
+  knot-desktop (lib, bins, `scenario_lane`, `font_roles`, `typography_fonts`)
+  and knot-site pass, 624 tests, with a symlink-free `TMPDIR`. Graphshell
+  already used the shared helpers through its own labels
+  (`projection_compile::option_placeholder`). P3 is done on both sides. Still
+  open: the P2 receipt (Woodshed adopting `CameraHost`, `FitHost` and
+  `FaceGeometry` on its three surfaces, after its repin to a revision with them);
+  `canvas_physics` and `canvas_reader` have not moved; Knot's pin bumps now
+  belong to the overmap agent.
 

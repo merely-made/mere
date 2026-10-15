@@ -166,6 +166,8 @@ pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 mod elapsed;
+/// What a host implements to use the camera, command and face helpers.
+pub mod camera_host;
 /// Camera, arrangement and physics commands a host's controls share.
 pub mod controls;
 /// Wheel, touch and keyboard-pan policy and camera arithmetic.
