@@ -433,13 +433,16 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
     }
 
     /// The text a node's visible label shows: its own visible text, or its
-    /// accessible name.
-    fn label_text(&self, index: usize) -> &str {
+    /// accessible name, cut in the middle when it is longer than a label holds
+    /// ([`middle_cut`]).
+    fn label_text(&self, index: usize) -> std::borrow::Cow<'_, str> {
         let node = &self.graph.nodes[index];
-        self.visible_labels
+        let text = self
+            .visible_labels
             .iter()
             .find(|(id, _)| *id == node.id)
-            .map_or(node.label.as_str(), |(_, text)| text.as_str())
+            .map_or(node.label.as_str(), |(_, text)| text.as_str());
+        middle_cut(text, GRAPH_LABEL_CHARS)
     }
 
     /// Ask for keyboard focus on one node's target (see
@@ -647,7 +650,7 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         // The boxes `GraphLabelPlacement::style` lays out.
         let rect = |index: usize| {
             let (x, y) = positions[index];
-            let width = label_text_width(self.label_text(index));
+            let width = label_text_width(&self.label_text(index));
             match self.label_placement(index) {
                 placement @ (GraphLabelPlacement::Above | GraphLabelPlacement::Below) => {
                     let top = if placement == GraphLabelPlacement::Above {
@@ -988,11 +991,64 @@ fn rectangle_ray_exit(
 /// side leaves.
 const GRAPH_LABEL_WIDTH: f32 = 160.0;
 
+/// A label character's estimated width at the labels' 10 px size.
+const LABEL_CHAR_WIDTH: f32 = 5.6;
+
+/// The most characters a visible label shows before it is cut: as many as its
+/// width holds at the 4.6 px a label character measures natively (the width
+/// estimate above stays conservative, for culling).
+const GRAPH_LABEL_CHARS: usize = ((GRAPH_LABEL_WIDTH - 2.0) / 4.6) as usize;
+
 /// A label's width estimated from its length at the labels' 10 px size, no
 /// wider than [`GRAPH_LABEL_WIDTH`].
 fn label_text_width(label: &str) -> f32 {
-    const CHAR_WIDTH: f32 = 5.6;
-    (label.chars().count() as f32 * CHAR_WIDTH + 2.0).min(GRAPH_LABEL_WIDTH)
+    (label.chars().count() as f32 * LABEL_CHAR_WIDTH + 2.0).min(GRAPH_LABEL_WIDTH)
+}
+
+/// `text` cut to at most `max` characters by dropping its middle, so a long
+/// label keeps both its start and its distinguishing end, as in
+/// `Session (fork of … blake3:f612a))`. Names that differ only at their end
+/// (two forks, two codicils) stay told apart, which an end ellipsis loses.
+/// Text that fits is returned as it is.
+pub(crate) fn middle_cut(text: &str, max: usize) -> std::borrow::Cow<'_, str> {
+    const MARK: &str = " … ";
+    let count = text.chars().count();
+    if count <= max || max <= MARK.chars().count() + 1 {
+        return std::borrow::Cow::Borrowed(text);
+    }
+    // How far a cut moves to land between words rather than inside one.
+    const SNAP: usize = 6;
+    let chars: Vec<char> = text.chars().collect();
+    let keep = max - MARK.chars().count();
+    // The end is what tells long names apart. It starts at a word: the next
+    // one when that is near, else the one it falls in.
+    let mut tail_start = count - keep / 2;
+    let at_word = |at: usize| at == 0 || chars[at - 1].is_whitespace();
+    if !at_word(tail_start) {
+        if let Some(ahead) = (0..SNAP)
+            .take_while(|ahead| tail_start + ahead < count)
+            .find(|ahead| chars[tail_start + ahead].is_whitespace())
+        {
+            tail_start += ahead + 1;
+        } else if let Some(back) = (1..=SNAP)
+            .take_while(|back| *back < tail_start)
+            .find(|back| chars[tail_start - back].is_whitespace())
+        {
+            tail_start -= back - 1;
+        }
+    }
+    // The start takes the rest, ending between words when one is near.
+    let mut head_end = keep.saturating_sub(count - tail_start).clamp(1, tail_start);
+    if !at_word(head_end)
+        && let Some(back) = (1..=SNAP)
+            .take_while(|back| *back < head_end)
+            .find(|back| chars[head_end - back].is_whitespace())
+    {
+        head_end -= back;
+    }
+    let start: String = chars[..head_end].iter().collect();
+    let end: String = chars[tail_start..].iter().collect();
+    std::borrow::Cow::Owned(format!("{}{MARK}{}", start.trim_end(), end.trim_start()))
 }
 
 /// Where a node's visible label sits against its node.
@@ -1467,7 +1523,7 @@ where
                     class.push_str(" hovered");
                 }
                 let placement = swatch.label_placement(index);
-                el::<_, State, AppAction>("span", swatch.label_text(index).to_string())
+                el::<_, State, AppAction>("span", swatch.label_text(index).into_owned())
                     .attr("class", class)
                     .attr("aria-hidden", "true")
                     .attr("data-label-placement", placement.name())
@@ -1478,7 +1534,7 @@ where
                             y,
                             swatch.node_radius + 7.0,
                             size,
-                            label_text_width(swatch.label_text(index)),
+                            label_text_width(&swatch.label_text(index)),
                         ),
                     )
             })
@@ -2468,6 +2524,47 @@ mod tests {
         };
         assert!(texts.contains(&"Second".to_string()), "{texts:?}");
         assert!(!texts.contains(&"Second node".to_string()), "{texts:?}");
+    }
+
+    /// A long label is cut in its middle, keeping its start and the end that
+    /// tells it apart, at word boundaries; a short one is left whole.
+    #[test]
+    fn a_long_label_is_cut_in_the_middle() {
+        let fork = "Session (fork of Session (from blake3:f612a))";
+        let cut = middle_cut(fork, GRAPH_LABEL_CHARS);
+        assert!(cut.chars().count() <= GRAPH_LABEL_CHARS, "{cut}");
+        assert!(cut.starts_with("Session"), "{cut}");
+        assert_eq!(cut, "Session (fork of … blake3:f612a))");
+        let picked = middle_cut(
+            "Session (picked from Evening reading (from blake3:f612a))",
+            GRAPH_LABEL_CHARS,
+        );
+        assert!(picked.starts_with("Session (picked"), "{picked}");
+        assert!(picked.ends_with("blake3:f612a))"), "{picked}");
+        assert!(picked.chars().count() <= GRAPH_LABEL_CHARS, "{picked}");
+        assert!(cut.contains(" … "), "{cut}");
+        let other = middle_cut(
+            "Session (fork of Session (from blake3:0c0de))",
+            GRAPH_LABEL_CHARS,
+        );
+        assert_ne!(cut, other, "names that differ at the end stay apart");
+        assert_eq!(
+            middle_cut("Evening reading", GRAPH_LABEL_CHARS),
+            "Evening reading"
+        );
+        assert_eq!(
+            middle_cut("abcdefghijklmnopqrstuvwxyz0123456789", 10)
+                .chars()
+                .count(),
+            10,
+            "a name without spaces is cut at the budget"
+        );
+        // The canvas shows the cut and keeps the whole accessible name.
+        let swatch = model(None, None)
+            .with_node_labels(true)
+            .with_visible_label(2, fork);
+        assert_eq!(swatch.label_text(1), cut);
+        assert_eq!(swatch.graph.nodes[1].label, "Second node");
     }
 
     /// A node an overlay occupies shows the overlay, not its label too, with
