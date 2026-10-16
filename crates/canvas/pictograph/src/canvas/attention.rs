@@ -47,6 +47,14 @@ impl GrammarState {
         &mut self.attention
     }
 
+    pub(crate) fn seed_book(&self) -> &SeedBook<NodeKey> {
+        &self.seeds
+    }
+
+    pub(crate) fn seed_book_mut(&mut self) -> &mut SeedBook<NodeKey> {
+        &mut self.seeds
+    }
+
     /// Keep only the nodes `live` still holds.
     pub(crate) fn retain(&mut self, mut live: impl FnMut(&NodeKey) -> bool) {
         self.attention.retain(&mut live);

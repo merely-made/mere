@@ -75,6 +75,22 @@ pub struct CartographyGeometry {
     /// & face — face persistence.)
     #[serde(default)]
     faces: Vec<(GraphMemberId, String)>,
+    /// The saved seed (graph grammar, *Reset and seed*): `None` resets to the
+    /// recipe seed. Serde-defaulted.
+    #[serde(default)]
+    seed: Option<Vec<(GraphMemberId, (f32, f32))>>,
+    /// The regions the active arrangement drew (Partition, Sets, Mosaic), so a
+    /// restored scene draws them without re-projecting. Serde-defaulted.
+    #[serde(default)]
+    regions: Vec<SavedRegion>,
+}
+
+/// One region an arrangement drew, in world coordinates, its members by id.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct SavedRegion {
+    pub contour: Vec<(f32, f32)>,
+    pub label: Option<String>,
+    pub members: Vec<GraphMemberId>,
 }
 
 impl CartographyGeometry {
@@ -196,6 +212,46 @@ impl CartographyGeometry {
     /// `apply_cartography_faces`). (Node body & face — face persistence.)
     pub fn face_iter(&self) -> impl Iterator<Item = (GraphMemberId, &str)> + '_ {
         self.faces.iter().map(|(m, code)| (*m, code.as_str()))
+    }
+
+    /// Attach the saved seed (chainable); `None` is the recipe seed.
+    pub fn with_seed(
+        mut self,
+        seed: Option<impl IntoIterator<Item = (GraphMemberId, (f32, f32))>>,
+    ) -> Self {
+        self.seed = seed.map(|seed| seed.into_iter().collect());
+        self
+    }
+
+    pub fn seed(&self) -> Option<&[(GraphMemberId, (f32, f32))]> {
+        self.seed.as_deref()
+    }
+
+    /// Attach the arrangement's regions (chainable).
+    pub fn with_regions(mut self, regions: impl IntoIterator<Item = SavedRegion>) -> Self {
+        self.regions = regions.into_iter().collect();
+        self
+    }
+
+    pub fn regions(&self) -> &[SavedRegion] {
+        &self.regions
+    }
+
+    /// Keep only what belongs to members `keep` admits, across every
+    /// member-keyed field; a region keeps its contour with its kept members.
+    pub fn retain_members(&mut self, keep: impl Fn(&GraphMemberId) -> bool) {
+        self.positions.retain(|(id, _)| keep(id));
+        self.sizes.retain(|(id, _)| keep(id));
+        self.sprites.retain(|(id, _)| keep(id));
+        self.sprite_hulls.retain(|(id, _)| keep(id));
+        self.materials.retain(|(id, _)| keep(id));
+        self.faces.retain(|(id, _)| keep(id));
+        if let Some(seed) = self.seed.as_mut() {
+            seed.retain(|(id, _)| keep(id));
+        }
+        for region in &mut self.regions {
+            region.members.retain(|id| keep(id));
+        }
     }
 
     pub fn is_empty(&self) -> bool {
