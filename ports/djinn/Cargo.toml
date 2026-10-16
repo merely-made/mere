@@ -100,6 +100,8 @@ graphshell-host = { workspace = true, features = ["native"] }
 # The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
 mere-overmap.workspace = true
 knot-editor.workspace = true
+# Exact signed Knot relation intake into durable Mere sessions.
+kernel.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from
 # graphshell with the keeper adapters (dramatis repo plan, D15).
 light-file-dialog = "3.21.3"
@@ -264,7 +266,6 @@ graphshell-client = { workspace = true, features = ["pump"] }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
 mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint.workspace = true
-kernel.workspace = true
 pollster = "0.4"
 mere-view.workspace = true
 p2panda-core = "0.7.0"

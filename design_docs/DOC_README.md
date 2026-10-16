@@ -873,6 +873,10 @@ is historical evidence, not the current path or ownership inventory. For the wor
   that delivery from a qualified or completed phase. Use existing owners and
   contracts, and keep unresolved architecture choices explicit.
 
+- **Direct publication (2026-10-15):** Mark requests direct pushes to main for
+  routine work in this repository. Fetch first, preserve other sessions' work,
+  qualify the bounded change and push without a PR unless one is requested.
+
 - **Portable qualification handoffs (2026-10-10):** when one machine supplies
   implementation and another supplies visual testing, keep the tested revision,
   build/features, scenario order, retained-state prerequisites and open gates
