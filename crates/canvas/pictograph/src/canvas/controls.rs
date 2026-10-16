@@ -47,6 +47,8 @@ pub enum CanvasCommand {
     /// Grow or shrink the selected Mosaic tiles by a quarter.
     GrowTiles,
     ShrinkTiles,
+    /// Draw the territory field beneath the graph, or stop.
+    ToggleTerritory,
 }
 
 impl CanvasCommand {
@@ -97,6 +99,7 @@ impl CanvasCommand {
             Self::ToggleForegroundPin => host.toggle_selection_foreground_pin(),
             Self::GrowTiles => host.resize_selected_tiles(1.25),
             Self::ShrinkTiles => host.resize_selected_tiles(0.8),
+            Self::ToggleTerritory => host.toggle_territory_field(),
         }
     }
 }

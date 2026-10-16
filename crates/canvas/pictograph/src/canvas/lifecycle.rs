@@ -170,6 +170,7 @@ impl Canvas {
             grammar: Default::default(),
             strategy_regions: Vec::new(),
             mosaic: Default::default(),
+            territory_field: false,
             field_drag: None,
             forme_region: None,
             forme_guides: None,
