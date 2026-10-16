@@ -133,8 +133,7 @@ pub fn facet_projection_for_node(graph: &Graph, key: NodeKey) -> Option<FacetPro
         .edges_directed(key, Direction::Incoming)
         .filter(|e| {
             e.weight()
-                .arrangement
-                .as_ref()
+                .arrangement_data()
                 .is_some_and(|a| a.sub_kinds.contains(&ArrangementSubKind::FrameMember))
         })
         .map(|e| FacetScalar::Text(format!("{:?}", e.source())))

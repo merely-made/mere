@@ -473,10 +473,8 @@ pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
         from_node_id: from.to_string(),
         to_node_id: to.to_string(),
         families: vec![PersistedEdgeFamily::Semantic],
-        semantic: Some(PersistedSemanticEdgeData {
-            statements,
-            ..Default::default()
-        }),
+        semantic: None,
+        assertions: Some(statements),
         traversal: None,
         containment: None,
         arrangement: None,

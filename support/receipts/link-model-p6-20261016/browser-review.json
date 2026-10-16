@@ -1,0 +1,61 @@
+{
+  "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+  "origin": "http://127.0.0.1:8857",
+  "viewport": [
+    1280,
+    720
+  ],
+  "device_pixel_ratio": 2,
+  "reviewed_captures": 4,
+  "image_observations": [
+    "Both strata remain distinct and directed at rest.",
+    "Saved exact assertion hide acknowledgement is visible; the pair and independent reason remain available.",
+    "A fresh tab opens the same graph session with the hide retained; ordinary restore returns both reasons.",
+    "The default short viewport shows the upper part of the scrolling inspector; exact assertion data is also verified by the scenario semantic snapshot."
+  ],
+  "results": [
+    {
+      "scenario": "p6_tree_family_assertion_hide",
+      "result": "ok",
+      "reopened": false,
+      "session": "7dac643c-595d-43a1-9ed8-07892b345986",
+      "backend": "BrowserWebGpu",
+      "captures": [
+        {
+          "name": "p6_family_assertions_initial",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 402882
+        },
+        {
+          "name": "p6_family_assertion_hidden",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 447914
+        }
+      ]
+    },
+    {
+      "scenario": "p6_tree_family_assertion_hide_reopen",
+      "result": "ok",
+      "reopened": true,
+      "session": "7dac643c-595d-43a1-9ed8-07892b345986",
+      "backend": "BrowserWebGpu",
+      "captures": [
+        {
+          "name": "p6_family_assertion_reopened_hidden",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 403042
+        },
+        {
+          "name": "p6_family_assertion_reopened_shown",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 438226
+        }
+      ]
+    }
+  ],
+  "scope": "BrowserWebGpu and fresh-tab IndexedDB reopen; not a browser-process restart receipt."
+}

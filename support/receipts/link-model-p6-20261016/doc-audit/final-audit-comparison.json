@@ -1,0 +1,21 @@
+{
+  "baseline": "fb32346fe",
+  "qualified_supplier": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+  "final_docs": "working tree, subsequently committed with this receipt",
+  "audit_deltas": {},
+  "no_new_findings": true,
+  "judgment_errors_unchanged": true,
+  "judgment_errors": 15,
+  "covered_active_docs": 271,
+  "active_docs": 285,
+  "normalization": "Worktree roots and Markdown line positions; object line/line_number excluded. List findings compared as Counters.",
+  "audit_exit_codes": {
+    "baseline_audit": 0,
+    "final_audit": 0,
+    "baseline_judgment": 1,
+    "final_judgment": 1
+  },
+  "final_judgment_supplemental_records": 238,
+  "baseline_judgment_supplemental_records": 238,
+  "reassessment_note": "The existing Batch89 architecture, plan and index records are updated in place; the 15 errors are unchanged."
+}

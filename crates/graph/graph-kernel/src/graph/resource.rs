@@ -306,11 +306,7 @@ impl Graph {
             return false;
         }
         let mut statements = std::collections::BTreeMap::new();
-        for statement in edges
-            .iter()
-            .filter_map(|edge| edge.semantic.as_ref())
-            .flat_map(|semantic| &semantic.statements)
-        {
+        for statement in edges.iter().flat_map(|edge| edge.retained_assertions()) {
             if let Some(previous) = statements.insert(&statement.statement_id, statement)
                 && previous != statement
             {
@@ -323,7 +319,7 @@ impl Graph {
             }
             if edge
                 .weight()
-                .semantic_statements()
+                .assertions()
                 .iter()
                 .any(|statement| statements.contains_key(&statement.statement_id))
             {
@@ -331,7 +327,7 @@ impl Graph {
             }
         }
         if self.inner.inner().edge_weights().any(|edge| {
-            edge.semantic_statements()
+            edge.assertions()
                 .iter()
                 .any(|statement| statements.contains_key(&statement.statement_id))
         }) {
@@ -339,7 +335,14 @@ impl Graph {
         }
         let payloads: Vec<_> = edges
             .iter()
-            .map(super::snapshot::payload_from_persisted)
+            .enumerate()
+            .map(|(ordinal, edge)| {
+                super::snapshot::payload_from_persisted_at(
+                    edge,
+                    super::GraphStratum::Resource,
+                    ordinal,
+                )
+            })
             .collect();
         let current: Vec<_> = self
             .resources
@@ -483,7 +486,10 @@ mod tests {
         });
         let original = super::super::snapshot::persisted_edge_for_ids(ids[0], ids[1], &payload);
         let mut aggregate_only = original.clone();
-        aggregate_only.semantic.as_mut().unwrap().statements.clear();
+        aggregate_only.assertions = None;
+        aggregate_only.semantic = Some(Default::default());
+        aggregate_only.semantic.as_mut().unwrap().sub_kinds =
+            vec![crate::persistence::PersistedSemanticSubKind::Cites];
         assert!(!graph.set_resource_edges_between(ids[0], ids[1], &[aggregate_only.clone()]));
         assert!(!graph.set_resource_edges_between(ids[0], ids[1], &[aggregate_only]));
         assert!(
@@ -494,7 +500,7 @@ mod tests {
         assert!(graph.set_resource_edges_between(ids[0], ids[1], &[original.clone()]));
         assert!(!graph.set_resource_edges_between(ids[0], ids[1], &[original.clone()]));
         let mut conflicting = original.clone();
-        conflicting.semantic.as_mut().unwrap().statements[0].label = Some("conflict".into());
+        conflicting.retained_assertions_mut()[0].label = Some("conflict".into());
         assert!(!graph.set_resource_edges_between(
             ids[0],
             ids[1],
@@ -512,7 +518,7 @@ mod tests {
                 .persisted_resource_edges_between(ids[0], ids[2])
                 .is_empty()
         );
-        other_pair.semantic.as_mut().unwrap().statements[0].statement_id = "other-handle".into();
+        other_pair.retained_assertions_mut()[0].statement_id = "other-handle".into();
         assert!(graph.set_resource_edges_between(ids[0], ids[2], &[other_pair.clone()]));
         assert_eq!(
             graph.persisted_resource_edges_between(ids[0], ids[2]),
@@ -527,7 +533,7 @@ mod tests {
             euclid::default::Point2D::new(1.0, 0.0),
         );
         let mut collision = other_pair.clone();
-        collision.semantic.as_mut().unwrap().statements[0].statement_id = "surface-handle".into();
+        collision.retained_assertions_mut()[0].statement_id = "surface-handle".into();
         graph.inner.connect(
             first,
             second,
@@ -538,8 +544,7 @@ mod tests {
             graph.persisted_resource_edges_between(ids[0], ids[2]),
             vec![other_pair]
         );
-        collision.semantic.as_mut().unwrap().statements[0].statement_id =
-            "fresh-resource-handle".into();
+        collision.retained_assertions_mut()[0].statement_id = "fresh-resource-handle".into();
         assert!(graph.set_resource_edges_between(ids[0], ids[2], &[collision.clone()]));
         assert_eq!(
             graph.persisted_resource_edges_between(ids[0], ids[2]),

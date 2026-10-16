@@ -42,7 +42,7 @@ fn builtin_themes_include_edge_tokens() {
     let dark = builtin(THEME_ID_DARK);
 
     assert!(default.edge_tokens.family_tokens.len() >= 5);
-    assert!(dark.edge_tokens.kind_tokens.len() >= 5);
+    assert!(dark.edge_tokens.family_tokens.len() >= 5);
 }
 
 #[test]
