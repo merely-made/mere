@@ -1,10 +1,11 @@
 # Link model: shared readings, assertion lifecycle and responsive paths
 
 **Date:** 2026-10-15
-**Status:** in progress. The bounded P1 shared reading and P5 fixed-endpoint
-Graphshell experiment are qualified on source `1e3fb426c`, based on
-`b2c8dcc28`. P2's semantic lifecycle is implemented and bounded-tested; its
-Knot supplier/intake gate remains open. P3–P4, P6 and P7 remain later work.
+**Status:** in progress overall. The bounded P1 shared reading, P2 semantic
+lifecycle/Knot intake and P5 fixed-endpoint experiment are qualified on their
+recorded sources. The P2 continuation is source `b69510949`, based on runtime
+`82e7fd718` with later upstream documentation merged. P3–P4, P6 and P7 remain
+later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -381,7 +382,7 @@ links, 151 missing known-root paths, six stale historical annotations and 61
 unheaded owned sources remain baseline debt. Batch 86 supersedes the two
 prior link-model judgments. This is no new debt, not a passing global gate.
 
-### Remaining phase gates and publication scope
+### Remaining gates at the first bounded delivery
 
 Knot is pinned to `fe9d98ccc1eb7b0589bd90243683d4f6dfab3242` on this source
 baseline. Its signed operation carries `asserted_at_ms` and its assertion DTO
@@ -402,7 +403,7 @@ new dependency set is a separate gate.
 
 ## P2 continuation: Knot source projection and Mere intake
 
-**2026-10-15, in progress.** The preceding bounded delivery was pushed
+**2026-10-15, qualified.** The preceding bounded delivery was pushed
 directly to main as `e21c581d8`; PR 9 was closed. Mark requests direct pushes
 for routine work in this repository. This continuation starts from Mere
 `82e7fd718` and Knot `d2cb090`, after the family source and dramatis flips.
@@ -445,3 +446,34 @@ keeping every package version and other supplier revision unchanged. Genet
 remains `e37762d752e423dc43f920bd728c83f70c47f2cc`; a temporary resolver advance
 to newer Genet was rolled back before compilation. The receipt records the
 full dependency-edge comparison.
+
+
+The continuation closes P2's semantic supplier/intake gate on
+`b6951094915009424c1a57cd2c917fdfda15bd14`, with the supplier above. The
+[qualification receipt](../../../support/receipts/link-model-knot-20261015/checks.json)
+records exact source hashes, commands, dependency-edge repairs and captures.
+The signed Djinn intake suite passes five tests; its ignored helper is invoked
+successfully in a fresh OS child process for an exact JSON snapshot comparison.
+It covers distinct same-reason operation IDs, full signer/scope/basis, timed and
+unknown assertion/withdrawal clocks, repeat and stale-held no-ops, exact-head
+admission, stale Surface/Resource refusal, and atomic source-metadata conflict
+refusal with graph, journal and all storage bytes unchanged.
+
+Graphshell's web library passes 300 tests with six existing ignores. The
+standalone product/WebGPU wasm build passes locked/offline. The browser scenario
+runs against an isolated fixture database at its normal 1280 × 720 CSS viewport,
+with 2560 × 1440 captures and BrowserWebGpu; GPU timestamps are unavailable.
+The final four captures were reviewed: held-default metadata, a closed timed
+span, withdrawal with no time, and an undated held assertion, including basis
+method/version/evidence. Selection/workbench checks pass and only held history
+rows expose exact-inspection actions. The fixture has two held and two withdrawn
+claims; it is separate from the real signed Knot intake proof. Browser reload
+reopens the retained fixture. Direction-arrow glyph fallback remains an existing
+presentation limit; lifecycle wording now uses ordinary ASCII words.
+
+The first capture pass verified state but did not reveal the relevant rows.
+The final scenario reveals accessible headings/actions before capturing. It is
+not desktop-native application acceptance, automatic Knot synchronization,
+physical-peer qualification, pre-P2 binary archive migration or P6 history-budget
+qualification. P3's chartulary asserter/span/basis prerequisite is next in the
+core sequence; fan retirement and promotion stay with their own phases.

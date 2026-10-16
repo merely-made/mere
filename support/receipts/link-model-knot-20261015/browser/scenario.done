@@ -1,0 +1,7 @@
+RESULT ok
+captured p2_link_history_held_default
+captured p2_link_history_retained
+captured p2_link_history_unknown_withdrawal
+captured p2_link_history_undated
+link history default scope, chronology, lifecycle disclosures, and held-only action passed
+gpu timestamps: no

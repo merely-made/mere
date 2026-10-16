@@ -3,8 +3,8 @@
 **Date:** 2026-10-15
 **Status:** design with a qualified bounded P1 shared reading and P5
 fixed-endpoint Graphshell experiment on source `1e3fb426c`. P2's semantic
-lifecycle is implemented and bounded-tested; its Knot supplier/intake gate
-remains open. P3–P4, P6 and P7 (§8) remain later work. Mark ruled L1–L6 on
+lifecycle and Knot supplier/intake gate are qualified by the continuation on
+`b69510949`. P3–P4, P6 and P7 (§8) remain later work. Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
@@ -685,3 +685,17 @@ Mere intake round-trip; the browser inspector fixture does not demonstrate
 withdrawn/undated spans visually. The plan and its receipt preserve these
 limits, including unqualified newer-main dependencies, pre-P2 binary archive
 migration and later-family/history budgets. No ruling changed.
+
+
+**2026-10-15, P2 supplier/intake qualified.** Knot `0020a50` preserves optional
+signed retraction time, including old checkpoint byte identity when absent.
+Djinn imports an opaque store-verified projection through exact captured-head
+and existing Surface/Resource admission. It keeps full operation/signer/space
+identity and source basis/clocks, preflights complete batches and commits through
+Pandect's acknowledged transaction. A real signed source, checkpoint/reopen and
+fresh-process Mere JSON reopen pass. The first Knot fold retraction supplies the
+effective tombstone; later source retraction events stay in Knot, and conflicting
+effective withdrawal metadata refuses intake. Four reviewed Graphshell captures
+now demonstrate held, timed withdrawn, time-unknown withdrawn and undated held
+records. This closes P2's recorded gate; automatic sync, desktop-native editing
+and later phases remain separate. The implementation plan owns exact evidence.

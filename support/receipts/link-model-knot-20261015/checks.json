@@ -1,0 +1,415 @@
+{
+  "schema": "mere.link-model-knot-qualification/1",
+  "date": "2026-10-15",
+  "source_commit": "b6951094915009424c1a57cd2c917fdfda15bd14",
+  "implementation_commit": "87191e39eabd0cec84f885b6f1b845667700339a",
+  "runtime_base": "82e7fd71812008cae30e21be1e2afd992fd9d3ba",
+  "upstream_docs_merged": "cd795487b5aa8f34db10eb09df744d2ca2c02cb9",
+  "knot_source_commit": "0020a50e6ff10a9244f4965609b31f4ac79fd753",
+  "knot_base": "d2cb090134dbdb1799ac1678fc4857296b587859",
+  "phase_status": {
+    "P1": "bounded shared reading previously qualified on recorded source",
+    "P2": "semantic lifecycle, signed Knot supplier/intake and history view qualified",
+    "P3": "next; chartulary asserter/span/basis before Woodshed",
+    "P4": "later; fan retirement",
+    "P5": "bounded experiment previously qualified on recorded source",
+    "P6": "later; other families and history budgets",
+    "P7": "later; promotion"
+  },
+  "build_source": {
+    "initial_cpu_worktree_hashes": "build-source.json",
+    "compiled_rust_manifest_lock_inputs_verified_identical_to_source_commit": true,
+    "scenario": "browser/p2_tree_link_history.scn",
+    "scenario_is_loaded_at_runtime": true,
+    "note": "Capture-only scenario steps were refined after initial binary build. Final locked browser build and fresh bindings match the exact served artifact bytes used by final captures."
+  },
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "bytes": 474096,
+      "sha256": "e85759f54c84c45a56e197d630a6f2d621294af138793821329f33570709de48"
+    },
+    {
+      "path": "ports/djinn/Cargo.toml",
+      "bytes": 13821,
+      "sha256": "6d95de6f5f280c9295206dbe12fabf1b57da562705a7bf895b616d36bd67a19f"
+    },
+    {
+      "path": "ports/djinn/src/knot_relation_intake.rs",
+      "bytes": 13336,
+      "sha256": "c20f7b0410a5f2ff63c0d20cb8d7d476583679354ab07a20ea0b0231f2d2d79b"
+    },
+    {
+      "path": "ports/djinn/src/lib.rs",
+      "bytes": 1308,
+      "sha256": "0d04c0bd6738ff7cb766851f35466f4414f1ca4ae767f8c191a16a0055c21d00"
+    },
+    {
+      "path": "ports/djinn/tests/knot_relation_intake.rs",
+      "bytes": 28576,
+      "sha256": "973fac8ba8d2f7e1f839a97170000e8e68951410dc58122ab9e76ef89b62e17d"
+    },
+    {
+      "path": "ports/graphshell/src/mere_host_fixture.rs",
+      "bytes": 19800,
+      "sha256": "6e1f5cefbf1733c02fa2863299726c5169f32ba0f59a49a2576e15e424bad70d"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/link_inspection.rs",
+      "bytes": 25379,
+      "sha256": "a9e7255d758131ac96ccfda1f3a0beaa2b088b60f69f49c3f998170e88d7c003"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/product.rs",
+      "bytes": 40658,
+      "sha256": "0a040ea6a2381ce2029bd6944d6f99ab1d91c52a16b8f7210b8ea815ae9be1b8"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p2_tree_link_history.scn",
+      "bytes": 3972,
+      "sha256": "64526e7ff1bf02b3fad0bdf430a22e5d34ee5fcfedaa02bf7b61ffcf3c214c8f"
+    }
+  ],
+  "checks": [
+    {
+      "name": "knot-relation-integration",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "knot-editor",
+        "--test",
+        "authored_relations",
+        "--test",
+        "file_relations"
+      ],
+      "cwd": "Knot checkout at 0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "exit_code": 0,
+      "log": "logs/knot-relations.log",
+      "log_sha256": "e1d0359c04cf48f002e86bd0e9f5ed8391fdd72f31fbd62657b321440d228400",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 10m 41s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s"
+      ],
+      "passed": 5
+    },
+    {
+      "name": "knot-library",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "knot-editor",
+        "--lib"
+      ],
+      "cwd": "Knot checkout at 0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "exit_code": 0,
+      "log": "logs/knot-lib.log",
+      "log_sha256": "dd9b3ad409260e8305d3c248fcbaa3edc4b91d4369bee0a731e50136fff40809",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.93s",
+        "test result: ok. 150 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 11.39s"
+      ],
+      "passed": 150,
+      "ignored": 1,
+      "ignore": "existing DR-C isolated receipt-keeper probe"
+    },
+    {
+      "name": "mere-signed-knot-intake",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "djinn",
+        "--test",
+        "knot_relation_intake",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "Mere checkout at b6951094915009424c1a57cd2c917fdfda15bd14",
+      "exit_code": 0,
+      "log": "logs/mere-knot-intake-retry.log",
+      "log_sha256": "25c7da95d8b18b680fbb7c444c52c4a9dc4a6131f31577632a174466a199c429",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.17s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.88s"
+      ],
+      "parent_tests_passed": 5,
+      "helper_ignored_in_parent": 1,
+      "fresh_os_child_helper_passed": 1
+    },
+    {
+      "name": "graphshell-web-library",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "web",
+        "--lib"
+      ],
+      "cwd": "Mere checkout at b6951094915009424c1a57cd2c917fdfda15bd14",
+      "exit_code": 0,
+      "log": "logs/graphshell-web.log",
+      "log_sha256": "a4d4e475220fdd9d83fb686c6eed428233861f31c80590bd391c4e57c95e8c8c",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 7m 02s",
+        "test result: ok. 300 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 9.78s"
+      ],
+      "passed": 300,
+      "ignored": 6
+    },
+    {
+      "name": "product-webgpu-wasm",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "product,presentation-webgpu"
+      ],
+      "cwd": "ports/graphshell/web",
+      "exit_code": 0,
+      "log": "logs/wasm-qualified.log",
+      "log_sha256": "6a673dd9d6617d69532b3af922298ff9000db34bd840edae1f57759632bdf01e",
+      "summaries": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.98s"
+      ],
+      "profile": "debug"
+    }
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/testing/mere/link-model-knot-20261015/knot-target",
+    "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/testing/mere/link-model-knot-20261015/knot-build",
+    "CARGO_BUILD_JOBS": "1",
+    "TMPDIR": "/tmp",
+    "cache_scope": "one task-owned native cache reused sequentially for supplier and consumer; no concurrent task builds",
+    "wasm_target_dir": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-target",
+    "wasm_build_dir": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-build",
+    "wasm_cache": "existing task-owned cache, builds serialized; served prior fixture artifacts preserved separately"
+  },
+  "toolchain": {
+    "rustc": "1.99.0 (b940084d7)",
+    "cargo": "1.99.0 (5f94df478)",
+    "wasm_bindgen": "0.2.129"
+  },
+  "dependency_update": {
+    "knot_packages_advanced_together": 6,
+    "genet_preserved": "e37762d752e423dc43f920bd728c83f70c47f2cc",
+    "package_versions_changed": 0,
+    "other_source_revisions_changed": 0,
+    "existing_dependency_references_repaired_by_cargo": 19,
+    "comparison": "lock-delta.json"
+  },
+  "intake_contract": {
+    "source": "opaque projection created only by Knot verified file-store fold; read-only accessor",
+    "admission": "exact document ID/head plus existing surface and expected shown Resource",
+    "identity": "full 32-byte operation/signer/space encoded as lowercase 64-hex URNs",
+    "basis": "qualification -> note, evidence retained as opaque references, no fabricated method",
+    "time": "signed source first/last/withdrawal preserved, None remains unknown; local transaction time is separate",
+    "withdrawal": "first Knot fold entry is effective; later retraction operation IDs/times remain in Knot; stale held import cannot revive; conflicting effective metadata refuses",
+    "atomicity": "private preflight graph and isolated capture, then acknowledged Pandect transaction",
+    "reopen": "real signed Knot checkpoint/reopen, then imported Mere JSON snapshot compared byte-for-byte in a fresh OS child process"
+  },
+  "browser": {
+    "state": "ok",
+    "result": "ok",
+    "page_errors": [],
+    "gate_failures": [],
+    "backend": "BrowserWebGpu",
+    "viewport_css": [
+      1280,
+      720
+    ],
+    "capture_pixels": [
+      2560,
+      1440
+    ],
+    "viewport_override": false,
+    "gpu_timestamps": false,
+    "captures_reviewed": 4,
+    "review": "Held default, closed timed withdrawal (1000 -> 1200), withdrawal with unknown time, and undated held assertion are visible with last time and method/version/evidence. No withdrawn action; held exact action works. Selection/workbench invariants pass. Fixture reopened on final run.",
+    "presentation_residual": "Existing direction-arrow glyph fallback remains; lifecycle label uses ASCII-safe words.",
+    "artifacts": [
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-knot-20261015/site/pkg/graphshell_web.js",
+        "bytes": 149342,
+        "sha256": "3b1ea4b7f71909e119736716b6f5c6b5bfe18189c667fdbf4cb64ce9d4feafe3",
+        "fresh_final_bindgen_matches_served_bytes": true
+      },
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-knot-20261015/site/pkg/graphshell_web_bg.wasm",
+        "bytes": 261260673,
+        "sha256": "947c278feb97a85654372d3f8eeb2ddb04aef4e18fca256051757b168049db1c",
+        "fresh_final_bindgen_matches_served_bytes": true
+      }
+    ],
+    "binding_tool": "/Users/markik/Code/testing/mere/one-tree-product-20261008/toolchain/bin/wasm-bindgen",
+    "served_scenario_sha256": "64526e7ff1bf02b3fad0bdf430a22e5d34ee5fcfedaa02bf7b61ffcf3c214c8f"
+  },
+  "formatting": {
+    "changed_rust_files_checked": 6,
+    "command": "rustfmt --edition 2024 --config skip_children=true --check <six changed Rust files>",
+    "result": "passed",
+    "diff_check": "passed"
+  },
+  "review": "Independent source review found the transaction boundary sound; opaque source wrapper and effective-withdrawal collision refusal were added and re-reviewed with no remaining actionable issue.",
+  "iterations": [
+    "Initial intake test compilation failed on an add_node import; corrected to kernel::graph::apply and final retry passed. Initial log retained, not counted as a successful gate.",
+    "Initial browser state scenario passed but captures were above the relevant details. Private CSS-class reveal selectors then missed; final accessible heading/action selectors passed and revealed all four reviewed captures.",
+    "A final browser rebuild launched from root would omit the standalone web Cargo configuration; cancelled with exit 130 and rerun from ports/graphshell/web. Only correct-directory build/bindings qualify artifacts."
+  ],
+  "limits": [
+    "Adapter API and real signed local-store round-trip; no automatic resident synchronization or desktop link authoring claimed",
+    "Browser visual proof is separate from desktop-native application acceptance and physical-peer qualification",
+    "P6 substantial-history memory/read budget and pre-P2 unversioned standalone postcard migration remain open",
+    "No whole-stack renderer release, Windows or hardware qualification claimed"
+  ],
+  "documentation_audit": {
+    "baseline": "cd795487b5aa8f34db10eb09df744d2ca2c02cb9",
+    "new_occurrences": 0,
+    "audit_exit_code": 0,
+    "judgment_exit_code": 1,
+    "judgment_coverage": [
+      271,
+      285
+    ],
+    "same_judgment_errors": 15,
+    "global_gate_green": false,
+    "comparison": "audit/comparison.json",
+    "baseline_placement": "Sibling checkout under Code/repos to preserve cross-repository path resolution; a nested testing-directory baseline was rejected as incomparable."
+  },
+  "receipt_artifacts": [
+    {
+      "path": "audit/comparison.json",
+      "bytes": 1963,
+      "sha256": "0f8a7e98cf08709cc942691e6926c97b79af34bcd6fa240a12d965a8f45d245f"
+    },
+    {
+      "path": "audit/doc-audit-final.json",
+      "bytes": 247511,
+      "sha256": "9526053d12267fce1e41937897604718c62432e27988013b0ba03ab0cd55d33a"
+    },
+    {
+      "path": "audit/doc-audit-upstream-baseline.json",
+      "bytes": 247511,
+      "sha256": "98311cc26f56c6a16975c6002c0ce7fc610e9e508bdc81ee9446fcdcfd9bc185"
+    },
+    {
+      "path": "audit/judgment-final.json",
+      "bytes": 11664,
+      "sha256": "b8f7b589bbd63d2ac35d68d573885257dbe3729f1a77c83d720cdd17706bd128"
+    },
+    {
+      "path": "audit/judgment-upstream-baseline.json",
+      "bytes": 11664,
+      "sha256": "9b8cd568f92bac4ae4bafa4d83c3d649759febf27850bdad66274858d1b4a8c7"
+    },
+    {
+      "path": "browser/p2_link_history_held_default.png",
+      "bytes": 301803,
+      "sha256": "38e95ca2fc9ab04ba61445747a75074fac4e23b0bdb47a30161e7c024d89ed66"
+    },
+    {
+      "path": "browser/p2_link_history_retained.png",
+      "bytes": 338050,
+      "sha256": "ec24ae383d731c451523872483d45f822860a287e6f4c0f6cc47d764a10889a6"
+    },
+    {
+      "path": "browser/p2_link_history_undated.png",
+      "bytes": 337581,
+      "sha256": "c0d2eafdc695027150b0c11c0b5ce17efabec1633af58589078d06f6a5e0c113"
+    },
+    {
+      "path": "browser/p2_link_history_unknown_withdrawal.png",
+      "bytes": 342819,
+      "sha256": "8a36e2222a839659bd48d9905d4cd4d08abf548ee27d7b2dbf18484feab4b606"
+    },
+    {
+      "path": "browser/p2_tree_link_history.scn",
+      "bytes": 3972,
+      "sha256": "64526e7ff1bf02b3fad0bdf430a22e5d34ee5fcfedaa02bf7b61ffcf3c214c8f"
+    },
+    {
+      "path": "browser/progress.json",
+      "bytes": 9796,
+      "sha256": "66ebcf5d54d5a52c0b245316c25a4b4d272d764a58451f4dc5e1fb6d63a81cca"
+    },
+    {
+      "path": "browser/result.json",
+      "bytes": 36376,
+      "sha256": "4c5a370ec061ee60fa6c7221f6cede66638ed6e39a419cab5bb5deb1c80c349e"
+    },
+    {
+      "path": "browser/scenario.done",
+      "bytes": 269,
+      "sha256": "887c0662eb966867d0cbfa72231412c95615f8c9cb8a44991486043c1cf85f9f"
+    },
+    {
+      "path": "build-source.json",
+      "bytes": 1395,
+      "sha256": "3c9a159869c8ae9ac2759e0c1a2084b33994c88646e7b31616da232b249d39d3"
+    },
+    {
+      "path": "lock-delta.json",
+      "bytes": 17150,
+      "sha256": "edbd1b8ae8d4b373769b4b8bf4b80c360aa431ffba1e32261e826117f396a5e0"
+    },
+    {
+      "path": "logs/graphshell-web.log",
+      "bytes": 71749,
+      "sha256": "a4d4e475220fdd9d83fb686c6eed428233861f31c80590bd391c4e57c95e8c8c"
+    },
+    {
+      "path": "logs/knot-lib.log",
+      "bytes": 14237,
+      "sha256": "dd9b3ad409260e8305d3c248fcbaa3edc4b91d4369bee0a731e50136fff40809"
+    },
+    {
+      "path": "logs/knot-relations.log",
+      "bytes": 30944,
+      "sha256": "e1d0359c04cf48f002e86bd0e9f5ed8391fdd72f31fbd62657b321440d228400"
+    },
+    {
+      "path": "logs/mere-knot-intake-retry.log",
+      "bytes": 34137,
+      "sha256": "25c7da95d8b18b680fbb7c444c52c4a9dc4a6131f31577632a174466a199c429"
+    },
+    {
+      "path": "logs/mere-knot-intake.log",
+      "bytes": 59961,
+      "sha256": "d7fa568f2b1ac3e22662d4fd596a0a4572b0d2a210fa7e4601c088f485dd1bc9"
+    },
+    {
+      "path": "logs/wasm-qualified.log",
+      "bytes": 27488,
+      "sha256": "6a673dd9d6617d69532b3af922298ff9000db34bd840edae1f57759632bdf01e"
+    },
+    {
+      "path": "logs/wasm.log",
+      "bytes": 32555,
+      "sha256": "4db52d055ed1e9099e11eaff857bbb24f1aa7317298a4ef336e07d0fdd815988"
+    }
+  ]
+}
