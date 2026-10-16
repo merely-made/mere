@@ -43,11 +43,16 @@ pub mod history;
 pub mod host_dataset;
 mod math;
 pub mod matrix;
+pub mod opened_link;
 pub mod projection;
 pub mod registry;
 mod relax;
 mod solve;
 
+pub use opened_link::{
+    OpenedLinkCompileError, OpenedLinkEntry, OpenedLinkLane, OpenedLinkScene, compile_opened_link,
+    compile_opened_link_scope,
+};
 pub use registry::{
     ArrangementId, Disclosure, RegisterError, SolveError, Solver, SolverCapability, SolverRegistry,
     solve_via,

@@ -371,6 +371,22 @@ impl Canvas {
         !self.selected_edges.is_empty()
     }
 
+    /// Derived links selected through the current relation-cell hit path.
+    /// Parallel and antiparallel cells yield one unordered Surface pair;
+    /// no cell index becomes a source assertion or a stored pair identity.
+    pub fn selected_link_pairs(&self) -> Vec<(uuid::Uuid, uuid::Uuid)> {
+        self.selected_edges
+            .iter()
+            .filter_map(|cell| {
+                let a = self.graph.get_node(cell.from)?.id;
+                let b = self.graph.get_node(cell.to)?.id;
+                Some((a.min(b), a.max(b)))
+            })
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect()
+    }
+
     /// Hide the currently-selected relation cells, and clear the selection. Relation-cell
     /// truth persists (display-only); the spring for each newly-hidden cell relaxes in
     /// this instance only (swatch-primitive P5).

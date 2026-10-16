@@ -184,6 +184,152 @@ pub struct LinkPairReading {
     pub coverage: LinkCoverage,
 }
 
+/// The layout selected when a link reading is opened in a swatch.
+///
+/// These are compositions of existing arrangements, not new arrangement
+/// families. List uses `Stack`; Timeline uses the existing numeric Timeline
+/// axis and places disclosed lanes as rows within it.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "kind", content = "config")]
+pub enum OpenedLinkLayout {
+    List {
+        group_by: LinkListGroup,
+        stack: sceno::Stack,
+    },
+    Timeline {
+        lane_by: LinkTimelineLane,
+        timeline: sceno::Timeline,
+    },
+}
+
+impl OpenedLinkLayout {
+    /// Choose Timeline only when dated exact assertions are a majority of all
+    /// exact and legacy members. Legacy members have no first-time and count
+    /// as undated. Empty and mostly undated readings use List by family.
+    pub fn default_for(reading: &LinkPairReading) -> Self {
+        let mut dated = 0usize;
+        let mut members = 0usize;
+        for link in &reading.links {
+            for bucket in &link.buckets {
+                for assertion in &bucket.assertions {
+                    members += 1;
+                    dated += usize::from(assertion.first_asserted_ms.is_some());
+                }
+                members += bucket.legacy_members.len() + bucket.legacy_summaries.len();
+            }
+        }
+        if dated > members / 2 {
+            Self::Timeline {
+                lane_by: LinkTimelineLane::Family,
+                timeline: sceno::Timeline::default(),
+            }
+        } else {
+            Self::List {
+                group_by: LinkListGroup::Family,
+                stack: sceno::Stack::default(),
+            }
+        }
+    }
+}
+
+/// The grouping key shown above rows in the accessible list arrangement.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LinkListGroup {
+    Family,
+    /// Owning stratum and source endpoint pair; row direction remains visible.
+    Source,
+}
+
+/// The grouping key shown as stacked rows inside the existing Timeline.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LinkTimelineLane {
+    Family,
+    Asserter,
+    Direction,
+}
+
+/// Caller-supplied, view-local values used to complete an opened-link layout.
+/// No current time is invented by the shared compiler.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OpenedLinkOptions {
+    /// Explicit clock for currently held intervals. `None` leaves their end
+    /// unknown; the compiler never samples wall-clock time.
+    pub now_ms: Option<u64>,
+}
+
+/// A reference into the owned source reading retained by a compiled view.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OpenedLinkEntryRef {
+    pub link_index: usize,
+    pub bucket_index: usize,
+    pub member: OpenedLinkMemberRef,
+}
+
+/// The exact member kind and its index in its original source bucket.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "kind", content = "index")]
+pub enum OpenedLinkMemberRef {
+    Assertion(usize),
+    LegacyMember(usize),
+    LegacySummary(usize),
+}
+
+/// Resolve an opened entry to its original exact assertion or legacy source.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum OpenedLinkMember<'a> {
+    Assertion(&'a LinkAssertion),
+    LegacyMember(&'a LinkLegacyMember),
+    LegacySummary(&'a LinkLegacyFamily),
+}
+
+impl OpenedLinkEntryRef {
+    pub fn resolve<'a>(&self, reading: &'a LinkPairReading) -> Option<OpenedLinkMember<'a>> {
+        let bucket = reading
+            .links
+            .get(self.link_index)?
+            .buckets
+            .get(self.bucket_index)?;
+        match self.member {
+            OpenedLinkMemberRef::Assertion(index) => bucket
+                .assertions
+                .get(index)
+                .map(OpenedLinkMember::Assertion),
+            OpenedLinkMemberRef::LegacyMember(index) => bucket
+                .legacy_members
+                .get(index)
+                .map(OpenedLinkMember::LegacyMember),
+            OpenedLinkMemberRef::LegacySummary(index) => bucket
+                .legacy_summaries
+                .get(index)
+                .map(OpenedLinkMember::LegacySummary),
+        }
+    }
+}
+
+/// End-state of an assertion span. Missing withdrawal time and missing
+/// caller clock remain distinct from a known open/closed interval.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "kind", content = "at_ms")]
+pub enum LinkSpanEnd {
+    WithdrawalAt(u64),
+    WithdrawalTimeUnknown,
+    OpenAt(u64),
+    OpenTimeUnknown,
+}
+
+/// A dated interval in scene coordinates. Undated entries have no span but
+/// still occupy an explicit Timeline lane and scene item.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct LinkSpanGeometry {
+    pub start_ms: u64,
+    pub end: LinkSpanEnd,
+    pub x_start: f32,
+    pub x_end: Option<f32>,
+    pub y: f32,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum LinkCoverageLayer {
@@ -278,5 +424,12 @@ mod tests {
         assert_eq!(decoded.first_asserted_ms, None);
         assert_eq!(decoded.withdrawn, None);
         assert_eq!(decoded.basis, LinkAssertionBasis::default());
+    }
+
+    #[test]
+    fn custom_assertion_scope_round_trips_without_normalization() {
+        let scope = LinkGraphScope::Custom("urn:scope:review".into());
+        let json = serde_json::to_string(&scope).expect("writes");
+        assert_eq!(serde_json::from_str::<LinkGraphScope>(&json).expect("reads"), scope);
     }
 }

@@ -4,8 +4,8 @@
 **Status:** in progress overall. The bounded P1 shared reading, P2 semantic
 lifecycle/Knot intake and P5 fixed-endpoint experiment are qualified on their
 recorded sources. The P2 continuation is source `b69510949`, based on runtime
-`82e7fd718` with later upstream documentation merged. P3–P4, P6 and P7 remain
-later work.
+`82e7fd718` with later upstream documentation merged. P3 began on 2026-10-16
+from published Mere `c01c0aa73`; P4, P6 and P7 remain later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -477,3 +477,27 @@ not desktop-native application acceptance, automatic Knot synchronization,
 physical-peer qualification, pre-P2 binary archive migration or P6 history-budget
 qualification. P3's chartulary asserter/span/basis prerequisite is next in the
 core sequence; fan retirement and promotion stay with their own phases.
+
+## P3 continuation: opened-link swatch and external source assertions
+
+**2026-10-16, in progress.** Mark authorized the next phase and internal
+orchestration. The starting supplier is published Mere `c01c0aa73`; Woodshed
+was refreshed at `aba2c7343`. Three bounded lanes prepare chartulary's
+assertion metadata, the shared opened-link layout and Graphshell proof, and
+the Woodshed source adapter review. The integration owner settles interfaces,
+serializes builds and host changes, and owns publication and this plan.
+
+The gate order is chartulary attribution/span/basis, shared link scope and
+Graphshell list/Timeline, Woodshed's exact-source selection/explanation/
+withdrawal/audition, then Knot authored-time and retraction disclosure.
+Timeline lanes remain stacked rows in the existing Timeline arrangement;
+unknown dates remain undated. Shared reading and layout must preserve every
+assertion identity and source, including separate independent reasons. No
+consumer may infer source edit permission from metadata or presentation.
+
+Done conditions are the P3 proof in the design's §8: use the existing swatch
+and two arrangements; preserve stable `EdgeId` and source-owned actions in
+Woodshed; remove its superseded pair/member identity helpers; and demonstrate
+Knot's authored span and withdrawal through the same opened-link path.
+Focused persistence/replay controls and reviewed receiving-host captures
+remain separate gates. No new phase acceptance is claimed by this setup.
