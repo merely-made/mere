@@ -29,7 +29,7 @@ use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
     qual, set_class, set_style,
 };
-use super::edge_cells::{edge_cell_for_relation, relation_cell_overlay, selected_edge_overlay};
+use super::edge_cells::link_overlay;
 use super::fold_projection::FoldProjection;
 use super::{Canvas, FACE_INSET, Face, NodeShape, NodeState, PAN_DECAY};
 
@@ -246,15 +246,9 @@ impl Canvas {
             &arrangement,
             |k| positions.get(&k).copied(),
             |k| !on_screen.contains(&k),
-            // Skip relation cells the user has hidden. Platen still projects one pair-level
-            // edge after filtering, so a parallel relation keeps the bundle visible.
-            |rel| {
-                !fold_members.contains(&rel.from)
-                    && !fold_members.contains(&rel.to)
-                    && !self
-                        .hidden_edges
-                        .contains(&edge_cell_for_relation(rel.from, rel.to, rel.kind))
-            },
+            // Link strokes are projected below from canonical LinkReading values.
+            // Suppress Platen's pair fallback so it cannot double-draw a link.
+            |_| false,
             // Each node's face radius (node_size / 2) so straight edges trim to the
             // face and demoted underlay rects draw at the node's true size. (Node-rep
             // Decision 5 — size drives the face geometry.)
@@ -274,24 +268,16 @@ impl Canvas {
             self.hidden_field_ids(),
         ));
         underlay.splice_world_underlay(self.forme_overlay());
-        underlay.splice_world_overlays(relation_cell_overlay(
+        underlay.splice_world_overlays(link_overlay(
             &self.graph,
             &self.view,
+            &self.hidden_links,
             &self.hidden_edges,
+            &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
+            |key| self.node_size(key),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
-        // Highlight selected edges by splicing thicker strokes inside the
-        // underlay's camera transform (world space — no transform replication).
-        if !self.selected_edges.is_empty() {
-            underlay.splice_world_overlays(selected_edge_overlay(
-                &self.graph,
-                &self.view,
-                &self.hidden_edges,
-                &self.selected_edges,
-                &node_visible,
-            ));
-        }
         // Community rings: a halo per node in its community's colour, spliced into the same
         // world-space transform. (Graph signals — community to a ring.)
         if self.show_community_rings

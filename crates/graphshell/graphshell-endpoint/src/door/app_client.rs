@@ -20,7 +20,8 @@
 use chirograph::{
     CapabilityProfile, Carrier, CarrierError, CarrierNotice, CarrierRequest, CarrierRequestBody,
     CarrierResponseBody, ContentHash, PortableCardV1, PresentationCodec, ProjectionRequest,
-    ProjectionSnapshot, ProtocolVersion, ResourceRequest, SessionOpen, SessionOpened,
+    ProjectionSnapshot, ProtocolVersion, ResourceAssembly, ResourceChunkRequest,
+    ResourceChunkResponse, SessionOpen, SessionOpened,
 };
 use rand_core::{OsRng, RngCore};
 
@@ -49,6 +50,8 @@ pub enum AppClientError {
     MalformedCard(#[from] serde_json::Error),
     #[error("the resident resource has another scope or content address")]
     InvalidResourceAddress,
+    #[error("the resident resource chunk is invalid: {0}")]
+    InvalidResourceChunk(String),
     #[error("transport failed: {0}")]
     Io(#[from] std::io::Error),
 }
@@ -179,18 +182,25 @@ impl AppBrokerClient {
         session: chirograph::ProjectionSession,
         resource: ContentHash,
     ) -> Result<Vec<u8>, AppClientError> {
-        let expected_session = session.clone();
-        let body = self
-            .request_body(CarrierRequestBody::Resource(ResourceRequest {
-                session,
-                resource,
-            }))
-            .await?;
-        match body {
-            CarrierResponseBody::Resource(response) => {
-                checked_resource(response, &expected_session, resource)
-            },
-            other => Err(unexpected_body("the resource", &other)),
+        let mut assembly = ResourceAssembly::new();
+        let mut total = None;
+        loop {
+            let body = self
+                .request_body(CarrierRequestBody::ResourceChunk(ResourceChunkRequest {
+                    session: session.clone(),
+                    resource,
+                    offset: assembly.received(),
+                    length: chirograph::MAX_RESOURCE_CHUNK_BYTES,
+                }))
+                .await?;
+            let CarrierResponseBody::ResourceChunk(chunk) = body else {
+                return Err(unexpected_body("a resource chunk", &body));
+            };
+            if let Some(bytes) =
+                accept_resource_chunk(&mut assembly, &chunk, &session, resource, &mut total)?
+            {
+                return Ok(bytes);
+            }
         }
     }
 
@@ -409,42 +419,126 @@ fn unexpected_body(expected: &'static str, got: &CarrierResponseBody) -> AppClie
     AppClientError::UnexpectedAnswer { expected, got }
 }
 
-fn checked_resource(
-    response: chirograph::ResourceResponse,
-    expected_session: &chirograph::ProjectionSession,
-    expected_hash: ContentHash,
-) -> Result<Vec<u8>, AppClientError> {
-    if &response.session != expected_session
-        || response.resource != expected_hash
-        || !response.has_valid_address()
-    {
+/// A native app shares the carrier's chunk protocol. Check the requested
+/// scope and hash before assembly, consistent lengths and bounded progress on
+/// every response, then the shared assembler verifies each chunk and the whole.
+const MAX_APP_RESOURCE_BYTES: u64 = 64 * 1024 * 1024;
+fn accept_resource_chunk(
+    assembly: &mut ResourceAssembly,
+    response: &ResourceChunkResponse,
+    session: &chirograph::ProjectionSession,
+    resource: ContentHash,
+    total: &mut Option<u64>,
+) -> Result<Option<Vec<u8>>, AppClientError> {
+    if &response.session != session || response.resource != resource {
         return Err(AppClientError::InvalidResourceAddress);
     }
-    Ok(response.bytes)
+    if response.total_len > MAX_APP_RESOURCE_BYTES
+        || total.is_some_and(|size| size != response.total_len)
+    {
+        return Err(AppClientError::InvalidResourceChunk(
+            "inconsistent or excessive total length".into(),
+        ));
+    }
+    let bytes = response
+        .decode()
+        .ok_or_else(|| AppClientError::InvalidResourceChunk("chunk address or encoding".into()))?;
+    let end = response
+        .offset
+        .checked_add(bytes.len() as u64)
+        .ok_or_else(|| AppClientError::InvalidResourceChunk("chunk length overflow".into()))?;
+    if bytes.len() > chirograph::MAX_RESOURCE_CHUNK_BYTES as usize
+        || end > response.total_len
+        || (bytes.is_empty() && response.offset < response.total_len)
+    {
+        return Err(AppClientError::InvalidResourceChunk(
+            "chunk exceeds its bounds or makes no progress".into(),
+        ));
+    }
+    *total = Some(response.total_len);
+    assembly
+        .accept(response)
+        .map_err(|e| AppClientError::InvalidResourceChunk(e.to_string()))
 }
 #[cfg(test)]
 mod resource_boundary_tests {
     use super::*;
     #[test]
-    fn native_resource_bytes_require_the_requested_scope_and_verified_address() {
+    fn native_resource_chunks_verify_requested_scope_and_complete_content_above_one_frame() {
         let session = chirograph::ProjectionSession("mere.graph".into());
-        let bytes = b"scoped graph material".to_vec();
-        let response = chirograph::ResourceResponse::new(session.clone(), bytes.clone());
-        assert_eq!(
-            checked_resource(response.clone(), &session, response.resource).unwrap(),
-            bytes
-        );
-        for failure in 0..3 {
-            let mut invalid = response.clone();
-            match failure {
-                0 => invalid.session = chirograph::ProjectionSession("another".into()),
-                1 => invalid.resource = ContentHash::of(b"another"),
-                _ => invalid.bytes.push(0),
+        let bytes = vec![0xa5; 1_200_007];
+        let whole = chirograph::ResourceResponse::new(session.clone(), bytes.clone());
+        let mut assembly = ResourceAssembly::new();
+        let mut total = None;
+        let mut frames = 0;
+        loop {
+            let chunk = ResourceChunkResponse::slice(
+                &whole,
+                assembly.received(),
+                chirograph::MAX_RESOURCE_CHUNK_BYTES,
+            );
+            let response = chirograph::CarrierResponse {
+                id: 1,
+                body: Ok(CarrierResponseBody::ResourceChunk(Box::new(chunk.clone()))),
+            };
+            let framed = AppHostMessage::Response { response };
+            let mut wire = Vec::new();
+            crate::door::frame::write_native_message(&mut wire, &framed).unwrap();
+            assert!(wire.len() < 1024 * 1024);
+            frames += 1;
+            if let Some(actual) =
+                accept_resource_chunk(&mut assembly, &chunk, &session, whole.resource, &mut total)
+                    .unwrap()
+            {
+                assert_eq!(actual, bytes);
+                break;
             }
-            assert!(matches!(
-                checked_resource(invalid, &session, response.resource),
-                Err(AppClientError::InvalidResourceAddress)
-            ));
         }
+        assert_eq!(frames, 3);
+    }
+    #[test]
+    fn native_resource_chunks_refuse_scope_address_order_length_and_no_progress_faults() {
+        let session = chirograph::ProjectionSession("mere.graph".into());
+        let whole = chirograph::ResourceResponse::new(session.clone(), vec![7; 16]);
+        for fault in 0..8 {
+            let mut chunk = ResourceChunkResponse::slice(&whole, 0, 8);
+            let mut total = None;
+            match fault {
+                0 => chunk.session = chirograph::ProjectionSession("other".into()),
+                1 => chunk.resource = ContentHash::of(b"other"),
+                2 => chunk.bytes.push('!'),
+                3 => chunk.offset = 1,
+                4 => chunk.total_len = 4,
+                5 => chunk.total_len = MAX_APP_RESOURCE_BYTES + 1,
+                6 => total = Some(15),
+                _ => {
+                    chunk.bytes = String::new();
+                    chunk.chunk = ContentHash::of(b"");
+                },
+            }
+            assert!(
+                accept_resource_chunk(
+                    &mut ResourceAssembly::new(),
+                    &chunk,
+                    &session,
+                    whole.resource,
+                    &mut total
+                )
+                .is_err(),
+                "accepted fault {fault}"
+            );
+        }
+        let empty = chirograph::ResourceResponse::new(session.clone(), Vec::new());
+        assert_eq!(
+            accept_resource_chunk(
+                &mut ResourceAssembly::new(),
+                &ResourceChunkResponse::slice(&empty, 0, 8),
+                &session,
+                empty.resource,
+                &mut None
+            )
+            .unwrap(),
+            Some(Vec::new())
+        );
     }
 }

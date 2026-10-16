@@ -57,6 +57,7 @@
 pub mod fold;
 pub mod footprint;
 pub mod geometry;
+pub mod link;
 pub mod scene;
 pub mod score;
 
@@ -65,6 +66,7 @@ pub use fold::{
 };
 pub use footprint::Footprint;
 pub use geometry::{Rect, Size2, Transform2, Vec2};
+pub use link::{LinkKey, LinkMarks, LinkStratum};
 pub use scene::{
     Backdrop, InstanceId, ProjectedItem, Region, Representation, RoutedRelation, Scene, SourceIx,
     SourceRef, Space, SpaceId,

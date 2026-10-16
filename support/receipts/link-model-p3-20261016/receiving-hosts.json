@@ -1,0 +1,84 @@
+{
+  "schema": "mere.link-model-p3-receiving-hosts/v1",
+  "date": "2026-10-16",
+  "phase_status": "bounded_P3_qualified",
+  "supplier": {
+    "qualified_source": "732c1537afd142a21c2bf4858c0375167eae70c1",
+    "published_receipt_commit": "ee324e517d501653aee8df7d5a430760a74749c0",
+    "receipt": "checks.json",
+    "receiving_lock_pin": "ee324e517d501653aee8df7d5a430760a74749c0"
+  },
+  "knot": {
+    "published_commit": "921b4e06e7eb4fa034cfaefddd9735f3b80ebec6",
+    "native_source": "e7b5c501281a1d6418f2877b77eabda22fa0ac11",
+    "status": "bounded_consumer_qualified",
+    "root_workspace_suite_cases": 694,
+    "ignored": 4,
+    "final_focused_passed": 1,
+    "native_seed_frames": 37,
+    "native_reopen_frames": 37,
+    "reviewed_native_captures": 4,
+    "receipt_url": "https://github.com/merely-made/knot-editor/blob/921b4e06e7eb4fa034cfaefddd9735f3b80ebec6/docs/receipts/2026-10-16_opened_link/checks.json",
+    "receipt_sha256": "fe02d5faa56357d4ed68522fcfee992472ceede7e718b3b5e52c8eb192096e38",
+    "limitation": "startup snapshot; no live refresh or mutation actions. Existing plaintext projection checkpoints are a separate recorded storage follow-up."
+  },
+  "woodshed": {
+    "published_commit": "943c7629585fe2c2c5bcd3799716b61c36346e6b",
+    "source": "474d10a1714fa10e97e55c6903adde9e1fb7f712",
+    "status": "bounded_consumer_qualified",
+    "root_suite_cases": 784,
+    "fresh_process_child_invocations": 5,
+    "ignored": 7,
+    "desktop_build": "passed",
+    "native_status": "passed: normal textbox authoring, exact personal withdrawal, ordered audition dispatch with Set unchanged, and fresh-process sealed identity/history reopen",
+    "reviewed_native_captures": 7,
+    "receipt_url": "https://github.com/merely-made/woodshed/blob/943c7629585fe2c2c5bcd3799716b61c36346e6b/validation/link-model-p3_20261016/receipt.json",
+    "receipt_sha256": "b53eed97117e64a7735bbfb5c6f0d849f46e6adf04496c160ffdf48ab4bbd42c",
+    "affected_suite_source": "374c75d0c8569b262f73e9ffb6786d2b482f5899",
+    "final_ui_followup_cases": 191,
+    "native_seed_frames": 103,
+    "native_reopen_frames": 49,
+    "identity_comparison": {
+      "assertion_ids": [
+        "{\"writer\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"counter\":0}",
+        "{\"writer\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"counter\":1}"
+      ],
+      "source_id": "e2c3d7fe-cee0-4f06-b646-af7c22c1501e",
+      "source_uuid_and_both_ids_match": true,
+      "retained_assertions": 2,
+      "held_assertions": 1,
+      "withdrawn_assertions": 1
+    },
+    "keeper_file_manifest_unchanged": true
+  },
+  "rulings": {
+    "independent_reasons": "separate assertions",
+    "woodshed_withdrawal": "personal assertions only; generated claims read-only",
+    "woodshed_audition": "both endpoints in original assertion direction"
+  },
+  "outside_scope": [
+    "full Woodshed P4f acceptance",
+    "physical audio quality",
+    "P4 rest stroke/fan retirement",
+    "P6 family migration and budgets",
+    "P7 promoted links",
+    "automatic resident synchronization"
+  ],
+  "documentation_audit": {
+    "baseline": "a7ca9b0350ae921d0401afb49230e75818ddbf06",
+    "new_finding_occurrences": 0,
+    "same_judgment_errors": 15,
+    "coverage": [
+      271,
+      285
+    ],
+    "global_green": false,
+    "artifact_sha256": {
+      "receiving-audit/final-judgment.json": "c445ee25476f1799ba7d5ea138ef0b55df2bc5c80c95546d91c712a4fe538f6f",
+      "receiving-audit/baseline-judgment.json": "c445ee25476f1799ba7d5ea138ef0b55df2bc5c80c95546d91c712a4fe538f6f",
+      "receiving-audit/comparison.json": "cd894de1aa9b4916161a9b7137bf9d740aad683ad44ec0cbf8864d1a83bff983",
+      "receiving-audit/baseline-audit.json": "9bfb363fffb8779181fe1058bb1950bbdefd6a67f8f5c71089a57a6717968f42",
+      "receiving-audit/final-audit.json": "5c16600d71383bb52e4289bbcbbd0a7c8fb28bc59af3ae8939598562d29a95da"
+    }
+  }
+}

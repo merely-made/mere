@@ -1,0 +1,11 @@
+{
+  "baseline_revision": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929",
+  "new_audit_findings": {},
+  "removed_audit_findings": {},
+  "judgment_errors_unchanged": true,
+  "judgment_errors": 15,
+  "covered_active_docs": 271,
+  "active_docs": 285,
+  "normalization": "worktree roots and Markdown line positions; object line fields excluded; list findings compared as Counters",
+  "result": "No new findings or judgment errors; existing global debt retained"
+}

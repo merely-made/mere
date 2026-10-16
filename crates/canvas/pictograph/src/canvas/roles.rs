@@ -188,6 +188,7 @@ impl Canvas {
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
         )
+        .with_link_hides(&self.graph, &self.hidden_edges, &self.hidden_links)
         .with_meaning(self.meaning.snapshot())
         .with_registry(&self.channels, self.physics_view_key());
         // A group is named by its smallest member's stable id (F134), which
@@ -289,7 +290,11 @@ impl Canvas {
     }
 
     pub(crate) fn arrangement_axis_locks(&self) -> seiche::Axes {
-        if self.roles.encoded == seiche::Axes::BOTH { seiche::Axes::NONE } else { self.roles.encoded }
+        if self.roles.encoded == seiche::Axes::BOTH {
+            seiche::Axes::NONE
+        } else {
+            self.roles.encoded
+        }
     }
 
     /// Realize the roles over the active arrangement: pinned items kinematic
@@ -332,7 +337,8 @@ impl Canvas {
         }
         self.roles.pinned = pinned;
         let held = self.arrangement_axis_locks();
-        self.physics.set_axis_locks(self.view.positions().map(|(key, _)| (key, held)).collect());
+        self.physics
+            .set_axis_locks(self.view.positions().map(|(key, _)| (key, held)).collect());
         let force = (playing && !anchors.is_empty())
             .then(|| seiche::AnchorSpring::new(anchors).with_stiffness(self.roles.stiffness));
         self.physics.set_anchor_force(force);

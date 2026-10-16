@@ -1,0 +1,27 @@
+{
+  "schema": "mere.link-model-p4-receiving/v1",
+  "date": "2026-10-16",
+  "mere_supplier": "91467c0bbf6f92cc26262579dec634155ee33f2d",
+  "woodshed": {
+    "published_main": "4716b71591d74a1fc2b7fde44074dd0183e0cbe1",
+    "qualified_source": "fe54425786779753bf6af1d4f6ea243271f13203",
+    "receipt": "https://github.com/merely-made/woodshed/blob/4716b71591d74a1fc2b7fde44074dd0183e0cbe1/validation/link-model-p4_20261016/receipt.json",
+    "receipt_sha256": "cf5882815112322ff5e19f382810b0466231656ac84adb4505f31c81537e9eeb",
+    "source_gate_cases": 619,
+    "merged_view_native_cases": 361,
+    "fresh_process_child_invocations_per_gate": 5,
+    "native_frames": [
+      141,
+      135
+    ],
+    "reviewed_native_captures": 4,
+    "result": "passed: native seed and fresh-process sealed reopen"
+  },
+  "knot": "Independent C5 receiving evidence; no P4 native claim by this lane",
+  "scope_limits": [
+    "Existing endpoint force law unchanged",
+    "Full Stage P4f separate",
+    "Physical audio separate",
+    "P6/P7 later"
+  ]
+}
