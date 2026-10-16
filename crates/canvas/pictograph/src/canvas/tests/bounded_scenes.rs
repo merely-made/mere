@@ -165,3 +165,48 @@ fn the_territory_field_claims_ground_by_site_beneath_the_graph() {
     crate::canvas::controls::CanvasCommand::ToggleTerritory.apply(&mut canvas, VIEW);
     assert!(!canvas.territory_field());
 }
+
+#[test]
+fn a_saved_scene_carries_the_seed_and_the_regions() {
+    let (mut canvas, keys) = canvas();
+    apply_arrangement(&mut canvas, "partition.default", VIEW).unwrap();
+    canvas
+        .view
+        .set_position(keys[1], PortablePoint::new(-33.0, 44.0));
+    canvas.set_seed();
+    let regions = canvas.strategy_regions().to_vec();
+    let json = serde_json::to_string(&canvas.cartography_geometry()).unwrap();
+
+    let geometry: crate::canvas::geometry::CartographyGeometry =
+        serde_json::from_str(&json).unwrap();
+    let mut restored = Canvas::with_graph(canvas.graph().clone());
+    restored.resize(VIEW.0, VIEW.1);
+    restored.set_physics_paused(true);
+    assert!(!restored.has_saved_seed());
+    restored.apply_cartography_scene_state(&geometry);
+    assert!(restored.has_saved_seed());
+    assert_eq!(restored.strategy_regions(), regions.as_slice());
+    restored.reset_to_seed();
+    assert_eq!(
+        restored.view.position_of(keys[1]),
+        Some(PortablePoint::new(-33.0, 44.0)),
+        "reset lands on the saved seed"
+    );
+
+    let mut lone = geometry.clone();
+    let kept = canvas.graph().get_node(keys[0]).unwrap().id;
+    lone.retain_members(|id| *id == kept);
+    assert_eq!(lone.seed().unwrap().len(), 1);
+    assert!(
+        lone.regions()
+            .iter()
+            .all(|r| r.members.iter().all(|m| *m == kept))
+    );
+
+    let old: crate::canvas::geometry::CartographyGeometry =
+        serde_json::from_str(r#"{"positions": []}"#).unwrap();
+    assert!(
+        old.seed().is_none() && old.regions().is_empty(),
+        "an older scene still loads"
+    );
+}

@@ -356,7 +356,7 @@ impl Canvas {
             // overlap, so it is a harmless no-op there. (Isometric camera P2 — depth.)
             let (s, c) = self.camera.yaw.sin_cos();
             let depth = (pos.x * s + pos.y * c).round() as i32;
-            let style = format!(
+            let mut style = format!(
                 "transform: translate({}px, {}px) scale({}); z-index: {}; width: {}px; height: {}px;",
                 ax - half,
                 (ay - lift) - half,
@@ -365,6 +365,9 @@ impl Canvas {
                 face,
                 face
             );
+            if let Some(frame) = &grammar {
+                style.push_str(&self.grammar_fill(key, frame));
+            }
             // Selection wins (orange); otherwise color by activation state —
             // green open, red closed, blue idle (the default for an unset node).
             let state_class = if self.selected.contains(&key) {

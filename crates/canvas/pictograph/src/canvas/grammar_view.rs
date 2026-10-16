@@ -13,11 +13,14 @@
 //! suggestions are the smallest mark. Labels show only for forward nodes,
 //! their neighbours, retained and hovered nodes. Links stay quiet until they
 //! touch a forward or hovered node. Colour carries category, not activation.
+//! The categories are the theme's (Tabard's `--tabard-color-category-1…5`,
+//! gated to 3:1) when the host passes them, else the canvas's own eight.
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use kernel::graph::NodeKey;
 use scenograph::attention::Attention;
+use scenograph::suggestion::SuggestionMark;
 
 use super::Canvas;
 
@@ -46,6 +49,32 @@ impl Canvas {
 
     pub fn graph_grammar(&self) -> bool {
         self.graph_grammar
+    }
+
+    /// Colour categories (sites and their territory) with the theme's
+    /// category colours, in order; an empty set restores the canvas's own.
+    pub fn set_category_colors(&mut self, colors: impl IntoIterator<Item = [u8; 3]>) {
+        self.category_colors = colors.into_iter().collect();
+    }
+
+    /// How many categories the colours tell apart before they repeat.
+    pub fn category_count(&self) -> usize {
+        match self.category_colors.len() {
+            0 => super::build::CATEGORY_PALETTE.len(),
+            n => n,
+        }
+    }
+
+    /// Category `index`'s colour, as unit RGB.
+    pub(crate) fn category_rgb(&self, index: usize) -> (f32, f32, f32) {
+        match self.category_colors.get(index % self.category_count()) {
+            Some([r, g, b]) => (
+                f32::from(*r) / 255.0,
+                f32::from(*g) / 255.0,
+                f32::from(*b) / 255.0,
+            ),
+            None => super::build::CATEGORY_PALETTE[index % super::build::CATEGORY_PALETTE.len()],
+        }
     }
 
     fn attention_of_key(&self, key: NodeKey) -> Attention {
@@ -107,18 +136,41 @@ impl Canvas {
             Attention::Forward => "gnode-body".to_string(),
             _ => format!(
                 "gnode-site gnode-cat-{}",
-                frame.category.get(&key).copied().unwrap_or(0) % super::territory::CATEGORY_COUNT
+                frame.category.get(&key).copied().unwrap_or(0) % self.category_count()
             ),
         };
         match attention {
             Attention::Retained => class.push_str(" gnode-retained"),
-            Attention::Suggestion => class.push_str(" gnode-suggestion"),
+            Attention::Suggestion => {
+                class.push_str(" gnode-suggestion gnode-mark-");
+                class.push_str(self.grammar.suggestions.mark.id());
+            },
             _ => {},
         }
         if !frame.labelled.contains(&key) {
             class.push_str(" gnode-quiet");
         }
         class
+    }
+
+    /// A site's fill, inline so it follows the theme: none for a body, nor for
+    /// a suggestion drawn as a bare dot or ring.
+    pub(crate) fn grammar_fill(&self, key: NodeKey, frame: &GrammarFrame) -> String {
+        let attention = self.attention_of_key(key);
+        let bare = matches!(
+            self.grammar.suggestions.mark,
+            SuggestionMark::Dot | SuggestionMark::Ring
+        );
+        if attention == Attention::Forward || (attention == Attention::Suggestion && bare) {
+            return String::new();
+        }
+        let (r, g, b) = self.category_rgb(frame.category.get(&key).copied().unwrap_or(0));
+        format!(
+            " background-color: rgb({}, {}, {});",
+            (r * 255.0).round(),
+            (g * 255.0).round(),
+            (b * 255.0).round()
+        )
     }
 
     /// A node's face scale under the grammar: suggestions are smallest.

@@ -8,6 +8,8 @@
 
 use super::*;
 use crate::canvas::grammar_view::{LINK_QUIET, link_tone};
+use paint_list_api::PaintCmd;
+use scenograph::attention::Attention;
 
 fn class_of(canvas: &Canvas, key: NodeKey) -> String {
     canvas
@@ -102,6 +104,10 @@ fn retained_and_suggested_nodes_carry_their_marks() {
     canvas.set_graph_grammar(true);
     canvas.select_member(id(&canvas, keys[0]));
     canvas.select_member(id(&canvas, keys[3]));
+    canvas.set_suggestion_settings(scenograph::suggestion::SuggestionSettings {
+        on: true,
+        ..Default::default()
+    });
     canvas.set_suggested_members([id(&canvas, keys[4])]);
     canvas.frame(800, 600);
     let hub = class_of(&canvas, keys[0]);
@@ -138,4 +144,140 @@ fn links_are_quiet_until_they_touch_the_foreground() {
     let frame = canvas.grammar_frame().unwrap();
     assert_eq!(link_tone(Some(&frame), keys[0], keys[1]), 1.0);
     assert_eq!(link_tone(Some(&frame), keys[3], keys[4]), LINK_QUIET);
+}
+
+#[test]
+fn suggestions_are_off_until_the_person_turns_them_on() {
+    use scenograph::suggestion::{SuggestionMark, SuggestionSettings};
+    let (mut canvas, keys) = grammar_canvas();
+    canvas.set_graph_grammar(true);
+    let offer: Vec<_> = keys[1..]
+        .iter()
+        .map(|key| (id(&canvas, *key), "web".to_string()))
+        .collect();
+    canvas.offer_suggestions(offer);
+    assert!(
+        canvas
+            .members_with_attention(Attention::Suggestion)
+            .is_empty(),
+        "off by default"
+    );
+
+    canvas.set_suggestion_settings(SuggestionSettings {
+        on: true,
+        at_once: 2,
+        mark: SuggestionMark::Ring,
+        ..SuggestionSettings::default()
+    });
+    let shown = canvas.members_with_attention(Attention::Suggestion);
+    assert_eq!(
+        shown,
+        [id(&canvas, keys[1]), id(&canvas, keys[2])],
+        "the first two, in order"
+    );
+    canvas.frame(800, 600);
+    assert!(class_of(&canvas, keys[1]).contains("gnode-mark-ring"));
+
+    canvas.set_suggestion_settings(SuggestionSettings {
+        on: true,
+        sources: vec!["mesh".into()],
+        ..SuggestionSettings::default()
+    });
+    assert!(
+        canvas
+            .members_with_attention(Attention::Suggestion)
+            .is_empty(),
+        "no allowed source"
+    );
+}
+
+#[test]
+fn sites_and_territory_take_the_themes_category_colours() {
+    use scenograph::suggestion::{SuggestionMark, SuggestionSettings};
+    let (mut canvas, keys) = grammar_canvas();
+    canvas.set_graph_grammar(true);
+    let style_of = |canvas: &Canvas, key| {
+        canvas
+            .node_document
+            .dom()
+            .attribute(
+                canvas.gnode_of[&key],
+                &Namespace::from(""),
+                &LocalName::from("style"),
+            )
+            .unwrap()
+            .to_owned()
+    };
+    canvas.frame(800, 600);
+    assert!(style_of(&canvas, keys[1]).contains("background-color: rgb("));
+
+    let theme = [
+        [10, 20, 30],
+        [40, 50, 60],
+        [70, 80, 90],
+        [1, 2, 3],
+        [4, 5, 6],
+    ];
+    canvas.set_category_colors(theme);
+    assert_eq!(canvas.category_count(), 5);
+    canvas.frame(800, 600);
+    let site = style_of(&canvas, keys[1]);
+    let category: usize = class_of(&canvas, keys[1])
+        .split(' ')
+        .nth(1)
+        .unwrap()
+        .trim_start_matches("gnode-cat-")
+        .parse()
+        .unwrap();
+    let [r, g, b] = theme[category];
+    assert!(
+        site.contains(&format!("background-color: rgb({r}, {g}, {b});")),
+        "{site}"
+    );
+
+    canvas.select_member(id(&canvas, keys[0]));
+    canvas.frame(800, 600);
+    assert!(
+        !style_of(&canvas, keys[0]).contains("background-color"),
+        "a body keeps its own fill"
+    );
+
+    canvas.set_suggestion_settings(SuggestionSettings {
+        on: true,
+        mark: SuggestionMark::Ring,
+        ..SuggestionSettings::default()
+    });
+    canvas.set_suggested_members([id(&canvas, keys[4])]);
+    canvas.frame(800, 600);
+    assert!(
+        !style_of(&canvas, keys[4]).contains("background-color"),
+        "a ring is bare"
+    );
+
+    canvas.set_territory_field(true);
+    let colours: Vec<(u8, u8, u8)> = canvas
+        .territory_commands()
+        .iter()
+        .filter_map(|command| match command {
+            PaintCmd::DrawRect(rect) => Some((
+                (rect.color.r * 255.0).round() as u8,
+                (rect.color.g * 255.0).round() as u8,
+                (rect.color.b * 255.0).round() as u8,
+            )),
+            _ => None,
+        })
+        .collect();
+    assert!(!colours.is_empty());
+    assert!(
+        colours
+            .iter()
+            .all(|c| theme.iter().any(|[r, g, b]| *c == (*r, *g, *b))),
+        "the territory paints the theme's colours"
+    );
+    canvas.set_category_colors([]);
+    assert_eq!(
+        canvas.category_count(),
+        8,
+        "empty restores the canvas's own"
+    );
 }

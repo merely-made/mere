@@ -101,6 +101,12 @@ fn build_node_sheet() -> Vec<String> {
         ".gnode-retained { border-bottom: 2px dashed var(--node-caption-fg); }".to_string(),
         ".gnode-suggestion { border-radius: 50%; opacity: 0.6; }".to_string(),
         ".gnode-quiet .gcaption { display: none; }".to_string(),
+        // A suggestion's mark, the person's choice: dot and ring are bare, word keeps
+        // its label even when quiet, glyph and face keep the face.
+        ".gnode-mark-dot { background-color: var(--node-caption-fg); }".to_string(),
+        ".gnode-mark-ring { background-color: transparent; border: 2px solid var(--node-caption-fg); }"
+            .to_string(),
+        ".gnode-mark-word .gcaption { display: block; }".to_string(),
         // The node's display label, riding beside the tile (not inside the 36px box):
         // absolutely positioned just right of the square so a long name reads in full on
         // the canvas instead of overflowing the tile. It is a child of the `.gnode`, so

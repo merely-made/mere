@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-16",
+  "status": "source-and-automated-checks-qualified; Woodshed receiving native/reopen pending",
+  "base_revision": "e43fcee761dcf76c1a5be51e11d8213e092308a5",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "source_sha256": {
+    "crates/cambium/cambium-rootstock/src/frame.rs": "bd3d6d8d882bd7c8dc5a9343adfad1f6c9ac85b67e9e975db2b0df09dfb94d36",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "e4455701edbee69cd25a043aa620ca09e61557905189252be52377401ba49529",
+    "crates/cambium/cambium-rootstock/src/producer/shadow_namespace_tests.rs": "ca5301c30821c46b4fffa636bbd2b145967b69e43c0019990e6d50ebd0dad341"
+  },
+  "lock_sha256": "95210c388525ce55f9865a415625996ccd1040cca52ca6cbab27628b4b83caff",
+  "resolved_git_sources": [
+    "git+https://github.com/merely-made/genet.git?branch=main#e37762d752e423dc43f920bd728c83f70c47f2cc",
+    "git+https://github.com/merely-made/netrender.git?branch=main#f4f9c0d87e6a6030b61075a45118055dfe6a12df"
+  ],
+  "supplier_selectors_and_lock_changed": false,
+  "red": {
+    "command": "cargo test -p cambium-rootstock --lib blurred_shadow_without_producers_is_accepted_and_mask_key_is_preserved --locked --offline -j1",
+    "exit_code": 101,
+    "failure": "ForeignInlineImage { renderer_key: 18446462598732840960 }"
+  },
+  "focused_green": {
+    "command": "cargo test -p cambium-rootstock --lib shadow_namespace_tests --locked --offline -j1",
+    "exit_code": 0,
+    "passed": 6
+  },
+  "rootstock_and_native_host": {
+    "command": "cargo test -p cambium-rootstock -p cambium-genet-winit-host --locked --offline -j1",
+    "exit_code": 0,
+    "passed": 307,
+    "failed": 0,
+    "ignored": 6,
+    "suites": 37
+  },
+  "review": "Independent read-only review found no correctness blocker.",
+  "doc_audit": {
+    "command": "python3 scripts/mere_doc_audit.py --json",
+    "new_findings_in_changed_plan": 0,
+    "tree_is_clean": false,
+    "note": "Existing unrelated broken links, absent cross-repo paths, stale historical annotations and unheaded sources remain; no whole-tree green claim.",
+    "new_findings_in_final_diff": 0
+  },
+  "raw_evidence_directory": "/Users/markik/Code/testing/mere/producer-shadow-20261016",
+  "raw_log_sha256": {
+    "red-shadow.log": "ba207b3763959c2d83192e4232d7592d953e7ff922ea146a38c3cae8dd34c30f",
+    "green-shadow.log": "8872b18d9ef2ded684315f11b8edecf3cfa8a5fe005bb3ba1fbdc5f84130fa0c",
+    "rootstock-host.log": "796eebd671c97a8a2fd2aa4d6921385e5ddaff3b13d72442e75424dee750ff6c",
+    "doc-audit.json": "30d843e068516a8b44f515492fc41f1e12fc355adba28d26f49637e566839246",
+    "doc-audit-final.json": "30d843e068516a8b44f515492fc41f1e12fc355adba28d26f49637e566839246"
+  },
+  "limits": [
+    "Automated supplier checks do not establish Woodshed native capture/reopen acceptance.",
+    "Portable composition shadow-mask admission is unchanged.",
+    "No physical audio qualification is claimed."
+  ]
+}

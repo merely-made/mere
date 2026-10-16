@@ -62,6 +62,10 @@ fn a_foreground_pin_is_attention_not_position() {
 #[test]
 fn suggestions_yield_and_removed_members_are_pruned() {
     let (mut canvas, a, b) = two_members();
+    canvas.set_suggestion_settings(scenograph::suggestion::SuggestionSettings {
+        on: true,
+        ..Default::default()
+    });
     canvas.set_suggested_members([a, b, uuid::Uuid::from_u128(9)]);
     assert_eq!(
         canvas.members_with_attention(Attention::Suggestion).len(),
