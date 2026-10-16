@@ -83,6 +83,20 @@ pub struct CartographyGeometry {
     /// restored scene draws them without re-projecting. Serde-defaulted.
     #[serde(default)]
     regions: Vec<SavedRegion>,
+    /// The person's arrangement of the Mosaic, if they made one. Serde-defaulted.
+    #[serde(default)]
+    mosaic: Option<SavedMosaic>,
+}
+
+/// The person's Mosaic arrangement by member: tiles moved out of their site's
+/// group, the group order, the member order and the size factors.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SavedMosaic {
+    pub group_of: Vec<(GraphMemberId, String)>,
+    pub group_order: Vec<String>,
+    pub member_order: Vec<GraphMemberId>,
+    pub scale: Vec<(GraphMemberId, f32)>,
 }
 
 /// One region an arrangement drew, in world coordinates, its members by id.
@@ -237,6 +251,16 @@ impl CartographyGeometry {
         &self.regions
     }
 
+    /// Attach the Mosaic arrangement (chainable).
+    pub fn with_mosaic(mut self, mosaic: Option<SavedMosaic>) -> Self {
+        self.mosaic = mosaic;
+        self
+    }
+
+    pub fn mosaic(&self) -> Option<&SavedMosaic> {
+        self.mosaic.as_ref()
+    }
+
     /// Keep only what belongs to members `keep` admits, across every
     /// member-keyed field; a region keeps its contour with its kept members.
     pub fn retain_members(&mut self, keep: impl Fn(&GraphMemberId) -> bool) {
@@ -251,6 +275,11 @@ impl CartographyGeometry {
         }
         for region in &mut self.regions {
             region.members.retain(|id| keep(id));
+        }
+        if let Some(mosaic) = self.mosaic.as_mut() {
+            mosaic.group_of.retain(|(id, _)| keep(id));
+            mosaic.member_order.retain(|id| keep(id));
+            mosaic.scale.retain(|(id, _)| keep(id));
         }
     }
 

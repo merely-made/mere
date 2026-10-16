@@ -207,3 +207,48 @@ fn a_selected_tile_grows_and_shrinks() {
     canvas.clear_selection();
     assert!(!canvas.resize_selected_tiles(2.0));
 }
+
+#[test]
+fn the_persons_mosaic_survives_a_saved_scene() {
+    let (mut canvas, keys) = songs();
+    let (take, lyrics) = (id(&canvas, keys[1]), id(&canvas, keys[2]));
+    canvas.mosaic_move_member(take, MosaicTarget::Tile(lyrics));
+    canvas.mosaic_move_group("search.example", "knot.example");
+    canvas.select_member(lyrics);
+    canvas.resize_selected_tiles(2.0);
+    canvas.clear_selection();
+    let arranged = canvas.strategy_regions().to_vec();
+    let json = serde_json::to_string(&canvas.cartography_geometry()).unwrap();
+
+    let geometry: crate::canvas::geometry::CartographyGeometry =
+        serde_json::from_str(&json).unwrap();
+    let mut restored = Canvas::with_graph(canvas.graph().clone());
+    restored.resize(VIEW.0, VIEW.1);
+    restored.apply_cartography_scene_state(&geometry);
+    assert_eq!(
+        restored.mosaic_state().group_order,
+        canvas.mosaic_state().group_order
+    );
+    let applied = apply_arrangement(&mut restored, MOSAIC_ARRANGEMENT, VIEW).unwrap();
+    let mut transition = applied.transition;
+    for at in [0.0, 1.0e6] {
+        advance_arrangement(&mut restored, &mut transition, MOSAIC_ARRANGEMENT, at);
+    }
+    assert_eq!(
+        restored.strategy_regions(),
+        arranged.as_slice(),
+        "the same mosaic, re-projected"
+    );
+
+    let mut plain = geometry.clone();
+    plain.retain_members(|member| *member != take);
+    assert!(
+        plain.mosaic().unwrap().group_of.is_empty(),
+        "the moved tile was filtered out"
+    );
+    let (fresh, _) = songs();
+    assert!(
+        fresh.cartography_geometry().mosaic().is_none(),
+        "nothing arranged, nothing saved"
+    );
+}
