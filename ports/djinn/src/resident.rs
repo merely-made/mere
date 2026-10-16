@@ -302,6 +302,14 @@ impl DjinnResident {
             .map(|lane| lane.lock_holder(self.credential_profile.clone()))
     }
 
+    /// Private stage workers remain lock holders even without a local ask lane.
+    #[cfg(feature = "inference-stages")]
+    pub fn inference_stage_lock_holder(&self) -> Option<Arc<dyn VaultLockHolder>> {
+        self.distillery
+            .as_ref()
+            .and_then(|works| works.inference_stage_lock_holder())
+    }
+
     /// Claim existing credential stores under each persisted persona's own keys.
     /// This runs during startup, before the app door opens. Empty roots are not
     /// created for profiles which have never kept credentials.

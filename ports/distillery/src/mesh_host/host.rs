@@ -13,7 +13,8 @@ use insigne::DerivedKeyAttestation;
 use mesh::{
     BlobSink, BlobSource, DevicePolicy, HostFacts, HostOffer, JobControl, JobId, LeaseId,
     LeasePolicy, LeaseProgress, MeshEvent, MeshStoreError, MeshSyncError, ReclaimReason,
-    ReleaseReason, ResourceRegistry, RunContext, SyncedMesh, WorkerAction, next_action,
+    ReleaseReason, ResourceRegistry, RunContext, SyncedMesh, WorkerAction,
+    next_action_with_availability,
     registry::{run_job_for, run_legacy},
     spec::CheckpointClass,
 };
@@ -142,7 +143,7 @@ pub enum HostError {
 /// The host supervisor.
 ///
 /// Owns the in-flight job map and their control handles, the registry, blob
-/// access, and the OS-facing seams. Drives [`next_action`] on a tick that never
+/// access, and the OS-facing seams. Drives [`mesh::next_action`] on a tick that never
 /// blocks on execution, which is what makes heartbeats and owner reclaim
 /// possible at all.
 pub struct MeshHost<B: Backend + Clone + Send + Sync + 'static> {
@@ -155,6 +156,18 @@ pub struct MeshHost<B: Backend + Clone + Send + Sync + 'static> {
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
+    /// Register an owner-composed resource between supervisor ticks. Existing
+    /// runs retain their adapters; host facts and lending policy still govern
+    /// whether the new offer may claim work.
+    pub fn register_resource(
+        &mut self,
+        resource: std::sync::Arc<dyn mesh::MeshResource>,
+    ) -> Result<(), mesh::RegistryError> {
+        let gpu = resource.descriptor().requires.compute == mesh::ComputeClass::Gpu;
+        self.config.registry.register(resource)?;
+        self.config.facts.gpu |= gpu;
+        Ok(())
+    }
     pub fn new(synced: SyncedMesh<B>, keypair: Ed25519Keypair, config: HostConfig) -> Self {
         let me = keypair.public_key().to_bytes();
         Self {
@@ -350,7 +363,17 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                 .observing(conditions)
                 .running(&running)
                 .with_lease_policy(self.config.lease);
-            next_action(&board, &self.me, &offer)
+            let unavailable: Vec<JobId> = board
+                .jobs()
+                .filter(|job| {
+                    job.spec
+                        .as_ref()
+                        .and_then(|spec| self.config.registry.get(&spec.resource))
+                        .is_some_and(|adapter| !adapter.available_for(job))
+                })
+                .map(|job| job.id)
+                .collect();
+            next_action_with_availability(&board, &self.me, &offer, &unavailable)
         };
 
         match action {

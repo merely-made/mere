@@ -1144,6 +1144,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             if let Some(holder) = resident.inference_lock_holder() {
                 personae.register_lock_holder(holder);
             }
+            #[cfg(feature="inference-stages")]
+            if let Some(holder)=resident.inference_stage_lock_holder() {
+                personae.register_lock_holder(holder);
+            }
         }
         #[cfg(not(feature = "inference"))]
         drop(personal_sync_host);

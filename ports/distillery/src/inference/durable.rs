@@ -822,7 +822,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
                 .session
                 .as_ref()
                 .map(|session| session.prompt_template_hash.clone()),
-            weight_format: Some("f32".into()),
+            weight_format: record.weight_format.clone(),
             request: serde_json::to_value(cp.map_or(&record.request, |cp| &cp.request))
                 .map_err(|error| error.to_string())?,
             output_blob: eidetic::ManifestId::of_blob(record.view.text.as_bytes()),
@@ -1132,6 +1132,7 @@ mod tests {
     }
     fn paused() -> RunRecord {
         RunRecord {
+            weight_format: None,
             view: RunV1 {
                 run: "private-run".into(),
                 question: "secret question".into(),

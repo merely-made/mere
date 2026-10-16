@@ -78,6 +78,44 @@ pub const RESIDENT_DISTILLERY_CHRONICLE_ROUTE: &str = "distillery.chronicle";
 /// Notice cadence for live Chronicle revisions on the first-party route.
 pub const RESIDENT_DISTILLERY_CHRONICLE_NOTICE_POLL: Duration = Duration::from_millis(250);
 
+#[cfg(feature = "inference-stages")]
+struct StageVaultLock {
+    services: Vec<Arc<distillery::inference_stage::StageService>>,
+    profile: ProfileId,
+}
+#[cfg(feature = "inference-stages")]
+impl castellan::lock::VaultLockHolder for StageVaultLock {
+    fn name(&self) -> &str {
+        "resident inference stages"
+    }
+    fn key_profile(&self) -> Option<&ProfileId> {
+        Some(&self.profile)
+    }
+    fn lock(&self) {
+        for service in &self.services {
+            service.set_private_locked(true);
+        }
+        // Djinn runs lock holders on its blocking lock path while the Tokio
+        // resident workers continue draining their leased computation.
+        while self
+            .services
+            .iter()
+            .any(|service| !service.private_drained())
+        {
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+    fn unlock(
+        &self,
+        _vault: &dyn personae::IdentityProvider,
+    ) -> Result<(), personae::IdentityError> {
+        for service in &self.services {
+            service.set_private_locked(false);
+        }
+        Ok(())
+    }
+}
+
 /// One resident Distillery works, bound to this profile's personal mesh.
 pub struct ResidentDistillery {
     resident: ResidentAuthority<RedbBackend>,
@@ -121,6 +159,65 @@ pub struct ResidentDistillery {
 }
 
 impl ResidentDistillery {
+    /// Explicit embedding composition for a stage worker. Uses this profile's
+    /// existing library, mesh leases, trainer gate and shared endpoint. The
+    /// caller reserves shared/activation/backend memory before giving a stage
+    /// its layer/KV budget and installs the vault holder before opening a door.
+    #[cfg(feature = "inference-stages")]
+    pub async fn enable_inference_stages(
+        &mut self,
+        data_root: &Path,
+        personal: &crate::sync::personal_sync_host::PersonalSyncHost,
+        loader: &str,
+        resident_layer_budget: u64,
+        settings: distillery::inference_stage::StageSettings,
+    ) -> Result<Arc<distillery::inference_stage::StageService>, String> {
+        let (device, gpu) = match loader {
+            "burn-ndarray" => (distillery::inference::InferenceDevice::ndarray(), None),
+            "burn-flex" => (distillery::inference::InferenceDevice::flex(), None),
+            #[cfg(feature = "inference-gpu")]
+            "burn-wgpu" => (
+                distillery::inference::discrete_gpu_inference_device()?.0,
+                Some(self.gpu_access.clone()),
+            ),
+            _ => return Err("stage loader is unavailable in this resident build".into()),
+        };
+        if (settings.requires.compute == mesh::ComputeClass::Gpu) != gpu.is_some() {
+            return Err("stage requirements disagree with the composed backend".into());
+        }
+        let library = self.inference_model_library(data_root)?;
+        let factory = distillery::inference_stage::library_stage_factory(
+            library,
+            device,
+            loader.into(),
+            gpu,
+            resident_layer_budget,
+        );
+        self.resident
+            .enable_inference_stages(
+                Arc::new(distillery::mesh_host::SystemClock),
+                mesh::LeasePolicy::default(),
+                settings,
+                factory,
+                crate::resident_inference::personal::stage_readers(personal),
+            )
+            .await
+    }
+
+    /// Register alongside the ask lane's holder. An idle resident with only
+    /// stage workers still participates in private-data lock handling.
+    #[cfg(feature = "inference-stages")]
+    pub fn inference_stage_lock_holder(&self) -> Option<Arc<dyn castellan::lock::VaultLockHolder>> {
+        let services = self.resident.inference_stage_services();
+        if services.is_empty() {
+            None
+        } else {
+            Some(Arc::new(StageVaultLock {
+                services,
+                profile: ProfileId(self.profile.clone()),
+            }))
+        }
+    }
     /// Open the works for one already-resolved Personae profile.
     pub async fn open(
         data_root: &Path,

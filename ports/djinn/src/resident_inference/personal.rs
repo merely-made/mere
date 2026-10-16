@@ -26,6 +26,32 @@ pub fn inference_space(graph: [u8; 32]) -> [u8; 32] {
     *hash.finalize().as_bytes()
 }
 
+/// Bind stage admission to the existing graph key owner. The service resolves
+/// transport authors to attested roots through its live mesh board first.
+#[cfg(feature = "inference-stages")]
+pub fn stage_readers(host: &PersonalSyncHost) -> Arc<distillery::inference_stage::StageReaders> {
+    let seals = host.seals();
+    Arc::new(move |root| seals.current_reader(&root))
+}
+
+/// Resolve outgoing stage peers through the live mesh directory, then query
+/// the same current graph seats used on admission. The host updates this
+/// directory alongside its board projection before each supervisor tick.
+#[cfg(feature = "inference-stages")]
+pub fn stage_peer_readers(
+    host: &PersonalSyncHost,
+    directory: Arc<std::sync::RwLock<mesh::DeviceDirectory>>,
+) -> Arc<dyn Fn(transport::PeerID) -> bool + Send + Sync> {
+    let seals = host.seals();
+    Arc::new(move |peer| {
+        directory
+            .read()
+            .unwrap()
+            .master_of(&peer.to_bytes())
+            .is_some_and(|root| seals.current_reader(&root))
+    })
+}
+
 fn writer_salt(graph: [u8; 32]) -> Vec<u8> {
     let mut salt = b"mere.djinn/personal-inference/writer/v1/".to_vec();
     salt.extend_from_slice(&graph);

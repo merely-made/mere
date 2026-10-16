@@ -179,6 +179,17 @@ GPU rows retain the trainer reclaim path. Imported format candidates must be
 measured against bf16 before publication. The measured loader must match the
 selected device's loader, and a format change refuses old checkpoints.
 
+The optional `inference-stages` feature exposes an embedding composition through
+`ResidentDistillery::enable_inference_stages` and Distillery's staged actor API.
+It borrows the existing library and GPU owner and checks current personal graph
+seats through `PersonalGraphSeals`. The stage vault holder refuses new work and
+waits for active KV/tensors to drain on lock; historical graph readability does
+not authorize a stage. Install it before admitting application sessions.
+This API takes an explicit leased stage plan. The JSON library setting above
+continues to select local execution; automatic peer/rung selection and a staged
+settings variant remain integration work. The native I8 fixture measures real
+iroh stage execution with separate roots/libraries on one physical computer.
+
 The route also takes `distillery.inference/pause-v1` and
 `distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.
 `distillery.inference/ask-sampled-v1` accepts `ask`, `max_tokens`, `temperature`,

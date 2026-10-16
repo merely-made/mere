@@ -547,6 +547,7 @@ mod tests {
         {
             let mut table = lane.shared.table();
             table.runs.push(RunRecord {
+                weight_format: None,
                 view: RunV1 {
                     run: "past".into(),
                     question: "nebula".into(),

@@ -145,6 +145,19 @@ pub enum WorkerAction {
 
 /// The next thing `me` (an author/verifying key) should do against `board`.
 pub fn next_action(board: &JobBoard, me: &[u8; 32], offer: &HostOffer<'_>) -> WorkerAction {
+    next_action_with_availability(board, me, offer, &[])
+}
+
+/// Make the same pure decision with an owner-sampled list of unavailable jobs.
+/// Withdrawal suppresses new claim/grant/execute actions. Existing owner
+/// reclaim and heartbeat obligations retain their original priority.
+pub fn next_action_with_availability(
+    board: &JobBoard,
+    me: &[u8; 32],
+    offer: &HostOffer<'_>,
+    unavailable: &[JobId],
+) -> WorkerAction {
+    let can_run = |job: &Job| !unavailable.contains(&job.id) && offer.can_run(job);
     let phases: Vec<(&Job, LeasePhase)> = board
         .jobs()
         .map(|job| (job, job.lease_at(offer.now_ms, &offer.lease)))
@@ -195,7 +208,7 @@ pub fn next_action(board: &JobBoard, me: &[u8; 32], offer: &HostOffer<'_>) -> Wo
             },
             _ => phase.held_by(me),
         };
-        if mine && !offer.is_running(job.id) && offer.can_run(job) {
+        if mine && !offer.is_running(job.id) && can_run(job) {
             return WorkerAction::Execute(job.id);
         }
     }
@@ -212,7 +225,7 @@ pub fn next_action(board: &JobBoard, me: &[u8; 32], offer: &HostOffer<'_>) -> Wo
         let Some(terms) = job.lease_terms() else {
             continue;
         };
-        if job.next_holder(offer.now_ms).as_ref() == Some(me) && offer.can_run(job) {
+        if job.next_holder(offer.now_ms).as_ref() == Some(me) && can_run(job) {
             return WorkerAction::Grant {
                 job: job.id,
                 epoch,
@@ -226,7 +239,7 @@ pub fn next_action(board: &JobBoard, me: &[u8; 32], offer: &HostOffer<'_>) -> Wo
     //    this epoch. (A one-device mesh still round-trips: self-execution stays
     //    allowed, which keeps the smallest setup useful and the demo honest.)
     for (job, phase) in &phases {
-        if !offer.can_run(job) {
+        if !can_run(job) {
             continue;
         }
         let open = match phase {
@@ -327,6 +340,48 @@ mod tests {
 
     fn permissive() -> DevicePolicy {
         DevicePolicy::permissive()
+    }
+
+    #[test]
+    fn availability_snapshot_withdraws_claim_grant_and_execution() {
+        let mut log = Log::new(44);
+        let post = posted_v2(&mut log, spec(true));
+        let job = JobId(*post.hash.as_bytes());
+        let me = log.me();
+        let registry = registry();
+        let policy = permissive();
+        let offer = HostOffer::new(&registry, HostFacts::cpu(128), &policy).at(1_000);
+        let board = JobBoard::fold(MESH, [&post]);
+        assert_eq!(next_action(&board, &me, &offer), WorkerAction::Claim(job));
+        assert_eq!(
+            next_action_with_availability(&board, &me, &offer, &[job]),
+            WorkerAction::Idle
+        );
+        let claim = log.author(&MeshEvent::JobClaimed {
+            job: job.0,
+            at_ms: 1_000,
+        });
+        let board = JobBoard::fold(MESH, [&post, &claim]);
+        assert!(matches!(
+            next_action(&board, &me, &offer),
+            WorkerAction::Grant { .. }
+        ));
+        assert_eq!(
+            next_action_with_availability(&board, &me, &offer, &[job]),
+            WorkerAction::Idle
+        );
+        let grant = log.author(&MeshEvent::LeaseGranted {
+            job: job.0,
+            epoch: 0,
+            granted_at_ms: 1_000,
+            expires_at_ms: 61_000,
+        });
+        let board = JobBoard::fold(MESH, [&post, &claim, &grant]);
+        assert_eq!(next_action(&board, &me, &offer), WorkerAction::Execute(job));
+        assert_eq!(
+            next_action_with_availability(&board, &me, &offer, &[job]),
+            WorkerAction::Idle
+        );
     }
 
     #[test]

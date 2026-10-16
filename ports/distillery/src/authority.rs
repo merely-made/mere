@@ -10,9 +10,9 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use crate::mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
 use mesh::JobBoard;
 use mesh::{BlobRef, MeshStoreError, RetentionCheckpoint, RetentionEffect};
-use crate::mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
 use muniment::Backend;
 
 type CustodyFuture<'a> = Pin<Box<dyn Future<Output = Result<u64, String>> + Send + 'a>>;
@@ -71,7 +71,7 @@ pub enum DistilleryError {
 }
 
 /// Type-erased board projection consumed by an optional remote-session lane.
-#[cfg(feature = "remote")]
+#[cfg(any(feature = "remote", feature = "inference-stages"))]
 pub trait RemoteSessionProjection: Send + Sync {
     /// Replace the admission snapshot with the host's current folded board.
     fn refresh(&self, board: JobBoard);
@@ -87,8 +87,8 @@ pub struct Distillery<B: Backend + Clone + Send + Sync + 'static> {
     host: MeshHost<B>,
     custody: Arc<dyn BlobCustody>,
     retention: RetentionSettings,
-    #[cfg(feature = "remote")]
-    remote: Option<Arc<dyn RemoteSessionProjection>>,
+    #[cfg(any(feature = "remote", feature = "inference-stages"))]
+    remote: Vec<Arc<dyn RemoteSessionProjection>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
@@ -103,24 +103,24 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
             host,
             custody,
             retention,
-            #[cfg(feature = "remote")]
-            remote: None,
+            #[cfg(any(feature = "remote", feature = "inference-stages"))]
+            remote: Vec::new(),
         }
     }
 
     /// Attach the remote-session authority composed into this host's resource
     /// registry and transport endpoint.
-    #[cfg(feature = "remote")]
+    #[cfg(any(feature = "remote", feature = "inference-stages"))]
     pub fn attach_remote_sessions(&mut self, remote: Arc<dyn RemoteSessionProjection>) {
-        self.remote = Some(remote);
+        self.remote.push(remote);
     }
 
     /// Drive one non-blocking supervisor tick.
     pub async fn tick(&mut self) -> Result<Vec<Step>, DistilleryError> {
-        #[cfg(feature = "remote")]
+        #[cfg(any(feature = "remote", feature = "inference-stages"))]
         self.refresh_remote().await?;
         let steps = self.host.tick().await?;
-        #[cfg(feature = "remote")]
+        #[cfg(any(feature = "remote", feature = "inference-stages"))]
         self.refresh_remote().await?;
         Ok(steps)
     }
@@ -136,11 +136,13 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
         Ok(self.host.synced().board().await?)
     }
 
-    #[cfg(feature = "remote")]
+    #[cfg(any(feature = "remote", feature = "inference-stages"))]
     async fn refresh_remote(&self) -> Result<(), DistilleryError> {
-        if let Some(remote) = &self.remote {
+        if !self.remote.is_empty() {
             let board = self.host.synced().board().await?;
-            remote.refresh(board);
+            for remote in &self.remote {
+                remote.refresh(board.clone());
+            }
         }
         Ok(())
     }

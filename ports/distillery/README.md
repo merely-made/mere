@@ -110,6 +110,38 @@ for these rows and retains NdArray for legacy rows. GPU composition keeps the
 same foreground reclaim guard for f16, Q8 and Q4. Format and qualification are
 immutable library data, and the exact session refuses a format change on resume.
 
+`inference-stages` adds the explicit embedding APIs in `inference_stage`.
+`StageService` mounts `mere/inference-stage/v1` on the resident's shared iroh
+endpoint and exposes a device-addressed mesh resource. The supervisor grants
+and reclaims its lease. Every call checks the poster's signed claim, live
+lease, transport identity, exact signed stage input and current personal graph
+read authority. A worker retains only its assigned contiguous layers and KV.
+Available layer budgets include the declared context's KV; shared tensors,
+activations and backend overhead require a separate host reservation.
+
+`StageChain` relays bounded hidden states through disjoint workers, leaving
+embedding at the coordinator and the final norm/head at the last worker. The
+last worker returns f32 logits; sampling and checkpointing stay at the coordinator. Its first wire version
+uses lossless f32 values, including exact widening of half activations. Traffic
+counts cover completed hidden-state and logits transfers; framing, QUIC overhead and
+partial failed transfers are outside those counts. `StageFallbackProvider`
+commits the last token/draw boundary and a placement record before retiring
+stages and loading the same session through local layer streaming. Format,
+template and backend-class guards remain exact.
+
+`open_staged_library_lane_with_journal` composes this path with the ordinary
+actor, journal and foreground GPU reclaim. Its host supplies newly leased
+stages through `StageChainFactory`. Pause/completion closes these stage sessions;
+resume rebuilds their KV from the retained token checkpoint. Worker vault lock,
+reader retirement, lease loss and shutdown drain private stage state before
+releasing hardware. `ResidentAuthority::enable_inference_stages` owns that
+service lifetime. A bounded authenticated readiness probe precedes private
+tensor transfer. Locked or unkeyed workers withdraw their offers; idle sessions
+close with a lease-bound receipt after the configured timeout. Availability is
+sampled by the host before the mesh's pure decision function runs.
+Peer discovery, automatic rung selection and a new CLI
+settings variant are not supplied by this embedding API.
+
 `distillery.inference/ask-recall-v1` takes an `ask` and optional source `scope`.
 It renders selected passage handles through the declared context template and
 retains the exact supplied passages as sealed native Eidetic artifacts. Stale
