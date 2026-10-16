@@ -54,6 +54,10 @@ pub struct DjinnResident {
     /// The inference lane, which borrows the Distillery lane's model
     /// library and so closes before it.
     inference: Option<ResidentInference>,
+    #[cfg(feature = "inference")]
+    inference_pending: Option<crate::settings::InferenceLaneSettings>,
+    #[cfg(feature = "inference")]
+    data_root: PathBuf,
     reservoir_settings: ReservoirLaneSettings,
     /// Off until [`DjinnResident::open_reservoir`] opens it under a shared
     /// root the caller names.
@@ -61,6 +65,31 @@ pub struct DjinnResident {
 }
 
 impl DjinnResident {
+    /// Open a resident with local-only inference. Hosts with personal sync use
+    /// `open_deferred_inference`, then start inference against that live host.
+    pub async fn open<P: IdentityProvider + ?Sized>(
+        identity: &P,
+        data_root: &Path,
+        profile: &ProfileId,
+        owner: OwnerSettings,
+        vault_dir: &Path,
+        unlock: Unlock,
+    ) -> Result<Self, String> {
+        let resident =
+            Self::open_deferred_inference(identity, data_root, profile, owner, vault_dir, unlock)
+                .await?;
+        #[cfg(feature = "inference")]
+        let mut resident = resident;
+        #[cfg(feature = "inference")]
+        if let Err(error) = resident.start_inference(identity, None).await {
+            let cleanup = resident.shutdown().await.err();
+            return Err(format!(
+                "open resident inference: {error}; cleanup: {cleanup:?}"
+            ));
+        }
+        Ok(resident)
+    }
+
     /// Open the credential, content, and optional Knot and Distillery
     /// authorities selected for one already-unlocked Personae profile.
     ///
@@ -72,7 +101,7 @@ impl DjinnResident {
     /// vault instead would mean either handing this constructor a Personae
     /// internal or moving the derivation out of Distillery, and both cost more
     /// than one extra open.
-    pub async fn open<P: IdentityProvider + ?Sized>(
+    pub async fn open_deferred_inference<P: IdentityProvider + ?Sized>(
         identity: &P,
         data_root: &Path,
         profile: &ProfileId,
@@ -144,123 +173,6 @@ impl DjinnResident {
             },
             None => None,
         };
-        #[cfg(feature = "inference")]
-        let mut distillery = distillery;
-        // The actor builds its provider on its own
-        // thread, and a provider that fails to build fails each run instead.
-        #[cfg(feature = "inference")]
-        let inference = match owner.inference.as_ref() {
-            Some(settings) => {
-                let library = if matches!(
-                    settings.model,
-                    crate::settings::InferenceModelSettings::Library { .. }
-                ) {
-                    match distillery
-                        .as_mut()
-                        .expect("validated Distillery lane")
-                        .inference_model_library(data_root)
-                    {
-                        Ok(library) => Some(library),
-                        Err(open_error) => {
-                            let mut message = format!("open inference model library: {open_error}");
-                            if let Some(lane) = distillery {
-                                if let Err(error) = lane.close().await {
-                                    message.push_str(&format!("; close Distillery: {error}"));
-                                }
-                            }
-                            if let Some(lane) = knot {
-                                if let Err(error) = lane.close().await {
-                                    message.push_str(&format!("; close Knot: {error}"));
-                                }
-                            }
-                            drop(site);
-                            if let Err(error) = blobs.shutdown().await {
-                                message.push_str(&format!("; close blob custody: {error}"));
-                            }
-                            return Err(message);
-                        },
-                    }
-                } else {
-                    None
-                };
-                let opening = async {
-                    let journal = if library.is_some() {
-                        let key = identity
-                            .derive_keypair(resident_inference::INFERENCE_DATA_SALT)
-                            .map_err(|error| error.to_string())?
-                            .to_seed();
-                        Some(
-                            distillery
-                                .as_ref()
-                                .expect("validated Distillery lane")
-                                .inference_journal(key)?,
-                        )
-                    } else {
-                        None
-                    };
-                    let opening = ResidentInference::open(
-                        settings,
-                        library,
-                        distillery
-                            .as_ref()
-                            .expect("validated Distillery lane")
-                            .gpu_access(),
-                        journal.clone(),
-                    );
-                    match opening {
-                        Ok(inference) => {
-                            if let Some(journal) = &journal {
-                                if let Err(error) = distillery
-                                    .as_ref()
-                                    .expect("validated Distillery lane")
-                                    .join_inference_journal(journal)
-                                    .await
-                                {
-                                    let closing = inference.close().await.err();
-                                    return Err(format!(
-                                        "join inference log: {error}; close: {closing:?}"
-                                    ));
-                                }
-                            }
-                            Ok(inference)
-                        },
-                        Err(error) => {
-                            if let Some(journal) = journal {
-                                if let Err(closing) = journal.shutdown().await {
-                                    return Err(format!("{error}; close inference log: {closing}"));
-                                }
-                            }
-                            Err(error)
-                        },
-                    }
-                }
-                .await;
-                match opening {
-                    Ok(lane) => Some(lane),
-                    Err(error) => {
-                        let mut message = format!("open resident inference: {error}");
-                        if let Some(lane) = distillery {
-                            if let Err(error) = lane.close().await {
-                                message.push_str(&format!("; close Distillery: {error}"));
-                            }
-                        }
-                        if let Some(lane) = knot {
-                            if let Err(error) = lane.close().await {
-                                message.push_str(&format!("; close Knot: {error}"));
-                            }
-                        }
-                        drop(site);
-                        if let Err(error) = blobs.shutdown().await {
-                            message.push_str(&format!("; close blob custody: {error}"));
-                        }
-                        return Err(message);
-                    },
-                }
-            },
-            None => None,
-        };
-        #[cfg(not(feature = "inference"))]
-        let inference: Option<ResidentInference> = None;
         let knot_reopen = match (&knot, knot_settings) {
             (Some(knot), Some(settings)) => Some((data_root.to_path_buf(), settings, knot.gate())),
             _ => None,
@@ -273,10 +185,72 @@ impl DjinnResident {
             knot,
             knot_reopen,
             distillery,
-            inference,
+            inference: None,
+            #[cfg(feature = "inference")]
+            inference_pending: owner.inference,
+            #[cfg(feature = "inference")]
+            data_root: data_root.to_path_buf(),
             reservoir_settings: owner.reservoir,
             reservoir: ReservoirLane::Off,
         })
+    }
+
+    /// Complete inference composition after personal sync opens, before its
+    /// lock holder or route is registered. No actor runs during this handoff.
+    #[cfg(feature = "inference")]
+    pub async fn start_inference<P: IdentityProvider + ?Sized>(
+        &mut self,
+        identity: &P,
+        personal: Option<Arc<graphshell::native::personal_sync_host::PersonalSyncHost>>,
+    ) -> Result<(), String> {
+        let Some(settings) = self.inference_pending.as_ref() else {
+            return Ok(());
+        };
+        let works = self
+            .distillery
+            .as_mut()
+            .ok_or("inference needs Distillery during composition")?;
+        let library = if matches!(
+            settings.model,
+            crate::settings::InferenceModelSettings::Library { .. }
+        ) {
+            Some(works.inference_model_library(&self.data_root)?)
+        } else {
+            None
+        };
+        let journal = if library.is_some() {
+            let key = identity
+                .derive_keypair(resident_inference::INFERENCE_DATA_SALT)
+                .map_err(|error| error.to_string())?
+                .to_seed();
+            let local = works.inference_journal(key)?;
+            Some(match personal.as_ref() {
+                Some(host) => resident_inference::personal::open(
+                    identity,
+                    works.mesh_root(),
+                    host,
+                    local,
+                    key,
+                )?,
+                None => local,
+            })
+        } else {
+            None
+        };
+        let mut inference =
+            ResidentInference::open(settings, library, works.gpu_access(), journal.clone())?;
+        if let (Some(host), Some(journal)) = (&personal, &journal) {
+            if let Err(error) = resident_inference::personal::join(host, journal).await {
+                let closed = inference.close().await.err();
+                return Err(format!(
+                    "join private inference log: {error}; close: {closed:?}"
+                ));
+            }
+            inference.retain_personal_sync(host.clone());
+        }
+        self.inference = Some(inference);
+        self.inference_pending = None;
+        Ok(())
     }
 
     /// Open the reservoir lane under `shared_root` as the owner's settings say.
@@ -490,6 +464,10 @@ impl DjinnResident {
             knot_reopen: _,
             distillery,
             inference,
+            #[cfg(feature = "inference")]
+                inference_pending: _,
+            #[cfg(feature = "inference")]
+                data_root: _,
             reservoir_settings: _,
             reservoir,
         } = self;

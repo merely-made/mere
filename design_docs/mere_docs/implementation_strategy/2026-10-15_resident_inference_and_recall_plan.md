@@ -1,10 +1,13 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-15):** in progress. I1 and I2 done (§7): strict decoder,
-declared templates, CPU and GPU model rows, and native trainer owner reclaim
-pass on O-PC. I3's checkpoint, restart and lock path is implemented; the
-production boundary for separately rooted paired devices remains open. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
+**Status (2026-10-16):** in progress. I1 to I3 software gates done (§7):
+strict decoder, declared templates, CPU and GPU model rows, native trainer
+owner reclaim, durable checkpoints, restart, lock recovery and keyed
+personal-graph continuation pass on O-PC. I4 recall is next. The new device
+boundary uses two separately rooted resident compositions on one computer;
+a physical second computer and installed-binary receipt remain separate.
+Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
 
@@ -193,6 +196,25 @@ can also support more than the llama family."** Follows: architecture
 coverage is a phase (I9). §2 records what the decoder runs today and what
 blocks each other family; families are added in the order that unlocks the
 largest openly licensed models.
+
+**Ruling 15 (2026-10-15).** *Which devices may read and continue private
+asks?* Mark: **"Proceed with I3 using every keyed personal graph device as
+the boundary."** Follows:
+- The personal graph's existing group distributes the data epochs. Inference
+  does not create another group or distribute a persona's private identity.
+- An incoming writer attests its distinct root under an inference-specific,
+  graph-specific derivation and must belong to the personal graph key group for that data epoch.
+  The encrypted envelope binds the inference domain and signed log address.
+  Transport reachability and pairing without a data key confer no read access.
+- Every keyed personal device can read received asks. Continuing one requires
+  the exact model session and an explicit Resume on that device. Concurrent
+  continuations remain a visible fork.
+- Existing group revocation semantics apply: a removed reader retains old
+  readable bytes, while an epoch turn excludes it from subsequent private
+  asks. Local historical reads do not reapply current writer admission.
+- With personal sync off, asks remain locally durable. With personal sync on,
+  shared asks refuse until this device is keyed. Live key agreement enables
+  them without restarting; inference never silently publishes plaintext.
 
 ---
 
@@ -910,16 +932,17 @@ Stop and record the reason if any of these happen:
     continuation tips are refused as a visible fork. An uninterrupted comparison
     stores the reference token-ID hash and first differing position; an absent
     comparison hash means unmeasured, not matched.
-  - *Qualification boundary.* The existing Distillery endpoint carries the
+  - *Qualification boundary at `9a4418ce` (historical; superseded by the
+    personal-graph binding below).* The existing Distillery endpoint carried the
     journal lane; a native two-host test uses independent transport endpoints
     and the same journal persona key. It proves real p2panda catch-up, continuation
     on the second host, device/position provenance and equal seeded IDs. It does
     not prove a second physical computer, or grant separately rooted paired
     personal-graph devices access. Personal sync already pairs such roots and
-    supplies its own key group. Whether private asks follow that keyed group or
-    only shared persona keys is an explicit pending boundary; the current
-    implementation preserves the narrower shared-persona admission. I3 stays
-    open until that production binding is settled and qualified. No installed
+    supplies its own key group. At that checkpoint, whether private asks followed
+    that keyed group or only shared persona keys was pending; that implementation
+    preserved shared-persona admission and left I3 open. Ruling 15 now resolves
+    the boundary. No installed
     resident or heap-residue audit is claimed by these tests.
   - *Checks.* ESP passes 160 release unit tests, both durable decoder tests
     (every pause boundary under greedy and seeded top-p sampling, failed-commit
@@ -940,3 +963,62 @@ Stop and record the reason if any of these happen:
     add no findings beyond the recorded repository baseline. Exact source and
     binary hashes, commands and qualified limits are in
     [the durable-ask receipt](../../../support/receipts/resident_inference_durable.json).
+
+- **2026-10-16, I3 keyed personal-graph binding (ruling 15), software gates
+  qualified.** The personal-sync host supplies a live protection handle to its
+  existing data keyring and membership. Inference uses a distinct sibling topic on
+  that host's endpoint, with additive peer tags kept when later peers pair.
+  No new key group or transport endpoint is opened for inference. Writer roots
+  remain distinct; graph/domain-specific public attestations bind each signer.
+  Private envelopes bind their complete signed address before insertion.
+  The header carries a compact 129-byte versioned public attestation, within
+  the existing p2panda header bound. Local appends round-trip the real header
+  codec before insertion, so an oversized extension cannot poison the log.
+  Incoming group records are schema-checked and must have an already retained
+  parent from the same run before insertion. Out-of-order children are refused
+  and can be offered again, keeping a catch-up interrupted by a crash reopenable.
+  - *Composition.* Djinn prepares the resident first and starts inference after
+    personal sync opens, before registering its lock holder and route. The
+    inference owner retains the personal host through actor and journal drain.
+    A resident without personal sync keeps its local journal without joining
+    the former shared-persona replication lane.
+  - *Storage and lock.* Graph journals live in `inference-personal-<graph>.redb`
+    beside `inference.redb`. On first keyed read, existing local records are
+    re-sealed into the group without overwriting an existing shared head.
+    A different local ask using an existing run name is a visible collision;
+    its local source is retained instead of silently selecting shared history.
+    Local Eidetic materializations keep a device-local persona-derived key.
+    Lock gates admission and materialization, clears heads, and also locks any
+    pending local import; unlock restores local access and reopens the sync
+    session to reconcile its retained frontier. Key-group revisions and missing
+    causal parents also request reconciliation. Locked checkpoint bodies are
+    refused rather than queued as decrypted data. The personal-sync owner
+    continues to own group epochs and key agreement.
+  - *Native evidence.* Two independently rooted vaults and resident compositions
+    use real personal-graph key agreement and p2panda endpoints. The tiny CPU
+    model continues on B after A's committed three-token pause; all eight seeded
+    token IDs equal the independent reference. Sealed native Eidetic evidence
+    records both visits and the measured comparison. An unkeyed device, an
+    outside writer, wrong graph/domain/address, plaintext fallback and a
+    cross-run parent are refused. A keyed reader can continue without browser
+    graph write permission. Unlock catches up asks refused while locked;
+    rotation excludes the retired reader from the new epoch, while retained
+    history still loads and reaches a late reader. A local-name collision keeps
+    its source. Both residents drain their shared custody and their personal
+    stores reopen. This complete scenario passes 20 repeated native runs.
+  - *Checks.* Distillery passes 37 unit tests and eight durability entries,
+    including killed-child recovery and the legacy same-persona network fixture.
+    Djinn passes six inference settings/attestation tests, four default-feature
+    settings tests, the four native inference-route tests and all three GPU
+    trainer-reclaim regressions. Graphshell passes 15 personal-sync host tests,
+    including additive sibling topics on pairing and unpairing. Formatting and
+    the documentation audit add no findings beyond the recorded baseline.
+  - *Evidence boundary.* The new gate runs two real endpoints with separate
+    identity roots on one O-PC and uses a tiny CPU model. It does not claim an
+    installed-binary run, a second physical computer, or a heap-residue audit.
+    The earlier real SmolLM2 and killed-child checkpoint receipts remain
+    independently qualified by their own source revisions; ESP's decoder and
+    provider are unchanged in this continuation.
+  - *Verification record.* [The personal-graph receipt](../../../support/receipts/resident_inference_personal.json)
+    records the gate results, repeated comparisons and source/binary hashes.
+    I3's software gate is closed. I4 recall with retained passage citations is next.

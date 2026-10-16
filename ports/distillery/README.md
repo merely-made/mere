@@ -78,8 +78,15 @@ cancelled partial and finished states distinct. Recall passage inputs remain I4.
 `PersonaRunJournal` stores signed, encrypted per-device logs through muniment
 and joins the caller's existing p2panda endpoint. Token entries contain only new
 IDs and text. A fork is reported rather than silently choosing a continuation.
-The current journal admits the same persona signer and data key; granting
-separately rooted paired devices access is a distinct production binding.
+A host can bind a journal to its existing encryption group through
+`RunGroupProtection`. Djinn uses the personal graph's live keyring and membership,
+with separately rooted, domain-attested writers on its existing endpoint.
+Current epochs require a current group member before insertion. Retained
+epochs admit historical writers named by the retained key agreement, and
+local historical reads survive removal of a writer. Unlock and key revisions
+reopen reconciliation against the retained frontier; a child whose parent has
+not arrived is retried without persisting a dangling checkpoint. The
+persona-only constructor remains the local journal and test seam.
 See the [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM

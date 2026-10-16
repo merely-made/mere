@@ -69,6 +69,9 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
 #[cfg(feature = "inference")]
 pub use lane::ResidentInference;
 
+#[cfg(feature = "inference")]
+pub mod personal;
+
 /// Without the feature the lane cannot exist: [`validate`] refuses its
 /// settings, so no value of this type is ever made.
 #[cfg(not(feature = "inference"))]
@@ -107,6 +110,7 @@ mod lane {
     /// The open lane.
     pub struct ResidentInference {
         lane: InferenceLane,
+        personal: Option<std::sync::Arc<graphshell::native::personal_sync_host::PersonalSyncHost>>,
         journal: Option<
             std::sync::Arc<
                 distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
@@ -165,7 +169,30 @@ mod lane {
                     ..
                 } => unreachable!("validate refuses GPU settings without inference-gpu"),
             };
-            Ok(Self { lane, journal })
+            Ok(Self {
+                lane,
+                journal,
+                personal: None,
+            })
+        }
+
+        /// Retain the endpoint/key owner until after the private lane drains.
+        pub fn retain_personal_sync(
+            &mut self,
+            host: std::sync::Arc<graphshell::native::personal_sync_host::PersonalSyncHost>,
+        ) {
+            self.personal = Some(host);
+        }
+
+        /// The sealed record authority, for in-process evidence readers.
+        pub fn journal(
+            &self,
+        ) -> Option<
+            &std::sync::Arc<
+                distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
+            >,
+        > {
+            self.journal.as_ref()
         }
 
         /// The lane itself, for in-process callers.
@@ -207,13 +234,37 @@ mod lane {
 
         /// Cancel unfinished runs and join the lane's threads.
         pub async fn close(self) -> Result<(), String> {
-            tokio::task::spawn_blocking(move || self.lane.close())
+            let closed = tokio::task::spawn_blocking(move || self.lane.close())
                 .await
-                .map_err(|error| format!("join the inference lane's close: {error}"))??;
-            if let Some(journal) = self.journal {
-                journal.shutdown().await?;
+                .map_err(|error| format!("join the inference lane's close: {error}"))
+                .and_then(|result| result);
+            let drained = match self.journal {
+                Some(journal) => journal.shutdown().await,
+                None => Ok(()),
+            };
+            // When the enclosing task scope has released its watchers and
+            // sessions, this is the final host owner. Await its transport drain
+            // before the resident checks shared blob custody for borrowers.
+            // An embedded caller retaining its own host keeps that ownership.
+            let personal = match self.personal {
+                Some(host) => match std::sync::Arc::try_unwrap(host) {
+                    Ok(host) => host
+                        .close()
+                        .await
+                        .map_err(|error| format!("close personal sync: {error}")),
+                    Err(_) => Ok(()),
+                },
+                None => Ok(()),
+            };
+            let failures: Vec<_> = [closed, drained, personal]
+                .into_iter()
+                .filter_map(Result::err)
+                .collect();
+            if failures.is_empty() {
+                Ok(())
+            } else {
+                Err(failures.join("; "))
             }
-            Ok(())
         }
     }
     struct InferenceLock {

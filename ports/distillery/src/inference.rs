@@ -286,6 +286,10 @@ pub trait RunJournal: Send + Sync {
     fn device(&self) -> &str;
     fn load(&self) -> Result<Vec<RunRecord>, String>;
     fn append(&self, record: &RunRecord) -> Result<(), String>;
+    /// Historical reads can remain available after execution authority ends.
+    fn execution_permitted(&self) -> bool {
+        true
+    }
     fn remote_revision(&self) -> u64 {
         0
     }
@@ -473,6 +477,7 @@ impl InferenceLane {
                     .is_some_and(|visit| visit.device == journal.device());
                 if !record.view.state.is_terminal() {
                     if local
+                        && journal.execution_permitted()
                         && (record.view.state != RunStateV1::Paused
                             || record.pause_reason.as_deref() == Some("shutdown")
                             || record.pause_reason.as_deref() == Some("lock"))
@@ -806,7 +811,12 @@ impl InferenceLane {
                 }
                 std::thread::sleep(Duration::from_millis(2));
             }
-        } else {
+        } else if self
+            .shared
+            .journal
+            .as_ref()
+            .is_none_or(|journal| journal.execution_permitted())
+        {
             for name in names {
                 self.resume(&name, "unlock")
                     .map_err(|error| error.to_string())?;
@@ -1317,6 +1327,59 @@ mod tests {
             }
             Ok(out)
         }
+    }
+
+    #[test]
+    fn retained_asks_do_not_auto_execute_without_current_authority() {
+        struct Historical;
+        impl RunJournal for Historical {
+            fn device(&self) -> &str {
+                "retired"
+            }
+            fn execution_permitted(&self) -> bool {
+                false
+            }
+            fn load(&self) -> Result<Vec<RunRecord>, String> {
+                Ok(vec![RunRecord {
+                    view: RunV1 {
+                        run: "private".into(),
+                        question: "retained question".into(),
+                        state: RunStateV1::Paused,
+                        text: "prefix".into(),
+                        error: None,
+                        session: None,
+                        tokens: 0,
+                        continuations: Vec::new(),
+                    },
+                    actor_id: 0,
+                    request: GenerationRequest::default(),
+                    checkpoint: None,
+                    continuations: vec![Continuation {
+                        device: "retired".into(),
+                        at_token: 0,
+                        reason: "ask".into(),
+                        first_differing_token: None,
+                        compared_token_ids_hash: None,
+                    }],
+                    pause_reason: Some("lock".into()),
+                    executing: false,
+                }])
+            }
+            fn append(&self, _: &RunRecord) -> Result<(), String> {
+                Err("not currently keyed".into())
+            }
+        }
+        let lane = InferenceLane::try_open_with_journal(
+            8,
+            || Ok(Box::new(StubInferenceProvider::new())),
+            Some(Arc::new(Historical)),
+        )
+        .unwrap();
+        assert_eq!(lane.runs().runs[0].state, RunStateV1::Paused);
+        lane.set_locked(true).unwrap();
+        lane.set_locked(false).unwrap();
+        assert_eq!(lane.runs().runs[0].state, RunStateV1::Paused);
+        lane.close().unwrap();
     }
 
     #[test]

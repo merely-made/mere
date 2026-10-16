@@ -28,7 +28,7 @@ trainer = ["distillery/trainer"]
 # The resident inference lane (`src/resident_inference.rs`; resident inference
 # and recall plan, I1). Gated for the trainer's reason: a default build stays
 # light, and settings naming the lane in a build without it are refused.
-inference = ["distillery/inference-model"]
+inference = ["distillery/inference-model", "dep:stickleback"]
 inference-gpu = ["inference", "distillery/inference-gpu"]
 # The same trainer, composed on this machine's discrete GPU. Additive over
 # `trainer`, and honest about the difference: a lane that says `device: "gpu"`
@@ -85,6 +85,7 @@ knot-site = { git = "https://github.com/merely-made/knot-editor.git", rev = "8ed
 mesh.workspace = true
 # The delegation-signing salts the custody route signs with (D11).
 insigne.workspace = true
+stickleback = { workspace = true, optional = true }
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
