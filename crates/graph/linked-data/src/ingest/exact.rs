@@ -11,10 +11,10 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 use kernel::graph::predicate_registry::GraphStratum;
 use kernel::graph::resource_content::RESOURCE_PROPERTIES;
 use kernel::graph::resource_properties::merge_resource_properties;
-use kernel::graph::{Graph, NodeKey, sub_kind_from_iri};
+use kernel::graph::{EdgeFamily, Graph, NodeKey, RelationKind, sub_kind_from_iri};
 use kernel::persistence::{
     GraphSnapshot, PersistedEdge, PersistedEdgeFamily, PersistedResourceFacet,
-    PersistedSemanticEdgeData, PersistedSemanticStatement, PersistedSemanticSubKind,
+    PersistedSemanticStatement, PersistedSemanticSubKind,
 };
 use kernel::types::NodeProperty;
 
@@ -180,7 +180,7 @@ pub(super) fn import_edge(
         ),
     ] {
         for record in records {
-            for held in record.semantic.iter().flat_map(|bucket| &bucket.statements) {
+            for held in record.retained_assertions() {
                 let pair_matches = pair.is_some_and(|(from, to)| {
                     record.from_node_id == *from && record.to_node_id == *to
                 });
@@ -220,16 +220,21 @@ pub(super) fn import_edge(
         GraphStratum::Resource => &mut snapshot.resource_edges,
     };
     let incoming = PersistedEdge {
+        assertions: Some(vec![statement.clone()]),
         from_node_id: pair.0.clone(),
         to_node_id: pair.1.clone(),
-        families: vec![PersistedEdgeFamily::Semantic],
-        semantic: Some(PersistedSemanticEdgeData {
-            sub_kinds: statement.recognized_sub_kind.into_iter().collect(),
-            label: statement.label.clone(),
-            predicate: Some(statement.predicate.clone()),
-            agent_decay_progress: None,
-            statements: vec![statement],
-        }),
+        families: vec![match RelationKind::from_predicate_iri(&statement.predicate)
+            .unwrap_or(RelationKind::OpenPredicate)
+            .family()
+        {
+            EdgeFamily::Semantic => PersistedEdgeFamily::Semantic,
+            EdgeFamily::Traversal => PersistedEdgeFamily::Traversal,
+            EdgeFamily::Containment => PersistedEdgeFamily::Containment,
+            EdgeFamily::Arrangement => PersistedEdgeFamily::Arrangement,
+            EdgeFamily::Imported => PersistedEdgeFamily::Imported,
+            EdgeFamily::Provenance => PersistedEdgeFamily::Provenance,
+        }],
+        semantic: None,
         traversal: None,
         containment: None,
         arrangement: None,
@@ -355,6 +360,67 @@ mod tests {
     }
 
     #[test]
+    fn exact_ingest_writes_canonical_records_with_family_from_predicate_iri() {
+        let mut graph = Graph::new();
+        let from = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://from.test/".into(),
+            Default::default(),
+        );
+        let to = kernel::graph::apply::add_node(
+            &mut graph,
+            None,
+            "https://to.test/".into(),
+            Default::default(),
+        );
+        let predicate = RelationKind::Containment(kernel::graph::ContainmentSubKind::UserFolder)
+            .predicate_iri()
+            .unwrap();
+        let edge = EdgeContribution {
+            subject: "https://from.test/".into(),
+            object: "https://to.test/".into(),
+            predicate: predicate.into(),
+            graph_scope: GraphScope::User,
+            statement_id: Some("exact-containment-claim".into()),
+            label: Some("folder membership".into()),
+            provenance_iri: Some("urn:source:import".into()),
+            first_asserted_ms: Some(10),
+            asserted_at_ms: Some(11),
+            withdrawn: None,
+            basis: Default::default(),
+        };
+
+        assert!(import_edge(&mut graph, from, to, &edge));
+        let snapshot = graph.to_snapshot();
+        let persisted = snapshot
+            .edges
+            .iter()
+            .find(|record| {
+                record
+                    .retained_assertions()
+                    .iter()
+                    .any(|statement| statement.statement_id == "exact-containment-claim")
+            })
+            .expect("imported canonical record");
+        assert!(persisted.assertions.is_some());
+        assert!(persisted.semantic.is_none());
+        assert!(
+            persisted
+                .families
+                .contains(&PersistedEdgeFamily::Containment)
+        );
+        assert!(!persisted.families.contains(&PersistedEdgeFamily::Semantic));
+        let statement = &persisted.retained_assertions()[0];
+        assert_eq!(statement.first_asserted_ms, Some(10));
+        assert_eq!(statement.asserted_at_ms, Some(11));
+        assert_eq!(
+            statement.provenance_iri.as_deref(),
+            Some("urn:source:import")
+        );
+    }
+
+    #[test]
     fn carried_surface_import_preserves_parallel_rows_and_traversals() {
         let mut graph = Graph::new();
         let from = kernel::graph::apply::add_node(
@@ -374,30 +440,25 @@ mod tests {
             .unwrap();
         let mut snapshot = graph.to_snapshot();
         let mut first = PersistedEdge {
+            assertions: Some(vec![PersistedSemanticStatement {
+                statement_id: "held-one".into(),
+                predicate: "urn:predicate:held".into(),
+                recognized_sub_kind: None,
+                label: Some("held".into()),
+                basis: kernel::types::AssertionBasis {
+                    note: Some("held".into()),
+                    ..Default::default()
+                },
+                graph_scope: GraphScope::User,
+                provenance_iri: Some("urn:author:held".into()),
+                asserted_at_ms: Some(10),
+                first_asserted_ms: Some(10),
+                withdrawn: None,
+            }]),
             from_node_id: graph.get_node(from).unwrap().id.to_string(),
             to_node_id: graph.get_node(to).unwrap().id.to_string(),
             families: vec![PersistedEdgeFamily::Semantic],
-            semantic: Some(PersistedSemanticEdgeData {
-                sub_kinds: vec![],
-                label: Some("held".into()),
-                predicate: Some("urn:predicate:held".into()),
-                agent_decay_progress: None,
-                statements: vec![PersistedSemanticStatement {
-                    statement_id: "held-one".into(),
-                    predicate: "urn:predicate:held".into(),
-                    recognized_sub_kind: None,
-                    label: Some("held".into()),
-                    basis: kernel::types::AssertionBasis {
-                        note: Some("held".into()),
-                        ..Default::default()
-                    },
-                    graph_scope: GraphScope::User,
-                    provenance_iri: Some("urn:author:held".into()),
-                    asserted_at_ms: Some(10),
-                    first_asserted_ms: Some(10),
-                    withdrawn: None,
-                }],
-            }),
+            semantic: None,
             traversal: None,
             containment: None,
             arrangement: None,
@@ -418,7 +479,7 @@ mod tests {
             },
         });
         let mut second = first.clone();
-        second.semantic.as_mut().unwrap().statements[0].statement_id = "held-two".into();
+        second.assertions.as_mut().unwrap()[0].statement_id = "held-two".into();
         let traversal = second.traversal.as_mut().unwrap();
         traversal.traversals[0].timestamp_ms = 22;
         traversal.traversals[0].trigger = PersistedNavigationTrigger::Back;

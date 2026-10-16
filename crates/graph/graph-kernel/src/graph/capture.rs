@@ -830,11 +830,17 @@ where
 }
 
 /// Attribution outlives a handle's removal so an undo keeps its original source.
-pub(crate) struct ReplayAttribution(BTreeMap<String, String>);
+pub(crate) struct ReplayAttribution(
+    BTreeMap<String, String>,
+    super::legacy_family_attribution::LegacyFamilyAttribution,
+);
 
 impl ReplayAttribution {
     pub(crate) fn from_baseline(graph: &Graph) -> Self {
-        let mut attribution = Self(BTreeMap::new());
+        let mut attribution = Self(
+            BTreeMap::new(),
+            super::legacy_family_attribution::LegacyFamilyAttribution::from_baseline(graph),
+        );
         attribution.observe_graph(graph);
         attribution
     }
@@ -846,7 +852,12 @@ impl ReplayAttribution {
             .edge_weights()
             .chain(graph.resources.inner().edge_weights())
         {
-            for statement in edge.semantic_statements() {
+            for statement in edge.assertions() {
+                if statement.statement_id.starts_with(
+                    super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX,
+                ) {
+                    continue;
+                }
                 self.0
                     .entry(statement.statement_id.clone())
                     .or_insert_with(|| {
@@ -864,6 +875,7 @@ impl ReplayAttribution {
         if changed {
             graph.bump_revision();
         }
+        self.1.repair_checkpoint(graph);
     }
 
     fn repair_edges<N: chartulary::Identified>(
@@ -874,10 +886,14 @@ impl ReplayAttribution {
         let keys: Vec<_> = graph.inner().edge_indices().collect();
         let mut changed = false;
         for key in keys {
-            if let Some(payload) = graph.edge_mut(key)
-                && let Some(semantic) = &mut payload.semantic
-            {
+            if let Some(payload) = graph.edge_mut(key) {
+                let semantic = &mut payload.assertions;
                 for statement in &mut semantic.statements {
+                    if statement.statement_id.starts_with(
+                        super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX,
+                    ) {
+                        continue;
+                    }
                     if statement
                         .provenance_iri
                         .as_deref()
@@ -904,20 +920,26 @@ impl ReplayAttribution {
         | GraphDelta::ReplaySetResourceEdgesByIds { edges, .. } = &mut delta
         {
             for edge in edges {
-                if let Some(semantic) = &mut edge.semantic {
-                    for statement in &mut semantic.statements {
-                        let original =
-                            self.0
-                                .entry(statement.statement_id.clone())
-                                .or_insert_with(|| {
-                                    statement
-                                        .provenance_iri
-                                        .clone()
-                                        .unwrap_or_else(|| author.asserter_iri())
-                                });
-                        if statement.provenance_iri.is_none() {
-                            statement.provenance_iri = Some(original.clone());
-                        }
+                for statement in edge.retained_assertions_mut() {
+                    if statement.statement_id.starts_with(
+                        super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX,
+                    ) {
+                        // This structural ID's original actor is tracked by
+                        // pair + kind across old replay events. A snapshot
+                        // writer is not its source.
+                        continue;
+                    }
+                    let original =
+                        self.0
+                            .entry(statement.statement_id.clone())
+                            .or_insert_with(|| {
+                                statement
+                                    .provenance_iri
+                                    .clone()
+                                    .unwrap_or_else(|| author.asserter_iri())
+                            });
+                    if statement.provenance_iri.is_none() {
+                        statement.provenance_iri = Some(original.clone());
                     }
                 }
             }
@@ -943,6 +965,7 @@ pub(crate) fn replay_attributed_deltas_onto<'a, I>(
                         | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
                 );
                 let _ = apply_graph_delta(graph, delta);
+                attribution.1.observe_delta(graph, entry);
                 if legacy_assertion {
                     attribution.observe_graph(graph);
                 }
@@ -2347,7 +2370,7 @@ mod tests {
         let minted = captured
             .iter()
             .filter(|delta| matches!(delta, CapturedDelta::ReplaySetResourceEdgesByIds { edges, .. }
-                if edges.iter().filter_map(|edge| edge.semantic.as_ref()).flat_map(|semantic| &semantic.statements)
+                if edges.iter().flat_map(|edge| edge.retained_assertions())
                     .any(|statement| statement.predicate != crate::graph::resource::TAGGED_WITH_IRI)))
             .count();
         assert_eq!(
@@ -2842,7 +2865,7 @@ mod resource_capture_tests {
         let from = chartulary::resource_id("https://resource.test/a");
         let to = chartulary::resource_id("https://resource.test/b");
         let mut captured = edges(from, to);
-        captured[0].semantic.as_mut().unwrap().statements[0].provenance_iri = None;
+        captured[0].retained_assertions_mut()[0].provenance_iri = None;
         let pair = |edges| CapturedDelta::ReplaySetResourceEdgesByIds {
             from_resource_id: from.to_string(),
             to_resource_id: to.to_string(),
@@ -2870,8 +2893,8 @@ mod resource_capture_tests {
         );
         let persisted = restored.persisted_resource_edges_between(from, to);
         assert_eq!(persisted.len(), 2, "parallel exact records remain separate");
-        let minted = &persisted[0].semantic.as_ref().unwrap().statements[0];
-        let explicit = &persisted[1].semantic.as_ref().unwrap().statements[0];
+        let minted = &persisted[0].retained_assertions()[0];
+        let explicit = &persisted[1].retained_assertions()[0];
         assert_eq!(minted.statement_id, "minted-handle");
         assert_eq!(minted.asserted_at_ms, Some(10));
         assert_eq!(minted.provenance_iri, Some(minter.asserter_iri()));

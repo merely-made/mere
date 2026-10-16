@@ -1,0 +1,6 @@
+{
+  "check": "Mere port and Graphshell web dependency boundaries passed",
+  "tool_normalization": "cargo metadata normalized the single turquet version-qualified lock reference",
+  "action": "restored exact pre-check lock bytes after verifying the entire diff was only this normalization",
+  "sha256": "7cbbade5759169a37eb7c6967f2d892edc42b3838684aa4c4eb06cf627583210"
+}

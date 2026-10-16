@@ -1,0 +1,37 @@
+{
+  "schema": "mere.cleromancy-c7-intake/v1",
+  "source": "6a0f015a42728b926174b0b04d545cad8f0eaa7b",
+  "core": "d5c383c189f9e866a38939dd372ddf6a7556b60b",
+  "compiler": "Cargo 1.99, rustc/rustdoc 1.97.1",
+  "command": "cargo test --locked --offline -p djinn --test embedded_reservoir_validation -- --nocapture --test-threads=1",
+  "gate": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 1,
+    "intentional_ignore": "process-child entry point, invoked by the parent process fixtures"
+  },
+  "immutable_git_core": true,
+  "local_override_in_final_gate": false,
+  "lock_changes": "Only the Cleromancy portable core Git hash changes; all other locked inputs are preserved.",
+  "proofs": [
+    "Formula records replay exactly and model-labelled synthetic contract records reopen from storage.",
+    "Explicit Keep is preserved through canonical resource tags.",
+    "Embedded to daemon to embedded ownership preserves the same session, complete graph, facets and history.",
+    "Input, output and disclosure tampering refuses the complete batch before projection, journal or durable-byte mutation.",
+    "Existing typed-deck, shuffle, ambient, situation and generic owner regressions remain active."
+  ],
+  "boundaries": [
+    "The receiving model output is explicitly synthetic; real ESP execution has separate product-native evidence.",
+    "The first preparation probe used the wrong legacy node.tags assertion. It is retained as failed diagnostic evidence.",
+    "The passing preparation used a local path override; only receiving-immutable-01.log qualifies the actual Git core.",
+    "Cargo update attempted a wider supplier intake; that lock was not used in the final gate. The final committed lock changes one core hash.",
+    "This is receiving CPU/process qualification, not product desktop or release qualification."
+  ],
+  "logs": {
+    "receiving-immutable-01.log": "97b241c3796e4e46839b05e1d7ac63f4b20980786d79c4434395068abaad575f",
+    "receiving-git-intake.log": "ea4f35462e56f7e5735db6acd4e919ab829b6bcfac3633d5ffe0100ceb64921e",
+    "receiving-preparation-02.log": "f1fe1690812bda3b26cad495b20176bd453d952690f6e939dcd651ddd71b4eb6",
+    "receiving-preparation-01.log": "79bb91563b0c1f913c5145b1a194cbb688767374c6ccba7932df627efbb443f7",
+    "receiving-git-intake-02.log": "bba3a1356c166d1676642344f44b80b4d3a4a6486647259fda8dd2420c3ee5e8"
+  }
+}

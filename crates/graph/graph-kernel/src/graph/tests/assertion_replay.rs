@@ -7,6 +7,7 @@
 use super::super::*;
 use crate::graph::apply::{GraphDelta, apply_graph_delta};
 use crate::graph::capture::{CapturedDelta, replay_captured_deltas_onto};
+use crate::persistence::PersistedSemanticEdgeData;
 use std::sync::{Arc, Mutex};
 
 fn resource_statements(graph: &Graph, from: NodeKey, to: NodeKey) -> &[SemanticStatement] {
@@ -313,6 +314,14 @@ fn exact_replay_normalizes_legacy_buckets_and_aggregate_predicates() {
         );
     }
     let mut edges = source.persisted_edges_between(from, to);
+    // This captured edge is deliberately the old sidecar DTO form. Replay has
+    // no enclosing GraphSnapshot schema field, so `assertions: None` selects
+    // the legacy semantic decoder directly.
+    let statements = edges[0].assertions.take().unwrap();
+    edges[0].semantic = Some(PersistedSemanticEdgeData {
+        statements,
+        ..Default::default()
+    });
     let statements = &mut edges[0].semantic.as_mut().unwrap().statements;
     statements[0].provenance_iri = None;
     statements[1].provenance_iri = None;

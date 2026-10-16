@@ -11,7 +11,7 @@
 //! `design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md`):
 //! "Save as graph codicil" freezes a [`Graph`] to its [`GraphSnapshot`] plus
 //! atomic facet store, redacts private / heavy state, and writes it through the
-//! eidetic typed-payload layer under the `mere.graph-snapshot/v2` schema; "Open
+//! eidetic typed-payload layer under the v4 graph-snapshot schemas; "Open
 //! as session" thaws a codicil back into a [`Graph`]. Browsing a codicil is
 //! read-only (immutability holds); editing forks a thaw.
 //!
@@ -41,9 +41,11 @@ use kernel::graph::AttributedDelta;
 
 /// Schema id bytes for the graph-snapshot codicil schema. The [`SchemaRef`] is the
 /// BLAKE3 of these bytes, so it is stable across builds and machines.
-pub const GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v2";
+pub const GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v4";
 const LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v1";
-pub const PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v3";
+const V2_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v2";
+const V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot/v3";
+pub const PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID: &[u8] = b"mere.graph-snapshot-profiled/v4";
 
 pub fn profiled_graph_snapshot_schema_ref() -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID))
@@ -63,11 +65,20 @@ fn legacy_graph_snapshot_schema_ref() -> SchemaRef {
     SchemaRef::from_id(ManifestId::of_blob(LEGACY_GRAPH_SNAPSHOT_SCHEMA_ID))
 }
 
+fn v2_graph_snapshot_schema_ref() -> SchemaRef {
+    SchemaRef::from_id(ManifestId::of_blob(V2_GRAPH_SNAPSHOT_SCHEMA_ID))
+}
+
+fn v3_profiled_graph_snapshot_schema_ref() -> SchemaRef {
+    SchemaRef::from_id(ManifestId::of_blob(V3_PROFILED_GRAPH_SNAPSHOT_SCHEMA_ID))
+}
+
 /// A graph snapshot and its one live facet store, bound to the graph-codicil
 /// schema.
 ///
-/// Version 1 carried a bare [`GraphSnapshot`]. Version 2 adds the sidecar because
-/// optional node metadata no longer lives in snapshot columns.
+/// Version 1 carried a bare [`GraphSnapshot`]. Version 2 added facets, version 3
+/// added an explicit placement profile, and version 4 stores assertion records
+/// as the canonical edge representation.
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GraphCodicil {
     pub snapshot: GraphSnapshot,
@@ -125,6 +136,18 @@ impl TypedPayload for ProfiledGraphCodicil {
     }
 }
 
+/// The profiled v3 JSON envelope. Retained only as an input adapter; new saves
+/// always use the v4 schema above.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+struct V3ProfiledGraphCodicil(ProfiledGraphCodicil);
+
+impl TypedPayload for V3ProfiledGraphCodicil {
+    fn schema_ref() -> SchemaRef {
+        v3_profiled_graph_snapshot_schema_ref()
+    }
+}
+
 impl TypedPayload for GraphCodicil {
     fn schema_ref() -> SchemaRef {
         graph_snapshot_schema_ref()
@@ -133,6 +156,19 @@ impl TypedPayload for GraphCodicil {
     // `graph.json`, hash-stable, and free of the rkyv-alignment-from-store
     // concern. A compact rkyv override is a later optimization (the architecture
     // doc's stated preference), not load-bearing for the spine.
+}
+
+/// The v2 JSON envelope remains readable after the current codicil advances.
+/// Current snapshot serde defaults admit its older edge shape; this adapter does
+/// not claim compatibility with standalone rkyv archives.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+struct V2GraphCodicil(GraphCodicil);
+
+impl TypedPayload for V2GraphCodicil {
+    fn schema_ref() -> SchemaRef {
+        v2_graph_snapshot_schema_ref()
+    }
 }
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -335,7 +371,8 @@ pub async fn save_graph_snapshot_codicil_sealed(
     .await
 }
 
-/// Freeze caller-qualified placement with its snapshot and facets under v3.
+/// Freeze caller-qualified placement with its snapshot and facets under the v4
+/// profiled schema.
 pub async fn save_profiled_graph_codicil_sealed(
     store: &mut dyn Store,
     sealer: Option<&dyn PayloadSealer>,
@@ -378,8 +415,8 @@ pub async fn open_codicil_as_session(
 
 /// Load the persisted graph-codicil payload without materializing a live graph.
 ///
-/// Legacy v1 payloads are upgraded in memory to the v2 snapshot + facet-store
-/// shape.
+/// Legacy v1-v3 schemas remain accepted as input. This API returns their decoded
+/// snapshot DTO; opening materializes current graph records, and new saves use v4.
 pub async fn load_graph_codicil(
     store: &mut dyn Store,
     id: ManifestId,
@@ -401,11 +438,14 @@ pub async fn open_codicil_as_session_sealed(
         .transpose()
 }
 
-/// List manifests for v1/v2 and explicitly profiled v3 graph codicils. Order is
-/// store-defined; callers that want newest-first should sort on `created_at`.
+/// List manifests for v1-v4 graph codicils, including both unprofiled and
+/// explicitly profiled inputs. Order is store-defined; callers that want
+/// newest-first should sort on `created_at`.
 pub async fn list_graph_codicils(store: &mut dyn Store) -> Result<Vec<BlobManifest>> {
     let mut manifests = list_typed::<GraphCodicil>(store).await?;
     manifests.extend(list_typed::<LegacyGraphCodicil>(store).await?);
+    manifests.extend(list_typed::<V2GraphCodicil>(store).await?);
+    manifests.extend(list_typed::<V3ProfiledGraphCodicil>(store).await?);
     manifests.extend(list_typed::<ProfiledGraphCodicil>(store).await?);
     Ok(manifests)
 }
@@ -466,7 +506,8 @@ pub async fn save_session_codicil_checked(
 }
 
 /// Save an archive with the source session's explicit current placement.
-/// Bare inputs remain v2 and unqualified; recorded inputs retain the v3 envelope.
+/// Bare inputs remain unqualified; recorded inputs retain their placement in the
+/// v4 profiled envelope.
 pub async fn save_profiled_session_codicil_checked(
     store: &mut dyn Store,
     payload: ProfiledGraphCodicil,
@@ -684,7 +725,9 @@ async fn load_graph_codicil_sealed(
         .transpose()
 }
 
-/// Read the explicit input profile. v1/v2 remain unqualified regardless of columns.
+/// Read the explicit input profile. v1/v2 remain unqualified regardless of
+/// columns; v3 placement metadata is preserved. Opening materializes the legacy
+/// snapshot through the current graph conversion.
 pub async fn load_profiled_graph_codicil_sealed(
     store: &mut dyn Store,
     sealer: Option<&dyn PayloadSealer>,
@@ -703,6 +746,16 @@ pub async fn load_profiled_graph_codicil_sealed(
         }
         return Ok(payload);
     }
+    if manifest.schema == v3_profiled_graph_snapshot_schema_ref() {
+        let payload =
+            load_typed_sealed::<V3ProfiledGraphCodicil>(store, &mut fetcher, sealer, id).await?;
+        if let Some(input) = &payload {
+            Graph::try_from_snapshot(&input.0.codicil.snapshot).map_err(|error| {
+                Error::new(format!("invalid v3 graph codicil snapshot: {error}"))
+            })?;
+        }
+        return Ok(payload.map(|input| input.0));
+    }
     if manifest.schema == graph_snapshot_schema_ref() {
         let payload = load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await?;
         if let Some(codicil) = &payload {
@@ -711,6 +764,18 @@ pub async fn load_profiled_graph_codicil_sealed(
         }
         return Ok(payload.map(|codicil| ProfiledGraphCodicil {
             codicil,
+            placement: None,
+        }));
+    }
+    if manifest.schema == v2_graph_snapshot_schema_ref() {
+        let payload = load_typed_sealed::<V2GraphCodicil>(store, &mut fetcher, sealer, id).await?;
+        if let Some(codicil) = &payload {
+            Graph::try_from_snapshot(&codicil.0.snapshot).map_err(|error| {
+                Error::new(format!("invalid v2 graph codicil snapshot: {error}"))
+            })?;
+        }
+        return Ok(payload.map(|codicil| ProfiledGraphCodicil {
+            codicil: codicil.0,
             placement: None,
         }));
     }
@@ -768,6 +833,10 @@ fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> Result<GraphCodicil
         sessions,
     })
 }
+
+#[cfg(test)]
+#[path = "graph_codicil_p6_migration_tests.rs"]
+mod p6_migration_tests;
 
 #[cfg(test)]
 mod tests {
@@ -1010,11 +1079,18 @@ mod tests {
                     .await
                     .unwrap()
                 } else {
-                    save_graph_snapshot_codicil(
+                    save_typed_sealed(
                         &mut store,
-                        snapshot.clone(),
-                        graph.facets().clone(),
-                        RedactionPolicy::include_all(),
+                        None,
+                        &V2GraphCodicil(GraphCodicil {
+                            snapshot: snapshot.clone(),
+                            facets: graph.facets().clone(),
+                            sessions: Vec::new(),
+                        }),
+                        Vec::<BlobSource>::new(),
+                        PrivacyClass::LocalOnly,
+                        graph_codicil_provenance(Timestamp(1)),
+                        TrustEnvelope::self_asserted(),
                         Timestamp(1),
                     )
                     .await

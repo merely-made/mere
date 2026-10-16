@@ -43,7 +43,7 @@ use seiche::{
 };
 
 use crate::canvas::seiche_bridge::{
-    visible_relation_edges, visible_relation_edges_with_link_hides,
+    visible_relation_edges, visible_relation_edges_with_assertion_hides,
 };
 use crate::canvas::{Canvas, SETTLE_TICKS};
 use crate::signals::ChannelRegistry;
@@ -767,8 +767,14 @@ impl<'a> LawInputs<'a> {
         graph: &Graph,
         hidden_edges: &HashSet<crate::canvas::EdgeCell>,
         hidden_links: &HashSet<scenograph::link::LinkKey>,
+        hidden_assertions: &HashSet<String>,
     ) -> Self {
-        self.edges = visible_relation_edges_with_link_hides(graph, hidden_edges, hidden_links);
+        self.edges = visible_relation_edges_with_assertion_hides(
+            graph,
+            hidden_edges,
+            hidden_links,
+            hidden_assertions,
+        );
         self
     }
     /// The inputs over `graph`, reading `sites` when the caller's registry
@@ -1190,10 +1196,11 @@ impl<'a> LawInputs<'a> {
 impl Canvas {
     pub(crate) fn controller_edges(&self) -> Vec<(NodeKey, NodeKey)> {
         self.occurrence_edges.clone().unwrap_or_else(|| {
-            visible_relation_edges_with_link_hides(
+            visible_relation_edges_with_assertion_hides(
                 &self.graph,
                 &self.hidden_edges,
                 &self.hidden_links,
+                &self.hidden_assertions,
             )
         })
     }
@@ -1269,7 +1276,12 @@ impl Canvas {
                 },
                 self.channels.sites_fresh(&self.graph),
             )
-            .with_link_hides(&self.graph, &self.hidden_edges, &self.hidden_links)
+            .with_link_hides(
+                &self.graph,
+                &self.hidden_edges,
+                &self.hidden_links,
+                &self.hidden_assertions,
+            )
             .with_occurrence_edges(self.occurrence_edges.as_deref())
             .with_meaning(self.meaning.snapshot())
             .with_registry(&self.channels, self.physics_view_key());
@@ -1395,7 +1407,12 @@ impl Canvas {
     /// the physics channels read from the registry.
     fn law_inputs_now(&self) -> LawInputs<'_> {
         LawInputs::new(&self.graph, &self.hidden_edges, None, None)
-            .with_link_hides(&self.graph, &self.hidden_edges, &self.hidden_links)
+            .with_link_hides(
+                &self.graph,
+                &self.hidden_edges,
+                &self.hidden_links,
+                &self.hidden_assertions,
+            )
             .with_occurrence_edges(self.occurrence_edges.as_deref())
             .with_registry(&self.channels, self.physics_view_key())
     }

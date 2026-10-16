@@ -1,0 +1,40 @@
+{
+  "schema": "mere.link-model-p6-receiving-hosts/v1",
+  "supplier": {
+    "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+    "published_on_main": true,
+    "remote_verified": "a45a0b6976fa8984ade032d5514d6403d5a216c3"
+  },
+  "woodshed": {
+    "qualified_source": "d896e398fe216b1fe5cd97926bd9e2f5337a0b3d",
+    "published_receipt_commit": "c32b60af83efb335153b539c7a2d16d40ece8c17",
+    "remote_verified": "c32b60af83efb335153b539c7a2d16d40ece8c17",
+    "receipt": "https://github.com/merely-made/woodshed/blob/c32b60af83efb335153b539c7a2d16d40ece8c17/validation/link-model-p6_20261016/receipt.json",
+    "receipt_sha256": "3fe10a9720a9165c39837a47a21462f3d2fee79cda309d0d0cb4e673744a2069",
+    "source_checks": {
+      "passed": 629,
+      "ignored": 7,
+      "additional_child_processes": 5
+    },
+    "desktop_build": "passed",
+    "native": {
+      "seed_frames": 141,
+      "reopen_frames": 134,
+      "reviewed_captures": 4,
+      "fresh_app_process": true,
+      "same_keeper_process": true,
+      "keeper_manifest_unchanged": true
+    },
+    "scope": "Portable custom-predicate personal assertion adapter and shared opened-link compiler; generated Surface native smoke and sealed-profile app-process reopen. No Mere Graph ingestion in Woodshed.",
+    "root_mere_rows_advanced": 45,
+    "other_sources_and_nested_locks_preserved": true
+  },
+  "knot": {
+    "locked_supplier": "b6a6222ede48bacebbc5a533c5930bcab779cee5",
+    "intake_source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+    "source_tests_passed": 5,
+    "additional_reopen_child_passed": 1,
+    "scope": "Signed projection intake and fresh-process Mere store reopen. No new independent Knot native qualification."
+  },
+  "verified_at_utc": "2026-10-16T14:36:28.256934+00:00"
+}

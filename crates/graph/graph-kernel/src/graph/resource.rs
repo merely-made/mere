@@ -23,6 +23,7 @@ pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
 pub struct ResourceNode {
     container: chartulary::Container<Uuid>,
     pub(super) nested_selection: Option<super::FrozenSelection>,
+    pub(super) nested_link: Option<super::FrozenLink>,
 }
 
 impl ResourceNode {
@@ -41,6 +42,7 @@ impl ResourceNode {
     pub(crate) fn from_canonical_iri(canonical: &str) -> Self {
         Self {
             nested_selection: None,
+            nested_link: None,
             container: chartulary::Container::with_identity(
                 chartulary::resource_id_from_canonical_iri(canonical),
             )
@@ -51,6 +53,11 @@ impl ResourceNode {
     /// Immutable nested selection borne by this Resource, when frozen.
     pub fn nested_selection(&self) -> Option<&super::FrozenSelection> {
         self.nested_selection.as_ref()
+    }
+
+    /// Immutable link reading borne by this Resource, when frozen.
+    pub fn nested_link(&self) -> Option<&super::FrozenLink> {
+        self.nested_link.as_ref()
     }
 
     /// The stable identity, shared by every surface showing this resource.
@@ -160,6 +167,9 @@ impl Graph {
         let Ok(selection) = super::frozen_selection::selection_from_record(&record) else {
             return false;
         };
+        let Ok(link) = super::frozen_link::validate_frozen_link_record(&record) else {
+            return false;
+        };
         if let Some(existing) = self
             .resource(id)
             .and_then(|resource| resource.nested_selection())
@@ -186,7 +196,34 @@ impl Graph {
                 return false;
             }
         }
+        if let Some(existing) = self
+            .resource(id)
+            .and_then(|resource| resource.nested_link())
+            && link.as_ref() != Some(existing)
+        {
+            return false;
+        }
+        if self
+            .resource(id)
+            .is_some_and(|resource| resource.nested_link().is_some())
+        {
+            let stored = self.resource_facets.get(
+                &id,
+                &chartulary::FacetId::new(super::frozen_link::FROZEN_LINK),
+            );
+            let incoming = record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == super::frozen_link::FROZEN_LINK)
+                .and_then(|facet| {
+                    serde_json::from_str::<serde_json::Value>(&facet.value_json).ok()
+                });
+            if stored != incoming.as_ref() {
+                return false;
+            }
+        }
         resource.nested_selection = selection;
+        resource.nested_link = link;
         if resource.id() != id {
             return false;
         }
@@ -306,11 +343,7 @@ impl Graph {
             return false;
         }
         let mut statements = std::collections::BTreeMap::new();
-        for statement in edges
-            .iter()
-            .filter_map(|edge| edge.semantic.as_ref())
-            .flat_map(|semantic| &semantic.statements)
-        {
+        for statement in edges.iter().flat_map(|edge| edge.retained_assertions()) {
             if let Some(previous) = statements.insert(&statement.statement_id, statement)
                 && previous != statement
             {
@@ -323,7 +356,7 @@ impl Graph {
             }
             if edge
                 .weight()
-                .semantic_statements()
+                .assertions()
                 .iter()
                 .any(|statement| statements.contains_key(&statement.statement_id))
             {
@@ -331,7 +364,7 @@ impl Graph {
             }
         }
         if self.inner.inner().edge_weights().any(|edge| {
-            edge.semantic_statements()
+            edge.assertions()
                 .iter()
                 .any(|statement| statements.contains_key(&statement.statement_id))
         }) {
@@ -339,7 +372,14 @@ impl Graph {
         }
         let payloads: Vec<_> = edges
             .iter()
-            .map(super::snapshot::payload_from_persisted)
+            .enumerate()
+            .map(|(ordinal, edge)| {
+                super::snapshot::payload_from_persisted_at(
+                    edge,
+                    super::GraphStratum::Resource,
+                    ordinal,
+                )
+            })
             .collect();
         let current: Vec<_> = self
             .resources
@@ -483,7 +523,10 @@ mod tests {
         });
         let original = super::super::snapshot::persisted_edge_for_ids(ids[0], ids[1], &payload);
         let mut aggregate_only = original.clone();
-        aggregate_only.semantic.as_mut().unwrap().statements.clear();
+        aggregate_only.assertions = None;
+        aggregate_only.semantic = Some(Default::default());
+        aggregate_only.semantic.as_mut().unwrap().sub_kinds =
+            vec![crate::persistence::PersistedSemanticSubKind::Cites];
         assert!(!graph.set_resource_edges_between(ids[0], ids[1], &[aggregate_only.clone()]));
         assert!(!graph.set_resource_edges_between(ids[0], ids[1], &[aggregate_only]));
         assert!(
@@ -494,7 +537,7 @@ mod tests {
         assert!(graph.set_resource_edges_between(ids[0], ids[1], &[original.clone()]));
         assert!(!graph.set_resource_edges_between(ids[0], ids[1], &[original.clone()]));
         let mut conflicting = original.clone();
-        conflicting.semantic.as_mut().unwrap().statements[0].label = Some("conflict".into());
+        conflicting.retained_assertions_mut()[0].label = Some("conflict".into());
         assert!(!graph.set_resource_edges_between(
             ids[0],
             ids[1],
@@ -512,7 +555,7 @@ mod tests {
                 .persisted_resource_edges_between(ids[0], ids[2])
                 .is_empty()
         );
-        other_pair.semantic.as_mut().unwrap().statements[0].statement_id = "other-handle".into();
+        other_pair.retained_assertions_mut()[0].statement_id = "other-handle".into();
         assert!(graph.set_resource_edges_between(ids[0], ids[2], &[other_pair.clone()]));
         assert_eq!(
             graph.persisted_resource_edges_between(ids[0], ids[2]),
@@ -527,7 +570,7 @@ mod tests {
             euclid::default::Point2D::new(1.0, 0.0),
         );
         let mut collision = other_pair.clone();
-        collision.semantic.as_mut().unwrap().statements[0].statement_id = "surface-handle".into();
+        collision.retained_assertions_mut()[0].statement_id = "surface-handle".into();
         graph.inner.connect(
             first,
             second,
@@ -538,8 +581,7 @@ mod tests {
             graph.persisted_resource_edges_between(ids[0], ids[2]),
             vec![other_pair]
         );
-        collision.semantic.as_mut().unwrap().statements[0].statement_id =
-            "fresh-resource-handle".into();
+        collision.retained_assertions_mut()[0].statement_id = "fresh-resource-handle".into();
         assert!(graph.set_resource_edges_between(ids[0], ids[2], &[collision.clone()]));
         assert_eq!(
             graph.persisted_resource_edges_between(ids[0], ids[2]),

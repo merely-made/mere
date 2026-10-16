@@ -17,8 +17,8 @@
 
 use std::sync::mpsc::Receiver;
 
-use armillary::{ActorHandle, Emitter, Wake, spawn};
 use crate::signals::{ClusterSet, CommunitySnapshot, community_louvain_on_snapshot};
+use armillary::{ActorHandle, Emitter, Wake, spawn};
 
 /// A recompute request: the structure to partition, stamped with the graph revision it was taken at.
 pub(crate) struct CommunityRequest {
