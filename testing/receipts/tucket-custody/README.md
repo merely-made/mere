@@ -23,6 +23,14 @@ The check detected it before any RF use. The recipe now refreshes that timestamp
 Both policy tests pass in `policy-tests.log`. Strict port/example Clippy passes;
 strict Djinn Clippy retains existing sync/door failures in `build-logs/`.
 
+The supplier change was cherry-picked onto upstream `c01c0aa7` in an approved
+worktree because the shared primary checkout had active Djinn builds and two
+unrelated unpublished documentation commits. The qualified custody Git blobs
+are identical. `upstream-integration-retry.log` passes locked/offline checks of
+both receiving libraries on that newer lock and source basis; the initial
+attempt records the missing cached Knot supplier, then the exact locked object
+was imported from its primary repository. No source redirect was committed.
+
 Generated synthetic wallets are kept only in ignored `runtime/` directories.
 Their helpers are stopped. Automatic approval review blocked their recursive
 deletion with "blocked by policy"; private runtime data must not be staged.
