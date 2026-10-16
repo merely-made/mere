@@ -80,7 +80,8 @@ its existing library owner and borrows it briefly for each content-verified
 layer artifact. It releases that lock before tensor work. GPU layer reads and
 execution stay inside the foreground guard, preserving trainer reclaim and
 release on pause. The streamed loader and weight index form part of the exact
-session identity. I6's larger-than-memory measurement remains a separate gate.
+session identity. The native I6 receipt qualifies a model exceeding GPU memory
+and bounded long prefill; the plan records its exact measurement scope.
 
 `PersonaRunJournal` stores signed, encrypted per-device logs through muniment
 and joins the caller's existing p2panda endpoint. Token entries contain only new

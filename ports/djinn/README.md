@@ -156,8 +156,9 @@ selects that row on CPU or GPU. The resident reads and verifies one layer at a
 time through its existing library owner, releases the library lock before
 tensor work, and uses bounded query blocks during prefill. Its execution loader
 has a `/layer-stream-v1` suffix, so checkpoints cannot silently resume through
-another loader. This software path does not yet qualify I6's model larger than
-device memory; the plan records that separate scale gate.
+another loader. The native I6 decoder rows qualify a model exceeding GPU
+memory and bounded long prefill; the plan records those measurements and the
+resident composition regressions separately.
 
 A GPU ask preempts the GPU trainer through owner reclaim. The offer is
 withdrawn while inference waits or runs; inference loads device tensors for
