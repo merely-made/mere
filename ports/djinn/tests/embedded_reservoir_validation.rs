@@ -597,6 +597,7 @@ mod published_replay_regression {
         typed_decks: bool,
         ambient: bool,
         shuffled: bool,
+        situation: bool,
     ) -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
         let captured = Arc::new(Mutex::new(Vec::new()));
         let observed = captured.clone();
@@ -669,18 +670,42 @@ mod published_replay_regression {
             let reading = if shuffled {
                 let context = host.context_for_digest(&context).unwrap();
                 let field = host.field_for_digest(&field).unwrap();
-                host.record_three_card_spread_derived_at_with_entropy(
-                    &context,
-                    &field,
-                    "C5 owner public seed",
-                    "cleromancy.owner/shuffle",
-                    6000,
-                    None,
-                    &mut PublicEntropy(0xc5),
-                )
-                .unwrap()
-                .2[0]
-                    .clone()
+                let drawn = host
+                    .record_three_card_spread_derived_at_with_entropy(
+                        &context,
+                        &field,
+                        "C5 owner public seed",
+                        "cleromancy.owner/shuffle",
+                        if situation { 1_792_149_302_000 } else { 6000 },
+                        None,
+                        &mut PublicEntropy(0xc5),
+                    )
+                    .unwrap();
+                if situation {
+                    use cleromancy_domain::situation::*;
+                    let place = ReadingPlace::new(51_476_900, 0).unwrap();
+                    // Public synthetic response; live network provenance has
+                    // a separate product-native receipt.
+                    let body = r#"{"latitude":51.472404,"longitude":0.011566162,"utc_offset_seconds":0,"current_units":{"time":"unixtime","interval":"seconds","temperature_2m":"°C","relative_humidity_2m":"%","precipitation":"mm","weather_code":"wmo code","wind_speed_10m":"m/s"},"current":{"time":1792149300,"interval":900,"temperature_2m":12.8,"relative_humidity_2m":70,"precipitation":0,"weather_code":3,"wind_speed_10m":4.1}}"#;
+                    let weather = WeatherObservation::from_response(
+                        &place,
+                        1_792_149_301_000,
+                        weather_url(&place).unwrap(),
+                        body.into(),
+                    )
+                    .unwrap();
+                    let snapshot = ReadingSituation::capture(
+                        &drawn.0,
+                        &SituationPreferences {
+                            place: Some(place),
+                            weather: true,
+                        },
+                        Some(weather),
+                    )
+                    .unwrap();
+                    host.insert_reading_situation(&snapshot).unwrap();
+                }
+                drawn.2[0].clone()
             } else {
                 detail.readings[0].clone()
             };
@@ -828,25 +853,29 @@ mod published_replay_regression {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn published_reading_replay_and_same_schema_tamper_survive_three_real_owners() {
-        owner_replay(false, false, false).await;
+        owner_replay(false, false, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn typed_decks_and_reading_survive_three_owners_and_refuse_metadata_tamper() {
-        owner_replay(true, false, false).await;
+        owner_replay(true, false, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn ambient_view_and_kept_memory_survive_three_owners_and_refuse_source_tamper() {
-        owner_replay(true, true, false).await;
+        owner_replay(true, true, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn shuffled_deck_survives_three_owners_and_refuses_orientation_tamper() {
-        owner_replay(true, false, true).await;
+        owner_replay(true, false, true, false).await;
     }
 
-    async fn owner_replay(typed_decks: bool, ambient: bool, shuffled: bool) {
+    #[tokio::test(flavor = "multi_thread")]
+    async fn recorded_situation_and_weather_survive_three_owners_and_refuse_tamper() {
+        owner_replay(true, false, true, true).await;
+    }
+    async fn owner_replay(typed_decks: bool, ambient: bool, shuffled: bool, situation: bool) {
         let root = tempfile::tempdir().unwrap();
         let unusable = root.path().join("no-attached-client-store");
         std::fs::write(
@@ -854,7 +883,8 @@ mod published_replay_regression {
             b"the live client cannot open local custody or storage",
         )
         .unwrap();
-        let (edits, expected_facets, reading) = product_fixture(typed_decks, ambient, shuffled);
+        let (edits, expected_facets, reading) =
+            product_fixture(typed_decks, ambient, shuffled, situation);
         let reading_url = format!("cleromancy://reading/{}", reading.id);
         let reading_id = kernel::graph::Graph::node_namespace_id(&reading_url);
         let mut retained_session = None;
@@ -1091,6 +1121,55 @@ mod published_replay_regression {
                 assert_eq!(durable_files_for(root.path(), "divination"), durable);
                 println!(
                     "SHUFFLED DECK REPLAY mode={mode} phase={phase} full-deck=78 prefix=3 orientation-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
+            if situation {
+                use cleromancy_domain::situation::*;
+                let host = cleromancy_domain::CleromancyHost::candidate(graph.clone()).unwrap();
+                let records = host.reading_situations().unwrap();
+                assert_eq!(records.len(), 1);
+                assert_eq!(
+                    records[0]
+                        .weather
+                        .as_ref()
+                        .unwrap()
+                        .values
+                        .temperature_millicelsius,
+                    12_800
+                );
+                let facet = SITUATION_FACET;
+                let (node_id, mut forged) = graph
+                    .facets()
+                    .iter()
+                    .find_map(|(id, facets)| {
+                        facets
+                            .iter()
+                            .find(|(name, _)| name.as_str() == facet)
+                            .map(|(_, v)| (*id, v.clone()))
+                    })
+                    .unwrap();
+                forged["weather"]["values"]["temperature_millicelsius"] = serde_json::json!(99_999);
+                let result = apply_checked(
+                    attached.client_mut(),
+                    &before[1],
+                    vec![
+                        node(0xc600 + phase as u128),
+                        CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: node_id.to_string(),
+                            facet: facet.into(),
+                            value_json: forged.to_string(),
+                        },
+                    ],
+                )
+                .await;
+                assert!(matches!(result, IntentResult::Rejected { .. }));
+                assert_eq!(
+                    serde_json::to_value(snapshots(attached.client_mut()).await).unwrap(),
+                    serde_json::to_value(&before).unwrap()
+                );
+                assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                println!(
+                    "SITUATION REPLAY mode={mode} phase={phase} saved-response-exact=true network-free-replay=true weather-tamper-refused=true durable-bytes-unchanged=true"
                 );
             }
             if let Some(id) = retained_session {
