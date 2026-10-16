@@ -26,6 +26,7 @@ pub mod options;
 pub mod presentation;
 pub mod relationship;
 pub mod seed;
+pub mod suggestion;
 pub mod swatch;
 
 /// The stable schema version for authored projection definitions.

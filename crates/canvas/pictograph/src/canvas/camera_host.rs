@@ -83,6 +83,7 @@ pub trait FitHost: CameraHost {
     fn toggle_selection_foreground_pin(&mut self) {}
     fn resize_selected_tiles(&mut self, _factor: f32) {}
     fn toggle_territory_field(&mut self) {}
+    fn toggle_suggestions(&mut self) {}
 }
 
 /// What [`super::face_alignment::FaceAlignment`] measures: each node's face
@@ -179,6 +180,12 @@ impl FitHost for Canvas {
     fn toggle_territory_field(&mut self) {
         let on = Canvas::territory_field(self);
         Canvas::set_territory_field(self, !on);
+    }
+
+    fn toggle_suggestions(&mut self) {
+        let mut settings = Canvas::suggestion_settings(self).clone();
+        settings.on = !settings.on;
+        Canvas::set_suggestion_settings(self, settings);
     }
 }
 

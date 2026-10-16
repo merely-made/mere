@@ -8,6 +8,7 @@
 
 use super::*;
 use crate::canvas::grammar_view::{LINK_QUIET, link_tone};
+use scenograph::attention::Attention;
 
 fn class_of(canvas: &Canvas, key: NodeKey) -> String {
     canvas
@@ -102,6 +103,10 @@ fn retained_and_suggested_nodes_carry_their_marks() {
     canvas.set_graph_grammar(true);
     canvas.select_member(id(&canvas, keys[0]));
     canvas.select_member(id(&canvas, keys[3]));
+    canvas.set_suggestion_settings(scenograph::suggestion::SuggestionSettings {
+        on: true,
+        ..Default::default()
+    });
     canvas.set_suggested_members([id(&canvas, keys[4])]);
     canvas.frame(800, 600);
     let hub = class_of(&canvas, keys[0]);
@@ -138,4 +143,49 @@ fn links_are_quiet_until_they_touch_the_foreground() {
     let frame = canvas.grammar_frame().unwrap();
     assert_eq!(link_tone(Some(&frame), keys[0], keys[1]), 1.0);
     assert_eq!(link_tone(Some(&frame), keys[3], keys[4]), LINK_QUIET);
+}
+
+#[test]
+fn suggestions_are_off_until_the_person_turns_them_on() {
+    use scenograph::suggestion::{SuggestionMark, SuggestionSettings};
+    let (mut canvas, keys) = grammar_canvas();
+    canvas.set_graph_grammar(true);
+    let offer: Vec<_> = keys[1..]
+        .iter()
+        .map(|key| (id(&canvas, *key), "web".to_string()))
+        .collect();
+    canvas.offer_suggestions(offer);
+    assert!(
+        canvas
+            .members_with_attention(Attention::Suggestion)
+            .is_empty(),
+        "off by default"
+    );
+
+    canvas.set_suggestion_settings(SuggestionSettings {
+        on: true,
+        at_once: 2,
+        mark: SuggestionMark::Ring,
+        ..SuggestionSettings::default()
+    });
+    let shown = canvas.members_with_attention(Attention::Suggestion);
+    assert_eq!(
+        shown,
+        [id(&canvas, keys[1]), id(&canvas, keys[2])],
+        "the first two, in order"
+    );
+    canvas.frame(800, 600);
+    assert!(class_of(&canvas, keys[1]).contains("gnode-mark-ring"));
+
+    canvas.set_suggestion_settings(SuggestionSettings {
+        on: true,
+        sources: vec!["mesh".into()],
+        ..SuggestionSettings::default()
+    });
+    assert!(
+        canvas
+            .members_with_attention(Attention::Suggestion)
+            .is_empty(),
+        "no allowed source"
+    );
 }

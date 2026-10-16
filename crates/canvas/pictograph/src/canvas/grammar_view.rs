@@ -112,7 +112,10 @@ impl Canvas {
         };
         match attention {
             Attention::Retained => class.push_str(" gnode-retained"),
-            Attention::Suggestion => class.push_str(" gnode-suggestion"),
+            Attention::Suggestion => {
+                class.push_str(" gnode-suggestion gnode-mark-");
+                class.push_str(self.grammar.suggestions.mark.id());
+            },
             _ => {},
         }
         if !frame.labelled.contains(&key) {
