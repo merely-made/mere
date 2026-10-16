@@ -43,8 +43,9 @@ fn base_roles(p: Palette) -> [(&'static str, Srgb); 16] {
         ("on-secondary", p.on_secondary),
         ("tertiary", p.tertiary),
         ("on-tertiary", p.on_tertiary),
-        ("success", p.success),
-        ("danger", p.danger),
+        // Published gated to 4.5:1 (tinct::derive_gated_roles).
+        ("success", tinct::derive_gated_roles(&p).success),
+        ("danger", tinct::derive_gated_roles(&p).danger),
     ]
 }
 

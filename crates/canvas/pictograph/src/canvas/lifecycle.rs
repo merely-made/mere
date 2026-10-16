@@ -172,6 +172,7 @@ impl Canvas {
             mosaic: Default::default(),
             territory_field: false,
             graph_grammar: false,
+            category_colors: Vec::new(),
             field_drag: None,
             forme_region: None,
             forme_guides: None,
