@@ -40,6 +40,7 @@ fn edge_cell_hit_test_picks_fanned_parallel_relation_cells() {
         "the pair exposes two relation-cell lanes"
     );
 
+    let before = serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap();
     for segment in segments {
         let midpoint = euclid::default::Point2D::new(
             (segment.from.x + segment.to.x) * 0.5,
@@ -56,7 +57,18 @@ fn edge_cell_hit_test_picks_fanned_parallel_relation_cells() {
             Some(segment.cell),
             "the fanned lane picks its own relation cell"
         );
+        canvas.selected_edges.insert(segment.cell);
     }
+    assert_eq!(
+        canvas.selected_link_pairs(),
+        vec![(a.min(b), a.max(b))],
+        "parallel selected cells open one derived link without collapsing source assertions"
+    );
+    assert_eq!(
+        serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap(),
+        before,
+        "opening a lifted link leaves its source assertions unchanged"
+    );
 }
 
 #[test]
