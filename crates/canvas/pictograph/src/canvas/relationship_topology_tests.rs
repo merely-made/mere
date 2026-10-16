@@ -59,6 +59,47 @@ fn assertions_preserve_current_projected_row_multiplicity() {
     assert_eq!(pair.cells[0].assertions, BTreeSet::from([first, second]));
     assert_eq!(serde_json::to_value(graph.to_snapshot()).unwrap(), before);
 }
+
+#[test]
+fn closed_surface_link_hide_filters_all_rows_without_merging_their_controller_weight() {
+    let (mut graph, [a, b, _, _]) = fixture();
+    assertion(
+        &mut graph,
+        a,
+        b,
+        Some(SemanticSubKind::UserGrouped),
+        "urn:alice",
+    );
+    assertion(
+        &mut graph,
+        a,
+        b,
+        Some(SemanticSubKind::UserGrouped),
+        "urn:bob",
+    );
+    let key = LinkKey::new(
+        scenograph::link::LinkStratum::Surface,
+        a.to_string(),
+        b.to_string(),
+    );
+    let hidden = BTreeSet::from([key]);
+    let pair = inspect_pair_with_link_hides(&graph, a, b, &hidden, |_, _, _| false).unwrap();
+    assert_eq!((pair.held_rows, pair.visible_rows), (2, 0));
+    let ak = graph.get_node_key_by_id(a).unwrap();
+    let bk = graph.get_node_key_by_id(b).unwrap();
+    assert_eq!(
+        crate::canvas::seiche_bridge::visible_relation_edges_with_link_hides(
+            &graph,
+            &std::collections::HashSet::new(),
+            &hidden.iter().cloned().collect(),
+        )
+        .into_iter()
+        .filter(|(from, to)| (*from == ak && *to == bk) || (*from == bk && *to == ak))
+        .count(),
+        0,
+        "a closed link hide removes every spring row in its own source stratum"
+    );
+}
 #[test]
 fn visibility_and_controller_share_exact_cell_filter() {
     let (mut graph, [a, b, _, _]) = fixture();

@@ -1,0 +1,12 @@
+{
+  "source": "72f9c5c73ab9ddd8ba761524388c2406a6d6ffcf",
+  "status": "shared source qualified; current product native qualification pending",
+  "compiler": "rustc/rustdoc 1.97.1 via Cargo 1.99",
+  "command": "cargo test --locked --offline -p scenomise --lib",
+  "passed": 184,
+  "failed": 0,
+  "ignored": 0,
+  "new_contract": "explicit grid.ordered ranks disclosed authored order into compiler-owned cells; source values and explanations stay unchanged",
+  "compatibility": "grid.default retains its exact single-row authored-cell behavior; reserved layout fields are refused",
+  "log_sha256": "d5e4d15897a501dd3004fae49e7abd5a8b2dc991d53347405418b84effc82424"
+}

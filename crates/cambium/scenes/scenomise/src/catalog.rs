@@ -163,7 +163,7 @@ impl Family {
     /// Older ids that saved recipes carry.
     pub fn aliases(self) -> &'static [&'static str] {
         match self {
-            Self::Grid => &[GRID_ARRANGEMENT_ID],
+            Self::Grid => &[GRID_ARRANGEMENT_ID, "grid.ordered"],
             Self::Geographic => &[SCATTER_ARRANGEMENT_ID],
             _ => &[],
         }
