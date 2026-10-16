@@ -11,7 +11,7 @@ use std::collections::BTreeSet;
 
 use rkyv::{Archive, Deserialize, Serialize};
 
-use crate::types::{GraphScope, mint_local_statement_id};
+use crate::types::{AssertionBasis, AssertionWithdrawal, GraphScope, mint_local_statement_id};
 
 use super::edge_taxonomy::{
     ArrangementSubKind, ContainmentSubKind, ImportedSubKind, NavigationTrigger, ProvenanceSubKind,
@@ -96,28 +96,38 @@ impl Default for EdgeMetrics {
 /// Attribution for stored assertions whose original asserter is unknown.
 pub const UNKNOWN_LEGACY_ASSERTER_IRI: &str = "https://mere.computer/ns/agent#unknown-legacy";
 
-#[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Archive,
-    Serialize,
-    Deserialize,
-    serde::Serialize,
-    serde::Deserialize,
-)]
+#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize, serde::Serialize)]
 pub struct SemanticStatement {
     pub statement_id: String,
     pub predicate: String,
     pub recognized_sub_kind: Option<SemanticSubKind>,
     pub label: Option<String>,
+    /// Why this assertion exists. `label` remains a compatibility projection.
+    pub basis: AssertionBasis,
     pub graph_scope: GraphScope,
     pub provenance_iri: Option<String>,
+    /// First record time. `None` is retained for legacy/imported records whose
+    /// source did not provide a time.
+    pub first_asserted_ms: Option<u64>,
+    /// Latest confirmation time; kept under its legacy field name for stored
+    /// compatibility.
     pub asserted_at_ms: Option<u64>,
+    /// Withdrawal is a retained tombstone, not a hard delete.
+    pub withdrawn: Option<AssertionWithdrawal>,
 }
 
 impl SemanticStatement {
+    pub fn is_held(&self) -> bool {
+        self.withdrawn.is_none()
+    }
+
+    pub fn normalize_basis_compat(&mut self) {
+        if self.basis.note.is_none() {
+            self.basis.note = self.label.clone();
+        }
+        self.label = self.basis.note.clone();
+    }
+
     /// Normalize missing attribution on a legacy record without inventing authorship.
     pub fn normalize_legacy_asserter(&mut self) -> bool {
         if self.provenance_iri.is_some() {
@@ -139,11 +149,105 @@ impl SemanticStatement {
             statement_id: mint_local_statement_id(),
             predicate,
             recognized_sub_kind,
-            label,
+            label: label.clone(),
+            basis: AssertionBasis {
+                note: label.clone(),
+                ..Default::default()
+            },
             graph_scope,
             provenance_iri,
+            first_asserted_ms: asserted_at_ms,
             asserted_at_ms,
+            withdrawn: None,
         }
+    }
+}
+
+// Keep the missing-vs-explicit-null distinction for first_asserted_ms. Old
+// serialized statements omitted the field, so only that case falls back to
+// the legacy asserted_at_ms value. An explicitly unknown first time stays
+// unknown after every reopen.
+struct PresentOptionU64(Option<Option<u64>>);
+struct PresentBasis(Option<Option<AssertionBasis>>);
+
+impl Default for PresentOptionU64 {
+    fn default() -> Self {
+        Self(None)
+    }
+}
+
+impl Default for PresentBasis {
+    fn default() -> Self {
+        Self(None)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for PresentBasis {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(Self(Some(Option::<AssertionBasis>::deserialize(
+            deserializer,
+        )?)))
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for PresentOptionU64 {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = <Option<u64> as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(Self(Some(value)))
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for SemanticStatement {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(serde::Deserialize)]
+        struct Fields {
+            statement_id: String,
+            predicate: String,
+            #[serde(default)]
+            recognized_sub_kind: Option<SemanticSubKind>,
+            #[serde(default)]
+            label: Option<String>,
+            #[serde(default)]
+            basis: PresentBasis,
+            #[serde(default)]
+            graph_scope: GraphScope,
+            #[serde(default)]
+            provenance_iri: Option<String>,
+            #[serde(default)]
+            asserted_at_ms: Option<u64>,
+            #[serde(default)]
+            first_asserted_ms: PresentOptionU64,
+            #[serde(default)]
+            withdrawn: Option<AssertionWithdrawal>,
+        }
+
+        let fields = <Fields as serde::Deserialize>::deserialize(deserializer)?;
+        let basis = fields.basis.0.flatten().unwrap_or_else(|| AssertionBasis {
+            note: fields.label.clone(),
+            ..Default::default()
+        });
+        let label = basis.note.clone();
+        Ok(Self {
+            statement_id: fields.statement_id,
+            predicate: fields.predicate,
+            recognized_sub_kind: fields.recognized_sub_kind,
+            label,
+            basis,
+            graph_scope: fields.graph_scope,
+            provenance_iri: fields.provenance_iri,
+            first_asserted_ms: fields.first_asserted_ms.0.unwrap_or(fields.asserted_at_ms),
+            asserted_at_ms: fields.asserted_at_ms,
+            withdrawn: fields.withdrawn,
+        })
     }
 }
 
@@ -188,9 +292,21 @@ pub struct SemanticStatementSpec {
     pub predicate: String,
     pub recognized_sub_kind: Option<SemanticSubKind>,
     pub label: Option<String>,
+    /// Optional reason metadata; on admission `basis.note` is authoritative.
+    pub basis: AssertionBasis,
     pub graph_scope: GraphScope,
     pub provenance_iri: Option<String>,
     pub asserted_at_ms: Option<u64>,
+}
+
+impl SemanticStatementSpec {
+    pub fn normalized(mut self) -> Self {
+        if self.basis.note.is_none() {
+            self.basis.note = self.label.clone();
+        }
+        self.label = self.basis.note.clone();
+        self
+    }
 }
 
 /// What [`SemanticData::assert_statement`] did.
@@ -209,24 +325,38 @@ impl SemanticData {
         &self.statements
     }
 
-    /// Statement-aware assert: content-dedup on
+    pub fn held_statements(&self) -> impl Iterator<Item = &SemanticStatement> {
+        self.statements
+            .iter()
+            .filter(|statement| statement.is_held())
+    }
+
+    /// Membership ensure: content-dedup on held statements by
     /// `(recognized_sub_kind, predicate, graph_scope, provenance_iri)` (same key as
     /// [`insert_statement`](Self::insert_statement)), updating the deduped
     /// statement's metadata in place; a miss mints a device-safe id and
     /// appends. Always returns the fact handle.
     pub fn assert_statement(&mut self, spec: SemanticStatementSpec) -> StatementAssert {
+        let spec = spec.normalized();
         if let Some(existing) = self.statements.iter_mut().find(|statement| {
-            statement.recognized_sub_kind == spec.recognized_sub_kind
+            statement.is_held()
+                && statement.recognized_sub_kind == spec.recognized_sub_kind
                 && statement.predicate == spec.predicate
                 && statement.graph_scope == spec.graph_scope
                 && statement.provenance_iri == spec.provenance_iri
+                && statement.basis.same_reason_as(&spec.basis)
         }) {
-            let changed =
-                existing.label != spec.label || existing.asserted_at_ms != spec.asserted_at_ms;
+            let update_time = spec.asserted_at_ms.is_some();
+            let changed = existing.label != spec.label
+                || existing.basis != spec.basis
+                || (update_time && existing.asserted_at_ms != spec.asserted_at_ms);
             let statement_id = existing.statement_id.clone();
             if changed {
                 existing.label = spec.label;
-                existing.asserted_at_ms = spec.asserted_at_ms;
+                existing.basis = spec.basis;
+                if update_time {
+                    existing.asserted_at_ms = spec.asserted_at_ms;
+                }
                 self.rebuild_compat();
             }
             return StatementAssert {
@@ -234,7 +364,7 @@ impl SemanticData {
                 changed,
             };
         }
-        let statement = SemanticStatement::new(
+        let mut statement = SemanticStatement::new(
             spec.predicate,
             spec.recognized_sub_kind,
             spec.label,
@@ -242,6 +372,7 @@ impl SemanticData {
             spec.provenance_iri,
             spec.asserted_at_ms,
         );
+        statement.basis = spec.basis;
         let statement_id = statement.statement_id.clone();
         self.statements.push(statement);
         self.rebuild_compat();
@@ -251,10 +382,30 @@ impl SemanticData {
         }
     }
 
-    /// Precise retract by fact handle. Bucket-local linear scan by design
-    /// (buckets stay small; a global id index waits for evidence). Returns
-    /// whether a statement was removed.
-    pub fn retract_statement(&mut self, statement_id: &str) -> bool {
+    /// Mark one exact held assertion withdrawn without deleting its history.
+    pub fn withdraw_statement(
+        &mut self,
+        statement_id: &str,
+        withdrawal: AssertionWithdrawal,
+    ) -> bool {
+        let Some(statement) = self
+            .statements
+            .iter_mut()
+            .find(|statement| statement.statement_id == statement_id)
+        else {
+            return false;
+        };
+        if statement.withdrawn.is_some() {
+            return false;
+        }
+        statement.withdrawn = Some(withdrawal);
+        self.rebuild_compat();
+        true
+    }
+
+    /// Retention compaction only: physically remove an assertion after its
+    /// tombstone has been captured by the owning checkpoint.
+    pub(crate) fn compact_statement(&mut self, statement_id: &str) -> bool {
         let before = self.statements.len();
         self.statements
             .retain(|statement| statement.statement_id != statement_id);
@@ -274,47 +425,77 @@ impl SemanticData {
         provenance_iri: Option<String>,
         asserted_at_ms: Option<u64>,
     ) -> bool {
+        let basis = AssertionBasis {
+            note: label.clone(),
+            ..Default::default()
+        };
         if let Some(existing) = self.statements.iter_mut().find(|statement| {
-            statement.recognized_sub_kind == recognized_sub_kind
+            statement.is_held()
+                && statement.recognized_sub_kind == recognized_sub_kind
                 && statement.predicate == predicate
                 && statement.graph_scope == graph_scope
                 && statement.provenance_iri == provenance_iri
+                && statement.basis.same_reason_as(&basis)
         }) {
-            if existing.label != label || existing.asserted_at_ms != asserted_at_ms {
+            let update_time = asserted_at_ms.is_some();
+            if existing.label != label || (update_time && existing.asserted_at_ms != asserted_at_ms)
+            {
                 existing.label = label;
-                existing.asserted_at_ms = asserted_at_ms;
+                existing.basis.note = existing.label.clone();
+                if update_time {
+                    existing.asserted_at_ms = asserted_at_ms;
+                }
                 self.rebuild_compat();
                 return true;
             }
             return false;
         }
 
-        self.statements.push(SemanticStatement::new(
+        let mut statement = SemanticStatement::new(
             predicate,
             recognized_sub_kind,
             label,
             graph_scope,
             provenance_iri,
             asserted_at_ms,
-        ));
+        );
+        statement.basis = basis;
+        self.statements.push(statement);
         self.rebuild_compat();
         true
     }
 
-    pub(crate) fn upsert_persisted_statement(&mut self, statement: SemanticStatement) -> bool {
-        if let Some(existing) = self.statements.iter_mut().find(|existing| {
-            existing.recognized_sub_kind == statement.recognized_sub_kind
-                && existing.predicate == statement.predicate
+    pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+        statement.normalize_basis_compat();
+        if let Some(existing) = self
+            .statements
+            .iter_mut()
+            .find(|existing| existing.statement_id == statement.statement_id)
+        {
+            // A withdrawn ID is a tombstone: stale exact-ID replay/import must
+            // not revive it or overwrite its lifecycle.
+            if existing.withdrawn.is_some() {
+                return false;
+            }
+            if existing.predicate == statement.predicate
+                && existing.recognized_sub_kind == statement.recognized_sub_kind
                 && existing.graph_scope == statement.graph_scope
                 && existing.provenance_iri == statement.provenance_iri
-        }) {
-            if existing.label == statement.label
+                && existing.label == statement.label
+                && existing.basis == statement.basis
                 && existing.asserted_at_ms == statement.asserted_at_ms
+                && existing.withdrawn == statement.withdrawn
             {
                 return false;
             }
+            existing.predicate = statement.predicate;
+            existing.recognized_sub_kind = statement.recognized_sub_kind;
+            existing.graph_scope = statement.graph_scope;
+            existing.provenance_iri = statement.provenance_iri;
             existing.label = statement.label;
+            existing.basis = statement.basis;
             existing.asserted_at_ms = statement.asserted_at_ms;
+            existing.withdrawn = statement.withdrawn;
             self.rebuild_compat();
             return true;
         }
@@ -322,7 +503,8 @@ impl SemanticData {
     }
 
     /// Exact restore preserves every stored handle, including legacy records.
-    pub fn push_persisted_statement(&mut self, statement: SemanticStatement) -> bool {
+    pub fn push_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+        statement.normalize_basis_compat();
         if self
             .statements
             .iter()
@@ -335,10 +517,13 @@ impl SemanticData {
         true
     }
 
-    pub fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    /// Migration/retention compaction primitive. Authored graph retractions
+    /// must use Graph's exact-ID withdrawal API instead.
+    pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
         let before = self.statements.len();
-        self.statements
-            .retain(|statement| statement.recognized_sub_kind != Some(sub_kind));
+        self.statements.retain(|statement| {
+            !statement.is_held() || statement.recognized_sub_kind != Some(sub_kind)
+        });
         if self.statements.len() == before {
             return false;
         }
@@ -349,7 +534,7 @@ impl SemanticData {
     pub fn set_statement_predicate(&mut self, predicate: Option<String>) {
         match predicate {
             Some(predicate) => {
-                if self.statements.is_empty() {
+                if self.held_statements().next().is_none() {
                     self.statements.push(SemanticStatement::new(
                         predicate,
                         None,
@@ -359,17 +544,27 @@ impl SemanticData {
                         None,
                     ));
                 } else {
-                    for statement in &mut self.statements {
+                    for statement in self
+                        .statements
+                        .iter_mut()
+                        .filter(|statement| statement.is_held())
+                    {
                         statement.predicate = predicate.clone();
                     }
                 }
             },
             None => {
-                self.statements
-                    .retain(|statement| statement.recognized_sub_kind.is_some());
-                for statement in &mut self.statements {
+                for statement in self.statements.iter_mut().filter(|s| s.is_held()) {
                     if let Some(sub_kind) = statement.recognized_sub_kind {
                         statement.predicate = predicate_iri(sub_kind).to_string();
+                    } else {
+                        // This compatibility setter has no authored event
+                        // envelope. Preserve an undated tombstone; callers
+                        // that need record time/actor use Graph's writer API.
+                        statement.withdrawn = Some(AssertionWithdrawal {
+                            at_ms: None,
+                            by: None,
+                        });
                     }
                 }
             },
@@ -381,12 +576,14 @@ impl SemanticData {
         self.sub_kinds = self
             .statements
             .iter()
+            .filter(|statement| statement.is_held())
             .filter_map(|statement| statement.recognized_sub_kind)
             .collect();
 
         let mut labels = self
             .statements
             .iter()
+            .filter(|statement| statement.is_held())
             .filter_map(|statement| statement.label.clone())
             .collect::<Vec<_>>();
         labels.sort();
@@ -398,12 +595,14 @@ impl SemanticData {
                 .statements
                 .iter()
                 .rev()
+                .filter(|statement| statement.is_held())
                 .find_map(|statement| statement.label.clone()),
         };
 
         let mut predicates = self
             .statements
             .iter()
+            .filter(|statement| statement.is_held())
             .map(|statement| statement.predicate.clone())
             .collect::<Vec<_>>();
         predicates.sort();

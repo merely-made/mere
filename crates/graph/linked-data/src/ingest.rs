@@ -33,7 +33,7 @@
 
 use crate::reifier::statement_id_from_reifier;
 use crate::{SCHEMA_KEYWORDS, SCHEMA_NAME};
-use kernel::types::{GraphScope, NodeProperty};
+use kernel::types::{AssertionBasis, AssertionWithdrawal, GraphScope, NodeProperty};
 use oxjsonld::{JsonLdParser, JsonLdRemoteDocument};
 use oxrdf::{NamedOrBlankNode, Quad, Term};
 use std::collections::BTreeMap;
@@ -41,6 +41,18 @@ use std::collections::BTreeMap;
 /// `rdf:type` — the predicate JSON-LD `@type` expands to.
 const RDF_TYPE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const XSD_STRING: &str = "http://www.w3.org/2001/XMLSchema#string";
+const PROV_INVALIDATED_AT_TIME: &str = "http://www.w3.org/ns/prov#invalidatedAtTime";
+const PROV_WAS_INVALIDATED_BY: &str = "http://www.w3.org/ns/prov#wasInvalidatedBy";
+const PROV_WAS_ASSOCIATED_WITH: &str = "http://www.w3.org/ns/prov#wasAssociatedWith";
+const PROV_WAS_GENERATED_BY: &str = "http://www.w3.org/ns/prov#wasGeneratedBy";
+const PROV_WAS_DERIVED_FROM: &str = "http://www.w3.org/ns/prov#wasDerivedFrom";
+const PROV_ACTIVITY: &str = "http://www.w3.org/ns/prov#Activity";
+const MERE_LAST_ASSERTED_AT: &str = "https://mere.computer/ns/lastAssertedAt";
+const MERE_METHOD_VERSION: &str = "https://mere.computer/ns/methodVersion";
+const MERE_LIFECYCLE_VERSION: &str = "https://mere.computer/ns/assertionLifecycleVersion";
+const MERE_ASSERTED_GRAPH_KIND: &str = "https://mere.computer/ns/assertedGraphKind";
+const MERE_ASSERTED_GRAPH_NAME: &str = "https://mere.computer/ns/assertedGraphName";
+const WITHDRAWAL_ACTIVITY_PREFIX: &str = "urn:mere:withdrawal-activity:v1:";
 
 /// How a newly bound subject identifies its resource at the apply boundary.
 /// Existing shown-resource associations retain their prepared identity.
@@ -96,7 +108,14 @@ pub struct EdgeContribution {
     pub statement_id: Option<String>,
     pub label: Option<String>,
     pub provenance_iri: Option<String>,
+    /// First assertion record time, distinct from later confirmations.
+    pub first_asserted_ms: Option<u64>,
+    /// Latest assertion/confirmation time; retained under the legacy name.
     pub asserted_at_ms: Option<u64>,
+    /// Retained tombstone metadata when this fact was withdrawn.
+    pub withdrawn: Option<AssertionWithdrawal>,
+    /// Reason metadata; `label` remains its compatibility projection.
+    pub basis: AssertionBasis,
 }
 
 /// The result of parsing a JSON-LD document: the nodes it describes and the
@@ -216,7 +235,10 @@ fn route_resource(
             statement_id: None,
             label: None,
             provenance_iri: None,
+            first_asserted_ms: None,
             asserted_at_ms: None,
+            withdrawn: None,
+            basis: AssertionBasis::default(),
         });
     }
 }
@@ -397,9 +419,20 @@ struct ReifiedStatement {
     graph_scope: GraphScope,
     label: Option<String>,
     provenance_iri: Option<String>,
-    asserted_at_ms: Option<u64>,
+    first_asserted_ms: Option<u64>,
+    last_asserted_ms: Option<u64>,
+    lifecycle_version: bool,
+    method_iri: Option<String>,
+    method_version: Option<String>,
+    evidence: Vec<String>,
+    withdrawal_activity: Option<String>,
+    withdrawal_actor: Option<String>,
+    withdrawal_at_ms: Option<u64>,
+    asserted_graph_kind: Option<String>,
+    asserted_graph_name: Option<String>,
 }
 
+#[derive(PartialEq, Eq)]
 enum ReifiedObject {
     Resource(String),
     Literal {
@@ -416,6 +449,65 @@ pub(crate) fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
         time::OffsetDateTime::parse(lexical, &time::format_description::well_known::Rfc3339)
             .ok()?;
     u64::try_from(parsed.unix_timestamp_nanos() / 1_000_000).ok()
+}
+
+fn parse_metadata_time(lexical: &str) -> Result<u64, IngestError> {
+    parse_xsd_datetime_ms(lexical).ok_or_else(|| {
+        IngestError::Parse(format!(
+            "invalid nonnegative xsd:dateTime value {lexical:?}"
+        ))
+    })
+}
+
+/// RDF graph order is not meaningful. Lifecycle and basis properties have one
+/// value, so repeated equal quads are harmless while conflicting values fail
+/// deterministically instead of allowing the last encountered quad to win.
+fn set_once_or_equal<T: PartialEq>(
+    slot: &mut Option<T>,
+    value: T,
+    field: &str,
+) -> Result<(), IngestError> {
+    if let Some(existing) = slot.as_ref() {
+        if existing != &value {
+            return Err(IngestError::Parse(format!("conflicting {field} metadata")));
+        }
+    } else {
+        *slot = Some(value);
+    }
+    Ok(())
+}
+
+fn restore_graph_scope(kind: Option<&str>, name: Option<&str>) -> Result<GraphScope, IngestError> {
+    match (kind, name) {
+        (Some("default"), None) => Ok(GraphScope::Default),
+        (Some("source"), None) => Ok(GraphScope::Source),
+        (Some("user"), None) => Ok(GraphScope::User),
+        (Some("agent"), None) => Ok(GraphScope::Agent),
+        (Some("moot"), None) => Ok(GraphScope::Moot),
+        (Some("custom"), Some(name)) => Ok(GraphScope::Custom(name.to_string())),
+        _ => Err(IngestError::Parse(
+            "incomplete or invalid original assertion graph scope marker".into(),
+        )),
+    }
+}
+
+fn is_withdrawal_activity_metadata(quad: &Quad, namespace: &str) -> bool {
+    subject_iri(&quad.subject, namespace).starts_with(WITHDRAWAL_ACTIVITY_PREFIX)
+        && matches!(quad.predicate.as_str(), RDF_TYPE | PROV_WAS_ASSOCIATED_WITH)
+}
+
+fn parse_withdrawal_activity_id(activity: &str) -> Option<String> {
+    let encoded = activity.strip_prefix(WITHDRAWAL_ACTIVITY_PREFIX)?;
+    if encoded.len() % 2 != 0 {
+        return None;
+    }
+    let mut bytes = Vec::with_capacity(encoded.len() / 2);
+    for pair in encoded.as_bytes().chunks_exact(2) {
+        let high = char::from(pair[0]).to_digit(16)?;
+        let low = char::from(pair[1]).to_digit(16)?;
+        bytes.push(((high << 4) | low) as u8);
+    }
+    String::from_utf8(bytes).ok()
 }
 
 /// Group a stream of RDF quads into a [`GraphContribution`] — shared by the
@@ -436,6 +528,7 @@ fn collect_contribution<E: std::fmt::Display>(
     let mut plain: Vec<Quad> = Vec::new();
     let mut reified: BTreeMap<String, ReifiedStatement> = BTreeMap::new();
     let mut reifier_meta: Vec<Quad> = Vec::new();
+    let mut activity_meta: Vec<Quad> = Vec::new();
     let quads = quads
         .map(|quad| quad.map_err(|error| IngestError::Parse(error.to_string())))
         .collect::<Result<Vec<_>, _>>()?;
@@ -486,19 +579,40 @@ fn collect_contribution<E: std::fmt::Display>(
                 },
                 Term::Triple(_) => continue, // nested triple terms: out of profile
             };
-            reified.insert(
-                reifier,
-                ReifiedStatement {
-                    statement_id,
-                    subject: subject_iri(&triple.subject.clone(), namespace),
-                    predicate: normalize_schema_org(triple.predicate.as_str()),
-                    object,
-                    graph_scope: scope_from_graph_name(&quad.graph_name, namespace),
-                    label: None,
-                    provenance_iri: None,
-                    asserted_at_ms: None,
-                },
-            );
+            let candidate = ReifiedStatement {
+                statement_id,
+                subject: subject_iri(&triple.subject.clone(), namespace),
+                predicate: normalize_schema_org(triple.predicate.as_str()),
+                object,
+                graph_scope: scope_from_graph_name(&quad.graph_name, namespace),
+                label: None,
+                provenance_iri: None,
+                first_asserted_ms: None,
+                last_asserted_ms: None,
+                lifecycle_version: false,
+                method_iri: None,
+                method_version: None,
+                evidence: Vec::new(),
+                withdrawal_activity: None,
+                withdrawal_actor: None,
+                withdrawal_at_ms: None,
+                asserted_graph_kind: None,
+                asserted_graph_name: None,
+            };
+            if let Some(existing) = reified.get(&reifier) {
+                if existing.statement_id != candidate.statement_id
+                    || existing.subject != candidate.subject
+                    || existing.predicate != candidate.predicate
+                    || existing.object != candidate.object
+                    || existing.graph_scope != candidate.graph_scope
+                {
+                    return Err(IngestError::Parse(format!(
+                        "reifier {reifier} identifies conflicting RDF statements"
+                    )));
+                }
+            } else {
+                reified.insert(reifier, candidate);
+            }
             continue;
         }
         plain.push(quad);
@@ -509,26 +623,50 @@ fn collect_contribution<E: std::fmt::Display>(
         for quad in plain {
             let reifier = subject_iri(&quad.subject, namespace);
             if reified.get(&reifier).is_some_and(|statement| {
-                if classic_reifiers.contains(&reifier) {
-                    statement.graph_scope == scope_from_graph_name(&quad.graph_name, namespace)
-                        && crate::jsonld::representable_metadata(
-                            quad.predicate.as_str(),
-                            &quad.object,
-                        )
-                } else {
-                    matches!(
-                        (quad.predicate.as_str(), &quad.object),
-                        (RDFS_LABEL | PROV_GENERATED_AT_TIME, Term::Literal(_))
-                            | (PROV_WAS_ATTRIBUTED_TO, Term::NamedNode(_))
-                    )
-                }
+                (!classic_reifiers.contains(&reifier)
+                    || statement.graph_scope == scope_from_graph_name(&quad.graph_name, namespace))
+                    && (crate::jsonld::representable_metadata(
+                        quad.predicate.as_str(),
+                        &quad.object,
+                    ) || (!classic_reifiers.contains(&reifier)
+                        && quad.predicate.as_str() == RDFS_LABEL
+                        && matches!(&quad.object, Term::Literal(_)))
+                        || (!classic_reifiers.contains(&reifier)
+                            && quad.predicate.as_str() == PROV_GENERATED_AT_TIME
+                            && matches!(&quad.object, Term::Literal(literal)
+                                if parse_xsd_datetime_ms(literal.value()).is_some())))
             }) {
                 reifier_meta.push(quad);
+            } else if is_withdrawal_activity_metadata(&quad, namespace) {
+                activity_meta.push(quad);
             } else {
                 rest.push(quad);
             }
         }
         plain = rest;
+        let mut activities = BTreeMap::<String, (bool, Option<String>)>::new();
+        for quad in &activity_meta {
+            let activity = subject_iri(&quad.subject, namespace);
+            let entry = activities.entry(activity).or_default();
+            match (quad.predicate.as_str(), &quad.object) {
+                (RDF_TYPE, Term::NamedNode(kind)) if kind.as_str() == PROV_ACTIVITY => {
+                    entry.0 = true;
+                },
+                (PROV_WAS_ASSOCIATED_WITH, Term::NamedNode(actor)) => {
+                    if entry
+                        .1
+                        .as_ref()
+                        .is_some_and(|existing| existing != actor.as_str())
+                    {
+                        return Err(IngestError::Parse(
+                            "withdrawal activity has multiple associated actors".into(),
+                        ));
+                    }
+                    entry.1 = Some(actor.as_str().to_string());
+                },
+                _ => {},
+            }
+        }
         for quad in &reifier_meta {
             let reifier = subject_iri(&quad.subject, namespace);
             let Some(statement) = reified.get_mut(&reifier) else {
@@ -539,12 +677,126 @@ fn collect_contribution<E: std::fmt::Display>(
                     statement.label = Some(literal.value().to_string());
                 },
                 (PROV_WAS_ATTRIBUTED_TO, Term::NamedNode(agent)) => {
-                    statement.provenance_iri = Some(agent.as_str().to_string());
+                    set_once_or_equal(
+                        &mut statement.provenance_iri,
+                        agent.as_str().to_string(),
+                        "asserted provenance attribution",
+                    )?;
                 },
                 (PROV_GENERATED_AT_TIME, Term::Literal(literal)) => {
-                    statement.asserted_at_ms = parse_xsd_datetime_ms(literal.value());
+                    set_once_or_equal(
+                        &mut statement.first_asserted_ms,
+                        parse_metadata_time(literal.value())?,
+                        "first assertion time",
+                    )?;
+                },
+                (MERE_LIFECYCLE_VERSION, Term::Literal(literal)) => {
+                    if literal.value() != "1" {
+                        return Err(IngestError::Parse(format!(
+                            "unsupported assertion lifecycle version {}",
+                            literal.value()
+                        )));
+                    }
+                    statement.lifecycle_version = true;
+                },
+                (MERE_LAST_ASSERTED_AT, Term::Literal(literal)) => {
+                    set_once_or_equal(
+                        &mut statement.last_asserted_ms,
+                        parse_metadata_time(literal.value())?,
+                        "last assertion time",
+                    )?;
+                },
+                (PROV_WAS_GENERATED_BY, Term::NamedNode(method)) => {
+                    set_once_or_equal(
+                        &mut statement.method_iri,
+                        method.as_str().to_string(),
+                        "method IRI",
+                    )?;
+                },
+                (MERE_METHOD_VERSION, Term::Literal(version)) => {
+                    set_once_or_equal(
+                        &mut statement.method_version,
+                        version.value().to_string(),
+                        "method version",
+                    )?;
+                },
+                (PROV_WAS_DERIVED_FROM, Term::NamedNode(evidence)) => {
+                    statement.evidence.push(evidence.as_str().to_string());
+                },
+                (PROV_WAS_INVALIDATED_BY, Term::NamedNode(activity)) => {
+                    set_once_or_equal(
+                        &mut statement.withdrawal_activity,
+                        activity.as_str().to_string(),
+                        "withdrawal activity",
+                    )?;
+                },
+                (PROV_INVALIDATED_AT_TIME, Term::Literal(literal)) => {
+                    set_once_or_equal(
+                        &mut statement.withdrawal_at_ms,
+                        parse_metadata_time(literal.value())?,
+                        "withdrawal time",
+                    )?;
+                },
+                (MERE_ASSERTED_GRAPH_KIND, Term::Literal(kind)) => {
+                    set_once_or_equal(
+                        &mut statement.asserted_graph_kind,
+                        kind.value().to_string(),
+                        "original assertion graph kind",
+                    )?;
+                },
+                (MERE_ASSERTED_GRAPH_NAME, Term::Literal(name)) => {
+                    set_once_or_equal(
+                        &mut statement.asserted_graph_name,
+                        name.value().to_string(),
+                        "original assertion graph name",
+                    )?;
                 },
                 _ => {},
+            }
+        }
+        for statement in reified.values_mut() {
+            if statement.asserted_graph_kind.is_some() || statement.asserted_graph_name.is_some() {
+                if statement.graph_scope
+                    != GraphScope::Custom(crate::ASSERTION_HISTORY_GRAPH_IRI.into())
+                {
+                    return Err(IngestError::Parse(
+                        "original assertion scope markers are valid only in the history graph"
+                            .into(),
+                    ));
+                }
+                statement.graph_scope = restore_graph_scope(
+                    statement.asserted_graph_kind.as_deref(),
+                    statement.asserted_graph_name.as_deref(),
+                )?;
+            }
+            if let Some(activity) = &statement.withdrawal_activity {
+                let Some((is_activity, actor)) = activities.get(activity) else {
+                    return Err(IngestError::Parse(
+                        "withdrawal reference does not identify an activity".into(),
+                    ));
+                };
+                if !is_activity {
+                    return Err(IngestError::Parse(
+                        "withdrawal reference target is not a prov:Activity".into(),
+                    ));
+                }
+                if let Some(id) = &statement.statement_id
+                    && parse_withdrawal_activity_id(activity).as_deref() != Some(id.as_str())
+                {
+                    return Err(IngestError::Parse(
+                        "withdrawal activity ID does not match its assertion".into(),
+                    ));
+                }
+                // The activity association is retained separately until edge construction.
+                statement.withdrawal_actor = actor.clone();
+            }
+            if statement.method_version.is_some() && statement.method_iri.is_none() {
+                return Err(IngestError::Parse(
+                    "method version metadata requires a method IRI".into(),
+                ));
+            }
+            if !statement.lifecycle_version && statement.last_asserted_ms.is_none() {
+                statement.last_asserted_ms = statement.first_asserted_ms;
             }
         }
     }
@@ -659,6 +911,23 @@ fn collect_contribution<E: std::fmt::Display>(
     }
     let asserted_literals: std::collections::HashSet<_> = property_index.keys().cloned().collect();
     for statement in reified.into_values() {
+        let basis = AssertionBasis {
+            note: statement.label.clone(),
+            method: statement
+                .method_iri
+                .clone()
+                .map(|iri| kernel::types::AssertionMethod {
+                    iri,
+                    version: statement.method_version.clone(),
+                }),
+            evidence: statement.evidence.clone(),
+        };
+        let withdrawn = (statement.withdrawal_activity.is_some()
+            || statement.withdrawal_at_ms.is_some())
+        .then(|| AssertionWithdrawal {
+            at_ms: statement.withdrawal_at_ms,
+            by: statement.withdrawal_actor.clone(),
+        });
         let statement_id = statement.statement_id;
         match &statement.object {
             ReifiedObject::Resource(object) => {
@@ -677,12 +946,13 @@ fn collect_contribution<E: std::fmt::Display>(
                     edge.statement_id = statement_id;
                     edge.label = statement.label;
                     edge.provenance_iri = statement.provenance_iri;
-                    edge.asserted_at_ms = statement.asserted_at_ms;
+                    edge.first_asserted_ms = statement.first_asserted_ms;
+                    edge.asserted_at_ms = statement.last_asserted_ms;
+                    edge.withdrawn = withdrawn;
+                    edge.basis = basis;
                 } else {
-                    // A reifier without its base triple still names a fact:
-                    // materialize the edge (RDF 1.2 allows unasserted
-                    // reification, but the Mere profile projects asserted
-                    // facts, so ingest treats it as one).
+                    // A reifier names a fact even when its base triple is not
+                    // asserted; history rows use this form by design.
                     nodes
                         .entry(statement.subject.clone())
                         .or_insert_with(|| NodeContribution::new(&statement.subject));
@@ -694,7 +964,10 @@ fn collect_contribution<E: std::fmt::Display>(
                         statement_id,
                         label: statement.label,
                         provenance_iri: statement.provenance_iri,
-                        asserted_at_ms: statement.asserted_at_ms,
+                        first_asserted_ms: statement.first_asserted_ms,
+                        asserted_at_ms: statement.last_asserted_ms,
+                        withdrawn,
+                        basis,
                     });
                 }
             },
@@ -742,7 +1015,7 @@ fn collect_contribution<E: std::fmt::Display>(
                     property.statement_id = id.clone();
                 }
                 property.provenance_iri = statement.provenance_iri;
-                property.asserted_at_ms = statement.asserted_at_ms;
+                property.asserted_at_ms = statement.last_asserted_ms;
                 if statement_id.is_some() {
                     evidence.carried_property(&statement.subject, property);
                 }

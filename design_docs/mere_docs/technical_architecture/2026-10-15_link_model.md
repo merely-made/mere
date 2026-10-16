@@ -1,17 +1,14 @@
 # Link model: assertions are the truth, links are readings
 
 **Date:** 2026-10-15
-**Status:** design with a bounded-tested P1 first slice and independent P5
-CPU probe; phase acceptance remains open. Mark ruled L1–L4 on
-2026-10-15 and L5–L6
-(formerly O2 and O3) later the same day (§4). It was amended the same day after
-an implementing agent's review (§11): the phases are reordered, source and
-origin are added, replay rules are stated, and a list arrangement is added.
-Mark then clarified the dynamics purpose: links respond to fields and perhaps
-to compatible links, making different dynamics legible (§7.3). P5 explores
-that response independently of the other phases. The
+**Status:** design with a qualified bounded P1 shared reading and P5
+fixed-endpoint Graphshell experiment on source `1e3fb426c`. P2's semantic
+lifecycle is implemented and bounded-tested; its Knot supplier/intake gate
+remains open. P3–P4, P6 and P7 (§8) remain later work. Mark ruled L1–L6 on
+2026-10-15 and clarified the dynamics purpose: links respond to fields and
+perhaps to compatible links, making different dynamics legible (§7.3). The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
-owns current assignments, evidence and limits. P2–P4, P6 and P7 (§8) are unscheduled.
+owns current assignments, exact evidence and qualification limits.
 Mark ruled the remaining open questions as L7–L13 on 2026-10-15 (§4); none
 remain open (§9).
 
@@ -69,9 +66,9 @@ what one means, or reads assertions for a view. Any other concept is retired.
    supernode's members. Members sit *inside* the opened link (§7.2), so no
    strokes are needed to show that they belong.
 2. **Members on a timeline of when and why.** *Kept, as the default
-   arrangement when the disclosed data is dated.* It needs data that does not
-   exist today: first-assertion time, timed withdrawal and a basis (§6). Most
-   members are timeless, so the timeline carries an **undated lane** (§7.2).
+   arrangement when the disclosed data is dated.* It needs first-assertion time, timed withdrawal and a basis (§6).
+   P2 now records these for semantic assertions; other families and unknown
+   source times still need an **undated lane** (§7.2).
 3. **Links respond to fields and perhaps to like links.** *Kept as an
    experiment.* With one stroke per link (ruling L4), its path can help make
    different dynamics legible. A field may deflect the path along its length;
@@ -108,12 +105,12 @@ states only what is new.
   | `subject`, `object` | direction is kept; the link reading is unordered | pair bucket direction |
   | `predicate` | meaning, as an IRI; recognized predicates carry behavior | `predicate` plus sub-kind sets |
   | `scope` | named graph | `graph_scope` |
-  | `source` | the store that owns the record, and its revision. Edits and withdrawals route to it, and an opened member keeps its source's explanation and actions | kernel graph (implicit); scenomise `source`, `source_revision` |
+  | `source` | the store that owns the record, with revision availability. Edits and withdrawals route to it, and an opened member keeps its source's explanation and actions | MereHost session/root identity in shared readings, immutable revision unavailable; scenomise `source`, `source_revision` |
   | `asserter` | attributed source, else the journal `Author` (ruling 5) | `provenance_iri` |
-  | `first_asserted_ms` | set when the assertion is minted, never overwritten | missing |
+  | `first_asserted_ms` | set when the assertion is minted, never overwritten | semantic `first_asserted_ms`; unknown remains explicit |
   | `last_asserted_ms` | updated on reassertion by the same asserter | `asserted_at_ms` (often `None`) |
-  | `withdrawn` | `{ at_ms, by }` once withdrawn; the record remains until compaction | missing (hard delete) |
-  | `basis` | why: `note`, `method`, `evidence`, `occurrences` (§6.2) | `label` only |
+  | `withdrawn` | `{ at_ms, by }` once withdrawn; the record remains until compaction | semantic retained withdrawal; other families wait for P6 |
+  | `basis` | why: `note`, `method`, `evidence`, `occurrences` (§6.2) | semantic note/method/evidence; label alias; occurrences remain sidecars |
 
   Mark's "linking factor" is an assertion. `statement` remains the code
   synonym under the `edge` rule. **Held** means not withdrawn.
@@ -228,7 +225,9 @@ slice (§11):
   without its version, plus the sorted evidence references, and empty for a
   plain explicit claim. A reassertion with the same reason key still updates
   its own record, and a new extractor version still updates its predecessor
-  (ruling 5). P1 keeps today's key unchanged.
+  (ruling 5). P2 implements the method IRI plus sorted unique evidence key;
+  note and method version do not split a reason. The first P1 delivery did
+  not change deduplication.
 
 ## 5. Retire, subsume, keep
 
@@ -277,13 +276,13 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | `VisualRelationKind` / `StrokeCue` (query view) | Keep | The stratum cue of the rest stroke. |
 | scenomise `DisclosedRelationship` with `RelationshipProvenance` | Keep | The disclosure shape of one assertion from a host. Its fields align with `basis`: method, method version, provider, evidence. |
 | Woodshed `MaterialRelation` | Keep, disclosed | A domain record disclosed as an assertion. `method` is the Woodshed computation and version. Its 0..100 weight is a domain value the strength function may read. |
-| `EdgePath` (`numen/edge_path.rs`) | Keep | Candidate path vocabulary for P5: `Spline` and `FieldLine` are declarations; a responsive-path evaluator remains to be designed (§7.3). |
+| `EdgePath` (`numen/edge_path.rs`) | Keep | `Spline` and `FieldLine` remain path declarations. Numen now has a separate bounded fixed-endpoint responsive-path evaluator; the implementation plan owns P5's host and visual proof (§7.3). |
 | Field couplings | Keep | Existing couplings remain node-targeted. P5 explores a view-local path response without adding an `EdgeFamily` or a stored link entity. |
 | Nested graph | Keep | Node-borne. Not used for links; promotion uses the freeze pattern instead. |
 | Swatch | Keep | Gains a **link** scope (§7.2). |
 | Timeline arrangement (sceno `score.rs`) | Keep | The default opened-link arrangement for dated data; list is the default for mostly undated data (§7.2). |
 | "Timeline" × 6 | Clarify | In this doc it means only the arrangement family. |
-| Linked-data first-arc surface projection (`linked-data/src/lib.rs`:360) | Retire | Reads every arc through `edges_between_undirected`, as the kernel already does. |
+| Linked-data first-arc surface projection (`linked-data/src/lib.rs`) | Retired in the bounded P1 delivery | Reads every outgoing bucket through the kernel's adjacency-indexed `surface_outgoing_relation_buckets`; preserves source direction and scope and excludes incoming-only arcs. |
 
 **Count.** Of 47 rows, 23 are retired or subsumed and two were already
 retired. They include three fans, three bundle
@@ -306,17 +305,23 @@ never a revived one. Asserter-claimed **valid time** ("these were related from
 
 Clock rule: the caller's time is used when the caller supplies one: Knot's
 signed header, an ingested `prov:generatedAtTime`, a sync event. Otherwise the
-kernel stamps wall clock at write. A record with no time is undated (legacy
+kernel stamps wall clock once at authored admission and records that value.
+Import, replay and restore preserve a missing source time. A record with no
+time is undated (legacy
 data, or a source that gives none). It is shown in the undated lane and never
 as 1970.
+
+An explicit authored reason or exact-ID confirmation advances last time.
+An idempotent membership ensure without a confirmation request leaves the
+existing time unchanged. These are separate entry points in the kernel.
 
 ### 6.2 Why: `basis`
 
 | Field | Holds | Source today |
 |---|---|---|
-| `note` | free-text reason | `label` |
-| `method` | `{ iri, version }` of the rule, script, engine or model that computed it | journal `Author` (dropped from the statement); scenomise `method`/`method_version` |
-| `evidence` | IRIs of supporting resources, captures or other assertions | Knot `evidence`; scenomise `evidence` refs |
+| `note` | free-text reason | semantic `basis.note`; `label` is its compatibility alias |
+| `method` | `{ iri, version }` of the rule, script, engine or model that computed it | semantic `basis.method`; scenomise `method`/`method_version`; journal `Author` remains authorship, not a fabricated method |
+| `evidence` | IRIs of supporting resources, captures or other assertions | semantic `basis.evidence`; Knot `evidence`; scenomise `evidence` refs |
 | `occurrences` | dated events plus rollup (count, first, last) for event-backed predicates | `TraversalData` + `EdgeMetrics`; Woodshed `Engagement` |
 
 There is no stored confidence, weight or origin field. The origin reading
@@ -352,14 +357,15 @@ item below:
    time, and its persisted name stays. Legacy records load with `first = last =`
    the stored value, or undated.
 3. **Withdraw, don't delete.** `retract_statement` sets
-   `withdrawn { at_ms, by }` instead of removing (`assertion_write.rs`:799-846;
-   `edge_data.rs`). Held readers filter it out. The bucket is removed only when
+   `withdrawn { at_ms, by }` instead of removing (`assertion_write.rs`; `edge_data.rs`). Held readers filter it out. The bucket is removed only when
    it holds no record at all. Graphshell's `RetractAssertion` event gains a
    time. Compaction is per predicate lifecycle (statement kernel brief) or by
    accepted checkpoint for shared assertions. A late assert or withdraw is
    resolved by id, as the rules above state.
-4. **Basis.** Persist `note`, `method`, `evidence` and `occurrences` in
-   `PersistedSemanticStatement`. Ingest and export round-trip them.
+4. **Basis.** Persist `note`, `method` and `evidence` in
+   `PersistedSemanticStatement`. Ingest and export round-trip them. Event-backed
+   `occurrences` remain in their current sidecars until those families migrate
+   in P6; this semantic slice does not invent occurrence records.
 5. **RDF.** On the reifier: `prov:generatedAtTime` = first;
    `mere:lastAssertedAt` = last; `prov:invalidatedAtTime` for a withdrawal;
    `prov:wasGeneratedBy` for the method; `prov:wasDerivedFrom` for evidence.
@@ -367,7 +373,7 @@ item below:
    ([PROV-O](https://www.w3.org/TR/prov-o/#wasInvalidatedBy)), so the
    withdrawer is a withdrawal activity node: `prov:wasInvalidatedBy` that
    activity, which is `prov:wasAssociatedWith` the withdrawer. Ingest lifts
-   all of these, not only today's three (`ingest.rs`:507-531). Withdrawn
+   all of these. Withdrawn
    reifiers appear only in the history scope (L5).
 6. **All families (P6).** The four sidecar families write assertions through
    the same `assert` and `withdraw`. Their compatibility reads become predicate
@@ -377,12 +383,12 @@ item below:
 
 ### 7.1 The link
 
-`link(stratum, a, b)` reads every arc in both directions through
-`edges_between_undirected` (`edge_ops.rs`:644), plus lifted appearances
-through `projected_relations` (`query.rs`). It yields assertions grouped by
+`link(stratum, a, b)` reads every directed bucket in both pair orientations
+through `projected_relations_between`, including lifted Resource appearances.
+Explicit retained history uses `retained_relations_between`. It yields assertions grouped by
 nothing else. Direction, predicate, asserter and family are attributes of
-members, not levels. There is one implementation, which every consumer reads:
-Graphshell, roster, pictograph, cambium and Woodshed. Hosts outside the kernel
+members, not levels. P1 gives Graphshell and pictograph one shared implementation;
+roster, cambium and Woodshed adopt it in their later phases. Hosts outside the kernel
 (Woodshed and Knot via scenomise) disclose assertions in the same shape,
 which lives in `scenograph` (L6). Until P6, members from the four sidecar
 families have no id: the shape admits an id-less `(family, sub-kind)`
@@ -462,10 +468,12 @@ Current implementation boundaries:
   (`crates/conatus/seiche/src/forces.rs`:184). It supplies no lateral path
   state. A field-responsive path needs its own evaluator and response model.
   Existing node-targeted couplings do not already act on paths.
-- **Numen declares `EdgePath::Spline` and `EdgePath::FieldLine`**
-  (`crates/conatus/numen/src/edge_path.rs`). These are candidate vocabulary,
-  not an implemented flexible path constrained to both endpoints; spline
-  tension alone does not establish a field response.
+- **Numen's `EdgePath::Spline` and `EdgePath::FieldLine` remain vocabulary**
+  (`crates/conatus/numen/src/edge_path.rs`). The separate bounded evaluator in
+  `crates/conatus/numen/src/responsive_path.rs` implements P5's fixed-endpoint
+  response. Pictograph adapts shared link readings and Graphshell supplies the
+  reference host. The implementation plan owns its bounds and visual evidence;
+  the declarations alone do not install a response law.
 - **One spring per link** can separately replace N spring slots per visible
   row (`seiche_bridge.rs`) when that law is selected. With additive linear
   stiffness contributions and a common rest length, an assertion has an
@@ -514,7 +522,8 @@ current storage, so a consumer benefits before any persistence change.
   semantic assertions, under §6.3's rules. Proof: Graphshell's inspector
   sorts by first time, shows withdrawn spans and lists undated assertions
   last. A Knot assertion and retraction round-trip with their times. Done
-  when no writer leaves time empty, replay reproduces recorded times exactly,
+  when authored writers record their admission time, import/replay preserve
+  an unknown source time, replay reproduces recorded times exactly,
   reassertion keeps the first time, withdraw-then-reassert yields two
   intervals, a stale assert does not revive a withdrawal, and default SPARQL
   shows held assertions only (L5).
@@ -646,16 +655,33 @@ independence without making persistence or consumer adoption follow a moving
 experimental interface.
 
 
-**2026-10-15, bounded implementation started.** The shared scenograph reading,
+**2026-10-15, first bounded implementation.** The shared scenograph reading,
 Pictograph reader and two consumer adapters are implemented as a first slice,
 alongside the outgoing parallel-bucket export fix and an isolated Numen path
 probe. P1 preserves existing records while adding explicit source availability
 to Graphshell's output; graph-only consumers report missing source context
 rather than inventing public identity or revision. The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
-records checks and open gates. P2–P4/P6 and P5's host/visual proof remain open.
+records that delivery's checks and open gates. At that point P2–P4/P6 and
+P5's host/visual proof remained open; the continuation below updates status.
 
 **2026-10-15, open rulings.** Mark ruled O1 and O4–O8, and the plan's pending
 same-asserter question, as L7–L13. They took the recommended option on each
 except O7, choosing to plan promotion now (P7) rather than keep it as an
 escape hatch.
+
+
+**2026-10-15, lifecycle and dynamics continuation.** Source `1e3fb426c` adds
+local MereHost session/root source identity with unavailable immutable
+revision, semantic first/last/withdrawal and basis, L13's exact reason key,
+held-default/history-explicit reads, JSON reopen and additive worker-wire
+compatibility, RDF lifecycle projection, and Graphshell's history inspector.
+The bounded P1 consumers pass their affected checks. P5 now adapts real shared
+readings into the bounded evaluator; eight reviewed browser configurations
+make field and compatible-link responses independently visible with fixed
+endpoints and retained assertion identities. P5's stated experiment is
+qualified. P2 remains open for Knot's timed retraction projection and a real
+Mere intake round-trip; the browser inspector fixture does not demonstrate
+withdrawn/undated spans visually. The plan and its receipt preserve these
+limits, including unqualified newer-main dependencies, pre-P2 binary archive
+migration and later-family/history budgets. No ruling changed.

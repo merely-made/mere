@@ -8,6 +8,7 @@
 //! decomposition pass (1420-LOC monolithic `tests.rs` → 5 focused
 //! sub-modules, each under the 600-LOC ceiling).
 
+pub mod assertion_lifecycle;
 pub mod assertion_replay;
 pub mod assertion_writers;
 pub mod assertions;

@@ -442,6 +442,7 @@ fn unsupported_metadata_stays_descriptive_and_extra_annotations_are_retained() {
         Some("https://author.test/")
     );
     assert_eq!(claim.asserted_at_ms, Some(0));
+    assert_eq!(claim.first_asserted_ms, Some(0));
     let record = contribution
         .nodes
         .iter()

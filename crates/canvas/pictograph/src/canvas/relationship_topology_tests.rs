@@ -38,6 +38,7 @@ fn assertion(
                     .into(),
                 recognized_sub_kind: kind,
                 label: None,
+                basis: Default::default(),
                 graph_scope: GraphScope::Custom("urn:graph:review".into()),
                 provenance_iri: Some(author.into()),
                 asserted_at_ms: Some(17),

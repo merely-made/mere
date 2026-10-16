@@ -1,17 +1,19 @@
-# Link model: bounded shared reading and responsive-path probe
+# Link model: shared readings, assertion lifecycle and responsive paths
 
 **Date:** 2026-10-15
-**Status:** in progress. The bounded P1 reading and independent P5 CPU probe
-are implemented and bounded-tested; phase acceptance remains open.
+**Status:** in progress. The bounded P1 shared reading and P5 fixed-endpoint
+Graphshell experiment are qualified on source `1e3fb426c`, based on
+`b2c8dcc28`. P2's semantic lifecycle is implemented and bounded-tested; its
+Knot supplier/intake gate remains open. P3–P4, P6 and P7 remain later work.
 Work began at `d4d2f88c4`; the first source
-commit `339a86c9e` was based on `39035965a` after renderer adoption. The current
-combined source `4f4678522` also includes published native-fold integration
+commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
+delivery's combined source `4f4678522` also includes published native-fold integration
 `2d0d38f7c`.
 
 ## Authority and scope
 
 The [link model](../technical_architecture/2026-10-15_link_model.md) owns the
-design, L1–L6, open rulings and phase order. This plan owns implementation
+design, L1–L13 and phase order. This plan owns implementation
 assignments and evidence. Preserve separately attributed assertions; derive
 the pair link. An assertion's RDF reifier supplies addressability without a
 stored pair entity. P1 does not introduce claim-editing UI or pair promotion.
@@ -19,13 +21,16 @@ stored pair entity. P1 does not introduce claim-editing UI or pair promotion.
 Use one integration owner for the portable contract and persistence. The core
 sequence remains P1 → P2 → P3 → P4 → P6. The independent P5 evaluator may
 advance on fixed fixtures while the core progresses. Shared host rendering
-and selection changes are serialized. P2–P4, P6 and P7 are later work, not silently
-included in this first delivery.
+and selection changes are serialized. P2–P4, P6 and P7 were outside the first
+delivery; the authorized continuation below starts P2 without claiming its
+remaining supplier and intake gates are complete.
 
 Mark ruled on 2026-10-15 (link model L13) that two independent reasons from
 the same asserter are two separately withdrawable assertions. P2 adds a reason
-key to the dedup key. P1 preserves every existing statement ID and leaves
-today's write-path deduplication unchanged.
+key to the dedup key: method IRI without version, plus sorted evidence refs.
+Existing relation-membership writers retain ensure semantics. The first P1
+delivery preserved every existing statement ID without changing write-path
+deduplication; the continuation below implements L13's semantic reason key.
 
 The link model's remaining open rulings were settled the same day as L7–L12.
 Those binding the core sequence: chartulary gains asserter, span and basis
@@ -175,7 +180,7 @@ keep fixture, package, host, native and persistence claims separate.
   populated the cache before the final offline checks. Neither setup failure
   is recorded as a test pass.
 
-## Combined check receipt and next review
+## First delivery: combined check receipt and next review
 
 The [compact check receipt](../../../support/receipts/link-model-20261015/checks.json)
 pins source commit `4f4678522cfb1bbf64655ddbd44cb7fa18919de6`, upstream
@@ -199,7 +204,8 @@ The first slice is implemented and bounded-tested. Phase acceptance remains
 open for receiving-host review: supply verified source binding/revision
 through the reader and Graphshell entry point, exercise the ordinary consumer
 inspection flows, and keep P5's real-link adapter and capture comparison
-separate. P2's assertion/evidence choice is now ruled (L13) and is P2's to implement.
+separate. At that delivery, P2's assertion/evidence choice remained pending;
+the subsequent ruling L13 now binds the continuation below.
 No new snapshot format, withdrawal state, opened-link layout or fan retirement
 is claimed by this delivery.
 
@@ -215,8 +221,180 @@ gates. `git diff --check` passes for this delivery.
 The first combined run passed 1,056 tests at `339a86c9e`. Upstream's native
 multi-fold canvas integration landed before publication and touched the
 kernel, Pictograph and dependency manifests. The combined source was reviewed
-and the named checks rerun at `4f4678522`, yielding the current 1,066 passes.
+and the named checks rerun at `4f4678522`, yielding that delivery's 1,066 passes.
 The receipt retains the earlier qualification basis; it does not apply the
 old result to the newer source. Link implementation files are unchanged by
 the merge, with the reader module declaration preserved over upstream's
 canvas module.
+
+
+## Continuation: owner context, semantic lifecycle and visible dynamics
+
+**2026-10-15, authorized continuation.** The source is committed as
+`1e3fb426c3c5f70c87bfb635379ce59e7b51515b`, based on `b2c8dcc28`.
+Three `gpt-6-luna` agents handled the shared consumers, central lifecycle and
+RDF/dynamics seams. Persistence and the portable contract had one owner;
+shared host edits and Cargo builds were serialized. P5's evaluator and host
+adapter were prepared independently. The final product/WebGPU browser build and both scenarios pass. P5's eight
+configurations have reviewed captures; P2's Knot gate remains open. The
+[qualification receipt](../../../support/receipts/link-model-lifecycle-20261015/checks.json)
+pins commands, artifacts, captures and limits to that source.
+
+### Implemented contract
+
+MereHost supplies its durable session UUID and root graph UUID as local source
+context. The `mere` namespace identifies that local host context and is not
+an authentication claim. Revision remains explicitly unavailable: an unflushed
+journal prefix can be reused after reopen for different facts and is not an
+immutable public revision. Source identity survives persistence/reopen and
+changes on a session switch. Graph-only callers disclose missing context.
+
+L13's reason key is method IRI without version plus sorted unique evidence
+references. Note and method version can change without selecting a different
+reason. Membership ensures remain idempotent; the explicit authored-reason
+entry point records a confirmation time. Exact-ID imports preserve distinct
+signed IDs even if their reasons match, and ambiguous legacy content keys
+require an exact handle. Withdrawal retains the old interval; asserting that
+reason again creates another ID. Stale assertions cannot revive a tombstone.
+
+Authored admission stamps time once. Import, replay and restore retain unknown
+source times. First time survives reconfirmation; the old `asserted_at_ms`
+field is last assertion time. JSON lacking the first-time field falls back to
+the old time, while explicit null stays unknown. Withdrawal carries a recorded
+time and actor where supplied. New semantic sync withdrawals require an exact
+ID, matching author and pair, and causal knowledge; old untimed events stay
+undated. Earlier assertion events in one signed operation may be withdrawn
+later in that operation, but later events cannot justify an earlier withdrawal.
+
+Default topology, shared link reads, RDF export and SPARQL expose held facts.
+Explicit history reads retain spans and basis. Graphshell sorts history by
+first time, places undated entries last and limits exact actionable inspection
+to held assertions. Retained history is a reading of the supplied snapshot,
+separate from exact journal replay. Raw retained graph storage iterators keep
+their documented meaning. Other relation families remain sidecars until P6.
+
+RDF reifiers carry first/last/withdrawal and basis. Withdrawn reifiers use an
+explicit history graph with original scope kind and name retained; no held
+base triple is emitted for them. Withdrawal identifies an activity associated
+with the actor. Conflicting single-valued identity/lifecycle/method/scope
+metadata and conflicting reifier targets are rejected independently of quad
+order; identical duplicates are accepted. A timestamp-only withdrawal remains
+a tombstone. Evidence RDF order is not source-vector order.
+
+Actual native store and GraphSession boundaries use JSON. The worker wire
+keeps the old `Contribution` payload at its original enum ordinal and appends
+`ContributionV2`; fixed legacy bytes and multi-edge transfer buffers exercise
+that boundary. V2 requires a V2-aware receiver. Current-shape postcard/rkyv
+roundtrips do not establish pre-P2 binary archive compatibility; the old
+unversioned standalone postcard shape has no migration in this delivery.
+
+The visible P5 fixture adapts real shared link readings into Numen while
+retaining source, assertion, bucket and displayed-endpoint identities. Two
+appearances have declared compatibility; a third is an incompatible control.
+Attractor, flow and vortex fields have independent field-response and
+compatible-attraction controls. Endpoints are fixed. Response rules and
+configured strengths are disclosed separately from observed path geometry;
+allocated spring share is explicitly unavailable. This is temporary view
+geometry, with no endpoint feedback or resonance requirement.
+
+### CPU and persistence qualification
+
+All commands use locked/offline resolution, one build job and isolated target
+and build directories. The final checks use the committed source above.
+
+| Gate | Result |
+|---|---|
+| Kernel library with native store support | 448 passed |
+| Kernel JSON store, two fresh child processes | write/exit/reopen passed; IDs, basis, first/last/withdrawal and unknown first time preserved |
+| Scenograph library | 28 passed |
+| Pictograph canvas library | 464 passed; 18 existing release/probe tests ignored |
+| Graphshell web library | 300 passed; 6 existing tests ignored |
+| Graphshell personal-sync library | 376 passed; 6 existing tests ignored |
+| Signed-sync probe binary | compile check passed; no physical peer qualification claimed |
+| Linked-data package | 84 passed; 0 doc tests |
+| Content wire library | 5 passed |
+| Pandect package | 310 library + 26 integration tests passed; 1 existing probe ignored |
+| Numen library | 65 passed |
+| Changed Rust sources | all 76 pass scoped rustfmt; diff check passes |
+
+Broad checks found fixtures still counting raw retained claims as held or
+mutating only the compatibility label while leaving canonical basis unchanged.
+Those fixtures now exercise held truth and real basis changes; collision,
+checkpoint-refusal and atomicity checks remain. Live/direct parity normalizes
+only newly authored clocks/IDs; its exact reopen and journal comparisons do
+not normalize them. The fresh-process fixture uses separate hosts to avoid
+legacy derived-Domain repair outside its lifecycle focus, and compares the
+whole persisted snapshot before checking exact assertion fields.
+
+The snapshot-size control now accounts for first/last metadata: the 49-record
+fixture rises from 705 to 770 bytes per statement. Its 780-byte gate has a
+10-byte margin. This bounded fixture does not qualify P6's substantial-history
+read/memory budget.
+
+### Browser qualification and visual review
+
+The standalone web workspace builds with `--locked --offline`,
+`--no-default-features --features product,presentation-webgpu` for
+`wasm32-unknown-unknown`. Bindings use wasm-bindgen 0.2.129. Both scenarios run
+in the Codex in-app browser with BrowserWebGpu at its normal 742 × 1044 CSS
+viewport, with 1484 × 2088 captures; GPU timestamps are unavailable.
+
+The responsive-links scenario passes eight configurations with no page errors
+or gate failures. All eight saved captures were visually reviewed: the
+no-response baseline is straight; compatible-only attraction draws A and B
+together while C stays straight; all three fields affect C independently of
+compatibility; the combined controls change A/B while preserving C's
+field-only result. All six endpoints and three assertion handles remain
+fixed. Controls, configured rules, observed bends and the unavailable spring
+allocation disclosure fit the viewport. Field strengths differ deliberately;
+these are response comparisons, not equal-force calibration.
+
+| Configuration | Maximum bend A / B / C, chart units |
+|---|---|
+| Disabled | 0 / 0 / 0 |
+| Compatible attraction only | 29.53 / 29.53 / 0 |
+| Attractor field only | 16.77 / 29.26 / 43.17 |
+| Attractor combined | 16.09 / 51.02 / 43.17 |
+| Flow field only | 38.40 / 38.40 / 38.40 |
+| Flow combined | 5.59 / 64.52 / 38.40 |
+| Vortex field only | 36.72 / 39.95 / 37.08 |
+| Vortex combined | 61.68 / 64.14 / 37.08 |
+
+The ordinary link-inspection scenario also passes, preserving selection and
+workbench membership while opening an exact assertion and switching held →
+history → held. Its three captures were reviewed. The fixture contains one
+held assertion, so this is not visual proof of a withdrawn or undated span;
+CPU tests cover those controls. The narrow inspector scrolls through long
+source records, and its font lacks some direction-arrow glyphs. These remain
+presentation limits, separate from P5's legible fixture. Neither browser lane
+is desktop-native application acceptance or physical-peer qualification.
+
+### Documentation qualification
+
+The final audit matches the pre-edit `cc801cbe0` documentation baseline
+(which is unchanged through `b2c8dcc28`) with zero new finding occurrences,
+comparing source, subject, detail and multiplicity after normalizing checkout
+roots and shifted line numbers. Active/indexed counts remain 285/284.
+Judgment coverage remains 271/285; the command still exits 1 for the same 14
+uncovered documents and snapshot digest mismatch. The 16 broken relative
+links, 151 missing known-root paths, six stale historical annotations and 61
+unheaded owned sources remain baseline debt. Batch 86 supersedes the two
+prior link-model judgments. This is no new debt, not a passing global gate.
+
+### Remaining phase gates and publication scope
+
+Knot is pinned to `fe9d98ccc1eb7b0589bd90243683d4f6dfab3242` on this source
+baseline. Its signed operation carries `asserted_at_ms` and its assertion DTO
+projects that time. `KnotRelationRetractionV1` still contains only operation
+and author, and its fold drops the signed retraction time. Mere has no
+relation-intake adapter for `KnotDocumentProjection`. P2 still needs the
+supplier projection change, a real Mere adapter, authored/untimed controls,
+checkpoint/reopen and compatibility evidence. A synthetic Mere fixture does
+not close this gate.
+
+P3 still requires chartulary's asserter/span/basis before Woodshed (L8). P4
+fan retirement, P6's remaining families and history budgets, and P7 promotion
+remain later work. Main advanced separately through `4a74b1cf2` to `d6b1e4a26` with family
+source, Knot/Murm and welding dependency changes during qualification. This delivery stays on its
+recorded baseline and is prepared as a review branch; compatibility with that
+new dependency set is a separate gate.

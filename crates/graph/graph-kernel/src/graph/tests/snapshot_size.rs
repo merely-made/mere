@@ -157,18 +157,45 @@ fn common_case_semantic_statement_stays_cheap_in_the_snapshot() {
     }
     let plain_len = snapshot_len(&plain);
 
+    // Compare with the pre-lifecycle JSON shape: these authored assertions
+    // previously had no timestamp, and the old schema had no first-time field.
+    let mut pre_lifecycle = serde_json::to_value(plain.to_snapshot()).unwrap();
+    for edge in pre_lifecycle["resource_edges"].as_array_mut().unwrap() {
+        if let Some(statements) = edge
+            .get_mut("semantic")
+            .and_then(|semantic| semantic.get_mut("statements"))
+            .and_then(serde_json::Value::as_array_mut)
+        {
+            for statement in statements {
+                statement.as_object_mut().unwrap().remove("asserted_at_ms");
+                statement
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("first_asserted_ms");
+            }
+        }
+    }
+    let pre_lifecycle_len = serde_json::to_vec(&pre_lifecycle).unwrap().len();
+    let current_value_len = serde_json::to_vec(&serde_json::to_value(plain.to_snapshot()).unwrap())
+        .unwrap()
+        .len();
+
     let per_statement = (plain_len - bare_len) as f64 / statements as f64;
     println!(
         "snapshot-size gate (statement): bare={bare_len} plain={plain_len} \
-         (common-case {per_statement:.0} B/statement, incl. edge wrapper)"
+         pre-lifecycle={pre_lifecycle_len} timestamp-overhead={} total / {:.1} per statement \
+         (common-case {per_statement:.0} B/statement, incl. edge wrapper)",
+        current_value_len - pre_lifecycle_len,
+        (current_value_len - pre_lifecycle_len) as f64 / statements as f64,
     );
 
     // Coarse: the whole `PersistedEdge` wrapper (defaulted edge-family payloads)
     // dominates here, so this ceiling guards the edge lane from gross regression
     // rather than isolating statement-metadata cost. Ceiling = measured (~590 B)
-    // with headroom.
+    // with headroom. The assertion lifecycle and basis fields add a small
+    // fixed cost per statement, so this ceiling includes that required shape.
     assert!(
-        per_statement < 760.0,
+        per_statement < 780.0,
         "common-case statement snapshot cost regressed: {per_statement:.0} B/statement (bare={bare_len}, plain={plain_len})"
     );
     let snapshot = plain.to_snapshot();
@@ -184,6 +211,9 @@ fn common_case_semantic_statement_stays_cheap_in_the_snapshot() {
             .iter()
             .all(|claim| claim.provenance_iri.as_deref() == Some(author.as_str()))
     );
+    assert!(claims.iter().all(|claim| {
+        claim.first_asserted_ms.is_some() && claim.first_asserted_ms == claim.asserted_at_ms
+    }));
 }
 
 #[test]
@@ -261,7 +291,13 @@ fn shared_resource_statement_cost_and_metadata_roundtrip_stay_bounded() {
         assert_eq!(claims.len(), N - 1);
         for claim in claims {
             assert_eq!(claim.provenance_iri.as_deref(), Some(author.as_str()));
-            assert_eq!(claim.asserted_at_ms, annotated.then_some(0));
+            if annotated {
+                assert_eq!(claim.asserted_at_ms, Some(0));
+                assert_eq!(claim.first_asserted_ms, Some(0));
+            } else {
+                assert!(claim.asserted_at_ms.is_some());
+                assert_eq!(claim.first_asserted_ms, claim.asserted_at_ms);
+            }
             assert_eq!(
                 claim.label.as_deref(),
                 annotated.then_some("held annotation")

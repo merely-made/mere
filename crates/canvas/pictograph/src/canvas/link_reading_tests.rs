@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use kernel::graph::{SemanticStatementSpec, SemanticSubKind, predicate_iri};
-use kernel::types::GraphScope;
+use kernel::graph::{SemanticStatement, SemanticStatementSpec, SemanticSubKind, predicate_iri};
+use kernel::types::{AssertionBasis, AssertionMethod, GraphScope};
 
 #[test]
 fn reading_keys_each_stratum_separately_and_preserves_assertion_source_facts() {
@@ -33,6 +33,7 @@ fn reading_keys_each_stratum_separately_and_preserves_assertion_source_facts() {
                 predicate: predicate_iri(SemanticSubKind::Cites).into(),
                 recognized_sub_kind: Some(SemanticSubKind::Cites),
                 label: Some("source claim".into()),
+                basis: AssertionBasis::default(),
                 graph_scope: GraphScope::Custom("urn:scope".into()),
                 provenance_iri: Some("urn:asserter".into()),
                 asserted_at_ms: Some(42),
@@ -127,6 +128,113 @@ fn reading_keys_each_stratum_separately_and_preserves_assertion_source_facts() {
 }
 
 #[test]
+fn explicit_history_reads_first_last_withdrawal_and_basis_but_default_is_held_only() {
+    let mut graph = Graph::new();
+    let a = Uuid::from_u128(41);
+    let b = Uuid::from_u128(42);
+    kernel::graph::apply::add_node(
+        &mut graph,
+        Some(a),
+        "https://history-a.test/".into(),
+        Default::default(),
+    );
+    kernel::graph::apply::add_node(
+        &mut graph,
+        Some(b),
+        "https://history-b.test/".into(),
+        Default::default(),
+    );
+    let method = AssertionMethod {
+        iri: "urn:method:extractor".into(),
+        version: Some("v3".into()),
+    };
+    let mut add = |id: &str, first, last, withdrawn| {
+        graph
+            .try_assert_persisted_semantic_statement(
+                graph.get_node_key_by_id(a).unwrap(),
+                graph.get_node_key_by_id(b).unwrap(),
+                SemanticStatement {
+                    statement_id: id.into(),
+                    predicate: predicate_iri(SemanticSubKind::Cites).into(),
+                    recognized_sub_kind: Some(SemanticSubKind::Cites),
+                    label: Some(format!("note:{id}")),
+                    basis: AssertionBasis {
+                        note: Some(format!("note:{id}")),
+                        method: Some(method.clone()),
+                        evidence: vec!["urn:evidence:b".into(), "urn:evidence:a".into()],
+                    },
+                    graph_scope: GraphScope::Default,
+                    provenance_iri: Some("urn:asserter:history".into()),
+                    first_asserted_ms: first,
+                    asserted_at_ms: last,
+                    withdrawn: None,
+                },
+            )
+            .unwrap();
+        if withdrawn {
+            assert!(graph.apply_imported_semantic_withdrawal_for_pair(
+                graph.get_node_key_by_id(a).unwrap(),
+                graph.get_node_key_by_id(b).unwrap(),
+                id,
+                Some(25),
+                Some("urn:withdrawer".into()),
+            ));
+        }
+    };
+    add("held", Some(5), Some(15), false);
+    add("withdrawn", Some(10), Some(20), true);
+    add("undated", None, None, false);
+
+    let source = LinkSource::Unavailable {
+        reason: "history fixture has no source identity".into(),
+    };
+    let held = read_link(&graph, a, b, source.clone()).unwrap();
+    let history = read_link_history(&graph, a, b, source).unwrap();
+    let collect = |reading: &LinkPairReading| {
+        reading
+            .links
+            .iter()
+            .flat_map(|link| &link.buckets)
+            .flat_map(|bucket| &bucket.assertions)
+            .cloned()
+            .collect::<Vec<_>>()
+    };
+    let held = collect(&held);
+    let history = collect(&history);
+    assert_eq!(held.len(), 2);
+    assert!(held.iter().all(|assertion| assertion.withdrawn.is_none()));
+    assert_eq!(history.len(), 3);
+    let removed = history
+        .iter()
+        .find(|assertion| assertion.id == "withdrawn")
+        .unwrap();
+    assert_eq!(removed.first_asserted_ms, Some(10));
+    assert_eq!(removed.asserted_at_ms, Some(20));
+    assert_eq!(
+        removed.withdrawn,
+        Some(LinkWithdrawal {
+            at_ms: Some(25),
+            by: Some("urn:withdrawer".into()),
+        })
+    );
+    assert_eq!(removed.basis.note.as_deref(), Some("note:withdrawn"));
+    assert_eq!(removed.basis.method.as_ref().unwrap().iri, method.iri);
+    assert_eq!(
+        removed.basis.method.as_ref().unwrap().version.as_deref(),
+        Some("v3")
+    );
+    assert_eq!(
+        removed.basis.evidence,
+        vec!["urn:evidence:b", "urn:evidence:a"]
+    );
+    assert!(
+        history
+            .iter()
+            .any(|assertion| assertion.first_asserted_ms.is_none())
+    );
+}
+
+#[test]
 fn summary_free_read_keeps_traversal_members_without_copying_event_history() {
     let mut payload = EdgePayload::new();
     payload.push_traversal(kernel::graph::edge_data::Traversal {
@@ -142,4 +250,22 @@ fn summary_free_read_keeps_traversal_members_without_copying_event_history() {
     assert_eq!(summaries.len(), 1);
     assert_eq!(summaries[0].family, "Traversal");
     assert_eq!(summaries[0].data["traversals"].as_array().unwrap().len(), 1);
+
+    let mut legacy_semantic = EdgePayload::new();
+    legacy_semantic.semantic = Some(kernel::graph::edge_data::SemanticData {
+        label: Some("legacy note".into()),
+        predicate: Some("urn:predicate:legacy".into()),
+        ..Default::default()
+    });
+    let (_, summaries) = legacy_data(&legacy_semantic, true);
+    assert_eq!(summaries.len(), 1);
+    assert_eq!(summaries[0].family, "Semantic");
+    assert_eq!(summaries[0].data["label"], "legacy note");
+
+    let empty_semantic = EdgePayload {
+        semantic: Some(Default::default()),
+        ..EdgePayload::new()
+    };
+    let (_, summaries) = legacy_data(&empty_semantic, true);
+    assert!(summaries.is_empty());
 }

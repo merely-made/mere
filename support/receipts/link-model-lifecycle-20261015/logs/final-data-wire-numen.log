@@ -1,0 +1,327 @@
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1021:19
+     |
+1021 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `upsert_persisted_statement` is never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:468:19
+    |
+323 | impl SemanticData {
+    | ----------------- method in this implementation
+...
+468 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:285:19
+    |
+ 57 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+285 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+298 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+320 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+344 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: methods `append_node_property`, `add_node_classification`, `remove_node_classification`, `set_node_classification_status`, and `set_node_primary_classification` are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:92:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `replay_assert_relation_by_ids`, `replay_set_edge_semantic_predicate_by_ids`, `dissolve_remove_node_collect_traversals`, `assert_surface_persisted_semantic_statement`, `replay_retract_relations`, and `set_edge_semantic_predicate` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:252:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+252 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+268 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+337 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+524 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+621 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+757 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 13 warnings (run `cargo fix --lib -p mere-kernel` to apply 6 suggestions)
+   Compiling mere-linked-data v0.0.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/linked-data)
+   Compiling content-contract v0.0.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/content-contract)
+   Compiling numen v0.2.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/conatus/numen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 11s
+     Running unittests src/lib.rs (/Users/markik/Code/testing/mere/link-model-next-20261015/p5-build/debug/deps/content_contract-965081b072bcf882)
+
+running 5 tests
+test edge_contribution_wire_tests::fixed_legacy_transfer_bytes_keep_the_original_contribution_ordinal_and_shape ... ok
+test edge_contribution_wire_tests::edge_contribution_transfer_preserves_lifecycle_and_basis ... ok
+test edge_contribution_wire_tests::v2_wire_preserves_unknown_first_time_and_empty_basis_note ... ok
+test edge_contribution_wire_tests::legacy_contribution_transfer_decodes_its_multi_edge_original_shape ... ok
+test edge_contribution_wire_tests::lifecycle_contribution_v2_roundtrips_multiple_edges_through_transfer_buffer ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/Users/markik/Code/testing/mere/link-model-next-20261015/p5-build/debug/deps/linked_data-b2a07e863ba82c07)
+
+running 84 tests
+test ingest::tests::conflicting_reifies_targets_are_rejected_independent_of_quad_order ... ok
+test ingest::tests::bundled_context_expands_a_remote_context ... ok
+test ingest::tests::dublin_core_literals_are_recognized ... ok
+test ingest::tests::blank_nodes_skolemize_under_a_document_namespace ... ok
+test ingest::tests::from_jsonld_parses_nodes_literals_types_and_edges ... ok
+test ingest::tests::from_jsonld_preserves_typed_and_language_tagged_literals ... ok
+test ingest::tests::context_presets_resolve_mere_docs ... ok
+test ingest::tests::identical_reifies_target_duplicates_are_accepted ... ok
+test ingest::tests::exact_subject_binding_replays_without_an_implicit_page_resource ... ok
+test ingest::tests::is_bundled_context_covers_the_packs ... ok
+test ingest::tests::identical_single_valued_lifecycle_metadata_duplicates_are_accepted ... ok
+test ingest::tests::a_harvested_hyperlink_records_extracted_from_provenance_on_the_target ... ok
+test ingest::tests::ingested_node_ids_are_deterministic_across_graphs ... ok
+test ingest::tests::partial_withdrawal_time_without_activity_is_preserved_as_tombstone ... ok
+test ingest::tests::method_version_without_method_iri_is_rejected ... ok
+test ingest::tests::referenced_context_urls_finds_remote_refs ... ok
+test ingest::tests::referenced_context_urls_ignores_inline_and_nonjson ... ok
+test ingest::tests::apply_materializes_recognized_and_raw_edges ... ok
+test ingest::tests::supplied_last_asserted_time_survives_without_lifecycle_marker ... ok
+test ingest::tests::subject_identity_preserves_existing_resource_metadata_and_shown_binding ... ok
+test ingest::tests::unbundled_remote_context_is_refused ... ok
+test ingest::apply::exact::tests::carried_surface_import_preserves_parallel_rows_and_traversals ... ok
+test jsonld::tests::descriptions::conflicting_description_and_cross_graph_base_do_not_select_a_claim ... ok
+test ingest::apply::exact::tests::carried_import_refuses_conflicting_and_cross_store_handles_without_writes ... ok
+test ingest::tests::rdf_subject_identity_is_exact_by_default_and_pages_are_explicit ... ok
+test ingest::tests::single_valued_lifecycle_metadata_rejects_conflicts_independent_of_quad_order ... ok
+test ingest::tests::every_ingest_assertion_path_supplies_source_or_author ... ok
+test jsonld::tests::descriptions::classic_reserved_ids_reject_atomically_with_foreign_controls ... ok
+test jsonld::tests::descriptions::incomplete_multivalued_and_unasserted_descriptions_remain_rdf ... ok
+test jsonld::tests::descriptions::reserved_identifier_validation_also_covers_standalone_jsonld_records ... ok
+test reifier::tests::decoder_distinguishes_foreign_and_malformed_reserved_inputs ... ok
+test jsonld::tests::profile::complete_blank_node_records_keep_document_scoped_identity ... ok
+test jsonld::tests::profile::nonclassic_reifiers_keep_existing_known_field_attachment ... ok
+test jsonld::tests::profile::two_classic_literal_reifiers_retain_ids_and_sources ... ok
+test jsonld::tests::descriptions::unsupported_metadata_stays_descriptive_and_extra_annotations_are_retained ... ok
+test reifier::tests::unsafe_handles_have_distinct_reversible_valid_reifier_iris ... ok
+test reifier::tests::valid_legacy_ids_keep_their_iris_and_exact_handles ... ok
+test ingest::tests::full_pack_resolves_activitystreams ... ok
+test resource_metadata::attribution_tests::resource_metadata_foreign_keywords_use_explicit_agent_else_source ... ok
+test reifier::tests::unsafe_literal_handles_retain_datatype_language_source_time_and_scope ... ok
+test reifier::tests::production_ingest_rejects_malformed_reserved_ids_and_keeps_valid_controls ... ok
+test resource_metadata::tests::resource_metadata_partial_skos_stays_ordinary_with_complete_owner_control ... ok
+test resource_metadata::tests::resource_metadata_canonical_subjects_affirmative_types_and_reifiers ... ok
+test statements::pending_tests::a_live_target_arrival_rederives_the_pending_source_claim ... ok
+test statements::pending_tests::a_resource_only_target_arrival_needs_no_appearance_and_duplicates_do_not_multiply ... ok
+test serialize::tests::nquads_round_trip_is_lossless_and_drops_vocabulary ... ok
+test statements::pending_tests::a_surface_owned_pending_link_requires_its_original_appearance_context ... ok
+test statements::pending_tests::document_rebuild_accepts_a_held_prepared_source_identity ... ok
+test statements::pending_tests::deleted_sources_and_ambiguous_appearances_do_not_redirect_pending_claims ... ok
+test statements::pending_tests::navigation_to_an_already_held_target_admits_a_surface_owned_claim ... ok
+test statements::pending_tests::carried_import_preserves_its_handle_before_consuming_pending_extraction ... ok
+test statements::pending_tests::purge_prevents_arrival_derivation_and_source_navigation_keeps_original_ownership ... ok
+test serialize::tests::trig_round_trip_matches_nquads ... ok
+test statements::pending_tests::replay_preserves_the_pending_index_and_exact_recorded_claim ... ok
+test statements::pending_tests::refused_import_without_admission_does_not_derive_ambient_claims ... ok
+test statements::pending_tests::rebuilding_from_a_real_document_preserves_truth_and_sources ... ok
+test statements::tests::apply_edges_recognized_statement_to_existing_target ... ok
+test statements::pending_tests::suppression_restores_after_panic_and_does_not_escape_into_a_clone ... ok
+test statements::tests::apply_reports_pending_when_target_absent ... ok
+test statements::tests::resolve_rel_recognizes_bare_slug_and_full_iri ... ok
+test statements::tests::apply_reports_unrecognized_raw_predicate ... ok
+test tests::compact_export_uses_terms_and_keeps_raw_iris ... ok
+test tests::default_export_omits_withdrawn_surface_and_resource_assertions ... ok
+test tests::empty_graph_exports_empty_array ... ok
+test tests::compact_export_round_trips_through_ingest ... ok
+test tests::expanded_export_round_trips_through_ingest ... ok
+test tests::exports_multiple_statements_on_one_node_pair ... ok
+test reifier::tests::production_dataset_ingest_apply_preserves_arbitrary_assertion_handles ... ok
+test resource_metadata::tests::envelope_foreign_definition_controls_keep_partial_typed_and_scoped_claims ... ok
+test tests::explicit_history_roundtrips_lifecycle_basis_and_original_scope ... ok
+test tests::exports_recognized_and_raw_predicates_with_literals ... ok
+test tests::properties_round_trip_via_the_property_bag ... ok
+test tests::node_direct_quads_export_each_outgoing_parallel_bucket_without_reversing_incoming ... ok
+test tests::type_round_trips_via_rdf_type_classification ... ok
+test vocab::tests::alignment_is_deterministic ... ok
+test tests::typed_and_language_tagged_properties_round_trip_via_the_property_bag ... ok
+test vocab::tests::alignment_quads_use_the_right_predicate_per_category ... ok
+test vocab::tests::every_sub_kind_is_categorized_and_maps_to_a_valid_iri ... ok
+test tests::type_export_uses_affirmative_statuses_and_retains_review_records ... ok
+test tests::dataset_round_trip_is_lossless_under_the_profile ... ok
+test resource_metadata::tests::envelope_keeps_paired_definition_and_literal_assertions_with_exact_handles ... ok
+test resource_metadata::tests::resource_metadata_four_formats_keep_assertions_and_resource_only_tags ... ok
+test jsonld::tests::profile::four_formats_preserve_the_complete_assertion_profile ... ok
+test ingest::tests::full_pack_resolves_a_schema_org_remote_context ... ok
+
+test result: ok. 84 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/lib.rs (/Users/markik/Code/testing/mere/link-model-next-20261015/p5-build/debug/deps/numen-3d53366f14e94daa)
+
+running 65 tests
+test coupling::tests::recognized_response_iri_round_trips ... ok
+test coupling::tests::open_canonicalizes_recognized_iri ... ok
+test eval::tests::analytic_gradient_of_add_is_sum ... ok
+test eval::tests::add_and_mul_compose ... ok
+test eval::tests::analytic_gradient_of_coord_x ... ok
+test eval::tests::analytic_gradient_of_linear ... ok
+test eval::tests::analytic_gradient_of_gaussian_points_inward ... ok
+test coupling::tests::coupling_serde_roundtrip ... ok
+test coupling::tests::selector_and_response_variants_roundtrip ... ok
+test edge_path::tests::edge_path_rule_serde ... ok
+test coupling::tests::open_response_serde_roundtrip ... ok
+test edge_path::tests::edge_path_serde ... ok
+test eval::tests::const_evaluates_constant ... ok
+test eval::tests::coord_returns_position ... ok
+test eval::tests::disk_hard_is_one_inside ... ok
+test eval::tests::disk_is_zero_outside_radius ... ok
+test eval::tests::disk_linear_falloff ... ok
+test eval::tests::dot_product_is_correct ... ok
+test eval::tests::finite_diff_gradient_for_unknown_form ... ok
+test eval::tests::gaussian_decays_with_distance ... ok
+test eval::tests::gaussian_peak_is_one_at_center ... ok
+test eval::tests::negate_flips_sign ... ok
+test eval::tests::sample_returns_zero_for_missing ... ok
+test eval::tests::sample_resolves_through_registry ... ok
+test eval::tests::time_returns_t ... ok
+test eval::tests::vector_coord_returns_position ... ok
+test eval::tests::vector_perp_rotates_90 ... ok
+test eval::tests::vector_sample_resolves ... ok
+test field::tests::a_degenerate_polygon_contains_nothing ... ok
+test field::inclusive_boundary_tests::polygon_reference_points_include_every_edge_and_vertex_in_both_windings ... ok
+test field::tests::a_polygon_extent_contains_and_measures ... ok
+test field::tests::attachment_is_a_question_for_a_graph ... ok
+test field::tests::defaults_are_global_active ... ok
+test field::tests::ids_are_distinct_types_but_uuid_backed ... ok
+test field::tests::a_polygon_extent_round_trips ... ok
+test field::tests::field_serde_roundtrip ... ok
+test field_ast::tests::disk_falloff_roundtrip ... ok
+test field_ast::tests::vector_field_serde_roundtrip ... ok
+test field_ast::tests::scalar_field_serde_roundtrip ... ok
+test projection::tests::add_coupling_appends ... ok
+test projection::tests::add_edge_path_rule_appends ... ok
+test projection::tests::add_scalar_returns_lookup_id ... ok
+test projection::tests::new_projection_is_empty ... ok
+test registry::tests::duplicate_name_keeps_id_and_overwrites_value ... ok
+test registry::tests::insert_and_lookup_scalar ... ok
+test registry::tests::ids_are_distinct_across_kinds ... ok
+test registry::tests::insert_and_lookup_vector ... ok
+test registry::tests::iter_yields_all_entries ... ok
+test registry::tests::name_of_returns_registered_name ... ok
+test projection::tests::serde_roundtrip_preserves_projection ... ok
+test registry::tests::remove_clears_both_maps ... ok
+test registry::tests::remove_returns_false_for_unknown_id ... ok
+test responsive_path::tests::a_cycle_hidden_behind_scalar_scale_is_rejected_before_evaluation ... ok
+test registry::tests::serde_roundtrip_preserves_registry ... ok
+test responsive_path::tests::field_expression_depth_is_limited_before_evaluation ... ok
+test responsive_path::tests::finite_work_and_input_limits_fail_closed ... ok
+test responsive_path::tests::nested_gradient_expansion_is_included_in_the_work_budget ... ok
+test responsive_path::tests::disabled_responses_return_the_straight_fixed_endpoint_path ... ok
+test responsive_path::tests::recursive_field_samples_are_bounded_and_cycles_refused ... ok
+test responsive_path::tests::non_finite_field_outputs_are_refused ... ok
+test responsive_path::tests::attractor_flow_and_vortex_each_change_the_path_shape ... ok
+test responsive_path::tests::zero_response_gains_disable_each_influence_independently ... ok
+test responsive_path::tests::field_and_compatible_link_responses_are_independently_switchable ... ok
+test responsive_path::tests::incompatible_links_do_not_attract_and_ids_and_input_order_survive ... ok
+test responsive_path::tests::geometric_correspondence_ignores_labels_and_handles_reversed_direction ... ok
+
+test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

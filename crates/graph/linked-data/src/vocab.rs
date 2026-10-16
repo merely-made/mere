@@ -195,10 +195,22 @@ mod tests {
 
         // The 2026-09-15 evidence-sense rows are exact.
         for (sub_kind, iri) in [
-            (SemanticSubKind::Supports, "<http://purl.org/spar/cito/supports>"),
-            (SemanticSubKind::Contradicts, "<http://purl.org/spar/cito/disputes>"),
-            (SemanticSubKind::Elaborates, "<http://purl.org/spar/cito/extends>"),
-            (SemanticSubKind::Hyperlink, "<http://purl.org/spar/cito/linksTo>"),
+            (
+                SemanticSubKind::Supports,
+                "<http://purl.org/spar/cito/supports>",
+            ),
+            (
+                SemanticSubKind::Contradicts,
+                "<http://purl.org/spar/cito/disputes>",
+            ),
+            (
+                SemanticSubKind::Elaborates,
+                "<http://purl.org/spar/cito/extends>",
+            ),
+            (
+                SemanticSubKind::Hyperlink,
+                "<http://purl.org/spar/cito/linksTo>",
+            ),
         ] {
             let subject = predicate_iri(sub_kind);
             let quad = quads

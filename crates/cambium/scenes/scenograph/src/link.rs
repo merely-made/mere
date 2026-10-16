@@ -100,7 +100,41 @@ pub struct LinkAssertion {
     pub label: Option<String>,
     pub scope: LinkGraphScope,
     pub asserter: Option<String>,
+    /// First recorded assertion time. Absence stays undated.
+    #[serde(default)]
+    pub first_asserted_ms: Option<u64>,
+    /// Most recent confirmation time; kept under the P1 field name.
     pub asserted_at_ms: Option<u64>,
+    /// A retained withdrawal tombstone. Held-only reads omit withdrawn assertions.
+    #[serde(default)]
+    pub withdrawn: Option<LinkWithdrawal>,
+    #[serde(default)]
+    pub basis: LinkAssertionBasis,
+}
+
+/// Record-time information for an assertion withdrawal.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LinkWithdrawal {
+    pub at_ms: Option<u64>,
+    pub by: Option<String>,
+}
+
+/// Portable read-only projection of why an assertion exists.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LinkAssertionBasis {
+    #[serde(default)]
+    pub note: Option<String>,
+    #[serde(default)]
+    pub method: Option<LinkAssertionMethod>,
+    /// Stored order is preserved; reason-key comparison belongs to admission.
+    #[serde(default)]
+    pub evidence: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LinkAssertionMethod {
+    pub iri: String,
+    pub version: Option<String>,
 }
 
 /// A currently stored family sidecar, retained for P1 reads without
@@ -225,5 +259,24 @@ mod tests {
                 state
             );
         }
+    }
+
+    #[test]
+    fn prior_p1_assertion_json_defaults_new_lifecycle_and_basis_fields() {
+        let old = serde_json::json!({
+            "id": "urn:assertion:old",
+            "predicate": "https://example.test/cites",
+            "recognized_kind": "cites",
+            "label": "an existing claim",
+            "scope": {"kind": "default"},
+            "asserter": "urn:agent:alice",
+            "asserted_at_ms": 42
+        });
+
+        let decoded: LinkAssertion = serde_json::from_value(old).unwrap();
+        assert_eq!(decoded.asserted_at_ms, Some(42));
+        assert_eq!(decoded.first_asserted_ms, None);
+        assert_eq!(decoded.withdrawn, None);
+        assert_eq!(decoded.basis, LinkAssertionBasis::default());
     }
 }

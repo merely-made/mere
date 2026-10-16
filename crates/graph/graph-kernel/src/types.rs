@@ -90,6 +90,98 @@ pub enum GraphScope {
     Custom(String),
 }
 
+/// Retained record-time tombstone for an assertion withdrawal.
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+#[rkyv(derive(Debug, PartialEq, Eq))]
+pub struct AssertionWithdrawal {
+    /// Informative caller-supplied or authored record time; `None` stays
+    /// undated for legacy/imported withdrawals.
+    pub at_ms: Option<u64>,
+    /// Actor IRI when the source supplies one.
+    pub by: Option<String>,
+}
+
+/// Optional account of why an assertion exists. `occurrences` remain with
+/// traversal sidecars until their P6 convergence phase.
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+#[rkyv(derive(Debug, PartialEq, Eq))]
+pub struct AssertionBasis {
+    /// Compatibility projection of the legacy assertion label.
+    #[serde(default)]
+    pub note: Option<String>,
+    #[serde(default)]
+    pub method: Option<AssertionMethod>,
+    /// Source order is retained; reason-key comparison sorts a copy.
+    #[serde(default)]
+    pub evidence: Vec<String>,
+}
+
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+#[rkyv(derive(Debug, PartialEq, Eq))]
+pub struct AssertionMethod {
+    pub iri: String,
+    #[serde(default)]
+    pub version: Option<String>,
+}
+
+impl AssertionBasis {
+    /// L13 reason identity: method IRI without version plus sorted evidence
+    /// references. A plain explicit claim has the empty key.
+    pub fn same_reason_as(&self, other: &Self) -> bool {
+        if self.method.as_ref().map(|method| method.iri.as_str())
+            != other.method.as_ref().map(|method| method.iri.as_str())
+        {
+            return false;
+        }
+        let mut left = self.evidence.iter().map(String::as_str).collect::<Vec<_>>();
+        let mut right = other
+            .evidence
+            .iter()
+            .map(String::as_str)
+            .collect::<Vec<_>>();
+        left.sort_unstable();
+        right.sort_unstable();
+        left.dedup();
+        right.dedup();
+        left == right
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.note.is_none() && self.method.is_none() && self.evidence.is_empty()
+    }
+}
+
 static NEXT_LOCAL_STATEMENT_NONCE: AtomicU64 = AtomicU64::new(1);
 static STATEMENT_MINTER_SALT: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
 
