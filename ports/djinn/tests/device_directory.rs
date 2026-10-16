@@ -16,15 +16,18 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::resident_devices::{
     self, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryEndpoint,
     DeviceDirectorySource, DeviceDirectoryV1, read_directory,
 };
-use graphshell::identity::VaultProtectionView;
-use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
+use graphshell_endpoint::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
+};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::identity::VaultProtectionView;
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
 

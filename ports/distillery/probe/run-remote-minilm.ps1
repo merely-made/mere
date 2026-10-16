@@ -24,7 +24,8 @@ $ownedStatus = git -C $mereRoot status --porcelain -- `
     crates/intel/esp `
     crates/mesh/mesh `
     crates/mesh/host `
-    crates/murm/transport `
+    Cargo.toml `
+    Cargo.lock `
     support/patches/burn-remote
 $env:DISTILLERY_REMOTE_PROBE_DIRTY = if ($ownedStatus) { 'true' } else { 'false' }
 

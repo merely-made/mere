@@ -1,0 +1,28 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "test",
+    "--manifest-path",
+    "repos/mere/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-j2",
+    "--no-fail-fast",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-genet-winit-host",
+    "-p",
+    "mesquite"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 395.0,
+  "environment": {
+    "CARGO_TARGET_DIR": "C:\\t\\cargo-targets\\mere",
+    "CARGO_BUILD_BUILD_DIR": "C:\\t\\cargo-targets\\mere\\build",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  }
+}

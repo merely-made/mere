@@ -11,7 +11,7 @@
 //! read, and replays to any step on request; it keeps no cursor, no redo
 //! stack and no step bound. Editing behaviour (where a viewer stands, undo,
 //! redo, truncate-on-commit) belongs to the host, which can keep traces in
-//! Cambium's `edit-history`. A position to share travels in the host's own
+//! Cambium's `backstep`. A position to share travels in the host's own
 //! link or citation, not here.
 //!
 //! This is scene-edit history only. Authority-revision history, the sequence

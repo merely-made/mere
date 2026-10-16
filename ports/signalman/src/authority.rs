@@ -15,13 +15,20 @@
 use std::io;
 use std::sync::Arc;
 
-use graphshell::native::app_admission::{AppId, configured_app_endpoint};
-use graphshell::native::custody::{CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest};
-use graphshell::native::custody_client::{BlockingCustodyClient, CustodyClientError};
+use graphshell_endpoint::door::app_admission::{AppId, configured_app_endpoint};
+use graphshell_endpoint::door::custody::{
+    CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest,
+};
+use graphshell_endpoint::door::custody_client::{BlockingCustodyClient, CustodyClientError};
 use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
 use pandect::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::RetainedKeys;
 use personae::carry::DeviceGrantSet;
+
+mod sennet;
+mod tucket;
+pub use sennet::ReleasedSennetStation;
+pub use tucket::{ReleasedTucketStation, StationCustodyLease, TucketCustodyLease};
 
 /// The application name Signalman connects to djinn as.
 pub const SIGNALMAN_APP: &str = "signalman";
@@ -70,6 +77,16 @@ impl Default for DjinnStationAuthority {
 }
 
 impl DjinnStationAuthority {
+    /// Release only one device/realm's Tucket seed and its checked attestation.
+    pub fn release_tucket(
+        &self,
+        device_id: DeviceId,
+        realm: &str,
+    ) -> Result<RetainedKeys, CustodyClientError> {
+        let salt = personae::tucket::station_salt(device_id.as_uuid().as_bytes(), realm)
+            .map_err(CustodyClientError::Release)?;
+        self.with_client(|client| client.release(KeySource::Wallet, vec![salt]))
+    }
     /// djinn at an explicit first-party endpoint.
     pub fn at(endpoint: impl Into<String>) -> Self {
         Self {

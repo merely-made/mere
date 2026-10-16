@@ -94,6 +94,8 @@ pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
 // session core and the lifecycle (reservoir plan V2).
 pub mod graph_session;
+// Observed stable-ID live commands over the complete session writer.
+pub mod live_graph;
 // Producer-owned, content-addressed recipes for reopening a source at a
 // cursor with existing durable curation. Source resolution stays at the host.
 pub mod live_view;
@@ -105,6 +107,8 @@ pub mod notochord_policy_store;
 #[cfg(test)]
 mod resource_content_merge_tests;
 pub mod snapshot_merge;
+// The merge rules Compose and session merge-in share (session merge-in note, M8).
+pub mod merge_rules;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod station_grant;
 // The frame.json pane-layout store moved OUT with the pane model at
@@ -188,15 +192,17 @@ pub use facet_store::{
 #[cfg(not(target_arch = "wasm32"))]
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
-    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, GraphValidator, Kept,
-    MereSessions, Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, DroppedChoice, GraphSession,
+    GraphValidator, Kept, MereSessions, MergeChoice, MergeConflict, MergeMatch, Pending,
+    PendingMerge, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    branched_session_name, forked_session_name, picked_session_name,
 };
 pub use identity::StartupUnlockMode;
 pub use wallet_sealed_backend::WalletSealedBackend;
 // The ids and author the session schema names, so a host can name them
 // through pandect.
 pub use incipit::{GraphId, SessionId};
-pub use kernel::graph::{Author, AuthorKind, CapturedDelta};
+pub use kernel::graph::{Author, AuthorKind, CapturedDelta, Part};
 pub use live_view::{
     LIVE_VIEW_RECORD_SCHEMA_ID, LIVE_VIEW_RECORD_VERSION, LiveViewCursor, LiveViewRecord,
     LiveViewRecordError, LiveViewSource, LiveViewSourceError, LiveViewSourceResolver,
@@ -204,8 +210,8 @@ pub use live_view::{
     open_live_view_record, save_live_view_record, save_live_view_record_sealed,
 };
 pub use manifest::{
-    CodicilId, EngineProfileBinding, GraphSessionManifest, MANIFEST_SCHEMA_VERSION, PersonaId,
-    SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
+    CodicilId, EngineProfileBinding, GraphSessionManifest, Lineage, MANIFEST_SCHEMA_VERSION,
+    MergedMark, PersonaId, PickedFrom, SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
 };
 pub use manifest_store::{LoadFailure, LoadReport, MANIFEST_FILE, ManifestStore, TRASH_DIR};
 #[cfg(not(target_arch = "wasm32"))]

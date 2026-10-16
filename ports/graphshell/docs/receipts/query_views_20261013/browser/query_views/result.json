@@ -1,0 +1,1192 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        737,
+        271
+      ],
+      "canvas_physical_size": [
+        1474,
+        542
+      ],
+      "log": [
+        "waited 0 frames",
+        "captured query_shared_resource_links_and_edges",
+        "waited 0 frames",
+        "captured query_frozen_resource",
+        "waited 0 frames",
+        "captured query_configured_edge_stroke",
+        "waited 0 frames",
+        "captured query_exact_empty",
+        "waited 0 frames",
+        "captured query_restored_members",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "owner_observation": {
+          "actual_app_present": true,
+          "actual_graph_session": "656e9bca-02ae-40b3-9e33-47ea677cefb6",
+          "actual_session_changes": 0,
+          "forme_model_session": "656e9bca-02ae-40b3-9e33-47ea677cefb6",
+          "forme_region_id": "0db82d7b-14f4-4f9c-bc96-5a3d6e2367ea",
+          "forme_session_matches": true,
+          "schema": "graphshell.actual-owner-observation/v1"
+        },
+        "reopened": true,
+        "save_state": "saved",
+        "selected": null,
+        "session": "656e9bca-02ae-40b3-9e33-47ea677cefb6",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "query_shared_resource_links_and_edges",
+        "width": 2074,
+        "height": 1278,
+        "bytes": 450570
+      },
+      {
+        "name": "query_frozen_resource",
+        "width": 2074,
+        "height": 1278,
+        "bytes": 484898
+      },
+      {
+        "name": "query_configured_edge_stroke",
+        "width": 2074,
+        "height": 1278,
+        "bytes": 448918
+      },
+      {
+        "name": "query_exact_empty",
+        "width": 2074,
+        "height": 1278,
+        "bytes": 449186
+      },
+      {
+        "name": "query_restored_members",
+        "width": 2074,
+        "height": 1278,
+        "bytes": 448734
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Graphshell",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "status",
+              "label": "saved graph \u00b7 18 nodes \u00b7 selected: 0 \u00b7 primary: none",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Open selected in workbench",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Return to Mere",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "status",
+                  "label": "Graph status",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Undo session",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Redo session",
+                  "children": []
+                },
+                {
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Add an object",
+                      "expanded": false,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect selected access",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect fields",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Open details",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Workbench",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "tablist",
+                                  "label": "Source view",
+                                  "children": [
+                                    {
+                                      "role": "tab",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Close Source view",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "article",
+                                      "label": "Reading access Source view",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Show in Mere",
+                                          "description": "urn:uuid:156f2145-05ca-4615-bece-1e179d99938c",
+                                          "children": []
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "heading",
+                                              "label": "Source view",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "children": [
+                                                {
+                                                  "role": "img",
+                                                  "label": "Cross-stratum edge: shown binding: 32ad7c62-3f47-4429-8c5c-829f9a9dab2c to 6d6d4b37-bef8-57c3-aaff-45b1e122fe49; source Surface to Resource",
+                                                  "box": [
+                                                    531,
+                                                    711,
+                                                    350,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Cross-stratum edge: shown binding: 94ca7ae1-e572-4542-be73-4d62b32b12e5 to 6d6d4b37-bef8-57c3-aaff-45b1e122fe49; source Surface to Resource",
+                                                  "box": [
+                                                    531,
+                                                    881,
+                                                    389,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Cross-stratum edge: shown binding: 9bd5419c-8f04-4359-a992-3e5355f32e00 to 7eeb83dd-e730-56d5-b4ac-7e14900e51c6; source Surface to Resource",
+                                                  "box": [
+                                                    531,
+                                                    1051,
+                                                    389,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Resource link: 6d6d4b37-bef8-57c3-aaff-45b1e122fe49 to 8ede0076-b866-5ae2-a7f7-51b449b0fc9a; source Resource to Resource",
+                                                  "box": [
+                                                    181,
+                                                    711,
+                                                    340,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Resource link: 6d6d4b37-bef8-57c3-aaff-45b1e122fe49 to fda360c2-e87f-5556-8583-99421f5750d1; source Resource to Resource",
+                                                  "box": [
+                                                    181,
+                                                    711,
+                                                    510,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Resource link: 6d6d4b37-bef8-57c3-aaff-45b1e122fe49 to 7eeb83dd-e730-56d5-b4ac-7e14900e51c6; source Resource to Resource",
+                                                  "box": [
+                                                    181,
+                                                    711,
+                                                    170,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Resource link: 32ad7c62-3f47-4429-8c5c-829f9a9dab2c to 9bd5419c-8f04-4359-a992-3e5355f32e00; source Resource to Resource",
+                                                  "box": [
+                                                    531,
+                                                    711,
+                                                    340,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Resource link: 94ca7ae1-e572-4542-be73-4d62b32b12e5 to 9bd5419c-8f04-4359-a992-3e5355f32e00; source Resource to Resource",
+                                                  "box": [
+                                                    531,
+                                                    881,
+                                                    170,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "img",
+                                                  "label": "Surface link: 94ca7ae1-e572-4542-be73-4d62b32b12e5 to 9bd5419c-8f04-4359-a992-3e5355f32e00; source Surface to Surface",
+                                                  "box": [
+                                                    531,
+                                                    881,
+                                                    170,
+                                                    3
+                                                  ],
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Resource: https://query.example/source",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "role": "button",
+                                                      "label": "Open Independent source access",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "role": "button",
+                                                      "label": "Open Query source",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Surface: Independent source access",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Surface: Query source",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Resource: https://query.example/target",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "role": "button",
+                                                      "label": "Open Query target",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Surface: Query target",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Resource: Music (urn:author:alice)",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "article",
+                                                  "label": "Resource: Music (urn:author:bob)",
+                                                  "children": [
+                                                    {
+                                                      "role": "paragraph",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 1: Cross-stratum edge: shown binding",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 2: Cross-stratum edge: shown binding",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 3: Cross-stratum edge: shown binding",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 4: Resource link",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 5: Resource link",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 6: Resource link",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 7: Resource link",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 8: Resource link",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Inspect query relation 9: Surface link",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "paragraph",
+                                              "children": []
+                                            },
+                                            {
+                                              "role": "button",
+                                              "label": "Freeze current query selection",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Appearance",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Appearance status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Inspector",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "status",
+                      "label": "Storage: IndexedDB reopened \u00b7 persistent",
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Speed status",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Physics status",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Find and filter",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Scenes and transfers",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Projection editor",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "History",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Explain selected dynamics",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Presentation rules",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Saved query views",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "New query view",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Edit query: Source view",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Inspect frozen selection c37d8c50-4afc-519a-8c03-ca7d276ae292",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "textbox",
+                              "label": "Query view title",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "textbox",
+                              "label": "SELECT query",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "textbox",
+                              "label": "Query member budget",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "textbox",
+                              "label": "Query appearance budget",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "textbox",
+                              "label": "Query relation budget",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: research (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: transport (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: address (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: local (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: reference (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: scene (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: remote (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: projection (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: identity (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: public (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: device (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: key-reference (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: grant (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: receipt (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: synthetic (personae://persona/alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: Music (urn:author:alice)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Use tag: Music (urn:author:bob)",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Show Resources and held appearances",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Tag context: true",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Resource link stroke: solid",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Surface link stroke: solid",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Cross-stratum edge stroke: dotted",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Save query view",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Copyable saved query definition",
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Query view saved",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Fields",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Unlock forme",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Undo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Redo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Hide forme boundary",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Select forme members",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Retry workbench save",
+                              "children": []
+                            },
+                            {
+                              "role": "status",
+                              "label": "Workbench saved",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Remote session",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1037,
+      "height": 639
+    }
+  },
+  "collected_at_utc": "2026-10-14T05:14:44.064511+00:00"
+}

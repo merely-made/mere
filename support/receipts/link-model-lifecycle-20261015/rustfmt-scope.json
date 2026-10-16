@@ -1,0 +1,306 @@
+[
+  {
+    "path": "crates/cambium/scenes/scenograph/src/link.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/build_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/link_reading.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/link_reading_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/relationship_topology_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/responsive_link_adapter.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/responsive_link_adapter_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/canvas/pictograph/src/canvas/tests/rings.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/apply.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/assertion_write.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/capture.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/edge_data.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/edge_ops.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/edge_payload.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/predicate_declarations.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/query.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/relation_read.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/resource.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/resource_tags.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/revert.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/snapshot/from.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/snapshot/tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/snapshot/to.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/assertion_lifecycle.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/assertion_replay.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/assertions.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/legacy_assertions.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/mod.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/nodes_and_edges.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/production_routing.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/resource_lifecycle.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/persistence_edge.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/types.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/tests/assertion_lifecycle_reopen.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/ingest.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/ingest/apply.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/ingest/exact.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/ingest/tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/jsonld.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/jsonld/tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/jsonld/tests/descriptions.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/lib.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/query.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/reifier.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/serialize.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/statements.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/statements_pending_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/graph/linked-data/src/vocab.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/system/content-contract/src/lib.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/system/pandect/src/graph_session.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/system/pandect/src/snapshot_merge.rs",
+    "formatted": true
+  },
+  {
+    "path": "crates/system/pandect/tests/live_graph.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/bin/h7_sync_peer.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/lib.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/link_inspection.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/link_inspection/tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/local_edit/tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/mere_host.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/personal_sync.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/personal_sync/assertions.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/presentation_binding.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/presentation_binding_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/product.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/responsive_links.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/responsive_links_tests.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/transfer.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree/lane.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree/link_inspection.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree/presentation.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree/product.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree/product_off.rs",
+    "formatted": true
+  },
+  {
+    "path": "ports/graphshell/src/web_tree/responsive_links.rs",
+    "formatted": true
+  }
+]

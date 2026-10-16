@@ -312,38 +312,18 @@ fn arrangement_projections(
     out
 }
 
-/// The goldens, taken on `7ea4b77f` before anything moved (G2b step 1).
+/// The goldens. G2b step 1 took the first set on `7ea4b77f`, before anything
+/// moved; they held one machine's maths library, not the arrangements alone.
+/// The Spiral's and Radial's angles went through the platform's `sinf` and
+/// `cosf`, which macOS, glibc and the capturing machine round differently in
+/// the last bits: the same commit gave three tables, and `768a2a94f` kept a
+/// Linux one beside the historical set, which aarch64 macOS never matched.
+/// The solvers now route their transcendentals through `libm` (scenomise's
+/// `math`), so one table holds on every target. Retaken here: against the
+/// platform maths it replaced, 71 of the 500 Spiral positions and 8 of the
+/// 500 Radial ones move, by at most two ulps (0.0002 px).
 #[rustfmt::skip]
-const HISTORICAL_GOLDENS: &[(&str, &str, u64, u64)] = &[
-    ("topic", "phyllotaxis.default recent_first true", 0x11d4ed56b1ecd0da, 0x4b58e36d54859225),
-    ("topic", "phyllotaxis.default recent_first false", 0xb8309ba62e9f1b4a, 0x5969b7597f373d27),
-    ("topic", "grid.default recent_first true", 0x43ad04ce7ccbfeca, 0x0000000000000000),
-    ("topic", "spectral.default recent_first true", 0x4dd47e18a22025f5, 0x0000000000000000),
-    ("topic", "penrose.default recent_first true", 0x3cdc98d37bf9b14a, 0x0000000000000000),
-    ("topic", "lsystem.default recent_first true", 0x39409c082dbd6d6f, 0x0000000000000000),
-    ("topic", "kanban.default recent_first true", 0x4e390e0f086b4059, 0x0000000000000000),
-    ("topic", "kanban.community recent_first true", 0x7d9ec76289cca0bd, 0x0000000000000000),
-    ("topic", "timeline.default recent_first true", 0x2812629cb6301615, 0x0000000000000000),
-    ("topic", "radial.default focus 0", 0x7b86498e83ab96e0, 0x0000000000000000),
-    ("topic", "radial weighted focus 0", 0xa7e7b5d148b5387f, 0x0000000000000000),
-    ("generated 500", "phyllotaxis.default recent_first true", 0x5fecef5b283f1e94, 0xbf7d39e9cb5455cd),
-    ("generated 500", "phyllotaxis.default recent_first false", 0xb91bd9d03607c36c, 0x18f34e3ca4421cfd),
-    ("generated 500", "grid.default recent_first true", 0x2c8eb12fa9da7098, 0x0000000000000000),
-    ("generated 500", "spectral.default recent_first true", 0xd0d787a1609d27d1, 0x0000000000000000),
-    ("generated 500", "penrose.default recent_first true", 0x6c7bd7d4d9651718, 0x0000000000000000),
-    ("generated 500", "lsystem.default recent_first true", 0xf5f0f54024d08202, 0x0000000000000000),
-    ("generated 500", "kanban.default recent_first true", 0x8e1d4d588a6c9fb9, 0x0000000000000000),
-    ("generated 500", "kanban.community recent_first true", 0x0ef74f7fc29541f7, 0x0000000000000000),
-    ("generated 500", "timeline.default recent_first true", 0x9b32cf772f256e3b, 0x0000000000000000),
-    ("generated 500", "radial.default focus 0", 0xb5efdbb33d9b168b, 0x0000000000000000),
-    ("generated 500", "radial weighted focus 0", 0x401f146407bdb99a, 0x0000000000000000),
-];
-
-// Captured independently from untouched main e5a24a4af on Linux. Keep the
-// historical captures too; their arithmetic differs from this platform's
-// bit hashes. The paired-store test below qualifies the new routing directly.
-#[rustfmt::skip]
-const LINUX_GOLDENS: &[(&str, &str, u64, u64)] = &[
+const GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("topic", "phyllotaxis.default recent_first true", 0x11d4ed56b1ecd0da, 0x4b58e36d54859225),
     ("topic", "phyllotaxis.default recent_first false", 0xb8309ba62e9f1b4a, 0x5969b7597f373d27),
     ("topic", "grid.default recent_first true", 0x43ad04ce7ccbfeca, 0x0000000000000000),
@@ -355,8 +335,8 @@ const LINUX_GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("topic", "timeline.default recent_first true", 0x2812629cb6301615, 0x0000000000000000),
     ("topic", "radial.default focus 0", 0x7b86498e83ab96e0, 0x0000000000000000),
     ("topic", "radial weighted focus 0", 0x143223deca19b751, 0x0000000000000000),
-    ("generated 500", "phyllotaxis.default recent_first true", 0xe35641c388bd0762, 0xbf7d39e9cb5455cd),
-    ("generated 500", "phyllotaxis.default recent_first false", 0x05cc902e1c85a84e, 0x18f34e3ca4421cfd),
+    ("generated 500", "phyllotaxis.default recent_first true", 0xbc5c195c1e3ba247, 0xbf7d39e9cb5455cd),
+    ("generated 500", "phyllotaxis.default recent_first false", 0x327bd615bc120833, 0x18f34e3ca4421cfd),
     ("generated 500", "grid.default recent_first true", 0x2c8eb12fa9da7098, 0x0000000000000000),
     ("generated 500", "spectral.default recent_first true", 0xd0d787a1609d27d1, 0x0000000000000000),
     ("generated 500", "penrose.default recent_first true", 0x6c7bd7d4d9651718, 0x0000000000000000),
@@ -364,15 +344,9 @@ const LINUX_GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("generated 500", "kanban.default recent_first true", 0x8e1d4d588a6c9fb9, 0x0000000000000000),
     ("generated 500", "kanban.community recent_first true", 0x0ef74f7fc29541f7, 0x0000000000000000),
     ("generated 500", "timeline.default recent_first true", 0x9b32cf772f256e3b, 0x0000000000000000),
-    ("generated 500", "radial.default focus 0", 0xa15022c25bb7cea3, 0x0000000000000000),
-    ("generated 500", "radial weighted focus 0", 0xb6d38886135c5dc3, 0x0000000000000000),
+    ("generated 500", "radial.default focus 0", 0xb5efdbb33d9b168b, 0x0000000000000000),
+    ("generated 500", "radial weighted focus 0", 0x401f146407bdb99a, 0x0000000000000000),
 ];
-
-const GOLDENS: &[(&str, &str, u64, u64)] = if cfg!(target_os = "linux") {
-    LINUX_GOLDENS
-} else {
-    HISTORICAL_GOLDENS
-};
 
 #[test]
 fn every_arrangement_matches_its_golden_on_both_fixtures() {

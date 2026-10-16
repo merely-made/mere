@@ -9,7 +9,7 @@
 //! moving the position is undo and redo, and committing after a move is
 //! `History::record` clearing redo. Scenotime itself keeps no cursor.
 
-use edit_history::History;
+use backstep::History;
 use sceno::{Footprint, InstanceId, ProjectedItem, Representation, Scene, SourceRef, Transform2};
 use scenotime::{Revision, SceneDiff, SceneEpoch, SceneOp, SceneSnapshot, SceneTrace, TraceStep};
 

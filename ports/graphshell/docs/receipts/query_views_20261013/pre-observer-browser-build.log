@@ -1,0 +1,1616 @@
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261011#d8acabc9)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+warning: unused import: `cubecl_environment::config::RuntimeConfig`
+  --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tuner.rs:22:5
+   |
+22 | use cubecl_environment::config::RuntimeConfig;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `batch_success`
+   --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tuner.rs:435:13
+    |
+435 |         let batch_success = false;
+    |             ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_batch_success`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `warmup_once` is never used
+  --> C:\Users\mark_\Code\repos\mere\support\patches\cubecl-runtime\src\tune\tune_benchmark.rs:48:19
+   |
+43 | impl<F: TuneInputs, Out: AutotuneOutput> TuneFn<F, Out> {
+   | ------------------------------------------------------- method in this implementation
+...
+48 |     pub(crate) fn warmup_once<'a>(
+   |                   ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cubecl-runtime` (lib) generated 3 warnings (run `cargo fix --lib -p cubecl-runtime` to apply 1 suggestion)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling paint_list_api v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling netrender_device v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling netrender v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling paint_list_render v0.1.2 (https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:707:19
+    |
+404 | impl Graph {
+    | ---------- methods in this implementation
+...
+707 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+721 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+743 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, and `assert_semantic_predicate_in_scope` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_payload.rs:268:19
+    |
+ 55 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+268 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+272 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+281 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\resource_content.rs:86:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+ 86 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_ops.rs:177:19
+    |
+ 32 | impl Graph {
+    | ---------- methods in this implementation
+...
+177 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+244 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+261 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+279 |     pub(crate) fn replay_assert_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+307 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+418 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+601 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\query.rs:227:19
+    |
+220 | impl Graph {
+    | ---------- method in this implementation
+...
+227 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 14 warnings (run `cargo fix --lib -p mere-kernel` to apply 6 suggestions)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\producer\registry.rs:36:10
+   |
+36 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+36 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+36 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\host.rs:114:10
+    |
+114 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+114 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+114 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: `cambium-rootstock` (lib) generated 3 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+   Compiling uxtree v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\forme\uxtree)
+   Compiling browsing-context-api v0.1.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+warning: function `build_affinity_spring` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas.rs:66:4
+   |
+66 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pictograph` (lib) generated 1 warning
+   Compiling genet-documents v0.1.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling mere-linked-data v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\graph\linked-data)
+warning: methods `is_plain_property` and `is_plain_edge` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\linked-data\src\ingest\envelope.rs:163:12
+    |
+ 53 | impl ImportEvidence {
+    | ------------------- methods in this implementation
+...
+163 |     pub fn is_plain_property(&self, subject: &str, property: &NodeProperty) -> bool {
+    |            ^^^^^^^^^^^^^^^^^
+...
+168 |     pub fn is_plain_edge(&self, index: usize) -> bool {
+    |            ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-linked-data` (lib) generated 1 warning
+   Compiling mere-document-lanes v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\document-lanes)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb5)
+   Compiling pelt-core v0.2.0 (C:\Users\mark_\Code\repos\mere\ports\pelt\core)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\ports\pelt\core\src\pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> C:\Users\mark_\Code\repos\mere\ports\pelt\core\src\lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: `pelt-core` (lib) generated 2 warnings (run `cargo fix --lib -p pelt-core` to apply 2 suggestions)
+   Compiling mesquite v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mesquite)
+warning: unused import: `std::io`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: method `into_graph` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\graph_codicil.rs:149:19
+    |
+148 | impl GraphCodicil {
+    | ----------------- method in this implementation
+149 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 7 warnings (run `cargo fix --lib -p pandect` to apply 6 suggestions)
+   Compiling mere v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\mere)
+   Compiling platen v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\platen\platen)
+   Compiling graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\ports\graphshell\src\retained_content\producer.rs:32:14
+   |
+32 |         NEXT.fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+32 -         NEXT.fetch_update(
+32 +         NEXT.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> C:\Users\mark_\Code\repos\mere\ports\graphshell\src\retained_content\producer.rs:136:30
+    |
+136 |                         NEXT.fetch_update(
+    |                              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+136 -                         NEXT.fetch_update(
+136 +                         NEXT.try_update(
+    |
+
+warning: unused import: `personae::AttestationKeys`
+  --> C:\Users\mark_\Code\repos\mere\ports\graphshell\src\webrtc_door.rs:78:5
+   |
+78 | use personae::AttestationKeys;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `begin_session` is never used
+   --> C:\Users\mark_\Code\repos\mere\ports\graphshell\src\mere_host.rs:386:19
+    |
+225 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+386 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `codicil_graph` is never used
+    --> C:\Users\mark_\Code\repos\mere\ports\graphshell\src\product.rs:1102:4
+     |
+1102 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> C:\Users\mark_\Code\repos\mere\ports\graphshell\src\product.rs:1504:15
+     |
+1504 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `graphshell` (lib) generated 6 warnings (run `cargo fix --lib -p graphshell` to apply 2 suggestions)
+   Compiling cambium-genet-web-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\recovery.rs:33:18
+   |
+33 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+33 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+33 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+582 | /     listen!(
+583 | |         canvas,
+584 | |         "pointerdown",
+585 | |         web_sys::PointerEvent,
+...   |
+606 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+611 | /     listen!(
+612 | |         canvas,
+613 | |         "pointermove",
+614 | |         web_sys::PointerEvent,
+...   |
+628 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+633 | /     listen!(
+634 | |         canvas,
+635 | |         "pointerup",
+636 | |         web_sys::PointerEvent,
+...   |
+657 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+661 | /     listen!(
+662 | |         canvas,
+663 | |         "pointercancel",
+664 | |         web_sys::PointerEvent,
+...   |
+678 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+682 | /     listen!(
+683 | |         canvas,
+684 | |         "wheel",
+685 | |         web_sys::WheelEvent,
+...   |
+701 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+767 | /     listen!(
+768 | |         root,
+769 | |         "click",
+770 | |         web_sys::MouseEvent,
+...   |
+777 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-web-host\src\mount.rs:568:17
+    |
+568 |               let mut handler = $handler;
+    |                   ----^^^^^^^
+    |                   |
+    |                   help: remove this `mut`
+...
+806 | /     listen!(
+807 | |         canvas,
+808 | |         "focus",
+809 | |         web_sys::FocusEvent,
+810 | |         move |_: web_sys::FocusEvent| m.take_focus()
+811 | |     );
+    | |_____- in this macro invocation
+    |
+    = note: this warning originates in the macro `listen` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: `cambium-genet-web-host` (lib) generated 8 warnings (run `cargo fix --lib -p cambium-genet-web-host` to apply 8 suggestions)
+   Compiling graphshell-web v0.1.0 (C:\Users\mark_\Code\repos\mere\ports\graphshell\web)
+warning: unused import: `std::rc::Rc`
+  --> ..\src\web_timing.rs:24:5
+   |
+24 | use std::rc::Rc;
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `serde::Deserialize`
+  --> ..\src\web_main.rs:21:5
+   |
+21 | use serde::Deserialize;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AccessRecordFilter`, `AccessRecord`, and `query_access_records`
+  --> ..\src\web_main.rs:25:26
+   |
+25 | use graphshell::access::{AccessRecord, AccessRecordFilter, query_access_records};
+   |                          ^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `BROWSER_HISTORY_HANDLER_PREFIX`, `BrowserHistoryCapture`, `BrowserVisit`, `CaptureOutcome`, and `ForgetMode`
+  --> ..\src\web_main.rs:29:5
+   |
+29 |     BROWSER_HISTORY_HANDLER_PREFIX, BrowserHistoryCapture, BrowserVisit, CaptureOutcome,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^^^^^
+30 |     ForgetMode, HistoryCapturePolicy,
+   |     ^^^^^^^^^^
+
+warning: unused imports: `Appearance`, `Encoding`, `Interaction`, `Reading`, `SelectionMode`, and `SourceBinding`
+  --> ..\src\web_main.rs:39:5
+   |
+39 |     Appearance, Channel, EditorAction, Encoding, Interaction, ProjectionDefinition,
+   |     ^^^^^^^^^^                         ^^^^^^^^  ^^^^^^^^^^^
+40 |     ProjectionDefinitionSink, ProjectionDraft, ProjectionEditor, ProjectionPanel, Provenance,
+41 |     PublicSourceRevision, Reading, RevisionEvidence, SelectionMode, SourceBinding,
+   |                           ^^^^^^^                    ^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+warning: multiple fields are never read
+   --> ..\src\web_main.rs:64:5
+    |
+ 63 | struct BrowserHost {
+    |        ----------- fields in this struct
+ 64 |     host_appearance: crate::web_appearance::Handle,
+    |     ^^^^^^^^^^^^^^^
+ 65 |     appearance_revision: u64,
+    |     ^^^^^^^^^^^^^^^^^^^
+...
+ 80 |     period_worker: web_period_worker::PeriodWorker,
+    |     ^^^^^^^^^^^^^
+ 81 |     layout_moved: bool,
+    |     ^^^^^^^^^^^^
+...
+ 93 |     gpu: GpuPresenter,
+    |     ^^^
+ 94 |     chrome_scene: Scene,
+    |     ^^^^^^^^^^^^
+ 95 |     /// Retained shaping state and the shipped font (see `run`).
+ 96 |     chrome_text: TextSystem,
+    |     ^^^^^^^^^^^
+...
+110 |     physics_paused: bool,
+    |     ^^^^^^^^^^^^^^
+111 |     physics_damping: f32,
+    |     ^^^^^^^^^^^^^^^
+...
+116 |     last_export: String,
+    |     ^^^^^^^^^^^
+...
+119 |     saved_scene: Option<SavedSceneV3>,
+    |     ^^^^^^^^^^^
+120 |     arrangement_transition: Option<graphshell::canvas_physics::ArrangementTransition>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^
+...
+126 |     practice_scene: Scene,
+    |     ^^^^^^^^^^^^^^
+...
+139 |     camera_mark: Option<(f32, f32)>,
+    |     ^^^^^^^^^^^
+...
+146 |     scenario_frames: u32,
+    |     ^^^^^^^^^^^^^^^
+...
+150 |     deferred_dom: Vec<DomAction>,
+    |     ^^^^^^^^^^^^
+151 |     capture_request: Option<String>,
+    |     ^^^^^^^^^^^^^^^
+152 |     capture_pending: Option<(String, PendingCapture)>,
+    |     ^^^^^^^^^^^^^^^
+...
+156 |     timing: web_timing::FrameTiming,
+    |     ^^^^^^
+...
+160 |     layout_log: Vec<String>,
+    |     ^^^^^^^^^^
+161 |     /// The last `measure-faces` reading, for the snapshot.
+162 |     faces: Option<graphshell::canvas_faces::FaceAlignment>,
+    |     ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `SessionProjectionSink` is never constructed
+   --> ..\src\web_main.rs:167:8
+    |
+167 | struct SessionProjectionSink<'a> {
+    |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `initial_projection_draft` is never used
+   --> ..\src\web_main.rs:185:4
+    |
+185 | fn initial_projection_draft() -> ProjectionDraft {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `draft_from_definition` is never used
+   --> ..\src\web_main.rs:189:4
+    |
+189 | fn draft_from_definition(definition: &ProjectionDefinition) -> ProjectionDraft {
+    |    ^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ..\src\web_main.rs:266:8
+    |
+193 | impl BrowserHost {
+    | ---------------- associated items in this implementation
+...
+266 |     fn resize_if_needed(&mut self) {
+    |        ^^^^^^^^^^^^^^^^
+...
+283 |     fn render(&mut self, host_ms: f64) -> Result<(), String> {
+    |        ^^^^^^
+...
+291 |     fn render_frame(&mut self, host_ms: f64) -> Result<(), String> {
+    |        ^^^^^^^^^^^^
+...
+387 |     fn finish_capture(&mut self) -> Result<(), String> {
+    |        ^^^^^^^^^^^^^^
+...
+406 |     fn advance_arrangement_transition(&mut self, host_ms: f64) {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+420 |     fn run_command(&mut self, command: &str) -> bool {
+    |        ^^^^^^^^^^^
+...
+517 |     fn select_projection_panel(&mut self, panel: &str) {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+...
+529 |     fn update_projection_field(&mut self, field: &str, value: &str) {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+...
+545 |     fn step_projection(&mut self, back: bool) {
+    |        ^^^^^^^^^^^^^^^
+...
+568 |     fn step_session(&mut self, back: bool) {
+    |        ^^^^^^^^^^^^
+...
+595 |     fn save_projection(&mut self) {
+    |        ^^^^^^^^^^^^^^^
+...
+629 |     fn reload_projection(&mut self) {
+    |        ^^^^^^^^^^^^^^^^^
+...
+672 |     fn zoom(&mut self, delta: f32) {
+    |        ^^^^
+...
+680 |     fn pan(&mut self, dx: f32, dy: f32) {
+    |        ^^^
+...
+687 |     fn fit_content(&mut self) {
+    |        ^^^^^^^^^^^
+...
+694 |     fn invoke_action(&mut self) {
+    |        ^^^^^^^^^^^^^
+...
+740 |     fn choose_action_draft(&mut self, field: &str, value: &str) {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+745 |     fn submit_action_draft(&mut self) {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+807 |     fn pointer_position(&self, x: i32, y: i32) -> (f32, f32) {
+    |        ^^^^^^^^^^^^^^^^
+...
+815 |     fn pointer_button(button: i16) -> Option<PointerButton> {
+    |        ^^^^^^^^^^^^^^
+
+warning: function `projection_panel` is never used
+   --> ..\src\web_main.rs:825:4
+    |
+825 | fn projection_panel(value: &str) -> Option<ProjectionPanel> {
+    |    ^^^^^^^^^^^^^^^^
+
+warning: function `now_ms` is never used
+   --> ..\src\web_main.rs:852:4
+    |
+852 | fn now_ms() -> u64 {
+    |    ^^^^^^
+
+warning: function `publish_capture_receipt` is never used
+    --> ..\src\web_main.rs:1300:4
+     |
+1300 | fn publish_capture_receipt(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `publish_history_controls` is never used
+    --> ..\src\web_main.rs:1323:4
+     |
+1323 | fn publish_history_controls(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `COMPONENT_MARKUP` is never used
+    --> ..\src\web_main.rs:1511:7
+     |
+1511 | const COMPONENT_MARKUP: &str = include_str!("../web/component.html");
+     |       ^^^^^^^^^^^^^^^^
+
+warning: function `run` is never used
+    --> ..\src\web_main.rs:1519:10
+     |
+1519 | async fn run(root_element: Element) -> Result<(), String> {
+     |          ^^^
+
+warning: function `mount` is never used
+  --> ..\src\web_appearance.rs:64:15
+   |
+64 | pub(crate) fn mount(root: Element, owned: bool) -> Result<Handle, String> {
+   |               ^^^^^
+
+warning: field `active` is never read
+  --> ..\src\web_capture.rs:61:16
+   |
+60 | pub(crate) struct HistoryControlSummary {
+   |                   --------------------- field in this struct
+61 |     pub(crate) active: bool,
+   |                ^^^^^^
+   |
+   = note: `HistoryControlSummary` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `install_events` is never used
+  --> ..\src\web_events.rs:23:15
+   |
+23 | pub(super) fn install_events(state: &Rc<RefCell<BrowserHost>>) -> Result<(), String> {
+   |               ^^^^^^^^^^^^^^
+
+warning: function `schedule_frames` is never used
+   --> ..\src\web_events.rs:347:15
+    |
+347 | pub(super) fn schedule_frames(state: Rc<RefCell<BrowserHost>>) -> Result<(), String> {
+    |               ^^^^^^^^^^^^^^^
+
+warning: constant `CONTENT_KEY` is never used
+  --> ..\src\web_gpu.rs:25:7
+   |
+25 | const CONTENT_KEY: u64 = 1;
+   |       ^^^^^^^^^^^
+
+warning: constant `CHROME_KEY` is never used
+  --> ..\src\web_gpu.rs:26:7
+   |
+26 | const CHROME_KEY: u64 = 2;
+   |       ^^^^^^^^^^
+
+warning: constant `CAPTURE_CONTENT_KEY` is never used
+  --> ..\src\web_gpu.rs:27:7
+   |
+27 | const CAPTURE_CONTENT_KEY: u64 = 3;
+   |       ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `CAPTURE_CHROME_KEY` is never used
+  --> ..\src\web_gpu.rs:28:7
+   |
+28 | const CAPTURE_CHROME_KEY: u64 = 4;
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: fields `buffer`, `width`, `height`, `padded_bytes_per_row`, and `done` are never read
+  --> ..\src\web_gpu.rs:47:5
+   |
+46 | pub(crate) struct PendingCapture {
+   |                   -------------- fields in this struct
+47 |     buffer: wgpu::Buffer,
+   |     ^^^^^^
+48 |     width: u32,
+   |     ^^^^^
+49 |     height: u32,
+   |     ^^^^^^
+50 |     padded_bytes_per_row: u32,
+   |     ^^^^^^^^^^^^^^^^^^^^
+51 |     done: Arc<AtomicBool>,
+   |     ^^^^
+
+warning: methods `ready` and `take` are never used
+  --> ..\src\web_gpu.rs:55:19
+   |
+54 | impl PendingCapture {
+   | ------------------- methods in this implementation
+55 |     pub(crate) fn ready(&self) -> bool {
+   |                   ^^^^^
+...
+60 |     pub(crate) fn take(self) -> Result<(u32, u32, Vec<u8>), String> {
+   |                   ^^^^
+
+warning: fields `core`, `surface`, `blitter`, and `capture_blitter` are never read
+  --> ..\src\web_gpu.rs:78:5
+   |
+77 | pub(crate) struct GpuPresenter {
+   |                   ------------ fields in this struct
+78 |     core: RenderCore,
+   |     ^^^^
+79 |     surface: WindowSurface,
+   |     ^^^^^^^
+80 |     blitter: wgpu::util::TextureBlitter,
+   |     ^^^^^^^
+...
+83 |     capture_blitter: Option<wgpu::util::TextureBlitter>,
+   |     ^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ..\src\web_gpu.rs:89:19
+    |
+ 86 | impl GpuPresenter {
+    | ----------------- associated items in this implementation
+...
+ 89 |     pub(super) fn retain(&self, scene: Scene, old: Option<u64>) -> Result<u64, String> {
+    |                   ^^^^^^
+...
+103 |     pub(super) fn release_fragment(&self, id: u64) {
+    |                   ^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) async fn boot(
+    |                         ^^^^
+...
+135 |     pub(crate) fn capture(
+    |                   ^^^^^^^
+...
+246 |     pub(crate) fn resize(&mut self, width: u32, height: u32) {
+    |                   ^^^^^^
+...
+251 |     pub(crate) fn gpu(&self) -> (&wgpu::Device, &wgpu::Queue) {
+    |                   ^^^
+...
+262 |     pub(crate) fn present(
+    |                   ^^^^^^^
+
+warning: fields `face`, `fragment`, `element`, `rect`, and `visible` are never read
+  --> ..\src\web_practice.rs:65:5
+   |
+64 | struct RetainedControl {
+   |        --------------- fields in this struct
+65 |     face: Face,
+   |     ^^^^
+66 |     fragment: u64,
+   |     ^^^^^^^^
+67 |     element: Element,
+   |     ^^^^^^^
+68 |     rect: [f32; 4],
+   |     ^^^^
+69 |     visible: bool,
+   |     ^^^^^^^
+
+warning: field `controls` is never read
+   --> ..\src\web_practice.rs:103:5
+    |
+ 93 | pub(super) struct PracticeHost {
+    |                   ------------ field in this struct
+...
+103 |     controls: HashMap<String, RetainedControl>,
+    |     ^^^^^^^^
+
+warning: methods `frame` and `publish` are never used
+    --> ..\src\web_practice.rs:965:19
+     |
+ 127 | impl PracticeHost {
+     | ----------------- methods in this implementation
+...
+ 965 |     pub(super) fn frame(
+     |                   ^^^^^
+...
+1203 |     pub(super) fn publish(&self) -> Result<(), String> {
+     |                   ^^^^^^^
+
+warning: function `now` is never used
+    --> ..\src\web_practice.rs:1215:4
+     |
+1215 | fn now() -> f64 {
+     |    ^^^
+
+warning: function `paint_face` is never used
+    --> ..\src\web_practice.rs:1223:4
+     |
+1223 | fn paint_face(face: &Face, text_system: &mut TextSystem) -> Result<Scene, String> {
+     |    ^^^^^^^^^^
+
+warning: method `practice_command` is never used
+    --> ..\src\web_practice.rs:1277:19
+     |
+1276 | impl BrowserHost {
+     | ---------------- method in this implementation
+1277 |     pub(super) fn practice_command(&mut self, command: &str) {
+     |                   ^^^^^^^^^^^^^^^^
+
+warning: function `install` is never used
+    --> ..\src\web_practice.rs:1287:15
+     |
+1287 | pub(super) fn install(state: &Rc<RefCell<BrowserHost>>) -> Result<(), String> {
+     |               ^^^^^^^
+
+warning: constant `DEFAULT_SPRITE` is never used
+  --> ..\src\web_product.rs:33:7
+   |
+33 | const DEFAULT_SPRITE: &str = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAA...
+   |       ^^^^^^^^^^^^^^
+
+warning: function `install_product_events` is never used
+  --> ..\src\web_product.rs:35:15
+   |
+35 | pub(super) fn install_product_events(
+   |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> ..\src\web_product.rs:75:19
+    |
+ 74 | impl BrowserHost {
+    | ---------------- methods in this implementation
+ 75 |     pub(super) fn run_product_command(&mut self, command: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(super) fn sync_canvas(&mut self, selected: &[Uuid], fit: bool) -> Result<(), String> {
+    |                   ^^^^^^^^^^^
+...
+190 |     pub(super) fn apply_saved_scene(&mut self, scene: SavedSceneV3) -> Result<(), String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+213 |     fn add_address(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^
+...
+226 |     fn save_metadata(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^
+...
+251 |     fn add_relation(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^
+...
+271 |     fn select_pair(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^
+...
+286 |     fn apply_filter(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^
+...
+301 |     fn clear_filter(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^
+...
+313 |     fn strategy_choice(&self) -> Option<String> {
+    |        ^^^^^^^^^^^^^^^
+...
+317 |     fn apply_arrangement_from_form(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+333 |     pub(super) fn refresh_representation_score(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+362 |     fn choose_speed_from_form(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+...
+371 |     fn apply_physics_from_form(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+...
+401 |     fn apply_profile_from_form(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+...
+409 |     fn toggle_physics(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^
+...
+423 |     fn apply_face(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^
+...
+436 |     fn apply_role_from_form(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^^^^^^^
+...
+444 |     fn apply_item_role_from_form(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+462 |     fn save_scene(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^
+...
+488 |     fn reopen_scene(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^
+...
+499 |     fn export_codicil(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^^^
+...
+535 |     fn open_codicil(&mut self) -> Result<String, String> {
+    |        ^^^^^^^^^^^^
+...
+559 |     fn focused_member(&self) -> Result<Uuid, String> {
+    |        ^^^^^^^^^^^^^^
+
+warning: function `read_file_metadata` is never used
+   --> ..\src\web_product.rs:831:10
+    |
+831 | async fn read_file_metadata(file: &File) -> Result<LocalFileMetadata, String> {
+    |          ^^^^^^^^^^^^^^^^^^
+
+warning: function `input_value` is never used
+   --> ..\src\web_product.rs:853:4
+    |
+853 | fn input_value(id: &str) -> Result<String, String> {
+    |    ^^^^^^^^^^^
+
+warning: function `selected_handler` is never used
+    --> ..\src\web_product.rs:1035:15
+     |
+1035 | pub(super) fn selected_handler() -> Result<String, String> {
+     |               ^^^^^^^^^^^^^^^^
+
+warning: function `textarea_value` is never used
+    --> ..\src\web_product.rs:1044:4
+     |
+1044 | fn textarea_value(id: &str) -> Result<String, String> {
+     |    ^^^^^^^^^^^^^^
+
+warning: function `set_textarea_value` is never used
+    --> ..\src\web_product.rs:1048:4
+     |
+1048 | fn set_textarea_value(id: &str, value: &str) -> Result<(), String> {
+     |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `checkbox` is never used
+    --> ..\src\web_product.rs:1053:4
+     |
+1053 | fn checkbox(id: &str) -> Result<bool, String> {
+     |    ^^^^^^^^
+
+warning: constant `PRACTICE_DATA` is never used
+  --> ..\src\web_projection.rs:37:7
+   |
+37 | const PRACTICE_DATA: &str = include_str!("../web/fixtures/woodshed-stage.json");
+   |       ^^^^^^^^^^^^^
+
+warning: multiple fields are never read
+  --> ..\src\web_projection.rs:41:5
+   |
+39 | pub(super) struct LiveProjection {
+   |                   -------------- fields in this struct
+40 |     dataset: ProjectionDataset,
+41 |     compiled: Option<CompiledProjection>,
+   |     ^^^^^^^^
+...
+44 |     dirty: bool,
+   |     ^^^^^
+45 |     scene: Scene,
+   |     ^^^^^
+46 |     host_sheet: String,
+   |     ^^^^^^^^^^
+47 |     targets: Vec<Target>,
+   |     ^^^^^^^
+48 |     extent: (u32, u32),
+   |     ^^^^^^
+49 |     title: String,
+   |     ^^^^^
+50 |     axes: String,
+51 |     fields: [String; 2],
+   |     ^^^^^^
+52 |     solves: u64,
+   |     ^^^^^^
+53 |     placement_reuses: u64,
+   |     ^^^^^^^^^^^^^^^^
+...
+56 |     comparing: bool,
+   |     ^^^^^^^^^
+57 |     comparison: Option<Comparison>,
+   |     ^^^^^^^^^^
+58 |     dynamics_comparison: Option<DynamicsComparison>,
+   |     ^^^^^^^^^^^^^^^^^^^
+59 |     dynamics: Option<ProjectionDynamics>,
+60 |     compare_dynamics: bool,
+   |     ^^^^^^^^^^^^^^^^
+...
+63 |     compare_column: usize,
+   |     ^^^^^^^^^^^^^^
+64 |     compare_row: usize,
+   |     ^^^^^^^^^^^
+65 |     /// The draft's arrangement kind, for the scenario lane.
+66 |     arrangement: String,
+   |     ^^^^^^^^^^^
+
+warning: fields `occurrence`, `view`, `label`, `detail`, `rect`, and `selected` are never read
+  --> ..\src\web_projection.rs:71:5
+   |
+70 | struct Target {
+   |        ------ fields in this struct
+71 |     occurrence: String,
+   |     ^^^^^^^^^^
+72 |     view: &'static str,
+   |     ^^^^
+73 |     label: String,
+   |     ^^^^^
+74 |     detail: String,
+   |     ^^^^^^
+75 |     rect: [f32; 4],
+   |     ^^^^
+76 |     selected: bool,
+   |     ^^^^^^^^
+   |
+   = note: `Target` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: multiple methods are never used
+   --> ..\src\web_projection.rs:80:19
+    |
+ 79 | impl BrowserHost {
+    | ---------------- methods in this implementation
+ 80 |     pub(super) fn load_practice_projection(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 84 |     pub(super) fn load_projection_dataset(&mut self, json: &str) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 88 |     pub(super) fn load_projection_input(&mut self, json: &str, definition_json: Option<&str>) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+...
+163 |     pub(super) fn recompile_projection(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+243 |     pub(super) fn toggle_projection_compare(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+255 |     pub(super) fn toggle_projection_dynamics_compare(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+273 |     pub(super) fn set_projection_settle_bound(&mut self, bound: Option<u32>) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+281 |     pub(super) fn toggle_projection_motion(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub(super) fn move_projection_comparison(&mut self, columns: isize, rows: isize) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+310 |     fn refresh_projection_comparison(&mut self) {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+403 |     pub(super) fn pick_projection_compare(&mut self, swatch_id: &str) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+441 |     pub(super) fn projection_arrangement(&mut self, id: &str) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+...
+449 |     pub(super) fn select_projection_occurrence(&mut self, occurrence: &str) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+466 |     pub(super) fn save_live_projection(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+500 |     pub(super) fn reload_live_projection(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `step_projection_save` is never used
+   --> ..\src\web_projection.rs:557:19
+    |
+545 | impl BrowserHost {
+    | ---------------- method in this implementation
+...
+557 |     pub(super) fn step_projection_save(&mut self, back: bool) {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `frame`, `compare_targets`, and `sync_semantics` are never used
+   --> ..\src\web_projection.rs:627:19
+    |
+599 | impl LiveProjection {
+    | ------------------- methods in this implementation
+...
+627 |     pub(super) fn frame(
+    |                   ^^^^^
+...
+792 |     fn compare_targets(&mut self, comparison: Comparison, left: f32, available: f32, height: f32) {
+    |        ^^^^^^^^^^^^^^^
+...
+984 |     fn sync_semantics(&self) -> Result<(), String> {
+    |        ^^^^^^^^^^^^^^
+
+warning: type alias `Child` is never used
+    --> ..\src\web_projection.rs:1148:6
+     |
+1148 | type Child = Box<dyn AnyView<(), (), GenetCtx, GenetElement>>;
+     |      ^^^^^
+
+warning: function `target_id` is never used
+    --> ..\src\web_projection.rs:1150:4
+     |
+1150 | fn target_id(target: &Target) -> String {
+     |    ^^^^^^^^^
+
+warning: function `paint` is never used
+    --> ..\src\web_projection.rs:1160:4
+     |
+1160 | fn paint(
+     |    ^^^^^
+
+warning: constant `BOARD_FIT` is never used
+  --> ..\src\web_remote.rs:40:7
+   |
+40 | const BOARD_FIT: BoardFit = BoardFit {
+   |       ^^^^^^^^^
+
+warning: variant `Fixture` is never constructed
+  --> ..\src\web_remote.rs:51:5
+   |
+49 | pub(crate) enum RemoteLink {
+   |                 ---------- variant in this enum
+50 |     /// In-process, synchronous, mounted into the app's own client.
+51 |     Fixture(FixtureEndpoint),
+   |     ^^^^^^^
+
+warning: multiple methods are never used
+   --> ..\src\web_remote.rs:117:19
+    |
+ 95 | impl BrowserHost {
+    | ---------------- methods in this implementation
+...
+117 |     pub(crate) fn form_mut(&mut self) -> &mut ActionForm {
+    |                   ^^^^^^^^
+...
+161 |     pub(crate) fn sync_remote_board(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+177 |     pub(crate) fn remote_scene(&self) -> Scene {
+    |                   ^^^^^^^^^^^^
+...
+202 |     pub(crate) fn remote_in_flight(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^
+...
+261 |     pub(crate) fn invoke_remote_action(&mut self, index: usize) {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub(crate) fn open_remote_action_draft(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+304 |     pub(crate) fn remote_disconnect(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+310 |     pub(crate) fn remote_reconnect(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^
+...
+319 |     pub(crate) fn remote_nudge(&mut self) {
+    |                   ^^^^^^^^^^^^
+
+warning: fields `scenario`, `steps`, and `frames` are never read
+  --> ..\src\web_scenario.rs:67:5
+   |
+66 | pub(crate) struct ScenarioRun {
+   |                   ----------- fields in this struct
+67 |     scenario: Scenario,
+   |     ^^^^^^^^
+68 |     steps: usize,
+   |     ^^^^^
+69 |     frames: u32,
+   |     ^^^^^^
+
+warning: function `install` is never used
+  --> ..\src\web_scenario.rs:74:15
+   |
+74 | pub(super) fn install(state: &Rc<RefCell<BrowserHost>>) {
+   |               ^^^^^^^
+
+warning: function `tick` is never used
+   --> ..\src\web_scenario.rs:119:15
+    |
+119 | pub(super) fn tick(host: &mut BrowserHost) {
+    |               ^^^^
+
+warning: function `numbers` is never used
+   --> ..\src\web_scenario.rs:250:4
+    |
+250 | fn numbers(rest: &str, count: usize) -> Result<Vec<f32>, String> {
+    |    ^^^^^^^
+
+warning: struct `Probe` is never constructed
+   --> ..\src\web_scenario.rs:264:8
+    |
+264 | struct Probe<'a> {
+    |        ^^^^^
+
+warning: methods `pointer`, `pointer_with`, `focused_point`, `app_verb`, and `app_assert` are never used
+   --> ..\src\web_scenario.rs:272:8
+    |
+269 | impl Probe<'_> {
+    | -------------- methods in this implementation
+...
+272 |     fn pointer(&mut self, kind: &'static str, x: f32, y: f32) {
+    |        ^^^^^^^
+...
+276 |     fn pointer_with(&mut self, kind: &'static str, x: f32, y: f32, button: i16) {
+    |        ^^^^^^^^^^^^
+...
+286 |     fn focused_point(&self) -> Result<(f32, f32), String> {
+    |        ^^^^^^^^^^^^^
+...
+293 |     fn app_verb(&mut self, line: &str) -> Result<(), String> {
+    |        ^^^^^^^^
+...
+496 |     fn app_assert(&self, rest: &str, line: &str) -> Result<(), String> {
+    |        ^^^^^^^^^^
+
+warning: function `find` is never used
+   --> ..\src\web_scenario.rs:676:4
+    |
+676 | fn find(css: &str) -> Result<Element, String> {
+    |    ^^^^
+
+warning: function `html_element` is never used
+   --> ..\src\web_scenario.rs:684:4
+    |
+684 | fn html_element(css: &str) -> Result<HtmlElement, String> {
+    |    ^^^^^^^^^^^^
+
+warning: variants `Pointer`, `Click`, `Key`, `Type`, `Select`, and `Check` are never constructed
+   --> ..\src\web_scenario.rs:703:5
+    |
+702 | pub(crate) enum DomAction {
+    |                 --------- variants in this enum
+703 |     Pointer {
+    |     ^^^^^^^
+...
+710 |     Click(String),
+    |     ^^^^^
+711 |     Key(KeySpec),
+    |     ^^^
+712 |     Type {
+    |     ^^^^
+...
+717 |     Select {
+    |     ^^^^^^
+...
+722 |     Check {
+    |     ^^^^^
+
+warning: fields `key`, `ctrl`, `shift`, `alt`, and `meta` are never read
+   --> ..\src\web_scenario.rs:731:5
+    |
+730 | pub(crate) struct KeySpec {
+    |                   ------- fields in this struct
+731 |     key: String,
+    |     ^^^
+732 |     ctrl: bool,
+    |     ^^^^
+733 |     shift: bool,
+    |     ^^^^^
+734 |     alt: bool,
+    |     ^^^
+735 |     meta: bool,
+    |     ^^^^
+
+warning: function `run_deferred` is never used
+   --> ..\src\web_scenario.rs:742:15
+    |
+742 | pub(super) fn run_deferred(actions: Vec<DomAction>) -> Vec<String> {
+    |               ^^^^^^^^^^^^
+
+warning: function `dispatch` is never used
+   --> ..\src\web_scenario.rs:753:4
+    |
+753 | fn dispatch(action: DomAction) -> Result<(), String> {
+    |    ^^^^^^^^
+
+warning: function `parse_chord` is never used
+   --> ..\src\web_scenario.rs:862:4
+    |
+862 | fn parse_chord(chord: &str) -> Result<KeySpec, String> {
+    |    ^^^^^^^^^^^
+
+warning: function `key_name` is never used
+   --> ..\src\web_scenario.rs:894:4
+    |
+894 | fn key_name(lower: &str, verbatim: &str) -> String {
+    |    ^^^^^^^^
+
+warning: function `split_first` is never used
+   --> ..\src\web_scenario.rs:918:4
+    |
+918 | fn split_first(line: &str) -> (&str, &str) {
+    |    ^^^^^^^^^^^
+
+warning: constant `COMMANDS_VIEW` is never used
+  --> ..\src\web_commands.rs:25:7
+   |
+25 | const COMMANDS_VIEW: &str = "commands";
+   |       ^^^^^^^^^^^^^
+
+warning: function `stored_choices` is never used
+  --> ..\src\web_commands.rs:39:15
+   |
+39 | pub(super) fn stored_choices(
+   |               ^^^^^^^^^^^^^^
+
+warning: methods `open_command_menu`, `close_command_menu`, `search_commands`, `command_menu_action`, `run_first_command`, and `keep_command_choices` are never used
+   --> ..\src\web_commands.rs:49:19
+    |
+ 47 | impl BrowserHost {
+    | ---------------- methods in this implementation
+ 48 |     /// Open the menu at client `(x, y)`, over `node` when one was clicked.
+ 49 |     pub(super) fn open_command_menu(&mut self, at: (i32, i32), node: Option<uuid::Uuid>) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+ 64 |     pub(super) fn close_command_menu(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+ 74 |     pub(super) fn search_commands(&mut self, query: &str) {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 82 |     pub(super) fn command_menu_action(&mut self, action: &str) {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+109 |     pub(super) fn run_first_command(&mut self) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+120 |     fn keep_command_choices(&mut self) {
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: variants `Stored`, `Pending`, `Writing`, and `Failed` are never constructed
+  --> ..\src\web_session.rs:27:5
+   |
+26 | pub(super) enum SessionStore {
+   |                 ------------ variants in this enum
+27 |     Stored,
+   |     ^^^^^^
+28 |     Pending,
+   |     ^^^^^^^
+29 |     Writing,
+   |     ^^^^^^^
+30 |     Failed,
+   |     ^^^^^^
+   |
+   = note: `SessionStore` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: method `busy` is never used
+  --> ..\src\web_session.rs:48:19
+   |
+33 | impl SessionStore {
+   | ----------------- method in this implementation
+...
+48 |     pub(super) fn busy(self) -> bool {
+   |                   ^^^^
+
+warning: function `store_pending` is never used
+  --> ..\src\web_session.rs:55:15
+   |
+55 | pub(super) fn store_pending(state: &Rc<RefCell<BrowserHost>>) {
+   |               ^^^^^^^^^^^^^
+
+warning: function `wake` is never used
+   --> ..\src\web_session.rs:101:4
+    |
+101 | fn wake() {
+    |    ^^^^
+
+warning: method `update_projection_option` is never used
+  --> ..\src\web_options.rs:24:19
+   |
+22 | impl BrowserHost {
+   | ---------------- method in this implementation
+23 |     /// A row's value changed: set the option, or leave it out when blank.
+24 |     pub(super) fn update_projection_option(&mut self, key: &str, value: &str) {
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `rebind_host_presenter` is never used
+   --> ..\src\web_tree\presenter.rs:134:19
+    |
+109 | impl TreePage {
+    | ------------- method in this implementation
+...
+134 |     pub(super) fn rebind_host_presenter(&mut self, envelope: HostDatasetV1) -> Result<(), String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+
+warning: type alias `ChromeChild` is never used
+  --> ..\src\web_view.rs:20:6
+   |
+20 | type ChromeChild = Box<dyn AnyView<(), (), GenetCtx, GenetElement>>;
+   |      ^^^^^^^^^^^
+
+warning: fields `local_active`, `detail_open`, `viewport_label`, `satisfaction`, `remote_cards`, and `remote_speed` are never read
+  --> ..\src\web_view.rs:25:9
+   |
+23 | pub(crate) struct ChromeModel {
+   |                   ----------- fields in this struct
+24 |     pub active_session: String,
+25 |     pub local_active: bool,
+   |         ^^^^^^^^^^^^
+26 |     pub selection: String,
+27 |     pub detail_open: bool,
+   |         ^^^^^^^^^^^
+...
+30 |     pub viewport_label: String,
+   |         ^^^^^^^^^^^^^^
+...
+35 |     pub satisfaction: String,
+   |         ^^^^^^^^^^^^
+...
+43 |     pub remote_cards: Vec<String>,
+   |         ^^^^^^^^^^^^
+...
+46 |     pub remote_speed: Option<String>,
+   |         ^^^^^^^^^^^^
+   |
+   = note: `ChromeModel` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: function `pill` is never used
+  --> ..\src\web_view.rs:50:4
+   |
+50 | fn pill(label: String, active: bool) -> impl View<(), (), GenetCtx, Element = GenetElement> {
+   |    ^^^^
+
+warning: function `action_form_view` is never used
+  --> ..\src\web_view.rs:57:4
+   |
+57 | fn action_form_view(draft: Option<&ActionDraftSemantics>) -> ChromeChild {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `chrome_view` is never used
+   --> ..\src\web_view.rs:127:4
+    |
+127 | fn chrome_view(model: ChromeModel) -> impl View<(), (), GenetCtx, Element = GenetElement> {
+    |    ^^^^^^^^^^^
+
+warning: function `stylesheet` is never used
+   --> ..\src\web_view.rs:242:4
+    |
+242 | fn stylesheet(width: u32, height: u32) -> String {
+    |    ^^^^^^^^^^
+
+warning: function `build_chrome_scene` is never used
+   --> ..\src\web_view.rs:342:15
+    |
+342 | pub(crate) fn build_chrome_scene(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `shared_label` is never used
+   --> ..\src\web_view.rs:369:4
+    |
+369 | fn shared_label(id: &str) -> &'static str {
+    |    ^^^^^^^^^^^^
+
+warning: `graphshell-web` (lib) generated 88 warnings (run `cargo fix --lib -p graphshell-web` to apply 5 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3m 46s

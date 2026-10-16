@@ -28,8 +28,8 @@ use castellan::custody::IdentityStorage;
 use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
-use graphshell::native::app_admission::AppId;
-use graphshell::native::custody::{
+use graphshell_endpoint::door::app_admission::AppId;
+use graphshell_endpoint::door::custody::{
     CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey,
     ReleasedKey, ResidentStatus, StationGrantRequest,
 };
@@ -45,6 +45,7 @@ use crate::keeper::Keeper;
 /// tools that do (Distillery's installed configuration, Signalman's station
 /// commissioning, D17).
 pub const CUSTODY_APPS: &[&str] = &[
+    "cleromancy",
     "turnstone",
     "knot-editor",
     "graphshell",
@@ -58,10 +59,10 @@ pub const CUSTODY_APPS: &[&str] = &[
 
 /// Grant the custody route to [`CUSTODY_APPS`].
 pub fn grant(
-    grants: &graphshell::native::app_admission::AppRouteGrants,
-) -> Result<(), graphshell::native::endpoint_catalog::ResidentEndpointRouteError> {
-    let route = graphshell::native::endpoint_catalog::ResidentEndpointRoute::new(
-        graphshell::native::custody::CUSTODY_ROUTE,
+    grants: &graphshell_endpoint::door::app_admission::AppRouteGrants,
+) -> Result<(), graphshell_endpoint::door::route::ResidentEndpointRouteError> {
+    let route = graphshell_endpoint::door::route::ResidentEndpointRoute::new(
+        graphshell_endpoint::door::custody::CUSTODY_ROUTE,
         std::time::Duration::from_millis(50),
     )?;
     for app in CUSTODY_APPS {
@@ -180,7 +181,8 @@ impl Default for ReleasePolicy {
     /// the transport identity (vault lock ruling 92); Distillery's personal
     /// mesh name; Graphshell's per-session endpoint keys; and, from the
     /// wallet, the station- and controller-scoped Reticulum material a sited
-    /// station runs on (D17). From the persona epoch: Knot's vault key and
+    /// station runs on (D17), plus Signalman's exact Tucket device/realm
+    /// child. From the persona epoch: Knot's vault key and
     /// device-bound writer seed, and only the public half of its legacy
     /// writer.
     fn default() -> Self {
@@ -208,6 +210,14 @@ impl Default for ReleasePolicy {
             .with(
                 KeySource::Wallet,
                 SaltRule::Matches(personae::reticulum::is_reticulum_salt),
+            )
+            .with(
+                KeySource::Wallet,
+                SaltRule::Matches(personae::tucket::is_station_salt),
+            )
+            .with(
+                KeySource::Wallet,
+                SaltRule::Matches(personae::sennet::is_station_salt),
             )
             .with_apps()
     }
@@ -435,6 +445,9 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             release(keeper.policy(), &app, source, root.provider(), salts)
         },
         CustodyCall::Attest { source, salt } => {
+            if !radio_station_app_allowed(&app, &salt) {
+                return Err(CustodyRefusal::NotReleasable);
+            }
             unlocked(&keeper)?;
             attest(
                 keeper.policy(),
@@ -448,6 +461,9 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             salt,
             message,
         } => {
+            if !radio_station_app_allowed(&app, &salt) {
+                return Err(CustodyRefusal::NotReleasable);
+            }
             unlocked(&keeper)?;
             sign(
                 keeper.policy(),
@@ -636,6 +652,11 @@ fn device_root(data_root: &Path, label: Option<&str>) -> Result<[u8; 32], Custod
     }
 }
 
+fn radio_station_app_allowed(app: &AppId, salt: &[u8]) -> bool {
+    !(personae::tucket::is_station_salt(salt) || personae::sennet::is_station_salt(salt))
+        || app == &AppId::new("signalman")
+}
+
 /// Release `salts`' keys from `root`, each with its attestation (D11).
 fn release(
     policy: &ReleasePolicy,
@@ -644,7 +665,11 @@ fn release(
     root: &dyn IdentityProvider,
     salts: Vec<Vec<u8>>,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
-    if salts.is_empty() || salts.iter().any(|salt| !policy.allows(source, salt)) {
+    if salts.is_empty()
+        || salts
+            .iter()
+            .any(|salt| !policy.allows(source, salt) || !radio_station_app_allowed(app, salt))
+    {
         return Err(CustodyRefusal::NotReleasable);
     }
     let master = root.master_public_key().to_bytes();
@@ -785,7 +810,7 @@ fn roster<S: IdentityStorage + 'static>(keeper: &Keeper<S>) -> Result<Roster, Cu
         .iter()
         .find(|entry| entry.chosen)
         .map(|entry| entry.id.clone())
-        .or_else(graphshell::profile::env_profile)
+        .or_else(graphshell_endpoint::door::profile::env_profile)
         .unwrap_or_else(|| ProfileId(castellan::custody::roster::DEFAULT_PROFILE.into()));
     Ok(Roster {
         entries,
@@ -851,6 +876,63 @@ mod tests {
     use super::*;
 
     #[test]
+    fn radio_station_release_is_exact_wallet_scope_for_signalman_only() {
+        let policy = ReleasePolicy::default();
+        for salt in [
+            personae::tucket::station_salt(&[4; 16], "ridge").unwrap(),
+            personae::sennet::station_salt(&[4; 16], "ridge").unwrap(),
+        ] {
+            let root = personae::InMemoryProvider::from_seed([19; 32]);
+            let signalman = AppId::new("signalman");
+            assert!(
+                release(
+                    &policy,
+                    &signalman,
+                    KeySource::Wallet,
+                    &root,
+                    vec![salt.clone()]
+                )
+                .is_ok()
+            );
+            assert!(
+                release(
+                    &policy,
+                    &AppId::new("turnstone"),
+                    KeySource::Wallet,
+                    &root,
+                    vec![salt.clone()]
+                )
+                .is_err()
+            );
+            assert!(
+                release(
+                    &policy,
+                    &signalman,
+                    KeySource::Persona,
+                    &root,
+                    vec![salt.clone()]
+                )
+                .is_err()
+            );
+            for forbidden in [
+                vec![],
+                b"mere.signalman.tucket.station/v1/".to_vec(),
+                [salt.as_slice(), b"x"].concat(),
+            ] {
+                assert!(
+                    release(
+                        &policy,
+                        &signalman,
+                        KeySource::Wallet,
+                        &root,
+                        vec![salt.clone(), forbidden]
+                    )
+                    .is_err()
+                );
+            }
+        }
+    }
+    #[test]
     fn the_default_policy_releases_named_namespaces_and_never_the_master() {
         let policy = ReleasePolicy::default();
         assert!(policy.allows(KeySource::Persona, mesh::MESH_AUTHOR_SALT));
@@ -891,7 +973,7 @@ mod tests {
             !policy.allows(KeySource::Persona, &install),
             "and never releases its key"
         );
-        for door in graphshell::native::local_session::door_salts([7; 32]) {
+        for door in crate::door::local_session::door_salts([7; 32]) {
             assert!(
                 !policy.allows(KeySource::Persona, &door),
                 "door keys stay in djinn"

@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- Rename the `edit-history` crate to `backstep` (`crates/cambium/backstep`, lib
+  `backstep`; Mark, 2026-10-15). `cambium::History` is unchanged, re-exported
+  from the renamed crate; only a direct `edit_history::` import changes, to
+  `backstep::`. The crate stays standalone, has no dependencies, and Mark
+  cleared it for publishing (`publish = false` is gone; `cargo publish
+  --dry-run` passes). Cambium depends on it, so it has to be on crates.io
+  before Cambium is.
+- Let a graph canvas carry a consumer's node kinds, and split the detail
+  popover's panel from its trigger, for widgets that live on graph nodes.
+  `GraphCanvasSwatch::with_node_attr(id, name, value)` sets an attribute on
+  one node's target (`aria-expanded`, `aria-haspopup`, a `data-*` kind); the
+  canvas's own class, label, key and style are never overridden.
+  `GraphCanvasSwatch::with_focus_request(id)` hands keyboard focus to one
+  node's target when the request first appears, as a closed card or a
+  dismissed popover returns it. `detail_popover_panel` renders a
+  `detail_popover`'s peek or pinned panel for a trigger the caller already
+  renders, such as a canvas node; `detail_popover` is built on it. mere-view's
+  overmap tier is the first consumer. Additive.
 - Remove the `nematic` feature and its `cambium::nematic` views
   (`gemtext_view`, `gopher_view`, `nex_view`, `feed_view`, `SmolwebTheme`,
   `stylesheet`), with the optional `errand` and `tabard` dependencies only it

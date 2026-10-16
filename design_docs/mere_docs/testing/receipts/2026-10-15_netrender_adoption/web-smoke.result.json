@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "--config",
+    "repos/mere/crates/cambium/examples/genet_web_smoke/.cargo/config.toml",
+    "check",
+    "--manifest-path",
+    "repos/mere/crates/cambium/examples/genet_web_smoke/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-j2",
+    "--target",
+    "wasm32-unknown-unknown"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 165.2,
+  "config": "repos/mere/crates/cambium/examples/genet_web_smoke/.cargo/config.toml"
+}

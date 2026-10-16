@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "distillery-model-session-fixture"
 version = "0.0.1"
 edition = "2024"
@@ -24,3 +25,6 @@ sha2 = "0.11"
 [patch.crates-io]
 # Match the stable runtime policy of the other Distillery fixtures.
 cubecl-runtime = { path = "../../../../support/patches/cubecl-runtime" }
+
+[workspace.package]
+rust-version = "1.97.1"

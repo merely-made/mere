@@ -15,7 +15,7 @@ use std::sync::Arc;
 use document_canvas::font_table::FontInterner;
 use document_canvas::{DocumentRenderPacket, DocumentStyleSheet, FontTable};
 use kernel::permissions::ResolvedPermission;
-use kernel::types::{GraphScope, NodeProperty};
+use kernel::types::{AssertionBasis, AssertionWithdrawal, GraphScope, NodeProperty};
 use linebender_resource_handle::Blob as ParleyBlob;
 use linked_data::{EdgeContribution, GraphContribution, NodeContribution};
 use netrender::{ImageKey, Scene, peniko};
@@ -731,8 +731,10 @@ enum ContentUpdateWire {
         nav: u64,
         urls: Vec<String>,
     },
+    /// Legacy payload shape retained at its original enum discriminant so
+    /// existing worker buffers continue to decode.
     Contribution {
-        contributions: Vec<GraphContributionWire>,
+        contributions: Vec<LegacyGraphContributionWire>,
     },
     FindMatches {
         nav: u64,
@@ -756,6 +758,11 @@ enum ContentUpdateWire {
     },
     TransportError {
         reason: String,
+    },
+    /// Versioned lifecycle-aware contribution payload, appended to preserve
+    /// the discriminants of the pre-existing update variants.
+    ContributionV2 {
+        contributions: Vec<GraphContributionWire>,
     },
 }
 
@@ -800,7 +807,7 @@ impl ContentUpdateWire {
                     .collect(),
             },
             ContentUpdateMessage::Wanted { nav, urls } => Self::Wanted { nav, urls },
-            ContentUpdateMessage::Contribution { contributions } => Self::Contribution {
+            ContentUpdateMessage::Contribution { contributions } => Self::ContributionV2 {
                 contributions: contributions
                     .into_iter()
                     .map(GraphContributionWire::from)
@@ -886,6 +893,12 @@ impl ContentUpdateWire {
             },
             Self::Wanted { nav, urls } => ContentUpdateMessage::Wanted { nav, urls },
             Self::Contribution { contributions } => ContentUpdateMessage::Contribution {
+                contributions: contributions
+                    .into_iter()
+                    .map(GraphContribution::from)
+                    .collect(),
+            },
+            Self::ContributionV2 { contributions } => ContentUpdateMessage::Contribution {
                 contributions: contributions
                     .into_iter()
                     .map(GraphContribution::from)
@@ -1222,6 +1235,29 @@ impl From<GraphContributionWire> for GraphContribution {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct LegacyGraphContributionWire {
+    nodes: Vec<NodeContributionWire>,
+    edges: Vec<LegacyEdgeContributionWire>,
+}
+
+impl From<LegacyGraphContributionWire> for GraphContribution {
+    fn from(contribution: LegacyGraphContributionWire) -> Self {
+        Self {
+            nodes: contribution
+                .nodes
+                .into_iter()
+                .map(NodeContribution::from)
+                .collect(),
+            edges: contribution
+                .edges
+                .into_iter()
+                .map(EdgeContribution::from)
+                .collect(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 struct NodeContributionWire {
     id: String,
@@ -1312,6 +1348,8 @@ impl From<NodePropertyWire> for NodeProperty {
     }
 }
 
+/// Lifecycle-aware edge payload; legacy transfer buffers use the separate
+/// `LegacyEdgeContributionWire` shape under the original enum variant.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 struct EdgeContributionWire {
     subject: String,
@@ -1326,6 +1364,50 @@ struct EdgeContributionWire {
     provenance_iri: Option<String>,
     #[serde(default)]
     asserted_at_ms: Option<u64>,
+    /// First assertion time carried by the lifecycle-aware V2 variant.
+    #[serde(default)]
+    first_asserted_ms: Option<u64>,
+    #[serde(default)]
+    withdrawn: Option<AssertionWithdrawal>,
+    #[serde(default)]
+    basis: AssertionBasis,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct LegacyEdgeContributionWire {
+    subject: String,
+    predicate: String,
+    object: String,
+    graph_scope: GraphScope,
+    #[serde(default)]
+    statement_id: Option<String>,
+    #[serde(default)]
+    label: Option<String>,
+    #[serde(default)]
+    provenance_iri: Option<String>,
+    #[serde(default)]
+    asserted_at_ms: Option<u64>,
+}
+
+impl From<LegacyEdgeContributionWire> for EdgeContribution {
+    fn from(edge: LegacyEdgeContributionWire) -> Self {
+        Self {
+            subject: edge.subject,
+            predicate: edge.predicate,
+            object: edge.object,
+            graph_scope: edge.graph_scope,
+            statement_id: edge.statement_id,
+            label: edge.label.clone(),
+            provenance_iri: edge.provenance_iri,
+            first_asserted_ms: edge.asserted_at_ms,
+            asserted_at_ms: edge.asserted_at_ms,
+            withdrawn: None,
+            basis: AssertionBasis {
+                note: edge.label,
+                ..AssertionBasis::default()
+            },
+        }
+    }
 }
 
 impl From<EdgeContribution> for EdgeContributionWire {
@@ -1339,6 +1421,9 @@ impl From<EdgeContribution> for EdgeContributionWire {
             label: edge.label,
             provenance_iri: edge.provenance_iri,
             asserted_at_ms: edge.asserted_at_ms,
+            first_asserted_ms: edge.first_asserted_ms,
+            withdrawn: edge.withdrawn,
+            basis: edge.basis,
         }
     }
 }
@@ -1354,6 +1439,218 @@ impl From<EdgeContributionWire> for EdgeContribution {
             label: edge.label,
             provenance_iri: edge.provenance_iri,
             asserted_at_ms: edge.asserted_at_ms,
+            first_asserted_ms: edge.first_asserted_ms,
+            withdrawn: edge.withdrawn,
+            basis: edge.basis,
         }
+    }
+}
+
+#[cfg(test)]
+mod edge_contribution_wire_tests {
+    use super::*;
+
+    #[test]
+    fn edge_contribution_transfer_preserves_lifecycle_and_basis() {
+        let edge = EdgeContribution {
+            subject: "https://example.test/a".into(),
+            predicate: "https://example.test/rel".into(),
+            object: "https://example.test/b".into(),
+            graph_scope: GraphScope::Custom("https://example.test/scope".into()),
+            statement_id: Some("assertion:wire:1".into()),
+            label: Some("reviewed source".into()),
+            provenance_iri: Some("urn:actor:asserted".into()),
+            first_asserted_ms: Some(10),
+            asserted_at_ms: Some(20),
+            withdrawn: Some(AssertionWithdrawal {
+                at_ms: Some(30),
+                by: Some("urn:actor:withdrew".into()),
+            }),
+            basis: AssertionBasis {
+                note: Some("reviewed source".into()),
+                method: Some(kernel::types::AssertionMethod {
+                    iri: "urn:method:extractor".into(),
+                    version: Some("3".into()),
+                }),
+                evidence: vec!["https://evidence.test/1".into()],
+            },
+        };
+        let wire = EdgeContributionWire::from(edge.clone());
+        let encoded = postcard::to_allocvec(&wire).expect("encode contribution wire");
+        let decoded: EdgeContributionWire =
+            postcard::from_bytes(&encoded).expect("decode contribution wire");
+        assert_eq!(EdgeContribution::from(decoded), edge);
+    }
+
+    #[test]
+    fn legacy_contribution_transfer_decodes_its_multi_edge_original_shape() {
+        let legacy = ContentUpdateWire::Contribution {
+            contributions: vec![LegacyGraphContributionWire {
+                nodes: vec![],
+                edges: vec![
+                    LegacyEdgeContributionWire {
+                        subject: "https://example.test/a".into(),
+                        predicate: "https://example.test/rel".into(),
+                        object: "https://example.test/b".into(),
+                        graph_scope: GraphScope::Default,
+                        statement_id: Some("legacy:assertion".into()),
+                        label: Some("legacy label".into()),
+                        provenance_iri: None,
+                        asserted_at_ms: Some(7),
+                    },
+                    LegacyEdgeContributionWire {
+                        subject: "https://example.test/c".into(),
+                        predicate: "https://example.test/other".into(),
+                        object: "https://example.test/d".into(),
+                        graph_scope: GraphScope::User,
+                        statement_id: Some("legacy:second".into()),
+                        label: None,
+                        provenance_iri: Some("urn:actor:legacy".into()),
+                        asserted_at_ms: None,
+                    },
+                ],
+            }],
+        };
+        let encoded = postcard::to_allocvec(&legacy).expect("encode old transfer payload");
+        let mut decoder = SceneTransferDecoder::default();
+        let ContentUpdateMessage::Contribution { contributions } =
+            ContentUpdateMessage::from_transfer_buffer(&encoded, &mut decoder)
+                .expect("decode old transfer payload")
+        else {
+            panic!("legacy contribution decoded as another update kind");
+        };
+        let edges = &contributions[0].edges;
+        assert_eq!(edges.len(), 2);
+        let edge = &edges[0];
+        assert_eq!(edge.first_asserted_ms, Some(7));
+        assert_eq!(edge.asserted_at_ms, Some(7));
+        assert_eq!(edge.withdrawn, None);
+        assert_eq!(
+            edge.basis.note.as_deref(),
+            Some("legacy label"),
+            "legacy label becomes the basis note when no basis was transmitted"
+        );
+        assert_eq!(edges[1].first_asserted_ms, None);
+        assert_eq!(edges[1].asserted_at_ms, None);
+        assert_eq!(edges[1].graph_scope, GraphScope::User);
+        assert_eq!(edges[1].basis, AssertionBasis::default());
+    }
+
+    #[test]
+    fn fixed_legacy_transfer_bytes_keep_the_original_contribution_ordinal_and_shape() {
+        // Hand-derived from the b2c8dcc enum order and legacy edge field order:
+        // Contribution(3), one contribution, no nodes, one edge ("a", "p",
+        // "b", Default, then four absent optional legacy fields). This is a
+        // byte fixture, not bytes emitted by the current serializer.
+        const LEGACY_BYTES: &[u8] = &[3, 1, 0, 1, 1, b'a', 1, b'p', 1, b'b', 0, 0, 0, 0, 0];
+        let mut decoder = SceneTransferDecoder::default();
+        let ContentUpdateMessage::Contribution { contributions } =
+            ContentUpdateMessage::from_transfer_buffer(LEGACY_BYTES, &mut decoder)
+                .expect("decode fixed legacy transfer bytes")
+        else {
+            panic!("fixed legacy bytes decoded as another update kind");
+        };
+        assert_eq!(contributions.len(), 1);
+        assert_eq!(contributions[0].nodes.len(), 0);
+        assert_eq!(contributions[0].edges.len(), 1);
+        let edge = &contributions[0].edges[0];
+        assert_eq!(
+            (&*edge.subject, &*edge.predicate, &*edge.object),
+            ("a", "p", "b")
+        );
+        assert_eq!(edge.graph_scope, GraphScope::Default);
+        assert_eq!(edge.statement_id, None);
+        assert_eq!(edge.label, None);
+        assert_eq!(edge.provenance_iri, None);
+        assert_eq!(edge.first_asserted_ms, None);
+        assert_eq!(edge.asserted_at_ms, None);
+        assert_eq!(edge.withdrawn, None);
+        assert_eq!(edge.basis, AssertionBasis::default());
+    }
+
+    #[test]
+    fn lifecycle_contribution_v2_roundtrips_multiple_edges_through_transfer_buffer() {
+        let first = EdgeContribution {
+            subject: "https://example.test/a".into(),
+            predicate: "https://example.test/rel".into(),
+            object: "https://example.test/b".into(),
+            graph_scope: GraphScope::Custom("https://example.test/scope".into()),
+            statement_id: Some("assertion:one".into()),
+            label: Some("".into()),
+            provenance_iri: Some("urn:actor:one".into()),
+            first_asserted_ms: None,
+            asserted_at_ms: Some(42),
+            withdrawn: Some(AssertionWithdrawal {
+                at_ms: Some(50),
+                by: Some("urn:actor:withdrawn".into()),
+            }),
+            basis: AssertionBasis {
+                note: Some("".into()),
+                method: Some(kernel::types::AssertionMethod {
+                    iri: "urn:method:test".into(),
+                    version: Some("1".into()),
+                }),
+                evidence: vec!["https://evidence.test/one".into()],
+            },
+        };
+        let second = EdgeContribution {
+            subject: "https://example.test/c".into(),
+            predicate: "https://example.test/other".into(),
+            object: "https://example.test/d".into(),
+            graph_scope: GraphScope::Default,
+            statement_id: Some("assertion:two".into()),
+            label: None,
+            provenance_iri: None,
+            first_asserted_ms: Some(11),
+            asserted_at_ms: None,
+            withdrawn: None,
+            basis: AssertionBasis::default(),
+        };
+        let expected = GraphContribution {
+            nodes: vec![],
+            edges: vec![first, second],
+        };
+        let message = ContentUpdateMessage::Contribution {
+            contributions: vec![expected.clone()],
+        };
+        let mut encoder = SceneTransferEncoder::default();
+        let transfer = message
+            .into_transfer_buffer(&mut encoder)
+            .expect("encode lifecycle-aware contribution");
+        let mut decoder = SceneTransferDecoder::default();
+        let ContentUpdateMessage::Contribution { contributions } =
+            ContentUpdateMessage::from_transfer_buffer(transfer.as_bytes(), &mut decoder)
+                .expect("decode lifecycle-aware contribution")
+        else {
+            panic!("v2 contribution decoded as another update kind");
+        };
+        assert_eq!(contributions, vec![expected]);
+    }
+
+    #[test]
+    fn v2_wire_preserves_unknown_first_time_and_empty_basis_note() {
+        let wire = EdgeContributionWire {
+            subject: "https://example.test/a".into(),
+            predicate: "https://example.test/rel".into(),
+            object: "https://example.test/b".into(),
+            graph_scope: GraphScope::Default,
+            statement_id: Some("assertion:partial".into()),
+            label: Some("".into()),
+            provenance_iri: None,
+            asserted_at_ms: Some(42),
+            first_asserted_ms: None,
+            withdrawn: None,
+            basis: AssertionBasis {
+                note: Some(String::new()),
+                ..AssertionBasis::default()
+            },
+        };
+        let encoded = postcard::to_allocvec(&wire).expect("encode v2 wire");
+        let decoded: EdgeContributionWire = postcard::from_bytes(&encoded).expect("decode v2 wire");
+        let edge = EdgeContribution::from(decoded);
+        assert_eq!(edge.first_asserted_ms, None);
+        assert_eq!(edge.asserted_at_ms, Some(42));
+        assert_eq!(edge.label.as_deref(), Some(""));
+        assert_eq!(edge.basis.note.as_deref(), Some(""));
     }
 }

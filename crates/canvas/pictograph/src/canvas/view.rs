@@ -157,6 +157,7 @@ impl Canvas {
         for &key in &self.selected {
             scope.extend(self.graph.neighbors_undirected(key));
         }
+        self.exact_scope = None;
         self.scope = Some(scope.into_iter().collect());
     }
 
@@ -170,11 +171,35 @@ impl Canvas {
             .into_iter()
             .filter_map(|id| self.graph.get_node_by_id(id).map(|(key, _)| key))
             .collect();
+        self.exact_scope = None;
         self.scope = (!keys.is_empty()).then_some(keys);
+    }
+
+    /// Scope the canvas to an authored roster, exactly. Unlike
+    /// [`scope_to_members`](Self::scope_to_members) an empty roster stays empty
+    /// (nothing is shown) rather than clearing to Show all, and members that are
+    /// not in the graph yet are remembered and appear once the graph holds them,
+    /// including after [`set_graph`](Self::set_graph). Only
+    /// [`clear_scope`](Self::clear_scope) shows everything again.
+    pub fn scope_to_exact_members(&mut self, members: impl IntoIterator<Item = uuid::Uuid>) {
+        let roster: std::collections::BTreeSet<uuid::Uuid> = members.into_iter().collect();
+        self.scope = Some(self.resolve_exact_scope(&roster));
+        self.exact_scope = Some(roster);
+    }
+
+    pub(super) fn resolve_exact_scope(
+        &self,
+        roster: &std::collections::BTreeSet<uuid::Uuid>,
+    ) -> Vec<NodeKey> {
+        roster
+            .iter()
+            .filter_map(|id| self.graph.get_node_by_id(*id).map(|(key, _)| key))
+            .collect()
     }
 
     /// Drop the scope lens — show the whole graph again. (Curated canvas.)
     pub fn clear_scope(&mut self) {
+        self.exact_scope = None;
         self.scope = None;
     }
 
@@ -183,6 +208,9 @@ impl Canvas {
     /// per-window scope override (a branch window scoping to its subgraph) and restores it
     /// after. (Per-window branch scope.)
     pub fn scope_members(&self) -> Option<Vec<uuid::Uuid>> {
+        if let Some(roster) = &self.exact_scope {
+            return Some(roster.iter().copied().collect());
+        }
         self.scope.as_ref().map(|keys| {
             keys.iter()
                 .filter_map(|&k| self.graph.get_node(k).map(|n| n.id))
@@ -191,14 +219,12 @@ impl Canvas {
     }
 
     /// Whether `key` is individually visible in the current Canvas view. The
-    /// scope lens is applied first; an active fold then substitutes its source
-    /// members with a synthetic summary body. The host's gnode builder uses this
-    /// too, so its DOM path matches the scene paint path. (Graph curation C3.)
+    /// scope lens is applied first; a current fold then hides its members but
+    /// a member stand-in, which stays drawn with its "+N". The host's gnode
+    /// builder uses this too, so its DOM path matches the scene paint path.
+    /// (Graph curation C3; mer3ly site plan, Ruling 166.)
     pub fn node_in_scope(&self, key: NodeKey) -> bool {
-        self.scope.as_ref().is_none_or(|s| s.contains(&key))
-            && self
-                .active_fold_projection()
-                .is_none_or(|projection| !projection.members.contains(&key))
+        self.scope.as_ref().is_none_or(|s| s.contains(&key)) && !self.fold_hides(key)
     }
 
     /// Zoom by `factor`, keeping the world point under `anchor` (screen px) fixed.
@@ -424,7 +450,12 @@ impl Canvas {
         let view = self.world_viewport();
         let mut framing = LayoutFraming {
             view: [view.min.x, view.min.y, view.max.x, view.max.y],
-            extent: [f32::INFINITY, f32::INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY],
+            extent: [
+                f32::INFINITY,
+                f32::INFINITY,
+                f32::NEG_INFINITY,
+                f32::NEG_INFINITY,
+            ],
             ..LayoutFraming::default()
         };
         for (_, p) in self.view.positions() {
@@ -593,7 +624,10 @@ mod tests {
         });
         let world = canvas.world_point_at((410.0, 275.0));
         let back = canvas.screen_point_of(world);
-        assert!((back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3, "{back:?}");
+        assert!(
+            (back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3,
+            "{back:?}"
+        );
         let (key, _) = canvas.graph.nodes().next().unwrap();
         canvas.selected = [key].into_iter().collect();
         let at = canvas.focused_world_position().unwrap();

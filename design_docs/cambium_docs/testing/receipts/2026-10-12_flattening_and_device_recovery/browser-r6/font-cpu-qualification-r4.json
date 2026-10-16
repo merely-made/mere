@@ -1,0 +1,150 @@
+{
+  "schema": "vello-font-cpu-qualification-v1",
+  "status": "PASS",
+  "at": "2026-10-14T00:26:09.829899+00:00",
+  "source_commits": {
+    "mere": "4682ba99040c234c6410d73125e5dc9b1f91cc03",
+    "genet": "5618326d287e7f7ef0c1cc3545587d64cedb22a7"
+  },
+  "controls": [
+    {
+      "label": "font-r4-genet-generic-shaping-r2",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-genet-generic-shaping-r2.json",
+        "bytes": 766,
+        "sha256": "3c6ed8dc524400ee6348811aa98e29c8d332c1e06d9c7a2dd5dd26fe05a62331"
+      },
+      "log": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-genet-generic-shaping-r2.log",
+        "bytes": 55116,
+        "sha256": "b422dbfd466982ada8b7f6b68cfd1ec803e0a441f2bd2d57a324e103dc0b1425"
+      },
+      "elapsed_seconds": 15.038,
+      "exactly_one_test_passed": true
+    },
+    {
+      "label": "font-r4-genet-retained-rebuild",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-genet-retained-rebuild.json",
+        "bytes": 753,
+        "sha256": "f171bfc9ad1d87dbcb484b0ed22ec01fd440c07250470573cb92d8fc0c37793f"
+      },
+      "log": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-genet-retained-rebuild.log",
+        "bytes": 54988,
+        "sha256": "0a47fb6f9c8eaa1843c3290a69bc96572032d7b26ca4c67a026cb7499398248d"
+      },
+      "elapsed_seconds": 1.042,
+      "exactly_one_test_passed": true
+    },
+    {
+      "label": "font-r4-rootstock-host-resources",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-rootstock-host-resources.json",
+        "bytes": 864,
+        "sha256": "5986863191359c13c73f3b65be4c30ac528835fa2ea3c10e86ce74ca993eb1fb"
+      },
+      "log": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-rootstock-host-resources.log",
+        "bytes": 9717,
+        "sha256": "070e0521626d4906f322ae2fba12d09223f2bc26041f2676c7c80c5abe9b11f3"
+      },
+      "elapsed_seconds": 30.862,
+      "exactly_one_test_passed": true
+    },
+    {
+      "label": "font-r4-document-canvas-atomic",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-document-canvas-atomic.json",
+        "bytes": 843,
+        "sha256": "93741ceb561dc48ed75c792e2986cb3b79f7976499f9cc0cca2edc7b08f39e50"
+      },
+      "log": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-document-canvas-atomic.log",
+        "bytes": 5046,
+        "sha256": "fe27e9d557e2599a89938d2fd8a279ab0edbadf63c61d9f9f40a0db9fd9d940d"
+      },
+      "elapsed_seconds": 38.63,
+      "exactly_one_test_passed": true
+    },
+    {
+      "label": "font-r4-workshop-retained-sources",
+      "receipt": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-workshop-retained-sources.json",
+        "bytes": 875,
+        "sha256": "32fc1b405a98f6e9ec0bf2e7a8c60b459c50c0d673af4f2d0f7f777968510700"
+      },
+      "log": {
+        "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-workshop-retained-sources.log",
+        "bytes": 11525,
+        "sha256": "189df1d1d79220c32aa553f2deacd43bf8e08bf4c0462ca10a03fd0ec35f1a84"
+      },
+      "elapsed_seconds": 31.366,
+      "exactly_one_test_passed": true
+    }
+  ],
+  "metadata_coherence": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/metadata-coherence-r4-v2.json",
+    "bytes": 4902,
+    "sha256": "700a976375ba1a2d5dd1b471a0cc358027e3909b7ea71171f3651e1cee197001"
+  },
+  "metadata": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/metadata-r4-v2.json",
+    "bytes": 6607533,
+    "sha256": "4110678873cd9cdf7f5be63a9542b9cf0f069e70387763efc90a1ab707d5c43e"
+  },
+  "config": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/font-patch-r4-v2.toml",
+    "bytes": 3070,
+    "sha256": "fc58d2499094e6938a0a9de44354db6b980457b41d176458907a8bc2e96d58ce"
+  },
+  "helper": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/capture_metadata_r4_v2.py",
+    "bytes": 904,
+    "sha256": "9245ba373e83d7e274cf7ebaa676795b60a7b1e21b0f9e16c618a2e8b5e3b1ac"
+  },
+  "exact3_materialized_font_assets": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/font-assets-materialized-r4.json",
+    "bytes": 1950,
+    "sha256": "1c535414b410028ecea0b15afc6d7ebebd7038a6b13cada0916d98c549955b14"
+  },
+  "current_private_lock": {
+    "path": "/Users/markik/Code/worktrees/mere-vello-release-adoption/Cargo.lock",
+    "bytes": 462525,
+    "sha256": "b2b9062be42028d0db6f19c09481a6ac9e236fd79f2ae252d2d5d44d6db45b83"
+  },
+  "prior_private_locks": [
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/pre-font-lock-r4.Cargo.lock",
+      "bytes": 465543,
+      "sha256": "d89970f8e0a3b0ada126b1751bcb3b2142b9677590e60ffe1765e2069278af91"
+    },
+    {
+      "path": "/Users/markik/Code/output/vello-next-gates-20261013/browser/pre-font-lock-r4-v2.Cargo.lock",
+      "bytes": 465295,
+      "sha256": "eb2fab3e40926456960b9d99280800ecd3b69321180a9ead1f4d33e140f11ec9"
+    }
+  ],
+  "preserved_initial_failure": {
+    "path": "/Users/markik/Code/output/vello-next-gates-20261013/checks/font-r4-genet-generic-shaping.json",
+    "bytes": 765,
+    "sha256": "1fa0ddb53cd2d72afb18b45fefe9a9109c2eaa6e9c261b0a5717db824349c9cd"
+  },
+  "closure": {
+    "all_guarded_root_children_reaped": true,
+    "matching_test_compiler_processes": [],
+    "locks_free": [
+      "/Users/markik/Code/targets/mere-s2s3/debug/.cargo-lock",
+      "/Users/markik/Code/targets/mere-s2s3/wasm32-unknown-unknown/debug/.cargo-lock"
+    ],
+    "historical_pid_birth_pgid_inventory_qualified": false
+  },
+  "free_disk_bytes": 89121583104,
+  "claims": {
+    "windowless_cpu_font_controls": true,
+    "gpu_or_browser_runtime": false,
+    "pixel_nonblank_threshold_pass": false,
+    "wasm_build_completed_this_phase": false
+  },
+  "phase": "Tests complete; Wasm compile awaits separate explicit Root instruction under same remaining lease."
+}

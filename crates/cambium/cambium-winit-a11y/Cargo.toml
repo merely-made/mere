@@ -3,7 +3,8 @@ name = "cambium-winit-a11y"
 version = "0.3.0"
 description = "AccessKit hosting for genet-backed Cambium applications on winit"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 # Can never be published, and that is the reason this crate exists. It needs the

@@ -477,6 +477,9 @@ mod tests {
             graph_scope: crate::types::GraphScope::Default,
             provenance_iri: Some("https://alice.test/".into()),
             asserted_at_ms: Some(17),
+            first_asserted_ms: Some(17),
+            withdrawn: None,
+            basis: Default::default(),
         });
         let original = super::super::snapshot::persisted_edge_for_ids(ids[0], ids[1], &payload);
         let mut aggregate_only = original.clone();
@@ -621,6 +624,9 @@ mod tests {
             graph_scope: crate::types::GraphScope::Default,
             provenance_iri: Some("https://author.test/".into()),
             asserted_at_ms: Some(19),
+            first_asserted_ms: Some(19),
+            withdrawn: None,
+            basis: Default::default(),
         });
         let edge =
             super::super::snapshot::persisted_edge_for_ids(terms[0].id(), terms[1].id(), &payload);

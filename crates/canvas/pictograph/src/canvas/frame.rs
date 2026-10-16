@@ -13,12 +13,13 @@ use crate::canvas::underlay::{canvas_paint_list_demoted_from_arrangement, identi
 use genet_scripted_dom::NodeId as DomNodeId;
 use kernel::geometry::PortablePoint;
 use kernel::graph::NodeKey;
+use layout_dom_api::LayoutDomMut;
 use netrender::Scene;
 use paint_list_api::{
     AlphaType, ColorF, CommonPlacement, DeviceIntSize, ExtendMode, GradientStop, IdNamespace,
     ImageItem, ImageKey, ImageRendering, ImageResource, LayoutPoint, LayoutRect, LayoutSize,
     LayoutTransform, PaintCmd, PaintList, PathCommand, PathData, PathItem, RadialGradientItem,
-    RadialGradientPayload, RectItem, StrokeCap, StrokeItem, StrokeJoin, StrokeStyle, TransformKind,
+    RadialGradientPayload, RectItem, StrokeCap, StrokeJoin, StrokeStyle, TransformKind,
     TransformSpec,
 };
 use paint_list_render::{CompositeLayer, composite_paint_layers};
@@ -26,69 +27,51 @@ use seiche::NodeCollider;
 
 use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
-    set_class, set_style,
+    qual, set_class, set_style,
 };
-use super::edge_cells::{
-    edge_cell_for_relation, relation_cell_overlay, relation_family_color, selected_edge_overlay,
-};
-use super::fold_projection::{FOLD_SUMMARY_RADIUS, FoldProjection};
+use super::edge_cells::{edge_cell_for_relation, relation_cell_overlay, selected_edge_overlay};
+use super::fold_projection::FoldProjection;
 use super::{Canvas, FACE_INSET, Face, NodeShape, NodeState, PAN_DECAY};
 
-/// Paint a fold's boundary bundles and its synthetic summary body. These are
-/// world-space commands only: neither the summary nor its boundary cells enter
-/// the source graph, layout view, or physics simulation.
-fn fold_summary_overlay(
-    fold: &FoldProjection,
-    positions: &HashMap<NodeKey, PortablePoint>,
-    summary_color: ColorF,
-) -> Vec<PaintCmd> {
-    let Some(center) = fold.summary_center(|key| positions.get(&key).copied()) else {
-        return Vec::new();
-    };
-    let mut commands = Vec::with_capacity(fold.boundary_bundles.len() + 1);
-    for bundle in &fold.boundary_bundles {
-        let Some(outside) = positions.get(&bundle.outside).copied() else {
+/// Show one badge element per `(centre, text)`, made as needed and reused,
+/// and hide the rest. Badges sit on the stage above every gnode.
+fn place_fold_badges(
+    dom: &mut genet_scripted_dom::ScriptedDom,
+    stage: DomNodeId,
+    pool: &mut Vec<(DomNodeId, DomNodeId, String)>,
+    badges: &[((f32, f32), String)],
+) {
+    while pool.len() < badges.len() {
+        let badge = dom.create_element(qual("div"));
+        dom.set_attribute(badge, qual("class"), "gbadge");
+        let text = dom.create_text("");
+        dom.append_child(badge, text);
+        dom.append_child(stage, badge);
+        pool.push((badge, text, String::new()));
+    }
+    for (index, (badge, text, shown)) in pool.iter_mut().enumerate() {
+        let Some(((x, y), wanted)) = badges.get(index) else {
+            set_style(dom, *badge, "display: none;");
             continue;
         };
-        let dx = outside.x - center.x;
-        let dy = outside.y - center.y;
-        let length = (dx * dx + dy * dy).sqrt();
-        if length <= f32::EPSILON {
-            continue;
+        if shown != wanted {
+            dom.set_text_content(*text, wanted);
+            *shown = wanted.clone();
         }
-        let ux = dx / length;
-        let uy = dy / length;
-        let from = LayoutPoint::new(
-            center.x + ux * FOLD_SUMMARY_RADIUS,
-            center.y + uy * FOLD_SUMMARY_RADIUS,
+        set_style(
+            dom,
+            *badge,
+            &format!(
+                "transform: translate({}px, {}px); z-index: 2147483000;",
+                x - FOLD_BADGE_HALF.0,
+                y - FOLD_BADGE_HALF.1
+            ),
         );
-        let to = LayoutPoint::new(outside.x - ux * 18.0, outside.y - uy * 18.0);
-        let bounds = LayoutRect::new(
-            LayoutPoint::new(from.x.min(to.x), from.y.min(to.y)),
-            LayoutPoint::new(from.x.max(to.x), from.y.max(to.y)),
-        );
-        commands.push(PaintCmd::DrawStroke(StrokeItem {
-            placement: CommonPlacement::new(bounds),
-            path: PathData {
-                commands: vec![PathCommand::MoveTo(from), PathCommand::LineTo(to)],
-            },
-            color: relation_family_color(bundle.family),
-            width: 2.0 + (bundle.count.saturating_sub(1).min(4) as f32),
-            cap: StrokeCap::Round,
-            join: StrokeJoin::Round,
-            dash: None,
-        }));
     }
-    let radius = FOLD_SUMMARY_RADIUS;
-    commands.push(PaintCmd::DrawRect(RectItem {
-        placement: CommonPlacement::new(LayoutRect::new(
-            LayoutPoint::new(center.x - radius, center.y - radius),
-            LayoutPoint::new(center.x + radius, center.y + radius),
-        )),
-        color: summary_color,
-    }));
-    commands
 }
+
+/// Half a badge's drawn size, px, so its centre lands on its anchor.
+const FOLD_BADGE_HALF: (f32, f32) = (12.0, 9.0);
 
 impl Canvas {
     /// Advance one frame at viewport `(w, h)` and return the composited content
@@ -194,8 +177,8 @@ impl Canvas {
         }
         // Pan inertia: glide + decay when not actively middle-dragging.
         let hand_panning = self.middle_drag.is_some() || self.left_panning();
-        let gliding = !hand_panning
-            && (self.pan_velocity.0.abs() > 0.05 || self.pan_velocity.1.abs() > 0.05);
+        let gliding =
+            !hand_panning && (self.pan_velocity.0.abs() > 0.05 || self.pan_velocity.1.abs() > 0.05);
         if gliding {
             self.camera.offset.0 += self.pan_velocity.0;
             self.camera.offset.1 += self.pan_velocity.1;
@@ -228,12 +211,13 @@ impl Canvas {
         // gnode loop). `None` shows the whole graph. (Curated canvas.)
         let scoped: Option<HashSet<NodeKey>> =
             self.scope.as_ref().map(|s| s.iter().copied().collect());
-        let fold = self.active_fold_projection();
-        let folded_members = fold
-            .as_ref()
-            .map(|projection| &projection.members)
-            .cloned()
-            .unwrap_or_default();
+        let folds = self.fold_projections();
+        let folded_members: HashSet<NodeKey> =
+            folds.iter().flat_map(FoldProjection::hidden).collect();
+        let fold_members: HashSet<_> = folds
+            .iter()
+            .flat_map(|fold| fold.members.iter().copied())
+            .collect();
         let node_visible = |key: NodeKey| {
             scoped.as_ref().is_none_or(|scope| scope.contains(&key))
                 && !folded_members.contains(&key)
@@ -251,8 +235,8 @@ impl Canvas {
         // scope. Either way the canvas renders as a Cartography projection of an
         // arrangement (the spine's "two projections of one arrangement"); a scoped
         // arrangement is exactly the shape a stored/compare arrangement would take.
-        let arrangement = match (&self.scope, &fold) {
-            (None, None) => identity_arrangement(&self.graph),
+        let arrangement = match (&self.scope, folds.is_empty()) {
+            (None, true) => identity_arrangement(&self.graph),
             _ => crate::canvas::underlay::arrangement_of_keys(&self.graph, &visible_keys),
         };
         observer.mark(1);
@@ -264,9 +248,11 @@ impl Canvas {
             // Skip relation cells the user has hidden. Platen still projects one pair-level
             // edge after filtering, so a parallel relation keeps the bundle visible.
             |rel| {
-                !self
-                    .hidden_edges
-                    .contains(&edge_cell_for_relation(rel.from, rel.to, rel.kind))
+                !fold_members.contains(&rel.from)
+                    && !fold_members.contains(&rel.to)
+                    && !self
+                        .hidden_edges
+                        .contains(&edge_cell_for_relation(rel.from, rel.to, rel.kind))
             },
             // Each node's face radius (node_size / 2) so straight edges trim to the
             // face and demoted underlay rects draw at the node's true size. (Node-rep
@@ -291,15 +277,9 @@ impl Canvas {
             &self.graph,
             &self.view,
             &self.hidden_edges,
-            &node_visible,
+            |key| node_visible(key) && !fold_members.contains(&key),
         ));
-        if let Some(fold) = &fold {
-            underlay.splice_world_overlays(fold_summary_overlay(
-                fold,
-                &positions,
-                self.style.node_color,
-            ));
-        }
+        underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
         // Highlight selected edges by splicing thicker strokes inside the
         // underlay's camera transform (world space — no transform replication).
         if !self.selected_edges.is_empty() {
@@ -418,7 +398,21 @@ impl Canvas {
             let class = format!("{state_class}{shape_class}{representation_class}");
             gnode_updates.push((gnode, style, Some(class)));
         }
+        // Each fold's "+N", over the node layer it belongs to: none when the
+        // host draws the gnodes itself (it reads `fold_badges` instead).
+        let badges: Vec<((f32, f32), String)> = if self.render_gnodes_as_dom {
+            Vec::new()
+        } else {
+            folds
+                .iter()
+                .filter_map(|fold| {
+                    let at = self.fold_badge_anchor(fold, |key| positions.get(&key).copied())?;
+                    Some((at, fold.badge()))
+                })
+                .collect()
+        };
         let stage_node = self.stage_node;
+        let mut badge_nodes = std::mem::take(&mut self.fold_badge_nodes);
         observer.mark(3);
         let (_, restyle) = self.node_document.mutate_dom(|dom| {
             set_style(dom, stage_node, "transform: translate(0px, 0px) scale(1);");
@@ -428,7 +422,9 @@ impl Canvas {
                     set_class(dom, *gnode, class);
                 }
             }
+            place_fold_badges(dom, stage_node, &mut badge_nodes, &badges);
         });
+        self.fold_badge_nodes = badge_nodes;
         tracing::debug!(?restyle, "canvas pool: Livery mutation batch");
         observer.mark(4);
         let nodes_plist = self

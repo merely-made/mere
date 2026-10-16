@@ -14,6 +14,17 @@ The [current reconciliation](#11-current-consumers-and-design-direction-2026-10-
 links the design language, actual consumer progress, ambient-context proposal
 and the separate Moot applet experiment. It changes no ownership or release bar.
 
+**Amended 2026-10-14:** [§12](#12-mount-boundary-compound-documents-and-networked-sharing-2026-10-14)
+records AC7 to AC10. A forest mount's boundary is a shadow root, which
+amends AC5's scope class. Genet's accessibility walk gets a fix lane.
+Compound documents are the use of the forest mount that AC1 left unnamed.
+Accessible app sharing is AC6's motivating consumer.
+
+**Amended 2026-10-15:** the AC7 mount probe ran and passed, and Mark ruled
+AC11 and AC12 on its findings. `OwnedLayout` must discover style resources,
+and the forest mount's owner is the shadow host. See the
+[probe note and AC11 to AC12](#progress-mount-probe-ac7-run-2026-10-15) in §12.
+
 Read against Mere `362c5d5a` (main moved during the read; no commit in that
 window touched `crates/cambium`), Turnstone `032463ae` (the committed tree:
 another session is repinning its working tree, which was not used), Knot
@@ -885,3 +896,289 @@ CPU raster output can provide an independent visual control and export path;
 host upload/presentation and recovery after a driver reset need separate
 qualification. Backend selection must preserve guest/session authority, drafts
 and selection; it must not turn a rendering failure into a new applet grant.
+
+## 12. Mount boundary, compound documents and networked sharing (2026-10-14)
+
+**Status:** research, ruled (AC7 to AC10). Read against Mere `83450968`,
+Genet `origin/main` `b6bfbeb5`, netrender `6a24ae08` and Turnstone `c7a828eb`.
+These are static reads only. Nothing was built or run: the workspace disk had
+222 GB free that day, below the cleanup threshold. A main-session conversation
+with Mark raised the forks, after reviewing an outside research atlas of the
+stack.
+
+### Findings
+
+**F13. The mount exists, and it is unscoped.** `Runner::new_at`
+(`crates/cambium/cambium/src/runner.rs`, line 1246) builds beneath a live mount
+owned by the caller. `RetainedMount` (`crates/cambium/cambium/src/retained_mount.rs`,
+landed in `d5850920` on 2026-10-14) hosts a runner inline in a shared forest
+document. It reparents the owner container between stations and keeps its DOM
+and state intact. Graphshell's port uses it
+(`ports/graphshell/docs/receipts/query_views_20261013/`). The owner
+container is a plain `div`, `cambium-retained-owner`, so a guest inherits the
+host's sheet. AC5's scope class has not been applied. Rootstock's `WindowDom`
+already limits `shadow_roots()` to its own window
+(`crates/cambium/cambium-rootstock/src/window_dom.rs`, line 129).
+
+**F14. Genet's Shadow DOM supplies the boundary.** It landed 2026-09-07/08
+(`genet/design_docs/2026-09-07_shadow_dom_plan.md`). The flat tree spans both
+DOMs, and Livery's style walk, box construction and hit testing follow
+`flat_children`. Style scoping is met:
+- a shadow tree's sheets apply inside it, and the document's sheets do not cross in;
+- inheritance follows the flat tree;
+- Cadency matches `:host`, `:host()`, `::slotted()` and `::part()` across tree
+  scopes (`genet/components/cadency/README.md`).
+
+Four of that plan's residuals touch a mount:
+- `:host-context()` is unsupported.
+- `adoptedStyleSheets` waits on constructable sheets. A guest's sheet would be
+  a `<style>` element in the shadow root instead.
+- Focus delegation is missing: focusing a host does not move focus, and focus
+  is not tracked per tree scope.
+- `getComposedRanges` ignores its `shadowRoots` argument
+  (`genet/design_docs/2026-09-07_selection_range_plan.md`, residual 4). That
+  is the piece selection across the boundary needs.
+
+**F15. Genet's accessibility projection does not enter shadow trees.**
+`projection_walk` (`genet/components/genet-render/src/a11y.rs`, line 774 at
+`b6bfbeb5`) recurses through `dom_children`, and so does `descendant_text`
+(line 214). A shadow root is not a DOM child of its host. So shadow-tree
+content never reaches the AccessKit tree, on any page, and names built from
+descendant text miss it. The Shadow DOM plan moved style, boxes and hit
+testing onto the flat tree, but its list did not include the accessibility
+walk. This comes from reading the code and has not been confirmed by a run.
+
+**F16. Networked sharing has its parts but no measurement.** `PaintEnvelope`
+is the wire form (F7). It carries invisible `HitTest` items with tags the
+producer chooses (`netrender/paint_list_api/src/lib.rs`, line 272), so a
+receiving host can hit-test without a round trip. AccessKit 0.24 has a `serde`
+feature, which Genet enables (`genet/Cargo.toml`). No document records how
+many bytes a real frame takes. Two existing plans bear on this:
+- Turnstone P4 shares presence, follow and pointer signals over the same
+  addressed objects; each peer renders the resource itself
+  (`turnstone/design_docs/2026-07-28_turnstone_peer_web_reframe.md`, P4).
+- The Commons calls plan makes screen sharing a later product, and its first
+  slice "must not create abstractions for them"
+  (`mere_docs/implementation_strategy/2026-07-27_commons_calls_plan.md`).
+
+**F17. Prior art.** *Reading, not ruled.* B2 corresponds to the iframe and B3
+to a custom element with a shadow root. The web made this choice once already,
+with the same trade: isolation against taking part in find, selection, flow
+and accessibility. A2 is Chromium's site-isolation architecture. Renderer
+processes send display lists and serialized accessibility tree updates, and
+out-of-process frames graft in by child-tree id. AccessKit's `TreeId` and
+graft follow that lineage. OpenDoc and OLE compound documents are the
+warning: their parts failed on versioning and coordination, which is F10's
+pin-set problem.
+
+### Forks and rulings (2026-10-14)
+
+**AC7. Where is a forest mount's boundary?** The forks were put with F13 and
+F14. Options:
+- **(a)** A shadow root. `RetainedMount`'s owner becomes a shadow host, and
+  the guest's sheet lives in its shadow root, scoped by Livery's existing
+  cascade. A windowless probe gates it.
+- (b) A scope class, as AC5 ruled.
+- (c) Unscoped, until a consumer is hurt by it.
+
+Mark: **"Shadow root (Recommended)"**. *Follows:* B3's mount boundary is a
+shadow root. This amends AC5's "a guest's sheet carries a scope class". AC5's
+mount reservation and U17's per-session registries stand. The probe below
+gates adoption.
+
+**AC8. What happens to Genet's accessibility walk (F15)?** Options:
+- **(a)** Record a residual in Genet's Shadow DOM plan, and give a fix lane a
+  failing-first test, followed by a walk over the flat tree.
+- (b) Fix it in the main session, now.
+- (c) Note it only.
+
+Mark: **"Residual + fix lane (Recommended)"**. *Follows:* the residual is
+residual 11 of Genet's Shadow DOM plan. A Genet lane works on branch
+`shadow-a11y-walk` in its own worktree. It writes the failing test first: a
+button inside an open shadow root must reach the projection, and the same
+button in light DOM is the control. Then it fixes the walk. Under Mark's
+accessibility-first ruling (Turnstone U2) this bug sits ahead of any mount
+work, since every web page with shadow content is affected.
+
+**Landed 2026-10-14.** F15 was confirmed by a run. The light-DOM button
+projected and its shadow-root twin produced `[]`. The fix is on Genet main at
+`85252e20`, with Mark's rulings 11.1 to 11.3 recorded in residual 11 of
+`genet/design_docs/2026-09-07_shadow_dom_plan.md`:
+- Projection, AccName name-from-content and scroll-ancestor climbs follow the
+  flat tree.
+- `aria-labelledby`, `aria-describedby` and `<label for>` resolve within
+  their own tree.
+- `descendant_text`, which supplies only the textarea and input value, stays
+  on DOM children.
+
+genet-render passes 48 of 48 tests. With only the old walk restored, the four
+shadow tests fail. F15's remark about descendant-text names was wrong: names
+come from `a11y/name.rs`. No WPT or screen-reader run covers the fix yet.
+AC7's mount probe needs a Mere pin that includes `85252e20`.
+
+**AC9. Is compound documents the use of forest mounts that AC1 left
+unnamed?** Here "compound documents" means find, selection, flowing layout and
+reading order that cross from host content into guest content. Options:
+- **(a)** Yes; record it under AC1.
+- (b) Record it as one candidate; the question stays open.
+- (c) No.
+
+Mark: **"Yes, that's it (Recommended)"**. *Follows:* the forest mount is for
+compound documents: a host document that carries a guest's live content inline.
+The guest's content then flows and fragments with the host's layout. Find and
+selection cross the boundary, and a screen reader reads host and guest in one
+order. A retained session cannot give any of these, because its document is
+its own. B3's first consumer is such a document, for example a live Woodshed
+fretboard inline in a Knot document. The known risk is F10 and F17's
+version coordination. Selection across the boundary waits on F14's
+`getComposedRanges` residual.
+
+**AC10. What is AC6's motivating consumer?** Options:
+- **(a)** Accessible app sharing, plus a probe of frame sizes. A peer receives
+  paint lists and the AccessKit tree, renders them crisply, and reads them
+  with the viewer's own screen reader. This is the shape of Commons' later
+  screen-sharing product.
+- (b) The same, recorded without a measurement.
+- (c) Leave AC6 as local research.
+
+Mark: **"Record, plus size probe (Recommended)"**. *Follows:* AC6's research
+target now has a consumer: accessible app sharing to a peer. It covers what P4
+co-browsing cannot, a view of state the peer does not hold. It is presentation
+only and never authority, as P4 rules for live sessions. The calls slice gains
+no abstraction for it. AC6's ordering stands: after AC1's path is proven.
+
+### Probes authorised by AC7 and AC10
+
+Both wait until the workspace disk is back above its cleanup threshold. Neither
+has an owner yet.
+
+- **Mount probe (AC7), windowless.** It needs a `ScriptedDom` with a document
+  sheet, plus a host element with an open shadow root. The shadow root holds a
+  `<style>` and a runner owned by a `RetainedMount`. Done when:
+  - the guest's rule applies inside;
+  - the document's rule does not cross in, but inheritance still does;
+  - the guest's rule does not leak out;
+  - a hit test inside the guest's rectangle returns the guest's node;
+  - once AC8 lands, the guest's button is in the AccessKit tree.
+
+  Controls, which must fail: a plain-`div` mount (the host's rule leaks in);
+  and the guest's `<style>` placed outside the shadow root (it leaks out).
+- **Frame-size probe (AC10).** Measure the postcard bytes of one real Cambium
+  application's `PaintEnvelope` and its AccessKit `TreeUpdate`, for the first
+  frame and for a steady-state frame after a keystroke, with fonts and images
+  counted separately.
+
+### Progress: mount probe (AC7), run 2026-10-15
+
+The disk precondition above is met (1.1 TB free on 2026-10-15). Mark approved
+the probe on 2026-10-15 and ruled "Approve dev-dep (Recommended)" on its one
+fork. It ran against Mere `90ce8f12` with Genet `ae3d9f5`, which contains the
+accessibility fix `85252e20`. The code is
+`crates/cambium/cambium-rootstock/src/mount_probe_tests.rs`, declared in
+`lib.rs` as a test-only module, with `genet-document-resources` added as a
+dev-dependency of `cambium-rootstock` (already a workspace dependency and in
+`Cargo.lock`). It sits in Rootstock because `WindowDom` lives there. It changes
+no library code in Cambium or Rootstock.
+
+**Result: AC7's boundary holds. All five done-conditions pass and both controls
+fail where they should.** `cargo test -p cambium-rootstock --lib mount_probe`:
+5 passed. The whole Rootstock lib suite: 103 passed, 1 ignored, 0 failed.
+
+Setup: a `ScriptedDom` whose document sheet colours `#host` blue and italicises
+`button, .note`. The host `div` has an open shadow root. The guest is a
+`GenetAppRunner::new_at` runner (a `section` with a button and a `.note` span)
+owned by a `RetainedMount`. The guest's `<style>` is in the shadow root and
+makes `button` green, bold, 120 by 30. The values below are those the runs
+printed.
+
+| Done-condition | Shadow root, owner inside it | Shadow root, owner is the host |
+|---|---|---|
+| Guest's rule applies inside | pass: button `rgb(0, 128, 0)`, bold | pass |
+| Document's rule does not cross in | pass: guest button and note `normal`; outside note `italic` | pass |
+| Inheritance still crosses | pass: guest note `rgb(0, 0, 255)`, the host's colour | pass |
+| Guest's rule does not leak out | pass: outside button `rgb(0, 0, 0)`, `normal` | pass |
+| Hit test in the guest's rectangle | pass: centre of the button's 120 by 30 box returns the button node | pass |
+| Guest's button in the projection | pass: `document_a11y_projection_with_style` lists "Guest action" as a button, after "Outside action" | pass |
+
+Controls:
+
+| Control | Observed | Reads as |
+|---|---|---|
+| Plain `div` mount | guest button `font-style: italic`, note `italic`; outside button also turns green and bold | **fails as required.** The document's rule leaks in, and the guest's sheet, being document-scope, leaks out. |
+| Guest `<style>` in the document, outside the shadow root | outside button turns green and bold; guest button stays blue and `normal` weight | **fails as required.** It leaks out, and it also cannot reach in, because a document-scope sheet does not cross the boundary. |
+
+Two probe shapes ran because AC7(a) and the probe text differ. The probe text
+puts the runner's owner inside a separate host's shadow root. AC7(a) says the
+owner "becomes a shadow host", so the runner mounts at the owner's shadow root
+(`new_at` accepts a shadow-root node). Both scope identically.
+
+**Findings for adoption.** These are the things the probe found, not changes it
+made.
+
+1. **The production host path cannot scope a guest sheet yet.**
+   `OwnedLayout::new` (`cambium-rootstock/src/owned_layout.rs`, line 99) calls
+   `StyleSet::cambium(sheets)`. Genet's `cambium()` (`genet-livery/src/style.rs`,
+   line 338 at `ae3d9f5`) builds every sheet with `owner_node: None`, so every
+   sheet is document-scope and the `<style>` elements a DOM carries are never
+   read. Genet's tree-scope boundary keys on the owner node. The probe therefore
+   built its own pipeline: `ResolvedDocumentResources::discover`, then
+   `StyleSet::cambium_resources`, `resolve_styles`, `layout_with_text_system`,
+   `hit_test_with_scroll` and `document_a11y_projection_with_style`, with the
+   closures `OwnedLayout` passes. Before a shadow-root mount can be scoped in a
+   real host, `OwnedLayout` must build its `StyleSet` from discovered resources.
+   That is Rootstock work and was not done here.
+2. **`RetainedMount::withdraw_from` does not work from inside a shadow tree.** It
+   finds its source by walking `parent()`, and a shadow root has no parent
+   (`genet-scripted-dom/shadow.rs`). In the run, `withdraw_from(host)` returned
+   `false` with the owner inside the host's shadow root and `true` when the owner
+   was the host. So AC7(a)'s shape (the owner is the shadow host, in the light
+   DOM) keeps station reparenting and teardown working with no change, and the
+   probe-text shape does not. This favours the owner-is-host shape for adoption.
+3. **What the probe did not test:** the residuals in F14 (`:host-context()`,
+   focus delegation and per-scope focus, `getComposedRanges`), real fonts, a
+   mount moving between stations, and a screen-reader run (the F15 fix is
+   covered by Genet's tests, not a WPT or screen-reader run). Only
+   `RetainedMount::new` and `new_at` were exercised unchanged; the owner's
+   `width:100%; height:100%` took the host's 300 by 100 box.
+
+### Rulings on the probe's findings (2026-10-15)
+
+**AC11. How should the production host path scope a guest sheet?** The fork was
+put with the probe's first finding. `OwnedLayout::new`
+(`cambium-rootstock/src/owned_layout.rs`, line 99) calls
+`StyleSet::cambium(sheets)`, so every sheet is document-scope and no `<style>`
+element is read. The probe passed only by building its own style set. Options:
+- **(a)** `OwnedLayout` discovers resources. It builds its `StyleSet` from
+  `ResolvedDocumentResources::discover`, keeping the host's `sheet` strings as
+  ownerless document sheets. A Rootstock-only change; the probe's pipeline moves
+  in as the failing-first test. The cost of discovery per relayout is unmeasured.
+- (b) The mount registers its own sheet: `RetainedMount` takes the guest's CSS
+  and the host registers it with the shadow root as owner node, with no scan.
+- (c) Defer until the first compound-document consumer forces it.
+
+Mark: **"OwnedLayout discovers resources (Recommended)"**. *Follows:* the
+production host path builds its style set from discovered resources, so a
+guest's `<style>` in a shadow root is scoped as the probe shows. This is
+Rootstock work and has no plan yet. *Reading, not ruled:* measure the cost of
+discovery per relayout before it lands, and keep the host's `sheet` strings as
+ownerless document sheets, as option (a) described.
+
+**AC12. Which shape is the forest mount?** The fork was put with the probe's
+second finding. `RetainedMount::withdraw_from` walks `parent()`, and a shadow
+root has no parent. In the run, `withdraw_from(host)` was `false` with the owner
+inside a host's shadow root and `true` when the owner was the host. Options:
+- **(a)** The owner is the shadow host, as AC7(a) worded it. The owner stays in
+  the light DOM, so withdrawal, station reparenting and teardown work unchanged,
+  and `new_at` mounts at the owner's shadow root. `RetainedMount` must attach or
+  expose that shadow root, a small Cambium change.
+- (b) The owner sits inside a host's shadow root, as the brief's probe text had
+  it. `withdraw_from`, and any other `parent()` walker, must walk composed
+  parents through shadow hosts.
+- (c) Leave open until a consumer.
+
+Mark: **"Owner is the shadow host (Recommended)"**. *Follows:* AC7(a)'s wording
+stands: the owner is the shadow host and the guest runner mounts at its shadow
+root. The probe-text shape is not adopted. *Reading, not ruled:* the Cambium
+change is that `RetainedMount` attaches or exposes the owner's shadow root; its
+form (attach inside `RetainedMount::new`, or a constructor option) is open, and
+it has no plan yet. The guest's `<style>` goes in that shadow root.

@@ -1,0 +1,19 @@
+{
+  "base_commit": "99ecfdeeb891bdee4387fa8d679917a5849a25bc",
+  "genet": "7ffe66208ca3059283ef8770de7d17aa8834ecc8",
+  "netrender": "f4f9c0d87e6a6030b61075a45118055dfe6a12df",
+  "files_sha256": {
+    "Cargo.toml": "e76b2c8ecaf621d18a72b5aa326766223085a4ea0bf5a69d8fca7353e13cd6dd",
+    "ports/graphshell/web/Cargo.toml": "c19af25ec703901f761d0284d9e120f6c77c3612009fda2d14890d18bda24fd0",
+    "ports/distillery/probe/Cargo.toml": "f4b6d2a19b2ba0b3a6f412169eb11768f8810c17fce642aa52daac586082e16a",
+    "crates/cambium/examples/genet_web_smoke/Cargo.toml": "8ec381d244c03f6c21599b7ebb9936d5aec80edf689af5c2a6daa41bad58171d",
+    "ports/graphshell/web/.cargo/config.toml": "54b55c6f0871084517dcfb7543afc365c398b15250fcc3e0f736c12e53c7f2ef",
+    "crates/cambium/examples/genet_web_smoke/.cargo/config.toml": "41b30e7676eb3505b8c332467fb66817b08fb8729579298f6f7f76dce619326f"
+  },
+  "inherited_flags": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS": null,
+    "RUSTC_WRAPPER": null
+  }
+}

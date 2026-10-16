@@ -1,0 +1,848 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        742,
+        667
+      ],
+      "canvas_physical_size": [
+        1484,
+        1334
+      ],
+      "log": [
+        "captured link_source_records",
+        "captured exact_link_assertion",
+        "captured retained_assertion_history",
+        "link and exact assertion inspection preserve selection and workbench membership",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "ok",
+      "saved_graph": {
+        "address": "https://example.test/i2p-port",
+        "file": null,
+        "owner_observation": {
+          "actual_app_present": true,
+          "actual_graph_session": "4ca21142-171b-48bf-a2f0-f08a03842440",
+          "actual_session_changes": 0,
+          "forme_model_session": "4ca21142-171b-48bf-a2f0-f08a03842440",
+          "forme_region_id": null,
+          "forme_session_matches": true,
+          "schema": "graphshell.actual-owner-observation/v1"
+        },
+        "reopened": true,
+        "save_state": "idle",
+        "selected": "81b91a6b-52ef-5751-b497-15f711cf9c70",
+        "session": "4ca21142-171b-48bf-a2f0-f08a03842440",
+        "tags": "research, transport",
+        "title": "I2P port notes"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "link_source_records",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 350822
+      },
+      {
+        "name": "exact_link_assertion",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 466706
+      },
+      {
+        "name": "retained_assertion_history",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 510358
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Graphshell",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "status",
+              "label": "saved graph \u00b7 11 nodes \u00b7 selected: 1 \u00b7 primary: https://example.test/i2p-port",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph tools",
+                  "expanded": true,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Open selected in workbench",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Show workbench",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Undo session",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Redo session",
+                  "children": []
+                },
+                {
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Add an object",
+                      "expanded": false,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect selected access",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect fields",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Open details",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Dataspace",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "group",
+                      "label": "11 of 11 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "I2P port notes",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "I2P service",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Reference notes",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Reference-host scene",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Mounted remote projection",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Alice",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Alice's laptop",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Alice's phone",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "SSH signing key reference",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Open-address grant",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "Synthetic signing receipt",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Appearance",
+                              "expanded": false,
+                              "children": []
+                            },
+                            {
+                              "role": "status",
+                              "label": "Appearance status",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "heading",
+                                  "label": "Inspector",
+                                  "children": []
+                                },
+                                {
+                                  "role": "paragraph",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "role": "status",
+                          "label": "Storage: IndexedDB reopened \u00b7 not persistent, may be evicted",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Arrangement and physics",
+                                  "expanded": true,
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Arrangement",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "role": "button",
+                                      "label": "Apply arrangement",
+                                      "children": []
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Role",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "role": "button",
+                                      "label": "Apply role",
+                                      "children": []
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Physics law",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "role": "group",
+                                      "label": "Overlays",
+                                      "children": [
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "checkbox",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Kinds",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Groups",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Mass",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Depth",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "role": "button",
+                                      "label": "Apply physics",
+                                      "children": []
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Speed",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "combobox",
+                                          "label": "Profile",
+                                          "expanded": false,
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "role": "button",
+                                      "label": "Apply profile",
+                                      "children": []
+                                    },
+                                    {
+                                      "role": "status",
+                                      "label": "Physics status",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Find and filter",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Scenes and transfers",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Projection editor",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "History",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Explain selected dynamics",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Presentation rules",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Saved query views",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "New query view",
+                              "children": []
+                            },
+                            {
+                              "role": "status",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Fields",
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "paragraph",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Unlock forme",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Undo saved forme change",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Redo saved forme change",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Hide forme boundary",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Select forme members",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Retry workbench save",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 742,
+      "height": 1044
+    }
+  },
+  "capture_files": [
+    "link_source_records",
+    "exact_link_assertion",
+    "retained_assertion_history"
+  ]
+}

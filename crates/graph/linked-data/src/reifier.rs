@@ -230,9 +230,12 @@ mod tests {
                 predicate: "https://example.test/claims".to_string(),
                 recognized_sub_kind: None,
                 label: Some(format!("assertion {index}")),
+                basis: Default::default(),
                 graph_scope: GraphScope::User,
                 provenance_iri: Some(format!("https://author.test/{index}")),
                 asserted_at_ms: Some(42 + index as u64),
+                first_asserted_ms: Some(42 + index as u64),
+                withdrawn: None,
             })
             .collect();
         for resource_projection in [false, true] {
@@ -258,9 +261,12 @@ mod tests {
                                 predicate: statement.predicate.clone(),
                                 recognized_sub_kind: None,
                                 label: statement.label.clone(),
+                                basis: statement.basis.clone(),
                                 graph_scope: statement.graph_scope.clone(),
                                 provenance_iri: statement.provenance_iri.clone(),
                                 asserted_at_ms: statement.asserted_at_ms,
+                                first_asserted_ms: statement.first_asserted_ms,
+                                withdrawn: statement.withdrawn.clone(),
                             })
                             .collect(),
                         ..Default::default()

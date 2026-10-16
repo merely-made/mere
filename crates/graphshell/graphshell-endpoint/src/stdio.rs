@@ -180,12 +180,18 @@ mod native {
     }
 
     fn parse_request(line: &str) -> Result<CarrierRequest, CarrierResponse> {
-        serde_json::from_str(line).map_err(|error| CarrierResponse {
+        let invalid = |reason: String| CarrierResponse {
             id: 0,
             body: Err(CarrierFailure {
-                message: format!("invalid carrier request: {error}"),
+                message: format!("invalid carrier request: {reason}"),
             }),
-        })
+        };
+        match chirograph::line::decode::<CarrierRequest>(line) {
+            Ok(Some(request)) => Ok(request),
+            // Callers skip blank lines before parsing; one here is malformed.
+            Ok(None) => Err(invalid("blank line".to_string())),
+            Err(error) => Err(invalid(error.to_string())),
+        }
     }
 
     /// Stdio's dispatch: the carrier-agnostic verbs come from
@@ -242,16 +248,17 @@ mod native {
     }
 
     fn write_response(writer: &mut impl Write, response: &CarrierResponse) -> io::Result<()> {
-        serde_json::to_writer(&mut *writer, &CarrierOutput::Response(response.clone()))
-            .map_err(io::Error::other)?;
-        writer.write_all(b"\n")?;
-        writer.flush()
+        write_output(writer, &CarrierOutput::Response(response.clone()))
     }
 
     fn write_notice(writer: &mut impl Write, notice: &CarrierNotice) -> io::Result<()> {
-        serde_json::to_writer(&mut *writer, &CarrierOutput::Notice(notice.clone()))
-            .map_err(io::Error::other)?;
-        writer.write_all(b"\n")?;
+        write_output(writer, &CarrierOutput::Notice(notice.clone()))
+    }
+
+    /// One output as one line ([`chirograph::line`]), flushed.
+    fn write_output(writer: &mut impl Write, output: &CarrierOutput) -> io::Result<()> {
+        let line = chirograph::line::encode_terminated(output).map_err(io::Error::other)?;
+        writer.write_all(&line)?;
         writer.flush()
     }
 
@@ -302,11 +309,11 @@ mod native {
             let input = self.input.as_mut().ok_or_else(|| {
                 CarrierError::Disconnected("endpoint input is closed".to_string())
             })?;
-            serde_json::to_writer(&mut *input, &request).map_err(|error| {
+            let line = chirograph::line::encode_terminated(&request).map_err(|error| {
                 CarrierError::Disconnected(format!("could not encode carrier request: {error}"))
             })?;
             input
-                .write_all(b"\n")
+                .write_all(&line)
                 .and_then(|()| input.flush())
                 .map_err(|error| {
                     CarrierError::Disconnected(format!("could not send carrier request: {error}"))
@@ -352,18 +359,27 @@ mod native {
         }
 
         fn read_output(&mut self) -> Result<CarrierOutput, CarrierError> {
-            let mut line = String::new();
-            self.output.read_line(&mut line).map_err(|error| {
-                CarrierError::Disconnected(format!("could not read carrier output: {error}"))
-            })?;
-            if line.is_empty() {
-                return Err(CarrierError::Disconnected(
-                    "endpoint closed without an output frame".into(),
-                ));
+            loop {
+                let mut line = String::new();
+                self.output.read_line(&mut line).map_err(|error| {
+                    CarrierError::Disconnected(format!("could not read carrier output: {error}"))
+                })?;
+                if line.is_empty() {
+                    return Err(CarrierError::Disconnected(
+                        "endpoint closed without an output frame".into(),
+                    ));
+                }
+                match chirograph::line::decode::<CarrierOutput>(&line) {
+                    Ok(Some(output)) => return Ok(output),
+                    // A blank line keeps a link warm; it is not a frame.
+                    Ok(None) => continue,
+                    Err(error) => {
+                        return Err(CarrierError::Disconnected(format!(
+                            "invalid carrier output: {error}"
+                        )));
+                    },
+                }
             }
-            serde_json::from_str(&line).map_err(|error| {
-                CarrierError::Disconnected(format!("invalid carrier output: {error}"))
-            })
         }
 
         pub fn shutdown(mut self) -> io::Result<()> {

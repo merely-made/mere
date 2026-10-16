@@ -161,12 +161,26 @@ mod coupling_trace;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
+mod fold_paint;
+pub use fold_paint::{FoldEndpoint, FoldRoute};
 mod forme_region;
-pub use forme_region::{FormeCell, FormeRegion};
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
+pub use forme_region::{FormeCell, FormeRegion};
+/// What a host implements to use the camera, command and face helpers.
+pub mod camera_host;
+/// Camera, arrangement and physics commands a host's controls share.
+pub mod controls;
 mod elapsed;
+/// Whether each node's face sits on its body, read back for receipts.
+pub mod face_alignment;
 pub mod fold_projection;
+mod folds;
+/// Wheel, touch and keyboard-pan policy and camera arithmetic.
+pub mod gestures;
+/// Arrangement and physics actions a host's controls apply.
+pub mod physics_controls;
+pub use folds::FoldBadge;
 mod frame;
 mod frame_profile;
 pub use frame_profile::CanvasFrameProfile;
@@ -203,21 +217,21 @@ pub use physics_device::{PhysicsDevice, physics_device_for};
 /// Compositions beyond a law and its overlays: a weighted mix of force laws
 /// and groups. (Dynamics grammar plan, G3.)
 pub mod composition;
-mod dynamics_record;
-pub mod relationship_topology;
 mod dynamics_inspection;
+mod dynamics_record;
 mod node_presentation;
+pub mod relationship_topology;
 pub use dynamics_inspection::{DynamicsInspection, DynamicsTarget, MemberDynamics};
+pub mod dynamics_recipe;
 /// The dynamics spec over this catalog: seiche's portable spec, with the
 /// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
 pub mod dynamics_spec;
-pub mod dynamics_recipe;
-pub mod projection_dynamics;
-mod projection_backdrops;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
 mod physics_view;
+mod projection_backdrops;
+pub mod projection_dynamics;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
 pub mod schedule;
@@ -354,7 +368,7 @@ pub struct ContextRequest {
 /// cells, and physics positions deliberately do not participate.
 #[derive(Clone)]
 struct FoldViewState {
-    fold: Option<forme::FoldRecord>,
+    folds: Vec<curation::FoldRecord>,
     selected: HashSet<NodeKey>,
     selected_edges: HashSet<EdgeCell>,
 }
@@ -753,14 +767,25 @@ pub struct Canvas {
     /// curated subset), projecting through a curated forme arrangement instead of the
     /// full Identity one. `None` shows the whole graph. (Curated canvas.)
     scope: Option<Vec<NodeKey>>,
-    /// One view-local fold currently rendered as a synthetic summary object. Its
-    /// members stay in the source graph and the physics layout; only this Canvas
-    /// projection replaces them visually. (Graph view curation C3.)
-    fold: Option<forme::FoldRecord>,
-    /// A pending summary-object click. Keeping this separate from node dragging
-    /// lets a click expand the fold without ever making the synthetic summary a
-    /// source-graph node.
-    fold_press: Option<(forme::FoldId, (f32, f32))>,
+    /// The authored stable-ID roster behind an exact scope. A host that scopes to
+    /// an authored roster keeps members that are not resident, and an empty
+    /// roster stays empty rather than clearing to Show all. `scope` is
+    /// re-resolved from this whenever the graph is replaced. Any other scope
+    /// change, and [`Canvas::clear_scope`], drops it.
+    exact_scope: Option<std::collections::BTreeSet<uuid::Uuid>>,
+    /// The view-local folds, never sharing a member, each drawn as its
+    /// stand-in: a summary body or a member with "+N". Their members stay in
+    /// the source graph and the physics layout; only this Canvas projection
+    /// replaces them visually. (Graph view curation C3; mer3ly site plan,
+    /// Rulings 165 and 166.)
+    folds: Vec<curation::FoldRecord>,
+    /// A pending stand-in click (a summary body or a badge). Keeping this
+    /// separate from node dragging lets a click expand the fold without ever
+    /// making the synthetic summary a source-graph node.
+    fold_press: Option<(curation::FoldId, (f32, f32))>,
+    /// The "+N" badge elements in the node document, made as folds need
+    /// them and reused; each with its text node and the text it shows.
+    fold_badge_nodes: Vec<(DomNodeId, DomNodeId, String)>,
     /// Fold/expand curation history. This stays local to one Canvas and is
     /// discarded on a graph switch, just like selection and other view state.
     fold_undo: Vec<FoldViewState>,
@@ -783,11 +808,13 @@ mod actions;
 pub(crate) mod at_rest;
 mod cartography;
 mod derived_face;
-mod gloss;
 mod framing;
+mod gloss;
 mod lifecycle;
+pub mod link_reading;
 mod nodes;
 mod reader;
+pub mod responsive_link_adapter;
 mod roles;
 mod selection;
 mod source_time;

@@ -1,0 +1,76 @@
+{
+  "qualified_utc": "2026-10-14T08:38:29.577418+00:00",
+  "parent_receipt": "netrender-bridge-source-closure.json",
+  "parent_receipt_sha256": "ebd9a95a83eb017cb008cf4de18570384c76c6114f31470087f11d115a632959",
+  "genet_revision": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "netrender_revision": "6a24ae08f55129b474282b8e4911564f875ce5fd",
+  "probe": {
+    "command": "cargo +1.99.0 metadata --manifest-path C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\Cargo.toml --format-version 1",
+    "exit_code": 0,
+    "package_count": 803,
+    "renderer_family": [
+      {
+        "name": "netrender",
+        "version": "0.1.2",
+        "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#netrender@0.1.2",
+        "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+      },
+      {
+        "name": "netrender_device",
+        "version": "0.1.2",
+        "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#netrender_device@0.1.2",
+        "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+      },
+      {
+        "name": "paint_list_api",
+        "version": "0.1.2",
+        "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#paint_list_api@0.1.2",
+        "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+      },
+      {
+        "name": "paint_list_render",
+        "version": "0.1.2",
+        "id": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#paint_list_render@0.1.2",
+        "source": "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+      }
+    ],
+    "genet_sources": [
+      "git+https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084"
+    ],
+    "metadata_file": "netrender-bridge-probe-metadata.json",
+    "metadata_sha256": "2c37c6ccbcdc8d928d0bd901f26de0f6f740633cb8a940baf2c74b2fc83b6777",
+    "log_file": "netrender-bridge-probe-metadata.log",
+    "log_sha256": "68d66907c121cd82631f666995a743568f477c9148ff39df62320a45ae275712",
+    "lock_path": "ports/distillery/probe/Cargo.lock",
+    "lock_before_sha256": "5a21dea936d093583cafecf1434741a96a5050355a081c8f7f5624403b7f75b9",
+    "lock_after_sha256": "dd43de27d5d62a60bc88bd3c66c5bd4bd81c535a764606cf77ec8fa96d71b8f7",
+    "lock_package_count": 803,
+    "genet_source_rows_replaced": 20,
+    "netrender_source_rows_replaced": 4,
+    "non_source_diff_lines": 0,
+    "unrelated_package_version_dependency_source_checksum_changes": 0
+  },
+  "smoke": {
+    "command": "cargo +1.99.0 metadata --manifest-path C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\examples\\genet_web_smoke\\Cargo.toml --no-deps --format-version 1",
+    "exit_code": 0,
+    "scope": "Manifest metadata only, including declared direct supplier revisions; no resolved dependency-family claim.",
+    "metadata_file": "netrender-bridge-smoke-manifest-metadata.json",
+    "metadata_sha256": "ece77c1d09481e8343652c032f59496d39e0b85cf6b9f080255f7a068067d0ca",
+    "log_file": "netrender-bridge-smoke-manifest-metadata.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lock_ignored": true,
+    "lock_preexisting": false,
+    "lock_generated": false,
+    "lock_removed": false,
+    "lock_retained": false
+  },
+  "environment": {
+    "toolchain": "1.99.0",
+    "cargo_target_dir": "C:\\t\\cargo-targets\\mere",
+    "cargo_build_build_dir": "C:\\t\\cargo-targets\\mere\\build",
+    "builds_run": false,
+    "cargo_owner_released": true,
+    "isolated_resources_created": false
+  },
+  "custody": "Only tracked probe Cargo.lock and separate addendum/raw evidence changed. Existing root/web proof and all other locks left untouched."
+}

@@ -1,0 +1,9 @@
+{
+  "reason": "spareval >=0.10,<0.12 hash ranges resolved to mutually incompatible Digest trait versions",
+  "source": "registry spareval 0.2.7 Cargo.toml and expression.rs",
+  "native_sha1": "0.11.0",
+  "native_sha2": "0.11.0",
+  "native_md5": "0.11.0",
+  "scope": "spareval SHA1/SHA2 edges only; previous SHA1 consumers retain 0.10.7 and previous SHA2 consumers retain 0.10.9",
+  "validation": "Cargo metadata accepted the directed evaluator-edge repair; locked build pending"
+}

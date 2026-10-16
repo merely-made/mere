@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "distillery"
 version = "0.0.1"
 edition.workspace = true
@@ -25,6 +26,7 @@ cambium.workspace = true
 chirograph.workspace = true
 graphshell-endpoint.workspace = true
 sceno.workspace = true
+scenograph.workspace = true
 scenomise.workspace = true
 scenotime.workspace = true
 eidetic = { workspace = true, optional = true }

@@ -199,6 +199,12 @@ pub enum ProvenanceSubKind {
     /// its identity and host graph differ. Appended last so existing ordinals
     /// (and the positional `tag` encoding) stay stable.
     CopiedFrom,
+    /// A node a merge-in brought from another session: a branch's node merged
+    /// back into its parent, or a picked-off part's node merged back into the
+    /// session it was picked from (session merge-in note, M4). The reverse of
+    /// [`CopiedFrom`](Self::CopiedFrom), recorded on the target node. Appended
+    /// last to keep ordinals stable.
+    MergedFrom,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Archive, Serialize, Deserialize)]

@@ -113,7 +113,7 @@ All five mere commits (`476880b`, `0dd0c3e`, `3eed418`, `8dc3683`, `737e0cd`) ar
 - **Beechat `reticulum` 0.1.0 as the backend.** This appears in the Goal (lines 11-12), in "the probe stays pinned to Beechat 0.1.0" (lines 59-61), and in Progress 2026-06-29 (`reticulum = "0.1"`). `be99eadb` (2026-07-15) replaced it with retinue:
   - The feature is now `reticulum = ["dep:retinue", "dep:hkdf", "dep:sha2"]` (`crates/murm/transport/Cargo.toml:17`).
   - The workspace pins retinue 0.2.0 at git rev `fa4f925` (`Cargo.toml:567-573`).
-  - Retinue's v0 plan records "R5 — Mere adoption. DONE 2026-07-15" (`retinue/design_docs/2026-07-06_retinue_v0_plan.md:269`).
+  - Retinue's v0 plan records "R5 — Mere adoption. DONE 2026-07-15" (`murm/design_docs/2026-07-06_retinue_v0_plan.md:269`).
 - **Identity mapping** (lines 100-105, both keys HKDF-derived): only the X25519 half is HKDF-derived now. The Ed25519 half is the Mere master seed itself (`reticulum_transport/keys.rs`, `derive_identity`), changed in `a69e4867` (2026-07-27).
 - **Authenticated binding** `app_data = PeerID || signature` (lines 107-126): app data is now intentionally empty. The 96-byte form is read only as legacy (`announce.rs:38-51`, `:56-80`), changed in the same commit.
 - **protoc required** (Progress 07-01, risk table): that was Beechat's `build.rs`. The retinue crate has no `build.rs` (only a firmware one), and no tonic/prost.

@@ -15,7 +15,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use graphshell::native::tasks::{ResidentTasks, spawn_tracked};
+use graphshell_endpoint::door::tasks::{ResidentTasks, spawn_tracked};
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn cancel_and_join_releases_what_scoped_tasks_hold() {

@@ -183,7 +183,7 @@ standing alone is a feature of the plan rather than a delay.
   covered by **source truth** (the authority) and **a mere / datalake** (the
   dataspace). Three senses on one noun would be a lexicon regression.
 - Signalman is retinue's application (`apps/signalman-desktop` *(historical citation)* <!-- doc-audit: historical-path -->, founded
-  [2026-08-06](https://github.com/merely-made/retinue/blob/main/design_docs/2026-08-06_signalman_founding.md)),
+  [2026-08-06](https://github.com/merely-made/murm/blob/main/design_docs/2026-08-06_signalman_founding.md)),
   whose founding already states this brief's authority split from its side:
   graphshell surfaces meres rather than owning radios. Its postilion base
   (station logic with no UI) is what would make an embedded cross-application
@@ -1266,8 +1266,9 @@ above now govern the profile design; broader lifecycle checkpoints remain open.
 
 ### Embedding in caller owned wgpu contexts draft
 
-**Status (2026-10-13):** Design direction from Mark; contract and toolkit
-adapters proposed. Mark wants Mere, Genet, the stack and application components
+**Status (2026-10-13):** Bounded native readback qualified: six contract/input
+tests pass, and real egui/Iced callbacks render retained content and a Mere graph.
+Window input, physical accessibility and wider renderer paths remain open. Mark wants Mere, Genet, the stack and application components
 to embed into wgpu contexts with less integration work and more flexibility
 than the external browser trio. This is a consumer target, not a claim of a
 qualified universal GUI adapter.
@@ -1360,10 +1361,204 @@ accessibility action routing, wake/suspend/dispose and device recovery. The
 same source shown twice must preserve separate access/appearance state, and
 closing one appearance must release only its unnecessary resources.
 
+The first source implementation extends existing Cambium Rootstock owners rather
+than adding a second runtime. The opt-in adapters select egui 0.36.2 and exact
+Iced source `ab336f6d6403d7206d82c7c2caa46143efde8284`, both using the stack's
+wgpu 30 API. Released Iced 0.14 uses wgpu 27 and is not that qualified supplier.
+The caller owns Device, Queue, command encoder, submission and device generation.
+The adapter imports immutable native scenes from actual retained owners.
+
+The bounded encoder path uses pinned NetRender's SparseHybridSession. It supports
+native outline text and CPU-supplied images, using NetRender's atlas-cache-disabled
+owned text path, and explicitly refuses unsupported fragments/filters. The
+separate GPU glyph-atlas path can submit internally and needs supplier ownership
+work before it is admitted. The
+current default Classic Vello path submits internally; full encoder ownership
+requires a separate supplier change that also protects deferred GPU resource
+recycling and readback. Sparse admission does not prove Classic parity.
+
+The Graphshell consumer bench must render actual held HTML, selected Fleece
+text/WAV packets, image content and an actual Mere Canvas in both toolkit
+callbacks, including clipping, repeated appearance state, source identity and
+host generation replacement. Input conversion tests and GPU readbacks are
+separate evidence from physical toolkit-window IME/AT acceptance. Receipts live
+in `ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/`; pending
+checks are not passing receipts. The executed headless bench produced sixteen
+byte-identical egui/Iced image pairs, with outside-clip, scale and independent
+access checks. Rehydration changes caller generation on the same Device/Queue
+after suspension; it does not demonstrate an actual device replacement or loss.
+The final combined Genet b6/Netrender 6a bench retains all sixteen identical
+pairs. Its `final/` receipt records the RTX 4060 Laptop Vulkan adapter, one
+caller Device/Queue shared by both hosts, source hashes, PNG hashes and the
+same-handle generation 1-to-2 transition. The later scheduling observer has its
+own pool/consumer controls; those changes do not relabel the measured GPU basis.
+The locked GPU shader supplier still forces
+WESL/WGSL 0.4.0 with an older-compiler comment. That dependency currency question
+remains with its supplier; this adapter does not rewrite the selected compiler
+or existing Genet, Murm or Vello pins.
+
 Qualify the native lane first. Optional Scrying/Graft/Weld providers retain
 their separate backend and packaging gates. Extend existing render/session
 owners before promoting a facade; source, producer and application semantics
 remain with their respective owners.
+
+### Browser WebGL2 presentation tenants design (2026-10-13)
+
+**Status:** written design approved by the owner, 2026-10-13. Implementation
+planning is recorded in the [browser presentation tenants plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md).
+This continues the embedding draft above; native egui/Iced integration keeps
+its separate gates.
+
+#### Purpose and first consumer
+
+Graphshell's viewer must present the same disclosed graph and Cambium controls
+with WebGL2 available and WebGPU unavailable. The browser host owns the graphics
+context, frame schedule and presentation. Vello GPU is a renderer tenant;
+graph and document producers are content tenants. Native presentation retains
+its single host-owned wgpu device and queue.
+
+First acceptance covers the viewer cone, its Inspector and ordinary controls.
+Full product, remote and applet feature combinations require their own gates.
+Genet's page-facing WebGL API and WebGL2 conformance are independent work.
+
+#### Verified starting point
+
+Source inspection used Mere `0b9b7a9b2`. Rootstock's `Surface` in
+`crates/cambium/cambium-rootstock/src/lib.rs` exposes `RenderCore`,
+`TextureFormat` and `SurfaceTexture`. `ProducerContext` and `ProducedTexture`
+in `src/producer.rs` also expose wgpu handles. Cambium's web host `surface.rs`
+and Graphshell's `src/web_gpu.rs` boot that core. The browser manifest enables
+wgpu's `webgpu` feature. Direct WebGL2 needs a shared-host boundary change.
+
+Conatus `tenant/src/device.rs` supplies `HostDevice` and `DeviceNeeds` for its
+lit-body renderer. That crate retains its domain and wgpu contract. Presentation
+belongs to Rootstock/platform hosts; scene lowering belongs to Netrender and
+its providers. This design founds no generic tenant crate.
+
+On October 13 the ThinkPad's Chrome 155 produced exact pixels through WebGL2
+before resize, after resize and after forced context loss/restoration. The
+hardware run identified AMD Radeon Graphics and peaked at about 313 MiB under
+a 1 GiB kernel cap; SwiftShader passed separately. The fixture shadowed
+`navigator.gpu` on its own page. This proves browser lifecycle feasibility,
+not Vello or Graphshell acceptance. Raw source/result hashes are in
+`Code/testing/genet/webgl-viewer-20261013/receipt.json`.
+
+#### Ownership and frame boundary
+
+Rootstock owns retained DOM, layout, input, focus and accessibility. Shared
+frame preparation produces paint/scene descriptions and logical resource
+identities. Presentation consumes that output, viewport, physical scale,
+clipping and clear/composition policy; it reports presented, deferred,
+context-lost or failed outcomes. These describe a proposed contract, not
+compile-ready Rust signatures.
+
+The host owns context creation, resize, wake delivery, loss listeners and
+disposal. The wgpu adapter owns acquisition and submission. The WebGL2 adapter
+owns its drawing-buffer/framebuffer target and one Vello GPU renderer on that
+context. Device-specific handles stay within their adapter. Optional same-device
+wgpu services remain available to native/WebGPU tenants; their absence on
+direct WebGL2 is explicit.
+
+Reuse neutral Genet paint commands and Netrender lowering. Retained geometry,
+glyphs, images, transforms and placements preserve logical identity, while
+each adapter makes its own resource/cache representation. Device-bound textures
+and encoded renderer fragments cannot become interchangeable common handles.
+Where the WebGL provider cannot transform an encoded fragment, re-emit retained
+source commands and measure the cost. Keep one graph/layout implementation.
+
+Vello GPU's direct WebGL2 route uses no compute shaders. It must be reachable
+through Rootstock's shared redraw/semantics lifecycle, rather than a second
+Graphshell render loop. Refactor the presentation portion of the host; retain
+session authority and platform input with their current owners.
+
+#### Content tenants and resources
+
+Each image registration carries owner/appearance identity, content revision,
+dimensions, pixel/alpha convention and context generation. Revision and
+generation are separate. Scope registrations to the owning host/context;
+refuse retired registrations, stale generations and incompatible resources
+before composition.
+
+The wgpu adapter supplies same-device texture views. A WebGL2 content adapter
+supplies same-context textures or imports CPU pixels/browser image sources
+through an advertised upload route. Native wgpu textures and external WebGL
+contexts require an explicit transfer path; they cannot pass as host resources.
+For the first viewer, use retained graph scene commands where representable,
+preserving its model, picking and accessibility without an unavailable GPU
+texture producer.
+
+The importing adapter handles alpha conversion once. Qualify transparent
+pixels, source-over order, clipping and scaled placement. Image caches update
+on content revision and retire with their owning appearance. Import failures
+name their owner and reason; content is never silently dropped.
+
+Reserve ordered WebGL renderer/producer phases. Every phase establishes the
+state it relies on: Vello can change GL bindings and active texture units.
+Restoration of prior caller state is not assumed. Arbitrary third-party sharing
+of the context is outside first acceptance.
+
+#### Selection, capability and recovery
+
+Expose a host-configurable presentation choice: `auto`, `webgpu`, `webgl2`.
+An explicit choice boots that backend or reports a capability failure. `auto`
+tries WebGPU and then direct WebGL2 after an attributed boot refusal. Use a
+fresh presentation canvas if the first context choice prevents reuse, moving
+listeners/semantics bindings while retaining application state. An ordinary
+draw failure never silently changes backend.
+
+Report supported scene/import operations and compute availability. Direct
+WebGL2 uses the viewer's existing CPU dynamics route. Explicit requests for
+unavailable GPU compute report that outcome. Required unsupported paint fails
+with backend and operation identified; inventory the real viewer's operations
+before advertising support.
+
+On `webglcontextlost`, prevent default restoration cancellation, suspend GPU
+work and report unavailable presentation. Preserve CPU model/retained source
+state; invalidate GPU resources and outstanding captures. Input may continue
+updating the model. Restoration advances context generation, rebuilds renderer
+and producer resources, requests fresh producer frames and draws the latest
+state. Reject old handles and completion callbacks. Hidden/zero-size surfaces
+defer presentation; resumption requests a frame. Disposal releases owned
+listeners/resources without releasing another appearance's state.
+
+#### Acceptance and done-conditions
+
+1. Freeze supplier revisions, features, locks, bundle hashes, browser versions
+   and actual adapter identities. Qualify a Vello GPU WebGL2 scene first.
+2. With WebGPU unavailable, mount the real Graphshell viewer through the shared
+   Cambium host. Verify backend disclosure and graph/text/image/control pixels,
+   clipping, opacity, scale and resize. Compare equivalent WebGPU/WebGL2 scenes
+   with declared pixel tolerances.
+3. Update graph and producer-image content in place, observing revisions and
+   changed pixels. Remove/recreate an appearance and reject its stale resource
+   registration. Include a stale-generation negative control.
+4. Force loss/restoration on the viewer's actual context. Mutate its model
+   while lost, then show the latest state. Verify resize, capture completion or
+   refusal, and orderly disposal.
+5. Exercise pointer picking, keyboard focus/actions and the existing DOM
+   accessibility mirror with equivalent semantic targets on both backends.
+   Automated mirror/action results remain distinct from human AT acceptance.
+6. Preserve native/WebGPU host, same-device producer and viewer guards. Record
+   unsupported operations and refusal controls. Measure retained update cost
+   without inventing a performance threshold.
+
+First acceptance requires a physical-GPU viewer receipt on an available host
+and a functional receipt from a second browser implementation. Label software
+rendering separately. Builds/browser tests use the common machine admission
+lock and verified memory caps; choose ThinkPad or O-PC using fresh resource
+readings. Existing owner permission covers those tests.
+
+#### Alternatives and scope
+
+A viewer-only loop could demonstrate rendering sooner but fork the shared
+host lifecycle. WebGL hidden behind wgpu would not provide the selected direct
+Vello GPU route or resolve the compute renderer's requirements. The selected
+approach gives the shared host two presentation adapters over prepared content.
+
+After written-design review, owner-specific dated plans sequence the interface,
+Netrender lowering, browser adapter and viewer gates. This does not qualify
+egui/Iced embedding, page WebGL2, media, or arbitrary foreign-context sharing.
+Those retain separate contracts and acceptance.
 
 ## What this brief deliberately does not do
 
@@ -1372,3 +1567,142 @@ not found crates or promote proposed APIs. The historical sidequests and §7
 implementation candidates enter owner-specific plans when their research
 and consumer gates are met; existing implementation plans retain authority
 over work already in progress.
+
+
+## Shared Rust toolchain and minimum version (2026-10-13)
+
+**Owner direction:** use the newest Rust across the stack, with build-directory
+support, and unify the declared minimum versions as well. Existing manifest or
+CI floors are observations of the tree, not evidence that the owner requested
+older-compiler compatibility. The initial Murm move plan's inference of a
+Rust 1.88 preservation requirement is withdrawn.
+
+**Working toolchain:** current stable Rust 1.99.0, verified against the
+[official release announcement](https://blog.rust-lang.org/2026/10/01/Rust-1.99.0/).
+Pin this exact release in active owned build roots for development, formatting,
+linting and current-compiler qualification. Advance the working toolchain as
+new stable releases are qualified.
+
+**Selected shared MSRV: Rust 1.97.1**, independently of the working toolchain.
+The owner accepted this floor provided no requirement pins a newer minimum.
+The earlier interpretation requiring `rust-version = "1.99"` and simultaneous
+pin/minimum upgrades is withdrawn. Align owned packages to
+`rust-version = "1.97.1"` during the qualified rollout; advance the minimum only
+when language use, supported dependencies or an explicit support decision
+require it. Published older versions keep their historical metadata; do not
+rewrite third-party/vendored suppliers' minimums to manufacture agreement.
+
+The locked Mere metadata on 2026-10-13 contains 1,614 resolved packages and no
+declared floor above 1.97.1. Iroh 1.3.0 declares 1.91, the refreshed p2panda
+supplier declares 1.96, Knot packages declare 1.97, and WESL/WGSL packages
+have the highest declaration at 1.97.1. Fetched owner manifests across eleven
+active repositories likewise contain no declared floor above 1.97.1. Several
+repositories pin 1.98.1 for development; that pin alone is not an MSRV.
+
+A further scan of 71 tracked lockfiles inspected 2,491 cached registry package
+manifests, again without a declaration above 1.97.1. There are 277 uncached
+registry package versions, independent Git suppliers outside Mere are not
+exhaustively resolved, and some packages declare no floor. These inventories
+support selecting 1.97.1 for rollout; they do not prove every supported build
+works on it. Qualify supported feature/target configurations on that compiler
+and resolve any newly discovered higher requirement before claiming shared
+support. Evidence: `Code/targets/murm-shared-msrv-selection-20261013.json`.
+
+CI must exercise both policies: current-toolchain development checks and a
+separate selected-MSRV build/test lane for supported configurations. Passing
+on 1.99 alone does not establish compatibility with the MSRV. A newer working
+pin does not change the support promise automatically.
+
+This policy covers the active first-party repository family and its independent
+application, library, probe, browser and firmware workspaces, including the
+Murm/Retinue foundation, Mere, Genet, Dramatis, Turnstone, Woodshed and Knot.
+The execution inventory must resolve current active homes and source pins;
+archived standalone clones are not additional migration targets. A target that
+actually needs a compiler fork or nightly has a documented target realization
+whose compiler is checked against the separately selected support floor, rather
+than an assumed permanent older MSRV exception. Workspace separation is justified by
+dependency graphs, feature unification, target realizations and profiles; it
+must not choose radio/native MSRVs merely from repository placement.
+
+Use Cargo's supported `build.build-dir` for intermediate build artifacts and
+`build.target-dir` for delivered outputs. Build-dir support stabilized in
+Cargo 1.91; the 1.99 working toolchain satisfies that requirement without
+requiring a 1.99 library MSRV. See the
+[Cargo build-dir documentation](https://doc.rust-lang.org/cargo/reference/config.html#buildbuild-dir)
+and [stabilization record](https://doc.rust-lang.org/cargo/reference/unstable.html#build-dir).
+Use workspace/platform/configuration isolation, and audit environment/CLI
+path overrides and cache keys. Packaging and test harnesses must discover
+actual Cargo artifact/executable paths rather than assume the intermediate
+layout is permanently `target/debug/deps`. A shared version does not require
+all configurations to write into one unqualified cache directory.
+
+The coordinated rollout inventories toolchain pins, owned minimums, CI jobs
+and independent build roots, qualifies the new working toolchain, and
+independently qualifies the selected 1.97.1 MSRV. It checks native, browser/Wasm
+and embedded paths plus packaging/artifact discovery. It records compiler
+versions in receipts and updates consumers' source pins where compiler changes require
+supplier adoption. An older compiler's passing receipt is not a new compiler's
+qualification. The Murm move plan carries this as MOVE1, before implementation
+imports and consumer cutover.
+
+**Current execution status:** defaults are published across the active Rust
+repository family; the first Murm supplier import is published and its primary
+Mere source cutover is qualified. Broader platform compiler qualification remains
+separate from declaration-policy checks. Isolated checkouts
+of all 21 active Rust repositories in the organization now carry the 1.99.0
+working pins, 1.97.1 owned-package declarations and separate intermediate build
+directories. Root metadata policy checks pass on both compiler versions (42
+checks). Vendored/patch suppliers and frozen historical receipts are preserved.
+The shared wgpu CI support-floor default is aligned too. Compiler qualification,
+publication and the first Murm imports are recorded in the canonical Murm move
+plan. Metadata checks alone do not establish all-platform MSRV compatibility.
+
+## Family source convention (2026-10-15)
+
+**Owner ruling (Mark, 2026-10-15):** the first-party repositories name one
+another by branch, not by revision, and the repositories do not cut releases
+while development moves this fast. Revision pins and `www.` aliases were a
+workaround for resolving several repositories at different moments; they made
+every repin a coordinated round and left a second source for the same crate
+whenever one repository was one pin behind.
+
+**The rule.**
+
+- A dependency on a first-party repository (`mere`, `murm`, `genet`,
+  `netrender`, `knot-editor`, and as each repository adopts this, `dramatis`,
+  `cleromancy`, `wgpu-weld`) is written exactly one way:
+  `git = "https://github.com/merely-made/<repo>.git", branch = "main"`.
+  No `www.` spelling, no double slash, no `.git`-less variant, no `rev`.
+  Cargo treats every spelling and every `rev`/`branch`/`tag` as a different
+  source, so a second spelling is a second copy of every crate and a type
+  mismatch, not a warning.
+- The consuming root commits its `Cargo.lock`. The lockfile, not the manifest,
+  names the revision that was tested. A fresh clone builds what was tested.
+- **Repin = `cargo update -p <package>`** at the consuming root (one `-p` per
+  repository, any package from it), then the root's checks. Commit the lock.
+  A repin is a lock commit, not a manifest edit, so it carries no coordination
+  with the supplier.
+- Non-family forks that are pinned for a reason keep their pin: `mark-ik/p2panda`
+  by `tag`, `mark-ik/vello`, `mark-ik/boa`, `mark-ik/kiss3d`, `merely-made/vano`
+  by `rev`. A pin there is a decision, and its comment says why.
+- `[patch]` is for packages that left a repository, never for bridging two
+  spellings of one repository. Cargo refuses a patch whose target is the same
+  source as the patched key, which is why the old workaround needed the `www.`
+  alias at all; with one spelling the bridges are deleted, not carried.
+  Mere's `[patch."…/mere.git"]` table, which redirects Knot's and Turnstone's
+  Mere crates onto the workspace members, stays: it names paths, not a second
+  spelling.
+- Library crates a family repository publishes to crates.io still carry a
+  `version`, and a git row that is `optional` still needs one. The crates.io
+  publish chain is separate and unchanged by this convention.
+
+**What it costs.** A supplier's `main` is what the next fresh resolve takes, so
+a broken push to a supplier's `main` is visible to its consumers at their next
+`cargo update`, never before, because their lockfile holds the tested revision.
+Run `cargo update -p` deliberately and read the diff of the lock before
+committing it.
+
+**Not covered.** Dependencies from crates.io, non-family forks, and the
+`dramatis`, `cleromancy`, `wgpu-weld`, `smolweb` rows stay on their revisions
+until each repository's `main` has been qualified against the consumers that
+pin it. The switch for those is one manifest edit and a `cargo update -p`.

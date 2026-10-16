@@ -1,0 +1,653 @@
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling sceno v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\producer\registry.rs:36:10
+   |
+36 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+36 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+36 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates\cambium\cambium-rootstock\src\producer\registry.rs:651:13
+    |
+651 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+651 -             drop(renderer);
+651 +             let _ = renderer;
+    |
+
+warning: `cambium-rootstock` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+   Compiling cambium-winit-a11y v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit-a11y)
+   Compiling mesquite v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mesquite)
+   Compiling cambium-genet-winit-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-winit-host)
+warning: `cambium-rootstock` (lib test) generated 4 warnings (4 duplicates)
+    Finished `test` profile [unoptimized] target(s) in 3m 27s
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\build\debug\deps\cambium_genet_winit_host-656774cf326ce072.exe)
+
+running 23 tests
+test headed_tests::control ... ignored, headed: opens a window on a GPU
+test decorations::tests::commands_queue_and_drain_once ... ok
+test decorations::tests::geometry_off_every_monitor_is_unreachable ... ok
+test decorations::tests::a_clone_shares_the_queue ... ok
+test geometry_tests::reachable_restored_geometry_is_used ... ok
+test decorations::tests::maximized_window_keeps_its_floating_restore_rectangle ... ok
+test headed_tests::one_core ... ignored, headed: opens a window on a GPU
+test decorations::tests::a_double_click_does_not_chain_into_a_third ... ok
+test decorations::tests::unknown_regions_do_not_drag ... ok
+test decorations::titlebar_tests::a_window_narrower_than_its_controls_publishes_nothing ... ok
+test decorations::tests::native_control_lookup_uses_html_button_semantics_and_accessible_name ... ok
+test decorations::titlebar_tests::reserving_nothing_publishes_a_full_width_zero_height_area ... ok
+test decorations::titlebar_tests::the_area_is_the_window_minus_the_reserved_edges ... ok
+test decorations::tests::double_click_needs_both_time_and_proximity ... ok
+test decorations::titlebar_tests::the_declarations_name_all_four_properties ... ok
+test geometry_tests::unreachable_restored_geometry_is_discarded ... ok
+test geometry_tests::receipt_size_override_wins_over_restored_geometry ... ok
+test headed_tests::windows ... ignored, headed: opens two windows on a GPU
+test headed_tests::windows_control ... ignored, headed: opens three windows on a GPU
+test menu_entry_key_tests::winit_menu_entry_keys_reach_the_runner_through_host_press ... ok
+test windows_snap::tests::logical_control_rect_scales_outward_to_device_pixels ... ok
+test occlusion_tests::unocclusion_requests_a_frame_without_booting_or_claiming_presentation ... ok
+test windows::recovery_tests::wake_recovery_polls_hidden_multiwindow_host_without_a_redraw ... ok
+
+test result: ok. 19 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\accessibility.rs (C:\t\cargo-targets\mere\build\debug\deps\accessibility-74cbc6493dbb0bd3.exe)
+
+running 6 tests
+test raw_requests_map_to_their_own_actions ... ok
+test the_projection_carries_roles_names_and_boxes ... ok
+test a_click_request_activates_the_control ... ok
+test a_focus_request_focuses_without_activating ... ok
+test a_screen_reader_wakes_an_idle_application ... ok
+test a_set_value_request_updates_a_numeric_control ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests\async_capture.rs (C:\t\cargo-targets\mere\build\debug\deps\async_capture-0879100c69ec69d9.exe)
+
+running 1 test
+test final_async_capture_is_collected_before_completion_and_failure_cannot_pass ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests\caret_follow.rs (C:\t\cargo-targets\mere\build\debug\deps\caret_follow-17a6f3addd61834e.exe)
+
+running 4 tests
+test a_moved_caret_brings_a_pane_below_the_window_along ... ok
+test a_moved_caret_scrolls_the_window_down_to_its_line ... ok
+test a_moved_caret_scrolls_its_pane_and_not_the_window ... ok
+test a_caret_that_has_not_moved_leaves_the_readers_scroll ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests\checked_producer_refusal.rs (C:\t\cargo-targets\mere\build\debug\deps\checked_producer_refusal-e605ee47fa2c2621.exe)
+
+running 2 tests
+test actual_scene_callback_destroys_device_after_host_preflight_without_panicking ... ignored, actual device destruction during production frame; coordinator executes serialized gate
+test healthy_provider_refusal_drops_staged_image_without_booting_replacement ... ignored, actual GPU staging; coordinator executes serialized gate
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\click_on_scroll.rs (C:\t\cargo-targets\mere\build\debug\deps\click_on_scroll-e0b82d6817d81870.exe)
+
+running 8 tests
+test click_on_reveals_horizontal_document_overflow ... ok
+test click_on_brings_a_pane_below_the_window_along ... ok
+test click_on_clicks_the_part_of_a_tall_element_that_shows ... ok
+test click_on_scrolls_a_clipped_element_into_view_and_clicks_it ... ok
+test click_on_reveals_through_every_horizontal_ancestor ... ok
+test click_on_reveals_rightmost_node_in_horizontal_and_vertical_planes ... ok
+test click_on_wide_target_reveals_visible_part_without_oscillation ... ok
+test click_on_does_not_scroll_hidden_overflow_or_chase_it_in_document ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests\command_menu_compact.rs (C:\t\cargo-targets\mere\build\debug\deps\command_menu_compact-ed734e72adf3996c.exe)
+
+running 1 test
+test nested_compact_menu_and_back_stay_in_one_popup_at_320_by_175 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests\decorations.rs (C:\t\cargo-targets\mere\build\debug\deps\decorations-210e6bdcf2a0ef18.exe)
+
+running 11 tests
+test the_command_handle_is_shared_not_copied ... ok
+test a_caption_button_carves_a_hole_in_the_bar ... ok
+test right_click_raises_the_system_menu_only_on_the_bar ... ok
+test a_right_press_on_the_bar_reaches_the_view_and_still_raises_the_menu ... ok
+test pressing_the_body_drags_nothing ... ok
+test the_bar_is_a_drag_surface_and_the_body_is_not ... ok
+test pressing_the_bar_drags_the_window ... ok
+test a_right_press_on_the_body_activates_nothing ... ok
+test pressing_a_caption_button_runs_its_verb_without_dragging ... ok
+test a_view_can_prevent_the_system_menu ... ok
+test double_clicking_the_bar_toggles_maximize ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests\files.rs (C:\t\cargo-targets\mere\build\debug\deps\files-cbf394811e8de64d.exe)
+
+running 4 tests
+test a_file_is_supplied_without_a_chooser ... ok
+test a_click_asks_the_chooser_and_its_answer_reaches_the_view ... ok
+test a_request_held_open_is_not_asked_again ... ok
+test with_no_chooser_the_view_hears_that_nothing_was_chosen ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests\fold_rows.rs (C:\t\cargo-targets\mere\build\debug\deps\fold_rows-ce3a39afc04a902f.exe)
+
+running 1 test
+test rows_stack_with_the_gutter_beside_each_line ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests\font_inventory.rs (C:\t\cargo-targets\mere\build\debug\deps\font_inventory-7629e1ee82d37c9d.exe)
+
+running 1 test
+test family_inventory_uses_registered_metadata_and_rejects_invalid_bytes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\host_fonts.rs (C:\t\cargo-targets\mere\build\debug\deps\host_fonts-784960251b32917e.exe)
+
+running 2 tests
+test registration_survives_a_relayout ... ok
+test bundled_face_shapes_the_family_the_sheet_names ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests\input_routing.rs (C:\t\cargo-targets\mere\build\debug\deps\input_routing-84bff8e4a2b3cef1.exe)
+
+running 18 tests
+test a_view_can_prevent_the_tab_default ... ok
+test a_control_can_be_clicked_by_role_and_label ... ok
+test enter_activates_the_focused_control ... ok
+test a_press_clicks_the_element_under_it ... ok
+test a_secondary_press_reaches_the_pointer_handler_without_capturing ... ok
+test a_drag_carries_the_captured_elements_local_coordinates ... ok
+test an_injected_chord_is_not_typed ... ok
+test right_click_on_resolves_a_selector_through_the_live_layout ... ok
+test a_press_outside_a_pointer_element_starts_no_drag ... ok
+test injected_text_types_even_though_the_key_is_unnamed ... ok
+test a_wheel_notch_reaches_the_view_handler_first ... ok
+test captured_motion_holds_hover_on_the_drag_target ... ok
+test a_secondary_press_off_the_handler_reaches_no_one ... ok
+test a_trackpad_pixel_delta_arrives_in_logical_pixels ... ok
+test a_wheel_line_delta_is_the_same_distance_at_any_scale ... ok
+test a_wheel_handler_can_cancel_the_scrolling_default ... ok
+test the_caret_defaults_run_through_the_focused_text_seam ... ok
+test tab_is_routed_before_it_traverses ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests\lifecycle.rs (C:\t\cargo-targets\mere\build\debug\deps\lifecycle-a0658b90f3e5cdd8.exe)
+
+running 3 tests
+test native_and_command_close_share_policy_and_can_hide_or_exit ... ok
+test application_can_keep_a_close_request_visible ... ok
+test armillary_shaped_wake_coalesces_and_drains_without_frames ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\popover_layout.rs (C:\t\cargo-targets\mere\build\debug\deps\popover_layout-83c2f74b2f2efb3e.exe)
+
+running 3 tests
+test an_open_popover_moves_nothing_in_its_toolbar ... ok
+test a_below_start_panel_opens_under_its_trigger ... ok
+test an_above_panel_opens_over_its_trigger ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests\presented_capture.rs (C:\t\cargo-targets\mere\build\debug\deps\presented_capture-9213238f3c78672b.exe)
+
+running 3 tests
+test delayed_pixels_keep_the_sealed_state_before_pointer_dispatch ... ok
+test requested_projection_byte_total_and_count_limits_are_enforced ... ok
+test missing_foreign_stale_mapping_observer_and_deadline_failures_cannot_pass ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests\producer_input.rs (C:\t\cargo-targets\mere\build\debug\deps\producer_input-447a28b8944d83c1.exe)
+
+running 2 tests
+test content_local_clicks_respect_transforms_padding_overlay_and_singular_rejection ... ok
+test window_coordinates_cross_host_zoom_once_before_content_mapping ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\scenario.rs (C:\t\cargo-targets\mere\build\debug\deps\scenario-852ef2238ff28096.exe)
+
+running 25 tests
+test a_file_with_no_request_waiting_is_loud ... ok
+test a_click_by_label_reaches_the_app_and_the_receipt_says_ok ... ok
+test mesquite_reveals_a_partly_clipped_large_non_text_control ... ok
+test a_capture_that_never_lands_fails_rather_than_hangs ... ok
+test a_cancelled_file_request_answers_with_nothing ... ok
+test mesquite_scrolls_then_uses_the_product_target_point_before_advancing ... ok
+test an_unknown_verb_is_loud ... ok
+test a_scenario_supplies_a_file_through_the_same_event_without_a_dialog ... ok
+test a_partly_visible_tall_editor_focuses_without_scrolling_its_toolbar ... ok
+test generated_names_agree_for_mesquite_native_accessibility_and_attribute_updates ... ok
+test the_receipt_goes_to_its_own_path_or_the_capture_directory ... ok
+test mesquite_reveals_a_partly_clipped_small_control ... ok
+test a_held_semantic_click_rejects_a_hidden_or_renamed_target_without_retargeting ... ok
+test a_failed_assertion_fails_the_receipt ... ok
+test a_click_scrolls_a_below_the_fold_button_before_the_next_assertion ... ok
+test product_click_verbs_share_the_lanes_scroll_and_dispatch_wait ... ok
+test both_receipt_modes_fail_an_unrevealable_target_even_without_an_assertion ... ok
+test both_receipt_modes_click_the_visible_part_of_an_oversized_button ... ok
+test resize_goes_through_the_window_verb_queue ... ok
+test product_acceptance_can_fail_either_receipt_format ... ok
+test scenario_keys_use_retained_focus_and_button_activation ... ok
+test text_and_json_runs_use_the_same_checkpoint_commands ... ok
+test semantic_click_and_accessibility_action_reach_the_same_named_control ... ok
+test product_completion_runs_once_and_preserves_failures_when_kept_open ... ok
+test semantic_name_precedence_does_not_change_explicit_class_text_selectors ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests\scroll_request.rs (C:\t\cargo-targets\mere\build\debug\deps\scroll_request-187953d2ed800436.exe)
+
+running 10 tests
+test an_overflow_box_that_grows_to_its_content_is_passed_over_for_the_window ... ok
+test inside_a_nested_scroll_container_the_container_scrolls_not_the_window ... ok
+test start_aligns_to_the_scrollport_inside_a_border ... ok
+test nearest_moves_only_as_far_as_the_element_needs ... ok
+test a_request_brings_an_element_far_below_the_fold_to_the_viewport_top ... ok
+test a_request_issued_before_the_first_layout_resolves_after_it ... ok
+test a_container_below_the_fold_brings_the_window_along ... ok
+test an_offset_past_the_end_of_the_content_is_clamped ... ok
+test a_request_for_an_element_that_does_not_exist_is_a_no_op ... ok
+test the_offsets_survive_a_rebuild ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests\single_line_field.rs (C:\t\cargo-targets\mere\build\debug\deps\single_line_field-f0db45abc4355e4a.exe)
+
+running 8 tests
+test an_empty_field_paints_its_caret_at_the_start_of_its_content ... ok
+test a_selection_across_a_scrolled_field_paints_only_inside_it ... ok
+test a_click_in_a_scrolled_field_places_the_caret_under_the_pointer ... ok
+test moving_the_caret_past_an_edge_scrolls_the_field_to_it ... ok
+test a_host_can_set_the_unsized_fields_intrinsic_width ... ok
+test a_field_scrolled_by_hand_keeps_its_scroll_until_the_caret_moves ... ok
+test a_long_value_stays_on_one_line_at_the_width_the_sheet_sets ... ok
+test a_field_with_no_width_keeps_its_own_whatever_the_value ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests\spatial_focus.rs (C:\t\cargo-targets\mere\build\debug\deps\spatial_focus-627c996fb02b7598.exe)
+
+running 5 tests
+test an_edge_holds_rather_than_wrapping ... ok
+test a_tap_is_unchanged_and_releasing_leaves_the_mode ... ok
+test arrows_move_one_cell_while_tab_is_held ... ok
+test the_option_turns_it_off ... ok
+test crossing_the_grid_costs_two_presses_not_twenty_four ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\status_bar_collapse.rs (C:\t\cargo-targets\mere\build\debug\deps\status_bar_collapse-23a2687851599158.exe)
+
+running 2 tests
+test refusal_and_overflow_fit_at_320_and_hidden_chips_are_not_mounted ... ok
+test overflow_panel_is_bounded_and_escape_removes_details ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests\status_bar_squeeze.rs (C:\t\cargo-targets\mere\build\debug\deps\status_bar_squeeze-c6509c08f3beb6f3.exe)
+
+running 1 test
+test a_long_message_is_cut_and_the_chips_keep_their_size ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests\status_bar_switch.rs (C:\t\cargo-targets\mere\build\debug\deps\status_bar_switch-13f7d367fc5aefea.exe)
+
+running 1 test
+test a_click_on_another_chip_opens_its_popover ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests\text_caret.rs (C:\t\cargo-targets\mere\build\debug\deps\text_caret-df5d3f819b6b2faa.exe)
+
+running 2 tests
+test a_selection_across_the_span_boundary_paints_on_both_lines ... ok
+test a_caret_after_a_line_break_between_spans_sits_on_the_next_line ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests\title_bar.rs (C:\t\cargo-targets\mere\build\debug\deps\title_bar-98995b9a5e32f5a0.exe)
+
+running 6 tests
+test native_caption_area_reserves_both_sides_and_its_minimum_height ... ok
+test platform_policy_keeps_native_mac_controls_and_adds_explicit_controls_elsewhere ... ok
+test tab_enter_and_space_activate_existing_caption_buttons_in_order ... ok
+test caption_clicks_use_the_host_queue_without_dragging_the_frame ... ok
+test slot_content_keeps_drag_regions_and_controls_carve_out_no_drag ... ok
+test caption_accessible_names_are_configurable_and_match_the_snap_contract ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\ui_zoom.rs (C:\t\cargo-targets\mere\build\debug\deps\ui_zoom-19207833dd3749a6.exe)
+
+running 17 tests
+test an_application_can_veto_the_zoom_chord ... ok
+test a_hook_can_ask_for_a_zoom_through_the_context ... ok
+test fit_design_scales_the_interface_until_the_design_fits ... ok
+test resizing_recomputes_the_fit ... ok
+test a_hook_is_told_the_zoom_once_per_change ... ok
+test logical_size_is_the_window_over_the_zoom ... ok
+test a_wheel_handler_can_prevent_the_zoom_default ... ok
+test a_click_in_window_coordinates_hits_the_scaled_element ... ok
+test the_accessibility_root_transform_carries_the_layout_scale ... ok
+test zoom_one_is_the_identity ... ok
+test a_text_runs_advance_scales_with_zoom_on_screen ... ok
+test the_explicit_knob_stands_alone_and_composes_with_the_fit ... ok
+test text_is_relaid_out_at_the_new_logical_width ... ok
+test ctrl_wheel_steps_the_ladder ... ok
+test a_step_under_fit_design_is_an_offset_and_ctrl_zero_clears_it ... ok
+test the_keyboard_walks_the_ladder_both_ways ... ok
+test the_ladder_clamps_at_its_ends ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+
+     Running tests\wheel_scenario.rs (C:\t\cargo-targets\mere\build\debug\deps\wheel_scenario-71bd102c6d07031a.exe)
+
+running 7 tests
+test a_wheel_line_is_worth_the_desktop_hosts_line_pixels ... ok
+test the_wheel_input_is_plain_copyable_data ... ok
+test a_wheel_at_a_point_lands_where_it_says_and_off_the_canvas_reaches_nobody ... ok
+test a_wheel_on_a_selector_reaches_a_graph_canvas_consumer_whole ... ok
+test lines_are_converted_and_modifiers_are_held_for_one_notch ... ok
+test shift_turns_a_vertical_notch_sideways_as_a_real_wheel_does ... ok
+test a_wheel_with_no_target_or_a_typo_fails_the_scenario ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests\workbench_collapse.rs (C:\t\cargo-targets\mere\build\debug\deps\workbench_collapse-cfa1872b27fb2ea2.exe)
+
+running 4 tests
+test a_narrow_rail_keeps_its_full_vertical_label_within_painted_bounds ... ok
+test escape_from_drawer_content_dismisses_without_changing_canonical_selection ... ok
+test drawer_fits_reflow_width_and_pointer_close_restores_the_rail ... ok
+test rail_label_remains_bounded_and_actionable_in_a_short_reflow_frame ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\build\debug\deps\cambium_rootstock-3da21a3116623509.exe)
+
+running 104 tests
+test host::window_frame_tests::app_frame_insets_are_css_pixels_and_carry_zoom ... ok
+test host::zoom_tests::a_degenerate_design_does_not_divide_by_zero ... ok
+test host::zoom_tests::the_fit_is_the_binding_axis ... ok
+test host::window_frame_tests::the_old_false_input_still_selects_an_app_frame ... ok
+test host::window_frame_tests::host_frame_is_the_default ... ok
+test host::window_frame_tests::app_frame_insets_only_apply_to_an_app_frame ... ok
+test host::zoom_tests::every_rung_is_reachable_by_stepping_up_from_the_bottom ... ok
+test host::zoom_tests::a_value_off_the_ladder_steps_to_the_next_rung_past_it ... ok
+test host::zoom_tests::the_ladder_steps_both_ways_and_clamps_at_its_ends ... ok
+test host::window_frame_tests::an_app_frame_is_explicit ... ok
+test host::disposal_controls::disposed_actual_host_releases_retained_producer_and_refuses_captures_outside_borrow_once ... ok
+test mount_probe_tests::withdrawal_walks_parents_so_it_needs_the_owner_outside_the_shadow_root ... ok
+test frame::gpu_binding_controls::actual_host_missing_gpu_binding_refuses_all_capture_forms_once_and_keeps_authority ... ok
+test multi_host_tests::a_turn_opens_and_closes_windows_through_its_tree ... ok
+test accessibility_tests::accessibility_sync_tracks_focus_changes_and_clear_without_hover ... ok
+test accessibility_tests::accessibility_bounds_follow_nested_and_document_scroll ... ok
+test mount_probe_tests::control_a_plain_div_mount_lets_the_document_rule_in ... ok
+test multi_host_tests::each_window_lays_out_its_own_subtree_at_its_own_size_and_scale ... ok
+test multi_host_tests::each_windows_accessibility_tree_is_its_own_subtree ... ok
+test mount_probe_tests::control_a_guest_style_outside_the_shadow_root_leaks_out ... ok
+test multi_host_tests::a_click_in_one_window_changes_what_the_other_shows_in_the_same_pass ... ok
+test multi_host_tests::a_hidden_element_leaves_the_accessibility_tree ... ok
+test multi_host_tests::a_change_only_one_window_shows_rebuilds_only_that_windows_layout ... ok
+test multi_host_tests::a_node_moved_between_windows_keeps_its_identity_and_its_leaf_keeps_its_painter ... ok
+test multi_host_tests::native_form_metadata_notifications_reach_only_the_owning_window ... ok
+test mount_probe_tests::a_shadow_root_mount_scopes_the_guest_and_stays_hittable_and_accessible ... ok
+test mount_probe_tests::an_owner_that_is_the_shadow_host_scopes_the_guest_the_same_way ... ok
+test multi_host_tests::queued_secondary_release_and_cancel_follow_host_capture_routing ... ok
+test owned_layout::hidden_panel_tests::a_closed_accordion_panel_generates_no_box ... ok
+test multi_host_tests::a_sheet_one_window_swaps_from_a_hook_reaches_the_other ... ok
+test multi_host_tests::native_form_state_change_rebuilds_only_its_owning_window ... ok
+test owned_layout::interaction::tests::equal_hover_cascade_retains_geometry_text_generation_and_scroll ... ok
+test owned_layout::interaction::tests::hover_without_dependent_rules_skips_cascade_even_when_focus_has_rules ... ok
+test owned_layout::interaction::tests::hover_geometry_changes_apply_and_revert_on_leave ... ok
+test owned_layout::tests::a_caret_paints_in_its_fields_text_colour ... ok
+test owned_layout::interaction::tests::focus_changes_and_later_dom_rebuilds_keep_the_current_interaction ... ok
+test owned_layout::interaction::tests::hover_can_reflow_text_in_a_different_element ... ok
+test owned_layout::interaction::tests::changed_color_is_not_mistaken_for_an_equal_cascade ... ok
+test owned_layout::hidden_panel_tests::a_closed_disclosure_panel_generates_no_box ... ok
+test owned_layout::hidden_panel_tests::a_collapsed_tree_group_generates_no_box ... ok
+test owned_layout::tests::a_box_that_stops_scrolling_or_leaves_the_dom_loses_its_offset ... ok
+test owned_layout::tests::an_unrelated_container_keeps_the_offset_it_had ... ok
+test owned_layout::tests::a_plane_carried_onto_a_fresh_session_is_clamped_as_it_is_set ... ok
+test multi_host_tests::native_interaction_option_and_custom_validity_reach_only_their_window ... ok
+test owned_layout::tests::a_shrinking_container_pulls_its_offset_back_to_the_new_end ... ok
+test owned_layout::tests::element_reveal_notifies_each_two_axis_plane_once_and_keeps_start_vertical ... ok
+test owned_layout::text_paint_tests::an_empty_field_still_paints_a_caret_inside_its_scope ... ok
+test producer::registry::checked_refusal_tests::checked_refusal_invalidates_slot_without_retiring_bound_source ... ok
+test producer::registry::namespace_controls::actual_registry_refuses_unstaged_and_unknown_local_sources ... ok
+test owned_layout::tests::later_text_fragments_contribute_beyond_short_formatting_lines ... ok
+test owned_layout::text_paint_tests::a_positive_z_overlay_inside_a_field_also_covers_its_decorations ... ok
+test producer::registry::namespace_controls::authored_high_local_key_is_remapped_with_local_command_identity_preserved ... ok
+test owned_layout::text_paint_tests::a_later_dom_overlay_covers_both_source_selection_and_caret ... ok
+test producer::registry::namespace_controls::equal_local_keys_stamps_and_extents_remap_to_distinct_physical_resources ... ok
+test producer::registry::namespace_controls::missing_late_binding_refuses_without_partial_scene_or_sidechannel_rewrite ... ok
+test producer::registry::namespace_controls::physical_identity_exhaustion_is_typed_and_never_wraps ... ok
+test producer::registry::namespace_controls::physical_identity_is_distinct_stable_and_never_recycled_for_same_local_key ... ok
+test producer::registry::namespace_controls::stale_generation_and_foreign_inline_payload_are_typed_refusals ... ok
+test producer::registry::portable::tests::portable_refusal_preserves_live_gpu_view_and_stamp ... ignored, real-device cache proof; root serializes GPU acceptance
+test owned_layout::text_paint_tests::normal_highlighted_text_keeps_its_selection_visible_over_opaque_tokens ... ok
+test owned_layout::text_paint_tests::raw_decoration_geometry_inherits_nested_scroll_clip_opacity_and_transform_once ... ok
+test producer::registry::portable::tests::default_gpu_only_source_refuses_without_registry_mutation ... ok
+test owned_layout::interaction::tests::escaped_commented_and_mixed_case_hover_rules_still_apply ... ok
+test producer::tests::cpu_appearance_reads_only_declared_values_with_typed_used_color ... ok
+test producer::tests::cpu_physical_extent_accounts_for_zoom_fractional_size_and_device_limits ... ok
+test owned_layout::text_paint_tests::the_original_window_overlay_order_is_a_failing_control ... ok
+test producer::registry::portable::tests::lifecycle::portable_presentation_advances_once_and_export_only_observes ... ok
+test producer::registry::portable::tests::oversized_callback_scene_refuses_before_digest_and_preserves_accepted_stamp ... ok
+test producer::tests::cpu_content_extent_and_pointer_mapping_exclude_border_and_padding ... ok
+test producer::registry::portable::tests::two_source_aggregate_refusal_preserves_all_accepted_metadata ... ok
+test producer::registry::portable::tests::late_whole_envelope_refusal_preserves_prior_stamps_and_registration ... ok
+test producer::tests::cpu_registration_rejects_aliases_and_does_not_replace_a_live_producer ... ok
+test owned_layout::tests::formatting_lines_supply_own_and_visible_descendant_scroll_range ... ok
+test producer::registry::portable::tests::lifecycle::portable_rebind_preserves_metadata_and_removal_commits_after_admission ... ok
+test producer::registry::portable::tests::lifecycle::portable_presentation_suspends_once_per_visibility_transition ... ok
+test scene_producer::tests::rebinding_redirects_all_callbacks_even_when_revisions_coincide ... ok
+test spatial_tests::alignment_beats_raw_distance ... ok
+test scene_producer::tests::an_absent_semantic_projection_keeps_the_host_dom_semantics ... ok
+test recovery::raster_refusal_tests::healthy_provider_failure_refuses_all_captures_once_without_recovery ... ok
+test tests::a_dead_key_never_types_even_carrying_text ... ok
+test tests::a_chord_is_a_command_not_typing ... ok
+test spatial_tests::the_opposite_direction_is_never_a_candidate ... ok
+test spatial_tests::the_same_row_is_not_below ... ok
+test tests::alt_is_not_a_chord_because_altgr_types ... ok
+test tests::arrows_resolve_to_directions ... ok
+test tests::an_unidentified_key_with_no_text_is_dropped ... ok
+test tests::character_press_carries_its_text ... ok
+test tests::control_characters_are_not_typed ... ok
+test tests::menu_entry_keys_lower_without_losing_identity_or_modifiers ... ok
+test tests::word_granularity_follows_the_caller ... ok
+test tests::injected_text_only_for_unidentified_keys ... ok
+test window_dom::tests::native_form_state_reads_through_the_window_view ... ok
+test window_dom::tests::nested_shadow_trees_belong_to_the_window_holding_their_hosts ... ok
+test tests::injected_text_reaches_the_runner_as_a_character ... ok
+test owned_layout::tests::clipped_descendant_lines_do_not_expand_the_outer_scroll_range ... ok
+test owned_layout::tests::host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes ... ok
+test tests::cambium_textbox_projection_reads_committed_value_and_preserves_semantics ... ok
+test producer::tests::gpu_unsupported_encoding_and_duplicate_dom_key_refuse_stale_pixels ... ok
+test producer::tests::gpu_host_timestamps_and_visibility_reach_the_producer ... ok
+test producer::tests::gpu_a_closed_windows_producers_retire ... ok
+test producer::tests::gpu_one_key_in_two_windows_is_a_duplicate_not_a_theft ... ok
+test producer::tests::gpu_a_producer_another_window_holds_is_not_retired ... ok
+test producer::tests::gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images ... ok
+test producer::tests::gpu_a_producer_moved_to_another_window_survives_either_order ... ok
+
+test result: ok. 103 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 8.18s
+
+     Running tests\capture_owner.rs (C:\t\cargo-targets\mere\build\debug\deps\capture_owner-7f497c51568542c0.exe)
+
+running 5 tests
+test disposed_scope_refuses_before_allocating_readback ... ok
+test disposal_during_poll_refuses_completion_and_releases_the_active_job ... ok
+test dropping_owner_releases_pending_resources_and_refuses_late_pixels ... ok
+test foreign_completion_stamp_is_refused_and_resources_release ... ok
+test restored_owner_never_revives_a_cancelled_capture ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\hover_motion.rs (C:\t\cargo-targets\mere\build\debug\deps\hover_motion-4a2db598a1783889.exe)
+
+running 4 tests
+test hover_motion_resolves_ancestor_coordinates_and_leaves_without_clicking ... ok
+test a_leave_handler_can_retire_the_next_hover_target_without_an_enter ... ok
+test a_move_handler_can_replace_its_own_hovered_subtree_before_the_next_event ... ok
+test replacing_a_hovered_subtree_does_not_deliver_leave_to_its_retired_node ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\prepared_frame.rs (C:\t\cargo-targets\mere\build\debug\deps\prepared_frame-1407b0f4411bbab0.exe)
+
+running 6 tests
+test ordinary_presentation_failure_is_observable_without_capture ... ok
+test unsupported_leaf_refuses_with_its_key_and_does_not_repeat_a_stamp ... ok
+test driver_cannot_commit_a_stamp_from_another_context ... ok
+test shared_redraw_observes_only_successful_driver_frames_and_refuses_failed_capture ... ok
+test owned_capture_keeps_the_original_presentation_after_another_draw ... ok
+test preparation_runs_hook_once_and_defers_zero_extent_without_a_gpu ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\presentation_policy.rs (C:\t\cargo-targets\mere\build\debug\deps\presentation_policy-771732accdb2b7ce.exe)
+
+running 7 tests
+test disposal_is_terminal_even_after_late_loss_notifications ... ok
+test duplicate_begin_restore_does_not_restart_generation ... ok
+test forced_backend_never_attempts_another_route ... ok
+test generation_overflow_stays_unavailable_and_never_reuses_an_identity ... ok
+test healthy_context_cannot_be_restored_without_loss ... ok
+test loss_during_rebuild_requires_a_new_restoration_attempt ... ok
+test loss_refuses_old_completions_before_restoration_starts ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\wgpu_driver.rs (C:\t\cargo-targets\mere\build\debug\deps\wgpu_driver-6cfe5856a145e23f.exe)
+
+running 2 tests
+test surface_replacement_reuses_shared_device_and_terminal_disposal_cannot_reboot ... ok
+test portable_webgpu_route_prepares_portable_paint_and_attributes_materialization_refusal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.18s
+
+     Running unittests src\lib.rs (C:\t\cargo-targets\mere\build\debug\deps\mesquite-3b432d4674cf940a.exe)
+
+running 34 tests
+test capture::tests::delayed_native_pixels_keep_the_original_request_and_presentation ... ok
+test capture::tests::expired_native_readback_refuses_late_pixels_without_polling_gpu ... ok
+test capture::tests::pending_native_readback_yields_until_completion_and_preserves_errors ... ok
+test checkpoints::tests::a_view_reads_the_names_and_fields_remember_took ... ok
+test checkpoints::tests::an_unknown_checkpoint_field_or_verb_fails_before_any_comparison ... ok
+test checkpoints::tests::dropped_holds_only_for_a_number_that_fell ... ok
+test checkpoints::tests::same_and_more_keep_the_meanings_the_new_verbs_mirror ... ok
+test checkpoints::tests::differs_holds_for_every_moved_field_and_names_the_one_that_did_not ... ok
+test cost::tests::percentile_uses_nearest_rank_and_even_median_is_not_truncated ... ok
+test cost::tests::retained_calls_remain_distinct_from_redraws_and_startup_frames ... ok
+test cost::tests::capture_and_invalid_outliers_do_not_pollute_first_or_steady_summary ... ok
+test probe::tests::input_text_preserves_multiword_titles_and_json_payloads ... ok
+test tests::a_capture_name_with_a_separator_is_taken_literally_and_others_are_sanitized ... ok
+test tests::a_close_before_the_scenario_completes_fails_the_run_and_a_second_close_is_inert ... ok
+test tests::a_declared_transform_round_trips_a_point_and_shows_in_the_receipt ... ok
+test tests::a_named_capture_hangs_off_the_run_s_own_artifact_stem ... ok
+test tests::a_close_with_no_scenario_is_an_ordinary_successful_end ... ok
+test lane::presentation_tests::a_stall_before_the_first_presentation_finishes_without_arming_a_final_capture ... ok
+test lane::presentation_tests::unavailable_and_duplicate_native_turns_do_not_spend_scenario_frames ... ok
+test lane::presentation_tests::asynchronous_readback_is_polled_while_native_presentation_is_unavailable ... ok
+test tests::the_viewport_mask_insets_its_border_and_drops_an_overlay ... ok
+test lane::presentation_tests::continuous_native_stall_has_an_independent_clock_deadline_and_honest_receipt ... ok
+test probe::text_tests::scenario_text_replaces_the_control_value_with_the_complete_payload ... ok
+test tests::the_receipt_carries_every_named_section_and_its_kind ... ok
+test wheel::tests::a_point_wheel_defaults_to_pixels_with_no_modifiers ... ok
+test tests::diagnostic_export_carries_loss_without_inventing_success_or_frame_causality ... ok
+test wheel::tests::a_selector_keeps_its_own_spaces_and_grammar ... ok
+test tests::requested_diagnostic_failure_is_visible_and_absent_hook_preserves_receipt_shape ... ok
+test tests::the_frame_limit_decides_only_once_and_only_after_the_limit ... ok
+test wheel::tests::mistakes_are_loud ... ok
+test wheel::tests::units_and_modifiers_are_words_in_any_order ... ok
+test wheel::tests::a_selector_that_contains_the_word_on_is_not_cut_short ... ok
+test lane::presentation_tests::failed_host_redraw_clears_the_previous_presentation_identity ... ok
+test cost::tests::phase_and_sample_limits_refuse_instead_of_silently_truncating ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests cambium_genet_winit_host
+
+running 2 tests
+test crates\cambium\cambium-genet-winit-host\src\harness.rs - harness (line 21) ... ignored
+test crates\cambium\cambium-genet-winit-host\src\lib.rs - (line 42) ... ignored
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.62s; merged doctests compilation took 0.51s
+   Doc-tests cambium_rootstock
+
+running 1 test
+test crates\cambium\cambium-rootstock\src\window_verbs.rs - window_verbs::WindowCommands (line 81) ... ignored
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.59s; merged doctests compilation took 0.47s
+   Doc-tests mesquite
+
+running 1 test
+test crates\cambium\mesquite\src\lib.rs - (line 44) ... ignored
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.60s; merged doctests compilation took 0.48s

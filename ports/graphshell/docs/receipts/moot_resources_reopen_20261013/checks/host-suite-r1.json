@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "ports/graphshell/docs/receipts/moot_resources_reopen_20261013/harness/Cargo.toml",
+    "--lib",
+    "-j2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-moot-capsule-proof",
+  "deadline_seconds": 900,
+  "elapsed_seconds": 120.34,
+  "exit_code": -2,
+  "timed_out": false,
+  "disk_refused": false,
+  "log": "/Users/markik/Code/output/moot-resources-reopen-20261013/checks/host-suite-r1.log",
+  "owned_group_survivors": [
+    "94000 92280 /Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/rustc --crate-name rkyv_derive --edition=2021 /Users/markik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rkyv_derive-0.8.18/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type proc-macro --emit=dep-info,link -C prefer-dynamic -C embed-bitcode=no --cfg feature=\"bytecheck\" --check-cfg cfg(docsrs,test) --check-cfg cfg(feature, values(\"bytecheck\", \"default\")) -C metadata=f748b4673d464a27 -C extra-filename=-b65a4c45c9a421db --out-dir /Users/markik/Code/targets/mere-s2s3/build/debug/deps -C strip=debuginfo -L dependency=/Users/markik/Code/targets/mere-s2s3/build/debug/deps --extern proc_macro2=/Users/markik/Code/targets/mere-s2s3/build/debug/deps/libproc_macro2-d4bbfefe16e882b1.rlib --extern quote=/Users/markik/Code/targets/mere-s2s3/build/debug/deps/libquote-9213c41fd05641d3.rlib --extern syn=/Users/markik/Code/targets/mere-s2s3/build/debug/deps/libsyn-1e0c27b8feeb49fd.rlib --extern proc_macro --cap-lints allow",
+    "94011 92280 /Users/markik/Code/targets/mere-s2s3/build/debug/build/hax-lib-e6f2504f0901cc6f/build-script-build"
+  ],
+  "owned_group_closed": false,
+  "gpu_executed": false
+}

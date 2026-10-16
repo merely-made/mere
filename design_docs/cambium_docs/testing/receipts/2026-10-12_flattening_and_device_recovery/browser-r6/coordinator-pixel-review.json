@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-14T02:17:52.497320+00:00",
+  "status": "pixel_and_present_resource_checks_pass",
+  "qualification_sha256": "58f15fc1b6e3cb68846aadfce8a11bf5b409163c8c3db6e2532d6cf7d186e1f7",
+  "artifacts_verified": 12,
+  "comparisons": [
+    {
+      "name": "first",
+      "max_rgb": 1,
+      "max_alpha": 0,
+      "mean_absolute": 3.3622034536553874e-06,
+      "changed_pixels": 18,
+      "nonblank_13_colors": true
+    },
+    {
+      "name": "second",
+      "max_rgb": 1,
+      "max_alpha": 0,
+      "mean_absolute": 3.893077683179922e-06,
+      "changed_pixels": 21,
+      "nonblank_13_colors": true
+    },
+    {
+      "name": "first_reader",
+      "max_rgb": 1,
+      "max_alpha": 0,
+      "mean_absolute": 1.4626298083954952e-05,
+      "changed_pixels": 5,
+      "nonblank_13_colors": true
+    },
+    {
+      "name": "second_reader",
+      "max_rgb": 1,
+      "max_alpha": 0,
+      "mean_absolute": 1.9501730778606602e-05,
+      "changed_pixels": 8,
+      "nonblank_13_colors": true
+    },
+    {
+      "name": "first_stylesheet",
+      "max_rgb": 1,
+      "max_alpha": 0,
+      "mean_absolute": 5.444250871080139e-06,
+      "changed_pixels": 7,
+      "nonblank_13_colors": true
+    },
+    {
+      "name": "second_stylesheet",
+      "max_rgb": 1,
+      "max_alpha": 0,
+      "mean_absolute": 3.1110004977600795e-06,
+      "changed_pixels": 4,
+      "nonblank_13_colors": true
+    }
+  ],
+  "owned_groups_absent": [
+    16612,
+    16619,
+    16722
+  ],
+  "visual_review": "separate",
+  "claims": "no physical reset, OS input/accessibility, async current-frame quality, or throughput qualification"
+}

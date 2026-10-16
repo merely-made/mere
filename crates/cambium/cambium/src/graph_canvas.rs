@@ -22,7 +22,7 @@ use crate::component::{ComponentView, component};
 use crate::{
     FocusEvent, FocusPhase, GenetCtx, GenetElement, HoverEvent, HoverPhase, OptionalAction,
     PointerClick, PointerEvent, PointerPhase, View, WheelEvent, custom_leaf, el, focusable,
-    on_click, on_focus, on_hover, on_pointer, on_wheel,
+    on_click, on_focus, on_hover, on_pointer, on_wheel, request_focus,
 };
 
 /// Structural classes emitted by [`graph_canvas_swatch`]. Hosts own the palette.
@@ -215,6 +215,25 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     pub relation_lines: Vec<(String, RelationLine)>,
     /// App-owned rectangular overlays currently occupying graph nodes.
     pub node_footprints: Vec<GraphCanvasNodeFootprint<Id>>,
+    /// Extra attributes on individual node targets, as `(id, name, value)`:
+    /// what a consumer's node kind says that the shared target cannot, such
+    /// as `aria-expanded` on a node that opens a card or `aria-haspopup` on
+    /// one that opens a popover. See [`with_node_attr`](Self::with_node_attr).
+    pub node_attrs: Vec<(Id, String, String)>,
+    /// The node whose target takes keyboard focus when this request first
+    /// appears, such as the trigger a dismissed popover or a collapsed card
+    /// returns focus to. Holding the same request does not steal focus on
+    /// later rebuilds.
+    pub focus_request: Option<Id>,
+    /// Shorter visible text for individual nodes' labels, as `(id, text)`.
+    /// A node's [`GraphCanvasNode::label`] stays its accessible name; the
+    /// visible label can say less, such as a name without the state words the
+    /// accessible name carries. See [`with_visible_label`](Self::with_visible_label).
+    pub visible_labels: Vec<(Id, String)>,
+    /// Where individual nodes' visible labels go, overriding the canvas's own
+    /// choice: for a node beside an app-owned control the label must not run
+    /// under. See [`with_label_placement`](Self::with_label_placement).
+    pub label_placements: Vec<(Id, GraphLabelPlacement)>,
     /// Optional fixed-world atlas beneath the graph labels and callouts.
     /// Geographic field identity refers to existing graph node ids, while the
     /// atlas's paint and picking geometry remain caller-produced projection data.
@@ -263,6 +282,10 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             relations: Vec::new(),
             relation_lines: Vec::new(),
             node_footprints: Vec::new(),
+            node_attrs: Vec::new(),
+            focus_request: None,
+            visible_labels: Vec::new(),
+            label_placements: Vec::new(),
             atlas: None,
             selected: None,
             focus: None,
@@ -370,6 +393,63 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         self.node_footprints.retain(|footprint| footprint.id != id);
         self.node_footprints
             .push(GraphCanvasNodeFootprint { id, width, height });
+        self
+    }
+
+    /// Set an attribute on one node's target (see [`Self::node_attrs`]).
+    /// Repeating a name on the same node replaces its earlier value. The
+    /// target's own `class`, `type`, `aria-label`, `data-node-index`,
+    /// `data-key` and `style` are the canvas's and are not overridden.
+    #[must_use]
+    pub fn with_node_attr(
+        mut self,
+        id: Id,
+        name: impl Into<String>,
+        value: impl Into<String>,
+    ) -> Self {
+        let name = name.into();
+        self.node_attrs
+            .retain(|(peer, peer_name, _)| !(*peer == id && *peer_name == name));
+        self.node_attrs.push((id, name, value.into()));
+        self
+    }
+
+    /// Show `text` as one node's visible label instead of its accessible
+    /// name (see [`Self::visible_labels`]). Repeating an id replaces it.
+    #[must_use]
+    pub fn with_visible_label(mut self, id: Id, text: impl Into<String>) -> Self {
+        self.visible_labels.retain(|(peer, _)| *peer != id);
+        self.visible_labels.push((id, text.into()));
+        self
+    }
+
+    /// Put one node's visible label at `placement` (see
+    /// [`Self::label_placements`]). Repeating an id replaces it.
+    #[must_use]
+    pub fn with_label_placement(mut self, id: Id, placement: GraphLabelPlacement) -> Self {
+        self.label_placements.retain(|(peer, _)| *peer != id);
+        self.label_placements.push((id, placement));
+        self
+    }
+
+    /// The text a node's visible label shows: its own visible text, or its
+    /// accessible name, cut in the middle when it is longer than a label holds
+    /// ([`middle_cut`]).
+    fn label_text(&self, index: usize) -> std::borrow::Cow<'_, str> {
+        let node = &self.graph.nodes[index];
+        let text = self
+            .visible_labels
+            .iter()
+            .find(|(id, _)| *id == node.id)
+            .map_or(node.label.as_str(), |(_, text)| text.as_str());
+        middle_cut(text, GRAPH_LABEL_CHARS)
+    }
+
+    /// Ask for keyboard focus on one node's target (see
+    /// [`Self::focus_request`]).
+    #[must_use]
+    pub fn with_focus_request(mut self, id: Option<Id>) -> Self {
+        self.focus_request = id;
         self
     }
 
@@ -545,11 +625,19 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
     /// source label.
     /// Which nodes' labels show, in node order: all of them unless
     /// [`Self::cull_labels`] is on. Label boxes are estimated from the label's
-    /// length at the label's 10 px size.
+    /// length at the label's 10 px size. A node an app-owned overlay occupies
+    /// ([`Self::node_footprints`]) shows the overlay, never its label as well,
+    /// which would print across the overlay's edge.
     fn shown_labels(&self) -> Vec<bool> {
         let count = self.graph.nodes.len();
+        let occupied = |index: usize| {
+            let id = &self.graph.nodes[index].id;
+            self.node_footprints
+                .iter()
+                .any(|footprint| &footprint.id == id)
+        };
         if !self.cull_labels {
-            return vec![true; count];
+            return (0..count).map(|index| !occupied(index)).collect();
         }
         const HEIGHT: f32 = 14.0;
         let clearance = self.node_radius + 7.0;
@@ -562,7 +650,7 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         // The boxes `GraphLabelPlacement::style` lays out.
         let rect = |index: usize| {
             let (x, y) = positions[index];
-            let width = label_text_width(&self.graph.nodes[index].label);
+            let width = label_text_width(&self.label_text(index));
             match self.label_placement(index) {
                 placement @ (GraphLabelPlacement::Above | GraphLabelPlacement::Below) => {
                     let top = if placement == GraphLabelPlacement::Above {
@@ -593,7 +681,7 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
             .chain((0..count).filter(|&index| !pinned(index)));
         let mut shown = vec![false; count];
         let mut kept = Vec::new();
-        for index in order {
+        for index in order.filter(|&index| !occupied(index)) {
             let boxed = rect(index);
             if pinned(index) || !kept.iter().any(|&other| overlaps(boxed, other)) {
                 shown[index] = true;
@@ -607,6 +695,9 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         let Some(node) = self.graph.nodes.get(index) else {
             return GraphLabelPlacement::Right;
         };
+        if let Some((_, placement)) = self.label_placements.iter().find(|(id, _)| *id == node.id) {
+            return *placement;
+        }
         let mut horizontal = 0.0_f32;
         let mut vertical = 0.0_f32;
         let mut add_neighbor = |neighbor: &Id| {
@@ -900,15 +991,69 @@ fn rectangle_ray_exit(
 /// side leaves.
 const GRAPH_LABEL_WIDTH: f32 = 160.0;
 
+/// A label character's estimated width at the labels' 10 px size.
+const LABEL_CHAR_WIDTH: f32 = 5.6;
+
+/// The most characters a visible label shows before it is cut: as many as its
+/// width holds at the 4.6 px a label character measures natively (the width
+/// estimate above stays conservative, for culling).
+const GRAPH_LABEL_CHARS: usize = ((GRAPH_LABEL_WIDTH - 2.0) / 4.6) as usize;
+
 /// A label's width estimated from its length at the labels' 10 px size, no
 /// wider than [`GRAPH_LABEL_WIDTH`].
 fn label_text_width(label: &str) -> f32 {
-    const CHAR_WIDTH: f32 = 5.6;
-    (label.chars().count() as f32 * CHAR_WIDTH + 2.0).min(GRAPH_LABEL_WIDTH)
+    (label.chars().count() as f32 * LABEL_CHAR_WIDTH + 2.0).min(GRAPH_LABEL_WIDTH)
 }
 
+/// `text` cut to at most `max` characters by dropping its middle, so a long
+/// label keeps both its start and its distinguishing end, as in
+/// `Session (fork of … blake3:f612a))`. Names that differ only at their end
+/// (two forks, two codicils) stay told apart, which an end ellipsis loses.
+/// Text that fits is returned as it is.
+pub(crate) fn middle_cut(text: &str, max: usize) -> std::borrow::Cow<'_, str> {
+    const MARK: &str = " … ";
+    let count = text.chars().count();
+    if count <= max || max <= MARK.chars().count() + 1 {
+        return std::borrow::Cow::Borrowed(text);
+    }
+    // How far a cut moves to land between words rather than inside one.
+    const SNAP: usize = 6;
+    let chars: Vec<char> = text.chars().collect();
+    let keep = max - MARK.chars().count();
+    // The end is what tells long names apart. It starts at a word: the next
+    // one when that is near, else the one it falls in.
+    let mut tail_start = count - keep / 2;
+    let at_word = |at: usize| at == 0 || chars[at - 1].is_whitespace();
+    if !at_word(tail_start) {
+        if let Some(ahead) = (0..SNAP)
+            .take_while(|ahead| tail_start + ahead < count)
+            .find(|ahead| chars[tail_start + ahead].is_whitespace())
+        {
+            tail_start += ahead + 1;
+        } else if let Some(back) = (1..=SNAP)
+            .take_while(|back| *back < tail_start)
+            .find(|back| chars[tail_start - back].is_whitespace())
+        {
+            tail_start -= back - 1;
+        }
+    }
+    // The start takes the rest, ending between words when one is near.
+    let mut head_end = keep.saturating_sub(count - tail_start).clamp(1, tail_start);
+    if !at_word(head_end)
+        && let Some(back) = (1..=SNAP)
+            .take_while(|back| *back < head_end)
+            .find(|back| chars[head_end - back].is_whitespace())
+    {
+        head_end -= back;
+    }
+    let start: String = chars[..head_end].iter().collect();
+    let end: String = chars[tail_start..].iter().collect();
+    std::borrow::Cow::Owned(format!("{}{MARK}{}", start.trim_end(), end.trim_start()))
+}
+
+/// Where a node's visible label sits against its node.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum GraphLabelPlacement {
+pub enum GraphLabelPlacement {
     Above,
     Below,
     Left,
@@ -1378,7 +1523,7 @@ where
                     class.push_str(" hovered");
                 }
                 let placement = swatch.label_placement(index);
-                el::<_, State, AppAction>("span", node.label.clone())
+                el::<_, State, AppAction>("span", swatch.label_text(index).into_owned())
                     .attr("class", class)
                     .attr("aria-hidden", "true")
                     .attr("data-label-placement", placement.name())
@@ -1389,7 +1534,7 @@ where
                             y,
                             swatch.node_radius + 7.0,
                             size,
-                            label_text_width(&node.label),
+                            label_text_width(&swatch.label_text(index)),
                         ),
                     )
             })
@@ -1486,6 +1631,22 @@ where
             if let Some(key) = &node.key {
                 target = target.attr("data-key", key.clone());
             }
+            const OWN: [&str; 6] = [
+                "class",
+                "type",
+                "aria-label",
+                "data-node-index",
+                "data-key",
+                "style",
+            ];
+            for (_, name, value) in swatch
+                .node_attrs
+                .iter()
+                .filter(|(id, name, _)| *id == node.id && !OWN.contains(&name.as_str()))
+            {
+                target = target.attr(name.clone(), value.clone());
+            }
+            let target = request_focus(target, swatch.focus_request.as_ref() == Some(&node.id));
 
             let click = on_node_click.clone();
             let click_id = node.id.clone();
@@ -1629,6 +1790,24 @@ pub enum GraphCanvasEvent<Id> {
 
 impl<Id> crate::Action for GraphCanvasEvent<Id> {}
 
+/// What [`graph_canvas_with_wheel`] reports: the established
+/// [`GraphCanvasEvent`]s, with the wheel passed through whole in place of
+/// [`GraphCanvasEvent::Zoom`]. A separate type, as [`GraphAtlasEvent`] is, so a
+/// consumer that matches [`GraphCanvasEvent`] exhaustively keeps compiling.
+#[derive(Clone, Debug)]
+pub enum GraphCanvasInput<Id> {
+    /// Any event [`graph_canvas`] reports other than a wheel notch.
+    Event(GraphCanvasEvent<Id>),
+    /// A wheel notch over the canvas, untouched: both axes of `delta`, the
+    /// pointer's canvas-local position (`local`, in the canvas's `size`) and the
+    /// modifiers. The host's own scroll default is not suppressed; the consumer
+    /// calls [`WheelEvent::prevent_default`] when its policy takes the notch,
+    /// and leaves it alone when the page should scroll.
+    Wheel(WheelEvent),
+}
+
+impl<Id> crate::Action for GraphCanvasInput<Id> {}
+
 /// Atlas-only interaction events. Kept separate from [`GraphCanvasEvent`] so
 /// the established generic graph callback remains source-compatible.
 #[derive(Clone, Debug, PartialEq)]
@@ -1682,6 +1861,72 @@ where
     Kind: Clone + PartialEq + 'static,
     F: Fn(&mut State, GraphCanvasEvent<Id>) -> Output + 'static,
 {
+    graph_canvas_core(
+        swatch,
+        |event| event,
+        |event: WheelEvent| {
+            // A notch toward the top zooms in, matching every map surface; the
+            // host's own scroll default is suppressed so the page does not
+            // scroll under the zoom.
+            if event.delta.1 == 0.0 {
+                return None;
+            }
+            event.prevent_default();
+            Some(GraphCanvasEvent::Zoom {
+                factor: if event.delta.1 > 0.0 { 1.2 } else { 1.0 / 1.2 },
+            })
+        },
+        on_event,
+    )
+}
+
+/// [`graph_canvas`] with the wheel passed through whole, for a consumer that
+/// applies its own wheel policy (a wheel-mode choice, pointer-anchored zoom, a
+/// modifier that always zooms) instead of taking a fixed zoom factor.
+///
+/// Every other event is the same [`GraphCanvasEvent`] [`graph_canvas`] reports,
+/// wrapped in [`GraphCanvasInput::Event`].
+pub fn graph_canvas_with_wheel<State, A, Output, Id, Kind, F>(
+    swatch: &GraphCanvasSwatch<Id, Kind>,
+    on_event: F,
+) -> impl View<State, A, GenetCtx, Element = GenetElement> + use<State, A, Output, Id, Kind, F>
+where
+    State: 'static,
+    A: 'static,
+    Output: OptionalAction<A> + 'static,
+    Id: Clone + PartialEq + 'static,
+    Kind: Clone + PartialEq + 'static,
+    F: Fn(&mut State, GraphCanvasInput<Id>) -> Output + 'static,
+{
+    graph_canvas_core(
+        swatch,
+        GraphCanvasInput::Event,
+        |event: WheelEvent| Some(GraphCanvasInput::Wheel(event)),
+        on_event,
+    )
+}
+
+/// The graph canvas, generic over the event a child reports to its own
+/// component boundary: `lift` wraps each [`GraphCanvasEvent`] and `wheel` turns
+/// a wheel notch into one (or none).
+fn graph_canvas_core<State, A, Output, Id, Kind, E, Lift, Wheel, F>(
+    swatch: &GraphCanvasSwatch<Id, Kind>,
+    lift: Lift,
+    wheel: Wheel,
+    on_event: F,
+) -> impl View<State, A, GenetCtx, Element = GenetElement>
++ use<State, A, Output, Id, Kind, E, Lift, Wheel, F>
+where
+    State: 'static,
+    A: 'static,
+    Output: OptionalAction<A> + 'static,
+    Id: Clone + PartialEq + 'static,
+    Kind: Clone + PartialEq + 'static,
+    E: crate::Action + 'static,
+    Lift: Fn(GraphCanvasEvent<Id>) -> E + Clone + 'static,
+    Wheel: Fn(WheelEvent) -> Option<E> + Clone + 'static,
+    F: Fn(&mut State, E) -> Output + 'static,
+{
     component(
         swatch.clone(),
         |_props: &GraphCanvasSwatch<Id, Kind>| GraphCanvasLocal {
@@ -1695,7 +1940,9 @@ where
         |_prev: &GraphCanvasSwatch<Id, Kind>,
          _next: &GraphCanvasSwatch<Id, Kind>,
          _local: &mut GraphCanvasLocal<Id>| {},
-        |props: &GraphCanvasSwatch<Id, Kind>, local: &GraphCanvasLocal<Id>| {
+        move |props: &GraphCanvasSwatch<Id, Kind>, local: &GraphCanvasLocal<Id>| {
+            let lift = lift.clone();
+            let wheel = wheel.clone();
             let mut swatch = props.clone();
             swatch.hovered = local.hovered.clone();
             swatch.focus = local.focus.clone();
@@ -1708,18 +1955,33 @@ where
             }
             Box::new(graph_canvas_swatch_with_focus_and_drag_and_relations(
                 &swatch,
-                |_: &mut GraphCanvasLocal<Id>, id: Id| GraphCanvasEvent::Activate(id),
+                {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>, id: Id| lift(GraphCanvasEvent::Activate(id))
+                },
                 |local: &mut GraphCanvasLocal<Id>, id: Option<Id>| local.hovered = id,
                 |local: &mut GraphCanvasLocal<Id>, id: Option<Id>| local.focus = id,
-                |_: &mut GraphCanvasLocal<Id>, drag: GraphCanvasNodeDrag<Id>| {
-                    GraphCanvasEvent::Drag(drag)
+                {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>, drag: GraphCanvasNodeDrag<Id>| {
+                        lift(GraphCanvasEvent::Drag(drag))
+                    }
                 },
-                |_: &mut GraphCanvasLocal<Id>, id: String| GraphCanvasEvent::RelationActivate(id),
+                {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>, id: String| {
+                        lift(GraphCanvasEvent::RelationActivate(id))
+                    }
+                },
                 |local: &mut GraphCanvasLocal<Id>, id: Option<String>| {
                     local.hovered_relation = id;
                 },
-                |_: &mut GraphCanvasLocal<Id>| GraphCanvasEvent::Expand,
                 {
+                    let lift = lift.clone();
+                    move |_: &mut GraphCanvasLocal<Id>| lift(GraphCanvasEvent::Expand)
+                },
+                {
+                    let lift = lift.clone();
                     let width = (props.width as f32).max(1.0);
                     let height = (props.height as f32).max(1.0);
                     move |local: &mut GraphCanvasLocal<Id>, event: PointerEvent| match event.phase {
@@ -1736,9 +1998,9 @@ where
                             if delta == (0.0, 0.0) {
                                 return None;
                             }
-                            Some(GraphCanvasEvent::Pan {
+                            Some(lift(GraphCanvasEvent::Pan {
                                 delta: (delta.0 / width, delta.1 / height),
-                            })
+                            }))
                         },
                         PointerPhase::Up | PointerPhase::Cancel => {
                             local.pan_anchor = None;
@@ -1746,19 +2008,8 @@ where
                         },
                     }
                 },
-                |_: &mut GraphCanvasLocal<Id>, event: WheelEvent| {
-                    // A notch toward the top zooms in, matching every map
-                    // surface; the host's own scroll default is suppressed so
-                    // the page does not scroll under the zoom.
-                    if event.delta.1 == 0.0 {
-                        return None;
-                    }
-                    event.prevent_default();
-                    Some(GraphCanvasEvent::Zoom {
-                        factor: if event.delta.1 > 0.0 { 1.2 } else { 1.0 / 1.2 },
-                    })
-                },
-            )) as ComponentView<GraphCanvasLocal<Id>, GraphCanvasEvent<Id>>
+                move |_: &mut GraphCanvasLocal<Id>, event: WheelEvent| wheel(event),
+            )) as ComponentView<GraphCanvasLocal<Id>, E>
         },
         on_event,
     )
@@ -1924,6 +2175,7 @@ mod tests {
         relation_clicked: Vec<String>,
         relation_hovered: Option<String>,
         expanded: bool,
+        focus_request: Option<u8>,
     }
 
     type TestView = Box<dyn AnyView<State, (), GenetCtx, GenetElement>>;
@@ -2018,6 +2270,95 @@ mod tests {
         assert_eq!(runner.state().zooms, vec![1.2, 1.0 / 1.2]);
     }
 
+    #[derive(Default)]
+    struct WheelState {
+        wheels: Vec<((f32, f32), (f32, f32), (f32, f32), bool, bool)>,
+        others: usize,
+        take: bool,
+    }
+
+    type WheelView = Box<dyn AnyView<WheelState, (), GenetCtx, GenetElement>>;
+
+    fn wheel_view(state: &WheelState) -> WheelView {
+        let swatch = model(None, None);
+        let _ = state;
+        Box::new(graph_canvas_with_wheel(
+            &swatch,
+            |state: &mut WheelState, input: GraphCanvasInput<u8>| match input {
+                GraphCanvasInput::Wheel(event) => {
+                    state.wheels.push((
+                        event.delta,
+                        event.local,
+                        event.size,
+                        event.modifiers.ctrl,
+                        event.modifiers.meta,
+                    ));
+                    if state.take {
+                        event.prevent_default();
+                    }
+                },
+                GraphCanvasInput::Event(_) => state.others += 1,
+            },
+        ))
+    }
+
+    /// A consumer that opts in sees the whole wheel notch (both axes, where the
+    /// pointer was, the modifiers) and decides whether the host's scroll default
+    /// runs. A wheel that is not asked for as a zoom is not turned into one.
+    #[test]
+    fn the_wheel_reaches_an_opting_in_consumer_whole() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), wheel_view, WheelState::default());
+        let root = runner.root();
+        let canvas = find_attr(&dom.borrow(), root, "class", "graph-canvas-swatch")
+            .expect("canvas root element");
+        let size = (240.0, 112.0);
+
+        let mut event = WheelEvent::new((7.0, -3.0), (100.0, 40.0), size);
+        event.modifiers.ctrl = true;
+        runner.dispatch_wheel(canvas, event);
+        assert_eq!(
+            runner.state().wheels,
+            vec![((7.0, -3.0), (100.0, 40.0), size, true, false)]
+        );
+        assert!(!runner.default_prevented(), "the consumer did not take it");
+
+        runner.update(|state| state.take = true);
+        runner.dispatch_wheel(canvas, WheelEvent::new((0.0, 0.0), (1.0, 2.0), size));
+        assert_eq!(
+            runner.state().wheels.len(),
+            2,
+            "a zero notch is still reported"
+        );
+        assert!(runner.default_prevented(), "the consumer took it");
+        assert_eq!(runner.state().others, 0);
+    }
+
+    /// The established form is unchanged: a notch is a fixed zoom factor, the
+    /// host's scroll default is suppressed, and a zero notch reports nothing.
+    #[test]
+    fn the_established_wheel_zoom_is_unchanged() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            viewport_view,
+            ViewportState::default(),
+        );
+        let root = runner.root();
+        let canvas = find_attr(&dom.borrow(), root, "class", "graph-canvas-swatch")
+            .expect("canvas root element");
+        let size = (240.0, 112.0);
+        runner.dispatch_wheel(canvas, WheelEvent::new((9.0, 3.0), (5.0, 5.0), size));
+        assert!(runner.default_prevented());
+        runner.dispatch_wheel(canvas, WheelEvent::new((9.0, 0.0), (5.0, 5.0), size));
+        assert!(
+            !runner.default_prevented(),
+            "a zero notch is left to the host"
+        );
+        assert_eq!(runner.state().zooms, vec![1.2]);
+    }
+
     fn attr<'a>(dom: &'a ScriptedDom, node: NodeId, name: &str) -> Option<&'a str> {
         dom.attribute(node, &Namespace::from(""), &LocalName::from(name))
     }
@@ -2053,6 +2394,54 @@ mod tests {
         assert!(runner.state().expanded);
     }
 
+    fn attributed_view(state: &State) -> TestView {
+        let swatch = model(state.hovered, state.focused)
+            .with_node_attr(2, "aria-expanded", "false")
+            .with_node_attr(2, "aria-expanded", "true")
+            .with_node_attr(2, "data-tier", "session")
+            .with_node_attr(2, "aria-label", "Not the canvas's name")
+            .with_focus_request(state.focus_request);
+        Box::new(graph_canvas_swatch_with_focus(
+            &swatch,
+            |state: &mut State, id| state.clicked.push(id),
+            |state: &mut State, id| state.hovered = id,
+            |state: &mut State, id| state.focused = id,
+            |state: &mut State| state.expanded = true,
+        ))
+    }
+
+    /// A consumer's node kind rides on the shared target as attributes, and a
+    /// requested node takes focus once, without the canvas's own attributes
+    /// being overridden.
+    #[test]
+    fn node_attrs_and_a_focus_request_reach_one_nodes_target() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), attributed_view, State::default());
+        let root = runner.root();
+        let second = find_attr(&dom.borrow(), root, "aria-label", "Second node")
+            .expect("the canvas keeps its own accessible name");
+        let first = find_attr(&dom.borrow(), root, "aria-label", "First node").unwrap();
+        {
+            let dom = dom.borrow();
+            assert_eq!(attr(&dom, second, "aria-expanded"), Some("true"));
+            assert_eq!(attr(&dom, second, "data-tier"), Some("session"));
+            assert_eq!(attr(&dom, first, "aria-expanded"), None);
+        }
+        assert_eq!(runner.focus(), None);
+        runner.update(|state| state.focus_request = Some(2));
+        let second = find_attr(&dom.borrow(), root, "aria-label", "Second node").unwrap();
+        assert_eq!(runner.focus(), Some(second), "the request takes focus");
+        let first = find_attr(&dom.borrow(), root, "aria-label", "First node").unwrap();
+        runner.set_focus(Some(first));
+        runner.update(|state| state.hovered = Some(1));
+        assert_eq!(
+            runner.focus(),
+            Some(first),
+            "a held request does not steal focus again"
+        );
+    }
+
     fn labelled_view(state: &State) -> TestView {
         let swatch = model(state.hovered, state.focused).with_node_labels(true);
         Box::new(graph_canvas_swatch_with_focus(
@@ -2075,6 +2464,119 @@ mod tests {
         }
         for child in dom.dom_children(root) {
             classes_of(dom, child, base, out);
+        }
+    }
+
+    fn short_labelled_view(_state: &State) -> TestView {
+        let swatch = model(None, None)
+            .with_node_labels(true)
+            .with_visible_label(2, "Second")
+            .with_label_placement(1, GraphLabelPlacement::Left);
+        Box::new(graph_canvas_swatch_with_focus(
+            &swatch,
+            |state: &mut State, id| state.clicked.push(id),
+            |state: &mut State, id| state.hovered = id,
+            |state: &mut State, id| state.focused = id,
+            |state: &mut State| state.expanded = true,
+        ))
+    }
+
+    /// A node's visible label can say less than its accessible name, and a
+    /// host can put a label on the side it needs.
+    #[test]
+    fn a_visible_label_can_be_shorter_and_placed_by_the_host() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), short_labelled_view, State::default());
+        let root = runner.root();
+        let dom = dom.borrow();
+        let second = find_attr(&dom, root, "aria-label", "Second node")
+            .expect("the accessible name stays whole");
+        assert_eq!(attr(&dom, second, "aria-label"), Some("Second node"));
+        let left = find_attr(&dom, root, "data-label-placement", "left")
+            .expect("node 1's label goes left as asked");
+        assert_eq!(
+            dom.text(dom.dom_children(left).next().unwrap()),
+            Some("First node")
+        );
+        let mut labels = Vec::new();
+        classes_of(&dom, root, "graph-canvas-swatch-label", &mut labels);
+        assert_eq!(labels.len(), 2);
+        let texts: Vec<String> = {
+            fn walk(dom: &ScriptedDom, node: NodeId, out: &mut Vec<String>) {
+                if attr(dom, node, "class")
+                    .is_some_and(|c| c.starts_with("graph-canvas-swatch-label "))
+                    || attr(dom, node, "class") == Some("graph-canvas-swatch-label")
+                {
+                    let text = dom
+                        .dom_children(node)
+                        .filter_map(|child| dom.text(child).map(str::to_string))
+                        .collect::<String>();
+                    out.push(text);
+                }
+                for child in dom.dom_children(node).collect::<Vec<_>>() {
+                    walk(dom, child, out);
+                }
+            }
+            let mut out = Vec::new();
+            walk(&dom, root, &mut out);
+            out
+        };
+        assert!(texts.contains(&"Second".to_string()), "{texts:?}");
+        assert!(!texts.contains(&"Second node".to_string()), "{texts:?}");
+    }
+
+    /// A long label is cut in its middle, keeping its start and the end that
+    /// tells it apart, at word boundaries; a short one is left whole.
+    #[test]
+    fn a_long_label_is_cut_in_the_middle() {
+        let fork = "Session (fork of Session (from blake3:f612a))";
+        let cut = middle_cut(fork, GRAPH_LABEL_CHARS);
+        assert!(cut.chars().count() <= GRAPH_LABEL_CHARS, "{cut}");
+        assert!(cut.starts_with("Session"), "{cut}");
+        assert_eq!(cut, "Session (fork of … blake3:f612a))");
+        let picked = middle_cut(
+            "Session (picked from Evening reading (from blake3:f612a))",
+            GRAPH_LABEL_CHARS,
+        );
+        assert!(picked.starts_with("Session (picked"), "{picked}");
+        assert!(picked.ends_with("blake3:f612a))"), "{picked}");
+        assert!(picked.chars().count() <= GRAPH_LABEL_CHARS, "{picked}");
+        assert!(cut.contains(" … "), "{cut}");
+        let other = middle_cut(
+            "Session (fork of Session (from blake3:0c0de))",
+            GRAPH_LABEL_CHARS,
+        );
+        assert_ne!(cut, other, "names that differ at the end stay apart");
+        assert_eq!(
+            middle_cut("Evening reading", GRAPH_LABEL_CHARS),
+            "Evening reading"
+        );
+        assert_eq!(
+            middle_cut("abcdefghijklmnopqrstuvwxyz0123456789", 10)
+                .chars()
+                .count(),
+            10,
+            "a name without spaces is cut at the budget"
+        );
+        // The canvas shows the cut and keeps the whole accessible name.
+        let swatch = model(None, None)
+            .with_node_labels(true)
+            .with_visible_label(2, fork);
+        assert_eq!(swatch.label_text(1), cut);
+        assert_eq!(swatch.graph.nodes[1].label, "Second node");
+    }
+
+    /// A node an overlay occupies shows the overlay, not its label too, with
+    /// and without culling.
+    #[test]
+    fn an_occupied_node_draws_no_label() {
+        for cull in [false, true] {
+            let swatch = model(None, None)
+                .with_node_labels(true)
+                .with_label_culling(cull)
+                .with_node_footprint(1, 120.0, 60.0);
+            assert_eq!(swatch.shown_labels(), [false, true], "cull {cull}");
         }
     }
 

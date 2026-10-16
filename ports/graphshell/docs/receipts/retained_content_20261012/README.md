@@ -70,11 +70,14 @@ replacement control and cancelled/wrong-directory build attempts are not
 acceptance evidence. Browser file-chooser upload could not be qualified because
 the extension lacked file-URL access; the core receiving/admission path is tested.
 
-Graphshell clip export still needs a host export adapter. Protected personal
-custody, arbitrary media/engine adapters, physical assistive technology and
-cross-platform headed acceptance remain open. Turnstone A4/S3's inline Component
-bodies, float composition and native theme/input/DPI/performance gates remain
-open. This receipt does not close the whole A4 plan.
+The [clip export continuation](clip-export-browser/README.md) adds the host
+PortableClip adapter, exact native custody controls and a trusted browser handoff.
+It keeps completed download-file verification separate and open. The original
+captures above retain their earlier source basis. Protected personal custody,
+arbitrary media/engine adapters, physical assistive technology and cross-platform
+headed acceptance remain open. Turnstone A4/S3's subsequent implementation and
+native qualification are recorded in its stations/windows receipt; this earlier
+receipt does not close the whole A4 plan.
 
 Generated browser-package hashes and cleanup are recorded in `qualification.json`.
 The package and loopback server are temporary; receipts and ordinary stable Cargo

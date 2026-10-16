@@ -1,0 +1,1257 @@
+    Checking socket2 v0.6.5
+    Checking mio v1.2.3
+    Checking muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+    Checking rustls-platform-verifier v0.7.0
+    Checking sceno v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+    Checking p384 v0.13.1
+    Checking p256 v0.13.2
+    Checking command-menu v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\command-menu)
+    Checking mere-curation v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\forme\curation)
+    Checking p521 v0.13.3
+    Checking numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+    Checking workbench v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\workbench)
+    Checking tinct v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\cambium\tinct)
+    Checking backstep v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\backstep)
+    Checking netdev v0.45.1
+    Checking inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+    Checking noq-proto v1.3.0
+    Checking noq-udp v1.3.0
+    Checking ipconfig v0.3.4
+    Checking stacker v0.1.25
+    Checking incipit v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\incipit)
+    Checking meristem v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\meristem)
+    Checking mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+    Checking tabard v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+    Checking buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+    Checking tokio v1.53.2
+    Checking mere-surface-api v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\surface-api)
+    Checking sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+    Checking armillary v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\armillary)
+    Checking serial2 v0.2.38
+    Checking k256 v0.13.4
+    Checking chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+    Checking esp v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\intel\esp)
+    Checking nu-ansi-term v0.50.3
+    Checking seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+    Checking ssh-key v0.6.7
+    Checking mere-proofs v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\proofs)
+    Checking tempfile v3.27.0
+    Checking hpke-rs-rust-crypto v0.7.0
+    Checking tracing-subscriber v0.3.23
+    Checking quinn-udp v0.5.15
+    Checking scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+    Checking scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+    Checking quinn-proto v0.11.18
+    Checking p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+    Checking cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+    Checking winapi-util v0.1.11
+    Checking mere-page-load v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\page-load)
+    Checking genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+    Checking same-file v1.0.6
+    Checking luggage v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\luggage)
+    Checking illume v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\nematic\illume)
+    Checking knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#11b07360)
+    Checking personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+    Checking walkdir v2.5.0
+    Checking chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+    Checking mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#11b07360)
+    Checking reference-data v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\intel\reference-data)
+    Checking mora-cmudict v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\intel\mora-cmudict)
+    Checking notify v8.2.0
+    Checking mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+    Checking eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+    Checking rtoolbox v0.0.6
+    Checking light-file-dialog v3.21.3
+    Checking rpassword v7.5.4
+    Checking scenomise v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+    Checking dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+    Checking servitor v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\servitor)
+    Checking document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+    Checking uxtree v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\forme\uxtree)
+    Checking script-rhai v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\script\rhai)
+    Checking cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+    Checking genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+    Checking knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#11b07360)
+    Checking genet-documents v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+    Checking cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+    Checking platen v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\platen\platen)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\producer\registry.rs:36:10
+   |
+36 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+36 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+36 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+    Checking mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates\cambium\cambium-rootstock\src\producer\registry.rs:651:13
+    |
+651 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&netrender::Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+651 -             drop(renderer);
+651 +             let _ = renderer;
+    |
+
+warning: `cambium-rootstock` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p cambium-rootstock -- --no-deps -D warnings` to apply 3 suggestions)
+    Checking mere-document-lanes v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\document-lanes)
+    Checking tokio-util v0.7.19
+    Checking tokio-rustls v0.26.6
+    Checking tower v0.5.3
+    Checking notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+    Checking backon v1.6.0
+    Checking acto v0.8.2
+    Checking serial2-tokio v0.1.25
+    Checking iroh-io v0.6.2
+    Checking p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+    Checking ractor v0.16.5
+    Checking spartan-protocol v0.1.1
+    Checking nex-protocol v0.1.1
+    Checking gopher-protocol v0.2.0
+    Checking finger-protocol v0.1.1
+    Checking guppy-protocol v0.1.1
+    Checking tulle v0.2.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking quinn v0.11.12
+    Checking graphshell-client v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-client)
+    Checking gemini-protocol v0.1.7
+    Checking bao-tree v0.16.1
+    Checking misfin v0.0.4
+    Checking h3 v0.0.8
+    Checking tokio-tungstenite v0.29.0
+    Checking async-compression v0.4.48
+    Checking swarm-discovery v0.6.3 (https://github.com/mark-ik/swarm-discovery.git?branch=mere#99dd24c5)
+    Checking pelt-core v0.2.0 (C:\Users\mark_\Code\repos\mere\ports\pelt\core)
+    Checking scroll-protocol v0.1.0
+    Checking tower-http v0.6.11
+    Checking retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ports\pelt\core\src\pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+    Checking h2 v0.4.19
+    Checking n0-future v0.3.2
+    Checking tokio-stream v0.1.19
+    Checking tokio-websockets v0.13.3
+    Checking ssh-agent-lib v0.6.0
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ports\pelt\core\src\lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+    Checking n0-watcher v1.0.0
+    Checking h3-quinn v0.0.10
+warning: `pelt-core` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p pelt-core -- --no-deps -D warnings` to apply 2 suggestions)
+    Checking nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+    Checking netwatch v0.19.3
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates\nematic\nematic\src\knot\expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates\nematic\nematic\src\knot\expand\build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+    Checking noq v1.3.0
+    Checking p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+warning: `nematic` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p nematic -- --no-deps -D warnings` to apply 2 suggestions)
+    Checking knot-editor-host v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\knot-editor-host)
+warning: unused import: `EdgeRef`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+    Checking knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#11b07360)
+    Checking irpc v0.17.0
+warning: unused variable: `key`
+    --> crates\graph\graph-kernel\src\graph\assertion_write.rs:1021:19
+     |
+1021 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+    Checking seneschal v0.2.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking outrider v0.3.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#11b07360)
+    Checking radio-hand v0.0.1 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking postilion v0.3.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking hyper v1.11.1
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates\graph\graph-kernel\src\graph\mod.rs:710:19
+    |
+407 | impl Graph {
+    | ---------- methods in this implementation
+...
+710 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+724 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+746 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `upsert_persisted_statement` is never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:468:19
+    |
+323 | impl SemanticData {
+    | ----------------- method in this implementation
+...
+468 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_payload.rs:285:19
+    |
+ 57 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+285 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+298 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+320 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+344 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\resource_content.rs:86:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+ 86 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\edge_ops.rs:181:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+181 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+252 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+268 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+337 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+524 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+621 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+757 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates\graph\graph-kernel\src\graph\query.rs:231:19
+    |
+224 | impl Graph {
+    | ---------- method in this implementation
+...
+231 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 15 warnings (run `cargo clippy --fix --lib -p mere-kernel -- --no-deps -D warnings` to apply 6 suggestions)
+    Checking mere-alembic v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\distillery\alembic)
+    Checking mere-cartography v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\canvas\cartography)
+    Checking hyper-util v0.1.20
+    Checking pandect v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\system\pandect)
+warning: unused import: `std::io`
+  --> crates\system\pandect\src\wallet_grant\pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> crates\system\pandect\src\wallet_grant\records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates\system\pandect\src\wallet_grant\records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> crates\system\pandect\src\wallet_grant\records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> crates\system\pandect\src\wallet_grant\types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> crates\system\pandect\src\wallet_grant\types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+    Checking pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+    Checking hyper-rustls v0.27.9
+    Checking igd-next v0.17.1
+warning: variable does not need to be mutable
+   --> crates\system\pandect\src\graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+    Checking reqwest v0.13.5
+    Checking murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking portmapper v0.19.3
+    Checking netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+    Checking n0-dns-resolver v0.1.0
+    Checking iroh-dns v1.3.0
+warning: function `build_affinity_spring` is never used
+  --> crates\canvas\pictograph\src\canvas.rs:66:4
+   |
+66 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pictograph` (lib) generated 1 warning
+    Checking mere-view v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mere-view)
+    Checking mere v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\mere)
+warning: method `into_graph` is never used
+   --> crates\system\pandect\src\graph_codicil.rs:149:19
+    |
+148 | impl GraphCodicil {
+    | ----------------- method in this implementation
+149 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+    Checking iroh-relay v1.3.0
+warning: `pandect` (lib) generated 8 warnings (run `cargo clippy --fix --lib -p pandect -- --no-deps -D warnings` to apply 7 suggestions)
+    Checking graphshell-endpoint v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-endpoint)
+    Checking mere-fetch v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\fetch)
+    Checking castellan v0.0.3 (C:\Users\mark_\Code\repos\mere\ports\djinn\castellan)
+    Checking cleromancy-core-acceptance v0.1.0 (https://github.com/merely-made/cleromancy.git?branch=main#a4364de9)
+    Checking mere-overmap v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mere-overmap)
+    Checking iroh v1.3.0
+    Checking mere-signalman v0.0.1 (C:\Users\mark_\Code\repos\mere\ports\signalman)
+warning: unused variable: `provider`
+  --> ports\djinn\castellan\src\custody\wallet\refresh.rs:51:5
+   |
+51 |     provider: &InMemoryProvider,
+   |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_provider`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `records_root` is never read
+  --> ports\djinn\castellan\src\resident.rs:64:5
+   |
+62 | pub struct CastellanResident {
+   |            ----------------- field in this struct
+63 |     records: SealedRecordStorage,
+64 |     records_root: PathBuf,
+   |     ^^^^^^^^^^^^
+   |
+   = note: `CastellanResident` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a constant
+  --> ports\djinn\castellan\src\authority.rs:68:1
+   |
+68 | pub const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+note: the lint level is defined here
+  --> ports\djinn\castellan\src\lib.rs:82:9
+   |
+82 | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\djinn\castellan\src\authority.rs:97:5
+   |
+97 |     UnknownIntent,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\djinn\castellan\src\authority.rs:99:5
+   |
+99 |     InvalidPayload(#[from] serde_json::Error),
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:101:5
+    |
+101 |     Decision(#[from] DecisionError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:103:5
+    |
+103 |     Identity(IdentityError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:111:5
+    |
+111 |     KeyGeneration,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:113:5
+    |
+113 |     PublicEncoding,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:115:5
+    |
+115 |     InvalidComment,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:120:5
+    |
+120 |     InvalidProfileId,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:122:5
+    |
+122 |     InvalidProfileName,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:124:5
+    |
+124 |     InvalidIdleWindow,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:126:5
+    |
+126 |     ConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:128:5
+    |
+128 |     KeyNotFound,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:130:5
+    |
+130 |     NativeHandoffRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:132:5
+    |
+132 |     DeviceRevocationConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:134:5
+    |
+134 |     CarryUnavailable,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:136:5
+    |
+136 |     DeviceRevocation(std::io::ErrorKind),
+    |     ^^^^^^^^^^^^^^^^
+
+warning: `castellan` (lib) generated 19 warnings (run `cargo clippy --fix --lib -p castellan -- --no-deps -D warnings` to apply 1 suggestion)
+    Checking iroh-gossip v0.101.0
+    Checking iroh-mdns-address-lookup v0.6.0
+    Checking iroh-util v0.6.0
+    Checking iroh-blobs v0.103.1
+    Checking mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+    Checking stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+    Checking mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Checking mere-mesh v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\mesh\mesh)
+    Checking graphshell-host v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-host)
+    Checking knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#11b07360)
+    Checking graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell)
+warning: unused import: `happens_before`
+  --> ports\graphshell\src\personal_sync.rs:35:5
+   |
+35 |     happens_before, observed_frontier, stable_writer_subject, validate_causal_metadata,
+   |     ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+    Checking distillery v0.0.1 (C:\Users\mark_\Code\repos\mere\ports\distillery)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ports\graphshell\src\retained_content\producer.rs:32:14
+   |
+32 |         NEXT.fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+32 -         NEXT.fetch_update(
+32 +         NEXT.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ports\graphshell\src\retained_content\producer.rs:136:30
+    |
+136 |                         NEXT.fetch_update(
+    |                              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+136 -                         NEXT.fetch_update(
+136 +                         NEXT.try_update(
+    |
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\courier.rs:42:5
+   |
+42 |     MalformedDigest,
+   |     ^^^^^^^^^^^^^^^
+   |
+note: the lint level is defined here
+  --> ports\distillery\src\lib.rs:45:9
+   |
+45 | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\courier.rs:44:5
+   |
+44 |     Store(String),
+   |     ^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\courier.rs:131:5
+    |
+131 |     pub async fn has(&self, blob: &BlobRef) -> bool {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> ports\distillery\src\mesh_host\courier.rs:219:5
+    |
+219 |     pub fn new(transport: Arc<P2pandaTransport>, blobs: Arc<BlobStore>) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\host.rs:32:5
+   |
+32 |     fn as_source(&self) -> &dyn BlobSource;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\host.rs:33:5
+   |
+33 |     fn as_sink(&self) -> &dyn BlobSink;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:47:5
+   |
+47 |     pub registry: ResourceRegistry,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:48:5
+   |
+48 |     pub blobs: Arc<dyn BlobSpace>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:51:5
+   |
+51 |     pub clock: Arc<dyn Clock>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:52:5
+   |
+52 |     pub conditions: Arc<dyn ConditionSource>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:53:5
+   |
+53 |     pub facts: HostFacts,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:54:5
+   |
+54 |     pub policy: DevicePolicy,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:55:5
+   |
+55 |     pub lease: LeasePolicy,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\host.rs:83:5
+   |
+83 |     Claimed {
+   |     ^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:84:9
+   |
+84 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\host.rs:86:5
+   |
+86 |     Granted {
+   |     ^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:87:9
+   |
+87 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:88:9
+   |
+88 |         epoch: u32,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:89:9
+   |
+89 |         lease: LeaseId,
+   |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\host.rs:91:5
+   |
+91 |     Heartbeat {
+   |     ^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:92:9
+   |
+92 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:93:9
+   |
+93 |         lease: LeaseId,
+   |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:94:9
+   |
+94 |         progress: LeaseProgress,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:98:9
+   |
+98 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:99:9
+   |
+99 |         lease: Option<LeaseId>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:101:5
+    |
+101 |     Completed {
+    |     ^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:102:9
+    |
+102 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:103:9
+    |
+103 |         lease: Option<LeaseId>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:105:5
+    |
+105 |     Released {
+    |     ^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:106:9
+    |
+106 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:107:9
+    |
+107 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:108:9
+    |
+108 |         reason: ReleaseReason,
+    |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:113:9
+    |
+113 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:118:9
+    |
+118 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:119:9
+    |
+119 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:120:9
+    |
+120 |         reason: ReclaimReason,
+    |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:121:9
+    |
+121 |         stopped_at: LeaseProgress,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:127:9
+    |
+127 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:128:9
+    |
+128 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:130:5
+    |
+130 |     Idle,
+    |     ^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:137:5
+    |
+137 |     Sync(#[from] MeshSyncError),
+    |     ^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:139:5
+    |
+139 |     Store(#[from] MeshStoreError),
+    |     ^^^^^
+
+warning: missing documentation for an associated function
+   --> ports\distillery\src\mesh_host\host.rs:157:5
+    |
+157 |     pub fn new(synced: SyncedMesh<B>, keypair: Ed25519Keypair, config: HostConfig) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\host.rs:168:5
+    |
+168 |     pub fn me(&self) -> [u8; 32] {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\host.rs:172:5
+    |
+172 |     pub fn synced(&self) -> &SyncedMesh<B> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\host.rs:186:5
+    |
+186 |     pub fn policy(&self) -> &DevicePolicy {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:30:5
+   |
+30 |     pub reason: ReclaimReason,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:41:5
+   |
+41 |     pub handle: JobControlHandle,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:42:5
+   |
+42 |     pub task: JoinHandle<Result<RunOutcome, RunError>>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:45:5
+   |
+45 |     pub reclaim: Option<Reclaiming>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:27:5
+   |
+27 |     fn now_ms(&self) -> u64;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> ports\distillery\src\mesh_host\sense.rs:52:5
+   |
+52 |     pub fn at(now_ms: u64) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:58:5
+   |
+58 |     pub fn set(&self, now_ms: u64) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:62:5
+   |
+62 |     pub fn advance(&self, by_ms: u64) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:80:5
+   |
+80 |     fn conditions(&self) -> DeviceConditions;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> ports\distillery\src\mesh_host\sense.rs:91:5
+   |
+91 |     pub fn new(conditions: DeviceConditions) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\sense.rs:102:5
+    |
+102 |     pub fn set(&self, conditions: DeviceConditions) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `distillery` (lib) generated 57 warnings
+warning: method `begin_session` is never used
+   --> ports\graphshell\src\mere_host.rs:427:19
+    |
+263 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+427 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `codicil_graph` is never used
+    --> ports\graphshell\src\product.rs:1063:4
+     |
+1063 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> ports\graphshell\src\product.rs:1465:15
+     |
+1465 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `graphshell` (lib) generated 6 warnings (run `cargo clippy --fix --lib -p graphshell -- --no-deps -D warnings` to apply 3 suggestions)
+    Checking djinn v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\djinn)
+error: unused import: `Hash`
+  --> ports\djinn\src\sync\carriage_host.rs:30:26
+   |
+30 | use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
+   |                          ^^^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: unused import: `HeldLease`
+  --> ports\djinn\src\sync\carriage_host_commissioning.rs:42:64
+   |
+42 | use super::{CarriageCeilings, CarriageHost, CarriageHostError, HeldLease, now_ms};
+   |                                                                ^^^^^^^^^
+
+error: function `refusal` is never used
+  --> ports\djinn\src\keeper\review.rs:15:4
+   |
+15 | fn refusal(error: impl std::fmt::Display) -> CustodyRefusal {
+   |    ^^^^^^^
+   |
+   = note: `-D dead-code` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: field `ceilings` is never read
+  --> ports\djinn\src\sync\carriage_host.rs:72:5
+   |
+62 | pub struct CarriageHost {
+   |            ------------ field in this struct
+...
+72 |     ceilings: CarriageCeilings,
+   |     ^^^^^^^^
+
+error: this function has too many arguments (8/7)
+   --> ports\djinn\src\door\app_broker.rs:219:1
+    |
+219 | / async fn serve_admitted_app<A, R, W>(
+220 | |     reader: &mut R,
+221 | |     writer: &mut W,
+222 | |     personae: Arc<A>,
+...   |
+231 | |     R: AsyncRead + Unpin,
+232 | |     W: AsyncWrite + Unpin,
+    | |__________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: this function has too many arguments (8/7)
+   --> ports\djinn\src\door\browser_carrier.rs:470:1
+    |
+470 | / pub async fn admit_browser_session<P: IdentityProvider>(
+471 | |     identity: &P,
+472 | |     network: NetworkId,
+473 | |     profile: ProfileRef,
+...   |
+478 | |     now_ms: u64,
+479 | | ) -> Result<(BrowserSessionClient, AdmittedSession<DuplexStream>), BrowserCarrierError> {
+    | |_______________________________________________________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+error: this `if` statement can be collapsed
+   --> ports\djinn\src\embedded_reservoir.rs:136:21
+    |
+136 | /                     if let Some(expected) = options.persona {
+137 | |                         if persona != expected {
+138 | |                             return Err(ReservoirAttachmentError::Persona {
+139 | |                                 expected: expected.as_uuid().to_string(),
+...   |
+143 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+136 ~                     if let Some(expected) = options.persona
+137 ~                         && persona != expected {
+138 |                             return Err(ReservoirAttachmentError::Persona {
+...
+141 |                             });
+142 ~                         }
+    |
+
+error: this function has too many arguments (10/7)
+   --> ports\djinn\src\personal_sync.rs:131:1
+    |
+131 | / pub async fn start<P: IdentityProvider + ?Sized>(
+132 | |     identity: &P,
+133 | |     app_dir: &Path,
+134 | |     vault_dir: &Path,
+...   |
+141 | |     blob_custody: ResidentBlobCustody,
+142 | | ) -> Result<Option<PersonalSyncStarted>, DeviceSyncError> {
+    | |_________________________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+error: redundant closure
+   --> ports\djinn\src\personal_sync.rs:183:18
+    |
+183 |         .map_err(|error| PersonalSyncHostError::Transport(error))?;
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace the closure with the tuple variant itself: `PersonalSyncHostError::Transport`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#redundant_closure
+    = note: `-D clippy::redundant-closure` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::redundant_closure)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+   --> ports\djinn\src\personal_sync.rs:605:28
+    |
+605 |     let authority_changes: Vec<([u8; 32], Option<[u8; 32]>, Option<[u8; 32]>)> = desired
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `-D clippy::type-complexity` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: field assignment outside of initializer for an instance created with Default::default()
+   --> ports\djinn\src\resident_knot.rs:305:9
+    |
+305 |         rosette.max_source_bytes = config.max_source_bytes;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: consider initializing the variable with `knot_editor::KnotRosetteConfig { max_source_bytes: config.max_source_bytes, ..Default::default() }` and removing relevant reassignments
+   --> ports\djinn\src\resident_knot.rs:304:9
+    |
+304 |         let mut rosette = KnotRosetteConfig::default();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#field_reassign_with_default
+    = note: `-D clippy::field-reassign-with-default` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::field_reassign_with_default)]`
+
+error: this `if` statement can be collapsed
+   --> ports\djinn\src\resident_mere.rs:455:17
+    |
+455 | /                 if binding.instance != InstanceId(0) {
+456 | |                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {
+457 | |                         for offer in offers {
+458 | |                             offer.semantics.actions.clear();
+...   |
+461 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+455 ~                 if binding.instance != InstanceId(0)
+456 ~                     && let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {
+457 |                         for offer in offers {
+458 |                             offer.semantics.actions.clear();
+459 |                         }
+460 ~                     }
+    |
+
+error: the borrowed expression implements the required traits
+   --> ports\djinn\src\resident_site.rs:816:53
+    |
+816 |         BlobLease::new(self.scope, LEASE_NAMESPACE, &digest)
+    |                                                     ^^^^^^^ help: change this to: `digest`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_borrows_for_generic_args
+    = note: `-D clippy::needless-borrows-for-generic-args` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_borrows_for_generic_args)]`
+
+error: this `if` statement can be collapsed
+   --> ports\djinn\src\sync\carriage_host.rs:487:17
+    |
+487 | /                 if operation.header.payload_hash == Some(current.payload) {
+488 | |                     if let Some(body) = operation.body {
+489 | |                         return Ok(Some(body.to_bytes()));
+490 | |                     }
+491 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+487 ~                 if operation.header.payload_hash == Some(current.payload)
+488 ~                     && let Some(body) = operation.body {
+489 |                         return Ok(Some(body.to_bytes()));
+490 ~                     }
+    |
+
+error: using `chunks_exact` with a constant chunk size
+  --> ports\djinn\src\sync\personal_sync_host.rs:53:62
+   |
+53 |     for (slot, pair) in node.iter_mut().zip(value.as_bytes().chunks_exact(2)) {
+   |                                                              ^^^^^^^^^^^^^^^
+   |
+help: consider using `as_chunks::<2>()` instead
+  --> ports\djinn\src\sync\personal_sync_host.rs:53:62
+   |
+53 |     for (slot, pair) in node.iter_mut().zip(value.as_bytes().chunks_exact(2)) {
+   |                                                              ^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+    --> ports\djinn\src\sync\personal_sync_host.rs:1140:17
+     |
+1140 |                 &node.url(),
+     |                 ^^^^^^^^^^^ help: change this to: `node.url()`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_borrow
+     = note: `-D clippy::needless-borrow` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::needless_borrow)]`
+
+error: could not compile `djinn` (lib) due to 16 previous errors

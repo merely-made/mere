@@ -1,0 +1,49 @@
+{
+  "source": "230a41cd0e979603aa87a3d61d92bfdc54ef34f9",
+  "wasm_build_and_bindgen_pass": true,
+  "viewer_delivery": {
+    "wasm": {
+      "raw_bytes": 9915496,
+      "sha256": "b61138263b947426dcf2ea67f784ce9f350b78f2d4937e3e17fb550c2b98f55c",
+      "cap_bytes": 3407872,
+      "gzip6_bytes": 3400367,
+      "gzip9_bytes": 3357347,
+      "cap_pass": true
+    },
+    "glue": {
+      "raw_bytes": 125254,
+      "sha256": "3984626c81435a4bc89e341a93fb01c9b86c278d2d503ea7f4c636a76208f06b",
+      "cap_bytes": 20480,
+      "gzip6_bytes": 19563,
+      "gzip9_bytes": 19722,
+      "cap_pass": true
+    },
+    "mount": {
+      "raw_bytes": 998,
+      "sha256": "d36f0c879683b0f18e27d31b67162055fab268377ad04c2d0039f1aaf116419f",
+      "cap_bytes": 8192,
+      "gzip6_bytes": 592,
+      "gzip9_bytes": 590,
+      "cap_pass": true
+    },
+    "history": {
+      "raw_bytes": 271932,
+      "sha256": "aa3411e8b7eb9d4b145ed895c5330ef3be47c31746a5ac9b61f4f7fe1452289d",
+      "cap_bytes": 131072,
+      "gzip6_bytes": 6490,
+      "gzip9_bytes": 6292,
+      "cap_pass": true
+    }
+  },
+  "browser": {
+    "scope": "Frozen viewer baseline; no successful presentation or screenshot",
+    "observed_from": "CDP /json/list during the owned receipt run",
+    "observed_page_title": "GRAPHSHELL TREE FAIL: netrender wgpu boot failed: could not request a wgpu adapter: No suitable graphics adapter found; noop support not compiled in, vulkan support not compiled in, metal support not compiled in, dx12 support not compiled in, gl support not compiled in, webgpu found no adapters",
+    "configuration": "Chrome headless, unsafe WebGPU, ANGLE Vulkan; this is configuration-bound evidence, not a claim about every host/browser",
+    "scenario_result": "No successful mount; receipt harness timed out",
+    "source": "230a41cd0e979603aa87a3d61d92bfdc54ef34f9"
+  },
+  "browser_kernel_scope_note": "The legacy receipt harness launches Flatpak Chrome, whose browser processes escape the parent service cgroup. Its runtime refusal is preserved, but its parent-service peak is not browser RAM qualification. Future browser gates must launch the existing Chrome binary directly inside the owned service. No exact owned profile argument remains in /proc after cleanup.",
+  "portable_viewer_inventory": "pending actual portable host entry",
+  "native_webgpu_baseline_pixels": "unavailable in this observed browser configuration"
+}

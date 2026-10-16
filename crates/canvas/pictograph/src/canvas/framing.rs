@@ -17,12 +17,7 @@ impl Canvas {
     /// above natural size. The usual zoom limits still apply to very large views.
     pub fn fit_visible(&mut self) -> bool {
         let mut points = self.framing_points(false);
-        if let Some(center) = self
-            .active_fold_projection()
-            .and_then(|fold| fold.summary_center(|key| self.world_position_of(key)))
-        {
-            points.push(center);
-        }
+        points.extend(self.fold_summary_centers());
         self.frame_points(points)
     }
 
@@ -48,7 +43,7 @@ impl Canvas {
     fn framing_points(&self, selected_only: bool) -> Vec<PortablePoint> {
         // Use the same scope/fold visibility as node_in_scope, but project the
         // fold once for this traversal instead of once per node.
-        let fold = self.active_fold_projection();
+        let hidden = self.fold_hidden_keys();
         let scope = self
             .scope
             .as_ref()
@@ -57,7 +52,7 @@ impl Canvas {
             .nodes()
             .filter_map(|(key, _)| {
                 (scope.as_ref().is_none_or(|keys| keys.contains(&key))
-                    && fold.as_ref().is_none_or(|f| !f.members.contains(&key))
+                    && !hidden.contains(&key)
                     && (!selected_only || self.selected.contains(&key)))
                 .then(|| self.world_position_of(key))
                 .flatten()

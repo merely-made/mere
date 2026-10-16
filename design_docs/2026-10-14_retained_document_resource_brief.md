@@ -1,0 +1,311 @@
+# Retained document resource brief
+
+**Date:** 2026-10-14. **Revised:** 2026-10-16. **Status:** Rowan remains the
+working direction. The parser comparison and isolated retained-document/pack
+consumer proof pass. Product integration, full generator ABI, durable history,
+and a shared resource API remain unimplemented. The proof stays in testing.
+
+Use a retained document resource to inspect and revise authored data while
+preserving its text, comments, unknown content, and earlier revisions. The
+resource owns document identity, revision history, diagnostics, and edit
+receipts. Rowan supplies the syntax tree. Format parsers and typed views
+remain specific to the application and format.
+
+**Why Rowan for TOML when `toml_edit` already preserves comments.**
+`toml_edit` does not expose a retained syntax tree for a document that fails
+parsing. A resource can still retain that source, its parse error, and earlier
+revisions. Syntax-aware editing of incomplete input requires an error-tolerant
+parser. Rowan supplies the immutable tree representation; the TOML parser must
+preserve all input and produce diagnostics. In the checked API,
+`Document::parse` and `FromStr` for `DocumentMut` return a document or a
+`TomlError`. Keep `toml_edit` useful for parseable documents while proving the
+Rowan consumer.
+
+## Rowan revisions
+
+Rowan's immutable green tree permits unchanged subtrees to be shared between
+revisions. Rowan 0.17.0 (2026-08-02) is immutable only: the in-place mutation
+API of 0.16 (`clone_for_update`, `splice_children`, `detach` on syntax nodes)
+was removed, so a retained root cannot be changed under a reader.
+`SyntaxNode::replace_with` asserts that the replacement has the same kind and
+returns a new green root, rebuilding ancestors on the path to the root while
+sharing unchanged subtrees. Each rebuilt parent processes its child list, so
+edit cost depends on the widths of those ancestors as well as tree depth.
+Insertion and removal go through the parent's green node
+(`insert_child`, `remove_child`, `splice_children`), followed by
+`replace_with` on that parent. Retaining the old root preserves the previous
+syntax revision. This provides a foundation for previews, document undo, and
+analysis of a fixed revision. The isolated proof now exercises publication and
+count-bounded history; product retention requirements remain open.
+[Rowan replacement API](https://docs.rs/rowan/0.17.0/rowan/api/struct.SyntaxNode.html#method.replace_with).
+
+**Revision consistency.** Every published revision has one authoritative
+authored text. Its syntax tree and diagnostics describe that exact text.
+Direct structural edits must preserve equivalence with parsing the resulting
+text, or reparse before publication. Green-tree splicing alone does not
+establish this: token boundaries, separators, and error recovery can change.
+
+**Initial edit path.** Start with text edits followed by a full reparse.
+Syntax-aware commands, such as inserting a generator, compute text edits from
+the current tree and use the same publication path. Full reparsing does not
+guarantee sharing across revisions; measure sharing separately. Incremental
+reparsing and direct green-tree splicing are later candidates if measurements
+justify them and equivalence checks pass. A receipt names both coordinate
+spaces: base-revision ranges for what was replaced and result-revision ranges
+for what was produced.
+
+The first slice accepts UTF-8 documents and preserves their bytes, including
+line endings, without normalization. Reject unsupported encodings explicitly.
+Edit and diagnostic ranges use UTF-8 byte offsets; edit endpoints must be code
+point boundaries. An editor using another coordinate system converts at its
+boundary. The proof sorts batch edits in base-revision coordinates and refuses
+overlaps and same-start edits, including ambiguous same-position insertions.
+
+**Interning and memory.** Only the green-node builder interns through
+`NodeCache`; structural edits allocate fresh nodes outside it. `NodeCache` is
+a plain hash map with no eviction API, so one long-lived cache shared across
+reparses can retain new entries until it is dropped. Evaluate document-scoped
+cache reuse against fresh caches; define a bounded reset policy if reuse is
+selected. Dropping history alone cannot release entries retained by a cache.
+Retained-memory measurements must include
+the cache as well as retained roots.
+
+**Workers.** Green nodes are `Arc`-backed and `Send + Sync`. Red
+`SyntaxNode`s use a non-atomic reference count and are neither. A worker
+receives a green root and builds its own navigation tree, which is cheap.
+This answers most of the worker-ownership question without a second library.
+
+**Version choice.** The October 15 comparison passed for taplo 0.14 unchanged
+(resolved Rowan 0.15.19) and the same library on Rowan 0.17.0. The port changes
+only the dependency and package/library names for side-by-side evaluation;
+zero Rust source changes were needed. Use the 0.17 port for the isolated proof.
+The registry check found these to be the latest stable library releases on
+that date; this is a dated observation, not an ongoing version check.
+Rowan 0.18.0-alpha.1 (2026-09-14) attaches leading
+and trailing trivia to tokens, so comments and whitespace move from sibling
+tokens into the token they decorate, and `index()` becomes optional. That
+changes where a parser places comments and what an edit carries with it.
+Treat comment ownership as a parser decision to revisit at 0.18.
+
+## Editing and admission
+
+**Editing and admission have different boundaries.** A document revision may
+contain incomplete or invalid text; its parser should preserve that text and
+attach diagnostics. Saving a draft preserves authored bytes. Lowering a
+revision into typed application data requires schema and semantic validation,
+and the owning application decides whether to admit the result. A syntax
+resource does not gain authority over world state, grants, or replication.
+Document undo after admission reverts text, not admitted state; the
+application must make that visible.
+
+The proposed resource contract is:
+
+- Open and retain a document with an explicit format and document identity.
+- Read or snapshot a named revision without changing it.
+- Apply an edit against an expected base revision; reject stale bases and
+  publish a new revision with an edit receipt.
+- Address a syntax occurrence within its document and revision. Shared green
+  nodes, text offsets, and storage positions are not durable domain identities.
+  Handles must reject another document or revision unless explicitly remapped.
+- Lower a revision into validated typed data, or return diagnostics tied to
+  that revision. Encode and save authored text through the format backend.
+
+A revision carries a monotonically increasing per-document sequence number
+for expected-base checks and a hash of its exact text. Equal text can occur at
+different revision numbers; content equality does not revive stale handles.
+Specify the content hash algorithm separately from the domain hash. A hash of
+saved bytes helps detect external changes but does not make saving atomic.
+
+**Save publication.** Save a named immutable revision and record which revision
+actually reached disk. If revision 12 finishes saving while revision 13 is
+current, the saved marker identifies 12 and the document remains dirty when
+13 has different text. Serialize saves per document or otherwise prevent an
+older save from overwriting a newer one. The backend must define external-change
+detection, conflict handling, and file replacement before consumer adoption.
+Comparing a disk hash and then writing has a race; atomic replacement alone
+does not provide compare-and-swap against another writer. State the supported
+coordination guarantees and test the chosen policy, including failed writes.
+
+An occurrence handle is the document identity, the revision, and a Rowan
+`SyntaxNodePtr` (node kind and text range). The first slice only rejects a
+handle from another document or revision; remapping waits for a consumer that
+needs it. `SyntaxNodePtr` locates nodes; token targets and insertion positions
+may use revision-fenced ranges or format-specific locators.
+
+A receipt should identify the document, base and resulting revisions, and
+affected text ranges and optional semantic paths. Receipts always include
+text ranges. A backend may recover paths from valid regions even when whole
+document lowering fails; it must not imply those paths are validated domain
+identities. TOML's logical structure is not its syntactic structure: in the
+demo pack, `[[generators.lock_presets]]` is a
+sibling header that belongs to the preceding `[[generators]]` entry, and dotted
+keys may define one table in several places. A path such as
+`generators[0].lock_presets[0]` can cover several disjoint syntax regions.
+Document undo publishes a new revision containing the selected older content,
+with a fresh sequence number and receipt. Earlier handles remain stale even
+when the text matches again. Undoing an admitted application command remains
+application-owned.
+
+**Unknown content and identity.** The proof preserves and hashes unknown
+properties that do not prevent typed decoding/validation, including the whole
+`[vendor.experimental]` table. Changing opaque extension data changes the
+domain hash; comments and formatting do not. Its text-only `GenValue` decoder
+rejects unknown fields within that variant. This is a bounded proof policy,
+not a product-wide ruling on unknown content or canonical domain encoding.
+
+The proof's history limit and save/reload policy are recorded below. Product
+retention budgets, external-writer coordination, crash recovery, and durable
+identity/history remain adoption decisions. Shared API design follows evidence
+from a second consumer.
+
+## Pieces
+
+| Piece | Intended role |
+|---|---|
+| Rowan 0.17 | Lossless authored syntax and structurally shared revisions. A format parser must build the tree, including unknown and erroneous input. |
+| TOML parser | taplo 0.14 (MIT) builds lossless trees and collects syntax errors; DOM validation checks semantics such as duplicate keys. Its Rowan ^0.15.3 dependency resolved to 0.15.19 in the comparison. A manifest-only port to 0.17 passed the same tests and is used in the isolated document proof. Neither version supports the tested TOML 1.1 additions. |
+| `toml_edit` | Existing TOML editing with comment and formatting preservation, for documents that parse. Keep it as the backend until the Rowan consumer is proven. |
+| Sonic | JSON ingestion and typed deserialization of machine interchange; not part of the authored-syntax slice. `OwnedLazyValue` remains an unmeasured candidate for deferred materialization. |
+| Source overlay | The probe's byte-exact JSON overlay remains the candidate where machine JSON must survive byte for byte. Rowan does not replace it. |
+| Serde and application schemas | Typed lowering, validation, and canonical domain encoding. |
+
+The completed [October 13 probe](/Users/markik/Code/testing/redox-document-20261013/REPORT.md) measured Sonic, `serde_json`,
+`toml_edit`, and the source overlay on the real 334-record monster catalogue
+and the demo pack. Its overlay preserved untouched bytes exactly, `toml_edit`
+preserved unrelated lines and comments, and the
+[fresh-process reopening](/Users/markik/Code/testing/redox-document-20261013/results/fresh-reopen.json) passed. Those results
+support the resource concept; they are not Rowan implementation or
+performance evidence.
+
+**Non-goal:** custom allocation and collection. Bump allocation and tracing
+collection do not supply revision isolation, and `gc-arena` has its own
+collection discipline. Keep both outside the initial document slice.
+
+`cstree` 0.14 remains the comparison if shared, already-built navigation
+across workers becomes necessary: its `SyntaxNode` is `Send + Sync`, at the
+cost of retaining realized nodes. Rebuilding Rowan's navigation tree per worker
+covers the expected cases. [cstree tradeoffs](https://docs.rs/cstree/0.14.0/cstree/).
+
+The existing [format policy](2026-10-06_data_formats_brief.md)
+continues to govern saved data: TOML for authored material, JSON for machine
+interchange, framed postcard internally, and deterministic CBOR at the
+specified boundaries. Domain hashes use the validated parsed form or canonical
+encoding. Reformatting an authored document must not change domain identity.
+
+## Bounded evidence and next gates
+
+**Parser evaluation — 2026-10-15.** The
+[comparison report](/Users/markik/Code/testing/retained-parser-20261015/REPORT.md)
+and [results](/Users/markik/Code/testing/retained-parser-20261015/results/summary.json)
+record 101 inherited unit tests passing for each backend, three probe tests,
+3,075 UTF-8-safe prefixes, and 360 deterministic edits. Real pack variants
+produce matching trees, diagnostics and DOM values, with exact text retention
+and fresh-process reopen. Both default-feature libraries and all optional
+features compile. The port changes no Rust source. Neither backend accepts the
+four TOML 1.1 spot checks: `\e`, `\xHH`, multiline inline tables, and omitted
+time seconds. These tests do not certify full TOML 1.0 conformance.
+
+Full reparsing uses a fresh builder cache. Comparing the original annotated
+snapshot with the final edited snapshot found zero shared green nodes out of
+152 final nodes in both backends. Immutable snapshots work, but cross-revision
+sharing is not supplied by this parse entry point. Local parser timings and
+allocation counts gave no compelling reason to prefer the older Rowan solely
+to avoid the manifest adaptation.
+
+**Retained-document proof — 2026-10-16.** The isolated
+[report](/Users/markik/Code/testing/retained-document-20261016/REPORT.md),
+[syntax/save policy](/Users/markik/Code/testing/retained-document-20261016/SYNTAX.md),
+and [machine-readable results](/Users/markik/Code/testing/retained-document-20261016/results/summary.json)
+record an implemented resource and bounded pack consumer. The real
+[demo pack](/Users/markik/Code/testing/retained-document-20261016/fixtures/demo-pack.toml)
+and its synthetic
+[annotated variant](/Users/markik/Code/testing/retained-document-20261016/fixtures/annotated-pack.toml)
+retain their pinned fixture hashes. The consumer uses an unchanged copy of
+Isocosm's manifest/validator at `20cb030fcc982db8fc89fa557918b8de5961543c`, with
+a probe-local, text-only `GenValue` stand-in. It does not link product code,
+load scripts/assets, or exercise the full generator ABI or product admission.
+
+The supported dialect, `probe-toml10-pack-v1`, admits TOML 1.0-compatible
+strings, integers, booleans, arrays and tables only when taplo and pinned
+`toml` 0.8.23 agree on parsed values and typed validation succeeds. Floats,
+date/time values, and unsupported TOML 1.1 forms block lowering but remain
+retained, saveable drafts. Invalid UTF-8 and BOM input are rejected; source
+size is limited to 2 MiB and lexical bracket/brace nesting to 64. Source hashes
+use SHA-256. The proof domain hash uses a version-prefixed, recursively
+key-sorted JSON encoding of the validated parsed value, including unknown
+properties; arrays retain order and schema defaults are not materialized.
+This local encoding does not change the stack's saved-data or wire policy.
+
+Ten release tests (four copied-validator tests and six resource integration
+tests), formatting, Clippy, standalone verification, and separate-process
+reopening passed. They demonstrate:
+
+- replacement, insertion and removal under `[[generators.lock_presets]]`, with
+  correct ownership by the first generator;
+- preserved comments, foreign content, literal strings, Unicode and CRLF;
+- incomplete drafts with revision-stamped diagnostics and refused admission;
+- unchanged old snapshots; stale-edit, wrong-document/instance, and stale
+  same-document handle rejection;
+- undo as a fresh revision without reviving handles or reversing admitted state;
+- valid UTF-8 byte ranges and multi-edit receipts, with overlap rejection;
+- typed manifest validation and negative controls for duplicate identities,
+  duplicate TOML keys, missing names and unsafe paths;
+- exact-byte save/reopen, stable domain hashes after reformatting/comment edits,
+  changed hashes after opaque extension edits, worker snapshot analysis, and
+  bounded history release.
+
+The save backend serializes cooperating writers with a per-path lease file,
+checks disk hashes, syncs a same-directory temporary file, and renames it over
+the target. Completion records the revision actually saved; newer different
+text stays dirty. Tests cover another cooperating resource, external changes
+before/during save, cancellation, wrong-document tickets, and injected failure
+before replacement. Conflicts require explicit reopen; there is no merge or
+forced overwrite. The final hash-check/rename gap remains for uncooperative
+writers. Directory fsync/crash durability, stale-lease recovery, metadata
+preservation, path aliases and symlinks are not implemented or qualified.
+
+Requested heap measurements include retained text, trees, hashes, diagnostics,
+receipts and bookkeeping; fresh parser caches are dropped before publication:
+
+| Total retained revisions | Retained bytes | After history release | After document drop |
+|---:|---:|---:|---:|
+| 2 | 26,796 | 13,718 | 0 |
+| 17 | 224,742 | 15,254 | 0 |
+| 65 | 859,206 | 21,398 | 0 |
+
+History release keeps the current revision and some bookkeeping capacity.
+These are requested allocation sizes, not RSS. Full reparsing still gives
+linear retained-history growth; no incremental parse, direct structural edit,
+or persistent cache optimization was implemented.
+
+Three local M4 release timing processes measured edit publication separately
+from lowering/validation/hashing. For the 850-byte demo pack, process-mean
+medians were 102.42 and 223.62 microseconds respectively; for the 1,115-byte
+annotated pack, 251.22 and 655.05 microseconds. The synthetic 4,096-key table
+had substantially higher composite lowering cost. Raw samples show host-load
+variation, so these are bounded observations rather than latency guarantees
+or a like-for-like comparison with the earlier parser-only benchmark. Profile
+stages before attributing that cost or selecting an optimization.
+
+**Next gates.** Product adoption remains open: settle the required TOML version
+and full schema/ABI, product identity encoding, retention budgets, save/reload
+coordination and crash behavior. A second consumer must establish common
+lifecycle needs before extracting a shared API. Direct structural edits, if
+introduced, must match parsing of their resulting text before publication;
+that optimization path has not been exercised by this proof.
+
+The detailed reports, fixtures, code, lockfiles and reproduction runners stay
+in three local testing directories: the
+[October 13 probe](/Users/markik/Code/testing/redox-document-20261013/REPORT.md),
+[October 15 parser comparison](/Users/markik/Code/testing/retained-parser-20261015/REPORT.md),
+and [October 16 document proof](/Users/markik/Code/testing/retained-document-20261016/REPORT.md).
+Their absolute links resolve on the M4 host; the artifacts are not copied into
+this repository or available through those links on GitHub.
+
+## Sources checked 2026-10-14
+
+Published crate sources from crates.io: rowan 0.16.1, 0.17.0 and
+0.18.0-alpha.1; taplo 0.14.0; cstree 0.14.0; `toml_edit` 0.25.17.
+At the October 14 check, Mere's
+`origin/main` lockfile carried `toml_edit` 0.22.27 and 0.25.15 and did not
+depend on Rowan, taplo, or cstree.

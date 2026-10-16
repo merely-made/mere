@@ -19,6 +19,46 @@ use pelt_core::{PeltContent, PeltLane, PeltRoute, PeltRouteSource, PeltRouteStat
 
 type Calls = Arc<Mutex<Vec<String>>>;
 
+#[test]
+fn mailbox_polling_follows_admitted_native_window_custody() {
+    use pelt_core::{PeltControllerPool, PeltPlacement, WorkspaceRect};
+    let calls: Calls = Default::default();
+    let mut pool: PeltControllerPool<u64, u64, String> = PeltControllerPool::new();
+    pool.insert(1, hosted(&calls));
+    let placement = |window, visible, width| PeltPlacement {
+        content: 1,
+        window,
+        rect: WorkspaceRect {
+            x: 0.0,
+            y: 0.0,
+            width,
+            height: 60.0,
+        },
+        visible,
+        focused: false,
+        scale_factor: 1.0,
+    };
+    pool.set_placements([
+        (10, placement(7, true, 80.0)),
+        (11, placement(8, false, 80.0)),
+        (12, placement(9, true, 0.0)),
+    ]);
+    let before = calls.lock().unwrap().clone();
+    assert!(pool.window_has_surface(7));
+    assert!(!pool.window_has_surface(8));
+    assert!(!pool.window_has_surface(9));
+    assert_eq!(
+        *calls.lock().unwrap(),
+        before,
+        "poll custody observation is read-only"
+    );
+    pool.set_placements([(10, placement(8, true, 80.0))]);
+    assert!(!pool.window_has_surface(7));
+    assert!(pool.window_has_surface(8));
+    pool.remove_content(&1);
+    assert!(!pool.window_has_surface(8));
+}
+
 /// A web page that records every control it receives and reports one title.
 struct Page {
     calls: Calls,

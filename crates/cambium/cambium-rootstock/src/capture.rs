@@ -21,12 +21,63 @@
 
 use crate::Surface;
 use netrender::ExternalTexturePlacement;
+mod scope;
+pub use scope::{CaptureOwner, CaptureScope};
 
 /// A presented frame, read back through the shared render-host machinery.
 pub type Frame = genet_render_host::RgbaFrame;
 
 /// An owned readback that can be polled without waiting on the shared GPU.
 pub type PendingFrame = genet_render_host::PendingRgbaReadback;
+
+struct NativePresentationReadback {
+    pending: PendingFrame,
+    stamp: crate::PresentedFrame,
+}
+impl crate::PendingPresentationCapture for NativePresentationReadback {
+    fn poll(&mut self) -> Option<Result<(crate::PresentedFrame, Frame), crate::CaptureRefusal>> {
+        self.pending.poll().map(|result| {
+            result
+                .map(|pixels| (self.stamp, pixels))
+                .map_err(|error| match error {
+                    genet_render_host::ReadbackFailure::DeviceLost(loss) => {
+                        crate::CaptureRefusal::DeviceLost(loss)
+                    },
+                    error => crate::CaptureRefusal::PresentationError {
+                        backend: crate::PresentationBackend::Wgpu,
+                        generation: self.stamp.context_generation,
+                        source_key: None,
+                        error: error.to_string(),
+                    },
+                })
+        })
+    }
+}
+
+/// Queue owned pixels immediately and retain their original presentation identity.
+pub fn start_presentation_readback(
+    surface: &dyn Surface,
+    view: &wgpu::TextureView,
+    stamp: crate::PresentedFrame,
+) -> Result<crate::CaptureFrame, crate::CaptureRefusal> {
+    if let Some(loss) = surface.core().loss_notice() {
+        return Err(crate::CaptureRefusal::DeviceLost(loss));
+    }
+    let pending =
+        start_frame_readback(surface, view, stamp.width, stamp.height).map_err(|error| {
+            surface
+                .core()
+                .loss_notice()
+                .map(crate::CaptureRefusal::DeviceLost)
+                .unwrap_or(crate::CaptureRefusal::PresentationError {
+                    backend: crate::PresentationBackend::Wgpu,
+                    generation: stamp.context_generation,
+                    source_key: None,
+                    error,
+                })
+        })?;
+    Ok(Box::new(NativePresentationReadback { pending, stamp }))
+}
 
 /// Compose the presented view and start copying it into host memory.
 /// Poll the returned frame on later event-loop turns; it retains the original
@@ -40,7 +91,7 @@ pub fn start_frame_readback(
     if let Some(loss) = surface.core().loss_notice() {
         return Err(format!("capture refused: DeviceLost({loss:?})"));
     }
-    let target = capture_target(surface, view, width, height);
+    let target = capture_target(surface, view, width, height)?;
     surface.core().start_rgba8_readback(&target, width, height)
 }
 
@@ -54,7 +105,9 @@ pub fn read_frame(
     width: u32,
     height: u32,
 ) -> Option<Frame> {
-    let target = capture_target(surface, view, width, height);
+    let target = capture_target(surface, view, width, height)
+        .map_err(|error| eprintln!("[cambium-host] {error}"))
+        .ok()?;
     surface
         .core()
         .read_rgba8_texture(&target, width, height)
@@ -67,7 +120,7 @@ fn capture_target(
     view: &wgpu::TextureView,
     width: u32,
     height: u32,
-) -> wgpu::Texture {
+) -> Result<wgpu::Texture, String> {
     let target = surface.device().create_texture(&wgpu::TextureDescriptor {
         label: Some("cambium host frame capture"),
         size: wgpu::Extent3d {
@@ -83,13 +136,16 @@ fn capture_target(
         view_formats: &[],
     });
     let target_view = target.create_view(&wgpu::TextureViewDescriptor::default());
-    surface.renderer().compose_external_texture(
-        view,
-        &target_view,
-        wgpu::TextureFormat::Rgba8Unorm,
-        width,
-        height,
-        ExternalTexturePlacement::new([0.0, 0.0, width as f32, height as f32]),
-    );
-    target
+    surface
+        .try_renderer()
+        .map_err(|failure| format!("capture refused: {failure}"))?
+        .compose_external_texture(
+            view,
+            &target_view,
+            wgpu::TextureFormat::Rgba8Unorm,
+            width,
+            height,
+            ExternalTexturePlacement::new([0.0, 0.0, width as f32, height as f32]),
+        );
+    Ok(target)
 }

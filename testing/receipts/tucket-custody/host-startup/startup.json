@@ -1,0 +1,6 @@
+{
+  "result": "unlocked_ready_and_clean_shutdown",
+  "host_sha256": "23886513FBAD19A6903F50DD4D91897C672F67238E4DDD990EFCB4D8DD1F4987",
+  "private_wallet_removed": false,
+  "cleanup": "automatic review blocked recursive deletion; retained ignored synthetic fixture"
+}

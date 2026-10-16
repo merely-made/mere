@@ -26,10 +26,10 @@ use light_file_dialog::dialog::{Dialog, DialogBackend, InputBox, OpenFileDialog}
 use ssh_key::PrivateKey;
 use zeroize::Zeroizing;
 
-use dramatis::intents::ImportSshKeyNativeIntentV1;
-use graphshell::browser_carrier::{
+use crate::door::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
 };
+use dramatis::intents::ImportSshKeyNativeIntentV1;
 
 const MAX_SSH_PRIVATE_KEY_BYTES: u64 = 1024 * 1024;
 const PICKER_START_ENV: &str = "GRAPHSHELL_NATIVE_PICKER_START";

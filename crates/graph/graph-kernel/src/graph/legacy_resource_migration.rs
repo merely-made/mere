@@ -1073,7 +1073,7 @@ fn filter_edges(
                 .map(|statement| statement.statement_id.clone())
                 .collect();
             for id in ids {
-                payload.retract_semantic_statement(&id);
+                payload.compact_semantic_statement(&id);
             }
             (!payload.is_empty()).then(|| persisted_edge_for_ids(pair.0, pair.1, &payload))
         })
@@ -1312,6 +1312,9 @@ mod tests {
             graph_scope: GraphScope::User,
             provenance_iri: source.map(str::to_owned),
             asserted_at_ms: Some(100),
+            first_asserted_ms: Some(100),
+            withdrawn: None,
+            basis: Default::default(),
         });
         payload
     }
@@ -1856,6 +1859,9 @@ mod tests {
             graph_scope: GraphScope::User,
             provenance_iri: Some("https://group-author.test/".into()),
             asserted_at_ms: Some(9),
+            first_asserted_ms: Some(9),
+            withdrawn: None,
+            basis: Default::default(),
         });
         held.assert_relation(EdgeAssertion::Imported {
             sub_kind: ImportedSubKind::BookmarkFolder,
@@ -2195,6 +2201,9 @@ mod tests {
             graph_scope: GraphScope::User,
             provenance_iri: Some("https://other.test/".into()),
             asserted_at_ms: Some(200),
+            first_asserted_ms: Some(200),
+            withdrawn: None,
+            basis: Default::default(),
         });
         journal.record(exact(1, 2, &both));
         let migrated = journal
@@ -2309,6 +2318,7 @@ mod tests {
         let mut metadata = held.clone();
         let statement = &mut metadata.semantic.as_mut().unwrap().statements[0];
         statement.label = Some("new label".into());
+        statement.basis.note = Some("new label".into());
         statement.asserted_at_ms = Some(300);
         journal.record(exact(1, 2, &metadata));
         let valid = journal
@@ -2397,6 +2407,15 @@ mod tests {
             .unwrap()
             .statements[0]
             .label = Some("conflicting copy".into());
+        invalid
+            .get_edge_mut(key)
+            .unwrap()
+            .semantic
+            .as_mut()
+            .unwrap()
+            .statements[0]
+            .basis
+            .note = Some("conflicting copy".into());
         assert!(migrate_legacy_prefix(&invalid, &[]).is_err());
         assert_eq!(baseline.persisted_edges_between(a, b).len(), 2);
     }
@@ -2431,6 +2450,9 @@ mod tests {
             graph_scope: GraphScope::User,
             provenance_iri: Some("https://author.test/".into()),
             asserted_at_ms: Some(200),
+            first_asserted_ms: Some(200),
+            withdrawn: None,
+            basis: Default::default(),
         });
         journal.record(exact(1, 2, &combined));
         let graph = journal

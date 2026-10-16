@@ -1,0 +1,65 @@
+    Updating crates.io index
+    Updating git repository `https://github.com/iced-rs/iced`
+    Updating git repository `https://github.com/iced-rs/cryoglyph.git`
+    Updating git repository `https://github.com/mark-ik/vello`
+    Updating git repository `https://github.com/hecrj/cosmic-text.git`
+warning: patch `layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7a8c5b8cb499f2d3b91083c2f7e38236599f98dc#7a8c5b8c)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/genet.git
+     Locking 45 packages to highest compatible versions
+    Removing anstream v1.0.0
+    Removing anstyle-parse v1.0.0
+    Removing anstyle-query v1.1.5
+    Removing anstyle-wincon v3.0.11
+    Removing bit-set v0.9.1
+      Adding borsh v1.8.1
+    Removing colorchoice v1.0.5
+      Adding cosmic-text v0.19.0 (https://github.com/hecrj/cosmic-text.git?rev=6adc2364289fd241daed751948a03d0aea5a31ca#6adc2364)
+      Adding cryoglyph v0.1.0 (https://github.com/iced-rs/cryoglyph.git?rev=cf38ed5ea0cfe95270b31ced2910560a7fcc5003#cf38ed5e)
+      Adding ecolor v0.36.2
+      Adding egui-wgpu v0.36.2
+      Adding emath v0.36.2
+      Adding epaint v0.36.2
+      Adding etagere v0.3.0
+      Adding fearless_simd v0.4.1
+      Adding fontconfig-parser v0.5.8
+      Adding fontdb v0.24.0
+      Adding glifo v0.2.0
+      Adding harfrust v0.12.0
+      Adding iced_core v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+      Adding iced_debug v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+      Adding iced_futures v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+      Adding iced_graphics v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+      Adding iced_wgpu v0.15.0-dev (https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d)
+    Removing is_terminal_polyfill v1.70.2
+ Downgrading lalrpop v0.23.1 -> v0.22.2
+ Downgrading lalrpop-util v0.23.1 -> v0.22.2
+      Adding lilt v0.8.2
+      Adding nohash-hasher v0.2.0
+    Removing once_cell_polyfill v1.70.2
+      Adding petgraph v0.7.1
+      Adding phf_shared v0.11.3
+      Adding pin-utils v0.1.1
+      Adding rangemap v1.8.0
+      Adding roxmltree v0.20.0
+      Adding smol_str v0.3.6
+      Adding string_cache v0.8.9
+      Adding swash v0.2.10
+      Adding sys-locale v0.3.2
+      Adding type-map v0.5.1
+      Adding unicode-general-category v1.1.0
+      Adding unicode-script v0.5.8
+    Removing utf8parse v0.2.2
+      Adding vello_common v0.1.0
+      Adding vello_cpu v0.1.0
+      Adding vello_gpu v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+      Adding vello_gpu_shaders v0.3.0 (https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243)
+      Adding wasmtimer v0.4.3
+ Downgrading wesl v0.4.4 -> v0.4.0 (available: v0.4.4)
+ Downgrading wesl-macros v0.4.4 -> v0.4.0 (available: v0.4.4)
+ Downgrading wgsl-parse v0.4.4 -> v0.4.0 (available: v0.4.4)
+ Downgrading wgsl-types v0.4.4 -> v0.4.0 (available: v0.4.4)
+      Adding yazi v0.2.1
+      Adding zeno v0.3.3
+note: pass `--verbose` to see 121 unchanged dependencies behind latest

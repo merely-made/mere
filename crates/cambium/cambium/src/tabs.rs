@@ -442,6 +442,7 @@ where
                         };
                         if let Some(target) = target {
                             arrows(state, target);
+                            event.prop.request_tab_focus(target);
                             event.prevent_default();
                         }
                     },

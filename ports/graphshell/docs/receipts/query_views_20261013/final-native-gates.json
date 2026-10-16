@@ -1,0 +1,52 @@
+[
+  {
+    "exit_code": 0,
+    "name": "final-retained-mount",
+    "command": "cargo +1.99.0 test -p cambium --lib retained_mount::tests --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-frisket-workspace",
+    "command": "cargo +1.99.0 test -p cambium --lib workspace::tests --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-native-mailbox",
+    "command": "cargo +1.99.0 test -p pelt-core --test host_surface mailbox_polling_follows_admitted_native_window_custody --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-document-polling",
+    "command": "cargo +1.99.0 test -p pelt-core --test pool pending_observation_is_read_only_and_redraw_is_scoped_to_visible_windows --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-shared-query",
+    "command": "cargo +1.99.0 test -p mere --no-default-features --features query --lib query_view --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-owner-query",
+    "command": "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib query_views::tests --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-clip-wheel",
+    "command": "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib retained_content:: --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-embedding",
+    "command": "cargo +1.99.0 test -p cambium-rootstock --no-default-features --features embedding-egui,embedding-iced --lib embedding::tests --locked --offline -j1"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-toolkit-bench",
+    "command": "cargo +1.99.0 run -p graphshell --no-default-features --features caller-owned-toolkit-bench,image-decode --example caller_owned_toolkits --locked --offline -j1 -- ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/final/native"
+  },
+  {
+    "exit_code": 0,
+    "name": "final-port-boundaries",
+    "command": "python scripts/check_port_boundaries.py"
+  }
+]

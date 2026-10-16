@@ -3,7 +3,8 @@ name = "cambium-genet-winit-host"
 version = "0.1.0"
 description = "The single-root Cambium desktop host: winit lifecycle, Livery/Buckram layout and paint, input routing, and AccessKit sync over one GenetAppRunner"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 # Rides genet-livery / genet-winit-host, which inherit genet's publish = false,

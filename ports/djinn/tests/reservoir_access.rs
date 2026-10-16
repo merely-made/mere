@@ -10,15 +10,15 @@ use std::path::Path;
 use std::process::Command;
 
 use chirograph::ProjectionSession;
+use djinn::door::app_broker::AppEndpointCatalog;
 use djinn::resident_mere::{MereRoutes, ambient_mere_route_id, mere_route_id};
 use djinn::resident_reservoir::ResidentReservoir;
-use graphshell::lifecycle::AdmittedEndpointContext;
-use graphshell::native::app_admission::{
+use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRequest, AppRouteGrants, AppRouteId,
 };
-use graphshell::native::app_broker::AppEndpointCatalog;
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_endpoint::{ProjectionCatalog, ProjectionSource};
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+use graphshell_host::lifecycle::AdmittedEndpointContext;
 use pandect::{
     Author, DomainId, MereApplicationAccess, MereSessions, ReservoirStore, open_mere_backend,
     open_reservoir_backend,
@@ -131,7 +131,8 @@ async fn fresh_resident_enforces_recorded_access() {
             .into_iter()
             .map(AppId::new)
             .collect(),
-    );
+    )
+    .with_divination_authority();
     // Serve fails closed if the composition forgets to load policy.
     let meres = reservoir.meres().await;
     assert!(routes.serve(&meres[0]).await.is_err());

@@ -1,0 +1,8 @@
+{
+  "device_id": "b20d20b3-b9f2-411c-9de4-f6c0f29f8427",
+  "mode": "unlocked",
+  "node_number": 11885083,
+  "realm": "bench-tucket-custody",
+  "result": "same_identity_on_reopen",
+  "wrong_app_release_sign_attest_refused": true
+}

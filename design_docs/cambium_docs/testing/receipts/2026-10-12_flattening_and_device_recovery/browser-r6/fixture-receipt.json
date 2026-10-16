@@ -1,0 +1,1075 @@
+{
+  "activated_cleanup": {
+    "mounts": [
+      {
+        "cleanup_pending": false,
+        "listener_removal_failures": 0,
+        "listeners": 0,
+        "phase": "Disposed",
+        "raf_pending": false,
+        "startup_pending": false
+      },
+      {
+        "cleanup_pending": false,
+        "listener_removal_failures": 0,
+        "listeners": 0,
+        "phase": "Disposed",
+        "raf_pending": false,
+        "startup_pending": false
+      }
+    ],
+    "scope": "owned mount startup, listeners, RAF and host bindings; excludes physical GPU destruction, JS WebGPU promise cancellation and shared recovery-task disposal",
+    "status": "disposed"
+  },
+  "actual_replacement_device_destroyed": true,
+  "artifact_names": [
+    "first_before",
+    "first_after",
+    "second_before",
+    "second_after",
+    "first_reader_before",
+    "first_stylesheet_before",
+    "first_reader_after",
+    "first_stylesheet_after",
+    "second_reader_before",
+    "second_stylesheet_before",
+    "second_reader_after",
+    "second_stylesheet_after"
+  ],
+  "cancellation_controls": {
+    "disposed_before_acquisition": {
+      "acquisition_polls": 0,
+      "init_calls": 0,
+      "status": {
+        "cleanup_pending": false,
+        "listener_removal_failures": 0,
+        "listeners": 0,
+        "phase": "Disposed",
+        "raf_pending": false,
+        "startup_pending": false
+      }
+    },
+    "late_actual_candidate": {
+      "control_device_closure": {
+        "actual_device_destroyed": true,
+        "generation": 1,
+        "matching_loss_notice_observed": true,
+        "observer_dropped": true,
+        "reason": "Destroyed"
+      },
+      "delivered_after_revocation": true,
+      "generation": 1,
+      "init_calls": 0,
+      "rust_core_released": true,
+      "status": {
+        "cleanup_pending": false,
+        "listener_removal_failures": 0,
+        "listeners": 0,
+        "phase": "Disposed",
+        "raf_pending": false,
+        "startup_pending": false
+      }
+    },
+    "scope": "actual mount startup/lifetime seam plus explicit closure of the fixture-private control device; excludes physical driver reset and cancellation of underlying JS WebGPU promises"
+  },
+  "complete_registered_producers": [
+    {
+      "first": {
+        "after": {
+          "generation": 3,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857664",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 4
+        },
+        "before": {
+          "generation": 2,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857664",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 2
+        },
+        "pixels": {
+          "after_sha256": "c144778078dc455759dfc465cbf7869646d9d613e809a29322f1fe927db0b584",
+          "before_sha256": "953af487adb2543b06b5e9ff0d58cfcbb71ad2e59e514e3480ea75293dd72bd0",
+          "changed_pixels": 5,
+          "exact_rgba": false,
+          "height": 215,
+          "limits": {
+            "alpha": 2,
+            "mean_absolute": 1,
+            "rgb": 3
+          },
+          "max_alpha": 0,
+          "max_rgb": 1,
+          "mean_absolute": 0.000014626298083954952,
+          "scope": "uniform unchanged strict interior limits on entire copied image",
+          "width": 477
+        },
+        "scope": "full actual registered physical image; no crop, source reconstruction or matte"
+      },
+      "second": {
+        "after": {
+          "generation": 3,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857666",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 4
+        },
+        "before": {
+          "generation": 2,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857666",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 2
+        },
+        "pixels": {
+          "after_sha256": "5cd712cfe9c951e30ced13338ae946aa301c3f09bbd71540a69dc3576b360860",
+          "before_sha256": "3f69d507a72a6d555af96b4365452ecea5790865be5b8396674d9e07d0968f3f",
+          "changed_pixels": 8,
+          "exact_rgba": false,
+          "height": 215,
+          "limits": {
+            "alpha": 2,
+            "mean_absolute": 1,
+            "rgb": 3
+          },
+          "max_alpha": 0,
+          "max_rgb": 1,
+          "mean_absolute": 0.000019501730778606602,
+          "scope": "uniform unchanged strict interior limits on entire copied image",
+          "width": 477
+        },
+        "scope": "full actual registered physical image; no crop, source reconstruction or matte"
+      },
+      "slot": 0
+    },
+    {
+      "first": {
+        "after": {
+          "generation": 3,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857665",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 3
+        },
+        "before": {
+          "generation": 2,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857665",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 1
+        },
+        "pixels": {
+          "after_sha256": "273b659afaaeb147ef5fc887ef378317506f080f4a0a87259ca6dbaf95311276",
+          "before_sha256": "9430b3ed377e6f6a317d70d9d022f726fd3227e31f38484f8fa09e3fa1d96b3e",
+          "changed_pixels": 7,
+          "exact_rgba": false,
+          "height": 328,
+          "limits": {
+            "alpha": 2,
+            "mean_absolute": 1,
+            "rgb": 3
+          },
+          "max_alpha": 0,
+          "max_rgb": 1,
+          "mean_absolute": 0.000005444250871080139,
+          "scope": "uniform unchanged strict interior limits on entire copied image",
+          "width": 980
+        },
+        "scope": "full actual registered physical image; no crop, source reconstruction or matte"
+      },
+      "second": {
+        "after": {
+          "generation": 3,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857667",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 3
+        },
+        "before": {
+          "generation": 2,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857667",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 1
+        },
+        "pixels": {
+          "after_sha256": "821365f64c255ef635cc4d4e999c5a374ac13486ab6e7df645aec2b364dc8da3",
+          "before_sha256": "b3fec79fbb7f432fcceb6d7a9ebd50992d65afc8f7e043cc99701bed35eb9875",
+          "changed_pixels": 4,
+          "exact_rgba": false,
+          "height": 328,
+          "limits": {
+            "alpha": 2,
+            "mean_absolute": 1,
+            "rgb": 3
+          },
+          "max_alpha": 0,
+          "max_rgb": 1,
+          "mean_absolute": 0.0000031110004977600795,
+          "scope": "uniform unchanged strict interior limits on entire copied image",
+          "width": 980
+        },
+        "scope": "full actual registered physical image; no crop, source reconstruction or matte"
+      },
+      "slot": 1
+    }
+  ],
+  "current_frame_async_error_scopes_qualified": false,
+  "current_frame_async_quality_qualified": false,
+  "disposed_host_gpu_bindings_released": true,
+  "elapsed_ms": 6999.800000071526,
+  "exactly_once_capture_refusals": 3,
+  "factory_count_inferred": false,
+  "first": {
+    "after": {
+      "authority": {
+        "dirty": true,
+        "focus": "Some(NodeId(3298534883519))",
+        "graph_selected": 2,
+        "mode": "light",
+        "name_selection": "Some(CaretSelection { anchor: CaretPosition { byte: 24, affinity: Downstream }, focus: CaretPosition { byte: 24, affinity: Downstream } })",
+        "name_text": "Browser-first-draft copy",
+        "status": "User copy ready to edit. Save to add it to your library.",
+        "theme": {
+          "harmony": "Custom",
+          "high_contrast": false,
+          "id": "theme:copy-1",
+          "mode_sheets": {},
+          "name": "Browser-first-draft copy",
+          "seeds": {
+            "danger": {
+              "a": 255,
+              "b": 78,
+              "g": 78,
+              "r": 213
+            },
+            "dark": true,
+            "neutral": {
+              "a": 255,
+              "b": 34,
+              "g": 20,
+              "r": 16
+            },
+            "primary": {
+              "a": 255,
+              "b": 200,
+              "g": 102,
+              "r": 94
+            },
+            "secondary": {
+              "a": 255,
+              "b": 166,
+              "g": 157,
+              "r": 46
+            },
+            "success": {
+              "a": 255,
+              "b": 110,
+              "g": 179,
+              "r": 79
+            },
+            "tertiary": {
+              "a": 255,
+              "b": 70,
+              "g": 168,
+              "r": 224
+            },
+            "text_body": null,
+            "text_header": null
+          },
+          "source": "User"
+        },
+        "zoom": 1
+      },
+      "font_resources": {
+        "outer_materialized_fonts": 1,
+        "outer_registration_errors": 0,
+        "reader": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            },
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 285
+        },
+        "stylesheet": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 146
+        }
+      },
+      "generation": 3,
+      "images": [
+        {
+          "generation": 3,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857664",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 4
+        },
+        {
+          "generation": 3,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857665",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 3
+        }
+      ],
+      "presentation": {
+        "height": 1102,
+        "host": 1,
+        "layout_scale": 1,
+        "sequence": 5,
+        "width": 1282
+      },
+      "reader_source": "0x7e61d0",
+      "runner": "0xc5d658",
+      "stylesheet_source": "0x8426e0"
+    },
+    "before": {
+      "authority": {
+        "dirty": true,
+        "focus": "Some(NodeId(3298534883519))",
+        "graph_selected": 2,
+        "mode": "light",
+        "name_selection": "Some(CaretSelection { anchor: CaretPosition { byte: 24, affinity: Downstream }, focus: CaretPosition { byte: 24, affinity: Downstream } })",
+        "name_text": "Browser-first-draft copy",
+        "status": "User copy ready to edit. Save to add it to your library.",
+        "theme": {
+          "harmony": "Custom",
+          "high_contrast": false,
+          "id": "theme:copy-1",
+          "mode_sheets": {},
+          "name": "Browser-first-draft copy",
+          "seeds": {
+            "danger": {
+              "a": 255,
+              "b": 78,
+              "g": 78,
+              "r": 213
+            },
+            "dark": true,
+            "neutral": {
+              "a": 255,
+              "b": 34,
+              "g": 20,
+              "r": 16
+            },
+            "primary": {
+              "a": 255,
+              "b": 200,
+              "g": 102,
+              "r": 94
+            },
+            "secondary": {
+              "a": 255,
+              "b": 166,
+              "g": 157,
+              "r": 46
+            },
+            "success": {
+              "a": 255,
+              "b": 110,
+              "g": 179,
+              "r": 79
+            },
+            "tertiary": {
+              "a": 255,
+              "b": 70,
+              "g": 168,
+              "r": 224
+            },
+            "text_body": null,
+            "text_header": null
+          },
+          "source": "User"
+        },
+        "zoom": 1
+      },
+      "font_resources": {
+        "outer_materialized_fonts": 1,
+        "outer_registration_errors": 0,
+        "reader": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            },
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 285
+        },
+        "stylesheet": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 146
+        }
+      },
+      "generation": 2,
+      "images": [
+        {
+          "generation": 2,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857664",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 2
+        },
+        {
+          "generation": 2,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857665",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 1
+        }
+      ],
+      "presentation": {
+        "height": 1102,
+        "host": 1,
+        "layout_scale": 1,
+        "sequence": 2,
+        "width": 1282
+      },
+      "reader_source": "0x7e61d0",
+      "runner": "0xc5d658",
+      "stylesheet_source": "0x8426e0"
+    },
+    "pixels": {
+      "after_sha256": "265c0828b20313285c1d725a9c541166016196bcf0af210e0ea78b984ec178f1",
+      "before_sha256": "153fc086849970d2a6d28e1d6def63985a87693a288dbd8e85d69ca52a95fe61",
+      "changed_pixels": 18,
+      "exact_rgba": false,
+      "height": 1102,
+      "limits": {
+        "alpha": 2,
+        "mean_absolute": 1,
+        "rgb": 3
+      },
+      "max_alpha": 0,
+      "max_rgb": 1,
+      "mean_absolute": 0.0000033622034536553874,
+      "scope": "uniform unchanged strict interior limits on entire copied image",
+      "width": 1282
+    }
+  },
+  "initial_adapter": {
+    "backend": "BrowserWebGpu",
+    "device": 0,
+    "device_type": "Other",
+    "driver": "",
+    "driver_info": "",
+    "name": "",
+    "source": "actual fixture RenderCore adapter; browser fields may be redacted",
+    "vendor": 0
+  },
+  "input_route": "logical Host::key dispatch; real DOM gestures remain separate",
+  "loss_reason": "Destroyed",
+  "lost_generation": 2,
+  "old_core_released": true,
+  "os_accessibility_actions": false,
+  "physical_driver_reset": false,
+  "post_input": {
+    "seal": {
+      "authority": {
+        "dirty": true,
+        "focus": "Some(NodeId(3298534883390))",
+        "graph_selected": 2,
+        "mode": "light",
+        "name_selection": "Some(CaretSelection { anchor: CaretPosition { byte: 24, affinity: Downstream }, focus: CaretPosition { byte: 24, affinity: Downstream } })",
+        "name_text": "Browser-first-draft copy",
+        "status": "Unsaved changes",
+        "theme": {
+          "harmony": "Custom",
+          "high_contrast": false,
+          "id": "theme:copy-1",
+          "mode_sheets": {},
+          "name": "Browser-first-draft copy",
+          "seeds": {
+            "danger": {
+              "a": 255,
+              "b": 78,
+              "g": 78,
+              "r": 213
+            },
+            "dark": true,
+            "neutral": {
+              "a": 255,
+              "b": 34,
+              "g": 20,
+              "r": 16
+            },
+            "primary": {
+              "a": 255,
+              "b": 200,
+              "g": 100,
+              "r": 94
+            },
+            "secondary": {
+              "a": 255,
+              "b": 166,
+              "g": 157,
+              "r": 46
+            },
+            "success": {
+              "a": 255,
+              "b": 110,
+              "g": 179,
+              "r": 79
+            },
+            "tertiary": {
+              "a": 255,
+              "b": 70,
+              "g": 168,
+              "r": 224
+            },
+            "text_body": null,
+            "text_header": null
+          },
+          "source": "User"
+        },
+        "zoom": 1
+      },
+      "font_resources": {
+        "outer_materialized_fonts": 1,
+        "outer_registration_errors": 0,
+        "reader": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            },
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 285
+        },
+        "stylesheet": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 146
+        }
+      },
+      "generation": 3,
+      "images": [
+        {
+          "generation": 3,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857664",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 6
+        },
+        {
+          "generation": 3,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857665",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 5
+        }
+      ],
+      "presentation": {
+        "height": 1102,
+        "host": 1,
+        "layout_scale": 1,
+        "sequence": 6,
+        "width": 1282
+      },
+      "reader_source": "0x7e61d0",
+      "runner": "0xc5d658",
+      "stylesheet_source": "0x8426e0"
+    },
+    "sha256": "b4f97cffe4285f883215fef457e81e23472f95f950ec308441eda53489946fcb"
+  },
+  "quality_pending_unqualified": "Some((3, 96))",
+  "queued_readback_loss_then_already_collected": true,
+  "replacement_adapter": {
+    "backend": "BrowserWebGpu",
+    "device": 0,
+    "device_type": "Other",
+    "driver": "",
+    "driver_info": "",
+    "name": "",
+    "source": "actual fixture RenderCore adapter; browser fields may be redacted",
+    "vendor": 0
+  },
+  "replacement_generation": 3,
+  "replacement_group_closure": {
+    "generation": 3,
+    "matching_loss_notice_observed": true,
+    "owner_and_core_dropped": true,
+    "reason": "Destroyed",
+    "rust_core_released": true,
+    "scope": "explicit Device.destroy of the fixture-exclusive replacement group after completed mount disposal; excludes physical driver reset"
+  },
+  "resized": {
+    "seal": {
+      "authority": {
+        "dirty": true,
+        "focus": "Some(NodeId(3298534883390))",
+        "graph_selected": 2,
+        "mode": "light",
+        "name_selection": "Some(CaretSelection { anchor: CaretPosition { byte: 24, affinity: Downstream }, focus: CaretPosition { byte: 24, affinity: Downstream } })",
+        "name_text": "Browser-first-draft copy",
+        "status": "Unsaved changes",
+        "theme": {
+          "harmony": "Custom",
+          "high_contrast": false,
+          "id": "theme:copy-1",
+          "mode_sheets": {},
+          "name": "Browser-first-draft copy",
+          "seeds": {
+            "danger": {
+              "a": 255,
+              "b": 78,
+              "g": 78,
+              "r": 213
+            },
+            "dark": true,
+            "neutral": {
+              "a": 255,
+              "b": 34,
+              "g": 20,
+              "r": 16
+            },
+            "primary": {
+              "a": 255,
+              "b": 200,
+              "g": 100,
+              "r": 94
+            },
+            "secondary": {
+              "a": 255,
+              "b": 166,
+              "g": 157,
+              "r": 46
+            },
+            "success": {
+              "a": 255,
+              "b": 110,
+              "g": 179,
+              "r": 79
+            },
+            "tertiary": {
+              "a": 255,
+              "b": 70,
+              "g": 168,
+              "r": 224
+            },
+            "text_body": null,
+            "text_header": null
+          },
+          "source": "User"
+        },
+        "zoom": 1
+      },
+      "font_resources": {
+        "outer_materialized_fonts": 1,
+        "outer_registration_errors": 0,
+        "reader": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            },
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 149
+        },
+        "stylesheet": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 146
+        }
+      },
+      "generation": 3,
+      "images": [
+        {
+          "generation": 3,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857664",
+          "size": [
+            317,
+            215
+          ],
+          "stamp": 8
+        },
+        {
+          "generation": 3,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857665",
+          "size": [
+            660,
+            328
+          ],
+          "stamp": 7
+        }
+      ],
+      "presentation": {
+        "height": 782,
+        "host": 1,
+        "layout_scale": 1,
+        "sequence": 7,
+        "width": 962
+      },
+      "reader_source": "0x7e61d0",
+      "runner": "0xc5d658",
+      "stylesheet_source": "0x8426e0"
+    },
+    "sha256": "aec32845aed8c7c8d4330c271229fd3bfbeb30ba89cb949de753b42e92bcb3a6"
+  },
+  "run": "2e6cf810-7abe-4ffa-8e54-63db08e540ed",
+  "scope": "two actual full Workshop mounts, identical local keys, hidden second host, controlled owned Device.destroy; same-canvas queue presentation and complete presented/source RGBA under unchanged limits; compositor visibility requires separate browser review",
+  "second": {
+    "after": {
+      "authority": {
+        "dirty": true,
+        "focus": "Some(NodeId(6597069766849))",
+        "graph_selected": 2,
+        "mode": "dark",
+        "name_selection": "Some(CaretSelection { anchor: CaretPosition { byte: 25, affinity: Downstream }, focus: CaretPosition { byte: 25, affinity: Downstream } })",
+        "name_text": "Browser-second-draft copy",
+        "status": "User copy ready to edit. Save to add it to your library.",
+        "theme": {
+          "harmony": "Custom",
+          "high_contrast": false,
+          "id": "theme:copy-1",
+          "mode_sheets": {},
+          "name": "Browser-second-draft copy",
+          "seeds": {
+            "danger": {
+              "a": 255,
+              "b": 78,
+              "g": 78,
+              "r": 213
+            },
+            "dark": true,
+            "neutral": {
+              "a": 255,
+              "b": 34,
+              "g": 20,
+              "r": 16
+            },
+            "primary": {
+              "a": 255,
+              "b": 200,
+              "g": 102,
+              "r": 94
+            },
+            "secondary": {
+              "a": 255,
+              "b": 166,
+              "g": 157,
+              "r": 46
+            },
+            "success": {
+              "a": 255,
+              "b": 110,
+              "g": 179,
+              "r": 79
+            },
+            "tertiary": {
+              "a": 255,
+              "b": 70,
+              "g": 168,
+              "r": 224
+            },
+            "text_body": null,
+            "text_header": null
+          },
+          "source": "User"
+        },
+        "zoom": 1
+      },
+      "font_resources": {
+        "outer_materialized_fonts": 1,
+        "outer_registration_errors": 0,
+        "reader": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            },
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 285
+        },
+        "stylesheet": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 146
+        }
+      },
+      "generation": 3,
+      "images": [
+        {
+          "generation": 3,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857666",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 4
+        },
+        {
+          "generation": 3,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857667",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 3
+        }
+      ],
+      "presentation": {
+        "height": 1102,
+        "host": 2,
+        "layout_scale": 1,
+        "sequence": 5,
+        "width": 1282
+      },
+      "reader_source": "0x1ea56e0",
+      "runner": "0x197cdc8",
+      "stylesheet_source": "0x181d5a8"
+    },
+    "before": {
+      "authority": {
+        "dirty": true,
+        "focus": "Some(NodeId(6597069766849))",
+        "graph_selected": 2,
+        "mode": "dark",
+        "name_selection": "Some(CaretSelection { anchor: CaretPosition { byte: 25, affinity: Downstream }, focus: CaretPosition { byte: 25, affinity: Downstream } })",
+        "name_text": "Browser-second-draft copy",
+        "status": "User copy ready to edit. Save to add it to your library.",
+        "theme": {
+          "harmony": "Custom",
+          "high_contrast": false,
+          "id": "theme:copy-1",
+          "mode_sheets": {},
+          "name": "Browser-second-draft copy",
+          "seeds": {
+            "danger": {
+              "a": 255,
+              "b": 78,
+              "g": 78,
+              "r": 213
+            },
+            "dark": true,
+            "neutral": {
+              "a": 255,
+              "b": 34,
+              "g": 20,
+              "r": 16
+            },
+            "primary": {
+              "a": 255,
+              "b": 200,
+              "g": 102,
+              "r": 94
+            },
+            "secondary": {
+              "a": 255,
+              "b": 166,
+              "g": 157,
+              "r": 46
+            },
+            "success": {
+              "a": 255,
+              "b": 110,
+              "g": 179,
+              "r": 79
+            },
+            "tertiary": {
+              "a": 255,
+              "b": 70,
+              "g": 168,
+              "r": 224
+            },
+            "text_body": null,
+            "text_header": null
+          },
+          "source": "User"
+        },
+        "zoom": 1
+      },
+      "font_resources": {
+        "outer_materialized_fonts": 1,
+        "outer_registration_errors": 0,
+        "reader": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            },
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 285
+        },
+        "stylesheet": {
+          "fonts": [
+            {
+              "bytes": 168260,
+              "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+            }
+          ],
+          "glyphs": 146
+        }
+      },
+      "generation": 2,
+      "images": [
+        {
+          "generation": 2,
+          "local_key": "1952539250",
+          "renderer_key": "16140901064495857666",
+          "size": [
+            477,
+            215
+          ],
+          "stamp": 2
+        },
+        {
+          "generation": 2,
+          "local_key": "1952539235",
+          "renderer_key": "16140901064495857667",
+          "size": [
+            980,
+            328
+          ],
+          "stamp": 1
+        }
+      ],
+      "presentation": {
+        "height": 1102,
+        "host": 2,
+        "layout_scale": 1,
+        "sequence": 3,
+        "width": 1282
+      },
+      "reader_source": "0x1ea56e0",
+      "runner": "0x197cdc8",
+      "stylesheet_source": "0x181d5a8"
+    },
+    "pixels": {
+      "after_sha256": "61c27b28d59b04e8affcd07f047746ce53761142e995d5c00c7a2ea215635ccb",
+      "before_sha256": "762407b4921d862d97e9d5e371eb09fc3a16188fb77f9ecb0516770b466f9628",
+      "changed_pixels": 21,
+      "exact_rgba": false,
+      "height": 1102,
+      "limits": {
+        "alpha": 2,
+        "mean_absolute": 1,
+        "rgb": 3
+      },
+      "max_alpha": 0,
+      "max_rgb": 1,
+      "mean_absolute": 0.000003893077683179922,
+      "scope": "uniform unchanged strict interior limits on entire copied image",
+      "width": 1282
+    }
+  },
+  "shared_replacement_arc": true,
+  "status": "pass",
+  "tab_release_controls": {
+    "controls": [
+      {
+        "application_authority_preserved": true,
+        "event": "synthetic DOM keyup Tab",
+        "focus_unchanged_by_release": true,
+        "original_focus_restored_by_reverse_tab": true,
+        "tab_release_verified": true,
+        "target": "canvas"
+      },
+      {
+        "application_authority_preserved": true,
+        "event": "synthetic DOM keyup Tab",
+        "focus_unchanged_by_release": true,
+        "original_focus_restored_by_reverse_tab": true,
+        "tab_release_verified": true,
+        "target": "mirror"
+      }
+    ],
+    "scope": "synthetic DOM adapter control; not OS keyboard or OS assistive technology"
+  }
+}

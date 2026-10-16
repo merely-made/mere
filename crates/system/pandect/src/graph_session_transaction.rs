@@ -18,7 +18,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         deltas: Vec<GraphDelta>,
         at: SystemTime,
     ) -> Result<Applied, SessionError> {
-        self.transact_change(at, move |candidate| {
+        self.transact_change(at, false, move |candidate| {
             candidate
                 .edit_as(author, ChangeKind::Edit, |graph| {
                     for delta in deltas {
@@ -28,6 +28,64 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
                 .map(|(_, applied)| applied)
         })
         .await
+        .map(|(applied, _)| applied)
+    }
+
+    /// [`transact_deltas`](Self::transact_deltas), with the addressable
+    /// publication of the resulting graph in the same atomic write. Returns the
+    /// published generation. A reader never sees an edit without its
+    /// publication, and a refused write leaves neither.
+    pub async fn transact_deltas_published(
+        &mut self,
+        author: Author,
+        deltas: Vec<GraphDelta>,
+        at: SystemTime,
+    ) -> Result<(Applied, String), SessionError> {
+        self.transact_change(at, true, move |candidate| {
+            candidate
+                .edit_as(author, ChangeKind::Edit, |graph| {
+                    for delta in deltas {
+                        apply_graph_delta(graph, delta);
+                    }
+                })
+                .map(|(_, applied)| applied)
+        })
+        .await
+        .map(|(applied, generation)| (applied, generation.expect("published write")))
+    }
+
+    /// Preflight observed stable-ID commands against this complete writer, then
+    /// apply their live deltas and the resulting addressable publication in one
+    /// atomic write. Every refusal comes before anything is written: a stale
+    /// observation, a missing target, an unqualified session or a storage
+    /// refusal leaves graph, history, capture and storage as they were. Returns
+    /// the published generation with the application.
+    pub async fn transact_live(
+        &mut self,
+        author: Author,
+        commands: Vec<crate::live_graph::ObservedCommand>,
+        at: SystemTime,
+    ) -> Result<(crate::live_graph::LiveApplied, String), crate::live_graph::LiveEditError> {
+        use crate::live_graph::{LiveApplied, preflight};
+        self.ensure_writable()?;
+        // The complete current records are what external observations were
+        // taken against; the resident graph's filtered copy is never hashed.
+        let source = self.prepare_resident_publication()?;
+        let program = preflight(&self.graph, &source, &author, commands)?;
+        let created = program.created.clone();
+        let (applied, generation) = self
+            .transact_change(at, true, move |candidate| {
+                candidate
+                    .edit_as(author.clone(), ChangeKind::Edit, |graph| {
+                        program.apply(graph, &author)
+                    })
+                    .map(|(_, applied)| applied)
+            })
+            .await?;
+        Ok((
+            LiveApplied { applied, created },
+            generation.expect("published write"),
+        ))
     }
 
     /// The same staged/acknowledged boundary for this author's saved history.
@@ -37,7 +95,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         redo: bool,
         at: SystemTime,
     ) -> Result<Option<Reverted>, SessionError> {
-        self.transact_change(at, move |candidate| {
+        self.transact_change(at, false, move |candidate| {
             if redo {
                 candidate.redo_now(author)
             } else {
@@ -45,13 +103,49 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             }
         })
         .await
+        .map(|(reverted, _)| reverted)
     }
 
-    async fn transact_change<R>(
+    /// [`transact_history`](Self::transact_history) with the addressable
+    /// publication of the resulting graph in the same atomic write.
+    pub async fn transact_history_published(
+        &mut self,
+        author: Author,
+        redo: bool,
+        at: SystemTime,
+    ) -> Result<(Option<Reverted>, String), SessionError> {
+        self.transact_change(at, true, move |candidate| {
+            if redo {
+                candidate.redo_now(author)
+            } else {
+                candidate.undo_now(author)
+            }
+        })
+        .await
+        .map(|(reverted, generation)| (reverted, generation.expect("published write")))
+    }
+
+    /// Stage the application's view and its parallel history together.
+    pub async fn transact_view(
+        &mut self,
+        author: Author,
+        key: ViewKey,
+        state: ViewIntent,
+        at: SystemTime,
+    ) -> Result<(), SessionError> {
+        self.transact_change(at, false, move |candidate| {
+            candidate.set_view_now(author, key, state)
+        })
+        .await
+        .map(|(result, _)| result)
+    }
+
+    pub(crate) async fn transact_change<R>(
         &mut self,
         at: SystemTime,
+        publish: bool,
         change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
-    ) -> Result<R, SessionError> {
+    ) -> Result<(R, Option<String>), SessionError> {
         self.ensure_writable()?;
         if self.has_unstored() {
             return Err(SessionError::Validation(
@@ -78,8 +172,30 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         }
         let mut candidate = self.detached_candidate();
         let result = change(&mut candidate)?;
+        // A view has its own log, so a graph head alone cannot detect a
+        // competing view append. Include existing and newly requested keys.
+        let mut view_heads = Vec::new();
+        for (key, view) in &candidate.views {
+            let log = self.keys.view_log(key);
+            view_heads.push((log.clone(), view.saved));
+            if let Some(held) = self.views.get(key).filter(|held| held.saved.0 > 0) {
+                tails.extend(
+                    held.log
+                        .entry_writes::<JsonCodec>(&log, Seq(held.saved.0 - 1))?,
+                );
+            }
+        }
         let pending = candidate.pending(at)?;
-        let ops = pending.ops().to_vec();
+        let mut ops = pending.ops().to_vec();
+        // The publication describes the candidate's graph and joins its write.
+        // Preparation refuses before anything is written or installed.
+        let generation = if publish {
+            let publication = candidate.prepare_resident_publication()?;
+            ops.extend_from_slice(publication.ops());
+            Some(publication.generation().to_owned())
+        } else {
+            None
+        };
         let rejection = Arc::new(Mutex::new(None));
         let rejected = rejection.clone();
         let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
@@ -96,6 +212,16 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
                         != expected_changes.0
                 {
                     return Err("Session changed before commit; draft retained".into());
+                }
+                for (log, expected) in view_heads {
+                    if reader
+                        .list(&format!("{log}/"))
+                        .map_err(|e| e.to_string())?
+                        .len() as u64
+                        != expected.0
+                    {
+                        return Err("Session view changed before commit; draft retained".into());
+                    }
                 }
                 for op in tails {
                     if let WriteOp::Put { key, value } = op {
@@ -121,7 +247,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         }
         candidate.stored(pending);
         *self = candidate;
-        Ok(result)
+        Ok((result, generation))
     }
 
     // A private copy with its own recorder. No candidate edit can reach the
@@ -154,6 +280,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             saved_pending_links: self.saved_pending_links.clone(),
             saved_pending_links_revision: self.saved_pending_links_revision,
             retained_pending_links_revision: self.retained_pending_links_revision,
+            merge_marks: self.merge_marks.clone(),
         }
     }
 }

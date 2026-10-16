@@ -3,7 +3,8 @@ name = "cambium"
 version = "0.3.3"
 description = "A Meristem backend and application toolkit for Genet"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 publish = true
@@ -13,12 +14,14 @@ highlight = ["dep:illume", "dep:tinct"]
 
 [dependencies]
 # The generic undo History; EditHistory is the text field's instance of it.
-edit-history = { workspace = true }
+backstep = { workspace = true }
 # The command set, the person's choices and a palette's state (SE45 to SE48).
 command-menu = { workspace = true }
 meristem = { version = "0.2.0", path = "../meristem" }
 sprigging = { version = "0.2.0", path = "../sprigging" }
 sceno = { workspace = true }
+scenograph = { workspace = true }
+scenomise = { workspace = true }
 genet-scripted-dom = { workspace = true }
 # Cambium also renders host settings and surface descriptors, which remain
 # product-neutral Genet host contracts rather than workspace vocabulary.

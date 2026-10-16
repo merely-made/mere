@@ -1186,7 +1186,7 @@ multiple assertions; choosing a richer explanation seam remains design work.
   - **Shared files touched:**
     - `Cargo.lock`, one line. burn-pre4-repin also changes the lock.
     - `crates/canvas/pictograph/Cargo.toml`, also changed by grammar-g2.
-    - `canvas.rs`, `physics_board.rs`, `canvas/tests.rs` and `ports/graphshell/src/web_product.rs`, also changed by seiche-speed and grammar-g2.
+    - `canvas.rs`, `physics_board.rs`, `canvas/tests.rs` and [web_product.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_product.rs), also changed by seiche-speed and grammar-g2.
     - `canvas/input.rs`, `canvas/roles.rs`, `ports/graphshell/src/web_practice.rs` and `web_tree/product.rs`.
     - The ignored web lock.
     - A plain three-way text merge of each overlapping file with each lane has no conflict hunk (`trial-merges.log`).

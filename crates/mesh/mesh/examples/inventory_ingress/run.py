@@ -55,12 +55,18 @@ def main():
             raise RuntimeError("independent-process semantic difference: " + field)
     if peer_before != hashlib.sha256(peer.read_bytes()).hexdigest():
         raise RuntimeError("peer executable changed during composition")
+    graph = json.loads(invoke(["cargo", "metadata", "--locked", "--offline", "--format-version", "1"], root).stdout)
+    carriers = [p for p in graph["packages"] if p["name"] == "mere-transport"]
+    if len(carriers) != 1:
+        raise RuntimeError("expected one imported transport supplier")
+    carrier = carriers[0]
+    carrier_root = Path(carrier["manifest_path"]).parent
+    carrier_files = [carrier_root / "src/p2panda_transport/bounded_accept.rs",
+                     carrier_root / "src/p2panda_transport.rs",
+                     carrier_root / "src/lib.rs", carrier_root / "Cargo.toml"]
     files = [*sorted(here.glob("*.rs")), here / "run.py",
              *sorted((root / "crates/mesh/mesh/src/ingress").glob("*.rs")),
              *sorted((root / "crates/stickleback/src/inventory").glob("*.rs")),
-             root / "crates/murm/transport/src/p2panda_transport/bounded_accept.rs",
-             root / "crates/murm/transport/src/p2panda_transport.rs",
-             root / "crates/murm/transport/src/lib.rs",
              root / "crates/mesh/mesh/src/lib.rs",
              root / "ports/distillery/src/resident.rs",
              root / "ports/distillery/tests/record_ingress.rs",
@@ -74,6 +80,8 @@ def main():
         "platform": platform.platform(),
         "source_sha256": {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
                           for p in files},
+        "transport_supplier": {"id": carrier["id"], "source": carrier["source"],
+                               "source_sha256": {str(p.relative_to(carrier_root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in carrier_files}},
         "executable_sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
         "peer_executable_sha256": peer_before,
         "peer_executable_blake3": reports[0]["peer_executable_blake3"],

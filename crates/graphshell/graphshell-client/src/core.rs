@@ -47,6 +47,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use chirograph::{
     AdvertisedAction, CapabilityProfile, CarrierNotice, CarrierRequestBody, CarrierResponseBody,
     EndpointDescriptor, IntentInvocation, IntentResult, ProjectionRequest, ProjectionSession,
+    ResourceRequest, ResourceResponse,
 };
 use sceno::InstanceId;
 use serde::Serialize;
@@ -102,6 +103,9 @@ pub enum Outcome {
     Resnapshotted,
     /// A presentation resolved, with every resource it needed in hand.
     Resolved(Box<ResolvedPresentation>),
+    /// An opaque side resource explicitly named by a resolved portable card.
+    /// Its bytes are checked but never entered into the presentation cache.
+    MediaResource(Box<ResourceResponse>),
     /// The endpoint answered an intent — admitted or refused, both are this.
     Intent(Box<IntentResult>),
     /// Whether anything actually changed.
@@ -125,6 +129,9 @@ enum Pending {
     Resolve {
         session: ProjectionSession,
         instance: InstanceId,
+    },
+    MediaResource {
+        request: ResourceRequest,
     },
     Intent,
     /// A resume driven by one notice, counting its resynchronize attempts.
@@ -283,6 +290,41 @@ impl SessionCore {
                 CarrierRequestBody::Resource(request),
             )),
         }
+    }
+
+    /// Read a card's disclosed media by role, after the card itself has been
+    /// resolved and content-address verified. It cannot request an arbitrary
+    /// hash or promote opaque owner data into a presentation codec.
+    pub fn media_resource(
+        &mut self,
+        session: &ProjectionSession,
+        instance: InstanceId,
+        index: usize,
+    ) -> Result<Progress<Outcome>, String> {
+        let resolved = self
+            .client
+            .resolve(session, instance, &self.profile)
+            .map_err(|e| format!("media card is unavailable: {e:?}"))?;
+        let crate::PresentationResolution::Ready(resolved) = resolved else {
+            return Err("Resolve the advertised card before reading its media.".into());
+        };
+        let crate::ResolvedContent::PortableCard(card) = resolved.content else {
+            return Err("Only a portable card may disclose this media role.".into());
+        };
+        let resource = *card
+            .media
+            .get(index)
+            .ok_or("The card does not disclose that media role.")?;
+        let request = ResourceRequest {
+            session: session.clone(),
+            resource,
+        };
+        Ok(self.begin(
+            Pending::MediaResource {
+                request: request.clone(),
+            },
+            CarrierRequestBody::Resource(request),
+        ))
     }
 
     /// Invoke an action exactly as advertised.
@@ -483,6 +525,20 @@ impl SessionCore {
                     self.resolve(&session, instance)
                 },
                 other => Err(unexpected("resource", &other)),
+            },
+            Pending::MediaResource { request } => match body {
+                CarrierResponseBody::Resource(response) => {
+                    if response.session != request.session
+                        || response.resource != request.resource
+                        || !response.has_valid_address()
+                    {
+                        return Err(
+                            "The media response has another scope or content address.".into()
+                        );
+                    }
+                    Ok(Progress::Done(Outcome::MediaResource(Box::new(response))))
+                },
+                other => Err(unexpected("media resource", &other)),
             },
             Pending::Intent => match body {
                 CarrierResponseBody::Intent(result) => {
@@ -695,5 +751,149 @@ mod tests {
             .expect("close was answered");
         assert!(matches!(done, Progress::Done(Outcome::Closed)));
         assert!(!core.is_awaiting());
+    }
+    fn media_core() -> (SessionCore, ProjectionSession, Vec<u8>, Vec<u8>) {
+        use chirograph::{
+            BoundsRelationship, CachePolicy, CacheRetention, PortableCardV1, PresentationBinding,
+            PresentationCapability, PresentationCodec, PresentationKey, PresentationManifest,
+            PresentationOffer, PresentationSemantics, ProjectionSnapshot, SemanticRole,
+        };
+        use sceno::{
+            Footprint, ProjectedItem, Representation, Scene, Size2, SourceRef, Transform2,
+        };
+        let mut core = SessionCore::from_descriptor(
+            descriptor_with_one_offer(),
+            CapabilityProfile::new([PresentationCapability::PortableCard]),
+        );
+        let session = core.descriptor.projections[0].request.session.clone();
+        let media = b"opaque owner-disclosed material".to_vec();
+        let card = serde_json::to_vec(&PortableCardV1 {
+            title: "Session".into(),
+            values: vec![],
+            badges: vec![],
+            media: vec![chirograph::ContentHash::of(&media)],
+        })
+        .unwrap();
+        let mut scene = Scene::new();
+        let source = scene.intern_source(SourceRef::new("session", "one"));
+        scene.items.push(ProjectedItem {
+            source,
+            space: Scene::WORLD,
+            transform: Transform2::translation(0., 0.),
+            footprint: Footprint::Rect {
+                size: Size2::new(120., 80.),
+            },
+            representation: Representation::Glyph,
+            layer: 0,
+            visible: true,
+            hit: None,
+            channels: vec![],
+        });
+        let key = PresentationKey("one".into());
+        let mut presentation = PresentationManifest::default();
+        presentation.bindings.push(PresentationBinding {
+            instance: InstanceId(0),
+            key: key.clone(),
+        });
+        presentation.offers.insert(
+            key,
+            vec![PresentationOffer {
+                codec: PresentationCodec::PortableCardV1,
+                resource: chirograph::ContentHash::of(&card),
+                byte_size: card.len() as u64,
+                requires: PresentationCapability::PortableCard,
+                semantics: PresentationSemantics {
+                    label: "Session".into(),
+                    role: SemanticRole::Article,
+                    bounds: BoundsRelationship::FillFootprint,
+                    actions: vec![],
+                },
+            }],
+        );
+        let _ = core.mount(0).unwrap();
+        let _ = core
+            .on_response(CarrierResponseBody::Snapshot(Box::new(
+                ProjectionSnapshot {
+                    version: ProtocolVersion::V1,
+                    session: session.clone(),
+                    scene: scenotime::SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene)
+                        .unwrap(),
+                    presentation,
+                    cache_policy: CachePolicy {
+                        retention: CacheRetention::MemoryOnly,
+                        expires_at_ms: None,
+                        purge_on_revocation: true,
+                    },
+                },
+            )))
+            .unwrap();
+        (core, session, card, media)
+    }
+    #[test]
+    fn media_requires_a_verified_card_and_keeps_owner_bytes_out_of_presentation_cache() {
+        let (mut core, session, card, media) = media_core();
+        assert!(
+            core.media_resource(&session, InstanceId(0), 0)
+                .unwrap_err()
+                .contains("Resolve")
+        );
+        let _ = core.resolve(&session, InstanceId(0)).unwrap();
+        let _ = core
+            .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                session.clone(),
+                card,
+            )))
+            .unwrap();
+        assert!(
+            core.media_resource(&session, InstanceId(0), 1)
+                .unwrap_err()
+                .contains("does not disclose")
+        );
+        assert!(!core.is_awaiting());
+        let requested = core.media_resource(&session, InstanceId(0), 0).unwrap();
+        assert!(
+            matches!(requested.request(),Some(CarrierRequestBody::Resource(request)) if request.resource==chirograph::ContentHash::of(&media))
+        );
+        let outcome = core
+            .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                session.clone(),
+                media.clone(),
+            )))
+            .unwrap();
+        assert!(
+            matches!(outcome,Progress::Done(Outcome::MediaResource(response)) if response.bytes==media)
+        );
+        assert!(
+            !core
+                .client
+                .resources
+                .contains_key(&(session, chirograph::ContentHash::of(&media)))
+        );
+    }
+    #[test]
+    fn media_refuses_wrong_scope_wrong_hash_and_corrupted_bytes() {
+        for failure in 0..3 {
+            let (mut core, session, card, media) = media_core();
+            let _ = core.resolve(&session, InstanceId(0)).unwrap();
+            let _ = core
+                .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                    session.clone(),
+                    card,
+                )))
+                .unwrap();
+            let _ = core.media_resource(&session, InstanceId(0), 0).unwrap();
+            let mut response = ResourceResponse::new(session, media);
+            match failure {
+                0 => response.session = ProjectionSession("another".into()),
+                1 => response.resource = chirograph::ContentHash::of(b"another"),
+                _ => response.bytes.push(0),
+            }
+            assert!(
+                core.on_response(CarrierResponseBody::Resource(response))
+                    .unwrap_err()
+                    .contains("another scope or content address")
+            );
+            assert!(!core.is_awaiting());
+        }
     }
 }

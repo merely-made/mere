@@ -1,0 +1,42 @@
+{
+  "recorded_at": "2026-10-14T07:34:57.545047+00:00",
+  "genet_supplier": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "wire_supplier": "80d9959000fcd913634fd223538dfdbbec1f5e4f",
+  "checks": [
+    {
+      "scope": "mere-fetch-git",
+      "compiler": "1.99.0",
+      "passed": 16,
+      "log_sha256": "52d876ab413aea483102c07bbbdc9c71ab050722e34e1c5ee6da4761e5223bcd"
+    },
+    {
+      "scope": "mere-fetch-msrv-git",
+      "compiler": "1.97.1",
+      "passed": 16,
+      "log_sha256": "a19a5e1f56ffb0d5927ebd32603905f8015734dd7356a3804ba3ed95af315ce7"
+    },
+    {
+      "scope": "strict Clippy, no default host features",
+      "compiler": "1.99.0",
+      "result": "passed",
+      "log_sha256": "3643b6bb623521d24ed808eefaee82689863840eb14d4ff2748b3d799eb2c44f"
+    }
+  ],
+  "inputs": {
+    "Cargo.toml": "f80344105764ea889597ff098802551be99e06d156f1faafb4eb395a52e1c10d",
+    "Cargo.lock": "401e15c5bc1e2511289cbc3c4bcf0d6afcf77f80c8cc46dfee601aaf03eddbd9",
+    "crates/system/fetch/Cargo.toml": "ef6dce2d49cd46df82c4616bd8f59d15d1f00db45baef24c9c99a8ad42012b0a",
+    "crates/system/fetch/src/crawler.rs": "0e0676df4d8331f5d0486f558054d0bcfd08a39eddc4e2b2cdc2969913677e46"
+  },
+  "metadata_sha256": "aad16400067cc2635a07105a42b064f383929166537f42f874d840f980daab91",
+  "one_genet_cohort": true,
+  "one_netfetcher": true,
+  "one_wire_engine": true,
+  "one_layout_dom_api": true,
+  "foreign_git_manifests": [],
+  "host_contract": "Crawler retains explicit Mozilla roots, its separate pool and canceled-request retries disabled; Fetch retains session stores, range/redirect/body-budget behavior",
+  "limits": [
+    "Default Netfetcher pool remains process-wide; this does not implement new per-persona pool partitioning",
+    "No full upstream WPT corpus, renderer/GPU/presentation or registry release claim"
+  ]
+}

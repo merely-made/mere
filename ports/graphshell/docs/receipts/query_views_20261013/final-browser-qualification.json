@@ -1,0 +1,97 @@
+{
+  "qualified_utc": "2026-10-14T09:50:11.281940+00:00",
+  "status": "three fresh saved-query browser scenarios passed",
+  "artifact": "final-browser-artifact.json",
+  "artifact_sha256": "458b869cda42b6f6df19e9980966c085a18cae6b38a092a4c40d216cd96d52f6",
+  "wasm_sha256": "5943978c46c576dd54cdd06c00681e0d537c88343babd62a9d0e2d00604791d1",
+  "consumer_source_count": 2711,
+  "genet": "b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+  "netrender": "6a24ae08f55129b474282b8e4911564f875ce5fd",
+  "browser": "Chrome154 Windows BrowserWebGPU; actual environment.json under browser-qualified-8884",
+  "viewport": [
+    1037,
+    639
+  ],
+  "device_pixel_ratio": 2,
+  "cases": [
+    {
+      "case": "scenarios_2Fquery_views",
+      "result_path": "browser-qualified-8884/scenarios_2Fquery_views/result.json",
+      "result_sha256": "562cbe3a8f6ae53594e4ab45b4163d4f907c41d7e6809a3bea290ee9203c4ccb",
+      "captures": [
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views/query_configured_edge_stroke.png",
+          "bytes": 334796,
+          "sha256": "8bc2fb4d65624d7be39c96bece0b3ef76b233776ff5062bf558ff60deacdbf31"
+        },
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views/query_exact_empty.png",
+          "bytes": 335053,
+          "sha256": "aaa3c1be8706266b51a73a0b1875aa7f6a39d22da9545547bfdabafc73dd4185"
+        },
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views/query_frozen_resource.png",
+          "bytes": 338151,
+          "sha256": "c191e88ee0fc7d8578aa88fa983a2a426c68280bc559eda98f847658bfc46cc4"
+        },
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views/query_restored_members.png",
+          "bytes": 334640,
+          "sha256": "552c145aea1c4cd265965f80a2bca563537909258e7aad218d4db8172c07e686"
+        },
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views/query_shared_resource_links_and_edges.png",
+          "bytes": 335982,
+          "sha256": "6a0a9fffda359fe132eba5019c7950b5e962f36a4cfc0151012aeecd69ce7df4"
+        }
+      ],
+      "reopened": false
+    },
+    {
+      "case": "scenarios_2Fquery_views_inspect",
+      "result_path": "browser-qualified-8884/scenarios_2Fquery_views_inspect/result.json",
+      "result_sha256": "764f0f367c4353bd4f72869066b6f6dcc54cbdd1f4539ac597806d7de8b31e44",
+      "captures": [
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views_inspect/query_dotted_bindings.png",
+          "bytes": 331083,
+          "sha256": "a69622eaa5bb67bf3f93b383119c6cd3fa49d59c7253a0522b60f840c0e3fd95"
+        },
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views_inspect/query_lifted_resource_link_inspected.png",
+          "bytes": 353108,
+          "sha256": "2205a57f252663a0ae3f6c3b5ba6aa0469cdcc28d9e805f9a420a75179a5dcd5"
+        },
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views_inspect/query_shown_binding_inspected.png",
+          "bytes": 382218,
+          "sha256": "a72003201d0042054b700998aa93339904a3d1bf7080818382341e858baacf80"
+        }
+      ],
+      "reopened": true
+    },
+    {
+      "case": "scenarios_2Fquery_views_reopen",
+      "result_path": "browser-qualified-8884/scenarios_2Fquery_views_reopen/result.json",
+      "result_sha256": "520cca51392ae3b5df2283ce9eb216805a1b2359974220845f1c5f40f752107d",
+      "captures": [
+        {
+          "path": "browser-qualified-8884/scenarios_2Fquery_views_reopen/query_resource_reopened.png",
+          "bytes": 297462,
+          "sha256": "f250ee635a8bf7b35eabb63d503b16fae2414112df142f457935637468f8e034"
+        }
+      ],
+      "reopened": true
+    }
+  ],
+  "clip_receipt": "../retained_content_20261012/clip-export-browser/qualified-8885/ui-confirmation.json",
+  "clip_scope": "natural wheel containment and trusted browser handoff passed; completed download file remains unverified",
+  "cleanup": "final-browser-cleanup.json",
+  "limitations": [
+    "additional strata",
+    "physical IME and assistive technology",
+    "cross-platform acceptance",
+    "physical audio output",
+    "actual GPU device loss"
+  ]
+}

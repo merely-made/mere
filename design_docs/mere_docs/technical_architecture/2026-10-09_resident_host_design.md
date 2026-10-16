@@ -3,6 +3,8 @@
 **Date:** 2026-10-09
 **Status:** Proposed for user review. This is not an approved implementation plan.
 
+**Corrected 2026-10-15 (port lane):** The status above is stale. The lane's own plan records Mark's approval of this design: "Written spec and concrete plan approved by Mark" (its status line, 2026-10-10), and in its progress log, "Concrete plan written and self-reviewed, then approved by Mark" (2026-10-09), retained by the documentation checkpoints `59393140` and `ec41bf4a`. The approval was recorded on the lane's branch (tag `archive/resident-current-main-20261010`) and never reached main, which is why this copy still read "proposed". The plan is restored as the [implementation plan](../implementation_strategy/2026-10-09_resident_host_implementation_plan.md), with a map of what C1 already covers. The approval is of the design and plan as written; the port may change the persistence contract (forks F1 and F2 in that plan), and any change is ruled and dated there. The original status text above is kept as written.
+
 This proposal belongs to the [graph semantics follow-ons](../implementation_strategy/2026-10-09_graph_semantics_followons_plan.md).
 It preserves the [bounded P1–P5 lane](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
 and its accepted semantic rulings, qualification and publication receipts.
@@ -114,7 +116,7 @@ with existing Pending forced-checkpoint writes. The prepared object carries sour
 cursor/revision and generation. Pause further writer edits for this first staged
 commit; await without holding the browser host borrow, acknowledge only confirmed
 storage, then refresh the resident display. Source/session changes reject stale
-acknowledgments. `ports/graphshell/src/web_session.rs` supplies the existing
+acknowledgments. [web_session.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_session.rs) supplies the existing
 prepare/write/install pattern; planned helpers extend it without another journal.
 
 Keep outcomes distinct: Rejected changes nothing; AppliedButUnstored means the

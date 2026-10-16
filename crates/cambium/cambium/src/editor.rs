@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 //! Host-agnostic editing helpers: the generic undo/redo [`History`] (from the
-//! `edit-history` crate), the text field's [`EditHistory`] built on it,
+//! `backstep` crate), the text field's [`EditHistory`] built on it,
 //! and an auto-pair [`wrap_selection`]. Any Genet host gets undoable editors
 //! and bracket-wrapping fields for free — the omnibar, a note editor, a form
 //! field, a projection editor. Prose- or grammar-specific editing (list
@@ -13,7 +13,7 @@
 use crate::controls::TextInput;
 use crate::controls::TextSnapshot;
 
-pub use edit_history::History;
+pub use backstep::History;
 
 /// Undo/redo for a [`TextInput`]: a [`History`] of committed text, caret, and
 /// selection snapshots. Composition and completion text are transient and are

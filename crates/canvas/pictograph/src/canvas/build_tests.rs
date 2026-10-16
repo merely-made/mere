@@ -336,9 +336,15 @@ pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
             _ => unreachable!(),
         }),
         label: Some(id.into()),
+        basis: kernel::types::AssertionBasis {
+            note: Some(id.into()),
+            ..Default::default()
+        },
         graph_scope: Default::default(),
         provenance_iri: Some(format!("https://author.test/{id}")),
         asserted_at_ms: Some(17),
+        first_asserted_ms: Some(17),
+        withdrawn: None,
     };
     let pair = |from: uuid::Uuid, to: uuid::Uuid, statements| PersistedEdge {
         from_node_id: from.to_string(),
@@ -524,11 +530,12 @@ fn content_projection_reaches_score_edges_and_fold_boundary_accounting() {
         5,
         "unbound surface still has a body"
     );
-    let fold = forme::FoldRecord::from_selection(
+    let fold = curation::FoldRecord::selection(
+        curation::FoldId::new("fold:content"),
         "content",
         [
-            graph.get_node(a).unwrap().id,
-            graph.get_node(alias_a).unwrap().id,
+            graph.get_node(a).unwrap().id.to_string(),
+            graph.get_node(alias_a).unwrap().id.to_string(),
         ],
     )
     .unwrap();
