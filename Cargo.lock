@@ -2655,17 +2655,20 @@ dependencies = [
 [[package]]
 name = "cleromancy-core-acceptance"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#277c6bd0cb6b4f63fc458d341678c0f8ed52830a"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#c1ff50c0ff6ef824a947ccbd5e223c8fd1d691b2"
 dependencies = [
  "blake3",
  "chartulary",
  "chirograph",
  "graphshell-client",
  "mere",
+ "mere-alembic",
  "muniment",
  "rand_core 0.6.4",
  "sceno",
+ "scenograph",
  "scenotime",
+ "seiche",
  "serde",
  "serde_json",
  "servitor",

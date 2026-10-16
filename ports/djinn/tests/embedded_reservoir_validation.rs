@@ -595,6 +595,7 @@ mod published_replay_regression {
 
     fn product_fixture(
         typed_decks: bool,
+        ambient: bool,
     ) -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
         let captured = Arc::new(Mutex::new(Vec::new()));
         let observed = captured.clone();
@@ -637,10 +638,33 @@ mod published_replay_regression {
                 .unwrap();
             assert_eq!(detail.readings.len(), 1);
             assert_eq!(detail.readings[0].receipt.mode, SelectionMode::Calculated);
-            (
-                consultation.host().graph().clone(),
-                detail.readings[0].clone(),
-            )
+            let mut host = consultation.into_host();
+            if ambient {
+                let context = host.ambient_context(&detail.session.id, "focus").unwrap();
+                let item = context
+                    .data
+                    .items
+                    .iter()
+                    .find(|i| i.id.starts_with("card:"))
+                    .unwrap()
+                    .id
+                    .clone();
+                host.examine_ambient(&detail.session.id, "focus", &item, false, 4000)
+                    .unwrap();
+                host.examine_ambient(&detail.session.id, "focus", &item, true, 5000)
+                    .unwrap();
+                let mut view = context.view;
+                view.snapshot.selected_occurrence = Some(item.clone());
+                view.roles.insert(
+                    item.clone(),
+                    serde_json::from_value(serde_json::json!("pinned")).unwrap(),
+                );
+                view.foreground.insert(item.clone());
+                view.positions.insert(item, [123000, 456000]);
+                view.reduced_motion = true;
+                host.insert_ambient_view(&view).unwrap();
+            }
+            (host.graph().clone(), detail.readings[0].clone())
         });
         drop(clear);
         let edits = std::mem::take(&mut *captured.lock().unwrap());
@@ -741,15 +765,20 @@ mod published_replay_regression {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn published_reading_replay_and_same_schema_tamper_survive_three_real_owners() {
-        owner_replay(false).await;
+        owner_replay(false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn typed_decks_and_reading_survive_three_owners_and_refuse_metadata_tamper() {
-        owner_replay(true).await;
+        owner_replay(true, false).await;
     }
 
-    async fn owner_replay(typed_decks: bool) {
+    #[tokio::test(flavor = "multi_thread")]
+    async fn ambient_view_and_kept_memory_survive_three_owners_and_refuse_source_tamper() {
+        owner_replay(true, true).await;
+    }
+
+    async fn owner_replay(typed_decks: bool, ambient: bool) {
         let root = tempfile::tempdir().unwrap();
         let unusable = root.path().join("no-attached-client-store");
         std::fs::write(
@@ -757,7 +786,7 @@ mod published_replay_regression {
             b"the live client cannot open local custody or storage",
         )
         .unwrap();
-        let (edits, expected_facets, reading) = product_fixture(typed_decks);
+        let (edits, expected_facets, reading) = product_fixture(typed_decks, ambient);
         let reading_url = format!("cleromancy://reading/{}", reading.id);
         let reading_id = kernel::graph::Graph::node_namespace_id(&reading_url);
         let mut retained_session = None;
@@ -883,6 +912,60 @@ mod published_replay_regression {
                 assert_eq!(durable_files_for(root.path(), "divination"), durable);
                 println!(
                     "TYPED DECK REPLAY mode={mode} phase={phase} decks=2 cards-per-deck=78 content-revisions-retained=true metadata-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
+            if ambient {
+                let host = cleromancy_domain::CleromancyHost::candidate(graph.clone()).unwrap();
+                let views = host.ambient_views().unwrap();
+                let memories = host.ambient_memories().unwrap();
+                assert_eq!(views.len(), 1);
+                assert!(views[0].reduced_motion);
+                assert_eq!(memories.len(), 1);
+                assert!(memories[0].kept);
+                assert_eq!(views[0].roles[&memories[0].memory.item.id].id(), "pinned");
+                assert!(views[0].foreground.contains(&memories[0].memory.item.id));
+                for facet in [
+                    cleromancy_domain::host::AMBIENT_VIEW_FACET,
+                    cleromancy_domain::host::AMBIENT_MEMORY_FACET,
+                ] {
+                    let (node_id, mut forged) = graph
+                        .facets()
+                        .iter()
+                        .find_map(|(id, facets)| {
+                            facets
+                                .iter()
+                                .find(|(name, _)| name.as_str() == facet)
+                                .map(|(_, v)| (*id, v.clone()))
+                        })
+                        .unwrap();
+                    if facet == cleromancy_domain::host::AMBIENT_VIEW_FACET {
+                        forged["snapshot"]["selected_occurrence"] =
+                            serde_json::json!("undisclosed");
+                    } else {
+                        forged["item"]["body"] = serde_json::json!("not the saved engine result");
+                    }
+                    let result = apply_checked(
+                        attached.client_mut(),
+                        &before[1],
+                        vec![CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: node_id.to_string(),
+                            facet: facet.into(),
+                            value_json: forged.to_string(),
+                        }],
+                    )
+                    .await;
+                    assert!(
+                        matches!(result, IntentResult::Rejected { .. }),
+                        "C4 source/curation tamper accepted: {result:?}"
+                    );
+                    assert_eq!(
+                        serde_json::to_value(snapshots(attached.client_mut()).await).unwrap(),
+                        serde_json::to_value(&before).unwrap()
+                    );
+                    assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                }
+                println!(
+                    "AMBIENT REPLAY mode={mode} phase={phase} focus-roles-foreground-and-spec-retained=true saved-memory=true source-tamper-refused=true durable-bytes-unchanged=true"
                 );
             }
             if let Some(id) = retained_session {
