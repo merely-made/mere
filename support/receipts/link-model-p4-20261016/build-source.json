@@ -1,0 +1,21 @@
+{
+  "pkg/graphshell_web.js": {
+    "bytes": 149348,
+    "sha256": "f5663e7b9cbe84615ee7183f0e5cd2aca63d2ce35d580455924890a80f3ef093"
+  },
+  "pkg/graphshell_web_bg.wasm": {
+    "bytes": 263025799,
+    "sha256": "ab7d3261c2066d3e0f0f22e9d2f5d205bd89e58b880f7462d1126b8036f99f7a"
+  },
+  "source": "03641402aad9764f6cd369408905ea92353cf54a",
+  "git_status": "",
+  "cwd": "/Users/markik/Code/repos/mere-link-model-p2-20261015",
+  "build_cwd": "/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web",
+  "bindgen": "0.2.129",
+  "features": [
+    "product",
+    "presentation-webgpu"
+  ],
+  "locked": true,
+  "offline": true
+}
