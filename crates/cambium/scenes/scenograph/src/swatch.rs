@@ -17,7 +17,7 @@
 use curation::SubgraphSpec;
 use serde::{Deserialize, Serialize};
 
-use crate::ValidationIssue;
+use crate::{ValidationIssue, link::LinkKey};
 
 /// What part of a mere a swatch shows (SE63). Ids are the host's spellings.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -25,6 +25,10 @@ use crate::ValidationIssue;
 pub enum Scope {
     Node(String),
     Subgraph(SubgraphSpec),
+    /// The derived link identified by its stratum and unordered endpoints.
+    /// Its source, revision, coverage, and members come from a link reading;
+    /// the scope itself does not mint or persist a pair entity.
+    Link(LinkKey),
     /// The graph nested within this node.
     NestedGraph(String),
     Mere(String),
@@ -258,6 +262,21 @@ mod tests {
     fn a_scale_left_out_is_shared() {
         let axis: Axis = serde_json::from_str(r#"{"kind":"scope","labels":["a"]}"#).expect("reads");
         assert_eq!(axis.scale, AxisScale::Shared);
+    }
+
+    #[test]
+    fn link_scope_round_trips_without_minting_another_identity() {
+        let scope = Scope::Link(LinkKey::new(
+            crate::link::LinkStratum::Resource,
+            "urn:resource:b",
+            "urn:resource:a",
+        ));
+        let encoded = serde_json::to_string(&scope).expect("writes");
+        assert!(encoded.contains(r#""kind":"link""#));
+        assert_eq!(
+            serde_json::from_str::<Scope>(&encoded).expect("reads"),
+            scope
+        );
     }
 
     #[test]

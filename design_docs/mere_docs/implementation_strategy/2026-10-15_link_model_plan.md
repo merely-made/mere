@@ -4,8 +4,10 @@
 **Status:** in progress overall. The bounded P1 shared reading, P2 semantic
 lifecycle/Knot intake and P5 fixed-endpoint experiment are qualified on their
 recorded sources. The P2 continuation is source `b69510949`, based on runtime
-`82e7fd718` with later upstream documentation merged. P3–P4, P6 and P7 remain
-later work.
+`82e7fd718` with later upstream documentation merged. P3 began on 2026-10-16
+from published Mere `c01c0aa73`. Its chartulary prerequisite and shared
+Graphshell opened-link slice are qualified on `732c1537a`; Woodshed and Knot
+receiving-host proofs remain open. P4, P6 and P7 remain later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -477,3 +479,106 @@ not desktop-native application acceptance, automatic Knot synchronization,
 physical-peer qualification, pre-P2 binary archive migration or P6 history-budget
 qualification. P3's chartulary asserter/span/basis prerequisite is next in the
 core sequence; fan retirement and promotion stay with their own phases.
+
+## P3 continuation: opened-link swatch and external source assertions
+
+**2026-10-16, in progress.** Mark authorized the next phase and internal
+orchestration. The starting supplier is published Mere `c01c0aa73`; Woodshed
+was refreshed at `aba2c7343`. Three bounded lanes prepare chartulary's
+assertion metadata, the shared opened-link layout and Graphshell proof, and
+the Woodshed source adapter review. The integration owner settles interfaces,
+serializes builds and host changes, and owns publication and this plan.
+
+The gate order is chartulary attribution/span/basis, shared link scope and
+Graphshell list/Timeline, Woodshed's exact-source selection/explanation/
+withdrawal/audition, then Knot authored-time and retraction disclosure.
+Timeline lanes remain stacked rows in the existing Timeline arrangement;
+unknown dates remain undated. Shared reading and layout must preserve every
+assertion identity and source, including separate independent reasons. No
+consumer may infer source edit permission from metadata or presentation.
+
+Done conditions are the P3 proof in the design's §8: use the existing swatch
+and two arrangements; preserve stable `EdgeId` and source-owned actions in
+Woodshed; remove its superseded pair/member identity helpers; and demonstrate
+Knot's authored span and withdrawal through the same opened-link path.
+Focused persistence/replay controls and reviewed receiving-host captures
+remain separate gates. The setup did not claim phase acceptance; the bounded
+qualification below advances the prerequisite and first consumer only.
+
+### Chartulary and shared Graphshell slice
+
+**2026-10-16, bounded qualification.** Source `732c1537afd142a21c2bf4858c0375167eae70c1`
+includes upstream main `6d1908f4c`. The
+[receipt](../../../support/receipts/link-model-p3-20261016/checks.json) records
+source hashes, native tests, browser artifacts, iterations and audit comparisons.
+
+Chartulary now retains one authoritative assertion ledger keyed by stable
+`EdgeId`, with source asserter, optional first/last/withdrawal clocks and basis.
+Source attribution is independent of the operation actor. Assert, confirm and
+withdraw batches preflight atomically; withdrawal is terminal, and a later claim
+uses a fresh ID. Legacy connect/disconnect and node removal retain their
+assertions, including unknown times. Held graph edges are reconstructed from
+the ledger rather than a second payload authority. New checkpoints validate
+the ledger/held-edge correspondence and reserve withdrawn IDs; old checkpoints
+recover assertions from the complete append-only journal. Journal pruning and
+new RDF reifier/history export are separate work: chartulary's current RDF
+adapter still exports held semantic triples.
+
+Servitor resolves both endpoints of assertion-ID operations before grant and
+node-scope admission, including the existing disconnect path. Source attribution
+does not grant permission. Controls cover scoped refusal, reserved grant
+projections, unknown IDs and no partial journal or ID allocation on rejection.
+
+The opened link uses the existing swatch with `Scope::Link`, Scenomise's existing
+Stack and Timeline solvers, and one shared Cambium widget. List groups by family
+or source; Timeline lanes group by family, asserter or direction. The dated
+majority chooses the default. Source clocks determine positions; unknown ends
+are points with a visible `?`, and unknown starts stay in an undated lane.
+Backward clocks remain visible rather than being corrected. Geometry uses the
+compiled scene and each assertion keeps its own row. The chronological detail
+list exposes the same members, graph scope, source availability, basis and exact
+source handles. Layout controls remain transient and do not store a pair entity.
+
+Graphshell consumes that widget for held and retained-history readings. Canvas
+selection can open the selected unordered pair. Exact inspection retains and
+rechecks source, stratum, direction and assertion ID against the current owner;
+an identical ID in the opposite direction does not select the wrong claim.
+Withdrawn and id-less legacy members receive no inspection action. Resource
+owner lookup currently scans retained data on a click; this is no P6 budget claim.
+
+The affected suites pass 1,426 distinct native tests: chartulary 75, scenograph
+30, scenomise 182, servitor 98, Cambium 275, Pictograph 464 and Graphshell web
+302. There are 24 existing ignores. Initial compile and fixture failures are
+retained separately from final passes. Final Cambium checks and the standalone
+product/WebGPU wasm build cover the presentation corrections on the recorded
+source; the other qualified source inputs remain unchanged.
+
+The isolated browser scenario passes held/history transitions, List and three
+Timeline lane controls, source metadata, exact held actions and selection/
+workbench invariants. Seven captures were reviewed at 1280 × 720 CSS pixels
+(2560 × 1440 capture pixels), using BrowserWebGpu without GPU timestamps. They
+show a timed withdrawal, held interval, unknown withdrawal point and undated
+held row, plus method/version/evidence. Reload reopens the retained fixture.
+The first run failed because a dashed top border was refused by the pinned
+portable renderer; it is preserved as a failed iteration. The correction uses
+a solid point with explicit unknown-time wording. A later visual review removed
+a duplicated undated caption. Browser proof is separate from desktop-native
+application acceptance, real source authoring and physical-peer qualification.
+
+### Remaining P3 consumer work
+
+Woodshed was read at `aba2c7343` without edits. Its catalog/computed/evidence
+relations are derived, its relation IDs are view-local, and its hide action is
+presentation-only. It has no personal assertion store yet. Mark ruled on 2026-10-16 that withdrawal initially applies only to personal
+assertions; catalog, computed and evidence-derived claims stay read-only. A
+source-owned suppression policy for generated claims is outside this flow. Do not turn
+hide into withdrawal or manufacture a durable owner from a view key. The selected
+flow must keep independent reasons separately withdrawable, route exact actions
+to Woodshed's owner, and prove explanation, provenance, audition and reopen before
+deleting the superseded helpers listed in §8 of the design.
+
+Knot's authenticated authored-time/retraction intake is already P2-qualified;
+its receiving opened-link consumer proof remains later in P3. The Chartulary
+prerequisite and Graphshell fixture do not close either receiving-host gate.
+P4 fan retirement, P6 all-family/history budgets, P7 promotion and automatic
+resident synchronization retain their own acceptance boundaries.

@@ -1,0 +1,30 @@
+[
+  {
+    "lock": "Cargo.lock",
+    "package_versions_or_sources_changed": 0,
+    "dependency_changes": [
+      {
+        "package": "cambium",
+        "added": [
+          "scenograph",
+          "scenomise"
+        ],
+        "removed": []
+      }
+    ]
+  },
+  {
+    "lock": "ports/graphshell/web/Cargo.lock",
+    "package_versions_or_sources_changed": 0,
+    "dependency_changes": [
+      {
+        "package": "cambium",
+        "added": [
+          "scenograph",
+          "scenomise"
+        ],
+        "removed": []
+      }
+    ]
+  }
+]

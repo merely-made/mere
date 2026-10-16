@@ -1,0 +1,11 @@
+{
+  "source_build": "9511f18d2fbe1d01e2bcfc6778a6d19e812f02d1",
+  "observed_canvas_attribute": "data-last-presentation-failure",
+  "observed_value": "Wgpu context 1 source None: portable preparation refused: Bundle(InvalidEnvelope { command: Some(252), reason: \"border fallback is not admitted\" })",
+  "data_redraw_attempts": "133",
+  "diagnostics_enabled_in_external_tree_html": true,
+  "pinned_renderer": "f4f9c0d",
+  "cause": "Per-side dashed top border takes a fallback rejected by the portable envelope preflight.",
+  "correction": "Solid point for unknown ends with visible ? plus distinct held/withdrawn wording; known spans still use source geometry.",
+  "final_canvas_failure": "None"
+}

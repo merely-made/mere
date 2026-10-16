@@ -1,0 +1,121 @@
+{
+  "source_commit": "9511f18d2fbe1d01e2bcfc6778a6d19e812f02d1",
+  "baseline": "c01c0aa73c04eb91eb1e3126477e9e232e532b90",
+  "inputs": [
+    {
+      "path": "Cargo.lock",
+      "bytes": 474125,
+      "sha256": "a71672f6cfcfaa4901f06b1480c60615871b4341c641f85e0e629daf1a813faa"
+    },
+    {
+      "path": "crates/cambium/cambium/Cargo.toml",
+      "bytes": 1301,
+      "sha256": "d1c11f0813e90218eed1abf1530ce29cfef15fb9b45b3c775c8434b0dd336a7c"
+    },
+    {
+      "path": "crates/cambium/cambium/src/lib.rs",
+      "bytes": 11848,
+      "sha256": "4a08929a907294d7f832cf141f1a3ef785a08ea6b351cc1651b38cb8a7e017b0"
+    },
+    {
+      "path": "crates/cambium/cambium/src/opened_link.rs",
+      "bytes": 25664,
+      "sha256": "950f7d8c4289bd968421974686e3705e80a15057e0bdea2cf9bbaa2a4dec0ea9"
+    },
+    {
+      "path": "crates/cambium/scenes/scenograph/src/link.rs",
+      "bytes": 14627,
+      "sha256": "e800d4883ad69d4bb160c8fc6adb86368eeb5fb0d9db8a5cb6d4b156ffdc9bfe"
+    },
+    {
+      "path": "crates/cambium/scenes/scenograph/src/swatch.rs",
+      "bytes": 11344,
+      "sha256": "9c0517a76ea8dcae2c15cb9b933894fccbe730744d49b4a01445c4d5aff7b8ae"
+    },
+    {
+      "path": "crates/cambium/scenes/scenomise/src/lib.rs",
+      "bytes": 2716,
+      "sha256": "e5be9da14d802113514b9c58ded4e252b6fdaacd502c052b1d15a6241b31f6a7"
+    },
+    {
+      "path": "crates/cambium/scenes/scenomise/src/opened_link.rs",
+      "bytes": 47221,
+      "sha256": "85cd7182a557d1aa0ea6bc4a543c08508cf6f9d569f24da477d1cc350cbdc2b9"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/selection.rs",
+      "bytes": 24161,
+      "sha256": "42ebca2e5ee633621534351f3f3422cb55ef01fcaa1ae7bb06448fa2e4ce9d8c"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/tests/relations.rs",
+      "bytes": 9115,
+      "sha256": "d9e618fa0a792753731a064ac9fdc8d996107b7b18a6db426938b12a72443c7f"
+    },
+    {
+      "path": "crates/eidetic/chartulary/src/assertion.rs",
+      "bytes": 3818,
+      "sha256": "3711136b054d08ab6b3577d49a6b607bd5fa4e9f14465063499a242a4da26376"
+    },
+    {
+      "path": "crates/eidetic/chartulary/src/commit.rs",
+      "bytes": 40427,
+      "sha256": "adf3f92a7f785c07b0aa82abde211e88a8cbf08085f7c185d8c092b2a2decaa8"
+    },
+    {
+      "path": "crates/eidetic/chartulary/src/edit.rs",
+      "bytes": 9074,
+      "sha256": "53c61eb2d714393822b7c47fa243c200e6f56e9355453c25d5a41e35470e9a9e"
+    },
+    {
+      "path": "crates/eidetic/chartulary/src/lib.rs",
+      "bytes": 4674,
+      "sha256": "09ca546770fe20b38a54c0227dbe31b84e4b1b52b6ab5b30557fef865ab1da4b"
+    },
+    {
+      "path": "crates/eidetic/chartulary/src/spine.rs",
+      "bytes": 52340,
+      "sha256": "a36aafceae9f807eab0488017af69131a45e6663e5aeba709908d42278face5c"
+    },
+    {
+      "path": "crates/servitor/src/gate.rs",
+      "bytes": 38351,
+      "sha256": "a2050e87c964e1cdf7ed39625b359d330b33601f862d3009decfe2d7ce6b5779"
+    },
+    {
+      "path": "ports/graphshell/src/link_inspection.rs",
+      "bytes": 27481,
+      "sha256": "1dc6111ba8eef171fad7a5ea53c3d36b6788abe751ba43b32b74fba467f302f2"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree.rs",
+      "bytes": 89322,
+      "sha256": "a5944d24f2e9d356ef94da9a6e0f35e7313e28ae809d5597e07278e37feb0f74"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/controls.rs",
+      "bytes": 14916,
+      "sha256": "49df31b92b3e2642ba87cdb28483afe40f316097c8d2c7e7e236cfb07ba10206"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/link_inspection.rs",
+      "bytes": 24449,
+      "sha256": "22d89430aef29b2380789591847e81d7b9a3e6fd75b16c73e8e7a8b8f0df822a"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/product.rs",
+      "bytes": 42282,
+      "sha256": "3d42ec5c0dd45ed8bad2b27db5487a18a1c4b1fdb1fadad16a692ccb65a31019"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "bytes": 298906,
+      "sha256": "afe85d57b66e079646f60e6d9dcff7838acbc79aec9cb2cf4972c8ab86741a7c"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p3_tree_opened_link.scn",
+      "bytes": 5541,
+      "sha256": "f66edfb2e46ec5956286d61e71a3a19c01664efd4e7cf0ef3fc794f623539f2a"
+    }
+  ]
+}

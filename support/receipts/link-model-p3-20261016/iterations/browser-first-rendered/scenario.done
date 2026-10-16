@@ -1,0 +1,10 @@
+RESULT ok
+captured p3_opened_link_held_timeline
+captured p3_link_history_held_default
+captured p3_opened_link_history_timeline
+captured p3_opened_link_asserter_lanes
+captured p3_link_history_retained
+captured p3_link_history_unknown_withdrawal
+captured p3_link_history_undated
+opened-link scope, list and Timeline layouts, source metadata, exact actions and selection invariants passed
+gpu timestamps: no
