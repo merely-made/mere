@@ -1,7 +1,8 @@
 # Link model: shared readings, assertion lifecycle and responsive paths
 
 **Date:** 2026-10-15
-**Status:** in progress overall. The bounded P1 shared reading, P2 semantic
+**Status:** qualified within the bounded P1–P7 scope; independent product and
+storage gates remain named below. The bounded P1 shared reading, P2 semantic
 lifecycle/Knot intake and P5 fixed-endpoint experiment are qualified on their
 recorded sources. The P2 continuation is source `b69510949`, based on runtime
 `82e7fd718` with later upstream documentation merged. P3 began on 2026-10-16
@@ -15,7 +16,8 @@ qualified within its recorded scope on Mere source `91467c0bb` and Woodshed rece
 published with receipt `4716b71`. P6 began from refreshed main `0f8c1bf59`;
 its bounded migration and receiving gates are qualified on Mere `a45a0b697`
 and Woodshed source `d896e39` (published receipt `c32b60a`). P7 began from refreshed
-main `a4c1814c8`; implementation and qualification are in progress below.
+main `a4c1814c8` and is qualified in Graphshell on final browser source
+`6d53d4439`; its source gates, receiving and reopen evidence are recorded below.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -49,7 +51,8 @@ before P3's Woodshed proof (L8); strength defaults to 1 per held assertion
 until the dynamics grammar plan sets it (L9); selection opens a link and
 lanes are rows in Timeline (L10); local compaction follows predicate nature
 (L12); valid time waits (L7). Promotion is planned as P7, after P3 and
-independent of P4 and P6 (L11). It is not part of this delivery.
+independent of P4 and P6 (L11). It was outside the first P1 delivery; the
+authorized P7 continuation is recorded below.
 
 ## P1: shared link reading over current storage
 
@@ -858,3 +861,47 @@ IDs and stays unavailable under relevant coverage or a different source.
 Graphshell must exercise freeze, acknowledged save, withdrawal, comment and
 fresh browser reopening with reviewed captures. Tests, browser observation and
 publication remain separate evidence gates until recorded here.
+
+
+### P7 qualification (2026-10-16)
+
+The [P7 receipt](../../../support/receipts/link-model-p7-20261016/receipt.json)
+records core source `611e484d4` and final Graphshell browser source `6d53d4439`.
+The tested kernel, journaled host operations, fixture and Pandect objects are
+identical across the browser-only refinements; their Git object receipts are
+retained. Each freeze creates a fresh Resource bearing a validated immutable
+`graph.frozen-link/v1` facet. It holds one source-qualified pair reading in its
+original stratum, exact directed assertion copies, source revision availability,
+local capture revision and coverage. Comments are separately attributed literal
+assertions on that Resource. Changing or clearing its retained facet refuses;
+normal whole-Resource deletion remains distinct, as for frozen selections.
+
+Kernel passes 474 library cases with the store feature. Graphshell passes 393
+library cases with six existing ignores. Pandect passes 318 library and 26
+integration cases, with one existing integration ignore. A separate writer,
+author reader and receiving reader process verify exact frozen JSON after a
+live withdrawal, the Resource-owned comment, and a reference-only receiving
+Resource with explicit missing Surface and Resource coverage. The receiver
+creates no endpoint payloads. Exact-ID drift reports additions, withdrawals,
+metadata changes and missing records; duplicate handles, source changes and
+relevant incomplete coverage refuse an absence conclusion. A simultaneous
+metadata update and withdrawal retains both drift signals.
+
+The locked offline WebGPU build and dependency boundary check pass. Six reviewed
+captures at the default 1280 × 720 logical viewport (device scale 2) accompany a
+fresh-origin seed and fresh-page IndexedDB reopen on the final committed source.
+Ordinary controls freeze the Surface link, acknowledge its save, withdraw only
+one personal assertion, and add a review comment. Reopening retains both original
+frozen assertions, reports the exact withdrawn source ID and restores the comment.
+The source pair's facts do not change when freezing or commenting. Early scenario
+iterations incorrectly counted one stratum in a pair-wide inspector and used an
+old selected-button label; those failures are retained. Visual review found an
+unsupported text-arrow glyph, replaced by plain endpoint words before the final
+run. The final captures use ordinary scrolling to the review outcome.
+
+This closes bounded P7 and the recorded bounded P1–P7 implementation sequence.
+The proof has one owning Mere graph source per freeze and explicitly unavailable
+public revision for the live MereHost graph. It does not qualify foreign-store
+aggregate promotion, another product's review UI, automatic resident
+synchronization, browser anti-eviction guarantees or physical audio. The broader
+product and storage qualifications retain their named owners and receipts.
