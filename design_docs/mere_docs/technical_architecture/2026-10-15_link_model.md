@@ -13,7 +13,9 @@ retirement is qualified on Mere source `91467c0bb` and Woodshed receiving source
 `4716b71`: canonical resting links, exact member opening, acknowledged whole-link
 hides and reviewed browser/native reopening. Bounded P6 (§8) is qualified on
 published Mere `a45a0b697`, with Woodshed source `d896e39` and published receiving
-receipt `c32b60a`. P7 remains later work.
+receipt `c32b60a`. P7 promotion is in progress from refreshed main
+`a4c1814c8`; its freeze, receiver and reopen gates remain unqualified until
+recorded in the implementation plan.
 Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The

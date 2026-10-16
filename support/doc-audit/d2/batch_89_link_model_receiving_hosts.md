@@ -10,7 +10,7 @@ formal status lines and final P6 reconciliation supersede their old scope.
 ## mere_docs/technical_architecture/2026-10-15_link_model.md
 
 - disposition: current
-- status line: "Bounded P6 is qualified; P7 remains later work" - accurate: yes
+- status line: "Bounded P6 is qualified; P7 promotion is in progress" - accurate: yes
 - claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -49,7 +49,7 @@ sealed. List provenance and direction Timeline captures were reviewed.
 ## mere_docs/implementation_strategy/2026-10-15_link_model_plan.md
 
 - disposition: current
-- status line: "Bounded P6 is qualified; P7 remains later work" - accurate: yes
+- status line: "Bounded P6 is qualified; P7 promotion is in progress" - accurate: yes
 - claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -198,3 +198,10 @@ The working-principle summary and the architecture/plan entries now match their
 bounded P6 receipts. Earlier in-progress entries above are historical checkpoints,
 superseded by this reconciliation. Promotion and separate physical acceptance
 remain open. No new active document or reserved project description is changed.
+
+### P7 implementation continuation (2026-10-16)
+
+Refreshed main `a4c1814c8` starts the authorized P7 continuation. The current
+architecture, plan and index report implementation in progress, with freeze,
+receiver coverage, source-owned review and browser reopening still gated on
+recorded evidence. Earlier qualified P1-P6 receipts retain their exact scope.

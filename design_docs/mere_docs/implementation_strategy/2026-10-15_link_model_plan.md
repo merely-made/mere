@@ -14,7 +14,8 @@ sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d` and is
 qualified within its recorded scope on Mere source `91467c0bb` and Woodshed receiving source `fe54425`,
 published with receipt `4716b71`. P6 began from refreshed main `0f8c1bf59`;
 its bounded migration and receiving gates are qualified on Mere `a45a0b697`
-and Woodshed source `d896e39` (published receipt `c32b60a`). P7 remains later work.
+and Woodshed source `d896e39` (published receipt `c32b60a`). P7 began from refreshed
+main `a4c1814c8`; implementation and qualification are in progress below.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -829,3 +830,31 @@ reopen. Sealed profile byte manifests are recorded separately from source truth.
 This closes the bounded P6 receiving gate. Full Stage P4f, physical audio,
 automatic resident synchronization, pre-P2 binary archives and P7 promotion
 retain their separate gates.
+
+## P7 continuation: promoted links (2026-10-16)
+
+P7 starts from published main `a4c1814c8`, including the integrated Cleromancy
+receiving checks. The kernel owner implements a new typed immutable
+`graph.frozen-link/v1` Resource facet, separate from frozen selections so the
+original Surface or Resource stratum survives. The integration owner owns
+Graphshell's journaled freeze, source-owned withdrawal, review assertions and
+drift reading. The presentation owner owns ordinary browser controls and the
+seed/reopen scenarios. Cargo and shared-seam integration are serialized.
+
+Each freeze mints a distinct Resource and retains the canonical pair, endpoint
+references, exact directed assertion copies (including retained withdrawals),
+separate Traversal context, freeze-time coverage, source identity and revision
+availability. The captured local graph revision is explicitly a local capture
+coordinate, never a public source revision. This Graphshell proof has one
+owning graph source per promoted link; it does not aggregate foreign stores.
+Comments are ordinary literal assertions about the promoted Resource.
+
+Done conditions: later source withdrawal leaves the copied facet unchanged;
+independent freezes have distinct identities; malformed or changed immutable
+facets refuse atomically; receivers admit the Resource without inventing its
+referenced endpoints and report missing Surface/Resource material through
+coverage. Live drift distinguishes added, withdrawn, changed and missing exact
+IDs and stays unavailable under relevant coverage or a different source.
+Graphshell must exercise freeze, acknowledged save, withdrawal, comment and
+fresh browser reopening with reviewed captures. Tests, browser observation and
+publication remain separate evidence gates until recorded here.

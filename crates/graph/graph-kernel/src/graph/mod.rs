@@ -65,7 +65,14 @@ pub mod pending_links;
 pub use pending_links::{PendingLink, PendingLinkRetention, PendingLinkRetry, PendingLinkState};
 pub mod frozen_selection;
 pub use frozen_selection::{FrozenSelection, OpenedFrozenSelection};
+pub mod frozen_link;
+pub use frozen_link::{
+    FROZEN_LINK, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource, FrozenSourceBinding,
+    FrozenSourceRevision, OpenedFrozenLink,
+};
 pub mod coverage;
+#[cfg(test)]
+mod frozen_link_tests;
 #[cfg(test)]
 mod frozen_selection_tests;
 mod residency;
