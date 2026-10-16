@@ -1,0 +1,7 @@
+error: failed to load source for dependency `embedded-graphics`
+
+Caused by:
+  unable to update https://github.com/merely-made/murm.git?branch=main#cba46d85
+
+Caused by:
+  can't checkout from 'https://github.com/merely-made/murm.git': you are in the offline mode (--offline)

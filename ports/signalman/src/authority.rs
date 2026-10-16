@@ -25,6 +25,9 @@ use pandect::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::RetainedKeys;
 use personae::carry::DeviceGrantSet;
 
+mod tucket;
+pub use tucket::{ReleasedTucketStation, TucketCustodyLease};
+
 /// The application name Signalman connects to djinn as.
 pub const SIGNALMAN_APP: &str = "signalman";
 
@@ -72,6 +75,16 @@ impl Default for DjinnStationAuthority {
 }
 
 impl DjinnStationAuthority {
+    /// Release only one device/realm's Tucket seed and its checked attestation.
+    pub fn release_tucket(
+        &self,
+        device_id: DeviceId,
+        realm: &str,
+    ) -> Result<RetainedKeys, CustodyClientError> {
+        let salt = personae::tucket::station_salt(device_id.as_uuid().as_bytes(), realm)
+            .map_err(CustodyClientError::Release)?;
+        self.with_client(|client| client.release(KeySource::Wallet, vec![salt]))
+    }
     /// djinn at an explicit first-party endpoint.
     pub fn at(endpoint: impl Into<String>) -> Self {
         Self {
