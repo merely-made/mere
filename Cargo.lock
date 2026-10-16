@@ -2655,7 +2655,7 @@ dependencies = [
 [[package]]
 name = "cleromancy-core-acceptance"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#ee97133432a09dac145a95a2112b2682b9b2853d"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#adc434dba77a6287d0132b0e6030f32ea36615f3"
 dependencies = [
  "blake3",
  "chartulary",
