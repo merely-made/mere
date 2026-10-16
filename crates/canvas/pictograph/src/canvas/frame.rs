@@ -439,6 +439,7 @@ impl Canvas {
         // DOM, then any marquee on top.
         let bg_cmds = background_cmds(w, h, self.backdrop);
         let projection_backdrop_cmds = self.projection_backdrop_commands();
+        let strategy_region_cmds = self.strategy_region_commands();
         // Ambient backdrop: the sim painted as the bottom layer (above the bg fill, below the scene),
         // in its tincture, stretched across the viewport. The sim owns its look (GoL = run-merged
         // cell rects; a continuous sim = dots). (Physics scenes P5.)
@@ -465,6 +466,9 @@ impl Canvas {
         let mut layers = vec![CompositeLayer::commands_only(&bg_cmds)];
         if !projection_backdrop_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&projection_backdrop_cmds));
+        }
+        if !strategy_region_cmds.is_empty() {
+            layers.push(CompositeLayer::commands_only(&strategy_region_cmds));
         }
         if !ambient_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&ambient_cmds));

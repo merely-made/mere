@@ -103,6 +103,7 @@ impl Canvas {
         self.drag = None;
         self.pinned_nodes.clear();
         self.grammar = Default::default();
+        self.strategy_regions.clear();
         self.field_drag = None;
         self.marquee = None;
         self.middle_drag = None;
@@ -165,6 +166,7 @@ impl Canvas {
             drag: None,
             pinned_nodes: HashSet::new(),
             grammar: Default::default(),
+            strategy_regions: Vec::new(),
             field_drag: None,
             forme_region: None,
             forme_guides: None,

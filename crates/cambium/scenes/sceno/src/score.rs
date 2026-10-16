@@ -255,6 +255,10 @@ pub enum Arrangement {
     Kanban(Kanban),
     Embedded(Embedded),
     Radial(Radial),
+    /// Shares of a measured whole, bounded by the viewport.
+    Partition(crate::Partition),
+    /// Fixed set regions; membership picks the region.
+    Setscape(crate::Setscape),
     /// A solver registered at runtime, named by id, configured opaquely.
     ///
     /// The id is matched against the `scenograph` solver registry. An
