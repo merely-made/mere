@@ -35,11 +35,11 @@ use distillery::inference::{
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::resident::DjinnResident;
 use djinn::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
-use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
@@ -1185,86 +1185,13 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     use distillery::inference::recall::{
         PageTextCorpus, RECALL_ASK_INTENT, RecallAskRequestV1, RecallConfig,
     };
-    use distillery::inference::{InferenceModelRow, PromptTemplate};
     use eidetic::models::recall::{RecallSourceId, RecallSourceKind};
-    use eidetic::typed::save_typed;
-    use eidetic::{ModelLibrary, PrivacyClass, ProvenanceRecord, Timestamp, TrustEnvelope};
-    use sha2::{Digest, Sha256};
 
     let temp = tempfile::tempdir().unwrap();
     let data_root = temp.path().join("data");
     let (vault_dir, identity) = open_vault(temp.path());
     write_device_settings(&data_root, Some(lending()));
-    let directory =
-        std::path::PathBuf::from(std::env::var_os("ESP_SMOLLM2_DIR").expect("ESP_SMOLLM2_DIR"));
-    let reference: serde_json::Value = serde_json::from_slice(include_bytes!(
-        "../../../crates/intel/esp/tests/smollm2_360m_reference.json"
-    ))
-    .unwrap();
-    let read = |name: &str| {
-        let bytes = std::fs::read(directory.join(name)).unwrap();
-        assert_eq!(
-            Sha256::digest(&bytes)
-                .iter()
-                .map(|byte| format!("{byte:02x}"))
-                .collect::<String>(),
-            reference["artifacts"][name].as_str().unwrap(),
-            "exact {name}"
-        );
-        bytes
-    };
-    let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
-    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
-    let mut library = muniment::RedbBackend::open(&path).unwrap();
-    let config = read("config.json");
-    let tokenizer = read("tokenizer.json");
-    let weights = read("model.safetensors");
-    read("tokenizer_config.json");
-    let model = ModelLibrary::save_model_with_components(
-        &mut library,
-        reference["model_id"].as_str().unwrap(),
-        "llama",
-        "Apache-2.0",
-        serde_json::from_slice(&config).unwrap(),
-        &weights,
-        &tokenizer,
-        vec![],
-        vec![],
-        PrivacyClass::LocalOnly,
-        ProvenanceRecord::self_imported("local"),
-        TrustEnvelope::self_asserted(),
-        Timestamp::ZERO,
-    )
-    .await
-    .unwrap();
-    drop(weights);
-    let template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
-    ))
-    .unwrap();
-    let template = save_typed(
-        &mut library,
-        &template,
-        vec![],
-        PrivacyClass::LocalOnly,
-        ProvenanceRecord::self_imported("local"),
-        TrustEnvelope::self_asserted(),
-        Timestamp::ZERO,
-    )
-    .await
-    .unwrap();
-    let row = save_typed(
-        &mut library,
-        &InferenceModelRow { model, template },
-        vec![],
-        PrivacyClass::LocalOnly,
-        ProvenanceRecord::self_imported("local"),
-        TrustEnvelope::self_asserted(),
-        Timestamp::ZERO,
-    )
-    .await
-    .unwrap();
-    drop(library);
+    let row = save_pinned_answer_model(&data_root).await;
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
             recall: Default::default(),
@@ -1542,4 +1469,344 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     if let Some(path) = std::env::var_os("DJINN_RECALL_RECEIPT") {
         std::fs::write(path, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
     }
+}
+
+/// Save the byte-pinned public checkpoint and its declared prompt template.
+#[cfg(feature = "inference-gpu")]
+async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::ManifestId {
+    use distillery::inference::{InferenceModelRow, PromptTemplate};
+    use eidetic::typed::save_typed;
+    use eidetic::{ModelLibrary, PrivacyClass, ProvenanceRecord, Timestamp, TrustEnvelope};
+    use sha2::{Digest, Sha256};
+    let directory =
+        std::path::PathBuf::from(std::env::var_os("ESP_SMOLLM2_DIR").expect("ESP_SMOLLM2_DIR"));
+    let reference: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../crates/intel/esp/tests/smollm2_360m_reference.json"
+    ))
+    .unwrap();
+    let read = |name: &str| {
+        let bytes = std::fs::read(directory.join(name)).unwrap();
+        assert_eq!(
+            Sha256::digest(&bytes)
+                .iter()
+                .map(|byte| format!("{byte:02x}"))
+                .collect::<String>(),
+            reference["artifacts"][name].as_str().unwrap(),
+            "exact {name}"
+        );
+        bytes
+    };
+    let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+    let mut library = muniment::RedbBackend::open(&path).unwrap();
+    let config = read("config.json");
+    let tokenizer = read("tokenizer.json");
+    let weights = read("model.safetensors");
+    read("tokenizer_config.json");
+    let model = ModelLibrary::save_model_with_components(
+        &mut library,
+        reference["model_id"].as_str().unwrap(),
+        "llama",
+        "Apache-2.0",
+        serde_json::from_slice(&config).unwrap(),
+        &weights,
+        &tokenizer,
+        vec![],
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    drop(weights);
+    let template = PromptTemplate::from_bytes(include_bytes!(
+        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+    ))
+    .unwrap();
+    let template = save_typed(
+        &mut library,
+        &template,
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    let row = save_typed(
+        &mut library,
+        &InferenceModelRow { model, template },
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    drop(library);
+    row
+}
+
+/// Test-owned native resident for the separate, real headed Turnstone process.
+/// Control files contain public fixture state only; vault material stays temporary.
+#[cfg(feature = "inference-gpu")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "requires ESP_SMOLLM2_DIR, DJINN_HEADED_DIR and headed Turnstone"]
+async fn serve_trained_model_for_headed_turnstone() {
+    let output =
+        std::path::PathBuf::from(std::env::var_os("DJINN_HEADED_DIR").expect("DJINN_HEADED_DIR"));
+    std::fs::create_dir_all(&output).unwrap();
+    let temp = tempfile::tempdir().unwrap();
+    let data_root = temp.path().join("data");
+    let (vault_dir, identity) = open_vault(temp.path());
+    write_device_settings(&data_root, Some(lending()));
+    let row = save_pinned_answer_model(&data_root).await;
+    let settings = OwnerSettings {
+        inference: Some(InferenceLaneSettings {
+            recall: distillery::inference::recall::RecallConfig {
+                max_passages: 1,
+                ..Default::default()
+            },
+            model: InferenceModelSettings::Library {
+                row: row.to_string(),
+                device: djinn::settings::InferenceDeviceSettings::Gpu,
+                max_tokens: 512,
+            },
+        }),
+        ..owner(Some(lane()))
+    };
+    let endpoint = endpoint_name();
+    std::fs::write(output.join("endpoint.txt"), &endpoint).unwrap();
+    let mut snapshots = vec![];
+    let mut saw_stream = false;
+    let mut saw_pause = false;
+    for phase in 0..2 {
+        let resident = DjinnResident::open(
+            &identity,
+            &data_root,
+            &profile(),
+            settings.clone(),
+            &vault_dir,
+            unlock(),
+        )
+        .await
+        .unwrap();
+        let lane = resident.inference().unwrap().lane();
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(90);
+        while lane.runs().session.is_none() {
+            assert!(lane.runs().load_error.is_none(), "{:?}", lane.runs());
+            assert!(tokio::time::Instant::now() < deadline);
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
+        let grants = AppRouteGrants::new(AllowedAppRoutes::new([]));
+        let route = catalog
+            .update(|catalog| resident.register_inference_route(catalog))
+            .await
+            .unwrap()
+            .unwrap();
+        grants.grant(AppId::new("turnstone"), route);
+        let server = {
+            let endpoint = endpoint.clone();
+            let grants = grants.clone();
+            let catalog = catalog.clone();
+            tokio::spawn(async move {
+                let _ = serve_app_broker(
+                    &endpoint,
+                    Arc::new(djinn::keeper::Keeper::new(keeper_host())),
+                    grants,
+                    1_200_000,
+                    None,
+                    catalog,
+                )
+                .await;
+            })
+        };
+        // Prove the application endpoint is accepting before announcing readiness.
+        for attempt in 0..100 {
+            if let Ok(mut client) = open(&endpoint, "turnstone").await {
+                let _ = client.close().await;
+                break;
+            }
+            assert!(attempt < 99);
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        std::fs::write(
+            output.join(format!("ready-{phase}.json")),
+            serde_json::to_vec_pretty(&lane.runs()).unwrap(),
+        )
+        .unwrap();
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(1200);
+        loop {
+            let runs = lane.runs();
+            if runs.runs.len() >= 2
+                && runs
+                    .runs
+                    .iter()
+                    .skip(1)
+                    .any(|run| matches!(run.state, RunStateV1::Queued | RunStateV1::Running))
+            {
+                std::fs::write(output.join("second-started.json"), b"started").unwrap();
+            }
+            for run in &runs.runs {
+                if run.state == RunStateV1::Running && run.tokens > 0 {
+                    saw_stream = true;
+                    std::fs::write(
+                        output.join("streaming.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
+                if run.state == RunStateV1::Paused {
+                    saw_pause = true;
+                    std::fs::write(
+                        output.join("paused.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
+                if run.state == RunStateV1::Finished && !output.join("finished.json").exists() {
+                    std::fs::write(
+                        output.join("finished.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
+                if phase == 1
+                    && run.state == RunStateV1::Finished
+                    && run
+                        .recall
+                        .as_ref()
+                        .is_some_and(|recall| !recall.citations.is_empty())
+                {
+                    std::fs::write(
+                        output.join("reopened.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
+                if run.state == RunStateV1::Cancelled && !output.join("cancelled.json").exists() {
+                    std::fs::write(
+                        output.join("cancelled.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
+            }
+            if output
+                .join(if phase == 0 {
+                    "restart.request"
+                } else {
+                    "stop.request"
+                })
+                .exists()
+            {
+                let journal = resident.inference().unwrap().journal().unwrap();
+                let mut evidence = vec![];
+                for run in &runs.runs {
+                    let record = journal.retained_record(&run.run).unwrap();
+                    let passages: Vec<_> = record
+                        .supplied_passages
+                        .iter()
+                        .map(|id| journal.resolve_passage(*id).unwrap().unwrap())
+                        .collect();
+                    let checkpoint = record.checkpoint_blob.map(|id| {
+                        serde_json::from_slice::<serde_json::Value>(
+                            &journal.resolve_evidence_blob(id).unwrap().unwrap(),
+                        )
+                        .unwrap()
+                    });
+                    evidence.push(serde_json::json!({"record":record,"passages":passages,"checkpoint":checkpoint}));
+                }
+                snapshots.push(serde_json::json!({"phase":phase,"runs":runs,"evidence":evidence}));
+                break;
+            }
+            assert!(
+                tokio::time::Instant::now() < deadline,
+                "headed fixture timed out"
+            );
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        server.abort();
+        let _ = server.await;
+        drop(catalog);
+        resident.shutdown().await.unwrap();
+    }
+    let receipt = serde_json::json!({"model_row":row,"streaming_observed":saw_stream,"pause_observed":saw_pause,"snapshots":snapshots,"boundary":"real GPU model in test-owned native Djinn resident, separate headed Turnstone process over actual app connection"});
+    std::fs::write(
+        output.join("resident-receipt.json"),
+        serde_json::to_vec_pretty(&receipt).unwrap(),
+    )
+    .unwrap();
+    assert!(saw_stream && saw_pause);
+    let first = &snapshots[0]["runs"]["runs"];
+    let finished = first
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|run| run["state"] == "finished")
+        .unwrap();
+    let paused: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(output.join("paused.json")).unwrap()).unwrap();
+    assert!(paused["tokens"].as_u64().unwrap() > 0);
+    assert!(
+        finished["text"]
+            .as_str()
+            .unwrap()
+            .starts_with(paused["text"].as_str().unwrap())
+    );
+    assert!(
+        finished["continuations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|continuation| continuation["reason"] == "user"
+                && continuation["at_token"].as_u64().unwrap() > 0)
+    );
+    let reopened = snapshots[1]["runs"]["runs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|run| run["run"] == finished["run"])
+        .unwrap();
+    assert_eq!(
+        reopened, finished,
+        "reopened published source must restore the same answer and citations"
+    );
+    let live_finished: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(output.join("finished.json")).unwrap()).unwrap();
+    let live_reopened: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(output.join("reopened.json")).unwrap()).unwrap();
+    assert!(
+        !live_finished["recall"]["citations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(
+        live_reopened, live_finished,
+        "live source publication restores exact citations after restart"
+    );
+    assert_eq!(
+        snapshots[0]["evidence"], snapshots[1]["evidence"],
+        "reopening cannot rewrite sealed source/prompt evidence"
+    );
+    assert!(
+        first
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|run| run["state"] == "finished")
+    );
+    assert!(
+        first
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|run| run["state"] == "cancelled")
+    );
 }

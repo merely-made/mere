@@ -184,8 +184,8 @@ Turnstone's app-owned browsing database. Turnstone publishes retained text over
 the admitted route, with an owner namespace per browsing session, then asks
 against that publication. Only supplied passages enter the sealed run journal.
 The optional `inference.recall` object sets `chunk_chars`, `max_passages`,
-`min_quote_chars`, `max_context_chars` and `max_corpus_chars`; omitted limits use
-the documented RecallConfig defaults. Inline publications above 128 KiB are
+`min_quote_chars`, `max_context_chars` and `max_corpus_chars`. When this object is
+omitted, RecallConfig defaults apply. Inline publications above 128 KiB are
 refused. The headed client remains under I5 qualification.
 See the
 [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
