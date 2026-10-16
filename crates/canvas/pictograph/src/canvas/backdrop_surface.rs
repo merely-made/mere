@@ -378,6 +378,7 @@ impl BackdropSurface {
         if !self.font_ready {
             return Err("embedding host must lend a font before scene painting".into());
         }
+        // The title font falls back as `board_scene.rs`'s TITLE_SHEET explains.
         let sheet = format!(
             ".board-title{{position:absolute;margin:0;padding:0;font-family:var(--tabard-font-interface, IBM Plex Sans), sans-serif;font-size:13px;line-height:16px;color:rgba({},{},{},{});text-align:center;white-space:nowrap;overflow:hidden;}}",
             r * 255.0,

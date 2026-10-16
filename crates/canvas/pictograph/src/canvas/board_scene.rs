@@ -536,6 +536,10 @@ impl BoardText {
 
 /// A title's line height, px; it is centred in its card.
 const TITLE_LINE: f32 = 16.0;
+// The title's family names Tabard's interface role, but no host publishes
+// `--tabard-font-*` into these surface documents yet: the fallback is the
+// face that renders. It is Plex Sans where the host lends it (Graphshell),
+// else whatever the generic sans-serif resolves to among the lent faces.
 const TITLE_SHEET: &str = "\
     .board-title { position: absolute; margin: 0; padding: 0 6px; box-sizing: border-box; \
       font-family: var(--tabard-font-interface, IBM Plex Sans), sans-serif; font-size: 13px; line-height: 16px; \
