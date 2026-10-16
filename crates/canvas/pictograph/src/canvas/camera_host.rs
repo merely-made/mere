@@ -81,6 +81,7 @@ pub trait FitHost: CameraHost {
     fn restore_recipe_seed(&mut self) {}
     fn dismiss_all_retained(&mut self) {}
     fn toggle_selection_foreground_pin(&mut self) {}
+    fn resize_selected_tiles(&mut self, _factor: f32) {}
 }
 
 /// What [`super::face_alignment::FaceAlignment`] measures: each node's face
@@ -168,6 +169,10 @@ impl FitHost for Canvas {
 
     fn toggle_selection_foreground_pin(&mut self) {
         Canvas::toggle_selection_foreground_pin(self);
+    }
+
+    fn resize_selected_tiles(&mut self, factor: f32) {
+        Canvas::resize_selected_tiles(self, factor);
     }
 }
 

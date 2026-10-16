@@ -105,6 +105,7 @@ impl Canvas {
         self.pinned_nodes.clear();
         self.grammar = Default::default();
         self.strategy_regions.clear();
+        self.mosaic = Default::default();
         self.field_drag = None;
         self.marquee = None;
         self.middle_drag = None;
@@ -168,6 +169,7 @@ impl Canvas {
             pinned_nodes: HashSet::new(),
             grammar: Default::default(),
             strategy_regions: Vec::new(),
+            mosaic: Default::default(),
             field_drag: None,
             forme_region: None,
             forme_guides: None,
@@ -416,6 +418,8 @@ impl Canvas {
         self.pinned_nodes
             .retain(|key| self.graph.get_node(*key).is_some());
         self.grammar
+            .retain(|key| self.graph.get_node(*key).is_some());
+        self.mosaic
             .retain(|key| self.graph.get_node(*key).is_some());
         for positions in [&mut self.strategy_positions, &mut self.paused_positions]
             .into_iter()

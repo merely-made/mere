@@ -234,6 +234,8 @@ impl Canvas {
                         press: self.cursor,
                         moved: false,
                     });
+                } else if self.begin_mosaic_group_press() {
+                    // A Mosaic group's label band: the group moves where it is dropped.
                 } else if self.begin_field_drag(self.screen_to_world(self.cursor)) {
                     // Grabbed a field's box edge (move) or corner (resize) — the deep
                     // interior fell through, so no marquee starts. (Field regions.)
@@ -277,6 +279,7 @@ impl Canvas {
         changed |= self.empty_press.take().is_some();
         changed |= self.marquee.take().is_some();
         changed |= self.fold_press.take().is_some();
+        changed |= self.mosaic.group_press.take().is_some();
         if self.end_field_drag() {
             self.settle_physics(SETTLE_TICKS / 3);
             changed = true;
@@ -331,10 +334,14 @@ impl Canvas {
                     self.settle_physics(SETTLE_TICKS / 3);
                     return true;
                 }
+                if self.end_mosaic_group_press() {
+                    return true;
+                }
                 if let Some(d) = self.drag.take() {
                     if d.moved {
                         self.physics.set_dragging(false);
                         self.release_dragged(d.node);
+                        self.mosaic_drop(d.node);
                     } else if self.shift {
                         // Shift-click toggles the node in the selection (multi-select).
                         self.sync_attention();
