@@ -61,6 +61,7 @@ impl Canvas {
     fn apply_fold_view_state(&mut self, state: FoldViewState) {
         self.folds = state.folds;
         self.fold_press = None;
+        self.sync_attention();
         self.selected = state.selected;
         self.selected_links = state.selected_links;
         self.selected_link_appearances = state.selected_link_appearances;
@@ -108,6 +109,7 @@ impl Canvas {
         }
         self.folds.push(record);
         self.fold_press = None;
+        self.sync_attention();
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
@@ -177,6 +179,7 @@ impl Canvas {
         self.push_fold_undo();
         self.folds.remove(index);
         self.fold_press = None;
+        self.sync_attention();
         self.selected = projection.members.into_iter().collect();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
@@ -316,6 +319,7 @@ impl Canvas {
             }
         }
         if !kept.is_empty() {
+            self.sync_attention();
             self.selected.clear();
             self.selected_links.clear();
             self.selected_link_appearances.clear();

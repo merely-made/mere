@@ -334,7 +334,7 @@ impl ArrangementTransition {
             .iter()
             .map(|(id, (x, y))| (id, PortablePoint::new(x, y)))
             .collect::<HashMap<_, _>>();
-        Self::from_to(canvas, &old_of, final_positions, false)
+        Self::from_to(canvas, &old_of, final_positions, false, None)
     }
 
     /// A stop's return (F24): from where the anchored items were to their
@@ -345,7 +345,7 @@ impl ArrangementTransition {
             .iter()
             .filter_map(|(key, at)| Some((canvas.graph().get_node(*key)?.id, *at)))
             .collect::<HashMap<_, _>>();
-        Self::from_to(canvas, &start_of, &stop.to, true)
+        Self::from_to(canvas, &start_of, &stop.to, true, stop.duration_ms)
     }
 
     fn from_to(
@@ -353,6 +353,7 @@ impl ArrangementTransition {
         old_of: &HashMap<uuid::Uuid, PortablePoint>,
         final_positions: &[(NodeKey, PortablePoint)],
         returning: bool,
+        duration_ms: Option<u32>,
     ) -> Result<Option<Self>, String> {
         let final_of = final_positions.iter().copied().collect::<HashMap<_, _>>();
         let extents = canvas.strategy_extents();
@@ -422,7 +423,11 @@ impl ArrangementTransition {
         let schedule = scenotime::TransitionSchedule::from_diff(
             &before,
             &diff,
-            &scenotime::TransitionSpec::default(),
+            &scenotime::TransitionSpec {
+                duration_ms: duration_ms
+                    .unwrap_or(scenotime::TransitionSpec::default().duration_ms),
+                ..Default::default()
+            },
         )
         .map_err(|error| format!("could not schedule arrangement transition: {error:?}"))?;
         Ok(Some(Self {
