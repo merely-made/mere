@@ -180,8 +180,13 @@ source-version staleness, validated citations and their answer spans alongside
 the run. Citation bases distinguish model markers from exact-quote annotations.
 The journal retains exact source versions and selectors through restart and
 personal-graph continuation. The desktop binary does not discover or reopen
-Turnstone's app-owned browsing database; its producer handoff and headed client
-remain part of I5 integration.
+Turnstone's app-owned browsing database. Turnstone publishes retained text over
+the admitted route, with an owner namespace per browsing session, then asks
+against that publication. Only supplied passages enter the sealed run journal.
+The optional `inference.recall` object sets `chunk_chars`, `max_passages`,
+`min_quote_chars`, `max_context_chars` and `max_corpus_chars`; omitted limits use
+the documented RecallConfig defaults. Inline publications above 128 KiB are
+refused. The headed client remains under I5 qualification.
 See the
 [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 

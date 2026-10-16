@@ -94,7 +94,7 @@ incipit.workspace = true
 # (`src/resident_distillery.rs`). Default features only unless djinn's own
 # `trainer` feature is on: `remote` would pull the burn stack into the desktop
 # resident, and `trainer` pulls it deliberately and by the owner's request.
-distillery.workspace = true
+distillery = { workspace = true, features = ["inference-wire"] }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).

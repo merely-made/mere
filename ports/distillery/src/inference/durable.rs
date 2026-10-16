@@ -159,18 +159,31 @@ struct Delta {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     evidence_schema: Option<eidetic::SchemaRef>,
 }
+fn required_semantics(record: &RunRecord) -> Option<&'static str> {
+    if record
+        .view
+        .recall
+        .as_ref()
+        .is_some_and(|evidence| evidence.owner.is_some())
+    {
+        Some("recall/published-v1")
+    } else if record.view.recall.is_some() || !record.request.context.is_empty() {
+        Some("recall/v1")
+    } else {
+        None
+    }
+}
 impl Delta {
     fn check_semantics(&self) -> Result<(), String> {
         if self
             .required_semantics
             .as_deref()
-            .is_some_and(|value| value != "recall/v1")
+            .is_some_and(|value| value != "recall/v1" && value != "recall/published-v1")
         {
             return Err("unsupported inference checkpoint semantics".into());
         }
         if let Some(record) = &self.record {
-            let needs_recall = record.view.recall.is_some() || !record.request.context.is_empty();
-            if needs_recall != self.required_semantics.is_some() {
+            if required_semantics(record) != self.required_semantics.as_deref() {
                 return Err("checkpoint recall semantics do not match its retained inputs".into());
             }
         }
@@ -928,9 +941,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
         let mut heads = self.heads.lock().unwrap();
         let previous = heads.get(&record.view.run);
         let mut delta = Delta {
-            required_semantics: (record.view.recall.is_some()
-                || !record.request.context.is_empty())
-            .then(|| "recall/v1".into()),
+            required_semantics: required_semantics(record).map(str::to_string),
             parent: previous.map(|(id, _)| id.clone()),
             record: Some(record.clone()),
             tokens: Vec::new(),

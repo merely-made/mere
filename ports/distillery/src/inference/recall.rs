@@ -14,8 +14,6 @@ use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, sync::Arc};
 
 pub use eidetic::models::recall;
-pub const RECALL_ASK_INTENT: &str = "distillery.inference/ask-recall-v1";
-pub const CHUNKER_VERSION: &str = "mere.unicode-chunks/v1";
 
 /// The composing host lends its source owner. No fetch or second database open.
 pub trait RecallCorpus: Send + Sync {
@@ -58,6 +56,7 @@ impl<B: Backend + Send + Sync> RecallCorpus for PageTextCorpus<B> {
                     source: RecallSourceId {
                         kind: RecallSourceKind::PageText,
                         source: entry.url,
+                        owner: None,
                         node: None,
                     },
                     version: format!("blake3:{}", entry.blob),
@@ -69,7 +68,10 @@ impl<B: Backend + Send + Sync> RecallCorpus for PageTextCorpus<B> {
         })
     }
     fn current_version(&self, source: &RecallSourceId) -> Result<Option<String>, String> {
-        if source.kind != RecallSourceKind::PageText || source.node.is_some() {
+        if source.kind != RecallSourceKind::PageText
+            || source.node.is_some()
+            || source.owner.is_some()
+        {
             return Err("not a page-text source".into());
         }
         pollster::block_on(eidetic::PageTextStore::new(self.0.as_ref()).reference(&source.source))
@@ -78,78 +80,7 @@ impl<B: Backend + Send + Sync> RecallCorpus for PageTextCorpus<B> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct RecallConfig {
-    pub chunk_chars: usize,
-    pub max_passages: usize,
-    /// Minimum non-padding characters for a host exact-quote annotation.
-    /// Zero disables that path while retaining validated model markers.
-    #[serde(default = "default_min_quote_chars")]
-    pub min_quote_chars: usize,
-    pub max_context_chars: usize,
-    pub max_corpus_chars: usize,
-}
-fn default_min_quote_chars() -> usize {
-    32
-}
-impl Default for RecallConfig {
-    fn default() -> Self {
-        Self {
-            chunk_chars: 512,
-            max_passages: 4,
-            min_quote_chars: default_min_quote_chars(),
-            max_context_chars: 12000,
-            max_corpus_chars: 1000000,
-        }
-    }
-}
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct RecallAskRequestV1 {
-    pub ask: super::AskRequestV1,
-    #[serde(default)]
-    pub scope: Vec<RecallSourceId>,
-}
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SuppliedPassage {
-    /// The numeric marker placed in the prompt, e.g. `[1]`.
-    pub handle: u32,
-    pub passage: InferencePassage,
-}
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct StalePassage {
-    pub source: RecallSourceId,
-    pub indexed_version: String,
-    pub current_version: Option<String>,
-    pub error: Option<String>,
-}
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Citation {
-    pub handle: u32,
-    pub passage: eidetic::ManifestId,
-    pub basis: CitationBasis,
-    /// Half-open Unicode scalar positions in the generated answer.
-    pub answer_selector: PassageSelector,
-}
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum CitationBasis {
-    ModelMarker,
-    VerbatimPassage,
-}
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RecallEvidence {
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub scope: Vec<RecallSourceId>,
-    pub config: RecallConfig,
-    pub passages: Vec<SuppliedPassage>,
-    pub stale: Vec<StalePassage>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub citations: Vec<Citation>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub unknown_citations: Vec<u32>,
-}
+pub use crate::inference_protocol::recall::*;
 impl RecallEvidence {
     /// Citations require a supplied current passage. Keep model-authored markers
     /// distinct from host annotations of a complete verbatim passage match.
@@ -329,6 +260,7 @@ impl RecallIndex {
         scope: &[RecallSourceId],
     ) -> Result<(RecallEvidence, String), String> {
         let mut evidence = RecallEvidence {
+            owner: None,
             scope: scope.to_vec(),
             config: self.config.clone(),
             passages: vec![],
@@ -519,6 +451,7 @@ mod tests {
         let selected = RecallSourceId {
             kind: RecallSourceKind::PageText,
             source: "https://corpus.test/b".into(),
+            owner: None,
             node: None,
         };
         let (evidence, _) = index.prepare("nebula", &[selected.clone()]).unwrap();
@@ -601,6 +534,7 @@ mod tests {
                 max_tokens: 1,
                 caches: Mutex::new(Vec::new()),
                 recall: Mutex::new(None),
+                published: Mutex::new(Default::default()),
             }),
         };
         let config = RecallConfig {
@@ -679,5 +613,20 @@ mod tests {
             .unwrap_err();
         assert!(error.to_string().contains("stub"));
         lane.close().unwrap();
+    }
+}
+
+/// A live source-owner publication. Payloads are immutable between publications.
+pub(super) struct PublishedCorpus(pub Vec<RetainedSourceText>);
+impl RecallCorpus for PublishedCorpus {
+    fn snapshot(&self) -> Result<Vec<RetainedSourceText>, String> {
+        Ok(self.0.clone())
+    }
+    fn current_version(&self, source: &RecallSourceId) -> Result<Option<String>, String> {
+        Ok(self
+            .0
+            .iter()
+            .find(|entry| &entry.source == source)
+            .map(|entry| entry.version.clone()))
     }
 }

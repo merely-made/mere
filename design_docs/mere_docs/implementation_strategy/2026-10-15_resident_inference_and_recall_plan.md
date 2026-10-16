@@ -1106,3 +1106,17 @@ Stop and record the reason if any of these happen:
   trail owner through the admitted app route, keep source namespaces distinct,
   and consume a decoder-free wire view. It must not reopen the trail database
   in Djinn or introduce ESP into Turnstone.
+
+- **2026-10-16, I5 producer protocol.** A decoder-free `inference-wire` feature
+  exposes the existing run/control data to Turnstone. The admitted inference
+  route accepts a bounded retained-text publication per live source-owner
+  session, and asks against that namespace. Hashes are checked before indexing;
+  an endpoint cannot overwrite another live publisher. Disconnect and lock
+  withdraw publications, while supplied passages remain sealed evidence.
+  Recall limits belong to Djinn settings. Inline publication JSON has a 128 KiB
+  cap, with refusal instead of truncation; a chunked larger-corpus protocol is
+  outside this slice. Published checkpoints require `recall/published-v1` so
+  older readers cannot silently lose source ownership. Current integrated
+  checks pass 50 Distillery unit tests and eight durability tests; Djinn's GPU
+  library, binary and native route test compile. These are producer-protocol
+  checks. The Turnstone consumer and headed acceptance are still pending.

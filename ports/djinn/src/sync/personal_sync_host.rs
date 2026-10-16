@@ -1095,7 +1095,7 @@ impl PersonalSyncHost {
         };
         let steps = {
             let replica = self.replica.lock().await;
-            crate::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
+            graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
         };
         let (current_roots, historical_roots) =
             sealing_roots(self.graph, &steps, &members, mine, self.own_root);

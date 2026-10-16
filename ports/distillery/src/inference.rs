@@ -112,121 +112,15 @@ pub fn open_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
     )
 }
 
-/// The first-party route an application asks through.
-pub const INFERENCE_ASK_ROUTE: &str = "inference.ask";
-
-/// How often a session is told the run table moved. Streamed fragments
-/// reach a client at most this often (plan R5).
-pub const INFERENCE_ASK_NOTICE_POLL: Duration = Duration::from_millis(100);
-
-/// Schema of the run table served as the card's media.
-pub const INFERENCE_RUNS_SCHEMA: &str = "distillery.inference-runs/v1";
-
-/// Start a run. Payload: [`AskRequestV1`] as JSON.
-pub const ASK_INTENT: &str = "distillery.inference/ask-v1";
-
-/// Cancel a run. Payload: [`CancelRequestV1`] as JSON.
-pub const CANCEL_INTENT: &str = "distillery.inference/cancel-v1";
-/// Pause a durable run, retaining its token checkpoint.
-pub const PAUSE_INTENT: &str = "distillery.inference/pause-v1";
-/// Resume a retained run with its recorded generation settings.
-pub const RESUME_INTENT: &str = "distillery.inference/resume-v1";
-/// Ask with explicit sampling settings, still bounded by the owner cap.
-pub const ASK_SAMPLED_INTENT: &str = "distillery.inference/ask-sampled-v1";
-
-/// Sampling controls accepted by [`ASK_SAMPLED_INTENT`].
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct SampledAskRequestV1 {
-    pub ask: AskRequestV1,
-    pub max_tokens: usize,
-    pub temperature: f32,
-    pub top_p: Option<f32>,
-    pub seed: Option<u64>,
-}
-
-/// The `Ask` intent's payload. The caller names the run, so it can find the
-/// run in the table without a reply channel: an intent result carries no data.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct AskRequestV1 {
-    /// Caller-chosen run name, unique within this lane.
-    pub run: String,
-    /// The raw question; a library provider renders its declared template.
-    pub question: String,
-}
-
-/// The `Cancel` intent's payload.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CancelRequestV1 {
-    /// The run to cancel.
-    pub run: String,
-}
-
-/// Where a run stands.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum RunStateV1 {
-    /// Accepted, waiting behind earlier runs.
-    Queued,
-    /// Generating; `text` grows.
-    Running,
-    /// Stopped at a durable token boundary.
-    Paused,
-    /// Complete; `text` is the whole answer.
-    Finished,
-    /// Stopped by a cancel; `text` is what was generated before it.
-    Cancelled,
-    /// The provider refused or failed; see `error`.
-    Failed,
-}
-
-impl RunStateV1 {
-    /// Whether the run will change no further.
-    pub fn is_terminal(self) -> bool {
-        matches!(self, Self::Finished | Self::Cancelled | Self::Failed)
-    }
-}
-
-/// One run, as the route serves it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RunV1 {
-    /// The caller's run name.
-    pub run: String,
-    /// The question asked.
-    pub question: String,
-    /// Where the run stands.
-    pub state: RunStateV1,
-    /// The answer so far, or in full once finished.
-    pub text: String,
-    /// Why a failed run failed.
-    pub error: Option<String>,
-    /// Exact session used for this run, absent for a stub or failed load.
-    pub session: Option<esp::infer::provider::SessionIdentity>,
-    #[serde(default)]
-    pub tokens: usize,
-    #[serde(default)]
-    pub continuations: Vec<Continuation>,
-    #[cfg(feature = "inference-model")]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub recall: Option<recall::RecallEvidence>,
-}
-
-/// The run table, as the route serves it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct InferenceRunsV1 {
-    /// [`INFERENCE_RUNS_SCHEMA`].
-    pub schema: String,
-    /// The provider's model id, once the actor has built it.
-    pub model: Option<String>,
-    /// Exact loaded session and template, absent for an unbound stub.
-    pub session: Option<esp::infer::provider::SessionIdentity>,
-    /// Provider construction error; asks fail with this instead of falling back.
-    pub load_error: Option<String>,
-    /// Runs in the order they were asked.
-    pub runs: Vec<RunV1>,
-}
+/// Decoder-free application wire types; the runtime keeps its provider identity.
+pub use crate::inference_protocol::{
+    ASK_INTENT, ASK_SAMPLED_INTENT, AskRequestV1, CANCEL_INTENT, CancelRequestV1, Continuation,
+    INFERENCE_ASK_NOTICE_POLL, INFERENCE_ASK_ROUTE, INFERENCE_RUNS_SCHEMA, PAUSE_INTENT,
+    RESUME_INTENT, RunStateV1, SampledAskRequestV1,
+};
+pub type RunV1 = crate::inference_protocol::RunV1<esp::infer::provider::SessionIdentity>;
+pub type InferenceRunsV1 =
+    crate::inference_protocol::InferenceRunsV1<esp::infer::provider::SessionIdentity>;
 
 /// Why the lane would not take an ask or a cancel.
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
@@ -275,17 +169,6 @@ impl Drop for RunRecord {
         self.view.text.zeroize();
         self.request.clear_private();
     }
-}
-
-/// One actual visit to a device, recorded before continuation starts.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Continuation {
-    pub device: String,
-    pub at_token: usize,
-    pub reason: String,
-    pub first_differing_token: Option<usize>,
-    #[serde(default)]
-    pub compared_token_ids_hash: Option<String>,
 }
 
 /// Synchronous durable barrier supplied by the persona's log owner.
@@ -426,6 +309,8 @@ struct Shared {
     caches: Mutex<Vec<std::sync::Weak<Mutex<Option<(Vec<u8>, Vec<u8>)>>>>>,
     #[cfg(feature = "inference-model")]
     recall: Mutex<Option<RecallBinding>>,
+    #[cfg(feature = "inference-model")]
+    published: Mutex<PublishedRecall>,
 }
 
 #[cfg(feature = "inference-model")]
@@ -433,6 +318,27 @@ struct RecallBinding {
     corpus: Arc<dyn recall::RecallCorpus>,
     config: recall::RecallConfig,
     index: Option<recall::RecallIndex>,
+}
+
+#[cfg(feature = "inference-model")]
+#[derive(Default)]
+struct PublishedRecall {
+    config: recall::RecallConfig,
+    owners: std::collections::BTreeMap<String, PublishedBinding>,
+}
+#[cfg(feature = "inference-model")]
+struct PublishedBinding {
+    publisher: ProjectionSession,
+    binding: RecallBinding,
+}
+#[cfg(feature = "inference-model")]
+enum RecallSelection {
+    Local(Vec<eidetic::models::recall::RecallSourceId>),
+    Published {
+        owner: String,
+        publisher: ProjectionSession,
+        scope: Vec<eidetic::models::recall::RecallSourceId>,
+    },
 }
 
 impl Shared {
@@ -454,9 +360,13 @@ impl Shared {
             return observed;
         }
         let binding = self.recall.lock().unwrap();
+        let published = self.published.lock().unwrap();
         for source in sources {
-            let current = binding
-                .as_ref()
+            let source_binding = match source.owner.as_deref() {
+                Some(owner) => published.owners.get(owner).map(|slot| &slot.binding),
+                None => binding.as_ref(),
+            };
+            let current = source_binding
                 .ok_or_else(|| "source owner is unavailable".to_string())
                 .and_then(|binding| binding.corpus.current_version(&source));
             observed.0.insert(source, current);
@@ -603,6 +513,8 @@ impl InferenceLane {
             caches: Mutex::new(Vec::new()),
             #[cfg(feature = "inference-model")]
             recall: Mutex::new(None),
+            #[cfg(feature = "inference-model")]
+            published: Mutex::new(PublishedRecall::default()),
         });
         let bridge = std::thread::Builder::new()
             .name("inference-bridge".into())
@@ -689,16 +601,36 @@ impl InferenceLane {
             max_tokens: self.shared.max_tokens,
             ..Default::default()
         };
-        self.ask_internal(request.ask, generation, Some(request.scope))
+        self.ask_internal(
+            request.ask,
+            generation,
+            Some(RecallSelection::Local(request.scope)),
+        )
+    }
+
+    /// Host-selected recall bounds for app-owned publications.
+    #[cfg(feature = "inference-model")]
+    pub fn configure_published_recall(&self, config: recall::RecallConfig) -> Result<(), String> {
+        config.validate()?;
+        let mut table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        let mut published = self.shared.published.lock().unwrap();
+        for slot in published.owners.values_mut() {
+            slot.binding.config = config.clone();
+            slot.binding.index = None;
+        }
+        published.config = config;
+        table.generation += 1;
+        Ok(())
     }
 
     fn ask_internal(
         &self,
         request: AskRequestV1,
         mut generation: GenerationRequest,
-        #[cfg(feature = "inference-model")] recall_scope: Option<
-            Vec<eidetic::models::recall::RecallSourceId>,
-        >,
+        #[cfg(feature = "inference-model")] recall_scope: Option<RecallSelection>,
     ) -> Result<(), InferenceLaneError> {
         generation.prompt = request.question.clone();
         generation.max_tokens = generation.max_tokens.min(self.shared.max_tokens);
@@ -743,22 +675,53 @@ impl InferenceLane {
             if table.session.is_none() || self.shared.journal.is_none() {
                 return Err(InferenceLaneError::Recall("recall requires a durable exact model session; stub inference cannot answer retained material".into()));
             }
-            let mut binding = self.shared.recall.lock().unwrap();
-            let binding = binding.as_mut().ok_or_else(|| {
-                InferenceLaneError::Recall("no retained corpus is attached".into())
-            })?;
+            let mut local = self.shared.recall.lock().unwrap();
+            let mut published = self.shared.published.lock().unwrap();
+            let (binding, scope, owner) = match scope {
+                RecallSelection::Local(scope) => (
+                    local.as_mut().ok_or_else(|| {
+                        InferenceLaneError::Recall("no retained corpus is attached".into())
+                    })?,
+                    scope,
+                    None,
+                ),
+                RecallSelection::Published {
+                    owner,
+                    publisher,
+                    scope,
+                } => {
+                    let slot = published.owners.get_mut(&owner).ok_or_else(|| {
+                        InferenceLaneError::Recall("retained source owner is unavailable".into())
+                    })?;
+                    if slot.publisher != publisher {
+                        return Err(InferenceLaneError::Recall(
+                            "this session does not own the retained publication".into(),
+                        ));
+                    }
+                    if scope
+                        .iter()
+                        .any(|source| source.owner.as_deref() != Some(owner.as_str()))
+                    {
+                        return Err(InferenceLaneError::Recall(
+                            "scope names another source owner".into(),
+                        ));
+                    }
+                    (&mut slot.binding, scope, Some(owner))
+                },
+            };
             if binding.index.is_none() {
                 binding.index = Some(
                     recall::RecallIndex::build(binding.corpus.clone(), binding.config.clone())
                         .map_err(InferenceLaneError::Recall)?,
                 );
             }
-            let (evidence, context) = binding
+            let (mut evidence, context) = binding
                 .index
                 .as_ref()
                 .unwrap()
                 .prepare(&request.question, &scope)
                 .map_err(InferenceLaneError::Recall)?;
+            evidence.owner = owner;
             if evidence.passages.is_empty() {
                 recall_failure = Some(if evidence.stale.is_empty() {
                     "No current retained passages match this question and scope."
@@ -1020,6 +983,8 @@ impl InferenceLane {
             binding.index = None;
         }
         #[cfg(feature = "inference-model")]
+        self.shared.published.lock().unwrap().owners.clear();
+        #[cfg(feature = "inference-model")]
         {
             table.seen_recall_revision = None;
         }
@@ -1174,6 +1139,8 @@ impl InferenceLane {
             session,
             noticed: None,
             current,
+            #[cfg(feature = "inference-model")]
+            publication: None,
         }
     }
 }
@@ -1210,6 +1177,8 @@ pub struct InferenceAskEndpoint {
     /// The bytes the last snapshot named, so its resources stay servable
     /// while the table moves on.
     current: Arc<Mutex<Option<(Vec<u8>, Vec<u8>)>>>,
+    #[cfg(feature = "inference-model")]
+    publication: Option<String>,
 }
 
 const CARD_LABEL: &str = "Inference runs";
@@ -1228,6 +1197,75 @@ impl InferenceAskEndpoint {
         } else {
             Err(format!("inference.ask {what} names another session"))
         }
+    }
+
+    #[cfg(feature = "inference-model")]
+    fn publish(
+        &mut self,
+        request: recall::PublishCorpusRequestV1,
+    ) -> Result<(), InferenceLaneError> {
+        if request.owner.trim().is_empty()
+            || request.owner.len() > 256
+            || self
+                .publication
+                .as_ref()
+                .is_some_and(|owner| owner != &request.owner)
+        {
+            return Err(InferenceLaneError::Recall(
+                "publication must name this session's stable source owner".into(),
+            ));
+        }
+        if request
+            .sources
+            .iter()
+            .any(|entry| entry.source.owner.as_ref() != Some(&request.owner))
+        {
+            return Err(InferenceLaneError::Recall(
+                "source identity names another owner".into(),
+            ));
+        }
+        for entry in &request.sources {
+            if entry.source.kind == eidetic::models::recall::RecallSourceKind::PageText
+                && entry.version != eidetic::Hash::of(entry.text.as_bytes()).to_string()
+            {
+                return Err(InferenceLaneError::Recall(
+                    "retained page-text bytes do not match their version".into(),
+                ));
+            }
+        }
+        let mut table = self.lane.shared.table();
+        if table.locked {
+            return Err(InferenceLaneError::Locked);
+        }
+        let mut published = self.lane.shared.published.lock().unwrap();
+        if published
+            .owners
+            .get(&request.owner)
+            .is_some_and(|slot| slot.publisher != self.session)
+        {
+            return Err(InferenceLaneError::Recall(
+                "this source owner already has a connected publisher".into(),
+            ));
+        }
+        let corpus: Arc<dyn recall::RecallCorpus> =
+            Arc::new(recall::PublishedCorpus(request.sources));
+        let config = published.config.clone();
+        let index = recall::RecallIndex::build(corpus.clone(), config.clone())
+            .map_err(InferenceLaneError::Recall)?;
+        self.publication = Some(request.owner.clone());
+        published.owners.insert(
+            request.owner,
+            PublishedBinding {
+                publisher: self.session.clone(),
+                binding: RecallBinding {
+                    corpus,
+                    config,
+                    index: Some(index),
+                },
+            },
+        );
+        table.generation += 1;
+        Ok(())
     }
 
     fn card_snapshot(&self, generation: u64, card_bytes: &[u8]) -> ProjectionSnapshot {
@@ -1274,6 +1312,24 @@ impl InferenceAskEndpoint {
                 .expect("a one-item scene is dense"),
             presentation,
             cache_policy: CachePolicy::default(),
+        }
+    }
+}
+
+#[cfg(feature = "inference-model")]
+impl Drop for InferenceAskEndpoint {
+    fn drop(&mut self) {
+        if let Some(owner) = &self.publication {
+            let mut table = self.lane.shared.table();
+            let mut published = self.lane.shared.published.lock().unwrap();
+            if published
+                .owners
+                .get(owner)
+                .is_some_and(|slot| slot.publisher == self.session)
+            {
+                published.owners.remove(owner);
+                table.generation += 1;
+            }
         }
     }
 }
@@ -1366,6 +1422,37 @@ impl IntentSink for InferenceAskEndpoint {
         self.own_session(&intent.session, "intent")?;
         let rejected = |reason: String| Ok(IntentResult::Rejected { reason });
         let outcome = match intent.intent.as_str() {
+            #[cfg(feature = "inference-model")]
+            recall::PUBLISH_CORPUS_INTENT => {
+                if intent.payload.len() > recall::MAX_PUBLISHED_CORPUS_BYTES {
+                    return rejected("retained publication exceeds the inline transport bound; choose a smaller corpus".into());
+                }
+                match serde_json::from_slice::<recall::PublishCorpusRequestV1>(&intent.payload) {
+                    Ok(request) => self.publish(request),
+                    Err(error) => return rejected(error.to_string()),
+                }
+            },
+            #[cfg(feature = "inference-model")]
+            recall::ASK_PUBLISHED_INTENT => {
+                match serde_json::from_slice::<recall::PublishedAskRequestV1>(&intent.payload) {
+                    Ok(request) => {
+                        let generation = GenerationRequest {
+                            max_tokens: self.lane.shared.max_tokens,
+                            ..Default::default()
+                        };
+                        self.lane.ask_internal(
+                            request.ask,
+                            generation,
+                            Some(RecallSelection::Published {
+                                owner: request.owner,
+                                publisher: self.session.clone(),
+                                scope: request.scope,
+                            }),
+                        )
+                    },
+                    Err(error) => return rejected(error.to_string()),
+                }
+            },
             #[cfg(feature = "inference-model")]
             recall::RECALL_ASK_INTENT => {
                 match serde_json::from_slice::<recall::RecallAskRequestV1>(&intent.payload) {
@@ -1839,6 +1926,119 @@ mod tests {
             score: score(),
         };
         assert!(endpoint.snapshot(request).is_err());
+        lane.close().unwrap();
+    }
+}
+
+#[cfg(all(test, feature = "inference-model"))]
+mod publication_tests {
+    use super::*;
+    use eidetic::models::recall::{RecallSourceId, RecallSourceKind, RetainedSourceText};
+    fn publication(owner: &str, text: &str) -> recall::PublishCorpusRequestV1 {
+        recall::PublishCorpusRequestV1 {
+            owner: owner.into(),
+            sources: vec![RetainedSourceText {
+                source: RecallSourceId {
+                    kind: RecallSourceKind::PageText,
+                    owner: Some(owner.into()),
+                    source: "https://retained.test/note".into(),
+                    node: None,
+                },
+                version: eidetic::Hash::of(text.as_bytes()).to_string(),
+                title: None,
+                text: text.into(),
+            }],
+        }
+    }
+    #[test]
+    fn publishers_cannot_replace_another_live_owner_and_disconnect_withdraws_heads() {
+        let lane = InferenceLane::open(|| Box::new(StubInferenceProvider::new()));
+        let mut a = lane.endpoint(ProjectionSession("a".into()));
+        let mut b = lane.endpoint(ProjectionSession("b".into()));
+        a.publish(publication("turnstone/one", "retained nebula amberstone"))
+            .unwrap();
+        assert!(
+            b.publish(publication("turnstone/one", "retained nebula indigo"))
+                .is_err()
+        );
+        b.publish(publication("turnstone/two", "retained nebula indigo"))
+            .unwrap();
+        let mut previous = {
+            let published = lane.shared.published.lock().unwrap();
+            published.owners["turnstone/one"]
+                .binding
+                .index
+                .as_ref()
+                .unwrap()
+                .prepare("nebula", &[])
+                .unwrap()
+                .0
+        };
+        let old = previous.passages[0].passage.clone();
+        previous.validate(
+            "amberstone [1]",
+            Some(
+                lane.shared.published.lock().unwrap().owners["turnstone/one"]
+                    .binding
+                    .corpus
+                    .as_ref(),
+            ),
+        );
+        assert_eq!(previous.citations.len(), 1);
+        a.publish(publication("turnstone/one", "retained nebula violet"))
+            .unwrap();
+        previous.validate(
+            "amberstone [1]",
+            Some(
+                lane.shared.published.lock().unwrap().owners["turnstone/one"]
+                    .binding
+                    .corpus
+                    .as_ref(),
+            ),
+        );
+        assert!(previous.citations.is_empty());
+        assert_eq!(previous.passages[0].passage, old);
+        drop(a);
+        let published = lane.shared.published.lock().unwrap();
+        assert!(!published.owners.contains_key("turnstone/one"));
+        assert!(published.owners.contains_key("turnstone/two"));
+        drop(published);
+        drop(b);
+        lane.close().unwrap();
+    }
+    #[test]
+    fn publications_require_owner_and_exact_page_text_bytes_and_never_make_a_stub_answer() {
+        let lane = InferenceLane::open(|| Box::new(StubInferenceProvider::new()));
+        let mut endpoint = lane.endpoint(ProjectionSession("publisher".into()));
+        let mut wrong = publication("turnstone/one", "nebula amberstone");
+        wrong.sources[0].source.owner = Some("turnstone/two".into());
+        assert!(endpoint.publish(wrong).is_err());
+        let mut wrong = publication("turnstone/one", "nebula amberstone");
+        wrong.sources[0].text.push_str(" changed");
+        assert!(endpoint.publish(wrong).is_err());
+        endpoint
+            .publish(publication("turnstone/one", "nebula amberstone"))
+            .unwrap();
+        let result = lane.ask_internal(
+            AskRequestV1 {
+                run: "published".into(),
+                question: "nebula".into(),
+            },
+            Default::default(),
+            Some(RecallSelection::Published {
+                owner: "turnstone/one".into(),
+                publisher: endpoint.session.clone(),
+                scope: vec![],
+            }),
+        );
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("stub inference cannot answer")
+        );
+        assert!(lane.runs().runs.is_empty());
+        drop(endpoint);
         lane.close().unwrap();
     }
 }
