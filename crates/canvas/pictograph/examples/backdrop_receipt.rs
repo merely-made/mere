@@ -23,11 +23,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let font =
         include_bytes!("../../../cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf");
     let mut receipt = Vec::new();
-    for (name, selected) in [
+    let mut samples = vec![
         ("metre", "line-1"),
         ("fretboard", "string-5-fret-3"),
         ("terrain", "workshop"),
-    ] {
+    ];
+    for name in ["progression", "progression-g"] {
+        if fixtures.join(format!("{name}.json")).is_file() {
+            samples.push((name, "bar-0"));
+        }
+    }
+    for (name, selected) in samples {
         let input = SceneInput::parse(&std::fs::read_to_string(
             fixtures.join(format!("{name}.json")),
         )?)?;
@@ -111,7 +117,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         )?,
     )?;
     println!(
-        "Three production surface frames and selection controls passed: {}",
+        "Production surface frames and selection controls passed: {}",
         output.display()
     );
     Ok(())

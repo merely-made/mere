@@ -176,6 +176,18 @@ source and rerun the app's checks. The standalone CPU example accepts an
 optional input directory after its output directory, containing `metre.json`,
 `fretboard.json` and `terrain.json` from those exporters.
 
+## Sequence templates
+
+`scenomise::template` supplies source-disclosed lanes, nested groups, integer
+tick spans, expected slots, occurrence alignments and explained relationships.
+The `templated_sequence` recipe uses the same `BackdropSurface` and Graphshell
+producer as metre, fretboard and terrain. Metre lowers its foot groups and
+syllable positions to this shared structure while retaining stress and rhyme
+meaning. Woodshed's progression adapter is the second consumer: expected
+Roman-numeral roles and arranged song-block spans stay separate. Open slots
+and unplaced material remain explicit, with no inferred conformity judgment.
+See the [decision and reproduction guide](../../../support/design-studies/backdrops/templates/README.md).
+
 ## Dependencies
 
 `sceno` depends on `serde` alone. `scenomise` depends on `sceno`, `serde` and
