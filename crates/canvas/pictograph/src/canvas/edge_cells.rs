@@ -540,6 +540,7 @@ pub(crate) fn link_overlay(
         selected_links,
         node_visible,
         node_size,
+        |_, _| 1.0,
     )
 }
 
@@ -552,6 +553,7 @@ pub(crate) fn link_overlay_with_assertion_hides(
     selected_links: &HashSet<LinkKey>,
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
+    tone: impl Fn(NodeKey, NodeKey) -> f32,
 ) -> Vec<PaintCmd> {
     visible_link_appearances_with_assertion_hides(
         graph,
@@ -566,7 +568,11 @@ pub(crate) fn link_overlay_with_assertion_hides(
         node_visible(segment.appearance.display_from) && node_visible(segment.appearance.display_to)
     })
     .flat_map(|segment| {
-        let mut strokes = link_strokes(&segment);
+        let share = tone(
+            segment.appearance.display_from,
+            segment.appearance.display_to,
+        );
+        let mut strokes = link_strokes(&segment, share);
         if selected_links.contains(&segment.appearance.key) {
             strokes.extend(polyline_strokes(
                 &segment.points,
@@ -579,11 +585,18 @@ pub(crate) fn link_overlay_with_assertion_hides(
     .collect()
 }
 
-fn link_strokes(segment: &LinkAppearanceSegment) -> Vec<PaintCmd> {
-    let color = match segment.appearance.key.stratum {
+/// A link's strokes at `share` of its loud alpha. A quiet link (share below
+/// one) is a hairline without marks; the grammar raises it when it touches
+/// the foreground.
+fn link_strokes(segment: &LinkAppearanceSegment, share: f32) -> Vec<PaintCmd> {
+    let mut color = match segment.appearance.key.stratum {
         LinkStratum::Surface => ColorF::new(0.93, 0.70, 0.34, 0.76),
         LinkStratum::Resource => ColorF::new(0.55, 0.72, 0.92, 0.82),
     };
+    color.a *= share;
+    if share < 1.0 {
+        return polyline_strokes(&segment.points, color, 1.0);
+    }
     let width = 1.35 + segment.appearance.strength.max(0.0).ln_1p().min(3.0) * 0.55;
     let mut strokes = polyline_strokes(&segment.points, color, width);
     let marks = segment.appearance.marks;

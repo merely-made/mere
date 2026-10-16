@@ -36,6 +36,7 @@ mod fold_and_source_time;
 mod framing;
 mod gloss;
 mod grammar;
+mod grammar_view;
 mod grouped;
 mod home_at_budget_end;
 mod layout_and_drag;
