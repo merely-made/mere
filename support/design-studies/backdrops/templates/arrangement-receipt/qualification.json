@@ -138,7 +138,8 @@
       "graphshell-varied-first-tonic.jpg",
       "graphshell-varied-second-tonic.jpg",
       "graphshell-final-default.jpg",
-      "graphshell-merged-runtime.jpg"
+      "graphshell-merged-runtime.jpg",
+      "graphshell-merged-desktop.jpg"
     ],
     "final_merged_runtime_recheck": {
       "result": "pass",
@@ -152,7 +153,8 @@
       "capture": "graphshell-merged-runtime.jpg",
       "admission": "browser-invalid-import-merged.txt",
       "roundtrip": "browser-roundtrip-merged.txt",
-      "console": "browser-console-merged.json"
+      "console": "browser-console-merged.json",
+      "desktop_capture": "graphshell-merged-desktop.jpg"
     },
     "captures_before_concurrent_merge": [
       "graphshell-regular.jpg",
