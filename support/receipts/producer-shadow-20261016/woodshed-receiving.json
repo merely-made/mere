@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-16",
+  "status": "bounded Woodshed native GPU receiving qualification passed",
+  "mere_revision": "6575075057e8909032475ae6c88118a19969eadc",
+  "consumer_rust_revision": "d2adb09ac3b04110508e91a0e539ad8310c766db",
+  "consumer_scenario_revision": "7500d1bc37433eb95811dbe0468c383b84df072c",
+  "consumer_binary_sha256": "00a5fca5ca06a39f37b35fcf116648912f050b87c5a2f74addb2e4bf93bf709a",
+  "consumer_published_revision": "c0f03ec76aee62a993d76b5c0ff54696d5f9fe0d",
+  "consumer_receipt": "woodshed/validation/stage-p4f_20261016/receipt.json",
+  "consumer_resolved_sources": {
+    "mere.git": [
+      "git+https://github.com/merely-made/mere.git?branch=main#6575075057e8909032475ae6c88118a19969eadc"
+    ],
+    "genet.git": [
+      "git+https://github.com/merely-made/genet.git?branch=main#6186c81ad7019ea51dd28861ef83574bfc992ed1",
+      "git+https://github.com/merely-made/genet.git?branch=main#e37762d752e423dc43f920bd728c83f70c47f2cc"
+    ],
+    "netrender.git": [
+      "git+https://github.com/merely-made/netrender.git?branch=main#8960024f7b1f2b7a5ba382972f08b2f75eb7a0f0"
+    ]
+  },
+  "receiving_checks": {
+    "command": "cargo test --offline --locked -p woodshed-core -p woodshed-audio -p woodshed-views -p woodshed-genet --quiet",
+    "audio": 158,
+    "core": 252,
+    "core_integration": 1,
+    "host": 177,
+    "views": 201,
+    "suite_and_integration_passes": 789,
+    "host_existing_ignores": 7,
+    "separate_fresh_process_child_invocations": 5,
+    "desktop_build": "cargo build --offline --locked -p woodshed-genet; passed"
+  },
+  "native_presented_frames": {
+    "seed": 342,
+    "fresh_process_reopen": 110,
+    "default_and_narrow_layout": 112
+  },
+  "reviewed_captures": 14,
+  "coordinator_review_sha256": "d842f3f39ae48d1f3e009a0eb52c9362ed7a0e707f2e1c3fc063f80419f3dbf3",
+  "fresh_process_exact": [
+    "working owner",
+    "Cards and IDs",
+    "material and voicing instructions",
+    "cursor",
+    "realization float bits",
+    "projection",
+    "workspace",
+    "personal source/journal"
+  ],
+  "software_preview_admission_counts": [
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      3
+    ]
+  ],
+  "final_binary_close": "Retry retains, Cancel resumes, explicit Discard exits; unreadable original bytes preserved",
+  "excluded_evidence": "Earlier failed/mixed native attempts are excluded; guarded v4 phases and final-binary close form this receipt.",
+  "limits": [
+    "Bounded macOS Woodshed receiving qualification only.",
+    "Software processor admission does not qualify physical audibility or hardware latency.",
+    "Portable composition shadow-mask admission is unchanged."
+  ],
+  "consumer_receipt_sha256": "0f59a3f5da3f458cc239d09d2e896d177e3f007bea9647006099eb7d70948f4f",
+  "documentation_audit": "No added findings relative to refreshed Mere base; existing unrelated whole-tree debt remains."
+}
