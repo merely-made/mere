@@ -201,20 +201,29 @@ fn self_link_points(
     node_size: f32,
     stratum: LinkStratum,
 ) -> Vec<Point2D<f32>> {
-    const RADIUS: f32 = 16.0;
     const SEGMENTS: usize = 20;
+    let size = node_size.max(1.0);
+    let horizontal_radius = size * 0.25;
+    let vertical_radius = 16.0_f32.max(size * 0.25);
     let side = match stratum {
-        LinkStratum::Surface => -20.0,
-        LinkStratum::Resource => 20.0,
+        LinkStratum::Surface => -horizontal_radius,
+        LinkStratum::Resource => horizontal_radius,
     };
-    let loop_center = Point2D::new(center.x + side, center.y - node_size.max(1.0) * 0.5);
+    let boundary_y = center.y - size * 0.5;
+    let loop_center = Point2D::new(center.x + side, boundary_y);
     (0..=SEGMENTS)
         .map(|index| {
+            if index == 0 {
+                return Point2D::new(loop_center.x - horizontal_radius, boundary_y);
+            }
+            if index == SEGMENTS {
+                return Point2D::new(loop_center.x + horizontal_radius, boundary_y);
+            }
             let angle =
                 std::f32::consts::PI + std::f32::consts::PI * index as f32 / SEGMENTS as f32;
             Point2D::new(
-                loop_center.x + angle.cos() * RADIUS,
-                loop_center.y + angle.sin() * RADIUS,
+                loop_center.x + angle.cos() * horizontal_radius,
+                loop_center.y + angle.sin() * vertical_radius,
             )
         })
         .collect()
