@@ -680,3 +680,29 @@ nor decryption keys. Serving a saved ordinary site must keep working without a m
   to G as still gated and §13's service and A4's `ReleaseRefV1` as landed, the
   Gazette row is corrected, and §13's relation to the gate and A4's credit are
   raised as open questions.
+
+### Sennet scoped station continuation (2026-10-16, scoped API qualified)
+
+Murm R7 extends the existing Signalman radio custody path to a canonical
+Sennet device/realm child. Dramatis 19be483 derives its public node number;
+this is not authenticated RF identity or a channel key. Only admitted Signalman
+may release/sign/attest this namespace. Sennet and Tucket share one sticky
+station watch, preserving the Tucket public type name. Reconnect requests a
+new scoped release. Done when actual Keeper probes refuse absent/Locked/no-wallet
+and wrong-app acts, retain stable identity on reopen and close independently
+on lock/resident loss. Consumer nonce reservations, public LongFast radio
+qualification and private-channel provisioning are separate Murm-owned gates.
+
+The primary Mere main has unrelated unpublished commits and newer concurrent
+upstream work. An integration worktree based on origin/main isolates this
+supplier change; it must be removed after publishing and receiving checks.
+
+The API and six actual Keeper cases are published through `e12788bc`, with
+stable reopen identity, absent/Locked/no-wallet and wrong-app refusal, and
+independent sticky lock/resident-loss closure. Both selected policy tests and
+strict Signalman port/example Clippy pass. The integration of concurrent
+upstream documentation leaves the qualified source/lock unchanged. Public
+evidence is in `testing/receipts/sennet-custody/`; private synthetic wallets
+stay in Murm's ignored validation results with helpers stopped. The existing
+shared `C:/t/cargo-homes/mere-upstreams` cache remains co-owned by the earlier
+family qualifiers and this gate. No isolated Cargo home/target was created.
