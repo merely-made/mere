@@ -80,14 +80,57 @@ plaintext checkpoint remains recorded in Knot's owner plan; this work does
 not claim a storage migration.
 
 
-### P4 source continuation (2026-10-16)
+### P4 final qualification (2026-10-16)
 
-The next authorized phase is in progress from Mere `b31363d2d` and Woodshed
-`284fa340`; this does not change P3's published qualification. The source pass
-carries canonical link identity through routed scenes, groups resting strokes,
-keeps direction/opposition marks and re-keys whole-link hides while preserving
-old exact member filters. Core Sceno/Scenograph/Cambium/Sprigging checks pass;
-Pictograph, integrated host, native receiving and saved-visibility reopening
-remain required before P4 is qualified. The implementation plan records those
-specific done conditions. No native or browser acceptance is inferred from the
-source changes or early package checks.
+Supersedes this batch's earlier P4 source-only checkpoint. The architecture and
+implementation plan now say bounded P4 is qualified, with source and receiving
+evidence separated. The original P3 qualification above remains historical.
+
+- disposition: current
+- status line: "bounded P4 qualified" - accurate: yes
+- claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
+
+Canonical keys retain stratum and unordered source endpoints; appearance is a
+separate view identity. The three fan paths retire, and direction/opposition
+marks retain the original directed reasons. Routed scenes carry typed keys and
+view summaries. Exact member filters affect eligible contributions without
+withdrawing source claims. Whole-link hides use acknowledged Pandect intent and
+reopen from IndexedDB. Self-link paint and pick geometry share attached arches.
+
+The shared receipt records Mere source `91467c0bb`, staged package gates,
+locked Wasm build, normal pointer selection and six reviewed real browser
+captures. Source facts/revision remain unchanged by view hide/show. Woodshed's
+published receipt `4716b71` preserves the 619-case source gate, then repeats 361
+affected cases and a native build on merged source `fe54425`. Two native
+processes present 141 and 135 frames, with four reviewed captures and matching
+source/assertion identity after sealed reopen. Later standalone Hocket changes
+have no Woodshed runtime or lock overlap. No physical audio or full Stage P4f
+qualification follows. P5 retains its independent proof; P6/P7 remain later.
+Knot's independent C5 compatibility intake does not become a P4 native claim.
+
+## DOC_README.md
+
+- disposition: current
+- status line: "bounded P1–P5 qualified; P6/P7 later" - accurate: yes
+- claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
+
+### Stale claims
+
+The P4-in-progress summary and both indexed descriptions are superseded by
+bounded P4 qualification. Earlier P1-P3 evidence keeps its recorded scope.
+
+### Contradictions
+
+None in the scoped entries. The index matches the existing design and plan;
+exact source and receiving revisions point to the shared and consumer receipts.
+
+### Recommended action
+
+Publish the scoped completion documentation and retained evidence directly to
+main under Mark's authorization. Keep P6/P7 and physical acceptance separate.
+
+### Notes
+
+No new active document is introduced. Compare audits against current main
+`81e6805cf`; retain the pre-existing judgment debt rather than describing the
+global audit as green.

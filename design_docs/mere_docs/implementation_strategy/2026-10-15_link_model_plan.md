@@ -10,8 +10,9 @@ Graphshell opened-link slice are qualified on `732c1537a`. Knot receiving
 qualification is published at `921b4e0`; Woodshed is qualified on native source
 `474d10a`, published with receipt `943c762`. This completes bounded P3, including
 source-owned personal authoring/withdrawal, ordered audition and fresh-process
-sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d`;
-P6 and P7 remain later work.
+sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d` and is
+qualified within its recorded scope on Mere source `91467c0bb` and Woodshed receiving source `fe54425`,
+published with receipt `4716b71`. P6 and P7 remain later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -632,8 +633,8 @@ forces acting on links rather than additional relationship assertions.
 
 ## P4 continuation: rest stroke and fan retirement
 
-**Status (2026-10-16): in progress.** Mark authorized proceeding after bounded
-P3. Mere starts from refreshed `b31363d2d`; Woodshed starts from `284fa340`
+**Status (2026-10-16): bounded P4 qualified.** Mark authorized proceeding after
+bounded P3. Mere began from refreshed `b31363d2d`; Woodshed began from `284fa340`
 including the independent capture-accumulator work. Root owns the shared
 contract, rendering integration, receiving locks, qualification and publication.
 Independent source work covers Pictograph, Woodshed's relationship editor and
@@ -658,7 +659,7 @@ remain precise eligibility filters; migration never widens a user's partial
 hide to a whole link or to the other stratum. Closed selection and picking no
 longer use a selector or arbitrary first assertion as the link identity.
 
-Done conditions remain architecture §8 P4: Woodshed's relationship editor,
+The completed done conditions are architecture §8 P4: Woodshed's relationship editor,
 Pictograph, Cambium and routed scenes use the shared key; all three fan drawing
 paths retire; direction/opposition and both strata remain legible and selectable;
 member actions resolve exact current source handles; and saved link hides
@@ -666,3 +667,46 @@ round-trip without changing graph truth. Qualification requires focused CPU and
 compatibility checks, reviewed receiving native and browser captures, and a
 fresh-process reopen for retained presentation state. P4f, P6/P7, physical audio
 quality and endpoint feedback retain their independent gates.
+
+### P4 qualification and receiving proof
+
+The [shared receipt](../../../support/receipts/link-model-p4-20261016/receipt.json)
+records the source gates and six reviewed browser captures on immutable supplier
+`91467c0bb`. Shared packages pass 714 cases; the final canvas gate passes 776
+cases with 18 existing ignores; Graphshell web passes 302 cases with six existing
+ignores. The shared and Graphshell logs precede the final fixture-only corrections;
+the exact recorded browser bundle compiles and executes those corrections.
+The port-boundary check and locked offline Wasm build pass. The real WebGPU
+fixture selects both strata, opens all six assertions on the selected pair,
+resolves an exact member action, and acknowledges a canonical-key hide before
+changing visibility. A new tab reopens the same IndexedDB profile with that
+hide retained; ordinary Show hidden links restores all six displayed appearances.
+Source facts and graph revision remain unchanged.
+
+Woodshed advances only its root Mere family to that immutable supplier. Its
+[P4 receiving receipt](../../../support/receipts/link-model-p4-20261016/receiving-hosts.json)
+links the published consumer proof at `4716b71`. The 619-case source gate on
+`a8c2cd2` retains seven existing ignores and five separate child invocations.
+After capture framing and an existing CSS wrapper correction, source `865e0e9`
+passes its desktop build and native seed/reopen, with four reviewed captures.
+Merged source `fe54425` incorporates concurrent take-navigation main and repeats
+193 view plus 168 native-host cases, five child invocations and the build.
+Two different native processes then present 141 and 135 frames on a fresh
+sealed test profile; all four new captures are reviewed. The exact source
+resource/revision, assertion handle, direction, method and evidence survive
+reopening. The four-file isolated Keeper manifest is unchanged. A later merge
+of standalone Hocket source changes no Woodshed runtime or lock input.
+
+Receiving checks caught an eligible-member summary defect; the rest stroke
+now counts only displayed source contributions while its opened reading keeps
+the complete independent evidence. Native review caught and repaired missing
+reader spacing. Pictograph self-link arches now meet their node boundaries and
+use the same geometry for paint and picking. All three old fan paths retire.
+The endpoint force law and per-source contribution policy remain unchanged.
+
+The later Mere `81e6805cf` intake changes C5 validation/receipts and the root
+Knot lock, with no P4 production source change. This lane does not claim a Knot
+P4 native intake; the independent C5 compatibility receipt keeps its own scope.
+P5 remains independently qualified. P6 family migration is next in the core
+sequence; P7 promotion is separately eligible. Full Stage P4f and physical audio
+qualification remain separate.
