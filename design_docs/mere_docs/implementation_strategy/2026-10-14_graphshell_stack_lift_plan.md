@@ -1414,3 +1414,44 @@ fast-forward of local main; nothing built).**
   order a surface shows them in, the palette's session state, and the shared
   command ids.
 
+- **2026-10-15 (publishing chain done; the one repin round; then the branch
+  convention):** published to crates.io: `workbench` 0.1.0, `backstep` 0.1.0,
+  `sceno` 0.0.5, `scenograph` 0.0.4, `scenomise` 0.0.5, and, from the Genet
+  repository at Mark's direction, `script-engine-api` 0.1.1 (ValueEngine, so
+  `scenograph`'s `^0.1.0` requirement resolves) and `genet-text` 0.1.0.
+  `scenograph` needed `version = "0.1.0"` on its optional git row. The repin round
+  ran in the order the remote mere route spec §7 sets: Murm `main` `fb6360c12b`;
+  Mere `R` `75a2e6ae7` (Murm rows, `www` alias); Knot `K` `fe9d98c` (Mere `R`, Murm
+  `M`, `sceno` and `scenomise` 0.0.5 rows, no `graphshell`); Mere's Knot pin `R2`
+  `b2c8dcc28`; Turnstone `T` `6439fa88` (Mere `R`, Knot `K`, Murm `M`, `graphshell`
+  dropped). Receipts: Knot 623-plus tests across the four Knot workspaces;
+  Mere `cargo test -p djinn -p graphshell-host --all-features` 204 passed; port
+  boundary script green; Turnstone `cargo check --all-targets` and `cargo test`
+  (942 passed, 10 ignored). Pre-existing failures that this round did not touch:
+  `tabard-desktop`'s `native_shared_recovery` example (`PendingPresentationCapture`
+  fields) and `mere-mesh`'s `inventory_ingress` and `retained_receive` examples
+  (`include!` of `../../../../murm/...`, a path that no longer exists).
+  Mark then ruled the family onto `branch = "main"` (one canonical URL per
+  repository, committed lock, repin = `cargo update -p`; written up in the family
+  composition brief, "Family source convention"). Landed: Genet `7af8de32`
+  (netrender and murm-wire rows), Mere `4a74b1cf` (genet, murm, netrender,
+  knot-editor rows; the Genet, Murm and netrender bridge tables and every
+  same-repository patch row deleted), Murm `a3621dc8` (the native workspace's Mere
+  rows, which kept a second Mere source in every consumer), Knot `3fc16df`. The
+  lesson is that Cargo cannot bridge two spellings of one repository, so the switch
+  is a flag day across the supplier chain, not a per-repo edit: one repository left
+  on `rev` keeps an extra source in every consumer. Each graph now resolves one
+  source for Mere, Murm, Genet, netrender and Knot. Not switched, and why:
+  `dramatis`, `cleromancy`, `wgpu-weld` and `smolweb` (their `main` is ahead of the
+  pin and not qualified against the consumers), `vano` (Genet pins a specific
+  `nova_vm`), the `mark-ik` forks (pinned on purpose), and Woodshed and Turnstone
+  (Woodshed's redshank rows still name Mere, Genet and netrender by `rev`, so
+  Turnstone cannot flip until Woodshed does; the Woodshed lane has been asked to).
+  Mere keeps one bridge: `[patch."https://www.github.com/merely-made/mere.git"]`,
+  because Cleromancy's pinned revision still names Mere through the `www` alias; it
+  goes when Cleromancy switches (its handoff says so). Woodshed `cbf95e4b` switched
+  at the Woodshed lane's hand, and Turnstone follows it (below).
+  One local environment note: `TMPDIR` under a long path makes
+  `ports/djinn/tests/device_directory.rs` fail to bind its socket (it passed with
+  `TMPDIR=/tmp`), while knot-site's export tests need a symlink-free `TMPDIR`
+  (`/private/tmp`).
