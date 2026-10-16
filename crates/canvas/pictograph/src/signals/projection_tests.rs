@@ -93,7 +93,7 @@ fn projected_signal_buckets_keep_surface_edges_aliases_and_numerical_parity() {
         for assertion in edge.retained_assertions_mut() {
             assertion
                 .statement_id
-                .push_str(&format!("-surface-{target}"));
+                .push_str(&format!("-surface-{}", target.index()));
         }
         recorded.edges.push(edge);
     }
