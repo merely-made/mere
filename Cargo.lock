@@ -2127,7 +2127,7 @@ dependencies = [
  "layout-dom-api",
  "mere-surface-api",
  "meristem",
- "sceno 0.0.5",
+ "sceno",
  "sprigging",
  "tinct",
  "workbench",
@@ -2569,7 +2569,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "blake3",
- "sceno 0.0.5",
+ "sceno",
  "scenotime",
  "serde",
  "serde_json",
@@ -2662,7 +2662,7 @@ dependencies = [
  "mere",
  "muniment",
  "rand_core 0.6.4",
- "sceno 0.0.5",
+ "sceno",
  "scenotime",
  "serde",
  "serde_json",
@@ -4631,9 +4631,9 @@ dependencies = [
  "personae",
  "pollster 0.4.0",
  "safetensors 0.4.5",
- "sceno 0.0.5",
+ "sceno",
  "scenograph",
- "scenomise 0.0.5",
+ "scenomise",
  "scenotime",
  "serde",
  "serde_json",
@@ -4693,7 +4693,7 @@ dependencies = [
  "rpassword",
  "rustls",
  "safetensors 0.4.5",
- "sceno 0.0.5",
+ "sceno",
  "scenograph",
  "scenotime",
  "serde",
@@ -6089,8 +6089,8 @@ dependencies = [
  "iri-string",
  "mere-fleece",
  "reqwest 0.12.28",
- "sceno 0.0.5",
- "scenomise 0.0.5",
+ "sceno",
+ "scenomise",
  "serde",
  "serde_json",
  "url",
@@ -6967,9 +6967,9 @@ dependencies = [
  "platen",
  "pollster 0.4.0",
  "rand_core 0.6.4",
- "sceno 0.0.5",
+ "sceno",
  "scenograph",
- "scenomise 0.0.5",
+ "scenomise",
  "scenotime",
  "serde",
  "serde_json",
@@ -7003,9 +7003,9 @@ dependencies = [
  "genet-scripted-dom",
  "incipit",
  "layout-dom-api",
- "sceno 0.0.5",
+ "sceno",
  "scenograph",
- "scenomise 0.0.5",
+ "scenomise",
  "scenotime",
  "serde",
  "serde_json",
@@ -7026,7 +7026,7 @@ dependencies = [
  "pandect",
  "personae",
  "rand_core 0.6.4",
- "sceno 0.0.5",
+ "sceno",
  "scenotime",
  "serde",
  "serde_json",
@@ -7054,7 +7054,7 @@ dependencies = [
  "pandect",
  "personae",
  "rand_core 0.6.4",
- "sceno 0.0.5",
+ "sceno",
  "scenotime",
  "serde",
  "serde_json",
@@ -8797,7 +8797,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=b19eebfffe08f31a035f2695a44f516c9afce274#b19eebfffe08f31a035f2695a44f516c9afce274"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=fe9d98ccc1eb7b0589bd90243683d4f6dfab3242#fe9d98ccc1eb7b0589bd90243683d4f6dfab3242"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8805,15 +8805,15 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=b19eebfffe08f31a035f2695a44f516c9afce274#b19eebfffe08f31a035f2695a44f516c9afce274"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=fe9d98ccc1eb7b0589bd90243683d4f6dfab3242#fe9d98ccc1eb7b0589bd90243683d4f6dfab3242"
 dependencies = [
  "blake3",
  "knot-capture",
  "quick-xml 0.39.4",
  "reference-data",
- "sceno 0.0.4",
+ "sceno",
  "scenograph",
- "scenomise 0.0.4",
+ "scenomise",
  "scenotime",
  "seiche",
  "serde",
@@ -8825,7 +8825,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=b19eebfffe08f31a035f2695a44f516c9afce274#b19eebfffe08f31a035f2695a44f516c9afce274"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=fe9d98ccc1eb7b0589bd90243683d4f6dfab3242#fe9d98ccc1eb7b0589bd90243683d4f6dfab3242"
 dependencies = [
  "cambium",
  "illume",
@@ -8841,7 +8841,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=b19eebfffe08f31a035f2695a44f516c9afce274#b19eebfffe08f31a035f2695a44f516c9afce274"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=fe9d98ccc1eb7b0589bd90243683d4f6dfab3242#fe9d98ccc1eb7b0589bd90243683d4f6dfab3242"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8878,7 +8878,7 @@ dependencies = [
  "postcard",
  "quinn",
  "rustls",
- "sceno 0.0.4",
+ "sceno",
  "scenotime",
  "script-rhai",
  "serde",
@@ -8911,7 +8911,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=b19eebfffe08f31a035f2695a44f516c9afce274#b19eebfffe08f31a035f2695a44f516c9afce274"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=fe9d98ccc1eb7b0589bd90243683d4f6dfab3242#fe9d98ccc1eb7b0589bd90243683d4f6dfab3242"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8924,7 +8924,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=b19eebfffe08f31a035f2695a44f516c9afce274#b19eebfffe08f31a035f2695a44f516c9afce274"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=fe9d98ccc1eb7b0589bd90243683d4f6dfab3242#fe9d98ccc1eb7b0589bd90243683d4f6dfab3242"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -9721,8 +9721,8 @@ name = "mere-cartography"
 version = "0.0.2"
 dependencies = [
  "mere-kernel",
- "sceno 0.0.5",
- "scenomise 0.0.5",
+ "sceno",
+ "scenomise",
  "serde",
  "serde_json",
  "uuid",
@@ -9982,7 +9982,7 @@ dependencies = [
  "mere-kernel",
  "mere-view",
  "pandect",
- "sceno 0.0.5",
+ "sceno",
  "scenotime",
  "serde",
  "serde_json",
@@ -13376,9 +13376,9 @@ dependencies = [
  "paint_list_api",
  "paint_list_render",
  "petgraph 0.8.3",
- "sceno 0.0.5",
+ "sceno",
  "scenograph",
- "scenomise 0.0.5",
+ "scenomise",
  "scenotime",
  "seiche",
  "serde",
@@ -15383,15 +15383,6 @@ dependencies = [
 
 [[package]]
 name = "sceno"
-version = "0.0.4"
-source = "git+https://www.github.com/merely-made/mere.git?rev=0c03dff3d324c53e7738722899804309f95d3087#0c03dff3d324c53e7738722899804309f95d3087"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "sceno"
 version = "0.0.5"
 dependencies = [
  "serde",
@@ -15403,20 +15394,8 @@ name = "scenograph"
 version = "0.0.4"
 dependencies = [
  "mere-curation",
- "sceno 0.0.5",
+ "sceno",
  "script-engine-api",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "scenomise"
-version = "0.0.4"
-source = "git+https://www.github.com/merely-made/mere.git?rev=0c03dff3d324c53e7738722899804309f95d3087#0c03dff3d324c53e7738722899804309f95d3087"
-dependencies = [
- "libm",
- "sceno 0.0.4",
- "scenograph",
  "serde",
  "serde_json",
 ]
@@ -15427,7 +15406,7 @@ version = "0.0.5"
 dependencies = [
  "backstep",
  "libm",
- "sceno 0.0.5",
+ "sceno",
  "scenograph",
  "scenotime",
  "serde",
@@ -15440,7 +15419,7 @@ name = "scenotime"
 version = "0.0.4"
 dependencies = [
  "backstep",
- "sceno 0.0.5",
+ "sceno",
  "serde",
  "serde_json",
 ]
