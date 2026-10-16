@@ -593,7 +593,9 @@ mod published_replay_regression {
         }
     }
 
-    fn product_fixture() -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
+    fn product_fixture(
+        typed_decks: bool,
+    ) -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
         let captured = Arc::new(Mutex::new(Vec::new()));
         let observed = captured.clone();
         kernel::graph::set_captured_delta_hook(Some(Arc::new(move |delta| {
@@ -604,7 +606,13 @@ mod published_replay_regression {
             // Historical 2851 persists only to this transient MemoryBackend.
             // No snapshot is installed in the resident: only captured edits cross its door.
             let mut consultation = Consultation::new(CleromancyHost::empty(MemoryBackend::new()));
-            let field = consultation.install_builtin_tarot_at(1).await.unwrap();
+            let field = if typed_decks {
+                let fields = consultation.install_typed_tarot_at(1).await.unwrap();
+                assert_eq!(fields.len(), 2);
+                fields[0].clone()
+            } else {
+                consultation.install_builtin_tarot_at(1).await.unwrap()
+            };
             let context = consultation
                 .save_context_at(
                     ContextDraft::new(
@@ -733,6 +741,15 @@ mod published_replay_regression {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn published_reading_replay_and_same_schema_tamper_survive_three_real_owners() {
+        owner_replay(false).await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn typed_decks_and_reading_survive_three_owners_and_refuse_metadata_tamper() {
+        owner_replay(true).await;
+    }
+
+    async fn owner_replay(typed_decks: bool) {
         let root = tempfile::tempdir().unwrap();
         let unusable = root.path().join("no-attached-client-store");
         std::fs::write(
@@ -740,7 +757,7 @@ mod published_replay_regression {
             b"the live client cannot open local custody or storage",
         )
         .unwrap();
-        let (edits, expected_facets, reading) = product_fixture();
+        let (edits, expected_facets, reading) = product_fixture(typed_decks);
         let reading_url = format!("cleromancy://reading/{}", reading.id);
         let reading_id = kernel::graph::Graph::node_namespace_id(&reading_url);
         let mut retained_session = None;
@@ -810,6 +827,64 @@ mod published_replay_regression {
             let graph_state = serde_json::to_value(graph.to_snapshot_at(0)).unwrap();
             let durable = durable_files_for(root.path(), "divination");
             let logs = journal_and_history(&durable);
+            if typed_decks {
+                let fields: Vec<_> = graph
+                    .nodes()
+                    .filter(|(_, node)| node.url().starts_with("cleromancy://field/"))
+                    .collect();
+                assert_eq!(fields.len(), 2);
+                for (_, field_node) in &fields {
+                    let stored = graph
+                        .facets()
+                        .get(
+                            &field_node.id,
+                            &pandect::facet_store::FacetId::new(
+                                cleromancy_domain::host::FIELD_FACET,
+                            ),
+                        )
+                        .unwrap();
+                    let field: cleromancy_domain::Field =
+                        serde_json::from_value(stored.clone()).unwrap();
+                    assert_eq!(field.tarot.as_ref().unwrap().cards.len(), 78);
+                    assert!(field.position_meanings.is_some());
+                }
+                let (_, field_node) = fields[0];
+                let mut forged = graph
+                    .facets()
+                    .get(
+                        &field_node.id,
+                        &pandect::facet_store::FacetId::new(cleromancy_domain::host::FIELD_FACET),
+                    )
+                    .unwrap()
+                    .clone();
+                forged["tarot"]["cards"][0]["title"] = serde_json::json!("Forged typed card title");
+                let result = apply_checked(
+                    attached.client_mut(),
+                    &before[1],
+                    vec![
+                        node(0xc300 + phase as u128),
+                        CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: field_node.id.to_string(),
+                            facet: cleromancy_domain::host::FIELD_FACET.into(),
+                            value_json: forged.to_string(),
+                        },
+                    ],
+                )
+                .await;
+                assert!(
+                    matches!(result, IntentResult::Rejected { .. }),
+                    "forged deck metadata must be refused: {result:?}"
+                );
+                let after = snapshots(attached.client_mut()).await;
+                assert_eq!(
+                    serde_json::to_value(&after).unwrap(),
+                    serde_json::to_value(&before).unwrap()
+                );
+                assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                println!(
+                    "TYPED DECK REPLAY mode={mode} phase={phase} decks=2 cards-per-deck=78 content-revisions-retained=true metadata-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
             if let Some(id) = retained_session {
                 assert_eq!(session, id, "the same owner-held session reopens");
                 assert_eq!(retained_graph.as_ref().unwrap(), &graph_state);
