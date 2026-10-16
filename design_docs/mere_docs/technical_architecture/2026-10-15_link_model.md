@@ -13,9 +13,9 @@ retirement is qualified on Mere source `91467c0bb` and Woodshed receiving source
 `4716b71`: canonical resting links, exact member opening, acknowledged whole-link
 hides and reviewed browser/native reopening. Bounded P6 (§8) is qualified on
 published Mere `a45a0b697`, with Woodshed source `d896e39` and published receiving
-receipt `c32b60a`. P7 promotion is in progress from refreshed main
-`a4c1814c8`; its freeze, receiver and reopen gates remain unqualified until
-recorded in the implementation plan.
+receipt `c32b60a`. Bounded P7 promotion is qualified in Graphshell on
+`6d53d4439`, from refreshed main `a4c1814c8`, including immutable Resource
+copies, receiver coverage, review assertions and browser reopening.
 Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
@@ -753,3 +753,19 @@ records source, compatibility, 50,000-withdrawal budgets, reviewed WebGPU
 hide/reopen proof and the published Woodshed receiving receipt. Traversal remains
 event-shaped; fields and sympathetic influences retain the dynamics framing in
 §7.3, and P7 promotion remains later work.
+
+
+### P7 promoted-link qualification (2026-10-16)
+
+The [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md#p7-qualification-2026-10-16)
+and [receipt](../../../support/receipts/link-model-p7-20261016/receipt.json)
+record bounded Graphshell P7 on `6d53d4439`. Each freeze creates an independent
+Resource with the original stratum, endpoint references, exact directed assertion
+copies and explicit source revision availability. The immutable facet survives
+later source withdrawal, while live drift and Resource-owned review comments
+remain separate readings/assertions. A receiving process reopens the carried
+Resource without inventing endpoint payloads and reports missing Surface and
+Resource references through coverage. Six reviewed final-source browser captures
+cover ordinary freeze, withdrawal, review and fresh-page reopening. This proof
+has one owning graph source per freeze; broader receiving products and automatic
+resident synchronization keep their separate gates.

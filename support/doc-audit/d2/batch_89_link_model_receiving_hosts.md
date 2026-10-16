@@ -1,17 +1,17 @@
 # Batch 89: Opened-link receiving hosts and observed qualification gates
 
-Audit date: 2026-10-16, bounded P6 source/browser/receiving qualification.
-Published Mere supplier `a45a0b697`; Woodshed native source `d896e39` and
-published receiving receipt `c32b60a`. The current receiving record is
-`support/receipts/link-model-p6-20261016/receiving-hosts.json`.
-Earlier P3/P4 observations below remain historical evidence; the current
-formal status lines and final P6 reconciliation supersede their old scope.
+Audit date: 2026-10-16, bounded P7 promoted-link qualification on `6d53d4439`.
+The current P7 record is `support/receipts/link-model-p7-20261016/receipt.json`.
+P6's Mere supplier `a45a0b697` and Woodshed native source `d896e39` / published
+receiving receipt `c32b60a` retain their earlier receiving scope. Earlier P3,
+P4 and P6 observations below remain historical evidence; the current formal
+status lines and final P7 reconciliation supersede their old scope.
 
 ## mere_docs/technical_architecture/2026-10-15_link_model.md
 
 - disposition: current
-- status line: "Bounded P6 is qualified; P7 promotion is in progress" - accurate: yes
-- claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
+- status line: "Bounded P7 is qualified in Graphshell" - accurate: yes
+- claims checked: 18 - holds: 18, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -49,8 +49,8 @@ sealed. List provenance and direction Timeline captures were reviewed.
 ## mere_docs/implementation_strategy/2026-10-15_link_model_plan.md
 
 - disposition: current
-- status line: "Bounded P6 is qualified; P7 promotion is in progress" - accurate: yes
-- claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
+- status line: "Bounded P7 is qualified in Graphshell" - accurate: yes
+- claims checked: 18 - holds: 18, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -205,3 +205,24 @@ Refreshed main `a4c1814c8` starts the authorized P7 continuation. The current
 architecture, plan and index report implementation in progress, with freeze,
 receiver coverage, source-owned review and browser reopening still gated on
 recorded evidence. Earlier qualified P1-P6 receipts retain their exact scope.
+
+
+### P7 final qualification (2026-10-16)
+
+The current architecture, plan and index now report bounded P7 qualification on
+Graphshell source `6d53d4439`; the earlier implementation-in-progress note is
+historical. Core `611e484d4` passes kernel 474 and Graphshell 393 cases, followed
+by Pandect 318 library plus 26 integration cases. Existing ignores remain
+separate. Git object continuity connects those tested components to the final
+browser-only refinements. The typed immutable facet stores copies only on its
+own promoted Resource; comments remain ordinary Resource literal assertions.
+
+Three distinct JSON-store child processes verify the frozen copy after a live
+withdrawal and reference-only receiver reopening with missing-resource and
+missing-surface coverage. The final locked WebGPU build, fresh browser seed and
+fresh-page reopen pass, with six original-resolution captures reviewed. Two
+early scenario-only failures and the corrected text-arrow rendering are retained
+in the receipt. One-source Graphshell promotion is the bounded proof; foreign
+aggregate promotion, automatic synchronization and physical audio are separate.
+The pre-task documentation baseline has 15 judgment errors; qualification does
+not claim a globally clean documentation audit.
