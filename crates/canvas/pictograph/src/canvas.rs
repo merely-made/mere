@@ -162,6 +162,7 @@ mod edge_cells;
 pub mod field_bridge;
 mod fields;
 mod fold_paint;
+pub use fold_paint::{FoldEndpoint, FoldRoute};
 mod forme_region;
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};

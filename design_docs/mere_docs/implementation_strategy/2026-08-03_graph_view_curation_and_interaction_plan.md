@@ -3,7 +3,7 @@
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23). CollapsedGraphlet is now ArrangementKind::Supernode.*
 
 **Date:** 2026-08-03  
-**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated and validated on macOS and by wasm compilation. Its Swatch and headed native acceptance proofs remain pending.
+**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The Isometry campaign Overmap fold controls and its separate consumer acceptance remain pending.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
 adapters, plus a real second source in Isometry's pre-log `GameSnapshot` and
 authority `GameEvent` Codicil. Its Overmap Swatch has a Cambium slider that
@@ -578,7 +578,8 @@ onto current main, following mer3ly's native-phase rulings 163–166 in
    duplicating cells or ignoring per-cell hiding.
 3. Validate and publish. Done when focused native library tests, affected
    consumer compilation and boundary checks pass and the commit is on main.
-   This does not close the separate C3 Swatch or headed native acceptance proof.
+   That source integration alone did not close the C3 Swatch or headed proof;
+   the subsequent native-host fixture receipt below records the bounded result.
 
 ### Findings (2026-10-15)
 
@@ -623,5 +624,47 @@ onto current main, following mer3ly's native-phase rulings 163–166 in
   intentionally ignored. `cargo check -p mere --all-targets` passes on macOS;
   `cargo check -p pictograph --features canvas --target wasm32-unknown-unknown
   --lib` passes; changed-source formatting and port/web dependency boundaries
-  pass. No headed window, GPU-producing qualification, or Swatch acceptance ran.
-  The separate C3 acceptance frontier remains open.
+  pass. At this initial integration no headed window or Swatch acceptance ran;
+  the subsequent finite native-host checks are recorded below.
+
+
+### Headed Canvas and bounded Swatch receipt (2026-10-15)
+
+The finite `mere-view` example `fold_acceptance` runs the production
+`Canvas::frame` scene through Rootstock's `SceneProducer` on the native host's
+renderer, beside Cambium's `GraphCanvasSwatch` paint leaf and real node targets.
+Canvas exposes its existing full-fold-set boundary routing as `fold_routes`;
+the Canvas painter and the fixture's Swatch adapter use those same bundles.
+A regression independently asserts two forward and one reverse source cells
+between two folds, counted once in each direction.
+
+Both LaunchServices processes passed on macOS: interaction produced 108
+presented frames and 12 captures; reopening the saved fold records produced
+36 presented frames and five captures. All 17 captures are 1900 by 1100,
+nonblank, and were read back from presented frames. Selected captures were
+visually inspected. The fixture checks two simultaneous folds, exact directed
+boundary accounting, native pointer expansion, Swatch pointer expansion,
+undo/redo, serialized reload, fresh-process identity restoration, and explicit
+containment incoming/outgoing versus semantic outgoing membership. Source
+truth remains byte-equivalent after normalizing only the generated snapshot
+clock, and all member placements remain exact.
+
+The durable [acceptance receipt](../../../support/receipts/native-fold-20261015/acceptance.json)
+records source and binary hashes, process outcomes, captures, and limits.
+The scenarios are `crates/cambium/mere-view/examples/scenarios/folds.scn` and
+`folds_reopen.scn`. Build with
+`CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build -p mere-view --example fold_acceptance`.
+Run them with `scripts/run_macos_scenario.py`, prefix `FOLD_ACCEPTANCE`, a new
+output directory, and a 55-second timeout. The first run explicitly sets
+`FOLD_ACCEPTANCE_STATE` to an isolated file; the second explicitly sets
+`FOLD_ACCEPTANCE_RESTORE` to that file. Neither uses a real application profile.
+
+This closes the bounded native-host fixture proof. It does not close the
+plan's named Isometry campaign consumer: its Overmap currently has no fold
+controls. Keyboard gestures, live screen-reader interaction, recovery, and
+Windows/Linux headed acceptance are also outside this receipt.
+
+Validation on the tested source: `pictograph` and `mere-view` library suites
+passed 494 tests, with 18 existing Canvas timing/release tests ignored. The
+port/web dependency boundary check, changed-file rustfmt, and diff check
+passed. The existing document audit has no new findings from these changes.

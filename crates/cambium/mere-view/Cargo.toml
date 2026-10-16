@@ -25,6 +25,11 @@ sprigging = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+pictograph = { workspace = true, features = ["canvas"] }
+serde_json.workspace = true
+netrender.workspace = true
+curation.workspace = true
+
 mesquite = { workspace = true }
 # The headed harness (examples/harness.rs) and its scenario lane.
 cambium-genet-winit-host = { workspace = true }

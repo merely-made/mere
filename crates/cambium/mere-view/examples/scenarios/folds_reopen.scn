@@ -1,0 +1,28 @@
+# A second LaunchServices process, loaded from the first process's saved folds.
+assert snap fresh_process == true
+assert snap folds == 2
+assert snap swatch_nodes == 3
+assert snap routes == 3
+assert snap cells == 5
+assert snap truth == true
+assert snap positions == true
+capture fresh-process-restored
+click role:button Expand fold 0
+settle 2
+assert snap folds == 1
+capture first-expanded
+click role:button Undo fold
+settle 2
+assert snap folds == 2
+capture undo-expanded
+click role:button Redo fold
+settle 2
+assert snap folds == 1
+capture redo-expanded
+click role:button Expand all
+settle 2
+assert snap folds == 0
+assert snap swatch_nodes == 5
+assert snap truth == true
+assert snap positions == true
+capture all-expanded

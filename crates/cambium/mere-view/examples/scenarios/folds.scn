@@ -1,0 +1,78 @@
+# Native Canvas and bounded Cambium Swatch over one production fold set.
+assert snap folds == 0
+assert snap swatch_nodes == 5
+capture expanded
+click role:button Fold A and B
+settle 2
+assert snap folds == 1
+assert snap routes == 3
+assert snap cells == 5
+assert snap max_bundle == 2
+assert snap swatch_nodes == 4
+assert snap truth == true
+assert snap positions == true
+capture selection
+click role:button Undo fold
+settle 2
+assert snap folds == 0
+click role:button Redo fold
+settle 2
+assert snap folds == 1
+capture redone
+click role:button Fold other pair
+settle 2
+assert snap folds == 2
+assert snap swatch_nodes == 3
+assert snap routes == 3
+assert snap cells == 5
+capture two-folds
+click role:button Reload serialized folds
+settle 2
+assert snap reopened == true
+assert snap folds == 2
+capture restored
+click role:button Expand fold 0
+settle 2
+assert snap folds == 1
+assert snap swatch_nodes == 4
+capture swatch-expanded
+click role:button Expand all
+settle 2
+assert snap folds == 0
+assert snap swatch_nodes == 5
+assert snap truth == true
+assert snap positions == true
+capture final-expanded
+click role:button Fold A and B
+settle 2
+click role:button Native Canvas
+settle 2
+assert snap folds == 0
+assert snap truth == true
+assert snap positions == true
+capture native-expanded
+
+click role:button Collapse containment outgoing
+settle 2
+assert snap folds == 1
+assert snap swatch_nodes == 3
+capture containment-outgoing
+click role:button Expand all
+settle 2
+click role:button Collapse containment incoming
+settle 2
+assert snap folds == 1
+assert snap swatch_nodes == 4
+capture containment-incoming
+click role:button Expand all
+settle 2
+click role:button Collapse semantic outgoing
+settle 2
+assert snap folds == 1
+assert snap swatch_nodes == 4
+capture semantic-outgoing
+click role:button Expand all
+settle 2
+assert snap truth == true
+assert snap positions == true
+capture hierarchy-expanded
