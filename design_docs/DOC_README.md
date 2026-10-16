@@ -1,5 +1,9 @@
 # Mere Documentation Index
 
+Sennet custody (2026-10-16): the [Djinn plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
+records the in-progress exact device/realm station release for Signalman,
+sharing the sticky radio custody watch. Murm R7 owns nonce and RF qualification.
+
 Tucket custody (2026-10-16): the [Djinn plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
 records the qualified device/realm-scoped Signalman release and real-broker
 positive, refusal and restored-fallback controls. The Murm R6 desktop and RF
