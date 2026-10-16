@@ -1,0 +1,154 @@
+{
+  "source_checkpoint": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+  "publication": {
+    "mere_supplier": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+    "woodshed_receipt": "c32b60af83efb335153b539c7a2d16d40ece8c17",
+    "remote_verified": true
+  },
+  "implementation": {
+    "recognized_predicates": 44,
+    "canonical_families": [
+      "semantic",
+      "containment",
+      "arrangement",
+      "imported",
+      "provenance"
+    ],
+    "traversal": "existing event and rollup model",
+    "snapshot_schema": 1,
+    "codicil_schema": 4,
+    "legacy_synthesized_identity": "UUIDv5 over declared UTF-8 bytes; unknown actor and clocks remain unknown absent proven journal attribution",
+    "view_hiding": "exact assertion IDs; acknowledged saved intent; graph truth unchanged"
+  },
+  "gates": [
+    {
+      "name": "shared-libraries",
+      "source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "log": "shared-tests-integrated-v2.log",
+      "results": {
+        "cambium": 276,
+        "kernel": 466,
+        "linked_data_query": 104,
+        "mere_view": 36,
+        "pandect": 318,
+        "scenograph": 43,
+        "scenomise": 184,
+        "tabard": 37
+      },
+      "observations": [
+        "Mere query/DTO failures subsequently fixed and full package rerun passed",
+        "Pictograph 484 pass, 18 ignore, one wall-clock budget failure; same timing test passed in isolation"
+      ]
+    },
+    {
+      "name": "canvas-timing-focused",
+      "source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "log": "canvas-speed-focused.log",
+      "passed": 1
+    },
+    {
+      "name": "history-budgets",
+      "source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "result": "history-budget-results.json"
+    },
+    {
+      "name": "signed-knot-intake",
+      "source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "supplier": "b6a6222ede48bacebbc5a533c5930bcab779cee5",
+      "log": "knot-intake-integrated.log",
+      "passed": 5,
+      "ignored_helper": 1,
+      "fresh_process_child_passed": 1
+    },
+    {
+      "name": "kernel-store-fresh-process",
+      "source": "7e460bc5792e70608754913a3d18eb882f956fab",
+      "build_log": "kernel-fresh-process.log",
+      "execution_log": "kernel-fresh-process-execution.log",
+      "passed": 1,
+      "fresh_process_children_passed": 2,
+      "command": "cargo test --locked --offline -j1 -p mere-kernel --features store --test assertion_lifecycle_reopen"
+    },
+    {
+      "name": "pandect-and-mere-full-package",
+      "source": "7e460bc5792e70608754913a3d18eb882f956fab",
+      "log": "pandect-mere-final.log",
+      "passed": {
+        "mere_lib": 70,
+        "pandect_lib": 318,
+        "graph_residency": 11,
+        "live_graph": 8,
+        "reservoir_archive": 2,
+        "resident_transaction": 5
+      },
+      "ignored": 1,
+      "command": "cargo test --locked --offline -j1 -p pandect -p mere --features mere/query"
+    },
+    {
+      "name": "port-boundaries",
+      "source": "78fcd3fec834730d522daef92f31df547304cb80",
+      "log": "port-boundaries-final.log",
+      "passed": true,
+      "observation": "Script cargo tree normalized one lock dependency spelling; original lock restored after preserving the diff. No supplier revision changed."
+    },
+    {
+      "name": "graphshell-sync-and-query",
+      "source": "683b0708b905266253371660610b86d3a60d31a5",
+      "log": "graphshell-final-v6.log",
+      "status": "passed",
+      "command": "cargo test --locked --offline -j1 -p graphshell --no-default-features --features personal-sync,query-views --lib",
+      "passed": 389,
+      "ignored": 6
+    },
+    {
+      "name": "graphshell-peer-binaries",
+      "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+      "log": "graphshell-peer-builds-final.log",
+      "passed": true,
+      "command": "cargo check --locked --offline -j1 -p graphshell --no-default-features --features personal-sync,query-views --bin h7_sync_peer --bin h6_transfer_peer",
+      "scope": "Standalone binary consumer builds. Functional sync/transfer assertions exercised in Graphshell library tests."
+    },
+    {
+      "name": "wasm-product-build",
+      "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+      "log": "wasm-build-v2.log",
+      "manifest": "browser-build.json",
+      "passed": true
+    },
+    {
+      "name": "port-boundaries-final",
+      "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+      "log": "port-boundaries-a45.log",
+      "passed": true
+    },
+    {
+      "name": "browser-exact-hide-and-reopen",
+      "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+      "passed": true,
+      "reviewed_captures": 4,
+      "review": "browser-review.json"
+    }
+  ],
+  "audit": {
+    "comparison": "doc-audit/final-audit-comparison.json",
+    "status": "final compared",
+    "no_new_findings": true,
+    "known_judgment_errors": 15,
+    "global_judgment_green": false
+  },
+  "receiving_scope": {
+    "Woodshed": "Portable custom-predicate personal assertion adapter and shared opened-link compiler; native relationship recipe smoke and sealed-profile fresh app process. No Mere Graph ingestion in Woodshed.",
+    "Knot": "Signed projection imports into Mere against exact locked source; no new independent Knot native qualification."
+  },
+  "remaining": [],
+  "browser_iterations": [
+    {
+      "source": "683b0708b905266253371660610b86d3a60d31a5",
+      "status": "failed exact action selector; fixed without changing source facts or actions",
+      "evidence": "browser-v1-failed",
+      "reason": "Selector.with_attr stores one predicate; second call replaced exact ID filter. Fixed to combine exact ID and independent accessible action label."
+    }
+  ],
+  "receiving": "receiving-hosts.json",
+  "component_continuity": "component-continuity.json"
+}

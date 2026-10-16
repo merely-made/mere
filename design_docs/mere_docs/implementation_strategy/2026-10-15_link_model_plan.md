@@ -13,7 +13,8 @@ source-owned personal authoring/withdrawal, ordered audition and fresh-process
 sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d` and is
 qualified within its recorded scope on Mere source `91467c0bb` and Woodshed receiving source `fe54425`,
 published with receipt `4716b71`. P6 began from refreshed main `0f8c1bf59`;
-its migration and receiving gates are in progress. P7 remains later work.
+its bounded migration and receiving gates are qualified on Mere `a45a0b697`
+and Woodshed source `d896e39` (published receipt `c32b60a`). P7 remains later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -715,7 +716,7 @@ qualification remain separate.
 
 ## P6 continuation: all relation families as assertions
 
-**Status (2026-10-16): in progress; source integration and qualification pending.**
+**Status (2026-10-16): bounded P6 qualified.**
 Mark authorized the next phase after P4. Work begins from refreshed main
 `0f8c1bf59`; the containment proof leads the migration without conflating
 rule-derived URL/domain membership with authored reasons. The integration
@@ -758,3 +759,73 @@ substantial withdrawal history. The integrated Graphshell browser must exercise
 ordinary exact-member hide/show and saved-intent reopen. Receiving products
 advance only after their own affected source/build/native gates. These are
 requirements, not acceptance inferred from the source edits.
+
+
+### P6 qualification and receiving proof
+
+The [P6 receipt](../../../support/receipts/link-model-p6-20261016/receipt.json)
+records published supplier `a45a0b697`, based on refreshed main `fb32346fe`, and
+the exact revisions used for each source gate. A canonical assertion collection
+owns all 44 recognized predicate kinds; semantic-only compatibility APIs retain
+their scope. Query projections separately expose canonical records, including
+withdrawals, and their resting strokes count exact held IDs. A withdrawn-only
+pair has no resting stroke. Traversal retains its event collection and rollup.
+
+The final shared checkpoint passes kernel 466, linked-data with query 104,
+Mere-view 36, Cambium 276, Scenograph 43, Scenomise 184 and Tabard 37 cases.
+After the query and historical-receipt controls, full Mere and Pandect gates
+pass 70 and 318 library cases plus 26 Pandect integration cases. Kernel's store
+reopen passes in separate write/read processes. Signed Knot intake passes five
+cases plus its separate reopen child against the actual locked supplier
+`b6a6222ed`; this does not claim another Knot native qualification. Graphshell
+passes 389 cases with six existing ignores, including all-family signed sync,
+exact withdrawal, v4 codicil/legacy readers and transfer. The separately gated
+sync and transfer peers compile. The port boundary check passes.
+
+The broader Pictograph run passes 484 cases with 18 existing ignores and one
+wall-clock physics-budget failure; that same test passes in isolation with its
+original threshold. Both outcomes remain in the receipt. No timing assertion
+was relaxed. Historical receipt checks use an independent serializer derived
+from the pre-P6 field schema, rather than treating the current constructor as
+its own checksum oracle. This is source-derived compatibility evidence, not an
+old-executable or pre-P2 binary-archive migration claim.
+
+The declared debug budgets use 50,000 retained withdrawals and two held reasons.
+Kernel's 64 held reads have p95 3.684 ms; its snapshot is 16,941,071 bytes and
+peak resident memory is 111,853,568 bytes, below the 64 MiB wire and 256 MiB
+process budgets. The portable reader's 16 held reads round to p95 1 ms; explicit
+50,002-record history materializes in 88 ms, serializes to 26,218,350 bytes and
+peaks at 245,448,704 resident bytes, below its 2 s, 64 MiB and 512 MiB budgets.
+These are bounded CPU read/materialization probes, not a UI frame-rate claim.
+
+The locked offline Wasm product build passes. Four reviewed WebGPU captures at
+the default 1280 × 720 logical viewport show the two strata, acknowledged exact
+assertion hiding and ordinary restoration. The fixture's two same-actor
+CollectionMember reasons keep separate IDs and basis/evidence. Hiding one
+changes strength from two to one without changing graph facts or revision.
+A new tab reopens the same IndexedDB graph session and retained hide; Show
+hidden assertions restores strength two. The initial exact-action scenario
+selector incorrectly replaced its ID filter with its action filter. The
+corrected selector combines exact ID with accessible action text; its fresh
+origin rerun passes, and the failed iteration is retained.
+
+The [receiving record](../../../support/receipts/link-model-p6-20261016/receiving-hosts.json)
+points to Woodshed's published `c32b60a` receipt. Only its 45 root Mere package
+rows advance, from `91467c0bb` to `a45a0b697`; other suppliers and nested locks
+are preserved. Source `d896e39` passes 629 cases, seven existing ignores and
+five additional child-process checks, followed by the locked desktop build.
+Its new portable custom-predicate regression preserves exact IDs, source scope,
+actor, clocks, basis and evidence through the real personal reading adapter and
+shared compiler; exact withdrawal retains the independent held reason.
+Woodshed has no Mere Graph ingestion owner, so the four-family graph-storage
+proof remains with Mere.
+
+Two native app processes present 141 and 134 frames on the same isolated sealed
+profile, producing four reviewed captures. The generated Surface recipe's source
+identity/revision, exact assertion handle, direction, method, evidence and
+unknown clocks survive reopening. The four-file Keeper manifest is unchanged;
+the Keeper remains the same separate fixture process during this app-process
+reopen. Sealed profile byte manifests are recorded separately from source truth.
+This closes the bounded P6 receiving gate. Full Stage P4f, physical audio,
+automatic resident synchronization, pre-P2 binary archives and P7 promotion
+retain their separate gates.
