@@ -13,6 +13,8 @@
     --workspace-rule: var(--tabard-color-surface-2);
     --workspace-accent: var(--tabard-color-primary);
     --workspace-accent-ink: var(--tabard-color-on-primary);
+    /* The accent as text: Tabard's gated accent (4.5:1), not the primary fill. */
+    --workspace-accent-text: var(--tabard-color-accent, var(--tabard-color-primary));
     --workspace-selected: var(--tabard-color-tertiary);
     --workspace-selected-ink: var(--tabard-color-on-tertiary);
     --workspace-focus: var(--tabard-color-secondary);
@@ -70,7 +72,7 @@
     flex-shrink: 0;
 }
 .instrument-workspace .workspace-pane-header[data-active=true] { border-bottom: 2px solid var(--workspace-accent); }
-.instrument-workspace .workspace-pane-header[data-selected=true] .workspace-pane-title { color: var(--workspace-accent); }
+.instrument-workspace .workspace-pane-header[data-selected=true] .workspace-pane-title { color: var(--workspace-accent-text); }
 .instrument-workspace .workspace-pane-heading { flex: 1; min-width: 0; }
 .instrument-workspace .workspace-pane-title {
     margin: 0;
@@ -88,7 +90,7 @@
 .instrument-workspace .workspace-pane-actions, .instrument-workspace .workspace-pane-states { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .instrument-workspace .workspace-pane-state { font-size: 12px; color: var(--workspace-muted); }
 .instrument-workspace .workspace-pane-state[data-state=dirty] { color: var(--tabard-color-danger); }
-.instrument-workspace .workspace-pane-state[data-state=selected] { color: var(--workspace-accent); }
+.instrument-workspace .workspace-pane-state[data-state=selected] { color: var(--workspace-accent-text); }
 .instrument-workspace .frisket-tabbar { background: var(--workspace-surface); border-bottom: 1px solid var(--workspace-rule); }
 .instrument-workspace .frisket-tab { border-radius: 0; color: var(--workspace-ink); background: var(--workspace-surface); }
 .instrument-workspace .frisket-tab.active { color: var(--workspace-selected-ink); background: var(--workspace-selected); }
