@@ -2558,7 +2558,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
 dependencies = [
  "serde",
  "uuid",
@@ -4561,7 +4561,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4846,7 +4846,7 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
 dependencies = [
  "personae",
  "serde",
@@ -5448,7 +5448,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6074,7 +6074,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
 dependencies = [
  "insigne",
  "muniment",
@@ -8063,7 +8063,7 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
 dependencies = [
  "blake3",
  "ed25519-dalek 3.0.0",
@@ -8236,7 +8236,7 @@ dependencies = [
  "bytes",
  "cfg_aliases",
  "chrono",
- "constant_time_eq 0.4.2",
+ "constant_time_eq 0.1.5",
  "data-encoding",
  "derive_more",
  "genawaiter",
@@ -11195,7 +11195,7 @@ dependencies = [
 [[package]]
 name = "notochord"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
 dependencies = [
  "blake3",
  "insigne",
@@ -11257,7 +11257,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -12525,7 +12525,7 @@ dependencies = [
  "oxilangtag",
  "oxiri",
  "oxsdatatypes",
- "rand 0.8.8",
+ "rand 0.9.5",
  "thiserror 2.0.21",
 ]
 
@@ -13141,7 +13141,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "personae"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
 dependencies = [
  "blake3",
  "chacha20poly1305 0.11.0",
@@ -14164,7 +14164,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15175,7 +15175,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15243,7 +15243,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -16287,7 +16287,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -16372,7 +16372,7 @@ dependencies = [
  "oxiri",
  "oxrdf",
  "oxsdatatypes",
- "rand 0.8.8",
+ "rand 0.9.5",
  "regex",
  "rustc-hash 2.1.3",
  "sha1 0.11.0",
@@ -16393,7 +16393,7 @@ dependencies = [
  "oxiri",
  "oxrdf",
  "peg",
- "rand 0.8.8",
+ "rand 0.9.5",
  "thiserror 2.0.21",
 ]
 
@@ -16404,7 +16404,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "973ee503ab3d6c3de66b4b459233cd5b22b44dad0fb7b8d0931daf73d2ede935"
 dependencies = [
  "oxrdf",
- "rand 0.8.8",
+ "rand 0.9.5",
  "spargebra",
 ]
 
@@ -16601,7 +16601,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17086,7 +17086,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -17132,7 +17132,7 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8c27177b12a6399ffc08b98f76f7c9a1f4fe9fc967c784c5a071fa8d93cf7e1"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -17879,7 +17879,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

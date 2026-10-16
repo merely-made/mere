@@ -1,7 +1,7 @@
 {
   "schema": "mere.link-model-p3-receiving-hosts/v1",
   "date": "2026-10-16",
-  "phase_status": "in_progress",
+  "phase_status": "bounded_P3_qualified",
   "supplier": {
     "qualified_source": "732c1537afd142a21c2bf4858c0375167eae70c1",
     "published_receipt_commit": "ee324e517d501653aee8df7d5a430760a74749c0",
@@ -23,23 +23,33 @@
     "limitation": "startup snapshot; no live refresh or mutation actions. Existing plaintext projection checkpoints are a separate recorded storage follow-up."
   },
   "woodshed": {
-    "published_commit": "d3659526989ccc4bedb3c1d5cde75b31706ebef5",
-    "source": "374c75d0c8569b262f73e9ffb6786d2b482f5899",
-    "status": "source_qualified_native_pending",
+    "published_commit": "943c7629585fe2c2c5bcd3799716b61c36346e6b",
+    "source": "474d10a1714fa10e97e55c6903adde9e1fb7f712",
+    "status": "bounded_consumer_qualified",
     "root_suite_cases": 784,
     "fresh_process_child_invocations": 5,
     "ignored": 7,
     "desktop_build": "passed",
-    "native_status": "Mac locked before first launch; manual unlock requested",
-    "reviewed_native_captures": 0,
-    "receipt_url": "https://github.com/merely-made/woodshed/blob/d3659526989ccc4bedb3c1d5cde75b31706ebef5/validation/link-model-p3_20261016/receipt.json",
-    "receipt_sha256": "cd98ff10bdc857b1da1e884b6908291c2db69664cf40317bbb8ef2a388feb6d3",
-    "remaining": [
-      "native personal authoring and exact withdrawal",
-      "native ordered audition dispatch with Set unchanged",
-      "reviewed captures",
-      "fresh-process reopening of the same sealed personal source UUID/assertion IDs/tombstone"
-    ]
+    "native_status": "passed: normal textbox authoring, exact personal withdrawal, ordered audition dispatch with Set unchanged, and fresh-process sealed identity/history reopen",
+    "reviewed_native_captures": 7,
+    "receipt_url": "https://github.com/merely-made/woodshed/blob/943c7629585fe2c2c5bcd3799716b61c36346e6b/validation/link-model-p3_20261016/receipt.json",
+    "receipt_sha256": "b53eed97117e64a7735bbfb5c6f0d849f46e6adf04496c160ffdf48ab4bbd42c",
+    "affected_suite_source": "374c75d0c8569b262f73e9ffb6786d2b482f5899",
+    "final_ui_followup_cases": 191,
+    "native_seed_frames": 103,
+    "native_reopen_frames": 49,
+    "identity_comparison": {
+      "assertion_ids": [
+        "{\"writer\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"counter\":0}",
+        "{\"writer\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"counter\":1}"
+      ],
+      "source_id": "e2c3d7fe-cee0-4f06-b646-af7c22c1501e",
+      "source_uuid_and_both_ids_match": true,
+      "retained_assertions": 2,
+      "held_assertions": 1,
+      "withdrawn_assertions": 1
+    },
+    "keeper_file_manifest_unchanged": true
   },
   "rulings": {
     "independent_reasons": "separate assertions",
@@ -55,7 +65,7 @@
     "automatic resident synchronization"
   ],
   "documentation_audit": {
-    "baseline": "f27ab46ae",
+    "baseline": "a7ca9b0350ae921d0401afb49230e75818ddbf06",
     "new_finding_occurrences": 0,
     "same_judgment_errors": 15,
     "coverage": [
@@ -65,7 +75,7 @@
     "global_green": false,
     "artifact_sha256": {
       "receiving-audit/final-judgment.json": "c445ee25476f1799ba7d5ea138ef0b55df2bc5c80c95546d91c712a4fe538f6f",
-      "receiving-audit/baseline-judgment.json": "681f431aacc2e732c64aa278dfd98b9a3bc667858cb3eab44480bdd7e34758df",
+      "receiving-audit/baseline-judgment.json": "c445ee25476f1799ba7d5ea138ef0b55df2bc5c80c95546d91c712a4fe538f6f",
       "receiving-audit/comparison.json": "cd894de1aa9b4916161a9b7137bf9d740aad683ad44ec0cbf8864d1a83bff983",
       "receiving-audit/baseline-audit.json": "9bfb363fffb8779181fe1058bb1950bbdefd6a67f8f5c71089a57a6717968f42",
       "receiving-audit/final-audit.json": "5c16600d71383bb52e4289bbcbbd0a7c8fb28bc59af3ae8939598562d29a95da"

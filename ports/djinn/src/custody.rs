@@ -215,6 +215,10 @@ impl Default for ReleasePolicy {
                 KeySource::Wallet,
                 SaltRule::Matches(personae::tucket::is_station_salt),
             )
+            .with(
+                KeySource::Wallet,
+                SaltRule::Matches(personae::sennet::is_station_salt),
+            )
             .with_apps()
     }
 }
@@ -441,7 +445,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             release(keeper.policy(), &app, source, root.provider(), salts)
         },
         CustodyCall::Attest { source, salt } => {
-            if !tucket_app_allowed(&app, &salt) {
+            if !radio_station_app_allowed(&app, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
@@ -457,7 +461,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             salt,
             message,
         } => {
-            if !tucket_app_allowed(&app, &salt) {
+            if !radio_station_app_allowed(&app, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
@@ -648,8 +652,9 @@ fn device_root(data_root: &Path, label: Option<&str>) -> Result<[u8; 32], Custod
     }
 }
 
-fn tucket_app_allowed(app: &AppId, salt: &[u8]) -> bool {
-    !personae::tucket::is_station_salt(salt) || app == &AppId::new("signalman")
+fn radio_station_app_allowed(app: &AppId, salt: &[u8]) -> bool {
+    !(personae::tucket::is_station_salt(salt) || personae::sennet::is_station_salt(salt))
+        || app == &AppId::new("signalman")
 }
 
 /// Release `salts`' keys from `root`, each with its attestation (D11).
@@ -663,7 +668,7 @@ fn release(
     if salts.is_empty()
         || salts
             .iter()
-            .any(|salt| !policy.allows(source, salt) || !tucket_app_allowed(app, salt))
+            .any(|salt| !policy.allows(source, salt) || !radio_station_app_allowed(app, salt))
     {
         return Err(CustodyRefusal::NotReleasable);
     }
@@ -871,59 +876,62 @@ mod tests {
     use super::*;
 
     #[test]
-    fn tucket_release_is_exact_wallet_scope_for_signalman_only() {
+    fn radio_station_release_is_exact_wallet_scope_for_signalman_only() {
         let policy = ReleasePolicy::default();
-        let salt = personae::tucket::station_salt(&[4; 16], "ridge").unwrap();
-        let root = personae::InMemoryProvider::from_seed([19; 32]);
-        let signalman = AppId::new("signalman");
-        assert!(
-            release(
-                &policy,
-                &signalman,
-                KeySource::Wallet,
-                &root,
-                vec![salt.clone()]
-            )
-            .is_ok()
-        );
-        assert!(
-            release(
-                &policy,
-                &AppId::new("turnstone"),
-                KeySource::Wallet,
-                &root,
-                vec![salt.clone()]
-            )
-            .is_err()
-        );
-        assert!(
-            release(
-                &policy,
-                &signalman,
-                KeySource::Persona,
-                &root,
-                vec![salt.clone()]
-            )
-            .is_err()
-        );
-        for forbidden in [
-            vec![],
-            b"mere.signalman.tucket.station/v1/".to_vec(),
-            [salt.as_slice(), b"x"].concat(),
+        for salt in [
+            personae::tucket::station_salt(&[4; 16], "ridge").unwrap(),
+            personae::sennet::station_salt(&[4; 16], "ridge").unwrap(),
         ] {
+            let root = personae::InMemoryProvider::from_seed([19; 32]);
+            let signalman = AppId::new("signalman");
             assert!(
                 release(
                     &policy,
                     &signalman,
                     KeySource::Wallet,
                     &root,
-                    vec![salt.clone(), forbidden]
+                    vec![salt.clone()]
+                )
+                .is_ok()
+            );
+            assert!(
+                release(
+                    &policy,
+                    &AppId::new("turnstone"),
+                    KeySource::Wallet,
+                    &root,
+                    vec![salt.clone()]
                 )
                 .is_err()
             );
+            assert!(
+                release(
+                    &policy,
+                    &signalman,
+                    KeySource::Persona,
+                    &root,
+                    vec![salt.clone()]
+                )
+                .is_err()
+            );
+            for forbidden in [
+                vec![],
+                b"mere.signalman.tucket.station/v1/".to_vec(),
+                [salt.as_slice(), b"x"].concat(),
+            ] {
+                assert!(
+                    release(
+                        &policy,
+                        &signalman,
+                        KeySource::Wallet,
+                        &root,
+                        vec![salt.clone(), forbidden]
+                    )
+                    .is_err()
+                );
+            }
         }
     }
-
     #[test]
     fn the_default_policy_releases_named_namespaces_and_never_the_master() {
         let policy = ReleasePolicy::default();
