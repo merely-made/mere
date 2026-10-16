@@ -40,7 +40,7 @@ pub struct OpenedFrozenSelection<'a> {
 }
 // Legacy edge DTOs deliberately remain permissive. This v1 carrier checks
 // every nested key against what their typed serialization retains instead.
-fn validate_retained_keys(
+pub(super) fn validate_retained_keys(
     input: &serde_json::Value,
     known: &serde_json::Value,
 ) -> Result<(), String> {
@@ -66,7 +66,7 @@ fn validate_retained_keys(
     Ok(())
 }
 
-fn normalize_statement_defaults(statements: &mut [serde_json::Value]) {
+pub(super) fn normalize_statement_defaults(statements: &mut [serde_json::Value]) {
     for statement in statements {
         let object = statement
             .as_object_mut()
