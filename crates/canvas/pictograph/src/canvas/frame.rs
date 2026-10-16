@@ -231,6 +231,10 @@ impl Canvas {
             .filter(|key| node_visible(*key))
             .collect();
 
+        // The graph grammar, when the host presents by it: who is loud, who is
+        // labelled, each node's category.
+        let grammar = self.grammar_frame();
+
         // Route the underlay through the canvas's forme arrangement — the full
         // read-through Identity arrangement, or a curated arrangement of just the
         // scope. Either way the canvas renders as a Cartography projection of an
@@ -277,6 +281,7 @@ impl Canvas {
             &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
             |key| self.node_size(key),
+            |from, to| super::grammar_view::link_tone(grammar.as_ref(), from, to),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
         // Community rings: a halo per node in its community's colour, spliced into the same
@@ -336,7 +341,10 @@ impl Canvas {
             // generalizes the old `NODE_HALF * z` (identical at the default
             // size) so the billboard stays centred on its anchor.
             // (Projection proofs — P3, the visible size channel.)
-            let face = self.node_size(key);
+            let face = self.node_size(key)
+                * grammar
+                    .as_ref()
+                    .map_or(1.0, |_| self.grammar_face_scale(key));
             let half = face * 0.5 * z;
             // P3 fake height: raise the gnode above its ground anchor (a stem, drawn under
             // the gnodes, drops back to the ground where the edges meet). Zero unless
@@ -383,7 +391,10 @@ impl Canvas {
             // embedded. The open representation tail falls back to Card.
             // (Projection proofs — P3b renderer consumption.)
             let representation_class = self.node_representation_class(key);
-            let class = format!("{state_class}{shape_class}{representation_class}");
+            let class = match &grammar {
+                Some(frame) => format!("{}{representation_class}", self.grammar_class(key, frame)),
+                None => format!("{state_class}{shape_class}{representation_class}"),
+            };
             gnode_updates.push((gnode, style, Some(class)));
         }
         // Each fold's "+N", over the node layer it belongs to: none when the
