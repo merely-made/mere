@@ -511,3 +511,46 @@ fn source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_tru
         );
     }
 }
+
+#[test]
+fn shared_fold_routes_count_cross_fold_cells_once_in_each_direction() {
+    use crate::canvas::fold_projection::FoldTraversalDirection;
+    use crate::canvas::{FoldEndpoint, FoldRoute};
+    use kernel::graph::EdgeFamily;
+    let (mut canvas, [root, x, y, other, z]) = two_hierarchies();
+    assert!(canvas.assert_relation_between_members(x, other, SemanticSubKind::Cites));
+    assert!(canvas.assert_relation_between_members(y, z, SemanticSubKind::Quotes));
+    assert!(canvas.assert_relation_between_members(other, x, SemanticSubKind::Cites));
+    let before = persisted_truth(canvas.graph().to_snapshot());
+    for id in [root, other] {
+        let key = canvas.graph().get_node_key_by_id(id).unwrap();
+        assert!(
+            canvas
+                .collapse_descendants(
+                    key,
+                    EdgeFamily::Containment,
+                    FoldTraversalDirection::Outgoing,
+                    "shared-routes"
+                )
+                .is_some()
+        );
+    }
+    assert_eq!(
+        canvas.fold_routes(),
+        vec![
+            FoldRoute {
+                from: FoldEndpoint::Fold(0),
+                to: FoldEndpoint::Fold(1),
+                family: EdgeFamily::Semantic,
+                count: 2
+            },
+            FoldRoute {
+                from: FoldEndpoint::Fold(1),
+                to: FoldEndpoint::Fold(0),
+                family: EdgeFamily::Semantic,
+                count: 1
+            },
+        ]
+    );
+    assert_eq!(persisted_truth(canvas.graph().to_snapshot()), before);
+}

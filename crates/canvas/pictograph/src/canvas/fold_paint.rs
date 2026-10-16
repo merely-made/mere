@@ -9,7 +9,7 @@
 use std::collections::{BTreeMap, HashMap};
 
 use kernel::geometry::PortablePoint;
-use kernel::graph::NodeKey;
+use kernel::graph::{EdgeFamily, NodeKey};
 use paint_list_api::{
     CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, RectItem, StrokeCap,
     StrokeItem, StrokeJoin,
@@ -19,18 +19,28 @@ use super::Canvas;
 use super::edge_cells::{edge_cell_for_relation, relation_family_color};
 use super::fold_projection::{FOLD_SUMMARY_RADIUS, FoldProjection};
 
+/// A source node or a stand-in indexed in the current fold projection set.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-enum Endpoint {
+pub enum FoldEndpoint {
     Node(NodeKey),
     Fold(usize),
 }
 
+/// One family bundle between visible fold stand-ins or ordinary nodes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FoldRoute {
+    pub from: FoldEndpoint,
+    pub to: FoldEndpoint,
+    pub family: EdgeFamily,
+    pub count: usize,
+}
+
 impl Canvas {
-    pub(super) fn fold_overlay(
-        &self,
-        folds: &[FoldProjection],
-        positions: &HashMap<NodeKey, PortablePoint>,
-    ) -> Vec<PaintCmd> {
+    /// Boundary cells routed through the complete active fold set. Fold indices
+    /// refer to `fold_projections()` in the same state. Hidden and out-of-scope
+    /// source cells are excluded; each directed source cell contributes once.
+    pub fn fold_routes(&self) -> Vec<FoldRoute> {
+        let folds = self.fold_projections();
         if folds.is_empty() {
             return Vec::new();
         }
@@ -42,20 +52,7 @@ impl Canvas {
         let endpoint = |key| {
             membership
                 .get(&key)
-                .map_or(Endpoint::Node(key), |&index| Endpoint::Fold(index))
-        };
-        let position = |key| positions.get(&key).copied();
-        let geometry = |endpoint| match endpoint {
-            Endpoint::Node(key) => position(key).map(|p| (p, self.node_size(key) / 2.0)),
-            Endpoint::Fold(index) => {
-                let fold = &folds[index];
-                if let Some(key) = fold.stand_in {
-                    position(key).map(|p| (p, self.node_size(key) / 2.0))
-                } else {
-                    fold.summary_center(position)
-                        .map(|p| (p, FOLD_SUMMARY_RADIUS))
-                }
-            },
+                .map_or(FoldEndpoint::Node(key), |&index| FoldEndpoint::Fold(index))
         };
         let in_scope = |key| self.scope.as_ref().is_none_or(|scope| scope.contains(&key));
         let mut bundles = BTreeMap::new();
@@ -80,8 +77,46 @@ impl Canvas {
                     .or_insert(0usize) += 1;
             }
         }
+        bundles
+            .into_iter()
+            .map(|((from, to, family), count)| FoldRoute {
+                from,
+                to,
+                family,
+                count,
+            })
+            .collect()
+    }
+
+    pub(super) fn fold_overlay(
+        &self,
+        folds: &[FoldProjection],
+        positions: &HashMap<NodeKey, PortablePoint>,
+    ) -> Vec<PaintCmd> {
+        if folds.is_empty() {
+            return Vec::new();
+        }
+        let position = |key| positions.get(&key).copied();
+        let geometry = |endpoint| match endpoint {
+            FoldEndpoint::Node(key) => position(key).map(|p| (p, self.node_size(key) / 2.0)),
+            FoldEndpoint::Fold(index) => {
+                let fold = &folds[index];
+                if let Some(key) = fold.stand_in {
+                    position(key).map(|p| (p, self.node_size(key) / 2.0))
+                } else {
+                    fold.summary_center(position)
+                        .map(|p| (p, FOLD_SUMMARY_RADIUS))
+                }
+            },
+        };
         let mut commands = Vec::new();
-        for ((from, to, family), count) in bundles {
+        for FoldRoute {
+            from,
+            to,
+            family,
+            count,
+        } in self.fold_routes()
+        {
             let (Some((a, a_radius)), Some((b, b_radius))) = (geometry(from), geometry(to)) else {
                 continue;
             };
