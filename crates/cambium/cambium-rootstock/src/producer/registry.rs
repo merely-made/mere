@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Weak};
 
@@ -16,20 +16,31 @@ use paint_list_api::{
 use super::*;
 use crate::{NodeId, OwnedLayout, Surface};
 
+#[cfg(test)]
+#[path = "shadow_namespace_tests.rs"]
+mod shadow_namespace_tests;
+
 #[path = "portable.rs"]
 mod portable;
 pub use portable::PortableCaptureError;
 pub(crate) use portable::PortablePlan;
 use portable::PortableSlot;
 
-// Rootstock physical producer IDs reserve the upper half of Netrender's
-// lower-62-bit producer domain. The full renderer image keys are therefore
-// 0xE000_0000_0000_0000..=u64::MAX. Direct, non-Rootstock external-image callers
-// sharing a renderer must not register keys in this physical binding range.
+// Rootstock physical producer IDs use the upper half of Netrender's
+// lower-62-bit producer domain, below its generated shadow-mask range.
+// Full renderer keys are 0xE000_0000_0000_0000..0xFFFF_0000_0000_0000.
+// Direct external-image callers sharing a renderer must not register keys
+// in this physical binding range. Preserve the translator's mask keys: moving
+// them into the inline domain could leave a retained renderer override that
+// captures an unrelated inline image in a later frame.
 // Local DOM/paint/portable keys still admit the entire lower-62-bit domain:
 // every local reference is remapped, even if its number lies in this range.
+const LOCAL_PRODUCER_END: u64 = 1 << 62;
+// Matches the translator's generated mask band; real-translator tests guard
+// this supplier contract rather than inferring mask ownership from key alone.
+const SHADOW_MASK_IMAGE_KEY_BASE: u64 = 0xFFFF_0000_0000_0000;
 const PHYSICAL_PRODUCER_BASE: u64 = 1 << 61;
-const PHYSICAL_PRODUCER_END: u64 = 1 << 62;
+const PHYSICAL_PRODUCER_END: u64 = SHADOW_MASK_IMAGE_KEY_BASE - netrender::EXTERNAL_IMAGE_KEY_BASE;
 static NEXT_PHYSICAL_PRODUCER: AtomicU64 = AtomicU64::new(PHYSICAL_PRODUCER_BASE);
 
 fn allocate_renderer_key(next: &AtomicU64) -> Result<u64, ProducerRegistrationError> {
@@ -67,6 +78,9 @@ pub enum ProducerGpuRemapError {
     ForeignInlineImage {
         renderer_key: u64,
     },
+    InconsistentShadowMask {
+        renderer_key: u64,
+    },
     UnsupportedRetainedFragment {
         fragment_id: u64,
     },
@@ -88,30 +102,38 @@ fn local_external_key(key: u64) -> Option<u64> {
     (key >= netrender::EXTERNAL_IMAGE_KEY_BASE).then(|| key - netrender::EXTERNAL_IMAGE_KEY_BASE)
 }
 
-/// Plan every rewrite before applying any of them. Image and pattern keys in
-/// the external namespace are local here, never already-physical passthrough.
+/// Plan every rewrite before applying any of them. External image and pattern
+/// references are local here, never already-physical passthrough. A validated
+/// translator mask is identified by its ownership metadata, except at a
+/// recorded producer image boundary where the same numeric key can be local.
 fn remap_gpu_display_list(
     translated: &mut paint_list_render::TranslatedDisplayList,
     binding: impl Fn(u64) -> Result<GpuBinding, ProducerGpuRemapError>,
 ) -> Result<(), ProducerGpuRemapError> {
+    let mut mask_keys = BTreeSet::new();
+    for mask in &translated.box_shadow_masks {
+        if mask.key < SHADOW_MASK_IMAGE_KEY_BASE
+            || !mask_keys.insert(mask.key)
+            || translated.scene.image_sources.contains_key(&mask.key)
+        {
+            return Err(ProducerGpuRemapError::InconsistentShadowMask {
+                renderer_key: mask.key,
+            });
+        }
+    }
     for &key in translated.scene.image_sources.keys() {
         if local_external_key(key).is_some() {
             return Err(ProducerGpuRemapError::ForeignInlineImage { renderer_key: key });
         }
     }
-    for mask in &translated.box_shadow_masks {
-        if local_external_key(mask.key).is_some() {
-            return Err(ProducerGpuRemapError::ForeignInlineImage {
-                renderer_key: mask.key,
-            });
-        }
-    }
+    let mut producer_boundaries = BTreeSet::new();
     let mut draw_rewrites = Vec::new();
     for (index, draw) in translated.external_textures.iter().enumerate() {
-        if draw.texture_key >= PHYSICAL_PRODUCER_END
+        if draw.texture_key >= LOCAL_PRODUCER_END
             || local_external_key(draw.image_key) != Some(draw.texture_key)
             || !matches!(translated.scene.ops.get(draw.scene_op_boundary),
                 Some(netrender::SceneOp::Image(image)) if image.key == draw.image_key)
+            || !producer_boundaries.insert(draw.scene_op_boundary)
         {
             return Err(ProducerGpuRemapError::InconsistentDrawBinding {
                 local_key: draw.texture_key,
@@ -131,7 +153,12 @@ fn remap_gpu_display_list(
     let mut op_rewrites = Vec::new();
     for (index, op) in translated.scene.ops.iter().enumerate() {
         let key = match op {
-            netrender::SceneOp::Image(image) => image.key,
+            netrender::SceneOp::Image(image) => {
+                if mask_keys.contains(&image.key) && !producer_boundaries.contains(&index) {
+                    continue;
+                }
+                image.key
+            },
             netrender::SceneOp::Pattern(pattern) => pattern.tile,
             // Rootstock emits its custom leaves as complete ordinary commands.
             // Opaque retained fragments cannot be inspected for local external
@@ -225,7 +252,7 @@ impl ProducerRegistry {
         producer: impl TextureProducer + 'static,
         properties: &[&str],
     ) -> Result<(), ProducerRegistrationError> {
-        if key >= 1_u64 << 62 {
+        if key >= LOCAL_PRODUCER_END {
             return Err(ProducerRegistrationError::KeyOutOfRange);
         }
         if self.entries.contains_key(&key) {
@@ -892,7 +919,10 @@ mod namespace_controls {
     #[test]
     fn physical_identity_exhaustion_is_typed_and_never_wraps() {
         let next = AtomicU64::new(PHYSICAL_PRODUCER_END - 1);
-        assert_eq!(allocate_renderer_key(&next), Ok(u64::MAX));
+        assert_eq!(
+            allocate_renderer_key(&next),
+            Ok(SHADOW_MASK_IMAGE_KEY_BASE - 1)
+        );
         for _ in 0..2 {
             assert_eq!(
                 allocate_renderer_key(&next),
@@ -949,7 +979,7 @@ mod namespace_controls {
 
     #[test]
     fn authored_high_local_key_is_remapped_with_local_command_identity_preserved() {
-        let local = PHYSICAL_PRODUCER_END - 1;
+        let local = LOCAL_PRODUCER_END - 1;
         let mut registry = ProducerRegistry::new();
         registry.register(local, CpuSource, &[]).unwrap();
         let physical = registry.entries[&local].renderer_key;
