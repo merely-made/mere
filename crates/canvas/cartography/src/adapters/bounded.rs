@@ -4,16 +4,17 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Adapters for the bounded arrangements (Partition, Sets): both fill the
-//! request's target size, centred on the origin, and both read their groups
-//! from the axis the host threads onto the intent.
+//! Adapters for the share arrangements: Partition and Sets fill the request's
+//! target size, centred on the origin; Mosaic grows on the infinite canvas.
+//! All three read their groups from the axis the host threads onto the
+//! intent.
 
 use std::collections::{BTreeMap, HashMap};
 
 use kernel::graph::NodeKey;
 use sceno::{Arrangement, Rect, SET_SEPARATOR, Size2, Vec2};
 
-use super::{Disclosures, project_arrangement};
+use super::{Disclosures, project_arrangement, project_score, score_from_request};
 use crate::projection::Projection;
 use crate::request::{AxisValue, ProjectionRequest};
 use crate::signals::WEIGHT_DEGREE;
@@ -143,5 +144,73 @@ impl LayoutStrategy for SetsAdapter {
             &Disclosures::from_intent(request).with_weight(tier),
             Vec::new(),
         )
+    }
+}
+
+/// Tiles by weight on the infinite canvas, grouped by the axis. A tile's
+/// weight is `weight.degree` plus one, times the person's size factor; the
+/// person's order leads within each group.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct MosaicAdapter {
+    pub config: sceno::Mosaic,
+    /// Nodes in the person's order; unlisted nodes follow in score order.
+    pub order: Vec<NodeKey>,
+    /// Size factors the person set, by node.
+    pub scale: HashMap<NodeKey, f32>,
+}
+
+impl MosaicAdapter {
+    pub const PROJECTION_ID: &'static str = "mosaic.default";
+}
+
+impl LayoutStrategy for MosaicAdapter {
+    fn projection_id(&self) -> &'static str {
+        Self::PROJECTION_ID
+    }
+
+    fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
+        let degree: HashMap<NodeKey, f32> = request
+            .signals
+            .weights(WEIGHT_DEGREE)
+            .map(|weights| weights.weights.iter().copied().collect())
+            .unwrap_or_default();
+        let weight = request
+            .graph
+            .nodes()
+            .map(|(key, _)| {
+                let base = degree.get(&key).copied().unwrap_or(0.0).max(0.0) + 1.0;
+                (key, base * self.scale.get(&key).copied().unwrap_or(1.0))
+            })
+            .collect();
+        let disclosures = Disclosures::from_intent(request).with_weight(weight);
+        let arrangement = Arrangement::Mosaic(self.config.clone());
+        let (mut score, keys) = match score_from_request(request, arrangement, &disclosures) {
+            Ok(scored) => scored,
+            Err(fault) => {
+                return super::faulted_projection(Self::PROJECTION_ID, vec![fault])
+                    .with_graph_coverage(request.graph);
+            },
+        };
+        if keys.is_empty() {
+            return super::empty_projection(Self::PROJECTION_ID).with_graph_coverage(request.graph);
+        }
+        // The person's order first, then the score's, as fresh ordinals.
+        let rank: HashMap<NodeKey, usize> = self
+            .order
+            .iter()
+            .enumerate()
+            .map(|(i, key)| (*key, i))
+            .collect();
+        let mut paired: Vec<_> = score.items.drain(..).zip(keys).collect();
+        paired.sort_by_key(|(item, key)| {
+            (rank.get(key).copied().unwrap_or(usize::MAX), item.ordinal)
+        });
+        let mut keys = Vec::with_capacity(paired.len());
+        for (ordinal, (mut item, key)) in paired.into_iter().enumerate() {
+            item.ordinal = ordinal as u32;
+            score.items.push(item);
+            keys.push(key);
+        }
+        project_score(Self::PROJECTION_ID, request, &score, &keys)
     }
 }

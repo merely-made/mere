@@ -44,6 +44,9 @@ pub enum CanvasCommand {
     DismissRetained,
     /// Pin the selection forward, or release it if all of it is pinned.
     ToggleForegroundPin,
+    /// Grow or shrink the selected Mosaic tiles by a quarter.
+    GrowTiles,
+    ShrinkTiles,
 }
 
 impl CanvasCommand {
@@ -92,6 +95,8 @@ impl CanvasCommand {
             Self::RestoreRecipeSeed => host.restore_recipe_seed(),
             Self::DismissRetained => host.dismiss_all_retained(),
             Self::ToggleForegroundPin => host.toggle_selection_foreground_pin(),
+            Self::GrowTiles => host.resize_selected_tiles(1.25),
+            Self::ShrinkTiles => host.resize_selected_tiles(0.8),
         }
     }
 }
