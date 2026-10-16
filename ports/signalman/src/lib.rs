@@ -42,8 +42,8 @@ mod head;
 mod lease;
 
 pub use authority::{
-    DjinnStationAuthority, ReleasedTucketStation, SIGNALMAN_APP, StationAuthority,
-    TucketCustodyLease, controller_salts, station_salts,
+    DjinnStationAuthority, ReleasedSennetStation, ReleasedTucketStation, SIGNALMAN_APP,
+    StationAuthority, StationCustodyLease, TucketCustodyLease, controller_salts, station_salts,
 };
 pub use control::{
     SITED_STATION_CONTROL_ACK_TITLE, SITED_STATION_CONTROL_TITLE, SitedStationControl,

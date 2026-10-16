@@ -25,8 +25,10 @@ use pandect::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::RetainedKeys;
 use personae::carry::DeviceGrantSet;
 
+mod sennet;
 mod tucket;
-pub use tucket::{ReleasedTucketStation, TucketCustodyLease};
+pub use sennet::ReleasedSennetStation;
+pub use tucket::{ReleasedTucketStation, StationCustodyLease, TucketCustodyLease};
 
 /// The application name Signalman connects to djinn as.
 pub const SIGNALMAN_APP: &str = "signalman";
