@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "result": "custody_boundary_passed",
+  "source_basis": "4d744b8347dce72f695eab05815a4a472aed8355",
+  "positive": "restored-verified/qualification.json",
+  "negative": "negative-control/qualification.json",
+  "policy_tests": "2 passed",
+  "clean_source_sha256": "082a3c434d615b3c4c702d29170adacd5c8c080f049076736049808eea55eb6c",
+  "clean_probe_sha256": "69159ce2b88f8e0041bebb5b02dc8110e84f86713086aa2d6577573134bac400",
+  "negative_probe_sha256": "368c488708fb03658c9b357e062a5eac6b65f700a0bfd37cfc438be17d9a444e",
+  "port_strict_clippy": "passed",
+  "djinn_strict_clippy": "blocked by existing sync and door diagnostics",
+  "desktop": "receiving gate pending",
+  "rf": "not run in this custody qualification",
+  "private_runtime_tracked": false,
+  "cleanup": "synthetic wallet deletion blocked by automatic review; ignored runtime retained",
+  "upstream_integration": {
+    "source": "0e6178bce156047108144e79edc15058ab319d99",
+    "upstream": "c01c0aa7",
+    "check": "locked/offline mere-signalman and djinn libraries passed",
+    "qualified_custody_git_blobs": "identical to cd277ded"
+  }
+}

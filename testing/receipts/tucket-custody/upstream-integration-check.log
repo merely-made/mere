@@ -1,0 +1,10 @@
+error: failed to get `knot-editor` as a dependency of package `djinn v0.0.2 (C:\Users\mark_\Code\worktrees\mere-tucket-custody\ports\djinn)`
+
+Caused by:
+  failed to load source for dependency `knot-editor`
+
+Caused by:
+  unable to update https://github.com/merely-made/knot-editor.git?branch=main#0020a50e
+
+Caused by:
+  can't checkout from 'https://github.com/merely-made/knot-editor.git': you are in the offline mode (--offline)
