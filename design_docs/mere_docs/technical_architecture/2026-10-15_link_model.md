@@ -11,8 +11,9 @@ Mark then clarified the dynamics purpose: links respond to fields and perhaps
 to compatible links, making different dynamics legible (§7.3). P5 explores
 that response independently of the other phases. The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
-owns current assignments, evidence and limits. P2–P4/P6 (§8) are unscheduled;
-open rulings O1 and O4–O8 (§9) remain open.
+owns current assignments, evidence and limits. P2–P4, P6 and P7 (§8) are unscheduled.
+Mark ruled the remaining open questions as L7–L13 on 2026-10-15 (§4); none
+remain open (§9).
 
 **Inputs.** The verified seven-agent survey of 2026-10-15
 (`testing/mere/link-edge-survey-20261015/survey.json`, outside this repo,
@@ -135,13 +136,14 @@ states only what is new.
   with many appearances, and it keeps its Resource origin (TERMINOLOGY). If
   a pair ever needs an identity of its own, for comments or shared review, it
   is **promoted**: it is frozen into a Resource the way a selection is frozen
-  (ruling 8), with assertion copies at a revision. Under the resource-leaf
-  draft, a selector alone mints no entity.
+  (ruling 8), with assertion copies at a revision (L11, phase P7). Under the
+  resource-leaf draft, a selector alone mints no entity.
 - **edge**: unchanged. A relation across strata, today the zero-hop shown
   binding. This design adds no new edge kind.
 - **strength** (view rule): a per-view function from a link's held
   assertions to one number. Its default is the sum over held assertions of
-  each predicate's declared force contribution. Stroke weight reads it, and
+  each predicate's declared force contribution, which is 1 for every
+  predicate until the dynamics grammar plan sets otherwise (L9). Stroke weight reads it, and
   so may a link spring's stiffness. Each assertion's term is its
   **allocated share**. That share is not a measured force (§7.3). Strength
   is a setting, not truth (audit thread 4: "the strength projection probably
@@ -193,6 +195,40 @@ L1–L4 were asked as four questions, and L5–L6 as two more after the review (
   It carries `source` and its revision. The kernel adapts its native
   assertions into it, and Woodshed and Knot disclose into it through
   scenomise.
+
+Mark ruled the open questions on 2026-10-15, after the implementer's first
+slice (§11):
+
+- **L7. Valid time: not yet (formerly O1).** Assertions carry record time
+  only. When a consumer needs asserter-claimed valid time, it is added as one
+  optional interval in `basis` and never becomes the timeline's default axis.
+- **L8. Chartulary converges (formerly O4).** Before P3's Woodshed proof,
+  chartulary relations gain asserter, span and basis under §6's rules.
+  Chartulary's `EdgeId(writer, counter)` is the assertion id, and
+  Connect/Disconnect become assert/withdraw.
+- **L9. Strength defaults are settled with the dynamics grammar plan
+  (formerly O5).** Until then every held assertion contributes 1 to
+  strength, which matches today's multiplicity. Traversal count and recency
+  do not feed strength yet.
+- **L10. Selection opens; lanes are rows (formerly O6).** Selecting a link
+  opens it. Zoom-to-open is a per-view setting, off by default. Timeline
+  lanes are stacked rows inside the existing Timeline family, with no new
+  family and no second axis.
+- **L11. Promotion is planned now (formerly O7).** A link can be frozen into
+  a Resource for comments and shared review, as phase P7 after P3 (§8). This
+  was not the recommended option, which had kept promotion as an escape
+  hatch only.
+- **L12. Compaction by predicate nature (formerly O8).** Content predicates
+  keep withdrawals until a checkpoint. Session and arrangement predicates
+  drop withdrawals at session end. Traversal compacts into its rollup.
+- **L13. Two reasons from one asserter are two assertions.** When one
+  asserter gives two independent reasons for the same predicate on one pair,
+  each is its own assertion, separately withdrawable and with its own time.
+  P2 extends ruling 1's dedup key with a **reason key**: the method IRI
+  without its version, plus the sorted evidence references, and empty for a
+  plain explicit claim. A reassertion with the same reason key still updates
+  its own record, and a new extractor version still updates its predecessor
+  (ruling 5). P1 keeps today's key unchanged.
 
 ## 5. Retire, subsume, keep
 
@@ -266,7 +302,7 @@ last confirmed it and when it was withdrawn. The span is
 asserter after a withdrawal mints a **new** assertion, because dedup matches
 held records only, so a pair's history is a sequence of closed intervals,
 never a revived one. Asserter-claimed **valid time** ("these were related from
-2010 to 2015") is not a field. It is open ruling O1.
+2010 to 2015") is not a field yet (L7).
 
 Clock rule: the caller's time is used when the caller supplies one: Knot's
 signed header, an ingested `prov:generatedAtTime`, a sync event. Otherwise the
@@ -303,7 +339,7 @@ item below:
   withdrawn is a no-op.
 - **Old records stay undated.** Migration does not guess times.
 - **Compaction follows checkpoints for shared assertions** (L2 and the
-  deletion plan §3.3). Local compaction windows are open ruling O8.
+  deletion plan §3.3). Local compaction follows predicate nature (L12).
 
 1. **Stamp every route at first write.** `apply.rs` (`AssertRelation`),
    `edge_ops.rs` (`assert_relation`, predicate setter) and graphshell personal
@@ -356,7 +392,8 @@ so "no more assertions" and "not loaded" stay distinct.
 
 ### 7.2 The opened link, which is the "nested link"
 
-Opening a link (select, or zoom past a threshold) shows a **swatch at link
+Selecting a link opens it (L10). Opening past a zoom threshold is a
+per-view setting, off by default. An opened link shows a **swatch at link
 scope**. That is the existing swatch with one new scope value, compiled to a
 scene in one of two arrangements, chosen from the disclosed data and
 switchable:
@@ -484,9 +521,22 @@ current storage, so a consumer benefits before any persistence change.
 - **P3. Opened link.** Swatch link scope with list and timeline arrangements
   (§7.2). Proof: Graphshell, then **Woodshed** (selection, explanation,
   method provenance, withdraw routed to Woodshed's source, P4f audition per
-  assertion), then **Knot** (authored time and retraction). Deletes Woodshed's
+  assertion), then **Knot** (authored time and retraction). Before Woodshed's
+  proof, chartulary relations gain asserter, span and basis, with `EdgeId` as
+  the assertion id (L8). Timeline lanes are stacked rows inside the existing
+  Timeline family (L10). Deletes Woodshed's
   `compact_relation_summaries`, `SetGraphRelationChoice` and
   `StageRelationKey` identity.
+- **P7. Promoted link (L11; after P3, independent of P4–P6).** Freezing an
+  opened link mints a Resource holding the link key (stratum and endpoints),
+  copies of its assertions as they stood at the freeze revision, and each
+  source's revision, by ruling 8's pattern. Each freeze is its own Resource.
+  Comments and review attach to it as assertions about that Resource. The live
+  link keeps reading current assertions, and the frozen record shows how it
+  has drifted from them. Proof: Graphshell, where selection freezing already
+  exists. Done when a later withdrawal leaves the frozen copy unchanged, a
+  receiver evaluates the shared Resource under ruling 4's coverage, and no
+  stored pair entity appears outside the promoted Resource.
 - **P4. Rest stroke, fan retired.** One stroke per link with direction and
   opposition marks (L4) in **Woodshed's relationship editor** first, the
   surface that started this lane. Then pictograph, cambium `graph_canvas` and
@@ -516,7 +566,8 @@ current storage, so a consumer benefits before any persistence change.
 
 ### 8.1 Execution recommendation: a core sequence and an independent probe
 
-Keep **P1 → P2 → P3 → P4 → P6** as one integration sequence. P1 settles the
+Keep **P1 → P2 → P3 → P4 → P6** as one integration sequence. P7 follows P3
+on the same contracts and does not block P4 or P6. P1 settles the
 portable link key, assertion reference, source/revision and coverage contract
 with two real consumers. P2 then owns persistence, replay, withdrawal and
 query semantics together. P3 and P4 consume those contracts before P6 replaces
@@ -544,32 +595,7 @@ and reviewed native behavior. This routing does not claim phase acceptance. Exec
 
 ## 9. Open rulings for Mark
 
-- **O1. Valid time.** Should an asserter be able to claim when a relation held
-  in the world, beyond record time? Recommended: not yet. When a consumer
-  needs it, add it as one optional `basis` interval, never as the timeline's
-  default axis.
-- **O2, O3.** Ruled as L5 and L6 (§4).
-- **O4. Chartulary convergence.** Chartulary models one edge per relation
-  with `EdgeId(writer, counter)`, which is already an assertion with an id,
-  and the kernel models a bucket of statements. Should chartulary relations
-  gain asserter, span and basis so Woodshed's links have time? Recommended:
-  yes, before P3's Woodshed proof, with chartulary's `EdgeId` as the
-  assertion id.
-- **O5. Strength defaults.** Each recognized predicate's force contribution,
-  and whether traversal counts or recency feed it. Recommended: settle with
-  the dynamics grammar plan's G-phases rather than here.
-- **O6. Open threshold and lanes.** When does a link open on zoom, and does
-  the Timeline family need a second (lane) axis? The Woodshed hocket survey
-  brief (`woodshed/design_docs/2026-10-14_dsp_graphshell_hocket_survey_brief.md`:210)
-  flags the same one-axis limit. Recommended: lanes as stacked rows inside
-  Timeline, with no new family.
-- **O7. Promotion.** Is freezing a link into a Resource, for comments and
-  shared review, wanted now? Recommended: no; record it as the escape hatch
-  only.
-- **O8. Compaction windows.** How long a locally withdrawn assertion stays
-  before its predicate's lifecycle compacts it. Recommended: content
-  predicates keep withdrawals until a checkpoint; session and arrangement
-  predicates drop at session end.
+None. O1–O8 were ruled as L5–L12, and the same-asserter question as L13 (§4).
 
 ## 10. Vocabulary
 
@@ -628,3 +654,8 @@ to Graphshell's output; graph-only consumers report missing source context
 rather than inventing public identity or revision. The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
 records checks and open gates. P2–P4/P6 and P5's host/visual proof remain open.
+
+**2026-10-15, open rulings.** Mark ruled O1 and O4–O8, and the plan's pending
+same-asserter question, as L7–L13. They took the recommended option on each
+except O7, choosing to plan promotion now (P7) rather than keep it as an
+escape hatch.

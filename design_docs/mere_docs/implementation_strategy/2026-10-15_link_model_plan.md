@@ -19,13 +19,21 @@ stored pair entity. P1 does not introduce claim-editing UI or pair promotion.
 Use one integration owner for the portable contract and persistence. The core
 sequence remains P1 → P2 → P3 → P4 → P6. The independent P5 evaluator may
 advance on fixed fixtures while the core progresses. Shared host rendering
-and selection changes are serialized. P2–P4/P6 are later work, not silently
+and selection changes are serialized. P2–P4, P6 and P7 are later work, not silently
 included in this first delivery.
 
-For P2, Mark is considering whether two independent reasons from the same
-asserter are separately withdrawable assertions or combined evidence on one
-assertion. P1 preserves every existing statement ID and does not change the
-current write-path deduplication rule while that question is pending.
+Mark ruled on 2026-10-15 (link model L13) that two independent reasons from
+the same asserter are two separately withdrawable assertions. P2 adds a reason
+key to the dedup key. P1 preserves every existing statement ID and leaves
+today's write-path deduplication unchanged.
+
+The link model's remaining open rulings were settled the same day as L7–L12.
+Those binding the core sequence: chartulary gains asserter, span and basis
+before P3's Woodshed proof (L8); strength defaults to 1 per held assertion
+until the dynamics grammar plan sets it (L9); selection opens a link and
+lanes are rows in Timeline (L10); local compaction follows predicate nature
+(L12); valid time waits (L7). Promotion is planned as P7, after P3 and
+independent of P4 and P6 (L11). It is not part of this delivery.
 
 ## P1: shared link reading over current storage
 
@@ -191,7 +199,7 @@ The first slice is implemented and bounded-tested. Phase acceptance remains
 open for receiving-host review: supply verified source binding/revision
 through the reader and Graphshell entry point, exercise the ordinary consumer
 inspection flows, and keep P5's real-link adapter and capture comparison
-separate. P2's pending assertion/evidence choice is not treated as ruled.
+separate. P2's assertion/evidence choice is now ruled (L13) and is P2's to implement.
 No new snapshot format, withdrawal state, opened-link layout or fan retirement
 is claimed by this delivery.
 
