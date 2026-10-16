@@ -379,7 +379,7 @@ impl BackdropSurface {
             return Err("embedding host must lend a font before scene painting".into());
         }
         let sheet = format!(
-            ".board-title{{position:absolute;margin:0;padding:0;font-family:Roboto,sans-serif;font-size:13px;line-height:16px;color:rgba({},{},{},{});text-align:center;white-space:nowrap;overflow:hidden;}}",
+            ".board-title{{position:absolute;margin:0;padding:0;font-family:var(--tabard-font-interface, IBM Plex Sans), sans-serif;font-size:13px;line-height:16px;color:rgba({},{},{},{});text-align:center;white-space:nowrap;overflow:hidden;}}",
             r * 255.0,
             g * 255.0,
             b * 255.0,

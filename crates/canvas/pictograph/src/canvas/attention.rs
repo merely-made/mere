@@ -32,6 +32,10 @@ const SEED_DISC_RADII: f32 = 4.0;
 pub(crate) struct GrammarState {
     attention: AttentionBook<NodeKey>,
     seeds: SeedBook<NodeKey>,
+    /// The host's suggestion settings (`suggestions.rs`); off by default.
+    pub(crate) suggestions: scenograph::suggestion::SuggestionSettings,
+    /// The last offer, kept so a settings change re-admits from it.
+    pub(crate) offered: Vec<(NodeKey, String)>,
 }
 
 impl GrammarState {
@@ -39,9 +43,22 @@ impl GrammarState {
         &self.attention
     }
 
+    pub(crate) fn attention_book_mut(&mut self) -> &mut AttentionBook<NodeKey> {
+        &mut self.attention
+    }
+
+    pub(crate) fn seed_book(&self) -> &SeedBook<NodeKey> {
+        &self.seeds
+    }
+
+    pub(crate) fn seed_book_mut(&mut self) -> &mut SeedBook<NodeKey> {
+        &mut self.seeds
+    }
+
     /// Keep only the nodes `live` still holds.
     pub(crate) fn retain(&mut self, mut live: impl FnMut(&NodeKey) -> bool) {
         self.attention.retain(&mut live);
+        self.offered.retain(|(key, _)| live(key));
         self.seeds.retain(live);
     }
 }
@@ -122,14 +139,11 @@ impl Canvas {
         self.grammar.attention.dismiss_all()
     }
 
-    /// Mark the members the scene offers as suggestions, replacing the last
-    /// set. Members not in the graph are skipped.
+    /// Offer `members` as suggestions from no particular source, replacing the
+    /// last offer; the suggestion settings decide which show
+    /// ([`Self::offer_suggestions`]).
     pub fn set_suggested_members(&mut self, members: impl IntoIterator<Item = uuid::Uuid>) {
-        let keys: Vec<_> = members
-            .into_iter()
-            .filter_map(|member| self.graph.get_node_key_by_id(member))
-            .collect();
-        self.grammar.attention.set_suggested(keys);
+        self.offer_suggestions(members.into_iter().map(|member| (member, String::new())));
     }
 
     /// Members with `attention`, in key order.

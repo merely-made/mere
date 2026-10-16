@@ -538,7 +538,7 @@ impl BoardText {
 const TITLE_LINE: f32 = 16.0;
 const TITLE_SHEET: &str = "\
     .board-title { position: absolute; margin: 0; padding: 0 6px; box-sizing: border-box; \
-      font-family: Roboto, sans-serif; font-size: 13px; line-height: 16px; \
+      font-family: var(--tabard-font-interface, IBM Plex Sans), sans-serif; font-size: 13px; line-height: 16px; \
       color: #f0dfb8; text-align: center; white-space: nowrap; overflow: hidden; }";
 
 /// A stable fallback paint for an open backdrop kind: an unfamiliar scene

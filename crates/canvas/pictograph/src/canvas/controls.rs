@@ -49,6 +49,8 @@ pub enum CanvasCommand {
     ShrinkTiles,
     /// Draw the territory field beneath the graph, or stop.
     ToggleTerritory,
+    /// Turn suggestions on or off (off by default).
+    ToggleSuggestions,
 }
 
 impl CanvasCommand {
@@ -100,6 +102,7 @@ impl CanvasCommand {
             Self::GrowTiles => host.resize_selected_tiles(1.25),
             Self::ShrinkTiles => host.resize_selected_tiles(0.8),
             Self::ToggleTerritory => host.toggle_territory_field(),
+            Self::ToggleSuggestions => host.toggle_suggestions(),
         }
     }
 }
