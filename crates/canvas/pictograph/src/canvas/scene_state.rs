@@ -13,7 +13,8 @@ use forme::GraphMemberId;
 use kernel::geometry::PortablePoint;
 
 use super::Canvas;
-use super::geometry::{CartographyGeometry, SavedRegion};
+use super::geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
+use super::mosaic::MosaicState;
 
 impl Canvas {
     /// The saved seed by member, or `None` for the recipe seed.
@@ -42,7 +43,31 @@ impl Canvas {
             .collect()
     }
 
-    /// Restore a saved scene's seed and regions. Call after the scene's graph,
+    /// The person's Mosaic arrangement by member, or `None` if they made none.
+    pub(crate) fn saved_mosaic(&self) -> Option<SavedMosaic> {
+        if self.mosaic == MosaicState::default() {
+            return None;
+        }
+        let id = |key: &kernel::graph::NodeKey| Some(self.graph.get_node(*key)?.id);
+        Some(SavedMosaic {
+            group_of: self
+                .mosaic
+                .group_of
+                .iter()
+                .filter_map(|(key, group)| Some((id(key)?, group.clone())))
+                .collect(),
+            group_order: self.mosaic.group_order.clone(),
+            member_order: self.mosaic.member_order.iter().filter_map(id).collect(),
+            scale: self
+                .mosaic
+                .scale
+                .iter()
+                .filter_map(|(key, factor)| Some((id(key)?, *factor)))
+                .collect(),
+        })
+    }
+
+    /// Restore a saved scene's seed, regions and Mosaic arrangement. Call after the scene's graph,
     /// arrangement and positions are in place.
     pub fn apply_cartography_scene_state(&mut self, geometry: &CartographyGeometry) {
         let key_of = |id: &GraphMemberId| self.graph.get_node_key_by_id(*id);
@@ -71,5 +96,23 @@ impl Canvas {
             },
         }
         self.strategy_regions = regions;
+        self.mosaic = match geometry.mosaic() {
+            None => MosaicState::default(),
+            Some(saved) => MosaicState {
+                group_of: saved
+                    .group_of
+                    .iter()
+                    .filter_map(|(id, group)| Some((key_of(id)?, group.clone())))
+                    .collect(),
+                group_order: saved.group_order.clone(),
+                member_order: saved.member_order.iter().filter_map(&key_of).collect(),
+                scale: saved
+                    .scale
+                    .iter()
+                    .filter_map(|(id, factor)| Some((key_of(id)?, *factor)))
+                    .collect(),
+                ..MosaicState::default()
+            },
+        };
     }
 }
