@@ -35,7 +35,7 @@ use distillery::inference::{
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::resident::DjinnResident;
 use djinn::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
-use graphshell::identity::VaultProtectionView;
+use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
@@ -49,6 +49,7 @@ use uuid::Uuid;
 
 fn stub_lane() -> Option<InferenceLaneSettings> {
     Some(InferenceLaneSettings {
+        recall: Default::default(),
         model: InferenceModelSettings::Stub,
     })
 }
@@ -238,6 +239,7 @@ async fn exercise_route(library_model: bool) {
         let expected = provider.bound().generate_prepared(&prepared).unwrap();
         (
             Some(InferenceLaneSettings {
+                recall: Default::default(),
                 model: InferenceModelSettings::Library {
                     row: row.to_string(),
                     device: djinn::settings::InferenceDeviceSettings::Cpu,
@@ -461,6 +463,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     assert_eq!(save_library(&data_b).await, row);
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            recall: Default::default(),
             model: InferenceModelSettings::Library {
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Cpu,
@@ -1264,6 +1267,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     drop(library);
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            recall: Default::default(),
             model: InferenceModelSettings::Library {
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Gpu,
@@ -1350,6 +1354,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     let source = RecallSourceId {
         kind: RecallSourceKind::PageText,
         source: source_a.into(),
+        owner: None,
         node: None,
     };
     let ask=RecallAskRequestV1 { ask:AskRequestV1 { run:"retained-answer".into(),question:"What is the Pelican observatory's access word? Answer in one short sentence and cite the passage using [1].".into() },scope:vec![] };

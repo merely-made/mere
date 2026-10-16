@@ -142,6 +142,9 @@ pub struct OwnerSettings {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct InferenceLaneSettings {
+    /// Owner bounds for retained-source publications and prompt assembly.
+    #[serde(default)]
+    pub recall: distillery::inference_protocol::recall::RecallConfig,
     /// Which model answers.
     pub model: InferenceModelSettings,
 }

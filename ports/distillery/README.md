@@ -114,6 +114,16 @@ Ordinary ask serialization remains compatible. Lock clears the derived recall
 index with the run materialization; the composing source owner keeps its own
 storage and disclosure authority.
 
+`inference-wire` exposes the run table, controls and recall DTOs without ESP or
+a decoder. An admitted source owner can publish its retained text through
+`distillery.inference/publish-corpus-v1`, then ask with
+`distillery.inference/ask-published-v1`. Each publication names an application
+session namespace and exact text hashes. Only its live publisher can replace
+it; disconnect or vault lock withdraws the publication. The host controls recall
+limits. Inline JSON is capped at 128 KiB and oversized publications are refused.
+Published material stays in memory; supplied passages and run records use the
+existing sealed journal. Published checkpoints require `recall/published-v1`.
+
 See the [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM

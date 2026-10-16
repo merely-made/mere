@@ -33,6 +33,7 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
                 .into(),
         );
     }
+    owner.inference.as_ref().unwrap().recall.validate()?;
     if owner.distillery.is_none() {
         return Err(
             "inference needs the distillery lane: it borrows that lane's model library \
@@ -42,6 +43,7 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
         );
     }
     if let Some(crate::settings::InferenceLaneSettings {
+        recall: _,
         model:
             crate::settings::InferenceModelSettings::Library {
                 row,
@@ -170,6 +172,7 @@ mod lane {
                     ..
                 } => unreachable!("validate refuses GPU settings without inference-gpu"),
             };
+            lane.configure_published_recall(settings.recall.clone())?;
             Ok(Self {
                 lane,
                 journal,
@@ -320,6 +323,7 @@ mod tests {
 
     fn stub() -> Option<InferenceLaneSettings> {
         Some(InferenceLaneSettings {
+            recall: Default::default(),
             model: InferenceModelSettings::Stub,
         })
     }
@@ -408,6 +412,7 @@ mod tests {
         };
         let set_model = |row: String, device, max_tokens| {
             Some(InferenceLaneSettings {
+                recall: Default::default(),
                 model: InferenceModelSettings::Library {
                     row,
                     device,
