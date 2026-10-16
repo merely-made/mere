@@ -336,7 +336,7 @@ where
                 el("div", format!("{interval} · {label}"))
                     .attr(
                         "aria-label",
-                        format!("{}: {interval}; {}", entry.lane_label, entry.label),
+                        format!("{}: {interval}; {label}; {}", entry.lane_label, entry.label),
                     )
                     .attr(
                         "style",
