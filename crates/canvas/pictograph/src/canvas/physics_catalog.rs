@@ -42,7 +42,9 @@ use seiche::{
     HubGravity, Kuramoto, LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
 };
 
-use crate::canvas::seiche_bridge::visible_relation_edges;
+use crate::canvas::seiche_bridge::{
+    visible_relation_edges, visible_relation_edges_with_assertion_hides,
+};
 use crate::canvas::{Canvas, SETTLE_TICKS};
 use crate::signals::ChannelRegistry;
 use crate::signals::physics::{self, PhysicsView, PhysicsViewKey};
@@ -759,6 +761,22 @@ impl<'a> LawInputs<'a> {
         }
         self
     }
+
+    pub(crate) fn with_link_hides(
+        mut self,
+        graph: &Graph,
+        hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+        hidden_links: &HashSet<scenograph::link::LinkKey>,
+        hidden_assertions: &HashSet<String>,
+    ) -> Self {
+        self.edges = visible_relation_edges_with_assertion_hides(
+            graph,
+            hidden_edges,
+            hidden_links,
+            hidden_assertions,
+        );
+        self
+    }
     /// The inputs over `graph`, reading `sites` when the caller's registry
     /// holds them (computing them here otherwise, as a stats reader does).
     pub(crate) fn new(
@@ -1177,9 +1195,14 @@ impl<'a> LawInputs<'a> {
 
 impl Canvas {
     pub(crate) fn controller_edges(&self) -> Vec<(NodeKey, NodeKey)> {
-        self.occurrence_edges
-            .clone()
-            .unwrap_or_else(|| visible_relation_edges(&self.graph, &self.hidden_edges))
+        self.occurrence_edges.clone().unwrap_or_else(|| {
+            visible_relation_edges_with_assertion_hides(
+                &self.graph,
+                &self.hidden_edges,
+                &self.hidden_links,
+                &self.hidden_assertions,
+            )
+        })
     }
     /// Whether the live law or an overlay snapshots graph structure, so a
     /// topology change must rebuild it.
@@ -1193,7 +1216,9 @@ impl Canvas {
 
     /// Whether the live law or an overlay keeps the graph moving on its own.
     pub fn physics_never_rests(&self) -> bool {
-        if self.roles.encoded == seiche::Axes::BOTH { return false; }
+        if self.roles.encoded == seiche::Axes::BOTH {
+            return false;
+        }
         let laws = self.physics_composition.as_ref().map_or_else(
             || vec![self.physics_law],
             crate::canvas::composition::PhysicsComposition::laws,
@@ -1223,10 +1248,11 @@ impl Canvas {
         }
         if self.roles.encoded == seiche::Axes::BOTH {
             // F28: two directly encoded axes admit contact separation only.
-            self.physics.set_forces(vec![Box::new(seiche::NodeExclusion {
-                cutoff: 2.0 * seiche::NODE_BODY_RADIUS,
-                ..Default::default()
-            })]);
+            self.physics
+                .set_forces(vec![Box::new(seiche::NodeExclusion {
+                    cutoff: 2.0 * seiche::NODE_BODY_RADIUS,
+                    ..Default::default()
+                })]);
             return;
         }
         let wants_clusters = self.physics_reads(PhysicsKindSource::Cluster);
@@ -1249,6 +1275,12 @@ impl Canvas {
                     None
                 },
                 self.channels.sites_fresh(&self.graph),
+            )
+            .with_link_hides(
+                &self.graph,
+                &self.hidden_edges,
+                &self.hidden_links,
+                &self.hidden_assertions,
             )
             .with_occurrence_edges(self.occurrence_edges.as_deref())
             .with_meaning(self.meaning.snapshot())
@@ -1375,6 +1407,12 @@ impl Canvas {
     /// the physics channels read from the registry.
     fn law_inputs_now(&self) -> LawInputs<'_> {
         LawInputs::new(&self.graph, &self.hidden_edges, None, None)
+            .with_link_hides(
+                &self.graph,
+                &self.hidden_edges,
+                &self.hidden_links,
+                &self.hidden_assertions,
+            )
             .with_occurrence_edges(self.occurrence_edges.as_deref())
             .with_registry(&self.channels, self.physics_view_key())
     }

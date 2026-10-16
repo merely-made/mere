@@ -2558,7 +2558,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59"
 dependencies = [
  "serde",
  "uuid",
@@ -2655,21 +2655,25 @@ dependencies = [
 [[package]]
 name = "cleromancy-core-acceptance"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#277c6bd0cb6b4f63fc458d341678c0f8ed52830a"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#d5c383c189f9e866a38939dd372ddf6a7556b60b"
 dependencies = [
  "blake3",
  "chartulary",
  "chirograph",
  "graphshell-client",
  "mere",
+ "mere-alembic",
  "muniment",
  "rand_core 0.6.4",
  "sceno",
+ "scenograph",
  "scenotime",
+ "seiche",
  "serde",
  "serde_json",
  "servitor",
  "thiserror 2.0.21",
+ "turquet",
 ]
 
 [[package]]
@@ -4843,7 +4847,7 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59"
 dependencies = [
  "personae",
  "serde",
@@ -5445,7 +5449,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6071,7 +6075,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59"
 dependencies = [
  "insigne",
  "muniment",
@@ -7393,6 +7397,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "hifitime"
+version = "4.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e6c0c34e60cdfd045523b41dba614648302795e1871793d40ded576f23b97a9"
+dependencies = [
+ "js-sys",
+ "lexical-core",
+ "num-traits",
+ "serde",
+ "serde_derive",
+ "snafu",
+ "wasm-bindgen",
+ "web-sys",
+ "web-time",
+]
+
+[[package]]
 name = "hkdf"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8060,7 +8081,7 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59"
 dependencies = [
  "blake3",
  "ed25519-dalek 3.0.0",
@@ -8790,7 +8811,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8798,7 +8819,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8818,7 +8839,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
 dependencies = [
  "cambium",
  "illume",
@@ -8834,7 +8855,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8904,7 +8925,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8917,7 +8938,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -11192,7 +11213,7 @@ dependencies = [
 [[package]]
 name = "notochord"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59"
 dependencies = [
  "blake3",
  "insigne",
@@ -12769,6 +12790,7 @@ dependencies = [
  "notochord",
  "personae",
  "pollster 0.4.0",
+ "sceno",
  "serde",
  "serde_json",
  "servitor",
@@ -13138,7 +13160,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "personae"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#19be4831553e3ba3db1a8837a0b3191e70c11659"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59"
 dependencies = [
  "blake3",
  "chacha20poly1305 0.11.0",
@@ -14161,7 +14183,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -15172,7 +15194,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -15240,7 +15262,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -16241,6 +16263,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "snafu"
+version = "0.9.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e45cb604038abb7b926b679887b3226d8d0f23874b66623625a0454be425a4b7"
+dependencies = [
+ "snafu-derive",
+]
+
+[[package]]
+name = "snafu-derive"
+version = "0.9.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "287f59010008f0d7cf5e3b03196d666c1acc46c8d3e9cf34c28a1a7157601e72"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "snow"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16284,8 +16327,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
+
+[[package]]
+name = "sofars"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5dd1c9b1b5d34e1e949deb0dac9ad612e20746c59eaa737e52fd29703c19ec5c"
 
 [[package]]
 name = "sonic-number"
@@ -16598,7 +16647,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17083,7 +17132,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -17830,6 +17879,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "turquet"
+version = "0.17.0"
+source = "git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b#30875f30e83909f3030bc01237a5046e14cde29b"
+dependencies = [
+ "hifitime",
+ "sofars",
+]
+
+[[package]]
 name = "tynm"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -17876,7 +17934,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]

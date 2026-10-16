@@ -439,6 +439,9 @@ impl MereView<'_> {
                           id: &str,
                           name: &str| {
                 swatch.relations.push(GraphCanvasRelation {
+                    link_key: None,
+                    marks: Default::default(),
+                    strength: 1.0,
                     id: format!("{relation}:{id}"),
                     from,
                     to: key.clone(),

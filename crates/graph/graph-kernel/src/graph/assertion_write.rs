@@ -279,14 +279,9 @@ mod migrated_handle_tests {
             graph.shown_resource_id(b).unwrap(),
         );
         let mut edges = graph.persisted_resource_edges_between(pair.0, pair.1);
-        let mut other = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        let mut other = edges[0].retained_assertions()[0].clone();
         other.statement_id = "second-exact-handle".into();
-        edges[0]
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements
-            .push(other.clone());
+        edges[0].assertions.as_mut().unwrap().push(other.clone());
         edges.push(edges[0].clone());
         assert!(graph.set_resource_edges_between(pair.0, pair.1, &edges));
         assert!(Graph::try_from_snapshot(&graph.to_snapshot()).is_ok());
@@ -434,7 +429,7 @@ impl Graph {
             )
         {
             for statement in payload
-                .semantic_statements()
+                .assertions()
                 .iter()
                 .filter(|statement| matches_spec(statement, spec))
             {
@@ -537,7 +532,7 @@ impl Graph {
             )
             .find_map(|(key, payload)| {
                 payload
-                    .semantic_statements()
+                    .assertions()
                     .iter()
                     .find(|statement| statement.statement_id == statement_id)
                     .map(|statement| (key, statement))
@@ -601,7 +596,7 @@ impl Graph {
             )
         {
             for statement in payload
-                .semantic_statements()
+                .assertions()
                 .iter()
                 .filter(|statement| matches_spec(statement, spec))
             {
@@ -713,7 +708,7 @@ impl Graph {
             let statement_id = self
                 .get_relation(key)
                 .expect("held bucket")
-                .semantic_statements()
+                .assertions()
                 .iter()
                 .find(|statement| matches_spec(statement, &spec))
                 .expect("held statement")
@@ -860,19 +855,14 @@ impl Graph {
             )
             .filter(|(_, payload)| {
                 payload
-                    .semantic_statements()
+                    .assertions()
                     .iter()
                     .any(|statement| statement.statement_id == statement_id)
             })
             .map(|(key, _)| key)
             .collect();
         for owner in &owners {
-            let semantic = self
-                .get_relation_mut(*owner)
-                .unwrap()
-                .semantic
-                .as_mut()
-                .unwrap();
+            let semantic = &mut self.get_relation_mut(*owner).unwrap().assertions;
             for statement in semantic
                 .statements
                 .iter_mut()
@@ -938,7 +928,7 @@ impl Graph {
         for owner in owners {
             let Some(data) = self
                 .get_relation_mut(owner)
-                .and_then(|payload| payload.semantic.as_mut())
+                .map(|payload| &mut payload.assertions)
             else {
                 continue;
             };
@@ -989,7 +979,7 @@ impl Graph {
             )
             .filter(|(_, payload)| {
                 payload
-                    .semantic_statements()
+                    .assertions()
                     .iter()
                     .any(|statement| statement.statement_id == statement_id)
             })
@@ -1108,7 +1098,7 @@ impl Graph {
         for owner in owners {
             let Some(data) = self
                 .get_relation_mut(owner)
-                .and_then(|payload| payload.semantic.as_mut())
+                .map(|payload| &mut payload.assertions)
             else {
                 continue;
             };
@@ -1158,6 +1148,30 @@ impl Graph {
             to_resource_id: to.to_string(),
             edges: self.persisted_resource_edges_between(from, to),
         });
+    }
+
+    /// All-family aliases retain exact owner, ID, basis and lifecycle admission.
+    pub fn find_assertion(&self, id: &str) -> Option<(RelationKey, &SemanticStatement)> {
+        self.find_semantic_statement(id)
+    }
+    pub fn find_held_assertion(&self, id: &str) -> Option<(RelationKey, &SemanticStatement)> {
+        self.find_held_semantic_statement(id)
+    }
+    pub fn try_assert_relation_statement(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        spec: SemanticStatementSpec,
+    ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
+        self.try_assert_semantic_statement(from, to, spec)
+    }
+    pub fn try_assert_persisted_relation_statement(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        statement: SemanticStatement,
+    ) -> Result<RelationKey, StatementWriteError> {
+        self.try_assert_persisted_semantic_statement(from, to, statement)
     }
 
     /// Compatibility spelling for authored exact-ID withdrawal.

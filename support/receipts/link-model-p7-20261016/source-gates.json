@@ -1,0 +1,103 @@
+[
+  {
+    "name": "kernel-final",
+    "source": "611e484d49d8894085ee7d66e5582764f46642df",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-j1",
+      "-p",
+      "mere-kernel",
+      "--features",
+      "store",
+      "--lib"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "kernel-process-reopen-final",
+    "source": "611e484d49d8894085ee7d66e5582764f46642df",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-j1",
+      "-p",
+      "mere-kernel",
+      "--features",
+      "store",
+      "--test",
+      "frozen_link_reopen",
+      "--",
+      "--nocapture"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "graphshell-final",
+    "source": "611e484d49d8894085ee7d66e5582764f46642df",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-j1",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "personal-sync,query-views",
+      "--lib"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "pandect-final",
+    "source": "611e484d49d8894085ee7d66e5582764f46642df",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-j1",
+      "-p",
+      "pandect"
+    ],
+    "exit_code": 0,
+    "log": "logs/pandect-final.log",
+    "source_continuity": "component-continuity.json"
+  },
+  {
+    "name": "port-boundaries",
+    "source": "f54cd36f5",
+    "command": [
+      "python3",
+      "scripts/check_port_boundaries.py"
+    ],
+    "exit_code": 0,
+    "log": "logs/port-boundaries.log",
+    "lock_normalization": "port-boundary-lock-normalization.json"
+  },
+  {
+    "name": "browser-reviewed-build",
+    "source": "6d53d4439fce520c1da9f3ddf87c3dac343934b3",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--offline",
+      "-j1",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,presentation-webgpu"
+    ],
+    "cwd": "ports/graphshell/web",
+    "exit_code": 0,
+    "log": "logs/browser-build-reviewed.log"
+  }
+]

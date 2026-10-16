@@ -1,0 +1,44 @@
+{
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+  "platform": "MacIntel",
+  "viewport": [
+    1280,
+    720
+  ],
+  "devicePixelRatio": 2,
+  "secureContext": true,
+  "databases": [],
+  "webgpu": true,
+  "adapter": {
+    "vendor": "apple",
+    "architecture": "metal-3",
+    "device": "",
+    "description": "",
+    "features": [
+      "depth32float-stencil8",
+      "rg11b10ufloat-renderable",
+      "texture-formats-tier1",
+      "bgra8unorm-storage",
+      "texture-compression-bc",
+      "dual-source-blending",
+      "core-features-and-limits",
+      "float32-filterable",
+      "indirect-first-instance",
+      "texture-compression-astc-sliced-3d",
+      "float32-blendable",
+      "subgroup-size-control",
+      "texture-compression-astc",
+      "texture-compression-etc2",
+      "depth-clip-control",
+      "texture-compression-bc-sliced-3d",
+      "texture-formats-tier2",
+      "shader-f16",
+      "timestamp-query",
+      "clip-distances",
+      "primitive-index",
+      "texture-component-swizzle",
+      "subgroups"
+    ]
+  },
+  "collected_at_utc": "2026-10-16T17:07:09.451012+00:00"
+}

@@ -1,0 +1,31 @@
+{
+  "started_from": "a4c1814c8eaac5bcccc7b10379cbdf389e5a6661",
+  "core_source": "611e484d49d8894085ee7d66e5582764f46642df",
+  "browser_source": "6d53d4439fce520c1da9f3ddf87c3dac343934b3",
+  "agents": [
+    "p1_seam: kernel typed facet and admission",
+    "p5_probe: Graphshell retained UI and scenarios",
+    "reification_audit: source/receiver audit and host tests"
+  ],
+  "cargo_owner": "root, serialized -j1",
+  "source_gates": "source-gates.json",
+  "counts": "source-summary.json",
+  "component_continuity": "component-continuity.json",
+  "browser_package": "browser-build-reviewed.json",
+  "receiving_proof": "logs/kernel-process-reopen-final.log has writer/author-reader/receiver-reader with separate PIDs; receiver carries one Resource and no endpoint payloads",
+  "shared_pair_entity": "Only immutable promoted Resource facet; live links remain derived",
+  "known_limits": [
+    "One owning Mere graph source per freeze; no foreign-store aggregate promotion",
+    "Live MereHost source has no qualified immutable public revision; unavailable is retained explicitly",
+    "P7 browser proof uses IndexedDB; browser storage can be evicted; native JSON store uses separate child processes",
+    "No new Woodshed/Knot UI integration or physical audio qualification in P7"
+  ],
+  "preflight_iterations": [
+    "kernel-focused-01: two compile errors corrected",
+    "kernel-focused-02: second-freeze test revision expectation corrected",
+    "graphshell-focused-01: fixture return-type assumption corrected",
+    "browser-build-01/02: retained UI type/move/lifetime errors corrected",
+    "browser on 8867/8868: incorrect combined-stratum assertion count and stale action/capture labels corrected; no source-data failure",
+    "browser on 8869: functional seed and reopen passed; missing text arrow glyph observed, replaced by plain words in final source; capture targets refined"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "supplier": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+  "unchanged_component_trees": [
+    {
+      "gate_source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "path": "crates/graph/graph-kernel",
+      "tree_object": "1f2f3973947cefcd535d75b6300cec255faa7e2f",
+      "same_at_supplier": true
+    },
+    {
+      "gate_source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "path": "crates/graph/linked-data",
+      "tree_object": "760dd06be5b9558723db4a8c3cefc00cb2ea0c06",
+      "same_at_supplier": true
+    },
+    {
+      "gate_source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "path": "crates/canvas/pictograph",
+      "tree_object": "f2ed96a5c3bdf0f103aedcecb5d30433d098a722",
+      "same_at_supplier": true
+    },
+    {
+      "gate_source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "path": "crates/cambium",
+      "tree_object": "1f201e0f08542cda3569b5780f68e6c8dc4da1df",
+      "same_at_supplier": true
+    },
+    {
+      "gate_source": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+      "path": "crates/system/tabard",
+      "tree_object": "790ced13889df1bbd50b57eda48f936fc9253a4f",
+      "same_at_supplier": true
+    },
+    {
+      "gate_source": "7e460bc5792e70608754913a3d18eb882f956fab",
+      "path": "crates/mere",
+      "tree_object": "8093a2dff6880953e9c47271d52bf10ca2212f57",
+      "same_at_supplier": true
+    },
+    {
+      "gate_source": "7e460bc5792e70608754913a3d18eb882f956fab",
+      "path": "crates/system/pandect",
+      "tree_object": "a77a16a3b7d3100f2f4e42235ef2dd80969a01f9",
+      "same_at_supplier": true
+    }
+  ],
+  "graphshell_native_test_followup": {
+    "source": "683b0708b905266253371660610b86d3a60d31a5",
+    "later_changed_paths": [
+      "ports/graphshell/src/web_tree/lane.rs"
+    ],
+    "scope": "Only the browser scenario selector changed after the native Graphshell gate; the exact supplier Wasm bundle was rebuilt and both browser scenarios rerun."
+  }
+}

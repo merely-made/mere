@@ -147,6 +147,9 @@ pub fn scene_from_projection(
             points: edge.path.iter().map(|p| Vec2::new(p.x, p.y)).collect(),
             kind: None,
             weight: Some(edge.weight),
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         });
     }
 

@@ -1,0 +1,227 @@
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, `Resolver`, and `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^             ^^^^^^^^^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `uuid::Uuid`
+   --> crates/graph/graph-kernel/src/graph/display.rs:200:9
+    |
+200 |     use uuid::Uuid;
+    |         ^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused variable: `copy`
+   --> crates/graph/graph-kernel/src/graph/cross_graph.rs:420:13
+    |
+420 |         let copy = b.get_node(copy_key).unwrap();
+    |             ^^^^ help: if this is intentional, prefix it with an underscore: `_copy`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/graph/graph-kernel/src/graph/legacy_family_attribution.rs:494:13
+    |
+494 |         let mut attribution = LegacyFamilyAttribution::from_baseline(&graph);
+    |             ----^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+
+warning: variable does not need to be mutable
+    --> crates/graph/graph-kernel/src/graph/query.rs:1311:13
+     |
+1311 |         let mut node = |g: &mut Graph, i: usize| {
+     |             ----^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: methods `branch_history` and `node_history_forward` are never used
+   --> crates/graph/graph-kernel/src/graph/mod.rs:733:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+733 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+755 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `remove_statements_with_sub_kind` is never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:539:19
+    |
+340 | impl SemanticData {
+    | ----------------- method in this implementation
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, and `withdraw_semantic_statement` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: methods `remove_node_classification`, `set_node_classification_status`, and `set_node_primary_classification` are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:106:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `replay_set_edge_semantic_predicate_by_ids`, `dissolve_remove_node_collect_traversals`, `replay_retract_relations`, and `set_edge_semantic_predicate` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:438:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib test) generated 19 warnings (run `cargo fix --lib -p mere-kernel --tests` to apply 10 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.58s
+     Running unittests src/lib.rs (/Users/markik/Code/testing/mere/link-model-knot-20261015/knot-build/debug/deps/kernel-75a18f2e1e712c2e)
+
+running 3 tests
+test graph::frozen_link_tests::resource_freeze_is_separate_and_receiver_reports_missing_references ... ok
+test graph::frozen_link_tests::refuses_empty_pairs_invalid_source_and_mutation_or_removal_of_frozen_owner ... ok
+test graph::frozen_link_tests::freezes_surface_pair_buckets_as_independent_immutable_resource_facets ... FAILED
+
+failures:
+
+---- graph::frozen_link_tests::freezes_surface_pair_buckets_as_independent_immutable_resource_facets stdout ----
+
+thread 'graph::frozen_link_tests::freezes_surface_pair_buckets_as_independent_immutable_resource_facets' (38711996) panicked at crates/graph/graph-kernel/src/graph/frozen_link_tests.rs:158:5:
+assertion `left == right` failed: freezing the same pair again mints an independent immutable Resource
+  left: Some(FrozenLink { version: 1, stratum: Surface, first: FrozenLinkEndpoint { id: 2683eae6-a547-46c0-bf78-9c88ba8b0090, resource: Some(0f4d3d06-910b-50b7-b89b-435c47c3c867), address: Some("https://frozen.test/first") }, second: FrozenLinkEndpoint { id: 54078b90-444e-4da0-8418-b92a78c8bc0d, resource: Some(bb6e2ea8-140c-5e60-91a9-0940866171f6), address: Some("https://frozen.test/second") }, revision: 10, source: Available { binding: FrozenSourceBinding { authority: "mere", domain: "graph-session", resource: "session:11111111-1111-4111-8111-111111111111" }, revision: Available { revision: "sha256:source-snapshot" } }, coverage: CoverageNote { limits: [] }, statements: [PersistedEdge { from_node_id: "2683eae6-a547-46c0-bf78-9c88ba8b0090", to_node_id: "54078b90-444e-4da0-8418-b92a78c8bc0d", families: [], semantic: None, traversal: None, containment: None, arrangement: None, imported: None, provenance: None, assertions: Some([PersistedSemanticStatement { statement_id: "01a1459c3d6a-0f4d6ef11dc28f1b-0000000000000002", predicate: "https://mere.computer/ns/rel#user-grouped", recognized_sub_kind: Some(UserGrouped), label: Some("reason: forward"), graph_scope: User, provenance_iri: Some("urn:author:test"), asserted_at_ms: Some(123), first_asserted_ms: Some(123), withdrawn: Some(AssertionWithdrawal { at_ms: Some(1792169229676), by: Some("https://mere.computer/ns/agent#person/user") }), basis: AssertionBasis { note: Some("reason: forward"), method: None, evidence: ["urn:evidence:forward"] } }]) }, PersistedEdge { from_node_id: "54078b90-444e-4da0-8418-b92a78c8bc0d", to_node_id: "2683eae6-a547-46c0-bf78-9c88ba8b0090", families: [Semantic], semantic: None, traversal: None, containment: None, arrangement: None, imported: None, provenance: None, assertions: Some([PersistedSemanticStatement { statement_id: "01a1459c3d6b-0f4d6ef11dc28f1b-0000000000000003", predicate: "https://mere.computer/ns/rel#user-grouped", recognized_sub_kind: Some(UserGrouped), label: Some("reason: reverse"), graph_scope: User, provenance_iri: Some("urn:author:test"), asserted_at_ms: Some(123), first_asserted_ms: Some(123), withdrawn: None, basis: AssertionBasis { note: Some("reason: reverse"), method: None, evidence: ["urn:evidence:reverse"] } }]) }, PersistedEdge { from_node_id: "2683eae6-a547-46c0-bf78-9c88ba8b0090", to_node_id: "54078b90-444e-4da0-8418-b92a78c8bc0d", families: [Traversal], semantic: None, traversal: Some(PersistedTraversalEdgeData { traversals: [PersistedTraversalRecord { timestamp_ms: 456, trigger: Programmatic }], metrics: PersistedTraversalMetrics { total_navigations: 1, forward_navigations: 1, backward_navigations: 0, last_navigated_at: Some(456) } }), containment: None, arrangement: None, imported: None, provenance: None, assertions: Some([]) }] })
+ right: Some(FrozenLink { version: 1, stratum: Surface, first: FrozenLinkEndpoint { id: 2683eae6-a547-46c0-bf78-9c88ba8b0090, resource: Some(0f4d3d06-910b-50b7-b89b-435c47c3c867), address: Some("https://frozen.test/first") }, second: FrozenLinkEndpoint { id: 54078b90-444e-4da0-8418-b92a78c8bc0d, resource: Some(bb6e2ea8-140c-5e60-91a9-0940866171f6), address: Some("https://frozen.test/second") }, revision: 8, source: Available { binding: FrozenSourceBinding { authority: "mere", domain: "graph-session", resource: "session:11111111-1111-4111-8111-111111111111" }, revision: Available { revision: "sha256:source-snapshot" } }, coverage: CoverageNote { limits: [] }, statements: [PersistedEdge { from_node_id: "2683eae6-a547-46c0-bf78-9c88ba8b0090", to_node_id: "54078b90-444e-4da0-8418-b92a78c8bc0d", families: [Semantic], semantic: None, traversal: None, containment: None, arrangement: None, imported: None, provenance: None, assertions: Some([PersistedSemanticStatement { statement_id: "01a1459c3d6a-0f4d6ef11dc28f1b-0000000000000002", predicate: "https://mere.computer/ns/rel#user-grouped", recognized_sub_kind: Some(UserGrouped), label: Some("reason: forward"), graph_scope: User, provenance_iri: Some("urn:author:test"), asserted_at_ms: Some(123), first_asserted_ms: Some(123), withdrawn: None, basis: AssertionBasis { note: Some("reason: forward"), method: None, evidence: ["urn:evidence:forward"] } }]) }, PersistedEdge { from_node_id: "54078b90-444e-4da0-8418-b92a78c8bc0d", to_node_id: "2683eae6-a547-46c0-bf78-9c88ba8b0090", families: [Semantic], semantic: None, traversal: None, containment: None, arrangement: None, imported: None, provenance: None, assertions: Some([PersistedSemanticStatement { statement_id: "01a1459c3d6b-0f4d6ef11dc28f1b-0000000000000003", predicate: "https://mere.computer/ns/rel#user-grouped", recognized_sub_kind: Some(UserGrouped), label: Some("reason: reverse"), graph_scope: User, provenance_iri: Some("urn:author:test"), asserted_at_ms: Some(123), first_asserted_ms: Some(123), withdrawn: None, basis: AssertionBasis { note: Some("reason: reverse"), method: None, evidence: ["urn:evidence:reverse"] } }]) }, PersistedEdge { from_node_id: "2683eae6-a547-46c0-bf78-9c88ba8b0090", to_node_id: "54078b90-444e-4da0-8418-b92a78c8bc0d", families: [Traversal], semantic: None, traversal: Some(PersistedTraversalEdgeData { traversals: [PersistedTraversalRecord { timestamp_ms: 456, trigger: Programmatic }], metrics: PersistedTraversalMetrics { total_navigations: 1, forward_navigations: 1, backward_navigations: 0, last_navigated_at: Some(456) } }), containment: None, arrangement: None, imported: None, provenance: None, assertions: Some([]) }] })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    graph::frozen_link_tests::freezes_surface_pair_buckets_as_independent_immutable_resource_facets
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 466 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p mere-kernel --lib`

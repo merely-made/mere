@@ -40,12 +40,12 @@ use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, Seman
 fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<RelationView> {
     use super::edge_taxonomy::RelationKind;
     let mut out: Vec<RelationView> = Vec::new();
-    for statement in payload.held_semantic_statements() {
-        let kind = match statement.recognized_sub_kind {
-            Some(sub_kind) => RelationKind::Semantic(sub_kind),
-            None => RelationKind::OpenPredicate,
-        };
-        out.push(RelationView { from, to, kind });
+    for statement in payload.held_assertions() {
+        out.push(RelationView {
+            from,
+            to,
+            kind: statement.relation_kind(),
+        });
     }
     // Traversal is event-shaped, no sub-kind. Presence of the
     // traversal sidecar yields one row, matching
@@ -59,42 +59,6 @@ fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<Relat
             to,
             kind: RelationKind::Traversal,
         });
-    }
-    if let Some(containment) = payload.containment_data() {
-        for &sub_kind in &containment.sub_kinds {
-            out.push(RelationView {
-                from,
-                to,
-                kind: RelationKind::Containment(sub_kind),
-            });
-        }
-    }
-    if let Some(arrangement) = payload.arrangement_data() {
-        for &sub_kind in &arrangement.sub_kinds {
-            out.push(RelationView {
-                from,
-                to,
-                kind: RelationKind::Arrangement(sub_kind),
-            });
-        }
-    }
-    if let Some(imported) = payload.imported_data() {
-        for &sub_kind in &imported.sub_kinds {
-            out.push(RelationView {
-                from,
-                to,
-                kind: RelationKind::Imported(sub_kind),
-            });
-        }
-    }
-    if let Some(prov) = payload.provenance_data() {
-        for &sub_kind in &prov.sub_kinds {
-            out.push(RelationView {
-                from,
-                to,
-                kind: RelationKind::Provenance(sub_kind),
-            });
-        }
     }
     out
 }
@@ -360,6 +324,43 @@ impl Graph {
         surfaces.chain(resources)
     }
 
+    /// Every exact held assertion lifted to its displayed endpoint pairs.
+    /// Traversal remains an event rollup and is not an assertion record.
+    pub fn projected_assertions(
+        &self,
+    ) -> impl Iterator<Item = (RelationKey, NodeKey, NodeKey, &super::SemanticStatement)> + '_ {
+        let surfaces = self.inner.inner().edge_references().flat_map(|edge| {
+            let (key, from, to) = (
+                RelationKey::Surface(edge.id()),
+                edge.source(),
+                edge.target(),
+            );
+            edge.weight()
+                .held_assertions()
+                .map(move |record| (key, from, to, record))
+        });
+        let resources =
+            self.resource_relations()
+                .flat_map(|(key, from, to, payload)| {
+                    let mut rows = Vec::new();
+                    for source in self.surface_ids_showing_resource(from) {
+                        let Some(source) = self.get_node_key_by_id(source) else {
+                            continue;
+                        };
+                        for target in self.surface_ids_showing_resource(to) {
+                            let Some(target) = self.get_node_key_by_id(target) else {
+                                continue;
+                            };
+                            rows.extend(payload.held_assertions().map(|record| {
+                                (RelationKey::Resource(key), source, target, record)
+                            }));
+                        }
+                    }
+                    rows
+                });
+        surfaces.chain(resources)
+    }
+
     /// Relations whose `from` endpoint is `key`, expanded with exactly the
     /// row semantics of [`Self::relations`] but visiting only that node's
     /// outgoing edges. Cost is proportional to the node's out-degree, not
@@ -412,8 +413,7 @@ impl Graph {
                 .arrangement_data()
                 .map(|data| {
                     data.sub_kinds
-                        .iter()
-                        .copied()
+                        .into_iter()
                         .map(move |sub_kind| ArrangementEdgeView { from, to, sub_kind })
                 })
                 .into_iter()
@@ -429,8 +429,7 @@ impl Graph {
                 .containment_data()
                 .map(|data| {
                     data.sub_kinds
-                        .iter()
-                        .copied()
+                        .into_iter()
                         .map(move |sub_kind| ContainmentEdgeView { from, to, sub_kind })
                 })
                 .into_iter()
@@ -486,18 +485,27 @@ impl Graph {
     pub(crate) fn rebuild_derived_containment_relations(&mut self) {
         let edge_ids: Vec<EdgeKey> = self.inner.inner().edge_indices().collect();
         let mut empty_edges = Vec::new();
-        // This rebuild retracts containment relations and removes empty edges directly on `inner`
-        // (bypassing the bumping API), so track the structural change and bump once. The
-        // `assert_relation` calls below bump on their own when they re-derive the edges.
+        // This rebuild replaces only held, positively rule-marked containment
+        // rows on `inner` (bypassing the bumping API), so track the structural
+        // change and bump once. The `assert_relation` calls below bump on their
+        // own when they re-derive the edges.
         let mut changed = false;
         for edge_id in edge_ids {
             if let Some(payload) = self.inner.edge_mut(edge_id) {
-                let mut removed_any = false;
-                removed_any |= payload
-                    .retract_relation(RelationSelector::Containment(ContainmentSubKind::UrlPath));
-                removed_any |= payload
-                    .retract_relation(RelationSelector::Containment(ContainmentSubKind::Domain));
+                let before = payload.assertions().len();
+                payload.assertions.statements.retain(|statement| {
+                    !(statement.is_held()
+                        && is_derived_containment_record(statement)
+                        && matches!(
+                            statement.relation_kind(),
+                            super::RelationKind::Containment(
+                                ContainmentSubKind::UrlPath | ContainmentSubKind::Domain
+                            )
+                        ))
+                });
+                let removed_any = payload.assertions().len() != before;
                 if removed_any {
+                    payload.assertions.rebuild_compat();
                     changed = true;
                 }
                 if removed_any && payload.is_empty() {
@@ -511,6 +519,9 @@ impl Graph {
         if changed {
             self.bump_revision();
         }
+
+        // Resource assertions keep their recorded owner and metadata. The
+        // compatibility rebuild below retains its prior Surface-only behavior.
 
         let mut domain_anchor: HashMap<String, (NodeKey, usize, Uuid)> = HashMap::new();
         for (key, node) in self.nodes() {
@@ -976,6 +987,16 @@ impl Graph {
     pub fn edge_count(&self) -> usize {
         self.inner.edge_count()
     }
+}
+
+/// Only rows positively identified as outputs of the containment rule may be
+/// replaced by a current derivation. Same-predicate authored/imported rows
+/// remain retained graph facts.
+pub(crate) fn is_derived_containment_record(statement: &super::SemanticStatement) -> bool {
+    statement.basis.method.as_ref().is_some_and(|method| {
+        method.iri == "urn:mere:method:derived-containment"
+            && method.version.as_deref() == Some("1")
+    })
 }
 
 #[cfg(test)]

@@ -51,29 +51,14 @@ fn family(
     });
 }
 
+// Every relation family now has exact records. Traversal remains an event
+// rollup and is the sole compatibility member/summary in this adapter.
 fn legacy_data(
     payload: &EdgePayload,
     include_summaries: bool,
 ) -> (Vec<LinkLegacyMember>, Vec<LinkLegacyFamily>) {
     let mut members = Vec::new();
     let mut out = Vec::new();
-    if let Some(data) = &payload.semantic {
-        let has_held_assertion = data.held_statements().next().is_some();
-        let has_legacy_metadata =
-            !data.sub_kinds.is_empty() || data.label.is_some() || data.predicate.is_some();
-        if has_held_assertion || has_legacy_metadata {
-            family(
-                EdgeFamily::Semantic,
-                || {
-                    serde_json::json!({
-                        "sub_kinds": data.sub_kinds, "label": data.label, "predicate": data.predicate
-                    })
-                },
-                &mut out,
-                include_summaries,
-            );
-        }
-    }
     if let Some(data) = &payload.traversal {
         family(
             EdgeFamily::Traversal,
@@ -93,56 +78,6 @@ fn legacy_data(
             &mut out,
             include_summaries,
         );
-    }
-    if let Some(data) = &payload.arrangement {
-        members.extend(data.sub_kinds.iter().map(|kind| LinkLegacyMember {
-            family: serialized_name(&EdgeFamily::Arrangement),
-            sub_kind: Some(serialized_name(kind)),
-        }));
-        family(
-            EdgeFamily::Arrangement,
-            || serde_json::json!({ "sub_kinds": data.sub_kinds }),
-            &mut out,
-            include_summaries,
-        );
-    }
-    if let Some(data) = &payload.containment {
-        members.extend(data.sub_kinds.iter().map(|kind| LinkLegacyMember {
-            family: serialized_name(&EdgeFamily::Containment),
-            sub_kind: Some(serialized_name(kind)),
-        }));
-        family(
-            EdgeFamily::Containment,
-            || serde_json::json!({ "sub_kinds": data.sub_kinds }),
-            &mut out,
-            include_summaries,
-        );
-    }
-    if let Some(data) = &payload.imported {
-        members.extend(data.sub_kinds.iter().map(|kind| LinkLegacyMember {
-            family: serialized_name(&EdgeFamily::Imported),
-            sub_kind: Some(serialized_name(kind)),
-        }));
-        family(
-            EdgeFamily::Imported,
-            || serde_json::json!({ "sub_kinds": data.sub_kinds }),
-            &mut out,
-            include_summaries,
-        );
-    }
-    if let Some(data) = &payload.provenance {
-        members.extend(data.sub_kinds.iter().map(|kind| LinkLegacyMember {
-            family: serialized_name(&EdgeFamily::Provenance),
-            sub_kind: Some(serialized_name(kind)),
-        }));
-        family(
-            EdgeFamily::Provenance,
-            || serde_json::json!({ "sub_kinds": data.sub_kinds }),
-            &mut out,
-            include_summaries,
-        );
-    }
-    if payload.traversal.is_some() {
         members.push(LinkLegacyMember {
             family: serialized_name(&EdgeFamily::Traversal),
             sub_kind: None,
@@ -320,46 +255,43 @@ pub fn read_link_with_options(
                 projected_endpoint_id(&source_to, portable_stratum),
             );
             let mut assertions = Vec::new();
-            let mut add_assertion =
-                |statement: &kernel::graph::SemanticStatement| {
-                    assertions.push(LinkAssertion {
-                        id: statement.statement_id.clone(),
-                        predicate: statement.predicate.clone(),
-                        recognized_kind: statement
-                            .recognized_sub_kind
-                            .map(|kind| serialized_name(&kind)),
-                        label: statement.label.clone(),
-                        scope: scope(&statement.graph_scope),
-                        asserter: statement.provenance_iri.clone(),
-                        first_asserted_ms: statement.first_asserted_ms,
-                        asserted_at_ms: statement.asserted_at_ms,
-                        withdrawn: statement
-                            .withdrawn
+            let mut add_assertion = |statement: &kernel::graph::SemanticStatement| {
+                assertions.push(LinkAssertion {
+                    id: statement.statement_id.clone(),
+                    predicate: statement.predicate.clone(),
+                    recognized_kind: match statement.relation_kind() {
+                        kernel::graph::RelationKind::Semantic(kind) => Some(serialized_name(&kind)),
+                        _ => None,
+                    },
+                    label: statement.label.clone(),
+                    scope: scope(&statement.graph_scope),
+                    asserter: statement.provenance_iri.clone(),
+                    first_asserted_ms: statement.first_asserted_ms,
+                    asserted_at_ms: statement.asserted_at_ms,
+                    withdrawn: statement
+                        .withdrawn
+                        .as_ref()
+                        .map(|withdrawal| LinkWithdrawal {
+                            at_ms: withdrawal.at_ms,
+                            by: withdrawal.by.clone(),
+                        }),
+                    basis: LinkAssertionBasis {
+                        note: statement.basis.note.clone(),
+                        method: statement
+                            .basis
+                            .method
                             .as_ref()
-                            .map(|withdrawal| LinkWithdrawal {
-                                at_ms: withdrawal.at_ms,
-                                by: withdrawal.by.clone(),
+                            .map(|method| LinkAssertionMethod {
+                                iri: method.iri.clone(),
+                                version: method.version.clone(),
                             }),
-                        basis: LinkAssertionBasis {
-                            note: statement.basis.note.clone(),
-                            method: statement.basis.method.as_ref().map(|method| {
-                                LinkAssertionMethod {
-                                    iri: method.iri.clone(),
-                                    version: method.version.clone(),
-                                }
-                            }),
-                            evidence: statement.basis.evidence.clone(),
-                        },
-                    })
-                };
+                        evidence: statement.basis.evidence.clone(),
+                    },
+                })
+            };
             match options.scope {
-                LinkReadScope::Held => payload
-                    .held_semantic_statements()
-                    .for_each(&mut add_assertion),
-                LinkReadScope::History => payload
-                    .semantic_statements()
-                    .iter()
-                    .for_each(&mut add_assertion),
+                LinkReadScope::Held => payload.held_assertions().for_each(&mut add_assertion),
+                LinkReadScope::History => payload.assertions().iter().for_each(&mut add_assertion),
             }
             let (legacy_members, legacy_summaries) =
                 legacy_data(payload, options.include_legacy_summaries);

@@ -20,7 +20,8 @@ use super::predicate_declarations::PREDICATE_DECLARATIONS_FACET;
 use super::snapshot::{payload_from_persisted, persisted_edge_for_ids};
 use super::{AttributedDelta, CapturedDelta, EdgePayload, Graph, GraphStratum, ResourceNode};
 use crate::persistence::{
-    GraphSnapshot, PersistedEdge, PersistedResourceFacet, PersistedResourceRecord,
+    GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+    PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
     PersistedSemanticStatement,
 };
 
@@ -192,8 +193,7 @@ pub fn probe_legacy_mint_links(
                     {
                         let explicit = edges
                             .iter()
-                            .filter_map(|edge| edge.semantic.as_ref())
-                            .flat_map(|semantic| &semantic.statements)
+                            .flat_map(|edge| edge.retained_assertions())
                             .find(|carried| carried.statement_id == statement.statement_id)
                             .and_then(|carried| carried.provenance_iri.as_ref())
                             .filter(|source| {
@@ -423,7 +423,7 @@ pub fn migrate_legacy_prefix_with_content_context(
         }
         let after_original = replay.output.to_snapshot();
         let after_original_facets = replay.output.facets().clone();
-        replay.sync(&old_pairs, false, Some(&entry.author))?;
+        replay.sync(&old_pairs, false, Some(entry))?;
         replay.content.sync(
             &replay.source,
             &mut replay.output,
@@ -539,7 +539,7 @@ impl Replay {
         baseline: bool,
     ) -> Result<Origin, LegacyMigrationError> {
         let statement = payload
-            .semantic_statements()
+            .assertions()
             .iter()
             .find(|statement| statement.statement_id == id)
             .expect("claim present");
@@ -575,12 +575,11 @@ impl Replay {
         if baseline {
             let edge = persisted_edge_for_ids(pair.0, pair.1, payload);
             let statement = edge
-                .semantic
-                .expect("semantic payload")
-                .statements
-                .into_iter()
+                .retained_assertions()
+                .iter()
                 .find(|statement| statement.statement_id == id)
-                .expect("statement serialized");
+                .expect("statement serialized")
+                .clone();
             self.add_note(
                 from,
                 LegacyMigrationNote {
@@ -693,7 +692,7 @@ impl Replay {
         &mut self,
         before: &Pairs,
         baseline: bool,
-        author: Option<&super::Author>,
+        entry: Option<&AttributedDelta>,
     ) -> Result<(), LegacyMigrationError> {
         let after = surface_pairs(&self.source)?;
         let previous = self.active.clone();
@@ -719,14 +718,35 @@ impl Replay {
                 }) {
                     let key = (pair, kind.tag());
                     if !self.aggregate_origins.contains_key(&key) {
-                        let resource = self.first_aggregate_origin(pair, kind, author)?;
+                        let proven_author = entry
+                            .filter(|entry| delta_introduces_member(&entry.delta, pair, kind))
+                            .map(|entry| &entry.author);
+                        let resource = self.first_aggregate_origin(pair, kind, proven_author)?;
                         self.aggregate_origins.insert(key, resource);
                     }
                     if self.aggregate_active.contains_key(&key) || !old_kinds.contains(&kind.tag())
                     {
                         let resource = self.aggregate_origins[&key];
                         let mut claim = EdgePayload::new();
-                        claim.assert_relation(aggregate_assertion(kind));
+                        // The prefix marks the deterministic record created
+                        // when an old family sidecar is decoded. Lift that
+                        // exact record into its Resource owner; minting a new
+                        // membership assertion here loses identity and makes
+                        // two parallel Surface owners indistinguishable.
+                        let statement = payload
+                            .assertions()
+                            .iter()
+                            .find(|statement| {
+                                statement.is_held()
+                                    && statement.relation_kind() == kind
+                                    && statement.statement_id.starts_with(
+                                        super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX,
+                                    )
+                            })
+                            .expect("legacy aggregate kind has its deterministic source record")
+                            .clone();
+                        claim.assertions.statements.push(statement);
+                        claim.assertions.rebuild_compat();
                         aggregate_next
                             .entry(key)
                             .or_insert_with(|| Membership {
@@ -738,19 +758,20 @@ impl Replay {
                             .push(persisted_edge_for_ids(resource.0, resource.1, &claim));
                     }
                 }
-                if let Some(semantic) = &mut payload.semantic {
+                {
+                    let semantic = &mut payload.assertions;
                     for statement in &mut semantic.statements {
                         statement.normalize_legacy_asserter();
                     }
                 }
                 let ids: Vec<_> = payload
-                    .semantic_statements()
+                    .assertions()
                     .iter()
                     .map(|statement| statement.statement_id.clone())
                     .collect();
                 for id in ids {
                     let statement = payload
-                        .semantic_statements()
+                        .assertions()
                         .iter()
                         .find(|statement| statement.statement_id == id)
                         .expect("claim present");
@@ -778,11 +799,19 @@ impl Replay {
                         )));
                     }
                     if let Some(resource) = origin.resource
+                        // Exact records minted from canonical input keep their
+                        // carried IDs in the Resource stratum. The only records
+                        // handled by the pair+kind compatibility migration are
+                        // IDs synthesized while decoding pre-canonical family
+                        // sidecars; those have no source-owned assertion handle.
+                        && !(id.starts_with(super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX)
+                            && aggregate_kinds(&payload)
+                                .contains(&statement.relation_kind()))
                         && (self.active.contains_key(&id) || !old_ids.contains(&id))
                     {
                         let mut claim = EdgePayload::new();
-                        claim.semantic = payload.semantic.clone();
-                        let semantic = claim.semantic.as_mut().expect("semantic claim");
+                        claim.assertions = payload.assertions.clone();
+                        let semantic = &mut claim.assertions;
                         semantic
                             .statements
                             .retain(|statement| statement.statement_id == id);
@@ -856,14 +885,20 @@ impl Replay {
                 }),
         );
         for pair in affected {
-            let old_ids: BTreeSet<_> = previous
-                .iter()
-                .filter(|(_, member)| member.resource == pair)
-                .map(|(id, _)| id.clone())
-                .collect();
             let existing = self.output.persisted_resource_edges_between(pair.0, pair.1);
-            let mut desired = filter_edges(pair, &existing, |id| old_ids.contains(id));
-            // Remove only owned copies, preserving same-kind claims from other sources.
+            let mut desired = existing.clone();
+            // Remove only copies this migration previously placed. A typed
+            // checkpoint may have replaced the pair since then; preserve its
+            // independently owned records while reconciling the legacy source.
+            for edge in previous
+                .values()
+                .filter(|member| member.resource == pair)
+                .flat_map(|member| &member.edges)
+            {
+                if let Some(index) = desired.iter().position(|held| held == edge) {
+                    desired.remove(index);
+                }
+            }
             for edge in aggregate_previous
                 .values()
                 .filter(|member| member.resource == pair)
@@ -871,10 +906,6 @@ impl Replay {
             {
                 if let Some(index) = desired.iter().position(|held| held == edge) {
                     desired.remove(index);
-                } else {
-                    return Err(LegacyMigrationError(
-                        "managed aggregate copy is absent".into(),
-                    ));
                 }
             }
             desired.extend(
@@ -937,43 +968,26 @@ fn historical_statement_stratum(
 }
 
 fn aggregate_kinds(payload: &EdgePayload) -> Vec<super::RelationKind> {
-    let mut kinds = Vec::new();
-    if let Some(data) = &payload.containment {
-        kinds.extend(
-            data.sub_kinds
-                .iter()
-                .copied()
-                .map(super::RelationKind::Containment),
-        );
-    }
-    if let Some(data) = &payload.imported {
-        kinds.extend(
-            data.sub_kinds
-                .iter()
-                .copied()
-                .map(super::RelationKind::Imported),
-        );
-    }
-    if let Some(data) = &payload.provenance {
-        kinds.extend(
-            data.sub_kinds
-                .iter()
-                .copied()
-                .map(super::RelationKind::Provenance),
-        );
-    }
+    let mut kinds: Vec<_> = payload
+        .held_assertions()
+        .filter(|statement| {
+            statement
+                .statement_id
+                .starts_with(super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX)
+        })
+        .map(|statement| statement.relation_kind())
+        .filter(|kind| {
+            matches!(
+                kind,
+                super::RelationKind::Containment(_)
+                    | super::RelationKind::Imported(_)
+                    | super::RelationKind::Provenance(_)
+            )
+        })
+        .collect();
+    kinds.sort_by_key(|kind| kind.tag());
+    kinds.dedup();
     kinds
-}
-
-fn aggregate_assertion(kind: super::RelationKind) -> super::EdgeAssertion {
-    match kind {
-        super::RelationKind::Containment(sub_kind) => {
-            super::EdgeAssertion::Containment { sub_kind }
-        },
-        super::RelationKind::Imported(sub_kind) => super::EdgeAssertion::Imported { sub_kind },
-        super::RelationKind::Provenance(sub_kind) => super::EdgeAssertion::Provenance { sub_kind },
-        _ => unreachable!("aggregate family"),
-    }
 }
 
 fn filter_resource_aggregates(pair: Pair, edges: &[PersistedEdge]) -> Vec<PersistedEdge> {
@@ -981,21 +995,17 @@ fn filter_resource_aggregates(pair: Pair, edges: &[PersistedEdge]) -> Vec<Persis
         .iter()
         .filter_map(|edge| {
             let mut payload = payload_from_persisted(edge);
-            for kind in aggregate_kinds(&payload)
+            let kinds: Vec<_> = aggregate_kinds(&payload)
                 .into_iter()
                 .filter(|kind| super::built_in_relation_stratum(*kind) == GraphStratum::Resource)
-            {
-                let selector = match kind {
-                    super::RelationKind::Containment(kind) => {
-                        super::RelationSelector::Containment(kind)
-                    },
-                    super::RelationKind::Imported(kind) => super::RelationSelector::Imported(kind),
-                    super::RelationKind::Provenance(kind) => {
-                        super::RelationSelector::Provenance(kind)
-                    },
-                    _ => unreachable!("aggregate family"),
-                };
-                payload.retract_relation(selector);
+                .collect();
+            if !kinds.is_empty() {
+                payload.assertions.statements.retain(|statement| {
+                    !statement.statement_id.starts_with(
+                        super::legacy_family_attribution::LEGACY_FAMILY_ASSERTION_ID_PREFIX,
+                    ) || !kinds.contains(&statement.relation_kind())
+                });
+                payload.assertions.rebuild_compat();
             }
             (!payload.is_empty()).then(|| persisted_edge_for_ids(pair.0, pair.1, &payload))
         })
@@ -1036,6 +1046,41 @@ fn raw_semantic_edit(delta: &CapturedDelta) -> bool {
             | CapturedDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
     )
 }
+
+/// A legacy aggregate can retain an actor only when this exact replay event
+/// first asserted the directed member. Full-pair snapshots and unrelated
+/// checkpoint writes do not attribute newly seen sidecar membership.
+fn delta_introduces_member(delta: &CapturedDelta, pair: Pair, kind: super::RelationKind) -> bool {
+    match delta {
+        CapturedDelta::ReplayAssertRelationByIds {
+            from_id,
+            to_id,
+            assertion,
+        } => {
+            let asserted_kind = match assertion {
+                super::EdgeAssertion::Semantic { sub_kind, .. } => {
+                    super::RelationKind::Semantic(*sub_kind)
+                },
+                super::EdgeAssertion::Containment { sub_kind } => {
+                    super::RelationKind::Containment(*sub_kind)
+                },
+                super::EdgeAssertion::Arrangement { sub_kind } => {
+                    super::RelationKind::Arrangement(*sub_kind)
+                },
+                super::EdgeAssertion::Imported { sub_kind } => {
+                    super::RelationKind::Imported(*sub_kind)
+                },
+                super::EdgeAssertion::Provenance { sub_kind } => {
+                    super::RelationKind::Provenance(*sub_kind)
+                },
+            };
+            (parse_id(from_id).ok(), parse_id(to_id).ok()) == (Some(pair.0), Some(pair.1))
+                && asserted_kind == kind
+        },
+        _ => false,
+    }
+}
+
 fn surface_pairs(graph: &Graph) -> Result<Pairs, LegacyMigrationError> {
     pairs(&graph.to_snapshot().edges)
 }
@@ -1052,8 +1097,7 @@ fn pairs(edges: &[PersistedEdge]) -> Result<Pairs, LegacyMigrationError> {
 fn statement_ids(edges: &[PersistedEdge]) -> BTreeSet<String> {
     edges
         .iter()
-        .filter_map(|edge| edge.semantic.as_ref())
-        .flat_map(|semantic| &semantic.statements)
+        .flat_map(|edge| edge.retained_assertions())
         .map(|statement| statement.statement_id.clone())
         .collect()
 }
@@ -1067,7 +1111,7 @@ fn filter_edges(
         .filter_map(|edge| {
             let mut payload = payload_from_persisted(edge);
             let ids: Vec<_> = payload
-                .semantic_statements()
+                .assertions()
                 .iter()
                 .filter(|statement| remove(&statement.statement_id))
                 .map(|statement| statement.statement_id.clone())
@@ -1328,6 +1372,80 @@ mod tests {
         }
     }
 
+    fn legacy_sidecar(from: Uuid, to: Uuid, kinds: &[super::super::RelationKind]) -> PersistedEdge {
+        use super::super::RelationKind;
+        use crate::persistence::{
+            PersistedContainmentSubKind as C, PersistedImportedSubKind as I,
+            PersistedProvenanceSubKind as P,
+        };
+
+        let mut containment = Vec::new();
+        let mut imported = Vec::new();
+        let mut provenance = Vec::new();
+        for kind in kinds {
+            match kind {
+                RelationKind::Containment(kind) => containment.push(match kind {
+                    super::super::ContainmentSubKind::UrlPath => C::UrlPath,
+                    super::super::ContainmentSubKind::Domain => C::Domain,
+                    super::super::ContainmentSubKind::FileSystem => C::FileSystem,
+                    super::super::ContainmentSubKind::UserFolder => C::UserFolder,
+                    super::super::ContainmentSubKind::ClipSource => C::ClipSource,
+                    super::super::ContainmentSubKind::NotebookSection => C::NotebookSection,
+                    super::super::ContainmentSubKind::CollectionMember => C::CollectionMember,
+                }),
+                RelationKind::Imported(kind) => imported.push(match kind {
+                    super::super::ImportedSubKind::BookmarkFolder => I::BookmarkFolder,
+                    super::super::ImportedSubKind::HistoryImport => I::HistoryImport,
+                    super::super::ImportedSubKind::SessionImport => I::SessionImport,
+                    super::super::ImportedSubKind::RssMembership => I::RssMembership,
+                    super::super::ImportedSubKind::FileSystemImport => I::FileSystemImport,
+                    super::super::ImportedSubKind::ArchiveMembership => I::ArchiveMembership,
+                    super::super::ImportedSubKind::SharedCollection => I::SharedCollection,
+                }),
+                RelationKind::Provenance(kind) => provenance.push(match kind {
+                    super::super::ProvenanceSubKind::ClippedFrom => P::ClippedFrom,
+                    super::super::ProvenanceSubKind::ExcerptedFrom => P::ExcerptedFrom,
+                    super::super::ProvenanceSubKind::SummarizedFrom => P::SummarizedFrom,
+                    super::super::ProvenanceSubKind::TranslatedFrom => P::TranslatedFrom,
+                    super::super::ProvenanceSubKind::RewrittenFrom => P::RewrittenFrom,
+                    super::super::ProvenanceSubKind::GeneratedFrom => P::GeneratedFrom,
+                    super::super::ProvenanceSubKind::ExtractedFrom => P::ExtractedFrom,
+                    super::super::ProvenanceSubKind::ImportedFromSource => P::ImportedFromSource,
+                    super::super::ProvenanceSubKind::CopiedFrom => P::CopiedFrom,
+                    super::super::ProvenanceSubKind::MergedFrom => P::MergedFrom,
+                }),
+                _ => panic!("test legacy fixture only encodes the three old family sidecars"),
+            }
+        }
+        PersistedEdge {
+            from_node_id: from.to_string(),
+            to_node_id: to.to_string(),
+            families: Vec::new(),
+            semantic: None,
+            traversal: None,
+            containment: (!containment.is_empty()).then_some(PersistedContainmentEdgeData {
+                sub_kinds: containment,
+            }),
+            arrangement: None,
+            imported: (!imported.is_empty()).then_some(PersistedImportedEdgeData {
+                sub_kinds: imported,
+            }),
+            provenance: (!provenance.is_empty()).then_some(PersistedProvenanceEdgeData {
+                sub_kinds: provenance,
+            }),
+            assertions: None,
+        }
+    }
+
+    fn exact_legacy(from: u128, to: u128, kind: super::super::RelationKind) -> CapturedDelta {
+        let (from_id, to_id) = (Uuid::from_u128(from), Uuid::from_u128(to));
+        CapturedDelta::ReplaySetEdgesByIds {
+            from_id: from_id.to_string(),
+            to_id: to_id.to_string(),
+            edges: vec![legacy_sidecar(from_id, to_id, &[kind])],
+        }
+    }
+
     fn clear(from: u128, to: u128) -> CapturedDelta {
         CapturedDelta::ReplaySetEdgesByIds {
             from_id: Uuid::from_u128(from).to_string(),
@@ -1338,6 +1456,21 @@ mod tests {
 
     fn resource_pair(a: &str, b: &str) -> Pair {
         (ResourceNode::new(a).id(), ResourceNode::new(b).id())
+    }
+
+    fn aggregate_assertion(kind: super::super::RelationKind) -> super::super::EdgeAssertion {
+        match kind {
+            super::super::RelationKind::Containment(sub_kind) => {
+                super::super::EdgeAssertion::Containment { sub_kind }
+            },
+            super::super::RelationKind::Imported(sub_kind) => {
+                super::super::EdgeAssertion::Imported { sub_kind }
+            },
+            super::super::RelationKind::Provenance(sub_kind) => {
+                super::super::EdgeAssertion::Provenance { sub_kind }
+            },
+            _ => unreachable!("fixture includes the three nonsemantic families"),
+        }
     }
 
     fn persisted_aggregate_tags(edges: &[PersistedEdge]) -> Vec<u32> {
@@ -1537,7 +1670,7 @@ mod tests {
                 });
             }
             let mut carried = payload("surface-carried", predicate, Some(&author.asserter_iri()));
-            carried.semantic.as_mut().unwrap().statements[0].graph_scope = GraphScope::Default;
+            carried.assertions.statements[0].graph_scope = GraphScope::Default;
             entries.push(AttributedDelta {
                 author,
                 delta: exact(1, 2, &carried),
@@ -1598,7 +1731,7 @@ mod tests {
             record: Some(conflict.clone()),
         });
         let mut carried = payload("new-carried", predicate, Some(&author.asserter_iri()));
-        carried.semantic.as_mut().unwrap().statements[0].graph_scope = GraphScope::Default;
+        carried.assertions.statements[0].graph_scope = GraphScope::Default;
         journal.record(exact(1, 2, &carried));
         let before = serde_json::to_vec(journal.entries()).unwrap();
         let error = migrate_legacy_prefix(&baseline, journal.entries())
@@ -1672,7 +1805,8 @@ mod tests {
     }
 
     #[test]
-    fn legacy_resource_migration_aggregate_catalog_places_all_23_kinds_with_uncertainty() {
+    fn legacy_resource_migration_canonical_family_records_keep_exact_ids_without_aggregate_copies()
+    {
         let baseline = baseline(&["https://a.test/old", "https://b.test/"]);
         let kinds: Vec<_> = [(2u32, 7), (4, 7), (5, 9)]
             .into_iter()
@@ -1684,40 +1818,59 @@ mod tests {
         for kind in &kinds {
             all.assert_relation(aggregate_assertion(*kind));
         }
+        let exact_ids: BTreeSet<_> = all
+            .assertions()
+            .iter()
+            .map(|statement| statement.statement_id.clone())
+            .collect();
         let mut journal = GraphJournal::new();
-        let author = Author::engine("legacy-import", "v7").via("reader");
-        journal.record_as(author.clone(), exact(1, 2, &all));
+        journal.record_as(
+            Author::engine("legacy-import", "v7").via("reader"),
+            exact(1, 2, &all),
+        );
         let result = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
-        let resource_tags = persisted_aggregate_tags(&result.graph.to_snapshot().resource_edges);
-        let surface_tags = persisted_aggregate_tags(&result.graph.to_snapshot().edges);
-        assert_eq!(resource_tags.len(), 16);
-        assert_eq!(surface_tags.len(), 7);
-        for kind in kinds {
-            let in_resource =
-                super::super::built_in_relation_stratum(kind) == GraphStratum::Resource;
-            assert_eq!(resource_tags.contains(&kind.tag()), in_resource);
-            assert_eq!(surface_tags.contains(&kind.tag()), !in_resource);
+        let snapshot = result.graph.to_snapshot();
+        // These are already canonical assertion records, not anonymous old
+        // sidecar memberships. Preserve their exact records without emitting
+        // compatibility aggregate copies alongside them.
+        let resource_tags = persisted_aggregate_tags(&snapshot.resource_edges);
+        let surface_tags = persisted_aggregate_tags(&snapshot.edges);
+        assert!(resource_tags.is_empty());
+        assert!(surface_tags.is_empty());
+        let resource_ids = statement_ids(&snapshot.resource_edges);
+        let surface_ids = statement_ids(&snapshot.edges);
+        assert_eq!(resource_ids.len(), 16);
+        assert_eq!(surface_ids.len(), 7);
+        assert_eq!(
+            resource_ids
+                .union(&surface_ids)
+                .cloned()
+                .collect::<BTreeSet<_>>(),
+            exact_ids
+        );
+        for edge in &snapshot.resource_edges {
+            for statement in payload_from_persisted(edge).assertions() {
+                assert_eq!(
+                    super::super::built_in_relation_stratum(statement.relation_kind()),
+                    GraphStratum::Resource
+                );
+            }
+        }
+        for edge in &snapshot.edges {
+            for statement in payload_from_persisted(edge).assertions() {
+                assert_eq!(
+                    super::super::built_in_relation_stratum(statement.relation_kind()),
+                    GraphStratum::Surface
+                );
+            }
         }
         let from = ResourceNode::new("https://a.test/old").id();
-        let notes: Vec<LegacyAggregateMigrationNote> = serde_json::from_str(
-            &result
-                .graph
-                .resource_record(from)
-                .unwrap()
+        let record = result.graph.resource_record(from).unwrap();
+        assert!(
+            !record
                 .facets
                 .iter()
-                .find(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
-                .unwrap()
-                .value_json,
-        )
-        .unwrap();
-        assert_eq!(notes.len(), 16);
-        assert!(
-            notes
-                .iter()
-                .all(|note| note.author.as_ref() == Some(&author)
-                    && note.uncertainty
-                        == "legacy_pair_kind_identity_without_assertion_handle_or_time")
+                .any(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
         );
         let mut effective = baseline.clone();
         replay_captured_deltas_onto(&mut effective, result.baseline_effects);
@@ -1745,10 +1898,11 @@ mod tests {
         claim.assert_relation(EdgeAssertion::Provenance {
             sub_kind: ProvenanceSubKind::ClippedFrom,
         });
+        let legacy_kind = super::super::RelationKind::Provenance(ProvenanceSubKind::ClippedFrom);
         let mint = Author::person("mint");
         let mut journal = GraphJournal::new();
-        journal.record_as(mint.clone(), exact(1, 3, &claim));
-        journal.record_as(Author::person("alias"), exact(2, 3, &claim));
+        journal.record_as(mint, exact_legacy(1, 3, legacy_kind));
+        journal.record_as(Author::person("alias"), exact_legacy(2, 3, legacy_kind));
         journal.record(CapturedDelta::ReplaySetNodeUrlById {
             node_id: Uuid::from_u128(1).to_string(),
             new_url: "https://a.test/new".into(),
@@ -1766,7 +1920,10 @@ mod tests {
             1,
             "withdrawal preserves the other original surface pair"
         );
-        journal.record_as(Author::person("restorer"), exact(1, 3, &claim));
+        // Restore the old family membership through its legacy sidecar form.
+        // `exact` carries canonical assertion IDs and belongs to the typed
+        // takeover path below; it must not be reinterpreted as an aggregate.
+        journal.record_as(Author::person("restorer"), exact_legacy(1, 3, legacy_kind));
         let restored = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
         assert_eq!(
             persisted_aggregate_tags(
@@ -1805,7 +1962,8 @@ mod tests {
                 .find(|note| note.from_surface_id == Uuid::from_u128(1).to_string())
                 .unwrap()
                 .author,
-            Some(mint)
+            None,
+            "an aggregate snapshot has no exact mint event author"
         );
         let typed = vec![persisted_edge_for_ids(pair.0, pair.1, &claim)];
         journal.record(CapturedDelta::ReplaySetResourceEdgesByIds {
@@ -1824,17 +1982,24 @@ mod tests {
             "explicit pair ownership is not repopulated by an unrelated edit"
         );
         journal.record(clear(1, 3));
-        journal.record(exact(1, 3, &claim));
+        journal.record(exact_legacy(1, 3, legacy_kind));
         let new_member = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
+        let new_member_edges = new_member
+            .graph
+            .persisted_resource_edges_between(pair.0, pair.1);
+        assert_eq!(persisted_aggregate_tags(&new_member_edges).len(), 1);
+        let records: Vec<_> = new_member_edges
+            .iter()
+            .flat_map(|edge| edge.retained_assertions())
+            .collect();
         assert_eq!(
-            persisted_aggregate_tags(
-                &new_member
-                    .graph
-                    .persisted_resource_edges_between(pair.0, pair.1)
-            )
-            .len(),
+            records.len(),
             2,
             "a later legacy reappearance adds its own copy without erasing the typed copy"
+        );
+        assert!(
+            records.contains(&&typed[0].retained_assertions()[0]),
+            "the explicit typed record remains exact alongside the legacy copy"
         );
         journal.record(clear(1, 3));
         let final_state = migrate_legacy_prefix(&baseline, journal.entries()).unwrap();
@@ -1883,12 +2048,30 @@ mod tests {
         let claims = replay
             .graph
             .persisted_resource_edges_between(pair.0, pair.1);
-        assert_eq!(statement_ids(&claims), BTreeSet::from(["unknown".into()]));
-        let claim = &claims
+        let source_payload = payload_from_persisted(&before.edges[0]);
+        let expected_resource_ids: BTreeSet<_> = source_payload
+            .assertions()
             .iter()
-            .find_map(|edge| edge.semantic.as_ref())
-            .unwrap()
-            .statements[0];
+            .filter(|statement| {
+                historical_statement_stratum(&baseline, statement) == GraphStratum::Resource
+            })
+            .map(|statement| statement.statement_id.clone())
+            .collect();
+        let expected_surface_ids: BTreeSet<_> = source_payload
+            .assertions()
+            .iter()
+            .filter(|statement| {
+                historical_statement_stratum(&baseline, statement) == GraphStratum::Surface
+            })
+            .map(|statement| statement.statement_id.clone())
+            .collect();
+        assert_eq!(statement_ids(&claims), expected_resource_ids);
+        assert!(statement_ids(&claims).contains("unknown"));
+        let claim = claims
+            .iter()
+            .flat_map(|edge| edge.retained_assertions())
+            .find(|statement| statement.statement_id == "unknown")
+            .expect("unknown legacy statement remains available");
         assert_eq!(claim.asserted_at_ms, Some(100));
         assert_eq!(
             claim.provenance_iri.as_deref(),
@@ -1897,7 +2080,8 @@ mod tests {
         let held_surface = replay.graph.persisted_edges_between(a, b);
         assert_eq!(
             statement_ids(&held_surface),
-            BTreeSet::from(["group".into()])
+            expected_surface_ids,
+            "canonical surface-family records remain on the original Surface pair"
         );
         assert_eq!(held_surface[0].imported, before.edges[0].imported);
         assert!(held_surface[0].provenance.is_none());
@@ -1907,7 +2091,11 @@ mod tests {
                 .any(|edge| edge.provenance == before.edges[0].provenance)
         );
         assert_eq!(
-            held_surface[0].semantic.as_ref().unwrap().statements[0]
+            held_surface[0]
+                .retained_assertions()
+                .iter()
+                .find(|statement| statement.statement_id == "group")
+                .expect("the held user-grouped claim remains on Surface")
                 .provenance_iri
                 .as_deref(),
             Some("https://group-author.test/")
@@ -1922,12 +2110,15 @@ mod tests {
                 .value_json,
         )
         .unwrap();
-        assert_eq!(notes.len(), 1);
-        assert_eq!(notes[0].statement, *claim);
-        assert_eq!(notes[0].from_surface_id, Uuid::from_u128(1).to_string());
-        assert_eq!(notes[0].to_surface_id, Uuid::from_u128(2).to_string());
+        assert_eq!(notes.len(), expected_resource_ids.len());
+        let claim_note = notes
+            .iter()
+            .find(|note| note.statement.statement_id == claim.statement_id)
+            .expect("each exact carried record keeps its own migration note");
+        assert_eq!(claim_note.from_surface_id, Uuid::from_u128(1).to_string());
+        assert_eq!(claim_note.to_surface_id, Uuid::from_u128(2).to_string());
         assert_eq!(
-            notes[0].uncertainty,
+            claim_note.uncertainty,
             "baseline_current_resources_without_mint_event"
         );
         assert_eq!(replay.graph.shown_resource_id(a), Some(pair.0));
@@ -1941,20 +2132,11 @@ mod tests {
             effective.to_snapshot().edges,
             replay.graph.to_snapshot().edges
         );
-        let aggregate_notes: Vec<LegacyAggregateMigrationNote> = serde_json::from_str(
-            &record
+        assert!(
+            !record
                 .facets
                 .iter()
-                .find(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
-                .unwrap()
-                .value_json,
-        )
-        .unwrap();
-        assert_eq!(aggregate_notes.len(), 1);
-        assert!(aggregate_notes[0].author.is_none());
-        assert_eq!(
-            aggregate_notes[0].uncertainty,
-            "baseline_current_resources_without_mint_event_handle_or_time"
+                .any(|facet| facet.facet == LEGACY_AGGREGATE_MIGRATION_FACET)
         );
         let mut noted_baseline = baseline.clone();
         for record in &replay.graph.to_snapshot().resources {
@@ -2025,7 +2207,7 @@ mod tests {
         for (id, author) in [("one", alice), ("two", bob)] {
             let statement = claims
                 .iter()
-                .flat_map(|edge| &edge.semantic.as_ref().unwrap().statements)
+                .flat_map(|edge| edge.retained_assertions())
                 .find(|statement| statement.statement_id == id)
                 .unwrap();
             assert_eq!(statement.asserted_at_ms, Some(100));
@@ -2051,7 +2233,7 @@ mod tests {
                 .to_snapshot()
                 .edges
                 .iter()
-                .all(|edge| edge.semantic.is_none())
+                .all(|edge| edge.semantic.is_none() && edge.assertions.is_some())
         );
         journal
             .migrated_replay_from_with_baseline(checkpoint_cursor, &mut checkpoint, &baseline)
@@ -2113,7 +2295,7 @@ mod tests {
             edges: vec![typed.clone()],
         });
         let mut update = payload("old-c", predicate, Some("https://author.test/"));
-        update.semantic.as_mut().unwrap().statements[0].label = Some("later unrelated edit".into());
+        update.assertions.statements[0].label = Some("later unrelated edit".into());
         journal.record(exact(3, 4, &update));
         let replay = journal
             .migrated_prefix_at_from(&baseline, journal.live_cursor())
@@ -2139,7 +2321,7 @@ mod tests {
                 .to_snapshot()
                 .edges
                 .iter()
-                .all(|edge| edge.semantic.is_none())
+                .all(|edge| edge.semantic.is_none() && edge.assertions.is_some())
         );
         journal.record(CapturedDelta::ReplaySetResourceEdgesByIds {
             from_resource_id: first.0.to_string(),
@@ -2316,7 +2498,7 @@ mod tests {
         journal.record(exact(1, 2, &held));
         journal.record(clear(1, 2));
         let mut metadata = held.clone();
-        let statement = &mut metadata.semantic.as_mut().unwrap().statements[0];
+        let statement = &mut metadata.assertions.statements[0];
         statement.label = Some("new label".into());
         statement.basis.note = Some("new label".into());
         statement.asserted_at_ms = Some(300);
@@ -2326,17 +2508,13 @@ mod tests {
             .unwrap()
             .unwrap();
         let valid_snapshot = valid.to_snapshot();
-        let statement = &valid_snapshot.resource_edges[0]
-            .semantic
-            .as_ref()
-            .unwrap()
-            .statements[0];
+        let statement = &valid_snapshot.resource_edges[0].retained_assertions()[0];
         assert_eq!(statement.statement_id, "held");
         assert_eq!(statement.label.as_deref(), Some("new label"));
         assert_eq!(statement.asserted_at_ms, Some(300));
         for change in 0..4 {
             let mut conflict = held.clone();
-            let statement = &mut conflict.semantic.as_mut().unwrap().statements[0];
+            let statement = &mut conflict.assertions.statements[0];
             match change {
                 0 => statement.predicate = "https://vocab.test/changed".into(),
                 1 => statement.recognized_sub_kind = Some(SemanticSubKind::Quotes),
@@ -2362,8 +2540,7 @@ mod tests {
                 serde_json::to_vec(divergent.entries()).unwrap(),
                 source_before
             );
-            conflict.semantic.as_mut().unwrap().statements[0].statement_id =
-                format!("distinct-{change}");
+            conflict.assertions.statements[0].statement_id = format!("distinct-{change}");
             let mut distinct = journal.clone();
             distinct.record(exact(1, 2, &conflict));
             assert!(
@@ -2399,21 +2576,9 @@ mod tests {
         assert!(migrated.graph.persisted_edges_between(a, b).is_empty());
         let mut invalid = baseline.clone();
         let key = invalid.find_edge_key(a, b).unwrap();
-        invalid
-            .get_edge_mut(key)
-            .unwrap()
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements[0]
-            .label = Some("conflicting copy".into());
-        invalid
-            .get_edge_mut(key)
-            .unwrap()
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements[0]
+        invalid.get_edge_mut(key).unwrap().assertions.statements[0].label =
+            Some("conflicting copy".into());
+        invalid.get_edge_mut(key).unwrap().assertions.statements[0]
             .basis
             .note = Some("conflicting copy".into());
         assert!(migrate_legacy_prefix(&invalid, &[]).is_err());
@@ -2563,7 +2728,7 @@ mod tests {
             let claims = graph.persisted_resource_edges_between(pair.0, pair.1);
             assert_eq!(claims.len(), 1);
             assert_eq!(
-                claims[0].semantic.as_ref().unwrap().statements[0].provenance_iri,
+                claims[0].retained_assertions()[0].provenance_iri,
                 Some(author.asserter_iri())
             );
             assert!(
@@ -2579,7 +2744,7 @@ mod tests {
                     .to_snapshot()
                     .edges
                     .iter()
-                    .all(|edge| edge.semantic.is_none())
+                    .all(|edge| edge.semantic.is_none() && edge.assertions.is_some())
             );
         }
         // Raw records did not carry stable handles; repeated replay deliberately
@@ -2617,7 +2782,7 @@ mod tests {
             predicate_iri(SemanticSubKind::Cites),
             Some(&author.asserter_iri()),
         );
-        carried.semantic.as_mut().unwrap().statements[0].graph_scope = GraphScope::Default;
+        carried.assertions.statements[0].graph_scope = GraphScope::Default;
         journal.record_as(Author::person("later-author"), exact(1, 2, &carried));
         let source_before = serde_json::to_vec(journal.entries()).unwrap();
         let diagnostics = probe_legacy_mint_links(&baseline, journal.entries()).unwrap();
@@ -2664,15 +2829,13 @@ mod tests {
             assert_eq!(statement_ids(&exact), BTreeSet::from(["carried".into()]));
             let claim = &exact
                 .iter()
-                .find_map(|edge| edge.semantic.as_ref())
+                .find(|edge| !edge.retained_assertions().is_empty())
                 .unwrap()
-                .statements[0];
+                .retained_assertions()[0];
             assert_eq!(
                 claim,
                 &persisted_edge_for_ids(Uuid::from_u128(1), Uuid::from_u128(2), &carried)
-                    .semantic
-                    .unwrap()
-                    .statements[0],
+                    .retained_assertions()[0],
                 "resolution preserves carried ID, time and source"
             );
             let prefix = journal
@@ -2807,7 +2970,7 @@ mod tests {
             "a real edit proves the retained recorder works"
         );
         let mut marker = carried.clone();
-        marker.semantic.as_mut().unwrap().statements[0].provenance_iri =
+        marker.assertions.statements[0].provenance_iri =
             Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into());
         let mut uncertain = journal.entries()[..2].to_vec();
         uncertain.push(AttributedDelta {
@@ -2822,7 +2985,7 @@ mod tests {
         );
         assert!(!unknown[0].explicit_source_matches);
         assert!(migrate_legacy_prefix(&baseline, &uncertain).is_err());
-        marker.semantic.as_mut().unwrap().statements[0].provenance_iri =
+        marker.assertions.statements[0].provenance_iri =
             Some(Author::person("different-author").asserter_iri());
         uncertain[2].delta = exact(1, 2, &marker);
         assert!(
@@ -2837,9 +3000,8 @@ mod tests {
             BTreeSet::from(["carried".into()])
         );
         // A distinct claim key is an unambiguous carried handle control.
-        carried.semantic.as_mut().unwrap().statements[0].predicate =
-            "https://vocab.test/distinct".into();
-        carried.semantic.as_mut().unwrap().statements[0].recognized_sub_kind = None;
+        carried.assertions.statements[0].predicate = "https://vocab.test/distinct".into();
+        carried.assertions.statements[0].recognized_sub_kind = None;
         let mut independent = journal.entries()[..2].to_vec();
         independent.push(AttributedDelta {
             author,

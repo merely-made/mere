@@ -70,12 +70,9 @@ impl BoardFootprint {
     /// Local bounds in score units, for overlap.
     pub fn bounds(&self) -> Option<BoardRect> {
         match self {
-            BoardFootprint::Rect { width, height } => Some(BoardRect::new(
-                -width / 2.0,
-                -height / 2.0,
-                *width,
-                *height,
-            )),
+            BoardFootprint::Rect { width, height } => {
+                Some(BoardRect::new(-width / 2.0, -height / 2.0, *width, *height))
+            },
             BoardFootprint::Other { bounds } => *bounds,
         }
     }
@@ -191,7 +188,10 @@ pub struct BoardTransform {
 
 impl BoardTransform {
     pub fn to_viewport(&self, (x, y): (f32, f32)) -> (f32, f32) {
-        (self.origin.0 + x * self.scale, self.origin.1 + y * self.scale)
+        (
+            self.origin.0 + x * self.scale,
+            self.origin.1 + y * self.scale,
+        )
     }
 }
 
@@ -283,7 +283,11 @@ impl BoardScene {
     }
 
     fn framed(&self, fit: BoardFit) -> BoardRect {
-        if fit.frame_edges { self.frame() } else { self.bounds }
+        if fit.frame_edges {
+            self.frame()
+        } else {
+            self.bounds
+        }
     }
 
     /// Each card's body in viewport px, at the board's positions, in card
@@ -596,11 +600,16 @@ mod tests {
         let transform = page_fit().transform(bounds, 1400.0, 900.0);
         // The formula the old page drew with: (W - 100) / w, (H - 180) / h,
         // never above 1; centred in W; hung at 116.
-        let scale = ((1400.0_f32 - 100.0) / 560.0).min((900.0 - 180.0) / 156.0).min(1.0);
+        let scale = ((1400.0_f32 - 100.0) / 560.0)
+            .min((900.0 - 180.0) / 156.0)
+            .min(1.0);
         assert_eq!(transform.scale, scale);
         assert_eq!(
             transform.origin,
-            ((1400.0 - 560.0 * scale) * 0.5 + 140.0 * scale, 116.0 + 78.0 * scale)
+            (
+                (1400.0 - 560.0 * scale) * 0.5 + 140.0 * scale,
+                116.0 + 78.0 * scale
+            )
         );
         // A board wider than the viewport shrinks to fit.
         let wide = page_fit().transform(BoardRect::new(0.0, 0.0, 2600.0, 100.0), 1400.0, 900.0);
@@ -610,7 +619,10 @@ mod tests {
     #[test]
     fn an_empty_board_is_ground_only() {
         let scene = BoardScene::default().paint(&PhysicsBoard::new(), 640, 480, page_fit());
-        assert_eq!(rects(&scene), vec![([0.0, 0.0, 640.0, 480.0], BOARD_GROUND)]);
+        assert_eq!(
+            rects(&scene),
+            vec![([0.0, 0.0, 640.0, 480.0], BOARD_GROUND)]
+        );
     }
 
     #[test]
@@ -626,7 +638,10 @@ mod tests {
         let transform = page_fit().transform(scene_desc.frame(), 1400.0, 900.0);
         let (cx, cy) = transform.to_viewport((140.0, 0.0));
         let body = before.last().unwrap().0;
-        assert_eq!([(body[0] + body[2]) / 2.0, (body[1] + body[3]) / 2.0], [cx, cy]);
+        assert_eq!(
+            [(body[0] + body[2]) / 2.0, (body[1] + body[3]) / 2.0],
+            [cx, cy]
+        );
 
         board.sync(scene_desc.items());
         assert!(board.drag_start("1"));
@@ -655,7 +670,10 @@ mod tests {
         let drawn = rects(&scene_desc.paint(&PhysicsBoard::new(), 1400, 900, page_fit()));
         // Ground, then held edge + shadow + lead body, then shadow + body.
         let colors: Vec<_> = drawn.iter().map(|(_, color)| *color).collect();
-        assert_eq!(colors, vec![BOARD_GROUND, HELD_EDGE, SHADOW, LEAD_CARD, SHADOW, CARD]);
+        assert_eq!(
+            colors,
+            vec![BOARD_GROUND, HELD_EDGE, SHADOW, LEAD_CARD, SHADOW, CARD]
+        );
         let (edge, body) = (drawn[1].0, drawn[3].0);
         assert_eq!(edge[0], body[0] - 3.0);
         assert_eq!(edge[3], body[3] + 3.0);
@@ -682,7 +700,11 @@ mod tests {
         let drawn = rects(&scene_desc.paint(&PhysicsBoard::new(), 1400, 900, page_fit()));
         assert_eq!(drawn.len(), 1 + 5 + 1);
         assert_eq!(drawn[1].1, backdrop_color("shore"));
-        assert!(drawn[2..6].iter().all(|(_, color)| *color == COLLIDABLE_EDGE));
+        assert!(
+            drawn[2..6]
+                .iter()
+                .all(|(_, color)| *color == COLLIDABLE_EDGE)
+        );
         assert_eq!(drawn[6].1, backdrop_color("field"));
         assert_eq!(backdrop_color("shore"), backdrop_color("shore"));
     }
@@ -691,7 +713,11 @@ mod tests {
     fn overlap_counts_shared_area_not_touching_edges() {
         let board = PhysicsBoard::new();
         let touching = BoardScene {
-            cards: vec![card("a", 0.0, 0.0), card("b", 280.0, 0.0), card("c", 900.0, 0.0)],
+            cards: vec![
+                card("a", 0.0, 0.0),
+                card("b", 280.0, 0.0),
+                card("c", 900.0, 0.0),
+            ],
             ..BoardScene::default()
         };
         assert_eq!(touching.overlaps(&board), 0);
@@ -745,19 +771,28 @@ mod tests {
             backdrops: Vec::new(),
             cards: vec![first, second],
         };
-        assert_eq!(scene_desc.frame(), BoardRect::new(-60.0, -40.0, 260.0, 80.0));
+        assert_eq!(
+            scene_desc.frame(),
+            BoardRect::new(-60.0, -40.0, 260.0, 80.0)
+        );
         let fit = BoardFit::new(24.0, 24.0, 24.0, 24.0);
         let rects = scene_desc.card_rects(&PhysicsBoard::new(), 982, 627, fit);
         assert_eq!(rects.len(), 2);
         assert!(
-            rects.iter().all(|(_, _, rect)| (rect.y - 24.0).abs() < 0.01),
+            rects
+                .iter()
+                .all(|(_, _, rect)| (rect.y - 24.0).abs() < 0.01),
             "both cards start at the top margin: {rects:?}"
         );
         assert_eq!(rects[1].1, "Card 1");
         // Framing the bounds alone, as the old page does, the cards cross the
         // top margin by half their height.
         let old = scene_desc.card_rects(&PhysicsBoard::new(), 982, 627, fit.framing_bounds());
-        assert!(old.iter().all(|(_, _, rect)| (rect.y - (24.0 - 40.0)).abs() < 0.01), "{old:?}");
+        assert!(
+            old.iter()
+                .all(|(_, _, rect)| (rect.y - (24.0 - 40.0)).abs() < 0.01),
+            "{old:?}"
+        );
     }
 
     #[test]
