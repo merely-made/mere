@@ -208,6 +208,7 @@ use seiche::Physics;
 /// A board scene: the cards and backdrops of a scene that is not a graph,
 /// painted where the physics board holds them.
 pub mod board_scene;
+pub mod backdrop_surface;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
