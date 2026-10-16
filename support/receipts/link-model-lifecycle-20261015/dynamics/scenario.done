@@ -1,0 +1,11 @@
+RESULT ok
+captured responsive_attractor
+captured responsive_disabled
+captured responsive_attraction_only
+captured responsive_combined
+captured responsive_flow
+captured responsive_flow_field_only
+captured responsive_vortex_field_only
+captured responsive_vortex_combined
+waited 0 frames
+gpu timestamps: no

@@ -1,0 +1,237 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        742,
+        1044
+      ],
+      "canvas_physical_size": [
+        0,
+        0
+      ],
+      "log": [
+        "captured responsive_attractor",
+        "captured responsive_disabled",
+        "captured responsive_attraction_only",
+        "captured responsive_combined",
+        "captured responsive_flow",
+        "captured responsive_flow_field_only",
+        "captured responsive_vortex_field_only",
+        "captured responsive_vortex_combined",
+        "waited 0 frames",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "ok",
+      "saved_graph": null,
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "responsive_attractor",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 590006
+      },
+      {
+        "name": "responsive_disabled",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 531542
+      },
+      {
+        "name": "responsive_attraction_only",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 552358
+      },
+      {
+        "name": "responsive_combined",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 584150
+      },
+      {
+        "name": "responsive_flow",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 553702
+      },
+      {
+        "name": "responsive_flow_field_only",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 559358
+      },
+      {
+        "name": "responsive_vortex_field_only",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 610778
+      },
+      {
+        "name": "responsive_vortex_combined",
+        "width": 1484,
+        "height": 2088,
+        "bytes": 595114
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "label": "Responsive link dynamics fixture",
+          "children": [
+            {
+              "role": "heading",
+              "label": "Responsive links \u00b7 fixed endpoints",
+              "children": []
+            },
+            {
+              "role": "paragraph",
+              "children": []
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Attractor",
+                  "pressed": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Flow",
+                  "pressed": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Vortex",
+                  "pressed": true,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Field response",
+                  "pressed": true,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Compatible-link attraction",
+                  "pressed": true,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "role": "paragraph",
+              "children": []
+            },
+            {
+              "role": "paragraph",
+              "children": []
+            },
+            {
+              "role": "img",
+              "label": "Three responsive source links with six fixed endpoints",
+              "box": [
+                12,
+                194,
+                712,
+                469
+              ],
+              "children": []
+            },
+            {
+              "role": "heading",
+              "label": "Observed path geometry",
+              "children": []
+            },
+            {
+              "role": "list",
+              "label": "Compatible path A \u00b7 maximum bend 61.68 units \u00b7 endpoints fixed \u00b7 fixture:v1:assertion:path-aCompatible path B \u00b7 maximum bend 64.14 units \u00b7 endpoints fixed \u00b7 fixture:v1:assertion:path-bIncompatible control path \u00b7 maximum bend 37.08 units \u00b7 endpoints fixed \u00b7 fixture:v1:assertion:path-c",
+              "children": [
+                {
+                  "role": "listitem",
+                  "label": "Compatible path A \u00b7 maximum bend 61.68 units \u00b7 endpoints fixed \u00b7 fixture:v1:assertion:path-a",
+                  "box": [
+                    36,
+                    705,
+                    694,
+                    16
+                  ],
+                  "children": []
+                },
+                {
+                  "role": "listitem",
+                  "label": "Compatible path B \u00b7 maximum bend 64.14 units \u00b7 endpoints fixed \u00b7 fixture:v1:assertion:path-b",
+                  "box": [
+                    36,
+                    726,
+                    694,
+                    16
+                  ],
+                  "children": []
+                },
+                {
+                  "role": "listitem",
+                  "label": "Incompatible control path \u00b7 maximum bend 37.08 units \u00b7 endpoints fixed \u00b7 fixture:v1:assertion:path-c",
+                  "box": [
+                    36,
+                    747,
+                    694,
+                    16
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "role": "paragraph",
+              "children": []
+            },
+            {
+              "role": "paragraph",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 742,
+      "height": 1044
+    }
+  },
+  "capture_files": [
+    "responsive_attractor",
+    "responsive_disabled",
+    "responsive_attraction_only",
+    "responsive_combined",
+    "responsive_flow",
+    "responsive_flow_field_only",
+    "responsive_vortex_field_only",
+    "responsive_vortex_combined"
+  ]
+}
