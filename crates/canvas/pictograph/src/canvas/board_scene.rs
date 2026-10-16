@@ -468,6 +468,17 @@ impl BoardText {
         width: u32,
         height: u32,
     ) -> Option<genet_livery::LiveryPaintList> {
+        self.labels(cards, width, height, TITLE_SHEET)
+    }
+
+    /// Shared label shaping for independent surfaces; appearance belongs to the host.
+    pub(crate) fn labels(
+        &mut self,
+        cards: &[(String, String, BoardRect)],
+        width: u32,
+        height: u32,
+        sheet: &str,
+    ) -> Option<genet_livery::LiveryPaintList> {
         use layout_dom_api::{LayoutDom, LayoutDomMut};
         if cards.iter().all(|(_, title, _)| title.is_empty()) {
             return None;
@@ -493,7 +504,7 @@ impl BoardText {
         }
         let styles = genet_livery::resolve_styles(
             &dom,
-            &genet_livery::StyleSet::cambium(&[TITLE_SHEET]),
+            &genet_livery::StyleSet::cambium(&[sheet]),
             &genet_livery::Device::screen(width as f32, height as f32),
             &genet_livery::InteractionStates::default(),
         );

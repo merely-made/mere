@@ -80,6 +80,81 @@ instance. A scene or snapshot without folds writes no `folds` key.
 (highest layer, then latest explicit order, then highest stable slot), using an
 item's `hit` shape when present and its footprint otherwise.
 
+## Portable backdrop recipes
+
+`scenomise::backdrops` compiles three version-1 `SceneInput` recipes into a
+`BackdropScene`: metre grid, fretboard, and terrain with coverage. The whole
+bundle carries geometry, labels, relation explanations, source references,
+revision, diagnostics and unplaced readings. Export the bundle when passing
+compiled readings between hosts; a bare `sceno::Scene` omits label strings.
+Alternatively export the input recipe and compile it again in another host.
+
+The supplying application owns facts. Knot can supply syllables, stress and
+rhyme tails; Woodshed can supply tuning, positions and pitch identities;
+Signalman can supply coordinates, terrain, coverage polygons and their basis.
+These are adapters to a shared presentation, not dependencies of the compiler.
+The compiler does not perform scansion, infer radio propagation, obtain source
+authority or persist application data. Missing radio positions remain unplaced;
+unmeasured ground stays distinct from supplied coverage. Expected rhyme pairs
+with absent or disagreeing supplied tails remain expected, with diagnostics.
+
+The independent renderer is
+`pictograph::canvas::backdrop_surface::BackdropSurface` (`canvas` feature).
+Call `new`, register a host font, then `paint(width, height, &SurfaceTheme)` to
+obtain a Netrender scene. `pick` uses the same fitted coordinates. Selection,
+retained attention and coverage/link visibility are view state; they do not
+rewrite the source. Replacement validates and compiles before changing the live
+surface. Callers supply applied colors and own resource lifetimes.
+`cambium::backdrop_scene_reading` provides accessible occurrence controls and
+inspection, emitting selection events to its host. Repeated occurrences retain
+distinct keys even when they reference the same resource.
+
+Graphshell is the first embedding: open `tree.html?app=local`, find Graph tools,
+then choose **Portable scenes**. Its existing workspace chrome contains the
+three disclosed illustrative recipes, selection, coverage/link controls,
+recipe-file import and JSON export. It uses the shared renderer and semantic view
+with the host's applied appearance. Opening a recipe does not import its data
+into the local graph. Product adapters, source writes, pan/zoom and domain
+editing are outside this first embedding.
+
+For a local debug browser check, the full unoptimized host currently needs an
+explicit larger WebAssembly stack. The receipt uses the following build (this
+is a debug qualification setting, not a delivery/performance profile):
+
+```sh
+cargo rustc --manifest-path ports/graphshell/web/Cargo.toml --lib \
+  --target wasm32-unknown-unknown --no-default-features \
+  --features product,presentation-webgpu -- \
+  -C link-arg=-zstack-size=16777216
+wasm-bindgen --target web --out-dir /tmp/graphshell-backdrops/pkg \
+  ports/graphshell/web/target/wasm32-unknown-unknown/debug/graphshell_web.wasm
+```
+
+Serve the generated package alongside the web directory's HTML, JavaScript,
+CSS and fonts on a fresh local origin. The ordinary debug stack failed during
+host startup on both the local-mere and fixture routes; the explicit-stack
+build's browser result is recorded separately in the qualification receipt.
+
+Fixtures and rendering evidence live in
+[`support/design-studies/backdrops`](../../../support/design-studies/backdrops).
+The CPU receipt exercises the actual shared painter with Vello, including
+selection pixel changes and an unmeasured-area sample. Reproduce it with:
+
+```sh
+cargo test -p scenomise --test backdrop_scenes
+cargo test -p pictograph --no-default-features --features canvas --lib backdrop_surface
+cargo test -p cambium --lib backdrop_scene
+cargo run -p pictograph --no-default-features --features backdrop-cpu \
+  --example backdrop_receipt -- /tmp/backdrop-receipt
+python3 support/design-studies/backdrops/render_cpu_pngs.py /tmp/backdrop-receipt
+python3 scripts/check_port_boundaries.py
+```
+
+The CPU receipt writes raw 900×540 RGBA frames, compiled bundles, input recipes
+and a JSON result. CPU paint evidence, WebAssembly compilation and headed browser
+presentation are separate checks; consult the receipt's qualification record for
+the actual environments exercised.
+
 ## Dependencies
 
 `sceno` depends on `serde` alone. `scenomise` depends on `sceno`, `serde` and
