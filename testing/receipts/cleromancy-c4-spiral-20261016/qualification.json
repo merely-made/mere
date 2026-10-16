@@ -1,0 +1,31 @@
+{
+  "schema": "mere.cleromancy-c4-order-spiral/v1",
+  "date": "2026-10-16",
+  "source": "803f8d26a61864839f17da41dd0859eff8596c69",
+  "status": "Shared compiler source-qualified; Cleromancy consumer qualification follows separately",
+  "behavior": "Relationship recipes may arrange their disclosed authored order with Grid or Spiral. Physical scatter remains refused; occurrence identities, sources and exact relationship disclosures are retained.",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "scenomise",
+    "--lib"
+  ],
+  "exit": 0,
+  "passed": 183,
+  "failed": 0,
+  "ignored": 0,
+  "log_sha256": "cdc897d17a530c3ac7f9503cfdf41f103877188f2aa562bfc4169b2c577610a6",
+  "input_blobs": {
+    "Cargo.lock": "9f16288fb1b3e9f11a0a1bc645dccbfdcd3b1bed",
+    "crates/cambium/scenes/scenomise/src/projection.rs": "c6334c5c6348b76263ef22194011f712bf603385",
+    "crates/cambium/scenes/scenomise/src/projection_relationship_tests.rs": "688171b7a683b6ac8322a0d4aa6d822f1ff2b1db"
+  },
+  "excluded_diagnostic": "The first module-name filter selected zero tests; preserved externally and replaced by the complete 183-test library gate.",
+  "limits": [
+    "No dynamics grammar, physics terms or coordinate-scatter contract changes.",
+    "No existing receipt is relabeled; product native acceptance remains separate."
+  ]
+}

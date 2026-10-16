@@ -206,6 +206,24 @@ fn ordinal_authored_order_is_not_silently_interpreted_as_scatter_distance() {
 }
 
 #[test]
+fn order_based_spiral_retains_exact_disclosed_relationships_and_occurrence_ids() {
+    let data = disclosed("cleromancy-adapter", "card.same-tradition-axis");
+    let mut saved = snapshot(&data);
+    saved.recipe.definition.arrangement.kind = "spiral".into();
+    let compiled = compiler().compile_relationship_snapshot(&saved, &data).unwrap();
+    assert_eq!(compiled.projection.scene.items.len(), data.dataset.occurrences.len());
+    assert_eq!(compiled.relationships[0].disclosure, data.relationships[0]);
+    assert_eq!(compiled.projection.instance_by_occurrence.len(), 3);
+    assert_eq!(compiled.projection.scene.sources.len(), 2);
+    assert_eq!(compiled.projection.selected, Some(compiled.projection.instance_by_occurrence["repeat"]));
+    assert!(compiled.projection.scene.items.iter().any(|a| {
+        compiled.projection.scene.items.iter().any(|b| a.transform.translate.y != b.transform.translate.y)
+    }), "the shared spiral solver supplies two-dimensional seed positions");
+    saved.recipe.definition.arrangement.kind = SCATTER_ARRANGEMENT_ID.into();
+    refuses(&saved, &data, "arrangement.kind");
+}
+
+#[test]
 fn unknown_kind_and_stale_exact_selections_refuse_instead_of_empty_fallback() {
     let data = disclosed("sound-adapter", "sound.rhyme");
     let mut saved = snapshot(&data);
