@@ -112,6 +112,7 @@ impl Canvas {
         let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
 
         self.apply_forme_region();
+        self.sync_attention();
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
