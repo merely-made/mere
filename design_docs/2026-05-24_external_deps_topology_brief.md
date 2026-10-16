@@ -131,6 +131,17 @@ GitHub archive for ideas, never treat as prescriptive; mere-kernel is canonical.
 
 ## Workspace tooling: sem & weave (Ataraxy Labs)
 
+**Amended 2026-10-15 (Mark's ruling): weave is dropped across the family.** It
+garbled three Mere merges that day (a header placed mid-file, dropped imports,
+a duplicated 900-line impl block), after an earlier merge on 2026-09-03 that did
+not compile. Mark ruled to drop it: merges are plain git merges, with `zdiff3`
+and `rerere` on the user side. The `merge=weave` rules, the global and
+repo-local driver config, the binaries and the `crates/weave` fork were removed
+the same day; sem stays. Three weave merges made later that day (mere's two and
+woodshed's one) were replayed with a plain text merge and matched, apart from
+one hand-resolved conflict. The text below is the original record and describes
+weave as it stood before this amendment.
+
 Two agent-native dev tools are in use across `repos/`. Both are
 **non-authoritative** — they understand structural entities (via tree-sitter),
 not program semantics or project invariants, and **never replace compile/test
