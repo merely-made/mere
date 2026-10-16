@@ -55,7 +55,7 @@
     "automatic resident synchronization"
   ],
   "documentation_audit": {
-    "baseline": "0d7c2e3d2",
+    "baseline": "f27ab46ae",
     "new_finding_occurrences": 0,
     "same_judgment_errors": 15,
     "coverage": [
@@ -66,9 +66,9 @@
     "artifact_sha256": {
       "receiving-audit/final-judgment.json": "c445ee25476f1799ba7d5ea138ef0b55df2bc5c80c95546d91c712a4fe538f6f",
       "receiving-audit/baseline-judgment.json": "681f431aacc2e732c64aa278dfd98b9a3bc667858cb3eab44480bdd7e34758df",
-      "receiving-audit/comparison.json": "94ec612f334f3c7656077a56dc2db4742af43b1cd610c631a3c52e9bf6256cdd",
-      "receiving-audit/baseline-audit.json": "e9335586f8c78629bac90df5f958dbbcc6732023abb13b8710c7ddd5817b7f11",
-      "receiving-audit/final-audit.json": "e9335586f8c78629bac90df5f958dbbcc6732023abb13b8710c7ddd5817b7f11"
+      "receiving-audit/comparison.json": "cd894de1aa9b4916161a9b7137bf9d740aad683ad44ec0cbf8864d1a83bff983",
+      "receiving-audit/baseline-audit.json": "9bfb363fffb8779181fe1058bb1950bbdefd6a67f8f5c71089a57a6717968f42",
+      "receiving-audit/final-audit.json": "5c16600d71383bb52e4289bbcbbd0a7c8fb28bc59af3ae8939598562d29a95da"
     }
   }
 }

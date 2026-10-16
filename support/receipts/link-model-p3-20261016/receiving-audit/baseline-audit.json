@@ -2465,7 +2465,12 @@
     {
       "source": "2026-05-24_external_deps_topology_brief.md",
       "subject": "crates/import",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/import"
+    },
+    {
+      "source": "2026-05-24_external_deps_topology_brief.md",
+      "subject": "crates/weave",
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/weave"
     },
     {
       "source": "2026-08-12_family_composition_thesis_brief.md",
@@ -2580,12 +2585,12 @@
     {
       "source": "DOC_README.md",
       "subject": "crates/probes/document-script-p0/",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/document-script-p0"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/document-script-p0"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/probes/resident-graph",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/resident-graph"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/resident-graph"
     },
     {
       "source": "DOC_README.md",
@@ -2655,7 +2660,7 @@
     {
       "source": "inker_docs/implementation_strategy/2026-06-15_engine_picker_and_pluggability_plan.md",
       "subject": "crates/import",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/import"
     },
     {
       "source": "mere_docs/design/2026-09-23_ambiance_design.md",
@@ -2700,17 +2705,17 @@
     {
       "source": "mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md",
       "subject": "ports/graphshell/src/canvas_physics.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/canvas_physics.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/canvas_physics.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-25_operator_presence_overlay_plan.md",
       "subject": "crates/import",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/import"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-25_operator_presence_overlay_plan.md",
       "subject": "crates/import",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/import"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md",
@@ -2755,12 +2760,12 @@
     {
       "source": "mere_docs/implementation_strategy/2026-07-06_node_image_externalization_plan.md",
       "subject": "crates/probes/rdf-kernel-footprint/",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/rdf-kernel-footprint"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/rdf-kernel-footprint"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-06_node_image_externalization_plan.md",
       "subject": "crates/probes/rdf-kernel-footprint/",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/rdf-kernel-footprint"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/rdf-kernel-footprint"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md",
@@ -2800,32 +2805,32 @@
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/identity.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/identity.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/identity.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/identity_endpoint.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/identity_endpoint.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/identity_endpoint.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/identity_projection.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/identity_projection.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/identity_projection.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/native/device_broker.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/native/device_broker.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/native/device_broker.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/bin/graphshell_native_host.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/bin/graphshell_native_host.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/bin/graphshell_native_host.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/session_loop.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/session_loop.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/session_loop.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
@@ -2840,7 +2845,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
       "subject": "ports/graphshell/src/projection_editor.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/projection_editor.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/projection_editor.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_conatus_engine_plan.md",
@@ -2870,37 +2875,37 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md",
       "subject": "ports/graphshell/tests/webrtc_join_loopback.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/tests/webrtc_join_loopback.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/tests/webrtc_join_loopback.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md",
       "subject": "ports/graphshell/src/carrier.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/carrier.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/carrier.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md",
       "subject": "ports/graphshell/src/browser_carrier.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/browser_carrier.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/browser_carrier.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md",
       "subject": "ports/graphshell/src/webrtc_door.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/webrtc_door.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/webrtc_door.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md",
       "subject": "crates/probes/webrtc-ping",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/webrtc-ping"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/webrtc-ping"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-02_distillery_projection_walk_plan.md",
       "subject": "ports/graphshell/src/native/projection_host.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/native/projection_host.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/native/projection_host.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-02_distillery_projection_walk_plan.md",
       "subject": "ports/graphshell/src/live_endpoint.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/live_endpoint.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/live_endpoint.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-16_lattice_sync_pass_plan.md",
@@ -2950,7 +2955,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md",
       "subject": "ports/graphshell/src/webrtc_join.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/webrtc_join.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/webrtc_join.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md",
@@ -2970,7 +2975,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md",
       "subject": "ports/graphshell/src/native/personal_sync_host.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/native/personal_sync_host.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/native/personal_sync_host.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md",
@@ -2980,12 +2985,12 @@
     {
       "source": "mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md",
       "subject": "ports/graphshell/src/canvas_physics.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/canvas_physics.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/canvas_physics.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md",
       "subject": "ports/graphshell/src/canvas_physics.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/canvas_physics.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/canvas_physics.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md",
@@ -3005,12 +3010,12 @@
     {
       "source": "mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md",
       "subject": "ports/graphshell/src/carrier.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/carrier.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/carrier.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md",
       "subject": "ports/graphshell/src/projection_editor.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/projection_editor.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/projection_editor.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md",
@@ -3020,17 +3025,17 @@
     {
       "source": "mere_docs/implementation_strategy/2026-10-05_djinn_test_harness_plan.md",
       "subject": "ports/graphshell/src/native/tasks.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/native/tasks.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/native/tasks.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "crates/cambium/edit-history",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/edit-history"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cambium/edit-history"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "ports/graphshell/src/projection_editor.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/projection_editor.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/projection_editor.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
@@ -3045,42 +3050,42 @@
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "crates/import",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/import"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "crates/cambium/edit-history",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/edit-history"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cambium/edit-history"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md",
       "subject": "ports/graphshell/src/view.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/view.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/view.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
       "subject": "apps/desktop/src/composition/recipe/",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/apps/desktop/src/composition/recipe"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/apps/desktop/src/composition/recipe"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
       "subject": "ports/hocket",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/hocket"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/hocket"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
       "subject": "ports/hocket",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/hocket"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/hocket"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
       "subject": "ports/hocket",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/hocket"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/hocket"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
       "subject": "design_docs/2026-10-15_knot_mere_overmap_layer.md",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/2026-10-15_knot_mere_overmap_layer.md"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/2026-10-15_knot_mere_overmap_layer.md"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
@@ -3130,7 +3135,7 @@
     {
       "source": "mere_docs/research/2026-08-25_browser_native_webrtc_carrier_probe.md",
       "subject": "ports/graphshell/src/browser_carrier.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/browser_carrier.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/browser_carrier.rs"
     },
     {
       "source": "mere_docs/research/2026-10-02_dynamics_grammar_brief.md",
@@ -3140,12 +3145,12 @@
     {
       "source": "mere_docs/research/2026-10-06_balaur_review_brief.md",
       "subject": "ports/graphshell/src/projection_editor.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/projection_editor.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/projection_editor.rs"
     },
     {
       "source": "mere_docs/research/2026-10-06_balaur_review_brief.md",
       "subject": "ports/graphshell/src/projection_editor.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/projection_editor.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/projection_editor.rs"
     },
     {
       "source": "mere_docs/technical_architecture/2026-08-11_device_grant_delegation_reconciliation.md",
@@ -3155,59 +3160,59 @@
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "apps/desktop/Cargo.toml",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/apps/desktop/Cargo.toml"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/apps/desktop/Cargo.toml"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "crates/knot-document/Cargo.toml",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/knot-document/Cargo.toml"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/knot-document/Cargo.toml"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "crates/knot-site/Cargo.toml",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/knot-site/Cargo.toml"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/knot-site/Cargo.toml"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "crates/knot-editor/Cargo.toml",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/knot-editor/Cargo.toml"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/knot-editor/Cargo.toml"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "crates/knot-editor/tests/rosette_projection.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/knot-editor/tests/rosette_projection.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/knot-editor/tests/rosette_projection.rs"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "crates/knot-editor/src/mere_overlay.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/knot-editor/src/mere_overlay.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/knot-editor/src/mere_overlay.rs"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_remote_mere_route_spec.md",
       "subject": "ports/hocket",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/hocket"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/hocket"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md",
       "subject": "ports/graphshell/src/native/app_broker.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/native/app_broker.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/native/app_broker.rs"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md",
       "subject": "ports/graphshell/src/lifecycle.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/lifecycle.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/lifecycle.rs"
     },
     {
       "source": "mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md",
       "subject": "ports/graphshell/src/session_loop.rs",
-      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/session_loop.rs"
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/session_loop.rs"
     }
   ],
   "historical_missing_known_root_paths": [
     {
       "source": "2026-05-24_external_deps_topology_brief.md",
       "subject": "crates/weave",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/weave"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/weave"
     },
     {
       "source": "2026-07-02_data_oriented_doctrine_brief.md",
@@ -3232,12 +3237,12 @@
     {
       "source": "2026-08-12_family_composition_thesis_brief.md",
       "subject": "apps/signalman-desktop",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/apps/signalman-desktop"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/apps/signalman-desktop"
     },
     {
       "source": "2026-08-12_family_composition_thesis_brief.md",
       "subject": "crates/isometry-runtime/src/render.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/isometry-runtime/src/render.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/isometry-runtime/src/render.rs"
     },
     {
       "source": "2026-08-12_family_composition_thesis_brief.md",
@@ -3252,12 +3257,12 @@
     {
       "source": "2026-08-22_turnstone_suite_composition_and_capability_census.md",
       "subject": "ports/distillery/alembic",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/distillery/alembic"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/distillery/alembic"
     },
     {
       "source": "2026-08-22_turnstone_suite_composition_and_capability_census.md",
       "subject": "ports/distillery/alembic",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/distillery/alembic"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/distillery/alembic"
     },
     {
       "source": "2026-08-23_projection_scenes_and_graph_native_platform.md",
@@ -3272,67 +3277,67 @@
     {
       "source": "DOC_POLICY.md",
       "subject": "crates/cambium/docs/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/docs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cambium/docs"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/dramatis/gazette",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/dramatis/gazette"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/dramatis/gazette"
     },
     {
       "source": "DOC_README.md",
       "subject": "ports/alembic",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/alembic"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/alembic"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/persona/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/persona"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/persona"
     },
     {
       "source": "DOC_README.md",
       "subject": "ports/knot",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/knot"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/knot"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/meerkat/src/graphlets.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat/src/graphlets.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat/src/graphlets.rs"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/probes/rdf-kernel-bench/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/rdf-kernel-bench"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/rdf-kernel-bench"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/graph/glossary/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/glossary"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/glossary"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/xilem-woodshed",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/xilem-woodshed"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/xilem-woodshed"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/murm/misfin",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm/misfin"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm/misfin"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/meerkat",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/cambium/docs/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/docs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cambium/docs"
     },
     {
       "source": "DOC_README.md",
       "subject": "crates/cambium/ARCHITECTURE.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/ARCHITECTURE.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cambium/ARCHITECTURE.md"
     },
     {
       "source": "DOC_README.md",
@@ -3362,7 +3367,7 @@
     {
       "source": "cambium_docs/implementation_strategy/2026-07-08_chisel_widget_catalog.md",
       "subject": "ports/pelt-desktop/smoke_chisel.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/pelt-desktop/smoke_chisel.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/pelt-desktop/smoke_chisel.rs"
     },
     {
       "source": "eidetic_docs/research/2026-05-09_eidetic_design_pass.md",
@@ -3392,22 +3397,22 @@
     {
       "source": "eidetic_docs/research/2026-09-04_eidetic_review_brief.md",
       "subject": "crates/eidetic/eidetic-fjall",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/eidetic-fjall"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/eidetic/eidetic-fjall"
     },
     {
       "source": "eidetic_docs/research/2026-09-04_eidetic_review_brief.md",
       "subject": "crates/eidetic/eidetic-https-fetcher",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/eidetic-https-fetcher"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/eidetic/eidetic-https-fetcher"
     },
     {
       "source": "eidetic_docs/research/2026-09-04_eidetic_review_brief.md",
       "subject": "crates/eidetic/eidetic-iroh-fetcher",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/eidetic-iroh-fetcher"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/eidetic/eidetic-iroh-fetcher"
     },
     {
       "source": "intel_docs/research/2026-07-07_sibylla_founding_proposal.md",
       "subject": "design_docs/2026-07-07_optional_intelligence_vision.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/2026-07-07_optional_intelligence_vision.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/2026-07-07_optional_intelligence_vision.md"
     },
     {
       "source": "intel_docs/research/2026-07-07_sibylla_founding_proposal.md",
@@ -3427,12 +3432,12 @@
     {
       "source": "intel_docs/research/2026-07-07_sibylla_founding_proposal.md",
       "subject": "design_docs/2026-07-07_optional_intelligence_vision.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/2026-07-07_optional_intelligence_vision.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/2026-07-07_optional_intelligence_vision.md"
     },
     {
       "source": "intel_docs/research/2026-07-07_vates_founding_proposal.md",
       "subject": "design_docs/2026-07-07_optional_intelligence_vision.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/2026-07-07_optional_intelligence_vision.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/2026-07-07_optional_intelligence_vision.md"
     },
     {
       "source": "intel_docs/research/2026-07-07_vates_founding_proposal.md",
@@ -3462,22 +3467,22 @@
     {
       "source": "intel_docs/research/2026-07-07_vates_founding_proposal.md",
       "subject": "design_docs/2026-07-07_optional_intelligence_vision.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/2026-07-07_optional_intelligence_vision.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/2026-07-07_optional_intelligence_vision.md"
     },
     {
       "source": "intel_docs/technical_architecture/sibylla_README.md",
       "subject": "crates/intel/vates",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/vates"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/vates"
     },
     {
       "source": "intel_docs/technical_architecture/sibylla_README.md",
       "subject": "crates/intel/embed",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/embed"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/embed"
     },
     {
       "source": "intel_docs/technical_architecture/vates_README.md",
       "subject": "crates/intel/sibylla",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/sibylla"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/sibylla"
     },
     {
       "source": "mere_docs/design/2026-07-05_one_state_n_windows_design.md",
@@ -3492,37 +3497,37 @@
     {
       "source": "mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md",
       "subject": "crates/murm/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md",
       "subject": "crates/mere/mere-transport/src/iroh_transport.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere/mere-transport/src/iroh_transport.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere/mere-transport/src/iroh_transport.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md",
       "subject": "crates/mere/mere-identity/src/vault.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere/mere-identity/src/vault.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere/mere-identity/src/vault.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md",
       "subject": "design_docs/moothold_docs/implementation_strategy/2026-05-05_irc_mod_plan.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/moothold_docs/implementation_strategy/2026-05-05_irc_mod_plan.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/moothold_docs/implementation_strategy/2026-05-05_irc_mod_plan.md"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md",
       "subject": "crates/meerkat",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md",
       "subject": "crates/persona/identity",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/persona/identity"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/persona/identity"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md",
       "subject": "crates/murm/murmuring",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm/murmuring"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm/murmuring"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md",
@@ -3532,57 +3537,57 @@
     {
       "source": "mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md",
       "subject": "crates/graphshell/shell-state",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graphshell/shell-state"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graphshell/shell-state"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md",
       "subject": "crates/mere-domain/graphshell",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere-domain/graphshell"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere-domain/graphshell"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-05-10_graph_cluster_namespaces_brief.md",
       "subject": "crates/probes/willow-cluster-cap",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/willow-cluster-cap"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/willow-cluster-cap"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-06_moot_constitution_brief.md",
       "subject": "crates/probes/willow-cluster-cap",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/willow-cluster-cap"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/willow-cluster-cap"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md",
       "subject": "crates/shell/frame",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/shell/frame"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/shell/frame"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md",
       "subject": "crates/graph/glossary/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/glossary"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/glossary"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md",
       "subject": "crates/orrery/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md",
       "subject": "crates/graph/glossary/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/glossary"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/glossary"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md",
       "subject": "crates/graph/glossary/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/glossary"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/glossary"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md",
       "subject": "crates/graph/glossary/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/glossary"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/glossary"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md",
       "subject": "crates/graph/glossary/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/glossary"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/glossary"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_native_session_store_plan.md",
@@ -3592,32 +3597,32 @@
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md",
       "subject": "crates/orrery/orrery",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/orrery"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/orrery"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md",
       "subject": "crates/orrery/gyre",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/gyre"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/gyre"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md",
       "subject": "crates/meerkat",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md",
       "subject": "crates/persona/identity",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/persona/identity"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/persona/identity"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md",
       "subject": "crates/moot/gemot/src/tessera",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/moot/gemot/src/tessera"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/moot/gemot/src/tessera"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-06-30_runtime_mod_authoring_loop_plan.md",
       "subject": "crates/meerkat/src/shell_eval.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat/src/shell_eval.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat/src/shell_eval.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
@@ -3627,7 +3632,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
       "subject": "crates/meerkat/src/theme_sheets.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat/src/theme_sheets.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat/src/theme_sheets.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md",
@@ -3647,7 +3652,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md",
       "subject": "crates/murm",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md",
@@ -3662,37 +3667,37 @@
     {
       "source": "mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md",
       "subject": "crates/persona/personae/src/delegation.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/persona/personae/src/delegation.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/persona/personae/src/delegation.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md",
       "subject": "crates/tulle/src/direct_phy_serial.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/tulle/src/direct_phy_serial.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/tulle/src/direct_phy_serial.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md",
       "subject": "crates/retinue/src/endpoint.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/retinue/src/endpoint.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/retinue/src/endpoint.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md",
       "subject": "crates/retinue/src/endpoint.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/retinue/src/endpoint.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/retinue/src/endpoint.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/native/personae_host.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/native/personae_host.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/native/personae_host.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/src/bin/graphshell_device_host.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/bin/graphshell_device_host.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/bin/graphshell_device_host.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/graphshell/install-device-host-windows.ps1",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/install-device-host-windows.ps1"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/install-device-host-windows.ps1"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
@@ -3702,12 +3707,12 @@
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "crates/system/session-runtime/src/wallet_store.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/session-runtime/src/wallet_store.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/system/session-runtime/src/wallet_store.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-03_graph_view_curation_and_interaction_plan.md",
       "subject": "crates/system/session-runtime/src/view_intent_store.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/session-runtime/src/view_intent_store.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/system/session-runtime/src/view_intent_store.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-03_graph_view_curation_and_interaction_plan.md",
@@ -3717,22 +3722,22 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-03_graph_view_curation_and_interaction_plan.md",
       "subject": "crates/isometry-views/src/overmap.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/isometry-views/src/overmap.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/isometry-views/src/overmap.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-03_graph_view_curation_and_interaction_plan.md",
       "subject": "crates/repo-graph",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/repo-graph"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/repo-graph"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-08_knot_mark_read_adapter.md",
       "subject": "ports/knot",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/knot"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/knot"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-08_knot_mark_read_adapter.md",
       "subject": "ports/knot/src/mark.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/knot/src/mark.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/knot/src/mark.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
@@ -3742,7 +3747,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
       "subject": "crates/scenograph/sceno/src/score.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/scenograph/sceno/src/score.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/scenograph/sceno/src/score.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
@@ -3752,7 +3757,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
       "subject": "crates/canvas/arrangements/src/registry.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/arrangements/src/registry.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/canvas/arrangements/src/registry.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
@@ -3762,17 +3767,17 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_conatus_engine_plan.md",
       "subject": "crates/cargo-gpu",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cargo-gpu"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cargo-gpu"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_conatus_engine_plan.md",
       "subject": "crates/crabslab",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/crabslab"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/crabslab"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_conatus_engine_plan.md",
       "subject": "crates/kiss3d",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/kiss3d"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/kiss3d"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md",
@@ -3782,7 +3787,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md",
       "subject": "crates/canvas/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/canvas/arrangements"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md",
@@ -3792,7 +3797,7 @@
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md",
       "subject": "crates/paredros-identity",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/paredros-identity"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/paredros-identity"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md",
@@ -3802,142 +3807,142 @@
     {
       "source": "mere_docs/implementation_strategy/2026-09-02_physics_catalog_plan.md",
       "subject": "design_docs/graphshell_docs/implementation_strategy/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/implementation_strategy"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/implementation_strategy"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-02_physics_catalog_plan.md",
       "subject": "crates/nexus",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/nexus"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/nexus"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-02_physics_catalog_plan.md",
       "subject": "crates/cargo-gpu/crates/cargo-gpu-install/src/install.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cargo-gpu/crates/cargo-gpu-install/src/install.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cargo-gpu/crates/cargo-gpu-install/src/install.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-16_lattice_sync_pass_plan.md",
       "subject": "crates/cargo-gpu",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cargo-gpu"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cargo-gpu"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md",
       "subject": "ports/redshank/Cargo.lock",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/redshank/Cargo.lock"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/redshank/Cargo.lock"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-09-23_crate_consolidation_plan.md",
       "subject": "crates/system/pandect/src/athanor.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/athanor.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/system/pandect/src/athanor.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md",
       "subject": "crates/p2panda",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/p2panda"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/p2panda"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md",
       "subject": "crates/cambium/cambium/src/nematic.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium/src/nematic.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cambium/cambium/src/nematic.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md",
       "subject": "crates/graph/subgraph",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/subgraph"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/subgraph"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "crates/shell/chrome/src/command_palette.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/shell/chrome/src/command_palette.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/shell/chrome/src/command_palette.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "crates/graph/curation",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/curation"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/curation"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
       "subject": "crates/shell/chrome/src/command_palette.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/shell/chrome/src/command_palette.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/shell/chrome/src/command_palette.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md",
       "subject": "ports/graphshell/src/web_session.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/web_session.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/web_session.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md",
       "subject": "ports/graphshell/src/web_product.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/web_product.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/web_product.rs"
     },
     {
       "source": "mere_docs/research/2026-02-04_donor_docs_search_findings_summary.md",
       "subject": "design_docs/verse_docs/research/SEARCH_FINDINGS_SUMMARY.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/research/SEARCH_FINDINGS_SUMMARY.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/research/SEARCH_FINDINGS_SUMMARY.md"
     },
     {
       "source": "mere_docs/research/2026-02-22_aspirational_protocols_and_tools.md",
       "subject": "design_docs/verse_docs/research/2026-02-22_aspirational_protocols_and_tools.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/research/2026-02-22_aspirational_protocols_and_tools.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/research/2026-02-22_aspirational_protocols_and_tools.md"
     },
     {
       "source": "mere_docs/research/2026-02-23_modern_yacy_gap_analysis.md",
       "subject": "design_docs/verse_docs/research/2026-02-23_modern_yacy_gap_analysis.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/research/2026-02-23_modern_yacy_gap_analysis.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/research/2026-02-23_modern_yacy_gap_analysis.md"
     },
     {
       "source": "mere_docs/research/2026-02-23_storage_economy_and_indices.md",
       "subject": "design_docs/verse_docs/research/2026-02-23_storage_economy_and_indices.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/research/2026-02-23_storage_economy_and_indices.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/research/2026-02-23_storage_economy_and_indices.md"
     },
     {
       "source": "mere_docs/research/2026-02-27_freenet_takeaways_for_verse.md",
       "subject": "design_docs/verse_docs/research/2026-02-27_freenet_takeaways_for_verse.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/research/2026-02-27_freenet_takeaways_for_verse.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/research/2026-02-27_freenet_takeaways_for_verse.md"
     },
     {
       "source": "mere_docs/research/2026-03-24_tool_comparison_product_lessons.md",
       "subject": "design_docs/graphshell_docs/research/2026-03-24_tool_comparison_product_lessons.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/research/2026-03-24_tool_comparison_product_lessons.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/research/2026-03-24_tool_comparison_product_lessons.md"
     },
     {
       "source": "mere_docs/research/2026-03-28_libp2p_nostr_synergy_for_verse.md",
       "subject": "design_docs/verse_docs/research/2026-03-28_libp2p_nostr_synergy_for_verse.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/research/2026-03-28_libp2p_nostr_synergy_for_verse.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/research/2026-03-28_libp2p_nostr_synergy_for_verse.md"
     },
     {
       "source": "mere_docs/research/2026-03-29_middlenet_engine_spec.md",
       "subject": "design_docs/graphshell_docs/technical_architecture/2026-03-29_middlenet_engine_spec.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/technical_architecture/2026-03-29_middlenet_engine_spec.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/technical_architecture/2026-03-29_middlenet_engine_spec.md"
     },
     {
       "source": "mere_docs/research/2026-03-30_middlenet_vision_synthesis.md",
       "subject": "design_docs/graphshell_docs/research/2026-03-30_middlenet_vision_synthesis.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/research/2026-03-30_middlenet_vision_synthesis.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/research/2026-03-30_middlenet_vision_synthesis.md"
     },
     {
       "source": "mere_docs/research/2026-04-11_linked_data_over_middlenet_relevance_note.md",
       "subject": "design_docs/graphshell_docs/research/2026-04-11_linked_data_over_middlenet_relevance_note.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/research/2026-04-11_linked_data_over_middlenet_relevance_note.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/research/2026-04-11_linked_data_over_middlenet_relevance_note.md"
     },
     {
       "source": "mere_docs/research/2026-04-11_tabfs_tablab_graphshell_relevance_note.md",
       "subject": "design_docs/graphshell_docs/research/2026-04-11_tabfs_tablab_graphshell_relevance_note.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/research/2026-04-11_tabfs_tablab_graphshell_relevance_note.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/research/2026-04-11_tabfs_tablab_graphshell_relevance_note.md"
     },
     {
       "source": "mere_docs/research/2026-04-16_middlenet_lane_architecture_spec.md",
       "subject": "design_docs/graphshell_docs/technical_architecture/2026-04-16_middlenet_lane_architecture_spec.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/graphshell_docs/technical_architecture/2026-04-16_middlenet_lane_architecture_spec.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/graphshell_docs/technical_architecture/2026-04-16_middlenet_lane_architecture_spec.md"
     },
     {
       "source": "mere_docs/research/2026-04-17_verse_distributed_index_protocol_v0_1.md",
       "subject": "design_docs/archive_docs/checkpoint_2026-04-17/verse_docs/technical_architecture/2026-04-17_verse_distributed_index_protocol_v0.1.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/archive_docs/checkpoint_2026-04-17/verse_docs/technical_architecture/2026-04-17_verse_distributed_index_protocol_v0.1.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/archive_docs/checkpoint_2026-04-17/verse_docs/technical_architecture/2026-04-17_verse_distributed_index_protocol_v0.1.md"
     },
     {
       "source": "mere_docs/research/2026-04-17_verse_graph_contribution_protocol_v0_1.md",
       "subject": "design_docs/verse_docs/technical_architecture/2026-04-17_verse_graph_contribution_protocol_v0_1.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/verse_docs/technical_architecture/2026-04-17_verse_graph_contribution_protocol_v0_1.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/verse_docs/technical_architecture/2026-04-17_verse_graph_contribution_protocol_v0_1.md"
     },
     {
       "source": "mere_docs/research/2026-05-08_local_intelligence_integration_research.md",
@@ -3987,62 +3992,62 @@
     {
       "source": "mere_docs/research/2026-05-08_local_intelligence_integration_research.md",
       "subject": "crates/intel/embed/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/embed"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/embed"
     },
     {
       "source": "mere_docs/research/2026-05-08_local_intelligence_integration_research.md",
       "subject": "crates/intelligence-embeddings/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intelligence-embeddings"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intelligence-embeddings"
     },
     {
       "source": "mere_docs/research/2026-05-08_local_intelligence_integration_research.md",
       "subject": "crates/intel/embed/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/embed"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/embed"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/graph/graph-canvas/src/simulate.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-canvas/src/simulate.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/graph-canvas/src/simulate.rs"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/graph/graph-layout/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-layout"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/graph-layout"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/graph/graph-canvas/src/layout/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-canvas/src/layout"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/graph-canvas/src/layout"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/graph/graph-canvas/src/layout/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-canvas/src/layout"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/graph-canvas/src/layout"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/cartography/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cartography"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/cartography"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/graph/graph-canvas/src/layout/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-canvas/src/layout"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/graph-canvas/src/layout"
     },
     {
       "source": "mere_docs/research/2026-05-10_cartography_layer_brief.md",
       "subject": "crates/graph/graph-layout/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-layout"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/graph-layout"
     },
     {
       "source": "mere_docs/research/2026-05-11_browser_multiplexer_framing.md",
       "subject": "crates/mere-host/src/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere-host/src"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere-host/src"
     },
     {
       "source": "mere_docs/research/2026-05-11_tearout_operations_brief.md",
       "subject": "crates/mere-host/src/tearout.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere-host/src/tearout.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere-host/src/tearout.rs"
     },
     {
       "source": "mere_docs/research/2026-05-27_understory_orrery_graduation_brief.md",
@@ -4062,52 +4067,52 @@
     {
       "source": "mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md",
       "subject": "crates/murm",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm"
     },
     {
       "source": "mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md",
       "subject": "crates/persona/identity",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/persona/identity"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/persona/identity"
     },
     {
       "source": "mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md",
       "subject": "crates/murm/misfin",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm/misfin"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm/misfin"
     },
     {
       "source": "mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md",
       "subject": "crates/murm/webfinger",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm/webfinger"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm/webfinger"
     },
     {
       "source": "mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md",
       "subject": "crates/murm/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm"
     },
     {
       "source": "mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md",
       "subject": "crates/murm/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm"
     },
     {
       "source": "mere_docs/research/2026-06-15_in_the_wings_and_browser_bar_audit.md",
       "subject": "crates/meerkat",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "mere_docs/research/2026-06-15_in_the_wings_and_browser_bar_audit.md",
       "subject": "crates/meerkat",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "mere_docs/research/2026-06-18_rdf_native_kernel_feasibility.md",
       "subject": "crates/orrery/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/arrangements"
     },
     {
       "source": "mere_docs/research/2026-06-18_rdf_native_kernel_feasibility.md",
       "subject": "crates/probes/rdf-kernel-bench/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/probes/rdf-kernel-bench"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/probes/rdf-kernel-bench"
     },
     {
       "source": "mere_docs/research/2026-06-19_cross_platform_parallelism_strategy.md",
@@ -4122,57 +4127,57 @@
     {
       "source": "mere_docs/research/2026-06-22_graph_projections_research.md",
       "subject": "crates/graph/node-lineage",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/node-lineage"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/graph/node-lineage"
     },
     {
       "source": "mere_docs/research/2026-06-22_graph_projections_research.md",
       "subject": "crates/orrery/cartography",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/cartography"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/cartography"
     },
     {
       "source": "mere_docs/research/2026-06-22_graph_projections_research.md",
       "subject": "crates/meerkat",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "mere_docs/research/2026-06-22_graph_projections_research.md",
       "subject": "crates/orrery/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/arrangements"
     },
     {
       "source": "mere_docs/research/2026-06-22_orrery_physics_environments_research.md",
       "subject": "crates/orrery/gyre",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/gyre"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/gyre"
     },
     {
       "source": "mere_docs/research/2026-06-22_orrery_physics_environments_research.md",
       "subject": "crates/orrery/aether",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/aether"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/aether"
     },
     {
       "source": "mere_docs/research/2026-07-04_burn_utilization_brief.md",
       "subject": "crates/intel/embed",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/embed"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/embed"
     },
     {
       "source": "mere_docs/research/2026-07-04_burn_utilization_brief.md",
       "subject": "crates/eidetic/eidetic-search",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/eidetic-search"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/eidetic/eidetic-search"
     },
     {
       "source": "mere_docs/research/2026-07-04_burn_utilization_brief.md",
       "subject": "crates/orrery/aether",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/aether"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/aether"
     },
     {
       "source": "mere_docs/research/2026-07-04_burn_utilization_brief.md",
       "subject": "crates/orrery/gyre",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/gyre"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/gyre"
     },
     {
       "source": "mere_docs/research/2026-07-04_burn_utilization_brief.md",
       "subject": "crates/intel/infer",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/intel/infer"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/intel/infer"
     },
     {
       "source": "mere_docs/research/2026-07-05_xilem_serval_directions_brief.md",
@@ -4182,32 +4187,32 @@
     {
       "source": "mere_docs/research/2026-07-21_projection_engine_prior_art_brief.md",
       "subject": "crates/canvas/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/canvas/arrangements"
     },
     {
       "source": "mere_docs/research/2026-08-10_sited_device_identity_brief.md",
       "subject": "crates/postilion/src/lib.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/postilion/src/lib.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/postilion/src/lib.rs"
     },
     {
       "source": "mere_docs/research/2026-08-15_projection_grammar_catalog.md",
       "subject": "crates/canvas/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/canvas/arrangements"
     },
     {
       "source": "mere_docs/research/2026-08-16_mer3ly_stack_consumer_survey.md",
       "subject": "crates/canvas/arrangements/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/canvas/arrangements"
     },
     {
       "source": "mere_docs/research/2026-08-16_mer3ly_stack_consumer_survey.md",
       "subject": "crates/repo-graph/src/lib.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/repo-graph/src/lib.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/repo-graph/src/lib.rs"
     },
     {
       "source": "mere_docs/research/2026-08-16_mer3ly_stack_consumer_survey.md",
       "subject": "crates/canvas/arrangements/src/registry.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/arrangements/src/registry.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/canvas/arrangements/src/registry.rs"
     },
     {
       "source": "mere_docs/research/2026-08-18_scenograph_lane_handoffs.md",
@@ -4217,42 +4222,42 @@
     {
       "source": "mere_docs/research/2026-08-19_knot_lane_brief.md",
       "subject": "ports/knot",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/knot"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/knot"
     },
     {
       "source": "mere_docs/research/2026-09-01_frontier_sync_over_reticulum_brief.md",
       "subject": "crates/p2panda",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/p2panda"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/p2panda"
     },
     {
       "source": "mere_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md",
       "subject": "design_docs/2026-07-18_meerkat_harvest.md",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/design_docs/2026-07-18_meerkat_harvest.md"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/design_docs/2026-07-18_meerkat_harvest.md"
     },
     {
       "source": "mere_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md",
       "subject": "ports/knot",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/knot"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/knot"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/workbench/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/workbench"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/workbench"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/mere/host/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere/host"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere/host"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/verso/masonry-renderer/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso/masonry-renderer"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso/masonry-renderer"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/verso/masonry-renderer",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso/masonry-renderer"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso/masonry-renderer"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
@@ -4272,47 +4277,47 @@
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/mere/host",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere/host"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere/host"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/mere/host-substrate",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere/host-substrate"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/mere/host-substrate"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/orrery/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/arrangements"
     },
     {
       "source": "mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md",
       "subject": "crates/verso/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso"
     },
     {
       "source": "mere_docs/technical_architecture/2026-06-18_interaction_model_spine.md",
       "subject": "crates/meerkat/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat"
     },
     {
       "source": "mere_docs/technical_architecture/2026-06-18_interaction_model_spine.md",
       "subject": "crates/orrery/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery"
     },
     {
       "source": "mere_docs/technical_architecture/2026-06-18_interaction_model_spine.md",
       "subject": "crates/inker/engines/nematic",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/inker/engines/nematic"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/inker/engines/nematic"
     },
     {
       "source": "mere_docs/technical_architecture/2026-06-18_interaction_model_spine.md",
       "subject": "crates/meerkat/src/fetch.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/meerkat/src/fetch.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/meerkat/src/fetch.rs"
     },
     {
       "source": "mere_docs/technical_architecture/2026-06-18_interaction_model_spine.md",
       "subject": "crates/orrery/arrangements",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/orrery/arrangements"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/orrery/arrangements"
     },
     {
       "source": "mere_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md",
@@ -4322,17 +4327,17 @@
     {
       "source": "mere_docs/technical_architecture/2026-08-16_facet_signaling_and_control_loops.md",
       "subject": "crates/eidetic/scholia/src/project.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/scholia/src/project.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/eidetic/scholia/src/project.rs"
     },
     {
       "source": "mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md",
       "subject": "ports/redshank/Cargo.toml",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/redshank/Cargo.toml"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/redshank/Cargo.toml"
     },
     {
       "source": "murm_docs/technical_architecture/MURM_AS_BILATERAL.md",
       "subject": "crates/murm/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/murm"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/murm"
     },
     {
       "source": "murm_docs/technical_architecture/MURM_AS_BILATERAL.md",
@@ -4342,12 +4347,12 @@
     {
       "source": "nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md",
       "subject": "crates/middlenet-core/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/middlenet-core"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/middlenet-core"
     },
     {
       "source": "nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md",
       "subject": "crates/middlenet-core/src/document.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/middlenet-core/src/document.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/middlenet-core/src/document.rs"
     },
     {
       "source": "nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md",
@@ -4357,7 +4362,7 @@
     {
       "source": "nematic_docs/implementation_strategy/2026-09-15_micron_navigation_plan.md",
       "subject": "crates/import/src/history.rs",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import/src/history.rs"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/import/src/history.rs"
     },
     {
       "source": "verso_docs/implementation_strategy/2026-06-23_genet_scrying_flipcarrier_plan.md",
@@ -4367,22 +4372,22 @@
     {
       "source": "verso_docs/implementation_strategy/2026-06-23_genet_scrying_flipcarrier_plan.md",
       "subject": "crates/verso-api",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso-api"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso-api"
     },
     {
       "source": "verso_docs/implementation_strategy/2026-06-23_genet_scrying_flipcarrier_plan.md",
       "subject": "crates/verso-genet",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso-genet"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso-genet"
     },
     {
       "source": "verso_docs/implementation_strategy/2026-06-23_genet_scrying_flipcarrier_plan.md",
       "subject": "crates/verso",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso"
     },
     {
       "source": "verso_docs/implementation_strategy/2026-06-23_genet_scrying_flipcarrier_plan.md",
       "subject": "crates/verso-scry",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso-scry"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso-scry"
     },
     {
       "source": "verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md",
@@ -4392,54 +4397,54 @@
     {
       "source": "verso_docs/technical_architecture/2026-06-10_compatibility_view_charter.md",
       "subject": "crates/verso/",
-      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/verso"
+      "detail": "unresolved known-root path is explicitly historical: /Users/markik/Code/repos/mere-link-audit-p3-20261016/crates/verso"
     }
   ],
   "planned_missing_known_root_paths": [
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/retinue-agent",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/retinue-agent"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/retinue-agent"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/retinue-agent/Cargo.toml",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/retinue-agent/Cargo.toml"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/retinue-agent/Cargo.toml"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/retinue-agent/src/main.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/retinue-agent/src/main.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/retinue-agent/src/main.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/retinue-agent/src/endpoint.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/retinue-agent/src/endpoint.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/retinue-agent/src/endpoint.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/retinue-agent/src/projection.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/retinue-agent/src/projection.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/retinue-agent/src/projection.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md",
       "subject": "ports/retinue-agent/src/intents.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/retinue-agent/src/intents.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/retinue-agent/src/intents.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md",
       "subject": "ports/graphshell/src/web_resident.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/web_resident.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/src/web_resident.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md",
       "subject": "ports/graphshell/tests/resident_host.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/tests/resident_host.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/tests/resident_host.rs"
     },
     {
       "source": "mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md",
       "subject": "ports/graphshell/tests/resident_host_browser.rs",
-      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/tests/resident_host_browser.rs"
+      "detail": "unresolved known-root path is an explicit planned target: /Users/markik/Code/repos/mere-link-audit-p3-20261016/ports/graphshell/tests/resident_host_browser.rs"
     }
   ],
   "invalid_historical_annotations": [],
@@ -4826,7 +4831,7 @@
     "ambiguous_known_root_paths": 171,
     "ignored_known_root_patterns": 23,
     "reserved_identifier_paths": 31,
-    "missing_known_root_paths": 151,
+    "missing_known_root_paths": 152,
     "historical_missing_known_root_paths": 238,
     "planned_missing_known_root_paths": 9,
     "invalid_historical_annotations": 0,
