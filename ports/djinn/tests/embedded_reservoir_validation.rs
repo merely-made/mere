@@ -968,7 +968,7 @@ mod published_replay_regression {
                     0,
                     "the owner has no fixture-seeded graph"
                 );
-                if shuffled {
+                if shuffled || typed_decks {
                     apply_bounded_fixture(attached.client_mut(), &edits).await;
                 } else {
                     assert_eq!(
