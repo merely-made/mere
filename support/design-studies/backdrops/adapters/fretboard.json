@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "source": {
+    "adapter": "woodshed.fretboard",
+    "id": "cli-stage"
+  },
+  "revision": "ef74be3c7d509b63db66b607e20996edf6b97be772a537b61699bd6e76df7404",
+  "title": "C Major · Standard",
+  "facts": {
+    "kind": "fretboard",
+    "data": {
+      "strings": [
+        {
+          "label": "E4",
+          "open_midi": 64
+        },
+        {
+          "label": "B3",
+          "open_midi": 59
+        },
+        {
+          "label": "G3",
+          "open_midi": 55
+        },
+        {
+          "label": "D3",
+          "open_midi": 50
+        },
+        {
+          "label": "A2",
+          "open_midi": 45
+        },
+        {
+          "label": "E2",
+          "open_midi": 40
+        }
+      ],
+      "frets": 5,
+      "positions": [
+        {
+          "key": "string-0/fret-0",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "4"
+          },
+          "string_index": 5,
+          "fret": 0,
+          "pitch_class": 4,
+          "label": "E",
+          "role": "third"
+        },
+        {
+          "key": "string-0/fret-3",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "7"
+          },
+          "string_index": 5,
+          "fret": 3,
+          "pitch_class": 7,
+          "label": "G",
+          "role": "fifth"
+        },
+        {
+          "key": "string-1/fret-3",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "0"
+          },
+          "string_index": 4,
+          "fret": 3,
+          "pitch_class": 0,
+          "label": "C",
+          "role": "root"
+        },
+        {
+          "key": "string-2/fret-2",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "4"
+          },
+          "string_index": 3,
+          "fret": 2,
+          "pitch_class": 4,
+          "label": "E",
+          "role": "third"
+        },
+        {
+          "key": "string-2/fret-5",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "7"
+          },
+          "string_index": 3,
+          "fret": 5,
+          "pitch_class": 7,
+          "label": "G",
+          "role": "fifth"
+        },
+        {
+          "key": "string-3/fret-0",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "7"
+          },
+          "string_index": 2,
+          "fret": 0,
+          "pitch_class": 7,
+          "label": "G",
+          "role": "fifth"
+        },
+        {
+          "key": "string-3/fret-5",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "0"
+          },
+          "string_index": 2,
+          "fret": 5,
+          "pitch_class": 0,
+          "label": "C",
+          "role": "root"
+        },
+        {
+          "key": "string-4/fret-1",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "0"
+          },
+          "string_index": 1,
+          "fret": 1,
+          "pitch_class": 0,
+          "label": "C",
+          "role": "root"
+        },
+        {
+          "key": "string-4/fret-5",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "4"
+          },
+          "string_index": 1,
+          "fret": 5,
+          "pitch_class": 4,
+          "label": "E",
+          "role": "third"
+        },
+        {
+          "key": "string-5/fret-0",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "4"
+          },
+          "string_index": 0,
+          "fret": 0,
+          "pitch_class": 4,
+          "label": "E",
+          "role": "third"
+        },
+        {
+          "key": "string-5/fret-3",
+          "source": {
+            "adapter": "woodshed.pitch-class",
+            "id": "7"
+          },
+          "string_index": 0,
+          "fret": 3,
+          "pitch_class": 7,
+          "label": "G",
+          "role": "fifth"
+        }
+      ]
+    }
+  }
+}

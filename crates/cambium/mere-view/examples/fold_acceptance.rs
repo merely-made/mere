@@ -239,7 +239,7 @@ impl App {
         for (i, route) in self.canvas.fold_routes().into_iter().enumerate() {
             relations.push(GraphCanvasRelation {
                 link_key: None,
-                marks: sceno::LinkMarks::default(),
+                marks: Default::default(),
                 strength: 1.0,
                 id: format!("boundary:{i}"),
                 from: self.endpoint(route.from),
@@ -257,7 +257,7 @@ impl App {
             }
             relations.push(GraphCanvasRelation {
                 link_key: None,
-                marks: sceno::LinkMarks::default(),
+                marks: Default::default(),
                 strength: 1.0,
                 id: format!("source:{i}"),
                 from: self.endpoint(FoldEndpoint::Node(r.from)),
