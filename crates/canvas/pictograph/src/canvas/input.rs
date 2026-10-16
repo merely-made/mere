@@ -307,6 +307,7 @@ impl Canvas {
                         self.release_dragged(d.node);
                     } else if self.shift {
                         // Shift-click toggles the node in the selection (multi-select).
+                        self.sync_attention();
                         if !self.selected.remove(&d.node) {
                             self.selected.insert(d.node);
                         }
@@ -353,6 +354,7 @@ impl Canvas {
             self.screen_to_world(self.cursor),
         ]);
         let sel = self.view.rect_select(region);
+        self.sync_attention();
         self.selected = sel
             .nodes
             .into_iter()
@@ -373,6 +375,7 @@ impl Canvas {
     fn bare_empty_click(&mut self) {
         let world = self.screen_to_world(self.cursor);
         let tol = EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON);
+        self.sync_attention();
         self.selected.clear();
         self.selected_edges.clear();
         if let Some(cell) =

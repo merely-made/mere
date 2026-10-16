@@ -30,14 +30,17 @@ use seiche::{Role, RoleTable};
 /// the canvas supplies its positions.
 pub const SETTLED_ARRANGEMENT: &str = "settled";
 
-/// A stop's return of anchored items: where they were and where they go.
-/// A host that adopts transitions animates between the two
-/// ([`Canvas::preview_paused_positions`], [`Canvas::land_paused_positions`]);
-/// the canvas has already placed `to`, so a host that does not still lands.
+/// A stop's return of anchored items, or a reset's return to the seed: where
+/// they were and where they go. A host that adopts transitions animates
+/// between the two ([`Canvas::preview_paused_positions`],
+/// [`Canvas::land_paused_positions`]); the canvas has already placed `to`, so a
+/// host that does not still lands.
 #[derive(Clone, Debug, PartialEq)]
 pub struct StopReturn {
     pub from: Vec<(NodeKey, PortablePoint)>,
     pub to: Vec<(NodeKey, PortablePoint)>,
+    /// The ease's length; `None` is the arrangement transition's default.
+    pub duration_ms: Option<u32>,
 }
 
 /// The canvas's role state, kept in one field so it moves as one piece.
@@ -393,8 +396,14 @@ impl Canvas {
         self.roles.stop_return = moved.then(|| StopReturn {
             from: from.to_vec(),
             to: to.clone(),
+            duration_ms: None,
         });
         to
+    }
+
+    /// Queue a return for the host to animate, replacing any pending one.
+    pub(crate) fn queue_return(&mut self, ret: StopReturn) {
+        self.roles.stop_return = Some(ret);
     }
 
     /// Whether a stop's return waits for a host to animate it.
