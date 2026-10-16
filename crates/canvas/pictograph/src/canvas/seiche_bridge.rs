@@ -16,8 +16,9 @@
 use std::collections::HashSet;
 
 use euclid::default::Point2D;
-use kernel::graph::{Graph, NodeKey};
+use kernel::graph::{Graph, NodeKey, RelationKey};
 use numen::FieldRegistry;
+use scenograph::link::{LinkKey, LinkStratum};
 use seiche::{Boundary, CouplingForce, EdgeSpring, NodeExclusion, Simulation};
 
 /// The relation-cell edges that feed the layout **springs**, respecting this instance's
@@ -33,9 +34,45 @@ pub(crate) fn visible_relation_edges(
     graph: &Graph,
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
 ) -> Vec<(NodeKey, NodeKey)> {
-    super::relationship_topology::visible_edges(graph, |from, to, selector| {
-        hidden_edges.contains(&crate::canvas::EdgeCell { from, to, selector })
-    })
+    visible_relation_edges_with_link_hides(graph, hidden_edges, &HashSet::new())
+}
+
+/// Keep the historical one-spring-per-visible-source-row law. A canonical
+/// link hide removes only rows in its owning stratum; another stratum over the
+/// same displayed pair keeps its own rows and spring multiplicity.
+pub(crate) fn visible_relation_edges_with_link_hides(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+    hidden_links: &HashSet<LinkKey>,
+) -> Vec<(NodeKey, NodeKey)> {
+    graph
+        .projected_relations()
+        .filter_map(|(relation_key, relation)| {
+            let selector = super::relationship_topology::selector_for_relation_kind(relation.kind);
+            if hidden_edges.contains(&crate::canvas::EdgeCell {
+                from: relation.from,
+                to: relation.to,
+                selector,
+            }) {
+                return None;
+            }
+            let key = match relation_key {
+                RelationKey::Surface(_) => {
+                    let from = graph.get_node(relation.from)?.id.to_string();
+                    let to = graph.get_node(relation.to)?.id.to_string();
+                    LinkKey::new(LinkStratum::Surface, from, to)
+                },
+                RelationKey::Resource(_) => {
+                    let from_id = graph.shown_resource_id(relation.from)?;
+                    let to_id = graph.shown_resource_id(relation.to)?;
+                    let from = graph.resource(from_id)?.canonical_iri().to_owned();
+                    let to = graph.resource(to_id)?.canonical_iri().to_owned();
+                    LinkKey::new(LinkStratum::Resource, from, to)
+                },
+            };
+            (!hidden_links.contains(&key)).then_some((relation.from, relation.to))
+        })
+        .collect()
 }
 
 /// Build the force-directed simulation from `graph`: a body per node, one spring

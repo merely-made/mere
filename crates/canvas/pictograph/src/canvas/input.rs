@@ -18,7 +18,7 @@ use kernel::graph::{
 
 use super::actions::ArrangementAction;
 use super::build::hyperlink;
-use super::edge_cells::{edge_cell_hit_test, edge_cells_in_rect};
+use super::edge_cells::{link_hit_test, links_in_rect};
 use super::seiche_bridge::seed_cluster;
 use super::{
     CLICK_SLOP, Canvas, ContextRequest, Drag, EDGE_PICK_TOL, EmptyPress, ORBIT_TILT_PER_PX,
@@ -197,6 +197,7 @@ impl Canvas {
     /// request (SE23, SE26).
     pub fn pointer_down(&mut self, button: PointerButton, x: f32, y: f32) -> bool {
         self.cursor = (x, y);
+        self.self_link_press = None;
         match button {
             PointerButton::Middle => {
                 self.follow = false;
@@ -211,6 +212,21 @@ impl Canvas {
                     self.orbit_drag = Some(self.cursor);
                 } else if let Some(fold) = self.fold_stand_in_at_screen(self.cursor) {
                     self.fold_press = Some((fold, self.cursor));
+                } else if let Some(appearance) = if self.shift {
+                    None
+                } else {
+                    crate::canvas::edge_cells::self_link_hit_test(
+                        &self.graph,
+                        &self.view,
+                        &self.hidden_links,
+                        &self.hidden_edges,
+                        self.screen_to_world(self.cursor),
+                        EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON),
+                        |key| self.node_visible_in_canvas(key),
+                        |key| self.node_size(key),
+                    )
+                } {
+                    self.self_link_press = Some((appearance, self.cursor));
                 } else if let Some(node) = self.pick_at(self.cursor) {
                     self.drag = Some(Drag {
                         node,
@@ -295,6 +311,19 @@ impl Canvas {
                     }
                     return true;
                 }
+                if let Some((appearance, press)) = self.self_link_press.take() {
+                    if (self.cursor.0 - press.0).hypot(self.cursor.1 - press.1) <= CLICK_SLOP {
+                        self.selected.clear();
+                        self.selected_links.clear();
+                        self.selected_link_appearances.clear();
+                        self.selected_links.insert(appearance.key.clone());
+                        self.selected_link_appearances.insert(
+                            appearance.key,
+                            (appearance.display_from, appearance.display_to),
+                        );
+                    }
+                    return true;
+                }
                 // End a field move / resize drag: re-aim already happened live; just
                 // settle the layout into the new well and persist. (Field regions.)
                 if self.end_field_drag() {
@@ -310,7 +339,8 @@ impl Canvas {
                         if !self.selected.remove(&d.node) {
                             self.selected.insert(d.node);
                         }
-                        self.selected_edges.clear();
+                        self.selected_links.clear();
+                        self.selected_link_appearances.clear();
                     } else {
                         self.select_only(d.node);
                     }
@@ -358,13 +388,20 @@ impl Canvas {
             .into_iter()
             .filter(|&key| self.node_visible_in_canvas(key))
             .collect();
-        self.selected_edges =
-            edge_cells_in_rect(&self.graph, &self.view, &self.hidden_edges, region)
-                .into_iter()
-                .filter(|cell| {
-                    self.node_visible_in_canvas(cell.from) && self.node_visible_in_canvas(cell.to)
-                })
-                .collect();
+        let appearances = links_in_rect(
+            &self.graph,
+            &self.view,
+            &self.hidden_links,
+            &self.hidden_edges,
+            region,
+            |key| self.node_visible_in_canvas(key),
+            |key| self.node_size(key),
+        );
+        self.selected_links = appearances.iter().map(|item| item.key.clone()).collect();
+        self.selected_link_appearances = appearances
+            .into_iter()
+            .map(|item| (item.key, (item.display_from, item.display_to)))
+            .collect();
     }
 
     /// A bare empty click clears the selection and may pick an edge under the
@@ -374,15 +411,23 @@ impl Canvas {
         let world = self.screen_to_world(self.cursor);
         let tol = EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON);
         self.selected.clear();
-        self.selected_edges.clear();
-        if let Some(cell) =
-            edge_cell_hit_test(&self.graph, &self.view, &self.hidden_edges, world, tol).filter(
-                |cell| {
-                    self.node_visible_in_canvas(cell.from) && self.node_visible_in_canvas(cell.to)
-                },
-            )
-        {
-            self.selected_edges.insert(cell);
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
+        if let Some(appearance) = link_hit_test(
+            &self.graph,
+            &self.view,
+            &self.hidden_links,
+            &self.hidden_edges,
+            world,
+            tol,
+            |key| self.node_visible_in_canvas(key),
+            |key| self.node_size(key),
+        ) {
+            self.selected_links.insert(appearance.key.clone());
+            self.selected_link_appearances.insert(
+                appearance.key,
+                (appearance.display_from, appearance.display_to),
+            );
         }
     }
 
