@@ -153,8 +153,19 @@ to `gpu` for the GPU build. The `inference.ask` route is granted to Turnstone.
 A GPU ask preempts the GPU trainer through owner reclaim. The offer is
 withdrawn while inference waits or runs; inference loads device tensors for
 each ask and releases them before returning the GPU. CPU inference retains
-its loaded model. Closing the lane cancels a pending device wait. Durable
-asks and pause on lock belong to I3 of the
+its loaded model. Library asks now retain exact token checkpoints in an
+append-only encrypted log. Shutdown pauses unfinished asks and joins the actor;
+local interrupted asks resume after reopen. Lock refuses the route, pauses at a
+token boundary, clears materialized runs and the data key, and unlock rehydrates
+and resumes lock-paused work. Explicit pauses remain paused. A GPU pause drops
+its KV cache and device tensors before releasing the foreground guard.
+
+The route also takes `distillery.inference/pause-v1` and
+`distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.
+`distillery.inference/ask-sampled-v1` accepts `ask`, `max_tokens`, `temperature`,
+`top_p` and `seed`; the owner cap still applies. Current journal replication
+admits a shared persona signer. Connecting private asks to separately rooted,
+keyed personal-graph devices remains an I3 authority boundary in the
 [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 
 ## Publishing

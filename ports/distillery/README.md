@@ -68,6 +68,20 @@ of durable operations. The [local composition and receipt](../../crates/mesh/mes
 cover actual RaptorQ recovery, QUIC handoff, preserved signed bytes, action
 separation, shared-budget refusal and fresh-process durable reopening.
 
+With `inference-model`, `InferenceLane::try_open_with_journal` adds a
+synchronous checkpoint barrier to the actor. The decoder records exact session,
+rendered prompt, model-token IDs and random-draw position. Text becomes visible
+after the commit; resumed generation rebuilds KV state by prefill. The retained
+record uses Eidetic's `InferenceRunRecord` schema, keeping paused, failed,
+cancelled partial and finished states distinct. Recall passage inputs remain I4.
+
+`PersonaRunJournal` stores signed, encrypted per-device logs through muniment
+and joins the caller's existing p2panda endpoint. Token entries contain only new
+IDs and text. A fork is reported rather than silently choosing a continuation.
+The current journal admits the same persona signer and data key; granting
+separately rooted paired devices access is a distinct production binding.
+See the [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM
 row localized and recovered two Burn/CubeCL browser defects. The configured
 D2c embedding matrix now passes BGE Micro, MiniLM, E5-small, and E5-base in

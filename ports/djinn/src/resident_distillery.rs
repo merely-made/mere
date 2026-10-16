@@ -440,6 +440,57 @@ impl ResidentDistillery {
         ))
     }
 
+    /// Open the persona's ask log before starting replication into it.
+    #[cfg(feature = "inference")]
+    pub fn inference_journal(
+        &self,
+        key: [u8; 32],
+    ) -> Result<Arc<distillery::inference::durable::PersonaRunJournal<RedbBackend>>, String> {
+        use rand_core::RngCore;
+        let device_path = self.mesh_root.join("inference-device");
+        let device = match std::fs::read_to_string(&device_path) {
+            Ok(device) => device,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                let mut bytes = [0u8; 16];
+                rand_core::OsRng.fill_bytes(&mut bytes);
+                let id: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
+                let device = format!(
+                    "{}:{id}",
+                    std::env::var("COMPUTERNAME")
+                        .or_else(|_| std::env::var("HOSTNAME"))
+                        .unwrap_or_else(|_| "device".into())
+                );
+                std::fs::write(&device_path, &device).map_err(|error| error.to_string())?;
+                device
+            },
+            Err(error) => return Err(error.to_string()),
+        };
+        let backend = RedbBackend::open(self.mesh_root.join("inference.redb"))
+            .map_err(|error| error.to_string())?;
+        let journal = Arc::new(distillery::inference::durable::PersonaRunJournal::new(
+            backend,
+            self.mesh_id,
+            &self.author,
+            device,
+            key,
+        ));
+        Ok(journal)
+    }
+
+    /// Start replication after the inference lane has recovered its local log.
+    #[cfg(feature = "inference")]
+    pub async fn join_inference_journal(
+        &self,
+        journal: &Arc<distillery::inference::durable::PersonaRunJournal<RedbBackend>>,
+    ) -> Result<(), String> {
+        let (endpoint, gossip) = self
+            .resident
+            .transport()
+            .sync_parts()
+            .ok_or("inference needs the resident gossip endpoint")?;
+        journal.join(endpoint, gossip).await
+    }
+
     /// The GPU adapter this lane's trainer was composed on, or `None` when it
     /// composed a CPU trainer or none at all.
     ///
