@@ -100,6 +100,7 @@ fn self_links_draw_separate_strata_loops_and_select_through_node_pick_area() {
     let member = canvas.open_member_as_new_node(None, "https://self-link.test");
     let node = canvas.graph().get_node_by_id(member).unwrap().0;
     assert!(canvas.assert_relation_between_members(member, member, SemanticSubKind::Cites));
+    assert!(canvas.assert_relation_between_members(member, member, SemanticSubKind::UserGrouped));
     canvas
         .view
         .set_position(node, euclid::default::Point2D::new(200.0, 200.0));
