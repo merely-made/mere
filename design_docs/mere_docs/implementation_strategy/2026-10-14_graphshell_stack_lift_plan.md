@@ -1468,3 +1468,24 @@ fast-forward of local main; nothing built).**
   source through it, and Cargo cannot bridge that. It flips when Cleromancy does
   (its handoff, task 2), together with Mere, Murm `native/`, Knot, Turnstone and
   Woodshed in one pass.
+- **2026-10-15 (the dramatis flip, one pass):** with Cleromancy in the pass,
+  dramatis now follows the convention everywhere. Manifest commits first (each
+  graph needed the others' flipped manifests before it could lock): Murm
+  `742d2e8`, Knot `11b0736`, Cleromancy `a4364de`, Mere `59f88e6` (dramatis and
+  the Djinn Cleromancy pin; the `www` Mere patch table deleted), Turnstone
+  `bda84ca`, Woodshed `0a0d67d`. Then lock commits: Murm `cba46d8`, Knot
+  `d2cb090`, Mere `82e7fd7`, Turnstone `15362e3`, Woodshed `4415b71`, Cleromancy
+  `22df4c9`. Every graph resolves one source for Mere (`59f88e63`), Murm
+  (`cba46d85`), Genet (`e37762d7`), netrender (`f4f9c0d8`), Knot (`11b07360`),
+  Cleromancy (`a4364de9`) and dramatis (`5c89001a`). Checks: Mere's djinn,
+  graphshell-host, graphshell-client, cambium and scenomise (all targets, all
+  features), djinn and graphshell-host tests, port boundaries and the
+  graphshell-web wasm32 check; Knot's full round; Turnstone 942 passed; Woodshed's
+  root, hocket and redshank checks and tests; Murm's native workspace; Cleromancy's
+  default, graphshell-admission and core checks and `cargo test`. Not green, and
+  not fixed because it is product code: Cleromancy's `personal-sync` feature
+  fails with 15 `PersonalGraphEvent.basis` missing-field errors against the
+  current Mere (its handoff says so, task 2), and Woodshed's
+  `validation/relationship-recipe` bin test target lacks a `tempfile`
+  dev-dependency, which its manifest never declared. Still on `rev`, on purpose:
+  `wavicle` (Woodshed), `turquet`, `wgpu-graft`, the `mark-ik` forks.
