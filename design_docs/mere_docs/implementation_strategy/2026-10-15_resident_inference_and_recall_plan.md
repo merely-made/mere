@@ -9,7 +9,8 @@ exact retained passage evidence and version-checked citations with the pinned
 SmolLM2 model. I5 qualifies the separate native Turnstone process against a
 GPU resident, including progress, pause/resume, cancellation and past-answer
 source viewing after restart with the origin offline. Distillery M2 and the
-inference-surface half of Eidetic P4 are closed. I6 is next.
+inference-surface half of Eidetic P4 are closed. I6 layer streaming is in
+progress; its larger-than-device-memory acceptance row remains open.
 The new device
 boundary uses two separately rooted resident compositions on one computer;
 a physical second computer and installed-binary receipt remain separate.
@@ -491,8 +492,8 @@ releases it, and moves on. Prefill runs the whole prompt through each layer
 in one pass. Memory is about one layer plus the KV cache; time per token is
 bounded by disk reads of the whole model, or of the routed experts only for
 a mixture-of-experts model. It needs, from §2: sharded safetensors with
-their index; memory-mapped, per-layer loading (burn-store's lazy loader, or
-the crate-private tensor loader made public); a layer-range forward;
+their index; per-layer loading through memory mapping or bounded tensor-range
+reads followed by immutable library artifacts; a layer-range forward;
 attention that bounds the score tensor during prefill (chunked over query
 positions); and the output head on the last position only.
 

@@ -76,8 +76,35 @@ pub fn parse_model_row(row: &str) -> Result<eidetic::ManifestId, String> {
         .map_err(|error| format!("inference model row {row:?}: {error}"))
 }
 
-/// The library lock covers resolution only. Generation never holds it, so a
-/// trainer can publish another artifact while an ask is running on the CPU.
+#[cfg(feature = "inference-model")]
+fn library_layer_source<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    resolved: &esp::infer::library::ResolvedInferenceRow,
+) -> Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>> {
+    let artifacts = resolved.layer_artifacts()?;
+    Some(Arc::new(move |index: usize, limit: usize| {
+        let artifact = artifacts.get(index).ok_or_else(|| {
+            esp::infer::InferError::InvalidWeights(format!("layer {index} missing from index"))
+        })?;
+        let mut store = library.blocking_lock();
+        pollster::block_on(artifact.read(&mut *store, limit))
+    }))
+}
+
+#[cfg(feature = "inference-model")]
+fn borrow_layer_source(
+    source: &Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>>,
+) -> Option<Box<dyn esp::infer::decoder::streaming::LayerSource>> {
+    source.as_ref().map(|source| {
+        let source = source.clone();
+        Box::new(move |index, limit| source.read_layer(index, limit))
+            as Box<dyn esp::infer::decoder::streaming::LayerSource>
+    })
+}
+
+/// The library lock covers resolution and individual streamed layer reads.
+/// It is released before tensor work, so the trainer can publish artifacts
+/// between reads while a CPU ask is running.
 #[cfg(feature = "inference-model")]
 pub fn open_library_lane<B: eidetic::Store + Send + 'static>(
     library: Arc<tokio::sync::Mutex<B>>,
@@ -104,8 +131,13 @@ pub fn open_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
                     row,
                 ))?
             };
-            let provider =
-                resolved.load(&InferenceDevice::ndarray(), "burn-ndarray", max_tokens)?;
+            let source = library_layer_source(library, &resolved);
+            let provider = resolved.load_with_layer_source(
+                &InferenceDevice::ndarray(),
+                "burn-ndarray",
+                max_tokens,
+                borrow_layer_source(&source),
+            )?;
             Ok(Box::new(provider))
         },
         journal,
