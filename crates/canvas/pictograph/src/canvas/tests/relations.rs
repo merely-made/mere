@@ -42,6 +42,7 @@ fn parallel_assertions_share_one_stroke_and_one_link_key_hit_target() {
         &canvas.view,
         &canvas.hidden_links,
         &canvas.hidden_edges,
+        |_| 36.0,
     )
     .into_iter()
     .filter(|segment| segment.appearance.key == key)
@@ -67,6 +68,7 @@ fn parallel_assertions_share_one_stroke_and_one_link_key_hit_target() {
             midpoint,
             1.0,
             |_| true,
+            |_| 36.0,
         )
         .map(|appearance| appearance.key),
         Some(key.clone()),
@@ -88,6 +90,79 @@ fn parallel_assertions_share_one_stroke_and_one_link_key_hit_target() {
         before,
         "opening a lifted link leaves its source assertions unchanged"
     );
+}
+
+#[test]
+fn self_links_draw_separate_strata_loops_and_select_through_node_pick_area() {
+    use scenograph::link::LinkStratum;
+
+    let mut canvas = Canvas::new();
+    let member = canvas.open_member_as_new_node(None, "https://self-link.test");
+    let node = canvas.graph().get_node_by_id(member).unwrap().0;
+    assert!(canvas.assert_relation_between_members(member, member, SemanticSubKind::Cites));
+    canvas
+        .view
+        .set_position(node, euclid::default::Point2D::new(200.0, 200.0));
+    canvas.set_camera(CameraView {
+        offset: (0.0, 0.0),
+        zoom: 1.0,
+    });
+
+    let segments = crate::canvas::edge_cells::visible_link_appearances(
+        canvas.graph(),
+        &canvas.view,
+        &canvas.hidden_links,
+        &canvas.hidden_edges,
+        |key| canvas.node_size(key),
+    );
+    let self_links: Vec<_> = segments
+        .iter()
+        .filter(|segment| segment.appearance.display_from == node)
+        .collect();
+    assert_eq!(
+        self_links.len(),
+        2,
+        "Surface and Resource self-links remain distinct"
+    );
+    assert!(
+        self_links
+            .iter()
+            .any(|link| link.appearance.key.stratum == LinkStratum::Surface)
+    );
+    assert!(
+        self_links
+            .iter()
+            .any(|link| link.appearance.key.stratum == LinkStratum::Resource)
+    );
+    assert!(self_links.iter().all(|link| link.points.len() > 2));
+    assert_ne!(self_links[0].points[4], self_links[1].points[4]);
+
+    for segment in self_links {
+        let pick = segment.points[5];
+        let selected = crate::canvas::edge_cells::link_hit_test(
+            canvas.graph(),
+            &canvas.view,
+            &canvas.hidden_links,
+            &canvas.hidden_edges,
+            pick,
+            1.0,
+            |_| true,
+            |key| canvas.node_size(key),
+        )
+        .expect("loop stroke has a geometric hit target");
+        assert_eq!(selected.key, segment.appearance.key);
+
+        canvas.pointer_down(PointerButton::Left, pick.x, pick.y);
+        assert!(canvas.pointer_up(PointerButton::Left, pick.x, pick.y));
+        assert_eq!(
+            canvas.selected_link_keys(),
+            vec![segment.appearance.key.clone()]
+        );
+        assert!(
+            canvas.selected_members().is_empty(),
+            "the loop beats its node's pick area"
+        );
+    }
 }
 
 #[test]
@@ -126,6 +201,7 @@ fn closing_a_link_hides_all_parallel_assertions_under_one_key() {
             &canvas.view,
             &canvas.hidden_links,
             &canvas.hidden_edges,
+            |_| 36.0,
         )
         .into_iter()
         .all(|segment| segment.appearance.key != key)
@@ -179,6 +255,7 @@ fn legacy_member_filters_reduce_one_link_summary_without_becoming_link_identity(
         &canvas.view,
         &HashSet::new(),
         &hidden,
+        |_| 36.0,
     );
     assert_eq!(segments.len(), 1);
     assert_eq!(segments[0].appearance.key, key);
@@ -205,6 +282,7 @@ fn antiparallel_and_opposed_assertions_become_marks_on_one_resting_stroke() {
         &canvas.view,
         &HashSet::new(),
         &HashSet::new(),
+        |_| 36.0,
     );
     assert_eq!(segments.len(), 1, "two directions share one link stroke");
     assert!(segments[0].appearance.marks.forward);
@@ -299,6 +377,7 @@ fn legacy_directed_filter_hides_only_that_member_under_one_link() {
         &canvas.view,
         &canvas.hidden_links,
         &canvas.hidden_edges,
+        |_| 36.0,
     )
     .into_iter()
     .filter(|segment| {

@@ -190,7 +190,8 @@ fn link_appearances_keep_resource_identity_across_aliases_and_separate_two_strat
         dedup_edges(&graph),
         1.0,
     );
-    let appearances = visible_link_appearances(&graph, &view, &HashSet::new(), &HashSet::new());
+    let appearances =
+        visible_link_appearances(&graph, &view, &HashSet::new(), &HashSet::new(), |_| 36.0);
     assert_eq!(
         appearances.len(),
         5,
@@ -576,7 +577,8 @@ fn content_projection_drives_all_shown_pairs_through_topology_draw_and_hit() {
         pairs,
         1.0,
     );
-    let segments = visible_link_appearances(&graph, &view, &HashSet::new(), &HashSet::new());
+    let segments =
+        visible_link_appearances(&graph, &view, &HashSet::new(), &HashSet::new(), |_| 36.0);
     assert_eq!(segments.len(), 5, "one appearance per stratum/pair");
     let hidden = HashSet::from([crate::canvas::EdgeCell {
         from: a,
@@ -584,7 +586,7 @@ fn content_projection_drives_all_shown_pairs_through_topology_draw_and_hit() {
         selector: RelationSelector::Semantic(SemanticSubKind::Cites),
     }]);
     assert_eq!(visible_relation_edges(&graph, &hidden).len(), 11);
-    let visible = visible_link_appearances(&graph, &view, &HashSet::new(), &hidden);
+    let visible = visible_link_appearances(&graph, &view, &HashSet::new(), &hidden, |_| 36.0);
     assert_eq!(
         visible.len(),
         5,

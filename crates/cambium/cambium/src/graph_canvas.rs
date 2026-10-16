@@ -1587,12 +1587,23 @@ where
             if relation.emphasized {
                 class.push_str(" emphasized");
             }
+            let label = format!("{}: {}", relation.kind, relation.label);
+            let label = if relation.link_key.is_some() {
+                format!("{label}; {}{}",
+                    match (relation.marks.forward, relation.marks.reverse) {
+                        (true, true) => "both directions",
+                        (true, false) => "forward",
+                        (false, true) => "reverse",
+                        _ => "direction unavailable",
+                    },
+                    if relation.marks.opposed { "; opposing assertions" } else { "" })
+            } else {
+                label
+            };
             let mut target = el::<_, State, AppAction>("button", ())
                 .attr("class", class)
                 .attr("type", "button")
-                .attr("aria-label", format!("{}: {}; {}{}", relation.kind, relation.label,
-                    match (relation.marks.forward,relation.marks.reverse) {(true,true)=>"both directions",(true,false)=>"forward",(false,true)=>"reverse",_=>"direction unavailable"},
-                    if relation.marks.opposed {"; opposing assertions"} else {""}))
+                .attr("aria-label", label)
                 .attr("data-relation-id", relation.id.clone())
                 .attr("data-link-direction", match (relation.marks.forward,relation.marks.reverse) {(true,true)=>"both",(true,false)=>"forward",(false,true)=>"reverse",_=>"none"})
                 .attr("data-link-opposed", if relation.marks.opposed {"true"} else {"false"})
