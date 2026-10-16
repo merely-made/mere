@@ -128,8 +128,8 @@ fn relationship_snapshot(
         }
     }
     let definition = &snapshot.recipe.definition;
-    if Family::resolve(&definition.arrangement.kind) != Some(Family::Grid) {
-        issues.push(CompileIssue::new("arrangement.kind", "authored occurrence order requires the grid arrangement; it is not a physical scatter coordinate"));
+    if !matches!(Family::resolve(&definition.arrangement.kind), Some(Family::Grid | Family::Spiral)) {
+        issues.push(CompileIssue::new("arrangement.kind", "authored occurrence order requires a grid or spiral arrangement; it is not a physical scatter coordinate"));
     }
     if definition.reading.kind != "nodes"
         || definition.reading.key != "occurrence_id"
