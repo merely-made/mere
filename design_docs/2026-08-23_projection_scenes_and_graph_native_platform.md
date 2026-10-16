@@ -1250,6 +1250,18 @@ recipe replacement leaves the current accepted reading intact.
 
 The [implementation receipts](../support/design-studies/backdrops/receipt/qualification.json)
 record the exercised source, CPU rendering and browser checks. The included
-recipes are illustrative fixtures. Actual Knot/Woodshed/Signalman source
-adapters and native host qualification remain separate work; this establishes
-their portable presentation path and its first Graphshell embedding.
+recipes are illustrative fixtures. App-owned source adapters are described
+below; native host qualification remains separate work. Graphshell establishes
+their first reference embedding.
+
+The subsequent app-adapter slice adds optional, app-owned recipe exporters:
+Knot's bounded lexical sound reading with explicit template/rhyme expectations,
+Woodshed's current resolved Stage scale/chord lens, and Signalman's revalidated
+Survey imports. These produce the shared recipe and exercise the independent
+renderer; they add no native scene panel. Knot retains unresolved-pronunciation
+refusal and candidate-stress disclosure. Woodshed preserves tuning orientation,
+occurrence identity and musical degree roles. Signalman displays GPX segments
+and track-sample landmarks while capture identities stay unplaced; timestamps
+and track names do not become position authority. Actual RF coverage and native
+host acceptance remain separate work. The [adapter receipt](../support/design-studies/backdrops/adapters/qualification.json)
+records the cross-repository source cohort and exercised export/render paths.
