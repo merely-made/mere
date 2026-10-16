@@ -12,6 +12,7 @@ categories = ["gui"]
 publish = true
 
 [dependencies]
+curation.workspace = true
 cambium = { workspace = true }
 # Graph-only layouts by strategy id, over a kernel graph built from the model.
 cartography = { workspace = true }
@@ -28,7 +29,6 @@ uuid = { workspace = true }
 pictograph = { workspace = true, features = ["canvas"] }
 serde_json.workspace = true
 netrender.workspace = true
-curation.workspace = true
 
 mesquite = { workspace = true }
 # The headed harness (examples/harness.rs) and its scenario lane.

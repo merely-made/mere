@@ -632,6 +632,9 @@ fn relation(
         points,
         kind: Some(kind.into()),
         weight: None,
+        link_key: None,
+        marks: sceno::LinkMarks::default(),
+        strength: None,
     });
     out.relations.push(RelationReading { index, label, why });
 }

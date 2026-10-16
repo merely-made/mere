@@ -1,0 +1,22 @@
+{
+  "declared_before_focused_measurement": true,
+  "build": "debug",
+  "scope": "single focused test process, not UI frame rate",
+  "kernel": {
+    "retained_records": 50002,
+    "held_records": 2,
+    "reads": 64,
+    "read_p95_ms_max": 100,
+    "snapshot_wire_bytes_max": 67108864,
+    "peak_resident_bytes_max": 268435456
+  },
+  "portable": {
+    "retained_records": 50002,
+    "held_records": 2,
+    "reads": 16,
+    "held_read_p95_ms_max": 100,
+    "history_materialization_ms_max": 2000,
+    "history_wire_bytes_max": 67108864,
+    "peak_resident_bytes_max": 536870912
+  }
+}

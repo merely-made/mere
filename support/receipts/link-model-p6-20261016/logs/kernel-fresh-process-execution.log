@@ -1,0 +1,21 @@
+
+running 2 tests
+test lifecycle_reopen_child ... ignored, subprocess helper for assertion_lifecycle_survives_a_fresh_process
+
+running 1 test
+wrote lifecycle fixture and exited before reopen
+test lifecycle_reopen_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+
+running 1 test
+fresh process retained IDs, basis, withdrawal and unknown first time
+test lifecycle_reopen_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+test assertion_lifecycle_survives_a_fresh_process ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
