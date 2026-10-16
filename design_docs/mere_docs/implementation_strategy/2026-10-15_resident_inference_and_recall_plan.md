@@ -1,7 +1,7 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-16):** in progress. I1 to I5 gates done (§7):
+**Status (2026-10-16):** in progress. I1 to I6 gates done (§7):
 strict decoder, declared templates, CPU and GPU model rows, native trainer
 owner reclaim, durable checkpoints, restart, lock recovery and keyed
 personal-graph continuation pass on O-PC. I4's native gate adds BM25 recall,
@@ -9,8 +9,9 @@ exact retained passage evidence and version-checked citations with the pinned
 SmolLM2 model. I5 qualifies the separate native Turnstone process against a
 GPU resident, including progress, pause/resume, cancellation and past-answer
 source viewing after restart with the origin offline. Distillery M2 and the
-inference-surface half of Eidetic P4 are closed. I6 layer streaming is in
-progress; its larger-than-device-memory acceptance row remains open.
+inference-surface half of Eidetic P4 are closed. I6 qualifies a seven-shard
+OpenLlama 3B model whose f32 weights exceed the target GPU's memory, plus a
+4,126-token streamed prefill. I7 is next.
 The new device
 boundary uses two separately rooted resident compositions on one computer;
 a physical second computer and installed-binary receipt remain separate.
@@ -1160,3 +1161,84 @@ Stop and record the reason if any of these happen:
     larger-corpus handoff is open. I5 closes M2 and only the inference-surface
     half of P4; embedding envelopes, assessment/tag workflows and the later
     resident phases remain open.
+
+
+- **2026-10-16, I6 native layer streaming qualified (`fa0cdaff`).** The host
+  importer reads bounded tensor ranges from single-file or indexed HF
+  safetensors checkpoints. It stores one shared embedding/norm/head artifact
+  and ordered, independently content-verified layer artifacts in the existing
+  model library. A new `esp.layer-weights/v1` index carries the configurable
+  query chunk and artifact limits. The resident uses `NoFetcher`, borrows its
+  existing library owner for one layer read at a time, and releases the lock
+  before tensor work. A layer's GPU work drains before its weights drop.
+  Module parameters adopt loaded tensors directly, avoiding throwaway random
+  matrices. Prefill chunks queries against the complete causal keys/values;
+  generation applies the output head only to the last position.
+  - *Exact sessions and ownership.* The index and `/layer-stream-v1` loader
+    enter the session identity. Whole-model and streamed imports remain
+    distinct sessions; I8 still owns cross-rung compatibility and fallback.
+    GPU reads and execution remain inside the existing foreground guard, so
+    pause releases the trainer's device. Default feature edges are unchanged.
+    An integration fixture completes an ask, corrupts a layer after provider
+    construction, observes a failed next ask without emitted text, and proves
+    lane close releases its library borrower. The native browser source-owner
+    and private personal-graph boundaries are unchanged.
+  - *Larger-than-GPU-memory row.* OpenLlama 3B v2, revision
+    `bce5d60d3b0c68318862270ec4e794d83308d80a`, is an ordinary Llama block.
+    Its [upstream checkpoint](https://huggingface.co/openlm-research/open_llama_3b_v2/tree/bce5d60d3b0c68318862270ec4e794d83308d80a)
+    is byte-pinned, converted offline without changing tensor dtypes/values
+    into seven safetensors shards, and imported as layer artifacts. The two
+    fixed QA prompts also pass fast/slow tokenizer ID parity. The independent
+    float32 Transformers CPU reference holds **13,705,894,400 bytes** of
+    parameter weights, with a measured **14,609,170,432-byte** process peak on
+    this computer's 33.52 GB host memory. The target RTX 4060 Laptop GPU has
+    **8,585,740,288 bytes** total and **7,156,531,200 bytes** free before the
+    streamed row. Both eight-token asks match all **16 independent token IDs**
+    and their prompt IDs. The first ask pauses after three committed tokens
+    and resumes to the identical reference sequence. A plain QA template is
+    data; this base-model row qualifies execution, not answer quality.
+  - *Measured costs.* The two GPU asks complete in **131.72 and 148.76 s**,
+    or **16.47 and 18.59 s/token**. Each reads **6,443,367,136 encoded artifact
+    bytes per output token**. These are actual logical library payload reads,
+    including OS-cache hits; physical disk traffic is not attributed. The
+    complete fixture, including import and pause/resume, takes **555.46 s**.
+    The process's measured peak working set is **3,224,231,936 bytes**.
+    Sampled whole-GPU use peaks at **3,652,190,208 bytes**, including other
+    processes. The CPU reference asks take 4.86 and 4.17 s. A concurrent Djinn
+    build overlaps the scale fixture, so these timings are recorded execution
+    costs, not an isolated throughput comparison.
+  - *Long prefill and small-model reference.* The pinned SmolLM2-360M-Instruct
+    row matches all **39 independent greedy IDs**, including the exact prompt
+    IDs, and matches its first answer after a three-token pause/resume. A
+    **4,126-token** prompt completes a one-token ask in **14.77 s** with
+    `query_chunk: 32`. Its largest logical attention score block is
+    **7,921,920 bytes**; allocator padding and other temporaries are outside
+    that tensor count. Across this complete fixture, including import and the
+    preceding reference asks, the measured host process peak is
+    **1,424,113,664 bytes**, and sampled whole-GPU use peaks at
+    **2,304,770,048 bytes**. The long prompt's output is recorded without a
+    separate independent numerical comparison.
+  - *Checks.* A subsequent direct-provider guard (`7f460ae8`) also checks the
+    shared artifact's budget before constructing tensors, even outside library
+    composition. The native measurement source remains `fa0cdaff`; the guard
+    changes refusal of invalid inputs, with a separate regression. ESP passes
+    **172 unit tests**, two durable-generation tests,
+    two library-session tests, five template tests and six autodiff trainer
+    tests. Distillery passes **53 unit tests**, eight durability entries and
+    the new layer-owner integration test. The actor/wire build passes **38
+    tests** and its normal dependency feature graph has neither decoder nor
+    model-session enabled. Djinn passes **four native route regressions**,
+    including separately rooted keyed personal-graph continuation, and all
+    **three explicitly run GPU trainer-reclaim regressions**. Its explicitly
+    run real SmolLM2 recall regression also preserves exact source versions,
+    withdraws stale citations and reopens the sealed answer after restart.
+    The import
+    example checks; touched Rust formatting, Python syntax, JSON parsing and
+    the documentation audit add no findings beyond the recorded baseline.
+  - *Evidence and limits.* [The I6 receipt](../../../support/receipts/resident_inference_streaming.json)
+    records exact source/binary hashes, model identities, reference outputs,
+    measurement profiles, commands and log hashes. Native provider rows and
+    resident composition regressions qualify this phase. An installed Djinn
+    binary with this scale model, a new headed scale-model run, physical
+    second-device execution, cold-disk throughput and isolated per-process
+    VRAM high-water remain separate receipts. I7 weight formats is next.
