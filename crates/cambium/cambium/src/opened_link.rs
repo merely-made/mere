@@ -371,8 +371,6 @@ where
                     .attr("role", "img")
                     .attr("aria-label", format!("{}; starts {}; {state}", entry.label, span.start_ms))
                     .attr("data-span-state", state)));
-            } else {
-                row.push(Box::new(el("span", "Undated; no time position inferred")));
             }
             plot.push(Box::new(
                 el("div", row)
