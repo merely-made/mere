@@ -368,6 +368,22 @@ impl DjinnResident {
         self.inference.as_ref()
     }
 
+    /// Borrow a retained corpus from its source owner; never reopen its store.
+    /// Desktop and embedded compositions share this adapter before admitting
+    /// `ask-recall-v1`. Source acquisition and disclosure remain caller-owned.
+    #[cfg(feature = "inference")]
+    pub fn configure_inference_recall(
+        &self,
+        corpus: Arc<dyn distillery::inference::recall::RecallCorpus>,
+        config: distillery::inference::recall::RecallConfig,
+    ) -> Result<(), String> {
+        self.inference
+            .as_ref()
+            .ok_or("inference is not open")?
+            .lane()
+            .configure_recall(corpus, config)
+    }
+
     /// Refresh mutable Knot pairing and evidence-reader authority.
     pub async fn refresh(&mut self) -> Result<bool, String> {
         match self.knot.as_mut() {

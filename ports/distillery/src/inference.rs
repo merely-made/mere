@@ -38,6 +38,8 @@ use esp::infer::provider::GenerationCheckpoint;
 use esp::infer::{GenerationRequest, InferCommand, InferUpdate};
 #[cfg(feature = "inference-model")]
 pub mod durable;
+#[cfg(feature = "inference-model")]
+pub mod recall;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
@@ -206,6 +208,9 @@ pub struct RunV1 {
     pub tokens: usize,
     #[serde(default)]
     pub continuations: Vec<Continuation>,
+    #[cfg(feature = "inference-model")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recall: Option<recall::RecallEvidence>,
 }
 
 /// The run table, as the route serves it.
@@ -242,6 +247,8 @@ pub enum InferenceLaneError {
     Locked,
     #[error("inference journal: {0}")]
     Journal(String),
+    #[error("inference recall: {0}")]
+    Recall(String),
 }
 
 /// Retained host state. Journals serialize this beside Eidetic evidence;
@@ -305,6 +312,8 @@ struct RunTable {
     next_actor_id: u64,
     locked: bool,
     seen_remote_revision: u64,
+    #[cfg(feature = "inference-model")]
+    seen_recall_revision: Option<[u8; 32]>,
     /// Bumped on every change a client can see.
     generation: u64,
 }
@@ -415,9 +424,70 @@ struct Shared {
     bridge: Mutex<Option<JoinHandle<()>>>,
     max_tokens: usize,
     caches: Mutex<Vec<std::sync::Weak<Mutex<Option<(Vec<u8>, Vec<u8>)>>>>>,
+    #[cfg(feature = "inference-model")]
+    recall: Mutex<Option<RecallBinding>>,
+}
+
+#[cfg(feature = "inference-model")]
+struct RecallBinding {
+    corpus: Arc<dyn recall::RecallCorpus>,
+    config: recall::RecallConfig,
+    index: Option<recall::RecallIndex>,
 }
 
 impl Shared {
+    #[cfg(feature = "inference-model")]
+    fn observe_recall(&self, table: &mut RunTable) -> recall::ObservedSources {
+        let mut observed = recall::ObservedSources::default();
+        if table.locked {
+            return observed;
+        }
+        let mut sources = std::collections::BTreeSet::new();
+        for record in &table.runs {
+            if let Some(evidence) = &record.view.recall {
+                sources.extend(evidence.passages.iter().map(|p| p.passage.source.clone()));
+                sources.extend(evidence.stale.iter().map(|p| p.source.clone()));
+            }
+        }
+        if sources.is_empty() {
+            table.seen_recall_revision = None;
+            return observed;
+        }
+        let binding = self.recall.lock().unwrap();
+        for source in sources {
+            let current = binding
+                .as_ref()
+                .ok_or_else(|| "source owner is unavailable".to_string())
+                .and_then(|binding| binding.corpus.current_version(&source));
+            observed.0.insert(source, current);
+        }
+        let encoded = zeroize::Zeroizing::new(
+            serde_json::to_vec(&observed.0.iter().collect::<Vec<_>>())
+                .expect("source revision serialization"),
+        );
+        let revision = *eidetic::Hash::of(&encoded).as_bytes();
+        if table
+            .seen_recall_revision
+            .is_some_and(|previous| previous != revision)
+        {
+            table.generation += 1;
+        }
+        table.seen_recall_revision = Some(revision);
+        observed
+    }
+    fn view(&self, table: &mut RunTable) -> InferenceRunsV1 {
+        #[cfg(feature = "inference-model")]
+        let observed = self.observe_recall(table);
+        #[allow(unused_mut)]
+        let mut view = table.view();
+        #[cfg(feature = "inference-model")]
+        for run in &mut view.runs {
+            if let Some(evidence) = &mut run.recall {
+                evidence.validate(&run.text, Some(&observed));
+            }
+        }
+        view
+    }
     fn table(&self) -> MutexGuard<'_, RunTable> {
         self.table.lock().expect("the run table is never poisoned")
     }
@@ -531,6 +601,8 @@ impl InferenceLane {
             bridge: Mutex::new(None),
             max_tokens,
             caches: Mutex::new(Vec::new()),
+            #[cfg(feature = "inference-model")]
+            recall: Mutex::new(None),
         });
         let bridge = std::thread::Builder::new()
             .name("inference-bridge".into())
@@ -577,7 +649,56 @@ impl InferenceLane {
     pub fn ask_with_generation(
         &self,
         request: AskRequestV1,
+        generation: GenerationRequest,
+    ) -> Result<(), InferenceLaneError> {
+        self.ask_internal(
+            request,
+            generation,
+            #[cfg(feature = "inference-model")]
+            None,
+        )
+    }
+
+    /// Borrow a retained corpus from its owner and build a disposable BM25 index.
+    #[cfg(feature = "inference-model")]
+    pub fn configure_recall(
+        &self,
+        corpus: Arc<dyn recall::RecallCorpus>,
+        config: recall::RecallConfig,
+    ) -> Result<(), String> {
+        let mut table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        let index = recall::RecallIndex::build(corpus.clone(), config.clone())?;
+        *self.shared.recall.lock().unwrap() = Some(RecallBinding {
+            corpus,
+            config,
+            index: Some(index),
+        });
+        table.generation += 1;
+        Ok(())
+    }
+
+    #[cfg(feature = "inference-model")]
+    pub fn ask_recalled(
+        &self,
+        request: recall::RecallAskRequestV1,
+    ) -> Result<(), InferenceLaneError> {
+        let generation = GenerationRequest {
+            max_tokens: self.shared.max_tokens,
+            ..Default::default()
+        };
+        self.ask_internal(request.ask, generation, Some(request.scope))
+    }
+
+    fn ask_internal(
+        &self,
+        request: AskRequestV1,
         mut generation: GenerationRequest,
+        #[cfg(feature = "inference-model")] recall_scope: Option<
+            Vec<eidetic::models::recall::RecallSourceId>,
+        >,
     ) -> Result<(), InferenceLaneError> {
         generation.prompt = request.question.clone();
         generation.max_tokens = generation.max_tokens.min(self.shared.max_tokens);
@@ -615,6 +736,42 @@ impl InferenceLane {
         {
             return Err(InferenceLaneError::DuplicateRun(request.run));
         }
+        #[allow(unused_mut)]
+        let mut recall_failure: Option<String> = None;
+        #[cfg(feature = "inference-model")]
+        let recall_evidence = if let Some(scope) = recall_scope {
+            if table.session.is_none() || self.shared.journal.is_none() {
+                return Err(InferenceLaneError::Recall("recall requires a durable exact model session; stub inference cannot answer retained material".into()));
+            }
+            let mut binding = self.shared.recall.lock().unwrap();
+            let binding = binding.as_mut().ok_or_else(|| {
+                InferenceLaneError::Recall("no retained corpus is attached".into())
+            })?;
+            if binding.index.is_none() {
+                binding.index = Some(
+                    recall::RecallIndex::build(binding.corpus.clone(), binding.config.clone())
+                        .map_err(InferenceLaneError::Recall)?,
+                );
+            }
+            let (evidence, context) = binding
+                .index
+                .as_ref()
+                .unwrap()
+                .prepare(&request.question, &scope)
+                .map_err(InferenceLaneError::Recall)?;
+            if evidence.passages.is_empty() {
+                recall_failure = Some(if evidence.stale.is_empty() {
+                    "No current retained passages match this question and scope."
+                } else {
+                    "Retained sources changed or became unavailable. Refresh the retained corpus before asking again."
+                }.into());
+            } else {
+                generation.context = context;
+            }
+            Some(evidence)
+        } else {
+            None
+        };
         let actor_id = table.next_actor_id;
         table.next_actor_id += 1;
         let index = table.runs.len();
@@ -623,12 +780,18 @@ impl InferenceLane {
             view: RunV1 {
                 run: request.run,
                 question: request.question,
-                state: RunStateV1::Queued,
+                state: if recall_failure.is_some() {
+                    RunStateV1::Failed
+                } else {
+                    RunStateV1::Queued
+                },
                 text: String::new(),
-                error: None,
+                error: recall_failure.clone(),
                 session,
                 tokens: 0,
                 continuations: Vec::new(),
+                #[cfg(feature = "inference-model")]
+                recall: recall_evidence,
             },
             actor_id,
             request: generation.clone(),
@@ -657,6 +820,10 @@ impl InferenceLane {
             }
         }
         table.by_actor_id.insert(actor_id, index);
+        if recall_failure.is_some() {
+            table.generation += 1;
+            return Ok(());
+        }
         let command = if self.shared.journal.is_some() {
             InferCommand::Checkpointed {
                 id: actor_id,
@@ -848,6 +1015,14 @@ impl InferenceLane {
                 runs.zeroize();
             }
         }
+        #[cfg(feature = "inference-model")]
+        if let Some(binding) = self.shared.recall.lock().unwrap().as_mut() {
+            binding.index = None;
+        }
+        #[cfg(feature = "inference-model")]
+        {
+            table.seen_recall_revision = None;
+        }
     }
 
     fn refresh_remote(&self) -> Result<(), String> {
@@ -922,12 +1097,16 @@ impl InferenceLane {
 
     /// The run table now.
     pub fn runs(&self) -> InferenceRunsV1 {
-        self.shared.table().view()
+        self.shared.view(&mut self.shared.table())
     }
 
     /// The table's change counter.
     pub fn generation(&self) -> u64 {
-        self.shared.table().generation
+        #[allow(unused_mut)]
+        let mut table = self.shared.table();
+        #[cfg(feature = "inference-model")]
+        self.shared.observe_recall(&mut table);
+        table.generation
     }
 
     /// Cancel every unfinished run, stop the actor and wait for both of the
@@ -1121,11 +1300,11 @@ impl ProjectionSource for InferenceAskEndpoint {
     fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, Self::Error> {
         self.own_session(&request.session, "snapshot")?;
         self.lane.refresh_remote()?;
-        let table = self.lane.shared.table();
+        let mut table = self.lane.shared.table();
         if table.locked {
             return Err("inference.ask is locked".into());
         }
-        let (runs, generation) = (table.view(), table.generation);
+        let (runs, generation) = (self.lane.shared.view(&mut table), table.generation);
         let runs_bytes = serde_json::to_vec(&runs).map_err(|error| error.to_string())?;
         let finished = runs
             .runs
@@ -1187,6 +1366,13 @@ impl IntentSink for InferenceAskEndpoint {
         self.own_session(&intent.session, "intent")?;
         let rejected = |reason: String| Ok(IntentResult::Rejected { reason });
         let outcome = match intent.intent.as_str() {
+            #[cfg(feature = "inference-model")]
+            recall::RECALL_ASK_INTENT => {
+                match serde_json::from_slice::<recall::RecallAskRequestV1>(&intent.payload) {
+                    Ok(ask) => self.lane.ask_recalled(ask),
+                    Err(error) => return rejected(error.to_string()),
+                }
+            },
             ASK_INTENT => match serde_json::from_slice::<AskRequestV1>(&intent.payload) {
                 Ok(ask) => self.lane.ask(ask),
                 Err(error) => return rejected(format!("{ASK_INTENT} payload: {error}")),
@@ -1349,6 +1535,8 @@ mod tests {
                         error: None,
                         session: None,
                         tokens: 0,
+                        #[cfg(feature = "inference-model")]
+                        recall: None,
                         continuations: Vec::new(),
                     },
                     actor_id: 0,

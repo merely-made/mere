@@ -1,10 +1,13 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-16):** in progress. I1 to I3 software gates done (§7):
+**Status (2026-10-16):** in progress. I1 to I4 software gates done (§7):
 strict decoder, declared templates, CPU and GPU model rows, native trainer
 owner reclaim, durable checkpoints, restart, lock recovery and keyed
-personal-graph continuation pass on O-PC. I4 recall is next. The new device
+personal-graph continuation pass on O-PC. I4's native gate adds BM25 recall,
+exact retained passage evidence and version-checked citations with the pinned
+SmolLM2 model. I5's Turnstone producer handoff and headed answer card are next.
+The new device
 boundary uses two separately rooted resident compositions on one computer;
 a physical second computer and installed-binary receipt remain separate.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
@@ -1022,3 +1025,71 @@ Stop and record the reason if any of these happen:
   - *Verification record.* [The personal-graph receipt](../../../support/receipts/resident_inference_personal.json)
     records the gate results, repeated comparisons and source/binary hashes.
     I3's software gate is closed. I4 recall with retained passage citations is next.
+
+
+- **2026-10-16, I4 retained lexical recall, native trained-model gate qualified.**
+  Distillery borrows a source-owned corpus. `PageTextCorpus` reads already-open
+  Eidetic page-text storage; capture, clip and Fleece producers use the same
+  source identity/current-version contract. The host never reopens an application's
+  private database or fetches a current URL as a substitute for a retained version.
+  The fixed corpus gate uses two version-bearing page-text sources.
+  - *Inputs and ranking.* Configurable Unicode chunk sizes and corpus/context/
+    passage limits bound a versioned deterministic chunker. The existing BM25
+    `DocumentIndex` uses passage content references as keys. Each passage binds
+    the source identity/version, canonical text hash, Unicode range, chunker and
+    exact text. `ask-recall-v1` records its source scope; the declared template
+    renders selected handles and text in the context field before generation.
+  - *Citations and stale sources.* Source owners revalidate current versions.
+    Stale or unavailable hits are reported and excluded. With no usable passages,
+    the ask is retained as failed before a token or checkpoint is generated.
+    The answer view distinguishes model-written numeric markers from host-made
+    annotations of a complete verbatim supplied-passage match. Both name the
+    exact passage artifact and answer span, and both disappear from the current
+    citation list when their source becomes stale or unavailable. Partial matches
+    and invented handles do not establish support. The configurable minimum quote
+    length defaults to 32 non-padding characters; zero disables host annotations.
+    Source changes advance the route revision so clients receive a notice; each
+    view uses one source-head observation for its revision and citation checks.
+    This does not assert semantic entailment of generated paraphrases. Historical inputs remain inspectable.
+  - *Durability and compatibility.* The journal saves supplied passages as native
+    sealed Eidetic artifacts and fills `InferenceRunRecord.supplied_passages`.
+    Original rendered prompts and passage evidence continue through I3's log.
+    Every context-bearing entry carries authenticated `required_semantics`:
+    old readers' deny-unknown envelope refuses it rather than answering a queued
+    question without its context. Existing ordinary asks retain their encoding.
+    Vault lock drops the derived recall index with the run materialization.
+  - *Composition boundary.* The native/embedded host lends its existing source
+    adapter through `configure_inference_recall`. Desktop Turnstone's producer
+    handoff, repin and headed answer card are I5 integration. This gate does not
+    claim automatic discovery of its app-owned browsing store, a headed run, or
+    concrete capture/clip/Fleece producer adapters beyond the shared contract.
+
+  - *Trained-model receipt.* The pinned SmolLM2-360M-Instruct library row answers
+    through a real Turnstone-labelled app connection to an in-process Djinn,
+    using its existing discrete GPU provider. BM25 selects one of two retained
+    observatory notes. The model returns the Pelican note's 81-character answer
+    verbatim; the service attaches a `verbatim_passage` citation over answer
+    positions 0..81. This is explicitly a host exact-quote annotation, not a claim
+    that the model generated a numeric citation marker. The prompt checkpoint
+    contains that passage's exact version and selector and excludes the other
+    note. Updating the source withdraws the citation; a subsequent scoped ask
+    remains a failed, zero-token run without a checkpoint. Lock refuses the route.
+    Restart reopens the finished answer and the identical sealed passage artifact
+    through `NoFetcher`, while keeping its stale citation suppressed.
+  - *Verification.* The new recall, downgrade-refusal and exact-quote controls
+    pass with the 48 Distillery unit tests and eight durability entries. The five
+    resident inference-route tests pass, including the real model and I3's
+    separately rooted personal-graph handoff. ESP passes 160 release unit tests,
+    two checkpoint tests, two library-session tests and five template tests.
+    All three GPU trainer-reclaim regressions pass, as do six inference settings/
+    attestation tests, four default-feature settings tests, 35 actor-only tests
+    and four retained page-text store tests. Formatting and the documentation
+    audit add no findings beyond the existing baseline. [The I4 receipt](../../../support/receipts/resident_inference_recall.json)
+    retains the exact native output, gate results and source/binary hashes. This is
+    a native software gate; installed-binary, headed application and broad
+    paraphrase-entailment claims remain outside this receipt. Two standalone
+    probe request literals also accept the new empty context field. The Wasm
+    browser probe passes `cargo check` with its existing lock dependency edges
+    refreshed and package versions unchanged. The native fixture build is separately blocked by fresh lock resolution through
+    `burn-tch`/`tch` to yanked `zip 0.6` versions; the resident gate uses the
+    existing workspace lock.

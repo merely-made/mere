@@ -97,6 +97,9 @@ impl OperationPolicy<RunExt> for Policy {
             // the address or parent check below refuses the operation.
             delta.tokens.zeroize();
             delta.text.zeroize();
+            delta
+                .check_semantics()
+                .map_err(|error| Reject::new("checkpoint-semantics", error))?;
             // Never persist a dangling cross-device child. A crash while
             // catching up must leave a causally closed store that can reopen;
             // LogSync can offer the child again after its parent is admitted.
@@ -138,6 +141,11 @@ impl OperationPolicy<RunExt> for Policy {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Delta {
+    /// Older checkpoint readers deny unknown fields. Keep this authenticated
+    /// marker on every context-bearing entry so they refuse rather than lose
+    /// queued context or passage evidence during deserialization.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    required_semantics: Option<String>,
     parent: Option<String>,
     /// Full state at creation and state/device transitions only.
     record: Option<RunRecord>,
@@ -150,6 +158,24 @@ struct Delta {
     evidence: Option<InferenceRunRecord>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     evidence_schema: Option<eidetic::SchemaRef>,
+}
+impl Delta {
+    fn check_semantics(&self) -> Result<(), String> {
+        if self
+            .required_semantics
+            .as_deref()
+            .is_some_and(|value| value != "recall/v1")
+        {
+            return Err("unsupported inference checkpoint semantics".into());
+        }
+        if let Some(record) = &self.record {
+            let needs_recall = record.view.recall.is_some() || !record.request.context.is_empty();
+            if needs_recall != self.required_semantics.is_some() {
+                return Err("checkpoint recall semantics do not match its retained inputs".into());
+            }
+        }
+        Ok(())
+    }
 }
 #[derive(Serialize, Deserialize)]
 struct Sealed {
@@ -517,6 +543,24 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
         .map(|blob| blob.map(|blob| blob.0))
         .map_err(|error| error.to_string())
     }
+    /// Open the immutable native passage artifact named by a retained run.
+    pub fn resolve_passage(
+        &self,
+        id: eidetic::ManifestId,
+    ) -> Result<Option<eidetic::models::recall::InferencePassage>, String> {
+        let _writer = self.writer.lock().unwrap();
+        for (_, (_, record)) in self.fold()? {
+            self.materialize_evidence(&record)?;
+        }
+        let mut backend = self.store.backend().clone();
+        pollster::block_on(eidetic::typed::load_typed_sealed(
+            &mut backend,
+            &mut eidetic::NoFetcher,
+            Some(self),
+            id,
+        ))
+        .map_err(|e| e.to_string())
+    }
     fn save_evidence<T: eidetic::TypedPayload>(
         &self,
         value: &T,
@@ -561,6 +605,11 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
             self.save_evidence(&eidetic::models::OpaqueBlob(
                 serde_json::to_vec(cp).map_err(|error| error.to_string())?,
             ))?;
+        }
+        if let Some(recall) = &record.view.recall {
+            for passage in &recall.passages {
+                self.save_evidence(&passage.passage)?;
+            }
         }
         self.save_evidence(&Self::evidence(record)?)
     }
@@ -654,7 +703,9 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
                 serde_json::from_slice(body.as_bytes()).map_err(|error| error.to_string())?;
             Zeroizing::new(self.crypt(&sealed.bytes, sealed.nonce, &op.header.extensions, false)?)
         };
-        serde_json::from_slice(&clear).map_err(|error| error.to_string())
+        let delta: Delta = serde_json::from_slice(&clear).map_err(|error| error.to_string())?;
+        delta.check_semantics()?;
+        Ok(delta)
     }
     fn fold(&self) -> Result<BTreeMap<String, (String, RunRecord)>, String> {
         let mut pending: BTreeMap<String, (RunExt, Delta)> = pollster::block_on(self.operations())?
@@ -742,7 +793,12 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
         Ok(InferenceRunRecord {
             run: record.view.run.clone(),
             question_blob: eidetic::ManifestId::of_blob(record.view.question.as_bytes()),
-            supplied_passages: Vec::new(),
+            supplied_passages: record
+                .view
+                .recall
+                .as_ref()
+                .map(|recall| recall.passages.iter().map(|p| p.passage.id()).collect())
+                .unwrap_or_default(),
             session_id: record
                 .view
                 .session
@@ -872,6 +928,9 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
         let mut heads = self.heads.lock().unwrap();
         let previous = heads.get(&record.view.run);
         let mut delta = Delta {
+            required_semantics: (record.view.recall.is_some()
+                || !record.request.context.is_empty())
+            .then(|| "recall/v1".into()),
             parent: previous.map(|(id, _)| id.clone()),
             record: Some(record.clone()),
             tokens: Vec::new(),
@@ -883,6 +942,9 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
             state: record.view.state,
         };
         if let Some((_, previous)) = previous {
+            if previous.view.recall != record.view.recall {
+                return Err("retained recall passages changed during an ask".into());
+            }
             if previous.view.question != record.view.question
                 || previous.request != record.request
                 || record.continuations.len() < previous.continuations.len()
@@ -1004,6 +1066,59 @@ mod tests {
             [9; 32],
         )
     }
+    #[test]
+    fn recall_entries_refuse_legacy_readers_instead_of_losing_context() {
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        #[allow(dead_code)]
+        struct LegacyDelta {
+            parent: Option<String>,
+            record: Option<serde_json::Value>,
+            tokens: Vec<u32>,
+            text: String,
+            draws: u64,
+            complete: bool,
+            state: RunStateV1,
+            #[serde(default)]
+            evidence: Option<serde_json::Value>,
+            #[serde(default)]
+            evidence_schema: Option<serde_json::Value>,
+        }
+        let delta = Delta {
+            required_semantics: Some("recall/v1".into()),
+            parent: None,
+            record: None,
+            tokens: vec![],
+            text: String::new(),
+            draws: 0,
+            complete: false,
+            state: RunStateV1::Queued,
+            evidence: None,
+            evidence_schema: None,
+        };
+        let encoded = serde_json::to_vec(&delta).unwrap();
+        assert!(
+            serde_json::from_slice::<LegacyDelta>(&encoded)
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("required_semantics")
+        );
+        let current: Delta = serde_json::from_slice(&encoded).unwrap();
+        current.check_semantics().unwrap();
+        let mut ordinary = delta;
+        ordinary.required_semantics = None;
+        let encoded = serde_json::to_vec(&ordinary).unwrap();
+        serde_json::from_slice::<LegacyDelta>(&encoded).unwrap();
+        let mut unsupported: Delta = serde_json::from_slice(&encoded).unwrap();
+        unsupported.required_semantics = Some("future/v9".into());
+        assert!(unsupported.check_semantics().is_err());
+        let mut record = paused();
+        record.request.context = "retained context".into();
+        unsupported.required_semantics = None;
+        unsupported.record = Some(record);
+        assert!(unsupported.check_semantics().is_err());
+    }
     fn paused() -> RunRecord {
         RunRecord {
             view: RunV1 {
@@ -1015,6 +1130,7 @@ mod tests {
                 session: None,
                 tokens: 0,
                 continuations: Vec::new(),
+                recall: None,
             },
             actor_id: 0,
             request: GenerationRequest {

@@ -28,6 +28,7 @@ sceno.workspace = true
 scenomise.workspace = true
 scenotime.workspace = true
 eidetic = { workspace = true, optional = true }
+eidetic-search = { workspace = true, optional = true }
 # The decoder half is named by the features that need it (`trainer`,
 # `flora`), so `inference` can carry the actor without the Burn stack.
 esp = { workspace = true, optional = true }
@@ -67,7 +68,7 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 # model runtime: the host supplies the provider.
 inference = ["dep:esp", "esp/actor", "dep:armillary"]
 inference-gpu = ["inference-model", "esp/decoder-wgpu"]
-inference-model = ["inference", "esp/decoder", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]
+inference-model = ["dep:eidetic-search", "inference", "esp/decoder", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]
 
 [dev-dependencies]
 safetensors = "0.4"

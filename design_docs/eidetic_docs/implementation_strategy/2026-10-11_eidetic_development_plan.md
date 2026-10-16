@@ -462,8 +462,14 @@ remain proposals admitted by the owning application. The 2026-10-15 resident
 inference I3 slice adds the `models::inference::InferenceRunRecord` binding for
 question/output/checkpoint references, request and exact-session evidence,
 distinct terminal/paused states, device visits and actual comparison provenance.
-Distillery retains it in the encrypted checkpoint log; supplied passage refs
-remain empty until I4, and derived tag proposals remain separate. This is the evidence side
+Distillery retains it in the encrypted checkpoint log. The 2026-10-16 I4
+continuation adds `models::recall::InferencePassage`: exact source identity and
+version, canonical text hash, Unicode selector, versioned chunker and supplied
+text. Distillery seals those artifacts and fills the run's supplied passage refs;
+its native trained-model gate is qualified against the pinned SmolLM2 row and
+separately owned page-text storage. Source owners retain their
+stores and current-version authority, and current citations fail closed on
+staleness. Derived tag proposals remain separate. This is the evidence side
 of the Distillery plan's M2/M3, not another execution supervisor.
 
 **Done when:** restart accepts a matching embedding envelope and rejects a
