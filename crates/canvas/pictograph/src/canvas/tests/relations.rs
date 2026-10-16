@@ -136,6 +136,25 @@ fn self_links_draw_separate_strata_loops_and_select_through_node_pick_area() {
     );
     assert!(self_links.iter().all(|link| link.points.len() > 2));
     assert_ne!(self_links[0].points[4], self_links[1].points[4]);
+    let node_size = canvas.node_size(node);
+    let boundary_y = canvas.view.position_of(node).unwrap().y - node_size * 0.5;
+    let min_x = canvas.view.position_of(node).unwrap().x - node_size * 0.5;
+    let max_x = canvas.view.position_of(node).unwrap().x + node_size * 0.5;
+    for segment in &self_links {
+        for endpoint in [
+            segment.points.first().unwrap(),
+            segment.points.last().unwrap(),
+        ] {
+            assert!(
+                (endpoint.y - boundary_y).abs() < 0.001,
+                "self-link endpoint must meet the top boundary: {endpoint:?} vs {boundary_y}"
+            );
+            assert!(
+                endpoint.x >= min_x - 0.001 && endpoint.x <= max_x + 0.001,
+                "self-link endpoint must stay within the node's horizontal bounds: {endpoint:?} not in [{min_x}, {max_x}]"
+            );
+        }
+    }
 
     for segment in self_links {
         let pick = segment.points[5];
