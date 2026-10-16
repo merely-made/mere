@@ -1265,3 +1265,13 @@ and track-sample landmarks while capture identities stay unplaced; timestamps
 and track names do not become position authority. Actual RF coverage and native
 host acceptance remain separate work. The [adapter receipt](../support/design-studies/backdrops/adapters/qualification.json)
 records the cross-repository source cohort and exercised export/render paths.
+
+The sequence-template follow-up uses Woodshed progressions as a second
+structural consumer alongside metre. `scenomise::template` supplies lanes,
+nested groups, tick spans, expected slots, source occurrences and explained
+alignments. Metre keeps stress/rhyme semantics while sharing foot grouping and
+position geometry. Woodshed exports relative roles and supplied song-block
+arrangements, including sustained blocks and rests, with no inferred harmonic
+judgment. Graphshell's Portable scenes includes actual exports in C and G.
+The [decision and qualification guide](../support/design-studies/backdrops/templates/README.md)
+records limits, reproduction and the exercised host paths.

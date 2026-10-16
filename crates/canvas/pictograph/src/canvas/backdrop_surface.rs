@@ -300,6 +300,16 @@ impl BackdropSurface {
                 _ => theme.category,
             };
             if mark.selectable {
+                // A selectable occurrence can occupy a disclosed span. Its
+                // extent remains visible while attention marks its centre.
+                if let Footprint::Rect { size } = item.footprint {
+                    commands.push(path(
+                        &rect(at, size.w * fit.scale, size.h * fit.scale),
+                        true,
+                        Some(alpha(color, if forward { 0.32 } else { 0.16 })),
+                        Some(stroke(alpha(color, 0.45), 1.0, None)),
+                    ));
+                }
                 if forward {
                     let disc = circle(at, 15.0);
                     commands.push(path(
@@ -350,10 +360,11 @@ impl BackdropSurface {
         }
         for (i, label) in self.compiled.guides.iter().enumerate() {
             let p = point(label.at);
+            let width = (label.text.chars().count() as f32 * 7.5).clamp(44.0, 600.0);
             labels.push((
                 format!("guide-{i}"),
                 label.text.clone(),
-                BoardRect::new(p.x - 22.0, p.y - 8.0, 44.0, 16.0),
+                BoardRect::new(p.x - width / 2.0, p.y - 8.0, width, 16.0),
             ));
         }
         let [r, g, b, a] = theme.text;
@@ -523,6 +534,44 @@ mod tests {
         assert!(surface.retained().contains("string-5-fret-3"));
         assert!(surface.select(Some("missing")).is_err());
         assert_eq!(surface.selected(), Some("string-2-fret-1"));
+    }
+    #[test]
+    fn progression_span_is_pickable_at_its_edge_and_refusal_preserves_attention() {
+        let input = SceneInput::parse(include_str!(
+            "../../../../../support/design-studies/backdrops/templates/progression.json"
+        ))
+        .unwrap();
+        let mut surface = BackdropSurface::new(&input).unwrap();
+        let mark = surface
+            .scene()
+            .marks
+            .iter()
+            .find(|m| m.key == "bar-2")
+            .unwrap();
+        let item = &surface.scene().scene.items[mark.instance.0 as usize];
+        let Footprint::Rect { size } = item.footprint else {
+            panic!("span footprint required")
+        };
+        let p = item.transform.translate;
+        let fit = surface.fit(900, 540).unwrap();
+        let (x, y) = fit.to_viewport((p.x + size.w / 2.0 - 1.0, p.y));
+        assert_eq!(surface.pick(x, y, 900, 540), Some("bar-2"));
+        surface.select(Some("bar-2")).unwrap();
+        let before = surface.scene().clone();
+        let mut invalid = input;
+        let scenomise::backdrops::SceneFacts::TemplatedSequence(sequence) = &mut invalid.facts
+        else {
+            unreachable!()
+        };
+        sequence.occurrences[2]
+            .placement
+            .as_mut()
+            .unwrap()
+            .span
+            .length = u32::MAX;
+        assert!(surface.replace(&invalid).is_err());
+        assert_eq!(surface.selected(), Some("bar-2"));
+        assert_eq!(surface.scene(), &before);
     }
     #[test]
     fn painting_requires_host_fonts_and_valid_viewport() {

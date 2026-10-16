@@ -47,6 +47,7 @@ pub mod matrix;
 pub mod opened_link;
 pub mod projection;
 pub mod registry;
+pub mod template;
 mod relax;
 mod solve;
 

@@ -5,6 +5,7 @@
 //! positions and coverage contours; this module supplies geometry, never
 //! analysis, radio prediction, persistence or application authority.
 
+use crate::template::{SequenceTemplate, Span, TemplateGroup, TemplatedSequence};
 use sceno::{
     Backdrop, Footprint, InstanceId, ProjectedItem, Rect, Region, Representation, RoutedRelation,
     Scene, Size2, SourceRef, Transform2, Vec2,
@@ -36,6 +37,7 @@ pub struct SceneInput {
 )]
 pub enum SceneFacts {
     MetreGrid(MetreGrid),
+    TemplatedSequence(TemplatedSequence),
     Fretboard(Fretboard),
     TerrainCoverage(TerrainCoverage),
 }
@@ -352,6 +354,9 @@ impl SceneInput {
                 }
                 check(count <= MAX_MARKS, "metre", "too many marks")?;
             },
+            SceneFacts::TemplatedSequence(sequence) => {
+                sequence.validate().map_err(|e| error("template", e))?
+            },
             SceneFacts::Fretboard(board) => {
                 check(
                     board.strings.iter().all(|s| s.open_midi <= 127),
@@ -506,6 +511,7 @@ impl SceneInput {
         let src = out.scene.intern_source(self.source.clone());
         match &self.facts {
             SceneFacts::MetreGrid(grid) => compile_metre(&mut out, src, grid),
+            SceneFacts::TemplatedSequence(sequence) => compile_sequence(&mut out, src, sequence),
             SceneFacts::Fretboard(board) => compile_fretboard(&mut out, src, board),
             SceneFacts::TerrainCoverage(map) => compile_terrain(&mut out, src, map),
         }
@@ -629,11 +635,167 @@ fn relation(
     });
     out.relations.push(RelationReading { index, label, why });
 }
+/// Shared groups and coordinates. Domain-specific marks and judgments stay
+/// with their owning recipe/adapter.
+fn draw_template(out: &mut BackdropScene, src: sceno::SourceIx, template: &SequenceTemplate) {
+    for (i, label) in template.lanes.iter().enumerate() {
+        if !label.is_empty() {
+            out.guides.push(GuideLabel {
+                at: Vec2::new(
+                    template.x(template.extent as f32 / 2.0),
+                    template.y(i as u16) - 40.0,
+                ),
+                text: label.clone(),
+            });
+        }
+    }
+    let depths = template.depths();
+    let mut lane_depth = vec![0; template.lanes.len()];
+    for group in &template.groups {
+        lane_depth[group.lane as usize] =
+            lane_depth[group.lane as usize].max(depths[group.key.as_str()]);
+    }
+    for group in &template.groups {
+        let depth = depths[group.key.as_str()];
+        let max_depth = lane_depth[group.lane as usize];
+        let y = template.y(group.lane) + 33.0 + (max_depth - depth) as f32 * 20.0;
+        let a = template.x(group.span.start as f32);
+        let b = template.x(group.span.end().unwrap() as f32) - 5.0;
+        guide(
+            out,
+            src,
+            vec![
+                Vec2::new(a, y),
+                Vec2::new(a, y + 4.0),
+                Vec2::new(b, y + 4.0),
+                Vec2::new(b, y),
+            ],
+        );
+        if !group.label.is_empty() {
+            out.guides.push(GuideLabel {
+                at: Vec2::new((a + b) / 2.0, y + 16.0),
+                text: group.label.clone(),
+            });
+        }
+    }
+}
+fn compile_sequence(out: &mut BackdropScene, src: sceno::SourceIx, sequence: &TemplatedSequence) {
+    use std::collections::HashMap;
+    let t = &sequence.template;
+    draw_template(out, src, t);
+    out.scene.bounds = Rect::new(
+        Vec2::ZERO,
+        Size2::new(t.x(t.extent as f32) + 48.0, 154.0 * t.lanes.len() as f32),
+    );
+    let source = out.scene.sources[src.0 as usize].clone();
+    let mut anchors = HashMap::new();
+    for slot in &sequence.slots {
+        let centre = t.centre(slot.lane, slot.span);
+        let at = Vec2::new(centre.x, centre.y + 20.0);
+        let id = mark(
+            out,
+            slot.key.clone(),
+            &source,
+            slot.label.clone(),
+            format!(
+                "Expected: {} · {} ticks at {} · {}",
+                slot.expectation, slot.span.length, slot.span.start, t.unit_label
+            ),
+            MarkRole::Node,
+            at,
+            Footprint::Circle { radius: 3.0 },
+            true,
+            Some(Vec2::new(at.x, at.y + 12.0)),
+        );
+        anchors.insert(slot.key.as_str(), (id, at));
+        if !sequence
+            .occurrences
+            .iter()
+            .any(|o| o.slot.as_ref() == Some(&slot.key))
+        {
+            out.diagnostics.push(format!(
+                "{}: no source occurrence aligned; expectation remains open",
+                slot.key
+            ));
+        }
+    }
+    for occurrence in &sequence.occurrences {
+        let Some(p) = &occurrence.placement else {
+            out.unplaced.push(Unplaced {
+                key: occurrence.key.clone(),
+                source: occurrence.source.clone(),
+                label: occurrence.label.clone(),
+                reason: format!("No supplied alignment · {}", occurrence.detail),
+            });
+            continue;
+        };
+        let centre = t.centre(p.lane, p.span);
+        let at = Vec2::new(centre.x, centre.y - 10.0);
+        let width = t.x(p.span.length as f32) - t.x(0.0) - 8.0;
+        let id = mark(
+            out,
+            occurrence.key.clone(),
+            &occurrence.source,
+            occurrence.label.clone(),
+            format!(
+                "{} · start {} / span {} ticks · {}",
+                occurrence.detail, p.span.start, p.span.length, t.unit_label
+            ),
+            MarkRole::Other,
+            at,
+            Footprint::Rect {
+                size: Size2::new(width.max(3.0), 12.0),
+            },
+            true,
+            Some(Vec2::new(at.x, at.y - 12.0)),
+        );
+        anchors.insert(occurrence.key.as_str(), (id, at));
+        if let Some(slot) = &occurrence.slot {
+            let (to, point) = anchors[slot.as_str()];
+            relation(
+                out,
+                id,
+                to,
+                vec![at, point],
+                "template.alignment",
+                "Alignment".into(),
+                "Source-declared alignment to expectation; no conformity judgment inferred".into(),
+            );
+        }
+    }
+    for r in &sequence.relations {
+        if let (Some(&(from, a)), Some(&(to, b))) =
+            (anchors.get(r.from.as_str()), anchors.get(r.to.as_str()))
+        {
+            let points = (0..=24)
+                .map(|i| {
+                    let u = i as f32 / 24.0;
+                    Vec2::new(
+                        a.x + (b.x - a.x) * u,
+                        a.y + (b.y - a.y) * u - 22.0 * 4.0 * u * (1.0 - u),
+                    )
+                })
+                .collect();
+            relation(
+                out,
+                from,
+                to,
+                points,
+                &r.kind,
+                r.label.clone(),
+                r.why.clone(),
+            );
+        } else {
+            out.diagnostics.push(format!(
+                "{}: relation has an unplaced endpoint; {}",
+                r.label, r.why
+            ));
+        }
+    }
+}
 fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid) {
     let slot = 47.0;
-    let x = 48.0;
-    let row = 94.0;
-    let positions = grid.positions_per_foot as f32;
+    let row = 154.0;
     let n = grid.feet as usize * grid.positions_per_foot as usize;
     let max_syllables = grid
         .lines
@@ -642,14 +804,38 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
         .max()
         .unwrap_or(n)
         .max(n);
-    let right = x + max_syllables as f32 * slot + 38.0;
+    let template = SequenceTemplate {
+        lanes: vec![String::new(); grid.lines.len().max(1)],
+        extent: max_syllables.max(1) as u32,
+        ticks_per_unit: 1,
+        unit_label: "metrical position".into(),
+        groups: grid
+            .lines
+            .iter()
+            .enumerate()
+            .flat_map(|(i, line)| {
+                (0..grid.feet).map(move |foot| TemplateGroup {
+                    key: format!("{}/foot/{foot}", line.key),
+                    lane: i as u16,
+                    span: Span {
+                        start: u32::from(foot) * u32::from(grid.positions_per_foot),
+                        length: u32::from(grid.positions_per_foot),
+                    },
+                    parent: None,
+                    label: String::new(),
+                })
+            })
+            .collect(),
+    };
+    draw_template(out, src, &template);
+    let right = template.x(max_syllables as f32) + 38.0;
     out.scene.bounds = Rect::new(
         Vec2::ZERO,
         Size2::new(right + 90.0, 42.0 + row * grid.lines.len().max(1) as f32),
     );
     let mut rows = Vec::new();
     for (i, line) in grid.lines.iter().enumerate() {
-        let y = 60.0 + i as f32 * row;
+        let y = template.y(i as u16);
         let detail = format!(
             "{} syllables / {} expected; rhyme {}",
             line.syllables.len(),
@@ -672,21 +858,16 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
             size: Size2::new(36.0, 44.0),
         });
         rows.push(id);
-        for foot in 0..grid.feet {
-            let a = x + foot as f32 * positions * slot;
-            guide(
-                out,
-                src,
-                vec![
-                    Vec2::new(a, y + 33.0),
-                    Vec2::new(a, y + 37.0),
-                    Vec2::new(a + slot * positions - 5.0, y + 37.0),
-                    Vec2::new(a + slot * positions - 5.0, y + 33.0),
-                ],
-            );
-        }
         for (j, syllable) in line.syllables.iter().enumerate() {
-            let sx = x + (j as f32 + 0.5) * slot;
+            let sx = template
+                .centre(
+                    i as u16,
+                    Span {
+                        start: j as u32,
+                        length: 1,
+                    },
+                )
+                .x;
             let h = if syllable.stressed { 24.0 } else { 7.0 };
             mark(
                 out,
@@ -742,8 +923,8 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
             .as_ref()
             .zip(line.rhyme_tail.as_ref())
             .is_some_and(|(a, b)| a == b);
-        let y1 = 60.0 + a as f32 * row;
-        let y2 = 60.0 + b as f32 * row;
+        let y1 = template.y(a as u16);
+        let y2 = template.y(b as u16);
         let points = (0..=24)
             .map(|step| {
                 let t = step as f32 / 24.0;

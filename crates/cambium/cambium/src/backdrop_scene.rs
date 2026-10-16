@@ -181,6 +181,7 @@ pub const BACKDROP_SCENE_CSS: &str = "\
  .backdrop-scene-workspace { display:flex; flex-direction:column; flex:1 1 auto; min-width:0; } \
  .backdrop-scene-bar { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 12px; border-bottom:1px solid var(--workspace-rule, #444d3e); } \
  .backdrop-scene-body { display:flex; flex-direction:row; min-width:0; } \
+ .backdrop-scene-stage { min-width:0; max-width:100%; flex:1 1 auto; overflow-x:auto; } \
  .backdrop-scene-reading { width:240px; flex:none; padding:12px; border-left:1px solid var(--workspace-rule, #444d3e); overflow-wrap:anywhere; } \
  .backdrop-scene-reading h3 { font-size:13px; font-weight:500; margin:4px 0 8px; } \
  .backdrop-scene-reading p { font-size:12px; margin:6px 0; } \
