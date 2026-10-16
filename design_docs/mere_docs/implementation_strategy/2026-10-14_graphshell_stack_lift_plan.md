@@ -1455,3 +1455,16 @@ fast-forward of local main; nothing built).**
   `ports/djinn/tests/device_directory.rs` fail to bind its socket (it passed with
   `TMPDIR=/tmp`), while knot-site's export tests need a symlink-free `TMPDIR`
   (`/private/tmp`).
+- **2026-10-15 (convention extended to wgpu-weld, smolweb and vano; dramatis
+  blocked):** none of those four repositories names a family repository in its own
+  manifests, so the switch is in their consumers' rows. Landed: Genet `e37762d`
+  (vano; `script-engine-nova` checks and 43 tests pass), Mere `4e2828c`
+  (wgpu-weld; `weld-engine` 11 tests, djinn, graphshell-host, cambium, scenomise
+  and inker check clean), Knot `8196f98` (smolweb; knot-site, knot-editor and
+  knot-desktop tests pass), Turnstone `efdc67c` (wgpu-weld and smolweb, Mere
+  `4e2828ce`; 942 passed, 10 ignored). Dramatis is not switched: Cleromancy, which
+  Mere's Djinn pins at `2851e6b0` and which stays with its own lane, names Dramatis
+  by `rev` at the plain URL, so any consumer that flips keeps a second Dramatis
+  source through it, and Cargo cannot bridge that. It flips when Cleromancy does
+  (its handoff, task 2), together with Mere, Murm `native/`, Knot, Turnstone and
+  Woodshed in one pass.
