@@ -435,6 +435,9 @@ pub struct Canvas {
     /// This is local view curation, never graph truth. Pointer pulls may update
     /// a held node, but only an explicit release returns it to the solver.
     pinned_nodes: HashSet<NodeKey>,
+    /// The graph grammar's attention and seed (`attention.rs`): view-local,
+    /// never graph truth.
+    grammar: attention::GrammarState,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
@@ -818,6 +821,7 @@ impl Default for Canvas {
 
 mod actions;
 pub(crate) mod at_rest;
+mod attention;
 mod cartography;
 mod derived_face;
 mod framing;

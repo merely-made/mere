@@ -28,6 +28,7 @@ fn retract_via_delta(
 impl Canvas {
     /// Replace the selection with just `key` (clearing any selected nodes/edges).
     pub(crate) fn select_only(&mut self, key: NodeKey) {
+        self.sync_attention();
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
@@ -89,6 +90,7 @@ impl Canvas {
         let Some(key) = self.graph.get_node_key_by_id(member) else {
             return false;
         };
+        self.sync_attention();
         if !self.selected.remove(&key) {
             self.selected.insert(key);
         }
@@ -111,6 +113,7 @@ impl Canvas {
         let id = self.graph.get_node(key)?.id;
         let _ = apply_graph_delta(&mut self.graph, GraphDelta::RemoveNode { key });
         self.pinned_nodes.remove(&key);
+        self.sync_attention();
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
@@ -127,6 +130,7 @@ impl Canvas {
         if self.selected.is_empty() && self.selected_links.is_empty() {
             return;
         }
+        self.sync_attention();
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();

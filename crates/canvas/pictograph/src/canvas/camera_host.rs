@@ -75,6 +75,12 @@ pub trait FitHost: CameraHost {
         false
     }
     fn set_physics_paused(&mut self, _paused: bool) {}
+    /// The graph grammar's seed and attention verbs (`attention.rs`).
+    fn reset_to_seed(&mut self) {}
+    fn set_seed(&mut self) {}
+    fn restore_recipe_seed(&mut self) {}
+    fn dismiss_all_retained(&mut self) {}
+    fn toggle_selection_foreground_pin(&mut self) {}
 }
 
 /// What [`super::face_alignment::FaceAlignment`] measures: each node's face
@@ -142,6 +148,26 @@ impl FitHost for Canvas {
 
     fn set_physics_paused(&mut self, paused: bool) {
         Canvas::set_physics_paused(self, paused);
+    }
+
+    fn reset_to_seed(&mut self) {
+        Canvas::reset_to_seed(self);
+    }
+
+    fn set_seed(&mut self) {
+        Canvas::set_seed(self);
+    }
+
+    fn restore_recipe_seed(&mut self) {
+        Canvas::restore_recipe_seed(self);
+    }
+
+    fn dismiss_all_retained(&mut self) {
+        Canvas::dismiss_all_retained(self);
+    }
+
+    fn toggle_selection_foreground_pin(&mut self) {
+        Canvas::toggle_selection_foreground_pin(self);
     }
 }
 
