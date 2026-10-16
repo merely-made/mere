@@ -734,6 +734,9 @@ tinct = { path = "crates/cambium/tinct" }
 uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 
+# Kept until Cleromancy switches to branch = "main" (family source convention):
+# its pinned revision still names Mere through the www alias, and a patch from the
+# www URL onto the workspace members is the one bridge Cargo allows here.
 # Canonical-www consumer pins must share the same workspace contracts as
 # the portable Cleromancy domain validator composed into Djinn.
 [patch."https://www.github.com/merely-made/mere.git"]
