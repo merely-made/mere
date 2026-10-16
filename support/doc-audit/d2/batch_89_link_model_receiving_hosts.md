@@ -78,3 +78,16 @@ native review; its scenario now types through the real textbox. Knot's full
 detail handles wrap while its Timeline keeps compact geometry. Its existing
 plaintext checkpoint remains recorded in Knot's owner plan; this work does
 not claim a storage migration.
+
+
+### P4 source continuation (2026-10-16)
+
+The next authorized phase is in progress from Mere `b31363d2d` and Woodshed
+`284fa340`; this does not change P3's published qualification. The source pass
+carries canonical link identity through routed scenes, groups resting strokes,
+keeps direction/opposition marks and re-keys whole-link hides while preserving
+old exact member filters. Core Sceno/Scenograph/Cambium/Sprigging checks pass;
+Pictograph, integrated host, native receiving and saved-visibility reopening
+remain required before P4 is qualified. The implementation plan records those
+specific done conditions. No native or browser acceptance is inferred from the
+source changes or early package checks.

@@ -4,13 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Relation cells: picking a fanned parallel cell, and retracting / hiding one
-//! cell without disturbing its neighbours in the same bundle.
+//! Link-key hit testing and compatibility behavior for exact directed filters.
 
 use super::*;
 
 #[test]
-fn edge_cell_hit_test_picks_fanned_parallel_relation_cells() {
+fn parallel_assertions_share_one_stroke_and_one_link_key_hit_target() {
     let mut canvas = Canvas::new();
     let a = canvas.open_member_as_new_node(None, "https://fan-a.test");
     let b = canvas.open_member_as_new_node(None, "https://fan-b.test");
@@ -25,50 +24,192 @@ fn edge_cell_hit_test_picks_fanned_parallel_relation_cells() {
         .view
         .set_position(bk, euclid::default::Point2D::new(100.0, 0.0));
 
-    let pair = if ak <= bk { (ak, bk) } else { (bk, ak) };
-    let segments: Vec<_> = crate::canvas::edge_cells::visible_edge_cell_segments(
+    let key = scenograph::link::LinkKey::new(
+        scenograph::link::LinkStratum::Resource,
+        canvas
+            .graph()
+            .resource(canvas.graph().shown_resource_id(ak).unwrap())
+            .unwrap()
+            .canonical_iri(),
+        canvas
+            .graph()
+            .resource(canvas.graph().shown_resource_id(bk).unwrap())
+            .unwrap()
+            .canonical_iri(),
+    );
+    let segments: Vec<_> = crate::canvas::edge_cells::visible_link_appearances(
         canvas.graph(),
         &canvas.view,
+        &canvas.hidden_links,
         &canvas.hidden_edges,
     )
     .into_iter()
-    .filter(|segment| segment.cell.endpoint_pair() == pair)
+    .filter(|segment| segment.appearance.key == key)
     .collect();
     assert_eq!(
         segments.len(),
-        2,
-        "the pair exposes two relation-cell lanes"
+        1,
+        "parallel assertions produce one resting stroke"
     );
 
     let before = serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap();
-    for segment in segments {
-        let midpoint = euclid::default::Point2D::new(
-            (segment.from.x + segment.to.x) * 0.5,
-            (segment.from.y + segment.to.y) * 0.5,
-        );
-        assert_eq!(
-            crate::canvas::edge_cells::edge_cell_hit_test(
-                canvas.graph(),
-                &canvas.view,
-                &canvas.hidden_edges,
-                midpoint,
-                1.0,
-            ),
-            Some(segment.cell),
-            "the fanned lane picks its own relation cell"
-        );
-        canvas.selected_edges.insert(segment.cell);
-    }
+    let segment = &segments[0];
+    let midpoint = euclid::default::Point2D::new(
+        (segment.from.x + segment.to.x) * 0.5,
+        (segment.from.y + segment.to.y) * 0.5,
+    );
     assert_eq!(
-        canvas.selected_link_pairs(),
-        vec![(a.min(b), a.max(b))],
-        "parallel selected cells open one derived link without collapsing source assertions"
+        crate::canvas::edge_cells::link_hit_test(
+            canvas.graph(),
+            &canvas.view,
+            &canvas.hidden_links,
+            &canvas.hidden_edges,
+            midpoint,
+            1.0,
+            |_| true,
+        )
+        .map(|appearance| appearance.key),
+        Some(key.clone()),
+        "stroke hit resolves the canonical link identity"
+    );
+    canvas.selected_links.insert(key.clone());
+    assert_eq!(
+        canvas.selected_link_keys(),
+        vec![key.clone()],
+        "parallel assertions produce one open target"
+    );
+    assert_eq!(
+        canvas.link_appearance_pair(&key),
+        Some((a, b)),
+        "a Resource key resolves its actual displayed appearance"
     );
     assert_eq!(
         serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap(),
         before,
         "opening a lifted link leaves its source assertions unchanged"
     );
+}
+
+#[test]
+fn closing_a_link_hides_all_parallel_assertions_under_one_key() {
+    let mut canvas = Canvas::new();
+    let a = canvas.open_member_as_new_node(None, "https://closed-a.test");
+    let b = canvas.open_member_as_new_node(None, "https://closed-b.test");
+    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
+    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
+    assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Cites));
+    assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Quotes));
+    canvas
+        .view
+        .set_position(ak, euclid::default::Point2D::new(0.0, 0.0));
+    canvas
+        .view
+        .set_position(bk, euclid::default::Point2D::new(100.0, 0.0));
+    let key = scenograph::link::LinkKey::new(
+        scenograph::link::LinkStratum::Resource,
+        canvas
+            .graph()
+            .resource(canvas.graph().shown_resource_id(ak).unwrap())
+            .unwrap()
+            .canonical_iri(),
+        canvas
+            .graph()
+            .resource(canvas.graph().shown_resource_id(bk).unwrap())
+            .unwrap()
+            .canonical_iri(),
+    );
+    canvas.selected_links.insert(key.clone());
+    assert_eq!(canvas.hide_selected_links(), 1);
+    assert!(
+        crate::canvas::edge_cells::visible_link_appearances(
+            canvas.graph(),
+            &canvas.view,
+            &canvas.hidden_links,
+            &canvas.hidden_edges,
+        )
+        .into_iter()
+        .all(|segment| segment.appearance.key != key)
+    );
+    assert_eq!(canvas.graph().projected_relations().count(), 2);
+}
+
+#[test]
+fn legacy_member_filters_reduce_one_link_summary_without_becoming_link_identity() {
+    let mut canvas = Canvas::new();
+    let a = canvas.open_member_as_new_node(None, "https://legacy-filter-a.test");
+    let b = canvas.open_member_as_new_node(None, "https://legacy-filter-b.test");
+    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
+    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
+    assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Cites));
+    assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Quotes));
+    canvas
+        .view
+        .set_position(ak, euclid::default::Point2D::new(0.0, 0.0));
+    canvas
+        .view
+        .set_position(bk, euclid::default::Point2D::new(100.0, 0.0));
+    let key = scenograph::link::LinkKey::new(
+        scenograph::link::LinkStratum::Resource,
+        canvas
+            .graph()
+            .resource(canvas.graph().shown_resource_id(ak).unwrap())
+            .unwrap()
+            .canonical_iri(),
+        canvas
+            .graph()
+            .resource(canvas.graph().shown_resource_id(bk).unwrap())
+            .unwrap()
+            .canonical_iri(),
+    );
+    let (from, to) = canvas
+        .graph()
+        .projected_relations()
+        .find_map(|(_, row)| {
+            (row.kind == RelationKind::Semantic(SemanticSubKind::Cites))
+                .then_some((row.from, row.to))
+        })
+        .unwrap();
+    let hidden = HashSet::from([EdgeCell {
+        from,
+        to,
+        selector: RelationSelector::Semantic(SemanticSubKind::Cites),
+    }]);
+    let segments = crate::canvas::edge_cells::visible_link_appearances(
+        canvas.graph(),
+        &canvas.view,
+        &HashSet::new(),
+        &hidden,
+    );
+    assert_eq!(segments.len(), 1);
+    assert_eq!(segments[0].appearance.key, key);
+    assert_eq!(segments[0].appearance.strength, 1.0);
+}
+
+#[test]
+fn antiparallel_and_opposed_assertions_become_marks_on_one_resting_stroke() {
+    let mut canvas = Canvas::new();
+    let a = canvas.open_member_as_new_node(None, "https://marks-a.test");
+    let b = canvas.open_member_as_new_node(None, "https://marks-b.test");
+    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
+    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
+    canvas.assert_relation_between_members(a, b, SemanticSubKind::Supports);
+    canvas.assert_relation_between_members(b, a, SemanticSubKind::Contradicts);
+    canvas
+        .view
+        .set_position(ak, euclid::default::Point2D::new(0.0, 0.0));
+    canvas
+        .view
+        .set_position(bk, euclid::default::Point2D::new(100.0, 0.0));
+    let segments = crate::canvas::edge_cells::visible_link_appearances(
+        canvas.graph(),
+        &canvas.view,
+        &HashSet::new(),
+        &HashSet::new(),
+    );
+    assert_eq!(segments.len(), 1, "two directions share one link stroke");
+    assert!(segments[0].appearance.marks.forward);
+    assert!(segments[0].appearance.marks.reverse);
+    assert!(segments[0].appearance.marks.opposed);
 }
 
 #[test]
@@ -84,16 +225,6 @@ fn retract_selected_relation_removes_the_user_relation() {
     canvas.assert_selected_relation(SemanticSubKind::UserGrouped);
     let with_edge = canvas.graph().relations().count();
 
-    // The edge is stored in the asserted (uuid-sorted) direction; select it and
-    // retract.
-    let mut pair = [ak, bk];
-    pair.sort_by_key(|k| canvas.graph().get_node(*k).map(|n| n.id));
-    canvas.selected_edges.clear();
-    canvas.selected_edges.insert(EdgeCell {
-        from: pair[0],
-        to: pair[1],
-        selector: RelationSelector::Semantic(SemanticSubKind::UserGrouped),
-    });
     assert_eq!(
         canvas.retract_selected_relation(),
         1,
@@ -105,28 +236,26 @@ fn retract_selected_relation_removes_the_user_relation() {
         "the edge is gone (no families left → garbage-collected)",
     );
     assert!(
-        canvas.selected_edges.is_empty(),
-        "retraction clears the edge selection"
+        canvas.selected.len() == 2,
+        "pairwise retraction leaves the node selection intact"
     );
 }
 
 #[test]
-fn retract_selected_edge_cell_removes_only_that_relation() {
+fn explicit_member_retraction_removes_only_that_relation() {
     let mut canvas = Canvas::new();
     let a = canvas.open_member_as_new_node(None, "https://cell-a.test");
     let b = canvas.open_member_as_new_node(None, "https://cell-b.test");
-    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
-    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
     assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Cites));
     assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Quotes));
-
-    canvas.selected_edges.insert(EdgeCell {
-        from: ak,
-        to: bk,
-        selector: RelationSelector::Semantic(SemanticSubKind::Cites),
-    });
-
-    assert_eq!(canvas.retract_selected_relation(), 1);
+    assert_eq!(
+        canvas.retract_relation_between_members(
+            a,
+            b,
+            RelationSelector::Semantic(SemanticSubKind::Cites),
+        ),
+        1
+    );
     let remaining: Vec<_> = canvas
         .graph()
         .projected_relations()
@@ -140,22 +269,17 @@ fn retract_selected_edge_cell_removes_only_that_relation() {
 }
 
 #[test]
-fn hide_selected_edge_cell_hides_only_that_relation() {
+fn legacy_directed_filter_hides_only_that_member_under_one_link() {
     let mut canvas = Canvas::new();
     let a = canvas.open_member_as_new_node(None, "https://hide-cell-a.test");
     let b = canvas.open_member_as_new_node(None, "https://hide-cell-b.test");
-    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
-    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
     assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Cites));
     assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Quotes));
-
-    canvas.selected_edges.insert(EdgeCell {
-        from: ak,
-        to: bk,
-        selector: RelationSelector::Semantic(SemanticSubKind::Cites),
-    });
-
-    assert_eq!(canvas.hide_selected_edges(), 1);
+    assert!(canvas.hide_relation_between_members(
+        a,
+        b,
+        RelationSelector::Semantic(SemanticSubKind::Cites)
+    ));
     assert!(canvas.relation_between_members_hidden(
         a,
         b,
@@ -170,19 +294,26 @@ fn hide_selected_edge_cell_hides_only_that_relation() {
         !canvas.edge_between_members_hidden(a, b),
         "the endpoint bundle is not fully hidden while another cell remains visible"
     );
-    let visible: Vec<_> = crate::canvas::edge_cells::visible_edge_cell_segments(
+    let visible: Vec<_> = crate::canvas::edge_cells::visible_link_appearances(
         canvas.graph(),
         &canvas.view,
+        &canvas.hidden_links,
         &canvas.hidden_edges,
     )
     .into_iter()
-    .filter(|segment| segment.cell.endpoint_pair() == (ak.min(bk), ak.max(bk)))
+    .filter(|segment| {
+        let from = canvas.graph().get_node_by_id(a).unwrap().0;
+        let to = canvas.graph().get_node_by_id(b).unwrap().0;
+        (segment.appearance.display_from == from && segment.appearance.display_to == to)
+            || (segment.appearance.display_from == to && segment.appearance.display_to == from)
+    })
     .collect();
-    assert_eq!(visible.len(), 1, "only one relation lane remains visible");
     assert_eq!(
-        visible[0].cell.selector,
-        RelationSelector::Semantic(SemanticSubKind::Quotes)
+        visible.len(),
+        1,
+        "the remaining assertion keeps one link visible"
     );
+    assert_eq!(visible[0].appearance.strength, 1.0);
 }
 
 #[test]
@@ -203,7 +334,7 @@ fn unrelate_is_symmetric_with_relate_on_a_two_node_selection() {
     assert_eq!(canvas.graph().relations().count(), base + 1, "related");
 
     // No edge selected — the two-node selection alone retracts the relation.
-    assert!(canvas.selected_edges.is_empty());
+    assert!(canvas.selected_link_keys().is_empty());
     assert_eq!(
         canvas.retract_selected_relation(),
         1,

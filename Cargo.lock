@@ -12769,6 +12769,7 @@ dependencies = [
  "notochord",
  "personae",
  "pollster 0.4.0",
+ "sceno",
  "serde",
  "serde_json",
  "servitor",

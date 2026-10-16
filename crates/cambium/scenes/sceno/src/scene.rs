@@ -136,9 +136,8 @@ pub struct ProjectedItem {
     /// (community-spanning emphasis); both come from mere's cartography
     /// overlays.
     ///
-    /// Relations deliberately have no equivalent. An item carries several
-    /// simultaneous emphases, but a pair of instances related for several
-    /// reasons is several relations, not one relation with a channel list.
+    /// Relations keep their own kind and route. A source `LinkKey` can group
+    /// them by endpoint pair and stratum without collapsing distinct reasons.
     pub channels: Vec<(String, f32)>,
 }
 
@@ -157,6 +156,18 @@ pub struct RoutedRelation {
     /// Emphasis weight in `0..=1` (the cartography `EdgeWeight` overlay
     /// migrates here).
     pub weight: Option<f32>,
+    /// Stable source pair and stratum shared by the underlying link. This
+    /// does not identify a particular assertion/relation kind; `None` is
+    /// appropriate for synthetic or source-unbound scene geometry.
+    #[serde(default)]
+    pub link_key: Option<crate::LinkKey>,
+    /// Directional source contribution marks for this resting link stroke.
+    #[serde(default)]
+    pub marks: crate::LinkMarks,
+    /// Number/strength of contributing source assertions, when the source
+    /// adapter can disclose it. This is distinct from render weight.
+    #[serde(default)]
+    pub strength: Option<f32>,
 }
 
 /// A region over member instances: a drawn hull, a derived cluster halo, a
@@ -396,10 +407,54 @@ mod tests {
             points: vec![Vec2::ZERO, Vec2::new(3.0, 4.0)],
             kind: Some("traversal".into()),
             weight: Some(0.5),
+            link_key: None,
+            marks: crate::LinkMarks::default(),
+            strength: None,
         });
         let json = serde_json::to_string(&scene).unwrap();
         let back: Scene = serde_json::from_str(&json).unwrap();
         assert_eq!(scene, back);
+    }
+
+    #[test]
+    fn routed_link_key_round_trips_and_older_scenes_default_it() {
+        let mut scene = Scene::new();
+        scene.relations.push(RoutedRelation {
+            from: InstanceId(0),
+            to: InstanceId(1),
+            space: Scene::WORLD,
+            points: vec![Vec2::ZERO, Vec2::new(1.0, 2.0)],
+            kind: Some("supports".into()),
+            weight: None,
+            link_key: Some(crate::LinkKey::new(
+                crate::LinkStratum::Resource,
+                "https://example.test/b",
+                "https://example.test/a",
+            )),
+            marks: crate::LinkMarks {
+                forward: true,
+                reverse: true,
+                opposed: true,
+            },
+            strength: Some(3.0),
+        });
+        let value = serde_json::to_value(&scene).unwrap();
+        let restored: Scene = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(restored.relations[0].link_key, scene.relations[0].link_key);
+        assert_eq!(restored.relations[0].marks, scene.relations[0].marks);
+        assert_eq!(restored.relations[0].strength, scene.relations[0].strength);
+
+        let mut legacy = value;
+        for field in ["link_key", "marks", "strength"] {
+            legacy["relations"][0].as_object_mut().unwrap().remove(field);
+        }
+        let restored_legacy: Scene = serde_json::from_value(legacy).unwrap();
+        assert_eq!(restored_legacy.relations[0].link_key, None);
+        assert_eq!(
+            restored_legacy.relations[0].marks,
+            crate::LinkMarks::default()
+        );
+        assert_eq!(restored_legacy.relations[0].strength, None);
     }
 
     #[test]

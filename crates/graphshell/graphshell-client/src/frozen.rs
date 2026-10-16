@@ -48,8 +48,8 @@
 use std::collections::HashMap;
 
 use sceno::{
-    HeldPlacement, InstanceId, ProjectedItem, Representation, RoutedRelation, Scene, SourceIx,
-    SourceRef,
+    HeldPlacement, InstanceId, LinkKey, LinkMarks, ProjectedItem, Representation, RoutedRelation,
+    Scene, SourceIx, SourceRef,
 };
 use scenotime::{FoldId, SceneSnapshot};
 
@@ -109,6 +109,14 @@ pub struct FrozenRelation {
     pub to: String,
     /// The relation's own word for itself, when it has one.
     pub kind: Option<String>,
+    /// Source link identity and contribution summary, retained for consumers
+    /// that need to group or describe the original resting stroke.
+    #[serde(default)]
+    pub link_key: Option<LinkKey>,
+    #[serde(default)]
+    pub marks: LinkMarks,
+    #[serde(default)]
+    pub strength: Option<f32>,
 }
 
 /// A fold, frozen as a group a reader can open.
@@ -332,6 +340,9 @@ impl FrozenScene {
                     from: name_by_instance.get(&relation.from)?.clone(),
                     to: name_by_instance.get(&relation.to)?.clone(),
                     kind: relation.kind.clone(),
+                    link_key: relation.link_key.clone(),
+                    marks: relation.marks,
+                    strength: relation.strength,
                 })
             })
             .collect::<Vec<_>>();
@@ -1219,6 +1230,9 @@ mod tests {
                     points: Vec::new(),
                     kind: Some("depends_on".into()),
                     weight: None,
+                    link_key: None,
+                    marks: sceno::LinkMarks::default(),
+                    strength: None,
                 });
             }
         }
@@ -1429,6 +1443,17 @@ mod tests {
             points: vec![Vec2::ZERO, Vec2::ZERO],
             kind: Some("feeds".to_owned()),
             weight: None,
+            link_key: Some(sceno::LinkKey::new(
+                sceno::LinkStratum::Surface,
+                "surface:north",
+                "surface:south",
+            )),
+            marks: sceno::LinkMarks {
+                forward: true,
+                reverse: false,
+                opposed: false,
+            },
+            strength: Some(1.0),
         });
 
         let frozen = FrozenScene::freeze(
@@ -1443,6 +1468,9 @@ mod tests {
         assert_eq!(frozen.relations[0].from, "North station");
         assert_eq!(frozen.relations[0].to, "South station");
         assert_eq!(frozen.relations[0].kind.as_deref(), Some("feeds"));
+        assert_eq!(frozen.relations[0].link_key, scene.relations[0].link_key);
+        assert_eq!(frozen.relations[0].marks, scene.relations[0].marks);
+        assert_eq!(frozen.relations[0].strength, scene.relations[0].strength);
     }
 
     #[test]
@@ -1614,6 +1642,9 @@ mod tests {
             points: vec![Vec2::ZERO, Vec2::ZERO],
             kind: Some("sights".to_owned()),
             weight: None,
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         });
         let names = named(&[
             ("fixture.map", "harbor", "Harbor"),
