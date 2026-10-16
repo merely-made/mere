@@ -59,7 +59,7 @@ use build::{
     sample_graph, surface_bg,
 };
 use paint_list_api::ColorF;
-use seiche_bridge::{build_simulation, visible_relation_edges_with_link_hides};
+use seiche_bridge::{build_simulation, visible_relation_edges_with_assertion_hides};
 
 /// Build the seiche [`AffinitySpring`] from a cartography [`AffinityScores`](crate::signals::AffinityScores)
 /// signal: flatten the `((a, b), weight)` pairs into the force's `(a, b, weight)` triples at the
@@ -461,6 +461,9 @@ pub struct Canvas {
     /// Closed-link hides use canonical source identity; legacy directed-cell
     /// filters remain separate compatibility state.
     hidden_links: HashSet<LinkKey>,
+    /// Exact assertion IDs hidden from this view. This remains narrower than
+    /// both canonical-link and selector/cell visibility filters.
+    hidden_assertions: HashSet<String>,
     /// Disposable occurrence controllers supply disclosed endpoint pairs
     /// without minting graph assertions. Ordinary graph canvases use `None`.
     occurrence_edges: Option<Vec<(NodeKey, NodeKey)>>,

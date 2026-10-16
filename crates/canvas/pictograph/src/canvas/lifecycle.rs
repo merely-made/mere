@@ -80,6 +80,7 @@ impl Canvas {
         self.selected_link_appearances.clear();
         self.hidden_edges.clear();
         self.hidden_links.clear();
+        self.hidden_assertions.clear();
         self.active_field = None;
         self.hidden_fields.clear();
         self.node_states.clear();
@@ -176,6 +177,7 @@ impl Canvas {
             selected_link_appearances: HashMap::new(),
             hidden_edges: HashSet::new(),
             hidden_links: HashSet::new(),
+            hidden_assertions: HashSet::new(),
             occurrence_edges: None,
             physics_view_revision: 0,
             active_field: None,

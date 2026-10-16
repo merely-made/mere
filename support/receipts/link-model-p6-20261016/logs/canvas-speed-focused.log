@@ -1,0 +1,25 @@
+
+running 1 test
+tick 320.583µs (worst 1.610959ms), budget 2ms: reached 4.0x, 28 of 30 frames inside the budget, worst 2.051875ms
+test canvas::tests::speed::fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 502 filtered out; finished in 16.20s
+
+       16.22 real        14.23 user         0.76 sys
+           148029440  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               12090  page reclaims
+                2626  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                1074  voluntary context switches
+               75270  involuntary context switches
+        129450278733  instructions retired
+         47828457109  cycles elapsed
+           108954272  peak memory footprint

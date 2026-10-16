@@ -394,11 +394,12 @@ impl Canvas {
     /// Source identities and marks of the current resting stroke appearances.
     /// Geometry, picking and host-accessible alternates read this same projection.
     pub fn visible_link_appearances(&self) -> Vec<crate::canvas::LinkAppearance> {
-        crate::canvas::edge_cells::visible_link_appearances(
+        crate::canvas::edge_cells::visible_link_appearances_with_assertion_hides(
             &self.graph,
             &self.view,
             &self.hidden_links,
             &self.hidden_edges,
+            &self.hidden_assertions,
             |key| self.node_size(key),
         )
         .into_iter()
@@ -426,11 +427,12 @@ impl Canvas {
             .get(key)
             .copied()
             .or_else(|| {
-                crate::canvas::edge_cells::visible_link_appearances(
+                crate::canvas::edge_cells::visible_link_appearances_with_assertion_hides(
                     &self.graph,
                     &self.view,
                     &self.hidden_links,
                     &self.hidden_edges,
+                    &self.hidden_assertions,
                     |key| self.node_size(key),
                 )
                 .into_iter()
@@ -480,6 +482,41 @@ impl Canvas {
         let mut keys: Vec<_> = self.hidden_links.iter().cloned().collect();
         keys.sort();
         keys
+    }
+
+    /// Read-only exact assertion hides for consumers that must preserve one
+    /// spring contribution per independently hidden source record.
+    pub fn hidden_assertions(&self) -> &HashSet<String> {
+        &self.hidden_assertions
+    }
+
+    /// Return a stable ordered snapshot for host view-intent persistence.
+    pub fn hidden_assertion_ids(&self) -> Vec<String> {
+        let mut ids: Vec<_> = self.hidden_assertions.iter().cloned().collect();
+        ids.sort();
+        ids
+    }
+
+    /// Replace exact source assertion hides restored from a host view intent.
+    pub fn set_hidden_assertion_ids(&mut self, ids: impl IntoIterator<Item = String>) -> bool {
+        let replacement: HashSet<_> = ids.into_iter().collect();
+        if replacement == self.hidden_assertions {
+            return false;
+        }
+        self.hidden_assertions = replacement;
+        self.resync_edge_springs();
+        true
+    }
+
+    /// Clear only exact assertion hides, preserving whole-link and legacy
+    /// selector visibility state.
+    pub fn show_all_assertions(&mut self) -> usize {
+        let count = self.hidden_assertions.len();
+        if count > 0 {
+            self.hidden_assertions.clear();
+            self.resync_edge_springs();
+        }
+        count
     }
 
     /// Reveal every closed-link hide and every legacy cell eligibility filter.
@@ -675,10 +712,11 @@ impl Canvas {
     fn resync_edge_springs(&mut self) {
         self.physics_view_revision += 1;
         self.physics
-            .sync_edges(visible_relation_edges_with_link_hides(
+            .sync_edges(visible_relation_edges_with_assertion_hides(
                 &self.graph,
                 &self.hidden_edges,
                 &self.hidden_links,
+                &self.hidden_assertions,
             ));
         self.settle_physics(SETTLE_TICKS / 3);
     }

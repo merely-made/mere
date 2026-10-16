@@ -18,7 +18,7 @@ use kernel::graph::{
 
 use super::actions::ArrangementAction;
 use super::build::hyperlink;
-use super::edge_cells::{link_hit_test, links_in_rect};
+use super::edge_cells::{link_hit_test_with_assertion_hides, links_in_rect_with_assertion_hides};
 use super::seiche_bridge::seed_cluster;
 use super::{
     CLICK_SLOP, Canvas, ContextRequest, Drag, EDGE_PICK_TOL, EmptyPress, ORBIT_TILT_PER_PX,
@@ -215,11 +215,12 @@ impl Canvas {
                 } else if let Some(appearance) = if self.shift {
                     None
                 } else {
-                    crate::canvas::edge_cells::self_link_hit_test(
+                    crate::canvas::edge_cells::self_link_hit_test_with_assertion_hides(
                         &self.graph,
                         &self.view,
                         &self.hidden_links,
                         &self.hidden_edges,
+                        &self.hidden_assertions,
                         self.screen_to_world(self.cursor),
                         EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON),
                         |key| self.node_visible_in_canvas(key),
@@ -390,11 +391,12 @@ impl Canvas {
             .into_iter()
             .filter(|&key| self.node_visible_in_canvas(key))
             .collect();
-        let appearances = links_in_rect(
+        let appearances = links_in_rect_with_assertion_hides(
             &self.graph,
             &self.view,
             &self.hidden_links,
             &self.hidden_edges,
+            &self.hidden_assertions,
             region,
             |key| self.node_visible_in_canvas(key),
             |key| self.node_size(key),
@@ -416,11 +418,12 @@ impl Canvas {
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
-        if let Some(appearance) = link_hit_test(
+        if let Some(appearance) = link_hit_test_with_assertion_hides(
             &self.graph,
             &self.view,
             &self.hidden_links,
             &self.hidden_edges,
+            &self.hidden_assertions,
             world,
             tol,
             |key| self.node_visible_in_canvas(key),
