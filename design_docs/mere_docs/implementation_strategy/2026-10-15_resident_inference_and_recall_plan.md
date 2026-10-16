@@ -1,7 +1,7 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-16):** in progress. I1 to I6 gates done (§7):
+**Status (2026-10-16):** in progress. I1 to I7 gates done (§7):
 strict decoder, declared templates, CPU and GPU model rows, native trainer
 owner reclaim, durable checkpoints, restart, lock recovery and keyed
 personal-graph continuation pass on O-PC. I4's native gate adds BM25 recall,
@@ -11,8 +11,8 @@ GPU resident, including progress, pause/resume, cancellation and past-answer
 source viewing after restart with the origin offline. Distillery M2 and the
 inference-surface half of Eidetic P4 are closed. I6 qualifies a seven-shard
 OpenLlama 3B model whose f32 weights exceed the target GPU's memory, plus a
-4,126-token streamed prefill. I7 weight formats are implemented; final native
-format qualification and resident regression checks are in progress.
+4,126-token streamed prefill. I7 adds half-precision and packed Q8/Q4 rows,
+with measured drift, memory and streaming costs. I8 layer stages is next.
 The new device
 boundary uses two separately rooted resident compositions on one computer;
 a physical second computer and installed-binary receipt remain separate.
@@ -1242,26 +1242,77 @@ Stop and record the reason if any of these happen:
     resident composition regressions qualify this phase. An installed Djinn
     binary with this scale model, a new headed scale-model run, physical
     second-device execution, cold-disk throughput and isolated per-process
-    VRAM high-water remain separate receipts. I7 weight formats is next.
+    VRAM high-water remain separate receipts. I7 weight formats was next at that source cut.
 
 
-- **2026-10-16: I7 implementation and qualification in progress.** Explicit
-  f16/bf16 and signed Q8/Q4 weight formats use `esp.layer-weights/v2`.
-  Packed blocks follow 32 input weights within each HF output row, with f32
-  scales and f16 embeddings/norms; a tied output head shares its embedding.
-  Loading transposes metadata rather than unpacking matrices. CPU composition
-  uses Flex for explicit half rows, and preserves the legacy NdArray corridor.
-  GPU composition retains its existing trainer reclaim owner.
-  - Candidate imports are diagnostic until an immutable, loader-specific bf16
-    comparison records exact prompts, token sequences, logit errors, weight
-    payload sizes and logical streaming costs. The format enters the session;
-    changing format refuses an existing checkpoint. Half constructors state
-    the dtype explicitly rather than inheriting Burn's f32 device default.
-  - A narrow cubek-matmul 0.3.0 patch reduces the unit stage after register
-    partitions reach one, keeping packed Q4 within the adapter's 48-KiB
-    workgroup limit. Its direct selector regression passes. GPU projections
-    also match host-decoded packed weights at 960-wide prefill/decode shapes.
-  - ESP currently passes 178 unit tests, two durable generation cases, two
-    library session cases, five prompt template cases and six autodiff trainer
-    cases. Final native format measurements and resident composition checks
-    remain to be recorded before this gate is marked complete.
+- **2026-10-16: I7 qualified: explicit half and packed weight rows.**
+  Source cut `963067cb` adds explicit f16/bf16 and signed Q8/Q4 formats in
+  `esp.layer-weights/v2`. Packed blocks follow 32 input weights within each HF
+  output row, with f32 scales and f16 embeddings/norms. A tied output head
+  shares its embedding. Loading transposes metadata rather than unpacking
+  matrices. CPU composition uses Flex for explicit half rows and preserves
+  legacy NdArray rows. GPU composition retains the existing trainer reclaim
+  owner. Unsupported dtype/scheme requests refuse selection.
+  - *Selection and exact sessions.* Candidate imports remain diagnostic until
+    an immutable, loader-specific bf16 comparison records exact prompts,
+    generated sequences, logit errors, payload sizes and logical streaming
+    costs. Format and loader enter session identity; changing format refuses a
+    checkpoint. Half constructors state their dtype explicitly, rather than
+    inheriting Burn's f32 default. Import rejects non-finite weights and half
+    overflow; loading validates packed sizes and positive finite scales.
+  - *Numerical and storage rows.* Pinned SmolLM2-360M-Instruct runs all three
+    fixed prompts, with at most 16 generated tokens each, using the same source
+    checkpoint and template. The bf16 CPU row matches the 39 independent f32
+    reference token IDs. Every row preserves its own first sequence through a
+    three-token pause/resume. Next-token logit errors cover the full vocabulary;
+    sequence comparisons expose later autoregressive drift.
+
+    | Format / loader | Artifact MB | Logical layer-pass MB | Logit RMSE vs bf16, range | Identical sequences |
+    | --- | ---: | ---: | ---: | ---: |
+    | bf16 / Flex | 723.674 | 629.300 | 0 | 3/3 |
+    | f16 / Flex | 723.674 | 629.300 | 0.0550 to 0.0654 | 1/3 |
+    | f16 / wgpu | 723.674 | 629.300 | 0.0526 to 0.0622 | 3/3 |
+    | Q8 / wgpu | 448.422 | 354.048 | 0.0833 to 0.0920 | 2/3 |
+    | Q4 / wgpu | 291.135 | 196.761 | 1.1124 to 1.2618 | 1/3 |
+
+    MB means 1,000,000 bytes. Quantized formats and CPU f16 show answer drift,
+    including a refusal on the counting prompt; Q4 also changes the sky answer.
+    These measurements establish execution and report quality loss on this
+    prompt set. Cross-backend errors include arithmetic differences; the
+    receipt also compares each row's logits with GPU f16.
+  - *Memory and execution cost.* Shared plus one largest layer contains
+    **114,038,400 bytes** of half weights, **105,436,800 bytes** for Q8, and
+    **100,521,600 bytes** for Q4. These payload counts exclude allocator
+    overhead, activations, KV and temporary compute buffers. Full-fixture
+    process peaks, including import, range from **1.36 to 1.64 GB**. Sampled
+    whole-GPU peaks for the GPU rows range from **1.83 to 1.89 GB**, including
+    unrelated processes. Primary GPU asks together take **65.44 s** for f16,
+    **36.53 s** for Q8 and **21.14 s** for Q4. A compile-only Distillery build
+    overlaps these measurements, so these are recorded execution costs, not
+    isolated throughput comparisons. Logical bytes include OS-cache hits;
+    physical disk traffic is unmeasured.
+  - *Backend and checks.* A narrow cubek-matmul 0.3.0 patch reduces the unit
+    stage after register partitions reach one, keeping packed Q4 within the
+    adapter's 48-KiB workgroup limit. Its direct selector regression passes.
+    GPU projections match host-decoded packed values at 960-wide prefill and
+    decode shapes. A separate full-decoder case covers untied quantized heads
+    and warm decode. Embedding Cargo roots must adopt this patch explicitly.
+    ESP passes 178 unit tests plus that supplemental decoder case, two durable
+    generation cases, two library session cases, five template cases and six
+    autodiff trainer cases. Distillery passes 53 unit tests, eight durability
+    entries and both layer-owner cases, including a measured bf16 CPU row.
+    Exact re-import also preserves both recorded half-format artifact IDs.
+    Djinn passes four route regressions, all three explicitly run GPU trainer-
+    reclaim cases, and real-model recall with exact retained versions, stale
+    citation withdrawal and restart recovery. The actor/wire build passes 38
+    tests and retains its decoder-free normal dependency graph. Both import
+    examples check; formatting and the documentation audit add no findings
+    beyond the recorded baseline. Supplemental source `7d9bffe3` admits
+    non-aligned output widths while retaining K32 input alignment, tested with
+    a 79-entry untied head; aligned native rows keep their original encoding.
+  - *Evidence and limits.* [The I7 receipt](../../../support/receipts/resident_inference_weight_formats.json)
+    records source/binary hashes, row identities, exact outputs, deviations,
+    host profiles and log hashes. Native provider rows qualify SmolLM2 here;
+    larger quantized models, Metal bf16, a new headed browser row, an installed
+    Djinn binary and a physical second computer remain separate receipts.
+    I7 is complete; I8 layer stages is next.
