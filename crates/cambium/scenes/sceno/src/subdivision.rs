@@ -4,13 +4,14 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Arrangements that divide a bounded area (graph grammar scenes, Merely
-//! Design System DECISIONS 2026-10-16): Partition and Sets.
+//! Arrangements that divide an area into shares (graph grammar scenes, Merely
+//! Design System DECISIONS 2026-10-16): Partition, Sets and Mosaic.
 //!
-//! Both are bounded by design. Partition subdivides the viewport (Mark,
-//! 2026-10-16: "Partition being subdivisions of the viewport makes more
-//! sense"); Sets draws fixed regions whose positions mean membership. The
-//! infinite canvas belongs to the open families.
+//! Partition subdivides the viewport (Mark, 2026-10-16: "Partition being
+//! subdivisions of the viewport makes more sense"); Sets draws fixed regions
+//! whose positions mean membership. Mosaic is not bounded: it lives on the
+//! infinite canvas, its extent grown from the weight it holds ("Same behavior,
+//! just pannable, organizable, resizable").
 
 use serde::{Deserialize, Serialize};
 
@@ -80,3 +81,38 @@ pub const SET_SEPARATOR: char = '|';
 
 /// The weight at or above which a [`Setscape`] item sits in a core.
 pub const SET_CORE_WEIGHT: f32 = 0.5;
+
+/// Tiles by weight on the infinite canvas, grouped by an item's categorical
+/// axis. Weight alone sizes a tile, so selection never reflows the mosaic;
+/// the order is explicit, so a person's arrangement holds. Groups and members
+/// split by weighted balanced bisection, the workbench's recursive splits.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Mosaic {
+    /// The mosaic's centre, in scene units.
+    pub origin: Vec2,
+    /// Scene area one unit of weight occupies.
+    pub unit_area: f32,
+    /// Width over height of the whole mosaic.
+    pub aspect: f32,
+    /// Gutter between tiles and around groups.
+    pub gap: f32,
+    /// The band along a group's top that carries its label.
+    pub header: f32,
+    /// Group order, left to right and top to bottom as the splits fall.
+    /// Groups not named here follow in first-appearance order; members keep
+    /// the score's order within their group.
+    pub group_order: Vec<String>,
+}
+
+impl Default for Mosaic {
+    fn default() -> Self {
+        Self {
+            origin: Vec2::ZERO,
+            unit_area: 9_000.0,
+            aspect: 1.6,
+            gap: 5.0,
+            header: 22.0,
+            group_order: Vec::new(),
+        }
+    }
+}

@@ -18,6 +18,7 @@ use sceno::{Arrangement, AxisValue, Footprint, Placement, ScoreItem, Vec2};
 mod axial;
 mod embedded;
 mod lsystem;
+pub(crate) mod mosaic;
 pub(crate) mod partition;
 mod penrose;
 mod radial;
@@ -46,7 +47,9 @@ pub(crate) fn arrange(arrangement: &Arrangement, items: &[&ScoreItem]) -> Option
         Arrangement::Kanban(config) => axial::kanban(config, items),
         Arrangement::Embedded(config) => embedded::place(config, items),
         Arrangement::Radial(config) => radial::place(config, items),
-        Arrangement::Partition(_) | Arrangement::Setscape(_) => shape(arrangement, items)?.positions,
+        Arrangement::Partition(_) | Arrangement::Setscape(_) | Arrangement::Mosaic(_) => {
+            shape(arrangement, items)?.positions
+        },
         Arrangement::Custom { .. } => return None,
     })
 }
@@ -77,11 +80,13 @@ pub(crate) struct ShapedRegion {
     pub members: Vec<usize>,
 }
 
-/// The shape of a bounded family (Partition, Sets); `None` for the rest.
+/// The shape of a family that sizes items and draws regions (Partition,
+/// Sets, Mosaic); `None` for the rest.
 pub(crate) fn shape(arrangement: &Arrangement, items: &[&ScoreItem]) -> Option<Shape> {
     match arrangement {
         Arrangement::Partition(config) => Some(partition::shape(config, items)),
         Arrangement::Setscape(config) => Some(setscape::shape(config, items)),
+        Arrangement::Mosaic(config) => Some(mosaic::shape(config, items)),
         _ => None,
     }
 }

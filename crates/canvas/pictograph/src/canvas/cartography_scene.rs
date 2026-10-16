@@ -96,7 +96,7 @@ impl CartographySceneOptions {
         self
     }
 
-    fn to_view_intent(&self) -> ViewIntent {
+    pub(crate) fn to_view_intent(&self) -> ViewIntent {
         let mut intent = ViewIntent::default();
         intent.form_factor = self.form_factor;
         intent.dimension = self.dimension;
@@ -166,6 +166,8 @@ pub const CANVAS_LAYOUT_STRATEGIES: &[(&str, &str)] = &[
     ("partition.default", "Partition (by site)"),
     ("sets.default", "Sets (by tag)"),
     ("provenance.default", "Provenance"),
+    // Tiles by weight on the infinite canvas, grouped by site, organised by the person.
+    ("mosaic.default", "Mosaic (by site)"),
 ];
 
 /// The main canvas's strategy result. Existing strategies emit positions;
@@ -212,6 +214,11 @@ fn project_canvas_dispatch(
     // footprints, and `scenomise` is the only generic solver that realizes it.
     if id == "phyllotaxis.default" {
         return spiral_in(registry, graph, extents, focus, recent_first, 1.0, None).projection;
+    }
+    // A host without a canvas has no arrangement of the person's: plain by-site Mosaic.
+    if id == super::mosaic::MOSAIC_ARRANGEMENT {
+        let state = super::mosaic::MosaicState::default();
+        return super::mosaic::project_mosaic(registry, graph, &state, width, height, extents);
     }
     // The axis an axis-driven arrangement reads, threaded on the intent (where `axis_values`
     // lives), from the registry's channel.
@@ -564,6 +571,22 @@ impl crate::canvas::Canvas {
         zoom_level: f32,
         previous_score: Option<&sceno::Score>,
     ) -> CanvasStrategyProjection {
+        if id == super::mosaic::MOSAIC_ARRANGEMENT {
+            let projection = super::mosaic::project_mosaic(
+                &mut self.channels,
+                &self.graph,
+                &self.mosaic,
+                width,
+                height,
+                extents,
+            );
+            return CanvasStrategyProjection {
+                positions: projection.nodes.iter().map(|n| (n.node, n.position)).collect(),
+                score: None,
+                coverage: projection.metadata.coverage,
+                regions: projection.regions,
+            };
+        }
         let focus = self.focused_key();
         project_strategy_in(
             &mut self.channels,
