@@ -310,11 +310,38 @@ where
                 .transform
                 .translate
                 .y;
+            let label = match opened.resolve(entry) {
+                Some(OpenedLinkMember::Assertion(assertion)) => assertion
+                    .basis
+                    .note
+                    .as_deref()
+                    .or(assertion.label.as_deref())
+                    .or(assertion.recognized_kind.as_deref())
+                    .unwrap_or(&entry.label),
+                _ => &entry.label,
+            };
+            let interval = entry
+                .span
+                .as_ref()
+                .map(|span| match span.end {
+                    LinkSpanEnd::WithdrawalAt(end) => format!("{} to {end}", span.start_ms),
+                    LinkSpanEnd::WithdrawalTimeUnknown => {
+                        format!("{} to ? (withdrawn)", span.start_ms)
+                    },
+                    LinkSpanEnd::OpenAt(end) => format!("{} to {end} (held)", span.start_ms),
+                    LinkSpanEnd::OpenTimeUnknown => format!("{} to ? (held)", span.start_ms),
+                })
+                .unwrap_or_else(|| "Undated".into());
             let mut row: Vec<Child<State, Action>> = vec![Box::new(
-                el("div", format!("{}: {}", entry.lane_label, entry.label)).attr(
-                    "style",
-                    "font-size:11px;white-space:nowrap;overflow:hidden;",
-                ),
+                el("div", format!("{interval} · {label}"))
+                    .attr(
+                        "aria-label",
+                        format!("{}: {interval}; {}", entry.lane_label, entry.label),
+                    )
+                    .attr(
+                        "style",
+                        "font-size:11px;white-space:nowrap;overflow:hidden;",
+                    ),
             )];
             if let Some(span) = &entry.span {
                 let percent = |value: f32| {
@@ -329,16 +356,17 @@ where
                 let end = span.x_end.map(percent);
                 let left = end.map(|end| end.min(x)).unwrap_or(x);
                 let width = end.map(|end| (end - x).abs()).unwrap_or(0.0);
-                let (line, state) = match span.end {
-                    LinkSpanEnd::WithdrawalAt(_) => ("solid", "withdrawn"),
-                    LinkSpanEnd::WithdrawalTimeUnknown => ("dashed", "withdrawn; time unavailable"),
-                    LinkSpanEnd::OpenAt(_) => ("solid", "held; open at observation time"),
-                    LinkSpanEnd::OpenTimeUnknown => {
-                        ("dashed", "held; observation time unavailable")
-                    },
+                let state = match span.end {
+                    LinkSpanEnd::WithdrawalAt(_) => "withdrawn",
+                    LinkSpanEnd::WithdrawalTimeUnknown => "withdrawn; time unavailable",
+                    LinkSpanEnd::OpenAt(_) => "held; open at observation time",
+                    LinkSpanEnd::OpenTimeUnknown => "held; observation time unavailable",
                 };
+                // Unknown ends have no x_end: render a point and keep the visible
+                // question mark above it. A solid border is admitted by portable
+                // presentation, including when only the top side is decorated.
                 row.push(Box::new(el("div", el::<_, State, Action>("div", ())
-                    .attr("style", format!("position:absolute;left:{left}%;width:{width}%;min-width:4px;border-top:5px {line} currentColor;top:8px;")))
+                    .attr("style", format!("position:absolute;left:{left}%;width:{width}%;min-width:4px;border-top:5px solid currentColor;top:8px;")))
                     .attr("style", "position:relative;height:22px;margin-right:6px;border-bottom:1px solid currentColor;")
                     .attr("role", "img")
                     .attr("aria-label", format!("{}; starts {}; {state}", entry.label, span.start_ms))
