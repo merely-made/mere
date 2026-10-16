@@ -398,3 +398,50 @@ remain later work. Main advanced separately through `4a74b1cf2` to `d6b1e4a26` w
 source, Knot/Murm and welding dependency changes during qualification. This delivery stays on its
 recorded baseline and is prepared as a review branch; compatibility with that
 new dependency set is a separate gate.
+
+
+## P2 continuation: Knot source projection and Mere intake
+
+**2026-10-15, in progress.** The preceding bounded delivery was pushed
+directly to main as `e21c581d8`; PR 9 was closed. Mark requests direct pushes
+for routine work in this repository. This continuation starts from Mere
+`82e7fd718` and Knot `d2cb090`, after the family source and dramatis flips.
+The previous receipt still qualifies only its recorded source and dependencies.
+
+Knot's supplier change is published as `0020a50e6ff10a9244f4965609b31f4ac79fd753`: 150
+library and five integration tests pass, with one existing custody probe
+ignored. Its additive retraction projection keeps the optional signed header time
+without changing signed operations or old checkpoint bytes when the field is
+absent. Djinn already composes Knot and owns the source adapter; Graphshell
+does not gain a Knot dependency. Admitted endpoint bindings name the exact
+Knot document id/head plus an existing Mere Surface and its expected shown
+Resource. Missing heads are excluded, and a stale target binding refuses
+the batch. No endpoint is created or retargeted by the adapter.
+
+The adapter uses all 32 operation-hash bytes in an assertion IRI, preserves
+the full signer and space in source IRIs, resolves the predicate IRI from
+Knot's catalog, maps qualification to basis note (§6.2), and preserves evidence.
+First/last and withdrawal times come from signed source data, including
+unknown values. The first retraction in Knot's deterministic fold supplies
+the effective Mere tombstone; Knot retains the complete retraction history.
+An already retained tombstone remains stable on stale held input; a repeated
+withdrawn record with a different effective withdrawal time or signer refuses.
+Later retraction operation IDs and times remain Knot-owned rather than being
+flattened into additional Mere lifecycle events. The public intake accepts
+only an opaque projection acquired through Knot's authenticated store fold;
+it has no raw-DTO constructor or mutable projection accessor.
+
+Preflight runs on a private candidate graph and records its exact replayable
+deltas. Only an entirely accepted batch reaches Pandect's acknowledged
+transaction. Tests use real signed Knot operations, supplier checkpoint/reopen,
+exact-head admission, collision/refusal controls and durable Mere reopen.
+The source fold and intake are separate from desktop link authoring and
+automatic resident synchronization. Those UI/runtime integrations are not
+claimed by this gate.
+
+The root lock advances all six Knot packages together. Cargo also repairs
+19 existing dependency references (platform and macro/RDF dependencies) while
+keeping every package version and other supplier revision unchanged. Genet
+remains `e37762d752e423dc43f920bd728c83f70c47f2cc`; a temporary resolver advance
+to newer Genet was rolled back before compilation. The receipt records the
+full dependency-edge comparison.
