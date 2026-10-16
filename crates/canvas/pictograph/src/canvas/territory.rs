@@ -9,7 +9,8 @@
 //! nodes, tiered by how clearly it belongs, that is, by the margin by which
 //! the nearest domain beats the runner-up. It is a field over wherever the
 //! nodes are, so it works under forces or any arrangement, and it is drawn
-//! beneath everything else. Domains are sites, coloured by category.
+//! beneath everything else. Domains are sites, coloured by category (the
+//! theme's, when the host passes them; `grammar_view.rs`).
 
 use std::collections::BTreeMap;
 
@@ -17,10 +18,7 @@ use kernel::geometry::PortablePoint;
 use paint_list_api::{ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, RectItem};
 
 use super::Canvas;
-use super::build::cluster_color;
 
-/// How many categories the palette tells apart before it repeats.
-pub const CATEGORY_COUNT: usize = super::build::CATEGORY_PALETTE.len();
 /// Grid columns across the claimed ground; rows follow the aspect.
 const COLUMNS: usize = 48;
 /// The three tiers' fill alphas (`--g-tier-1…3`).
@@ -164,13 +162,13 @@ impl Canvas {
             .map(|run| {
                 let (ax, ay) = self.camera.to_screen(run.min);
                 let (bx, by) = self.camera.to_screen(run.max);
-                let tone = cluster_color(run.domain);
+                let (r, g, b) = self.category_rgb(run.domain);
                 PaintCmd::DrawRect(RectItem {
                     placement: CommonPlacement::new(LayoutRect::new(
                         LayoutPoint::new(ax.min(bx), ay.min(by)),
                         LayoutPoint::new(ax.max(bx), ay.max(by)),
                     )),
-                    color: ColorF::new(tone.r, tone.g, tone.b, TIER_ALPHA[run.tier as usize - 1]),
+                    color: ColorF::new(r, g, b, TIER_ALPHA[run.tier as usize - 1]),
                 })
             })
             .collect()

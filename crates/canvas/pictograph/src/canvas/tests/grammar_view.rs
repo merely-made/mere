@@ -8,6 +8,7 @@
 
 use super::*;
 use crate::canvas::grammar_view::{LINK_QUIET, link_tone};
+use paint_list_api::PaintCmd;
 use scenograph::attention::Attention;
 
 fn class_of(canvas: &Canvas, key: NodeKey) -> String {
@@ -187,5 +188,96 @@ fn suggestions_are_off_until_the_person_turns_them_on() {
             .members_with_attention(Attention::Suggestion)
             .is_empty(),
         "no allowed source"
+    );
+}
+
+#[test]
+fn sites_and_territory_take_the_themes_category_colours() {
+    use scenograph::suggestion::{SuggestionMark, SuggestionSettings};
+    let (mut canvas, keys) = grammar_canvas();
+    canvas.set_graph_grammar(true);
+    let style_of = |canvas: &Canvas, key| {
+        canvas
+            .node_document
+            .dom()
+            .attribute(
+                canvas.gnode_of[&key],
+                &Namespace::from(""),
+                &LocalName::from("style"),
+            )
+            .unwrap()
+            .to_owned()
+    };
+    canvas.frame(800, 600);
+    assert!(style_of(&canvas, keys[1]).contains("background-color: rgb("));
+
+    let theme = [
+        [10, 20, 30],
+        [40, 50, 60],
+        [70, 80, 90],
+        [1, 2, 3],
+        [4, 5, 6],
+    ];
+    canvas.set_category_colors(theme);
+    assert_eq!(canvas.category_count(), 5);
+    canvas.frame(800, 600);
+    let site = style_of(&canvas, keys[1]);
+    let category: usize = class_of(&canvas, keys[1])
+        .split(' ')
+        .nth(1)
+        .unwrap()
+        .trim_start_matches("gnode-cat-")
+        .parse()
+        .unwrap();
+    let [r, g, b] = theme[category];
+    assert!(
+        site.contains(&format!("background-color: rgb({r}, {g}, {b});")),
+        "{site}"
+    );
+
+    canvas.select_member(id(&canvas, keys[0]));
+    canvas.frame(800, 600);
+    assert!(
+        !style_of(&canvas, keys[0]).contains("background-color"),
+        "a body keeps its own fill"
+    );
+
+    canvas.set_suggestion_settings(SuggestionSettings {
+        on: true,
+        mark: SuggestionMark::Ring,
+        ..SuggestionSettings::default()
+    });
+    canvas.set_suggested_members([id(&canvas, keys[4])]);
+    canvas.frame(800, 600);
+    assert!(
+        !style_of(&canvas, keys[4]).contains("background-color"),
+        "a ring is bare"
+    );
+
+    canvas.set_territory_field(true);
+    let colours: Vec<(u8, u8, u8)> = canvas
+        .territory_commands()
+        .iter()
+        .filter_map(|command| match command {
+            PaintCmd::DrawRect(rect) => Some((
+                (rect.color.r * 255.0).round() as u8,
+                (rect.color.g * 255.0).round() as u8,
+                (rect.color.b * 255.0).round() as u8,
+            )),
+            _ => None,
+        })
+        .collect();
+    assert!(!colours.is_empty());
+    assert!(
+        colours
+            .iter()
+            .all(|c| theme.iter().any(|[r, g, b]| *c == (*r, *g, *b))),
+        "the territory paints the theme's colours"
+    );
+    canvas.set_category_colors([]);
+    assert_eq!(
+        canvas.category_count(),
+        8,
+        "empty restores the canvas's own"
     );
 }

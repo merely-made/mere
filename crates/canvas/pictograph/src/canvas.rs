@@ -447,6 +447,8 @@ pub struct Canvas {
     territory_field: bool,
     /// Whether nodes and links are presented by the graph grammar (`grammar_view.rs`).
     graph_grammar: bool,
+    /// The theme's category colours (`grammar_view.rs`); empty uses the canvas's own.
+    category_colors: Vec<[u8; 3]>,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,

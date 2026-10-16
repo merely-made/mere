@@ -17,6 +17,9 @@ use crate::{ModeExportError, ModePalette, Theme};
 /// The authoritative presentation for a selected definition and mode.
 /// An authored stylesheet must be rendered by the host's existing cascade.
 /// It carries no claimed palette for those arbitrary rules.
+// Derived is the common case and is read in place; boxing it would add an
+// allocation per resolution for no gain.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, PartialEq)]
 pub enum ThemePresentation {
     Derived(ModePalette),
