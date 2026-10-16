@@ -11,7 +11,8 @@ GPU resident, including progress, pause/resume, cancellation and past-answer
 source viewing after restart with the origin offline. Distillery M2 and the
 inference-surface half of Eidetic P4 are closed. I6 qualifies a seven-shard
 OpenLlama 3B model whose f32 weights exceed the target GPU's memory, plus a
-4,126-token streamed prefill. I7 is next.
+4,126-token streamed prefill. I7 weight formats are implemented; final native
+format qualification and resident regression checks are in progress.
 The new device
 boundary uses two separately rooted resident compositions on one computer;
 a physical second computer and installed-binary receipt remain separate.
@@ -1242,3 +1243,25 @@ Stop and record the reason if any of these happen:
     binary with this scale model, a new headed scale-model run, physical
     second-device execution, cold-disk throughput and isolated per-process
     VRAM high-water remain separate receipts. I7 weight formats is next.
+
+
+- **2026-10-16: I7 implementation and qualification in progress.** Explicit
+  f16/bf16 and signed Q8/Q4 weight formats use `esp.layer-weights/v2`.
+  Packed blocks follow 32 input weights within each HF output row, with f32
+  scales and f16 embeddings/norms; a tied output head shares its embedding.
+  Loading transposes metadata rather than unpacking matrices. CPU composition
+  uses Flex for explicit half rows, and preserves the legacy NdArray corridor.
+  GPU composition retains its existing trainer reclaim owner.
+  - Candidate imports are diagnostic until an immutable, loader-specific bf16
+    comparison records exact prompts, token sequences, logit errors, weight
+    payload sizes and logical streaming costs. The format enters the session;
+    changing format refuses an existing checkpoint. Half constructors state
+    the dtype explicitly rather than inheriting Burn's f32 device default.
+  - A narrow cubek-matmul 0.3.0 patch reduces the unit stage after register
+    partitions reach one, keeping packed Q4 within the adapter's 48-KiB
+    workgroup limit. Its direct selector regression passes. GPU projections
+    also match host-decoded packed weights at 960-wide prefill/decode shapes.
+  - ESP currently passes 178 unit tests, two durable generation cases, two
+    library session cases, five prompt template cases and six autodiff trainer
+    cases. Final native format measurements and resident composition checks
+    remain to be recorded before this gate is marked complete.

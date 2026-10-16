@@ -170,7 +170,7 @@ pub enum InferenceModelSettings {
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum InferenceDeviceSettings {
-    /// Burn's portable NdArray backend.
+    /// CPU execution: NdArray for legacy rows, Flex for explicit weight formats.
     Cpu,
     /// First discrete wgpu adapter, probed before device construction.
     Gpu,

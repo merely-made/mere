@@ -104,6 +104,12 @@ BM25 `DocumentIndex` is keyed by passage content references. Its deterministic
 Unicode chunks retain the source version, canonical text hash and half-open
 Unicode scalar selector. Reconfigure recall to rebuild a changed corpus.
 
+Explicit `esp.layer-weights/v2` rows preserve their declared dtype and require
+a bf16 comparison receipt for the selected loader. CPU composition uses Flex
+for these rows and retains NdArray for legacy rows. GPU composition keeps the
+same foreground reclaim guard for f16, Q8 and Q4. Format and qualification are
+immutable library data, and the exact session refuses a format change on resume.
+
 `distillery.inference/ask-recall-v1` takes an `ask` and optional source `scope`.
 It renders selected passage handles through the declared context template and
 retains the exact supplied passages as sealed native Eidetic artifacts. Stale
