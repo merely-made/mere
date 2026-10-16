@@ -16,11 +16,13 @@
 
 pub mod conditions;
 pub mod custody;
-pub mod hocket_adoption;
+pub mod door;
 pub mod embedded_reservoir;
 pub mod enrollment;
+pub mod hocket_adoption;
 pub mod identity_ui;
 pub mod keeper;
+pub mod knot_relation_intake;
 pub mod lock_triggers;
 pub mod pairing;
 pub mod personal_sync;
@@ -33,8 +35,10 @@ pub mod resident_events;
 pub mod resident_inference;
 pub mod resident_knot;
 pub mod resident_mere;
+pub mod resident_projection;
 pub mod resident_reservoir;
 pub mod resident_site;
 pub mod resident_status;
 pub mod settings;
 pub mod startup_vault;
+pub mod sync;

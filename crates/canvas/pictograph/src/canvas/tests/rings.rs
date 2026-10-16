@@ -67,6 +67,7 @@ fn strategy_cache_tracks_visible_payload_and_resource_rebinding() {
                     predicate: claim.predicate,
                     recognized_sub_kind: claim.recognized_sub_kind,
                     label: Some("edited metadata".into()),
+                    basis: Default::default(),
                     graph_scope: claim.graph_scope,
                     provenance_iri: claim.provenance_iri,
                     asserted_at_ms: claim.asserted_at_ms,
@@ -262,9 +263,15 @@ fn strategy_cache_tracks_exact_assertion_insertions_and_retractions() {
         predicate: kernel::graph::predicate_iri(SemanticSubKind::UserGrouped).into(),
         recognized_sub_kind: Some(SemanticSubKind::UserGrouped),
         label: Some(id.into()),
+        basis: kernel::types::AssertionBasis {
+            note: Some(id.into()),
+            ..Default::default()
+        },
         graph_scope: Default::default(),
         provenance_iri: Some(format!("https://source.test/{id}")),
         asserted_at_ms: Some(17),
+        first_asserted_ms: Some(17),
+        withdrawn: None,
     };
     canvas.note_strategy_computed("grid.default", 800, 600, None);
     for (id, count) in [("cache-alice", 14), ("cache-bob", 15)] {
@@ -306,12 +313,12 @@ fn strategy_cache_tracks_exact_assertion_insertions_and_retractions() {
             .iter()
             .any(|statement| statement.statement_id == "cache-bob")
     );
-    assert!(
-        !payload
-            .semantic_statements()
-            .iter()
-            .any(|statement| statement.statement_id == "cache-alice")
-    );
+    let alice = payload
+        .semantic_statements()
+        .iter()
+        .find(|statement| statement.statement_id == "cache-alice")
+        .expect("retraction retains its exact statement handle");
+    assert!(alice.withdrawn.is_some());
     canvas.note_strategy_computed("grid.default", 800, 600, None);
     let revision = canvas.graph().revision();
     assert!(!canvas.ingest_graph(|graph| graph.retract_semantic_statement(a, b, "missing-handle")));

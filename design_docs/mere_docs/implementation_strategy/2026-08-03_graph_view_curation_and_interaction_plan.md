@@ -3,7 +3,7 @@
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23). CollapsedGraphlet is now ArrangementKind::Supernode.*
 
 **Date:** 2026-08-03  
-**Status (2026-10-06):** C3's root-Canvas fold is landed; its Swatch proof remains pending.
+**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The Isocosm: VTT campaign Overmap fold controls and its separate consumer acceptance remain pending.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
 adapters, plus a real second source in Isometry's pre-log `GameSnapshot` and
 authority `GameEvent` Codicil. Its Overmap Swatch has a Cambium slider that
@@ -559,3 +559,112 @@ It extends rather than rewrites:
   (its content verified), the view-state owner is repointed to pandect, the
   graphlet banner names `crates/mere/src/subgraph.rs`, and the C3/C6
   sequencing conflict is written in as a fork.
+
+
+## Native fold continuation integration (2026-10-15)
+
+**Status (2026-10-15):** complete; integrated and validated for main publication. Ports the five `s5-native-fold` commits
+onto current main, following mer3ly's native-phase rulings 163–166 in
+`merelyllc.com/docs/2026-09-30_graphshell_site_canvas_plan.md`.
+
+### Phases and done-conditions
+
+1. Restore the curation-owned v2 fold record, v1 migration, multiple Canvas
+   folds and shared command vocabulary. Done when the source compiles with
+   current scope, camera and host APIs and persisted records retain their meaning.
+2. Integrate framing and boundary rendering. Done when regression tests prove
+   all summary and member stand-ins frame correctly, scoped-out folds do not
+   render, and boundary cells route through both kinds of stand-in without
+   duplicating cells or ignoring per-cell hiding.
+3. Validate and publish. Done when focused native library tests, affected
+   consumer compilation and boundary checks pass and the commit is on main.
+   That source integration alone did not close the C3 Swatch or headed proof;
+   the subsequent native-host fixture receipt below records the bounded result.
+
+### Findings (2026-10-15)
+
+- Current main retained Forme's v1 record and one active Canvas fold; the old
+  branch implements the recorded continuation rather than duplicating main.
+- The initial merge conflicted in `canvas.rs` and `canvas/lifecycle.rs` over
+  newer exact-scope state. That state is retained alongside the fold set.
+- `canvas/framing.rs` was added after the branch and still called the removed
+  single-fold API. Framing now uses all summary centers and the fold hidden set.
+- The branch painted boundary overlays only for synthetic summaries. Member
+  stand-ins therefore lost hidden members' boundary cells, and multiple
+  summaries could draw a link to a hidden member. Boundary routing now operates
+  on the complete fold set, applying scope and per-cell visibility first.
+
+### Progress
+
+- 2026-10-15: recovered the branch changes and resolved scope conflicts;
+  native libraries pass (curation 9, command-menu 13, Forme 117, kernel 432,
+  Pandect 310, Canvas 455; 18 existing Canvas tests intentionally ignored).
+  The macOS Mere all-target consumer check, wasm Canvas library check and
+  refreshed port/web dependency-boundary checks pass.
+
+- 2026-10-15 validation findings: scope-aware fold visibility preserves saved
+  records without hiding a partially scoped member; exact empty scopes remain
+  empty. Restore refuses duplicate fold identity even for disjoint members.
+  Saved records validate after v1 migration and before use. Boundary regression
+  cases cover both stand-in kinds, between-fold links, family/direction
+  separation, scope and per-cell hiding without source mutation.
+- The old source-time byte-equality test crossed a snapshot wall-clock second.
+  It now uses the same timestamp normalization as the neighboring test, while
+  comparing every persisted content field. The exact-empty-scope regression uses
+  `scope_to_exact_members`, preserving the older scope helper's Show all behavior.
+- The D2 audit retains the same 15 incoming-main baseline errors (14 uncovered documents and
+  the snapshot aggregate digest); this integration adds no audit diagnostic.
+
+- 2026-10-15 integration refresh: rebased cleanly onto `39035965a`, including
+  the concurrent renderer-adoption commits. Fold source is unchanged by the
+  rebase; validation is repeated with that head's Genet/Netrender suppliers.
+
+- 2026-10-15 closure: all six library suites pass on the refreshed supplier
+  basis: 1,336 passed, zero failed, with 18 existing Canvas release/timing tests
+  intentionally ignored. `cargo check -p mere --all-targets` passes on macOS;
+  `cargo check -p pictograph --features canvas --target wasm32-unknown-unknown
+  --lib` passes; changed-source formatting and port/web dependency boundaries
+  pass. At this initial integration no headed window or Swatch acceptance ran;
+  the subsequent finite native-host checks are recorded below.
+
+
+### Headed Canvas and bounded Swatch receipt (2026-10-15)
+
+The finite `mere-view` example `fold_acceptance` runs the production
+`Canvas::frame` scene through Rootstock's `SceneProducer` on the native host's
+renderer, beside Cambium's `GraphCanvasSwatch` paint leaf and real node targets.
+Canvas exposes its existing full-fold-set boundary routing as `fold_routes`;
+the Canvas painter and the fixture's Swatch adapter use those same bundles.
+A regression independently asserts two forward and one reverse source cells
+between two folds, counted once in each direction.
+
+Both LaunchServices processes passed on macOS: interaction produced 108
+presented frames and 12 captures; reopening the saved fold records produced
+36 presented frames and five captures. All 17 captures are 1900 by 1100,
+nonblank, and were read back from presented frames. Selected captures were
+visually inspected. The fixture checks two simultaneous folds, exact directed
+boundary accounting, native pointer expansion, Swatch pointer expansion,
+undo/redo, serialized reload, fresh-process identity restoration, and explicit
+containment incoming/outgoing versus semantic outgoing membership. Source
+truth remains byte-equivalent after normalizing only the generated snapshot
+clock, and all member placements remain exact.
+
+The durable [acceptance receipt](../../../support/receipts/native-fold-20261015/acceptance.json)
+records source and binary hashes, process outcomes, captures, and limits.
+The scenarios are `crates/cambium/mere-view/examples/scenarios/folds.scn` and
+`folds_reopen.scn`. Build with
+`CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build -p mere-view --example fold_acceptance`.
+Run them with `scripts/run_macos_scenario.py`, prefix `FOLD_ACCEPTANCE`, a new
+output directory, and a 55-second timeout. The first run explicitly sets
+`FOLD_ACCEPTANCE_STATE` to an isolated file; the second explicitly sets
+`FOLD_ACCEPTANCE_RESTORE` to that file. Neither uses a real application profile.
+
+This closes the bounded native-host fixture proof. It does not close the
+plan's named Isocosm: VTT campaign consumer: its Overmap currently has no fold
+controls. Keyboard gestures, live screen-reader interaction, recovery, and
+Windows/Linux headed acceptance are also outside this receipt.
+
+Validation on the tested source: `pictograph` and `mere-view` library suites
+passed 494 tests, with 18 existing Canvas timing/release tests ignored. The
+port/web dependency boundary check, changed-file rustfmt, and diff check
+passed. The existing document audit has no new findings from these changes.

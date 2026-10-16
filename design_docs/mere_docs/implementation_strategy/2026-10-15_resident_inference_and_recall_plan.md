@@ -1093,3 +1093,16 @@ Stop and record the reason if any of these happen:
     refreshed and package versions unchanged. The native fixture build is separately blocked by fresh lock resolution through
     `burn-tch`/`tch` to yanked `zip 0.6` versions; the resident gate uses the
     existing workspace lock.
+
+- **2026-10-16, I5 integration started.** The inference branch incorporates
+  published Mere `9b6da81d`, preserving I1-I4 while adopting the application
+  door in `graphshell-endpoint`, serving/catalog support in `graphshell-host`,
+  and personal-sync ownership in Djinn. The private sibling sealing handle
+  follows its key-owning host into `djinn::sync`; it is not an application-door
+  capability. Turnstone's clean main incorporates its published updates while
+  preserving its local committed change. Existing I1-I4 receipts retain their
+  recorded source cuts; integrated compilation and I5 headed acceptance remain
+  pending. I5 must supply retained source versions from Turnstone's existing
+  trail owner through the admitted app route, keep source namespaces distinct,
+  and consume a decoder-free wire view. It must not reopen the trail database
+  in Djinn or introduce ESP into Turnstone.

@@ -1,0 +1,13 @@
+RESULT ok
+captured fresh-process-restored
+captured first-expanded
+captured undo-expanded
+captured redo-expanded
+captured all-expanded
+capture fresh-process-restored 1900x1100 digest=683d3ff9c5b9437f file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-reopen-r2/fresh-process-restored.png
+capture first-expanded 1900x1100 digest=9ba28fb864158dce file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-reopen-r2/first-expanded.png
+capture undo-expanded 1900x1100 digest=b4bed71fb4585777 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-reopen-r2/undo-expanded.png
+capture redo-expanded 1900x1100 digest=6171e710a1b77bbb file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-reopen-r2/redo-expanded.png
+capture all-expanded 1900x1100 digest=f37e273574f8eaa1 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-reopen-r2/all-expanded.png
+frames: 5 captured, 0 blank, 5 distinct digests
+presentation: 36 frames, 40 redraws, 4 unpresented redraws

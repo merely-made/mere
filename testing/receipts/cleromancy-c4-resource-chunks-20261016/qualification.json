@@ -1,0 +1,22 @@
+{
+  "source": "b35819edc7c338284a32a36198b1a54a81c48678",
+  "status": "shared native resource client source-qualified; product intake/native pending",
+  "tests": {
+    "command": "cargo test --locked --offline -p graphshell-endpoint --features door",
+    "passed": 32,
+    "failed": 0,
+    "ignored": 0,
+    "log_sha256": "5109ffca0904e8dd3d91335228a606ff29c774cf2f4b2914fc9ed53ab910ae98"
+  },
+  "protocol": "existing ResourceChunkRequest/ResourceChunkResponse, unchanged 1 MiB framing",
+  "checks": [
+    "requested scope and hash",
+    "stable total length",
+    "sequential offset",
+    "chunk hash and decoded bounds",
+    "progress on nonfinal chunks",
+    "whole resource hash"
+  ],
+  "consumer_limit_bytes": 67108864,
+  "publication": "local commit; coordinated product qualification pending"
+}

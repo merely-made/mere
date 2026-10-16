@@ -47,6 +47,9 @@ pub mod ids {
     pub const NAV_FORWARD: &str = "nav:forward";
     pub const NAV_RELOAD: &str = "nav:reload";
     pub const NAV_STOP: &str = "nav:stop";
+    pub const FOLD_SELECTION: &str = "fold:selection";
+    pub const FOLD_COLLAPSE_DESCENDANTS: &str = "fold:collapse_descendants";
+    pub const FOLD_EXPAND: &str = "fold:expand";
 }
 
 /// A shared id and its label.
@@ -61,7 +64,8 @@ const fn entry(id: &'static str, label: &'static str) -> Entry {
 }
 
 /// Every shared id with its label, in the plan's order (F13; four labels
-/// revised by SE52).
+/// revised by SE52), then the graph view's fold verbs (mer3ly site plan,
+/// Ruling 165; added for the editor lane's review).
 pub const CATALOGUE: &[Entry] = &[
     entry(ids::NODE_NEW, "New node"),
     entry(ids::NODE_DELETE, "Delete node"),
@@ -96,6 +100,9 @@ pub const CATALOGUE: &[Entry] = &[
     entry(ids::NAV_FORWARD, "Forward"),
     entry(ids::NAV_RELOAD, "Reload"),
     entry(ids::NAV_STOP, "Stop loading"),
+    entry(ids::FOLD_SELECTION, "Fold selection"),
+    entry(ids::FOLD_COLLAPSE_DESCENDANTS, "Collapse descendants"),
+    entry(ids::FOLD_EXPAND, "Expand fold"),
 ];
 
 /// The label for a shared id.
@@ -138,7 +145,7 @@ mod tests {
 
     #[test]
     fn every_id_is_well_formed_unique_and_labelled() {
-        assert_eq!(CATALOGUE.len(), 33, "F13's count");
+        assert_eq!(CATALOGUE.len(), 36, "F13's 33 and Ruling 165's three");
         for (index, entry) in CATALOGUE.iter().enumerate() {
             assert!(is_well_formed(entry.id), "{}", entry.id);
             assert!(!entry.label.is_empty(), "{}", entry.id);
@@ -159,6 +166,8 @@ mod tests {
         assert_eq!(fit.category, "view");
         assert!(command("host:own").is_none());
         assert_eq!(label(ids::NAV_STOP), Some("Stop loading"));
+        let collapse = command(ids::FOLD_COLLAPSE_DESCENDANTS).expect("in the catalogue");
+        assert_eq!(collapse.category, "fold");
     }
 
     #[test]

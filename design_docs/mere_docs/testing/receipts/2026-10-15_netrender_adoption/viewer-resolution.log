@@ -1,0 +1,39 @@
+    Blocking waiting for file lock on package cache
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://github.com/merely-made/netrender.git`
+    Updating crates.io index
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+     Locking 27 packages to highest Rust 1.97.1 compatible versions
+      Adding browsing-context-api v0.1.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding buckram v0.0.3 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding cadency v0.0.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding document-session-api v0.1.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding fleece v0.5.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-documents v0.1.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-livery v0.0.4 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-parley v0.10.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-render v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding genet-text v0.1.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding livery v0.0.5 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df#f4f9c0d8)
+      Adding netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df#f4f9c0d8)
+      Adding paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df#f4f9c0d8)
+      Adding paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df#f4f9c0d8)
+      Adding regress v0.11.1 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+      Adding taproot v0.1.0 (https://github.com/merely-made/genet.git?rev=7ffe66208ca3059283ef8770de7d17aa8834ecc8#7ffe6620)
+    Blocking waiting for file lock on package cache

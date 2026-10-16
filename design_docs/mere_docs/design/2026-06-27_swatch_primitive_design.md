@@ -155,6 +155,11 @@ What flattens them is purely the orrery draw, "one undirected line per pair"
 **Decision (Mark, 2026-06-27): the addressable edge is a cell**, identified
 `(source, target, RelationSelector)`. No storage change. The work is:
 
+> **Superseded 2026-10-15** by the [link model](../technical_architecture/2026-10-15_link_model.md)
+> (L1, L4): the addressable unit is the assertion, and the drawable unit is the
+> link, one stroke at rest that opens to show its assertions. Fanning retires.
+> The §11 fan-geometry question dissolves. Code is unchanged until that doc's P4.
+
 1. **Un-collapse the render**: draw each visible cell between a pair as its own
    fanned, family-coloured line, individually selectable.
 2. **Per-cell weight**: thickness becomes each relation's own metric, not per-pair

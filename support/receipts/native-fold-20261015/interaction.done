@@ -1,0 +1,27 @@
+RESULT ok
+captured expanded
+captured selection
+captured redone
+captured two-folds
+captured restored
+captured swatch-expanded
+captured final-expanded
+captured native-expanded
+captured containment-outgoing
+captured containment-incoming
+captured semantic-outgoing
+captured hierarchy-expanded
+capture expanded 1900x1100 digest=61308a5ffc787df4 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/expanded.png
+capture selection 1900x1100 digest=69d6aa5cde479146 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/selection.png
+capture redone 1900x1100 digest=3cf9073ab49eb867 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/redone.png
+capture two-folds 1900x1100 digest=d7c0b60d939af500 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/two-folds.png
+capture restored 1900x1100 digest=6eec8e39321234b0 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/restored.png
+capture swatch-expanded 1900x1100 digest=2562dcc7466fb658 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/swatch-expanded.png
+capture final-expanded 1900x1100 digest=f614a3f53693af4b file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/final-expanded.png
+capture native-expanded 1900x1100 digest=1028c3412da83547 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/native-expanded.png
+capture containment-outgoing 1900x1100 digest=c2562e64d451e199 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/containment-outgoing.png
+capture containment-incoming 1900x1100 digest=01526a851877af30 file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/containment-incoming.png
+capture semantic-outgoing 1900x1100 digest=b3a38ad34112ac4a file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/semantic-outgoing.png
+capture hierarchy-expanded 1900x1100 digest=f8137cf376525dbf file=/Users/markik/Code/output/native-fold-validation-2026-10-15/headed-r2/hierarchy-expanded.png
+frames: 12 captured, 0 blank, 12 distinct digests
+presentation: 108 frames, 111 redraws, 3 unpresented redraws

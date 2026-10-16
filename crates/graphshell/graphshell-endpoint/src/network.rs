@@ -116,10 +116,9 @@ async fn write_request<W>(writer: &mut W, request: &CarrierRequest) -> Result<()
 where
     W: AsyncWrite + Unpin,
 {
-    let mut line = serde_json::to_vec(request).map_err(|error| {
+    let line = chirograph::line::encode_terminated(request).map_err(|error| {
         CarrierError::Disconnected(format!("could not encode carrier request: {error}"))
     })?;
-    line.push(b'\n');
     writer.write_all(&line).await.map_err(|error| {
         CarrierError::Disconnected(format!("could not send carrier request: {error}"))
     })?;
@@ -141,12 +140,16 @@ where
                 "endpoint closed without an output frame".into(),
             ));
         };
-        if line.trim().is_empty() {
-            continue;
+        match chirograph::line::decode::<CarrierOutput>(&line) {
+            Ok(Some(output)) => return Ok(output),
+            // A blank line keeps a link warm; it is not a frame.
+            Ok(None) => continue,
+            Err(error) => {
+                return Err(CarrierError::Disconnected(format!(
+                    "invalid carrier output: {error}"
+                )));
+            },
         }
-        return serde_json::from_str(&line).map_err(|error| {
-            CarrierError::Disconnected(format!("invalid carrier output: {error}"))
-        });
     }
 }
 

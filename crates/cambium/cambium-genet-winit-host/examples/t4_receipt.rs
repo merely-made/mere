@@ -54,8 +54,7 @@ use std::rc::Rc;
 
 use cambium::{AnyView, GenetCtx, GenetElement, custom_leaf, el};
 use cambium_genet_winit_host::{
-    AppCtx, Frame, FrameProfile, HostHooks, HostOptions, Init, Surface, inert_hooks, read_frame,
-    run,
+    AppCtx, Frame, FrameProfile, HostHooks, HostOptions, Init, inert_hooks, run,
 };
 use paint_list_api::ColorF;
 use sprigging::{Leaf, PaintCx, Size, SizeHint};
@@ -428,15 +427,23 @@ fn main() {
     std::fs::create_dir_all(receipt_dir.join("pixels")).expect("create pixels dir");
 
     let steps = Rc::new(build_steps());
-    let total = steps.len();
     let results: Rc<RefCell<Results>> = Rc::new(RefCell::new(Results::default()));
 
     let mut hooks: HostHooks<St, Logic, Child> = inert_hooks();
+    type PixelJob = (
+        String,
+        Rc<std::cell::Cell<Option<u64>>>,
+        cambium_rootstock::CaptureFrame,
+    );
+    let pending: Rc<RefCell<Option<PixelJob>>> = Rc::new(RefCell::new(None));
 
     {
         let results = results.clone();
-        let receipt_dir = receipt_dir.clone();
+        let pending = pending.clone();
         hooks.frame = Box::new(move |ctx: &mut AppCtx<St, Logic, Child>| {
+            if pending.borrow().is_some() {
+                return true;
+            }
             let i = ctx.runner.state().idx;
             let steps = ctx.runner.state().steps.clone();
             let step = steps[i].clone();
@@ -498,52 +505,67 @@ fn main() {
             let want_pixels = matches!(step.kind, StepKind::Pair { .. });
             let want_control_lower = matches!(step.kind, StepKind::Control);
             let label = step.label.clone();
-            let results_for_capture = results.clone();
-            let dir_for_capture = receipt_dir.clone();
-            *ctx.capture = Some(Box::new(move |capture| {
-                let capture = capture.expect("retained fragment receipt capture refused");
-                let (surface, view, w, h) =
-                    (capture.surface, capture.view, capture.width, capture.height);
-                let lower = surface.renderer().fragment_lower_count();
+            let lower = Rc::new(std::cell::Cell::new(None));
+            let observed = lower.clone();
+            let results_for_observer = results.clone();
+            *ctx.presentation_observer = Some(Box::new(move |ctx, _stamp| {
+                let count = ctx
+                    .render_core
+                    .and_then(|core| core.renderer().fragment_lower_count());
+                observed.set(count);
                 if want_control_lower {
-                    results_for_capture.borrow_mut().control_lower_after = lower;
-                }
-                if want_pixels {
-                    let frame = read_frame(surface, view, w, h).expect("readback");
-                    let col_w = frame.width / 3;
-                    let leaf_bytes = crop(&frame, 0, col_w);
-                    let reference_bytes = crop(&frame, col_w, 2 * col_w);
-                    let bare_bytes = crop(&frame, 2 * col_w, 3 * col_w);
-                    let matched = leaf_bytes == reference_bytes;
-                    let non_vacuous = reference_bytes != bare_bytes;
-                    if label.ends_with("frame0") || label.ends_with("frame3") {
-                        let _ = write_png(
-                            &dir_for_capture.join("pixels").join(format!("{label}.png")),
-                            frame.width,
-                            frame.height,
-                            &frame.rgba,
-                        );
-                    }
-                    results_for_capture.borrow_mut().pairs.push(PairResult {
-                        label: label.clone(),
-                        matched,
-                        non_vacuous,
-                        lower_count: lower,
-                    });
+                    results_for_observer.borrow_mut().control_lower_after = count;
                 }
             }));
-
-            let last = i + 1 >= total;
-            if last {
-                *ctx.close = true;
+            if want_pixels {
+                let sink = pending.clone();
+                *ctx.capture = Some(Box::new(move |capture| {
+                    *sink.borrow_mut() = Some((
+                        label,
+                        lower,
+                        capture.expect("retained fragment receipt capture refused"),
+                    ));
+                }));
             }
-            !last
+            true
         });
     }
 
     {
         let results = results.clone();
+        let pending = pending.clone();
+        let receipt_dir = receipt_dir.clone();
         hooks.after_frame = Box::new(move |ctx: &mut AppCtx<St, Logic, Child>| {
+            let completed = pending
+                .borrow_mut()
+                .as_mut()
+                .and_then(|(_, _, job)| job.poll());
+            if let Some(result) = completed {
+                let (label, lower, _) = pending.borrow_mut().take().unwrap();
+                let (_presentation, frame) = result.expect("readback");
+                let col_w = frame.width / 3;
+                let leaf_bytes = crop(&frame, 0, col_w);
+                let reference_bytes = crop(&frame, col_w, 2 * col_w);
+                let bare_bytes = crop(&frame, 2 * col_w, 3 * col_w);
+                if label.ends_with("frame0") || label.ends_with("frame3") {
+                    write_png(
+                        &receipt_dir.join("pixels").join(format!("{label}.png")),
+                        frame.width,
+                        frame.height,
+                        &frame.rgba,
+                    )
+                    .expect("receipt PNG");
+                }
+                results.borrow_mut().pairs.push(PairResult {
+                    label,
+                    matched: leaf_bytes == reference_bytes,
+                    non_vacuous: reference_bytes != bare_bytes,
+                    lower_count: lower.get(),
+                });
+            }
+            if pending.borrow().is_some() || ctx.presentation.is_none() {
+                return;
+            }
             let i = ctx.runner.state().idx;
             let steps = ctx.runner.state().steps.clone();
             let step = &steps[i];
@@ -574,6 +596,8 @@ fn main() {
             }
             if i + 1 < steps.len() {
                 ctx.runner.update(|s| s.idx = i + 1);
+            } else {
+                *ctx.close = true;
             }
         });
     }

@@ -8,12 +8,10 @@
 
 use std::{path::Path, sync::Arc};
 
+use crate::sync::{personal_seals::PersonalGraphSeals, personal_sync_host::PersonalSyncHost};
 use distillery::inference::{
     RunJournal,
     durable::{PersonaRunJournal, RunExt, RunGroupProtection},
-};
-use graphshell::native::{
-    personal_seals::PersonalGraphSeals, personal_sync_host::PersonalSyncHost,
 };
 use muniment::RedbBackend;
 use personae::IdentityProvider;

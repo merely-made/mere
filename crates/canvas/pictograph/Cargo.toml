@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "pictograph"
 version = "0.2.0"
 edition.workspace = true
@@ -15,7 +16,7 @@ default = ["image-decode"]
 image-decode = ["genet-livery?/image-decode"]
 vello = ["dep:netrender_vello"]
 # Graph-structural signals over the kernel graph (`pictograph::signals`).
-signals = ["dep:kernel", "dep:cartography", "dep:chartulary"]
+signals = ["dep:kernel", "dep:cartography", "dep:chartulary", "dep:libm"]
 # The canvas's and the board's repulsion staged on the host's GPU
 # (`Canvas::set_physics_device`; physics catalog plan, P5c). Opt-in per consumer.
 gpu = ["canvas", "seiche/gpu"]
@@ -34,6 +35,8 @@ canvas = [
     # Permitted actions are chirograph's `AdvertisedAction`s (stack seams S3;
     # dynamics grammar plan, G9).
     "dep:chirograph",
+    # The native fold record (mer3ly site plan, Rulings 153 and 163).
+    "dep:curation",
     "dep:esp",
     "dep:euclid",
     "dep:forme",
@@ -49,6 +52,9 @@ canvas = [
     "dep:sceno",
     "dep:scenomise",
     "dep:scenograph",
+    # The arrangement transitions `canvas::physics_controls` schedules
+    # (Graphshell stack lift plan, P2 and L5).
+    "dep:scenotime",
     "dep:seiche",
     # The dynamics spec's wire (dynamics grammar plan, G4a).
     "seiche/serde",
@@ -66,6 +72,7 @@ netrender_vello = { workspace = true, optional = true }
 armillary = { workspace = true, optional = true }
 cartography = { workspace = true, optional = true }
 chirograph = { workspace = true, optional = true }
+curation = { workspace = true, optional = true }
 chartulary = { version = "0.2.1", path = "../../eidetic/chartulary", optional = true }
 esp = { workspace = true, optional = true }
 euclid = { version = "0.22", optional = true }
@@ -74,6 +81,9 @@ genet-livery = { workspace = true, optional = true }
 genet-scripted-dom = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }
 layout_dom_api = { workspace = true, optional = true }
+# The spectral producer's start vector (`signals`): the same bits on every
+# target, as scenomise's solvers (ruling S4).
+libm = { workspace = true, optional = true }
 netrender = { workspace = true, optional = true }
 numen = { workspace = true, optional = true }
 paint_list_api = { workspace = true, optional = true }
@@ -82,6 +92,7 @@ petgraph = { version = "0.8.3", optional = true }
 sceno = { workspace = true, optional = true }
 scenomise = { workspace = true, optional = true }
 scenograph = { workspace = true, optional = true }
+scenotime = { workspace = true, optional = true }
 seiche = { workspace = true, optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }

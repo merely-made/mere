@@ -103,8 +103,8 @@ fn walk(grammar: &GrammarDef, depth: u8) -> Vec<Vec2> {
     for symbol in symbols.chars() {
         match symbol {
             'F' => {
-                x += heading.cos();
-                y += heading.sin();
+                x += crate::math::cos(heading);
+                y += crate::math::sin(heading);
                 positions.push(Vec2::new(x, y));
             },
             '+' => heading -= grammar.angle,
@@ -153,7 +153,7 @@ fn normalize_path(raw: &[Vec2], config: &LSystem) -> Vec<Vec2> {
     let extent = (max_x - min_x).max(max_y - min_y).max(1.0);
     let scale = config.size / extent;
     let (center_x, center_y) = ((min_x + max_x) * 0.5, (min_y + max_y) * 0.5);
-    let (sin, cos) = config.rotation.sin_cos();
+    let (sin, cos) = crate::math::sin_cos(config.rotation);
     raw.iter()
         .map(|point| {
             let (dx, dy) = ((point.x - center_x) * scale, (point.y - center_y) * scale);

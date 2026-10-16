@@ -24,6 +24,39 @@ The new fixture's initial zero-difference predicate was stricter than the establ
 
 Rootstock additionally releases frame-local raster views/textures and swapchain target handles before initiating replacement from mid-frame loss branches. That ordering is source-reviewed; this runtime control injects after a completed capture and does not qualify arbitrary concurrent loss during upload/composition/presentation. The opt-in is acceptance-only (`TABARD_CONTROLLED_DEVICE_LOSS=1` plus a fresh run identity), has no product UI, retains no strong old GPU handles, and uses presentation-bound state/image metadata. Renderer algorithms, release pins and acceptance thresholds are unchanged.
 
+## Later two-window native and browser recovery
+
+The [native shared R2 record](native-shared-r2/README.md) separately qualifies two
+independent full Workshop windows with identical local preview keys. Its native
+binary was built at Mere `cc65bf4a8f71867217f10041e9cfd34d1e2d0de2` and Genet
+`09b16a559237aaa8163589763dbe2370264097cc`; candidate Mere `0570f098e2e99e787e7bfcc78495f3c1a06af0d2`
+differs only in an unused browser fixture repair. All 24 raw/PNG artifacts and six
+full recovery pairs pass RGB 3 / alpha 2 / mean 1, with maximum RGB 1, alpha 0 and
+mean 7.282838983050848e-7. Normal-run processes close in 30.745 seconds; no
+interruption occurred. This earlier native proof does not qualify the later
+retained font changes or browser fixture font-role fidelity.
+
+The [accepted browser R6 record](browser-r6/README.md) uses actual Genet `5618326d287e7f7ef0c1cc3545587d64cedb22a7`
+and Mere `4682ba99040c234c6410d73125e5dc9b1f91cc03`, retaining Netrender `c74b7cb` and
+provider `2eae624`. The production async owner recovers generation 2 to 3 across
+two full Workshop mounts with identical local keys, one application-hidden host
+and distinct physical images. Twelve complete copied root/Reader/Stylesheet
+images and six comparisons pass unchanged uniform RGB 3 / alpha 2 / mean 1,
+with maximum RGB 1, alpha 0 and mean 1.9501730778606602e-5. All twelve PNGs were
+visually reviewed. State/source/runner identity, typed capture/readback refusal,
+continued logical input/resize, mount disposal and explicit owned-device closure
+pass. Synthetic DOM Tab-release controls are separate from OS input/AT.
+
+Explicit retained font ledgers keep actual Roboto bytes in the outer Host and
+both producer documents, with positive glyph/font observations through recovery.
+Mapping that one fixture face to sans-serif, system-ui, serif and monospace
+qualifies delivery/retention, not serif/fixed-width/script/locale fidelity. Five
+CPU resource controls have their own receipt. R6 reuses the unchanged compiled
+R4 Wasm/glue and R5 package under recorded compiler-input equivalence; its R6
+runtime helper repair is sealed separately. Compact copies and external absolute
+raw/build/source hashes are retained in provenance. Later immutable Git-only
+pin/merge coherence is not inferred from the candidate-local patch proof.
+
 ## Resource and timing scope
 
 Root alone executed builds/tests and GPU/native batches, using 2 Cargo jobs, disabled incremental/debug, one test thread, finite outer deadlines and 5 second per-readback bounds. Source/review lanes ran in parallel; runtime remained serialized. The unlocked retry used Canonical's explicit brief handoff, an immutable copy of the existing binary and a finite display inhibitor; its app exited and owned inhibitor stopped before runtime returned to Canonical. The shared CPU target lease remained with Moot. No physical driver reset was forced.
@@ -32,6 +65,6 @@ Matched fresh-session observations show median case ratios CPU 1.52x and Sparse 
 
 ## Remaining qualification
 
-The default browser recovery factory requires an asynchronous host replacement path. WebGPU asynchronous error-scope outcomes and physical driver reset remain unqualified. Native raster scopes cover target/filter creation and checked renderer submission; they do not qualify every producer upload, composition or presentation operation against concurrent loss. Multiple native windows, complete hidden producer pixel rehydration, OS accessibility and headed-browser acceptance remain separate consumer gates coordinated through the explicit runtime handoff. This controlled one-window run qualifies queue presentation after owned-device destruction and continued runner input/resize, within its recorded pixel limits.
+The stored browser asynchronous replacement path is implemented and its controlled two-mount R6 gate is accepted. Browser current-frame GPU error-scope outcomes, shader-counter completion and final canvas clear/blit scopes remain unqualified; R6 records pending Some((3, 96)) and both current-frame flags false. Native raster scopes cover target/filter creation and checked renderer submission; they do not qualify every producer upload, composition or presentation operation against concurrent loss. The earlier two-window native and current browser full-producer recovery records have the exact separate source/font bounds above. Background-document RAF suspension, shared-forest disposal, OS accessibility/input, physical driver reset and sustained performance remain separate gates. The controlled one-window record remains valid for its original scope.
 
 The actual native current-frame completion control also passed: a finite width-40,000,000 round-cap stroke submits under aggregate preflight, then the checked host returns its shader CurveFlatteningLimit before success. Counters drain, generation/owner stay unchanged, factory calls stay zero and a valid next render succeeds. Native checked targets now wait for current counter qualification within the five-second deadline. Browser current-frame counter qualification remains an async gate.

@@ -1355,7 +1355,7 @@ P5 and P6 stay in this plan.
   `fragile-send-sync-non-atomic-wasm` unconditionally; feature unification
   puts it on the page's one wgpu, which then requires a `Send` callback for
   every wasm `map_async`. Three readbacks captured `Rc<Cell<bool>>`:
-  `ports/graphshell/src/web_gpu.rs` and `web_timing.rs` (now
+  [web_gpu.rs at the pre-cutover revision](https://github.com/merely-made/mere/blob/e84cfbd95b1660046d646580a8707af020a06e4b/ports/graphshell/src/web_gpu.rs) and `web_timing.rs` (now
   `Arc<AtomicBool>`) and `crates/cambium/cambium-genet-web-host/src/capture.rs`,
   outside this lane's crates (the same change, uncommitted, put to Mark).
 - 2026-10-02 (P5c, web): a generated graph with links packs into a jammed ball

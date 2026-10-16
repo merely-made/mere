@@ -9,6 +9,12 @@
 
 use super::*;
 
+fn persisted_truth(mut snapshot: kernel::persistence::GraphSnapshot) -> Vec<u8> {
+    // Snapshot creation stamps wall-clock seconds; compare every persisted fact.
+    snapshot.timestamp_secs = 0;
+    serde_json::to_vec(&snapshot).expect("graph persists")
+}
+
 #[test]
 fn fold_selection_projects_a_summary_and_click_expands_without_mutating_graph() {
     let mut canvas = Canvas::new();
@@ -38,20 +44,27 @@ fn fold_selection_projects_a_summary_and_click_expands_without_mutating_graph() 
     assert!(canvas.toggle_select_member(b));
     let source_nodes = canvas.graph().nodes().count();
     let source_relations = canvas.graph().relations().count();
-    let source_truth = serde_json::to_vec(&canvas.graph().to_snapshot())
-        .expect("the source graph has a stable persisted form");
+    let source_truth = persisted_truth(canvas.graph().to_snapshot());
 
     let fold_id = canvas
         .fold_selected("canvas:test")
         .expect("two selected nodes make a fold");
-    let projection = canvas
-        .active_fold_projection()
-        .expect("the current graph projects the fold");
-    let record = canvas
-        .fold_record()
-        .cloned()
-        .expect("the current fold remains a durable view record");
+    let projection = canvas.fold_projections().pop().expect("the fold projects");
+    let records = canvas.fold_records().to_vec();
+    assert_eq!(records[0].rule, Some(curation::FoldRule::Selection));
+    assert_eq!(
+        records[0].stand_in,
+        curation::FoldStandIn::Summary { label: None }
+    );
     assert_eq!(projection.members.len(), 2);
+    assert_eq!(projection.stand_in, None, "a selection folds to a summary");
+    assert_eq!(projection.badge(), "+2");
+    assert_eq!(
+        canvas.fold_summary_centers(),
+        vec![PortablePoint::new(50.0, 0.0)],
+        "the body sits at the members' centroid"
+    );
+    assert_eq!(canvas.fold_hidden_keys(), HashSet::from([ak, bk]));
     assert_eq!(projection.internal_relation_count, 1);
     assert_eq!(projection.boundary_bundles.len(), 1);
     assert_eq!(projection.boundary_bundles[0].count, 2);
@@ -61,27 +74,26 @@ fn fold_selection_projects_a_summary_and_click_expands_without_mutating_graph() 
     assert_eq!(canvas.graph().nodes().count(), source_nodes);
     assert_eq!(canvas.graph().relations().count(), source_relations);
     assert!(canvas.undo_fold(), "undo restores the pre-fold selection");
-    assert!(canvas.active_fold_projection().is_none());
+    assert!(canvas.fold_projections().is_empty());
     assert_eq!(canvas.selected, HashSet::from([ak, bk]));
     assert!(canvas.redo_fold(), "redo restores the same synthetic fold");
-    assert_eq!(canvas.active_fold_projection().unwrap().fold_id, fold_id);
+    assert_eq!(canvas.fold_projections()[0].fold_id, fold_id);
 
     let center = canvas
         .camera
         .to_screen(euclid::default::Point2D::new(50.0, 0.0));
     canvas.pointer_down(PointerButton::Left, center.0, center.1);
     assert!(canvas.pointer_up(PointerButton::Left, center.0, center.1));
-    assert!(canvas.active_fold_projection().is_none());
+    assert!(canvas.fold_projections().is_empty());
     assert_eq!(canvas.selected, HashSet::from([ak, bk]));
-    assert!(canvas.restore_fold(None));
-    assert!(canvas.restore_fold(Some(record)));
-    assert!(canvas.active_fold_projection().is_some());
-    assert!(canvas.expand_active_fold());
+    assert!(canvas.restore_folds([]).is_empty());
+    assert!(canvas.restore_folds(records).is_empty());
+    assert_eq!(canvas.fold_projections().len(), 1);
+    assert!(canvas.expand_selected_fold());
     assert_eq!(canvas.graph().nodes().count(), source_nodes);
     assert_eq!(canvas.graph().relations().count(), source_relations);
     assert_eq!(
-        serde_json::to_vec(&canvas.graph().to_snapshot())
-            .expect("the source graph remains serializable"),
+        persisted_truth(canvas.graph().to_snapshot()),
         source_truth,
         "folding remains a byte-for-byte view action"
     );
@@ -93,9 +105,218 @@ fn fold_selection_projects_a_summary_and_click_expands_without_mutating_graph() 
         );
     }
     assert!(
-        !canvas.expand_fold(fold_id),
+        !canvas.expand_fold(&fold_id),
         "the summary is already expanded"
     );
+}
+
+/// A canvas of five nodes: `root` contains `x` and `y`, `other` contains
+/// `z`, laid out on a line.
+fn two_hierarchies() -> (Canvas, [uuid::Uuid; 5]) {
+    let mut graph = kernel::graph::Graph::new();
+    let keys = [
+        "https://root.fold.test",
+        "https://x.fold.test",
+        "https://y.fold.test",
+        "https://other.fold.test",
+        "https://z.fold.test",
+    ]
+    .map(|url| graph.add_node(url.into(), euclid::default::Point2D::zero()));
+    let [root, x, y, other, z] = keys;
+    for (from, to) in [(root, x), (root, y), (other, z)] {
+        graph.assert_relation(
+            from,
+            to,
+            kernel::graph::EdgeAssertion::Containment {
+                sub_kind: kernel::graph::ContainmentSubKind::Domain,
+            },
+        );
+    }
+    let ids = keys.map(|key| graph.get_node(key).unwrap().id);
+    let mut canvas = Canvas::with_graph(graph);
+    for (index, key) in keys.into_iter().enumerate() {
+        canvas.view.set_position(
+            key,
+            euclid::default::Point2D::new(index as f32 * 100.0, 0.0),
+        );
+    }
+    (canvas, ids)
+}
+
+#[test]
+fn several_folds_stand_in_as_members_with_badges_and_undo_as_a_set() {
+    use crate::canvas::fold_projection::FoldTraversalDirection;
+    use kernel::graph::EdgeFamily;
+
+    let (mut canvas, [root, x, y, other, z]) = two_hierarchies();
+    let key = |canvas: &Canvas, id| canvas.graph().get_node_key_by_id(id).unwrap();
+    let first = canvas
+        .collapse_descendants(
+            key(&canvas, root),
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Outgoing,
+            "canvas:test",
+        )
+        .expect("root and its two children");
+    let second = canvas
+        .collapse_descendants(
+            key(&canvas, other),
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Outgoing,
+            "canvas:test",
+        )
+        .expect("a second, disjoint fold");
+    assert_ne!(first, second);
+    assert_eq!(canvas.fold_records().len(), 2);
+    assert_eq!(
+        canvas.fold_records()[0].rule,
+        Some(curation::FoldRule::Descendants {
+            root: root.to_string(),
+            family: "containment".into(),
+            direction: curation::FoldDirection::Outgoing,
+        })
+    );
+    assert!(
+        canvas.node_in_scope(key(&canvas, root)),
+        "the root stands in"
+    );
+    assert!(canvas.node_in_scope(key(&canvas, other)));
+    for hidden in [x, y, z] {
+        assert!(!canvas.node_in_scope(key(&canvas, hidden)));
+    }
+    assert_eq!(canvas.fold_of_member(z), Some(second.clone()));
+
+    // A fold that would share a member with an active one is refused.
+    canvas.select_only(key(&canvas, root));
+    assert!(canvas.toggle_select_member(other));
+    assert!(canvas.fold_selected("canvas:test").is_none());
+
+    // Each stand-in carries its "+N", at its top-right corner.
+    let badges = canvas.fold_badges();
+    assert_eq!(
+        badges
+            .iter()
+            .map(|badge| (badge.stand_in, badge.text.as_str()))
+            .collect::<Vec<_>>(),
+        vec![(Some(root), "+2"), (Some(other), "+1")]
+    );
+    let (sx, sy) = canvas.screen_position_of(key(&canvas, root)).unwrap();
+    assert!(
+        badges[0].at.0 > sx && badges[0].at.1 < sy,
+        "{:?}",
+        badges[0].at
+    );
+
+    // The badge is a hit target that expands its fold; the stand-in's own
+    // body stays an ordinary node.
+    assert!(canvas.set_fold_label(&first, Some("Root's contents".into())));
+    assert!(!canvas.set_fold_label(&first, Some("  ".into())), "blank");
+    let at = badges[1].at;
+    canvas.pointer_down(PointerButton::Left, at.0, at.1);
+    assert!(canvas.pointer_up(PointerButton::Left, at.0, at.1));
+    assert_eq!(canvas.fold_records().len(), 1);
+    assert_eq!(canvas.fold_records()[0].id, first);
+    assert!(canvas.node_in_scope(key(&canvas, z)));
+
+    // Undo walks the set back: the expand, then the label.
+    assert!(canvas.undo_fold());
+    assert_eq!(canvas.fold_records().len(), 2);
+    assert_eq!(
+        canvas.fold_records()[0].label.as_deref(),
+        Some("Root's contents")
+    );
+    assert!(canvas.undo_fold());
+    assert_eq!(canvas.fold_records()[0].label, None);
+    assert!(canvas.redo_fold());
+    assert!(canvas.redo_fold());
+    assert_eq!(canvas.fold_records().len(), 1);
+
+    // The scene draws one badge element per stand-in, and keeps the one
+    // made for an expanded fold for reuse, hidden.
+    assert!(canvas.undo_fold());
+    canvas.frame(800, 600);
+    assert_eq!(
+        canvas
+            .fold_badge_nodes
+            .iter()
+            .map(|(_, _, text)| text.as_str())
+            .collect::<Vec<_>>(),
+        vec!["+2", "+1"]
+    );
+    assert!(canvas.redo_fold());
+    canvas.frame(800, 600);
+    assert_eq!(canvas.fold_badge_nodes.len(), 2);
+}
+
+#[test]
+fn a_collapse_absorbs_a_fold_inside_it_and_restore_refuses_stale_or_overlapping_records() {
+    use crate::canvas::fold_projection::FoldTraversalDirection;
+    use kernel::graph::EdgeFamily;
+
+    let (mut canvas, [root, x, y, ..]) = two_hierarchies();
+    let key = |canvas: &Canvas, id| canvas.graph().get_node_key_by_id(id).unwrap();
+    canvas.select_only(key(&canvas, x));
+    assert!(canvas.toggle_select_member(y));
+    let inner = canvas.fold_selected("canvas:test").expect("x and y");
+    let outer = canvas
+        .collapse_descendants(
+            key(&canvas, root),
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Outgoing,
+            "canvas:test",
+        )
+        .expect("the inner fold lies wholly inside");
+    assert_eq!(
+        canvas
+            .fold_records()
+            .iter()
+            .map(|record| record.id.clone())
+            .collect::<Vec<_>>(),
+        vec![outer.clone()],
+        "folds do not nest"
+    );
+    assert!(canvas.undo_fold());
+    assert_eq!(canvas.fold_records()[0].id, inner, "one undo step");
+    assert!(canvas.redo_fold());
+
+    let kept = canvas.fold_records()[0].clone();
+    let mut overlapping = kept.clone();
+    overlapping.id = curation::FoldId::new("overlap");
+    let mut stale = kept.clone();
+    stale.id = curation::FoldId::new("stale");
+    stale.members[1] = uuid::Uuid::from_u128(7).to_string();
+    stale.members.sort();
+    stale.stand_in = curation::FoldStandIn::Summary { label: None };
+    stale.rule = None;
+    let refused = canvas.restore_folds([kept.clone(), overlapping, stale]);
+    assert_eq!(
+        refused
+            .iter()
+            .map(|record| record.id.as_str())
+            .collect::<Vec<_>>(),
+        vec!["overlap", "stale"]
+    );
+    assert_eq!(canvas.fold_records(), &[kept]);
+}
+
+#[test]
+fn restore_refuses_duplicate_fold_identity_even_with_disjoint_members() {
+    let (mut canvas, [root, x, _, other, z]) = two_hierarchies();
+    let id = curation::FoldId::new("same-fold");
+    let first = curation::FoldRecord::selection(
+        id.clone(),
+        "canvas:test",
+        [root, x].map(|id| id.to_string()),
+    )
+    .unwrap();
+    let duplicate =
+        curation::FoldRecord::selection(id, "canvas:test", [other, z].map(|id| id.to_string()))
+            .unwrap();
+    assert_eq!(
+        canvas.restore_folds([first.clone(), duplicate.clone()]),
+        vec![duplicate]
+    );
+    assert_eq!(canvas.fold_records(), &[first]);
 }
 
 #[test]
@@ -142,8 +363,7 @@ fn source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journa
     source_canvas
         .live_canvas_mut()
         .set_selected_members(&[live_one]);
-    let live_truth = serde_json::to_vec(&source_canvas.live_canvas().graph().to_snapshot())
-        .expect("live graph persists");
+    let live_truth = persisted_truth(source_canvas.live_canvas().graph().to_snapshot());
 
     assert!(source_canvas.select(&journal, Seq(2)));
     assert_eq!(
@@ -168,8 +388,7 @@ fn source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journa
     );
     assert_eq!(source_canvas.live_canvas().graph().node_count(), 3);
     assert_eq!(
-        serde_json::to_vec(&source_canvas.live_canvas().graph().to_snapshot())
-            .expect("live graph remains persistable"),
+        persisted_truth(source_canvas.live_canvas().graph().to_snapshot()),
         live_truth,
         "scrubbing never rewrites the retained live canvas"
     );
@@ -249,12 +468,6 @@ fn source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_tru
             .apply_strategy_positions(&positions);
         source_canvas.frame(800, 600);
 
-        // `to_snapshot` stamps wall-clock seconds; zero it so two snapshots taken
-        // across a second boundary still compare equal on content.
-        let persisted_truth = |mut snapshot: kernel::persistence::GraphSnapshot| {
-            snapshot.timestamp_secs = 0;
-            serde_json::to_vec(&snapshot).expect("live graph persists")
-        };
         let live_truth = persisted_truth(source_canvas.live_canvas().graph().to_snapshot());
         let live_position = source_canvas
             .live_canvas()
@@ -297,4 +510,47 @@ fn source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_tru
             "{arrangement_id} returns to the retained live presentation"
         );
     }
+}
+
+#[test]
+fn shared_fold_routes_count_cross_fold_cells_once_in_each_direction() {
+    use crate::canvas::fold_projection::FoldTraversalDirection;
+    use crate::canvas::{FoldEndpoint, FoldRoute};
+    use kernel::graph::EdgeFamily;
+    let (mut canvas, [root, x, y, other, z]) = two_hierarchies();
+    assert!(canvas.assert_relation_between_members(x, other, SemanticSubKind::Cites));
+    assert!(canvas.assert_relation_between_members(y, z, SemanticSubKind::Quotes));
+    assert!(canvas.assert_relation_between_members(other, x, SemanticSubKind::Cites));
+    let before = persisted_truth(canvas.graph().to_snapshot());
+    for id in [root, other] {
+        let key = canvas.graph().get_node_key_by_id(id).unwrap();
+        assert!(
+            canvas
+                .collapse_descendants(
+                    key,
+                    EdgeFamily::Containment,
+                    FoldTraversalDirection::Outgoing,
+                    "shared-routes"
+                )
+                .is_some()
+        );
+    }
+    assert_eq!(
+        canvas.fold_routes(),
+        vec![
+            FoldRoute {
+                from: FoldEndpoint::Fold(0),
+                to: FoldEndpoint::Fold(1),
+                family: EdgeFamily::Semantic,
+                count: 2
+            },
+            FoldRoute {
+                from: FoldEndpoint::Fold(1),
+                to: FoldEndpoint::Fold(0),
+                family: EdgeFamily::Semantic,
+                count: 1
+            },
+        ]
+    );
+    assert_eq!(persisted_truth(canvas.graph().to_snapshot()), before);
 }

@@ -1,0 +1,288 @@
+{
+  "schema": "codex.client-mesh/qualification-v1",
+  "observed_at": "2026-10-14T18:26:52Z",
+  "status": "Windows enrollment and login-shell repair qualified; ThinkPad native recovery confirmed; Claude Desktop peer menu and O-PC-to-ThinkPad native connection confirmed",
+  "clients": {
+    "o-pc": {
+      "registered": [
+        "s-pc",
+        "thinkpad-l14-f",
+        "imac-intel",
+        "imac-m4"
+      ],
+      "auto_connect": true,
+      "codex_sidebar_grouping": "connection",
+      "native_display": "owner confirmed s-pc connected in O-PC settings and subsequently reported connections look good",
+      "m4_connection": "native app logged state=connected; read_thread passed for 01a135a7-bed2-7180-920b-b8d601eb6855"
+    },
+    "s-pc": {
+      "registered": [
+        "o-pc",
+        "thinkpad-l14-f"
+      ],
+      "auto_connect": true,
+      "activation": "owner reports connected; auto-connect enabled in live client state",
+      "identity_agent": "Djinn; native unlock completed; both reverse SSH routes passed"
+    },
+    "thinkpad-l14-f": {
+      "registered": [
+        "s-pc",
+        "o-pc"
+      ],
+      "auto_connect": true,
+      "activation": "owner reports connected; auto-connect enabled in live client state",
+      "identity_agent": "existing GCR desktop agent; Djinn not installed",
+      "q_pc_connection": "imac-intel registered and owner confirms Connected; SSH and thread/read passed"
+    },
+    "imac-m4": {
+      "ssh_alias": "imac-m4",
+      "local_hostname": "m4-imac.local",
+      "address": "192.168.4.58",
+      "registered": [
+        "o-pc",
+        "s-pc",
+        "thinkpad-l14-f"
+      ],
+      "auto_connect": true,
+      "identity_agent": "legacy personae-agent PID 6669 recovered when owner switched to markik; no tool restart",
+      "identity_file": "public-only ~/.ssh/id_ed25519.pub",
+      "activation": "peer aliases registered through native deep links; auto-connect now enabled in live state",
+      "previous_desktop_app_pid_preserved": 69566,
+      "ssh_user_uid": 502,
+      "current_desktop_account": "markik",
+      "account_choice": "owner chose markik and switched back; return chat reads passed"
+    },
+    "imac-intel": {
+      "hostname": "Q-PC.local",
+      "ssh_alias": "imac-intel",
+      "address": "192.168.4.68",
+      "hardware_model": "iMacPro1,1",
+      "macos": "15.8.1",
+      "same_host_identity_as_old_intel": true,
+      "registered": [
+        "o-pc",
+        "s-pc",
+        "thinkpad-l14-f",
+        "imac-m4"
+      ],
+      "auto_connect": true,
+      "identity_agent": "Djinn PID 54928 ready after native unlock; custody-generated Ed25519 identity",
+      "agent_endpoint": "/Users/markik/Library/Application Support/djinn/agent.sock",
+      "identity_file": "public-only ~/.ssh/djinn-mesh.pub",
+      "existing_chatgpt_pid_preserved": 44604,
+      "existing_openssh_agent_pid_preserved": 95140
+    }
+  },
+  "windows_daemon": {
+    "cli_install": "npm @openai/codex@0.162.0-alpha.17.2",
+    "version": "0.162.0-alpha.17.2",
+    "bootstrap": "passed",
+    "backend": "pid",
+    "account_remote_control_enabled": false,
+    "local_websocket_handshake": "HTTP/1.1 101 Switching Protocols",
+    "initialize": "passed",
+    "thread_read": "01a12716-2a74-7ee0-9840-1b356432b10f",
+    "thread_read_result": "passed without resuming or acquiring writer",
+    "startup_after_reboot": "not qualified",
+    "restored_managed_daemon_pid": 10856,
+    "native_app_processes_preserved": [18972, 28248]
+  },
+  "linux_daemons": {
+    "s-pc": {
+      "status": "running",
+      "version": "0.160.1"
+    },
+    "thinkpad-l14-f": {
+      "status": "running",
+      "version": "0.162.0-alpha.17.2"
+    }
+  },
+  "routes": {
+    "o-pc -> s-pc": "SSH and app read_thread passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4; native display discrepancy reported",
+    "s-pc -> o-pc": "SSH hostname and app-server thread/read passed for 01a12716-2a74-7ee0-9840-1b356432b10f",
+    "o-pc -> thinkpad-l14-f": "SSH and app read_thread passed for 01a11e41-e5d7-7011-a39f-1205b16b15dc; native display discrepancy reported",
+    "thinkpad-l14-f -> s-pc": "SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
+    "s-pc -> thinkpad-l14-f": "Djinn SSH hostname passed after native unlock",
+    "thinkpad-l14-f -> o-pc": "ordinary SSH/WebSocket thread/read passed after login-shell repair; owner reports desktop looks good now",
+    "imac-m4": "reachable at updated LAN address; partial mesh qualification as above",
+    "imac-intel": "reachable; same trusted Ed25519 host identity as prior imac-intel at 192.168.4.105",
+    "o-pc -> imac-m4": "previous SSH/native app read qualified; current strict-trust SSH login passed after updating address to .58",
+    "imac-m4 -> s-pc": "agent-held SSH hostname and app-server thread/read passed for 01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
+    "s-pc -> imac-m4": "agent-held SSH hostname passed after owner completed native unlock; subsequent idle lock still denies signing",
+    "imac-m4 -> o-pc": "public key and scoped firewall installed; ordinary SSH/WebSocket thread/read passed after login-shell repair",
+    "imac-m4 -> thinkpad-l14-f": "agent-held SSH hostname passed after ThinkPad responsiveness returned",
+    "thinkpad-l14-f -> imac-m4": "agent-held SSH hostname passed; live native auto-connect enabled",
+    "o-pc -> imac-intel": "SSH and native app read_thread passed for 01a1365b-291b-70a0-8819-5c05ebf5277c, Review Murm P2P Integrations",
+    "imac-m4 -> imac-intel": "SSH/WebSocket thread/read passed after owner switched desktop back to markik and legacy agent recovered",
+    "thinkpad-l14-f -> imac-intel": "SSH hostname and app-server thread/read passed; native client Connected confirmed by owner",
+    "s-pc -> imac-intel": "public key enrolled and client registered; login denied while Surface Djinn has no identities after idle lock",
+    "imac-intel -> s-pc": "Djinn-held key authenticated; WebSocket thread/read passed for Check stack status",
+    "imac-intel -> thinkpad-l14-f": "Djinn-held key authenticated; WebSocket thread/read passed for Turnstone after transient reachability failure",
+    "imac-intel -> imac-m4": "Djinn-held key authenticated at .58 under existing pinned trust; WebSocket thread/read passed for Assess REDox for the stack",
+    "imac-intel -> o-pc": "Djinn-held key authenticated; ordinary SSH/WebSocket thread/read passed after native unlock and Windows login-shell repair"
+  },
+  "windows_thinkpad_enrollment": {
+    "script": "scripts/codex-peer-enroll-windows.ps1",
+    "peer_address": "192.168.4.32",
+    "peer_rule": "Djinn-SSH-LAN-thinkpad-l14-f",
+    "peer_rule_installed": true,
+    "public_key_fingerprint": "SHA256:/wpcbebhH6lJ9WjHQtJPrOiRrDg8JzRoMf0S7Il8Co8",
+    "script_parse": "passed",
+    "unelevated_negative_control": "refused before writes",
+    "native_elevation": "completed after reopening; peer rule address and authenticated login verified",
+    "existing_surface_rule": "Djinn-SSH-LAN-Peer remains scoped to 192.168.4.59"
+  },
+  "preservation": {
+    "existing_apps_restarted": false,
+    "existing_chats_interrupted": false,
+    "writer_locks_deleted": false,
+    "private_keys_copied": false,
+    "agent_forwarding_enabled": false,
+    "live_global_state_rewritten": false,
+    "laptop_builds_started": false,
+    "worktrees_or_cargo_homes_created": false
+  },
+  "done_conditions": [
+    "Other Claude Desktop peer routes remain registered with SSH/SFTP prerequisites; native connection receipt covers O-PC to ThinkPad",
+    "Verify Surface outgoing peers after native unlock and retain Locked denial",
+    "Keep existing app processes, source state and writer guards intact",
+    "Daemon reboot persistence remains separate qualification"
+  ],
+  "follow_up": {
+    "owner_confirmation": "looks good",
+    "surface_wifi": "owner suspects chipset instability; not diagnosed in this qualification"
+  },
+  "mac_daemons": {
+    "imac-m4": {
+      "version": "0.162.0-alpha.17.2",
+      "source": "complete packaged CLI already bundled with ChatGPT 26.1007.30912",
+      "cli_link": "~/.local/bin/codex -> /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+      "path_addition": "owned ~/.zprofile block",
+      "bootstrap": "passed",
+      "backend": "pid",
+      "auto_update_enabled": false,
+      "remote_control_gateway_enabled": false,
+      "pid": 3007,
+      "observed_rss_kib": 43376,
+      "local_websocket_initialize_and_thread_list": "passed",
+      "restart_or_reboot": "not qualified"
+    },
+    "imac-intel": {
+      "version": "0.162.0-alpha.17.2",
+      "source": "complete matching package already bundled with ChatGPT 26.1007.30912",
+      "cli_link": "~/.local/bin/codex -> /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+      "path_addition": "owned ~/.zprofile block",
+      "bootstrap": "passed",
+      "backend": "pid",
+      "auto_update_enabled": false,
+      "remote_control_gateway_enabled": false,
+      "stored_chat_listing": "passed",
+      "restart_or_reboot": "not qualified"
+    }
+  },
+  "mac_enrollment": {
+    "imac-m4": {
+      "user_key_fingerprint": "SHA256:LuTRGuyGMxyGcwu4ZMFeak2rHD6mkMY0TRfKW7CawCQ",
+      "host_key_fingerprint": "SHA256:0sT34z10ELgEyR8+LJFVDvOov3iGNuPz8gOx4QU48vo",
+      "host_trust": "existing Windows HostKeyAlias 192.168.4.57 verified unchanged; public host keys pinned on peers",
+      "windows_input": "%LOCALAPPDATA%/Djinn/imac-m4-authorized.pub",
+      "windows_rule": "Djinn-SSH-LAN-imac-m4",
+      "windows_rule_address": "192.168.4.58",
+      "windows_rule_installed": true,
+      "windows_uac": "completed; first shell option -c corrected to -lc after native approval",
+      "linux_authorized_key_grants": "appended on Surface and ThinkPad; existing grants preserved",
+      "windows_name_lookup": "m4-imac.local intermittently failed; existing SSH alias now uses verified IPv4 address",
+      "source_builds": false,
+      "new_private_key_files": false,
+      "djinn_installed_or_legacy_agent_replaced": false
+    },
+    "imac-intel": {
+      "host_key_fingerprint": "SHA256:AJkWyCQFEkeFUhg3sDU+5/2hxcr8QFGx9DQRFB7hUWk",
+      "host_trust": "existing q-pc.local, current IP and old Intel HostKeyAlias all agree; strict checking preserved",
+      "old_proxy_jump_removed": true,
+      "incoming_grants": "Surface, ThinkPad and M4 public keys appended; existing Windows grant preserved",
+      "outbound_public_key": "custody-generated SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA",
+      "outbound_grants": "Surface, ThinkPad, M4 and Windows complete"
+    }
+  },
+  "q_pc_djinn": {
+    "source_head": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+    "source_clean_before_and_after": true,
+    "build_jobs": 1,
+    "build_rss_cap_bytes": 4294967296,
+    "build_peak_owned_rss_bytes": 1477734400,
+    "build_guard_failure": null,
+    "other_cargo_owners": "two processes in mere-shared-browsing-mode worktree, preserved",
+    "build_target": "/Users/markik/Code/targets/mere",
+    "build_target_owner": "q-pc Djinn setup; generated cache removed after checking marker and no live target owner",
+    "build_evidence_directory": "/Users/markik/Library/Application Support/djinn/qualification",
+    "production_binary_build": "passed; no workspace test-suite receipt claimed",
+    "initial_build_selection": "personae-vault package absent from Mere workspace; corrected to Djinn-only; initial failure retained in build log",
+    "installed_manifest": "q-pc-djinn-install.json",
+    "build_log": "q-pc-djinn-build.log",
+    "build_result": "q-pc-djinn-build.json",
+    "resident_pid": 54928,
+    "launchd_unit": "/Users/markik/Library/LaunchAgents/org.merely.djinn.plist",
+    "launchd_nice": 10,
+    "launchd_low_priority_io": true,
+    "run_at_login": true,
+    "restart_policy": "KeepAlive false for initial qualification",
+    "vault_status": "native unlock accepted; subsequently idle-Locked in the same ready resident; no credential supplied through tooling",
+    "observed_rss_kib": 42792,
+    "service_settings": "dedicated SSH resident settings; existing legacy sync settings unchanged",
+    "agent_disabled_negative_control": "exit 255; public-only identity cannot authenticate without Djinn",
+    "locked_login_check": "passed after natural idle lock; new SSH authentication denied with exit 255",
+    "new_plaintext_private_key_file": false
+  },
+  "windows_ssh_shell": {
+    "current_default_shell": "Git Bash with -lc login initialization",
+    "failure": "native app authenticates, then Scoop Git sh launcher loses POSIX single-quote probe under cmd",
+    "script": "scripts/codex-ssh-shell-windows.ps1",
+    "prepared_shell": "C:/Program Files/Git/usr/bin/bash.exe",
+    "local_posix_shell_probe_and_daemon_lookup": "passed",
+    "script_parse": "passed",
+    "unelevated_negative_control": "refused before writes",
+    "registry_change_applied": true,
+    "snapshot_and_restore": "prepared; protects original registry value kinds and rejects concurrent changes",
+    "sshd_restart_required": false,
+    "pending_step": null,
+    "combined_installer": "%LOCALAPPDATA%/Djinn/q-pc-mesh-enroll-windows.ps1",
+    "combined_installer_parse": "passed",
+    "combined_installer_unelevated_control": "refused before writes",
+    "initial_native_install_at": "2026-10-14T17:58:24.6161276Z",
+    "login_shell_correction_at": "2026-10-14T18:12:33.4728106Z",
+    "live_failure_caught": "-c omitted Git Unix tools, breaking the npm Codex wrapper; -lc restores their path",
+    "ordinary_remote_chat_reads": ["imac-intel", "thinkpad-l14-f", "imac-m4"],
+    "thinkpad_native_confirmation": "owner says it looks good now"
+  },
+  "claude_setup": {
+    "official_reference": "https://code.claude.com/docs/en/desktop#pre-configure-ssh-connections-for-your-team",
+    "desktop_version": "2.37337.1",
+    "configuration": "additive sshConfigs in each owner's ~/.claude/settings.json; SSH key field omitted to reuse existing config/agents",
+    "desktop_clients": {
+      "o-pc": ["s-pc", "thinkpad-l14-f", "imac-m4", "imac-intel"],
+      "s-pc": ["o-pc", "thinkpad-l14-f", "imac-m4", "imac-intel"],
+      "imac-m4": ["o-pc", "s-pc", "thinkpad-l14-f", "imac-intel"],
+      "imac-intel": ["o-pc", "s-pc", "thinkpad-l14-f", "imac-m4"]
+    },
+    "standalone_windows_cli_version": "2.1.261",
+    "thinkpad_cli_version": "2.1.248",
+    "thinkpad_code": "existing shell SSH access passed to all four peers; no new Desktop installation or permission change",
+    "windows_sftp_prerequisites": "passed to all four peers using ordinary aliases",
+    "native_desktop_menu": "owner confirms all four SSH entries visible in O-PC Claude Desktop Code tab",
+    "thinkpad_first_connection_preflight": {
+      "folder": "/home/markik/Code",
+      "folder_exists": true,
+      "folder_is_git_worktree": false,
+      "home_free_bytes": 395261849600,
+      "remote_helper_cache_preexisting": false
+    },
+    "native_desktop_first_connection": "owner reports O-PC Claude Desktop to ThinkPad worked using /home/markik/Code",
+    "other_native_desktop_routes": "registered; not individually qualified in Claude Desktop",
+    "permissions_changed": false,
+    "active_claude_sessions_interrupted": false,
+    "model_sessions_started_by_tools": false,
+    "private_keys_exported": false,
+    "worktrees_created": false
+  }
+}

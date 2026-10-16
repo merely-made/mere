@@ -18,8 +18,9 @@
 //! Beyond taproot's verbs and the lane's `resize`, a scenario may press keys
 //! through the runner's own keyboard path (`key tab`, `key shift+tab`,
 //! `key enter`, `key space`, or `key tab-until <attr>=<value>`), and may
-//! `act` one of `decline-next`, `empty`, `unavailable`, `building`, `ready`
-//! and `theme-dark`.
+//! `act` one of `decline-next`, `empty`, `unavailable`, `building`, `ready`,
+//! `theme-dark` and `tier` (the sessions, and two archives, as an overmap tier
+//! on the graph's canvas).
 
 use mesquite::{CaptureRecord, LaneConfig};
 use std::cell::RefCell;
@@ -35,9 +36,10 @@ use cambium_genet_winit_host::{
 use incipit::SessionId;
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use mere_view::{
-    GraphModel, HostAction, MERE_VIEW_CSS, MereView, MereViewElement, MereViewModel,
-    MereViewRequest, MereViewState, NodeEntry, NodeState, Provenance, RelationEntry, SessionEntry,
-    SessionStep, StatusNote, ViewStatus, mere_view,
+    ArchiveEntry, ArchiveModel, GraphModel, HostAction, MERE_VIEW_CSS, MereNodeKind, MereView,
+    MereViewElement, MereViewModel, MereViewRequest, MereViewState, NodeEntry, NodeState,
+    Provenance, RelationEntry, SessionEntry, SessionPlacement, SessionStep, StatusNote, ViewStatus,
+    mere_view,
 };
 use sprigging::ColorF;
 use uuid::Uuid;
@@ -67,20 +69,29 @@ const RULES: &str = "\
     .mere-view-session[data-trashed=\"true\"] { color: var(--muted); } \
     .mere-view-session-state { color: var(--muted); font-size: 12px; } \
     .mere-view-state { padding: 16px; } \
-    .graph-canvas-swatch-node:focus-visible { outline: 2px solid var(--accent); }";
+    .graph-canvas-swatch-node:focus-visible { outline: 2px solid var(--accent); } \
+    .mere-view-card, .mere-view-popover-layer .overlay-surface-panel { background: var(--paper); color: var(--ink); } \
+    .mere-view-card[data-attached=\"true\"] .mere-view-session-name { color: var(--accent); } \
+    .mere-view-card .mere-view-session-state, .mere-view-archive-from, .mere-view-archive-detail { color: var(--muted); font-size: 12px; }";
 
 fn sheet(tokens: &str) -> String {
     format!("{GRAPH_CANVAS_SWATCH_CSS}\n{MERE_VIEW_CSS}\n{tokens}\n{RULES}")
 }
 
-/// Node paint by state. A real host derives these from its tokens; the words
-/// in each node's label carry the state either way.
-fn palette(state: &NodeState) -> ColorF {
-    let (r, g, b, a) = match state {
-        NodeState::Available => (0.18, 0.36, 0.54, 1.0),
-        NodeState::Open => (0.12, 0.55, 0.35, 1.0),
-        NodeState::Dirty => (0.72, 0.45, 0.05, 1.0),
-        NodeState::Unavailable => (0.55, 0.55, 0.55, 0.45),
+/// Node paint by kind: the graph's own nodes by state, and a tier's sessions,
+/// archives and shelf apart from them. A real host derives these from its
+/// tokens; the words in each node's label carry the kind and state either way.
+fn palette(kind: &MereNodeKind) -> ColorF {
+    let (r, g, b, a) = match kind {
+        MereNodeKind::Graph(NodeState::Available) => (0.18, 0.36, 0.54, 1.0),
+        MereNodeKind::Graph(NodeState::Open) => (0.12, 0.55, 0.35, 1.0),
+        MereNodeKind::Graph(NodeState::Dirty) => (0.72, 0.45, 0.05, 1.0),
+        MereNodeKind::Graph(NodeState::Unavailable) => (0.55, 0.55, 0.55, 0.45),
+        MereNodeKind::Session { trashed: true, .. } => (0.55, 0.55, 0.55, 0.45),
+        MereNodeKind::Session { attached: true, .. } => (0.42, 0.22, 0.60, 1.0),
+        MereNodeKind::Session { .. } => (0.58, 0.40, 0.72, 1.0),
+        MereNodeKind::Archive { .. } | MereNodeKind::More => (0.62, 0.48, 0.20, 1.0),
+        MereNodeKind::Shelf => (0.45, 0.35, 0.18, 1.0),
     };
     ColorF { r, g, b, a }
 }
@@ -106,7 +117,13 @@ type Logic = fn(&Harness) -> Child;
 fn root(harness: &Harness) -> Child {
     mere_view(
         harness.view_of(),
-        |harness: &mut Harness, event| harness.view.apply(event),
+        |harness: &mut Harness, event| {
+            let (width, height) = harness.tile;
+            harness
+                .view
+                .apply_and_lay_out(event, &harness.model, width, height);
+            harness.relayout();
+        },
         |harness: &mut Harness, request| harness.carry_out(request),
     )
 }
@@ -173,9 +190,12 @@ impl Harness {
         let what = match &request {
             MereViewRequest::Activate(key) => format!("open {key}"),
             MereViewRequest::Mint => "mint a session".to_string(),
+            MereViewRequest::Archive(request) => format!("archive {request:?}"),
             MereViewRequest::Session(id, step) => format!("{} {}", step.token(), self.name_of(*id)),
             MereViewRequest::Host(key) => format!("run {key}"),
             MereViewRequest::Layout(id) => format!("lay out by {id}"),
+            MereViewRequest::Merge(request) => format!("merge {request:?}"),
+            other => format!("{other:?}"),
         };
         self.events.push(format!("request {what}"));
         if std::mem::take(&mut self.decline_next) {
@@ -212,6 +232,13 @@ impl Harness {
                 let name = format!("Fork of {}", self.name_of(id));
                 self.push_session(name);
             },
+            MereViewRequest::Session(id, SessionStep::Branch) => {
+                let name = format!("Branch of {}", self.name_of(id));
+                self.push_session(name);
+            },
+            MereViewRequest::Session(_, SessionStep::Merge) | MereViewRequest::Merge(_) => {
+                self.decline("This harness keeps no sessions to merge.".to_string());
+            },
             MereViewRequest::Session(id, step @ (SessionStep::Trash | SessionStep::Restore)) => {
                 if let Some(session) = self.model.sessions.iter_mut().find(|s| s.id == id) {
                     session.trashed = step == SessionStep::Trash;
@@ -223,6 +250,9 @@ impl Harness {
                 }
             },
             MereViewRequest::Layout(id) => self.model.layout = id,
+            MereViewRequest::Archive(_) => self.decline("The fixture offers no archive.".into()),
+            // A request or step this harness does not know yet.
+            _ => self.decline("This harness does not carry that out.".into()),
         }
         for session in &mut self.model.sessions {
             session.steps = steps_for(session.attached, session.trashed);
@@ -370,6 +400,26 @@ fn catalog() -> MereViewModel {
             HostAction::new("recent", "Recent"),
         ],
         notice: None,
+        ..MereViewModel::default()
+    }
+}
+
+/// Two archives for the tier: one saved from the shown session, one composed.
+fn archives() -> ArchiveModel {
+    let entry = |key: &str, name: &str, session: Option<SessionId>| ArchiveEntry {
+        key: key.into(),
+        name: name.into(),
+        detail: "Read-only archive".into(),
+        can_open: true,
+        session,
+    };
+    ArchiveModel {
+        entries: vec![
+            entry("saved", "Codicil blake3:f612a", Some(session_id(1))),
+            entry("composed", "Codicil blake3:0c0de", None),
+        ],
+        save_sessions: vec![session_id(1), session_id(2)],
+        can_compose: true,
     }
 }
 
@@ -522,6 +572,14 @@ impl mesquite::Product for HarnessLane {
         match label {
             "decline-next" => {
                 ctx.runner.update(|harness| harness.decline_next = true);
+                true
+            },
+            "tier" => {
+                ctx.runner.update(|harness| {
+                    harness.model.placement = SessionPlacement::Tier;
+                    harness.model.archive = Some(archives());
+                    harness.relayout();
+                });
                 true
             },
             "theme-dark" => {

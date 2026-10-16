@@ -56,6 +56,7 @@ mod keyed;
 mod menu;
 mod multi;
 mod optional_action;
+mod opened_link;
 mod overlay;
 mod overlay_surface;
 mod frisket_presentation;
@@ -93,6 +94,9 @@ mod tests;
 
 pub use action_list::{ActionItem, ActionListEvent, ActionListState, action_list};
 pub use arrangement::{arrangement, placed, placed_with};
+pub use opened_link::{
+    LinkMemberAction, LinkMemberTarget, OpenedLinkEvent, opened_link_swatch,
+};
 pub use atlas::{
     GraphCanvasAtlas, GraphCanvasAtlasCallout, GraphCanvasAtlasCompoundOutline,
     GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,
@@ -110,6 +114,7 @@ pub use context::GenetCtx;
 pub use detail_panel::{DetailRow, DetailSection, detail_panel};
 pub use detail_popover::{
     DetailPopoverEvent, DetailPopoverMode, DetailPopoverState, detail_popover,
+    detail_popover_panel,
 };
 pub use disclosure::{
     AccordionConfig, AccordionItem, AccordionMode, AccordionState, DisclosureState, TreeItem,
@@ -118,12 +123,13 @@ pub use disclosure::{
 };
 pub use editor::{EditHistory, History, pair_close, wrap_selection};
 pub use graph_canvas::{
-    GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasNode,
-    GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion, GraphCanvasRelation,
-    GraphCanvasSubgraph, GraphCanvasSwatch, graph_atlas_swatch, graph_canvas, graph_canvas_swatch,
+    GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasInput,
+    GraphCanvasNode, GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion,
+    GraphCanvasRelation, GraphCanvasSubgraph, GraphCanvasSwatch, GraphLabelPlacement,
+    graph_atlas_swatch, graph_canvas, graph_canvas_swatch,
     graph_canvas_swatch_with_drag, graph_canvas_swatch_with_drag_and_relations,
     graph_canvas_swatch_with_focus, graph_canvas_swatch_with_focus_and_drag,
-    graph_canvas_swatch_with_focus_and_drag_and_relations,
+    graph_canvas_swatch_with_focus_and_drag_and_relations, graph_canvas_with_wheel,
 };
 pub use grid::{GridView, data_grid};
 pub use menu::{MENU_CLASS, MENU_ROW_ACTIVE_CLASS, MENU_ROW_CLASS, menu};
@@ -163,6 +169,8 @@ pub use overlay_surface::{OverlayDismiss, OverlayRole, OverlaySurface, overlay_s
 pub use pod::{GenetElement, GenetElementMut};
 pub use pointer::{OnPointer, PointerButton, PointerEvent, PointerPhase, on_pointer};
 pub use portable::{PortableKeyed, PortableKeyedState};
+mod retained_mount;
+pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use propagation::Propagation;
 pub use radio::{RadioGroup, radio_group};
 pub use range_scrubber::{RangeScrubber, RangeScrubberEvent, RangeScrubberPin, range_scrubber};

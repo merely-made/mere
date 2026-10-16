@@ -14,6 +14,8 @@ use super::{
     RelationKey, ResourceEdgeKey, ResourceNode, SemanticStatement, SemanticStatementSpec,
     StatementAssert,
 };
+use crate::time::unix_epoch_millis;
+use crate::types::AssertionWithdrawal;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StatementWriteError {
@@ -96,7 +98,19 @@ mod tests {
         graph.update_node_url(a, "https://example.org/later".into());
         graph.refresh_surface_resource(a);
         assert!(graph.retract_assertion(&first.statement_id));
-        assert!(graph.find_semantic_statement(&first.statement_id).is_none());
+        assert!(
+            graph
+                .find_semantic_statement(&first.statement_id)
+                .unwrap()
+                .1
+                .withdrawn
+                .is_some()
+        );
+        assert!(
+            graph
+                .find_held_semantic_statement(&first.statement_id)
+                .is_none()
+        );
         assert!(
             graph
                 .find_semantic_statement(&second.statement_id)
@@ -292,6 +306,7 @@ mod migrated_handle_tests {
             .1
             .clone();
         precise.label = Some("precise edit".into());
+        precise.basis.note = Some("precise edit".into());
         precise.asserted_at_ms = Some(99);
         assert!(
             graph
@@ -324,7 +339,25 @@ mod migrated_handle_tests {
         ));
         assert!(!graph.update_assertion_metadata("absent", None, None));
         assert!(graph.retract_assertion(&first.statement_id));
-        assert!(graph.find_semantic_statement(&first.statement_id).is_none());
+        assert!(
+            graph
+                .find_semantic_statement(&first.statement_id)
+                .unwrap()
+                .1
+                .withdrawn
+                .is_some()
+        );
+        let withdrawn_copies: Vec<_> = graph
+            .resource_relations()
+            .flat_map(|(_, _, _, payload)| payload.semantic_statements().iter())
+            .filter(|statement| statement.statement_id == first.statement_id)
+            .collect();
+        assert_eq!(withdrawn_copies.len(), 2);
+        assert!(
+            withdrawn_copies
+                .iter()
+                .all(|statement| statement.withdrawn.is_some())
+        );
         assert!(graph.find_semantic_statement(&other.statement_id).is_some());
         assert!(Graph::try_from_snapshot(&graph.to_snapshot()).is_ok());
         assert!(
@@ -340,7 +373,7 @@ mod migrated_handle_tests {
         assert!(
             copies
                 .iter()
-                .all(|statement| statement.label.is_none() && statement.asserted_at_ms.is_none())
+                .all(|statement| statement.label.is_none() && statement.asserted_at_ms == Some(99))
         );
         assert!(Graph::try_from_snapshot(&graph.to_snapshot()).is_ok());
     }
@@ -369,10 +402,12 @@ impl std::fmt::Display for StatementWriteError {
 impl std::error::Error for StatementWriteError {}
 
 fn matches_spec(statement: &SemanticStatement, spec: &SemanticStatementSpec) -> bool {
-    statement.predicate == spec.predicate
+    statement.withdrawn.is_none()
+        && statement.predicate == spec.predicate
         && statement.recognized_sub_kind == spec.recognized_sub_kind
         && statement.graph_scope == spec.graph_scope
         && statement.provenance_iri == spec.provenance_iri
+        && statement.basis.same_reason_as(&spec.basis)
 }
 
 impl Graph {
@@ -421,8 +456,9 @@ impl Graph {
         &mut self,
         from: Uuid,
         to: Uuid,
-        mut spec: SemanticStatementSpec,
+        spec: SemanticStatementSpec,
     ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
+        let mut spec = spec.normalized();
         if self.resource(from).is_none() || self.resource(to).is_none() {
             return Err(StatementWriteError::MissingEndpoint);
         }
@@ -430,7 +466,12 @@ impl Graph {
             spec.provenance_iri = Some(self.write_author().asserter_iri());
         }
         if let Some((key, id)) = self.held_statement_by_resource_ids(from, to, &spec)? {
-            let changed = self.update_assertion_metadata(&id, spec.label, spec.asserted_at_ms);
+            let changed = self.update_assertion_metadata_if_requested(
+                &id,
+                spec.label,
+                spec.asserted_at_ms,
+                Some(spec.basis),
+            );
             return Ok((
                 key,
                 StatementAssert {
@@ -455,6 +496,7 @@ impl Graph {
             )),
         };
         let key = RelationKey::Resource(key);
+        spec.asserted_at_ms.get_or_insert_with(unix_epoch_millis);
         let asserted = self
             .get_relation_mut(key)
             .expect("resource bucket")
@@ -479,7 +521,8 @@ impl Graph {
         })
     }
 
-    /// Locate a held handle in its recorded store, independent of current nature.
+    /// Locate any retained handle, including withdrawn history, independent of
+    /// current nature. Use `find_held_semantic_statement` for default reads.
     pub fn find_semantic_statement(
         &self,
         statement_id: &str,
@@ -501,6 +544,14 @@ impl Graph {
             })
     }
 
+    pub fn find_held_semantic_statement(
+        &self,
+        statement_id: &str,
+    ) -> Option<(RelationKey, &SemanticStatement)> {
+        self.find_semantic_statement(statement_id)
+            .filter(|(_, statement)| statement.is_held())
+    }
+
     fn prospective_resource_pair(&self, from: NodeKey, to: NodeKey) -> Option<(Uuid, Uuid)> {
         let identity = |key| {
             self.shown_resource_id(key).or_else(|| {
@@ -509,6 +560,25 @@ impl Graph {
             })
         };
         Some((identity(from)?, identity(to)?))
+    }
+
+    fn semantic_owner_matches_pair(&self, owner: RelationKey, from: NodeKey, to: NodeKey) -> bool {
+        match owner {
+            RelationKey::Surface(key) => self.inner.inner().edge_endpoints(key) == Some((from, to)),
+            RelationKey::Resource(key) => {
+                let actual = self
+                    .resources
+                    .inner()
+                    .edge_endpoints(key.raw())
+                    .map(|(a, b)| {
+                        (
+                            self.resources.node(a).unwrap().id(),
+                            self.resources.node(b).unwrap().id(),
+                        )
+                    });
+                actual == self.prospective_resource_pair(from, to)
+            },
+        }
     }
 
     fn held_statement_on_pair(
@@ -607,7 +677,31 @@ impl Graph {
         &mut self,
         from: NodeKey,
         to: NodeKey,
+        spec: SemanticStatementSpec,
+    ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
+        let spec = spec.normalized();
+        self.try_assert_semantic_statement_with_clock(from, to, spec, true)
+    }
+
+    /// Import without a carried ID: retain the source time if present, but do
+    /// not create chronology when the source supplied none. Content ensure
+    /// keeps repeated imports idempotent until the source provides identity.
+    pub fn try_import_semantic_statement(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        spec: SemanticStatementSpec,
+    ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
+        let spec = spec.normalized();
+        self.try_assert_semantic_statement_with_clock(from, to, spec, false)
+    }
+
+    fn try_assert_semantic_statement_with_clock(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
         mut spec: SemanticStatementSpec,
+        stamp_new: bool,
     ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
         if self.get_node(from).is_none() || self.get_node(to).is_none() {
             return Err(StatementWriteError::MissingEndpoint);
@@ -625,8 +719,12 @@ impl Graph {
                 .expect("held statement")
                 .statement_id
                 .clone();
-            let changed =
-                self.update_assertion_metadata(&statement_id, spec.label, spec.asserted_at_ms);
+            let changed = self.update_assertion_metadata_if_requested(
+                &statement_id,
+                spec.label,
+                spec.asserted_at_ms,
+                Some(spec.basis),
+            );
             return Ok((
                 key,
                 StatementAssert {
@@ -634,6 +732,9 @@ impl Graph {
                     changed,
                 },
             ));
+        }
+        if stamp_new {
+            spec.asserted_at_ms.get_or_insert_with(unix_epoch_millis);
         }
         let key = self.new_statement_bucket(from, to, &spec.predicate)?;
         let outcome = self
@@ -654,6 +755,7 @@ impl Graph {
         to: NodeKey,
         mut statement: SemanticStatement,
     ) -> Result<RelationKey, StatementWriteError> {
+        statement.normalize_basis_compat();
         if self.get_node(from).is_none() || self.get_node(to).is_none() {
             return Err(StatementWriteError::MissingEndpoint);
         }
@@ -670,6 +772,7 @@ impl Graph {
             provenance_iri: statement.provenance_iri.clone(),
             label: statement.label.clone(),
             asserted_at_ms: statement.asserted_at_ms,
+            basis: statement.basis.clone(),
         };
         if let Some((owner, existing)) = self.find_semantic_statement(&statement.statement_id) {
             let pair_matches = match owner {
@@ -690,26 +793,37 @@ impl Graph {
                     actual == self.prospective_resource_pair(from, to)
                 },
             };
-            if !pair_matches || !matches_spec(existing, &spec) {
+            let same_claim = existing.predicate == spec.predicate
+                && existing.recognized_sub_kind == spec.recognized_sub_kind
+                && existing.graph_scope == spec.graph_scope
+                && existing.provenance_iri == spec.provenance_iri
+                && existing.basis.same_reason_as(&statement.basis);
+            if !pair_matches || !same_claim {
                 return Err(StatementWriteError::HandleCollision(statement.statement_id));
             }
+            if existing.withdrawn.is_some() {
+                // A stale exact-ID import is observed but cannot revive a
+                // tombstone. Causal history may still carry later events.
+                return Ok(owner);
+            }
             let statement_id = statement.statement_id.clone();
-            self.update_assertion_metadata(
+            let existing_first = existing.first_asserted_ms;
+            let existing_last = existing.asserted_at_ms;
+            self.update_assertion_record(
                 &statement_id,
                 statement.label,
-                statement.asserted_at_ms,
+                statement.asserted_at_ms.or(existing_last),
+                existing_first,
+                statement.withdrawn.clone(),
+                statement.basis,
             );
             return Ok(owner);
         }
-        let held = self.held_statement_on_pair(from, to, &spec)?;
-        let key = match held {
-            Some(key) => key,
-            None => self.new_statement_bucket(from, to, &statement.predicate)?,
-        };
+        let key = self.new_statement_bucket(from, to, &statement.predicate)?;
         if self
             .get_relation_mut(key)
             .expect("assertion bucket")
-            .upsert_persisted_semantic_statement(statement)
+            .push_persisted_semantic_statement(statement)
         {
             self.bump_revision();
             self.capture_statement_bucket(key);
@@ -724,10 +838,15 @@ impl Graph {
         label: Option<String>,
         asserted_at_ms: Option<u64>,
     ) -> bool {
-        let Some((key, statement)) = self.find_semantic_statement(statement_id) else {
+        let Some((_, statement)) = self.find_semantic_statement(statement_id) else {
             return false;
         };
-        if statement.label == label && statement.asserted_at_ms == asserted_at_ms {
+        if statement.withdrawn.is_some() {
+            return false;
+        }
+        let mut basis = statement.basis.clone();
+        basis.note = label.clone();
+        if statement.basis == basis && statement.asserted_at_ms == asserted_at_ms {
             return false;
         }
         let owners: Vec<_> = self
@@ -747,9 +866,9 @@ impl Graph {
             })
             .map(|(key, _)| key)
             .collect();
-        for owner in owners {
+        for owner in &owners {
             let semantic = self
-                .get_relation_mut(owner)
+                .get_relation_mut(*owner)
                 .unwrap()
                 .semantic
                 .as_mut()
@@ -760,12 +879,258 @@ impl Graph {
                 .filter(|statement| statement.statement_id == statement_id)
             {
                 statement.label = label.clone();
+                statement.basis = basis.clone();
                 statement.asserted_at_ms = asserted_at_ms;
             }
             semantic.rebuild_compat();
         }
         self.bump_revision();
-        self.capture_statement_bucket(key);
+        for owner in owners {
+            self.capture_statement_bucket(owner);
+        }
+        true
+    }
+
+    pub(crate) fn update_assertion_metadata_if_requested(
+        &mut self,
+        statement_id: &str,
+        label: Option<String>,
+        asserted_at_ms: Option<u64>,
+        basis: Option<crate::types::AssertionBasis>,
+    ) -> bool {
+        let Some((_, current)) = self.find_semantic_statement(statement_id) else {
+            return false;
+        };
+        let desired_basis = basis.unwrap_or_else(|| crate::types::AssertionBasis {
+            note: label.clone(),
+            ..Default::default()
+        });
+        if current.basis == desired_basis && asserted_at_ms.is_none() {
+            return false;
+        }
+        let Some((_, current)) = self.find_semantic_statement(statement_id) else {
+            return false;
+        };
+        self.update_assertion_record(
+            statement_id,
+            desired_basis.note.clone(),
+            asserted_at_ms.or(current.asserted_at_ms),
+            current.first_asserted_ms,
+            current.withdrawn.clone(),
+            desired_basis,
+        )
+    }
+
+    fn update_assertion_record(
+        &mut self,
+        statement_id: &str,
+        label: Option<String>,
+        asserted_at_ms: Option<u64>,
+        first_asserted_ms: Option<u64>,
+        withdrawn: Option<AssertionWithdrawal>,
+        basis: crate::types::AssertionBasis,
+    ) -> bool {
+        let owners = self.semantic_statement_owner_keys(statement_id);
+        if owners.is_empty() {
+            return false;
+        }
+        let mut changed_owners = Vec::new();
+        for owner in owners {
+            let Some(data) = self
+                .get_relation_mut(owner)
+                .and_then(|payload| payload.semantic.as_mut())
+            else {
+                continue;
+            };
+            let mut changed = false;
+            for statement in data
+                .statements
+                .iter_mut()
+                .filter(|statement| statement.statement_id == statement_id)
+            {
+                if statement.label == label
+                    && statement.asserted_at_ms == asserted_at_ms
+                    && statement.first_asserted_ms == first_asserted_ms
+                    && statement.withdrawn == withdrawn
+                    && statement.basis == basis
+                {
+                    continue;
+                }
+                statement.label = label.clone();
+                statement.asserted_at_ms = asserted_at_ms;
+                statement.first_asserted_ms = first_asserted_ms;
+                statement.withdrawn = withdrawn.clone();
+                statement.basis = basis.clone();
+                changed = true;
+            }
+            if changed {
+                data.rebuild_compat();
+                changed_owners.push(owner);
+            }
+        }
+        if changed_owners.is_empty() {
+            return false;
+        }
+        self.bump_revision();
+        for owner in changed_owners {
+            self.capture_statement_bucket(owner);
+        }
+        true
+    }
+
+    fn semantic_statement_owner_keys(&self, statement_id: &str) -> Vec<RelationKey> {
+        self.inner
+            .inner()
+            .edge_references()
+            .map(|edge| (RelationKey::Surface(edge.id()), edge.weight()))
+            .chain(
+                self.resource_relations()
+                    .map(|(key, _, _, payload)| (RelationKey::Resource(key), payload)),
+            )
+            .filter(|(_, payload)| {
+                payload
+                    .semantic_statements()
+                    .iter()
+                    .any(|statement| statement.statement_id == statement_id)
+            })
+            .map(|(key, _)| key)
+            .collect()
+    }
+
+    /// Ensure an assertion by its L13 reason key. Method version and note may
+    /// update on the same ID; a changed method IRI or evidence set creates a
+    /// new independently withdrawable assertion.
+    pub fn try_assert_semantic_reason(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        mut spec: SemanticStatementSpec,
+    ) -> Result<(RelationKey, StatementAssert), StatementWriteError> {
+        spec.asserted_at_ms.get_or_insert_with(unix_epoch_millis);
+        self.try_assert_semantic_statement(from, to, spec)
+    }
+
+    /// Confirm one exact held ID. Missing caller time is stamped once here;
+    /// an unknown or withdrawn ID is never selected by matching its content.
+    pub fn reconfirm_semantic_assertion(
+        &mut self,
+        statement_id: &str,
+        label: Option<String>,
+        asserted_at_ms: Option<u64>,
+    ) -> bool {
+        let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+            return false;
+        };
+        if current.withdrawn.is_some() {
+            return false;
+        }
+        self.update_assertion_record(
+            statement_id,
+            label.clone(),
+            Some(asserted_at_ms.unwrap_or_else(unix_epoch_millis)),
+            current.first_asserted_ms,
+            None,
+            crate::types::AssertionBasis {
+                note: label,
+                ..current.basis.clone()
+            },
+        )
+    }
+
+    /// Apply an exact-ID withdrawal. Unknown IDs are explicitly unapplied;
+    /// callers with causal event streams must defer/reject until admitted.
+    pub fn withdraw_semantic_assertion(
+        &mut self,
+        statement_id: &str,
+        at_ms: Option<u64>,
+        by: Option<String>,
+    ) -> bool {
+        let actor = by.or_else(|| Some(self.write_author().asserter_iri()));
+        self.withdraw_semantic_assertion_record(
+            statement_id,
+            AssertionWithdrawal {
+                at_ms: Some(at_ms.unwrap_or_else(unix_epoch_millis)),
+                by: actor,
+            },
+        )
+    }
+
+    /// Import/replay path: preserve missing time and never synthesize the
+    /// clock. It returns false for unknown IDs so an event is not acknowledged.
+    pub fn apply_imported_semantic_withdrawal(
+        &mut self,
+        statement_id: &str,
+        at_ms: Option<u64>,
+        by: Option<String>,
+    ) -> bool {
+        self.withdraw_semantic_assertion_record(statement_id, AssertionWithdrawal { at_ms, by })
+    }
+
+    /// Apply an imported exact-ID withdrawal only when its authored pair owns
+    /// the assertion. Source events with no carried time remain undated.
+    pub fn apply_imported_semantic_withdrawal_for_pair(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        statement_id: &str,
+        at_ms: Option<u64>,
+        by: Option<String>,
+    ) -> bool {
+        let Some((owner, _)) = self.find_semantic_statement(statement_id) else {
+            return false;
+        };
+        self.semantic_owner_matches_pair(owner, from, to)
+            && self.apply_imported_semantic_withdrawal(statement_id, at_ms, by)
+    }
+
+    /// Authored pair-checked exact-ID withdrawal. It records the current time
+    /// and configured writer only after verifying the owning bucket.
+    pub fn withdraw_semantic_assertion_for_pair(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        statement_id: &str,
+    ) -> bool {
+        let Some((owner, _)) = self.find_semantic_statement(statement_id) else {
+            return false;
+        };
+        self.semantic_owner_matches_pair(owner, from, to)
+            && self.withdraw_semantic_assertion(statement_id, None, None)
+    }
+
+    fn withdraw_semantic_assertion_record(
+        &mut self,
+        statement_id: &str,
+        withdrawal: AssertionWithdrawal,
+    ) -> bool {
+        let owners = self.semantic_statement_owner_keys(statement_id);
+        let mut changed_owners = Vec::new();
+        for owner in owners {
+            let Some(data) = self
+                .get_relation_mut(owner)
+                .and_then(|payload| payload.semantic.as_mut())
+            else {
+                continue;
+            };
+            let mut changed = false;
+            for statement in data.statements.iter_mut().filter(|statement| {
+                statement.statement_id == statement_id && statement.withdrawn.is_none()
+            }) {
+                statement.withdrawn = Some(withdrawal.clone());
+                changed = true;
+            }
+            if changed {
+                data.rebuild_compat();
+                changed_owners.push(owner);
+            }
+        }
+        if changed_owners.is_empty() {
+            return false;
+        }
+        self.bump_revision();
+        for owner in changed_owners {
+            self.capture_statement_bucket(owner);
+        }
         true
     }
 
@@ -795,53 +1160,8 @@ impl Graph {
         });
     }
 
-    /// Withdraw a handle from its owning store even after navigation or nature changes.
+    /// Compatibility spelling for authored exact-ID withdrawal.
     pub fn retract_assertion(&mut self, statement_id: &str) -> bool {
-        let mut removed = false;
-        while let Some((key, _)) = self.find_semantic_statement(statement_id) {
-            let key = key;
-            let endpoints = match key {
-                RelationKey::Surface(key) => self
-                    .inner
-                    .inner()
-                    .edge_endpoints(key)
-                    .map(|(a, b)| (self.get_node(a).unwrap().id, self.get_node(b).unwrap().id)),
-                RelationKey::Resource(key) => {
-                    self.resources
-                        .inner()
-                        .edge_endpoints(key.raw())
-                        .map(|(a, b)| {
-                            (
-                                self.resources.node(a).unwrap().id(),
-                                self.resources.node(b).unwrap().id(),
-                            )
-                        })
-                },
-            }
-            .expect("assertion endpoints");
-            let payload = self.get_relation_mut(key).expect("held assertion");
-            payload.retract_semantic_statement(statement_id);
-            let empty = payload.is_empty();
-            if empty {
-                match key {
-                    RelationKey::Surface(key) => {
-                        self.inner.disconnect(key);
-                    },
-                    RelationKey::Resource(key) => {
-                        self.resources.disconnect(key.raw());
-                    },
-                }
-            }
-            self.bump_revision();
-            match key {
-                RelationKey::Surface(_) => self.capture_semantic_pair(
-                    self.get_node_key_by_id(endpoints.0).unwrap(),
-                    self.get_node_key_by_id(endpoints.1).unwrap(),
-                ),
-                RelationKey::Resource(_) => self.capture_resource_pair(endpoints.0, endpoints.1),
-            }
-            removed = true;
-        }
-        removed
+        self.withdraw_semantic_assertion(statement_id, None, None)
     }
 }

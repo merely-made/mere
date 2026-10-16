@@ -12,6 +12,15 @@ use crate::{
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 
+/// Work observed from one exact retained receiver, independent of its current
+/// window placement. A host anchors its relative timer at the actual turn.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PeltDocumentWork<K> {
+    pub content: K,
+    pub identity: PeltSessionIdentity,
+    pub work: inker::session_engine::SessionPendingWork,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct PeltPlacement<K> {
     pub content: K,
@@ -425,10 +434,52 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         self.pending.iter()
     }
 
+    /// Observe actual engine work without invalidating prepared appearances,
+    /// semantic routes, or pump deduplication. Hidden documents remain schedulable.
+    pub fn document_work(&mut self) -> impl Iterator<Item = PeltDocumentWork<K>> + '_ {
+        self.contents.iter_mut().filter_map(|(key, content)| {
+            let (identity, work) = content.document_pending_work()?;
+            Some(PeltDocumentWork {
+                content: key.clone(),
+                identity,
+                work,
+            })
+        })
+    }
+
+    /// Admit a scheduling observation only for its still-current receiver and
+    /// this window's current visible placement. Moving a receiver does not
+    /// rewrite its identity; replacing it refuses an old deadline's repaint.
+    pub fn window_has_document_work(&self, window: u64, work: &PeltDocumentWork<K>) -> bool {
+        self.contents
+            .get(&work.content)
+            .and_then(PeltContent::document)
+            .is_some_and(|document| document.session_identity() == work.identity)
+            && self.placements.values().any(|placement| {
+                placement.value.window == window
+                    && placement.value.admits()
+                    && placement.value.content == work.content
+            })
+    }
+
     /// Whether this window has admitted content awaiting another frame.
     pub fn window_needs_frame(&self, window: u64) -> bool {
         self.placements.values().any(|p| {
             p.value.window == window && p.value.admits() && self.pending.contains(&p.value.content)
+        })
+    }
+
+    /// Whether this window presents an admitted native surface producer.
+    /// Hosts without producer wake callbacks poll only these windows; a
+    /// retained document or component does not need that surface mailbox clock.
+    pub fn window_has_surface(&self, window: u64) -> bool {
+        self.placements.values().any(|placement| {
+            placement.value.window == window
+                && placement.value.admits()
+                && self
+                    .contents
+                    .get(&placement.value.content)
+                    .is_some_and(|content| content.lane() == PeltLane::Surface)
         })
     }
 

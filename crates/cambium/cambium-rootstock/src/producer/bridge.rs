@@ -95,7 +95,16 @@ where
         };
         shared.producers.suspend_except(
             &elsewhere,
-            self.s.surface.as_ref().map(|surface| surface.renderer()),
+            self.s
+                .surface
+                .as_deref()
+                .or_else(|| {
+                    self.s
+                        .presentation_driver
+                        .as_ref()
+                        .and_then(|driver| driver.wgpu_surface())
+                })
+                .map(|surface| surface.core()),
         );
         if held.is_empty() {
             shared.producers.forget_device();
@@ -104,8 +113,16 @@ where
 
     pub(crate) fn prepare_producers(&mut self, scale: f32) -> ProducerFrameStats {
         self.s.shared.producers.clear_render_failure();
+        if let Some(core) = self.s.shared.render_core.as_ref() {
+            self.s.shared.producers.bind_core(core);
+        }
         let (Some(surface), Some(layout), Some(runner)) = (
-            self.s.surface.as_deref(),
+            self.s.surface.as_deref().or_else(|| {
+                self.s
+                    .presentation_driver
+                    .as_ref()
+                    .and_then(|driver| driver.wgpu_surface())
+            }),
             self.s.layout.as_ref(),
             self.s.runner.as_ref(),
         ) else {
@@ -132,7 +149,7 @@ where
         if self.s.hidden {
             shared
                 .producers
-                .suspend_except(&elsewhere, Some(surface.renderer()));
+                .suspend_except(&elsewhere, Some(surface.core()));
             if held.is_empty() {
                 shared.producers.forget_device();
             }

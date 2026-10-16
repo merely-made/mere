@@ -68,9 +68,24 @@ fn main() {
         let armed = Rc::new(std::cell::Cell::new(false));
         let captured = Rc::new(std::cell::Cell::new(false));
         let signal = captured.clone();
+        let pending = Rc::new(RefCell::new(None::<cambium_genet_winit_host::CaptureFrame>));
         let mut frames = 0;
         hooks.frame = Box::new(|_| true);
         hooks.after_frame = Box::new(move |ctx| {
+            let completed = pending.borrow_mut().as_mut().and_then(|job| job.poll());
+            if let Some(result) = completed {
+                pending.borrow_mut().take();
+                let (_, frame) = result.expect("presented frame readback");
+                image::save_buffer(
+                    &path,
+                    &frame.rgba,
+                    frame.width,
+                    frame.height,
+                    image::ColorType::Rgba8,
+                )
+                .expect("receipt PNG");
+                signal.set(true);
+            }
             frames += 1;
             if captured.get() {
                 *ctx.close = true;
@@ -95,23 +110,9 @@ fn main() {
                 return;
             }
             armed.set(true);
-            let destination = path.clone();
-            let signal = signal.clone();
+            let sink = pending.clone();
             *ctx.capture = Some(Box::new(move |capture| {
-                let capture = capture.expect("presented frame capture refused");
-                let (surface, view, w, h) =
-                    (capture.surface, capture.view, capture.width, capture.height);
-                let frame = cambium_genet_winit_host::read_frame(surface, view, w, h)
-                    .expect("presented frame readback");
-                image::save_buffer(
-                    &destination,
-                    &frame.rgba,
-                    frame.width,
-                    frame.height,
-                    image::ColorType::Rgba8,
-                )
-                .expect("receipt PNG");
-                signal.set(true);
+                *sink.borrow_mut() = Some(capture.expect("presented frame capture refused"));
             }));
         });
     }

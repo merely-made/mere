@@ -1,0 +1,55 @@
+{
+  "reviewer": "Root",
+  "reviewed_utc": "2026-10-13T22:46:06.973266+00:00",
+  "manifest_sha256": "8fea8ee15fda60362a98d2f278634bb60a70626ab848394ebc422cc59548930a",
+  "reviewed_pngs": [
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-A-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-A-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-A-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-B-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-B-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/baseline-B-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-A-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-A-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-A-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-B-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-B-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-loss-B-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-A-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-A-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-A-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-B-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-B-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-input-B-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-A-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-A-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-A-stylesheet.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-B-complete.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-B-reader.png",
+    "/Users/markik/Code/output/vello-next-gates-20261013/native/run-r2/visual/after-resize-B-stylesheet.png"
+  ],
+  "reviewed_count": 24,
+  "result": "pass for controlled recovery and retained layout",
+  "observations": [
+    "All complete Workshop queue-target captures remain nonblank with header, authored controls and reader/syntax/graph specimens visible.",
+    "Hosts retain distinct light and dark Reader themes and distinct authored stylesheet images before and after controlled loss.",
+    "After logical input, authored host names and caret are visible in complete captures.",
+    "Native resize narrows and reflows the Reader text and stylesheet geometry for both hosts.",
+    "Bottom viewport clipping persists as existing bounded viewport behavior.",
+    "Authored dark stylesheet sample retains pale text on light content background; no broad visual accessibility acceptance is inferred."
+  ],
+  "limits": [
+    "GPU queue-target and full producer-source captures, not OS compositor screenshots.",
+    "No OS IME, screen-reader or exhaustive user interaction acceptance.",
+    "Controlled owned Device.destroy recovery, not spontaneous physical driver-reset recovery."
+  ],
+  "coordinator_review": {
+    "thread_id": "01a1195d-a29f-7d50-92dc-6864b439c1ac",
+    "reviewed": [
+      "baseline-A-complete",
+      "after-loss-B-complete",
+      "after-resize-A-complete"
+    ],
+    "accepted_scope": "controlled recovery and layout retention"
+  }
+}

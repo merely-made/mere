@@ -473,6 +473,15 @@ where
         });
     }
 
+    /// Release the named key in the host's platform-neutral input state.
+    /// Releasing Tab ends held-Tab spatial navigation; other releases have no
+    /// host default. This does not synthesize an application key press/action.
+    pub fn key_released(&mut self, key: &Key) {
+        if matches!(key, Key::Named(NamedKey::Tab)) {
+            self.s.tab_held = false;
+        }
+    }
+
     pub fn key(&mut self, press: &KeyPress) {
         // `CAMBIUM_HOST_KEY_TRACE=1` reports every key the host was handed and
         // what became of it. It exists because "typing does not work" has three

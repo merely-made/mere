@@ -1,0 +1,12 @@
+{
+  "result": "fail",
+  "controls": [
+    "consumer root paint includes owned red image",
+    "consumer replacement includes blue image",
+    "consumer replacement retires red image",
+    "consumer removal removes blue image"
+  ],
+  "errors": [
+    "Error: image consumer context disposed\n    at assert (http://127.0.0.1:8975/:2:146)\n    at http://127.0.0.1:8975/:2:1150"
+  ]
+}

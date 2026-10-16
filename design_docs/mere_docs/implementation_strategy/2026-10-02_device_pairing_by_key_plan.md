@@ -152,6 +152,224 @@ provenance are retained in
 and the bounded custody patch alongside them. D2 is partial; D3–D6 and the
 other machines' rollout remain open.
 
+**2026-10-13: bilateral client visibility, partial.** O-PC already registered
+the Surface, ThinkPad and both Macs; its Codex sidebar now groups by connection.
+The Surface client now registers O-PC and ThinkPad, and the ThinkPad client
+registers the Surface and O-PC. Registration used the supported SSH deep link;
+it leaves automatic connection disabled, so the Linux clients' Connect buttons
+remain a native user step. Sidebar visibility in those clients is not yet
+qualified. See [OpenAI's remote connections guide](https://learn.chatgpt.com/docs/remote-connections)
+and [deep-link reference](https://learn.chatgpt.com/docs/app/commands).
+
+Windows' bundled CLI lacked a complete package for daemon bootstrap. The
+matching packaged CLI (`0.162.0-alpha.17.2`) is now installed through npm and
+its managed daemon is running with the PID backend. A WebSocket handshake,
+initialization and read of an existing O-PC chat passed through its local
+control socket without resuming the chat. Reboot persistence is unqualified.
+Existing desktop app servers were preserved.
+
+The two Linux peers exchanged public-key grants and pinned host keys read
+through existing trusted connections. ThinkPad → Surface passed both SSH
+execution and a read of `Check stack status` through the Surface app-server.
+ThinkPad uses its existing GCR agent, not Djinn. Surface reverse checks await
+its native Djinn unlock. The additive Windows enrollment script preserves the
+Surface grant and scopes a separate rule to ThinkPad's address; parsing and
+unelevated refusal passed. Its UAC prompt was canceled, so that grant remains
+pending. The Macs remain unreachable. No laptop build, app restart or writer
+lock removal was used. Concrete client states and remaining done-conditions
+are in [`client-mesh.json`](../testing/receipts/djinn-ssh-peers/client-mesh.json).
+
+**2026-10-13: client follow-up.** Native Windows elevation completed after
+reopening UAC; ThinkPad's separate rule is installed at `192.168.4.32` and its
+SSH login to O-PC passed. The Surface native unlock completed, and Surface →
+O-PC and Surface → ThinkPad passed. Both Linux clients now enable automatic
+connection, and the owner reports them connected. Each Linux peer read the
+existing O-PC chat through its managed daemon without resuming it.
+
+The owner reports O-PC is not connecting. Its SSH commands and app
+`read_thread` calls succeed for both Linux peers; its app chat listing includes
+both with no unavailable hosts. This establishes transport and stored-chat
+access, while the native connection display discrepancy remains unresolved
+pending the exact UI error. No app restart or connection replacement was used.
+The same receipt now records these follow-up results. The owner subsequently
+confirmed s-pc connected in O-PC and ThinkPad settings and reported that the
+connections look good. The three-peer SSH and stored-chat access slice is
+qualified. Surface Wi-Fi instability is an owner hypothesis, not a diagnosed
+cause. Mac enrollment and Windows daemon reboot persistence remain open.
+
+**2026-10-13: Mac expansion, in progress.** The owner resumed the same client
+mesh setup on both Macs. The M4's configured address was stale; the owner
+provided `markik@m4-imac`. `m4-imac.local` reached it at `192.168.4.42` with
+the previously trusted host key. Windows name lookup then failed intermittently,
+so only that alias's address now uses the verified IPv4 address. Its existing
+HostKeyAlias is preserved. The Intel's saved address still times out from M4;
+its current SSH address is pending from the owner.
+
+M4 already bundles a complete matching Codex CLI (`0.162.0-alpha.17.2`). A
+user-local command link and owned PATH block expose it to login shells, and
+managed-daemon bootstrap passed with the PID backend. Its existing ChatGPT
+PID `69566` and personae-agent PID `1248` remain running. The latter holds M4's
+existing SSH identity; this slice does not migrate its custody to Djinn.
+No Mac source build or new private key file was used. Daemon RSS was 43,376 KiB.
+
+The M4, Surface and ThinkPad received additive public-key grants and pinned
+host trust. M4 registers O-PC, Surface and ThinkPad; live client state now
+enables automatic connection for them. O-PC's native client logged M4 Connected
+and read `Assess REDox for the stack`. M4 → Surface passed SSH execution and
+read `Check stack status`. Surface → M4 denied login while Djinn exposed no
+identities; its native unlock remains pending. M4's Windows UAC request was
+canceled, leaving its peer-scoped rule and reverse login pending. ThinkPad
+command sessions are slow: bounded M4/ThinkPad probes timed out, and ThinkPad
+client registration needs verification before retrying. Existing chats, agents
+and grants were preserved. These partial results are added to the existing
+[`client-mesh.json`](../testing/receipts/djinn-ssh-peers/client-mesh.json) receipt;
+neither Mac rollout nor daemon reboot persistence is closed.
+
+**2026-10-13: q-pc identified and incoming access qualified.** q-pc is the
+saved Intel host: its Ed25519 key matches the old `192.168.4.105` trust entry,
+while its current address is `192.168.4.68` (`Q-PC.local`, iMacPro1,1, macOS
+15.8.1). The existing `imac-intel` alias now uses that address directly; its
+obsolete M4 jump was removed. Matching bundled Codex CLI exposure and managed
+daemon bootstrap passed. O-PC, M4 and ThinkPad each read q-pc's existing
+`Review Murm P2P Integrations` chat without resuming it. The owner confirmed
+ThinkPad's newly registered `imac-intel` entry Connected. M4/ThinkPad SSH
+execution now passes in both directions. Surface's M4 login passed after
+native unlock, then its agent became idle-locked again and denied q-pc login.
+
+q-pc had no outbound SSH identity. Djinn compiled from its clean primary Mere
+`9f3361be`, unchanged before and after, with one job and a 4 GiB owned-process
+RSS guard; peak was 1,477,734,400 bytes, with no guard failure. Two existing
+Cargo processes in another worktree were preserved. The initial selection of
+the external `personae-vault` package was corrected to Djinn-only; its failure
+is retained in the log. The installed, stripped binary and launchd unit have
+recorded hashes. Its native first-vault dialog is waiting for the owner; key
+generation and outbound qualification remain pending. Existing ChatGPT PID
+`44604` and empty OpenSSH agent PID `95140` are preserved. The task-owned stable
+target is retained while native qualification and possible repairs remain.
+See [`q-pc-djinn-build.json`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-build.json),
+[`q-pc-djinn-build.log`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-build.log),
+and [`q-pc-djinn-install.json`](../testing/receipts/djinn-ssh-peers/q-pc-djinn-install.json).
+
+**2026-10-14: q-pc native unlock accepted; legacy sync startup isolated.**
+The first resident accepted the owner's native passphrase, then stopped while
+opening a legacy personal-sync operation store (`incompatible CBOR type Array`
+under p2panda 0.7.1). The SSH installation inherited the existing Graphshell
+sync configuration. Its task-owned launchd unit now uses dedicated service
+settings with sync absent and reservoir disabled, and explicitly retains the
+same vault, agent/app/browser endpoints and original data root. The existing
+sync settings are unchanged; the legacy graph was not migrated or replaced.
+The original launchd unit is preserved beside the installation manifest.
+Djinn restarted as PID `54928` and is waiting at its native unlock dialog.
+Key generation and outbound qualification remain pending. This establishes
+service configuration isolation, not recovery of the old sync store.
+
+The subsequent native unlock succeeded in the same PID; the resident reported
+`ready`. Djinn generated q-pc's Ed25519 identity internally and returned only
+its public key (`SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA`).
+Additive grants on Surface, ThinkPad and M4 preserve their existing keys.
+q-pc read existing chats on all three peers over SSH/WebSocket without
+resuming them. Disabling its agent caused SSH to fail with exit 255; this is
+an agent-dependency control, not a new q-pc Locked-login receipt. Resident
+RSS was 42,792 KiB, and the existing q-pc ChatGPT and OpenSSH agent processes
+remain running. Native client display and reboot persistence are not newly
+qualified.
+
+M4 now answers at `192.168.4.58` under its previously trusted host key.
+Windows and q-pc's explicit peer addresses were updated; Surface and ThinkPad
+already use `m4-imac.local`. The Windows edit briefly produced an invalid
+replacement line, which was corrected and checked with `ssh -G` and a
+successful strict-trust login. M4's return route is currently unavailable:
+its SSH account `markik` is UID 502, the console belongs to `mayolaboykin`,
+and the saved per-user agent socket refuses connection. The other desktop
+session and legacy launch agent were left untouched; account choice is
+pending with the owner.
+
+The prepared Windows installer combines q-pc/M4 public-key grants, firewall
+rules scoped to `.68`/`.58`, and the existing reversible shell correction.
+Parsing and unelevated refusal passed. Native UAC was canceled; neither new
+peer rule is installed, and reopening is pending owner choice.
+
+q-pc subsequently reached its normal idle lock in the same resident PID.
+With its normal configured agent (not the agent-disabled control), a new SSH
+login to Surface was denied with exit 255. Its public-only file could not
+supply a fallback private key. This qualifies idle-Locked denial following
+the successful unlocked reads. Custody is left Locked while native Windows
+enrollment is pending; the later Windows probe will require native unlock.
+
+**2026-10-14: Windows return access and M4 account recovery qualified.**
+Native elevation installed q-pc/M4's public keys and firewall rules restricted
+to `192.168.4.68`/`.58`. The first shell install used `-c`; a live remote
+probe caught missing `sed`, `dirname` and `uname`, which broke the npm Codex
+wrapper. The corrected helper uses `-lc` to initialize Git's Unix tool path,
+and admits the previous owned `-c` value only with its protected original
+snapshot and exact Git Bash shell still present. Parsing and unelevated
+refusal passed; the owner approved the correction. Original registry value
+kinds and presence remain available to `-Restore`. No sshd restart was made.
+
+The managed Windows chat daemon had stopped separately. Bootstrap restored
+it as PID `10856` at the matching `0.162.0-alpha.17.2` version, preserving
+the running native app processes. With ordinary remote commands and no path
+override, q-pc, ThinkPad and M4 each read the existing O-PC chat without
+resuming it. The owner reports ThinkPad's client looks good again. q-pc's
+in-process native unlock passed in the same resident PID, and O-PC's native
+remote read of its existing q-pc chat also passed. Normal idle locking remains
+enabled; q-pc has subsequently returned to Locked.
+
+The owner chose `markik` for M4 and switched the desktop back to that account.
+Its existing legacy agent recovered as PID `6669` through its own launch
+agent, without a tool restart, and M4's return read of q-pc passed. The task
+did not sign out or alter the other desktop account. M4's Djinn migration
+and daemon reboot persistence remain separate work.
+
+q-pc's marker-owned Cargo cache was removed after verifying the exact approved
+path and no live target owner. Its build log, result and owner marker were
+moved intact to the installed Djinn's `qualification/` directory; their hashes
+are recorded in `q-pc-djinn-install.json`. The installed binary and existing
+shared/source-tree caches are preserved. No task-owned Cargo target, Cargo
+home or worktree remains.
+
+**2026-10-14: Claude harness registration.** The owner requested Claude
+Desktop on O-PC, Surface and both Macs, with terminal Claude Code on Fedora's
+ThinkPad. All four desktops have `2.37337.1`. Supported, additive `sshConfigs`
+entries in each owner's `~/.claude/settings.json` name the existing peer
+aliases and omit private-key fields, reusing the existing SSH configuration
+and agents. Other settings and permission modes remain unchanged; active
+Claude sessions were not restarted. ThinkPad's existing `2.1.248` CLI can
+use its shell SSH access, verified against all four peers, without a Desktop
+installation or new permission grants.
+
+Ordinary Windows SSH/SFTP prerequisite checks passed for all four peers.
+Claude Desktop's own menu and first connection remain distinct, pending
+native qualification. No model task, remote helper installation or worktree
+was started. A future coding session must follow the workspace's main-first
+and approved-worktree-location rules; connection registration itself creates
+neither checkouts nor worktrees. Native Code SSH sessions are the feature
+being registered, not a merger of ordinary Chat/Cowork history.
+Reference: [Claude Desktop SSH configuration](https://code.claude.com/docs/en/desktop#pre-configure-ssh-connections-for-your-team).
+
+The owner confirms all four peer entries are visible in O-PC's Claude Desktop
+Code-tab environment menu. For the first native connection check, ThinkPad's
+`/home/markik/Code` exists and is not a Git worktree, so browsing that folder
+does not require a new checkout. Home has 395,261,849,600 free bytes and no
+preexisting Claude remote-helper cache. Native connection remains pending;
+the owner was asked to select ThinkPad without sending a model task.
+
+The owner subsequently confirms O-PC's Claude Desktop connection to ThinkPad
+worked. This qualifies the native client connection in addition to the
+OpenSSH/SFTP preflight, using the existing agent-backed access. Other peer
+entries remain registered, with their own native connection checks separate.
+The tools did not send a model task or restart an existing Claude session.
+
+The owner also reported ThinkPad's O-PC client error. Raw SSH still passes;
+the native client authenticates, then its POSIX shell probe loses its quoting
+through the Scoop Git launcher under Windows' default `cmd`. A local probe
+using the real Git Bash executable passes and locates the running Codex daemon.
+The prepared SSH-shell script saves original registry values and kinds,
+supports restoration, refuses concurrent changes, and needs no sshd restart.
+Parsing and unelevated refusal passed. Its native administrator step and
+actual native-client reconnection are still pending. This distinction is
+recorded in the existing client mesh receipt.
+
 **Related**:
 
 - [reachability rungs and privacy lanes plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
@@ -820,13 +1038,13 @@ documents the same day as dated corrections.
    `device_sync`; it now lives in djinn (`ports/djinn/src/settings.rs:468`).
 3. **Reachability plan, R2.** It says announces already bind authenticated
    app data; the code sends none, deliberately, so an announce fits a
-   255-byte LoRa frame (`crates/murm/transport/src/reticulum_transport/announce.rs:38-51`),
+   255-byte LoRa frame (`murm/native/crates/transport/src/reticulum_transport/announce.rs:38-51`),
    which also constrains R2's proposed `EndpointAddr` payload.
 
 Lane-reported and not re-checked here (code comments, recorded for the
 phases that touch them): `ports/djinn/src/pairing.rs:46-48` says the host
 never writes the settings file back, while `personal_sync.rs` writes hints;
-`crates/murm/transport/src/peer_id.rs:11-14` says a `PeerID` derives from the
+`murm/native/crates/transport/src/peer_id.rs:11-14` says a `PeerID` derives from the
 master, while hosts pass per-graph seeds; `djinn --pairing-facts` computes
 the group pre-key and omits it from its output (`ports/djinn/src/bin/djinn.rs:405-439`).
 
@@ -984,7 +1202,7 @@ Findings from D1, for D1b and D2:
 
 **2026-10-02: D1b's cause, found and checked.** A paired device id is tagged
 onto the gossip overlay (`P2pandaOverlayHost::seed_peers`,
-`crates/murm/transport/src/p2panda_host.rs:103-125`) before the address book
+`murm/native/crates/transport/src/p2panda_host.rs:103-125`) before the address book
 holds any record for it; topic membership means "has a record and the topic"
 (stickleback's store and upstream's SQLite store alike), so gossip's one-time
 bootstrap query returns nobody and joins with nobody. When mDNS later writes

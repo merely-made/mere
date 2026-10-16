@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "--config",
+    "repos/mere/ports/graphshell/web/.cargo/config.toml",
+    "check",
+    "--manifest-path",
+    "repos/mere/ports/graphshell/web/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-j2",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "--features",
+    "presentation-webgl2,without-classic-vello"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 36.5,
+  "config": "repos/mere/ports/graphshell/web/.cargo/config.toml"
+}

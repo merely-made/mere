@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- Copyright 2026 Mark Alan Boykin
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ SPDX-License-Identifier: MPL-2.0 -->
+<meta charset="utf-8">
+<title>Shared Workshop controlled recovery fixture</title>
+<style>body{margin:12px;font-family:sans-serif}canvas{display:block;width:1280px;height:1100px;border:1px solid #999}pre{white-space:pre-wrap}</style>
+<h1>Two full Workshop mounts on one owned device</h1>
+<p>This finite fixture destroys its own WebGPU device. Current-frame async GPU error scopes and shader-counter qualification remain open.</p>
+<button id="run" disabled>Run finite shared recovery</button>
+<pre id="receipt">Loading fixture</pre>
+<canvas id="first" tabindex="0" aria-label="First Workshop"></canvas>
+<canvas id="second" tabindex="0" aria-label="Second Workshop"></canvas>
+<script type="module">
+import init, * as fixture from './pkg/shared_recovery.js';
+await init();
+window.sharedRecovery = fixture;
+const button = document.getElementById('run');
+const output = document.getElementById('receipt');
+output.textContent = 'Prepared only. Click to run under the owned runtime handoff.';
+button.disabled = false;
+button.onclick = async () => {
+  button.disabled = true;
+  const run = crypto.randomUUID();
+  const poll = setInterval(() => { output.textContent = JSON.stringify(fixture.status(), null, 2); }, 100);
+  try {
+    window.sharedRecoveryReceipt = await fixture.run_shared_recovery('first', 'second', run);
+    output.textContent = JSON.stringify(window.sharedRecoveryReceipt, null, 2);
+    document.title = 'SHARED RECOVERY PASS — async frame quality open';
+  } catch (error) {
+    output.textContent = String(error);
+    window.sharedRecoveryReceipt = fixture.status();
+    document.title = 'SHARED RECOVERY FAIL';
+  } finally { clearInterval(poll); }
+};
+</script>

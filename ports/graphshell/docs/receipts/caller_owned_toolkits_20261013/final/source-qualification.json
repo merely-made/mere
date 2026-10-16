@@ -1,0 +1,1054 @@
+{
+  "kind": "final-source-and-native-toolkit-qualification",
+  "git_head": "eeb59b303fd32611fdab1aea7a52a0f29b004fa0",
+  "supplier_sources": [
+    "git+https://github.com/iced-rs/cryoglyph.git?rev=cf38ed5ea0cfe95270b31ced2910560a7fcc5003#cf38ed5ea0cfe95270b31ced2910560a7fcc5003",
+    "git+https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d6403d7206d82c7c2caa46143efde8284",
+    "git+https://github.com/mark-ik/vello?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782",
+    "git+https://github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+    "git+https://www.github.com/merely-made/genet.git?rev=b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084#b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084",
+    "git+https://www.github.com/merely-made/netrender.git?rev=6a24ae08f55129b474282b8e4911564f875ce5fd#6a24ae08f55129b474282b8e4911564f875ce5fd"
+  ],
+  "source_and_metadata": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "77ee8deb58748694b466d3265bc829bab8e3c992326396bf9019f9792d907b89"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "c71dcb22f97d72b6e418f8b4fd726ef21afe6ec24b481de5cfb9d1bc2bacf6f2"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/egui.rs",
+      "sha256": "3602674c9830df82b3d1eb10ffddc339e5989f2123728e926ee14e23bbd6e81c"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/egui_input.rs",
+      "sha256": "fe607323cd484d6a7f910876e1b1b96b6f71952ee94ee8ef698eeaaf9cdacd32"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/gpu.rs",
+      "sha256": "7ced5db6a2f1cc35573bd32c1fcc114be9e4a3745a1141473d2a6aa01d6b2e5c"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/iced.rs",
+      "sha256": "c37545bc7d56308eedffb0d948f205620a3222dc7391efbd749d2c04b32d8368"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/iced_input.rs",
+      "sha256": "53407ad4cff2aa559d7fab8dc14d0f92528f2859fb54fd857d83f263b7903acd"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/input.rs",
+      "sha256": "c09d4ab58b3a68cf1a53d97200cef2710114ad2f4abd93de825ba93952a7b060"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding/tests.rs",
+      "sha256": "70668c698f14b647bee7eed6add6a7e0524055ca2dfefeb6b3d438be29e842fa"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/embedding.rs",
+      "sha256": "64a618ba970fe98b5f5bbd7e47b2eac169ef54171f955f0295114c51ebc1a8c4"
+    },
+    {
+      "path": "crates/mere/src/query_view/stroke.rs",
+      "sha256": "07f76ba16fb72808921b61b6af6c14fa366ef4a30b27ee3c072cc61483673b93"
+    },
+    {
+      "path": "crates/mere/src/query_view.rs",
+      "sha256": "54da421cb0ae921aff5bc4e29c11a44814761ab149b4afff0691b8a6bdf33a09"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/final/qualify_artifacts.py",
+      "sha256": "595acbe5929ce22f756e9fe9bd7fb3aecf4ea3a4d41844984d8494f639705618"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/co_op_member.png",
+      "sha256": "3ad9338a662de893a9867d3add1a7e5a046b074c35e492a0787858eb92776c61"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/final_native_gates.ps1",
+      "sha256": "0c98caf46f3053662a4080affaae3ab20ca5a3f5557df410eb7e3abe6575becf"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/netrender-bridge-probe-metadata.json",
+      "sha256": "2c37c6ccbcdc8d928d0bd901f26de0f6f740633cb8a940baf2c74b2fc83b6777"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/netrender-bridge-root-metadata.json",
+      "sha256": "470386fe1d1643c06485294810fefccb1fd2f584790bce232b137ef3d0bb9eaa"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/netrender-bridge-smoke-manifest-metadata.json",
+      "sha256": "ece77c1d09481e8343652c032f59496d39e0b85cf6b9f080255f7a068067d0ca"
+    },
+    {
+      "path": "ports/graphshell/docs/receipts/query_views_20261013/netrender-bridge-web-metadata.json",
+      "sha256": "718400bc3483953e1a1fd03b85a0605880cd37080791e8272c09bd708934dc97"
+    },
+    {
+      "path": "ports/graphshell/examples/caller_owned_toolkits.rs",
+      "sha256": "961166b90310949c563bbe39784987177de010e847901e540c36cee7b6902e88"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/producer.rs",
+      "sha256": "c0b74e44c1b447e5003ec4be25e44a6732da2b5776eadf9304ca0f0a8eeb0b0a"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content/view.rs",
+      "sha256": "4549fd1c2a1cba991d22d9f2215ef875db0c1d3dceb1de5c0c613f00254a403d"
+    },
+    {
+      "path": "ports/graphshell/src/retained_content.rs",
+      "sha256": "9d78567e536519a06133b6397f390558b45b885d7eba196153e58db6dc3012af"
+    },
+    {
+      "path": "ports/graphshell/web/GraphshellSans.ttf",
+      "sha256": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481"
+    }
+  ],
+  "source_freeze_sha256": "9a952ffc10ce5e5419d7605921c1ecc867bea62791326b219f067aabbeb94e2b",
+  "source_unchanged_during_gates": true,
+  "runtime_qualification_sha256": "e2e44bbe989c590303419881198c8192ea50521cc128113750b8f8346b722d9f",
+  "adapter": {
+    "backend": "Vulkan",
+    "device": 10464,
+    "device_type": "DiscreteGpu",
+    "driver": "NVIDIA",
+    "driver_info": "610.88",
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "vendor": 4318
+  },
+  "caller_gpu": {
+    "device_count": 1,
+    "initial_generation": 1,
+    "physical_device_replaced": false,
+    "queue_count": 1,
+    "rehydrated_generation": 2,
+    "same_handles_for_both_toolkits": true
+  },
+  "gates": [
+    {
+      "exit_code": 0,
+      "name": "final-retained-mount",
+      "command": "cargo +1.99.0 test -p cambium --lib retained_mount::tests --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 11,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "f401485e1235c7f2b32f90d8694d88aefeb48eeca4462c9fde6715509ca42695"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-frisket-workspace",
+      "command": "cargo +1.99.0 test -p cambium --lib workspace::tests --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 7,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "721a5a18f49d9e5231945ec7b1d12e0481924e98d1e256f6abbd885c096c4302"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-native-mailbox",
+      "command": "cargo +1.99.0 test -p pelt-core --test host_surface mailbox_polling_follows_admitted_native_window_custody --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "a5a2287cd89fd9a0c673aa913a4711838887e4c24f7517e2fc0eb2434578c635"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-document-polling",
+      "command": "cargo +1.99.0 test -p pelt-core --test pool pending_observation_is_read_only_and_redraw_is_scoped_to_visible_windows --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "313eb663b771379b077a2d5efd621b14af77be7b76034be14d3b57a5e448e9e4"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-shared-query",
+      "command": "cargo +1.99.0 test -p mere --no-default-features --features query --lib query_view --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 10,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "686cbce8abc2df57ccf1a025fdc20e40a4c3e84645db60c6dff667ec125d0cc7"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-owner-query",
+      "command": "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib query_views::tests --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "08b1c035bde3ae82fe409fc603e3dd83f18792f91e26632bbfee1d226f37bebe"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-clip-wheel",
+      "command": "cargo +1.99.0 test -p graphshell --no-default-features --features query-views,retained-content,image-decode --lib retained_content:: --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 13,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "68dc5f47ed747423bfe58f96eb6f2b03f1fb50e757866576e2a0098ac32aac76"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-embedding",
+      "command": "cargo +1.99.0 test -p cambium-rootstock --no-default-features --features embedding-egui,embedding-iced --lib embedding::tests --locked --offline -j1",
+      "test_results": [
+        {
+          "passed": 6,
+          "failed": 0
+        }
+      ],
+      "log_sha256": "731cb1029ff77a491d2fe16340bd89f53fb2acb7fcdfbb0727217cefb7e389d4"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-toolkit-bench",
+      "command": "cargo +1.99.0 run -p graphshell --no-default-features --features caller-owned-toolkit-bench,image-decode --example caller_owned_toolkits --locked --offline -j1 -- ports/graphshell/docs/receipts/caller_owned_toolkits_20261013/final/native",
+      "test_results": [],
+      "log_sha256": "f002a269ba1353beb75eee30e39a841b1cd5f587dd3b2b24f2c4f85dd589f8bb"
+    },
+    {
+      "exit_code": 0,
+      "name": "final-port-boundaries",
+      "command": "python scripts/check_port_boundaries.py",
+      "test_results": [],
+      "log_sha256": "ed4d418c7935ec6ab35610fbd1f8d9b7078ca2ad0684de25623968362a13de39"
+    }
+  ],
+  "toolkit_pairs": [
+    {
+      "egui": "egui-content-0-rehydrated.png",
+      "iced": "iced-content-0-rehydrated.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-0-scaled.png",
+      "iced": "iced-content-0-scaled.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-0.png",
+      "iced": "iced-content-0.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-1-rehydrated.png",
+      "iced": "iced-content-1-rehydrated.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-1-scaled.png",
+      "iced": "iced-content-1-scaled.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-1.png",
+      "iced": "iced-content-1.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-2-rehydrated.png",
+      "iced": "iced-content-2-rehydrated.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-2-scaled.png",
+      "iced": "iced-content-2-scaled.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-2.png",
+      "iced": "iced-content-2.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-3-rehydrated.png",
+      "iced": "iced-content-3-rehydrated.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-3-scaled.png",
+      "iced": "iced-content-3-scaled.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-3.png",
+      "iced": "iced-content-3.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-4-rehydrated.png",
+      "iced": "iced-content-4-rehydrated.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-4-scaled.png",
+      "iced": "iced-content-4-scaled.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-content-4.png",
+      "iced": "iced-content-4.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "egui": "egui-graph.png",
+      "iced": "iced-graph.png",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "previous_artifact_comparisons": [
+    {
+      "path": "native/egui-content-0-rehydrated.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-0-scaled.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-0.png",
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "previous_sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-1-rehydrated.png",
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "previous_sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-1-scaled.png",
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "previous_sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-1.png",
+      "sha256": "21d46c6221e0a5c014671c0bc42b6db128a62e83f8bd0e0c9423f770dd7fe480",
+      "previous_sha256": "21d46c6221e0a5c014671c0bc42b6db128a62e83f8bd0e0c9423f770dd7fe480",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-2-rehydrated.png",
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "previous_sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-2-scaled.png",
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "previous_sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-2.png",
+      "sha256": "a98672d312a0ff63d7cbae9925396a79aeb4e4c02ce35360786cff3cd50346ab",
+      "previous_sha256": "a98672d312a0ff63d7cbae9925396a79aeb4e4c02ce35360786cff3cd50346ab",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-3-rehydrated.png",
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "previous_sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-3-scaled.png",
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "previous_sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-3.png",
+      "sha256": "eb892d47243f019a1c870aa51d60e770d01e10a5607e956ca41c07010fb1697b",
+      "previous_sha256": "eb892d47243f019a1c870aa51d60e770d01e10a5607e956ca41c07010fb1697b",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-4-rehydrated.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-4-scaled.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-content-4.png",
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "previous_sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/egui-graph.png",
+      "sha256": "b86ece2e7f65954dc98670decac036ac17160b728d77ea8383d4deea4c1171d2",
+      "previous_sha256": "b86ece2e7f65954dc98670decac036ac17160b728d77ea8383d4deea4c1171d2",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-0-rehydrated.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-0-scaled.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-0.png",
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "previous_sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-1-rehydrated.png",
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "previous_sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-1-scaled.png",
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "previous_sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-1.png",
+      "sha256": "21d46c6221e0a5c014671c0bc42b6db128a62e83f8bd0e0c9423f770dd7fe480",
+      "previous_sha256": "21d46c6221e0a5c014671c0bc42b6db128a62e83f8bd0e0c9423f770dd7fe480",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-2-rehydrated.png",
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "previous_sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-2-scaled.png",
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "previous_sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-2.png",
+      "sha256": "a98672d312a0ff63d7cbae9925396a79aeb4e4c02ce35360786cff3cd50346ab",
+      "previous_sha256": "a98672d312a0ff63d7cbae9925396a79aeb4e4c02ce35360786cff3cd50346ab",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-3-rehydrated.png",
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "previous_sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-3-scaled.png",
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "previous_sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-3.png",
+      "sha256": "eb892d47243f019a1c870aa51d60e770d01e10a5607e956ca41c07010fb1697b",
+      "previous_sha256": "eb892d47243f019a1c870aa51d60e770d01e10a5607e956ca41c07010fb1697b",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-4-rehydrated.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-4-scaled.png",
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "previous_sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-content-4.png",
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "previous_sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "path": "native/iced-graph.png",
+      "sha256": "b86ece2e7f65954dc98670decac036ac17160b728d77ea8383d4deea4c1171d2",
+      "previous_sha256": "b86ece2e7f65954dc98670decac036ac17160b728d77ea8383d4deea4c1171d2",
+      "equal_png_sha256": true,
+      "size": [
+        720,
+        520
+      ],
+      "different_pixels": 0,
+      "max_channel_delta": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "all_32_previous_pngs_equal": true,
+  "all_32_previous_rgba_equal": true,
+  "open": [
+    "Classic encoder",
+    "physical window IME and accessibility",
+    "actual device loss",
+    "audio output"
+  ]
+}

@@ -1,7 +1,7 @@
 # Reachability Rungs and Privacy Lanes
 
 **Date:** 2026-08-03
-**Status (2026-10-06):** R0 landed, recorded 2026-09-01, with one fork pin left since `a5543904` (2026-10-03); R1 landed 2026-08-03 (Graphshell) and 2026-08-06 (Knot), the genuinely remote receipt still open; R2 scoped, its premise of authenticated announce app data overtaken (the announce now sends none); R3's Noise in-stream plane landed 2026-08-06 (`crates/murm/transport/src/noise.rs`), while its emissary and Arti lanes remain scoped, emissary gated on entering the tree. Veilid retired 2026-09-01.
+**Status (2026-10-06):** R0 landed, recorded 2026-09-01, with one fork pin left since `a5543904` (2026-10-03); R1 landed 2026-08-03 (Graphshell) and 2026-08-06 (Knot), the genuinely remote receipt still open; R2 scoped, its premise of authenticated announce app data overtaken (the announce now sends none); R3's Noise in-stream plane landed 2026-08-06 (`murm/native/crates/transport/src/noise.rs`), while its emissary and Arti lanes remain scoped, emissary gated on entering the tree. Veilid retired 2026-09-01.
 **Depends on:** the S1 findings recorded in the
 [reference host plan](2026-07-27_graphshell_reference_host_plan.md) H6 addendum;
 the retinue lane in `mere-transport` (feature-gated, trusted-mesh only until
@@ -62,8 +62,24 @@ every early instrument filtered for the wrong string, and `avahi-browse` never
 surfaces it, so observe with a raw multicast listener armed before the peer
 starts.
 
+**Supplier refresh, 2026-10-13:** upstream `490be93b`, incorporated in the
+October 13 compatibility snapshot, appends the first 32 hex characters of the
+BLAKE3 network-id digest to `p2pandav1`. The service name is now
+`_p2pandav1<network-digest>._udp.local`, so a diagnostic must derive the exact
+name from the configured public network id rather than filter for the former
+fixed label. Old and new advertisements do not discover each other; explicit
+endpoint tickets remain the mixed-version bootstrap. This separates discovery
+networks and grants no membership, conversation access or service admission.
+The resulting service string is 41 characters before the underscore. It fits
+a DNS label, but exceeds the fifteen-character DNS-SD service-name limit in
+[RFC 6763 §7](https://www.rfc-editor.org/rfc/rfc6763.html#section-7).
+Treat this as the upstream private peer-discovery naming scheme, not generic
+DNS-SD service conformance. F3's service browser needs a short service type and
+an explicit network selector in an appropriate domain, subtype or metadata
+contract, qualified separately from this interoperability-preserving refresh.
+
 **Where the policy lives.** `P2pandaHostPolicy` and `P2pandaOverlayHost` in
-`crates/murm/transport/src/p2panda_host.rs` (landed 2026-08-22, `0f0a8006`,
+`murm/native/crates/transport/src/p2panda_host.rs` (landed 2026-08-22, `0f0a8006`,
 device resident R5) own discovery mode, relays, route seeding, endpoint
 reporting and shutdown once; product hosts keep identity, admission, stores and
 protocol handlers. Default policy is `Active` mDNS and no relay. A new host

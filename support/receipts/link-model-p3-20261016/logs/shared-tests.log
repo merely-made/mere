@@ -1,0 +1,52 @@
+   Compiling syn v3.0.6
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_derive v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling ptr_meta_derive v0.3.2
+   Compiling cc v1.6.0
+   Compiling ptr_meta v0.3.2
+   Compiling rancor v0.1.3
+   Compiling blake3 v1.8.7
+   Compiling sceno v0.0.5 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/sceno)
+   Compiling bytecheck_derive v0.8.3
+   Compiling syn v2.0.119
+   Compiling hashbrown v0.17.1
+   Compiling simdutf8 v0.1.5
+   Compiling bytecheck v0.8.3
+   Compiling munge_macro v0.4.7
+   Compiling mere-curation v0.1.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/forme/curation)
+   Compiling arrayvec v0.7.8
+   Compiling libm v0.2.16
+   Compiling constant_time_eq v0.4.2
+   Compiling indexmap v2.14.2
+   Compiling munge v0.4.7
+   Compiling rend v0.5.4
+   Compiling async-trait v0.1.92
+   Compiling rkyv_derive v0.8.18
+   Compiling uuid v1.27.0
+   Compiling petgraph v0.8.3
+   Compiling rkyv v0.8.18
+   Compiling muniment v0.1.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/muniment)
+   Compiling slotmap v1.1.1
+   Compiling scenograph v0.0.4 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenograph)
+   Compiling scenotime v0.0.4 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenotime)
+   Compiling chartulary v0.2.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/chartulary)
+   Compiling scenomise v0.0.5 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenomise)
+error[E0282]: type annotations needed
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:636:40
+    |
+636 |         let assertion = |id: &str, at, end, asserter: Option<&str>| LinkAssertion {
+    |                                        ^^^
+...
+645 |             withdrawn: end.map(|at_ms| LinkWithdrawal { at_ms, by: None }),
+    |                        --- type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+636 |         let assertion = |id: &str, at, end: /* Type */, asserter: Option<&str>| LinkAssertion {
+    |                                           ++++++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `scenomise` (lib test) due to 1 previous error

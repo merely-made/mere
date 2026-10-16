@@ -12,7 +12,7 @@ import argparse, hashlib, json, os, shutil, subprocess, time
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "support/receipts/dramatis-app"
 TARGET = Path("C:/t/cargo-targets/mere")
-CARGO = ["cargo", "+1.98.1"]
+CARGO = ["cargo", "+1.99.0"]
 records = []
 JOBS = 1
 def run(name, args, env=None, expected=0):
@@ -128,7 +128,7 @@ def main():
     run("window-absent",[str(TARGET/"debug/dramatis-ui.exe")],env)
     fixture("locked"); fixture("unlocked")
     hashes={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in ROOT.glob("ports/dramatis/**/*.rs")}
-    owned = subprocess.check_output(["git", "ls-files", "ports/castellan", "ports/djinn", "ports/graphshell", "ports/dramatis"],cwd=ROOT,text=True).splitlines() + ["Cargo.toml", "Cargo.lock"]
+    owned = subprocess.check_output(["git", "ls-files", "ports/djinn/castellan", "ports/djinn", "ports/graphshell", "ports/dramatis"],cwd=ROOT,text=True).splitlines() + ["Cargo.toml", "Cargo.lock"]
     for p in [ROOT/name for name in owned if name.endswith((".rs", ".toml", "Cargo.lock"))]:
         hashes[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
     executables={name:hashlib.sha256((TARGET/"debug"/name).read_bytes()).hexdigest() for name in ["dramatis-ui.exe","dramatis-review-host.exe"]}

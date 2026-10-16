@@ -162,7 +162,10 @@ pub use journal::{
     AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
 };
 pub use merge::import_edits;
-pub use revert::{Part, Revert, Touched, revert_change};
+pub use revert::{
+    Part, Revert, Touched, part_edits, part_node, part_of, part_value, recreate_node_edits,
+    revert_change,
+};
 pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public
 // surface, re-exported so consumers name it without a direct muniment dep.

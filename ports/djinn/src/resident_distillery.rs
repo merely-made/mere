@@ -60,9 +60,8 @@ use distillery::{
     ChronicleObserver, ChronicleRevision, Distillery, InstalledAuthority, InstalledSettings,
     ResidentAuthority, ResidentReceipt, ResidentSettings, RetentionSettings,
 };
-use graphshell::native::endpoint_catalog::{
-    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
-};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use mesh::spec::JobSpec;
 use mesh::{AvailabilityPolicy, DevicePolicy, ErasurePolicy, JobBoard, MeshRetentionPolicy};
 use muniment::RedbBackend;
@@ -529,16 +528,12 @@ impl ResidentDistillery {
         observer: ChronicleObserver,
         policy: LocalNetworkPolicy,
     ) -> Result<
-        graphshell::native::projection_host::ResidentProjectionHost,
+        graphshell_host::projection_host::ResidentProjectionHost,
         ResidentEndpointCatalogError,
     > {
         let mut catalog = ResidentEndpointCatalog::new();
         let route = Self::register_chronicle_route(observer, &mut catalog)?;
-        Ok(
-            graphshell::native::projection_host::ResidentProjectionHost::new(
-                policy, route, catalog,
-            ),
-        )
+        Ok(graphshell_host::projection_host::ResidentProjectionHost::new(policy, route, catalog))
     }
 
     /// Local route descriptor granted to an installed first-party client.

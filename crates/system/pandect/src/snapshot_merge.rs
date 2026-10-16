@@ -9,24 +9,33 @@
 //! Unions surfaces by stable id and resources by their prepared identity IRI.
 //! Pure and deterministic. It lives here, not in `graph-kernel`, so it works
 //! directly on the public `GraphSnapshot` structs without the kernel graph API:
-//! [`PersistedEdge`] keys its endpoints by `from_node_id` / `to_node_id`
-//! (stable `String`s), so a merge is plain Vec surgery (the audited
+//! [`PersistedEdge`](kernel::persistence::PersistedEdge) keys its endpoints by
+//! `from_node_id` / `to_node_id` (stable `String`s), so a merge is plain Vec surgery (the audited
 //! `codicil_compose_merge_plan`). A kernel `Graph::merge_from` is a later, optional
 //! promotion. This is what first populates the codicil lineage
 //! (`ProvenanceRecord.upstream`, via [`crate::graph_codicil::compose_graph_codicils`])
 //! that the consolidation pass will read.
+//!
+//! The per-facet rules, same-id layering, edge signatures and the
+//! assertion-handle check live in [`crate::merge_rules`], shared with session
+//! merge-in (session merge-in note, M8).
 
 use std::collections::{HashMap, HashSet};
 
 use eidetic::{Error, Result};
 use kernel::graph::Graph;
-use kernel::graph::predicate_declarations::{
-    PREDICATE_DECLARATIONS_FACET, merge_predicate_declarations,
-};
-use kernel::graph::resource_classifications::merge_classification_variants;
-use kernel::graph::resource_content::{RESOURCE_CLASSIFICATIONS, RESOURCE_PROPERTIES};
-use kernel::graph::resource_properties::merge_resource_properties;
-use kernel::persistence::{GraphSnapshot, PersistedEdge};
+#[cfg(test)]
+use kernel::graph::predicate_declarations::PREDICATE_DECLARATIONS_FACET;
+use kernel::persistence::GraphSnapshot;
+#[cfg(test)]
+use kernel::persistence::PersistedEdge;
+
+use crate::merge_rules::{edge_signature, layer_resource_record, layer_surface};
+
+/// The shared assertion-handle check, with Compose's error type.
+fn check_assertion_handles(snapshot: &GraphSnapshot) -> Result<()> {
+    crate::merge_rules::check_assertion_handles(snapshot).map_err(|error| Error::new(error.0))
+}
 
 /// What [`merge_snapshots`] did, for the Athanor proposal / diagnostics. Never a
 /// placebo: every count reflects a real change to the merged snapshot.
@@ -94,17 +103,7 @@ pub(crate) fn merge_snapshots_with_remap(
     for bn in &b.nodes {
         remap.insert(bn.node_id.clone(), bn.node_id.clone());
         if let Some(&idx) = id_to_index.get(&bn.node_id) {
-            let an = &mut merged.nodes[idx];
-            for t in &bn.tags {
-                if !an.tags.contains(t) {
-                    an.tags.push(t.clone());
-                }
-            }
-            for p in &bn.properties {
-                if !an.properties.iter().any(|q| q.predicate == p.predicate) {
-                    an.properties.push(p.clone());
-                }
-            }
+            layer_surface(&mut merged.nodes[idx], bn);
             report.layered_nodes += 1;
         } else {
             id_to_index.insert(bn.node_id.clone(), merged.nodes.len());
@@ -173,76 +172,8 @@ pub(crate) fn merge_snapshots_with_remap(
     for record in &b.resources {
         let id = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
         if let Some(&index) = resources.get(&id) {
-            let target = &mut merged.resources[index];
-            for facet in &record.facets {
-                if let Some(existing) = target
-                    .facets
-                    .iter_mut()
-                    .find(|existing| existing.facet == facet.facet)
-                {
-                    let old: serde_json::Value = serde_json::from_str(&existing.value_json)
-                        .map_err(|error| Error::new(error.to_string()))?;
-                    let new: serde_json::Value = serde_json::from_str(&facet.value_json)
-                        .map_err(|error| Error::new(error.to_string()))?;
-                    if facet.facet == PREDICATE_DECLARATIONS_FACET {
-                        let declarations =
-                            merge_predicate_declarations(&target.canonical_iri, &old, &new)
-                                .map_err(|error| Error::new(error.to_string()))?;
-                        existing.value_json = serde_json::to_string(&declarations)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                    } else if facet.facet == RESOURCE_CLASSIFICATIONS {
-                        let old: Vec<
-                            kernel::graph::resource_classifications::ClassificationVariant,
-                        > = serde_json::from_value(old)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        let new: Vec<
-                            kernel::graph::resource_classifications::ClassificationVariant,
-                        > = serde_json::from_value(new)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        let variants = merge_classification_variants(&old, &new)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        existing.value_json = serde_json::to_string(&variants)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                    } else if facet.facet == RESOURCE_PROPERTIES {
-                        let old: Vec<kernel::types::NodeProperty> = serde_json::from_value(old)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        let new: Vec<kernel::types::NodeProperty> = serde_json::from_value(new)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        let properties = merge_resource_properties(&old, &new)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        existing.value_json = serde_json::to_string(&properties)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                    } else if facet.facet
-                        == kernel::graph::legacy_content_migration::LEGACY_CONTENT_ORIGINS
-                    {
-                        let mut notes: Vec<
-                            kernel::graph::legacy_content_migration::LegacyContentOrigin,
-                        > = serde_json::from_value(old)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        let incoming: Vec<
-                            kernel::graph::legacy_content_migration::LegacyContentOrigin,
-                        > = serde_json::from_value(new)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                        for note in incoming {
-                            if !notes.contains(&note) {
-                                notes.push(note);
-                            }
-                        }
-                        notes.sort_by_cached_key(|note| {
-                            serde_json::to_string(note).expect("origin encodes")
-                        });
-                        existing.value_json = serde_json::to_string(&notes)
-                            .map_err(|error| Error::new(error.to_string()))?;
-                    } else if old != new {
-                        return Err(Error::new(format!(
-                            "resource {id} has conflicting facet {:?}; precise variant merge is required",
-                            facet.facet
-                        )));
-                    }
-                } else {
-                    target.facets.push(facet.clone());
-                }
-            }
+            layer_resource_record(&mut merged.resources[index], record)
+                .map_err(|error| Error::new(error.0))?;
         } else {
             resources.insert(id, merged.resources.len());
             merged.resources.push(record.clone());
@@ -268,61 +199,6 @@ pub(crate) fn merge_snapshots_with_remap(
     merged.timestamp_secs = a.timestamp_secs.max(b.timestamp_secs);
 
     Ok((merged, report, remap))
-}
-
-/// A complete signature, so no sidecar disappears when endpoints coincide.
-fn edge_signature(e: &PersistedEdge) -> (String, String, String) {
-    (
-        e.from_node_id.clone(),
-        e.to_node_id.clone(),
-        format!("{e:?}"),
-    )
-}
-
-fn check_assertion_handles(snapshot: &GraphSnapshot) -> Result<()> {
-    let surfaces: HashSet<_> = snapshot
-        .nodes
-        .iter()
-        .filter_map(|node| uuid::Uuid::parse_str(&node.node_id).ok())
-        .collect();
-    let mut handles = HashMap::new();
-    for (resource, edge) in snapshot
-        .edges
-        .iter()
-        .filter(|edge| {
-            [&edge.from_node_id, &edge.to_node_id]
-                .into_iter()
-                .all(|id| {
-                    uuid::Uuid::parse_str(id)
-                        .ok()
-                        .is_some_and(|id| surfaces.contains(&id))
-                })
-        })
-        .map(|edge| (false, edge))
-        .chain(snapshot.resource_edges.iter().map(|edge| (true, edge)))
-    {
-        for statement in edge
-            .semantic
-            .iter()
-            .flat_map(|semantic| &semantic.statements)
-        {
-            let identity = (
-                resource,
-                uuid::Uuid::parse_str(&edge.from_node_id).map_err(|_| edge.from_node_id.as_str()),
-                uuid::Uuid::parse_str(&edge.to_node_id).map_err(|_| edge.to_node_id.as_str()),
-                statement,
-            );
-            if let Some(previous) = handles.insert(statement.statement_id.as_str(), identity)
-                && previous != identity
-            {
-                return Err(Error::new(format!(
-                    "assertion {:?} has conflicting domain, endpoints or payload during composition",
-                    statement.statement_id
-                )));
-            }
-        }
-    }
-    Ok(())
 }
 
 #[cfg(test)]
@@ -477,9 +353,15 @@ mod tests {
                 predicate: "https://schema.org/citation".into(),
                 recognized_sub_kind: None,
                 label: Some("citation".into()),
+                basis: kernel::types::AssertionBasis {
+                    note: Some("citation".into()),
+                    ..Default::default()
+                },
                 graph_scope: kernel::types::GraphScope::Default,
                 provenance_iri: Some("https://author.test/".into()),
                 asserted_at_ms: Some(17),
+                first_asserted_ms: Some(17),
+                withdrawn: None,
             }],
             ..Default::default()
         });

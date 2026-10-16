@@ -78,7 +78,7 @@ Every real gap is in **crypto agility**, not in crypto choice.
 
 Verified in code, 2026-08-24:
 
-- `ports/castellan/src/custody/passphrase_storage.rs` — the on-disk
+- `ports/djinn/castellan/src/custody/passphrase_storage.rs` — the on-disk
   `EncryptedFile` carries `version`, `salt`, `profiles`. It does **not** carry
   the Argon2 cost parameters; `grep` for `m_cost`/`t_cost`/`p_cost` across both
   `passphrase_storage.rs` and `passphrase_root.rs` returns nothing. The module
@@ -714,12 +714,12 @@ recorded in §1, §3.3, §5, §6 and §8.
 | WATCH | Cryptoki — the cryptographic token interface | PKCS #11 Specification Version 3.2 (and PKCS #11 Profiles v3.2) | castellan's authority half, in two opposite directions. **As a consumer**: a YubiKey PIV applet, a smartcard, or a Nitrokey holding a persona's root … |
 | PULL | TPM 2.0 NV monotonic counters (the standard that closes the rollback gap) | TCG TPM 2.0 Library Specification, Family 2.0, Level 00, Revision 01.83 (published as ISO/IEC 11889) | **personae sealed_record_storage::freshness::FileFreshnessLedger** — directly and specifically. The castellan README states the gap in its own words: … |
 | PULL | Credential Exchange Format and Protocol | CXF v1.0 (Proposed Standard, 2025-08-21, with Errata 2026-03-09) / CXP v1.0 (Working Draft, 2024-10-03) | castellan's import path. The README states plainly: 'CXF import remains follow-on work.' The 2026-08-10 credential-port brief already identified CXF … |
-| ADOPT | FIDO Credential Exchange Format | CXF v1.0 Proposed Standard with Errata, 2026-03-09 | repos/mere/ports/castellan — the README's own open item, 'CXF import remains follow-on work'. Second consumer: repos/mere/crates/import, which today … |
+| ADOPT | FIDO Credential Exchange Format | CXF v1.0 Proposed Standard with Errata, 2026-03-09 | repos/mere/ports/djinn/castellan — the README's own open item, 'CXF import remains follow-on work'. Second consumer: repos/mere/crates/import, which today … |
 | WATCH | FIDO Credential Exchange Protocol | CXP v1.0 Working Draft, 2024-10-03 | castellan's authority half — it is the only component that would ever hold the HPKE private half. Speculatively distillery/moot if credential handoff … |
 | PULL | KDBX (KeePass database format) | KDBX 4.1 File Format Specification (format version 0x00040001) | castellan import. KeePassXC is also the closest architectural sibling to castellan's local-first, no-account posture, so its users are the most … |
 | PULL | 1Password Unencrypted Export (1PUX) and OPVault | 1PUX export format; OPVault design | castellan import, as the pre-CXF fallback for 1Password users. |
 | PULL | De-facto vault and browser export formats (Bitwarden JSON, Chrome/Firefox CSV, Apple Passwords CSV) | Bitwarden export .json / .csv; Chromium password CSV; Firefox password CSV; Apple Passwords CSV export | castellan import — specifically the long tail of users who are not on any platform that brokers CXP and are not KeePass users. |
-| ADOPT | Freedesktop Secret Service API | Secret Service 0.2 DRAFT (publication date 2026-04-08) | repos/mere/ports/castellan, feature secret-service — already shipped: the resident owns org.freedesktop.secrets without replacement, implements the … |
+| ADOPT | Freedesktop Secret Service API | Secret Service 0.2 DRAFT (publication date 2026-04-08) | repos/mere/ports/djinn/castellan, feature secret-service — already shipped: the resident owns org.freedesktop.secrets without replacement, implements the … |
 | PULL | XDG Desktop Portal Secret interface | org.freedesktop.portal.Secret, interface version 1 (xdg-desktop-portal ≥ 1.5.0) | Only a hypothetical Flatpak or Snap build of pelt/graphshell/castellan. No such build exists today. |
 | ADOPT | HTML autofill field names (autocomplete tokens) | WHATWG HTML Standard, Living Standard — Autofill / autocomplete attribute | repos/genet (the engine and pelt), paired with castellan's embeddable half. This is the entry where owning the engine changes the verdict. |
 | PULL | Credential Management API | Credential Management Level 1, W3C Working Draft 2026-02-13 | repos/genet, if and only if WebAuthn support lands there; castellan would be the credential store behind it. |
@@ -797,7 +797,7 @@ recorded in §1, §3.3, §5, §6 and §8.
 | PULL | ActivityPub (with Activity Streams 2.0) | W3C ActivityPub; W3C Activity Streams 2.0 | ports/gazette (already classifies ActivityPub actor links out of WebFinger JRDs); ports/moot as a future publish target |
 | PULL | HTTP Message Signatures | RFC 9421 | Only if gazette or moot ever writes to the fediverse. No current consumer. |
 | WATCH | AT Protocol (atproto) | draft-newbold-at-architecture, draft-holmgren-at-repository, and the IETF ATP working group charter | AMENDED 2026-09-23 (§5 prose wins): WATCH stands for the repository and sync layers only. The identity layer (did:plc, handle resolution) is ADOPT for crates/dramatis/gaz and ports/gazette, checked against live PLC data. |
-| ADOPT | Messaging Layer Security (MLS) | RFC 9420 | CORRECTED 2026-08-24: not ports/moot, which is a 43-line reservation. Prospective home is crates/murm/transport (reserves ALPN mere/mls/v1); crates/moot/commons ships encrypted group chat today via p2panda, not MLS |
+| ADOPT | Messaging Layer Security (MLS) | RFC 9420 | CORRECTED 2026-08-24: not ports/moot, which is a 43-line reservation. Prospective home is murm/native/crates/transport (reserves ALPN mere/mls/v1); crates/moot/commons ships encrypted group chat today via p2panda, not MLS |
 | WATCH | More Instant Messaging Interoperability (MIMI) | draft-ietf-mimi-protocol, draft-ietf-mimi-content, draft-ietf-mimi-arch, draft-ietf-mimi-room-policy | ports/moot (murmur) — speculative only |
 | SKIP | Matrix | Matrix Specification v1.16 (client-server, server-server, and the Olm/Megolm ratchets) | None. moot/murmur is unimplemented and its README scopes it to Mere's own governed spaces. |
 | PULL | Signal protocol: Double Ratchet, X3DH, PQXDH, SPQR | Signal specifications (Double Ratchet; X3DH; PQXDH; Sparse Post-Quantum Ratchet) | crates/murm — the bilateral lane (design_docs/murm_docs/technical_architecture/MURM_AS_BILATERAL.md) |
@@ -886,7 +886,7 @@ disagree.
 
 **Basis.** Each row's own consumer text, which §7's table truncates in places.
 Where a grade turned on a fact, the fact was checked on 2026-09-23: which
-crates depend on a UAX #29 segmenter, whether `crates/murm/webrtc-carrier`
+crates depend on a UAX #29 segmenter, whether `murm/native/crates/webrtc-carrier`
 exists, whether genet's design docs mention WebAuthn (they do not), and what
 `repos/emblem` implements. The design-for notes name where room is reserved;
 none of them is built by this re-read.
@@ -929,7 +929,7 @@ because they are already built, ten move to SKIP, and three split.
 | 31 | ActivityPub / Activity Streams 2.0 | gaz's `EndpointKind::ActivityPub` exists; gazette's article model maps AS2 objects; moot's publish path is the named future | PULL |
 | 32 | HTTP Message Signatures | moot's outbound publish path (row 31) signs requests with a persona key through castellan's gate | PULL |
 | 33 | Signal: Double Ratchet, X3DH, PQXDH | murm's bilateral session store reserves per-peer ratchet state | PULL |
-| 34 | WebRTC (and SIP) | WebRTC is already built as `crates/murm/webrtc-carrier`. SIP has no consumer; calls ride WebRTC | WebRTC ADOPT; SIP SKIP, reopened by a telephony bridge |
+| 34 | WebRTC (and SIP) | WebRTC is already built as `murm/native/crates/webrtc-carrier`. SIP has no consumer; calls ride WebRTC | WebRTC ADOPT; SIP SKIP, reopened by a telephony bridge |
 | 35 | Reticulum and LXMF | already built: signalman runs on retinue/postilion, and insigne's `TypedKey::Reticulum` holds an identity as the reference implementation defines it (§5) | ADOPT |
 | 36 | AX.25, KISS, APRS | KISS is already built (`retinue/crates/selvage/src/kiss.rs`). AX.25 and APRS are amateur-service protocols, and the house radio posture is unlicensed ISM because amateur service bars encryption (§5) | KISS ADOPT; AX.25 and APRS SKIP, reopened by a plain-text amateur lane |
 | 37 | GGUF | distillery's model source reserves a GGUF loader beside esp's safetensors, for weights and tokenizer metadata both | PULL |
@@ -1133,7 +1133,7 @@ later integration and qualification open. Mark prefers published standards for c
 for orchestration, the useful specification scope, prior art and a WPT-like
 testing set. This section is the canonical cross-repository research record.
 Implementation sequencing lives in
-`retinue/design_docs/2026-10-11_transport_conformance_plan.md`.
+`murm/design_docs/2026-10-11_transport_conformance_plan.md`.
 
 **Execution posture, owner clarification:** prototype the composed stack toward
 its final shape using code and canonical documents as the execution frontier.
@@ -1301,7 +1301,7 @@ zero/one-floor scheduling and sustained overload. The model counts actual
 authored frame/signature bytes and uses ideal simultaneous transmitter lanes,
 preconfigured channel/manifest cadence and a common slot clock. Findings and
 the historical source-fingerprinted report live once in
-`retinue/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
+`murm/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
 `retinue/testing/transport-conformance/results/retained-repair-exploration-20261011.json`.
 The owner-local receive continuation below now exercises application admission;
 the model does not establish live carrier integration or physical Mbps.

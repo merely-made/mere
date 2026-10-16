@@ -1,0 +1,2 @@
+# Preserve the actual broker receipt bytes and their recorded hashes.
+* -text whitespace=cr-at-eol

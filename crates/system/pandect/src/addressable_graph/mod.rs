@@ -37,6 +37,10 @@ pub struct ResidencyRoots {
     pub projection_surfaces: BTreeSet<Uuid>,
     pub pinned: BTreeSet<GraphAddress>,
     pub focused: Option<GraphAddress>,
+    /// Items open panes are inspecting right now. Kept individually like pins
+    /// (zero hops, shown binding followed) but never durable and never a walk
+    /// root.
+    pub transient: BTreeSet<GraphAddress>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResidencyStatus {
@@ -67,6 +71,7 @@ mod schema;
 mod write;
 use kernel::graph::NodeFacetStore;
 use schema::*;
+pub use write::PreparedGraphPublication;
 use std::collections::BTreeMap;
 
 pub struct AddressableGraphStore<B> {
@@ -84,6 +89,18 @@ impl<B: Backend> AddressableGraphStore<B> {
         self.backend
             .put(&self.key("policy"), &encode(&policy)?)
             .await
+    }
+    /// The write that sets `policy`, for a caller that stages it with other
+    /// writes (for example the host's settings) in one batch.
+    pub fn policy_write(&self, policy: ResidencyPolicy) -> Result<muniment::WriteOp, StoreError> {
+        Ok(muniment::WriteOp::Put {
+            key: self.key("policy"),
+            value: encode(&policy)?,
+        })
+    }
+    /// Whether any publication exists to open a reader on.
+    pub async fn is_published(&self) -> Result<bool, StoreError> {
+        Ok(self.backend.get(&self.key("head")).await?.is_some())
     }
     pub async fn open(self, roots: ResidencyRoots) -> Result<ResidentGraph<B>, StoreError> {
         let policy = match self.backend.get(&self.key("policy")).await? {
@@ -148,6 +165,22 @@ impl<B: Backend> ResidentGraph<B> {
     }
     pub fn policy(&self) -> ResidencyPolicy {
         self.policy
+    }
+    /// The content hash of the complete stored record at `address` in the
+    /// installed generation, whether or not the record is resident. Observation
+    /// checks compare this, never a hash of the filtered resident graph.
+    pub fn record_digest(&self, address: GraphAddress) -> Option<&str> {
+        self.catalog
+            .as_ref()?
+            .row(address)
+            .map(|row| row.hash.as_str())
+    }
+    /// The Resource a Surface shows in the installed generation's catalog.
+    pub fn shown_resource(&self, surface: Uuid) -> Option<Uuid> {
+        self.catalog
+            .as_ref()?
+            .row(GraphAddress::Surface(surface))?
+            .shown
     }
     pub fn status(&self, address: GraphAddress) -> ResidencyStatus {
         if self.records.contains_key(&address) {

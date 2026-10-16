@@ -54,6 +54,21 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 /// rasterized view is still alive (scenario screenshots).
 #[derive(Clone, Debug)]
 pub enum CaptureRefusal {
+    HostDisposed,
+    ProducerResource {
+        generation: u64,
+        error: crate::ProducerGpuRemapError,
+    },
+    PresentationError {
+        backend: crate::PresentationBackend,
+        generation: crate::ContextGeneration,
+        source_key: Option<u64>,
+        error: String,
+    },
+    ContextLost {
+        backend: crate::PresentationBackend,
+        generation: crate::ContextGeneration,
+    },
     DeviceLost(genet_render_host::DeviceLossNotice),
     SurfaceUnavailable {
         generation: u64,
@@ -71,19 +86,16 @@ impl std::fmt::Display for CaptureRefusal {
     }
 }
 impl std::error::Error for CaptureRefusal {}
-pub struct CaptureFrame<'a> {
-    pub surface: &'a dyn Surface,
-    pub view: &'a wgpu::TextureView,
-    pub width: u32,
-    pub height: u32,
-}
-pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame<'_>, CaptureRefusal>) + 'static>;
+pub type CaptureFrame = Box<dyn crate::PendingPresentationCapture>;
+pub type CaptureFn = Box<dyn FnOnce(Result<CaptureFrame, CaptureRefusal>) + 'static>;
 
 /// Identity of one successful queue presentation in this host/window lifetime.
 /// Host numbers are process-local; a receipt must also carry its product run.
 /// This certifies submission of the rasterized source, not compositor visibility.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PresentedFrame {
+    /// Graphics lifetime that produced these pixels, scoped to `host`.
+    pub context_generation: crate::ContextGeneration,
     pub host: u64,
     pub sequence: u64,
     pub width: u32,
@@ -92,13 +104,8 @@ pub struct PresentedFrame {
 }
 
 /// A readback of that exact rasterized source, branded at presentation.
-pub struct StampedCaptureFrame<'a> {
-    pub surface: &'a dyn Surface,
-    pub view: &'a wgpu::TextureView,
-    pub presentation: PresentedFrame,
-}
-pub type StampedCaptureFn =
-    Box<dyn FnOnce(Result<StampedCaptureFrame<'_>, CaptureRefusal>) + 'static>;
+pub type StampedCaptureFrame = CaptureFrame;
+pub type StampedCaptureFn = Box<dyn FnOnce(Result<StampedCaptureFrame, CaptureRefusal>) + 'static>;
 
 /// One-shot read-only observation, before capture callbacks and pointer/AT input.
 pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> =
@@ -202,6 +209,12 @@ impl AppFrameInsets {
 
 /// Window and pipeline configuration.
 pub struct HostOptions {
+    /// Browser presentation preference. Native hosts retain their wgpu route.
+    pub presentation_choice: crate::PresentationChoice,
+    /// Browser WebGPU presents the same portable scene as direct WebGL2,
+    /// composing producer scenes in the page pass instead of sampling their
+    /// textures. For applications whose producers supply portable scenes.
+    pub wgpu_portable_scene: bool,
     /// The window title.
     pub title: String,
     /// The layer responsible for the window frame.
@@ -275,6 +288,8 @@ pub struct HostOptions {
 impl Default for HostOptions {
     fn default() -> Self {
         Self {
+            presentation_choice: crate::PresentationChoice::Auto,
+            wgpu_portable_scene: false,
             title: String::new(),
             window_frame: WindowFrame::Host,
             decorations: true,
@@ -654,7 +669,45 @@ pub enum HostPointer {
     SecondaryRelease(f32, f32),
     /// Cancel the current capture without delivering an activating release.
     Cancel,
+    /// Turn the wheel with the cursor at this point and these modifiers held.
+    ///
+    /// The notch runs through [`Host::wheel`](crate::Host::wheel): the nearest
+    /// `on_wheel` ancestor of the hit node gets a genuine
+    /// [`WheelEvent`](cambium::WheelEvent) (both axes, the cursor-local
+    /// position, the modifiers), and what no handler took falls to the host's
+    /// scroll and Ctrl-zoom defaults. The modifiers are held for this notch
+    /// only; the host's own modifier state is restored after it.
+    Wheel {
+        /// Where the cursor is, in logical window coordinates.
+        x: f32,
+        y: f32,
+        /// The scroll delta in the direction the content moves, as
+        /// [`Host::wheel`](crate::Host::wheel) takes it: a positive `dy`
+        /// advances toward the end of the document.
+        dx: f32,
+        dy: f32,
+        /// Whether `dx` and `dy` are logical pixels or wheel lines.
+        unit: WheelUnit,
+        /// The modifiers held while it turns.
+        modifiers: Modifiers,
+    },
 }
+
+/// What a [`HostPointer::Wheel`] delta counts.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum WheelUnit {
+    /// Logical pixels: a trackpad's pixel delta.
+    #[default]
+    Pixels,
+    /// Wheel lines: a mouse wheel's notches, each [`HOST_WHEEL_LINE_PX`] logical
+    /// pixels, as the desktop host converts a winit `LineDelta`.
+    Lines,
+}
+
+/// Logical pixels a wheel line is worth under the desktop host. It restates
+/// `genet_winit_host::WHEEL_LINE_PX`, which this crate does not depend on; a
+/// test in `cambium-genet-winit-host` holds the two equal.
+pub const HOST_WHEEL_LINE_PX: f32 = 48.0;
 
 /// A request to bring one retained DOM node into view, queued by
 /// [`AppCtx::scroll_into_view`] and resolved on the host's next layout.
@@ -775,6 +828,16 @@ where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
+    /// Materialized font instances and explicit generic registration refusals
+    /// from the actual retained host layout, suitable for source-bound receipts.
+    pub fn retained_font_count(&self) -> usize {
+        self.layout.map_or(0, |layout| layout.retained_font_count())
+    }
+    pub fn font_registration_error_count(&self) -> usize {
+        self.layout
+            .map_or(0, |layout| layout.font_registration_errors().len())
+    }
+
     /// Where a retained DOM node actually paints, in the logical coordinate
     /// space used by [`HostPointer`]: `(x, y, width, height)`.
     ///
@@ -943,6 +1006,9 @@ pub struct Init<State, Logic> {
 /// `family` pins the face to a CSS family name, the way `@font-face` does, so
 /// a sheet can name `'IBM Plex Sans'` without the face declaring it. `None`
 /// registers the face under whatever family its own name table carries.
+/// `sans-serif`, `serif`, `monospace`, and `system-ui` explicitly bind the
+/// corresponding CSS generic to this face in addition to retaining the quoted
+/// named-family alias. No global/system fallback is installed.
 #[derive(Clone, Debug)]
 pub struct HostFont {
     pub family: Option<String>,
@@ -1027,6 +1093,55 @@ impl Default for AppShared {
     }
 }
 
+/// Resources detached from a disposed independent host. Drop outside any host
+/// borrow: producer retirement, subscription wakes and capture callbacks may
+/// enter application code. Only this independent host's physical producer keys
+/// and retained fragment IDs are retired. Shared-forest disposal is not qualified.
+#[must_use = "drop the disposal guard outside the host borrow"]
+pub struct HostDisposal {
+    producers: Option<crate::ProducerRegistry>,
+    fragments: std::collections::HashMap<u64, (u64, u64)>,
+    driver: Option<Box<dyn crate::PresentationDriver>>,
+    surface: Option<Box<dyn Surface>>,
+    core: Option<Arc<RenderCore>>,
+    subscription: Option<genet_render_host::RecoverySubscription>,
+    owner: Option<Arc<genet_render_host::SharedRenderCore>>,
+    capture: Option<CaptureFn>,
+    stamped: Option<StampedCaptureFn>,
+    paint: Option<PaintCaptureFn>,
+}
+impl Drop for HostDisposal {
+    fn drop(&mut self) {
+        // Registry cleanup uses its weak core while the detached core is live.
+        // Release all owned GPU resources before opening the detach barrier.
+        drop(self.producers.take());
+        let fragments = std::mem::take(&mut self.fragments);
+        if let Some(core) = &self.core {
+            for &(id, _) in fragments.values() {
+                crate::retire_fragment(core, id);
+            }
+        }
+        drop(fragments);
+        // An installed driver owns its context/surface and outstanding output.
+        if let Some(mut driver) = self.driver.take() {
+            driver.dispose();
+        }
+        drop(self.surface.take());
+        drop(self.core.take());
+        drop(self.subscription.take());
+        drop(self.owner.take());
+        if let Some(capture) = self.capture.take() {
+            capture(Err(CaptureRefusal::HostDisposed));
+        }
+        if let Some(capture) = self.stamped.take() {
+            capture(Err(CaptureRefusal::HostDisposed));
+        }
+        if let Some(capture) = self.paint.take() {
+            capture(Err(CaptureRefusal::HostDisposed));
+        }
+    }
+}
+
 /// One window's host state, with the application's [`AppShared`] part in
 /// `shared`.
 pub struct HostState<State: 'static, Logic, V, T = Runner<State, Logic, V>>
@@ -1046,8 +1161,12 @@ where
     /// The presentation surface behind the neutral seam. A browser event
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
+    /// A browser presenter with optional same-device services.
+    pub presentation_driver: Option<Box<dyn crate::PresentationDriver>>,
     pub recovery_status: Option<genet_render_host::RecoveryStatus>,
     /// Current checked raster refusal; cleared at the next redraw admission.
+    /// Most recent refused presentation, including portable backend failures.
+    pub last_presentation_failure: Option<crate::PresentationFailure>,
     pub last_raster_failure: Option<genet_render_host::RasterizeFailure>,
     pub(crate) detached_generation: Option<u64>,
     pub needs_recovery_surface: bool,
@@ -1141,6 +1260,7 @@ where
     /// the same deferral `pending_sheet` gets, and for the same reason.
     pub pending_ui_zoom: Option<f32>,
     pub pending_capture: Option<CaptureFn>,
+    pub capture_owner: crate::CaptureOwner,
     pub pending_presentation_observer: Option<PresentationObserver<State, Logic, V, T>>,
     pub pending_stamped_capture: Option<StampedCaptureFn>,
     pub presentation_host: u64,
@@ -1178,7 +1298,9 @@ where
             titlebar_published: None,
             titlebar_sheet: String::new(),
             surface: None,
+            presentation_driver: None,
             recovery_status: None,
+            last_presentation_failure: None,
             last_raster_failure: None,
             recovery_subscription: None,
             detached_generation: None,
@@ -1226,6 +1348,7 @@ where
             pending_sheet: None,
             pending_ui_zoom: None,
             pending_capture: None,
+            capture_owner: crate::CaptureOwner::default(),
             pending_presentation_observer: None,
             pending_stamped_capture: None,
             presentation_host: next_host_identity(),
@@ -1286,6 +1409,34 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    /// Detach an independent host's rendering lifetime, including an installed
+    /// presentation driver and its owned captures. The application runner
+    /// and CPU authority remain inspectable. Drop the returned guard only after
+    /// releasing the host borrow. This is disposal, not a recovery transition.
+    /// The registry and fragment map must belong to this independent host;
+    /// disposing a window while lending a shared forest is not qualified.
+    pub fn take_disposal(&mut self) -> HostDisposal {
+        self.s.hidden = true;
+        self.s.needs_recovery_surface = false;
+        self.s.last_redraw_presentation = None;
+        self.s.pending_presentation_observer = None;
+        // Owned in-flight captures are refused now; this needs no host loan
+        // and keeps later frame preparation from presenting.
+        self.s.capture_owner.scope().dispose();
+        HostDisposal {
+            producers: Some(std::mem::take(&mut self.s.shared.producers)),
+            fragments: std::mem::take(&mut self.s.shared.leaf_fragments),
+            driver: self.s.presentation_driver.take(),
+            surface: self.s.surface.take(),
+            core: self.s.shared.render_core.take(),
+            subscription: self.s.recovery_subscription.take(),
+            owner: self.s.shared.render_recovery.take(),
+            capture: self.s.pending_capture.take(),
+            stamped: self.s.pending_stamped_capture.take(),
+            paint: self.s.pending_paint_capture.take(),
+        }
+    }
+
     /// Assemble a host and seed the runtime zoom from its options.
     ///
     /// The seeding is why this exists rather than a struct literal:
@@ -1723,6 +1874,23 @@ where
                     self.release_button(cambium::PointerButton::Secondary);
                 },
                 HostPointer::Cancel => self.cancel_pointer(),
+                HostPointer::Wheel {
+                    x,
+                    y,
+                    dx,
+                    dy,
+                    unit,
+                    modifiers,
+                } => {
+                    self.s.cursor = (x, y);
+                    let scale = match unit {
+                        WheelUnit::Pixels => 1.0,
+                        WheelUnit::Lines => HOST_WHEEL_LINE_PX,
+                    };
+                    let held = std::mem::replace(&mut self.s.modifiers, modifiers);
+                    self.wheel(dx * scale, dy * scale);
+                    self.s.modifiers = held;
+                },
             }
         }
     }
@@ -1828,5 +1996,117 @@ where
             return IdlePolicy::Animate(std::time::Duration::from_millis(33));
         }
         IdlePolicy::Wait
+    }
+}
+
+#[cfg(test)]
+mod disposal_controls {
+    use super::*;
+    use crate::ScriptedDom;
+    use cambium::{AnyView, GenetCtx, GenetElement, el, text};
+    use std::{
+        cell::{Cell, RefCell},
+        rc::Rc,
+    };
+    struct App {
+        draft: String,
+    }
+    type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&App) -> Child;
+    fn root(app: &App) -> Child {
+        Box::new(el("div", text(app.draft.clone())))
+    }
+    struct RetainedProducer {
+        suspensions: Rc<Cell<usize>>,
+    }
+    impl crate::TextureProducer for RetainedProducer {
+        fn render(&mut self, _: &crate::ProducerContext<'_>) -> Option<crate::ProducedTexture> {
+            None
+        }
+        fn suspend(&mut self) {
+            self.suspensions.set(self.suspensions.get() + 1);
+        }
+    }
+    #[test]
+    fn disposed_actual_host_releases_retained_producer_and_refuses_captures_outside_borrow_once() {
+        let mut state: HostState<App, Logic, Child> = HostState::new();
+        state.runner = Some(Runner::new(
+            Rc::new(RefCell::new(ScriptedDom::new())),
+            root as Logic,
+            App {
+                draft: "uncommitted application authority".into(),
+            },
+        ));
+        // CPU-only ownership metadata: this asserts transfer rather than
+        // pretending these IDs were registered in an actual renderer.
+        state.shared.leaf_fragments.insert(7, (101, 9));
+        state.shared.leaf_fragments.insert(8, (102, 4));
+        let suspensions = Rc::new(Cell::new(0));
+        let retained = Rc::new(RefCell::new(RetainedProducer {
+            suspensions: suspensions.clone(),
+        }));
+        state
+            .shared
+            .producers
+            .register(7, retained.clone(), &[])
+            .unwrap();
+        let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let host = Rc::new(RefCell::new(Host::new(
+            HostOptions::default(),
+            None,
+            HostHooks::inert(),
+            state,
+            wake,
+        )));
+        let results = Rc::new(RefCell::new(Vec::new()));
+        fn check(
+            host: &Rc<RefCell<Host<App, Logic, Child>>>,
+            results: &Rc<RefCell<Vec<u8>>>,
+            id: u8,
+            refusal: CaptureRefusal,
+        ) {
+            assert!(matches!(refusal, CaptureRefusal::HostDisposed));
+            // Actual callback can inspect authority; no Host RefMut is live.
+            assert_eq!(
+                host.borrow().s.runner.as_ref().unwrap().state().draft,
+                "uncommitted application authority"
+            );
+            results.borrow_mut().push(id);
+        }
+        let weak = Rc::downgrade(&host);
+        let out = results.clone();
+        host.borrow_mut().s.pending_capture = Some(Box::new(move |result| {
+            check(&weak.upgrade().unwrap(), &out, 1, result.err().unwrap())
+        }));
+        let weak = Rc::downgrade(&host);
+        let out = results.clone();
+        host.borrow_mut().s.pending_stamped_capture = Some(Box::new(move |result| {
+            check(&weak.upgrade().unwrap(), &out, 2, result.err().unwrap())
+        }));
+        let weak = Rc::downgrade(&host);
+        let out = results.clone();
+        host.borrow_mut().s.pending_paint_capture = Some(Box::new(move |result| {
+            check(&weak.upgrade().unwrap(), &out, 3, result.err().unwrap())
+        }));
+        let disposal = { host.borrow_mut().take_disposal() };
+        assert_eq!(suspensions.get(), 0);
+        assert!(host.borrow().s.shared.leaf_fragments.is_empty());
+        assert_eq!(disposal.fragments.len(), 2);
+        assert_eq!(disposal.fragments[&7], (101, 9));
+        assert_eq!(disposal.fragments[&8], (102, 4));
+        assert!(!host.borrow().s.shared.producers.contains(7));
+        drop(disposal);
+        assert_eq!(
+            suspensions.get(),
+            1,
+            "default producer retirement suspends the externally retained instance"
+        );
+        assert_eq!(*results.borrow(), [1, 2, 3]);
+        let repeated = { host.borrow_mut().take_disposal() };
+        assert!(repeated.fragments.is_empty());
+        drop(repeated);
+        assert_eq!(suspensions.get(), 1);
+        assert_eq!(*results.borrow(), [1, 2, 3]);
+        assert_eq!(Rc::strong_count(&retained), 1);
     }
 }

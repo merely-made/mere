@@ -40,17 +40,28 @@ use genet_render::VisualMovement;
 
 mod files;
 pub use files::{FileAnswer, FileChooser};
+mod presentation;
+pub use presentation::{
+    ContextGeneration, FrameContentMode, NativePresentationFailure, PendingPresentationCapture,
+    PortableMaterializer, PreparedFrame, PreparedPaint, PresentationBackend, PresentationChoice,
+    PresentationDriver, PresentationFailure, PresentationLifetime, PresentationState, WgpuDriver,
+    WgpuSurfaceFactory, backend_attempts,
+};
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
+#[cfg(feature = "embedding")]
+pub mod embedding;
+mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
     ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
-    ProducerFrameInfo, ProducerFrameStats, ProducerImageIdentity, ProducerNode,
-    ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
-    ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
-    TextureProducer,
+    ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats, ProducerGpuRemapError,
+    ProducerImageIdentity, ProducerNode, ProducerRegistrationError, ProducerRegistry,
+    ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource, ResolvedAppearance,
+    SourceAlpha, SourceEncoding, TextureProducer,
 };
+pub use scene_producer::SceneProducer;
 
 /// The host's clock.
 ///
@@ -203,9 +214,18 @@ pub trait Surface {
         }
     }
 
-    /// The netrender renderer.
-    fn renderer(&self) -> &netrender::Renderer {
+    /// The netrender renderer, for one operation. In the browser this is
+    /// Genet's frame-gate guard: never keep it across another renderer use
+    /// (rasterization, a producer callback) or across frames. Prefer
+    /// [`try_renderer`](Self::try_renderer), which refuses instead of panicking.
+    fn renderer(&self) -> RendererAccess<'_> {
         self.core().renderer()
+    }
+
+    /// The netrender renderer for one operation, or the attributed refusal
+    /// (device loss, or another owner of the browser frame gate).
+    fn try_renderer(&self) -> Result<RendererAccess<'_>, genet_render_host::RasterizeFailure> {
+        try_renderer(self.core())
     }
 
     /// The wgpu device backing the renderer.
@@ -217,6 +237,42 @@ pub trait Surface {
     fn queue(&self) -> &wgpu::Queue {
         self.core().queue()
     }
+}
+
+/// One operation's access to a core's renderer. In the browser it is Genet's
+/// guard over the shared frame gate, so it must not outlive the operation;
+/// native hosts borrow the renderer directly.
+#[cfg(target_arch = "wasm32")]
+pub type RendererAccess<'a> = genet_render_host::RendererAccess<'a>;
+/// One operation's access to a core's renderer (see the browser definition).
+#[cfg(not(target_arch = "wasm32"))]
+pub type RendererAccess<'a> = &'a netrender::Renderer;
+
+/// Checked access to `core`'s renderer for one operation.
+pub fn try_renderer(
+    core: &genet_render_host::RenderCore,
+) -> Result<RendererAccess<'_>, genet_render_host::RasterizeFailure> {
+    #[cfg(target_arch = "wasm32")]
+    return core.try_renderer();
+    #[cfg(not(target_arch = "wasm32"))]
+    return Ok(core.renderer());
+}
+
+/// Retire an external image this host registered. Valid after device loss
+/// and without the browser frame gate, unlike live renderer access.
+pub(crate) fn retire_external_image(core: &genet_render_host::RenderCore, key: u64) {
+    #[cfg(target_arch = "wasm32")]
+    core.retire_owned_external_image(key);
+    #[cfg(not(target_arch = "wasm32"))]
+    core.renderer().unregister_external_image(key);
+}
+
+/// Retire a retained fragment this host registered; valid after device loss.
+pub(crate) fn retire_fragment(core: &genet_render_host::RenderCore, id: u64) {
+    #[cfg(target_arch = "wasm32")]
+    core.retire_owned_fragment(id);
+    #[cfg(not(target_arch = "wasm32"))]
+    let _ = core.renderer().remove_fragment(id);
 }
 
 /// What a screen reader asked for, kept as the action it actually requested.
@@ -1094,6 +1150,8 @@ mod spatial_tests {
 
 #[cfg(test)]
 mod accessibility_tests;
+#[cfg(test)]
+mod mount_probe_tests;
 mod capture;
 mod frame;
 mod host;
@@ -1123,14 +1181,18 @@ pub mod meristem_bounds {
     }
 }
 
-pub use capture::{Frame, PendingFrame, read_frame, start_frame_readback};
+pub use capture::{
+    CaptureOwner, CaptureScope, Frame, PendingFrame, read_frame, start_frame_readback,
+    start_presentation_readback,
+};
 pub use host::{
-    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
+    HOST_WHEEL_LINE_PX, AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
-    FrameProfile, Hook, Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostState,
-    IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn, PresentationObserver, PresentedFrame,
-    RelayoutProfile, Runner, ScrollIntoView, StampedCaptureFn, StampedCaptureFrame, WindowFrame,
-    ZOOM_LADDER, env_size, fit_zoom, ladder_step,
+    FrameProfile, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage, HostOptions,
+    HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
+    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    StampedCaptureFn, StampedCaptureFrame, WindowFrame, WheelUnit, ZOOM_LADDER, env_size,
+    fit_zoom, ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;

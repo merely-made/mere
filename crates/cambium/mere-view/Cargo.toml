@@ -3,7 +3,8 @@ name = "mere-view"
 version = "0.1.0"
 description = "The mere view: a mere's sessions and graph as one Cambium component every application embeds."
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 keywords = ["mere", "cambium", "graph", "sessions", "gui"]
@@ -24,6 +25,11 @@ sprigging = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+pictograph = { workspace = true, features = ["canvas"] }
+serde_json.workspace = true
+netrender.workspace = true
+curation.workspace = true
+
 mesquite = { workspace = true }
 # The headed harness (examples/harness.rs) and its scenario lane.
 cambium-genet-winit-host = { workspace = true }

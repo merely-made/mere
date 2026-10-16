@@ -1,0 +1,75 @@
+{
+  "scope": "Presentation policy and context lifetime only; broader host regression and viewer acceptance pending",
+  "runs": [
+    {
+      "label": "policy-red-attempt-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "--test",
+        "presentation_policy",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "source_unchanged": true,
+      "summaries": [],
+      "missing_interface_red": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 387854336,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "247e26b24788df06d98c0fc4999ec23e8bbba35f18533ca8a08f8c6852a17fde"
+    },
+    {
+      "label": "policy-green-attempt-2",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "--test",
+        "presentation_policy",
+        "-j1",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "summaries": [
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "missing_interface_red": false,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 1885802496,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "stdout_sha256": "d00ed49cfeb740edb5c5a37e1cb5c6f2462ee658030f49a93eccf905f8d283db",
+      "stderr_sha256": "f8603665ff0ded595d448e7ef8e3f902e817a854a3d5faebdb9ad44e286fb5c0"
+    }
+  ]
+}

@@ -11,6 +11,7 @@
 //! transactionally, and preserves tombstones in resynchronization snapshots.
 //! Networking, presentation resources, and product authority remain outside.
 
+mod clock;
 mod diff;
 mod ids;
 mod pick;
@@ -19,6 +20,7 @@ mod snapshot;
 mod trace;
 mod transition;
 
+pub use clock::ProjectionClock;
 pub use diff::{ApplyOutcome, DiffError, SceneDiff, SceneOp};
 pub use ids::{BackdropId, FoldId, RegionId, RelationId, Revision, SceneEpoch};
 pub use return_motion::{ReturnMotion, ReturnMotionMode, ReturnMotionSettings, ReturnMotionTick};

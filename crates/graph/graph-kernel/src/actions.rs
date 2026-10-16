@@ -52,11 +52,14 @@ pub enum ActionId {
     NavForward,
     NavReload,
     NavStop,
+    FoldSelection,
+    FoldCollapseDescendants,
+    FoldExpand,
 }
 
 impl ActionId {
     /// Every variant, in the catalogue's order.
-    pub const ALL: [Self; 33] = [
+    pub const ALL: [Self; 36] = [
         Self::NodeNew,
         Self::NodeDelete,
         Self::NodeEdit,
@@ -90,6 +93,9 @@ impl ActionId {
         Self::NavForward,
         Self::NavReload,
         Self::NavStop,
+        Self::FoldSelection,
+        Self::FoldCollapseDescendants,
+        Self::FoldExpand,
     ];
 
     /// The shared id, `namespace:name`.
@@ -128,6 +134,9 @@ impl ActionId {
             Self::NavForward => ids::NAV_FORWARD,
             Self::NavReload => ids::NAV_RELOAD,
             Self::NavStop => ids::NAV_STOP,
+            Self::FoldSelection => ids::FOLD_SELECTION,
+            Self::FoldCollapseDescendants => ids::FOLD_COLLAPSE_DESCENDANTS,
+            Self::FoldExpand => ids::FOLD_EXPAND,
         }
     }
 
@@ -144,5 +153,31 @@ impl ActionId {
     /// The variant for a shared id.
     pub fn from_key(key: &str) -> Option<Self> {
         Self::ALL.into_iter().find(|action| action.key() == key)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn every_shared_command_round_trips_through_the_typed_catalogue() {
+        assert_eq!(ActionId::ALL.len(), catalogue::CATALOGUE.len());
+        for action in ActionId::ALL {
+            assert_eq!(ActionId::from_key(action.key()), Some(action));
+            assert_eq!(catalogue::label(action.key()), Some(action.label()));
+        }
+        for (key, action) in [
+            ("fold:selection", ActionId::FoldSelection),
+            (
+                "fold:collapse_descendants",
+                ActionId::FoldCollapseDescendants,
+            ),
+            ("fold:expand", ActionId::FoldExpand),
+        ] {
+            assert_eq!(ActionId::from_key(key), Some(action));
+            assert_eq!(action.namespace(), "fold");
+        }
+        assert_eq!(ActionId::from_key("fold:unknown"), None);
     }
 }

@@ -133,7 +133,7 @@ step 5 and the consumer/domain/native gates retain their order.
 | V3: archive | Session archive payload in graph codicil v2; reservoir save/open/fork/compose intents and archive projection; per-mere `archive.redb` | Resident contract qualified by route and real-process fixtures. Consumer UI must expose these actions; installed/product acceptance remains separate. |
 | V4: access and ambient crossing | Durable per-mere/per-app denial and independent ambient choice; explicit and read-only ambient routes; live endpoint rechecks | Route enforcement is qualified. Trusted owner controls and actual opted-in material in a product's ambient tier remain consumer work. |
 | V5: standalone ownership | `djinn::embedded_reservoir::ReservoirAttachment` attaches first and embeds the existing resident source only on endpoint absence | Library process fixtures qualify ownership, attachment and refusal. Each consumer must supply the same domain registration in daemon and embedded composition and qualify its actual startup. |
-| Cleromancy C1 | Pure `validate_divination_graph` in Cleromancy; shared `GraphValidator`, checked session/archive APIs and `MereRoutes::with_domain_validator` in Mere | Register Cleromancy's validator in both resident compositions, admit its application, repin/adapt the consumer and retire private snapshot persistence. V2b and Cleromancy's native shared-view/reopen gates still precede full C1 acceptance. |
+| Cleromancy C1 | Pure `validate_divination_graph` in Cleromancy; shared `GraphValidator`, checked session/archive APIs and `MereRoutes::with_domain_validator` in Mere | Current H/f7ec/N source registers the product-owned validator in daemon and embedded compositions, admits Cleromancy/Graphshell and retires ordinary private persistence. Exact shared/consumer/owner gates and five fresh native Cleromancy runs pass with 19 independently reviewed originals; ordinary encrypted terminal fallback has a declared process-local environment. H cross-application renewal, complete V2b/browser wall and native publication remain open. |
 
 **How the work reached this point.** V1–V2 and V2b's first three steps landed
 on 2026-09-24/25. The ruled "one tree first" decision made Graphshell's cutover
@@ -167,8 +167,9 @@ exposes no policy-edit action, and `via` is provenance. Explicit denial wins
 over default and ambient grants, even for an attached endpoint. Ambient routes
 offer graph reads only and do not mint a session in an empty mere. Embedded
 selection preserves admission, policy, persona, lock and protocol refusals;
-only endpoint absence permits ownership. The installed Djinn application's
-allowlist and product-domain registrations still need consumer adaptation.
+only endpoint absence permits ownership. Working stock Djinn and embedded source
+now admit Cleromancy and Graphshell and register the same divination validator;
+their actual consumer and immutable publication receipts remain separate gates.
 
 Cleromancy's plan still requires V1–V5 for full C1 acceptance. Its named
 dependency map separates source-backed preparation of narration, typed data
@@ -1689,3 +1690,74 @@ ruling 84).
   tokio's named-pipe documentation advises. Both fixtures pass on Windows
   (3 and 1, each with its child entrypoint ignored); on the same commit
   without the fix, both fail.
+
+### Cleromancy C1 coordinated consumer cutover (2026-10-13; in progress)
+
+Mark authorized C1 in lockstep with Graphshell and reservoir work through
+qualification and push. The integration composes product-owned portable
+divination validation into stock and embedded residents, refuses an
+unregistered authority and admits Cleromancy and Graphshell as first-party
+applications. Explicit sessions disclose graph/facets and only the admitted
+application's view; ambient routes do not disclose that full resource.
+Revision-checked product/view edits use staged Pandect transactions with
+rollback of graph, logs and revision on failure.
+
+Ordinary Cleromancy attaches first and embeds on genuine endpoint absence,
+using Djinn's selected identity capsule. It opens no reservoir files or private
+snapshot store. Historical receipts remain explicit nondefault harnesses.
+The common mere view supplies lifecycle/archive controls; separate native and
+browser Graphshell clients witness the same admitted domain.
+
+The [current qualification receipt](../testing/receipts/2026-10-14_c1_resident_divination/README.md)
+binds published Mere H `a1309431f`, portable validator `f7ec0db` and native N
+`04bd240`, unchanged Genet B6 and the existing Knot pin. H repairs exact JSON
+facet-float replay without weakening the production whole-graph/facet guard.
+Its shared/stock suites pass 877/505 tests; seven native runtimes and four
+shipping browser packages rebuild, with unchanged CPU Viewer caps. The actual
+original headed Scene Save/Reopen passes on a fresh H profile. Historical F/G
+receipts and H-on-F disk compatibility remain separately scoped.
+
+Portable default/legacy/sky gates pass 18/19/20 tests. Native gates pass 87/125,
+both all-target checks and build; all 145 compiled inputs match N Git blobs.
+The imported H/validator owner capsule passes 24 stock and 24 embedded tests,
+five intentional child ignores each, and a real three-owner replay/tamper
+parent. All 846 common registry names have equal versions.
+
+Five fresh H Cleromancy processes supply 19 independently reviewed originals,
+including lifecycle/archive, fresh reopening, compact controls and controlled
+ordinary production terminal unlock. The initial real graphical-dialog attempt
+remains failed; graphical handling is unqualified. Exclusive-owner refusal,
+separate warm original/read-only byte guards and clean same-disk helper handoff
+pass. Cold hydration changes remain recorded separately.
+
+H native Graphshell witness and actual fresh reopening pass with six original
+reviews, the same acknowledged be49 Reading-session/Grid view, unchanged
+Cleromancy Fool map and domain records. Reopening preserves all 36 shared files
+and the sentinel. The mounted H browser witness also passes with five original
+reviews; only its scoped view history appends, and the other 35 files and
+sentinel remain unchanged. Fresh Chrome restoration also passes with one original review and all36
+shared files plus sentinel unchanged. Retained native-ACK/browser-generation live synchronization and staged archive/
+read-only controls also pass with separate original reviews and owner guards.
+Save/Open add only the acknowledged codicil and read-only thaw. From the post-Open
+freeze through transient controls and return to the writable original, all45
+shared files plus sentinel remain byte-identical, epochs included; both complete
+views and domain records stay exact.
+
+The full 164-case canonical wall and mandatory supplements remain open. V2b
+steps 4–5 and full one-tree UI qualification require that complete wall; bounded
+native or mounted-witness proofs do not close them. Cleromancy owns the final
+C1 verdict; card ambient presentation remains later C4. All three source
+checkpoints are pushed and exact remote revisions verified. Final canonical
+qualification documentation publication remains pending. No main merge or
+phase acceptance is inferred.
+
+The H controls batch now closes 21 of 164 original canonical cases, with
+43 independently reviewed originals: 20 fresh profiles plus the retained Scene
+profile. The other 143 cases and mandatory supplements remain open. A final
+clean same-disk H resident restart preserves both complete application views
+and all domain IDs, with five sessions/two archives. Separate warm original
+and thaw guards preserve all45 shared files plus sentinel, epochs included.
+Release/startup database changes and the first cold original epoch8→10 byte
+failure remain recorded separately; the warm passes do not erase them.
+The documentation audits retain exactly the pre-edit F mechanical findings
+and D2 errors, with no new findings; inherited debt remains unresolved.

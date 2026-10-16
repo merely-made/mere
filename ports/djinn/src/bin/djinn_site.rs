@@ -19,8 +19,8 @@ use djinn::resident_site::{
     PUBLISHED_SITE_COMMIT_INTENT, PUBLISHED_SITE_PREPARE_INTENT, PUBLISHED_SITE_REMOVE_INTENT,
     PUBLISHED_SITE_ROUTE, PUBLISHED_SITE_STOP_INTENT, PublishedSiteChunkV1, PublishedSitePrepareV1,
 };
-use graphshell::native::app_admission::{AppId, AppRouteId};
-use graphshell::native::app_client::AppBrokerClient;
+use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
+use graphshell_endpoint::door::app_client::AppBrokerClient;
 use knot_site::Site;
 use sceno::InstanceId;
 use scenotime::{Revision, SceneEpoch};

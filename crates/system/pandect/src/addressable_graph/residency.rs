@@ -122,6 +122,7 @@ impl<B: Backend> ResidentGraph<B> {
                         .pinned
                         .iter()
                         .copied()
+                        .chain(roots.transient.iter().copied())
                         .chain(roots.focused)
                         .chain(demands.iter().copied())
                         .map(|a| (a, 0, false)),

@@ -1,0 +1,73 @@
+{
+  "source_head": "9f3361be457f2ee7a5fc111439a5b45673fc14b9",
+  "source_binary_sha256": "4abee2a734f62cd514c98d5a4bc19c9bac57a3656feed4b94cb9498a5f1b505c",
+  "installed_binary_sha256": "ccb67418891be9708504c6c3af4346b0a118629de7c243aa7e869f2fcc26683c",
+  "installed_binary": "/Users/markik/Library/Application Support/djinn/bin/djinn",
+  "unit": "/Users/markik/Library/LaunchAgents/org.merely.djinn.plist",
+  "unit_sha256": "4c93e586d84d8bde604a2e0938b3f1e5b0476525c66524ae55968256ce232af2",
+  "original_unit_sha256": "ca4d01c8351d9d6d53cd0c6e81d7d21ed020315a031aa6891a6fb9a4c06acd93",
+  "runtime_settings": "/Users/markik/Library/Application Support/djinn/runtime/graphshell/settings/default.json",
+  "vault_dir": "/Users/markik/.local/share/personae/vault",
+  "data_root": "/Users/markik/.local/share/graphshell/data",
+  "startup_recovery": {
+    "date": "2026-10-14",
+    "original_pid": 17224,
+    "native_unlock_accepted": true,
+    "startup_failure": "stored operation is not p2panda 0.7.1 format: incompatible CBOR type Array",
+    "cause": "existing Graphshell personal-sync settings enabled an incompatible legacy store",
+    "original_sync_settings_preserved": true,
+    "legacy_store_migration_performed": false,
+    "isolated_service_settings": { "reservoir": { "enabled": false } },
+    "sync_enabled_in_isolated_settings": false,
+    "backup_launchagent": "/Users/markik/Library/Application Support/djinn/launchagent-before-service-isolation.plist",
+    "restarted_pid": 54928,
+    "status": "ready-after-native-unlock",
+    "outbound_qualification": "s-pc, ThinkPad, M4 and Windows thread reads passed; Windows uses ordinary remote command after login-shell repair"
+  },
+  "ssh_public_key_fingerprint": "SHA256:qIU8gMb7+oxRleIqA2oM1EW3FcU8OwFXdlds6sHL3YA",
+  "ssh_public_key_file": "/Users/markik/.ssh/djinn-mesh.pub",
+  "qualification": {
+    "resident_pid": 54928,
+    "ready": true,
+    "observed_rss_kib": 42792,
+    "custody_key_generation": "passed; exactly one Ed25519 public key returned; secret stays in Djinn",
+    "public_key_enrolled_on": ["s-pc", "thinkpad-l14-f", "imac-m4", "o-pc"],
+    "outgoing_thread_reads": {
+      "s-pc": "01a132b0-fcf6-7871-b0a2-b8d8f40c18e4",
+      "thinkpad-l14-f": "01a11e41-e5d7-7011-a39f-1205b16b15dc",
+      "imac-m4": "01a135a7-bed2-7180-920b-b8d601eb6855",
+      "o-pc": "01a12716-2a74-7ee0-9840-1b356432b10f"
+    },
+    "agent_disabled_negative_control_exit": 255,
+    "negative_control_reason": "without agent, public-only identity cannot authenticate",
+    "locked_login_check": "passed after natural idle lock; normal agent-backed new SSH login denied with exit 255",
+    "final_custody_state": "Locked; resident PID 54928 remains running",
+    "idle_lock_event_at_ms": 1791997693340,
+    "native_client_display": "not newly confirmed",
+    "windows_enrollment": "completed with native elevation; peer rule scoped to 192.168.4.68",
+    "m4_current_address": "192.168.4.58",
+    "m4_return_route": "passed after owner switched desktop to markik; existing legacy agent recovered without tool restart",
+    "in_process_native_unlock_after_idle_lock": "passed; resident PID unchanged",
+    "windows_native_read_thread_of_q_pc": "passed without resuming"
+  },
+  "build_cache_cleanup": {
+    "at": "2026-10-14T18:14:35.197960+00:00",
+    "target": "/Users/markik/Code/targets/mere",
+    "removed": true,
+    "owner": "q-pc Djinn peer setup",
+    "live_target_owners": [],
+    "evidence_directory": "/Users/markik/Library/Application Support/djinn/qualification",
+    "evidence_sha256": {
+      "djinn-build.log": "9a21c2a4f586c58b8ee8b20a13d2a200e4df9887865cdb79384027b8e62a6c96",
+      "djinn-build-result.json": "dcba5fc0c3c5174cba00f366f1276a1c565a01ec8c8d07ee5ab37d2dcabaf823",
+      "q-pc-cargo-target-ownership.json": "67b14067b8d45c40538a3872f14c21646309ab2239dc030a90b34411dbeffee2"
+    },
+    "installed_binary_preserved": true
+  },
+  "agent_endpoint": "/Users/markik/Library/Application Support/djinn/agent.sock",
+  "app_endpoint": "/Users/markik/.local/share/personae/vault/graphshell-app.sock",
+  "source_build_peak_owned_rss_bytes": 1477734400,
+  "existing_chatgpt_pid": 44604,
+  "existing_openssh_agent_pid": 95140,
+  "new_plaintext_private_key_file": false
+}

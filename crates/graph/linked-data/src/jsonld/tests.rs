@@ -87,9 +87,12 @@ fn profile_graph() -> Graph {
                         predicate: "https://example.test/claims".into(),
                         recognized_sub_kind: None,
                         label: Some(format!("label {index}")),
+                        basis: Default::default(),
                         graph_scope: scope,
                         provenance_iri: Some(format!("https://author.test/{index}")),
                         asserted_at_ms: Some(index as u64),
+                        first_asserted_ms: Some(index as u64),
+                        withdrawn: None,
                     },
                 )
                 .is_some()
@@ -139,9 +142,12 @@ fn profile_graph() -> Graph {
                     predicate: kernel::graph::resource::TAGGED_WITH_IRI.into(),
                     recognized_sub_kind: None,
                     label: Some(format!("resource {index}")),
+                    basis: Default::default(),
                     graph_scope: GraphScope::User,
                     provenance_iri: Some(format!("https://tagger.test/{index}")),
                     asserted_at_ms: Some(100 + index as u64),
+                    first_asserted_ms: Some(100 + index as u64),
+                    withdrawn: None,
                 })
                 .collect(),
             ..Default::default()

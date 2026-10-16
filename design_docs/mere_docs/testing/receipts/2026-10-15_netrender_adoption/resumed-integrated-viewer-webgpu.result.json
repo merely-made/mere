@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "--config",
+    "repos/mere/ports/graphshell/web/.cargo/config.toml",
+    "check",
+    "--manifest-path",
+    "repos/mere/ports/graphshell/web/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-j2",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "--features",
+    "presentation-webgpu"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 46.0,
+  "environment": {
+    "CARGO_TARGET_DIR": "C:\\t\\cargo-targets\\mere\\netrender-adoption",
+    "CARGO_BUILD_BUILD_DIR": "C:\\t\\cargo-targets\\mere\\build",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "source_basis": "integrated-source-basis.json"
+}

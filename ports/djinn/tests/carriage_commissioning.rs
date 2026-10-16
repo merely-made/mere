@@ -13,9 +13,9 @@
 
 use std::path::PathBuf;
 
+use djinn::door::browser_host::now_ms;
+use djinn::sync::carriage_host::{CarriageHost, CarriageHostConfig};
 use graphshell::carriage::CarriageCeilings;
-use graphshell::native::browser_host::now_ms;
-use graphshell::native::carriage_host::{CarriageHost, CarriageHostConfig};
 use personae::Ed25519Keypair;
 
 /// The wrapping keys pairing retained, as the resident loads them.

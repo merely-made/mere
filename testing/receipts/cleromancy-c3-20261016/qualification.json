@@ -1,0 +1,56 @@
+{
+  "schema": "mere.cleromancy-c3-receiving-intake/v1",
+  "date": "2026-10-16",
+  "status": "Receiving validator intake and integrated real-process owner qualification pass",
+  "source_commit": "7a656097ebb6bb144e0877b36b501d791cf6759d",
+  "implementation_commit": "88a05e10ff0d4bf431bfe55add16b1a240614a52",
+  "incoming_main": "ee324e517",
+  "cleromancy_validator": "277c6bd0cb6b4f63fc458d341678c0f8ed52830a",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "djinn",
+    "--test",
+    "embedded_reservoir_validation",
+    "--",
+    "--nocapture",
+    "--test-threads",
+    "1"
+  ],
+  "exit": 0,
+  "passed": 4,
+  "failed": 0,
+  "ignored": 1,
+  "ignored_scope": "Process-child entry point explicitly launched by parent tests.",
+  "toolchain": "cargo 1.99.0 (5f94df478 2026-08-27)",
+  "inputs": {
+    "Cargo.lock": "c8b60aa5d42e49a4c14b052ec0c2208597a1d226d00d9dcef31acb3a892844ae",
+    "ports/djinn/Cargo.toml": "b5f813483f1e5e46d8df1c35c0e94cb50100da875013297103d7e2e222ab9471",
+    "ports/djinn/tests/embedded_reservoir_validation.rs": "3852e7b5bf298bc5f33617f366f19755b94698c743ed54f6c94690e7e3e6bc04"
+  },
+  "evidence": {
+    "owner-validation.log": "ac424e4e2d2b817c2cb6315fa5db39698bc193dd236d5fda23d427f8b354acdb",
+    "lock-delta.json": "76d7eea0033fc0ea14bc0e7e6c9db592b4eb0deaa22d54c83064265649204276",
+    "owner-validation-integrated.log": "d90b2df83f376b3ad67d93f84c9ba4f0984ba74b7f0840529b3918ee76858a29",
+    "lock-delta-integrated.json": "3090b2f9ece1f36c15c4b275cb322aab46270df7d930a61fe52e7f40de363765"
+  },
+  "proof": [
+    "Two complete 78-card deck snapshots and position definitions admitted through the real product validator.",
+    "Exact full product facets, sealed reading, session and journal/history survive embedded/daemon/embedded child processes.",
+    "Forged deck metadata and same-schema reading receipt tamper refuse the complete batch with unchanged durable bytes and projections.",
+    "Historical untyped fixture remains and passes independently."
+  ],
+  "lock_scope": "Only the Cleromancy git revision changes against integrated upstream; every other lock byte retained.",
+  "diagnostics": [
+    "An initial cargo update also proposed unrelated family and registry changes; that expanded lock is retained externally as diagnostic evidence and excluded. The committed lock changes one source line and passes the locked offline build.",
+    "macOS daemon link emitted a compact-unwind size warning; test build and all process tests passed. No startup performance qualification is inferred."
+  ],
+  "limits": [
+    "Receiving process fixture and compiled daemon only; no graphical unlock or resident daemon deployment claim.",
+    "Cleromancy native acceptance retains its independent ef014d7/Mere locked-family source identity.",
+    "C4, C5 and full shared cutover wall remain separate."
+  ]
+}

@@ -1,0 +1,744 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        737,
+        299
+      ],
+      "canvas_physical_size": [
+        1474,
+        598
+      ],
+      "log": [
+        "waited 0 frames",
+        "captured clip_export_ready",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "ok",
+      "saved_graph": {
+        "address": "mere://clip/b40c579d5234ed1f14d7512474a18c958c5e07f1a16f27afc42d337eeabd07ba",
+        "file": null,
+        "owner_observation": {
+          "actual_app_present": true,
+          "actual_graph_session": "ef4e35fd-c6a1-4759-8266-94ad8e820a2c",
+          "actual_session_changes": 0,
+          "forme_model_session": "ef4e35fd-c6a1-4759-8266-94ad8e820a2c",
+          "forme_region_id": "efcac776-1bd5-4fb2-adfb-bfdd986e716d",
+          "forme_session_matches": true,
+          "schema": "graphshell.actual-owner-observation/v1"
+        },
+        "reopened": true,
+        "save_state": "idle",
+        "selected": "f3d887ca-6b6b-4f68-9637-9cf087b617ed",
+        "session": "ef4e35fd-c6a1-4759-8266-94ad8e820a2c",
+        "tags": "",
+        "title": "Coffee"
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "clip_export_ready",
+        "width": 2074,
+        "height": 1278,
+        "bytes": 366254
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Graphshell",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "status",
+              "label": "saved graph \u00b7 14 nodes \u00b7 selected: 1 \u00b7 primary: mere://clip/b40c579d5234ed1f14d7512474a18c958c5e07f1a16f27afc42d337eeabd07ba",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Open selected in workbench",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Return to Mere",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Undo session",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Redo session",
+                  "children": []
+                },
+                {
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Add an object",
+                      "expanded": false,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect selected access",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect fields",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Open details",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Workbench",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "tablist",
+                                  "label": "Coffee",
+                                  "children": [
+                                    {
+                                      "role": "tab",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Close Coffee",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "article",
+                                      "label": "Reading access Coffee",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Show in Mere",
+                                          "description": "mere://clip/b40c579d5234ed1f14d7512474a18c958c5e07f1a16f27afc42d337eeabd07ba",
+                                          "children": []
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "role": "group",
+                                              "children": [
+                                                {
+                                                  "role": "group",
+                                                  "label": "Coffee",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "label": "Coffee",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "label": "caf\u00e9",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "label": "Source anchor (utf8-bytes): mere://knot/document/coffee",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "label": "Original selection: caf\u00e9",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "label": "Source tags (author unknown): coffee",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "label": "Export selected clip",
+                                                  "children": [
+                                                    {
+                                                      "role": "button",
+                                                      "label": "Activate",
+                                                      "description": "Activate this retained document target",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "role": "group",
+                                                  "children": []
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "role": "status",
+                                              "label": "Viewing held content through Pelt",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Appearance",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Appearance status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Inspector",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "status",
+                      "label": "Storage: IndexedDB reopened \u00b7 persistent",
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Speed status",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Physics status",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Find and filter",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Scenes and transfers",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Projection editor",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "History",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Explain selected dynamics",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Presentation rules",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Saved query views",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "New query view",
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Fields",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Unlock forme",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Undo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Redo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Hide forme boundary",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Select forme members",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Retry workbench save",
+                              "children": []
+                            },
+                            {
+                              "role": "status",
+                              "label": "Workbench saved",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Remote session",
+                              "expanded": false,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1037,
+      "height": 639
+    }
+  },
+  "collected_at_utc": "2026-10-14T05:45:07.771287+00:00"
+}

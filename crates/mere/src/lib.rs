@@ -31,9 +31,13 @@ pub use pictograph::canvas;
 #[cfg(feature = "canvas")]
 pub mod gloss;
 #[cfg(feature = "graph")]
+pub mod coupling_edit;
+#[cfg(feature = "graph")]
 pub mod glossary;
 #[cfg(feature = "graph")]
 pub mod subgraph;
+#[cfg(feature = "query")]
+pub mod query_view;
 #[cfg(feature = "graph")]
 pub use kernel;
 #[cfg(feature = "linked-data")]

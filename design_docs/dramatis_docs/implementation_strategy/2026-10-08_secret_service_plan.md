@@ -36,7 +36,7 @@ component, with the vault lock's semantics (rulings 10, 67 and 68).
 
 ## 1. What exists (assessed 2026-10-08)
 
-- **castellan's adapter** (`ports/castellan/src/secret_service/`) is built
+- **castellan's adapter** (`ports/djinn/castellan/src/secret_service/`) is built
   and proven under a disposable bus (`tests/secret_service_linux.rs`,
   vault lock plan `aac67a85`). It runs behind castellan's `secret-service`
   feature.

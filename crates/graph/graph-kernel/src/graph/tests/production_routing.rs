@@ -120,6 +120,7 @@ fn production_routing_all_fixed_families_have_exact_captures_and_controls() {
         (ProvenanceSubKind::ExtractedFrom, true),
         (ProvenanceSubKind::ImportedFromSource, true),
         (ProvenanceSubKind::CopiedFrom, false),
+        (ProvenanceSubKind::MergedFrom, false),
     ] {
         cases.push((
             EdgeAssertion::Provenance { sub_kind: kind },
@@ -138,7 +139,7 @@ fn production_routing_all_fixed_families_have_exact_captures_and_controls() {
             false,
         ));
     }
-    assert_eq!(cases.len(), 43);
+    assert_eq!(cases.len(), 44);
     for (assertion, selector, resource) in cases {
         let (mut graph, a, b) = bound_graph();
         let mut replayed = graph.clone();
@@ -303,7 +304,19 @@ fn production_routing_selector_retracts_both_held_stores_but_raw_replay_is_surfa
                 ArrangementSubKind::FrameMember
             ))
     );
-    assert_eq!(graph.resource_relations().count(), 0);
+    let retained_resource: Vec<_> = graph.resource_relations().collect();
+    assert_eq!(
+        retained_resource.len(),
+        1,
+        "authored retract retains a tombstone bucket"
+    );
+    assert!(
+        retained_resource[0]
+            .3
+            .held_semantic_statements()
+            .next()
+            .is_none()
+    );
     replay_captured_deltas_onto(&mut replayed, captured.lock().unwrap().clone());
     assert_eq!(truth(&replayed), truth(&graph));
 

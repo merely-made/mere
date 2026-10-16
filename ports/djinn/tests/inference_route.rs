@@ -32,13 +32,16 @@ use distillery::inference::{
     ASK_INTENT, AskRequestV1, CANCEL_INTENT, CancelRequestV1, INFERENCE_ASK_ROUTE,
     INFERENCE_RUNS_SCHEMA, InferenceProvider, InferenceRunsV1, RunStateV1,
 };
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::resident::DjinnResident;
 use djinn::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
 use graphshell::identity::VaultProtectionView;
-use graphshell::native::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
-use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
-use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
+use graphshell_endpoint::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
+};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use sceno::InstanceId;
 use scenotime::{Revision, SceneEpoch};
@@ -434,7 +437,7 @@ async fn the_lane_without_a_distillery_lane_is_refused_before_anything_opens() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     use distillery::inference::{InferenceDevice, RunJournal, load_library_session};
-    use graphshell::native::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
+    use djinn::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
     use graphshell::personal_sync::{SyncRoster, SyncSelection};
     use p2panda_core::{Body, Header, Operation, SigningKey};
     use personae::IdentityProvider;

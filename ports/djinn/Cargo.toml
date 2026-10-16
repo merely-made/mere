@@ -1,4 +1,5 @@
 [package]
+rust-version = "1.97.1"
 name = "djinn"
 version = "0.0.2"
 edition.workspace = true
@@ -28,7 +29,7 @@ trainer = ["distillery/trainer"]
 # The resident inference lane (`src/resident_inference.rs`; resident inference
 # and recall plan, I1). Gated for the trainer's reason: a default build stays
 # light, and settings naming the lane in a build without it are refused.
-inference = ["distillery/inference-model", "dep:stickleback"]
+inference = ["distillery/inference-model"]
 inference-gpu = ["inference", "distillery/inference-gpu"]
 # The same trainer, composed on this machine's discrete GPU. Additive over
 # `trainer`, and honest about the difference: a lane that says `device: "gpu"`
@@ -51,10 +52,31 @@ trainer-autodiff = ["trainer", "distillery/trainer-autodiff"]
 distillery-chronicle-receipt-host = [
     "personal-sync",
     "graphshell/webrtc-session",
+    "graphshell-host/webrtc-session",
     "dep:webrtc-carrier",
 ]
+# The browser-launched native-messaging relay to the device broker, moved
+# from Graphshell with `door::device_broker` (stack lift plan P5). The binary
+# name stays: the extension's host manifest names its path.
+[[bin]]
+name = "graphshell_native_host"
+path = "src/bin/graphshell_native_host.rs"
+
+[[bin]]
+name = "c1-receipt-host"
+path = "src/bin/c1_receipt_host.rs"
+required-features = ["custody-receipt-host"]
 
 [dependencies]
+# The personal sync, carriage and transfer staging hosts (`sync`) and the
+# browser door's nonces (`door::browser_host`), moved from Graphshell's
+# `native` with the stack lift plan's P5.
+base64.workspace = true
+chartulary.workspace = true
+eidetic.workspace = true
+p2panda-core = "0.7.0"
+p2panda-store = { version = "0.7.0", default-features = false }
+stickleback.workspace = true
 blake3.workspace = true
 chatelaine.workspace = true
 # The one crate allowed to link castellan (dramatis repo plan, D4, D16).
@@ -62,6 +84,9 @@ chatelaine.workspace = true
 # (vault lock ruling 47); it moved from personae with custody (DR-B).
 castellan = { workspace = true, features = ["keeper", "os-presence"] }
 chirograph.workspace = true
+# Divination replay authority is supplied by the product's portable package;
+# the native Cleromancy executable may itself embed Djinn without a crate cycle.
+cleromancy-domain = { package = "cleromancy-core-acceptance", git = "https://github.com/merely-made/cleromancy.git", branch = "main" }
 # The identity tier's plain types: views, intents, the roster (DR-A, DR-C).
 dramatis.workspace = true
 incipit.workspace = true
@@ -71,21 +96,29 @@ incipit.workspace = true
 # resident, and `trainer` pulls it deliberately and by the owner's request.
 distillery.workspace = true
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
-graphshell-endpoint.workspace = true
+# The application side of the first-party door: admission, the app client,
+# custody, quarantine, tasks and the identity views (stack lift plan, L1).
+graphshell-endpoint = { workspace = true, features = ["door"] }
+# The serving half: the endpoint catalog and its admitted context, the
+# projection host, admission and the session loop (stack lift plan, L2).
+graphshell-host = { workspace = true, features = ["native"] }
+# The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
+mere-overmap.workspace = true
 knot-editor.workspace = true
+# Exact signed Knot relation intake into durable Mere sessions.
+kernel.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from
 # graphshell with the keeper adapters (dramatis repo plan, D15).
 light-file-dialog = "3.21.3"
 # Immutable saved-site snapshot contract published by Knot, at the workspace's
 # Knot revision so knot-site and knot-editor share one Knot source.
-knot-site = { git = "https://github.com/merely-made/knot-editor.git", rev = "8ed49d43f049921d56ab5a0c091a2c37c0970ee7", package = "knot-site", features = ["retinue"] }
+knot-site = { git = "https://github.com/merely-made/knot-editor.git", branch = "main", package = "knot-site", features = ["retinue"] }
 # The policy vocabulary the device sensor fills in (`DeviceConditions`), and
 # the `ConditionSource` seam it plugs into. `mere-mesh` refuses to touch the
 # OS; `src/conditions.rs` is the Windows-facing half that seam expects.
 mesh.workspace = true
 # The delegation-signing salts the custody route signs with (D11).
 insigne.workspace = true
-stickleback = { workspace = true, optional = true }
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
@@ -96,6 +129,7 @@ rand_core = { version = "0.6", features = ["getrandom"] }
 # The H4d receipt host verifies the approved signature.
 signature = "2"
 sceno.workspace = true
+scenograph.workspace = true
 scenotime.workspace = true
 serde = { version = "1", features = ["derive"] }
 # `lock.toml`, the per-device lock settings a person edits (vault lock ruling 77).
@@ -213,6 +247,9 @@ path = "src/bin/distillery_chronicle_receipt_host.rs"
 required-features = ["distillery-chronicle-receipt-host"]
 
 [dev-dependencies]
+# Knot's overmap layer over the mere route (`mere_overlay`), driven through the
+# first-party door in `resident_mere`'s archive round trip.
+knot-editor = { workspace = true, features = ["mere-overlay"] }
 # This package with `passphrase-fd`, so the binary the tests spawn reads the
 # harness's passphrase (ruling 65).
 djinn = { path = ".", default-features = false, features = ["passphrase-fd"] }
@@ -222,15 +259,19 @@ djinn-testkit = { path = "../../crates/system/djinn-testkit" }
 insigne = { workspace = true, features = ["verify"] }
 # The trainer receipt (`tests/distillery_trainer.rs`) authors the synthetic
 # base model and reads the published artifacts back out of the model library,
-# so the *test* names eidetic and safetensors. Production djinn does not:
-# `src/resident_distillery.rs` speaks only `muniment::RedbBackend` and
-# distillery's own re-exported trainer vocabulary.
-eidetic.workspace = true
-# The route adapter's test in `resident_mere`: graphshell's `mere_route`, the
+# so the test names safetensors (and eidetic, which production names too since
+# `sync::transfer_staging` moved here). `src/resident_distillery.rs` speaks
+# only `muniment::RedbBackend` and distillery's own re-exported trainer
+# vocabulary.
+# The identity endpoint's tests read its cards back as a client does; the
+# dialable host's tests drive the route panel over the native line pump.
+graphshell-client = { workspace = true, features = ["pump"] }
+# The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
-graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "mere-route"] }
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint.workspace = true
-kernel.workspace = true
+pollster = "0.4"
 mere-view.workspace = true
 p2panda-core = "0.7.0"
 # The Knot residue test's baselines (iroh alone, p2panda-net alone), built as
@@ -262,6 +303,11 @@ harness = false
 [[bin]]
 name = "dr-c-receipt-host"
 path = "src/bin/dr_c_receipt_host.rs"
+required-features = ["custody-receipt-host"]
+
+[[bin]]
+name = "tucket-custody-receipt-host"
+path = "src/bin/tucket_custody_receipt_host.rs"
 required-features = ["custody-receipt-host"]
 
 [[bin]]

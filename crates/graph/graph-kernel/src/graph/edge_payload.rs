@@ -22,6 +22,8 @@ use rkyv::{Archive, Deserialize, Serialize};
 
 use crate::types::GraphScope;
 
+use crate::types::AssertionWithdrawal;
+
 use super::edge_data::{
     ArrangementData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData, SemanticData,
     SemanticStatement, SemanticStatementSpec, StatementAssert, Traversal, TraversalData,
@@ -32,7 +34,17 @@ use super::edge_taxonomy::{
 };
 
 /// Edge semantics payload: structural assertions + temporal traversal events.
-#[derive(Debug, Clone, PartialEq, Eq, Archive, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 pub struct EdgePayload {
     pub semantic: Option<SemanticData>,
     pub traversal: Option<TraversalData>,
@@ -123,10 +135,10 @@ impl EdgePayload {
     pub fn has_relation(&self, selector: RelationSelector) -> bool {
         match selector {
             RelationSelector::Family(family) => self.has_family(family),
-            RelationSelector::Semantic(sub_kind) => self
-                .semantic
-                .as_ref()
-                .is_some_and(|data| data.sub_kinds.contains(&sub_kind)),
+            RelationSelector::Semantic(sub_kind) => self.semantic.as_ref().is_some_and(|data| {
+                data.held_statements()
+                    .any(|statement| statement.recognized_sub_kind == Some(sub_kind))
+            }),
             RelationSelector::Containment(sub_kind) => self
                 .containment
                 .as_ref()
@@ -146,7 +158,10 @@ impl EdgePayload {
         }
     }
 
-    pub fn retract_relation(&mut self, selector: RelationSelector) -> bool {
+    /// Physical removal for legacy migration/retention compaction only.
+    /// Authored semantic withdrawal must go through `Graph` so it carries a
+    /// timestamp, actor, journal capture, and exact assertion identity.
+    pub(crate) fn retract_relation(&mut self, selector: RelationSelector) -> bool {
         match selector {
             RelationSelector::Family(EdgeFamily::Traversal) => self.traversal.take().is_some(),
             RelationSelector::Family(_) => false,
@@ -205,7 +220,7 @@ impl EdgePayload {
     fn has_family(&self, family: EdgeFamily) -> bool {
         match family {
             EdgeFamily::Semantic => self.semantic.as_ref().is_some_and(|data| {
-                !data.statements().is_empty()
+                data.held_statements().next().is_some()
                     || !data.sub_kinds.is_empty()
                     || data.predicate.is_some()
             }),
@@ -230,7 +245,11 @@ impl EdgePayload {
     }
 
     pub fn is_empty(&self) -> bool {
-        !self.has_family(EdgeFamily::Semantic)
+        !self
+            .semantic
+            .as_ref()
+            .is_some_and(|data| !data.statements().is_empty())
+            && !self.has_family(EdgeFamily::Semantic)
             && self.traversal.is_none()
             && !self.has_family(EdgeFamily::Containment)
             && !self.has_family(EdgeFamily::Arrangement)
@@ -253,6 +272,14 @@ impl EdgePayload {
             .as_ref()
             .map(SemanticData::statements)
             .unwrap_or(&[])
+    }
+
+    /// Held assertions for default query projections. The raw accessor above
+    /// remains the persistence/history view and includes tombstones.
+    pub fn held_semantic_statements(&self) -> impl Iterator<Item = &SemanticStatement> {
+        self.semantic_statements()
+            .iter()
+            .filter(|statement| statement.is_held())
     }
 
     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
@@ -289,14 +316,23 @@ impl EdgePayload {
             .assert_statement(spec)
     }
 
-    /// Precise retract by fact handle. Clears the semantic sidecar when its
-    /// last statement goes (the caller removes the petgraph edge when the
-    /// whole payload empties, same as `retract_relation`).
-    pub(crate) fn retract_semantic_statement(&mut self, statement_id: &str) -> bool {
+    /// Retain a precise withdrawal tombstone on the exact fact handle.
+    pub(crate) fn withdraw_semantic_statement(
+        &mut self,
+        statement_id: &str,
+        withdrawal: AssertionWithdrawal,
+    ) -> bool {
         let Some(data) = self.semantic.as_mut() else {
             return false;
         };
-        if !data.retract_statement(statement_id) {
+        data.withdraw_statement(statement_id, withdrawal)
+    }
+
+    pub(crate) fn compact_semantic_statement(&mut self, statement_id: &str) -> bool {
+        let Some(data) = self.semantic.as_mut() else {
+            return false;
+        };
+        if !data.compact_statement(statement_id) {
             return false;
         }
         if data.statements().is_empty() {
@@ -324,8 +360,10 @@ impl EdgePayload {
     }
 
     /// Set (or clear) the open predicate IRI on the semantic sidecar, creating
-    /// the sidecar if needed. The predicate is independent of `sub_kinds`: a
-    /// recognized edge carries both; a raw web predicate may carry only this.
+    /// the sidecar if needed. Clearing preserves open assertions as undated
+    /// tombstones; authored withdrawals should use the Graph write API. The
+    /// predicate is independent of `sub_kinds`: a recognized edge carries
+    /// both; a raw web predicate may carry only this.
     pub fn set_semantic_predicate(&mut self, predicate: Option<String>) {
         if predicate.is_none() && self.semantic.is_none() {
             return;
@@ -426,6 +464,13 @@ impl EdgePayload {
             out.insert(EdgeFamily::Provenance);
         }
         out
+    }
+
+    /// Whether this retained bucket participates in ordinary graph topology.
+    /// A tombstone-only semantic bucket remains persisted but is not held
+    /// graph content; other held sidecars on the same bucket still participate.
+    pub fn has_held_topology(&self) -> bool {
+        !self.families().is_empty()
     }
 }
 

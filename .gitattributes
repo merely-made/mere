@@ -1,50 +1,3 @@
-*.ts merge=weave
-*.tsx merge=weave
-*.js merge=weave
-*.mjs merge=weave
-*.cjs merge=weave
-*.jsx merge=weave
-*.py merge=weave
-*.go merge=weave
-*.rs merge=weave
-*.java merge=weave
-*.c merge=weave
-*.h merge=weave
-*.cpp merge=weave
-*.cc merge=weave
-*.cxx merge=weave
-*.hpp merge=weave
-*.hh merge=weave
-*.hxx merge=weave
-*.rb merge=weave
-*.cs merge=weave
-*.php merge=weave
-*.swift merge=weave
-*.ex merge=weave
-*.exs merge=weave
-*.sh merge=weave
-*.f90 merge=weave
-*.f95 merge=weave
-*.f03 merge=weave
-*.f08 merge=weave
-*.xml merge=weave
-*.plist merge=weave
-*.svg merge=weave
-*.csproj merge=weave
-*.fsproj merge=weave
-*.vbproj merge=weave
-*.json merge=weave
-*.yaml merge=weave
-*.yml merge=weave
-*.toml merge=weave
-*.md merge=weave
-*.scala merge=weave
-*.sc merge=weave
-*.sbt merge=weave
-*.kojo merge=weave
-*.mill merge=weave
-*.dart merge=weave
-
 # README / marketing media. Treat as binary so git never line-merges or
 # attempts a text diff on screenshots and the demo gif.
 assets/** binary
@@ -60,9 +13,9 @@ crates/system/tabard/tests/fixtures/** text eol=lf
 # Fixtures whose digests graphshell's web tests pin (site export, practice dataset).
 ports/graphshell/web/fixtures/** text eol=lf
 # OpenSSH key fixtures whose slot bytes a test compares to a pre-P4a baseline.
-ports/castellan/tests/fixtures/** text eol=lf
+ports/djinn/castellan/tests/fixtures/** text eol=lf
 # Snapshot JSON that castellan compares byte for byte (dramatis repo plan D32).
-ports/castellan/tests/golden/** text eol=lf
+ports/djinn/castellan/tests/golden/** text eol=lf
 
 # The Cambium component-catalog receipt test compares the live render against these
 # captures byte for byte; autocrlf must not rewrite them on checkout (2026-09-03).
@@ -117,3 +70,6 @@ support/receipts/tabard_typography_20261012/**/*.log -text -whitespace
 support/receipts/tabard_typography_20261012/**/*.json text eol=lf
 support/receipts/tabard_typography_20261012/**/scenario.done text eol=lf
 support/receipts/tabard_typography_20261012/**/*.png binary
+
+# Preserve raw compiler and test receipts for coordinated supplier adoption.
+design_docs/mere_docs/testing/receipts/2026-10-15_netrender_adoption/*.log -text -whitespace

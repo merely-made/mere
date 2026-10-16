@@ -1,0 +1,454 @@
+{
+  "kind": "combined-source-and-native-artifact-qualification",
+  "toolkit_pairs": [
+    {
+      "egui": "egui-content-0-rehydrated.png",
+      "iced": "iced-content-0-rehydrated.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-0-scaled.png",
+      "iced": "iced-content-0-scaled.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-0.png",
+      "iced": "iced-content-0.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-1-rehydrated.png",
+      "iced": "iced-content-1-rehydrated.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-1-scaled.png",
+      "iced": "iced-content-1-scaled.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-1.png",
+      "iced": "iced-content-1.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-2-rehydrated.png",
+      "iced": "iced-content-2-rehydrated.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-2-scaled.png",
+      "iced": "iced-content-2-scaled.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-2.png",
+      "iced": "iced-content-2.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-3-rehydrated.png",
+      "iced": "iced-content-3-rehydrated.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-3-scaled.png",
+      "iced": "iced-content-3-scaled.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-3.png",
+      "iced": "iced-content-3.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-4-rehydrated.png",
+      "iced": "iced-content-4-rehydrated.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-4-scaled.png",
+      "iced": "iced-content-4-scaled.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-content-4.png",
+      "iced": "iced-content-4.png",
+      "equal_png_sha256": true
+    },
+    {
+      "egui": "egui-graph.png",
+      "iced": "iced-graph.png",
+      "equal_png_sha256": true
+    }
+  ],
+  "note": "Source hashes bind merged files and the stabilized root lock after the directed wasm-only query clock/random feature repair. Original pre561 evidence remains intact.",
+  "sources": [
+    {
+      "sha256": "64a618ba970fe98b5f5bbd7e47b2eac169ef54171f955f0295114c51ebc1a8c4",
+      "path": "crates/cambium/cambium-rootstock/src/embedding.rs"
+    },
+    {
+      "sha256": "7ced5db6a2f1cc35573bd32c1fcc114be9e4a3745a1141473d2a6aa01d6b2e5c",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/gpu.rs"
+    },
+    {
+      "sha256": "c09d4ab58b3a68cf1a53d97200cef2710114ad2f4abd93de825ba93952a7b060",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/input.rs"
+    },
+    {
+      "sha256": "3602674c9830df82b3d1eb10ffddc339e5989f2123728e926ee14e23bbd6e81c",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/egui.rs"
+    },
+    {
+      "sha256": "c37545bc7d56308eedffb0d948f205620a3222dc7391efbd749d2c04b32d8368",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/iced.rs"
+    },
+    {
+      "sha256": "fe607323cd484d6a7f910876e1b1b96b6f71952ee94ee8ef698eeaaf9cdacd32",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/egui_input.rs"
+    },
+    {
+      "sha256": "53407ad4cff2aa559d7fab8dc14d0f92528f2859fb54fd857d83f263b7903acd",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/iced_input.rs"
+    },
+    {
+      "sha256": "70668c698f14b647bee7eed6add6a7e0524055ca2dfefeb6b3d438be29e842fa",
+      "path": "crates/cambium/cambium-rootstock/src/embedding/tests.rs"
+    },
+    {
+      "sha256": "4f5fa631c4ef17e41da88a9957605ed8b4b2e24237bb256c798d6020d32850ee",
+      "path": "ports/graphshell/examples/caller_owned_toolkits.rs"
+    },
+    {
+      "sha256": "4720bce7eaf8371a7e302271e56e05f686c36c3d47c4cc90671694d9ddfa0d40",
+      "path": "crates/cambium/cambium-rootstock/Cargo.toml"
+    },
+    {
+      "sha256": "cb396401236df9c2d2077819e430fa670d7d61de047cbd467c23ed72f89bb329",
+      "path": "crates/cambium/cambium-rootstock/src/lib.rs"
+    },
+    {
+      "sha256": "1f43c20ac2012940e9decaaa757a63f2328b5b5c7ce9a97122b52443ff154c4a",
+      "path": "crates/cambium/cambium-rootstock/src/producer.rs"
+    },
+    {
+      "sha256": "179ba6ef67c4866c76e1f0d53c65f13b5ca02d5e8f0f36e1188e5c39005bf573",
+      "path": "crates/cambium/cambium-rootstock/src/producer/registry.rs"
+    },
+    {
+      "sha256": "a328cb78226cc08d5678394ec1b875f2ca895fc46fb3c0dc2063f7d8e72ad711",
+      "path": "crates/cambium/cambium-rootstock/src/scene_producer.rs"
+    },
+    {
+      "sha256": "2e5ec78f4b9fc5b59f5a9a7eeb82183d5562eecb32f8a1b8549e6a8f0c46fd6a",
+      "path": "crates/cambium/cambium-rootstock/src/host.rs"
+    },
+    {
+      "sha256": "91606b73f917af1ebb7be562a1023776c0f04ddc0382d4f33dd3a1b6d1930e35",
+      "path": "crates/cambium/cambium-rootstock/src/frame.rs"
+    },
+    {
+      "sha256": "9a69193a08283a206bc5c78fc8d1767787c2a294ecbe8ed2d68ed2d1a6ef44f9",
+      "path": "ports/graphshell/Cargo.toml"
+    },
+    {
+      "sha256": "c0b74e44c1b447e5003ec4be25e44a6732da2b5776eadf9304ca0f0a8eeb0b0a",
+      "path": "ports/graphshell/src/retained_content/producer.rs"
+    },
+    {
+      "sha256": "bc70e697961397337e057a451246808a70f7f27d0e5a382771cb9ea647f25ab7",
+      "path": "Cargo.toml"
+    },
+    {
+      "sha256": "aef3fb4f411db714226ffc946eb4e5ed58c39fd28bbf33108de2fb062a811b87",
+      "path": "Cargo.lock"
+    }
+  ],
+  "open": [
+    "Classic caller-encoder owner",
+    "glyph atlas parity",
+    "physical toolkit window input/IME/AT",
+    "actual GPU device loss",
+    "audio output"
+  ],
+  "compiler": "rustc/cargo +1.99.0",
+  "source_commit": "f7e0a09788ad2304254bb4afaf4e77cc9a94ae21",
+  "genet_revision": "5618326d287e7f7ef0c1cc3545587d64cedb22a7",
+  "visual_inspection": [
+    "egui-content-0.png",
+    "iced-graph.png",
+    "egui-content-3-scaled.png"
+  ],
+  "focused_tests": {
+    "failed": 0,
+    "passed": 6
+  },
+  "scope": "native headless actual toolkit callbacks; Sparse outline text and owned CPU images",
+  "prior_qualification_comparison": [
+    {
+      "png": "egui-content-0-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-0-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-0.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-1-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-1-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-1.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-2-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-2-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-2.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-3-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-3-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-3.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-4-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-4-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-content-4.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "egui-graph.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-0-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-0-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-0.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-1-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-1-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-1.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-2-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-2-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-2.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-3-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-3-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-3.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-4-rehydrated.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-4-scaled.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-content-4.png",
+      "pre561_png_sha256_equal": true
+    },
+    {
+      "png": "iced-graph.png",
+      "pre561_png_sha256_equal": true
+    }
+  ],
+  "native_png_count": 32,
+  "artifacts": [
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/egui-content-0-rehydrated.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/egui-content-0-scaled.png"
+    },
+    {
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "path": "native/egui-content-0.png"
+    },
+    {
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "path": "native/egui-content-1-rehydrated.png"
+    },
+    {
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "path": "native/egui-content-1-scaled.png"
+    },
+    {
+      "sha256": "21d46c6221e0a5c014671c0bc42b6db128a62e83f8bd0e0c9423f770dd7fe480",
+      "path": "native/egui-content-1.png"
+    },
+    {
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "path": "native/egui-content-2-rehydrated.png"
+    },
+    {
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "path": "native/egui-content-2-scaled.png"
+    },
+    {
+      "sha256": "a98672d312a0ff63d7cbae9925396a79aeb4e4c02ce35360786cff3cd50346ab",
+      "path": "native/egui-content-2.png"
+    },
+    {
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "path": "native/egui-content-3-rehydrated.png"
+    },
+    {
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "path": "native/egui-content-3-scaled.png"
+    },
+    {
+      "sha256": "eb892d47243f019a1c870aa51d60e770d01e10a5607e956ca41c07010fb1697b",
+      "path": "native/egui-content-3.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/egui-content-4-rehydrated.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/egui-content-4-scaled.png"
+    },
+    {
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "path": "native/egui-content-4.png"
+    },
+    {
+      "sha256": "b86ece2e7f65954dc98670decac036ac17160b728d77ea8383d4deea4c1171d2",
+      "path": "native/egui-graph.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/iced-content-0-rehydrated.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/iced-content-0-scaled.png"
+    },
+    {
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "path": "native/iced-content-0.png"
+    },
+    {
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "path": "native/iced-content-1-rehydrated.png"
+    },
+    {
+      "sha256": "3066fdd26addfce910b3737fde17829446dd9266dd64fef7dacbc1bc85cf70f2",
+      "path": "native/iced-content-1-scaled.png"
+    },
+    {
+      "sha256": "21d46c6221e0a5c014671c0bc42b6db128a62e83f8bd0e0c9423f770dd7fe480",
+      "path": "native/iced-content-1.png"
+    },
+    {
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "path": "native/iced-content-2-rehydrated.png"
+    },
+    {
+      "sha256": "812f8ec131b6aa2db6d39d7c7e8629c8d92972a0b06d969aeea704d92c6df19f",
+      "path": "native/iced-content-2-scaled.png"
+    },
+    {
+      "sha256": "a98672d312a0ff63d7cbae9925396a79aeb4e4c02ce35360786cff3cd50346ab",
+      "path": "native/iced-content-2.png"
+    },
+    {
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "path": "native/iced-content-3-rehydrated.png"
+    },
+    {
+      "sha256": "8ce3f9da9745e510f8f89593812490e2b4e3c9feaa2cd3af2e3fbde158947b63",
+      "path": "native/iced-content-3-scaled.png"
+    },
+    {
+      "sha256": "eb892d47243f019a1c870aa51d60e770d01e10a5607e956ca41c07010fb1697b",
+      "path": "native/iced-content-3.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/iced-content-4-rehydrated.png"
+    },
+    {
+      "sha256": "1ab912cc5579c09b7f2a8e9aecba8ab6a45e7eb404f66ba4a62f5439548ea383",
+      "path": "native/iced-content-4-scaled.png"
+    },
+    {
+      "sha256": "3ef2499364514f7d2eab1d888fe3c669475ff259628c1dd87ef84e49feb9ef93",
+      "path": "native/iced-content-4.png"
+    },
+    {
+      "sha256": "b86ece2e7f65954dc98670decac036ac17160b728d77ea8383d4deea4c1171d2",
+      "path": "native/iced-graph.png"
+    },
+    {
+      "sha256": "a65c32049b6e09ca25ac0225214b9dd27be70b7f151860448114f0caa76c11fa",
+      "path": "native/qualification.json"
+    }
+  ],
+  "native_bench_exit": 0
+}

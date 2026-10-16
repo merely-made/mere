@@ -1,5 +1,22 @@
 # Djinn Family Resident Services Plan
 
+Tucket custody continuation (2026-10-16, qualified at the custody boundary): the owner selected a
+Djinn-backed Tucket identity before further Signalman physical qualification.
+Personae owns the device/realm derivation; Djinn releases that exact wallet
+child only on Signalman's admitted custody route. The Signalman port verifies
+the release and watches custody for the connection lifetime. Real-broker probes
+pass absent, Locked and no-wallet refusal, stable identity on reopen, wrong-app
+release/sign/attest refusal, and independent lock/resident-loss closure. Both
+custody policy tests pass. A deliberately restored local-seed fallback fails
+the absent and Locked controls; the exact clean source is restored and the
+rebuilt clean executable passes all six probes. See
+[`testing/receipts/tucket-custody`](../../../testing/receipts/tucket-custody/README.md).
+Signalman's port/example pass strict Clippy; strict Djinn Clippy is blocked by
+existing sync/door diagnostics recorded with the receipts.
+The consumer/runtime and radio gates remain in
+`murm/design_docs/2026-10-13_murm_family_move_plan.md`, R6. This bounded custody
+extension does not claim the planned resident service phases below.
+
 **Status (2026-10-06):** Phases A to G are planned and still gated on the
 `djinn 0.0.2` release (§2): djinn is version 0.0.2, but its knot-site
 dependency is Git-only, so `cargo package` would refuse it. §13's ordinary
@@ -238,7 +255,7 @@ Done conditions:
 **Corrected 2026-10-06 (S14 pass):** A4 is partly built, which this section
 did not record. `ReleaseRefV1` exists at `crates/system/luggage/src/release.rs`
 (line 62), landed in `d10e04da` (2026-09-01), and
-`crates/murm/webrtc-carrier/src/invite.rs` uses it. `ReleaseOfferV1` and the
+`murm/native/crates/webrtc-carrier/src/invite.rs` uses it. `ReleaseOfferV1` and the
 versioned manifest are absent.
 
 **Open, raised by the S14 pass (2026-10-06):** `ReleaseRefV1` landed for the
@@ -426,7 +443,7 @@ authorization and does not replace owner-selected relays outside the LAN.
 
 The peer-discovery substrate this advertises beside is recorded as R0 of the
 [reachability rungs plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
-(2026-09-01); `P2pandaHostPolicy` in `crates/murm/transport/src/p2panda_host.rs`
+(2026-09-01); `P2pandaHostPolicy` in `murm/native/crates/transport/src/p2panda_host.rs`
 is where an advertisement toggle plugs in.
 
 Done conditions for Phase F:
@@ -663,3 +680,29 @@ nor decryption keys. Serving a saved ordinary site must keep working without a m
   to G as still gated and §13's service and A4's `ReleaseRefV1` as landed, the
   Gazette row is corrected, and §13's relation to the gate and A4's credit are
   raised as open questions.
+
+### Sennet scoped station continuation (2026-10-16, scoped API qualified)
+
+Murm R7 extends the existing Signalman radio custody path to a canonical
+Sennet device/realm child. Dramatis 19be483 derives its public node number;
+this is not authenticated RF identity or a channel key. Only admitted Signalman
+may release/sign/attest this namespace. Sennet and Tucket share one sticky
+station watch, preserving the Tucket public type name. Reconnect requests a
+new scoped release. Done when actual Keeper probes refuse absent/Locked/no-wallet
+and wrong-app acts, retain stable identity on reopen and close independently
+on lock/resident loss. Consumer nonce reservations, public LongFast radio
+qualification and private-channel provisioning are separate Murm-owned gates.
+
+The primary Mere main has unrelated unpublished commits and newer concurrent
+upstream work. An integration worktree based on origin/main isolates this
+supplier change; it must be removed after publishing and receiving checks.
+
+The API and six actual Keeper cases are published through `e12788bc`, with
+stable reopen identity, absent/Locked/no-wallet and wrong-app refusal, and
+independent sticky lock/resident-loss closure. Both selected policy tests and
+strict Signalman port/example Clippy pass. The integration of concurrent
+upstream documentation leaves the qualified source/lock unchanged. Public
+evidence is in `testing/receipts/sennet-custody/`; private synthetic wallets
+stay in Murm's ignored validation results with helpers stopped. The existing
+shared `C:/t/cargo-homes/mere-upstreams` cache remains co-owned by the earlier
+family qualifiers and this gate. No isolated Cargo home/target was created.

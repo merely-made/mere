@@ -1,0 +1,254 @@
+{
+  "date": "2026-10-14",
+  "host": "ThinkPad, AMD Radeon (Renoir), Fedora 44",
+  "integration": {
+    "mere_parent": "189df27bce73ffbe8a3199b0e6fd0fa27584b0de",
+    "lane_head": "52dfbc7d9e670712e9584f4bbbb250895841b2a3",
+    "netrender": "68bcddc063636056d1c8c9669f58e5acc499a542 (merge of webgl-presentation cbdbf1e6 onto main 6a24ae08)"
+  },
+  "native_tests": {
+    "cambium-rootstock + mesquite + cambium-genet-winit-host + cambium-genet-web-host": {
+      "passed": 336,
+      "failed": 0,
+      "ignored": 11
+    },
+    "cambium-genet-web-host --features webgl --test portable_presentation": {
+      "passed": 5,
+      "failed": 0
+    },
+    "graphshell (lib + integration)": {
+      "passed": 513,
+      "failed": 0,
+      "ignored": 7
+    },
+    "checks": [
+      "dramatis-ui",
+      "graphshell moot-resource-host (moot-resource-proof)",
+      "tenant",
+      "cambium-genet-web-host wasm32 --features webgl"
+    ],
+    "netrender (vb2/vb3/vb5 sparse + webgl_scene, vello-cpu,vello-hybrid)": {
+      "passed": 28,
+      "failed": 0
+    },
+    "presentation-mount.mjs": "pass"
+  },
+  "browser": {
+    "chrome-webgl2": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (radeonsi renoir ACO), OpenGL ES 3.2)"
+      },
+      "policy": {
+        "backend": "webgl2",
+        "disable_webgpu": false,
+        "force_context_loss": true,
+        "angle": null
+      },
+      "bundle_sha256": "1e1a483c6a4069c1364c51d082673efd72bf47f86583c5290910239d733c227b",
+      "browser": "chrome",
+      "flags": [
+        "--headless=new",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--use-gl=angle",
+        "--use-angle=gl"
+      ]
+    },
+    "chrome-auto-nowebgpu": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "Google Inc. (AMD)",
+        "renderer": "ANGLE (AMD, AMD Radeon Graphics (radeonsi renoir ACO), OpenGL ES 3.2)"
+      },
+      "policy": {
+        "backend": "auto",
+        "disable_webgpu": true,
+        "force_context_loss": true,
+        "angle": null
+      },
+      "bundle_sha256": "1e1a483c6a4069c1364c51d082673efd72bf47f86583c5290910239d733c227b",
+      "browser": "chrome",
+      "flags": [
+        "--disable-features=WebGPU",
+        "--headless=new",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--use-gl=angle",
+        "--use-angle=gl"
+      ]
+    },
+    "chrome-webgpu": {
+      "result": "pass",
+      "controls": 26,
+      "renderer": null,
+      "policy": {
+        "backend": "webgpu",
+        "disable_webgpu": false,
+        "force_context_loss": false,
+        "angle": null
+      },
+      "bundle_sha256": "1e1a483c6a4069c1364c51d082673efd72bf47f86583c5290910239d733c227b",
+      "browser": "chrome",
+      "flags": [
+        "--enable-unsafe-webgpu",
+        "--enable-features=Vulkan",
+        "--use-vulkan=native",
+        "--headless=new",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--use-gl=angle",
+        "--use-angle=vulkan"
+      ]
+    },
+    "firefox-webgl2": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "AMD",
+        "renderer": "Radeon HD 3200 Graphics, or similar"
+      },
+      "policy": {
+        "backend": "webgl2",
+        "disable_webgpu": false,
+        "force_context_loss": true,
+        "angle": null
+      },
+      "bundle_sha256": "1e1a483c6a4069c1364c51d082673efd72bf47f86583c5290910239d733c227b",
+      "browser": "firefox",
+      "flags": [
+        "--no-remote"
+      ]
+    },
+    "chrome-swiftshader": {
+      "result": "pass",
+      "controls": 32,
+      "renderer": {
+        "vendor": "Google Inc. (Google)",
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+      },
+      "policy": {
+        "backend": "webgl2",
+        "disable_webgpu": false,
+        "force_context_loss": true,
+        "angle": "swiftshader"
+      },
+      "bundle_sha256": "1e1a483c6a4069c1364c51d082673efd72bf47f86583c5290910239d733c227b",
+      "browser": "chrome",
+      "flags": [
+        "--enable-unsafe-swiftshader",
+        "--headless=new",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--use-gl=angle",
+        "--use-angle=swiftshader"
+      ]
+    }
+  },
+  "delivery": {
+    "wasm": {
+      "raw_bytes": 10729772,
+      "gzip6_bytes": 3661337,
+      "gzip9_bytes": 3615553,
+      "cap_bytes": 3407872,
+      "cap_pass": false
+    },
+    "glue": {
+      "raw_bytes": 68799,
+      "gzip6_bytes": 18445,
+      "gzip9_bytes": 18820,
+      "cap_bytes": 20480,
+      "cap_pass": true
+    },
+    "mount": {
+      "raw_bytes": 998,
+      "gzip6_bytes": 592,
+      "gzip9_bytes": 590,
+      "cap_bytes": 8192,
+      "cap_pass": true
+    },
+    "history": {
+      "raw_bytes": 271932,
+      "gzip6_bytes": 6490,
+      "gzip9_bytes": 6292,
+      "cap_bytes": 131072,
+      "cap_pass": true
+    }
+  },
+  "delivery_note": "build-viewer.py refuses packaging on the unchanged wasm cap; limit not changed (owner decision)",
+  "comparison_normal_scale": [
+    {
+      "name": "before-loss",
+      "rgb_rms": 0.25225019462247533,
+      "max_rgb_delta": 11,
+      "max_alpha_delta": 0,
+      "size": [
+        801,
+        641
+      ],
+      "pass": true
+    },
+    {
+      "name": "after-restore",
+      "rgb_rms": 0.2998884550349409,
+      "max_rgb_delta": 11,
+      "max_alpha_delta": 0,
+      "size": [
+        801,
+        641
+      ],
+      "pass": true
+    },
+    {
+      "name": "odd-resize",
+      "rgb_rms": 0.29904643219428156,
+      "max_rgb_delta": 11,
+      "max_alpha_delta": 0,
+      "size": [
+        803,
+        643
+      ],
+      "pass": true
+    }
+  ],
+  "comparison_fractional_1_25": [
+    {
+      "name": "before-loss",
+      "rgb_rms": 1.2645071043516303,
+      "max_rgb_delta": 80,
+      "max_alpha_delta": 0,
+      "size": [
+        1001,
+        801
+      ],
+      "pass": false
+    },
+    {
+      "name": "after-restore",
+      "rgb_rms": 1.1902130537161515,
+      "max_rgb_delta": 80,
+      "max_alpha_delta": 0,
+      "size": [
+        1001,
+        801
+      ],
+      "pass": false
+    },
+    {
+      "name": "odd-resize",
+      "rgb_rms": 0.5430998075036064,
+      "max_rgb_delta": 31,
+      "max_alpha_delta": 0,
+      "size": [
+        1004,
+        804
+      ],
+      "pass": true
+    }
+  ],
+  "comparison_note": "WebGL2 (Chrome ANGLE GL, forced context loss) vs WebGPU (Chrome native Vulkan) same reduced-motion state, lane fixtures review-{gl,wg}-{normal,fractional}; contracts webgl-webgpu-comparison-contract.json and fractional-comparison-contract.json unchanged",
+  "raw_evidence": "/home/markik/Code/testing/mere/webgl-integration-20261014"
+}

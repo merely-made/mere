@@ -3,7 +3,8 @@ name = "cambium-rootstock"
 version = "0.1.0"
 description = "The stock a Cambium application host is grafted onto: input vocabulary, routing, layout, paint, and accessibility, with no event source of its own"
 edition.workspace = true
-rust-version = "1.92"
+
+rust-version = "1.97.1"
 license = "MPL-2.0"
 repository.workspace = true
 # Same posture as cambium-genet-winit-host, which this was carved out of: it
@@ -15,8 +16,15 @@ publish = false
 default = ["image-decode"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
 image-decode = ["genet-livery/image-decode", "genet-render/image-decode"]
+embedding = ["netrender/vello-gpu"]
+embedding-egui = ["embedding", "dep:egui", "dep:egui-wgpu", "dep:epaint"]
+embedding-iced = ["embedding", "dep:iced_wgpu"]
 
 [dependencies]
+egui-wgpu = { version = "=0.36.2", default-features = false, optional = true }
+egui = { version = "=0.36.2", default-features = false, optional = true }
+epaint = { version = "=0.36.2", default-features = false, optional = true }
+iced_wgpu = { git = "https://github.com/iced-rs/iced", rev = "ab336f6d6403d7206d82c7c2caa46143efde8284", default-features = false, optional = true }
 # The neutral key vocabulary this crate lowers into when it dispatches to a
 # runner. Named here so the conversion lives on this side of the seam rather
 # than in each event-source adapter.
@@ -51,3 +59,8 @@ layout_dom_api = { workspace = true }
 # std time would pass every type check and die on its first frame. web_time
 # re-exports std on native and uses performance.now() on wasm.
 web-time = "1"
+
+[dev-dependencies]
+# AC7's mount probe discovers the `<style>` elements a document and its shadow
+# roots carry, with their owner nodes, which `OwnedLayout::new` does not.
+genet-document-resources = { workspace = true }

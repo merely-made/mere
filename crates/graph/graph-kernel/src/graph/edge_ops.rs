@@ -19,6 +19,7 @@ use petgraph::Direction;
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
+use crate::time::unix_epoch_millis;
 use crate::types::GraphScope;
 
 use super::edge_data::Traversal;
@@ -68,6 +69,7 @@ impl Graph {
                         graph_scope: GraphScope::Default,
                         provenance_iri: Some(asserter_iri),
                         asserted_at_ms,
+                        basis: Default::default(),
                     },
                 )
                 .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
@@ -115,6 +117,7 @@ impl Graph {
                         graph_scope: GraphScope::Default,
                         provenance_iri: Some(asserter_iri),
                         asserted_at_ms,
+                        basis: Default::default(),
                     },
                 )
                 .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
@@ -162,6 +165,7 @@ impl Graph {
                 graph_scope,
                 provenance_iri: Some(self.write_author().asserter_iri()),
                 asserted_at_ms: None,
+                basis: Default::default(),
             },
         )
         .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
@@ -200,6 +204,7 @@ impl Graph {
                 graph_scope,
                 provenance_iri: Some(self.write_author().asserter_iri()),
                 asserted_at_ms: None,
+                basis: Default::default(),
             },
         )
         .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
@@ -238,6 +243,9 @@ impl Graph {
         let Some(to_key) = self.get_node_key_by_id(to_id) else {
             return 0;
         };
+        if is_semantic_selector(selector) {
+            return self.withdraw_selected_semantic_assertions(from_key, to_key, selector, false);
+        }
         self.retract_surface_relations(from_key, to_key, selector)
     }
 
@@ -249,12 +257,11 @@ impl Graph {
     ) -> Option<RelationKey> {
         let from_key = self.get_node_key_by_id(from_id)?;
         let to_key = self.get_node_key_by_id(to_id)?;
-        self.assert_surface_relation_as(
+        self.replay_surface_relation_as(
             from_key,
             to_key,
             assertion,
             self.write_author().asserter_iri(),
-            None,
         )
     }
 
@@ -281,10 +288,33 @@ impl Graph {
         from_id: Uuid,
         to_id: Uuid,
         predicate: String,
+        asserter_iri: String,
     ) -> Option<RelationKey> {
         let from_key = self.get_node_key_by_id(from_id)?;
         let to_key = self.get_node_key_by_id(to_id)?;
-        self.assert_semantic_predicate(from_key, to_key, predicate)
+        if !self.inner.contains_node(from_key) || !self.inner.contains_node(to_key) {
+            return None;
+        }
+        let edge_key = self
+            .find_edge_key(from_key, to_key)
+            .unwrap_or_else(|| self.inner.connect(from_key, to_key, EdgePayload::new()));
+        let outcome =
+            self.inner
+                .edge_mut(edge_key)?
+                .assert_semantic_statement(SemanticStatementSpec {
+                    predicate,
+                    recognized_sub_kind: None,
+                    label: None,
+                    graph_scope: GraphScope::Default,
+                    provenance_iri: Some(asserter_iri),
+                    asserted_at_ms: None,
+                    basis: Default::default(),
+                });
+        if outcome.changed {
+            self.bump_revision();
+            self.capture_semantic_pair(from_key, to_key);
+        }
+        Some(RelationKey::Surface(edge_key))
     }
 
     pub(crate) fn replay_append_traversal_by_ids(
@@ -380,12 +410,46 @@ impl Graph {
         to: NodeKey,
         mut spec: SemanticStatementSpec,
     ) -> Option<(RelationKey, StatementAssert)> {
+        spec = spec.normalized();
         if spec.provenance_iri.is_none() {
             spec.provenance_iri = Some(self.write_author().asserter_iri());
         }
         if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
             return None;
         }
+        if let Some((key, existing)) = self
+            .find_edge_key(from, to)
+            .and_then(|key| self.inner.edge(key).map(|payload| (key, payload)))
+            .and_then(|(key, payload)| {
+                payload
+                    .semantic_statements()
+                    .iter()
+                    .find(|statement| {
+                        statement.withdrawn.is_none()
+                            && statement.predicate == spec.predicate
+                            && statement.recognized_sub_kind == spec.recognized_sub_kind
+                            && statement.graph_scope == spec.graph_scope
+                            && statement.provenance_iri == spec.provenance_iri
+                            && statement.basis.same_reason_as(&spec.basis)
+                    })
+                    .map(|statement| (key, statement.statement_id.clone()))
+            })
+        {
+            let changed = self.update_assertion_metadata_if_requested(
+                &existing,
+                spec.label,
+                spec.asserted_at_ms,
+                Some(spec.basis),
+            );
+            return Some((
+                RelationKey::Surface(key),
+                StatementAssert {
+                    statement_id: existing,
+                    changed,
+                },
+            ));
+        }
+        spec.asserted_at_ms.get_or_insert_with(unix_epoch_millis);
         let edge_key = self
             .find_edge_key(from, to)
             .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
@@ -398,6 +462,48 @@ impl Graph {
             self.capture_semantic_pair(from, to);
         }
         Some((RelationKey::Surface(edge_key), outcome))
+    }
+
+    /// Historical replay path. Missing source time stays absent; replay never
+    /// stamps a wall clock into a prior journal prefix.
+    pub(crate) fn replay_surface_relation_as(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        assertion: EdgeAssertion,
+        asserter_iri: String,
+    ) -> Option<RelationKey> {
+        if let EdgeAssertion::Semantic {
+            sub_kind,
+            label,
+            decay_progress: _,
+        } = assertion
+        {
+            if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
+                return None;
+            }
+            let edge_key = self
+                .find_edge_key(from, to)
+                .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
+            let outcome =
+                self.inner
+                    .edge_mut(edge_key)?
+                    .assert_semantic_statement(SemanticStatementSpec {
+                        predicate: super::predicate_iri(sub_kind).into(),
+                        recognized_sub_kind: Some(sub_kind),
+                        label,
+                        graph_scope: GraphScope::Default,
+                        provenance_iri: Some(asserter_iri),
+                        asserted_at_ms: None,
+                        basis: Default::default(),
+                    });
+            if outcome.changed {
+                self.bump_revision();
+                self.capture_semantic_pair(from, to);
+            }
+            return Some(RelationKey::Surface(edge_key));
+        }
+        self.assert_surface_relation_as(from, to, assertion, asserter_iri, None)
     }
 
     /// Assert a semantic statement whose id is ALREADY minted — the re-ingest /
@@ -441,29 +547,15 @@ impl Graph {
         Some(RelationKey::Surface(edge_key))
     }
 
-    /// Precise retract by fact handle (the id `assert_semantic_statement`
-    /// returned, also carried on every projected reifier). Removes the
-    /// statement from the pair bucket; an emptied payload removes the petgraph
-    /// edge itself, so "there is an edge A -> B" keeps meaning "at least one
-    /// fact or other family payload exists on the pair".
+    /// Compatibility spelling for an authored exact-ID withdrawal. The
+    /// assertion remains as a tombstone in its original pair bucket.
     pub fn retract_semantic_statement(
         &mut self,
-        from: NodeKey,
-        to: NodeKey,
+        _from: NodeKey,
+        _to: NodeKey,
         statement_id: &str,
     ) -> bool {
-        let Some((owner, _)) = self.find_semantic_statement(statement_id) else {
-            return false;
-        };
-        if matches!(owner, RelationKey::Resource(_)) {
-            return self.retract_assertion(statement_id);
-        }
-        if let RelationKey::Surface(key) = owner
-            && self.inner.inner().edge_endpoints(key) == Some((from, to))
-        {
-            return self.retract_assertion(statement_id);
-        }
-        false
+        self.withdraw_semantic_assertion(statement_id, None, None)
     }
 
     /// Keep assertion ids and metadata exact through journal replay and undo.
@@ -484,6 +576,9 @@ impl Graph {
         to: NodeKey,
         selector: RelationSelector,
     ) -> usize {
+        if is_semantic_selector(selector) {
+            return self.withdraw_selected_semantic_assertions(from, to, selector, true);
+        }
         let mut removed = self.retract_surface_relations(from, to, selector);
         if removed > 0 {
             self.capture_semantic_pair(from, to);
@@ -518,6 +613,67 @@ impl Graph {
             removed += resource_removed;
         }
         removed
+    }
+
+    /// Historical selector replay retains an undated tombstone instead of
+    /// stamping replay time. Exact journal pair snapshots remain the primary
+    /// replay form; this covers legacy selector deltas only.
+    pub(crate) fn replay_retract_relations(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        selector: RelationSelector,
+    ) -> usize {
+        if is_semantic_selector(selector) {
+            return self.withdraw_selected_semantic_assertions(from, to, selector, false);
+        }
+        self.retract_relations(from, to, selector)
+    }
+
+    fn withdraw_selected_semantic_assertions(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        selector: RelationSelector,
+        authored: bool,
+    ) -> usize {
+        let matches_selector = |statement: &SemanticStatement| match selector {
+            RelationSelector::Semantic(kind) => statement.recognized_sub_kind == Some(kind),
+            RelationSelector::Family(super::edge_taxonomy::EdgeFamily::Semantic) => true,
+            _ => false,
+        };
+        let mut ids = self
+            .inner
+            .inner()
+            .edges_connecting(from, to)
+            .flat_map(|edge| edge.weight().held_semantic_statements())
+            .filter(|statement| matches_selector(statement))
+            .map(|statement| statement.statement_id.clone())
+            .collect::<Vec<_>>();
+        if authored
+            && let Some((source, target)) =
+                self.shown_resource_id(from).zip(self.shown_resource_id(to))
+        {
+            ids.extend(
+                self.resource_relations()
+                    .filter(|(_, a, b, _)| (*a, *b) == (source, target))
+                    .flat_map(|(_, _, _, payload)| payload.held_semantic_statements())
+                    .filter(|statement| matches_selector(statement))
+                    .map(|statement| statement.statement_id.clone()),
+            );
+        }
+        ids.sort();
+        ids.dedup();
+        ids.into_iter()
+            .filter(|id| {
+                if authored {
+                    self.withdraw_semantic_assertion(id, None, None)
+                } else {
+                    let author = self.write_author().asserter_iri();
+                    self.apply_imported_semantic_withdrawal(id, None, Some(author))
+                }
+            })
+            .count()
     }
 
     fn retract_surface_relations(
@@ -712,6 +868,14 @@ impl Graph {
     }
 }
 
+fn is_semantic_selector(selector: RelationSelector) -> bool {
+    matches!(
+        selector,
+        RelationSelector::Semantic(_)
+            | RelationSelector::Family(super::edge_taxonomy::EdgeFamily::Semantic)
+    )
+}
+
 #[cfg(test)]
 mod legacy_predicate_revision_tests {
     use super::*;
@@ -729,6 +893,9 @@ mod legacy_predicate_revision_tests {
             graph_scope: GraphScope::User,
             provenance_iri: asserter.map(str::to_owned),
             asserted_at_ms: Some(17),
+            first_asserted_ms: Some(17),
+            withdrawn: None,
+            basis: Default::default(),
         });
         let edge = graph.inner.connect(from, to, payload);
         (graph, from, to, edge)
@@ -775,13 +942,10 @@ mod legacy_predicate_revision_tests {
         );
 
         assert!(graph.set_edge_semantic_predicate_as(edge, None, "unused".into()));
-        assert!(
-            graph
-                .get_edge(edge)
-                .unwrap()
-                .semantic_statements()
-                .is_empty()
-        );
+        let payload = graph.get_edge(edge).unwrap();
+        assert!(payload.held_semantic_statements().next().is_none());
+        assert_eq!(payload.semantic_statements().len(), 1);
+        assert!(payload.semantic_statements()[0].withdrawn.is_some());
         assert_eq!(graph.revision(), edited_revision + 1);
         let cleared_revision = graph.revision();
         assert!(graph.set_edge_semantic_predicate_as(edge, None, "unused".into()));

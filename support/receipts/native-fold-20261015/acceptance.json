@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-15",
+  "status": "passed",
+  "source_base": "1977cb2603e0f50fd462eda60c9046da1b7c004e",
+  "binary_sha256": "7770e4f75d49cd4fc0dbe922fec34437224d885559eeb44972eabd1c545fd6e1",
+  "source_inputs": "source-inputs.json",
+  "host": "macOS LaunchServices cambium-genet-winit-host; Canvas SceneProducer and GraphCanvasSwatch paint/hit targets",
+  "interaction": {
+    "launch_method": "LaunchServices temporary application bundle",
+    "launcher_exit": 0,
+    "timeout": false,
+    "success": true,
+    "elapsed_seconds": 29.412,
+    "binary_sha256": "7770e4f75d49cd4fc0dbe922fec34437224d885559eeb44972eabd1c545fd6e1",
+    "scenario_sha256": "fba0afd2fcb3ae9419369efc53751d65fe181cff6959340d5489d2ec6cb5a12f",
+    "receipt": "scenario.done",
+    "captures": 12
+  },
+  "fresh_process_restore": {
+    "launch_method": "LaunchServices temporary application bundle",
+    "launcher_exit": 0,
+    "timeout": false,
+    "success": true,
+    "elapsed_seconds": 21.94,
+    "binary_sha256": "7770e4f75d49cd4fc0dbe922fec34437224d885559eeb44972eabd1c545fd6e1",
+    "scenario_sha256": "0f846d30d479ea0b60aee84f56777b863522be1431b3319a3a9a8a1e32b0adfd",
+    "receipt": "scenario.done",
+    "captures": 5
+  },
+  "checks": [
+    "two nonoverlapping summary folds",
+    "five directed boundary source cells in three endpoint/family bundles; maximum bundle two",
+    "shared production boundary routing with no cross-fold double count",
+    "native Canvas pointer expansion",
+    "bounded Swatch pointer expansion",
+    "fold undo and redo",
+    "serialized folds reload",
+    "fresh process preserves exact saved fold records",
+    "containment outgoing and incoming; semantic outgoing produce expected different memberships",
+    "source truth byte-equivalent with only generated snapshot timestamp normalized",
+    "all five source member positions unchanged",
+    "17 presented captures at 1900x1100; zero blank captures",
+    "visual inspection of expanded, two folds, native expansion, hierarchy, and fresh-process restored frames"
+  ],
+  "limits": [
+    "acceptance fixture over production Canvas and Cambium, not Isocosm: VTT campaign Overmap controls",
+    "does not close the Isocosm: VTT consumer gate",
+    "no keyboard gesture, live screen-reader, device recovery, Windows, or Linux acceptance claim"
+  ],
+  "artifacts": {
+    "saved-folds.json": "fba347689ddfb8f947665fb00abadead75ca667598e2f541d4dffb67f4458a81",
+    "native-expanded.png": "97a9f4c2eea941013c93ec3104c75a6cc45f3f318e591c80d55c9a64ed1bef8e",
+    "interaction.done": "79a1e18faef90bd136e13c1056f2eccee9649436575288abb07a49e9c9af33ff",
+    "reopen-inputs.json": "de770814354594a1a09ba0a67da99e22e7405c22c7bbd40e88df4b48546c1e4f",
+    "two-folds.png": "0e697f3562448649b36b975cb265e5dfa14ff5b4357afe90c3fba886a36aad9f",
+    "reopen.done": "624c59bf926a60170d0b28bed3e579eb25b7facef1c99ee4472c5d555841583e",
+    "source-inputs.json": "dbc870643f9dc3e6158b175c470fb7e3d0e60c42f0363056c5108b88a9a973a7",
+    "fresh-process-restored.png": "f19e892968ea3bd865006b6d896582e0baa395de3c6879716f39583537bc4c49",
+    "containment-outgoing.png": "208a25de2516fc6862746b719870c5d584a49564c987b56909707ccaf25b4fc6"
+  },
+  "local_full_artifacts": "/Users/markik/Code/output/native-fold-validation-2026-10-15",
+  "validation": {
+    "native_libraries": {
+      "passed": 494,
+      "failed": 0,
+      "ignored": 18,
+      "packages": {
+        "mere-view": 36,
+        "pictograph": 458
+      },
+      "command": "CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 CARGO_INCREMENTAL=0 cargo test --offline -j 4 -p pictograph -p mere-view --features pictograph/canvas --lib -- --test-threads=4",
+      "log_sha256": "90de19bea92f48e76a644b22ddb809c88921064d373b89d3e33da14f6db56a24"
+    },
+    "dependency_boundaries": "passed",
+    "changed_rustfmt": "passed",
+    "git_diff_check": "passed",
+    "documentation_audit_new_findings": 0,
+    "documentation_audit_note": "Existing repository-wide findings remain; comparing the two changed documents against incoming main introduced no findings."
+  }
+}

@@ -42,8 +42,8 @@ pub(super) fn place(config: &Embedded, items: &[&ScoreItem]) -> Vec<Vec2> {
                     let angle =
                         (stable_hash(item) % 3_600) as f32 / 3_600.0 * std::f32::consts::TAU;
                     Vec2::new(
-                        config.origin.x + ring_radius * angle.cos(),
-                        config.origin.y + ring_radius * angle.sin(),
+                        config.origin.x + ring_radius * crate::math::cos(angle),
+                        config.origin.y + ring_radius * crate::math::sin(angle),
                     )
                 },
             },

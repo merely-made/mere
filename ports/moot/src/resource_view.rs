@@ -56,6 +56,13 @@ impl Reading {
     pub fn take_request(&mut self) -> Option<Request> {
         self.outbox.take()
     }
+    /// Prepare a fresh resource intention from the current selection and owner
+    /// offers. The embedding host must still dispatch and recheck authority.
+    pub fn request_resource(&mut self, action: ResourceAction) -> Result<(), Refusal> {
+        let request = self.pane.prepare_resource(action)?;
+        self.prepared(Ok(request));
+        Ok(())
+    }
     pub fn refresh(&mut self, snapshot: Snapshot) -> Result<(), Refusal> {
         self.pane.refresh(snapshot)?;
         self.outbox = None;
@@ -80,7 +87,9 @@ impl Reading {
     fn id(&self, suffix: &str) -> String {
         format!("moot-{}-{suffix}", self.id)
     }
-    fn select_resource(&mut self, reference: ResourceRef) {
+    /// Restore or change local attention against the current owner snapshot.
+    /// This prepares no command and carries no permission to open the content.
+    pub fn select_resource(&mut self, reference: ResourceRef) {
         let before = self.pane.selected_resource();
         match self.pane.select_resource(reference) {
             Ok(()) => {
@@ -240,8 +249,9 @@ pub fn view(reading: &Reading) -> View {
                 if reading.pane.selected_resource() != Some(reference) {
                     return;
                 }
-                let result = reading.pane.prepare_resource(action);
-                reading.prepared(result);
+                if let Err(error) = reading.request_resource(action) {
+                    reading.status = error.to_string();
+                }
             })
             .attr("id", reading.id(suffix));
             inspection.push(Box::new(

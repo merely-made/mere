@@ -1,0 +1,744 @@
+[
+  {
+    "name": "colored",
+    "version": "3.1.1",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.48.0"
+      ]
+    }
+  },
+  {
+    "name": "data-encoding-macro-internal",
+    "version": "0.1.19",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "data-encoding",
+        "syn 3.0.6"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "data-encoding",
+        "syn 1.0.109"
+      ]
+    }
+  },
+  {
+    "name": "dirs-sys",
+    "version": "0.5.0",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "libc",
+        "option-ext",
+        "redox_users 0.5.3",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "libc",
+        "option-ext",
+        "redox_users 0.5.3",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "errno",
+    "version": "0.3.14",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "libc",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "libc",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "knot-capture",
+    "version": "0.0.1",
+    "before": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#11b07360917241053a88cf127ab57ccdc56c6d1a",
+      "dependencies": [
+        "knot-file-catalog"
+      ]
+    },
+    "after": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "dependencies": [
+        "knot-file-catalog"
+      ]
+    }
+  },
+  {
+    "name": "knot-composition",
+    "version": "0.0.1",
+    "before": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#11b07360917241053a88cf127ab57ccdc56c6d1a",
+      "dependencies": [
+        "blake3",
+        "knot-capture",
+        "quick-xml 0.39.4",
+        "reference-data",
+        "sceno",
+        "scenograph",
+        "scenomise",
+        "scenotime",
+        "seiche",
+        "serde",
+        "serde_json",
+        "tempfile",
+        "uuid"
+      ]
+    },
+    "after": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "dependencies": [
+        "blake3",
+        "knot-capture",
+        "quick-xml 0.39.4",
+        "reference-data",
+        "sceno",
+        "scenograph",
+        "scenomise",
+        "scenotime",
+        "seiche",
+        "serde",
+        "serde_json",
+        "tempfile",
+        "uuid"
+      ]
+    }
+  },
+  {
+    "name": "knot-document",
+    "version": "0.0.1",
+    "before": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#11b07360917241053a88cf127ab57ccdc56c6d1a",
+      "dependencies": [
+        "cambium",
+        "illume",
+        "inker",
+        "knot-editor-host",
+        "mere-surface-api",
+        "nematic",
+        "same-file",
+        "serde_json",
+        "windows-sys 0.59.0"
+      ]
+    },
+    "after": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "dependencies": [
+        "cambium",
+        "illume",
+        "inker",
+        "knot-editor-host",
+        "mere-surface-api",
+        "nematic",
+        "same-file",
+        "serde_json",
+        "windows-sys 0.59.0"
+      ]
+    }
+  },
+  {
+    "name": "knot-editor",
+    "version": "0.0.3",
+    "before": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#11b07360917241053a88cf127ab57ccdc56c6d1a",
+      "dependencies": [
+        "base64 0.22.1",
+        "blake3",
+        "chartulary",
+        "chirograph",
+        "eidetic",
+        "esp",
+        "fleece",
+        "graphshell-endpoint",
+        "inker",
+        "insigne",
+        "jotdown",
+        "knot-capture",
+        "knot-composition",
+        "knot-document",
+        "knot-file-catalog",
+        "mere-fetch",
+        "mere-overmap",
+        "mere-p2panda-net",
+        "mere-proofs",
+        "mere-transport",
+        "mere-view",
+        "mora",
+        "mora-cmudict",
+        "muniment",
+        "nematic",
+        "notify",
+        "notochord",
+        "p2panda-core",
+        "p2panda-store",
+        "pandect",
+        "personae",
+        "pollster 0.4.0",
+        "postcard",
+        "quinn",
+        "rustls",
+        "sceno",
+        "scenotime",
+        "script-rhai",
+        "serde",
+        "serde_json",
+        "servitor",
+        "sha2 0.11.0",
+        "similar",
+        "stickleback",
+        "thiserror 1.0.69",
+        "tokio",
+        "tracing",
+        "tracing-subscriber",
+        "url",
+        "uuid",
+        "windows-sys 0.59.0",
+        "zeroize"
+      ]
+    },
+    "after": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "dependencies": [
+        "base64 0.22.1",
+        "blake3",
+        "chartulary",
+        "chirograph",
+        "eidetic",
+        "esp",
+        "fleece",
+        "graphshell-endpoint",
+        "inker",
+        "insigne",
+        "jotdown",
+        "knot-capture",
+        "knot-composition",
+        "knot-document",
+        "knot-file-catalog",
+        "mere-fetch",
+        "mere-overmap",
+        "mere-p2panda-net",
+        "mere-proofs",
+        "mere-transport",
+        "mere-view",
+        "mora",
+        "mora-cmudict",
+        "muniment",
+        "nematic",
+        "notify",
+        "notochord",
+        "p2panda-core",
+        "p2panda-store",
+        "pandect",
+        "personae",
+        "pollster 0.4.0",
+        "postcard",
+        "quinn",
+        "rustls",
+        "sceno",
+        "scenotime",
+        "script-rhai",
+        "serde",
+        "serde_json",
+        "servitor",
+        "sha2 0.11.0",
+        "similar",
+        "stickleback",
+        "thiserror 1.0.69",
+        "tokio",
+        "tracing",
+        "tracing-subscriber",
+        "url",
+        "uuid",
+        "windows-sys 0.59.0",
+        "zeroize"
+      ]
+    }
+  },
+  {
+    "name": "knot-file-catalog",
+    "version": "0.0.1",
+    "before": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#11b07360917241053a88cf127ab57ccdc56c6d1a",
+      "dependencies": [
+        "muniment",
+        "pollster 0.4.0",
+        "serde",
+        "serde_json",
+        "uuid",
+        "zeroize"
+      ]
+    },
+    "after": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "dependencies": [
+        "muniment",
+        "pollster 0.4.0",
+        "serde",
+        "serde_json",
+        "uuid",
+        "zeroize"
+      ]
+    }
+  },
+  {
+    "name": "knot-site",
+    "version": "0.0.1",
+    "before": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#11b07360917241053a88cf127ab57ccdc56c6d1a",
+      "dependencies": [
+        "blake3",
+        "gemini-protocol",
+        "getrandom 0.2.17",
+        "language-tags",
+        "rcgen 0.13.2",
+        "retinue",
+        "rustls",
+        "scroll-protocol",
+        "serde",
+        "serde_json",
+        "spartan-protocol",
+        "tempfile",
+        "time",
+        "tokio",
+        "url"
+      ]
+    },
+    "after": {
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#0020a50e6ff10a9244f4965609b31f4ac79fd753",
+      "dependencies": [
+        "blake3",
+        "gemini-protocol",
+        "getrandom 0.2.17",
+        "language-tags",
+        "rcgen 0.13.2",
+        "retinue",
+        "rustls",
+        "scroll-protocol",
+        "serde",
+        "serde_json",
+        "spartan-protocol",
+        "tempfile",
+        "time",
+        "tokio",
+        "url"
+      ]
+    }
+  },
+  {
+    "name": "nu-ansi-term",
+    "version": "0.50.3",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "oxrdf",
+    "version": "0.3.4",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "oxilangtag",
+        "oxiri",
+        "oxsdatatypes",
+        "rand 0.9.5",
+        "thiserror 2.0.21"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "oxilangtag",
+        "oxiri",
+        "oxsdatatypes",
+        "rand 0.8.8",
+        "thiserror 2.0.21"
+      ]
+    }
+  },
+  {
+    "name": "pliron",
+    "version": "0.19.0",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "awint",
+        "combine",
+        "downcast-rs 2.0.2",
+        "dyn-clone",
+        "hashbrown 0.17.1",
+        "hi_sparse_bitset",
+        "indexmap",
+        "inventory",
+        "linkme",
+        "log",
+        "once_vec",
+        "pliron-derive",
+        "regex",
+        "rustc-hash 2.1.3",
+        "rustc_apfloat",
+        "slotmap",
+        "smallvec",
+        "spin 0.12.3",
+        "thiserror 2.0.21",
+        "utf8-chars"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "awint",
+        "combine",
+        "downcast-rs 2.0.2",
+        "dyn-clone",
+        "hashbrown 0.13.2",
+        "hi_sparse_bitset",
+        "indexmap",
+        "inventory",
+        "linkme",
+        "log",
+        "once_vec",
+        "pliron-derive",
+        "regex",
+        "rustc-hash 2.1.3",
+        "rustc_apfloat",
+        "slotmap",
+        "smallvec",
+        "spin 0.12.3",
+        "thiserror 2.0.21",
+        "utf8-chars"
+      ]
+    }
+  },
+  {
+    "name": "quinn-udp",
+    "version": "0.5.15",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "cfg_aliases",
+        "libc",
+        "once_cell",
+        "socket2",
+        "tracing",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "cfg_aliases",
+        "libc",
+        "once_cell",
+        "socket2",
+        "tracing",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "rustix",
+    "version": "1.1.5",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "bitflags 2.13.2",
+        "errno",
+        "libc",
+        "linux-raw-sys 0.12.1",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "bitflags 2.13.2",
+        "errno",
+        "libc",
+        "linux-raw-sys 0.12.1",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "rustls-platform-verifier",
+    "version": "0.7.0",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "core-foundation 0.10.1",
+        "core-foundation-sys",
+        "jni 0.22.4",
+        "log",
+        "once_cell",
+        "rustls",
+        "rustls-native-certs",
+        "rustls-platform-verifier-android",
+        "rustls-webpki",
+        "security-framework",
+        "security-framework-sys",
+        "webpki-root-certs",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "core-foundation 0.10.1",
+        "core-foundation-sys",
+        "jni 0.22.4",
+        "log",
+        "once_cell",
+        "rustls",
+        "rustls-native-certs",
+        "rustls-platform-verifier-android",
+        "rustls-webpki",
+        "security-framework",
+        "security-framework-sys",
+        "webpki-root-certs",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "socket2",
+    "version": "0.6.5",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "libc",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "libc",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "spareval",
+    "version": "0.2.7",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "hex",
+        "json-event-parser",
+        "md-5",
+        "oxiri",
+        "oxrdf",
+        "oxsdatatypes",
+        "rand 0.9.5",
+        "regex",
+        "rustc-hash 2.1.3",
+        "sha1 0.11.0",
+        "sha2 0.11.0",
+        "sparesults",
+        "spargebra",
+        "sparopt",
+        "thiserror 2.0.21"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "hex",
+        "json-event-parser",
+        "md-5",
+        "oxiri",
+        "oxrdf",
+        "oxsdatatypes",
+        "rand 0.8.8",
+        "regex",
+        "rustc-hash 2.1.3",
+        "sha1 0.11.0",
+        "sha2 0.11.0",
+        "sparesults",
+        "spargebra",
+        "sparopt",
+        "thiserror 2.0.21"
+      ]
+    }
+  },
+  {
+    "name": "spargebra",
+    "version": "0.4.7",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "oxilangtag",
+        "oxiri",
+        "oxrdf",
+        "peg",
+        "rand 0.9.5",
+        "thiserror 2.0.21"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "oxilangtag",
+        "oxiri",
+        "oxrdf",
+        "peg",
+        "rand 0.8.8",
+        "thiserror 2.0.21"
+      ]
+    }
+  },
+  {
+    "name": "sparopt",
+    "version": "0.3.7",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "oxrdf",
+        "rand 0.9.5",
+        "spargebra"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "oxrdf",
+        "rand 0.8.8",
+        "spargebra"
+      ]
+    }
+  },
+  {
+    "name": "stacker",
+    "version": "0.1.25",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "cc",
+        "cfg-if",
+        "libc",
+        "psm",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "cc",
+        "cfg-if",
+        "libc",
+        "psm",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "tempfile",
+    "version": "3.27.0",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "fastrand",
+        "getrandom 0.4.3",
+        "once_cell",
+        "rustix 1.1.5",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "fastrand",
+        "getrandom 0.4.3",
+        "once_cell",
+        "rustix 1.1.5",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "term",
+    "version": "1.2.1",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "uds_windows",
+    "version": "1.2.1",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "memoffset",
+        "tempfile",
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "memoffset",
+        "tempfile",
+        "windows-sys 0.60.2"
+      ]
+    }
+  },
+  {
+    "name": "winapi-util",
+    "version": "0.1.11",
+    "before": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.61.2"
+      ]
+    },
+    "after": {
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "dependencies": [
+        "windows-sys 0.48.0"
+      ]
+    }
+  }
+]

@@ -42,7 +42,9 @@ impl Graph {
             .map(ResourceEdgeKey::from_raw)
     }
 
-    /// Every resource edge, with a typed handle and stable resource endpoints.
+    /// Every retained Resource edge, with a typed handle and stable endpoints.
+    /// This raw storage iterator includes tombstone-only buckets for history;
+    /// ordinary projected reads filter to held topology.
     pub fn resource_relations(
         &self,
     ) -> impl Iterator<Item = (ResourceEdgeKey, Uuid, Uuid, &EdgePayload)> {
@@ -62,9 +64,10 @@ impl Graph {
         })
     }
 
-    /// Directed surface edges followed by edges between the resources shown.
+    /// All retained Surface edges followed by retained edges between the
+    /// resources shown, including tombstone-only assertion history.
     /// Parallel records and self-loops each appear once per directed pair.
-    pub fn projected_relations_between(
+    pub fn retained_relations_between(
         &self,
         from: NodeKey,
         to: NodeKey,
@@ -98,6 +101,17 @@ impl Graph {
         surface.chain(resource)
     }
 
+    /// Directed held Surface edges followed by held edges between the
+    /// resources shown. Use `retained_relations_between` for explicit history.
+    pub fn projected_relations_between(
+        &self,
+        from: NodeKey,
+        to: NodeKey,
+    ) -> impl Iterator<Item = (RelationKey, &EdgePayload)> {
+        self.retained_relations_between(from, to)
+            .filter(|(_, payload)| payload.has_held_topology())
+    }
+
     /// Outgoing relations lifted to every surface showing their target resource.
     pub fn projected_outgoing_relations(
         &self,
@@ -127,6 +141,7 @@ impl Graph {
             self.inner
                 .inner()
                 .edges_directed(surface, direction)
+                .filter(|edge| edge.weight().has_held_topology())
                 .map(move |edge| {
                     let neighbor = match direction {
                         Direction::Outgoing => edge.target(),
@@ -138,6 +153,7 @@ impl Graph {
         let lifted = resource_key
             .into_iter()
             .flat_map(move |resource| self.resources.inner().edges_directed(resource, direction))
+            .filter(|edge| edge.weight().has_held_topology())
             .flat_map(move |edge| {
                 let neighbor = match direction {
                     Direction::Outgoing => edge.target(),
@@ -202,6 +218,9 @@ mod tests {
             graph_scope: GraphScope::Default,
             provenance_iri: Some("https://author.test/".into()),
             asserted_at_ms: Some(17),
+            first_asserted_ms: Some(17),
+            withdrawn: None,
+            basis: Default::default(),
         });
         payload
     }

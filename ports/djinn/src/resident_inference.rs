@@ -82,10 +82,10 @@ impl ResidentInference {
     /// Uninhabited without the feature.
     pub fn register(
         &self,
-        _: &mut graphshell::native::endpoint_catalog::ResidentEndpointCatalog,
+        _: &mut graphshell_host::endpoint_catalog::ResidentEndpointCatalog,
     ) -> Result<
-        graphshell::native::endpoint_catalog::ResidentEndpointRoute,
-        graphshell::native::endpoint_catalog::ResidentEndpointCatalogError,
+        graphshell_endpoint::door::route::ResidentEndpointRoute,
+        graphshell_host::endpoint_catalog::ResidentEndpointCatalogError,
     > {
         match *self {}
     }
@@ -101,8 +101,9 @@ mod lane {
     use distillery::inference::{
         INFERENCE_ASK_NOTICE_POLL, INFERENCE_ASK_ROUTE, InferenceLane, StubInferenceProvider,
     };
-    use graphshell::native::endpoint_catalog::{
-        ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
+    use graphshell_endpoint::door::route::ResidentEndpointRoute;
+    use graphshell_host::endpoint_catalog::{
+        ResidentEndpointCatalog, ResidentEndpointCatalogError,
     };
 
     use crate::settings::{InferenceLaneSettings, InferenceModelSettings};
@@ -110,7 +111,7 @@ mod lane {
     /// The open lane.
     pub struct ResidentInference {
         lane: InferenceLane,
-        personal: Option<std::sync::Arc<graphshell::native::personal_sync_host::PersonalSyncHost>>,
+        personal: Option<std::sync::Arc<crate::sync::personal_sync_host::PersonalSyncHost>>,
         journal: Option<
             std::sync::Arc<
                 distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
@@ -179,7 +180,7 @@ mod lane {
         /// Retain the endpoint/key owner until after the private lane drains.
         pub fn retain_personal_sync(
             &mut self,
-            host: std::sync::Arc<graphshell::native::personal_sync_host::PersonalSyncHost>,
+            host: std::sync::Arc<crate::sync::personal_sync_host::PersonalSyncHost>,
         ) {
             self.personal = Some(host);
         }

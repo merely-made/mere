@@ -15,6 +15,7 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
 use uuid::Uuid;
 
 use super::*;
+use crate::tier::{DEFAULT_MAX_ARCHIVE_NODES, ON_SHELF, SHELF_NODE_KEY, more_node_key};
 
 struct Host {
     model: MereViewModel,
@@ -47,7 +48,10 @@ fn render(host: &Host) -> MereViewElement<Host, ()> {
             width: host.width,
             height: host.height,
         },
-        |host: &mut Host, event| host.view.apply(event),
+        |host: &mut Host, event| {
+            host.view
+                .apply_and_lay_out(event, &host.model, host.width, host.height)
+        },
         |host: &mut Host, request| host.requests.push(request),
     )
 }
@@ -168,6 +172,7 @@ fn model() -> MereViewModel {
             HostAction::new("open", "Open"),
         ],
         notice: None,
+        ..MereViewModel::default()
     }
 }
 
@@ -694,4 +699,1307 @@ fn the_graph_only_layouts_match_their_goldens() {
         "no goldens recorded yet: paste the lines above"
     );
     assert_eq!(taken, GOLDENS, "a graph-only layout moved from its golden");
+}
+
+#[test]
+fn the_shared_panel_hides_only_its_duplicate_graph_and_keeps_requests_out() {
+    let mut model = model();
+    model.hide_graph = true;
+    model.archive = Some(ArchiveModel {
+        entries: vec![
+            ArchiveEntry {
+                key: "one".into(),
+                name: "Morning archive".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+                session: None,
+            },
+            ArchiveEntry {
+                key: "two".into(),
+                name: "Evening archive".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+                session: None,
+            },
+        ],
+        save_sessions: vec![session_id(1)],
+        can_compose: true,
+    });
+    let before = model.clone();
+    let (dom, mut runner) = runner(Host::new(model, 280, 700));
+    let root = runner.root();
+    assert_eq!(attr(&dom.borrow(), root, "data-graph"), Some("hidden"));
+    assert!(
+        find(&dom.borrow(), root, "data-key", "a").is_none(),
+        "the host's main canvas owns node targets"
+    );
+    let save = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Save Morning reading to archive",
+    )
+    .unwrap();
+    runner.dispatch_click(save, PointerClick::at((1., 1.)));
+    let open = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Open Morning archive as session",
+    )
+    .unwrap();
+    runner.dispatch_click(open, PointerClick::at((1., 1.)));
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests.len(),
+        2,
+        "fewer than two sources cannot compose"
+    );
+    for name in ["Morning archive", "Evening archive"] {
+        let selection = find(
+            &dom.borrow(),
+            root,
+            "aria-label",
+            &format!("Select {name} for composition"),
+        )
+        .unwrap();
+        runner.dispatch_click(selection, PointerClick::at((1., 1.)));
+    }
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Archive(ArchiveRequest::Save(session_id(1))),
+            MereViewRequest::Archive(ArchiveRequest::Open("one".into())),
+            MereViewRequest::Archive(ArchiveRequest::Compose(vec!["one".into(), "two".into()]))
+        ]
+    );
+    assert_eq!(
+        runner.state().model,
+        before,
+        "controls are requests, never a store"
+    );
+    runner.update(|host| {
+        host.model.archive.as_mut().unwrap().entries.remove(0);
+        host.view.lay_out(&host.model, 280, 700);
+    });
+    assert_eq!(
+        runner.state().view.selected_archives,
+        ["two"],
+        "refresh removes vanished stable identifiers"
+    );
+}
+
+fn overmap_model() -> MereViewModel {
+    let mut model = model();
+    model.placement = SessionPlacement::Overmap;
+    model.archive = Some(ArchiveModel {
+        entries: vec![
+            ArchiveEntry {
+                key: "saved".into(),
+                name: "Codicil blake3:f612a".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+                session: Some(session_id(1)),
+            },
+            ArchiveEntry {
+                key: "composed".into(),
+                name: "Codicil blake3:0c0de".into(),
+                detail: "Read-only archive".into(),
+                can_open: true,
+                session: None,
+            },
+            ArchiveEntry {
+                key: "forgotten".into(),
+                name: "Codicil blake3:90ne0".into(),
+                detail: "Read-only archive".into(),
+                can_open: false,
+                session: Some(session_id(99)),
+            },
+        ],
+        save_sessions: vec![session_id(1), session_id(2)],
+        can_compose: true,
+    });
+    model
+}
+
+fn container_of(dom: &ScriptedDom, root: NodeId, archive: &str) -> Option<String> {
+    let mut containers = Vec::new();
+    find_all(dom, root, "data-container", &mut containers);
+    containers.into_iter().find_map(|container| {
+        find(dom, container, "data-archive", archive).map(|_| {
+            attr(dom, container, "aria-label")
+                .unwrap_or_default()
+                .to_string()
+        })
+    })
+}
+
+#[test]
+fn the_overmap_puts_sessions_in_containers_above_the_graph_with_their_archives_on_them() {
+    let model = overmap_model();
+    let before = model.clone();
+    let beside = {
+        let mut beside = model.clone();
+        beside.placement = SessionPlacement::Beside;
+        MereView {
+            model: &beside,
+            state: &MereViewState::default(),
+            leaf_key: 7,
+            width: 900,
+            height: 600,
+        }
+        .graph_size()
+    };
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        assert_eq!(attr(&dom, root, "data-sessions"), Some("overmap"));
+        let view = MereView {
+            model: &runner.state().model,
+            state: &runner.state().view,
+            leaf_key: 7,
+            width: 900,
+            height: 600,
+        };
+        let band = view.overmap_height();
+        assert!(band > 0, "the overmap takes a band");
+        assert_eq!(
+            view.graph_size(),
+            (900, 600 - 40 - band),
+            "the graph keeps the full width, below the band"
+        );
+        assert!(view.graph_size().0 > beside.0, "no column beside the graph");
+
+        // One container per session, then the shelf, then minting.
+        let mut containers = Vec::new();
+        find_all(&dom, root, "data-container", &mut containers);
+        let kinds: Vec<_> = containers
+            .iter()
+            .map(|node| attr(&dom, *node, "data-container").unwrap())
+            .collect();
+        assert_eq!(kinds, ["session", "session", "session", "shelf", "mint"]);
+        let attached = find(&dom, root, "aria-label", "Session Morning reading").unwrap();
+        assert_eq!(attr(&dom, attached, "data-attached"), Some("true"));
+        assert!(text(&dom, attached).contains("Shown here"));
+
+        // An archive sits on the session it was saved from; one no live
+        // session holds sits on the shelf.
+        assert_eq!(
+            container_of(&dom, root, "saved").as_deref(),
+            Some("Session Morning reading")
+        );
+        assert_eq!(
+            container_of(&dom, root, "composed").as_deref(),
+            Some("Archive")
+        );
+        assert_eq!(
+            container_of(&dom, root, "forgotten").as_deref(),
+            Some("Archive")
+        );
+
+        // The side column is gone; the notice sits below the band.
+        let mut lists = Vec::new();
+        find_all(&dom, root, "aria-label", &mut lists);
+        let sessions = lists
+            .into_iter()
+            .find(|node| attr(&dom, *node, "aria-label") == Some("Sessions"))
+            .unwrap();
+        assert!(
+            attr(&dom, sessions, "style")
+                .unwrap()
+                .contains("display:none"),
+            "no column of sessions beside the graph"
+        );
+    }
+
+    // The containers' controls are the panel's requests.
+    for label in [
+        "Save Morning reading to archive",
+        "Switch to Evening reading",
+        "Open Codicil blake3:f612a as session",
+    ] {
+        let control = find(&dom.borrow(), root, "aria-label", label).unwrap();
+        runner.dispatch_click(control, PointerClick::at((1., 1.)));
+    }
+    for name in ["Codicil blake3:f612a", "Codicil blake3:0c0de"] {
+        let select = find(
+            &dom.borrow(),
+            root,
+            "aria-label",
+            &format!("Select {name} for composition"),
+        )
+        .unwrap();
+        runner.dispatch_click(select, PointerClick::at((1., 1.)));
+    }
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    let mint = find(&dom.borrow(), root, "data-request", "mint").unwrap();
+    runner.dispatch_click(mint, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Archive(ArchiveRequest::Save(session_id(1))),
+            MereViewRequest::Session(session_id(2), SessionStep::Switch),
+            MereViewRequest::Archive(ArchiveRequest::Open("saved".into())),
+            MereViewRequest::Archive(ArchiveRequest::Compose(vec![
+                "saved".into(),
+                "composed".into()
+            ])),
+            MereViewRequest::Mint,
+        ]
+    );
+    assert_eq!(
+        runner.state().model,
+        before,
+        "controls are requests, never a store"
+    );
+}
+
+#[test]
+fn the_overmap_band_wraps_and_stops_at_its_share() {
+    let model = overmap_model();
+    let wide = MereView {
+        model: &model,
+        state: &MereViewState::default(),
+        leaf_key: 7,
+        width: 1400,
+        height: 900,
+    };
+    let narrow = MereView { width: 600, ..wide };
+    assert!(
+        narrow.overmap_height() > wide.overmap_height(),
+        "fewer containers to a row take more rows"
+    );
+    let short = MereView {
+        height: 200,
+        ..wide
+    };
+    assert!(
+        short.overmap_height() <= ((200 - 40) as f32 * 0.6) as u32,
+        "the band stops at its share of the body"
+    );
+    let mut without = model.clone();
+    without.sessions.clear();
+    without.archive = None;
+    without.can_mint = false;
+    assert_eq!(
+        MereView {
+            model: &without,
+            ..wide
+        }
+        .overmap_height(),
+        0,
+        "no sessions, no band"
+    );
+}
+
+fn tier_model() -> MereViewModel {
+    let mut model = overmap_model();
+    model.placement = SessionPlacement::Tier;
+    model
+}
+
+fn tier_view(host: &Host) -> MereView<'_> {
+    MereView {
+        model: &host.model,
+        state: &host.view,
+        leaf_key: 7,
+        width: host.width,
+        height: host.height,
+    }
+}
+
+fn hover(phase: cambium::HoverPhase) -> cambium::HoverEvent {
+    cambium::HoverEvent::new(phase, (2.0, 2.0), (44.0, 44.0))
+}
+
+fn escape() -> cambium::KeyEvent {
+    cambium::KeyEvent::new(cambium::Key::Named(cambium::NamedKey::Escape))
+}
+
+fn count(dom: &ScriptedDom, root: NodeId, name: &str, value: &str) -> usize {
+    let mut found = Vec::new();
+    find_all(dom, root, name, &mut found);
+    found
+        .into_iter()
+        .filter(|node| attr(dom, *node, name) == Some(value))
+        .count()
+}
+
+#[test]
+fn the_tier_puts_sessions_and_archives_on_the_canvas_one_level_up() {
+    let (dom, mut runner) = runner(Host::new(tier_model(), 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let host = runner.state();
+        let view = tier_view(host);
+        assert_eq!(attr(&dom, root, "data-sessions"), Some("tier"));
+        assert_eq!(
+            view.graph_size(),
+            (900, 600 - 40),
+            "the tier is on the graph's own canvas, which keeps the whole body"
+        );
+        assert_eq!(view.overmap_height(), 0, "no band above the canvas");
+        let tier = view.tier_height() as f32;
+        assert!(tier > 0.0);
+
+        // Sessions and archives are canvas nodes in the tier; the graph's own
+        // nodes are laid out below it.
+        let swatch = view.swatch();
+        for (node, (id, (_, y))) in swatch.graph.nodes.iter().zip(swatch.projected_positions()) {
+            let in_tier = !matches!(node.kind, MereNodeKind::Graph(_));
+            if in_tier {
+                assert!(y < tier, "{id} sits in the tier");
+            } else {
+                assert!(y > tier, "{id} sits below the tier");
+            }
+        }
+        assert_eq!(
+            swatch
+                .graph
+                .nodes
+                .iter()
+                .filter(|node| node.id.starts_with(SESSION_NODE_PREFIX))
+                .count(),
+            3
+        );
+
+        // The shown session is marked, in words and as the current node.
+        let shown = find(&dom, root, "data-key", &session_node_key(session_id(1)))
+            .expect("a session is a canvas node");
+        assert_eq!(
+            attr(&dom, shown, "aria-label"),
+            Some("Session Morning reading, shown here")
+        );
+        assert_eq!(attr(&dom, shown, "aria-current"), Some("true"));
+        assert_eq!(attr(&dom, shown, "data-attached"), Some("true"));
+        assert_eq!(attr(&dom, shown, "aria-expanded"), Some("false"));
+        let trashed = find(&dom, root, "data-key", &session_node_key(session_id(3))).unwrap();
+        assert_eq!(
+            attr(&dom, trashed, "aria-label"),
+            Some("Session Old draft, in the trash")
+        );
+
+        // An archive is a node joined to the session it was saved from; one
+        // no live session holds says it is in the archive.
+        let saved = find(&dom, root, "data-key", &archive_node_key("saved")).unwrap();
+        assert_eq!(attr(&dom, saved, "aria-haspopup"), Some("dialog"));
+        assert_eq!(attr(&dom, saved, "data-tier"), Some("archive"));
+        let route = find(&dom, root, "data-relation-id", "saved-from:saved")
+            .expect("the archive's route to its session");
+        assert_eq!(attr(&dom, route, "data-kind"), Some(SAVED_FROM));
+        let composed = find(&dom, root, "data-key", &archive_node_key("composed")).unwrap();
+        assert_eq!(
+            attr(&dom, composed, "aria-label"),
+            Some("Codicil blake3:0c0de, in the archive")
+        );
+        assert!(find(&dom, root, "data-relation-id", "saved-from:composed").is_none());
+
+        // No column, no band, no card until one is opened.
+        assert_eq!(count(&dom, root, "data-container", "session"), 0);
+        assert!(find(&dom, root, "class", "mere-view-overmap").is_none());
+    }
+
+    // New session is the tier's own control; a graph node is still the host's.
+    let mint = find(&dom.borrow(), root, "data-request", "mint").unwrap();
+    runner.dispatch_click(mint, PointerClick::at((1., 1.)));
+    let alpha = find(&dom.borrow(), root, "data-key", "a").unwrap();
+    runner.dispatch_click(alpha, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().requests,
+        [MereViewRequest::Mint, MereViewRequest::Activate("a".into())]
+    );
+}
+
+#[test]
+fn a_session_node_opens_in_place_into_its_card_one_at_a_time() {
+    let model = tier_model();
+    let before = model.clone();
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    let morning = session_node_key(session_id(1));
+    let node = find(&dom.borrow(), root, "data-key", &morning).unwrap();
+    runner.dispatch_click(node, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(1)))
+    );
+    assert!(
+        runner.state().requests.is_empty(),
+        "opening a card asks nothing of the host"
+    );
+    {
+        let dom = dom.borrow();
+        let host = runner.state();
+        let swatch = tier_view(host).swatch();
+        let card = find(&dom, root, "aria-label", "Session Morning reading").expect("the card");
+        assert_eq!(attr(&dom, card, "data-container"), Some("session"));
+        assert!(text(&dom, card).contains("Shown here"));
+        let node = find(&dom, root, "data-key", &morning).unwrap();
+        assert_eq!(attr(&dom, node, "aria-expanded"), Some("true"));
+
+        // The card is the node's footprint: it sits where the canvas says,
+        // and the archive's route ends at its border, not its centre.
+        let region = swatch
+            .projected_node_footprint(&morning)
+            .expect("footprint");
+        let style = attr(&dom, card, "style").unwrap();
+        assert!(
+            style.contains(&format!("left:{}px", region.left)),
+            "{style}"
+        );
+        assert!(style.contains(&format!("top:{}px", region.top)), "{style}");
+        let (_, route) = swatch
+            .projected_relations()
+            .into_iter()
+            .find(|(relation, _)| relation.id == "saved-from:saved")
+            .unwrap();
+        let end = *route.last().unwrap();
+        let on_edge = |value: f32, edge: f32| (value - edge).abs() < 0.5;
+        assert!(
+            on_edge(end.1, region.top)
+                || on_edge(end.1, region.top + region.height)
+                || on_edge(end.0, region.left)
+                || on_edge(end.0, region.left + region.width),
+            "the route ends at the card's border: {end:?} {region:?}"
+        );
+        let (_, saved) = swatch
+            .projected_positions()
+            .into_iter()
+            .find(|(id, _)| **id == archive_node_key("saved"))
+            .unwrap();
+        assert!(
+            saved.1 > region.top + region.height || saved.1 < region.top,
+            "the archive node moves clear of the card"
+        );
+        // The card holds the session's archives as chips.
+        assert!(find(&dom, card, "data-archive-chip", "saved").is_some());
+    }
+
+    // The card's controls are the session's requests.
+    for label in ["Save Morning reading to archive", "Fork Morning reading"] {
+        let control = find(&dom.borrow(), root, "aria-label", label).unwrap();
+        runner.dispatch_click(control, PointerClick::at((1., 1.)));
+    }
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Archive(ArchiveRequest::Save(session_id(1))),
+            MereViewRequest::Session(session_id(1), SessionStep::Fork),
+        ]
+    );
+
+    // Opening another session's node moves the one card there.
+    let evening = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &session_node_key(session_id(2)),
+    )
+    .unwrap();
+    runner.dispatch_click(evening, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(2)))
+    );
+    assert_eq!(count(&dom.borrow(), root, "data-container", "session"), 1);
+    assert!(find(&dom.borrow(), root, "aria-label", "Session Evening reading").is_some());
+
+    // Close returns focus to the session's node; so does Escape.
+    let close = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Close session Evening reading",
+    )
+    .unwrap();
+    assert_eq!(
+        runner.focus(),
+        Some(close),
+        "the card takes focus as it opens"
+    );
+    runner.dispatch_click(close, PointerClick::at((1., 1.)));
+    assert_eq!(runner.state().view.expanded, None);
+    let evening = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &session_node_key(session_id(2)),
+    )
+    .unwrap();
+    assert_eq!(runner.focus(), Some(evening));
+    runner.dispatch_click(evening, PointerClick::at((1., 1.)));
+    let close = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Close session Evening reading",
+    )
+    .unwrap();
+    runner.set_focus(Some(close));
+    runner.dispatch_key(escape());
+    assert_eq!(runner.state().view.expanded, None);
+    assert_eq!(runner.state().model, before, "a card is presentation only");
+}
+
+#[test]
+fn an_archive_node_peeks_on_hover_and_pins_a_popover_on_click() {
+    use cambium::HoverPhase;
+    let (dom, mut runner) = runner(Host::new(tier_model(), 900, 600));
+    let root = runner.root();
+    let saved_key = archive_node_key("saved");
+    let saved = find(&dom.borrow(), root, "data-key", &saved_key).unwrap();
+
+    runner.dispatch_hover(saved, hover(HoverPhase::Enter));
+    {
+        let dom = dom.borrow();
+        let peek = find(&dom, root, "role", "tooltip").expect("hover peeks");
+        assert!(text(&dom, peek).contains("Saved from Morning reading"));
+        assert!(
+            find(&dom, peek, "data-step", "open-archive").is_none(),
+            "a peek is words, not controls"
+        );
+    }
+    runner.dispatch_hover(saved, hover(HoverPhase::Leave));
+    assert!(find(&dom.borrow(), root, "role", "tooltip").is_none());
+
+    // A click pins the controls, and the first takes focus.
+    runner.dispatch_click(saved, PointerClick::at((1., 1.)));
+    let open = {
+        let dom = dom.borrow();
+        let dialog = find(&dom, root, "role", "dialog").expect("a click pins");
+        assert_eq!(
+            attr(&dom, dialog, "aria-label"),
+            Some("Codicil blake3:f612a")
+        );
+        assert!(find(&dom, dialog, "data-request", "compose-archives").is_some());
+        let saved = find(&dom, root, "data-key", &saved_key).unwrap();
+        assert_eq!(attr(&dom, saved, "aria-expanded"), Some("true"));
+        find(
+            &dom,
+            dialog,
+            "aria-label",
+            "Open Codicil blake3:f612a as session",
+        )
+        .unwrap()
+    };
+    assert_eq!(runner.focus(), Some(open));
+    // Hovering another node leaves a pinned popover where it is.
+    let composed = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &archive_node_key("composed"),
+    )
+    .unwrap();
+    runner.dispatch_hover(composed, hover(HoverPhase::Enter));
+    assert!(find(&dom.borrow(), root, "role", "dialog").is_some());
+    assert!(find(&dom.borrow(), root, "role", "tooltip").is_none());
+    runner.dispatch_hover(composed, hover(HoverPhase::Leave));
+
+    let select = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Select Codicil blake3:f612a for composition",
+    )
+    .unwrap();
+    runner.dispatch_click(select, PointerClick::at((1., 1.)));
+    // Escape dismisses and hands focus back to the archive's node.
+    runner.set_focus(Some(open));
+    runner.dispatch_key(escape());
+    assert!(find(&dom.borrow(), root, "role", "dialog").is_none());
+    let saved = find(&dom.borrow(), root, "data-key", &saved_key).unwrap();
+    assert_eq!(runner.focus(), Some(saved));
+
+    // Open as session asks for the session and closes the popover, so the
+    // next click reaches the canvas rather than the dismiss layer.
+    runner.dispatch_click(saved, PointerClick::at((1., 1.)));
+    let open = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Open Codicil blake3:f612a as session",
+    )
+    .unwrap();
+    runner.dispatch_click(open, PointerClick::at((1., 1.)));
+    assert!(find(&dom.borrow(), root, "role", "dialog").is_none());
+    assert_eq!(runner.state().view.archive_popover, None);
+
+    // A second archive's popover composes the two; an outside click closes it.
+    let composed = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &archive_node_key("composed"),
+    )
+    .unwrap();
+    runner.dispatch_click(composed, PointerClick::at((1., 1.)));
+    let select = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Select Codicil blake3:0c0de for composition",
+    )
+    .unwrap();
+    runner.dispatch_click(select, PointerClick::at((1., 1.)));
+    let compose = find(&dom.borrow(), root, "data-request", "compose-archives").unwrap();
+    runner.dispatch_click(compose, PointerClick::at((1., 1.)));
+    let outside = find(
+        &dom.borrow(),
+        root,
+        "class",
+        "overlay-surface-dismiss-layer",
+    )
+    .unwrap();
+    runner.dispatch_click(outside, PointerClick::at((1., 1.)));
+    assert!(find(&dom.borrow(), root, "role", "dialog").is_none());
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Archive(ArchiveRequest::Open("saved".into())),
+            MereViewRequest::Archive(ArchiveRequest::Compose(vec![
+                "saved".into(),
+                "composed".into()
+            ])),
+        ]
+    );
+
+    // A card's archive chip pins the same popover.
+    let morning = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &session_node_key(session_id(1)),
+    )
+    .unwrap();
+    runner.dispatch_click(morning, PointerClick::at((1., 1.)));
+    let chip = find(&dom.borrow(), root, "data-archive-chip", "saved").unwrap();
+    runner.dispatch_click(chip, PointerClick::at((1., 1.)));
+    assert!(find(&dom.borrow(), root, "role", "dialog").is_some());
+}
+
+#[test]
+fn a_card_or_popover_closes_when_its_session_or_archive_is_gone() {
+    let mut host = Host::new(tier_model(), 900, 600);
+    host.view
+        .apply(MereViewEvent::Expand(Some(TierCard::Session(session_id(
+            2,
+        )))));
+    host.view.apply(MereViewEvent::ArchivePopover(
+        "composed".into(),
+        cambium::DetailPopoverEvent::TogglePinned,
+    ));
+    assert!(host.view.archive_popover.is_some());
+    host.model
+        .sessions
+        .retain(|session| session.id != session_id(2));
+    if let Some(archive) = &mut host.model.archive {
+        archive.entries.retain(|entry| entry.key != "composed");
+    }
+    host.view.lay_out(&host.model, 900, 600);
+    assert_eq!(host.view.expanded, None);
+    assert_eq!(host.view.archive_popover, None);
+
+    // Without sessions, archives or minting there is no tier at all.
+    let mut bare = tier_model();
+    bare.sessions.clear();
+    bare.archive = None;
+    bare.can_mint = false;
+    let host = Host::new(bare, 900, 600);
+    assert_eq!(tier_view(&host).tier_height(), 0);
+    assert_eq!(tier_view(&host).graph_size(), (900, 560));
+}
+
+#[test]
+fn every_node_has_a_kind_the_host_colours_by() {
+    let host = Host::new(tier_model(), 900, 600);
+    let swatch = tier_view(&host).swatch();
+    let kind = |key: &str| {
+        swatch
+            .graph
+            .nodes
+            .iter()
+            .find(|node| node.id == key)
+            .map(|node| node.kind)
+    };
+    assert_eq!(kind("b"), Some(MereNodeKind::Graph(NodeState::Unavailable)));
+    assert_eq!(
+        kind(&session_node_key(session_id(1))),
+        Some(MereNodeKind::Session {
+            attached: true,
+            trashed: false
+        })
+    );
+    assert_eq!(
+        kind(&archive_node_key("saved")),
+        Some(MereNodeKind::Archive { held: true })
+    );
+    assert_eq!(
+        kind(&archive_node_key("composed")),
+        Some(MereNodeKind::Archive { held: false })
+    );
+    assert_eq!(kind(SHELF_NODE_KEY), Some(MereNodeKind::Shelf));
+    // A palette that knows only graph states still reads a tier node.
+    assert_eq!(
+        MereNodeKind::Session {
+            attached: true,
+            trashed: false
+        }
+        .state(),
+        NodeState::Open
+    );
+    // The palette sees each kind, and every target says its kind.
+    let seen = RefCell::new(Vec::new());
+    tier_view(&host).paint_leaf(|kind| {
+        seen.borrow_mut().push(kind.token());
+        sprigging::ColorF {
+            r: 0.,
+            g: 0.,
+            b: 0.,
+            a: 1.,
+        }
+    });
+    for token in ["graph", "session", "archive", "shelf"] {
+        assert!(seen.borrow().contains(&token), "the palette sees {token}");
+    }
+    let (dom, runner) = runner(host);
+    let dom = dom.borrow();
+    let shelf = find(&dom, runner.root(), "data-key", SHELF_NODE_KEY).unwrap();
+    assert_eq!(attr(&dom, shelf, "data-node-kind"), Some("shelf"));
+    let alpha = find(&dom, runner.root(), "data-key", "a").unwrap();
+    assert_eq!(attr(&dom, alpha, "data-node-kind"), Some("graph"));
+}
+
+#[test]
+fn loose_archives_hang_off_the_shelf_which_opens_into_its_card() {
+    let (dom, mut runner) = runner(Host::new(tier_model(), 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let shelf = find(&dom, root, "data-key", SHELF_NODE_KEY).expect("a shelf node");
+        assert_eq!(attr(&dom, shelf, "aria-label"), Some("Archive"));
+        for loose in ["composed", "forgotten"] {
+            let route = find(
+                &dom,
+                root,
+                "data-relation-id",
+                &format!("{ON_SHELF}:{loose}"),
+            )
+            .expect("a loose archive joins the shelf");
+            assert_eq!(attr(&dom, route, "data-kind"), Some(ON_SHELF));
+        }
+        assert!(find(&dom, root, "data-relation-id", "on-shelf:saved").is_none());
+        // New session and Compose are the tier's own controls.
+        let mut controls = Vec::new();
+        find_all(&dom, root, "class", &mut controls);
+        let tier_controls = controls
+            .into_iter()
+            .find(|node| attr(&dom, *node, "class") == Some("mere-view-tier-controls"))
+            .expect("the tier's controls");
+        assert!(find(&dom, tier_controls, "data-request", "mint").is_some());
+        assert!(find(&dom, tier_controls, "data-request", "compose-archives").is_some());
+    }
+    let shelf = find(&dom.borrow(), root, "data-key", SHELF_NODE_KEY).unwrap();
+    runner.dispatch_click(shelf, PointerClick::at((1., 1.)));
+    assert_eq!(runner.state().view.expanded, Some(TierCard::Shelf));
+    let dom = dom.borrow();
+    let card = find(&dom, root, "data-container", "shelf").expect("the shelf's card");
+    assert_eq!(attr(&dom, card, "aria-label"), Some("Archive"));
+    assert!(find(&dom, card, "data-request", "compose-archives").is_some());
+    assert!(find(&dom, card, "data-archive-chip", "composed").is_some());
+    assert!(find(&dom, card, "data-archive-chip", "forgotten").is_some());
+    assert!(find(&dom, card, "data-archive-chip", "saved").is_none());
+}
+
+#[test]
+fn an_open_card_grows_the_tier_and_the_graph_is_laid_out_again_below_it() {
+    let (dom, mut runner) = runner(Host::new(tier_model(), 900, 600));
+    let root = runner.root();
+    let (rest, laid_before) = {
+        let host = runner.state();
+        (tier_view(host).tier_height(), host.view.position("a"))
+    };
+    let morning = find(
+        &dom.borrow(),
+        root,
+        "data-key",
+        &session_node_key(session_id(1)),
+    )
+    .unwrap();
+    runner.dispatch_click(morning, PointerClick::at((1., 1.)));
+    let host = runner.state();
+    let view = tier_view(host);
+    let open = view.tier_height();
+    assert!(
+        open > rest,
+        "the tier grows to hold the card: {rest} to {open}"
+    );
+    assert_ne!(
+        host.view.position("a"),
+        laid_before,
+        "the graph is laid out again in the smaller area"
+    );
+    let swatch = view.swatch();
+    let card = swatch
+        .projected_node_footprint(&session_node_key(session_id(1)))
+        .unwrap();
+    assert!(
+        card.top + card.height <= open as f32,
+        "the card sits in the tier"
+    );
+    for (node, (id, (_, y))) in swatch.graph.nodes.iter().zip(swatch.projected_positions()) {
+        if matches!(node.kind, MereNodeKind::Graph(_)) {
+            assert!(y > open as f32, "{id} sits below the grown tier");
+        } else {
+            assert!(y < open as f32, "{id} sits in the grown tier");
+        }
+    }
+    // Closing it lets the tier rest again.
+    runner.update(|host| {
+        host.view.apply(MereViewEvent::Expand(None));
+        host.view.lay_out(&host.model, host.width, host.height);
+    });
+    assert_eq!(tier_view(runner.state()).tier_height(), rest);
+    assert_eq!(runner.state().view.position("a"), laid_before);
+}
+
+#[test]
+fn past_a_few_archives_a_session_shows_one_more_node_that_opens_its_card() {
+    let mut model = tier_model();
+    let archive = model.archive.as_mut().unwrap();
+    for n in 0..4 {
+        archive.entries.push(ArchiveEntry {
+            key: format!("evening-{n}"),
+            name: format!("Codicil blake3:e{n}"),
+            detail: "Read-only archive".into(),
+            can_open: true,
+            session: Some(session_id(2)),
+        });
+    }
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    let more_key = more_node_key(TierCard::Session(session_id(2)));
+    {
+        let dom = dom.borrow();
+        let more = find(&dom, root, "data-key", &more_key).expect("one +N node");
+        assert_eq!(
+            attr(&dom, more, "aria-label"),
+            Some("+4 archives of Session Evening reading")
+        );
+        assert_eq!(attr(&dom, more, "data-count"), Some("4"));
+        assert!(
+            find(&dom, root, "data-key", &archive_node_key("evening-0")).is_none(),
+            "the four collapse into it"
+        );
+        assert!(
+            find(
+                &dom,
+                root,
+                "data-relation-id",
+                "saved-from:more:00000000-0000-0000-0000-000000000002"
+            )
+            .is_some()
+        );
+        // Morning's single archive still shows as its own node.
+        assert!(find(&dom, root, "data-key", &archive_node_key("saved")).is_some());
+    }
+    assert!(DEFAULT_MAX_ARCHIVE_NODES < 4);
+    let more = find(&dom.borrow(), root, "data-key", &more_key).unwrap();
+    runner.dispatch_click(more, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(2)))
+    );
+    // A +N node only opens: a second press keeps the card open.
+    let more = find(&dom.borrow(), root, "data-key", &more_key).unwrap();
+    runner.dispatch_click(more, PointerClick::at((1., 1.)));
+    assert_eq!(
+        runner.state().view.expanded,
+        Some(TierCard::Session(session_id(2)))
+    );
+    // The card's chips stand in for the collapsed nodes: one pins its popover
+    // beside the chip, and Escape hands focus back to the chip.
+    let chip = find(&dom.borrow(), root, "data-archive-chip", "evening-2").unwrap();
+    runner.dispatch_click(chip, PointerClick::at((1., 1.)));
+    let open = {
+        let dom = dom.borrow();
+        let dialog = find(&dom, root, "role", "dialog").expect("the chip pins a popover");
+        assert_eq!(attr(&dom, dialog, "aria-label"), Some("Codicil blake3:e2"));
+        find(&dom, dialog, "data-step", "open-archive").unwrap()
+    };
+    runner.set_focus(Some(open));
+    runner.dispatch_key(escape());
+    let chip = find(&dom.borrow(), root, "data-archive-chip", "evening-2").unwrap();
+    assert_eq!(runner.focus(), Some(chip));
+}
+
+#[test]
+fn the_host_sets_how_many_archives_show_before_they_collapse() {
+    let mut model = tier_model();
+    let archive = model.archive.as_mut().unwrap();
+    for n in 0..4 {
+        archive.entries.push(ArchiveEntry {
+            key: format!("evening-{n}"),
+            name: format!("Codicil blake3:e{n}"),
+            detail: "Read-only archive".into(),
+            can_open: true,
+            session: Some(session_id(2)),
+        });
+    }
+    let nodes = |model: &MereViewModel| {
+        let host = Host::new(model.clone(), 900, 600);
+        tier_view(&host)
+            .swatch()
+            .graph
+            .nodes
+            .iter()
+            .map(|node| node.id.clone())
+            .collect::<Vec<_>>()
+    };
+    let more = more_node_key(TierCard::Session(session_id(2)));
+    assert!(
+        nodes(&model).contains(&more),
+        "four pass the default of three"
+    );
+    model.max_archive_nodes = Some(4);
+    let shown = nodes(&model);
+    assert!(!shown.contains(&more), "the host lets four show");
+    assert!(shown.contains(&archive_node_key("evening-3")));
+    model.max_archive_nodes = Some(0);
+    assert!(
+        nodes(&model).contains(&more_node_key(TierCard::Session(session_id(1)))),
+        "even one collapses at zero"
+    );
+}
+
+#[test]
+fn apply_and_lay_out_lays_the_graph_out_again_for_an_open_card() {
+    let model = tier_model();
+    let mut state = MereViewState::default();
+    state.lay_out(&model, 900, 600);
+    let before = state.position("a");
+    state.apply_and_lay_out(
+        MereViewEvent::Expand(Some(TierCard::Session(session_id(1)))),
+        &model,
+        900,
+        600,
+    );
+    assert_eq!(state.expanded, Some(TierCard::Session(session_id(1))));
+    assert_ne!(
+        state.position("a"),
+        before,
+        "laid out again below the grown tier"
+    );
+}
+
+#[test]
+fn tier_labels_show_the_name_and_keep_clear_of_the_tier_controls() {
+    let host = Host::new(tier_model(), 900, 600);
+    let swatch = tier_view(&host).swatch();
+    let visible = |key: &str| {
+        swatch
+            .visible_labels
+            .iter()
+            .find(|(id, _)| id == key)
+            .map(|(_, text)| text.as_str())
+    };
+    let morning = session_node_key(session_id(1));
+    assert_eq!(visible(&morning), Some("Morning reading"));
+    assert_eq!(
+        visible(&archive_node_key("composed")),
+        Some("Codicil blake3:0c0de")
+    );
+    assert_eq!(visible(SHELF_NODE_KEY), Some("Archive"));
+    let node = swatch
+        .graph
+        .nodes
+        .iter()
+        .find(|node| node.id == morning)
+        .unwrap();
+    assert_eq!(
+        node.label, "Session Morning reading, shown here",
+        "the accessible name keeps the words"
+    );
+    // The shelf sits in the last slot, against the tier's controls: its
+    // codicils' labels go left; the first session's stays right.
+    let placement = |key: &str| {
+        swatch
+            .label_placements
+            .iter()
+            .find(|(id, _)| id == key)
+            .map(|(_, placement)| *placement)
+    };
+    assert_eq!(
+        placement(&archive_node_key("forgotten")),
+        Some(cambium::GraphLabelPlacement::Left)
+    );
+    assert_eq!(placement(&morning), None);
+}
+
+#[test]
+fn the_sheet_pins_the_rows_a_card_and_a_popover_are_measured_by() {
+    use crate::tier::{BUTTON_HEIGHT, CARD_BORDER, CARD_HEAD, ROW_GAP};
+    use crate::view::{CONTAINER_PAD, LINE};
+    let sheet = MERE_VIEW_CSS;
+    for rule in [
+        format!(
+            ".mere-view-card {{ position: absolute; z-index: 3; border-width: {CARD_BORDER}px; padding: {CONTAINER_PAD}px;"
+        ),
+        format!(
+            ".mere-view-card-head {{ display: flex; flex-wrap: nowrap; align-items: center; gap: {ROW_GAP}px; height: {CARD_HEAD}px;"
+        ),
+        // Each pinned button's line is its height less its 1px borders, so its
+        // text sits in the middle rather than at the top.
+        format!(
+            ".mere-view-card .mere-view-session-steps > button {{ height: {BUTTON_HEIGHT}px; line-height: {}px;",
+            BUTTON_HEIGHT - 2
+        ),
+        ".mere-view-card .mere-view-card-close { height: 28px; line-height: 26px;".to_string(),
+        ".mere-view-archive-chip { height: 24px; line-height: 22px;".to_string(),
+        format!(
+            ".mere-view-card .mere-view-session-steps {{ gap: {ROW_GAP}px; padding: 0 0 {ROW_GAP}px 0;"
+        ),
+        format!(
+            ".mere-view-popover-layer .mere-view-archive-steps > button {{ height: {BUTTON_HEIGHT}px; line-height: {}px;",
+            BUTTON_HEIGHT - 2
+        ),
+    ] {
+        assert!(sheet.contains(&rule), "the sheet pins {rule}");
+    }
+    // Morning's card: border and padding, head, state, Fork and Trash then
+    // Save (two rows of controls), and its one codicil.
+    let host = Host::new(tier_model(), 900, 600);
+    let view = tier_view(&host);
+    let expected = 2 * (CARD_BORDER + CONTAINER_PAD)
+        + CARD_HEAD
+        + LINE
+        + (ROW_GAP + 2 * BUTTON_HEIGHT + ROW_GAP)
+        + 28;
+    assert_eq!(
+        crate::tier::card_height(view.model, TierCard::Session(session_id(1))),
+        expected
+    );
+}
+
+#[test]
+fn branch_sits_beside_fork_and_merge_into_source_on_a_branch() {
+    let mut model = model();
+    model.sessions[1].steps = vec![
+        SessionStep::Switch,
+        SessionStep::Fork,
+        SessionStep::Branch,
+        SessionStep::Merge,
+        SessionStep::Trash,
+    ];
+    let (dom, mut runner) = runner(Host::new(model, 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let evening = find(&dom, root, "data-session", &Uuid::from_u128(2).to_string()).expect("2");
+        let mut steps = Vec::new();
+        find_all(&dom, evening, "data-step", &mut steps);
+        let tokens: Vec<_> = steps.iter().map(|&s| attr(&dom, s, "data-step")).collect();
+        assert_eq!(
+            tokens,
+            [
+                Some("switch"),
+                Some("fork"),
+                Some("branch"),
+                Some("merge"),
+                Some("trash")
+            ]
+        );
+    }
+    for label in [
+        "Branch Evening reading",
+        "Merge into source Evening reading",
+    ] {
+        let step = find(&dom.borrow(), root, "aria-label", label).expect(label);
+        runner.dispatch_click(step, PointerClick::at((1.0, 1.0)));
+    }
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Session(session_id(2), SessionStep::Branch),
+            MereViewRequest::Session(session_id(2), SessionStep::Merge),
+        ]
+    );
+}
+
+fn merge_model() -> MereViewModel {
+    let mut model = model();
+    model.merge = Some(MergeModel {
+        source: session_id(2),
+        source_name: "Evening reading".into(),
+        target_name: "Morning reading".into(),
+        conflicts: vec![
+            MergeConflictEntry {
+                key: "title-1".into(),
+                label: "Title of One".into(),
+                base: "One".into(),
+                source: "Branch".into(),
+                target: "Target".into(),
+                add_as_new: false,
+                chosen: None,
+            },
+            MergeConflictEntry {
+                key: "node-2".into(),
+                label: "Two".into(),
+                base: "Two".into(),
+                source: "Two, edited".into(),
+                target: String::new(),
+                add_as_new: true,
+                chosen: Some(MergeOption::Target),
+            },
+        ],
+        dropped: Vec::new(),
+    });
+    model
+}
+
+#[test]
+fn a_pending_merge_lists_each_conflict_with_its_choices_then_apply() {
+    let (dom, mut runner) = runner(Host::new(merge_model(), 900, 600));
+    let root = runner.root();
+    {
+        let dom = dom.borrow();
+        let card = find(
+            &dom,
+            root,
+            "aria-label",
+            "Pending merge: Evening reading into Morning reading",
+        )
+        .expect("merge card");
+        assert_eq!(attr(&dom, card, "data-resolved"), Some("false"));
+        let title = find(&dom, card, "data-key", "title-1").expect("conflict");
+        let words = text(&dom, title);
+        for want in [
+            "Title of One",
+            "Base: One",
+            "Source: Branch",
+            "Target: Target",
+        ] {
+            assert!(words.contains(want), "{words}");
+        }
+        assert_eq!(count(&dom, title, "data-choice", "add-as-new"), 0);
+        let vanished = find(&dom, card, "data-key", "node-2").expect("conflict");
+        assert!(text(&dom, vanished).contains("Target: absent"));
+        assert_eq!(attr(&dom, vanished, "data-chosen"), Some("target"));
+        assert!(find(&dom, vanished, "aria-label", "Add Two as new").is_some());
+        let target = find(&dom, vanished, "aria-label", "Keep the target's Two").unwrap();
+        assert_eq!(attr(&dom, target, "aria-pressed"), Some("true"));
+        let apply = find(&dom, card, "aria-label", "Apply merge").expect("apply");
+        assert_eq!(attr(&dom, apply, "aria-disabled"), Some("true"));
+    }
+    let apply = find(&dom.borrow(), root, "aria-label", "Apply merge").unwrap();
+    runner.dispatch_click(apply, PointerClick::at((1.0, 1.0)));
+    assert!(runner.state().requests.is_empty(), "nothing to apply yet");
+    for label in [
+        "Take the source's Title of One",
+        "Add Two as new",
+        "Cancel merge",
+    ] {
+        let control = find(&dom.borrow(), root, "aria-label", label).expect(label);
+        runner.dispatch_click(control, PointerClick::at((1.0, 1.0)));
+    }
+    assert_eq!(
+        runner.state().requests,
+        [
+            MereViewRequest::Merge(MergeRequest::Choose("title-1".into(), MergeOption::Source)),
+            MereViewRequest::Merge(MergeRequest::Choose("node-2".into(), MergeOption::AddAsNew)),
+            MereViewRequest::Merge(MergeRequest::Cancel),
+        ]
+    );
+
+    let mut resolved = merge_model();
+    resolved.merge.as_mut().unwrap().conflicts[0].chosen = Some(MergeOption::Source);
+    let (dom, mut resolved) = self::runner(Host::new(resolved, 900, 600));
+    let root = resolved.root();
+    let apply = find(&dom.borrow(), root, "aria-label", "Apply merge").unwrap();
+    assert_eq!(attr(&dom.borrow(), apply, "aria-disabled"), None);
+    resolved.dispatch_click(apply, PointerClick::at((1.0, 1.0)));
+    assert_eq!(
+        resolved.state().requests,
+        [MereViewRequest::Merge(MergeRequest::Apply)]
+    );
+}
+
+#[test]
+fn a_hand_value_is_typed_in_place_and_reported_by_edit_by_hand() {
+    let (dom, mut runner) = runner(Host::new(merge_model(), 900, 600));
+    let root = runner.root();
+    let field = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Hand value for Title of One",
+    )
+    .expect("hand field");
+    assert_eq!(
+        attr(&dom.borrow(), field, "data-cambium-text-value"),
+        Some("Target"),
+        "the draft starts from the target's value"
+    );
+    runner.set_focus(Some(field));
+    for key in [
+        cambium::Key::Named(cambium::NamedKey::Backspace),
+        cambium::Key::Character("!".into()),
+    ] {
+        runner.dispatch_key(cambium::KeyEvent::new(key));
+    }
+    assert_eq!(runner.state().view.merge_drafts["title-1"].text(), "Targe!");
+    let hand = find(
+        &dom.borrow(),
+        root,
+        "aria-label",
+        "Use the hand value for Title of One",
+    )
+    .expect("edit by hand");
+    runner.dispatch_click(hand, PointerClick::at((1.0, 1.0)));
+    assert_eq!(
+        runner.state().requests,
+        [MereViewRequest::Merge(MergeRequest::Choose(
+            "title-1".into(),
+            MergeOption::Hand("Targe!".into())
+        ))]
+    );
+
+    // A draft goes with its merge.
+    let mut view = runner.state().view.clone();
+    let mut model = merge_model();
+    model.merge = None;
+    view.lay_out(&model, 900, 600);
+    assert!(view.merge_drafts.is_empty());
+}
+
+#[test]
+fn a_replanned_merge_names_the_choices_it_dropped() {
+    let (dom, runner) = runner(Host::new(merge_model(), 900, 600));
+    assert!(
+        find(
+            &dom.borrow(),
+            runner.root(),
+            "aria-label",
+            "Dropped choices"
+        )
+        .is_none(),
+        "nothing dropped, nothing shown"
+    );
+    let mut model = merge_model();
+    model.merge.as_mut().unwrap().dropped =
+        vec!["Title of Two: Target (no longer in conflict)".into()];
+    let (dom, runner) = self::runner(Host::new(model, 900, 600));
+    let dom = dom.borrow();
+    let dropped = find(&dom, runner.root(), "aria-label", "Dropped choices").expect("list");
+    assert_eq!(attr(&dom, dropped, "role"), Some("status"));
+    assert_eq!(
+        text(&dom, dropped),
+        "Title of Two: Target (no longer in conflict)"
+    );
 }

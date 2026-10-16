@@ -1010,3 +1010,152 @@ async fn unloaded_only_cache_controls<B: Backend + Clone>(backend: B) {
 fn unloaded_checkpoint_keeps_available_query_cache() {
     pollster::block_on(unloaded_only_cache_controls(MemoryBackend::new()));
 }
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn preparation_has_no_writes_and_observations_use_complete_records() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let (graph, surfaces, resources) = source(8);
+        let graph_id = Uuid::from_u128(1400);
+        let store = AddressableGraphStore::new(backend.clone(), graph_id);
+        let prepared = store.prepare_recorded_graph(&graph).unwrap();
+        assert!(
+            backend
+                .list(&format!("graphs/{graph_id}/resident/v1/"))
+                .await
+                .unwrap()
+                .is_empty()
+        );
+        let address = GraphAddress::Surface(surfaces[0]);
+        let expected = prepared.record_digest(address).unwrap().to_string();
+        assert_eq!(prepared.shown_resource(surfaces[0]), Some(resources[0]));
+        backend.apply(prepared.ops()).await.unwrap();
+        store
+            .set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
+            .await
+            .unwrap();
+        let view = store.open(roots(surfaces[0])).await.unwrap();
+        assert_eq!(view.record_digest(address), Some(expected.as_str()));
+        assert_eq!(view.shown_resource(surfaces[0]), Some(resources[0]));
+        assert_eq!(view.generation(), prepared.generation());
+        assert!(view.graph().node_count() < graph.node_count());
+        // A record that is not resident is still observed from the catalog.
+        let far = GraphAddress::Surface(surfaces[5]);
+        assert_eq!(view.status(far), ResidencyStatus::NotLoaded);
+        assert_eq!(view.record_digest(far), prepared.record_digest(far));
+        // An incident edge whose other endpoint is unloaded is part of the
+        // complete record, so the resident digest matches the publication's.
+        let resource = GraphAddress::Resource(resources[0]);
+        assert_eq!(view.status(resource), ResidencyStatus::Loaded);
+        assert_eq!(view.record_digest(resource), prepared.record_digest(resource));
+        assert!(view.graph().resource_nodes().count() < graph.resource_nodes().count());
+        assert_eq!(
+            view.record_digest(GraphAddress::Surface(Uuid::from_u128(9000))),
+            None
+        );
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn preparation_matches_publication_and_refuses_limited_views_before_writes() {
+    pollster::block_on(async {
+        let (graph, surfaces, _) = source(8);
+        let graph_id = Uuid::from_u128(1401);
+        let published = MemoryBackend::new();
+        let generation = AddressableGraphStore::new(published.clone(), graph_id)
+            .write_recorded_graph(&graph)
+            .await
+            .unwrap();
+        let backend = MemoryBackend::new();
+        let store = AddressableGraphStore::new(backend.clone(), graph_id);
+        let prepared = store.prepare_recorded_graph(&graph).unwrap();
+        assert_eq!(prepared.generation(), generation);
+        backend.apply(prepared.ops()).await.unwrap();
+        let mut keys = published.list("").await.unwrap();
+        keys.sort();
+        let mut prepared_keys = backend.list("").await.unwrap();
+        prepared_keys.sort();
+        assert_eq!(prepared_keys, keys);
+        for key in keys {
+            assert_eq!(backend.get(&key).await.unwrap(), published.get(&key).await.unwrap());
+        }
+        // A residency-limited view cannot be prepared as complete truth.
+        store
+            .set_policy(ResidencyPolicy::Neighborhood { hops: 0 })
+            .await
+            .unwrap();
+        let view = store.open(roots(surfaces[0])).await.unwrap();
+        let other = MemoryBackend::new();
+        let refused = AddressableGraphStore::new(other.clone(), graph_id)
+            .prepare_recorded_graph(view.graph());
+        assert!(refused.is_err());
+        assert!(other.list("").await.unwrap().is_empty());
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn surface_and_resource_with_one_uuid_keep_separate_observations() {
+    pollster::block_on(async {
+        let (mut graph, surfaces, resources) = source(2);
+        // A second Surface takes the first Resource's UUID.
+        apply::add_node(
+            &mut graph,
+            Some(resources[0]),
+            "https://residency.test/collide".into(),
+            Default::default(),
+        );
+        let store = AddressableGraphStore::new(MemoryBackend::new(), Uuid::from_u128(1402));
+        let prepared = store.prepare_recorded_graph(&graph).unwrap();
+        let surface = GraphAddress::Surface(resources[0]);
+        let resource = GraphAddress::Resource(resources[0]);
+        let (a, b) = (
+            prepared.record_digest(surface).unwrap(),
+            prepared.record_digest(resource).unwrap(),
+        );
+        assert_ne!(a, b);
+        assert_ne!(prepared.shown_resource(resources[0]), Some(resources[0]));
+        assert_ne!(prepared.shown_resource(surfaces[0]), None);
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn transient_focus_is_kept_with_its_shown_binding_but_does_not_walk() {
+    pollster::block_on(async {
+        let (graph, surfaces, resources) = source(8);
+        let store = AddressableGraphStore::new(MemoryBackend::new(), Uuid::from_u128(1403));
+        store.write_recorded_graph(&graph).await.unwrap();
+        store
+            .set_policy(ResidencyPolicy::Neighborhood { hops: 1 })
+            .await
+            .unwrap();
+        // Rooted only by a pane's transient focus: the Surface and its shown
+        // Resource are resident, and no neighbor is walked in.
+        let focus = GraphAddress::Surface(surfaces[4]);
+        let mut view = store
+            .open(ResidencyRoots {
+                transient: [focus].into(),
+                ..Default::default()
+            })
+            .await
+            .unwrap();
+        assert_eq!(view.status(focus), ResidencyStatus::Loaded);
+        assert_eq!(
+            view.status(GraphAddress::Resource(resources[4])),
+            ResidencyStatus::Loaded
+        );
+        for neighbor in [3, 5] {
+            assert_eq!(
+                view.status(GraphAddress::Surface(surfaces[neighbor])),
+                ResidencyStatus::NotLoaded,
+                "focus is not a projection root"
+            );
+        }
+        // Releasing the focus (no roots) drops it again; nothing was pinned.
+        view.reconcile(ResidencyRoots::default()).await.unwrap();
+        assert_eq!(view.status(focus), ResidencyStatus::NotLoaded);
+    });
+}

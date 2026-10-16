@@ -1,0 +1,112 @@
+{
+  "runs": [
+    {
+      "label": "baseline-viewer-wasm-1",
+      "command": [
+        "cargo",
+        "+1.99.0",
+        "build",
+        "--offline",
+        "--locked",
+        "--profile",
+        "viewer",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "-j1"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 4303941632,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-84c541abdfb040cb9960fca029f4ee34.service",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "8a3f61ea2fa2f0ac2c82b892da6f02cc8e654d6d6a16407399f0de7b1fe69565",
+      "summaries": []
+    },
+    {
+      "label": "baseline-viewer-bindgen-1",
+      "command": [
+        "/home/markik/Code/testing/mere/graphshell-three-lanes/tools/wasm-bindgen-0.2.129/wasm-bindgen",
+        "/home/markik/Code/worktrees/mere-webgl-presentation/target/wasm32-unknown-unknown/viewer/graphshell_web.wasm",
+        "--target",
+        "web",
+        "--remove-name-section",
+        "--out-dir",
+        "/home/markik/Code/worktrees/mere-webgl-presentation/.superpowers/sdd/2026-10-13_browser_presentation_tenants_plan/baseline-source/ports/graphshell/web/pkg",
+        "--out-name",
+        "graphshell_web"
+      ],
+      "exit": 0,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 664285184,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-b27f1ad014c54f00b93db23b71f71978.service",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summaries": []
+    },
+    {
+      "label": "baseline-viewer-browser-1",
+      "command": [
+        "python3",
+        "tests/run-headed-receipt.py",
+        "--web",
+        ".",
+        "--out",
+        "/home/markik/Code/testing/genet/webgl-viewer-20261013/baseline-viewer-browser-1",
+        "--scenario",
+        "viewer_commands",
+        "--page",
+        "tree.html",
+        "--query",
+        "nodes=21&seed=7&links=none&physics_speed=1&gpu=off",
+        "--unsafe-webgpu",
+        "--chrome-arg=--headless=new",
+        "--chrome-arg=--enable-features=Vulkan,VulkanFromANGLE",
+        "--chrome-arg=--use-angle=vulkan",
+        "--port",
+        "8970",
+        "--timeout",
+        "180",
+        "--node",
+        "/home/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+      ],
+      "exit": 1,
+      "source_unchanged": true,
+      "resource_status": "complete",
+      "kernel_memory_peak_bytes": 74067968,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "0",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0",
+        "sock_throttled": "0"
+      },
+      "unit": "turnstone-overlap-3ec0e5a29ab04f669eca4cc2b7ee623a.service",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e1d76fe7008be66df6531054fa83c284c2c2fac81734450bec914966f77a93e2",
+      "summaries": []
+    }
+  ]
+}

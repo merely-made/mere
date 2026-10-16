@@ -46,6 +46,7 @@
 
 mod authority;
 mod chronicle;
+pub mod chronicle_recipe;
 pub mod gpu;
 
 #[cfg(feature = "flora")]

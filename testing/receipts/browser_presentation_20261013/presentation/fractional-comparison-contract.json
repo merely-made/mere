@@ -1,0 +1,8 @@
+{
+  "display_scale": 1.25,
+  "same_reduced_motion_state": true,
+  "rgb_rms_max": 1.0,
+  "max_rgb_delta": 128,
+  "max_alpha_delta": 0,
+  "reason": "vector composition versus intermediate-texture resampling may differ at partially covered edges; full-frame RMS and alpha bound remain strict"
+}

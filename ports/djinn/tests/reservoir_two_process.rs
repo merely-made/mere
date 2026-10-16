@@ -22,9 +22,9 @@ use chirograph::{IntentInvocation, IntentResult, ProjectionSession};
 use djinn::resident_reservoir::{
     EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
 };
-use graphshell::lifecycle::AdmittedEndpointContext;
-use graphshell::native::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+use graphshell_host::lifecycle::AdmittedEndpointContext;
 use personae::PersonaId;
 use sceno::InstanceId;
 use uuid::Uuid;

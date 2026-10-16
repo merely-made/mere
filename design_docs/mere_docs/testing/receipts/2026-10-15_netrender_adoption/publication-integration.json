@@ -1,0 +1,11 @@
+{
+  "qualified_implementation": "16104bbd",
+  "qualified_receipt_commit_before_rebase": "cb8624e1",
+  "publication_upstream": "d4d2f88c",
+  "upstream_changes": "Documentation only; adoption and upstream index entries both preserved.",
+  "changed_paths_after_rebase": [
+    "design_docs/DOC_README.md",
+    "design_docs/mere_docs/technical_architecture/2026-10-15_link_model.md"
+  ],
+  "production_source_manifests_configs_locks_unchanged": true
+}

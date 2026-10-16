@@ -29,13 +29,12 @@ use chirograph::{
     ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion, ResourceRequest,
     ResourceResponse, SemanticRole,
 };
-use graphshell::identity::{VaultLockView, VaultProtectionView};
-use graphshell::native::app_admission::{AppId, AppRouteGrants};
-use graphshell::native::app_client::{AppBrokerClient, AppClientError};
-use graphshell::native::endpoint_catalog::{
-    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
-};
+use graphshell_endpoint::door::app_admission::{AppId, AppRouteGrants};
+use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
+use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
+use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use sceno::{
     Arrangement, Footprint, InstanceId, ProjectedItem, Representation, Scene, Score, Size2,
     SourceRef, Transform2,
@@ -571,7 +570,13 @@ pub async fn request_unlock(
 
 /// Ask the resident to show its own unlock prompt: nothing crosses the pipe.
 pub async fn request_native_unlock(client: &mut AppBrokerClient) -> Result<(), AppClientError> {
-    control_intent(client, UNLOCK_NATIVE_INTENT, Vec::new(), "the native unlock").await
+    control_intent(
+        client,
+        UNLOCK_NATIVE_INTENT,
+        Vec::new(),
+        "the native unlock",
+    )
+    .await
 }
 
 async fn control_intent(
@@ -673,7 +678,9 @@ mod tests {
             "{refused:?}"
         );
         assert_eq!(prompts.load(Ordering::SeqCst), 0, "no prompt ran");
-        let accepted = control.invoke(invocation(UNLOCK_NATIVE_INTENT, b"")).unwrap();
+        let accepted = control
+            .invoke(invocation(UNLOCK_NATIVE_INTENT, b""))
+            .unwrap();
         assert_eq!(accepted, IntentResult::Accepted);
         assert_eq!(prompts.load(Ordering::SeqCst), 1);
     }

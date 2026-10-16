@@ -115,8 +115,35 @@ where
         }
     });
     let trigger = request_focus(trigger, state.return_focus);
+    let panel = detail_popover_panel(state, surface, preview, content, on_change);
 
-    let panel: Option<Box<dyn AnyView<State, Action, GenetCtx, GenetElement>>> = match state.mode {
+    Box::new(el::<_, State, Action>("div", (trigger, panel)).attr("class", "detail-popover-root"))
+}
+
+/// The panel half of a [`detail_popover`], for a trigger the caller already
+/// renders: a graph-canvas node, a chip or a row whose own target reports
+/// [`DetailPopoverEvent::Hover`] and [`DetailPopoverEvent::TogglePinned`].
+///
+/// `surface.trigger` is that target's box in the positioned root's space.
+/// Peek shows `preview` as a tooltip; Pinned shows `content` as a dialog that
+/// Escape and an outside click dismiss. Hidden renders nothing. Returning
+/// focus to the trigger after a dismissal is the caller's, through
+/// [`DetailPopoverState::return_focus`] and its own [`request_focus`].
+pub fn detail_popover_panel<State, Action, Preview, Content, Change>(
+    state: DetailPopoverState,
+    surface: &OverlaySurface,
+    preview: Preview,
+    content: Content,
+    on_change: Change,
+) -> Option<Box<dyn AnyView<State, Action, GenetCtx, GenetElement>>>
+where
+    State: 'static,
+    Action: 'static,
+    Preview: ViewSequence<State, Action, GenetCtx, GenetElement>,
+    Content: ViewSequence<State, Action, GenetCtx, GenetElement>,
+    Change: Fn(&mut State, DetailPopoverEvent) + Clone + 'static,
+{
+    match state.mode {
         DetailPopoverMode::Hidden => None,
         DetailPopoverMode::Peek => {
             let preview_surface = surface
@@ -136,18 +163,15 @@ where
                 .with_role(OverlayRole::Dialog)
                 .dismiss_on_outside_click(true)
                 .dismiss_on_escape(true);
-            let change = on_change.clone();
             Some(Box::new(overlay_surface(
                 &pinned_surface,
                 el::<_, State, Action>("div", content).attr("class", "detail-popover-content"),
                 move |app_state: &mut State, reason| {
-                    change(app_state, DetailPopoverEvent::Dismiss(reason));
+                    on_change(app_state, DetailPopoverEvent::Dismiss(reason));
                 },
             )))
         },
-    };
-
-    Box::new(el::<_, State, Action>("div", (trigger, panel)).attr("class", "detail-popover-root"))
+    }
 }
 
 #[cfg(test)]

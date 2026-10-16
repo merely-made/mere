@@ -11,12 +11,14 @@ pub mod core;
 pub mod driver;
 pub mod fold;
 pub mod frozen;
+#[cfg(feature = "pump")]
+pub mod pump;
 pub mod remote;
 pub mod session;
 
 pub use action_draft::{ActionDraft, ActionDraftSemantics, ActionDraftTarget};
 pub use core::{Outcome, Progress, RESUME_ATTEMPTS, SessionCore};
-pub use driver::{Advance, SessionDriver};
+pub use driver::{Advance, LineDriven, SessionDriver};
 pub use fold::{FoldReading, read_folds};
 pub use remote::{ActionForm, RemoteOp, RemoteSession};
 pub use session::{

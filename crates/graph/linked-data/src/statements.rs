@@ -168,6 +168,7 @@ pub fn apply_link_statements(
                 predicate: predicate.into(),
                 recognized_sub_kind: Some(sub_kind),
                 label: None,
+                basis: Default::default(),
                 graph_scope: kernel::types::GraphScope::Source,
                 provenance_iri: Some(asserter.clone()),
                 asserted_at_ms: None,

@@ -77,8 +77,8 @@ fn distribute(
 
     let at_angle = |angle: f32| {
         Vec2::new(
-            config.center.x + radius * angle.cos(),
-            config.center.y + radius * angle.sin(),
+            config.center.x + radius * crate::math::cos(angle),
+            config.center.y + radius * crate::math::sin(angle),
         )
     };
 
