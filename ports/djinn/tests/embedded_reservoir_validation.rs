@@ -596,6 +596,7 @@ mod published_replay_regression {
     fn product_fixture(
         typed_decks: bool,
         ambient: bool,
+        shuffled: bool,
     ) -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
         let captured = Arc::new(Mutex::new(Vec::new()));
         let observed = captured.clone();
@@ -665,7 +666,25 @@ mod published_replay_regression {
                 view.reduced_motion = true;
                 host.insert_ambient_view(&view).unwrap();
             }
-            (host.graph().clone(), detail.readings[0].clone())
+            let reading = if shuffled {
+                let context = host.context_for_digest(&context).unwrap();
+                let field = host.field_for_digest(&field).unwrap();
+                host.record_three_card_spread_derived_at_with_entropy(
+                    &context,
+                    &field,
+                    "C5 owner public seed",
+                    "cleromancy.owner/shuffle",
+                    6000,
+                    None,
+                    &mut PublicEntropy(0xc5),
+                )
+                .unwrap()
+                .2[0]
+                    .clone()
+            } else {
+                detail.readings[0].clone()
+            };
+            (host.graph().clone(), reading)
         });
         drop(clear);
         let edits = std::mem::take(&mut *captured.lock().unwrap());
@@ -718,6 +737,49 @@ mod published_replay_regression {
         envelope
     }
 
+    // Fixture seeding may contain several complete decks. Each bounded
+    // transaction remains a fully valid candidate; no frame cap or refusal
+    // guard is widened to fit a combined acceptance setup packet.
+    async fn apply_bounded_fixture(client: &mut AppBrokerClient, edits: &[CapturedDelta]) {
+        let mut accepted: Vec<CapturedDelta> = Vec::new();
+        let mut offset = 0;
+        while offset < edits.len() {
+            let current = snapshots(client).await;
+            let mut choice = None;
+            for end in (offset + 1..=edits.len()).rev() {
+                let batch = edits[offset..end].to_vec();
+                let payload =
+                    serde_json::to_vec(&ApplyEditsV1::checked(current[1].scene.revision, batch))
+                        .unwrap();
+                if serde_json::to_vec(&payload).unwrap().len() > 900_000 {
+                    continue;
+                }
+                let candidate = kernel::graph::replay_captured_deltas(
+                    accepted
+                        .iter()
+                        .cloned()
+                        .chain(edits[offset..end].iter().cloned()),
+                );
+                if cleromancy_domain::host::validate_divination_graph(&candidate).is_ok() {
+                    choice = Some(end);
+                    break;
+                }
+            }
+            let end =
+                choice.expect("fixture must have a replay-valid prefix below the carrier limit");
+            assert_eq!(
+                apply_checked(client, &current[1], edits[offset..end].to_vec()).await,
+                IntentResult::Accepted
+            );
+            println!(
+                "BOUNDED PRODUCT FIXTURE deltas={} replay-valid-candidate=true",
+                end - offset
+            );
+            accepted.extend_from_slice(&edits[offset..end]);
+            offset = end;
+        }
+    }
+
     async fn apply_checked(
         client: &mut AppBrokerClient,
         snapshot: &ProjectionSnapshot,
@@ -766,20 +828,25 @@ mod published_replay_regression {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn published_reading_replay_and_same_schema_tamper_survive_three_real_owners() {
-        owner_replay(false, false).await;
+        owner_replay(false, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn typed_decks_and_reading_survive_three_owners_and_refuse_metadata_tamper() {
-        owner_replay(true, false).await;
+        owner_replay(true, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn ambient_view_and_kept_memory_survive_three_owners_and_refuse_source_tamper() {
-        owner_replay(true, true).await;
+        owner_replay(true, true, false).await;
     }
 
-    async fn owner_replay(typed_decks: bool, ambient: bool) {
+    #[tokio::test(flavor = "multi_thread")]
+    async fn shuffled_deck_survives_three_owners_and_refuses_orientation_tamper() {
+        owner_replay(true, false, true).await;
+    }
+
+    async fn owner_replay(typed_decks: bool, ambient: bool, shuffled: bool) {
         let root = tempfile::tempdir().unwrap();
         let unusable = root.path().join("no-attached-client-store");
         std::fs::write(
@@ -787,7 +854,7 @@ mod published_replay_regression {
             b"the live client cannot open local custody or storage",
         )
         .unwrap();
-        let (edits, expected_facets, reading) = product_fixture(typed_decks, ambient);
+        let (edits, expected_facets, reading) = product_fixture(typed_decks, ambient, shuffled);
         let reading_url = format!("cleromancy://reading/{}", reading.id);
         let reading_id = kernel::graph::Graph::node_namespace_id(&reading_url);
         let mut retained_session = None;
@@ -829,11 +896,15 @@ mod published_replay_regression {
                     0,
                     "the owner has no fixture-seeded graph"
                 );
-                assert_eq!(
-                    apply_checked(attached.client_mut(), &initial[1], edits.clone()).await,
-                    IntentResult::Accepted,
-                    "real published replay authority accepts the complete product batch"
-                );
+                if shuffled {
+                    apply_bounded_fixture(attached.client_mut(), &edits).await;
+                } else {
+                    assert_eq!(
+                        apply_checked(attached.client_mut(), &initial[1], edits.clone()).await,
+                        IntentResult::Accepted,
+                        "real published replay authority accepts the complete product batch"
+                    );
+                }
             }
             let before = snapshots(attached.client_mut()).await;
             let envelope = disclosed(attached.client_mut(), &before[1]).await;
@@ -973,6 +1044,55 @@ mod published_replay_regression {
                     "AMBIENT REPLAY mode={mode} phase={phase} focus-roles-foreground-and-spec-retained=true saved-memory=true source-tamper-refused=true durable-bytes-unchanged=true"
                 );
             }
+            if shuffled {
+                let draw = reading.receipt.shuffle.as_ref().unwrap();
+                assert_eq!(draw.count, 3);
+                let plan = draw
+                    .shuffle
+                    .replay(
+                        &cleromancy_domain::CleromancyHost::candidate(graph.clone())
+                            .unwrap()
+                            .context_for_digest(&reading.receipt.context_digest)
+                            .unwrap(),
+                        &cleromancy_domain::CleromancyHost::candidate(graph.clone())
+                            .unwrap()
+                            .field_for_digest(&reading.receipt.field_digest)
+                            .unwrap(),
+                    )
+                    .unwrap();
+                assert_eq!(plan.len(), 78);
+                let mut forged = stored.clone();
+                forged["receipt"]["shuffle"]["orientation"] = serde_json::json!(if reading
+                    .orientation()
+                    == cleromancy_domain::Orientation::Reversed
+                {
+                    "upright"
+                } else {
+                    "reversed"
+                });
+                let result = apply_checked(
+                    attached.client_mut(),
+                    &before[1],
+                    vec![
+                        node(0xc500 + phase as u128),
+                        CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: reading_id.to_string(),
+                            facet: cleromancy_domain::host::READING_FACET.into(),
+                            value_json: forged.to_string(),
+                        },
+                    ],
+                )
+                .await;
+                assert!(matches!(result, IntentResult::Rejected { .. }));
+                assert_eq!(
+                    serde_json::to_value(snapshots(attached.client_mut()).await).unwrap(),
+                    serde_json::to_value(&before).unwrap()
+                );
+                assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                println!(
+                    "SHUFFLED DECK REPLAY mode={mode} phase={phase} full-deck=78 prefix=3 orientation-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
             if let Some(id) = retained_session {
                 assert_eq!(session, id, "the same owner-held session reopens");
                 assert_eq!(retained_graph.as_ref().unwrap(), &graph_state);
@@ -998,8 +1118,13 @@ mod published_replay_regression {
                 assert_eq!(typed.schema, reading.schema);
                 assert_eq!(typed.receipt.schema, reading.receipt.schema);
                 assert_eq!(typed.id, reading.id);
-                assert!(typed.schema.ends_with("/v1"));
-                assert!(typed.receipt.schema.ends_with("/v1"));
+                assert!(typed.schema.ends_with(if shuffled { "/v3" } else { "/v1" }));
+                assert!(
+                    typed
+                        .receipt
+                        .schema
+                        .ends_with(if shuffled { "/v5" } else { "/v1" })
+                );
                 let result = apply_checked(
                     attached.client_mut(),
                     &before[1],
