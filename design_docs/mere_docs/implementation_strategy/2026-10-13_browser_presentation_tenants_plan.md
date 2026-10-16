@@ -4,7 +4,7 @@
 
 **Status:** coordinated adoption qualified, 2026-10-15, including merged upstream version/supplier updates. All four temporary Netrender bridge tables are retired. Earlier gate tuples remain explicit below.
 
-**Continuation status (2026-10-16):** native shadow-mask/producer namespace correction landed and source-tested; Woodshed P4f receiving native and fresh-process qualification remains open.
+**Continuation status (2026-10-16):** native shadow-mask/producer namespace correction and bounded Woodshed P4f receiving native/fresh-process qualification complete. Portable composition shadow-mask support retains its separate admission scope.
 
 **Goal:** Run Graphshell's viewer through the shared Cambium host on direct WebGL2 when WebGPU is unavailable, including content updates, resize, recovery, capture, input and accessibility.
 
@@ -456,3 +456,19 @@ Viewer size levers remain options. Forms C and three-lanes are outside scope.
   records commands, source/lock hashes and the separate receiving gate.
   The documentation audit adds no finding in this continuation; existing
   unrelated whole-tree findings remain. Woodshed native/reopen is pending.
+- 2026-10-16: Woodshed receiving qualification passes on Mere `6575075057e`,
+  consumer Rust source `d2adb09ac3b` and scenario-only successor `7500d1b`.
+  Its preserved Netrender `8960024f7b` supplier independently exercises the fix
+  beyond Mere's supplier-test graph. The guarded seed presents 342 frames,
+  a fresh-process reopen 110 and the default/narrow layout phase 112.
+  Fourteen captures were independently reviewed, including the final-binary
+  save-refusal close panel. Both Stage and Rehearsal show the retained four-note
+  realization; exact owner/Card IDs, instructions, realization float bits,
+  cursor, projection, workspace and personal journal survive reopening.
+  Directed and selected-Card auditions each reach the same output runtime
+  without changing those durable facts. Receiving checks pass 789 tests plus
+  five separate fresh-process child checks, with seven existing host ignores.
+  [Receiving closure](../../../support/receipts/producer-shadow-20261016/woodshed-receiving.json)
+  binds the source, binary, supplier graph and owning consumer receipt.
+  Failed/mixed earlier trials are excluded. Physical audio, other platforms
+  and portable shadow-mask composition retain their separate qualification.
