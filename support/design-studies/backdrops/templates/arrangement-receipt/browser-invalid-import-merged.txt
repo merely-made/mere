@@ -1,0 +1,239 @@
+Browser tab: 11, Title: "Graphshell, one tree", URL: "http://127.0.0.1:8793/tree.html?app=local&receipt=linked-arrangements".
+1 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8793/tree.html?app=local&receipt=linked-arrangements
+	2 container Graphshell, one tree
+		3 container
+			4 text mereGraphshellLocal mere / retained material
+			5 container
+				6 text mere mere
+			7 container
+				8 text GraphshellLocal mere / retained material GraphshellLocal mere / retained material
+				9 heading Graphshell, Value: 1
+					10 text Graphshell
+				11 text Local mere / retained material
+			12 text saved graph · 11 nodes · selected: 0 · primary: none
+			13 container Graph controls
+				14 button Pan left
+				15 button Pan right
+				16 button Pan up
+				17 button Pan down
+				18 button Zoom in
+				19 button Zoom out
+				20 button Fit graph
+				21 button (disabled) Fit selection
+				22 button Restore arrangement
+				23 button Reset
+				24 button Set seed
+				25 button (disabled) Foreground pin
+				26 button Dismiss retained
+				27 button (disabled) Grow tile
+				28 button (disabled) Shrink tile
+				29 button Territory
+				30 button Play physics
+				31 pop up button (collapsed) Graph commands, Secondary Actions: Expand
+				32 button (disabled) Hide selected link
+				33 button (disabled) Show hidden links
+				34 text No saved whole-link hides
+				35 button (expanded) Graph tools, Secondary Actions: Collapse
+			36 text Open selected in workbenchShow workbench
+			37 button Open selected in workbench
+			38 button Show workbench
+			39 text Saved graph
+			40 button Undo session
+			41 button Redo session
+			42 container
+				43 text Add an object
+				44 button (collapsed) Add an object, Secondary Actions: Expand
+			45 button (disabled) Inspect selected access
+			46 button Inspect fields
+			47 button Open details
+			48 text Dataspace11 items / Graph presentationPortable scene workspaceGraph tools
+			49 container
+				50 text Dataspace11 items / Graph presentationPortable scene workspace Dataspace11 items / Graph presentation
+				51 container
+					52 text Dataspace11 items / Graph presentation
+					53 heading Dataspace, Value: 2
+						54 text Dataspace
+					55 text 11 items / Graph presentation
+				221 text Portable scene workspace
+				222 container
+					223 text Graphshell / portable sceneMetre gridProgression in CProgression in GRegular arrangementVaried arrangementFretboardTerrain and coverageLinksImport scene recipeExport scene recipe Graphshell / portable scene
+					224 checkbox Metre grid, Value: 0
+					225 checkbox Progression in C, Value: 0
+					226 checkbox Progression in G, Value: 0
+					227 checkbox Regular arrangement, Value: 0
+					228 checkbox Varied arrangement, Value: 1
+					229 checkbox Fretboard, Value: 0
+					230 checkbox Terrain and coverage, Value: 0
+					231 checkbox Links, Value: 1
+					232 button Import scene recipe
+					233 button Export scene recipe
+				234 text version: unsupported backdrop scene version
+				235 heading Varied arrangement · ii-V-I (Jazz) in C, Value: 2
+					236 text Varied arrangement · ii-V-I (Jazz) in C
+				237 container
+					238 text Portable scene stageSelected voicing · Cmaj7 (IM7)Cmaj7 (IM7) · supplied voicing 2 · capo 0 · x-3-x-0-0-0Related scene stageSupplied marks: C · G · B · E · revision 9093185d99269aa97315e642f17fce97f5e0fb1ff3c37b078bef18e91efd0346Scene selection and occurrences Portable scene stageSelected voicing · Cmaj7 (IM7)Cmaj7 (IM7) · supplied voicing 2 · capo 0 · x-3-x-0-0-0Related scene stageSupplied marks: C · G · B · E · revision 9093185d99269aa97315e642f17fce97f5e0fb1ff3c37b078bef18e91efd0346
+					239 container
+						240 text Portable scene stage Portable scene stage
+					241 heading Selected voicing · Cmaj7 (IM7), Value: 3
+						242 text Selected voicing · Cmaj7 (IM7)
+					243 text Cmaj7 (IM7) · supplied voicing 2 · capo 0 · x-3-x-0-0-0
+					244 container
+						245 text Related scene stage Related scene stage
+					246 text Supplied marks: C · G · B · E · revision 9093185d99269aa97315e642f17fce97f5e0fb1ff3c37b078bef18e91efd0346
+					247 text Scene selection and occurrences
+					248 heading Selection, Value: 3
+						249 text Selection
+					250 text Cmaj7 (IM7)
+					251 text ii-V-I-study#card=4 · persistent Set occurrence · supplied alignment · start 48 / span 16 ticks · quarter-note beat (4 ticks); supplied spans, no playback clock
+					252 text Source: woodshed.chord / 0:Major 7:capo-0 · 9d21da61694caf1fdfee21a2ee0f0d0a97345db0a8bcaad84d4132a55f2aa3ea
+					253 button Related occurrence role-2
+					254 text Source-declared alignment to expectation; no conformity judgment inferred
+					255 button Related occurrence card-3
+					256 text Persistent Set order; spatial alignment and chord identity remain independent
+					257 text forward 1 · retained 0
+					258 button Clear selection
+					259 button Dismiss retained
+					260 heading Occurrences, Value: 3
+						261 text Occurrences
+					262 checkbox Scene occurrence role-0: iim7, Value: 0
+					263 checkbox Scene occurrence role-1: V7, Value: 0
+					264 checkbox Scene occurrence role-2: IM7, Value: 0
+					265 checkbox Scene occurrence card-1: Dm7 (iim7), Value: 0
+					266 checkbox Scene occurrence card-2: G7 (V7), Value: 0
+					267 checkbox Scene occurrence card-3: Cmaj7 (IM7), Value: 0
+					268 checkbox Scene occurrence card-4: Cmaj7 (IM7), Value: 1
+					269 checkbox Scene occurrence rest-breath: Rest, Value: 0
+				270 text Source revision: 9d21da61694caf1fdfee21a2ee0f0d0a97345db0a8bcaad84d4132a55f2aa3ea · supplied facts; selection does not edit the source
+			90 container
+				91 text Graph tools Graph tools
+				92 container
+					93 text Application appearance
+					94 button (collapsed) Appearance, Secondary Actions: Expand
+					95 text Appearance status
+				96 container
+					97 text InspectorSelection, scene and presentation InspectorSelection, scene and presentation
+					98 heading Inspector, Value: 2
+						99 text Inspector
+					100 text Selection, scene and presentation
+				101 text Storage: IndexedDB reopened · not persistent, may be evicted
+				102 container
+					103 text Arrangement and physics Arrangement and physicsArrangement and physics
+					104 button (expanded) Arrangement and physics, Secondary Actions: Collapse
+					105 container
+						106 text Arrangement and physics ArrangementArrangement
+						107 text Arrangement
+						108 combo box (collapsed) Description: Arrangement, Value: Spiral, Secondary Actions: Expand
+							109 text Spiral
+						110 button Apply arrangement
+						111 text RoleRole
+						112 text Role
+						113 combo box (collapsed) Description: Role, Value: Seeded, Secondary Actions: Expand
+							114 text Seeded
+						115 button Apply role
+						116 text Physics lawPhysics law
+						117 text Physics law
+						118 combo box (collapsed) Description: Physics law, Value: Springs, Secondary Actions: Expand
+							119 text Springs
+						120 container Overlays
+							121 container
+								122 text Hub roomHub room
+								123 checkbox Hub room, Value: 0
+								124 text Hub room
+							125 container
+								126 text Group pullGroup pull
+								127 checkbox Group pull, Value: 0
+								128 text Group pull
+							129 container
+								130 text Hub pullHub pull
+								131 checkbox Hub pull, Value: 0
+								132 text Hub pull
+							133 container
+								134 text DepthDepth
+								135 checkbox Depth, Value: 0
+								136 text Depth
+							137 container
+								138 text GridGrid
+								139 checkbox Grid, Value: 0
+								140 text Grid
+							141 container
+								142 text CentreCentre
+								143 checkbox Centre, Value: 0
+								144 text Centre
+							145 container
+								146 text TideTide
+								147 checkbox Tide, Value: 0
+								148 text Tide
+							149 container
+								150 text SkeletonSkeleton
+								151 checkbox Skeleton, Value: 0
+								152 text Skeleton
+						153 text KindsKinds
+						154 text Kinds
+						155 combo box (collapsed) Description: Kinds, Value: By site, Secondary Actions: Expand
+							156 text By site
+						157 text GroupsGroups
+						158 text Groups
+						159 combo box (collapsed) Description: Groups, Value: By site, Secondary Actions: Expand
+							160 text By site
+						161 text MassMass
+						162 text Mass
+						163 combo box (collapsed) Description: Mass, Value: By degree, Secondary Actions: Expand
+							164 text By degree
+						165 text DepthDepth
+						166 text Depth
+						167 combo box (collapsed) Description: Depth, Value: From roots, Secondary Actions: Expand
+							168 text From roots
+						169 button Apply physics
+						170 text SpeedSpeed
+						171 text Speed
+						172 combo box (collapsed) Description: Speed, Value: 1x, Secondary Actions: Expand
+							173 text 1x
+						174 text ProfileProfile
+						175 text Profile
+						176 combo box (collapsed) Description: Profile, Value: Springs, Secondary Actions: Expand
+							177 text Springs
+						178 button Apply profile
+						179 text Physics status
+				180 container
+					181 text Find and filter
+					182 button (collapsed) Find and filter, Secondary Actions: Expand
+				183 container
+					184 text Scenes and transfers
+					185 button (collapsed) Scenes and transfers, Secondary Actions: Expand
+				186 container
+					187 text Projection editor
+					188 button (collapsed) Projection editor, Secondary Actions: Expand
+				189 button (expanded) Close portable scene, Secondary Actions: Collapse
+				190 container
+					191 text History
+					192 button (collapsed) History, Secondary Actions: Expand
+				193 container
+					194 text Dynamics inspector
+					195 button (disabled) Explain selected dynamics
+				196 container
+					197 text Presentation rules
+					198 button (collapsed) Presentation rules, Secondary Actions: Expand
+				199 container
+					200 text Saved query views
+					201 heading Saved query views, Value: 3
+						202 text Saved query views
+					203 button New query view
+				204 container
+					205 text Promoted links
+					206 heading Promoted links for review, Value: 3
+						207 text Promoted links for review
+					208 text Each Resource keeps one frozen link reading and can be compared with its live source.
+				209 container
+					210 text Fields
+					211 heading Fields, Value: 2
+						212 text Fields
+					213 text Forme controls
+					214 text Workbench · 0 accesses · 0 regions
+					215 button Unlock forme
+					216 button (disabled) Undo saved forme change
+					217 button (disabled) Redo saved forme change
+					218 button Hide forme boundary
+					219 button Select forme members
+					220 button Retry workbench save
+
+The focused UI element is 1 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8793/tree.html?app=local&receipt=linked-arrangements

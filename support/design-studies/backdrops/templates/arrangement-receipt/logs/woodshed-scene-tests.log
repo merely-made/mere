@@ -1,0 +1,142 @@
+warning: skipping duplicate package `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/proofs/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/system/proofs/Cargo.toml
+
+warning: skipping duplicate package `muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/muniment/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/eidetic/muniment/Cargo.toml
+
+warning: skipping duplicate package `cambium v0.3.3 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/cambium/cambium/Cargo.toml
+
+warning: skipping duplicate package `sprigging v0.2.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/cambium/sprigging/Cargo.toml
+
+warning: skipping duplicate package `chartulary v0.2.2 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/chartulary/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/eidetic/chartulary/Cargo.toml
+
+warning: skipping duplicate package `tabard v0.0.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/tabard/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/system/tabard/Cargo.toml
+
+warning: skipping duplicate package `mere-surface-api v0.1.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/surface-api/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/system/surface-api/Cargo.toml
+
+warning: skipping duplicate package `tinct v0.1.2 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/tinct/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/cambium/tinct/Cargo.toml
+
+warning: skipping duplicate package `workbench v0.1.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/workbench/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/cambium/workbench/Cargo.toml
+
+warning: skipping duplicate package `meristem v0.2.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/meristem/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/cambium/meristem/Cargo.toml
+
+warning: skipping duplicate package `cambium-winit v0.3.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/cambium/cambium-winit/Cargo.toml
+
+warning: skipping duplicate package `mere-apparatus v0.0.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/domain/apparatus/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/domain/apparatus/Cargo.toml
+
+warning: skipping duplicate package `armillary v0.1.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/armillary/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/armillary/Cargo.toml
+
+warning: skipping duplicate package `mere-kernel v0.0.2 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/graph/graph-kernel/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/graph/graph-kernel/Cargo.toml
+
+warning: skipping duplicate package `numen v0.2.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/conatus/numen/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/conatus/numen/Cargo.toml
+
+warning: skipping duplicate package `document-canvas v0.1.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/document-canvas/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/inker/document-canvas/Cargo.toml
+
+warning: skipping duplicate package `inker v0.1.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/inker/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/inker/inker/Cargo.toml
+
+warning: skipping duplicate package `mere-document-lanes v0.1.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/document-lanes/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/system/document-lanes/Cargo.toml
+
+warning: skipping duplicate package `pandect v0.1.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/pandect/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/system/pandect/Cargo.toml
+
+warning: skipping duplicate package `illume v0.0.2 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/nematic/illume/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/nematic/illume/Cargo.toml
+
+warning: skipping duplicate package `mere-alembic v0.0.1 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/distillery/alembic/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/distillery/alembic/Cargo.toml
+
+warning: skipping duplicate package `eidetic v0.0.2 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/eidetic-core/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/eidetic/eidetic-core/Cargo.toml
+
+warning: skipping duplicate package `incipit v0.2.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/incipit/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/b7146e2/crates/incipit/Cargo.toml
+
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#b7146e25)` was not used in the crate graph
+warning: patch `mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)` was not used in the crate graph
+warning: patch `mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#cba46d85)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling woodshed-core v0.1.0 (/Users/markik/Code/worktrees/woodshed-portable-fretboard/crates/woodshed-core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.68s
+     Running unittests src/lib.rs (target/build/debug/deps/woodshed_core-92efe21261864c61)
+
+running 35 tests
+test stage_scene::tests::an_empty_set_projects_an_empty_scene_not_a_broken_one ... ok
+test progression_scene::tests::missing_progression_and_unusable_arrangements_are_refused ... ok
+test stage_scene::tests::a_hand_drawn_path_is_placed_but_relates_to_nothing ... ok
+test stage_scene::tests::changed_source_content_starts_a_fresh_dense_epoch ... ok
+test progression_scene::tests::role_template_transposes_but_keeps_relative_identity ... ok
+test fretboard_scene::tests::a_diminished_fifth_keeps_its_musical_role ... ok
+test progression_scene::tests::repeated_chord_resource_keeps_distinct_occurrences ... ok
+test stage_scene::tests::equal_local_sets_have_distinct_owner_qualified_scene_epochs ... ok
+test progression_scene::tests::longer_bars_and_rests_keep_spans_without_source_edits_or_judgment ... ok
+test fretboard_scene::tests::a_changed_neck_changes_the_reading_but_export_does_not_edit_stage ... ok
+test fretboard_scene::tests::real_tuning_and_repeated_pitch_occurrences_survive_an_independent_host ... ok
+test stage_scene::tests::focused_catalog_context_has_no_duplicate_symmetric_shared_tone_routes ... ok
+test stage_scene::tests::circle_context_completes_the_twelve_major_fifth_links_through_a_staged_c ... ok
+test arrangement_scene::tests::selected_capo_shape_keeps_physical_frets_and_concert_pitches_consistent ... ok
+test arrangement_scene::tests::repeated_tonics_keep_card_identity_and_different_saved_voicings ... ok
+test arrangement_scene::tests::missing_alignment_is_not_a_guessed_position_and_bad_source_is_refused ... ok
+test arrangement_scene::tests::reorder_insert_and_reopen_preserve_selection_keys_and_bindings ... ok
+test stage_scene::tests::a_relation_filter_is_a_view_operation ... ok
+test stage_scene::tests::selecting_a_pair_exposes_every_reason_with_its_authority ... ok
+test stage_scene::tests::each_staged_occurrence_is_its_own_instance ... ok
+test stage_scene::tests::instances_and_occurrences_map_both_ways ... ok
+test stage_scene::tests::recency_rides_the_scene_rather_than_a_host_side_lookup ... ok
+test stage_scene::tests::epoch_qualifies_instance_and_relation_table_ids ... ok
+test stage_scene::tests::relation_inventory_identities_survive_dense_scene_epochs ... ok
+test stage_scene::tests::independent_reasons_keep_one_link_key_in_the_scene ... ok
+test stage_scene::tests::pitch_motion_is_available_without_edges_and_rejects_stale_instances ... ok
+test stage_scene::tests::stage_relation_identity_changes_when_the_underlying_generated_source_changes ... ok
+test stage_scene::tests::the_lane_grows_with_the_set_and_every_card_is_inside_it ... ok
+test stage_scene::tests::set_order_is_drawn_and_can_be_withheld ... ok
+test stage_scene::tests::stage_projection_preserves_duplicate_same_kind_claims_and_inverse_source_identity ... ok
+test stage_scene::tests::circle_context_keeps_relative_pairs_and_extensions_in_distinct_slots ... ok
+test stage_scene::tests::tonnetz_has_twenty_four_triads_and_thirty_six_transformations ... ok
+test stage_scene::tests::staged_sequential_forms_keep_distinct_sources_and_occurrence_relations ... ok
+test stage_scene::tests::ambient_patterns_have_separate_stable_slots_and_occurrence_relations ... ok
+test stage_scene::tests::chromatic_approach_satellites_are_distinct_and_staged_targets_keep_typed_relations ... ok
+
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 224 filtered out; finished in 0.07s
+
