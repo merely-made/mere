@@ -1,6 +1,6 @@
 # Batch 89: Opened-link receiving hosts and observed qualification gates
 
-Audit date: 2026-10-16. Refreshed Mere main `0d7c2e3d2`, supplier receipt
+Audit date: 2026-10-16. Refreshed Mere main `f27ab46ae`, supplier receipt
 `ee324e517`; receiving source Knot `e7b5c50` / published `921b4e0` and
 Woodshed `374c75d` / published `d365952`. The receiving receipt is
 `support/receipts/link-model-p3-20261016/receiving-hosts.json`.

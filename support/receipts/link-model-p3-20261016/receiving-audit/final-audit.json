@@ -2468,6 +2468,11 @@
       "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/import"
     },
     {
+      "source": "2026-05-24_external_deps_topology_brief.md",
+      "subject": "crates/weave",
+      "detail": "resolved path does not exist: /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/weave"
+    },
+    {
       "source": "2026-08-12_family_composition_thesis_brief.md",
       "subject": "repos/isometry/mesocosm/crates/mesocosm-runtime/src/voxel_profile.rs",
       "detail": "resolved path does not exist: /Users/markik/Code/repos/isometry/mesocosm/crates/mesocosm-runtime/src/voxel_profile.rs"
@@ -4826,7 +4831,7 @@
     "ambiguous_known_root_paths": 171,
     "ignored_known_root_patterns": 23,
     "reserved_identifier_paths": 31,
-    "missing_known_root_paths": 151,
+    "missing_known_root_paths": 152,
     "historical_missing_known_root_paths": 238,
     "planned_missing_known_root_paths": 9,
     "invalid_historical_annotations": 0,
