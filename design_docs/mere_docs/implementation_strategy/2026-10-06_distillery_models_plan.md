@@ -1,9 +1,9 @@
 # Distillery models plan: the consolidated model, inference and mesh-host follow-ons
 
 **Date:** 2026-10-06
-**Status (2026-10-15):** M1's three receipts all have stable results and
+**Status (2026-10-16):** M1's three receipts all have stable results and
 the Fusion panic is gone (§3); the remote-autotune reclaim failure M1
-surfaced needs an owner. M2 to M5 not started. Founded under ruling S63 of
+surfaced needs an owner. M2 is qualified through resident inference I5; M3 to M5 remain open. Founded under ruling S63 of
 the [stack seams plan](2026-10-04_stack_seams_plan.md), which consolidated the
 open items of four plans archived on 2026-10-06 (ruling S58: "These four need
 to be consolidated now that 0.22 is out"): the
@@ -94,7 +94,13 @@ with cancellation, headed; the prompt template is per-model data, not code.
 **2026-10-15:** Mark chose djinn's resident as the host, with recall over
 retained material as the forcing consumer. The
 [resident inference and recall plan](2026-10-15_resident_inference_and_recall_plan.md)
-carries M2; its I5 closes this phase.
+carries M2; its I5 closes this phase. **2026-10-16: closed.** The native
+Turnstone pane asks through Djinn's admitted route against retained text and
+the pinned GPU model, streams progress, pauses/resumes, cancels another ask,
+and reopens the answer and exact source after both processes restart with the
+origin offline. The I5 receipt in that plan records the source cuts, binary
+hashes and six native frames. Djinn is test-owned in this gate; its installed
+binary and physical second-device qualification stay separate.
 
 ### M3. Distillery operations
 

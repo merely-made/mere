@@ -1,12 +1,14 @@
 # Eidetic development: content, encounters and computed memory
 
 **Date:** 2026-10-11
-**Status (2026-10-12):** active plan. The first Fleece portable-clip draft has
+**Status (2026-10-16):** active plan. The first Fleece portable-clip draft has
 native transfer tests and browser compilation. Turnstone now qualifies native
 selected text/WAV receiving, restart, local playback and onward copy; the broader phases
 and remaining host checkpoints stay open. The first browser encounter slice
 now has native regression, fresh-process disk and browser compilation receipts;
-renewed headed browser intake and private custody remain open.
+renewed headed browser intake and private custody remain open. P4's inference
+surface is now qualified through the resident plan's I5 native gate; P4's other
+embedding, assessment and tag-work requirements remain open.
 The five gathering/intake dependency
 moves are already complete in the
 [Fleece and Eidetic checkpoint](../../archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md).
@@ -470,7 +472,14 @@ its native trained-model gate is qualified against the pinned SmolLM2 row and
 separately owned page-text storage. Source owners retain their
 stores and current-version authority, and current citations fail closed on
 staleness. Derived tag proposals remain separate. This is the evidence side
-of the Distillery plan's M2/M3, not another execution supervisor.
+of the Distillery plan's M2/M3, not another execution supervisor. I5 now
+qualifies the Turnstone consumer: retained text stays behind its existing
+trail actor, the resident seals supplied passages, and a separate native
+Turnstone process streams, pauses/resumes and cancels real GPU work. After
+both processes restart with the origin offline, the pane reopens the past
+answer and exact source; sealed run and prompt evidence remain unchanged.
+The resident inference plan's I5 receipt records this inference-surface
+qualification. The other P4 requirements below remain open.
 
 **Done when:** restart accepts a matching embedding envelope and rejects a
 same-dimension index from another space. A real lexical/model provider produces
