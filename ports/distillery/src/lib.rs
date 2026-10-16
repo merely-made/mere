@@ -56,6 +56,9 @@ pub mod flora;
 pub mod inference;
 /// Decoder-free resident inference wire contract.
 pub mod inference_protocol;
+/// Lease-bound layer-stage protocol and coordinator composition.
+#[cfg(feature = "inference-stages")]
+pub mod inference_stage;
 mod installed;
 /// Shutdown ordering shared by long-lived residents; Djinn uses it too.
 pub mod lifecycle;

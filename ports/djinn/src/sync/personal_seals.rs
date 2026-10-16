@@ -24,12 +24,56 @@ pub(crate) struct SealingState {
     pub revision: u64,
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn stage_reads_require_a_current_seat_and_current_local_key() {
+        let root = [17; 32];
+        let mut keys = DataKeyring::new();
+        keys.rotate_random().unwrap();
+        let state = Arc::new(RwLock::new(SealingState {
+            keys: Some(Arc::new(keys)),
+            current_roots: BTreeSet::from([root]),
+            historical_roots: BTreeSet::from([root]),
+            can_write: true,
+            revision: 1,
+        }));
+        let seals = PersonalGraphSeals(state.clone());
+        assert!(seals.current_reader(&root));
+        assert!(!seals.current_reader(&[18; 32]));
+        state.write().unwrap().current_roots.clear();
+        assert!(
+            !seals.current_reader(&root),
+            "old readable history does not authorize stage work"
+        );
+        state.write().unwrap().current_roots.insert(root);
+        state.write().unwrap().can_write = false;
+        assert!(!seals.current_reader(&root));
+        state.write().unwrap().can_write = true;
+        state.write().unwrap().keys = None;
+        assert!(!seals.current_reader(&root));
+    }
+}
+
 /// Live graph protection. Retained epochs have exactly the personal graph's
 /// history semantics; retiring a reader cannot revoke bytes it already read.
 #[derive(Clone)]
 pub struct PersonalGraphSeals(pub(crate) Arc<RwLock<SealingState>>);
 
 impl PersonalGraphSeals {
+    /// Live private compute requires both this device's current key and the
+    /// peer's current seat. Historical readability cannot open a new stage.
+    pub fn current_reader(&self, root: &[u8; 32]) -> bool {
+        let state = self.0.read().unwrap();
+        state.can_write
+            && state
+                .keys
+                .as_ref()
+                .is_some_and(|keys| keys.current_epoch().is_some())
+            && state.current_roots.contains(root)
+    }
     /// Changes with installed epochs and group membership.
     pub fn revision(&self) -> u64 {
         self.0.read().unwrap().revision

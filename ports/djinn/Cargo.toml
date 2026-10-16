@@ -31,6 +31,7 @@ trainer = ["distillery/trainer"]
 # light, and settings naming the lane in a build without it are refused.
 inference = ["distillery/inference-model"]
 inference-gpu = ["inference", "distillery/inference-gpu"]
+inference-stages = ["inference", "distillery/inference-stages"]
 # The same trainer, composed on this machine's discrete GPU. Additive over
 # `trainer`, and honest about the difference: a lane that says `device: "gpu"`
 # on a build without this feature refuses `open` by name rather than quietly

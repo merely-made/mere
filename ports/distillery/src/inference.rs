@@ -77,7 +77,7 @@ pub fn parse_model_row(row: &str) -> Result<eidetic::ManifestId, String> {
 }
 
 #[cfg(feature = "inference-model")]
-fn library_layer_source<B: eidetic::Store + Send + 'static>(
+pub(crate) fn library_layer_source<B: eidetic::Store + Send + 'static>(
     library: Arc<tokio::sync::Mutex<B>>,
     resolved: &esp::infer::library::ResolvedInferenceRow,
 ) -> Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>> {
@@ -92,7 +92,7 @@ fn library_layer_source<B: eidetic::Store + Send + 'static>(
 }
 
 #[cfg(feature = "inference-model")]
-fn borrow_layer_source(
+pub(crate) fn borrow_layer_source(
     source: &Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>>,
 ) -> Option<Box<dyn esp::infer::decoder::streaming::LayerSource>> {
     source.as_ref().map(|source| {
@@ -186,6 +186,8 @@ pub enum InferenceLaneError {
 /// execution IDs and in-flight flags are local materialization details.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct RunRecord {
+    #[serde(default)]
+    weight_format: Option<String>,
     view: RunV1,
     actor_id: u64,
     request: GenerationRequest,
@@ -224,6 +226,7 @@ pub trait RunJournal: Send + Sync {
 
 #[derive(Default)]
 struct RunTable {
+    weight_format: Option<String>,
     model: Option<String>,
     session: Option<esp::infer::provider::SessionIdentity>,
     load_error: Option<String>,
@@ -236,6 +239,13 @@ struct RunTable {
     seen_recall_revision: Option<[u8; 32]>,
     /// Bumped on every change a client can see.
     generation: u64,
+}
+
+fn capability_weight_format(capability: &esp::infer::ModelCapability) -> Option<String> {
+    capability
+        .quantization
+        .clone()
+        .or_else(|| capability.loader.starts_with("burn-").then(|| "f32".into()))
 }
 
 impl RunTable {
@@ -270,7 +280,15 @@ impl RunTable {
     /// dropped, so nothing reaches a cancelled run after its cancel lands.
     fn apply(&mut self, update: InferUpdate) {
         match update {
-            InferUpdate::Ready { capability } => self.model = Some(capability.model_id),
+            InferUpdate::Ready { capability } => {
+                self.weight_format = capability_weight_format(&capability);
+                for record in &mut self.runs {
+                    if record.view.session.is_none() && !record.view.state.is_terminal() {
+                        record.weight_format = self.weight_format.clone();
+                    }
+                }
+                self.model = Some(capability.model_id);
+            },
             InferUpdate::Session { identity } => {
                 for record in &mut self.runs {
                     if record.view.session.is_none()
@@ -512,6 +530,17 @@ impl InferenceLane {
         let commit_table = table.clone();
         let commit_journal = journal.clone();
         let wake: Wake = Arc::new(|| {});
+        let ready_table = table.clone();
+        let build = move || {
+            let provider = build()?;
+            // The first durable commit can outrun the asynchronous Ready
+            // observer. Publish exact format/session facts on the actor's
+            // construction path before it can execute a queued request.
+            let mut table = ready_table.lock().unwrap();
+            table.weight_format = capability_weight_format(provider.capability());
+            table.session = provider.session_identity();
+            Ok(provider)
+        };
         let (actor, updates) =
             spawn_inference_actor_with_checkpoints(wake, build, move |id, checkpoint| {
                 if commit_journal.is_some() && checkpoint.session.is_none() {
@@ -524,8 +553,31 @@ impl InferenceLane {
                     .by_actor_id
                     .get(&id)
                     .ok_or_else(|| esp::infer::InferError::Backend("missing durable run".into()))?;
+                let weight_format = if table.session == checkpoint.session {
+                    table.weight_format.clone()
+                } else {
+                    None
+                };
                 let record = &mut table.runs[index];
                 let mut next = record.clone();
+                if next.weight_format.is_none() {
+                    next.weight_format = weight_format;
+                }
+                for placement in &checkpoint.placements {
+                    if !next.continuations.iter().any(|visit| {
+                        visit.at_token == placement.at_token
+                            && visit.device == placement.device
+                            && visit.reason == placement.reason
+                    }) {
+                        next.continuations.push(Continuation {
+                            device: placement.device.clone(),
+                            at_token: placement.at_token,
+                            reason: placement.reason.clone(),
+                            first_differing_token: None,
+                            compared_token_ids_hash: None,
+                        });
+                    }
+                }
                 next.checkpoint = Some(checkpoint.clone());
                 next.view.text = checkpoint.text.clone();
                 next.view.session = checkpoint.session.clone();
@@ -776,7 +828,9 @@ impl InferenceLane {
         table.next_actor_id += 1;
         let index = table.runs.len();
         let session = table.session.clone();
+        let weight_format = table.weight_format.clone();
         table.runs.push(RunRecord {
+            weight_format,
             view: RunV1 {
                 run: request.run,
                 question: request.question,
@@ -1653,6 +1707,7 @@ mod tests {
             }
             fn load(&self) -> Result<Vec<RunRecord>, String> {
                 Ok(vec![RunRecord {
+                    weight_format: None,
                     view: RunV1 {
                         run: "private".into(),
                         question: "retained question".into(),

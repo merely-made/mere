@@ -9,7 +9,7 @@
 #[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
 mod fixture;
 
-use distillery::inference::{AskRequestV1, RunStateV1, open_library_lane};
+use distillery::inference::{AskRequestV1, RunStateV1, open_library_lane_with_journal};
 use eidetic::typed::save_typed;
 use eidetic::{PrivacyClass, ProvenanceRecord, Store, Timestamp, TrustEnvelope};
 use esp::infer::decoder::streaming::StreamingOptions;
@@ -226,7 +226,15 @@ fn exercise_layer_owner(half: bool) {
         (row, key)
     });
     let store = Arc::new(tokio::sync::Mutex::new(store));
-    let lane = open_library_lane(store.clone(), row, 8);
+    let journal = Arc::new(distillery::inference::durable::PersonaRunJournal::new(
+        muniment::MemoryBackend::new(),
+        [42; 32],
+        &personae::Ed25519Keypair::from_seed([13; 32]),
+        "local".into(),
+        [23; 32],
+    ));
+    let lane =
+        open_library_lane_with_journal(store.clone(), row, 8, Some(journal.clone())).unwrap();
     let wait = |name: &str| {
         let deadline = Instant::now() + Duration::from_secs(10);
         loop {
@@ -253,6 +261,14 @@ fn exercise_layer_owner(half: bool) {
     // exercised by inference_durable and the provider's checkpoint fixtures.
     assert!(!run.text.is_empty());
     assert!(run.session.is_some());
+    assert_eq!(
+        journal
+            .retained_record("complete")
+            .unwrap()
+            .weight_format
+            .as_deref(),
+        Some(if half { "bf16" } else { "f32" })
+    );
     // Corrupt the second layer after provider construction. A subsequent ask
     // must read it again and fail before publishing its first generated token.
     pollster::block_on(store.blocking_lock().put(&damaged_key, b"corrupt")).unwrap();
