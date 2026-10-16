@@ -71,7 +71,7 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 inference = ["dep:esp", "esp/actor", "dep:armillary"]
 inference-gpu = ["inference-model", "esp/decoder-wgpu"]
 inference-wire = ["dep:eidetic"]
-inference-model = ["inference-wire","dep:eidetic-search", "inference", "esp/decoder", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]
+inference-model = ["inference-wire","dep:eidetic-search", "inference", "esp/decoder-flex", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]
 
 [dev-dependencies]
 safetensors = "0.4"

@@ -1848,6 +1848,7 @@ dependencies = [
  "burn-autodiff",
  "burn-core",
  "burn-cubecl",
+ "burn-flex",
  "burn-fusion",
  "burn-std",
 ]
@@ -4006,8 +4007,6 @@ dependencies = [
 [[package]]
 name = "cubek-matmul"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59816f7d5baf51ca06f417899ee194d46d76f633541907c94091163b4ade20ff"
 dependencies = [
  "bytemuck",
  "cubecl",

@@ -173,6 +173,12 @@ current execution seat. Unlock also reconciles operations refused while locked.
 Explicit pauses remain paused. A GPU pause drops
 its KV cache and device tensors before releasing the foreground guard.
 
+A qualified `esp.layer-weights/v2` row selects its declared f16, bf16, Q8 or
+Q4 format through the same library setting. CPU rows use Flex for half precision;
+GPU rows retain the trainer reclaim path. Imported format candidates must be
+measured against bf16 before publication. The measured loader must match the
+selected device's loader, and a format change refuses old checkpoints.
+
 The route also takes `distillery.inference/pause-v1` and
 `distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.
 `distillery.inference/ask-sampled-v1` accepts `ask`, `max_tokens`, `temperature`,
