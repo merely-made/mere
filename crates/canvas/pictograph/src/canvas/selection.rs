@@ -395,6 +395,7 @@ impl Canvas {
             &self.view,
             &self.hidden_links,
             &self.hidden_edges,
+            |key| self.node_size(key),
         )
         .into_iter()
         .map(|segment| segment.appearance)
@@ -426,6 +427,7 @@ impl Canvas {
                     &self.view,
                     &self.hidden_links,
                     &self.hidden_edges,
+                    |key| self.node_size(key),
                 )
                 .into_iter()
                 .find(|segment| &segment.appearance.key == key)

@@ -440,7 +440,7 @@ impl MereView<'_> {
                           name: &str| {
                 swatch.relations.push(GraphCanvasRelation {
                     link_key: None,
-                    marks: sceno::LinkMarks::default(),
+                    marks: Default::default(),
                     strength: 1.0,
                     id: format!("{relation}:{id}"),
                     from,

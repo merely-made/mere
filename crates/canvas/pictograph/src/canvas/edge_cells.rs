@@ -27,6 +27,7 @@ pub(crate) fn visible_link_appearances(
     view: &LayoutView,
     hidden_links: &HashSet<LinkKey>,
     hidden_legacy_cells: &HashSet<EdgeCell>,
+    node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<LinkAppearanceSegment> {
     let source = LinkSource::Unavailable {
         reason:
@@ -152,34 +153,71 @@ pub(crate) fn visible_link_appearances(
         ) else {
             continue;
         };
-        if strata_by_pair
-            .get(&endpoint_pair(
-                appearance.display_from,
-                appearance.display_to,
-            ))
-            .is_some_and(|strata| strata.len() > 1)
-        {
-            let dx = to.x - from.x;
-            let dy = to.y - from.y;
-            let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
-            let sign = if appearance.key.stratum == LinkStratum::Surface {
-                -1.0
-            } else {
-                1.0
-            };
-            let offset = sign * 3.0;
-            let nx = -dy / len * offset;
-            let ny = dx / len * offset;
-            from = Point2D::new(from.x + nx, from.y + ny);
-            to = Point2D::new(to.x + nx, to.y + ny);
-        }
+        let points = if appearance.display_from == appearance.display_to {
+            self_link_points(
+                from,
+                node_size(appearance.display_from),
+                appearance.key.stratum,
+            )
+        } else {
+            if strata_by_pair
+                .get(&endpoint_pair(
+                    appearance.display_from,
+                    appearance.display_to,
+                ))
+                .is_some_and(|strata| strata.len() > 1)
+            {
+                let dx = to.x - from.x;
+                let dy = to.y - from.y;
+                let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
+                let sign = if appearance.key.stratum == LinkStratum::Surface {
+                    -1.0
+                } else {
+                    1.0
+                };
+                let offset = sign * 3.0;
+                let nx = -dy / len * offset;
+                let ny = dx / len * offset;
+                from = Point2D::new(from.x + nx, from.y + ny);
+                to = Point2D::new(to.x + nx, to.y + ny);
+            }
+            vec![from, to]
+        };
         segments.push(LinkAppearanceSegment {
             appearance,
             from,
             to,
+            points,
         });
     }
     segments
+}
+
+/// Return a small arch that leaves and rejoins the node's top boundary.
+/// Surface and Resource self-links use separate horizontal slots so both
+/// strata remain visible and pickable.
+fn self_link_points(
+    center: Point2D<f32>,
+    node_size: f32,
+    stratum: LinkStratum,
+) -> Vec<Point2D<f32>> {
+    const RADIUS: f32 = 16.0;
+    const SEGMENTS: usize = 20;
+    let side = match stratum {
+        LinkStratum::Surface => -20.0,
+        LinkStratum::Resource => 20.0,
+    };
+    let loop_center = Point2D::new(center.x + side, center.y - node_size.max(1.0) * 0.5);
+    (0..=SEGMENTS)
+        .map(|index| {
+            let angle =
+                std::f32::consts::PI + std::f32::consts::PI * index as f32 / SEGMENTS as f32;
+            Point2D::new(
+                loop_center.x + angle.cos() * RADIUS,
+                loop_center.y + angle.sin() * RADIUS,
+            )
+        })
+        .collect()
 }
 
 fn selector_for_link_assertion(assertion: &LinkAssertion) -> Option<RelationSelector> {
@@ -212,6 +250,57 @@ pub(crate) struct LinkAppearanceSegment {
     pub appearance: LinkAppearance,
     pub from: Point2D<f32>,
     pub to: Point2D<f32>,
+    pub points: Vec<Point2D<f32>>,
+}
+
+impl LinkAppearanceSegment {
+    fn is_self_link(&self) -> bool {
+        self.appearance.display_from == self.appearance.display_to
+    }
+}
+
+fn polyline_strokes(points: &[Point2D<f32>], color: ColorF, width: f32) -> Vec<PaintCmd> {
+    points
+        .windows(2)
+        .map(|pair| stroke(pair[0], pair[1], color, width))
+        .collect()
+}
+
+fn polyline_distance(point: Point2D<f32>, points: &[Point2D<f32>]) -> f32 {
+    points
+        .windows(2)
+        .map(|pair| point_segment_distance(point, pair[0], pair[1]))
+        .fold(f32::INFINITY, f32::min)
+}
+
+fn polyline_intersects_box(points: &[Point2D<f32>], region: Box2D<f32>) -> bool {
+    points
+        .windows(2)
+        .any(|pair| segment_intersects_box(pair[0], pair[1], region))
+}
+
+fn loop_arrowhead(points: &[Point2D<f32>], reverse: bool, color: ColorF) -> Vec<PaintCmd> {
+    let mut path = points.to_vec();
+    if reverse {
+        path.reverse();
+    }
+    let index = (path.len().saturating_sub(2) * 2 / 3).min(path.len().saturating_sub(2));
+    if path.len() < 2 {
+        return Vec::new();
+    }
+    arrowhead(path[index], path[index + 1], color)
+}
+
+fn polyline_midpoint_normal(points: &[Point2D<f32>]) -> (Point2D<f32>, Point2D<f32>) {
+    let index = points.len().saturating_sub(2) / 2;
+    let (Some(&from), Some(&to)) = (points.get(index), points.get(index + 1)) else {
+        return (Point2D::new(0.0, 0.0), Point2D::new(0.0, 0.0));
+    };
+    let midpoint = Point2D::new((from.x + to.x) * 0.5, (from.y + to.y) * 0.5);
+    let dx = to.x - from.x;
+    let dy = to.y - from.y;
+    let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
+    (midpoint, Point2D::new(-dy / len, dx / len))
 }
 
 pub(crate) fn link_hit_test(
@@ -222,15 +311,64 @@ pub(crate) fn link_hit_test(
     point: Point2D<f32>,
     tolerance: f32,
     node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
 ) -> Option<LinkAppearance> {
-    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells)
+    link_hit_test_where(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        point,
+        tolerance,
+        node_visible,
+        node_size,
+        |_| true,
+    )
+}
+
+pub(crate) fn self_link_hit_test(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    point: Point2D<f32>,
+    tolerance: f32,
+    node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Option<LinkAppearance> {
+    link_hit_test_where(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        point,
+        tolerance,
+        node_visible,
+        node_size,
+        |segment| segment.appearance.display_from == segment.appearance.display_to,
+    )
+}
+
+fn link_hit_test_where(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    point: Point2D<f32>,
+    tolerance: f32,
+    node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
+    include: impl Fn(&LinkAppearanceSegment) -> bool,
+) -> Option<LinkAppearance> {
+    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells, node_size)
         .into_iter()
         .filter(|segment| {
-            node_visible(segment.appearance.display_from)
+            include(segment)
+                && node_visible(segment.appearance.display_from)
                 && node_visible(segment.appearance.display_to)
         })
         .filter_map(|segment| {
-            let distance = point_segment_distance(point, segment.from, segment.to);
+            let distance = polyline_distance(point, &segment.points);
             (distance <= tolerance).then_some((segment.appearance, distance))
         })
         .min_by(|a, b| a.1.total_cmp(&b.1))
@@ -244,13 +382,14 @@ pub(crate) fn links_in_rect(
     hidden_legacy_cells: &HashSet<EdgeCell>,
     region: Box2D<f32>,
     node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<LinkAppearance> {
-    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells)
+    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells, node_size)
         .into_iter()
         .filter(|segment| {
             node_visible(segment.appearance.display_from)
                 && node_visible(segment.appearance.display_to)
-                && segment_intersects_box(segment.from, segment.to, region)
+                && polyline_intersects_box(&segment.points, region)
         })
         .fold(
             std::collections::BTreeMap::new(),
@@ -272,8 +411,9 @@ pub(crate) fn link_overlay(
     hidden_legacy_cells: &HashSet<EdgeCell>,
     selected_links: &HashSet<LinkKey>,
     node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<PaintCmd> {
-    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells)
+    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells, node_size)
         .into_iter()
         .filter(|segment| {
             node_visible(segment.appearance.display_from)
@@ -282,9 +422,8 @@ pub(crate) fn link_overlay(
         .flat_map(|segment| {
             let mut strokes = link_strokes(&segment);
             if selected_links.contains(&segment.appearance.key) {
-                strokes.push(stroke(
-                    segment.from,
-                    segment.to,
+                strokes.extend(polyline_strokes(
+                    &segment.points,
                     ColorF::new(0.91, 0.59, 0.16, 1.0),
                     4.0,
                 ));
@@ -300,23 +439,35 @@ fn link_strokes(segment: &LinkAppearanceSegment) -> Vec<PaintCmd> {
         LinkStratum::Resource => ColorF::new(0.55, 0.72, 0.92, 0.82),
     };
     let width = 1.35 + segment.appearance.strength.max(0.0).ln_1p().min(3.0) * 0.55;
-    let mut strokes = vec![stroke(segment.from, segment.to, color, width)];
+    let mut strokes = polyline_strokes(&segment.points, color, width);
     let marks = segment.appearance.marks;
     if marks.forward {
-        strokes.extend(arrowhead(segment.from, segment.to, color));
+        strokes.extend(if segment.is_self_link() {
+            loop_arrowhead(&segment.points, false, color)
+        } else {
+            arrowhead(segment.from, segment.to, color)
+        });
     }
     if marks.reverse {
-        strokes.extend(arrowhead(segment.to, segment.from, color));
+        strokes.extend(if segment.is_self_link() {
+            loop_arrowhead(&segment.points, true, color)
+        } else {
+            arrowhead(segment.to, segment.from, color)
+        });
     }
     if marks.opposed {
-        let midpoint = Point2D::new(
-            (segment.from.x + segment.to.x) * 0.5,
-            (segment.from.y + segment.to.y) * 0.5,
-        );
-        let dx = segment.to.x - segment.from.x;
-        let dy = segment.to.y - segment.from.y;
-        let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
-        let normal = Point2D::new(-dy / len, dx / len);
+        let (midpoint, normal) = if segment.is_self_link() {
+            polyline_midpoint_normal(&segment.points)
+        } else {
+            let midpoint = Point2D::new(
+                (segment.from.x + segment.to.x) * 0.5,
+                (segment.from.y + segment.to.y) * 0.5,
+            );
+            let dx = segment.to.x - segment.from.x;
+            let dy = segment.to.y - segment.from.y;
+            let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
+            (midpoint, Point2D::new(-dy / len, dx / len))
+        };
         strokes.push(stroke(
             Point2D::new(midpoint.x - normal.x * 3.0, midpoint.y - normal.y * 3.0),
             Point2D::new(midpoint.x + normal.x * 3.0, midpoint.y + normal.y * 3.0),

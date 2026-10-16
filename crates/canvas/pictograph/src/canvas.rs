@@ -688,6 +688,9 @@ pub struct Canvas {
     marquee: Option<(f32, f32)>,
     /// A left press on empty canvas, a click or a pan (SE23).
     empty_press: Option<EmptyPress>,
+    /// A left click on the loop geometry of a self-link, which sits over the
+    /// node's pick region and therefore needs its own press target.
+    self_link_press: Option<(LinkAppearance, (f32, f32))>,
     /// A right click waiting for the host's context menu (SE26).
     context_request: Option<ContextRequest>,
     /// Whether Ctrl is held (gates wheel-zoom vs wheel-pan).

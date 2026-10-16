@@ -634,7 +634,7 @@ impl MereView<'_> {
                 let to = labels.get(relation.to.as_str())?;
                 Some(GraphCanvasRelation {
                     link_key: None,
-                    marks: sceno::LinkMarks::default(),
+                    marks: Default::default(),
                     strength: 1.0,
                     id: relation.key.clone(),
                     from: relation.from.clone(),

@@ -222,6 +222,7 @@ impl Canvas {
             height_by_degree: false,
             marquee: None,
             empty_press: None,
+            self_link_press: None,
             context_request: None,
             ctrl: false,
             shift: false,

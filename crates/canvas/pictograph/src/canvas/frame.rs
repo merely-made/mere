@@ -274,6 +274,7 @@ impl Canvas {
             &self.hidden_edges,
             &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
+            |key| self.node_size(key),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
         // Community rings: a halo per node in its community's colour, spliced into the same
