@@ -1,7 +1,7 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-16):** in progress. I1 to I7 gates done (§7):
+**Status (2026-10-16):** in progress. I1 to I8 native gates done (§7):
 strict decoder, declared templates, CPU and GPU model rows, native trainer
 owner reclaim, durable checkpoints, restart, lock recovery and keyed
 personal-graph continuation pass on O-PC. I4's native gate adds BM25 recall,
@@ -12,10 +12,12 @@ source viewing after restart with the origin offline. Distillery M2 and the
 inference-surface half of Eidetic P4 are closed. I6 qualifies a seven-shard
 OpenLlama 3B model whose f32 weights exceed the target GPU's memory, plus a
 4,126-token streamed prefill. I7 adds half-precision and packed Q8/Q4 rows,
-with measured drift, memory and streaming costs. I8 layer stages is next.
-The new device
-boundary uses two separately rooted resident compositions on one computer;
-a physical second computer and installed-binary receipt remain separate.
+with measured drift, memory and streaming costs. I8 adds leased layer stages,
+exact-session token parity and checkpointed streaming recovery. Its three
+software devices have independent roots and model libraries on one computer
+and GPU. Explicit embedding APIs supply the leased plan; automatic peer/rung
+selection and staged JSON settings remain integration work. Physical second-
+computer and installed-binary receipts remain separate. I9 is next.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -1316,3 +1318,75 @@ Stop and record the reason if any of these happen:
     larger quantized models, Metal bf16, a new headed browser row, an installed
     Djinn binary and a physical second computer remain separate receipts.
     I7 is complete; I8 layer stages is next.
+
+- **2026-10-16: I8 native gate qualified: leased layer stages.**
+  Source cut `60107aa1` assigns contiguous decoder ranges by device capacity,
+  including the full declared context KV budget. The coordinator holds the
+  embedding and sampler; the last worker holds the final norm and output
+  head. Each worker loads only its range from its own verified model library.
+  Tensor frames retain exact values across the declared dtype and enforce
+  dimensions, finite values and byte limits. The model, format, loader,
+  tokenizer and template retain their exact session identity across stages
+  and local streaming.
+  - *Lease and private-state ownership.* Stage services use the existing
+    resident iroh endpoint and real mesh claim/grant/reclaim. Every call checks
+    the live signed lease, stage input, transport identity and current keyed
+    personal-graph readers. A readiness probe precedes private input. Owner
+    reclaim, lock, reader retirement, lease loss, idle timeout and shutdown
+    close admission and drain work before releasing the shared GPU guard.
+    Loading and detached blocking work retain that guard until drained.
+    Dynamic availability is sampled by the host and passed to the pure mesh
+    scheduler, avoiding repeated grants to an unavailable worker.
+  - *Recovery and evidence.* A stage departure retires the stage chain before
+    allocating local streaming state. The last committed checkpoint records
+    the placement boundary before another random draw. Ordinary staged actor
+    checkpoints also retain worker identities and ranges. Sealed run evidence
+    now records the actual selected weight format, including bf16, rather
+    than labelling every library row f32. Existing continuation evidence
+    carries these facts without a P4 schema change.
+  - *Native row.* The pinned SmolLM2-360M-Instruct f16 GPU row from I7 runs
+    through two separately rooted workers with ranges `[0,16)` and `[16,32)`,
+    plus a separately rooted coordinator. Their independent libraries contain
+    the exact qualified artifacts. Real iroh connections and supervised mesh
+    leases complete the fixed France ask with all **seven token IDs identical**
+    to the single-device run of the same session/backend. Reclaim after token
+    three writes and reopens the checkpoint; local streaming completes with
+    the same seven IDs. CPU rows additionally exercise private lock, reader
+    retirement, idle expiry and abort during drain.
+  - *Measured cost.* The preloaded staged ask takes **0.7510506 s**, or
+    **0.10729294 s/output token**. Completed tensor frames move **2,080,256
+    bytes**, or **297,179.43 bytes/output token**, including prefill and the
+    EOS decision. A warm pass moves **208,192 bytes**. These counts include
+    tensor geometry headers but exclude control/framing, QUIC overhead and
+    incomplete failed transfers. The local reference takes **16.9238 s**;
+    checkpointed reclaim and fallback take **7.1001 s**. Their construction
+    and streaming costs differ, so these are execution receipts rather than
+    an isolated throughput comparison.
+  - *Memory scope.* The complete native fixture takes **53.3084 s**, including
+    imports and recovery. Its three-role process peaks at **3,595,534,336 bytes**
+    working set; sampled whole-GPU use peaks at **2,736,783,360 bytes**, including
+    unrelated processes. Each 16-layer admission budget is **482,406,400 bytes**
+    of weights plus full-context KV. Shared/head tensors, RoPE, activations,
+    backend reserves and allocator overhead are separate. All roles share one
+    physical RTX 4060 Laptop GPU; this row does not measure pooled physical
+    VRAM or inter-computer latency.
+  - *Checks.* Final source passes **188 ESP**, **54 Distillery** and **125
+    mesh unit tests**; ESP's durable/session/template/autodiff integrations
+    pass **15 cases**, and Distillery's durability/layer/stage integrations
+    pass **15 cases**. The actor/wire build passes **38 tests** and retains its
+    decoder-free normal dependency graph. Both ESP examples check. Djinn passes
+    its current-key stage-reader unit, all **four route regressions**, all
+    **three explicitly run GPU trainer-reclaim cases**, and the explicitly run
+    real-model recall case with exact retained versions and restart recovery.
+    The blocked debug actor/wire invocation was rerun successfully in the
+    existing release cache. Touched Rust formatting, profiler syntax and the
+    documentation audit add no findings beyond the recorded baseline.
+  - *Evidence and integration limits.* [The I8 receipt](../../../support/receipts/resident_inference_stages.json)
+    records source/binary hashes, model and session identities, exact token
+    outputs, placement, tensor traffic, host profile and gate logs. The
+    embedding APIs compose explicit leased stage plans and the ordinary
+    durable inference actor. Automatic peer discovery/rung selection and a
+    staged JSON settings variant remain integration work. Larger staged
+    models, other formats/backend classes, physical second-computer execution,
+    a new headed Turnstone row and an installed Djinn run need separate
+    receipts. I8's native gate is complete; I9 architecture coverage is next.
