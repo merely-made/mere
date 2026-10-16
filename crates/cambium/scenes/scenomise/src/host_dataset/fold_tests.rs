@@ -115,6 +115,9 @@ fn folds(
             points: Vec::new(),
             kind: Some(relation.kind.clone()),
             weight: None,
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         })
         .collect();
     HostDatasetFolds::new(dataset, relationships, kind, scene, instances)

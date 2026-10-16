@@ -48,7 +48,8 @@ impl Canvas {
         FoldViewState {
             folds: self.folds.clone(),
             selected: self.selected.clone(),
-            selected_edges: self.selected_edges.clone(),
+            selected_links: self.selected_links.clone(),
+            selected_link_appearances: self.selected_link_appearances.clone(),
         }
     }
 
@@ -61,7 +62,8 @@ impl Canvas {
         self.folds = state.folds;
         self.fold_press = None;
         self.selected = state.selected;
-        self.selected_edges = state.selected_edges;
+        self.selected_links = state.selected_links;
+        self.selected_link_appearances = state.selected_link_appearances;
     }
 
     fn fold_view_state_is_current(&self, state: &FoldViewState) -> bool {
@@ -107,7 +109,8 @@ impl Canvas {
         self.folds.push(record);
         self.fold_press = None;
         self.selected.clear();
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         Some(id)
     }
 
@@ -175,7 +178,8 @@ impl Canvas {
         self.folds.remove(index);
         self.fold_press = None;
         self.selected = projection.members.into_iter().collect();
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         true
     }
 
@@ -313,7 +317,8 @@ impl Canvas {
         }
         if !kept.is_empty() {
             self.selected.clear();
-            self.selected_edges.clear();
+            self.selected_links.clear();
+            self.selected_link_appearances.clear();
         }
         self.folds = kept;
         self.fold_press = None;

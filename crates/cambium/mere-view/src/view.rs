@@ -633,6 +633,9 @@ impl MereView<'_> {
                 let from = labels.get(relation.from.as_str())?;
                 let to = labels.get(relation.to.as_str())?;
                 Some(GraphCanvasRelation {
+                    link_key: None,
+                    marks: Default::default(),
+                    strength: 1.0,
                     id: relation.key.clone(),
                     from: relation.from.clone(),
                     to: relation.to.clone(),
