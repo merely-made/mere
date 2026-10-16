@@ -1,5 +1,10 @@
 # Mere Documentation Index
 
+Tucket custody (2026-10-16): the [Djinn plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
+records the qualified device/realm-scoped Signalman release and real-broker
+positive, refusal and restored-fallback controls. The Murm R6 desktop and RF
+consumer gates remain separate.
+
 Coordinated renderer adoption (2026-10-15): the [browser presentation plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md#coordinated-supplier-adoption-2026-10-15) tracks published Genet `7ffe66208ca` and canonical Netrender `f4f9c0d87`, retirement of the four temporary bridge tables, and fresh receiving qualification. All four portable graph audits, 336 receiving native tests and viewer/standalone wasm compile gates pass, including requalification after upstream `75a2e6ae`; [receipts](mere_docs/testing/receipts/2026-10-15_netrender_adoption/README.md) preserve the exact source and lock basis. Existing browser runtime and delivery-size receipts retain their original source identities.
 
 Link model (2026-10-15): the [link model](mere_docs/technical_architecture/2026-10-15_link_model.md) makes each separately attributed reason an assertion and the link a derived per-stratum reading of a pair. L1–L13 are settled, including separate assertions for independent reasons from one asserter. The [implementation plan](mere_docs/implementation_strategy/2026-10-15_link_model_plan.md) records the qualified bounded P1 consumers, semantic lifecycle implementation and P5 fixed-endpoint Graphshell experiment on source `1e3fb426c`: eight reviewed browser configurations compare attractor, flow and vortex fields with compatible-link attraction independently enabled. P2 remains open for Knot's timed-retraction projection and real Mere intake; P3–P4, P6 and P7 follow their recorded gates.
