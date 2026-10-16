@@ -3,7 +3,7 @@
 //! Actual shared surface → Netrender → Vello CPU frames; no browser/GPU claim.
 use netrender::vello_backends::{CpuSession, SparseResourceLimits};
 use pictograph::canvas::backdrop_surface::{BackdropSurface, SurfaceTheme};
-use scenomise::backdrops::SceneInput;
+use scenomise::{backdrops::SceneInput, document::SceneDocument};
 use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -33,10 +33,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             samples.push((name, "bar-0"));
         }
     }
+    let mut inputs = Vec::new();
     for (name, selected) in samples {
         let input = SceneInput::parse(&std::fs::read_to_string(
             fixtures.join(format!("{name}.json")),
         )?)?;
+        inputs.push((name.to_owned(), selected.to_owned(), input));
+    }
+    for name in ["arrangement-regular", "arrangement-varied"] {
+        let path = fixtures.join(format!("{name}.json"));
+        if !path.is_file() {
+            continue;
+        }
+        let document = SceneDocument::parse(&std::fs::read_to_string(path)?)?;
+        inputs.push((name.to_owned(), "card-3".into(), document.primary.clone()));
+        for view in document.linked {
+            inputs.push((
+                format!("{name}-{}", view.occurrence),
+                String::new(),
+                view.scene,
+            ));
+        }
+    }
+    for (name, selected, input) in inputs {
         let mut surface = BackdropSurface::new(&input)?;
         let original_reading = serde_json::to_value(surface.scene())?;
         surface.register_font(font.to_vec());

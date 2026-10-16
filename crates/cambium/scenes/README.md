@@ -166,13 +166,15 @@ surface with no app-specific renderer. Signalman's current Survey evidence
 contains no admitted radio/track association or propagation estimate, so its
 radio identities remain unplaced and its whole plane stays unmeasured.
 
-For cross-repository qualification before the shared change is integrated,
+The shared implementation and receiving app cohorts are now integrated on
+their canonical sources. Ordinary app checks use their committed lockfiles.
+For reproduction of the historical pre-integration qualification,
 `support/design-studies/backdrops/with_local_scene_source.py MERE_CHECKOUT`
 runs the remaining Cargo arguments in the caller's app checkout against a
 temporary patch of all four scene crates. It preserves one type-bearing cohort
 and writes no local paths into tracked manifests. Cargo can update that app's
-lockfile, as with any ordinary repin. After integration, repin the canonical
-source and rerun the app's checks. The standalone CPU example accepts an
+lockfile, as with any ordinary repin. This helper is not needed by the current
+app builds. The standalone CPU example accepts an
 optional input directory after its output directory, containing `metre.json`,
 `fretboard.json` and `terrain.json` from those exporters.
 
@@ -187,6 +189,14 @@ meaning. Woodshed's progression adapter is the second consumer: expected
 Roman-numeral roles and arranged song-block spans stay separate. Open slots
 and unplaced material remain explicit, with no inferred conformity judgment.
 See the [decision and reproduction guide](../../../support/design-studies/backdrops/templates/README.md).
+
+`scenomise::document::SceneDocument` binds a primary occurrence to a supplied
+scene reading. Its one-MiB total and 32-linked-reading budgets include all
+recipes, and all children validate before replacement. Bare recipes remain
+supported. Graphshell uses two instances of the existing portable producer
+to show the primary scene and the selected occurrence's related reading.
+Woodshed supplies persistent Set identities, explicit role/card/rest alignment
+and saved voicing facts; the host supplies no musical interpretation.
 
 ## Dependencies
 
