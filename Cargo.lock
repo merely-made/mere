@@ -2673,7 +2673,7 @@ dependencies = [
  "serde_json",
  "servitor",
  "thiserror 2.0.21",
- "turquet 0.17.0",
+ "turquet",
 ]
 
 [[package]]
