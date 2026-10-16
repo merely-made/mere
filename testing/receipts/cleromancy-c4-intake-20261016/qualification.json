@@ -1,0 +1,85 @@
+{
+  "schema": "mere.cleromancy-c4-intake/v1",
+  "date": "2026-10-16",
+  "status": "Latest C4 validator and ordered view qualify across three real owner processes on integrated source; publication pending",
+  "receiving_source": "8111fa2ba37cfd41797e9f8427b3348af0e4f342",
+  "integrated_origin_main": "b31363d2d2de081a76fbbac5272e5f02df851d58",
+  "core_commit": "d6ea9f700cf712de364cf9cb61e74f26d12cd64a",
+  "product_supplier": "72f9c5c73ab9ddd8ba761524388c2406a6d6ffcf",
+  "compiler": "rustc/rustdoc 1.97.1 via Cargo 1.99",
+  "command": "cargo test --locked -p djinn --test embedded_reservoir_validation",
+  "passed": 5,
+  "failed": 0,
+  "ignored": 1,
+  "ignore_reason": "Process-child entrypoint is intentionally ignored by the outer runner and explicitly launched by parent tests.",
+  "owner_sequence": [
+    "embedded",
+    "daemon",
+    "embedded"
+  ],
+  "checks": [
+    "Current typed decks, sealed reading, shared ordered ambient view and kept memory survive every ownership handoff",
+    "Invented selected occurrence and forged memory text refused before journal writes",
+    "Exact view/memory/sealed facets and durable bytes remain unchanged on refused batches"
+  ],
+  "software_supplements": [
+    {
+      "source": "72f9c5c73ab9ddd8ba761524388c2406a6d6ffcf",
+      "receipt": "../cleromancy-c4-ordered-grid-20261016/qualification.json",
+      "passed": 184
+    },
+    {
+      "source": "b35819edc7c338284a32a36198b1a54a81c48678",
+      "receipt": "../cleromancy-c4-resource-chunks-20261016/qualification.json",
+      "passed": 32
+    }
+  ],
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "e482a898d1f5ffa0fcb69796a7c3238b18244fe7c027f027c42d9d3da5c5a7de"
+    },
+    {
+      "path": "ports/djinn/tests/embedded_reservoir_validation.rs",
+      "sha256": "2d2b21c354291a78cb2b3011f1b24272724e62408bf05e09ba14a7e565998ade"
+    },
+    {
+      "path": "crates/graphshell/graphshell-endpoint/src/door/app_client.rs",
+      "sha256": "f949d6b13a3ef283879432186922f3fdfafbab54e16d49b6f495dcabe83cfc31"
+    },
+    {
+      "path": "crates/cambium/scenes/scenomise/src/catalog.rs",
+      "sha256": "94d4d8a8d94a3d20169419a0b120c81682e7f782c902b44cd7f8c703e2287d17"
+    },
+    {
+      "path": "crates/cambium/scenes/scenomise/src/projection.rs",
+      "sha256": "4d8ca0631b4e539a27b1c4c76237b6557fe893839973db47ad82899cbe337451"
+    },
+    {
+      "path": "crates/cambium/scenes/scenomise/src/projection_relationship_tests.rs",
+      "sha256": "dd6293ba88935f2a53bcae98ba86bf31855c6f7abba8dc73173a2aa9d77d0217"
+    }
+  ],
+  "logs": [
+    {
+      "path": "ordered-grid-owner-suite.log",
+      "sha256": "87c51e1fe3fc29788b34eafb22a92684ee932b9166ddf7f731d1867e607360fc"
+    },
+    {
+      "path": "ordered-integrated-owner-online.log",
+      "sha256": "c6e34d53532f072cf122805a8c1b0a7f1cbb9661cfecd987578e7bfebe63d70d"
+    },
+    {
+      "path": "ordered-integrated-owner-suite.log",
+      "sha256": "d670af858bc35d9e7953eb469e2640ac4165acd55e6696954e12368eef54ee51"
+    }
+  ],
+  "offline_attempt": "Initial integrated offline command failed before compilation because upstream Dramatis 19be4831 was not cached. The locked online run fetched that exact object and passed; no lock mutation.",
+  "native": "The product owns eleven reviewed native originals and exact full-view/memory plus sealed-reading reopen on its frozen supplier72f and productd6ea. This receiving software run does not relabel the native binary as integrated Mere8111.",
+  "publication": "Unpublished local supplier/core/receiving objects are loaded in canonical Cargo Git caches for qualification. Coordinated publication requires Mark approval. Frozen product supplier does not move to integrated receiving head.",
+  "limits": [
+    "No acceptance of the full shared 164-scene wall",
+    "No stack-wide G4b2/T2 or graphical-unlock acceptance",
+    "No C5 draw changes"
+  ]
+}
