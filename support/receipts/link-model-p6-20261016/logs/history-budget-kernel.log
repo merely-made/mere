@@ -1,0 +1,25 @@
+
+running 1 test
+P6 debug read budget: retained=50002 held=2 snapshot-bytes=16941071 wire budget=64MiB load=587.386125ms pair-query p50=1.9265ms p95=3.683917ms max=4.267167ms; p95 budget=100ms
+test graph::tests::family_read_budget::family_read_budget_keeps_fifty_thousand_withdrawals_out_of_held_rows ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 465 filtered out; finished in 1.81s
+
+        1.81 real         1.30 user         0.08 sys
+           111853568  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                6549  page reclaims
+                 478  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  10  voluntary context switches
+               19140  involuntary context switches
+         11446679716  instructions retired
+          4317192654  cycles elapsed
+           104235440  peak memory footprint

@@ -1,0 +1,25 @@
+
+running 1 test
+portable link history probe: held_reads=16 held_p95_ms=1 history_records=50002 history_ms=88 serialized_bytes=26218350
+test canvas::link_reading::tests::portable_link_reads_bound_held_work_and_materialize_substantial_history ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 502 filtered out; finished in 5.55s
+
+        5.56 real         4.37 user         0.10 sys
+           245448704  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               16383  page reclaims
+                  47  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  20  voluntary context switches
+               14019  involuntary context switches
+         36632096198  instructions retired
+         13274587264  cycles elapsed
+           213107384  peak memory footprint
