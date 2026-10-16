@@ -1,5 +1,9 @@
 # Mere Documentation Index
 
+Sennet directed custody (2026-10-16): the [Djinn plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
+records transient material under the existing exact station release. Six real
+Keeper cases and selected strict port/example Clippy pass; Murm owns R8 RF.
+
 Sennet custody (2026-10-16): the [Djinn plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
 records the qualified exact device/realm station release for Signalman,
 sharing the sticky radio custody watch. Six real-Keeper cases, both selected

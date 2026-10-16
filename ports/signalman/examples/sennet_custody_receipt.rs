@@ -72,6 +72,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let again = authority.open_sennet(device, &args[2])?;
             let other = again.identity.node_number();
             assert!(public == other, "reconnect changed public identity");
+            assert!(
+                *released.material.seed_bytes() == *again.material.seed_bytes(),
+                "reconnect changed scoped material"
+            );
+            assert_eq!(
+                format!("{:?}", released.material),
+                "SennetStationMaterial(<redacted>)"
+            );
+            report["same_scoped_material_on_reopen"] = true.into();
             released.lease.check()?;
             again.lease.check()?;
             report["result"] = "same_identity_on_reopen".into();
