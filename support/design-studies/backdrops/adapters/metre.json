@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "source": {
+    "adapter": "knot.file",
+    "id": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops/support/design-studies/backdrops/adapters/poem.txt"
+  },
+  "revision": "fe57eb6d5da408f24169b83aa67e7b7d06de561e2050abe1197aabba2024e9c1",
+  "title": "CMUdict candidate stress · later syllables numbered · not intended performance",
+  "facts": {
+    "kind": "metre_grid",
+    "data": {
+      "feet": 1,
+      "lines": [
+        {
+          "key": "bytes-0-9",
+          "source": {
+            "adapter": "knot.document-range",
+            "id": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops/support/design-studies/backdrops/adapters/poem.txt#bytes=0..9"
+          },
+          "text": "the night",
+          "syllables": [
+            {
+              "text": "the",
+              "stressed": false
+            },
+            {
+              "text": "night",
+              "stressed": true
+            }
+          ],
+          "rhyme_group": "A",
+          "rhyme_tail": "5-30"
+        },
+        {
+          "key": "bytes-10-19",
+          "source": {
+            "adapter": "knot.document-range",
+            "id": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops/support/design-studies/backdrops/adapters/poem.txt#bytes=10..19"
+          },
+          "text": "the light",
+          "syllables": [
+            {
+              "text": "the",
+              "stressed": false
+            },
+            {
+              "text": "light",
+              "stressed": true
+            }
+          ],
+          "rhyme_group": "A",
+          "rhyme_tail": "5-30"
+        },
+        {
+          "key": "bytes-20-27",
+          "source": {
+            "adapter": "knot.document-range",
+            "id": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops/support/design-studies/backdrops/adapters/poem.txt#bytes=20..27"
+          },
+          "text": "the day",
+          "syllables": [
+            {
+              "text": "the",
+              "stressed": false
+            },
+            {
+              "text": "day",
+              "stressed": true
+            }
+          ],
+          "rhyme_group": "B",
+          "rhyme_tail": "12"
+        },
+        {
+          "key": "bytes-28-32",
+          "source": {
+            "adapter": "knot.document-range",
+            "id": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops/support/design-studies/backdrops/adapters/poem.txt#bytes=28..32"
+          },
+          "text": "away",
+          "syllables": [
+            {
+              "text": "away",
+              "stressed": false
+            },
+            {
+              "text": "·2",
+              "stressed": true
+            }
+          ],
+          "rhyme_group": "B",
+          "rhyme_tail": "12"
+        }
+      ]
+    }
+  }
+}

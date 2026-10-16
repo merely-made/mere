@@ -1,0 +1,5 @@
+RESULT fail
+captured p3_opened_link_held_timeline
+captured p3_link_history_held_default
+FAIL: native presentation stalled for 10000 ms (244 redraws, 79 presented frames)
+gpu timestamps: no

@@ -96,7 +96,7 @@ impl CartographySceneOptions {
         self
     }
 
-    fn to_view_intent(&self) -> ViewIntent {
+    pub(crate) fn to_view_intent(&self) -> ViewIntent {
         let mut intent = ViewIntent::default();
         intent.form_factor = self.form_factor;
         intent.dimension = self.dimension;
@@ -160,6 +160,14 @@ pub const CANVAS_LAYOUT_STRATEGIES: &[(&str, &str)] = &[
     ("kanban.default", "Columns (by site)"),
     ("kanban.community", "Columns (by cluster)"),
     ("timeline.default", "Timeline (by order)"),
+    // The graph grammar's bounded scenes (DECISIONS 2026-10-16): Partition subdivides the
+    // viewport by site, sized by degree; Sets draws the four most common tags as fixed regions;
+    // Provenance stands sources left, one column per derivation step.
+    ("partition.default", "Partition (by site)"),
+    ("sets.default", "Sets (by tag)"),
+    ("provenance.default", "Provenance"),
+    // Tiles by weight on the infinite canvas, grouped by site, organised by the person.
+    ("mosaic.default", "Mosaic (by site)"),
 ];
 
 /// The main canvas's strategy result. Existing strategies emit positions;
@@ -169,6 +177,8 @@ pub struct CanvasStrategyProjection {
     pub positions: Vec<(NodeKey, PortablePoint)>,
     pub score: Option<sceno::Score>,
     pub coverage: kernel::graph::CoverageNote,
+    /// Regions a bounded arrangement draws (Partition, Sets).
+    pub regions: Vec<cartography::ProjectedRegion>,
 }
 
 /// Dispatch `id` to its cartography adapter and project against `graph` at viewport
@@ -205,11 +215,17 @@ fn project_canvas_dispatch(
     if id == "phyllotaxis.default" {
         return spiral_in(registry, graph, extents, focus, recent_first, 1.0, None).projection;
     }
+    // A host without a canvas has no arrangement of the person's: plain by-site Mosaic.
+    if id == super::mosaic::MOSAIC_ARRANGEMENT {
+        let state = super::mosaic::MosaicState::default();
+        return super::mosaic::project_mosaic(registry, graph, &state, width, height, extents);
+    }
     // The axis an axis-driven arrangement reads, threaded on the intent (where `axis_values`
     // lives), from the registry's channel.
+    let mut provenance_columns = Vec::new();
     let axis: Option<HashMap<NodeKey, AxisValue>> = match id {
-        // Columns by site: a categorical column per URL authority.
-        "kanban.default" => Some(
+        // Columns by site: a categorical column per URL authority; Partition's groups likewise.
+        "kanban.default" | "partition.default" => Some(
             registry
                 .sites(graph)
                 .iter()
@@ -248,6 +264,16 @@ fn project_canvas_dispatch(
         // Focus-driven: rings outward from `focus` (the pane's selection), which the request
         // carries as `rings.focus`. Without a focus there is no layout to compute, so leave the
         // canvas as-is.
+        // Sets reads tags as memberships; the focus sits in the core.
+        "sets.default" => {
+            options.focus = focus;
+            Some(super::scene_axes::tag_sets(graph))
+        },
+        "provenance.default" => {
+            let (axis, order) = super::scene_axes::derivation_columns(graph);
+            provenance_columns = order;
+            Some(axis)
+        },
         "radial.default" => {
             let Some(focus) = focus else {
                 return cartography::Projection::unavailable(graph, "projection focus unavailable");
@@ -269,6 +295,15 @@ fn project_canvas_dispatch(
         "kanban.default" | "kanban.community" => KanbanAdapter::default().project(&request),
         "timeline.default" => TimelineAdapter::default().project(&request),
         "radial.default" => RadialAdapter::default().project(&request),
+        "partition.default" => cartography::adapters::PartitionAdapter::default().project(&request),
+        "sets.default" => cartography::adapters::SetsAdapter::default().project(&request),
+        "provenance.default" => KanbanAdapter {
+            config: sceno::Kanban {
+                column_order: provenance_columns,
+                ..sceno::Kanban::default()
+            },
+        }
+        .project(&request),
         // Grid, Spectral, Penrose and L-system: cartography keeps their table, shared with the
         // mere view.
         other => cartography::adapters::project_graph_only(other, &request).unwrap_or_else(|| {
@@ -536,6 +571,22 @@ impl crate::canvas::Canvas {
         zoom_level: f32,
         previous_score: Option<&sceno::Score>,
     ) -> CanvasStrategyProjection {
+        if id == super::mosaic::MOSAIC_ARRANGEMENT {
+            let projection = super::mosaic::project_mosaic(
+                &mut self.channels,
+                &self.graph,
+                &self.mosaic,
+                width,
+                height,
+                extents,
+            );
+            return CanvasStrategyProjection {
+                positions: projection.nodes.iter().map(|n| (n.node, n.position)).collect(),
+                score: None,
+                coverage: projection.metadata.coverage,
+                regions: projection.regions,
+            };
+        }
         let focus = self.focused_key();
         project_strategy_in(
             &mut self.channels,
@@ -619,6 +670,7 @@ fn project_strategy_in(
                 .collect(),
             score: Some(result.score),
             coverage: result.projection.metadata.coverage,
+            regions: Vec::new(),
         };
     }
     let projection = project_canvas_dispatch(
@@ -640,6 +692,7 @@ fn project_strategy_in(
             .collect(),
         score: None,
         coverage: projection.metadata.coverage,
+        regions: projection.regions,
     }
 }
 

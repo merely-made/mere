@@ -1,0 +1,173 @@
+{
+  "schema": "mere.linked-scene-qualification/1",
+  "date_utc": "2026-10-16T19:04:43.833849+00:00",
+  "scope": "Canonical integration, persistent Woodshed Set arrangements, and source-supplied occurrence-linked fretboard scenes in Graphshell",
+  "source_manifest": "source-manifest.json",
+  "runtime_manifest": "runtime-manifest.json",
+  "mere_source_commit": "ebc8eece312bf9bc3a75086eb28cc19603c4f634",
+  "canonical_integration": {
+    "mere_base": "71405bc6d7d26553b93934efbf75d48a06dc1ae5",
+    "scene_document_api": "b7146e25a348a310538831981b4587eadebda12b",
+    "knot": "4768a47a4223da5b91853c869da459812bae4339",
+    "woodshed": "d90d4375405ecd43a594a292e1bbc6a21178ab51",
+    "signalman": "a5a27fba8d91577b43cbf805ad62083826c657d0",
+    "local_source_patches_used": false,
+    "scope": "Root workspace lockfiles; independent app/port locks retain their recorded qualification cohorts"
+  },
+  "checks": [
+    {
+      "command": "cargo test -p scenomise --test backdrop_scenes --test sequence_templates --test scene_documents --locked --offline",
+      "tests": 14,
+      "log": "logs/core-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p pictograph --no-default-features --features backdrop-cpu --lib backdrop_surface --locked --offline",
+      "tests": 3,
+      "log": "logs/surface-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p woodshed-core --features portable-scenes --lib scene:: --locked --offline",
+      "tests": 35,
+      "log": "logs/woodshed-scene-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p woodshed-core --features portable-scenes --lib card_shapes:: --locked --offline",
+      "tests": 11,
+      "log": "logs/woodshed-card-shape-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p knot-readings --features portable-scenes --lib --locked --offline",
+      "tests": 15,
+      "log": "logs/knot-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p signalman --features portable-scenes --lib survey:: --locked --offline",
+      "tests": 13,
+      "log": "logs/signalman-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p pictograph --no-default-features --features backdrop-cpu --lib grammar_view --locked --offline",
+      "tests": 4,
+      "log": "logs/grammar-regression.log",
+      "scope": "Regression for concurrently integrated graph grammar",
+      "result": "pass"
+    },
+    {
+      "command": "python3 scripts/check_port_boundaries.py",
+      "log": "logs/boundaries.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo run -p pictograph --no-default-features --features backdrop-cpu --example backdrop_receipt --locked --offline -- support/design-studies/backdrops/templates/arrangement-receipt support/design-studies/backdrops/templates",
+      "frames": 14,
+      "log": "logs/cpu.log",
+      "result": "pass"
+    },
+    {
+      "command": "RUSTC=/Users/markik/.rustup/toolchains/1.99.0-x86_64-apple-darwin/bin/rustc rustup run 1.99.0 cargo rustc --manifest-path ports/graphshell/web/Cargo.toml --lib --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu --locked --offline -- -C link-arg=-zstack-size=16777216",
+      "log": "logs/wasm-build.log",
+      "result": "pass"
+    },
+    {
+      "command": "wasm-bindgen ports/graphshell/web/target/wasm32-unknown-unknown/debug/graphshell_web.wasm --target web --out-dir /tmp/graphshell-arrangement-web/pkg",
+      "log": "logs/wasm-bindgen.log",
+      "result": "pass"
+    }
+  ],
+  "test_total": 95,
+  "slice_test_total": 91,
+  "concurrent_merge_regression_tests": 4,
+  "exports": [
+    {
+      "command": "cargo run -p woodshed-core --features portable-scenes --bin woodshed-arrangement-scene --locked --offline -- regular OUTPUT.json",
+      "recipe": "../arrangement-regular.json",
+      "log": "logs/export-regular.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo run -p woodshed-core --features portable-scenes --bin woodshed-arrangement-scene --locked --offline -- varied OUTPUT.json",
+      "recipe": "../arrangement-varied.json",
+      "log": "logs/export-varied.log",
+      "result": "pass"
+    }
+  ],
+  "cpu": {
+    "receipt": "receipt.json",
+    "frames": 14,
+    "backend": "Vello CPU",
+    "assertions": [
+      "Nonblank paint",
+      "Selection changes pixels",
+      "Attention leaves source unchanged",
+      "Repeated tonic voicings produce distinct RGBA frames"
+    ]
+  },
+  "browser": {
+    "result": "pass for listed smoke cases",
+    "browser": "Codex in-app Chromium",
+    "backend": "Graphshell presentation-webgpu, shared surface producers",
+    "gpu_adapter_identity": "not independently recorded",
+    "cases": [
+      "Regular and varied ii-V-I use the same expectation spans",
+      "Persistent card-3 selection survives switching arrangement samples",
+      "Two tonic Cards retain the same chord resource and have separate saved voicings",
+      "Selecting card-4 replaces the linked fretboard with supplied voicing 2",
+      "Selecting authored rest removes linked surface",
+      "Replacing document with metre removes linked surface",
+      "Browser export equals full source document including four linked readings",
+      "Reimport preserves card-4 selection and linked scene",
+      "Invalid linked scene version is refused and both prior displayed views remain intact"
+    ],
+    "negative_input": "invalid-linked-document.json",
+    "export": "browser-export.json",
+    "console": "browser-console.json",
+    "warn_error_count": 0,
+    "desktop_capture_viewport": [
+      1280,
+      1200
+    ],
+    "temporary_viewport_reset": true,
+    "captures": [
+      "graphshell-regular.jpg",
+      "graphshell-varied-first-tonic.jpg",
+      "graphshell-varied-second-tonic.jpg",
+      "graphshell-final-default.jpg",
+      "graphshell-merged-runtime.jpg",
+      "graphshell-merged-desktop.jpg"
+    ],
+    "final_merged_runtime_recheck": {
+      "result": "pass",
+      "cases": [
+        "Reloaded rebuilt merged source",
+        "Selected card-4 and observed supplied voicing 2",
+        "Rejected invalid child version with both views retained",
+        "Export equals source document",
+        "Reimport preserves card-4 and voicing 2"
+      ],
+      "capture": "graphshell-merged-runtime.jpg",
+      "admission": "browser-invalid-import-merged.txt",
+      "roundtrip": "browser-roundtrip-merged.txt",
+      "console": "browser-console-merged.json",
+      "desktop_capture": "graphshell-merged-desktop.jpg"
+    },
+    "captures_before_concurrent_merge": [
+      "graphshell-regular.jpg",
+      "graphshell-varied-first-tonic.jpg",
+      "graphshell-varied-second-tonic.jpg",
+      "graphshell-final-default.jpg"
+    ]
+  },
+  "limits": [
+    "Native application panels not qualified",
+    "No audio transport or playback clock",
+    "No source editing authority",
+    "No physical-device or performance qualification",
+    "No new narrow-screen qualification for the linked layout; prior host evidence remains historical"
+  ]
+}

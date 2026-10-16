@@ -1,0 +1,463 @@
+{
+  "schema": "mere.link-model-opened-link-qualification/1",
+  "date": "2026-10-16",
+  "source_commit": "732c1537afd142a21c2bf4858c0375167eae70c1",
+  "implementation_commit": "b36b5d85b",
+  "starting_main": "c01c0aa73c04eb91eb1e3126477e9e232e532b90",
+  "upstream_merged": "6d1908f4ca88f37a2081b557de3d29b46ec38b6b",
+  "phase_status": {
+    "P3": "Chartulary prerequisite and shared Graphshell opened-link slice qualified; Woodshed and Knot receiving-host proofs remain in progress",
+    "P4": "later; fan retirement",
+    "P6": "later; all families and history budgets",
+    "P7": "later; promotion"
+  },
+  "user_choices": {
+    "independent_reasons": "separate assertions",
+    "woodshed_withdrawal": "personal assertions only; generated claims read-only",
+    "woodshed_audition": "both endpoints in assertion direction as before/after pair"
+  },
+  "build_source": "build-source.json",
+  "source_input_hashes_verified": 23,
+  "checks": [
+    {
+      "name": "shared-packages",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "chartulary",
+        "-p",
+        "scenograph",
+        "-p",
+        "scenomise",
+        "-p",
+        "servitor",
+        "-p",
+        "cambium",
+        "-p",
+        "pictograph",
+        "--features",
+        "pictograph/canvas",
+        "--lib"
+      ],
+      "cwd": "Mere integration checkout",
+      "source_commit": "732c1537afd142a21c2bf4858c0375167eae70c1",
+      "exit_code": 0,
+      "log": "logs/shared-final.log",
+      "sha256": "dcffdb85189ba1bbe1258a06f951cc441b3fe4bfb16449bb0562407cd400a8f4",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.51s",
+        "test result: ok. 275 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s",
+        "test result: ok. 75 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+        "test result: ok. 464 passed; 0 failed; 18 ignored; 0 measured; 0 filtered out; finished in 50.02s",
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 182 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+        "test result: ok. 98 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ],
+      "passed": 1124,
+      "ignored": 18
+    },
+    {
+      "name": "graphshell-web",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "web",
+        "--lib"
+      ],
+      "cwd": "Mere integration checkout",
+      "source_commit": "732c1537afd142a21c2bf4858c0375167eae70c1",
+      "exit_code": 0,
+      "log": "logs/graphshell-final.log",
+      "sha256": "f1a322dbd350ab0c320e7b539ad8527accfe19ead293afaf7ac81d4256b09b18",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 15s",
+        "test result: ok. 302 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 55.60s"
+      ],
+      "passed": 302,
+      "ignored": 6
+    },
+    {
+      "name": "cambium-final",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "cambium",
+        "--lib"
+      ],
+      "cwd": "Mere integration checkout",
+      "source_commit": "732c1537afd142a21c2bf4858c0375167eae70c1",
+      "exit_code": 0,
+      "log": "logs/cambium-final.log",
+      "sha256": "53e4b22bac41ea5095038de55461984c792ff61bec9a672362246dde06313124",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.20s",
+        "test result: ok. 275 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s"
+      ],
+      "passed": 275,
+      "ignored": 0
+    },
+    {
+      "name": "product-webgpu-wasm",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "product,presentation-webgpu"
+      ],
+      "cwd": "ports/graphshell/web",
+      "source_commit": "732c1537afd142a21c2bf4858c0375167eae70c1",
+      "exit_code": 0,
+      "log": "logs/wasm-final.log",
+      "sha256": "44bfb40717ae95143655076db375bfa8159d5aaba5a5652b9061c57678226438",
+      "summaries": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 14.14s"
+      ],
+      "passed": null,
+      "ignored": null
+    }
+  ],
+  "unique_native_tests_passed": 1426,
+  "existing_native_ignores": 24,
+  "environment": {
+    "native_target": "/Users/markik/Code/testing/mere/link-model-knot-20261015/knot-target",
+    "native_build": "/Users/markik/Code/testing/mere/link-model-knot-20261015/knot-build",
+    "wasm_target": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-target",
+    "wasm_build": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-build",
+    "CARGO_BUILD_JOBS": "1",
+    "TMPDIR": "/tmp",
+    "cache_policy": "task-owned native/wasm caches reused sequentially; all Cargo invocations serialized"
+  },
+  "dependency_update": {
+    "comparison": "lock-delta.json",
+    "package_version_or_source_changes": 0,
+    "added_dependency_edges_per_lock": 2,
+    "only_changes": "Cambium now depends on existing Scenograph and Scenomise"
+  },
+  "browser": {
+    "state": "ok",
+    "result": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "backend": "BrowserWebGpu",
+    "viewport_css": [
+      1280,
+      720
+    ],
+    "capture_pixels": [
+      2560,
+      1440
+    ],
+    "viewport_override": false,
+    "gpu_timestamps": false,
+    "captures_reviewed": 7,
+    "reopened": true,
+    "review": "Held timeline; retained history timeline; asserter lanes; held exact row; timed closed withdrawal; unknown-time withdrawal; undated held row. Geometry, point marker, source/basis disclosure and chronological alternate are legible. Selection/workbench invariants and held-only exact actions pass.",
+    "served_artifacts": [
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-p3-20261016/site/pkg/graphshell_web.js",
+        "bytes": 149348,
+        "sha256": "aa209512cb5a09af7d444184bfa6d775009287f27249bf1466390606ad93e1ab"
+      },
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-p3-20261016/site/pkg/graphshell_web_bg.wasm",
+        "bytes": 261706417,
+        "sha256": "448cfafce6a593d7435dae7ef67b922a5fadaa63fb9b1bf64b2a2278db3f996b"
+      }
+    ],
+    "served_scenario_sha256": "2db19e2f34f0ad4c8ad9a571efde68da6921801d564811a3b4781825a9ce55ab",
+    "scenario_sha256": "2db19e2f34f0ad4c8ad9a571efde68da6921801d564811a3b4781825a9ce55ab",
+    "binding_tool_version": "0.2.129"
+  },
+  "assertion_contract": {
+    "identity": "one authoritative GraphLog ledger keyed EdgeId; independent assertions retain independent IDs",
+    "authority": "source asserter separate from operation actor; Servitor resolves both endpoints before scoped ID operation admission",
+    "withdrawal": "terminal, stale replay cannot revive; later assertion uses fresh ID",
+    "checkpoints": "new ledger/held-edge bijection and writer frontier validation; missing-ledger legacy checkpoint rebuilds from full append-only journal",
+    "payload": "ledger authoritative; held compatibility tuples do not become a second E payload authority",
+    "layout": "existing Stack and Timeline; each member row preserves source reference; unknown end is a point with ?; undated starts not positioned; reverse clocks preserved",
+    "exact_action": "full source + stratum + direction + assertion ID re-resolved against source owner; withdrawn/idless rows no actions"
+  },
+  "iterations": [
+    "Initial native compile issues: typed closures/helpers and expect_err Debug bound; repaired before green gates.",
+    "Initial Scenomise large-clock fixtures retained unrelated 30ms withdrawal; corrected fixtures to isolate intended near-MAX input.",
+    "Initial Pictograph regression assumed Surface instead of lifted Resource; corrected to source snapshot immutability.",
+    "Initial Graphshell test imported private persistence types; corrected public persistence import.",
+    "Initial browser rejected dashed top border by pinned portable preflight; exact diagnostic and failed results retained under iterations.",
+    "First successful presentation review found duplicate undated caption; final source removes duplicate and all seven final captures reviewed."
+  ],
+  "limits": [
+    "This is bounded P3 supplier and Graphshell qualification; Woodshed and Knot receiving-host proofs continue separately.",
+    "Chartulary RDF adapter still emits held semantic triples; no new reifier/history exporter is claimed.",
+    "Runtime generation is not an immutable public revision. Host actions cannot infer permission from metadata.",
+    "No desktop-native application, physical-peer, renderer release or automatic Knot synchronization acceptance claimed.",
+    "P6 substantial withdrawal-history budgets and complete pre-P2 binary archive migration remain open."
+  ],
+  "documentation_audit": {
+    "baseline": "6d1908f4ca88f37a2081b557de3d29b46ec38b6b",
+    "comparison": "audit/comparison.json",
+    "new_occurrences": 0,
+    "audit_exit_code": 0,
+    "judgment_exit_code": 1,
+    "coverage": [
+      271,
+      285
+    ],
+    "same_judgment_errors": 15,
+    "global_gate_green": false,
+    "baseline_unheaded_sources": 67,
+    "final_unheaded_sources": 67
+  },
+  "receipt_artifacts": [
+    {
+      "path": "audit/comparison.json",
+      "bytes": 1963,
+      "sha256": "0d6324ddc6cfefdc451a41da47333737d7247efda74693daa9c0b99ef5a6bfc1"
+    },
+    {
+      "path": "audit/doc-audit-final.json",
+      "bytes": 248711,
+      "sha256": "e9335586f8c78629bac90df5f958dbbcc6732023abb13b8710c7ddd5817b7f11"
+    },
+    {
+      "path": "audit/doc-audit-upstream-baseline.json",
+      "bytes": 248711,
+      "sha256": "75e86e04127f884aaa4be71f28dd474abbaf4d925571d1ecd4ef510cafd560c8"
+    },
+    {
+      "path": "audit/judgment-final.json",
+      "bytes": 11664,
+      "sha256": "681f431aacc2e732c64aa278dfd98b9a3bc667858cb3eab44480bdd7e34758df"
+    },
+    {
+      "path": "audit/judgment-upstream-baseline.json",
+      "bytes": 11664,
+      "sha256": "b8f7b589bbd63d2ac35d68d573885257dbe3729f1a77c83d720cdd17706bd128"
+    },
+    {
+      "path": "browser/p3_link_history_held_default.png",
+      "bytes": 310911,
+      "sha256": "6d9e9f92d73cc92c5d36c6117c406453480599bc02ef332d0867943b923f2b80"
+    },
+    {
+      "path": "browser/p3_link_history_retained.png",
+      "bytes": 317943,
+      "sha256": "ace3475230c313cb62ea856e3b8b95246bdbb3984f58af56e0f557478b3d2f77"
+    },
+    {
+      "path": "browser/p3_link_history_undated.png",
+      "bytes": 319451,
+      "sha256": "32096a6e1d98a4939bd43882534f4c090d3f799e07ae1d6d90bd0691b2b1bb5c"
+    },
+    {
+      "path": "browser/p3_link_history_unknown_withdrawal.png",
+      "bytes": 323266,
+      "sha256": "d20642b066c199c8b476d16ee15bf4409c554fe48440a5ffc59332388cfc891e"
+    },
+    {
+      "path": "browser/p3_opened_link_asserter_lanes.png",
+      "bytes": 332019,
+      "sha256": "e0abd0bbe1b37717708d8e638b947c30ba7030eb751a9c227025d69485d61d57"
+    },
+    {
+      "path": "browser/p3_opened_link_held_timeline.png",
+      "bytes": 344922,
+      "sha256": "a8f99af0b0c2b70c1b5bc1b585e41c7f74f9509a98fbcd7cce43478718912b99"
+    },
+    {
+      "path": "browser/p3_opened_link_history_timeline.png",
+      "bytes": 326690,
+      "sha256": "bb1d8d43c3cd53ff0bd1f20627fdafca8867b24ed28468fba7b21c307f74b8e0"
+    },
+    {
+      "path": "browser/p3_tree_opened_link.scn",
+      "bytes": 5559,
+      "sha256": "2db19e2f34f0ad4c8ad9a571efde68da6921801d564811a3b4781825a9ce55ab"
+    },
+    {
+      "path": "browser/progress.json",
+      "bytes": 11199,
+      "sha256": "83dc716a0d7bd1f1dfda57f6e5fafdbb240691466c50451d7d3fef61eb4983b2"
+    },
+    {
+      "path": "browser/result.json",
+      "bytes": 37069,
+      "sha256": "95d38e3e0f6a7a698db5e146b7ea8d4ad93370fa072b81affca4c00e4b73d835"
+    },
+    {
+      "path": "browser/scenario.done",
+      "bytes": 405,
+      "sha256": "a817b06135f3838ec57e0eb9703006425ee8c3451f95fc6d77dd84b0ad7c93c9"
+    },
+    {
+      "path": "build-source-initial.json",
+      "bytes": 4170,
+      "sha256": "b1a2b47e0f9285d17b1e457ea7a4fd0a9e9b989d6a0c08e8674e6ef356d19acd"
+    },
+    {
+      "path": "build-source.json",
+      "bytes": 4235,
+      "sha256": "5119b2115b134b535621f00dcb6e02088650321f6fda30c8e9ca23f58131db83"
+    },
+    {
+      "path": "iterations/browser-diagnosed-stall/progress.json",
+      "bytes": 11624,
+      "sha256": "5d1f72d0f9a2c0c37a2041d8f3b7a3f4063f246ea90bf1748fa9aec26b3fd517"
+    },
+    {
+      "path": "iterations/browser-diagnosed-stall/result.json",
+      "bytes": 44388,
+      "sha256": "355d729ce9f31cccc184b208144eef3769243003922da99c40bd3e2b8636cbf7"
+    },
+    {
+      "path": "iterations/browser-diagnosed-stall/scenario.done",
+      "bytes": 189,
+      "sha256": "ebe9acea716cfaef6b99c382b0fc89e55673516991cad35f1efd64a9312527d4"
+    },
+    {
+      "path": "iterations/browser-first-rendered/progress.json",
+      "bytes": 10046,
+      "sha256": "5b54415d8357bebd1ded6c4983efc9a3c91d1f12374325f852d587bb50aac785"
+    },
+    {
+      "path": "iterations/browser-first-rendered/result.json",
+      "bytes": 37069,
+      "sha256": "36b9bbb6ce2c2282a385193e46a46b48ddf4544720991bd7e86252ce55bfd3a5"
+    },
+    {
+      "path": "iterations/browser-first-rendered/scenario.done",
+      "bytes": 405,
+      "sha256": "a817b06135f3838ec57e0eb9703006425ee8c3451f95fc6d77dd84b0ad7c93c9"
+    },
+    {
+      "path": "iterations/browser-initial-stall/progress.json",
+      "bytes": 11622,
+      "sha256": "5460fdac2d0ed4859261b5ec58af442b9983e43ff8457810f9f81d309be2a1f5"
+    },
+    {
+      "path": "iterations/browser-initial-stall/result.json",
+      "bytes": 44387,
+      "sha256": "09aedee6a3d76af106f6ad853bf9761dc2a8aa5f3b1d3ca5ccf5092133542f47"
+    },
+    {
+      "path": "iterations/browser-initial-stall/scenario.done",
+      "bytes": 189,
+      "sha256": "693da0d47dabafe11d9fdfc6ec4b84a74eac91a013d01625f08ed18255cb7f6f"
+    },
+    {
+      "path": "iterations/presentation-diagnostic.json",
+      "bytes": 698,
+      "sha256": "a9ad46a91faae26cb262405fd318d61f7e046685fcc542c09d4615367a0d79d9"
+    },
+    {
+      "path": "lock-delta.json",
+      "bytes": 542,
+      "sha256": "c49f6f421c30c740be558610b12aa94f4f173b658ec5b61109c8478fcdb5285c"
+    },
+    {
+      "path": "logs/cambium-final.log",
+      "bytes": 23016,
+      "sha256": "53e4b22bac41ea5095038de55461984c792ff61bec9a672362246dde06313124"
+    },
+    {
+      "path": "logs/cambium-portable-fix.log",
+      "bytes": 25889,
+      "sha256": "144acf51cac29414bd5142e852696e37b3379e61e10c62ed3797d15ce75ac628"
+    },
+    {
+      "path": "logs/cambium-qualified.log",
+      "bytes": 23016,
+      "sha256": "f9f52281fdf8f8bf001b549b617ed9c8900c690cd5284edcef095bb37a07f4d0"
+    },
+    {
+      "path": "logs/graphshell-final.log",
+      "bytes": 62169,
+      "sha256": "f1a322dbd350ab0c320e7b539ad8527accfe19ead293afaf7ac81d4256b09b18"
+    },
+    {
+      "path": "logs/graphshell-web-retry.log",
+      "bytes": 62554,
+      "sha256": "8a8fdbc95b3b1d609615e92ee7a4f31b21cf1ca346f84360a98728e5441f540d"
+    },
+    {
+      "path": "logs/graphshell-web.log",
+      "bytes": 30567,
+      "sha256": "9542072ebcab215a4e6e80f071ca7d3ed14a72c37746beee685157642ccd37c9"
+    },
+    {
+      "path": "logs/shared-final.log",
+      "bytes": 107522,
+      "sha256": "dcffdb85189ba1bbe1258a06f951cc441b3fe4bfb16449bb0562407cd400a8f4"
+    },
+    {
+      "path": "logs/shared-review-fixes.log",
+      "bytes": 46111,
+      "sha256": "17b84aa8a87fd2471d4ebd0bbb429db684ad1d10012d85a25a793d5db645a000"
+    },
+    {
+      "path": "logs/shared-tests-accepted.log",
+      "bytes": 101132,
+      "sha256": "dbdcc356ee92c9467da1afa8e32c7aeb09547dc982006dfbe53cada27877991b"
+    },
+    {
+      "path": "logs/shared-tests-final.log",
+      "bytes": 83343,
+      "sha256": "076ef1dbc51310660c6bc854a3b139323ab677a76c566f206dc25c3f4021c3e2"
+    },
+    {
+      "path": "logs/shared-tests-qualified.log",
+      "bytes": 15976,
+      "sha256": "b77fade990f062ac76a6d59b517eae746d3c7285dae2ba562b7f263a526556e9"
+    },
+    {
+      "path": "logs/shared-tests-retry.log",
+      "bytes": 5998,
+      "sha256": "cfe1a8a18d045d9def655f197cfe7b1e2f6fdb5fab9c0bde16f47e0ed9c4b194"
+    },
+    {
+      "path": "logs/shared-tests.log",
+      "bytes": 2426,
+      "sha256": "71cf9a8dd6ac6ffffb2a73c8830ba834537ed3e87573c03c8c20319bc84dffb8"
+    },
+    {
+      "path": "logs/wasm-final.log",
+      "bytes": 28694,
+      "sha256": "44bfb40717ae95143655076db375bfa8159d5aaba5a5652b9061c57678226438"
+    },
+    {
+      "path": "logs/wasm-portable-fix.log",
+      "bytes": 28694,
+      "sha256": "d1a5f34577a62e46677648229a33c245f912172529f1f2a314afe2849f1b0dac"
+    },
+    {
+      "path": "logs/wasm-qualified.log",
+      "bytes": 28694,
+      "sha256": "8f10feca076cf62d101fb46a65b3af5899d6a3a1b4c65b8cf41e2eb1054265f0"
+    },
+    {
+      "path": "logs/wasm.log",
+      "bytes": 30365,
+      "sha256": "5823855b2cf6af06b4c4da6206d68c320fe877a13522bf1f48631e308bb217b0"
+    }
+  ]
+}
