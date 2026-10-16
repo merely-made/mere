@@ -1,72 +1,80 @@
 # Batch 89: Opened-link receiving hosts and observed qualification gates
 
-Audit date: 2026-10-16. Refreshed Mere main `f27ab46ae`, supplier receipt
-`ee324e517`; receiving source Knot `e7b5c50` / published `921b4e0` and
-Woodshed `374c75d` / published `d365952`. The receiving receipt is
+Audit date: 2026-10-16, final native continuation. Refreshed Mere main
+`a7ca9b035`, supplier receipt `ee324e517`; receiving native source Knot
+`e7b5c50` / published `921b4e0` and Woodshed `474d10a` / published `943c762`.
+The receiving receipt is
 `support/receipts/link-model-p3-20261016/receiving-hosts.json`.
 
 ## mere_docs/technical_architecture/2026-10-15_link_model.md
 
 - disposition: current
-- status line: "Knot receiving qualification is published at 921b4e0, while Woodshed native acceptance remains pending after passing source tests/build" - accurate: yes
+- status line: "Bounded P3 is qualified" - accurate: yes
 - claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
 
-Supersedes batch 88 for current receiving status. The earlier supplier-only
-amendment remains a historical gate; the current status and final dated
-continuation distinguish Knot's observed native proof from Woodshed's pending
-native proof. No whole-P3 completion is asserted.
+Supersedes batch 88 and this batch's earlier Mac-lock checkpoint for current
+receiving status. The supplier-only amendment remains a historical gate. The
+current headline and final dated continuation now reflect observed native
+qualification in both receiving products.
 
 ### Contradictions
 
 None in the scoped source review. The canonical pair keeps original directed
 buckets and independent assertion IDs. Woodshed's actual sealed persona owns
 personal writes; generated facts remain read-only. Source scope, metadata and
-layout do not confer write permission.
+layout do not confer write permission. Full P4f and physical audio acceptance
+remain separate from the bounded opened-link flow.
 
 ### Recommended action
 
-Unlock the Mac, then observe Woodshed's author/withdraw/audition and separate
-sealed reopen against the prepared isolated Keeper. Keep P4/P6/P7 and physical
-audio acceptance separate. Knot owns its recorded checkpoint confidentiality
-follow-up; do not describe its projection database as fully encrypted.
+Proceed to P4's responsive rest stroke and fan after this bounded P3 delivery.
+Keep P6/P7, automatic resident synchronization and physical audio acceptance
+separate. Knot owns its recorded checkpoint confidentiality follow-up; do not
+describe its projection database as fully encrypted.
 
 ### Notes
 
 Read consumer source and owner receipts. Knot has four reviewed native captures
-from two separate processes. Woodshed has a green five-package source gate and
-desktop build, but the native launch was refused while the Mac was locked.
-The independent-reason source projection and canvas-filter defects were fixed
-before source qualification; the 11-adjacency controls now pass.
+from two separate processes. Final Woodshed native source `474d10a` has seven
+reviewed captures from seed (103 frames) and a different fresh process (49
+frames). Normal textbox entry and Add/Withdraw/Audition controls retain two
+independent reasons, exact source UUID and assertion IDs, and one withdrawal
+endpoint. The ordered audition request leaves Set serialization unchanged.
+The four-file isolated Keeper manifest is unchanged and the practice file is
+sealed. List provenance and direction Timeline captures were reviewed.
 
 ## mere_docs/implementation_strategy/2026-10-15_link_model_plan.md
 
 - disposition: current
-- status line: "Knot receiving qualification is published at 921b4e0; Woodshed source tests and build pass on 374c75d, with native acceptance awaiting an unlocked Mac" - accurate: yes
+- status line: "This completes bounded P3" - accurate: yes
 - claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
 
-Supersedes batch 88's receiving-host assignment. The implementation plan now
-records the completed source ownership changes and the exact open native gate.
+Supersedes the earlier source-qualified/native-pending continuation. The plan
+now records the final host UI correction, observed seed/reopen proof and
+published receiving receipts, with the next integration phase named.
 
 ### Contradictions
 
-None. 784 Woodshed root cases and five child invocations are counted separately;
-seven ignores are retained. Knot's workspace and final scoped/native sources
-are recorded separately. Positive native authoring is not inferred from source
-unit tests, fixture preparation or a failed UI launch.
+None. The 784 Woodshed suite cases on `374c75d` and five child invocations are
+counted separately; seven ignores are retained. The final UI change repeats
+191 view cases and the desktop build on `474d10a`. Knot's workspace and final
+scoped/native sources are recorded separately. The proof is bounded to the
+actual source, two native processes, and reviewed captures.
 
 ### Recommended action
 
-Publish the tested work and truthful partial receipt directly to main under
-Mark's authorization. Complete the prepared native gate after manual unlock;
-then update the same plan and receiving receipt without weakening its proof.
+Publish this completion receipt and documentation directly to main under
+Mark's authorization. Retain later product and physical gates in the plan.
 
 ### Notes
 
 Other supplier families and nested port locks retain their qualified revisions.
-Knot's final host presentation wraps full detail handles and preserves compact
-Timeline geometry. The existing plaintext checkpoint was observed and recorded
-in Knot's owner plan; no unrequested storage migration is claimed here.
+The final Woodshed source fixes the invisible authoring field found during
+native review; its scenario now types through the real textbox. Knot's full
+detail handles wrap while its Timeline keeps compact geometry. Its existing
+plaintext checkpoint remains recorded in Knot's owner plan; this work does
+not claim a storage migration.

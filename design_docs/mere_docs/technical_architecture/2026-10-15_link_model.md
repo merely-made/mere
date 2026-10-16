@@ -4,10 +4,12 @@
 **Status:** design with a qualified bounded P1 shared reading and P5
 fixed-endpoint Graphshell experiment on source `1e3fb426c`. P2's semantic
 lifecycle and Knot supplier/intake gate are qualified by the continuation on
-`b69510949`. P3 is in progress: its chartulary prerequisite and shared
+`b69510949`. Bounded P3 is qualified: its chartulary prerequisite and shared
 Graphshell opened-link slice are qualified on `732c1537a`; Knot receiving
-qualification is published at `921b4e0`, while Woodshed native acceptance
-remains pending after passing source tests/build. P4, P6 and P7 (§8) remain later work. Mark ruled L1–L6 on
+qualification is published at `921b4e0`, and Woodshed receiving qualification is
+published at `943c762` on native source `474d10a`, including authoring, ordered
+audition and fresh-process sealed reopen. P4, P6 and P7 (§8) remain later work.
+Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
@@ -722,8 +724,11 @@ process preserve exact assertion IDs, directions, source basis and authored/
 withdrawal clocks, with unknown times left unknown. Its source freshness and
 unavailable immutable revision are explicit. Woodshed has the session-owned
 personal assertion source and exact actions, with generated claims read-only;
-784 affected suite cases and its desktop build pass. Its native authoring,
-ordered audition and sealed reopening still require an unlocked Mac. P3 stays
-in progress until that receiving proof is observed. The implementation plan
-records exact revisions, receiving receipts and the separate Knot checkpoint
+the 784-case source gate and final 191-case view follow-up pass, with a rebuilt
+desktop binary. Final native source `474d10a` passes ordinary note entry, personal
+assertion admission, exact withdrawal and ordered audition with Set unchanged.
+A different process reopens the same sealed source UUID, both assertion IDs and
+withdrawal tombstone. Seven reviewed List/Timeline captures close the bounded P3
+receiving proof, published with receipt `943c762`. The implementation plan records
+exact revisions, receiving receipts and the separate Knot checkpoint
 confidentiality finding. L1–L13 and the later phase gates are unchanged.
