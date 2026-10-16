@@ -12,7 +12,8 @@ qualification is published at `921b4e0`; Woodshed is qualified on native source
 source-owned personal authoring/withdrawal, ordered audition and fresh-process
 sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d` and is
 qualified within its recorded scope on Mere source `91467c0bb` and Woodshed receiving source `fe54425`,
-published with receipt `4716b71`. P6 and P7 remain later work.
+published with receipt `4716b71`. P6 began from refreshed main `0f8c1bf59`;
+its migration and receiving gates are in progress. P7 remains later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -710,3 +711,50 @@ P4 native intake; the independent C5 compatibility receipt keeps its own scope.
 P5 remains independently qualified. P6 family migration is next in the core
 sequence; P7 promotion is separately eligible. Full Stage P4f and physical audio
 qualification remain separate.
+
+
+## P6 continuation: all relation families as assertions
+
+**Status (2026-10-16): in progress; source integration and qualification pending.**
+Mark authorized the next phase after P4. Work begins from refreshed main
+`0f8c1bf59`; the containment proof leads the migration without conflating
+rule-derived URL/domain membership with authored reasons. The integration
+owner controls the storage contract, serialized Cargo gates and publication.
+Cheaper agents own bounded source inventories, canonical predicate mapping,
+read adapters, exact view hiding and independent compatibility controls.
+
+The four set-based families are Containment, Arrangement, Imported and
+Provenance. Traversal remains event-shaped with its existing rollup. A single
+assertion list replaces the four authoritative membership sets; old typed
+accessors become derived read projections. Every recognized relation has a
+stable canonical predicate. Existing taxonomy tags remain compatibility
+filters and keep their ordinals; Tabard's unused per-kind registry retires,
+while its active generic styling contract stays intact.
+
+Existing membership writers retain ensure semantics. Independent reasons use
+the statement-aware writer with exact IDs, source attribution, scope, basis,
+first/last times and terminal withdrawal. Default reads count held records;
+explicit history retains tombstones. New exact-ID view hides are distinct from
+whole-link and old selector hides. Paint, picking, spring contributions and
+saved intent must agree, and source facts must not change with a view hide.
+
+Canonical snapshots carry `assertion_schema: 1` and one assertion array per
+bucket. Schema 0 decodes the legacy sidecars; migration creates one deterministic
+compatibility record per original member and keeps unknown times/attribution
+unknown. Identity uses declared UTF-8 canonical bytes and UUIDv5, never a
+platform hash or wall clock. Known retained journal authors may repair legacy
+attribution only where original membership history proves it. Versioned v4
+JSON codicils keep explicit v1-v3 readers. Checked loading rejects ambiguous
+mixed formats and conflicting assertion handles before materialization.
+Normal durable snapshots still omit session arrangements; exact pair captures
+retain them. Ordinary URL/domain regeneration keeps its rule source and stable
+identity, while recorded snapshots retain their supplied truth.
+
+Done conditions include the authored CollectionMember proof (two independent
+same-actor reasons, exact withdrawal/hide, retained sibling), all-family metadata
+and placement controls, old snapshot/journal/codicil compatibility, stale-ID and
+foreign-owner refusal, ordinary and exact persistence, and measured reads with
+substantial withdrawal history. The integrated Graphshell browser must exercise
+ordinary exact-member hide/show and saved-intent reopen. Receiving products
+advance only after their own affected source/build/native gates. These are
+requirements, not acceptance inferred from the source edits.

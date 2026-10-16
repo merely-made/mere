@@ -134,3 +134,17 @@ main under Mark's authorization. Keep P6/P7 and physical acceptance separate.
 No new active document is introduced. Compare audits against current main
 `81e6805cf`; retain the pre-existing judgment debt rather than describing the
 global audit as green.
+
+
+### P6 source integration checkpoint (2026-10-16)
+
+- disposition: current
+- status line: "P6 family migration is in progress" - accurate: yes
+- claims checked: 3 - holds: 3, stale: 0, unverifiable: 0
+
+The architecture, existing implementation plan and index now record the
+accepted P6 continuation from `0f8c1bf59`. Canonical all-family records, legacy
+input conversion, exact view hides and bounded history reads are integration
+work. Test iterations remain outside the qualified claim until the shared,
+browser and receiving gates have finished. P1-P5 receipts retain their prior
+scope; P7 promotion remains later work. No new active document is introduced.

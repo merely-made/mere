@@ -115,10 +115,8 @@ fn surface_buckets_preserve_parallel_assertions_without_resource_lifting() {
         .find(|edge| edge.from_node_id == from.to_string() && edge.to_node_id == to.to_string())
         .unwrap();
     let mut parallel = original.clone();
-    parallel.semantic.as_mut().unwrap().statements[0].statement_id =
-        "urn:statement:surface-parallel".into();
-    parallel.semantic.as_mut().unwrap().statements[0].provenance_iri =
-        Some("urn:author:surface-other".into());
+    parallel.retained_assertions_mut()[0].statement_id = "urn:statement:surface-parallel".into();
+    parallel.retained_assertions_mut()[0].provenance_iri = Some("urn:author:surface-other".into());
     apply_graph_delta(
         &mut graph,
         GraphDelta::ReplaySetEdgesByIds {
@@ -286,18 +284,14 @@ fn source_identity_parallel_assertions_tags_navigation_and_reopen_survive_projec
         .resource_edges
         .into_iter()
         .find(|edge| {
-            edge.semantic.as_ref().is_some_and(|s| {
-                s.statements
-                    .iter()
-                    .any(|s| s.predicate != kernel::graph::resource::TAGGED_WITH_IRI)
-            })
+            edge.retained_assertions()
+                .iter()
+                .any(|assertion| assertion.predicate != kernel::graph::resource::TAGGED_WITH_IRI)
         })
         .unwrap();
     let mut parallel = original.clone();
-    parallel.semantic.as_mut().unwrap().statements[0].statement_id =
-        "urn:statement:parallel-query".into();
-    parallel.semantic.as_mut().unwrap().statements[0].provenance_iri =
-        Some("urn:author:other".into());
+    parallel.retained_assertions_mut()[0].statement_id = "urn:statement:parallel-query".into();
+    parallel.retained_assertions_mut()[0].provenance_iri = Some("urn:author:other".into());
     let target = original.to_node_id.parse().unwrap();
     apply_graph_delta(
         &mut graph,

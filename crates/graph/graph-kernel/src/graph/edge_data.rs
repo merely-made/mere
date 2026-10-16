@@ -116,7 +116,24 @@ pub struct SemanticStatement {
     pub withdrawn: Option<AssertionWithdrawal>,
 }
 
+/// All-family assertion record. The legacy semantic name remains source compatible.
+pub type RelationAssertion = SemanticStatement;
+pub type RelationAssertionSpec = SemanticStatementSpec;
+pub type AssertionData = SemanticData;
+
 impl SemanticStatement {
+    /// Classify the assertion by its canonical predicate. The old semantic
+    /// discriminant remains a compatibility input for existing records.
+    pub fn relation_kind(&self) -> super::RelationKind {
+        super::RelationKind::from_predicate_iri(&self.predicate)
+            .or_else(|| self.recognized_sub_kind.map(super::RelationKind::Semantic))
+            .unwrap_or(super::RelationKind::OpenPredicate)
+    }
+
+    pub fn is_semantic(&self) -> bool {
+        self.relation_kind().family() == super::EdgeFamily::Semantic
+    }
+
     pub fn is_held(&self) -> bool {
         self.withdrawn.is_none()
     }
@@ -278,7 +295,7 @@ pub struct SemanticData {
     /// During the statement-bucket migration this is a compatibility view over
     /// the statement predicates, not the durable truth.
     pub predicate: Option<String>,
-    /// The durable semantic facts carried between one node pair.
+    /// The one durable assertion list carried between a directed pair.
     pub statements: Vec<SemanticStatement>,
 }
 
@@ -534,7 +551,7 @@ impl SemanticData {
     pub fn set_statement_predicate(&mut self, predicate: Option<String>) {
         match predicate {
             Some(predicate) => {
-                if self.held_statements().next().is_none() {
+                if !self.held_statements().any(SemanticStatement::is_semantic) {
                     self.statements.push(SemanticStatement::new(
                         predicate,
                         None,
@@ -547,14 +564,18 @@ impl SemanticData {
                     for statement in self
                         .statements
                         .iter_mut()
-                        .filter(|statement| statement.is_held())
+                        .filter(|statement| statement.is_held() && statement.is_semantic())
                     {
                         statement.predicate = predicate.clone();
                     }
                 }
             },
             None => {
-                for statement in self.statements.iter_mut().filter(|s| s.is_held()) {
+                for statement in self
+                    .statements
+                    .iter_mut()
+                    .filter(|s| s.is_held() && s.is_semantic())
+                {
                     if let Some(sub_kind) = statement.recognized_sub_kind {
                         statement.predicate = predicate_iri(sub_kind).to_string();
                     } else {
@@ -573,17 +594,25 @@ impl SemanticData {
     }
 
     pub(crate) fn rebuild_compat(&mut self) {
+        // Semantic-only access remains a borrowed contiguous slice, even with
+        // a large non-semantic withdrawal history. Stable partitioning keeps
+        // the original relative order inside both groups.
+        self.statements
+            .sort_by_key(|statement| !statement.is_semantic());
         self.sub_kinds = self
             .statements
             .iter()
-            .filter(|statement| statement.is_held())
-            .filter_map(|statement| statement.recognized_sub_kind)
+            .filter(|statement| statement.is_held() && statement.is_semantic())
+            .filter_map(|statement| match statement.relation_kind() {
+                super::RelationKind::Semantic(kind) => Some(kind),
+                _ => None,
+            })
             .collect();
 
         let mut labels = self
             .statements
             .iter()
-            .filter(|statement| statement.is_held())
+            .filter(|statement| statement.is_held() && statement.is_semantic())
             .filter_map(|statement| statement.label.clone())
             .collect::<Vec<_>>();
         labels.sort();
@@ -595,14 +624,14 @@ impl SemanticData {
                 .statements
                 .iter()
                 .rev()
-                .filter(|statement| statement.is_held())
+                .filter(|statement| statement.is_held() && statement.is_semantic())
                 .find_map(|statement| statement.label.clone()),
         };
 
         let mut predicates = self
             .statements
             .iter()
-            .filter(|statement| statement.is_held())
+            .filter(|statement| statement.is_held() && statement.is_semantic())
             .map(|statement| statement.predicate.clone())
             .collect::<Vec<_>>();
         predicates.sort();
@@ -797,5 +826,53 @@ impl ArrangementData {
             .iter()
             .copied()
             .any(|sub_kind| sub_kind.durability() == RelationDurability::Session)
+    }
+}
+
+#[cfg(test)]
+mod canonical_family_controls {
+    use super::*;
+    use crate::graph::{ContainmentSubKind, EdgeFamily, RelationKind};
+
+    #[test]
+    fn canonical_predicate_owns_classification_and_legacy_hint_is_only_a_fallback() {
+        let mut record = SemanticStatement::new(
+            RelationKind::Containment(ContainmentSubKind::CollectionMember)
+                .predicate_iri()
+                .unwrap()
+                .into(),
+            Some(SemanticSubKind::Cites),
+            None,
+            GraphScope::Default,
+            None,
+            None,
+        );
+        assert_eq!(
+            record.relation_kind(),
+            RelationKind::Containment(ContainmentSubKind::CollectionMember)
+        );
+        assert!(!record.is_semantic());
+        let mut data = SemanticData {
+            statements: vec![record.clone()],
+            ..Default::default()
+        };
+        data.rebuild_compat();
+        assert!(data.sub_kinds.is_empty());
+        record.predicate = predicate_iri(SemanticSubKind::Quotes).into();
+        assert_eq!(
+            record.relation_kind(),
+            RelationKind::Semantic(SemanticSubKind::Quotes)
+        );
+        data.statements = vec![record.clone()];
+        data.rebuild_compat();
+        assert_eq!(data.sub_kinds, BTreeSet::from([SemanticSubKind::Quotes]));
+        record.predicate = "urn:legacy:custom-predicate".into();
+        assert_eq!(
+            record.relation_kind(),
+            RelationKind::Semantic(SemanticSubKind::Cites)
+        );
+        record.recognized_sub_kind = None;
+        assert_eq!(record.relation_kind(), RelationKind::OpenPredicate);
+        assert_eq!(record.relation_kind().family(), EdgeFamily::Semantic);
     }
 }

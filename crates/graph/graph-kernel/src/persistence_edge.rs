@@ -582,6 +582,31 @@ pub struct PersistedEdge {
     pub imported: Option<PersistedImportedEdgeData>,
     #[serde(default)]
     pub provenance: Option<PersistedProvenanceEdgeData>,
+    /// Canonical all-family records. None selects the legacy sidecar decoder;
+    /// Some(empty) is an explicitly empty list, never a request to infer facts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub assertions: Option<Vec<PersistedSemanticStatement>>,
+}
+
+impl PersistedEdge {
+    pub fn retained_assertions(&self) -> &[PersistedSemanticStatement] {
+        self.assertions.as_deref().unwrap_or_else(|| self.semantic.as_ref()
+            .map(|data| data.statements.as_slice()).unwrap_or(&[]))
+    }
+    pub fn retained_assertions_mut(&mut self) -> &mut [PersistedSemanticStatement] {
+        match self.assertions.as_mut() {
+            Some(records) => records.as_mut_slice(),
+            None => self.semantic.as_mut().map(|data| data.statements.as_mut_slice()).unwrap_or(&mut []),
+        }
+    }
+    pub fn has_legacy_assertion_data(&self) -> bool {
+        self.semantic.as_ref().is_some_and(|data| !data.statements.is_empty() || !data.sub_kinds.is_empty()
+            || data.predicate.is_some() || data.label.is_some())
+            || self.containment.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
+            || self.arrangement.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
+            || self.imported.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
+            || self.provenance.as_ref().is_some_and(|data| !data.sub_kinds.is_empty())
+    }
 }
 
 #[cfg(test)]

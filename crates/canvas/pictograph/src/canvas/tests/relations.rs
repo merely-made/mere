@@ -93,6 +93,118 @@ fn parallel_assertions_share_one_stroke_and_one_link_key_hit_target() {
 }
 
 #[test]
+fn exact_assertion_hides_filter_before_aggregation_and_preserve_other_hide_sets() {
+    let mut canvas = Canvas::new();
+    let a = canvas.open_member_as_new_node(None, "https://hide-assertion-a.test");
+    let b = canvas.open_member_as_new_node(None, "https://hide-assertion-b.test");
+    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
+    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
+    assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Cites));
+    assert!(canvas.assert_relation_between_members(a, b, SemanticSubKind::Quotes));
+    canvas
+        .view
+        .set_position(ak, euclid::default::Point2D::new(0.0, 0.0));
+    canvas
+        .view
+        .set_position(bk, euclid::default::Point2D::new(100.0, 0.0));
+    let before = serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap();
+    let pair = crate::canvas::link_reading::read_link(
+        canvas.graph(),
+        a,
+        b,
+        scenograph::link::LinkSource::Unavailable {
+            reason: "test source omitted".into(),
+        },
+    )
+    .unwrap();
+    let ids = pair
+        .links
+        .iter()
+        .flat_map(|link| &link.buckets)
+        .flat_map(|bucket| &bucket.assertions)
+        .map(|assertion| assertion.id.clone())
+        .collect::<std::collections::BTreeSet<_>>();
+    assert_eq!(ids.len(), 2);
+    let hidden_link = scenograph::link::LinkKey::new(
+        scenograph::link::LinkStratum::Surface,
+        a.to_string(),
+        b.to_string(),
+    );
+    canvas.set_hidden_link_keys([hidden_link.clone()]);
+    canvas.set_hidden_assertion_ids([ids.iter().next().unwrap().clone()]);
+    assert_eq!(canvas.hidden_link_keys(), vec![hidden_link]);
+    assert_eq!(canvas.hidden_assertion_ids().len(), 1);
+    assert!(
+        canvas
+            .visible_link_appearances()
+            .iter()
+            .all(|appearance| appearance.key.stratum != scenograph::link::LinkStratum::Surface)
+    );
+    assert!(
+        canvas.visible_link_appearances().iter().any(|appearance| {
+            appearance.key.stratum == scenograph::link::LinkStratum::Resource
+        }),
+        "the unhidden exact assertion still contributes a visible resource appearance"
+    );
+
+    canvas.set_hidden_assertion_ids(ids.clone());
+    assert!(
+        !canvas.visible_link_appearances().iter().any(|appearance| {
+            appearance.key.stratum == scenograph::link::LinkStratum::Resource
+        })
+    );
+    assert_eq!(canvas.hidden_link_keys().len(), 1);
+    assert_eq!(canvas.show_all_assertions(), 2);
+    assert_eq!(canvas.hidden_link_keys().len(), 1);
+    assert_eq!(
+        serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap(),
+        before
+    );
+}
+
+#[test]
+fn selector_hides_classify_exact_nonsemantic_assertions_by_canonical_predicate() {
+    let mut canvas = Canvas::new();
+    let a = canvas.open_member_as_new_node(None, "https://containment-hide-a.test");
+    let b = canvas.open_member_as_new_node(None, "https://containment-hide-b.test");
+    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
+    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
+    let predicate = RelationKind::Containment(kernel::graph::ContainmentSubKind::CollectionMember)
+        .predicate_iri()
+        .unwrap();
+    canvas.ingest_graph(|graph| {
+        graph
+            .try_assert_persisted_relation_statement(
+                ak,
+                bk,
+                kernel::graph::SemanticStatement {
+                    statement_id: "urn:containment:hide-test".into(),
+                    predicate: predicate.into(),
+                    recognized_sub_kind: None,
+                    label: None,
+                    basis: kernel::types::AssertionBasis::default(),
+                    graph_scope: kernel::types::GraphScope::Default,
+                    provenance_iri: Some("urn:author:test".into()),
+                    first_asserted_ms: Some(1),
+                    asserted_at_ms: Some(1),
+                    withdrawn: None,
+                },
+            )
+            .unwrap();
+        true
+    });
+    let before = canvas.visible_link_appearances();
+    assert!(!before.is_empty());
+    let cell = first_edge_cell_between(&canvas, ak, bk);
+    assert_eq!(
+        cell.selector,
+        RelationSelector::Containment(kernel::graph::ContainmentSubKind::CollectionMember)
+    );
+    canvas.hidden_edges.insert(cell);
+    assert!(canvas.visible_link_appearances().is_empty());
+}
+
+#[test]
 fn self_links_draw_separate_strata_loops_and_select_through_node_pick_area() {
     use scenograph::link::LinkStratum;
 

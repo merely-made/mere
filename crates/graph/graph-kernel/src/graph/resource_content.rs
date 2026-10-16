@@ -164,7 +164,7 @@ impl Graph {
             Ok(())
         };
         for (from, to, payload) in self.resource_edges() {
-            for statement in payload.semantic_statements() {
+            for statement in payload.assertions() {
                 insert(
                     statement.statement_id.clone(),
                     ResourceHandleOwner::Relation(from.id(), to.id()),
@@ -182,7 +182,7 @@ impl Graph {
             }
         }
         for payload in self.inner.inner().edge_weights() {
-            for statement in payload.semantic_statements() {
+            for statement in payload.assertions() {
                 if handles.contains_key(&statement.statement_id) {
                     return Err(ContentError::HandleCollision(
                         statement.statement_id.clone(),

@@ -121,10 +121,7 @@ pub fn inspect_pair_with_link_hides(
                 .map_err(|_| "Invalid target endpoint identity")?;
             let mut rows = Vec::<(RelationKind, Option<String>)>::new();
             rows.extend(bucket.assertions.into_iter().map(|assertion| {
-                let kind = assertion
-                    .recognized_kind
-                    .and_then(|kind| serde_json::from_value(serde_json::Value::String(kind)).ok())
-                    .map(RelationKind::Semantic)
+                let kind = RelationKind::from_predicate_iri(&assertion.predicate)
                     .unwrap_or(RelationKind::OpenPredicate);
                 (kind, Some(assertion.id))
             }));
