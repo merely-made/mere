@@ -45,8 +45,33 @@ pub(crate) fn visible_relation_edges_with_link_hides(
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
     hidden_links: &HashSet<LinkKey>,
 ) -> Vec<(NodeKey, NodeKey)> {
-    graph
+    visible_relation_edges_with_assertion_hides(graph, hidden_edges, hidden_links, &HashSet::new())
+}
+
+pub(crate) fn visible_relation_edges_with_assertion_hides(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_assertions: &HashSet<String>,
+) -> Vec<(NodeKey, NodeKey)> {
+    let assertions = graph
+        .projected_assertions()
+        .filter(|(_, _, _, statement)| !hidden_assertions.contains(&statement.statement_id))
+        .map(|(owner, from, to, statement)| {
+            (
+                owner,
+                kernel::graph::RelationView {
+                    from,
+                    to,
+                    kind: statement.relation_kind(),
+                },
+            )
+        });
+    let traversals = graph
         .projected_relations()
+        .filter(|(_, relation)| relation.kind == kernel::graph::RelationKind::Traversal);
+    assertions
+        .chain(traversals)
         .filter_map(|(relation_key, relation)| {
             let selector = super::relationship_topology::selector_for_relation_kind(relation.kind);
             if hidden_edges.contains(&crate::canvas::EdgeCell {
@@ -279,6 +304,70 @@ mod tests {
             sim.coupling_force_count(),
             1,
             "the placed coupling resolves into the built simulation"
+        );
+    }
+}
+
+#[cfg(test)]
+mod assertion_hide_controls {
+    use super::*;
+    use kernel::graph::{ContainmentSubKind, RelationKind, SemanticStatementSpec};
+    use kernel::types::AssertionBasis;
+
+    #[test]
+    fn exact_hide_removes_one_reason_spring_without_hiding_its_same_kind_sibling() {
+        let mut graph = Graph::new();
+        use kernel::graph::fixtures::GraphFixtures;
+        let from = graph.add_node("urn:assertion-hide:a".into(), Default::default());
+        let to = graph.add_node("urn:assertion-hide:b".into(), Default::default());
+        let mut ids = Vec::new();
+        for evidence in ["urn:reason:one", "urn:reason:two"] {
+            let (_, result) = graph
+                .try_assert_relation_statement(
+                    from,
+                    to,
+                    SemanticStatementSpec {
+                        predicate: RelationKind::Containment(ContainmentSubKind::CollectionMember)
+                            .predicate_iri()
+                            .unwrap()
+                            .into(),
+                        basis: AssertionBasis {
+                            evidence: vec![evidence.into()],
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+            ids.push(result.statement_id);
+        }
+        let before = graph.to_snapshot_at(0);
+        assert_eq!(
+            visible_relation_edges(&graph, &HashSet::new()),
+            vec![(from, to), (from, to)]
+        );
+        let hidden = HashSet::from([ids[0].clone()]);
+        assert_eq!(
+            visible_relation_edges_with_assertion_hides(
+                &graph,
+                &HashSet::new(),
+                &HashSet::new(),
+                &hidden
+            ),
+            vec![(from, to)]
+        );
+        assert_eq!(
+            visible_relation_edges_with_assertion_hides(
+                &graph,
+                &HashSet::new(),
+                &HashSet::new(),
+                &HashSet::from(["urn:missing".into()])
+            ),
+            vec![(from, to), (from, to)]
+        );
+        assert_eq!(
+            serde_json::to_value(graph.to_snapshot_at(0)).unwrap(),
+            serde_json::to_value(before).unwrap()
         );
     }
 }

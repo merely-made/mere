@@ -265,6 +265,7 @@ mod tests {
                 predicate: "https://mere.computer/ns/rel#cites".to_string(),
                 recognized_sub_kind: Some(SemanticSubKind::Cites),
                 label: Some("also cites".to_string()),
+                basis: Default::default(),
                 graph_scope: GraphScope::User,
                 provenance_iri: Some("https://people.test/alice".to_string()),
                 asserted_at_ms: Some(1_720_000_000_123),
@@ -609,11 +610,8 @@ mod tests {
             (&dog, GraphScope::Default, vec!["carol"]),
         ] {
             snapshot.resource_edges.push(PersistedEdge {
-                from_node_id: page.id().to_string(),
-                to_node_id: target.id().to_string(),
-                families: vec![PersistedEdgeFamily::Semantic],
-                semantic: Some(PersistedSemanticEdgeData {
-                    statements: authors
+                assertions: Some(
+                    authors
                         .into_iter()
                         .enumerate()
                         .map(|(index, author)| PersistedSemanticStatement {
@@ -629,8 +627,11 @@ mod tests {
                             withdrawn: None,
                         })
                         .collect(),
-                    ..Default::default()
-                }),
+                ),
+                from_node_id: page.id().to_string(),
+                to_node_id: target.id().to_string(),
+                families: vec![PersistedEdgeFamily::Semantic],
+                semantic: None,
                 traversal: None,
                 containment: None,
                 arrangement: None,
@@ -758,6 +759,7 @@ mod resource_member_tests;
 #[cfg(test)]
 mod history_projection_tests {
     use super::{sparql, sparql_with_history};
+    use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::{Graph, SemanticStatement, SemanticSubKind, predicate_iri};
     use kernel::types::{AssertionWithdrawal, GraphScope};
 

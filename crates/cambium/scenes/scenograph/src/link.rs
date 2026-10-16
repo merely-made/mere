@@ -57,7 +57,10 @@ pub struct LinkEndpoint {
     pub address: Option<String>,
 }
 
-/// One exact, independently addressable semantic assertion.
+/// One exact, independently addressable relation assertion. Registered
+/// relation kinds use their canonical predicate IRI; unfamiliar predicates
+/// remain unchanged. `recognized_kind` remains the semantic sub-kind
+/// compatibility field and is absent for other families.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LinkAssertion {
     pub id: String,

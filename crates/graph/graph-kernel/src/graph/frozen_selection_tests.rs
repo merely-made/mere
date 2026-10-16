@@ -68,7 +68,7 @@ fn frozen_resource_bears_exact_immutable_nested_selection_and_surfaces_show_it()
     assert_eq!(frozen.members().len(), 2);
     assert!(frozen.members().contains(&a));
     assert_eq!(frozen.statements().len(), 1);
-    let statement = &frozen.statements()[0].semantic.as_ref().unwrap().statements[0];
+    let statement = &frozen.statements()[0].retained_assertions()[0];
     assert_eq!(statement.statement_id, claim);
     assert_eq!(statement.label.as_deref(), Some("exact label"));
     assert_eq!(statement.asserted_at_ms, Some(41));
@@ -215,7 +215,7 @@ fn malformed_nested_records_refuse_before_admission_and_nonce_reuse_is_atomic() 
             3 => value["statements"][0]["traversal"] = json!({"records":[]}),
             4 => value["future_payload"] = json!("must not be silently dropped"),
             _ => {
-                value["statements"][0]["semantic"]["statements"][0]["future_payload"] =
+                value["statements"][0]["assertions"][0]["future_payload"] =
                     json!("nested unknown must refuse")
             },
         }
@@ -257,7 +257,7 @@ fn immutable_frozen_carrier_refuses_wire_changes_hidden_by_float_decoding() {
         .find(|f| f.facet == frozen_selection::FROZEN_SELECTION)
         .unwrap();
     let mut value: serde_json::Value = serde_json::from_str(&facet.value_json).unwrap();
-    value["statements"][0]["semantic"]["agent_decay_progress"] = json!(1e-50_f64);
+    value["statements"][0]["assertions"][0]["future_float"] = json!(1e-50_f64);
     facet.value_json = value.to_string();
     assert!(
         !receiver.set_resource_record(owner, Some(record)),
@@ -272,7 +272,7 @@ fn frozen_selection_copies_parallel_rows_self_relations_and_opaque_handles_exact
     let (mut graph, a, b, original) = source();
     let first = graph.persisted_resource_edges_between(a, b)[0].clone();
     let mut second = first.clone();
-    let statement = &mut second.semantic.as_mut().unwrap().statements[0];
+    let statement = &mut second.retained_assertions_mut()[0];
     statement.statement_id = String::new();
     statement.label = Some("parallel variant".into());
     statement.provenance_iri = Some("urn:test:other-author".into());
@@ -289,7 +289,7 @@ fn frozen_selection_copies_parallel_rows_self_relations_and_opaque_handles_exact
         )
         .unwrap();
     let mut self_row = graph.persisted_resource_edges_between(a, a)[0].clone();
-    self_row.semantic.as_mut().unwrap().statements[0].statement_id = "opaque\nself handle".into();
+    self_row.retained_assertions_mut()[0].statement_id = "opaque\nself handle".into();
     assert!(graph.set_resource_edges_between(a, a, &[self_row]));
     let expected = graph.to_snapshot().resource_edges;
     let owner = graph
@@ -314,7 +314,7 @@ fn frozen_selection_copies_parallel_rows_self_relations_and_opaque_handles_exact
     let handles: std::collections::BTreeSet<_> = frozen
         .statements()
         .iter()
-        .flat_map(|e| &e.semantic.as_ref().unwrap().statements)
+        .flat_map(|e| e.retained_assertions())
         .map(|s| s.statement_id.as_str())
         .collect();
     assert!(handles.contains(original.as_str()));
@@ -340,8 +340,7 @@ fn frozen_wire_accepts_known_default_metadata_but_retained_owner_cannot_drop_it(
         .find(|f| f.facet == frozen_selection::FROZEN_SELECTION)
         .unwrap();
     let mut value: serde_json::Value = serde_json::from_str(&facet.value_json).unwrap();
-    value["statements"][0]["semantic"]["statements"][0]["recognized_sub_kind"] =
-        serde_json::Value::Null;
+    value["statements"][0]["assertions"][0]["recognized_sub_kind"] = serde_json::Value::Null;
     facet.value_json = value.to_string();
     let mut receiver = Graph::new();
     assert!(
@@ -349,7 +348,7 @@ fn frozen_wire_accepts_known_default_metadata_but_retained_owner_cannot_drop_it(
         "known null metadata remains supported"
     );
     let before = receiver.resource_record(owner).unwrap();
-    value["statements"][0]["semantic"]["statements"][0]
+    value["statements"][0]["assertions"][0]
         .as_object_mut()
         .unwrap()
         .remove("recognized_sub_kind");

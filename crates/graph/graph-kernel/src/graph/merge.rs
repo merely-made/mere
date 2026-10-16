@@ -270,6 +270,48 @@ mod tests {
     type Nodes = BTreeMap<Uuid, (NodeState, Vec<(ImageRole, ImageRef)>)>;
     type Relations = BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>>;
 
+    /// Bucket partition is a compatibility storage detail: an imported claim
+    /// may coalesce with a live pair bucket while a rebuilt legacy snapshot
+    /// still has parallel buckets. Compare the exact assertion multiset per
+    /// directed pair, along with the exposed family set and traversal rows.
+    fn relation_contents(
+        relations: &Relations,
+    ) -> BTreeMap<
+        (Uuid, Uuid),
+        (
+            Vec<crate::persistence::PersistedSemanticStatement>,
+            Vec<String>,
+            Vec<String>,
+        ),
+    > {
+        relations
+            .iter()
+            .map(|(pair, edges)| {
+                let mut assertions: Vec<_> = edges
+                    .iter()
+                    .flat_map(|edge| edge.retained_assertions())
+                    .cloned()
+                    .collect();
+                assertions.sort_by(|left, right| left.statement_id.cmp(&right.statement_id));
+                let families: BTreeSet<_> = edges
+                    .iter()
+                    .flat_map(|edge| &edge.families)
+                    .map(|family| format!("{family:?}"))
+                    .collect();
+                let mut traversals: Vec<_> = edges
+                    .iter()
+                    .filter_map(|edge| edge.traversal.as_ref())
+                    .map(|traversal| serde_json::to_string(traversal).unwrap())
+                    .collect();
+                traversals.sort();
+                (
+                    *pair,
+                    (assertions, families.into_iter().collect(), traversals),
+                )
+            })
+            .collect()
+    }
+
     /// Every node's state and images, every relation by pair, and the
     /// relations as the graph reports them, derived ones included.
     fn whole(graph: &Graph) -> (Nodes, Relations, BTreeSet<String>) {
@@ -396,7 +438,14 @@ mod tests {
         let (nodes, relations, listed) = whole(&imported);
 
         assert_eq!(nodes, want_nodes);
-        assert_eq!(relations, want_relations);
+        assert_eq!(
+            relations.keys().collect::<Vec<_>>(),
+            want_relations.keys().collect::<Vec<_>>()
+        );
+        assert_eq!(
+            relation_contents(&relations),
+            relation_contents(&want_relations)
+        );
         assert_eq!(listed, want_listed);
 
         // What the edits did, as a positive control on the comparison.
@@ -409,11 +458,11 @@ mod tests {
         assert_eq!(one.facets.get("custom.b"), Some(&serde_json::json!(true)));
         assert_eq!(nodes[&id(3)].1, [(ImageRole::Favicon, image)]);
         assert_eq!(
-            relations[&(id(1), id(2))][0]
-                .semantic
-                .as_ref()
-                .map(|semantic| semantic.statements.len()),
-            Some(2),
+            relations[&(id(1), id(2))]
+                .iter()
+                .flat_map(|edge| edge.retained_assertions())
+                .count(),
+            2,
             "the incoming relation joins the live one"
         );
         assert!(

@@ -202,8 +202,7 @@ fn common_case_semantic_statement_stays_cheap_in_the_snapshot() {
     let claims: Vec<_> = snapshot
         .resource_edges
         .iter()
-        .filter_map(|edge| edge.semantic.as_ref())
-        .flat_map(|semantic| &semantic.statements)
+        .flat_map(|edge| edge.retained_assertions())
         .collect();
     assert_eq!(claims.len(), statements);
     assert!(
@@ -285,8 +284,7 @@ fn shared_resource_statement_cost_and_metadata_roundtrip_stay_bounded() {
         let claims: Vec<_> = snapshot
             .resource_edges
             .iter()
-            .filter_map(|edge| edge.semantic.as_ref())
-            .flat_map(|semantic| &semantic.statements)
+            .flat_map(|edge| edge.retained_assertions())
             .collect();
         assert_eq!(claims.len(), N - 1);
         for claim in claims {

@@ -308,6 +308,14 @@ pub struct GraphSnapshot {
     pub resource_edges: Vec<PersistedEdge>,
     #[serde(default)]
     pub shown_resources: Vec<PersistedShownResource>,
+    /// Assertion-column format: `0` is the legacy sidecar layout and `1` is
+    /// the canonical all-family assertion-record layout.
+    #[serde(default, skip_serializing_if = "is_zero_u32")]
+    pub assertion_schema: u32,
+}
+
+fn is_zero_u32(value: &u32) -> bool {
+    *value == 0
 }
 
 impl GraphSnapshot {

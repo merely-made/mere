@@ -57,6 +57,7 @@ pub mod cross_graph;
 /// vocabulary). See `graph/journal.rs`.
 pub mod journal;
 pub mod legacy_content_migration;
+pub(crate) mod legacy_family_attribution;
 pub mod legacy_resource_migration;
 pub use cross_graph::ComponentCopy;
 mod assertion_write;
@@ -170,9 +171,10 @@ pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public
 // surface, re-exported so consumers name it without a direct muniment dep.
 pub use edge_data::{
-    ArrangementData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData, REL_VOCAB,
-    SemanticData, SemanticStatement, SemanticStatementSpec, StatementAssert, Traversal,
-    TraversalData, all_semantic_sub_kinds, predicate_iri, sub_kind_from_iri,
+    ArrangementData, AssertionData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData,
+    REL_VOCAB, RelationAssertion, RelationAssertionSpec, SemanticData, SemanticStatement,
+    SemanticStatementSpec, StatementAssert, Traversal, TraversalData, all_semantic_sub_kinds,
+    predicate_iri, sub_kind_from_iri,
 };
 pub use edge_payload::EdgePayload;
 pub use edge_taxonomy::{
