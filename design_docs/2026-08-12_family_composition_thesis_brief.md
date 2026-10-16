@@ -1656,3 +1656,53 @@ checks). Vendored/patch suppliers and frozen historical receipts are preserved.
 The shared wgpu CI support-floor default is aligned too. Compiler qualification,
 publication and the first Murm imports are recorded in the canonical Murm move
 plan. Metadata checks alone do not establish all-platform MSRV compatibility.
+
+## Family source convention (2026-10-15)
+
+**Owner ruling (Mark, 2026-10-15):** the first-party repositories name one
+another by branch, not by revision, and the repositories do not cut releases
+while development moves this fast. Revision pins and `www.` aliases were a
+workaround for resolving several repositories at different moments; they made
+every repin a coordinated round and left a second source for the same crate
+whenever one repository was one pin behind.
+
+**The rule.**
+
+- A dependency on a first-party repository (`mere`, `murm`, `genet`,
+  `netrender`, `knot-editor`, and as each repository adopts this, `dramatis`,
+  `cleromancy`, `wgpu-weld`) is written exactly one way:
+  `git = "https://github.com/merely-made/<repo>.git", branch = "main"`.
+  No `www.` spelling, no double slash, no `.git`-less variant, no `rev`.
+  Cargo treats every spelling and every `rev`/`branch`/`tag` as a different
+  source, so a second spelling is a second copy of every crate and a type
+  mismatch, not a warning.
+- The consuming root commits its `Cargo.lock`. The lockfile, not the manifest,
+  names the revision that was tested. A fresh clone builds what was tested.
+- **Repin = `cargo update -p <package>`** at the consuming root (one `-p` per
+  repository, any package from it), then the root's checks. Commit the lock.
+  A repin is a lock commit, not a manifest edit, so it carries no coordination
+  with the supplier.
+- Non-family forks that are pinned for a reason keep their pin: `mark-ik/p2panda`
+  by `tag`, `mark-ik/vello`, `mark-ik/boa`, `mark-ik/kiss3d`, `merely-made/vano`
+  by `rev`. A pin there is a decision, and its comment says why.
+- `[patch]` is for packages that left a repository, never for bridging two
+  spellings of one repository. Cargo refuses a patch whose target is the same
+  source as the patched key, which is why the old workaround needed the `www.`
+  alias at all; with one spelling the bridges are deleted, not carried.
+  Mere's `[patch."…/mere.git"]` table, which redirects Knot's and Turnstone's
+  Mere crates onto the workspace members, stays: it names paths, not a second
+  spelling.
+- Library crates a family repository publishes to crates.io still carry a
+  `version`, and a git row that is `optional` still needs one. The crates.io
+  publish chain is separate and unchanged by this convention.
+
+**What it costs.** A supplier's `main` is what the next fresh resolve takes, so
+a broken push to a supplier's `main` is visible to its consumers at their next
+`cargo update`, never before, because their lockfile holds the tested revision.
+Run `cargo update -p` deliberately and read the diff of the lock before
+committing it.
+
+**Not covered.** Dependencies from crates.io, non-family forks, and the
+`dramatis`, `cleromancy`, `wgpu-weld`, `smolweb` rows stay on their revisions
+until each repository's `main` has been qualified against the consumers that
+pin it. The switch for those is one manifest edit and a `cargo update -p`.
