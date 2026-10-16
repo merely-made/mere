@@ -1,0 +1,122 @@
+{
+  "schema": "mere.portable-backdrops-qualification/1",
+  "date_utc": "2026-10-16T06:43:51.945905+00:00",
+  "base_commit": "dc60476252f0e3eae445857331b7c0853928b29a",
+  "source_manifest": "source-manifest.json",
+  "scope": "Three shared supplied-data presentations and their Graphshell reference embedding",
+  "checks": [
+    {
+      "command": "cargo test -p scenomise --test backdrop_scenes --offline",
+      "result": "pass",
+      "tests": 6,
+      "log": "core-tests.log"
+    },
+    {
+      "command": "cargo test -p pictograph --no-default-features --features canvas --lib backdrop_surface --offline",
+      "result": "pass",
+      "tests": 2,
+      "log": "surface-tests.log"
+    },
+    {
+      "command": "cargo test -p pictograph --no-default-features --features canvas --lib board_scene --offline",
+      "result": "pass",
+      "tests": 10,
+      "log": "board-tests.log"
+    },
+    {
+      "command": "cargo test -p cambium --lib backdrop_scene --offline",
+      "result": "pass",
+      "tests": 1,
+      "log": "semantic-tests.log"
+    },
+    {
+      "command": "python3 scripts/check_port_boundaries.py",
+      "result": "pass",
+      "log": "boundaries.log"
+    },
+    {
+      "command": "cargo run -p pictograph --no-default-features --features backdrop-cpu --example backdrop_receipt -- support/design-studies/backdrops/receipt",
+      "result": "pass",
+      "frames": 3,
+      "backend": "Vello CPU",
+      "log": "cpu-render.log",
+      "result_file": "receipt.json"
+    },
+    {
+      "command": "cargo rustc --manifest-path ports/graphshell/web/Cargo.toml --lib --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu --offline -- -C link-arg=-zstack-size=16777216",
+      "result": "pass",
+      "log": "wasm-final-import-build.log"
+    }
+  ],
+  "browser": {
+    "result": "pass for listed desktop smoke cases",
+    "browser": "Codex in-app Chromium browser",
+    "backend": "Graphshell presentation-webgpu on the real host custom-leaf producer; adapter/hardware identity not independently recorded",
+    "runtime_manifest": "browser-runtime-manifest.json",
+    "viewport": [
+      1280,
+      1000
+    ],
+    "console_errors_and_warnings": 0,
+    "console": "browser-final-console.json",
+    "cases": [
+      "All three sample scenes visibly render within Graphshell workspace chrome",
+      "Imported metre line selection exposes supplied source revision and rhyme explanation",
+      "Two C occurrences select independently; second selection leaves one retained occurrence",
+      "Terrain shows supplied three-tier coverage and its illustrative basis",
+      "Coverage toggle removes the selected coverage field",
+      "Pocket remains unplaced and has no anchored coverage",
+      "Unsupported-version file import shows refusal while accepted River light remains rendered",
+      "Previously browser-exported metre recipe imports successfully and clears refusal",
+      "Final terrain recipe downloads and equals the supplied fixture as parsed JSON"
+    ],
+    "captures": [
+      "graphshell-metre.jpg",
+      "graphshell-fretboard.jpg",
+      "graphshell-terrain.jpg",
+      "graphshell-coverage-off.jpg",
+      "graphshell-unplaced.jpg",
+      "graphshell-rejected-import.jpg"
+    ]
+  },
+  "earlier_attempts": [
+    {
+      "result": "failed before scene workspace opened",
+      "profile": "ordinary unoptimized debug stack",
+      "routes": [
+        "tree.html?app=local",
+        "tree.html"
+      ],
+      "evidence": [
+        "browser-debug-startup.json",
+        "browser-fixture-debug-startup.json",
+        "browser-debug-runtime-manifest.json"
+      ],
+      "reason": "memory access out of bounds in host mount startup; explicit 16 MiB top-level stack admitted the later run"
+    },
+    {
+      "result": "raw JSON editor removed",
+      "reason": "large typed text editor was not a reliable debug-host path; file import is the delivered input control",
+      "evidence": [
+        "browser-editor-before-fix.jpg",
+        "source-manifest.pre-editor-fix.json",
+        "browser-runtime.pre-editor-fix.json"
+      ]
+    },
+    {
+      "result": "narrow presentation observed but not qualified",
+      "reason": "existing host tools drawer overlays scene; narrow visual and input acceptance remains outstanding",
+      "evidence": [
+        "graphshell-narrow-terrain.jpg"
+      ]
+    }
+  ],
+  "limits": [
+    "Fixtures are illustrative; no live Knot, Woodshed or Signalman adapter was exercised",
+    "Stress and rhyme tails are supplied facts; no scansion inference",
+    "Coverage contours are supplied facts, not a radio propagation model",
+    "No native host, release profile, delivery budget, hardware performance or platform parity qualification",
+    "No domain source edits, persistence, pan/zoom or domain editing added by this slice",
+    "Portable producer export contract compiles; browser recipe import/export was exercised; full host scene-capture export was not exercised"
+  ]
+}

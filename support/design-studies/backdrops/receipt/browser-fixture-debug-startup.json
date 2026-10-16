@@ -1,0 +1,50 @@
+[
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:39.846Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:39.980Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:40.112Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:40.246Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:40.380Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:40.513Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:40.646Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  },
+  {
+    "level": "error",
+    "message": "RuntimeError: memory access out of bounds\n    at graphshell_web.wasm.<core[608f92abc48d28da]::cell::RefCell<wasm_bindgen[8a6f7dac06a0671a]::externref::Slab>>::try_borrow_mut (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[83210]:0x29876ae)\n    at graphshell_web.wasm.__externref_table_alloc (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[87395]:0x2a2d0e5)\n    at graphshell_web.wasm.wasm_bindgen[8a6f7dac06a0671a]::convert::closures::_::invoke::<web_sys[ceec24127774ffd8]::features::gen_MessageEvent::MessageEvent, (), true> externref shim (http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm:wasm-function[282959]:0x37c57df)\n    at wasm_bindgen_8a6f7dac06a0671a___convert__closures_____invoke___web_sys_ceec24127774ffd8___features__gen_MessageEvent__MessageEvent______true_ (http://127.0.0.1:8786/pkg/graphshell_web.js:2738:10)\n    at Worker.real (http://127.0.0.1:8786/pkg/graphshell_web.js:3074:20)",
+    "timestamp": "2026-10-16T06:22:40.780Z",
+    "url": "http://127.0.0.1:8786/pkg/graphshell_web_bg.wasm"
+  }
+]

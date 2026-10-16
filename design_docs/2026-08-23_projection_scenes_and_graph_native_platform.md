@@ -1222,3 +1222,34 @@ Scene planes, node types and attention remain independent of semantic strata.
 This develops the earlier explicit/derived and resource/content proposals;
 provenance remains an independent distinction and surfaces retain their
 established name.
+
+### 9.19 Portable domain backdrops, Graphshell first (2026-10-16)
+
+Mark approved proceeding with metre grid, fretboard, and terrain with coverage
+after the quieter interactive studies were revised against the Graph-as-GUI
+references. The metre reading includes stress heights and rhyme arcs; shared
+workspace chrome frames all three. Graphshell is the reference host. These
+presentations should also be embeddable independently, with natural downstream
+uses in Knot, Woodshed and Signalman, rather than being locked to those apps.
+
+The first implementation adds pure, versioned recipe compilation in
+`scenomise::backdrops`, an independent `pictograph` surface producing Netrender
+scenes, and shared Cambium occurrence controls and inspection. Graphshell admits
+recipes, supplies applied appearance and fonts, owns view state and rendering
+resources, and provides JSON input/export. Shared crates do not depend on a port
+or acquire domain stores. The [scene README](../crates/cambium/scenes/README.md#portable-backdrop-recipes)
+owns the API and reproduction details.
+
+Supplied facts retain source identity and revision. Repeated fret positions can
+share a resource while keeping occurrence identity. Supplied stress remains
+separate from expected metre, and rhyme-tail disagreement remains visible.
+Terrain contours and coverage are distinct: supplied coverage records its basis,
+unmeasured areas mask it, and unknown device locations receive no invented
+position. Selection and retained attention change presentation only. Invalid
+recipe replacement leaves the current accepted reading intact.
+
+The [implementation receipts](../support/design-studies/backdrops/receipt/qualification.json)
+record the exercised source, CPU rendering and browser checks. The included
+recipes are illustrative fixtures. Actual Knot/Woodshed/Signalman source
+adapters and native host qualification remain separate work; this establishes
+their portable presentation path and its first Graphshell embedding.

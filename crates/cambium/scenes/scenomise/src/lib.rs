@@ -34,6 +34,7 @@
 //! the item, rather than shipping source truth for a solver to re-derive.
 
 pub mod arrangement;
+pub mod backdrops;
 #[cfg(feature = "authoring")]
 pub mod authoring;
 pub mod catalog;
