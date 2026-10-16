@@ -1,0 +1,26 @@
+  15.538993700s  INFO copy_to{rev=7af8de32ac5df9ff89076c6d3b691e7211b55877 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\genet-0bbbe1b4c8511eb3\\7af8de3" quiet=false}: cargo::sources::git::utils: reset C:/t/cargo-homes/mere-upstreams/git/checkouts/genet-0bbbe1b4c8511eb3/7af8de3/.git/ to 7af8de32ac5df9ff89076c6d3b691e7211b55877
+  15.547224100s DEBUG copy_to{rev=7af8de32ac5df9ff89076c6d3b691e7211b55877 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\genet-0bbbe1b4c8511eb3\\7af8de3" quiet=false}:reset: cargo::sources::git::utils: doing reset
+ 723.134629700s DEBUG copy_to{rev=7af8de32ac5df9ff89076c6d3b691e7211b55877 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\genet-0bbbe1b4c8511eb3\\7af8de3" quiet=false}:reset: cargo::sources::git::utils: reset done
+ 723.135924900s DEBUG copy_to{rev=7af8de32ac5df9ff89076c6d3b691e7211b55877 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\genet-0bbbe1b4c8511eb3\\7af8de3" quiet=false}: cargo::sources::git::utils: update submodules for: "C:/t/cargo-homes/mere-upstreams/git/checkouts/genet-0bbbe1b4c8511eb3/7af8de3/"
+ 732.236244700s  INFO copy_to{rev=1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b" quiet=false}: cargo::sources::git::utils: reset C:/t/cargo-homes/mere-upstreams/git/checkouts/p2panda-d3fc8d2ceee505e1/1f69c9b/.git/ to 1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65
+ 732.250563700s DEBUG copy_to{rev=1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b" quiet=false}:reset: cargo::sources::git::utils: doing reset
+ 734.453190100s DEBUG copy_to{rev=1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b" quiet=false}:reset: cargo::sources::git::utils: reset done
+ 734.453243700s DEBUG copy_to{rev=1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65 dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b" quiet=false}: cargo::sources::git::utils: update submodules for: "C:/t/cargo-homes/mere-upstreams/git/checkouts/p2panda-d3fc8d2ceee505e1/1f69c9b/"
+ 734.734332600s  INFO copy_to{rev=276b46648c08f3d2062e70559afa999842e1873c dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\vello-79c0d0e9216b3668\\276b466" quiet=false}: cargo::sources::git::utils: reset C:/t/cargo-homes/mere-upstreams/git/checkouts/vello-79c0d0e9216b3668/276b466/.git/ to 276b46648c08f3d2062e70559afa999842e1873c
+ 734.748436000s DEBUG copy_to{rev=276b46648c08f3d2062e70559afa999842e1873c dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\vello-79c0d0e9216b3668\\276b466" quiet=false}:reset: cargo::sources::git::utils: doing reset
+ 740.293974500s DEBUG copy_to{rev=276b46648c08f3d2062e70559afa999842e1873c dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\vello-79c0d0e9216b3668\\276b466" quiet=false}:reset: cargo::sources::git::utils: reset done
+ 740.294033800s DEBUG copy_to{rev=276b46648c08f3d2062e70559afa999842e1873c dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\vello-79c0d0e9216b3668\\276b466" quiet=false}: cargo::sources::git::utils: update submodules for: "C:/t/cargo-homes/mere-upstreams/git/checkouts/vello-79c0d0e9216b3668/276b466/"
+ 740.600760800s  INFO copy_to{rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\netrender-a79f0762881dec01\\f4f9c0d" quiet=false}: cargo::sources::git::utils: reset C:/t/cargo-homes/mere-upstreams/git/checkouts/netrender-a79f0762881dec01/f4f9c0d/.git/ to f4f9c0d87e6a6030b61075a45118055dfe6a12df
+ 740.623044400s DEBUG copy_to{rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\netrender-a79f0762881dec01\\f4f9c0d" quiet=false}:reset: cargo::sources::git::utils: doing reset
+ 745.077048200s DEBUG copy_to{rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\netrender-a79f0762881dec01\\f4f9c0d" quiet=false}:reset: cargo::sources::git::utils: reset done
+ 745.077102600s DEBUG copy_to{rev=f4f9c0d87e6a6030b61075a45118055dfe6a12df dest="C:\\t\\cargo-homes\\mere-upstreams\\git\\checkouts\\netrender-a79f0762881dec01\\f4f9c0d" quiet=false}: cargo::sources::git::utils: update submodules for: "C:/t/cargo-homes/mere-upstreams/git/checkouts/netrender-a79f0762881dec01/f4f9c0d/"
+error: failed to get `kiss3d` as a dependency of package `tenant v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\conatus\tenant)`
+
+Caused by:
+  failed to load source for dependency `kiss3d`
+
+Caused by:
+  unable to update https://github.com/mark-ik/kiss3d.git?rev=c362cd5855c01a525d1091589a0e38135007692f#c362cd58
+
+Caused by:
+  can't checkout from 'https://github.com/mark-ik/kiss3d.git': you are in the offline mode (--offline)

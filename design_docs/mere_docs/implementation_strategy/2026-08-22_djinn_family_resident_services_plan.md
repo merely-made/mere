@@ -1,5 +1,22 @@
 # Djinn Family Resident Services Plan
 
+Tucket custody continuation (2026-10-16, qualified at the custody boundary): the owner selected a
+Djinn-backed Tucket identity before further Signalman physical qualification.
+Personae owns the device/realm derivation; Djinn releases that exact wallet
+child only on Signalman's admitted custody route. The Signalman port verifies
+the release and watches custody for the connection lifetime. Real-broker probes
+pass absent, Locked and no-wallet refusal, stable identity on reopen, wrong-app
+release/sign/attest refusal, and independent lock/resident-loss closure. Both
+custody policy tests pass. A deliberately restored local-seed fallback fails
+the absent and Locked controls; the exact clean source is restored and the
+rebuilt clean executable passes all six probes. See
+[`testing/receipts/tucket-custody`](../../../testing/receipts/tucket-custody/README.md).
+Signalman's port/example pass strict Clippy; strict Djinn Clippy is blocked by
+existing sync/door diagnostics recorded with the receipts.
+The consumer/runtime and radio gates remain in
+`murm/design_docs/2026-10-13_murm_family_move_plan.md`, R6. This bounded custody
+extension does not claim the planned resident service phases below.
+
 **Status (2026-10-06):** Phases A to G are planned and still gated on the
 `djinn 0.0.2` release (§2): djinn is version 0.0.2, but its knot-site
 dependency is Git-only, so `cargo package` would refuse it. §13's ordinary
