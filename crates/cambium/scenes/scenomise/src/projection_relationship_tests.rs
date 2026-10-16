@@ -350,3 +350,53 @@ fn a_relationship_compile_refuses_a_degenerate_card() {
             .is_ok()
     );
 }
+
+#[test]
+fn ordered_grid_wraps_ranked_occurrences_without_reinterpreting_source_axes() {
+    let data = disclosed("ranked-grid", "same-card");
+    let original = data.clone();
+    let mut saved = snapshot(&data);
+    let legacy = compiler()
+        .compile_relationship_snapshot(&saved, &data)
+        .unwrap();
+    assert_eq!(
+        legacy
+            .projection
+            .scene
+            .items
+            .iter()
+            .map(|i| i.transform.translate.y.to_bits())
+            .collect::<BTreeSet<_>>()
+            .len(),
+        1
+    );
+    saved.recipe.definition.arrangement.kind = "grid.ordered".into();
+    saved
+        .recipe
+        .definition
+        .arrangement
+        .options
+        .insert("columns".into(), "2".into());
+    let compiled = compiler()
+        .compile_relationship_snapshot(&saved, &data)
+        .unwrap();
+    let at = |id: &str| {
+        compiled.projection.scene.items[compiled.projection.instance_by_occurrence[id].0 as usize]
+            .transform
+            .translate
+    };
+    assert_eq!(at("b").y, at("repeat").y);
+    assert!(at("repeat").x > at("b").x);
+    assert!(at("a").y > at("b").y);
+    assert_eq!(at("a").x, at("b").x);
+    assert_eq!(compiled.projection.scene.sources.len(), 2);
+    assert_eq!(compiled.relationships[0].disclosure, data.relationships[0]);
+    assert_eq!(compiled.selected_relationship, saved.selected_relationship);
+    assert_eq!(data, original);
+    let mut spoof = data.clone();
+    spoof
+        .dataset
+        .fields
+        .insert("__recipe_layout_column".into(), ProjectionFieldType::Number);
+    refuses(&saved, &spoof, "dataset.fields");
+}

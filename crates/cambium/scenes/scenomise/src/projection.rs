@@ -168,7 +168,7 @@ fn relationship_snapshot(
             ));
         }
     }
-    if dataset.fields.contains_key("__recipe_layout_row") {
+    if dataset.fields.contains_key("__recipe_layout_row") || dataset.fields.contains_key("__recipe_layout_column") {
         issues.push(CompileIssue::new(
             "dataset.fields",
             "reserved recipe layout row must not be disclosed as source truth",
@@ -240,6 +240,48 @@ fn relationship_snapshot(
         occurrence
             .values
             .insert("__recipe_layout_row".into(), ProjectionValue::Number(0.0));
+    }
+    // Opt-in ranked-grid layout. The legacy grid keeps its constant row.
+    // These cells are compiler-owned layout values, never source assertions.
+    if definition.arrangement.kind == "grid.ordered" {
+        let columns = definition
+            .arrangement
+            .options
+            .get("columns")
+            .and_then(|v| v.parse::<u32>().ok())
+            .filter(|v| *v > 0)
+            .unwrap_or_else(|| (dataset.occurrences.len() as f64).sqrt().ceil().max(1.0) as u32);
+        let mut order: Vec<_> = dataset
+            .occurrences
+            .iter()
+            .map(|o| {
+                (
+                    number(o, "order").expect("validated order") as u32,
+                    o.occurrence_id.clone(),
+                )
+            })
+            .collect();
+        order.sort();
+        let ranks: BTreeMap<_, _> = order
+            .into_iter()
+            .enumerate()
+            .map(|(rank, (_, id))| (id, rank as u32))
+            .collect();
+        bound.encoding.x = Channel::Field("__recipe_layout_column".into());
+        execution_dataset
+            .fields
+            .insert("__recipe_layout_column".into(), ProjectionFieldType::Number);
+        for occurrence in &mut execution_dataset.occurrences {
+            let rank = ranks[&occurrence.occurrence_id];
+            occurrence.values.insert(
+                "__recipe_layout_column".into(),
+                ProjectionValue::Number((rank % columns) as f64),
+            );
+            occurrence.values.insert(
+                "__recipe_layout_row".into(),
+                ProjectionValue::Number((rank / columns) as f64),
+            );
+        }
     }
     let mut projection = compiler.compile_snapshot(
         &ProjectionSnapshot {
