@@ -70,6 +70,7 @@ pub fn open_gpu_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
             };
             // Facts come from the same explicit adapter selection as the device.
             eprintln!("resident inference GPU: {facts}");
+            let layer_source = super::library_layer_source(library, &resolved);
             Ok(Box::new(GpuLibraryProvider {
                 resolved,
                 device,
@@ -77,6 +78,7 @@ pub fn open_gpu_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
                 max_tokens,
                 capability,
                 identity,
+                layer_source,
             }))
         },
         journal,
@@ -90,6 +92,7 @@ struct GpuLibraryProvider {
     max_tokens: usize,
     capability: ModelCapability,
     identity: SessionIdentity,
+    layer_source: Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>>,
 }
 
 impl InferenceProvider for GpuLibraryProvider {
@@ -111,9 +114,12 @@ impl InferenceProvider for GpuLibraryProvider {
             return resume.cloned().ok_or(InferError::Interrupted);
         };
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let provider = self
-                .resolved
-                .load(&self.device, "burn-wgpu", self.max_tokens)?;
+            let provider = self.resolved.load_with_layer_source(
+                &self.device,
+                "burn-wgpu",
+                self.max_tokens,
+                super::borrow_layer_source(&self.layer_source),
+            )?;
             provider.generate_checkpointed(request, resume, commit, stop)
         }))
         .unwrap_or_else(|_| {
@@ -153,9 +159,12 @@ impl InferenceProvider for GpuLibraryProvider {
             return Ok(String::new());
         };
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let provider = self
-                .resolved
-                .load(&self.device, "burn-wgpu", self.max_tokens)?;
+            let provider = self.resolved.load_with_layer_source(
+                &self.device,
+                "burn-wgpu",
+                self.max_tokens,
+                super::borrow_layer_source(&self.layer_source),
+            )?;
             provider.generate_streaming_controlled(request, on_token, cancelled)
         }))
         .unwrap_or_else(|_| {

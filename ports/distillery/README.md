@@ -75,6 +75,13 @@ after the commit; resumed generation rebuilds KV state by prefill. The retained
 record uses Eidetic's `InferenceRunRecord` schema, keeping paused, failed,
 cancelled partial and finished states distinct. I4 adds retained passage inputs.
 
+Layered library rows use the same CPU/GPU lane entry points. The lane retains
+its existing library owner and borrows it briefly for each content-verified
+layer artifact. It releases that lock before tensor work. GPU layer reads and
+execution stay inside the foreground guard, preserving trainer reclaim and
+release on pause. The streamed loader and weight index form part of the exact
+session identity. I6's larger-than-memory measurement remains a separate gate.
+
 `PersonaRunJournal` stores signed, encrypted per-device logs through muniment
 and joins the caller's existing p2panda endpoint. Token entries contain only new
 IDs and text. A fork is reported rather than silently choosing a continuation.

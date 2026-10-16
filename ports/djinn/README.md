@@ -150,10 +150,20 @@ The lane requires a `distillery` block and shares its persona's model library.
 template into that library. Its printed settings select CPU; change `device`
 to `gpu` for the GPU build. The `inference.ask` route is granted to Turnstone.
 
+Passing a streaming-options JSON file as the import example's sixth argument
+stores weights as immutable per-layer artifacts. The same library setting
+selects that row on CPU or GPU. The resident reads and verifies one layer at a
+time through its existing library owner, releases the library lock before
+tensor work, and uses bounded query blocks during prefill. Its execution loader
+has a `/layer-stream-v1` suffix, so checkpoints cannot silently resume through
+another loader. This software path does not yet qualify I6's model larger than
+device memory; the plan records that separate scale gate.
+
 A GPU ask preempts the GPU trainer through owner reclaim. The offer is
 withdrawn while inference waits or runs; inference loads device tensors for
 each ask and releases them before returning the GPU. CPU inference retains
-its loaded model. Library asks now retain exact token checkpoints in an
+its loaded model, with only shared weights resident for layered rows. Library
+asks now retain exact token checkpoints in an
 append-only encrypted log. Shutdown pauses unfinished asks and joins the actor;
 local interrupted asks resume after reopen. Lock refuses the route, pauses at a
 token boundary, clears materialized runs and their device-local data key, and
