@@ -3,7 +3,7 @@
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23). CollapsedGraphlet is now ArrangementKind::Supernode.*
 
 **Date:** 2026-08-03  
-**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The Isocosm: VTT campaign Overmap fold controls and its separate consumer acceptance remain pending.
+**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The next production consumer is Knot’s catalog Swatch; Isocosm: VTT is not a prerequisite.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
 adapters, plus a real second source in Isometry's pre-log `GameSnapshot` and
 authority `GameEvent` Codicil. Its Overmap Swatch has a Cambium slider that
@@ -668,3 +668,17 @@ Validation on the tested source: `pictograph` and `mere-view` library suites
 passed 494 tests, with 18 existing Canvas timing/release tests ignored. The
 port/web dependency boundary check, changed-file rustfmt, and diff check
 passed. The existing document audit has no new findings from these changes.
+
+
+### Knot catalog consumer continuation (2026-10-16)
+
+Knot is the next production consumer; Isocosm: VTT's changing workspace is not
+a prerequisite. `mere-view` now accepts host-owned native `FoldRecord`s in its
+view state. It lays out the full source graph, then projects summaries and
+directed endpoint/provenance boundary bundles into the same Swatch used by
+paint and hit targets, before adding the resident session/archive tier.
+Stale or overlapping records cannot hide partial members. Aggregated routes
+carry fresh aggregate identities rather than one source relation's evidence.
+The shared library's 38 tests pass, including two new opaque-id projection
+checks. Knot owns selection, reversible history and catalog-root preferences;
+its headed and fresh-process consumer qualification is recorded downstream.
