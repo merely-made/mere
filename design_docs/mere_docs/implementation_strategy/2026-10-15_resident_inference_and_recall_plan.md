@@ -1,12 +1,15 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-16):** in progress. I1 to I4 software gates done (§7):
+**Status (2026-10-16):** in progress. I1 to I5 gates done (§7):
 strict decoder, declared templates, CPU and GPU model rows, native trainer
 owner reclaim, durable checkpoints, restart, lock recovery and keyed
 personal-graph continuation pass on O-PC. I4's native gate adds BM25 recall,
 exact retained passage evidence and version-checked citations with the pinned
-SmolLM2 model. I5's Turnstone producer handoff and headed answer card are next.
+SmolLM2 model. I5 qualifies the separate native Turnstone process against a
+GPU resident, including progress, pause/resume, cancellation and past-answer
+source viewing after restart with the origin offline. Distillery M2 and the
+inference-surface half of Eidetic P4 are closed. I6 is next.
 The new device
 boundary uses two separately rooted resident compositions on one computer;
 a physical second computer and installed-binary receipt remain separate.
@@ -1120,3 +1123,39 @@ Stop and record the reason if any of these happen:
   checks pass 50 Distillery unit tests and eight durability tests; Djinn's GPU
   library, binary and native route test compile. These are producer-protocol
   checks. The Turnstone consumer and headed acceptance are still pending.
+
+- **2026-10-16, I5 headed gate passed.** Turnstone `ec9881ea` consumes the
+  published wire/producer supplier `65b97b0b`; the test-owned native Djinn
+  resident is `67a514e8`. Turnstone fetches two public fictional HTML notes
+  through its ordinary page pipeline and lends retained text through its one
+  trail actor. The pinned SmolLM2-360M-Instruct model runs on the NVIDIA RTX
+  4060 Laptop GPU. Six inspected native captures show a streamed prefix,
+  token progress, explicit pause at token 1, the resumed 18-token answer,
+  exact source viewing, cancellation of another ask, and a past answer/source
+  reopened after both processes restart. The origin server is stopped before
+  the second Turnstone launch. Native assertions verify prefix continuity,
+  matching restored citations and unchanged sealed source/prompt evidence.
+  The citation basis is the declared host complete-passage exact quotation;
+  this does not promote the output to a model-written numeric citation or a
+  semantic-entailment judgment.
+  - *Checks.* 53 Distillery GPU-feature unit tests and eight durability tests;
+    38 actor-plus-wire compatibility tests; four native route regressions,
+    including separately rooted keyed personal-graph continuation; four new
+    Turnstone source/client tests; 11 trail regressions (four existing ignored
+    cases); and two per-frame file-wait tests pass. Both native executables
+    build. The explicit headed resident fixture passes, and both scenario
+    outcomes are `RESULT ok`, with six captures and zero blank frames.
+  - *Repairs found headed.* The initially empty question field needed visible
+    bounds and readable colors. The scenario file wait now polls between
+    rendered frames, so a slow first token does not block presentation. The
+    restart scenario uses its restored pane instead of summoning a duplicate.
+    Failed attempts are kept separately in the generated fixture directory.
+  - *Evidence and limits.* [The I5 receipt](../../../support/receipts/resident_inference_answer_card.json)
+    records exact source and binary hashes and indexes the public native
+    frames, run/prompt records and scenario receipts in
+    `turnstone/docs/receipts/resident_inference_i5_windows_20261016/native/`.
+    The installed Djinn binary, physical second-device and whole-workspace
+    gates remain separate. Inline publication remains capped at 128 KiB;
+    larger-corpus handoff is open. I5 closes M2 and only the inference-surface
+    half of P4; embedding envelopes, assessment/tag workflows and the later
+    resident phases remain open.

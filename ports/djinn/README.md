@@ -186,7 +186,10 @@ against that publication. Only supplied passages enter the sealed run journal.
 The optional `inference.recall` object sets `chunk_chars`, `max_passages`,
 `min_quote_chars`, `max_context_chars` and `max_corpus_chars`. When this object is
 omitted, RecallConfig defaults apply. Inline publications above 128 KiB are
-refused. The headed client remains under I5 qualification.
+refused. The Turnstone native client is qualified through I5, including streaming,
+pause/resume, cancellation and exact source reopening after both processes
+restart with the origin offline. That gate uses a test-owned native resident;
+the installed Djinn binary retains its separate gate.
 See the
 [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 
