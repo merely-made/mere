@@ -526,7 +526,7 @@ impl SceneInput {
 
 // Core Sceno records keep their existing permissive stored-format serde.
 // This disclosed-input boundary is strict, including those nested records.
-fn strict_core_records(value: &serde_json::Value, path: &str) -> Result<(), SceneInputError> {
+pub(crate) fn strict_core_records(value: &serde_json::Value, path: &str) -> Result<(), SceneInputError> {
     match value {
         serde_json::Value::Object(map) => {
             let allowed: Option<&[&str]> = if map.contains_key("adapter") {

@@ -38,6 +38,7 @@ pub mod backdrops;
 #[cfg(feature = "authoring")]
 pub mod authoring;
 pub mod catalog;
+pub mod document;
 pub mod facet;
 mod families;
 pub mod history;
