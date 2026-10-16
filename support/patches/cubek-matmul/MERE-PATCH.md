@@ -6,7 +6,9 @@ The registry archive SHA-256 is
 `59816f7d5baf51ca06f417899ee194d46d76f633541907c94091163b4ade20ff`.
 Sources and tests come from that archive. The licenses come from that commit's
 repository root. Cargo.toml adds a standalone workspace and the same local
-cubecl-runtime patch used by Mere, for the patch regression gate.
+cubecl-runtime patch used by Mere, for the patch regression gate. Its lockfile
+pins that standalone gate. Embedding hosts must restate this patch at their
+own Cargo root; dependency manifests do not propagate Cargo patches.
 
 Mere changes `src/multi_level/routines/selector/unit.rs`. The original selector
 shrinks register partitions until its stage fits shared memory. Packed Q4 can
