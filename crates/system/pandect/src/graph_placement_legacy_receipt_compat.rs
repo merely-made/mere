@@ -5,9 +5,91 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use kernel::persistence::PersistedSemanticEdgeData;
+use kernel::persistence::{PersistedEdge, PersistedSemanticEdgeData};
 use kernel::types::{AssertionBasis, AssertionMethod, GraphScope};
+use serde::Serialize;
+use serde::ser::{SerializeStruct, Serializer};
 use uuid::Uuid;
+
+/// The pre-P6 receipt serializer's graph fields, copied from Mere
+/// `0f8c1bf59`: GraphSnapshot ended at `shown_resources`, and PersistedEdge
+/// ended at `provenance`. Keeping this independent serializer in the test
+/// checks the exact legacy tuple bytes consumed by LegacyTranslationReceipt's
+/// original digest algorithm without using its current constructor as oracle.
+struct HistoricalEdge<'a>(&'a PersistedEdge);
+
+impl Serialize for HistoricalEdge<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let edge = self.0;
+        let mut state = serializer.serialize_struct("PersistedEdge", 9)?;
+        state.serialize_field("from_node_id", &edge.from_node_id)?;
+        state.serialize_field("to_node_id", &edge.to_node_id)?;
+        state.serialize_field("families", &edge.families)?;
+        state.serialize_field("semantic", &edge.semantic)?;
+        state.serialize_field("traversal", &edge.traversal)?;
+        state.serialize_field("containment", &edge.containment)?;
+        state.serialize_field("arrangement", &edge.arrangement)?;
+        state.serialize_field("imported", &edge.imported)?;
+        state.serialize_field("provenance", &edge.provenance)?;
+        state.end()
+    }
+}
+
+struct HistoricalSnapshot<'a>(&'a kernel::persistence::GraphSnapshot);
+
+impl Serialize for HistoricalSnapshot<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let snapshot = self.0;
+        let mut state = serializer.serialize_struct("GraphSnapshot", 10)?;
+        let edges: Vec<_> = snapshot.edges.iter().map(HistoricalEdge).collect();
+        let resource_edges: Vec<_> = snapshot.resource_edges.iter().map(HistoricalEdge).collect();
+        state.serialize_field("nodes", &snapshot.nodes)?;
+        state.serialize_field("edges", &edges)?;
+        state.serialize_field("import_records", &snapshot.import_records)?;
+        state.serialize_field("timestamp_secs", &snapshot.timestamp_secs)?;
+        state.serialize_field("fields", &snapshot.fields)?;
+        state.serialize_field("couplings", &snapshot.couplings)?;
+        state.serialize_field("navigation", &snapshot.navigation)?;
+        state.serialize_field("resources", &snapshot.resources)?;
+        state.serialize_field("resource_edges", &resource_edges)?;
+        state.serialize_field("shown_resources", &snapshot.shown_resources)?;
+        state.end()
+    }
+}
+
+struct HistoricalFrozenGraph<'a>(&'a FrozenGraph);
+
+impl Serialize for HistoricalFrozenGraph<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("FrozenGraph", 2)?;
+        state.serialize_field("graph", &HistoricalSnapshot(&self.0.graph))?;
+        state.serialize_field("facets", &self.0.facets)?;
+        state.end()
+    }
+}
+
+fn historical_v1_digest(receipt: &LegacyTranslationReceipt) -> String {
+    let payload = (
+        receipt.version,
+        &receipt.source_digest,
+        &receipt.placement,
+        HistoricalFrozenGraph(&receipt.baseline),
+        &receipt.entry_effects,
+        HistoricalFrozenGraph(&receipt.legacy_final),
+    );
+    blake3::hash(&serde_json::to_vec(&payload).unwrap())
+        .to_hex()
+        .to_string()
+}
 
 fn legacy_receipt_graph(graph: &Graph) -> FrozenGraph {
     let mut frozen = FrozenGraph::of(graph);
@@ -106,6 +188,11 @@ fn old_json_translation_receipt_keeps_checksum_and_reopens_semantic_records() {
 
     let reopened: LegacyTranslationReceipt = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(reopened.translation_digest, receipt.translation_digest);
+    assert_eq!(
+        reopened.translation_digest,
+        historical_v1_digest(&reopened),
+        "the checksum matches an independent serializer with the pre-P6 field schema"
+    );
     reopened
         .validate(&profile, "historical-source-digest", &[])
         .expect("old checksum and translated graph remain valid after reopen");
