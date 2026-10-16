@@ -19,6 +19,8 @@ use paint_list_api::{ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd,
 use super::Canvas;
 use super::build::cluster_color;
 
+/// How many categories the palette tells apart before it repeats.
+pub const CATEGORY_COUNT: usize = super::build::CATEGORY_PALETTE.len();
 /// Grid columns across the claimed ground; rows follow the aspect.
 const COLUMNS: usize = 48;
 /// The three tiers' fill alphas (`--g-tier-1…3`).

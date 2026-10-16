@@ -444,6 +444,8 @@ pub struct Canvas {
     mosaic: mosaic::MosaicState,
     /// Whether the territory field is drawn beneath the graph (`territory.rs`).
     territory_field: bool,
+    /// Whether nodes and links are presented by the graph grammar (`grammar_view.rs`).
+    graph_grammar: bool,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
@@ -841,6 +843,7 @@ mod nodes;
 mod reader;
 pub mod responsive_link_adapter;
 mod roles;
+mod grammar_view;
 pub mod mosaic;
 pub mod scene_axes;
 pub mod territory;
