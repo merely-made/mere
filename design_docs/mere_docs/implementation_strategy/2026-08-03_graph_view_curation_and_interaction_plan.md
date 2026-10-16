@@ -3,7 +3,7 @@
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23). CollapsedGraphlet is now ArrangementKind::Supernode.*
 
 **Date:** 2026-08-03  
-**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The Isometry campaign Overmap fold controls and its separate consumer acceptance remain pending.
+**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The Isocosm: VTT campaign Overmap fold controls and its separate consumer acceptance remain pending.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
 adapters, plus a real second source in Isometry's pre-log `GameSnapshot` and
 authority `GameEvent` Codicil. Its Overmap Swatch has a Cambium slider that
@@ -660,7 +660,7 @@ output directory, and a 55-second timeout. The first run explicitly sets
 `FOLD_ACCEPTANCE_RESTORE` to that file. Neither uses a real application profile.
 
 This closes the bounded native-host fixture proof. It does not close the
-plan's named Isometry campaign consumer: its Overmap currently has no fold
+plan's named Isocosm: VTT campaign consumer: its Overmap currently has no fold
 controls. Keyboard gestures, live screen-reader interaction, recovery, and
 Windows/Linux headed acceptance are also outside this receipt.
 
