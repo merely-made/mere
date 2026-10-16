@@ -1496,6 +1496,9 @@ mod resource_revert_tests {
                 graph_scope: crate::types::GraphScope::User,
                 provenance_iri: Some("https://people.test/source".into()),
                 asserted_at_ms: Some(100),
+                first_asserted_ms: Some(100),
+                withdrawn: None,
+                basis: Default::default(),
             },
         );
         CapturedDelta::ReplaySetResourceEdgesByIds {

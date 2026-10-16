@@ -390,6 +390,9 @@ mod tests {
                 graph_scope: GraphScope::User,
                 provenance_iri: Some("https://original-author.test/".into()),
                 asserted_at_ms: Some(19),
+                first_asserted_ms: Some(19),
+                withdrawn: None,
+                basis: Default::default(),
             });
             payload
         };

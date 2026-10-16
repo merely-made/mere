@@ -304,7 +304,19 @@ fn production_routing_selector_retracts_both_held_stores_but_raw_replay_is_surfa
                 ArrangementSubKind::FrameMember
             ))
     );
-    assert_eq!(graph.resource_relations().count(), 0);
+    let retained_resource: Vec<_> = graph.resource_relations().collect();
+    assert_eq!(
+        retained_resource.len(),
+        1,
+        "authored retract retains a tombstone bucket"
+    );
+    assert!(
+        retained_resource[0]
+            .3
+            .held_semantic_statements()
+            .next()
+            .is_none()
+    );
     replay_captured_deltas_onto(&mut replayed, captured.lock().unwrap().clone());
     assert_eq!(truth(&replayed), truth(&graph));
 

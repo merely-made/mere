@@ -333,9 +333,12 @@ fn persisted_edge_with_ids(
                         .recognized_sub_kind
                         .map(persisted_semantic_sub_kind),
                     label: statement.label.clone(),
+                    basis: statement.basis.clone(),
                     graph_scope: statement.graph_scope.clone(),
                     provenance_iri: statement.provenance_iri.clone(),
                     asserted_at_ms: statement.asserted_at_ms,
+                    first_asserted_ms: statement.first_asserted_ms,
+                    withdrawn: statement.withdrawn.clone(),
                 })
                 .collect(),
         })

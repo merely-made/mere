@@ -48,6 +48,9 @@ fn held_claim(graph: &mut Graph, from: Uuid, to: Uuid) -> PersistedEdge {
         graph_scope: GraphScope::User,
         provenance_iri: Some("https://author.test/alice".into()),
         asserted_at_ms: Some(17),
+        first_asserted_ms: Some(17),
+        withdrawn: None,
+        basis: Default::default(),
     });
     let edge = snapshot::persisted_edge_for_ids(from, to, &payload);
     assert!(graph.set_resource_edges_between(from, to, &[edge.clone()]));

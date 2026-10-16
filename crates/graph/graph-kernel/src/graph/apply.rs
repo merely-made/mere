@@ -623,7 +623,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 .get_node_key_by_id(from_id)
                 .zip(graph.get_node_key_by_id(to_id))
                 .and_then(|(from, to)| {
-                    graph.assert_surface_relation_as(from, to, assertion, asserter_iri, None)
+                    graph.replay_surface_relation_as(from, to, assertion, asserter_iri)
                 });
             if edge.is_some() && !semantic {
                 graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
@@ -1569,25 +1569,12 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             predicate,
             asserter_iri,
         } => {
-            let edge = graph
-                .get_node_key_by_id(from_id)
-                .zip(graph.get_node_key_by_id(to_id))
-                .and_then(|(from, to)| {
-                    graph
-                        .assert_surface_semantic_statement(
-                            from,
-                            to,
-                            super::SemanticStatementSpec {
-                                predicate,
-                                recognized_sub_kind: None,
-                                label: None,
-                                graph_scope: GraphScope::Default,
-                                provenance_iri: Some(asserter_iri),
-                                asserted_at_ms: None,
-                            },
-                        )
-                        .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
-                });
+            let edge = graph.replay_assert_semantic_predicate_by_ids(
+                from_id,
+                to_id,
+                predicate,
+                asserter_iri,
+            );
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::AssertSemanticPredicate {
@@ -1607,6 +1594,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                         graph_scope: GraphScope::Default,
                         provenance_iri: Some(asserter_iri),
                         asserted_at_ms: None,
+                        basis: Default::default(),
                     },
                 )
                 .and_then(|(edge, outcome)| outcome.changed.then_some(edge));

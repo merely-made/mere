@@ -1,0 +1,976 @@
+{
+  "schema": "mere.link-model-lifecycle-qualification/1",
+  "date": "2026-10-15",
+  "source_commit": "1e3fb426c3c5f70c87bfb635379ce59e7b51515b",
+  "qualified_base": "b2c8dcc2860b146387b3ca076c18f994bcb80ad7",
+  "source_tree_clean_for_runtime_checks": true,
+  "evidence_commit": "separate documentation and receipt commit; see Git history",
+  "latest_main_seen": "d6b1e4a26f1fe87704c94e26b67931380478748d",
+  "latest_main_compatibility": "unqualified; separate family source, Knot/Murm and welding dependency updates",
+  "merge_tree_probe": {
+    "command": [
+      "git",
+      "merge-tree",
+      "--write-tree",
+      "1e3fb426c3c5f70c87bfb635379ce59e7b51515b",
+      "d6b1e4a26f1fe87704c94e26b67931380478748d"
+    ],
+    "exit_code": 0,
+    "tree": "2571b13d58f0be53cc4391fe35358ea8a421cfbe",
+    "meaning": "conflict-free Git merge only; no dependency/runtime qualification"
+  },
+  "toolchain": {
+    "rustc": "1.99.0 (b940084d7)",
+    "cargo": "1.99.0 (5f94df478)",
+    "wasm_bindgen": "0.2.129"
+  },
+  "build_environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/testing/mere/link-model-next-20261015/p5-target",
+    "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/testing/mere/link-model-next-20261015/p5-build",
+    "CARGO_BUILD_JOBS": "1",
+    "wasm_target_dir": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-target",
+    "wasm_build_dir": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-build"
+  },
+  "checks": [
+    {
+      "name": "final-kernel-fresh-process",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "mere-kernel",
+        "--features",
+        "store",
+        "--test",
+        "assertion_lifecycle_reopen",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.88,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.27s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ],
+      "log": "logs/final-kernel-fresh-process.log",
+      "log_sha256": "55a3125a688ce00ef1746f670514b826b34e59a473356100f564c55ef5053245"
+    },
+    {
+      "name": "final-pandect",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "pandect"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 13.3,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.25s",
+        "test result: ok. 310 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.70s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s",
+        "test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.62s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "log": "logs/final-pandect.log",
+      "log_sha256": "fa43de781c343abb3e2c130895db8e754581a4148bbe4f6d95f45495c477ab47"
+    },
+    {
+      "name": "final-shared-consumers",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "pictograph",
+        "-p",
+        "scenograph",
+        "--features",
+        "pictograph/canvas",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 47.02,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.66s",
+        "test result: ok. 464 passed; 0 failed; 18 ignored; 0 measured; 0 filtered out; finished in 33.94s",
+        "test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "log": "logs/final-shared-consumers.log",
+      "log_sha256": "d3a16d3664a057cc3546bec264f88855f6e62aa1961c7a5b308cd8216c705ca1"
+    },
+    {
+      "name": "final-graphshell-web",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "web",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 22.41,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.36s",
+        "test result: ok. 300 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 8.76s"
+      ],
+      "log": "logs/final-graphshell-web.log",
+      "log_sha256": "bc22a58eea3b3a5c199e510e4f48e13bf24f11ca4f34fa6e1fb1ee717fd9f495"
+    },
+    {
+      "name": "final-graphshell-personal-sync",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "personal-sync",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 21.73,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.09s",
+        "test result: ok. 376 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 8.70s"
+      ],
+      "log": "logs/final-graphshell-personal-sync.log",
+      "log_sha256": "4b92aeaf039c52fd13c0f58bb3ccf344c4be945706d63bc3d699414213b24e1b"
+    },
+    {
+      "name": "final-h7-sync-peer",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "personal-sync",
+        "--bin",
+        "h7_sync_peer"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.76,
+      "summaries": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.68s"
+      ],
+      "log": "logs/final-h7-sync-peer.log",
+      "log_sha256": "f25a9227be811358b135f6e25bd7254768b06b782f81064b24a212792830f528"
+    },
+    {
+      "name": "kernel-store-full",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "mere-kernel",
+        "--features",
+        "store",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "log": "logs/kernel-store-full.log",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.60s",
+        "test result: ok. 448 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s"
+      ],
+      "passed": 448,
+      "log_sha256": "0515b485d5ab3995bd4b6540a01aecb4c446b2c77b985570fb326a713400288b"
+    },
+    {
+      "name": "final-data-wire-numen",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "--lib",
+        "-p",
+        "mere-linked-data",
+        "-p",
+        "content-contract",
+        "-p",
+        "numen"
+      ],
+      "exit_code": 0,
+      "log": "logs/final-data-wire-numen.log",
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 11s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 84 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "passed_by_package": {
+        "mere-linked-data": 84,
+        "content-contract": 5,
+        "numen": 65
+      },
+      "log_sha256": "915d0a92fd7a747deb84a23d9a9df7e3d0933ae04e0d926bac76209cde391187"
+    },
+    {
+      "name": "wasm-final",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "product,presentation-webgpu"
+      ],
+      "exit_code": 0,
+      "log": "logs/wasm-final.log",
+      "summaries": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5m 00s"
+      ],
+      "working_directory": "ports/graphshell/web",
+      "elapsed_seconds": 300,
+      "log_sha256": "1f201ed8712195f79627fc867d7f78e05340e88786238d0da568b7fdfd70f262"
+    }
+  ],
+  "fresh_process": {
+    "parent_test_passed": 1,
+    "ignored_helper_test": 1,
+    "helper_actually_invoked_in_two_child_processes": true,
+    "comparison": "whole JSON snapshot exact equality plus explicit identity/basis/lifecycle checks",
+    "fixture_scope": "separate source hosts avoid unrelated legacy derived-Domain repair"
+  },
+  "test_counts_note": "Package/feature gates overlap. Counts are not claimed as unique tests across feature variants. Existing ignores are disclosed in logs.",
+  "browser": {
+    "source_commit": "1e3fb426c3c5f70c87bfb635379ce59e7b51515b",
+    "artifact_profile": "debug",
+    "backend": "BrowserWebGpu",
+    "viewport_css": [
+      742,
+      1044
+    ],
+    "capture_pixels": [
+      1484,
+      2088
+    ],
+    "viewport_override": false,
+    "gpu_timestamps": false,
+    "mac_unlock_needed": false,
+    "bindings_command": [
+      "/Users/markik/Code/testing/mere/one-tree-product-20261008/toolchain/bin/wasm-bindgen",
+      "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-target/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+      "--target",
+      "web",
+      "--out-dir",
+      "/Users/markik/Code/testing/mere/link-model-next-20261015/site/pkg"
+    ],
+    "artifacts": [
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-next-20261015/wasm-target/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+        "bytes": 1356990562,
+        "sha256": "c5f2fef0bc4bb8e96a920ca497b6810faaefb9b114f6c0370b6857057ed24f32"
+      },
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-next-20261015/site/pkg/graphshell_web.js",
+        "bytes": 149342,
+        "sha256": "fbaea081e23fb117f380a13c27fb92b1f4d08b3db0b20e12b752b1e7dc50fb90"
+      },
+      {
+        "path": "/Users/markik/Code/testing/mere/link-model-next-20261015/site/pkg/graphshell_web_bg.wasm",
+        "bytes": 261273958,
+        "sha256": "7768c10e18821d1a092306d289a275b34c2ec1cd0ac3a70d951463a0dd8fc091"
+      }
+    ],
+    "served_static_sha256": {
+      "loader.js": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728",
+      "mount.js": "46e06335f795fbae21fdbd3deb35d6420dc9b5c5bb9174a1b3f28d065a3d1bbf",
+      "styles.css": "a0944b06a83a7249fc69239ecffc8cab543f7556ffc95f2446b33ce3b5cd0bfd",
+      "tree.html": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b",
+      "responsive-links.html": "ed7212f191bebbbefd882c98f77b8cc71fdf19327b1b966d53010642fa8be9b5",
+      "scenarios/responsive_links.scn": "778c1a24e6c71712d31b0eed8d405a21d469f4e4fe261b5b1ac019917b21e83c",
+      "scenarios/p4_tree_link_inspection.scn": "2550a4363c309ec394a25440f9a07e0d6238d1582df6904e2a83c4b86b57ab32"
+    },
+    "dynamics": {
+      "result": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "capture_count": 8,
+      "all_saved_captures_visually_reviewed": true,
+      "review": "Independent fields and declared compatibility produce reproducible distinct bends. Disabled paths are straight; compatible-only leaves control C straight; all endpoints/handles fixed. Controls, rules, observed geometry and spring-unavailable disclosure fit.",
+      "scope": "bounded shared-reading host fixture, no endpoint feedback or resonance, unequal configured field strengths, not measured force allocation"
+    },
+    "inspector": {
+      "result": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "capture_count": 3,
+      "all_saved_captures_visually_reviewed": true,
+      "review": "Held/history toggle and exact assertion retain selection and workbench membership. Narrow layout scrolls through long source records; some arrow glyphs are unavailable.",
+      "fixture_contains": "one held assertion; withdrawn and undated spans covered by CPU tests, not visual fixture",
+      "startup_note": "Initial background page did not finish initialization. Closed the concurrent fixture tab and reloaded; presented page completed the scenario. This does not prove the cause."
+    }
+  },
+  "source_files": [
+    {
+      "path": "crates/cambium/scenes/scenograph/src/link.rs",
+      "sha256": "0d6212de340cff8643d13c43cded7ead074deb0e7796c34c6b40da11ae21c9cb",
+      "bytes": 9192
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas.rs",
+      "sha256": "2647485309ab36a7bd51b1234fff8bd70fff29f01d3edcd1af1eb590203495cd",
+      "bytes": 47459
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/build_tests.rs",
+      "sha256": "3a2a9570fc45709d1a87e77b21df7ddc90cbe0e82f15ca08ab8c6130147614f3",
+      "bytes": 19254
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/link_reading.rs",
+      "sha256": "f9184ea3704c247e0fc256caf9daa7f1205b250cd829ee066683266ebf0ef840",
+      "bytes": 15854
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/link_reading_tests.rs",
+      "sha256": "c2a00dd9209a3c57c0bd565c351f9f21e5fa0e36b5d7257d71e371476c391963",
+      "bytes": 9698
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/relationship_topology_tests.rs",
+      "sha256": "63d64fce4fcad0df8138866d536995f786ce253d0c00b295b46ec39dfcaadcf2",
+      "bytes": 9091
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_link_adapter.rs",
+      "sha256": "153573503cd99a4261ad33e097b6ed5579cdb6ea09ec1fb96cbbb2189a9c716f",
+      "bytes": 13069
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_link_adapter_tests.rs",
+      "sha256": "644086a0c63dd74ad521a505c74e06178b76a03f67f8ab86a9cf189e7185e2a8",
+      "bytes": 8488
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/tests/rings.rs",
+      "sha256": "0ad79006a0624c0ad25cc2b024028e2fb174e8350fde86f6fb595c852d8d6f09",
+      "bytes": 21255
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/apply.rs",
+      "sha256": "15b8adaa769fa287c767eb67129018d306ff14dd7608c855c0911409922903ef",
+      "bytes": 70497
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/assertion_write.rs",
+      "sha256": "3a3dff7f161f1b80a659ad18deefa01d1c6c28c23030a4fa159469e25d14f2d6",
+      "bytes": 44358
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/capture.rs",
+      "sha256": "52b10deba05feefffe15fee5b73d0b9562367835f2db106e5dd138c020701c12",
+      "bytes": 110607
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/edge_data.rs",
+      "sha256": "ad35301f31edf0e84a566d365368c863e6ccbde59032c19b2b80b75651d00521",
+      "bytes": 26723
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/edge_ops.rs",
+      "sha256": "5e54af95e96a3451c4c085aedd3106520cde5fb69a9064cde2ec714460be309c",
+      "bytes": 36668
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/edge_payload.rs",
+      "sha256": "d645567396d87d0273f09176dee6be9469bfb9fb3ea3b57cc62d440a86dbdf52",
+      "bytes": 16460
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs",
+      "sha256": "385b2355b11489ceed86f08444ca678f82393042f0e06624242f2061629e6371",
+      "bytes": 116516
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/predicate_declarations.rs",
+      "sha256": "a73aefc0210a13c704214d63aa799c13fac4fa46811ff397af6271c4d37e3418",
+      "bytes": 30383
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/query.rs",
+      "sha256": "812a1a1a707aacdcf6be62cee2720cc042c7cab05df436a079b3f1167ab6fa82",
+      "bytes": 56037
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/relation_read.rs",
+      "sha256": "f5fcaaf875db2572321035548af01db99c646de428ac730c483f7983c56978c6",
+      "bytes": 15975
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/resource.rs",
+      "sha256": "bb7e134a8ac81a872ce178001122fdd5a307765d32aa298e8a02b09c62f49711",
+      "bytes": 25537
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/resource_tags.rs",
+      "sha256": "5c796afa6809b843f5d95230fc274ac500b749b79e5731f123550b05ceb32405",
+      "bytes": 10761
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/revert.rs",
+      "sha256": "ac1ac84917ae05da1810ab7ff3b3d6f2ae97c906022cc957418d0d4fc44aa996",
+      "bytes": 69890
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/snapshot/from.rs",
+      "sha256": "b48dc77a22c6cb73722d44ed76a1fe10f33141b3db60ff2e93fac6629886ac64",
+      "bytes": 27211
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/snapshot/tests.rs",
+      "sha256": "0debb2f1ad3b304a72dd3d5770ec8f8549f0743b944960393531b45643bba734",
+      "bytes": 27157
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/snapshot/to.rs",
+      "sha256": "06f50b5a6bd9e87b4eea9bc42d063b483563e6b4af39736b3bbdfa1115d54205",
+      "bytes": 23155
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/assertion_lifecycle.rs",
+      "sha256": "850a07c3422df37103a73e5e7a1037b66ebc10723285110087fdce03bc31063c",
+      "bytes": 19983
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/assertion_replay.rs",
+      "sha256": "7584273fe256b18081691867e315867431b20ef3a9aed03fcfa6bfe82ef5b9d1",
+      "bytes": 19901
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/assertions.rs",
+      "sha256": "304a2628c3b851d0bfc97f466e1be167cc774fc23255cc77f03bf6e715f8631f",
+      "bytes": 6798
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/legacy_assertions.rs",
+      "sha256": "f888381de960e01eb7635647e88d22db4174bd8c3a09c4ede7d05d4f2b40546b",
+      "bytes": 3778
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/mod.rs",
+      "sha256": "1caa1cbd6e231be3ade1c8705b33a926b49591f796db291fe2063c1a158821a2",
+      "bytes": 841
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/nodes_and_edges.rs",
+      "sha256": "4d2b7652f4c35d2e4b9d76e2748e89cf5689b6c0eca63372f4ce0528a6d2f605",
+      "bytes": 25345
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/production_routing.rs",
+      "sha256": "a3e2ac9a476039e04e599ea824b0a6e93bd8f823fdc0ebf045e242c186683696",
+      "bytes": 17178
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/resource_lifecycle.rs",
+      "sha256": "3120cf5584f04d6e207a4e858b252d175667abd7a511694bd96e5011eafb4734",
+      "bytes": 13961
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs",
+      "sha256": "e4ab7949acd5c9b96692dd1924472812c1fe2a61c12bd596bc0591e4b4fb1274",
+      "bytes": 13901
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/persistence_edge.rs",
+      "sha256": "c0f236912d6429e04fefbfa6d6e918a7e83607768beb8d072233d6f430efc651",
+      "bytes": 20331
+    },
+    {
+      "path": "crates/graph/graph-kernel/src/types.rs",
+      "sha256": "a2b40b1b692d73e73b86b80c189f4909372d5db75607fc98f49fb8f7a3eb2df0",
+      "bytes": 27308
+    },
+    {
+      "path": "crates/graph/graph-kernel/tests/assertion_lifecycle_reopen.rs",
+      "sha256": "ca2ef7b9c90170e7de5f2c7ecb462c953c8d6dcf8c30379892caff2e25dc1b52",
+      "bytes": 6697
+    },
+    {
+      "path": "crates/graph/linked-data/src/ingest.rs",
+      "sha256": "2aacd55110bd91d53b465538925ba89b7fe8a066e0f6db2109c17f7cc16afa58",
+      "bytes": 50977
+    },
+    {
+      "path": "crates/graph/linked-data/src/ingest/apply.rs",
+      "sha256": "e99d66068b029b7e1686e6ef0676ee71194ea0b15126cce93487a7bbbce8ce7c",
+      "bytes": 18993
+    },
+    {
+      "path": "crates/graph/linked-data/src/ingest/exact.rs",
+      "sha256": "94a0bd0d1d69c17d4d4953f3f86a48260b939ced804d2bf5c2363b90bf4edbe3",
+      "bytes": 20044
+    },
+    {
+      "path": "crates/graph/linked-data/src/ingest/tests.rs",
+      "sha256": "88f7990c9dc64692e52d4ae54c28402ad21565824751b6b306bc2a10ffa6e882",
+      "bytes": 40950
+    },
+    {
+      "path": "crates/graph/linked-data/src/jsonld.rs",
+      "sha256": "f1a8d79f94637e3ab5c6d0b69fed97c75417bb2f2b584f0590dae4cf7d66c1e2",
+      "bytes": 14772
+    },
+    {
+      "path": "crates/graph/linked-data/src/jsonld/tests.rs",
+      "sha256": "17693c5948562b85e23c9a9c67057dd2328168af286b1e38672b689ba5f0b3ef",
+      "bytes": 12190
+    },
+    {
+      "path": "crates/graph/linked-data/src/jsonld/tests/descriptions.rs",
+      "sha256": "5f9c07f154fbb70a0abc1b55841295bce92aeb449998baecfe304d00fb193e97",
+      "bytes": 14811
+    },
+    {
+      "path": "crates/graph/linked-data/src/lib.rs",
+      "sha256": "83803b6f39568435625c9157f7bb175260aca79cd8a96c1dd320e7b40f79c6a3",
+      "bytes": 79339
+    },
+    {
+      "path": "crates/graph/linked-data/src/query.rs",
+      "sha256": "2c496ca7a666f22e44aa98769d627e3d5f28931e8f881c63abd419e0d0d3d13a",
+      "bytes": 32793
+    },
+    {
+      "path": "crates/graph/linked-data/src/reifier.rs",
+      "sha256": "ddb7d697193a3633465b05627da1806984b35bdf4247591abf32636d6fb97502",
+      "bytes": 18316
+    },
+    {
+      "path": "crates/graph/linked-data/src/serialize.rs",
+      "sha256": "a833f14d5b1ff96cf739361c0272803adc87eb0120677c2ce8cb1c89d913fda9",
+      "bytes": 9599
+    },
+    {
+      "path": "crates/graph/linked-data/src/statements.rs",
+      "sha256": "6e1ce708b0154b2093297a4b1b1c16be0d1c1de91daa7894cdd01a1bacdcee67",
+      "bytes": 12646
+    },
+    {
+      "path": "crates/graph/linked-data/src/statements_pending_tests.rs",
+      "sha256": "773622d2f917a9fb12d5a8ec2e8bcc28a7f19c968ef68e4ebd9e3fc1c12e83a7",
+      "bytes": 21839
+    },
+    {
+      "path": "crates/graph/linked-data/src/vocab.rs",
+      "sha256": "8aa1b25255c36207a4a2f18c2f3e167bad3854ee46fca4cf755831e24242f31b",
+      "bytes": 11250
+    },
+    {
+      "path": "crates/system/content-contract/src/lib.rs",
+      "sha256": "b4f2bc68b4c922a6392970f0541b104da8c5cc9eb11a63b14c3f75aca77111d3",
+      "bytes": 51336
+    },
+    {
+      "path": "crates/system/pandect/src/graph_session.rs",
+      "sha256": "3d4278407806e4ce368bca8de46df4a7f4531fe218e8e6e3cfc060235ae6cb16",
+      "bytes": 201659
+    },
+    {
+      "path": "crates/system/pandect/src/snapshot_merge.rs",
+      "sha256": "82241880fdc8d43ad433041e0dbf923cbdfc16612007b6a8a9206a7e5312aca5",
+      "bytes": 33339
+    },
+    {
+      "path": "crates/system/pandect/tests/live_graph.rs",
+      "sha256": "0eb680df72bd5e9b412edda6379d970dde3a5092bd3fb4a26b9af053c02e141c",
+      "bytes": 37321
+    },
+    {
+      "path": "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md",
+      "sha256": "8900b4a35c7c49abe5858c574835af354f5aee103938af57a1e8024399fff1bb",
+      "bytes": 20950
+    },
+    {
+      "path": "design_docs/mere_docs/technical_architecture/2026-10-15_link_model.md",
+      "sha256": "5bbf0967b9e9ac52533f390cf902ab6282273a53d0bdb8212f5f8e11926a7679",
+      "bytes": 45018
+    },
+    {
+      "path": "ports/graphshell/src/bin/h7_sync_peer.rs",
+      "sha256": "61ff9fe9f91e216b0b7a3615e660d3fec82d02c6902021f5467569f445ff7615",
+      "bytes": 13701
+    },
+    {
+      "path": "ports/graphshell/src/lib.rs",
+      "sha256": "023036a4b9af4df86ece8fd1c01cf3aedd2034da33d2f89de1cb51917ddfa04a",
+      "bytes": 3615
+    },
+    {
+      "path": "ports/graphshell/src/link_inspection.rs",
+      "sha256": "ce31b2cbea0365a5ae26c41c6e1e78d1ceb225b879f9accc39fd6634ff16d486",
+      "bytes": 20016
+    },
+    {
+      "path": "ports/graphshell/src/link_inspection/tests.rs",
+      "sha256": "47d2252db41ea48763e756705876b54bdf0b26c00af5a8a4772dc4f8d49cec6c",
+      "bytes": 19435
+    },
+    {
+      "path": "ports/graphshell/src/local_edit/tests.rs",
+      "sha256": "5d985952bad848277edb173dc663ff670285fe849c1b58291cc4d2af0d41debf",
+      "bytes": 20572
+    },
+    {
+      "path": "ports/graphshell/src/mere_host.rs",
+      "sha256": "0e94f2b6fbb3a7297bb87076f1f71d5e698f283915d2030830b3a070cbaa2ab8",
+      "bytes": 86138
+    },
+    {
+      "path": "ports/graphshell/src/personal_sync.rs",
+      "sha256": "15ac80d5b18ed3b2fa1b5c2b1102e14cd2018631c8e499a0a88905bd85067a47",
+      "bytes": 136411
+    },
+    {
+      "path": "ports/graphshell/src/personal_sync/assertions.rs",
+      "sha256": "cfd0b94f4b76adce1980faa0780799040142eaea1d586b6735e26dabe9c03dcf",
+      "bytes": 15326
+    },
+    {
+      "path": "ports/graphshell/src/presentation_binding.rs",
+      "sha256": "ee7756bf35bb68155cb319eba8d95c292b22e9532754fb3554c6c669882a893d",
+      "bytes": 13306
+    },
+    {
+      "path": "ports/graphshell/src/presentation_binding_tests.rs",
+      "sha256": "f8dc1ae2a06ad1f9fb820db8e57720d85b68f5c08513f1f7da32bde1bf018358",
+      "bytes": 11574
+    },
+    {
+      "path": "ports/graphshell/src/product.rs",
+      "sha256": "b9654cf870ad38dd01f2e5f0c6e7f861f8a649e901cfec122e302c5d5206ea3d",
+      "bytes": 163995
+    },
+    {
+      "path": "ports/graphshell/src/responsive_links.rs",
+      "sha256": "281fce0f2dcc7f6734817d17d60d3e3c97a8f819b761cad3eecb74e181062061",
+      "bytes": 17460
+    },
+    {
+      "path": "ports/graphshell/src/responsive_links_tests.rs",
+      "sha256": "38c3f3cfda0a963ba62ce07bafb3b2a10197e4c225ea27fcd4ad2d22ee77386c",
+      "bytes": 6396
+    },
+    {
+      "path": "ports/graphshell/src/transfer.rs",
+      "sha256": "be0062092f1f4623d67cecacfea8ee9512a23c0ca0110c937dd11b1181b6d693",
+      "bytes": 96741
+    },
+    {
+      "path": "ports/graphshell/src/web_tree.rs",
+      "sha256": "50e6af0a01bd38c3f9e977c04ed17402fe7b425203e694f5e264273556ed2c49",
+      "bytes": 88797
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/lane.rs",
+      "sha256": "19647c38209b243e3824bbc13fab764cfce20f0c51615ed01396afed2bd17781",
+      "bytes": 80880
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/link_inspection.rs",
+      "sha256": "2c58759344b2e2337914986a7961fc8e441db17d0200039d6e0f360e8e6c696b",
+      "bytes": 24811
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/presentation.rs",
+      "sha256": "7f877ad87d5e66924e34df964afe84fe087aa8bc5b1e843c1df749abbb954f72",
+      "bytes": 39310
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/product.rs",
+      "sha256": "098fcdf46165f95af3675790af6d1795a0bb054df55aff5f4b81b807ff90dd0a",
+      "bytes": 40335
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/product_off.rs",
+      "sha256": "bc38a1ff3fce7c947c2b80c196488d59ea839dd41d27937a08be7866f5df2b56",
+      "bytes": 4422
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/responsive_links.rs",
+      "sha256": "0283f69b53faa8c18f252208d6ef7c2e052f2c9e56d2a91c1cee19787f372c56",
+      "bytes": 11213
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "081a948431a1a3dec97afa293f1a15270945ca194fe7dbf59674b39b0a6c01d7",
+      "bytes": 299904
+    },
+    {
+      "path": "ports/graphshell/web/responsive-links.html",
+      "sha256": "ed7212f191bebbbefd882c98f77b8cc71fdf19327b1b966d53010642fa8be9b5",
+      "bytes": 622
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_inspection.scn",
+      "sha256": "2550a4363c309ec394a25440f9a07e0d6238d1582df6904e2a83c4b86b57ab32",
+      "bytes": 2557
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/responsive_links.scn",
+      "sha256": "778c1a24e6c71712d31b0eed8d405a21d469f4e4fe261b5b1ac019917b21e83c",
+      "bytes": 2289
+    }
+  ],
+  "snapshot_size": {
+    "fixture_statements": 49,
+    "before_bytes_per_statement": 705,
+    "after_bytes_per_statement": 770,
+    "gate_bytes_per_statement": 780,
+    "substantial_history_budget_qualified": false
+  },
+  "phase_status": {
+    "P1": "bounded shared-reading consumers qualified",
+    "P2": "semantic lifecycle implemented and bounded-tested; Knot supplier/intake gate open",
+    "P3": "open; chartulary asserter/span/basis prerequisite",
+    "P4": "open; fan retirement",
+    "P5": "stated fixed-endpoint Graphshell experiment qualified",
+    "P6": "open; other families and history budgets",
+    "P7": "open; promotion"
+  },
+  "compatibility_limits": [
+    "Knot fe9d98ccc1eb7b0589bd90243683d4f6dfab3242 lacks projected retraction time; Mere has no real Knot relation-intake adapter",
+    "Current JSON store and current postcard/rkyv roundtrips pass; old unversioned pre-P2 standalone postcard has no migration",
+    "Legacy Contribution wire payload and enum ordinal retained; ContributionV2 requires a V2-aware receiver",
+    "No desktop-native application acceptance or physical peer qualification",
+    "Newer origin/main dependency set not built or tested by this receipt"
+  ],
+  "iteration_notes": [
+    "Broad suites exposed retained-count and canonical-basis fixture assumptions; fixtures now check held truth and actual canonical basis changes while retaining collision/refusal/atomicity controls",
+    "Live/direct parity normalizes only newly authored clocks/IDs; exact reopen/journal comparisons remain strict",
+    "Earlier failed exploratory runs are not represented as successful aggregate commands"
+  ],
+  "documentation_audit": {
+    "baseline_source": "cc801cbe0; design_docs/scripts identical through qualified base b2c8dcc28",
+    "audit_command": [
+      "python3",
+      "scripts/mere_doc_audit.py",
+      "--json"
+    ],
+    "audit_exit_code": 0,
+    "judgment_command": [
+      "python3",
+      "scripts/mere_doc_judgment_audit.py",
+      "--json"
+    ],
+    "judgment_exit_code": 1,
+    "new_occurrences": 0,
+    "comparison": "audit/doc-audit-comparison.json",
+    "normalization": "ignore shifted line keys and replace each checkout absolute repo root with $REPO; preserve source, subject, detail and multiplicity",
+    "baseline_debt": {
+      "broken_relative_links": 16,
+      "missing_known_root_paths": 151,
+      "stale_historical_annotations": 6,
+      "unheaded_owned_sources": 61,
+      "missing_judgment_records": 14,
+      "snapshot_digest_mismatch": true
+    },
+    "judgment_coverage": [
+      271,
+      285
+    ],
+    "judgment_errors_unchanged": 15,
+    "global_gate_green": false,
+    "scoped_review": "Independent read-only review found no actionable factual contradictions in current architecture, plan, reason key and receipt limits."
+  },
+  "receipt_artifacts": [
+    {
+      "path": "audit/doc-audit-baseline-cc801.json",
+      "bytes": 248903,
+      "sha256": "9b75d1e428ef1e31bffd96fafbf400907ffad5b7b7180f54f8c5897fe32444ff"
+    },
+    {
+      "path": "audit/doc-audit-comparison.json",
+      "bytes": 2099,
+      "sha256": "95ff878a22d41d6c45f8a7f8bbc9636c9d4be28bfeb5487144ac60a9a480ba9e"
+    },
+    {
+      "path": "audit/doc-audit-final.json",
+      "bytes": 247511,
+      "sha256": "9526053d12267fce1e41937897604718c62432e27988013b0ba03ab0cd55d33a"
+    },
+    {
+      "path": "audit/judgment-baseline-cc801.json",
+      "bytes": 11664,
+      "sha256": "d6402dad3fa8f39dd03997db95dee9392357a092cdececf345506a7e149a42d0"
+    },
+    {
+      "path": "audit/judgment-final.json",
+      "bytes": 11664,
+      "sha256": "9b8cd568f92bac4ae4bafa4d83c3d649759febf27850bdad66274858d1b4a8c7"
+    },
+    {
+      "path": "dynamics/progress.json",
+      "bytes": 2370,
+      "sha256": "f000d2dc9391492574383fa866cdb062e39a65bdd9380cb0fe972d66317287d4"
+    },
+    {
+      "path": "dynamics/responsive_attraction_only.png",
+      "bytes": 414250,
+      "sha256": "502a5c013275ba5068834fb751bb5e8ca4e0470705b38156b11f8d343eb2546a"
+    },
+    {
+      "path": "dynamics/responsive_attractor.png",
+      "bytes": 442488,
+      "sha256": "4753dae4b505599d2c70df1bb5d296cbe705b7477e1671197837b372b2768e9c"
+    },
+    {
+      "path": "dynamics/responsive_combined.png",
+      "bytes": 438096,
+      "sha256": "855e03c81b9607a559f57ed98862bfe8d8891fd75d018f734d7c2cb6ef1dee16"
+    },
+    {
+      "path": "dynamics/responsive_disabled.png",
+      "bytes": 398638,
+      "sha256": "e710c9dfe20747d4ef428354298f933762e3e4cba73c32826a7b5e9a964af2d2"
+    },
+    {
+      "path": "dynamics/responsive_flow.png",
+      "bytes": 415259,
+      "sha256": "61876bc5d1b2900dc19ae61ed81fd53d0a01187ca11f0e94ac7957265cff006f"
+    },
+    {
+      "path": "dynamics/responsive_flow_field_only.png",
+      "bytes": 419502,
+      "sha256": "2e12065726ce9f075fd260c6e32adb4fa7561480426a4465e552d7154d81b85f"
+    },
+    {
+      "path": "dynamics/responsive_vortex_combined.png",
+      "bytes": 446319,
+      "sha256": "62357cdfac20eef1739aa9ea25da1def28c16028b37d99323a75c903c694860c"
+    },
+    {
+      "path": "dynamics/responsive_vortex_field_only.png",
+      "bytes": 458067,
+      "sha256": "0d964340cdf75c6fd0d83f197614f0814f3487fbe1b4574864f962dd5277ab12"
+    },
+    {
+      "path": "dynamics/result.json",
+      "bytes": 6444,
+      "sha256": "2d6c53f4455aa01c5e642fa0c5030737d31ac0854325bf5d05e32071b7646244"
+    },
+    {
+      "path": "dynamics/scenario.done",
+      "bytes": 304,
+      "sha256": "dd4907378e4a9062615620a3b2eafbf6d4f683fdf5ce170141feae7b2e54077c"
+    },
+    {
+      "path": "inspector/exact_link_assertion.png",
+      "bytes": 350011,
+      "sha256": "608f003e524339044ead38b117b1b5963c4fc60235e72966d8f0089ee7654573"
+    },
+    {
+      "path": "inspector/link_source_records.png",
+      "bytes": 263098,
+      "sha256": "e10e6b76c1a509cc9e440956232d896374eb90903d3b6dc84e72ede8af1b3063"
+    },
+    {
+      "path": "inspector/progress.json",
+      "bytes": 9275,
+      "sha256": "208e36a7e28fdd35ca1c814920f99b3705dfe3d481d8a6e0f4695120029ceba8"
+    },
+    {
+      "path": "inspector/result.json",
+      "bytes": 33405,
+      "sha256": "f0b2ea4de28727fa7769fb3ffa6bf9deb08c7fff8c0e9c46b6459555e13e7b1f"
+    },
+    {
+      "path": "inspector/retained_assertion_history.png",
+      "bytes": 382750,
+      "sha256": "db46dffc866e66f829c64cfd05911454bff2674149c07d0cda95acb38774c6c7"
+    },
+    {
+      "path": "inspector/scenario.done",
+      "bytes": 204,
+      "sha256": "e989da77e8e15a418011284bee92a7f8da96709abc0ab841788dd463823dda8f"
+    },
+    {
+      "path": "logs/final-data-wire-numen.log",
+      "bytes": 21176,
+      "sha256": "915d0a92fd7a747deb84a23d9a9df7e3d0933ae04e0d926bac76209cde391187"
+    },
+    {
+      "path": "logs/final-graphshell-personal-sync.log",
+      "bytes": 69221,
+      "sha256": "4b92aeaf039c52fd13c0f58bb3ccf344c4be945706d63bc3d699414213b24e1b"
+    },
+    {
+      "path": "logs/final-graphshell-web.log",
+      "bytes": 61635,
+      "sha256": "bc22a58eea3b3a5c199e510e4f48e13bf24f11ca4f34fa6e1fb1ee717fd9f495"
+    },
+    {
+      "path": "logs/final-h7-sync-peer.log",
+      "bytes": 16213,
+      "sha256": "f25a9227be811358b135f6e25bd7254768b06b782f81064b24a212792830f528"
+    },
+    {
+      "path": "logs/final-kernel-fresh-process.log",
+      "bytes": 10345,
+      "sha256": "55a3125a688ce00ef1746f670514b826b34e59a473356100f564c55ef5053245"
+    },
+    {
+      "path": "logs/final-pandect.log",
+      "bytes": 42868,
+      "sha256": "fa43de781c343abb3e2c130895db8e754581a4148bbe4f6d95f45495c477ab47"
+    },
+    {
+      "path": "logs/final-shared-consumers.log",
+      "bytes": 56397,
+      "sha256": "d3a16d3664a057cc3546bec264f88855f6e62aa1961c7a5b308cd8216c705ca1"
+    },
+    {
+      "path": "logs/kernel-store-full.log",
+      "bytes": 48400,
+      "sha256": "0515b485d5ab3995bd4b6540a01aecb4c446b2c77b985570fb326a713400288b"
+    },
+    {
+      "path": "logs/wasm-final.log",
+      "bytes": 39352,
+      "sha256": "1f201ed8712195f79627fc867d7f78e05340e88786238d0da568b7fdfd70f262"
+    },
+    {
+      "path": "rustfmt-scope.json",
+      "bytes": 7163,
+      "sha256": "dc38e67c5eaa8160c66592731b6e690f2d8c4c85a450a7c5c401892d4aa07369"
+    }
+  ]
+}

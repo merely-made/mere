@@ -1,0 +1,118 @@
+{
+  "index_orphans": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "index_ghosts": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "memory_directory_links": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "statusless_plans": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "broken_relative_links": {
+    "baseline": 16,
+    "final": 16,
+    "added": [],
+    "removed": []
+  },
+  "historical_broken_relative_links": {
+    "baseline": 245,
+    "final": 245,
+    "added": [],
+    "removed": []
+  },
+  "planned_broken_relative_links": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "ambiguous_known_root_paths": {
+    "baseline": 171,
+    "final": 171,
+    "added": [],
+    "removed": []
+  },
+  "ignored_known_root_patterns": {
+    "baseline": 23,
+    "final": 23,
+    "added": [],
+    "removed": []
+  },
+  "reserved_identifier_paths": {
+    "baseline": 31,
+    "final": 31,
+    "added": [],
+    "removed": []
+  },
+  "missing_known_root_paths": {
+    "baseline": 151,
+    "final": 151,
+    "added": [],
+    "removed": []
+  },
+  "historical_missing_known_root_paths": {
+    "baseline": 238,
+    "final": 238,
+    "added": [],
+    "removed": []
+  },
+  "planned_missing_known_root_paths": {
+    "baseline": 9,
+    "final": 9,
+    "added": [],
+    "removed": []
+  },
+  "invalid_historical_annotations": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "stale_historical_annotations": {
+    "baseline": 6,
+    "final": 6,
+    "added": [],
+    "removed": []
+  },
+  "unheaded_owned_sources": {
+    "baseline": 61,
+    "final": 61,
+    "added": [],
+    "removed": []
+  },
+  "exhibit_b_sources": {
+    "baseline": 0,
+    "final": 0,
+    "added": [],
+    "removed": []
+  },
+  "judgment": {
+    "baseline_coverage": [
+      271,
+      285
+    ],
+    "final_coverage": [
+      271,
+      285
+    ],
+    "baseline_error_count": 15,
+    "final_error_count": 15,
+    "same_errors": true,
+    "supplemental_records_added": 0
+  }
+}

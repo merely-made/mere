@@ -381,7 +381,19 @@ fn test_retract_relation_by_sub_kind_between_nodes() {
         RelationSelector::Semantic(SemanticSubKind::UserGrouped),
     );
     assert_eq!(removed, 1);
-    assert_eq!(graph.edge_count(), 0);
+    assert_eq!(
+        graph.edge_count(),
+        1,
+        "withdrawn Surface assertion remains in history"
+    );
+    let surface = graph
+        .find_edge_key(a, b)
+        .expect("retained Surface tombstone");
+    assert!(
+        graph.get_edge(surface).unwrap().semantic_statements()[0]
+            .withdrawn
+            .is_some()
+    );
     let (edge_key, payload) = graph
         .projected_relations_between(a, b)
         .next()
@@ -450,15 +462,15 @@ fn statement_assert_dedups_by_content_and_retracts_by_id() {
     assert_eq!(updated.statement_id, first.statement_id);
     assert!(updated.changed);
 
-    // Precise retract: the other statement survives; retracting the last
-    // semantic statement (with no other family payload) removes the edge.
+    // Precise withdrawal: the other held statement survives; the first stays
+    // available as history after its tombstone is recorded.
     assert!(graph.retract_semantic_statement(a, b, &first.statement_id));
     assert_eq!(
         graph
             .get_relation(edge)
             .unwrap()
-            .semantic_statements()
-            .len(),
+            .held_semantic_statements()
+            .count(),
         1
     );
     assert!(
@@ -467,8 +479,8 @@ fn statement_assert_dedups_by_content_and_retracts_by_id() {
     );
     assert!(graph.retract_semantic_statement(a, b, &second.statement_id));
     assert!(
-        graph.get_relation(edge).is_none() && graph.resource_relations().count() == 0,
-        "an emptied Resource payload removes its exact bucket"
+        graph.get_relation(edge).is_some() && graph.resource_relations().count() == 1,
+        "withdrawal keeps its exact Resource bucket until compaction"
     );
 }
 

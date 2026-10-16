@@ -29,6 +29,9 @@ fn complete_payload() -> EdgePayload {
                 graph_scope: GraphScope::Custom("https://scope.test/claims".into()),
                 provenance_iri: Some(asserter.into()),
                 asserted_at_ms: Some(time),
+                first_asserted_ms: Some(time),
+                withdrawn: None,
+                basis: Default::default(),
             });
         }
     }
@@ -40,6 +43,9 @@ fn complete_payload() -> EdgePayload {
         graph_scope: GraphScope::Source,
         provenance_iri: None,
         asserted_at_ms: Some(33),
+        first_asserted_ms: Some(33),
+        withdrawn: None,
+        basis: Default::default(),
     });
     for sub_kind in ArrangementSubKind::iter() {
         payload.assert_relation(EdgeAssertion::Arrangement { sub_kind });
@@ -381,6 +387,9 @@ fn checked_snapshot_recorded_loader_preserves_same_host_resource_containment_and
             graph_scope: GraphScope::User,
             provenance_iri: Some(author.into()),
             asserted_at_ms: Some(time),
+            first_asserted_ms: Some(time),
+            withdrawn: None,
+            basis: Default::default(),
         });
         graph.inner.connect(child, parent, payload);
     }
