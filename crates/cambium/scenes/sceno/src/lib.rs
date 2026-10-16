@@ -57,14 +57,17 @@
 pub mod fold;
 pub mod footprint;
 pub mod geometry;
+pub mod link;
 pub mod scene;
 pub mod score;
+pub mod subdivision;
 
 pub use fold::{
     BoundaryBundle, Fold, FoldBoundary, FoldDirection, FoldEffect, FoldError, FoldRule, StandIn,
 };
 pub use footprint::Footprint;
 pub use geometry::{Rect, Size2, Transform2, Vec2};
+pub use link::{LinkKey, LinkMarks, LinkStratum};
 pub use scene::{
     Backdrop, InstanceId, ProjectedItem, Region, Representation, RoutedRelation, Scene, SourceIx,
     SourceRef, Space, SpaceId,
@@ -75,4 +78,7 @@ pub use score::{
     Placement, Radial, RadialAngularPolicy, RadialUnreachablePolicy, SCORE_VERSION, Score,
     ScoreItem, ScoreVersionError, Spiral, SpiralCurve, Stack, SubdivisionCount, Timeline,
     TimelineFallback, UnusedVertexPolicy,
+};
+pub use subdivision::{
+    Mosaic, Partition, PartitionForm, SET_CORE_WEIGHT, SET_SEPARATOR, Setscape,
 };

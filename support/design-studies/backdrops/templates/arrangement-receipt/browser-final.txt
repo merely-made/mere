@@ -1,0 +1,107 @@
+Browser tab: 11, Title: "Graphshell, one tree", URL: "http://127.0.0.1:8793/tree.html?app=local&receipt=linked-arrangements".
+0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8793/tree.html?app=local&receipt=linked-arrangements
+	1 container Graphshell, one tree
+		2 container
+			3 text mereGraphshellLocal mere / retained material
+			4 container
+				5 text mere mere
+			6 container
+				7 text GraphshellLocal mere / retained material GraphshellLocal mere / retained material
+				8 heading Graphshell, Value: 1
+					9 text Graphshell
+				10 text Local mere / retained material
+			11 text saved graph · 11 nodes · selected: 0 · primary: none
+			12 container Graph controls
+				13 button Pan left
+				14 button Pan right
+				15 button Pan up
+				16 button Pan down
+				17 button Zoom in
+				18 button Zoom out
+				19 button Fit graph
+				20 button (disabled) Fit selection
+				21 button Restore arrangement
+				22 button Reset
+				23 button Set seed
+				24 button (disabled) Foreground pin
+				25 button Dismiss retained
+				26 button (disabled) Grow tile
+				27 button (disabled) Shrink tile
+				28 button Territory
+				29 button Play physics
+				30 pop up button (collapsed) Graph commands, Secondary Actions: Expand
+				31 button (disabled) Hide selected link
+				32 button (disabled) Show hidden links
+				33 text No saved whole-link hides
+				303 button (collapsed) Graph tools, Secondary Actions: Expand
+			34 text Open selected in workbenchShow workbench
+			35 button Open selected in workbench
+			36 button Show workbench
+			37 text Saved graph
+			38 button Undo session
+			39 button Redo session
+			40 container
+				41 text Add an object
+				42 button (collapsed) Add an object, Secondary Actions: Expand
+			43 button (disabled) Inspect selected access
+			44 button Inspect fields
+			45 button Open details
+			46 text Dataspace11 items / Graph presentationPortable scene workspace
+			47 container
+				48 text Dataspace11 items / Graph presentationPortable scene workspace Dataspace11 items / Graph presentation
+				49 container
+					50 text Dataspace11 items / Graph presentation
+					51 heading Dataspace, Value: 2
+						52 text Dataspace
+					53 text 11 items / Graph presentation
+				54 text Portable scene workspace
+				55 container
+					56 text Graphshell / portable sceneMetre gridProgression in CProgression in GRegular arrangementVaried arrangementFretboardTerrain and coverageLinksImport scene recipeExport scene recipe Graphshell / portable scene
+					57 checkbox Metre grid, Value: 0
+					58 checkbox Progression in C, Value: 0
+					59 checkbox Progression in G, Value: 0
+					60 checkbox Regular arrangement, Value: 0
+					61 checkbox Varied arrangement, Value: 1
+					62 checkbox Fretboard, Value: 0
+					63 checkbox Terrain and coverage, Value: 0
+					64 checkbox Links, Value: 1
+					65 button Import scene recipe
+					66 button Export scene recipe
+				224 heading Varied arrangement · ii-V-I (Jazz) in C, Value: 2
+					225 text Varied arrangement · ii-V-I (Jazz) in C
+				226 container
+					227 text Portable scene stageSelected voicing · Cmaj7 (IM7)Cmaj7 (IM7) · supplied voicing 2 · capo 0 · x-3-x-0-0-0Related scene stageSupplied marks: C · G · B · E · revision 9093185d99269aa97315e642f17fce97f5e0fb1ff3c37b078bef18e91efd0346Scene selection and occurrences Portable scene stageSelected voicing · Cmaj7 (IM7)Cmaj7 (IM7) · supplied voicing 2 · capo 0 · x-3-x-0-0-0Related scene stageSupplied marks: C · G · B · E · revision 9093185d99269aa97315e642f17fce97f5e0fb1ff3c37b078bef18e91efd0346
+					228 container
+						229 text Portable scene stage Portable scene stage
+					280 heading Selected voicing · Cmaj7 (IM7), Value: 3
+						281 text Selected voicing · Cmaj7 (IM7)
+					282 text Cmaj7 (IM7) · supplied voicing 2 · capo 0 · x-3-x-0-0-0
+					283 container
+						284 text Related scene stage Related scene stage
+					285 text Supplied marks: C · G · B · E · revision 9093185d99269aa97315e642f17fce97f5e0fb1ff3c37b078bef18e91efd0346
+					236 text Scene selection and occurrences
+					237 heading Selection, Value: 3
+						238 text Selection
+					286 text Cmaj7 (IM7)
+					240 text ii-V-I-study#card=4 · persistent Set occurrence · supplied alignment · start 48 / span 16 ticks · quarter-note beat (4 ticks); supplied spans, no playback clock
+					287 text Source: woodshed.chord / 0:Major 7:capo-0 · 9d21da61694caf1fdfee21a2ee0f0d0a97345db0a8bcaad84d4132a55f2aa3ea
+					288 button Related occurrence role-2
+					289 text Source-declared alignment to expectation; no conformity judgment inferred
+					290 button Related occurrence card-3
+					291 text Persistent Set order; spatial alignment and chord identity remain independent
+					292 text forward 1 · retained 0
+					293 button Clear selection
+					294 button Dismiss retained
+					295 heading Occurrences, Value: 3
+						296 text Occurrences
+					278 checkbox Scene occurrence role-0: iim7, Value: 0
+					279 checkbox Scene occurrence role-1: V7, Value: 0
+					297 checkbox Scene occurrence role-2: IM7, Value: 0
+					298 checkbox Scene occurrence card-1: Dm7 (iim7), Value: 0
+					299 checkbox Scene occurrence card-2: G7 (V7), Value: 0
+					300 checkbox Scene occurrence card-3: Cmaj7 (IM7), Value: 0
+					301 checkbox Scene occurrence card-4: Cmaj7 (IM7), Value: 1
+					302 checkbox Scene occurrence rest-breath: Rest, Value: 0
+				259 text Source revision: 9d21da61694caf1fdfee21a2ee0f0d0a97345db0a8bcaad84d4132a55f2aa3ea · supplied facts; selection does not edit the source
+
+The focused UI element is 0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8793/tree.html?app=local&receipt=linked-arrangements

@@ -1,0 +1,160 @@
+{
+  "backend": "Vello CPU",
+  "frames": [
+    {
+      "backdrops": 20,
+      "generation": 13311758983710843510,
+      "height": 540,
+      "items": 44,
+      "scene": "metre",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 12,
+      "generation": 12783941358327671159,
+      "height": 540,
+      "items": 5,
+      "scene": "fretboard",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 4,
+      "width": 900
+    },
+    {
+      "backdrops": 9,
+      "generation": 13003133134952339978,
+      "height": 540,
+      "items": 3,
+      "scene": "terrain",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 4,
+      "width": 900
+    },
+    {
+      "backdrops": 4,
+      "generation": 14253271072583254712,
+      "height": 540,
+      "items": 6,
+      "scene": "progression",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 4,
+      "width": 900
+    },
+    {
+      "backdrops": 4,
+      "generation": 13624449971889655622,
+      "height": 540,
+      "items": 6,
+      "scene": "progression-g",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 4,
+      "width": 900
+    },
+    {
+      "backdrops": 1,
+      "generation": 18179080090476893552,
+      "height": 540,
+      "items": 6,
+      "scene": "arrangement-regular",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 4,
+      "width": 900
+    },
+    {
+      "backdrops": 9,
+      "generation": 6759122901911853917,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-regular-card-1",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 10,
+      "generation": 2030277688156509035,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-regular-card-2",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 10,
+      "generation": 4326171995752097186,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-regular-card-3",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 1,
+      "generation": 3844060434330590624,
+      "height": 540,
+      "items": 8,
+      "scene": "arrangement-varied",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 9,
+      "generation": 6759122901911853917,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-varied-card-1",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 10,
+      "generation": 2030277688156509035,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-varied-card-2",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 10,
+      "generation": 4326171995752097186,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-varied-card-3",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 10,
+      "generation": 13661643341561873121,
+      "height": 540,
+      "items": 4,
+      "scene": "arrangement-varied-card-4",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    }
+  ],
+  "presentation": "not exercised"
+}

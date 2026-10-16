@@ -28,12 +28,14 @@ use crate::request::{AxisValue, ProjectionRequest};
 use crate::signals::{COORDS_HOST, COORDS_SPECTRAL, ORDER_TIMELINE, RINGS_FOCUS, WEIGHT_DEGREE};
 use crate::strategy::LayoutStrategy;
 
+pub mod bounded;
 pub mod changes;
 pub mod matrix;
 #[cfg(test)]
 mod parity;
 pub mod score;
 
+pub use bounded::{MosaicAdapter, PartitionAdapter, SetsAdapter, common_sets};
 pub use score::{
     Disclosures, empty_projection, faulted_projection, project_arrangement, project_score,
     score_from_request,
@@ -268,6 +270,9 @@ pub fn channels_read(id: &str) -> &'static [&'static str] {
         SpectralAdapter::PROJECTION_ID => &[ORDER_TIMELINE, COORDS_SPECTRAL],
         SemanticEmbeddingAdapter::PROJECTION_ID => &[ORDER_TIMELINE, COORDS_HOST],
         RadialAdapter::PROJECTION_ID => &[ORDER_TIMELINE, RINGS_FOCUS],
+        PartitionAdapter::PROJECTION_ID | MosaicAdapter::PROJECTION_ID => {
+            &[ORDER_TIMELINE, WEIGHT_DEGREE]
+        },
         _ => &[ORDER_TIMELINE],
     }
 }

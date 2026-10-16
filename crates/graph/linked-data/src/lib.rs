@@ -11,11 +11,11 @@
 //!
 //! **Export.** [`to_jsonld`] emits *expanded* JSON-LD (full IRIs, no `@context`);
 //! [`to_jsonld_compact`] emits the *compacted* form (a `@graph` under an inline
-//! `@context`). The statements-over-schema cut shows in both: a node's `Semantic`
-//! edges become RDF predicates — a recognized [`kernel::graph::SemanticSubKind`]
-//! uses its canonical Mere IRI ([`kernel::graph::predicate_iri`]) or short term,
-//! while an open predicate passes through verbatim. The other edge families
-//! (Traversal, Containment, …) are Mere's *experience* layer and are not exported.
+//! `@context`). Each held exact assertion becomes an RDF predicate and reifier,
+//! including semantic, containment, arrangement, imported, and provenance
+//! relation kinds. Recognized relation kinds use their canonical Mere IRI;
+//! open predicates pass through verbatim. The traversal event rollup remains
+//! Mere's experience layer and is not exported as a relation assertion.
 //! Curated literals stay on their fast paths (`title` → `schema:name`, `tags` →
 //! `schema:keywords`), and the open node property bag projects as RDF literals
 //! with datatype / language-tag fidelity. `@id` is the node's URL, or a
@@ -35,7 +35,7 @@
 
 #![doc(html_root_url = "https://docs.rs/linked-data/0.0.1")]
 
-use kernel::graph::{Graph, Node, NodeKey, SemanticData, SemanticStatement, predicate_iri};
+use kernel::graph::{Graph, Node, NodeKey, SemanticStatement};
 use kernel::types::ClassificationScheme;
 use kernel::types::{GraphScope, NodeProperty};
 use oxrdf::{GraphName, Literal, NamedNode, Quad, Term, Triple};
@@ -154,27 +154,6 @@ fn node_id(node: &Node) -> String {
         format!("urn:uuid:{}", node.id)
     } else {
         url.to_string()
-    }
-}
-
-/// The RDF predicate IRIs a `Semantic` edge contributes. An explicit open
-/// predicate (raw or canonical) wins and is emitted verbatim; otherwise each
-/// recognized sub-kind maps to its canonical Mere IRI.
-fn edge_predicates(semantic: &SemanticData) -> Vec<String> {
-    if !semantic.statements().is_empty() {
-        semantic
-            .statements()
-            .iter()
-            .map(|statement| statement.predicate.clone())
-            .collect()
-    } else if let Some(predicate) = &semantic.predicate {
-        vec![predicate.clone()]
-    } else {
-        semantic
-            .sub_kinds
-            .iter()
-            .map(|&sub_kind| predicate_iri(sub_kind).to_string())
-            .collect()
     }
 }
 
@@ -600,30 +579,20 @@ fn node_direct_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
         );
     }
 
-    // Semantic edges -> predicate IRIs -> target `@id`s, sorted by
+    // Canonical assertion edges -> predicate IRIs -> target `@id`s, sorted by
     // (predicate, target, graph) for a stable dataset.
     let mut edges: Vec<(String, String, GraphScope)> = Vec::new();
     for (_, _, target, payload) in graph.surface_outgoing_relation_buckets(key) {
-        let Some(semantic) = payload.semantic_data() else {
-            continue;
-        };
         let Some(target_node) = graph.get_node(target) else {
             continue;
         };
         let target_id = node_id(target_node);
-        let held_statements = semantic.held_statements().collect::<Vec<_>>();
-        if !held_statements.is_empty() {
-            for statement in held_statements {
-                edges.push((
-                    statement.predicate.clone(),
-                    target_id.clone(),
-                    statement.graph_scope.clone(),
-                ));
-            }
-        } else if semantic.statements().is_empty() {
-            for predicate in edge_predicates(semantic) {
-                edges.push((predicate, target_id.clone(), GraphScope::Default));
-            }
+        for statement in payload.held_assertions() {
+            edges.push((
+                statement.predicate.clone(),
+                target_id.clone(),
+                statement.graph_scope.clone(),
+            ));
         }
     }
     edges.sort();
@@ -685,7 +654,7 @@ fn node_metadata_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
         let Some(edge_key) = graph.find_edge_key(key, target) else {
             continue;
         };
-        let Some(semantic) = graph.get_edge(edge_key).and_then(|p| p.semantic_data()) else {
+        let Some(payload) = graph.get_edge(edge_key) else {
             continue;
         };
         let Some(target_node) = graph.get_node(target) else {
@@ -694,7 +663,7 @@ fn node_metadata_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
         let Ok(target_id) = NamedNode::new(node_id(target_node)) else {
             continue;
         };
-        for statement in semantic.held_statements() {
+        for statement in payload.held_assertions() {
             semantic_statements.push((statement.clone(), target_id.clone()));
         }
     }
@@ -804,7 +773,7 @@ pub fn dataset_quads_with_history(graph: &Graph) -> Vec<Quad> {
             continue;
         };
         for statement in payload
-            .semantic_statements()
+            .assertions()
             .iter()
             .filter(|statement| statement.withdrawn.is_some())
         {
@@ -830,7 +799,7 @@ pub fn dataset_quads_with_history(graph: &Graph) -> Vec<Quad> {
             continue;
         };
         for statement in payload
-            .semantic_statements()
+            .assertions()
             .iter()
             .filter(|statement| statement.withdrawn.is_some())
         {
@@ -862,7 +831,7 @@ fn resource_edge_quads(
     ) else {
         return quads;
     };
-    for statement in payload.held_semantic_statements() {
+    for statement in payload.held_assertions() {
         push_quad(
             &mut quads,
             &subject,
@@ -917,10 +886,12 @@ mod tests {
         ASSERTION_HISTORY_GRAPH_IRI, GraphContribution, MERE_ASSERTED_GRAPH_KIND,
         MERE_ASSERTED_GRAPH_NAME, MERE_LAST_ASSERTED_AT, MERE_LIFECYCLE_VERSION,
         MERE_METHOD_VERSION, PROV_GENERATED_AT_TIME, PROV_INVALIDATED_AT_TIME,
-        PROV_WAS_ASSOCIATED_WITH, PROV_WAS_INVALIDATED_BY, RDF_REIFIES, apply_contribution,
-        apply_import, dataset_quads_with_history, from_jsonld, from_nquads_envelope, node_id,
-        statement_reifier_id, to_jsonld, to_jsonld_compact, to_jsonld_with_history,
-        to_nquads_with_history, to_trig_with_history, withdrawal_activity_id,
+        PROV_WAS_ASSOCIATED_WITH, PROV_WAS_ATTRIBUTED_TO, PROV_WAS_DERIVED_FROM,
+        PROV_WAS_GENERATED_BY, PROV_WAS_INVALIDATED_BY, RDF_REIFIES, RDFS_LABEL,
+        apply_contribution, apply_import, dataset_quads_with_history, from_jsonld,
+        from_nquads_envelope, node_id, statement_reifier_id, to_jsonld, to_jsonld_compact,
+        to_jsonld_with_history, to_nquads_with_history, to_trig_with_history,
+        withdrawal_activity_id,
     };
     use super::{dataset_quads, node_direct_quads};
     use crate::from_trig_envelope;
@@ -1062,20 +1033,13 @@ mod tests {
             .expect("outgoing source bucket")
             .clone();
         let statement = parallel
-            .semantic
-            .as_mut()
-            .and_then(|semantic| semantic.statements.first_mut())
+            .retained_assertions_mut()
+            .first_mut()
             .expect("persisted outgoing assertion");
         statement.statement_id = "parallel-outgoing-assertion".into();
         statement.predicate = "https://example.test/parallel-outgoing".into();
         statement.recognized_sub_kind = None;
         statement.graph_scope = GraphScope::Custom("urn:graph:parallel".into());
-        parallel
-            .semantic
-            .as_mut()
-            .expect("semantic sidecar")
-            .sub_kinds
-            .clear();
         snapshot.edges.push(parallel);
 
         let incoming = snapshot
@@ -1083,9 +1047,8 @@ mod tests {
             .iter_mut()
             .find(|edge| edge.from_node_id == source.get_node(b).unwrap().id.to_string())
             .expect("incoming-only bucket")
-            .semantic
-            .as_mut()
-            .and_then(|semantic| semantic.statements.first_mut())
+            .retained_assertions_mut()
+            .first_mut()
             .expect("persisted incoming assertion");
         incoming.statement_id = "incoming-only-assertion".into();
         incoming.predicate = "https://example.test/incoming-only".into();
@@ -1227,6 +1190,241 @@ mod tests {
                     || quad.graph_name == history_graph
             }));
         }
+    }
+
+    #[test]
+    fn all_family_assertions_export_distinct_reifiers_and_withdrawal_history() {
+        use kernel::graph::{ContainmentSubKind, ImportedSubKind, RelationKind, SemanticStatement};
+        use kernel::types::{AssertionBasis, AssertionMethod};
+
+        let mut graph = Graph::new();
+        let from = graph.add_node("https://family.test/from".into(), Default::default());
+        let to = graph.add_node("https://family.test/to".into(), Default::default());
+        let predicate = RelationKind::Containment(ContainmentSubKind::CollectionMember)
+            .predicate_iri()
+            .expect("canonical containment predicate")
+            .to_owned();
+        let actor = "urn:family:actor";
+        let make_statement =
+            |id: &str, note: &str, method: &str, evidence: &str, at| SemanticStatement {
+                statement_id: id.into(),
+                predicate: predicate.clone(),
+                recognized_sub_kind: None,
+                label: Some(note.into()),
+                basis: AssertionBasis {
+                    note: Some(note.into()),
+                    method: Some(AssertionMethod {
+                        iri: method.into(),
+                        version: Some("1".into()),
+                    }),
+                    evidence: vec![evidence.into()],
+                },
+                graph_scope: GraphScope::Custom("urn:family:scope".into()),
+                provenance_iri: Some(actor.into()),
+                first_asserted_ms: Some(at),
+                asserted_at_ms: Some(at),
+                withdrawn: None,
+            };
+        for statement in [
+            make_statement(
+                "family:primary",
+                "primary reason",
+                "urn:method:primary",
+                "urn:evidence:primary",
+                10,
+            ),
+            make_statement(
+                "family:independent",
+                "independent reason",
+                "urn:method:independent",
+                "urn:evidence:independent",
+                11,
+            ),
+            make_statement(
+                "family:withdrawn",
+                "withdrawn reason",
+                "urn:method:withdrawn",
+                "urn:evidence:withdrawn",
+                12,
+            ),
+        ] {
+            graph
+                .try_assert_persisted_relation_statement(from, to, statement)
+                .expect("distinct exact family assertions are retained");
+        }
+        let resource_id = "family:resource-control";
+        let resource_kind = RelationKind::Imported(ImportedSubKind::SharedCollection);
+        graph
+            .try_assert_persisted_relation_statement(
+                from,
+                to,
+                SemanticStatement {
+                    statement_id: resource_id.into(),
+                    predicate: resource_kind
+                        .predicate_iri()
+                        .expect("canonical imported predicate")
+                        .into(),
+                    recognized_sub_kind: None,
+                    label: Some("resource family control".into()),
+                    basis: AssertionBasis {
+                        note: Some("resource family control".into()),
+                        method: None,
+                        evidence: vec!["urn:evidence:resource-family".into()],
+                    },
+                    graph_scope: GraphScope::Custom("urn:family:scope".into()),
+                    provenance_iri: Some(actor.into()),
+                    first_asserted_ms: Some(13),
+                    asserted_at_ms: Some(13),
+                    withdrawn: None,
+                },
+            )
+            .expect("exact resource-family assertion is retained");
+        assert!(graph.withdraw_semantic_assertion(
+            "family:withdrawn",
+            Some(20),
+            Some("urn:family:withdrawer".into()),
+        ));
+
+        let held = dataset_quads(&graph);
+        let expanded = to_jsonld(&graph).to_string();
+        assert!(expanded.contains(&statement_reifier_id("family:primary")));
+        assert!(expanded.contains(&statement_reifier_id("family:independent")));
+        assert!(expanded.contains(&statement_reifier_id(resource_id)));
+        assert!(!expanded.contains(&statement_reifier_id("family:withdrawn")));
+        #[cfg(feature = "query")]
+        {
+            let rows = super::query::sparql(
+                &graph,
+                &format!(
+                    "SELECT ?target WHERE {{ GRAPH <urn:family:scope> {{ <https://family.test/from> <{predicate}> ?target }} }}"
+                ),
+            )
+            .expect("SPARQL reads the canonical family assertion projection");
+            assert_eq!(rows.rows, vec![vec![Some("https://family.test/to".into())]]);
+        }
+        let scope = GraphName::NamedNode(NamedNode::new("urn:family:scope").unwrap());
+        let from_id = NamedNode::new("https://family.test/from").unwrap();
+        let to_id = NamedNode::new("https://family.test/to").unwrap();
+        assert!(held.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(from_id.clone())
+                && quad.predicate.as_str() == predicate
+                && quad.object == Term::NamedNode(to_id.clone())
+                && quad.graph_name == scope
+        }));
+        // RDF facts are a set, while independent source reasons retain one
+        // reifier each with their own immutable IDs and metadata.
+        for (id, note, method, evidence) in [
+            (
+                "family:primary",
+                "primary reason",
+                "urn:method:primary",
+                "urn:evidence:primary",
+            ),
+            (
+                "family:independent",
+                "independent reason",
+                "urn:method:independent",
+                "urn:evidence:independent",
+            ),
+        ] {
+            let reifier = NamedNode::new(statement_reifier_id(id)).unwrap();
+            assert!(held.iter().any(|quad| {
+                quad.subject == oxrdf::NamedOrBlankNode::from(reifier.clone())
+                    && quad.predicate.as_str() == RDF_REIFIES
+            }));
+            assert!(held.iter().any(|quad| {
+                quad.subject == oxrdf::NamedOrBlankNode::from(reifier.clone())
+                    && quad.predicate.as_str() == RDFS_LABEL
+                    && matches!(&quad.object, Term::Literal(value) if value.value() == note)
+            }));
+            assert!(held.iter().any(|quad| {
+                quad.subject == oxrdf::NamedOrBlankNode::from(reifier.clone())
+                    && quad.predicate.as_str() == PROV_WAS_GENERATED_BY
+                    && quad.object == Term::NamedNode(NamedNode::new(method).unwrap())
+            }));
+            assert!(held.iter().any(|quad| {
+                quad.subject == oxrdf::NamedOrBlankNode::from(reifier.clone())
+                    && quad.predicate.as_str() == MERE_METHOD_VERSION
+                    && matches!(&quad.object, Term::Literal(value) if value.value() == "1")
+            }));
+            assert!(held.iter().any(|quad| {
+                quad.subject == oxrdf::NamedOrBlankNode::from(reifier.clone())
+                    && quad.predicate.as_str() == PROV_WAS_DERIVED_FROM
+                    && quad.object == Term::NamedNode(NamedNode::new(evidence).unwrap())
+            }));
+            assert!(held.iter().any(|quad| {
+                quad.subject == oxrdf::NamedOrBlankNode::from(reifier.clone())
+                    && quad.predicate.as_str() == PROV_WAS_ATTRIBUTED_TO
+                    && quad.object == Term::NamedNode(NamedNode::new(actor).unwrap())
+            }));
+        }
+        let resource_reifier = NamedNode::new(statement_reifier_id(resource_id)).unwrap();
+        let resource_predicate = resource_kind.predicate_iri().unwrap();
+        assert!(held.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(from_id.clone())
+                && quad.predicate.as_str() == resource_predicate
+                && quad.object == Term::NamedNode(to_id.clone())
+                && quad.graph_name == scope
+        }));
+        assert!(held.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(resource_reifier.clone())
+                && quad.predicate.as_str() == RDF_REIFIES
+        }));
+        assert!(held.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(resource_reifier.clone())
+                && quad.predicate.as_str() == PROV_WAS_ATTRIBUTED_TO
+                && quad.object == Term::NamedNode(NamedNode::new(actor).unwrap())
+        }));
+        let withdrawn_reifier = NamedNode::new(statement_reifier_id("family:withdrawn")).unwrap();
+        assert!(held.iter().all(|quad| {
+            quad.subject != oxrdf::NamedOrBlankNode::from(withdrawn_reifier.clone())
+        }));
+
+        let history = dataset_quads_with_history(&graph);
+        assert!(
+            to_jsonld_with_history(&graph)
+                .to_string()
+                .contains(&statement_reifier_id("family:withdrawn"))
+        );
+        let history_graph =
+            GraphName::NamedNode(NamedNode::new(ASSERTION_HISTORY_GRAPH_IRI).unwrap());
+        assert!(history.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(withdrawn_reifier.clone())
+                && quad.predicate.as_str() == RDF_REIFIES
+                && quad.graph_name == history_graph
+                && matches!(&quad.object, Term::Triple(triple)
+                    if triple.predicate.as_str() == predicate)
+        }));
+        let activity = NamedNode::new(withdrawal_activity_id("family:withdrawn")).unwrap();
+        assert!(history.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(withdrawn_reifier.clone())
+                && quad.predicate.as_str() == PROV_WAS_INVALIDATED_BY
+                && quad.object == Term::NamedNode(activity.clone())
+                && quad.graph_name == history_graph
+        }));
+        assert!(history.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(withdrawn_reifier.clone())
+                && quad.predicate.as_str() == PROV_WAS_ATTRIBUTED_TO
+                && quad.object == Term::NamedNode(NamedNode::new(actor).unwrap())
+                && quad.graph_name == history_graph
+        }));
+        assert!(history.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(withdrawn_reifier.clone())
+                && quad.predicate.as_str() == PROV_INVALIDATED_AT_TIME
+                && quad.graph_name == history_graph
+        }));
+        assert!(history.iter().any(|quad| {
+            quad.subject == oxrdf::NamedOrBlankNode::from(activity.clone())
+                && quad.predicate.as_str() == PROV_WAS_ASSOCIATED_WITH
+                && quad.object == Term::NamedNode(NamedNode::new("urn:family:withdrawer").unwrap())
+                && quad.graph_name == history_graph
+        }));
+        assert!(history.iter().all(|quad| {
+            !(quad.subject == oxrdf::NamedOrBlankNode::from(from_id.clone())
+                && quad.predicate.as_str() == predicate
+                && quad.object == Term::NamedNode(to_id.clone())
+                && quad.graph_name == history_graph)
+        }));
     }
 
     #[test]
@@ -1980,9 +2178,10 @@ mod tests {
             .0;
         let payload = graph.get_relation_mut(edge).expect("payload");
         let statement = payload
-            .semantic
-            .as_mut()
-            .and_then(|semantic| semantic.statements.iter_mut().next())
+            .assertions
+            .statements
+            .iter_mut()
+            .next()
             .expect("semantic statement");
         statement.statement_id = "stmt-edge-1".to_string();
         statement.provenance_iri = Some("https://people.test/alice".to_string());

@@ -17,11 +17,12 @@
 pub mod conditions;
 pub mod custody;
 pub mod door;
-pub mod hocket_adoption;
 pub mod embedded_reservoir;
 pub mod enrollment;
+pub mod hocket_adoption;
 pub mod identity_ui;
 pub mod keeper;
+pub mod knot_relation_intake;
 pub mod lock_triggers;
 pub mod pairing;
 pub mod personal_sync;

@@ -1,0 +1,29 @@
+{
+  "base_commit": "dc60476252f0e3eae445857331b7c0853928b29a",
+  "sha256": {
+    "Cargo.lock": "c8b60aa5d42e49a4c14b052ec0c2208597a1d226d00d9dcef31acb3a892844ae",
+    "crates/cambium/cambium/src/backdrop_scene.rs": "be728caeb3db85835199894e78b9be1881ffd097d64f791c868a3e9c4ba3f946",
+    "crates/cambium/cambium/src/lib.rs": "162a88e634f4e87c1209591ba342f7b028abb07f19cc4a6aa3a513ac35657dea",
+    "crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481",
+    "crates/cambium/scenes/README.md": "1e457ba331ede64fd186fddcd8aaadc9f3b473f03ff06e3cd088afc067f6b893",
+    "crates/cambium/scenes/scenomise/src/backdrops.rs": "82c8d3d891ff33cd08f8f5d89968b05a979143c034e2a8203d86d4bbb67d19e1",
+    "crates/cambium/scenes/scenomise/src/lib.rs": "6096ab19f33128ceab87c2f77b02d8cc5021f5dc40ac5836d3e4003b5c58179d",
+    "crates/cambium/scenes/scenomise/tests/backdrop_scenes.rs": "8fa9762a2b3386b0eca471c338975deba4342efb652bfa2dbf02eb273c15fee7",
+    "crates/canvas/pictograph/Cargo.toml": "c4ea4a9954aa5fcfe7de0ca58a262a21239be58b28318638dbf39adeb1e2494d",
+    "crates/canvas/pictograph/examples/backdrop_receipt.rs": "c2353bebb42ff4b2c37beaa7f0cdfed8c1f3f181c5fbe1169d335ab3d69c6041",
+    "crates/canvas/pictograph/src/canvas.rs": "5bd59a2f2c66cb0b3c87ee6dc7080b3a753bcb5d108a267e0acf3ff459bb3506",
+    "crates/canvas/pictograph/src/canvas/backdrop_surface.rs": "39aa70bc587caaf4dd63a0e2e80cbf0110dcfabe4df3fab829442be45efe5b2e",
+    "crates/canvas/pictograph/src/canvas/board_scene.rs": "fac806c5aac4adbed648814cd51151ed0635a6293d9f3320c23f2c611369687b",
+    "design_docs/2026-08-23_projection_scenes_and_graph_native_platform.md": "da5382c8dab459637e6e7292cdceef20cc73dd6069dd84a12c5935d91da3a790",
+    "ports/graphshell/src/web_appearance.rs": "83998209740fb8a61c1930c08449fafb86f05ff34597858d79c01e276092433f",
+    "ports/graphshell/src/web_tree.rs": "b5b67739cdcd72dc1412c016eb9c2acf2cf449f43b32fb81241fa7fb937c9e05",
+    "ports/graphshell/src/web_tree/backdrop.rs": "c499ed1e9b0a1b508ad4118c1ce5b0fb97cf8b90633c34fe1bf4ab01292e4b68",
+    "ports/graphshell/web/Cargo.lock": "afe85d57b66e079646f60e6d9dcff7838acbc79aec9cb2cf4972c8ab86741a7c",
+    "ports/graphshell/web/Cargo.toml": "a4347b11631d20b7c0ddc2617785017b02cd49f42a1fa22a9224a108c467bf18",
+    "ports/graphshell/web/GraphshellSans.ttf": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481",
+    "support/design-studies/backdrops/fretboard.json": "f39d0aaffd27e0211943c531417661f801b324812e5a097cf5508a07a9e46a8a",
+    "support/design-studies/backdrops/metre.json": "a2ae127e10d6f16e155bb4bbb5fbcdf7105d7f3ebd17c579d81373ad51d629ee",
+    "support/design-studies/backdrops/render_cpu_pngs.py": "f01549fc8752eb783486bebb8d88a7a561dc4d4363564e48c9cbd8941ab2ef78",
+    "support/design-studies/backdrops/terrain.json": "7697c1431fbe73c752b41b9c85438e75ed032da82610ce807c283c83e42d19a5"
+  }
+}

@@ -32,6 +32,8 @@ mod atlas;
 mod command_surface;
 mod command_menu_bar;
 mod component;
+mod backdrop_scene;
+pub use backdrop_scene::{BackdropSceneEvent, BACKDROP_SCENE_CSS, backdrop_scene_reading};
 mod context;
 mod controls;
 mod detail_panel;
@@ -56,6 +58,7 @@ mod keyed;
 mod menu;
 mod multi;
 mod optional_action;
+mod opened_link;
 mod overlay;
 mod overlay_surface;
 mod frisket_presentation;
@@ -93,6 +96,9 @@ mod tests;
 
 pub use action_list::{ActionItem, ActionListEvent, ActionListState, action_list};
 pub use arrangement::{arrangement, placed, placed_with};
+pub use opened_link::{
+    LinkMemberAction, LinkMemberTarget, OpenedLinkEvent, opened_link_swatch,
+};
 pub use atlas::{
     GraphCanvasAtlas, GraphCanvasAtlasCallout, GraphCanvasAtlasCompoundOutline,
     GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,

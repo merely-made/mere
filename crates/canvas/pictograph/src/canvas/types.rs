@@ -5,8 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use kernel::graph::{NodeKey, RelationSelector};
+use scenograph::link::{LinkKey, LinkMarks};
 
-/// A selected addressable relation cell on the canvas.
+/// A legacy exact directed row filter. This remains for persisted
+/// `hidden_relations` compatibility; hit-testing and closed hides use LinkKey.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct EdgeCell {
     pub from: NodeKey,
@@ -15,7 +17,7 @@ pub struct EdgeCell {
 }
 
 impl EdgeCell {
-    /// The display/visibility endpoint bundle this cell belongs to.
+    /// The displayed endpoint bundle this compatibility filter belongs to.
     pub fn endpoint_pair(self) -> (NodeKey, NodeKey) {
         if self.from <= self.to {
             (self.from, self.to)
@@ -23,6 +25,18 @@ impl EdgeCell {
             (self.to, self.from)
         }
     }
+}
+
+/// One displayed appearance of an authoritative link. Resource links can have
+/// several surface appearances, so geometry endpoints are intentionally kept
+/// separate from the canonical key used for selection, opening, and hiding.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LinkAppearance {
+    pub key: LinkKey,
+    pub display_from: NodeKey,
+    pub display_to: NodeKey,
+    pub marks: LinkMarks,
+    pub strength: f32,
 }
 
 /// A pointer button the host reports to the canvas (winit / genet / … map onto it).

@@ -1,0 +1,159 @@
+    Blocking waiting for file lock on package cache
+warning: skipping duplicate package `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#71405bc6)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/proofs/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/71405bc/crates/system/proofs/Cargo.toml
+
+warning: skipping duplicate package `muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#71405bc6)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/muniment/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/71405bc/crates/eidetic/muniment/Cargo.toml
+
+warning: patch `mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#71405bc6)` was not used in the crate graph
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#71405bc6)` was not used in the crate graph
+warning: patch `p2panda-auth v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.46
+   Compiling unicode-ident v1.0.24
+   Compiling typenum v1.20.1
+   Compiling libc v0.2.186
+   Compiling cfg-if v1.0.4
+   Compiling serde_core v1.0.228
+   Compiling cmov v0.5.4
+   Compiling const-oid v0.10.2
+   Compiling serde v1.0.228
+   Compiling semver v1.0.28
+   Compiling autocfg v1.5.1
+   Compiling byteorder v1.5.0
+   Compiling cpufeatures v0.3.0
+   Compiling subtle v2.6.1
+   Compiling version_check v0.9.5
+   Compiling bytes v1.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling zeroize v1.9.0
+   Compiling heapless v0.9.3
+   Compiling signature v3.0.0
+   Compiling zmij v1.0.23
+   Compiling hash32 v0.3.1
+   Compiling ctutils v0.4.2
+   Compiling rustc_version v0.4.1
+   Compiling generic-array v0.14.7
+   Compiling selvage v0.1.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/selvage)
+   Compiling num-traits v0.2.19
+   Compiling ed25519 v3.0.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling cpubits v0.1.1
+   Compiling serde_json v1.0.151
+   Compiling curve25519-dalek v5.0.0
+   Compiling libbz2-rs-sys v0.2.5
+   Compiling memchr v2.8.3
+   Compiling rand_core v0.10.1
+   Compiling itoa v1.0.18
+   Compiling thiserror v2.0.19
+   Compiling hashbrown v0.17.1
+   Compiling getrandom v0.3.4
+   Compiling az v1.3.0
+   Compiling hybrid-array v0.4.13
+   Compiling bzip2 v0.6.1
+   Compiling equivalent v1.0.2
+   Compiling rustix v1.1.4
+   Compiling toml_write v0.1.2
+   Compiling indexmap v2.14.0
+   Compiling libm v0.2.16
+   Compiling micromath v2.1.0
+   Compiling syn v2.0.118
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling block-padding v0.4.2
+   Compiling syn v3.0.3
+   Compiling inout v0.2.2
+   Compiling embedded-graphics-core v0.4.1 (/Users/markik/Code/worktrees/signalman-portable-coverage/vendor/embedded-graphics-core)
+   Compiling winnow v0.7.15
+   Compiling errno v0.3.14
+   Compiling signal-hook-registry v1.4.8
+   Compiling digest v0.11.3
+   Compiling socket2 v0.6.5
+   Compiling serial2 v0.2.37
+   Compiling mio v1.2.2
+   Compiling cipher v0.5.2
+   Compiling sha2 v0.11.0
+   Compiling hmac v0.13.0
+   Compiling hkdf v0.13.0
+   Compiling cbc v0.2.1
+   Compiling aes v0.9.1
+   Compiling getrandom v0.2.17
+   Compiling cpufeatures v0.2.17
+   Compiling bitflags v2.13.1
+   Compiling pipit v0.2.0
+   Compiling once_cell v1.21.4
+   Compiling minisign-verify v0.2.5
+   Compiling fastrand v2.5.0
+   Compiling lora-modulation v0.1.5
+   Compiling quick-xml v0.39.4
+   Compiling hex v0.4.3
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling thiserror-impl v2.0.19
+   Compiling digest v0.10.7
+   Compiling float-cmp v0.9.0
+   Compiling rmp v0.8.15
+   Compiling sha2 v0.10.9
+   Compiling embedded-graphics v0.8.2 (/Users/markik/Code/worktrees/signalman-portable-coverage/vendor/embedded-graphics)
+   Compiling rmpv v1.3.1
+   Compiling serde_derive v1.0.228
+   Compiling tokio-macros v2.7.0
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling tokio v1.53.1
+   Compiling radio-face v0.0.1 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/radio-face)
+   Compiling x25519-dalek v3.0.0
+   Compiling ed25519-dalek v3.0.0
+   Compiling tempfile v3.27.0
+   Compiling toml_datetime v0.6.11
+   Compiling serde_spanned v0.6.9
+   Compiling mere-curation v0.1.1 (https://github.com/merely-made/mere.git?branch=main#71405bc6)
+   Compiling sceno v0.0.5 (https://github.com/merely-made/mere.git?branch=main#71405bc6)
+   Compiling toml_edit v0.22.27
+   Compiling scenograph v0.0.4 (https://github.com/merely-made/mere.git?branch=main#71405bc6)
+   Compiling toml v0.8.23
+   Compiling serial2-tokio v0.1.24
+   Compiling tulle v0.2.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/tulle)
+   Compiling linkboy v0.1.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/apps/linkboy)
+   Compiling retinue v0.3.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/retinue)
+   Compiling scenomise v0.0.5 (https://github.com/merely-made/mere.git?branch=main#71405bc6)
+   Compiling seneschal v0.2.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/seneschal)
+   Compiling outrider v0.3.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/outrider)
+   Compiling radio-hand v0.0.1 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/radio-hand)
+   Compiling postilion v0.3.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/crates/postilion)
+   Compiling signalman v0.1.0 (/Users/markik/Code/worktrees/signalman-portable-coverage/apps/signalman)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 35s
+     Running unittests src/lib.rs (target/build/debug/deps/signalman-ab0a2352002444fe)
+
+running 13 tests
+test survey::tests::refuses_external_entity_declarations_and_nonfinite_coordinates ... ok
+test survey::tests::imports_stationary_points_and_retains_a_long_gps_gap ... ok
+test survey::tests::imports_a_moving_track_without_rewriting_source_times ... ok
+test survey::tests::reimport_revalidates_nonfinite_coordinates_and_clock_scope ... ok
+test survey::tests::refuses_oversize_nonfinite_and_wrong_typed_optional_capture_fields ... ok
+test survey::tests::capture_import_has_explicit_clock_and_unknown_reverse_evidence ... ok
+test survey::tests::imports_reset_capture_loss_and_asymmetric_reception_as_distinct_evidence ... ok
+test survey::tests::rejects_impossible_dates_bad_fractions_and_nested_points ... ok
+test survey::tests::reimport_rejects_a_summary_that_disagrees_with_original_source_bytes ... ok
+test survey::tests::reverse_requires_receipt_or_test_opportunity_and_export_replays_settings ... ok
+test survey::scene::tests::tampered_track_evidence_and_absent_sources_are_refused ... ok
+test survey::scene::tests::tracks_keep_segment_gaps_and_radios_remain_unplaced ... ok
+test survey::tests::stored_capture_adapter_preserves_literal_evidence_and_rejects_tampered_summary ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.01s
+

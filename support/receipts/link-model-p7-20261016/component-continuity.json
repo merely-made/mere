@@ -1,0 +1,48 @@
+{
+  "sources": [
+    "611e484d49d8894085ee7d66e5582764f46642df",
+    "6d53d4439fce520c1da9f3ddf87c3dac343934b3"
+  ],
+  "components": [
+    {
+      "path": "crates/graph/graph-kernel",
+      "objects": [
+        "4bf4b9fe0ce8dc88442a7b1c9ee3f9057b5d3e4f",
+        "4bf4b9fe0ce8dc88442a7b1c9ee3f9057b5d3e4f"
+      ],
+      "unchanged": true
+    },
+    {
+      "path": "ports/graphshell/src/promoted_links.rs",
+      "objects": [
+        "851ff7eaa368b1c661142e996daf292ffa49c593",
+        "851ff7eaa368b1c661142e996daf292ffa49c593"
+      ],
+      "unchanged": true
+    },
+    {
+      "path": "ports/graphshell/src/promoted_links",
+      "objects": [
+        "68da3b8b41d28b4d1092443ad58f49154ed08ef8",
+        "68da3b8b41d28b4d1092443ad58f49154ed08ef8"
+      ],
+      "unchanged": true
+    },
+    {
+      "path": "ports/graphshell/src/mere_host_fixture.rs",
+      "objects": [
+        "8410b8d4b03f33d98a261684f37bc36a19705252",
+        "8410b8d4b03f33d98a261684f37bc36a19705252"
+      ],
+      "unchanged": true
+    },
+    {
+      "path": "crates/system/pandect",
+      "objects": [
+        "a77a16a3b7d3100f2f4e42235ef2dd80969a01f9",
+        "a77a16a3b7d3100f2f4e42235ef2dd80969a01f9"
+      ],
+      "unchanged": true
+    }
+  ]
+}
