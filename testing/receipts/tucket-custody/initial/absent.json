@@ -1,0 +1,7 @@
+{
+  "detail": "djinn is not reachable: transport failed: The system cannot find the file specified. (os error 2)",
+  "device_id": "54775cfb-7089-4f30-b72b-2d4ac82333b5",
+  "mode": "pending",
+  "realm": "bench-tucket-custody",
+  "result": "refused"
+}

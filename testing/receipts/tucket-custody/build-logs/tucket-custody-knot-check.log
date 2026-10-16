@@ -1,0 +1,10 @@
+error: failed to get `welding` as a dependency of package `weld-engine v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\inker\engines\weld-engine)`
+
+Caused by:
+  failed to load source for dependency `welding`
+
+Caused by:
+  unable to update https://github.com/merely-made/wgpu-weld.git?branch=main#b673f36f
+
+Caused by:
+  can't checkout from 'https://github.com/merely-made/wgpu-weld.git': you are in the offline mode (--offline)

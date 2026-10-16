@@ -1,0 +1,20 @@
+error: failed to load source for dependency `genet-scripted-dom`
+
+Caused by:
+  unable to update https://github.com/merely-made/genet.git?branch=main#e37762d7
+
+Caused by:
+  failed to remove file `C:\t\cargo-homes\mere-upstreams\git\checkouts\genet-0bbbe1b4c8511eb3\e37762d\.git\index.lock`
+
+  Caused by:
+      The process cannot access the file because it is being used by another process. (os error 32)
+
+  Error: failed to remove directory `C:\t\cargo-homes\mere-upstreams\git\checkouts\genet-0bbbe1b4c8511eb3\e37762d\.git`
+
+  Caused by:
+      The process cannot access the file because it is being used by another process. (os error 32)
+
+  Error: failed to remove directory `C:\t\cargo-homes\mere-upstreams\git\checkouts\genet-0bbbe1b4c8511eb3\e37762d`
+
+Caused by:
+  The process cannot access the file because it is being used by another process. (os error 32)

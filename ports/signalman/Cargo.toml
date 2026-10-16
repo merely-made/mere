@@ -30,7 +30,7 @@ retinue = { workspace = true, features = ["tulle-radio"] }
 serde.workspace = true
 serde_json.workspace = true
 pandect.workspace = true
-tokio = { version = "1", features = ["net", "rt", "sync", "time"] }
+tokio = { version = "1", features = ["net", "rt", "sync", "time", "macros"] }
 uuid.workspace = true
 zeroize = "1"
 
