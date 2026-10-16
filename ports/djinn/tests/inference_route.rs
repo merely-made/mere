@@ -1169,3 +1169,369 @@ async fn wait_run(
         tokio::time::sleep(Duration::from_millis(2)).await;
     }
 }
+
+/// I4 qualification: the pinned trained model, retained versioned material,
+/// actual Turnstone app connection, and a sealed run reopened after restart.
+#[cfg(feature = "inference-gpu")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "requires pinned ESP_SMOLLM2_DIR and a discrete GPU"]
+async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
+    use distillery::inference::recall::{
+        PageTextCorpus, RECALL_ASK_INTENT, RecallAskRequestV1, RecallConfig,
+    };
+    use distillery::inference::{InferenceModelRow, PromptTemplate};
+    use eidetic::models::recall::{RecallSourceId, RecallSourceKind};
+    use eidetic::typed::save_typed;
+    use eidetic::{ModelLibrary, PrivacyClass, ProvenanceRecord, Timestamp, TrustEnvelope};
+    use sha2::{Digest, Sha256};
+
+    let temp = tempfile::tempdir().unwrap();
+    let data_root = temp.path().join("data");
+    let (vault_dir, identity) = open_vault(temp.path());
+    write_device_settings(&data_root, Some(lending()));
+    let directory =
+        std::path::PathBuf::from(std::env::var_os("ESP_SMOLLM2_DIR").expect("ESP_SMOLLM2_DIR"));
+    let reference: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../crates/intel/esp/tests/smollm2_360m_reference.json"
+    ))
+    .unwrap();
+    let read = |name: &str| {
+        let bytes = std::fs::read(directory.join(name)).unwrap();
+        assert_eq!(
+            Sha256::digest(&bytes)
+                .iter()
+                .map(|byte| format!("{byte:02x}"))
+                .collect::<String>(),
+            reference["artifacts"][name].as_str().unwrap(),
+            "exact {name}"
+        );
+        bytes
+    };
+    let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+    let mut library = muniment::RedbBackend::open(&path).unwrap();
+    let config = read("config.json");
+    let tokenizer = read("tokenizer.json");
+    let weights = read("model.safetensors");
+    read("tokenizer_config.json");
+    let model = ModelLibrary::save_model_with_components(
+        &mut library,
+        reference["model_id"].as_str().unwrap(),
+        "llama",
+        "Apache-2.0",
+        serde_json::from_slice(&config).unwrap(),
+        &weights,
+        &tokenizer,
+        vec![],
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    drop(weights);
+    let template = PromptTemplate::from_bytes(include_bytes!(
+        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+    ))
+    .unwrap();
+    let template = save_typed(
+        &mut library,
+        &template,
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    let row = save_typed(
+        &mut library,
+        &InferenceModelRow { model, template },
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    drop(library);
+    let settings = OwnerSettings {
+        inference: Some(InferenceLaneSettings {
+            model: InferenceModelSettings::Library {
+                row: row.to_string(),
+                device: djinn::settings::InferenceDeviceSettings::Gpu,
+                max_tokens: 64,
+            },
+        }),
+        ..owner(Some(lane()))
+    };
+    let resident = DjinnResident::open(
+        &identity,
+        &data_root,
+        &profile(),
+        settings.clone(),
+        &vault_dir,
+        unlock(),
+    )
+    .await
+    .unwrap();
+    let source_store =
+        Arc::new(muniment::RedbBackend::open(temp.path().join("retained.redb")).unwrap());
+    let source_a = "https://retained.test/pelican";
+    let text_a =
+        "The Pelican observatory's access word is amberstone. It has no other access word.";
+    let text_b = "The Sandpiper observatory's access word is indigo. It has no other access word.";
+    let version_a = eidetic::PageTextStore::new(source_store.as_ref())
+        .put(source_a, text_a, 1)
+        .await
+        .unwrap();
+    eidetic::PageTextStore::new(source_store.as_ref())
+        .put("https://retained.test/sandpiper", text_b, 1)
+        .await
+        .unwrap();
+    let corpus = Arc::new(PageTextCorpus(source_store.clone()));
+    let recall_config = RecallConfig {
+        max_passages: 1,
+        ..Default::default()
+    };
+    resident
+        .configure_inference_recall(corpus.clone(), recall_config.clone())
+        .unwrap();
+    let lane = resident.inference().unwrap().lane();
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(90);
+    while lane.runs().session.is_none() {
+        assert!(lane.runs().load_error.is_none(), "{:?}", lane.runs());
+        assert!(tokio::time::Instant::now() < deadline);
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
+    let grants = AppRouteGrants::new(AllowedAppRoutes::new([]));
+    let route = catalog
+        .update(|catalog| resident.register_inference_route(catalog))
+        .await
+        .unwrap()
+        .unwrap();
+    grants.grant(AppId::new("turnstone"), route);
+    let endpoint = endpoint_name();
+    let server = {
+        let endpoint = endpoint.clone();
+        let grants = grants.clone();
+        let catalog = catalog.clone();
+        tokio::spawn(async move {
+            let _ = serve_app_broker(
+                &endpoint,
+                Arc::new(djinn::keeper::Keeper::new(keeper_host())),
+                grants,
+                60_000,
+                None,
+                catalog,
+            )
+            .await;
+        })
+    };
+    let mut client = None;
+    for _ in 0..100 {
+        if let Ok(opened) = open(&endpoint, "turnstone").await {
+            client = Some(opened);
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let mut client = client.unwrap();
+    let opened = client.open_session().await.unwrap();
+    let request = opened.descriptor.projections[0].request.clone();
+    let source = RecallSourceId {
+        kind: RecallSourceKind::PageText,
+        source: source_a.into(),
+        node: None,
+    };
+    let ask=RecallAskRequestV1 { ask:AskRequestV1 { run:"retained-answer".into(),question:"What is the Pelican observatory's access word? Answer in one short sentence and cite the passage using [1].".into() },scope:vec![] };
+    assert_eq!(
+        intent(
+            &mut client,
+            &request,
+            RECALL_ASK_INTENT,
+            serde_json::to_vec(&ask).unwrap()
+        )
+        .await,
+        IntentResult::Accepted
+    );
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(180);
+    let answered = loop {
+        let runs = read_runs(&mut client, &request).await;
+        if runs.runs[0].state.is_terminal() {
+            break runs.runs[0].clone();
+        }
+        assert!(tokio::time::Instant::now() < deadline, "{:?}", runs);
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    };
+    assert_eq!(answered.state, RunStateV1::Finished, "{:?}", answered);
+    assert!(
+        answered.text.to_lowercase().contains("amberstone"),
+        "{}",
+        answered.text
+    );
+    let recalled = answered.recall.as_ref().unwrap();
+    assert_eq!(recalled.passages.len(), 1);
+    assert_eq!(recalled.citations.len(), 1, "{}", answered.text);
+    assert!(recalled.unknown_citations.is_empty());
+    let supplied = &recalled.passages[0];
+    assert_eq!(supplied.passage.source, source);
+    assert_eq!(
+        supplied.passage.version,
+        format!("blake3:{}", version_a.to_hex())
+    );
+    assert_eq!(supplied.passage.text, text_a);
+    assert_eq!(supplied.passage.selector.start, 0);
+    assert_eq!(supplied.passage.selector.end, text_a.chars().count());
+    assert_eq!(recalled.citations[0].passage, supplied.passage.id());
+    if recalled.citations[0].basis == distillery::inference::recall::CitationBasis::VerbatimPassage
+    {
+        let span = &recalled.citations[0].answer_selector;
+        assert_eq!(
+            answered
+                .text
+                .chars()
+                .skip(span.start)
+                .take(span.end - span.start)
+                .collect::<String>(),
+            text_a
+        );
+    } else {
+        assert!(answered.text.contains("[1]"));
+    }
+
+    let journal = resident.inference().unwrap().journal().unwrap();
+    let evidence = journal.retained_record("retained-answer").unwrap();
+    assert_eq!(evidence.supplied_passages, vec![supplied.passage.id()]);
+    assert_eq!(
+        journal
+            .resolve_passage(evidence.supplied_passages[0])
+            .unwrap()
+            .unwrap(),
+        supplied.passage
+    );
+    let checkpoint = journal
+        .resolve_evidence_blob(evidence.checkpoint_blob.unwrap())
+        .unwrap()
+        .unwrap();
+    let checkpoint: serde_json::Value = serde_json::from_slice(&checkpoint).unwrap();
+    let prompt = checkpoint["request"]["prompt"].as_str().unwrap();
+    assert!(prompt.contains(text_a));
+    assert!(prompt.contains(&supplied.passage.version));
+    assert!(prompt.contains("[1]"));
+    assert!(!prompt.contains(text_b));
+    let source_revision_before = lane.generation();
+    let changed = eidetic::PageTextStore::new(source_store.as_ref())
+        .put(
+            source_a,
+            "The Pelican observatory's access word is now violet.",
+            2,
+        )
+        .await
+        .unwrap();
+    assert!(
+        lane.generation() > source_revision_before,
+        "source changes must produce a route notice revision"
+    );
+    let stale = read_runs(&mut client, &request).await.runs.remove(0);
+    assert!(stale.recall.as_ref().unwrap().citations.is_empty());
+    assert_eq!(
+        stale.recall.as_ref().unwrap().stale[0].current_version,
+        Some(format!("blake3:{}", changed.to_hex()))
+    );
+    let mut changed_ask = ask.clone();
+    changed_ask.ask.run = "changed-source".into();
+    changed_ask.scope = vec![source.clone()];
+    assert_eq!(
+        intent(
+            &mut client,
+            &request,
+            RECALL_ASK_INTENT,
+            serde_json::to_vec(&changed_ask).unwrap()
+        )
+        .await,
+        IntentResult::Accepted
+    );
+    let blocked = read_runs(&mut client, &request)
+        .await
+        .runs
+        .into_iter()
+        .find(|run| run.run == "changed-source")
+        .unwrap();
+    assert_eq!(blocked.state, RunStateV1::Failed);
+    assert_eq!(blocked.tokens, 0);
+    assert!(blocked.error.as_ref().unwrap().contains("sources changed"));
+    assert!(blocked.recall.as_ref().unwrap().passages.is_empty());
+    assert!(blocked.recall.as_ref().unwrap().citations.is_empty());
+    assert_eq!(
+        blocked.recall.as_ref().unwrap().stale[0].indexed_version,
+        supplied.passage.version
+    );
+    let failed_evidence = journal.retained_record("changed-source").unwrap();
+    assert!(failed_evidence.supplied_passages.is_empty());
+    assert!(failed_evidence.checkpoint_blob.is_none());
+    let holder = resident.inference_lock_holder().unwrap();
+    holder.lock();
+    assert!(client.snapshot(request.clone()).await.is_err());
+    holder.unlock(&identity).unwrap();
+    drop(holder);
+    let _ = client.close().await;
+    server.abort();
+    let _ = server.await;
+    drop(catalog);
+    resident.shutdown().await.unwrap();
+    let reopened = DjinnResident::open(
+        &identity,
+        &data_root,
+        &profile(),
+        settings,
+        &vault_dir,
+        unlock(),
+    )
+    .await
+    .unwrap();
+    reopened
+        .configure_inference_recall(corpus, recall_config)
+        .unwrap();
+    let past = reopened
+        .inference()
+        .unwrap()
+        .lane()
+        .runs()
+        .runs
+        .into_iter()
+        .find(|run| run.run == "retained-answer")
+        .unwrap();
+    assert_eq!(past.state, RunStateV1::Finished);
+    assert_eq!(past.text, answered.text);
+    assert!(past.recall.as_ref().unwrap().citations.is_empty());
+    let after = reopened
+        .inference()
+        .unwrap()
+        .journal()
+        .unwrap()
+        .retained_record("retained-answer")
+        .unwrap();
+    assert_eq!(after, evidence);
+    assert_eq!(
+        reopened
+            .inference()
+            .unwrap()
+            .journal()
+            .unwrap()
+            .resolve_passage(after.supplied_passages[0])
+            .unwrap()
+            .unwrap(),
+        supplied.passage
+    );
+    reopened.shutdown().await.unwrap();
+    let receipt = serde_json::json!({"model_row":row,"answer":answered,"after_source_change":stale,"reopened":past,"retained_record":evidence,"rendered_prompt":prompt,"checkpoint_token_ids":checkpoint["token_ids"],"source_change_advanced_revision":true,"stale_source_blocked_before_generation":true,"stale_run":blocked,"stale_run_evidence":failed_evidence,"lock_refused":true,"exact_native_passage_reopened":true,"real_model":true,"actual_app_connection":true,"boundary":"native in-process Djinn, actual app connection, pinned SmolLM2 on GPU, separately owned retained redb source; no installed binary or headed application"});
+    if let Some(path) = std::env::var_os("DJINN_RECALL_RECEIPT") {
+        std::fs::write(path, serde_json::to_vec_pretty(&receipt).unwrap()).unwrap();
+    }
+}

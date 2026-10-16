@@ -522,6 +522,7 @@ mod worker {
             .ok_or_else(|| "decoder text reference missing after validation".to_string())?;
         let request = GenerationRequest {
             prompt: config.input.clone(),
+            context: String::new(),
             max_tokens,
             temperature: 0.0,
             top_p: None,

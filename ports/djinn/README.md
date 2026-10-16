@@ -172,6 +172,16 @@ keep separate identity roots. Shared asks refuse until the device is keyed,
 then become available through live key agreement. With personal sync off,
 asks stay locally durable. Existing local history is imported when keyed.
 Revocation excludes future epochs while preserving already received history.
+The native/embedded composition can call `configure_inference_recall` with an
+already-owned retained corpus and recall limits. Turnstone then uses
+`distillery.inference/ask-recall-v1` with `{"ask":{"run":"name","question":"..."},"scope":[]}`.
+An empty scope means the composed corpus. The route returns supplied passages,
+source-version staleness, validated citations and their answer spans alongside
+the run. Citation bases distinguish model markers from exact-quote annotations.
+The journal retains exact source versions and selectors through restart and
+personal-graph continuation. The desktop binary does not discover or reopen
+Turnstone's app-owned browsing database; its producer handoff and headed client
+remain part of I5 integration.
 See the
 [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 

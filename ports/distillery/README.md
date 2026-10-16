@@ -73,7 +73,7 @@ synchronous checkpoint barrier to the actor. The decoder records exact session,
 rendered prompt, model-token IDs and random-draw position. Text becomes visible
 after the commit; resumed generation rebuilds KV state by prefill. The retained
 record uses Eidetic's `InferenceRunRecord` schema, keeping paused, failed,
-cancelled partial and finished states distinct. Recall passage inputs remain I4.
+cancelled partial and finished states distinct. I4 adds retained passage inputs.
 
 `PersonaRunJournal` stores signed, encrypted per-device logs through muniment
 and joins the caller's existing p2panda endpoint. Token entries contain only new
@@ -87,6 +87,33 @@ local historical reads survive removal of a writer. Unlock and key revisions
 reopen reconciliation against the retained frontier; a child whose parent has
 not arrived is retried without persisting a dangling checkpoint. The
 persona-only constructor remains the local journal and test seam.
+
+`InferenceLane::configure_recall` borrows a `RecallCorpus` and explicit
+`RecallConfig`. `PageTextCorpus` reads already-owned Eidetic page-text storage,
+verifying immutable blob bytes; other source owners supply the same snapshot
+and current-version contract with capture, clip or Fleece identities. The
+BM25 `DocumentIndex` is keyed by passage content references. Its deterministic
+Unicode chunks retain the source version, canonical text hash and half-open
+Unicode scalar selector. Reconfigure recall to rebuild a changed corpus.
+
+`distillery.inference/ask-recall-v1` takes an `ask` and optional source `scope`.
+It renders selected passage handles through the declared context template and
+retains the exact supplied passages as sealed native Eidetic artifacts. Stale
+or unavailable sources are excluded. An ask without usable passages is retained
+as failed before generation, with structured stale-source details. A stub
+cannot answer retained material. Current answer views distinguish validated
+model markers from host annotations of complete verbatim passage matches;
+partial matches and invented handles do not become citations. `min_quote_chars`
+defaults to 32 non-padding characters; zero disables host quote annotations. Both citation
+bases carry exact answer spans and require the source owner's current version.
+Historical input evidence remains readable when a source changes.
+
+Context-bearing checkpoint entries carry an authenticated `required_semantics`
+marker: older checkpoint readers reject them instead of silently losing context.
+Ordinary ask serialization remains compatible. Lock clears the derived recall
+index with the run materialization; the composing source owner keeps its own
+storage and disclosure authority.
+
 See the [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM
