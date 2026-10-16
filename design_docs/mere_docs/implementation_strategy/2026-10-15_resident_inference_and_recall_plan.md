@@ -334,7 +334,7 @@ Each names its evidence; a later phase may correct one.
 - **The app endpoint does not stream payloads.** Endpoint methods are
   synchronous; a source bumps a revision, `poll_notice` rings, and the client
   resumes or snapshots. Frames are capped at 1 MiB; Chronicle polls at
-  250 ms (`ports/graphshell/src/native/endpoint_catalog.rs:97-127`,
+  250 ms (`crates/graphshell/graphshell-host/src/endpoint_catalog.rs`,
   `browser_carrier.rs:49`, `resident_distillery.rs:76-80`).
 - **The vault lock says nothing about inference.** Knot closes on lock and
   reopens on unlock (rulings 43, 48); Distillery keeps running (ruling 24);

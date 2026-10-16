@@ -755,6 +755,8 @@ impl InferenceLane {
                 continuations: Vec::new(),
                 #[cfg(feature = "inference-model")]
                 recall: recall_evidence,
+                #[cfg(all(feature = "inference-wire", not(feature = "inference-model")))]
+                recall: None,
             },
             actor_id,
             request: generation.clone(),
@@ -1622,7 +1624,7 @@ mod tests {
                         error: None,
                         session: None,
                         tokens: 0,
-                        #[cfg(feature = "inference-model")]
+                        #[cfg(feature = "inference-wire")]
                         recall: None,
                         continuations: Vec::new(),
                     },
