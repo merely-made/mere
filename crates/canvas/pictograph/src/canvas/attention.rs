@@ -35,6 +35,10 @@ pub(crate) struct GrammarState {
 }
 
 impl GrammarState {
+    pub(crate) fn attention_book(&self) -> &AttentionBook<NodeKey> {
+        &self.attention
+    }
+
     /// Keep only the nodes `live` still holds.
     pub(crate) fn retain(&mut self, mut live: impl FnMut(&NodeKey) -> bool) {
         self.attention.retain(&mut live);
