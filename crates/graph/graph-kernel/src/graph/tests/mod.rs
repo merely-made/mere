@@ -23,3 +23,9 @@ pub mod snapshot_basic;
 pub mod snapshot_imports;
 pub mod snapshot_navigation;
 pub mod snapshot_size;
+
+#[path = "family_assertions.rs"]
+mod family_assertions;
+
+#[path = "family_read_budget.rs"]
+mod family_read_budget;

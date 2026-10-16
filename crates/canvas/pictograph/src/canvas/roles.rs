@@ -188,7 +188,12 @@ impl Canvas {
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
         )
-        .with_link_hides(&self.graph, &self.hidden_edges, &self.hidden_links)
+        .with_link_hides(
+            &self.graph,
+            &self.hidden_edges,
+            &self.hidden_links,
+            &self.hidden_assertions,
+        )
         .with_meaning(self.meaning.snapshot())
         .with_registry(&self.channels, self.physics_view_key());
         // A group is named by its smallest member's stable id (F134), which

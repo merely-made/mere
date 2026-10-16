@@ -11,7 +11,8 @@ published at `943c762` on native source `474d10a`, including authoring, ordered
 audition and fresh-process sealed reopen. Bounded P4 rest-stroke and fan
 retirement is qualified on Mere source `91467c0bb` and Woodshed receiving source `fe54425`, published with receipt
 `4716b71`: canonical resting links, exact member opening, acknowledged whole-link
-hides and reviewed browser/native reopening. P6 and P7 (§8) remain later work.
+hides and reviewed browser/native reopening. P6 (§8) is in progress from
+`0f8c1bf59`; P7 remains later work.
 Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
@@ -245,7 +246,7 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | Concept (where) | Verdict | Becomes |
 |---|---|---|
 | `EdgeFamily` (6; `edge_taxonomy.rs`) | Subsume | A declared predicate property (the policy group). No longer a storage shape. The stance doc's curated lens survives as registry vocabulary. |
-| Sub-kinds (`SemanticSubKind` and the four others; 43 recognized kinds) | Subsume | Recognized predicates. Each enum is the recognized-predicate table for its family. |
+| Sub-kinds (`SemanticSubKind` and the four others; 44 recognized kinds) | Subsume | Recognized predicates. Each enum is the recognized-predicate table for its family. |
 | `EdgePayload` six sidecars (`edge_payload.rs`:46-53) | Retire (P6) | One assertion list per pair bucket. The type name stays as the bucket, under the `edge` rule. |
 | `SemanticData` compatibility aggregates (`sub_kinds`, `label`, `predicate`) | Retire | Nothing; readers iterate assertions. |
 | `ArrangementData` / `ContainmentData` / `ImportedData` / `ProvenanceData` sub-kind sets | Retire (P6) | Assertions with id, asserter, span and basis. |

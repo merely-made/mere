@@ -9,7 +9,7 @@
 use std::collections::HashSet;
 
 use euclid::default::{Box2D, Point2D};
-use kernel::graph::{EdgeFamily, Graph, NodeKey, RelationKind, RelationSelector, SemanticSubKind};
+use kernel::graph::{EdgeFamily, Graph, NodeKey, RelationKind, RelationSelector};
 use paint_list_api::{
     ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, StrokeCap,
     StrokeItem, StrokeJoin,
@@ -27,6 +27,24 @@ pub(crate) fn visible_link_appearances(
     view: &LayoutView,
     hidden_links: &HashSet<LinkKey>,
     hidden_legacy_cells: &HashSet<EdgeCell>,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Vec<LinkAppearanceSegment> {
+    visible_link_appearances_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        &HashSet::new(),
+        node_size,
+    )
+}
+
+pub(crate) fn visible_link_appearances_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<LinkAppearanceSegment> {
     let source = LinkSource::Unavailable {
@@ -66,6 +84,9 @@ pub(crate) fn visible_link_appearances(
                     return false;
                 };
                 bucket.assertions.retain(|assertion| {
+                    if hidden_assertions.contains(&assertion.id) {
+                        return false;
+                    }
                     let Some(selector) = selector_for_link_assertion(assertion) else {
                         return true;
                     };
@@ -230,10 +251,11 @@ fn self_link_points(
 }
 
 fn selector_for_link_assertion(assertion: &LinkAssertion) -> Option<RelationSelector> {
-    let kind = assertion.recognized_kind.as_deref()?;
-    let parsed: SemanticSubKind =
-        serde_json::from_value(serde_json::Value::String(kind.into())).ok()?;
-    Some(RelationSelector::Semantic(parsed))
+    Some(
+        RelationKind::from_predicate_iri(&assertion.predicate)
+            .map(super::relationship_topology::selector_for_relation_kind)
+            .unwrap_or(RelationSelector::Family(EdgeFamily::Semantic)),
+    )
 }
 
 fn selector_for_legacy_member(member: &LinkLegacyMember) -> Option<RelationSelector> {
@@ -322,11 +344,36 @@ pub(crate) fn link_hit_test(
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Option<LinkAppearance> {
+    link_hit_test_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        &HashSet::new(),
+        point,
+        tolerance,
+        node_visible,
+        node_size,
+    )
+}
+
+pub(crate) fn link_hit_test_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    point: Point2D<f32>,
+    tolerance: f32,
+    node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Option<LinkAppearance> {
     link_hit_test_where(
         graph,
         view,
         hidden_links,
         hidden_legacy_cells,
+        hidden_assertions,
         point,
         tolerance,
         node_visible,
@@ -345,11 +392,36 @@ pub(crate) fn self_link_hit_test(
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Option<LinkAppearance> {
+    self_link_hit_test_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        &HashSet::new(),
+        point,
+        tolerance,
+        node_visible,
+        node_size,
+    )
+}
+
+pub(crate) fn self_link_hit_test_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    point: Point2D<f32>,
+    tolerance: f32,
+    node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Option<LinkAppearance> {
     link_hit_test_where(
         graph,
         view,
         hidden_links,
         hidden_legacy_cells,
+        hidden_assertions,
         point,
         tolerance,
         node_visible,
@@ -363,25 +435,33 @@ fn link_hit_test_where(
     view: &LayoutView,
     hidden_links: &HashSet<LinkKey>,
     hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
     point: Point2D<f32>,
     tolerance: f32,
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
     include: impl Fn(&LinkAppearanceSegment) -> bool,
 ) -> Option<LinkAppearance> {
-    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells, node_size)
-        .into_iter()
-        .filter(|segment| {
-            include(segment)
-                && node_visible(segment.appearance.display_from)
-                && node_visible(segment.appearance.display_to)
-        })
-        .filter_map(|segment| {
-            let distance = polyline_distance(point, &segment.points);
-            (distance <= tolerance).then_some((segment.appearance, distance))
-        })
-        .min_by(|a, b| a.1.total_cmp(&b.1))
-        .map(|(appearance, _)| appearance)
+    visible_link_appearances_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        hidden_assertions,
+        node_size,
+    )
+    .into_iter()
+    .filter(|segment| {
+        include(segment)
+            && node_visible(segment.appearance.display_from)
+            && node_visible(segment.appearance.display_to)
+    })
+    .filter_map(|segment| {
+        let distance = polyline_distance(point, &segment.points);
+        (distance <= tolerance).then_some((segment.appearance, distance))
+    })
+    .min_by(|a, b| a.1.total_cmp(&b.1))
+    .map(|(appearance, _)| appearance)
 }
 
 pub(crate) fn links_in_rect(
@@ -393,24 +473,53 @@ pub(crate) fn links_in_rect(
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<LinkAppearance> {
-    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells, node_size)
-        .into_iter()
-        .filter(|segment| {
-            node_visible(segment.appearance.display_from)
-                && node_visible(segment.appearance.display_to)
-                && polyline_intersects_box(&segment.points, region)
-        })
-        .fold(
-            std::collections::BTreeMap::new(),
-            |mut appearances, segment| {
-                appearances
-                    .entry(segment.appearance.key.clone())
-                    .or_insert(segment.appearance);
-                appearances
-            },
-        )
-        .into_values()
-        .collect()
+    links_in_rect_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        &HashSet::new(),
+        region,
+        node_visible,
+        node_size,
+    )
+}
+
+pub(crate) fn links_in_rect_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    region: Box2D<f32>,
+    node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Vec<LinkAppearance> {
+    visible_link_appearances_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        hidden_assertions,
+        node_size,
+    )
+    .into_iter()
+    .filter(|segment| {
+        node_visible(segment.appearance.display_from)
+            && node_visible(segment.appearance.display_to)
+            && polyline_intersects_box(&segment.points, region)
+    })
+    .fold(
+        std::collections::BTreeMap::new(),
+        |mut appearances, segment| {
+            appearances
+                .entry(segment.appearance.key.clone())
+                .or_insert(segment.appearance);
+            appearances
+        },
+    )
+    .into_values()
+    .collect()
 }
 
 pub(crate) fn link_overlay(
@@ -422,24 +531,52 @@ pub(crate) fn link_overlay(
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<PaintCmd> {
-    visible_link_appearances(graph, view, hidden_links, hidden_legacy_cells, node_size)
-        .into_iter()
-        .filter(|segment| {
-            node_visible(segment.appearance.display_from)
-                && node_visible(segment.appearance.display_to)
-        })
-        .flat_map(|segment| {
-            let mut strokes = link_strokes(&segment);
-            if selected_links.contains(&segment.appearance.key) {
-                strokes.extend(polyline_strokes(
-                    &segment.points,
-                    ColorF::new(0.91, 0.59, 0.16, 1.0),
-                    4.0,
-                ));
-            }
-            strokes
-        })
-        .collect()
+    link_overlay_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        &HashSet::new(),
+        selected_links,
+        node_visible,
+        node_size,
+    )
+}
+
+pub(crate) fn link_overlay_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    selected_links: &HashSet<LinkKey>,
+    node_visible: impl Fn(NodeKey) -> bool,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Vec<PaintCmd> {
+    visible_link_appearances_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        hidden_assertions,
+        node_size,
+    )
+    .into_iter()
+    .filter(|segment| {
+        node_visible(segment.appearance.display_from) && node_visible(segment.appearance.display_to)
+    })
+    .flat_map(|segment| {
+        let mut strokes = link_strokes(&segment);
+        if selected_links.contains(&segment.appearance.key) {
+            strokes.extend(polyline_strokes(
+                &segment.points,
+                ColorF::new(0.91, 0.59, 0.16, 1.0),
+                4.0,
+            ));
+        }
+        strokes
+    })
+    .collect()
 }
 
 fn link_strokes(segment: &LinkAppearanceSegment) -> Vec<PaintCmd> {
