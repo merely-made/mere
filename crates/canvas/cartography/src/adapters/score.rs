@@ -185,7 +185,26 @@ pub fn project_score(
             )
         })
         .collect();
-    projection_from_positions(strategy_id, request, positions)
+    let mut projection = projection_from_positions(strategy_id, request, positions);
+    projection.regions = scene
+        .regions
+        .iter()
+        .filter_map(|region| {
+            let Some(sceno::Footprint::Polygon { points }) = &region.contour else {
+                return None;
+            };
+            Some(crate::projection::ProjectedRegion {
+                contour: points.iter().map(|p| PortablePoint::new(p.x, p.y)).collect(),
+                label: region.label.clone(),
+                members: region
+                    .members
+                    .iter()
+                    .filter_map(|instance| keys.get(instance.0 as usize).copied())
+                    .collect(),
+            })
+        })
+        .collect();
+    projection
 }
 
 /// A projection that places nothing and reports why: the channels the
@@ -238,6 +257,7 @@ pub fn projection_from_positions(
             faults: Vec::new(),
             coverage: Default::default(),
         },
+        regions: Vec::new(),
     }
     .with_graph_coverage(request.graph)
 }

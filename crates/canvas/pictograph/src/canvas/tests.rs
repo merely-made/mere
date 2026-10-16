@@ -23,6 +23,7 @@ mod affinity;
 pub(crate) mod arrangement_goldens;
 mod arrangement_roles;
 mod binding;
+mod bounded_scenes;
 mod camera;
 mod combinators;
 mod dynamics_spec;

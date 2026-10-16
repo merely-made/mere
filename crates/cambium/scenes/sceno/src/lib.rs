@@ -60,6 +60,7 @@ pub mod geometry;
 pub mod link;
 pub mod scene;
 pub mod score;
+pub mod subdivision;
 
 pub use fold::{
     BoundaryBundle, Fold, FoldBoundary, FoldDirection, FoldEffect, FoldError, FoldRule, StandIn,
@@ -78,3 +79,4 @@ pub use score::{
     ScoreItem, ScoreVersionError, Spiral, SpiralCurve, Stack, SubdivisionCount, Timeline,
     TimelineFallback, UnusedVertexPolicy,
 };
+pub use subdivision::{Partition, PartitionForm, SET_CORE_WEIGHT, SET_SEPARATOR, Setscape};

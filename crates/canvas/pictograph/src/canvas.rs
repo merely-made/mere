@@ -438,6 +438,8 @@ pub struct Canvas {
     /// The graph grammar's attention and seed (`attention.rs`): view-local,
     /// never graph truth.
     grammar: attention::GrammarState,
+    /// Regions the active bounded arrangement draws (`scene_regions.rs`).
+    strategy_regions: Vec<::cartography::ProjectedRegion>,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
@@ -832,6 +834,8 @@ mod nodes;
 mod reader;
 pub mod responsive_link_adapter;
 mod roles;
+pub mod scene_axes;
+mod scene_regions;
 mod selection;
 mod source_time;
 mod strategy;

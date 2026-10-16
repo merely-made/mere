@@ -227,6 +227,7 @@ pub fn apply_arrangement(
     let transition = ArrangementTransition::between(canvas, &projection.positions)?;
     canvas.pick_layout_strategy(Some(layout_id.to_string()));
     canvas.set_projection_score(projection.score);
+    canvas.set_strategy_regions(projection.regions);
     if transition.is_none() {
         canvas.apply_strategy_positions(&projection.positions);
     }
@@ -256,6 +257,7 @@ fn apply_settled(canvas: &mut Canvas) -> Result<ArrangementApplied, String> {
     let transition = ArrangementTransition::between(canvas, &positions)?;
     canvas.pick_layout_strategy(Some(SETTLED_ARRANGEMENT.to_string()));
     canvas.set_projection_score(None);
+    canvas.set_strategy_regions(Vec::new());
     if transition.is_none() {
         canvas.apply_strategy_positions(&positions);
     }
