@@ -13,5 +13,11 @@
   "desktop": "receiving gate pending",
   "rf": "not run in this custody qualification",
   "private_runtime_tracked": false,
-  "cleanup": "synthetic wallet deletion blocked by automatic review; ignored runtime retained"
+  "cleanup": "synthetic wallet deletion blocked by automatic review; ignored runtime retained",
+  "upstream_integration": {
+    "source": "0e6178bce156047108144e79edc15058ab319d99",
+    "upstream": "c01c0aa7",
+    "check": "locked/offline mere-signalman and djinn libraries passed",
+    "qualified_custody_git_blobs": "identical to cd277ded"
+  }
 }
