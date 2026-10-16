@@ -477,20 +477,6 @@ impl ResidentDistillery {
         Ok(journal)
     }
 
-    /// Start replication after the inference lane has recovered its local log.
-    #[cfg(feature = "inference")]
-    pub async fn join_inference_journal(
-        &self,
-        journal: &Arc<distillery::inference::durable::PersonaRunJournal<RedbBackend>>,
-    ) -> Result<(), String> {
-        let (endpoint, gossip) = self
-            .resident
-            .transport()
-            .sync_parts()
-            .ok_or("inference needs the resident gossip endpoint")?;
-        journal.join(endpoint, gossip).await
-    }
-
     /// The GPU adapter this lane's trainer was composed on, or `None` when it
     /// composed a CPU trainer or none at all.
     ///

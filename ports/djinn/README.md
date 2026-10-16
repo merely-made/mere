@@ -156,16 +156,23 @@ each ask and releases them before returning the GPU. CPU inference retains
 its loaded model. Library asks now retain exact token checkpoints in an
 append-only encrypted log. Shutdown pauses unfinished asks and joins the actor;
 local interrupted asks resume after reopen. Lock refuses the route, pauses at a
-token boundary, clears materialized runs and the data key, and unlock rehydrates
-and resumes lock-paused work. Explicit pauses remain paused. A GPU pause drops
+token boundary, clears materialized runs and their device-local data key, and
+unlock rehydrates and resumes lock-paused work while the device retains a
+current execution seat. Unlock also reconciles operations refused while locked.
+Explicit pauses remain paused. A GPU pause drops
 its KV cache and device tensors before releasing the foreground guard.
 
 The route also takes `distillery.inference/pause-v1` and
 `distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.
 `distillery.inference/ask-sampled-v1` accepts `ask`, `max_tokens`, `temperature`,
-`top_p` and `seed`; the owner cap still applies. Current journal replication
-admits a shared persona signer. Connecting private asks to separately rooted,
-keyed personal-graph devices remains an I3 authority boundary in the
+`top_p` and `seed`; the owner cap still applies. Every keyed personal-graph
+device can read received asks and resume one with the exact model session.
+Inference borrows personal sync's existing key group and endpoint; devices
+keep separate identity roots. Shared asks refuse until the device is keyed,
+then become available through live key agreement. With personal sync off,
+asks stay locally durable. Existing local history is imported when keyed.
+Revocation excludes future epochs while preserving already received history.
+See the
 [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
 
 ## Publishing

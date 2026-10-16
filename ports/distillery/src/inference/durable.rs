@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Signed, encrypted per-persona ask logs over the resident's existing
+//! Signed, encrypted private ask logs over the resident's existing
 //! p2panda endpoint. Each token appends only new IDs and text; immutable prompt
 //! bytes appear once. Concurrent continuations remain a visible fork.
 use super::*;
@@ -19,10 +19,11 @@ use p2panda_store::topics::TopicStore;
 use personae::Ed25519Keypair;
 use rand_core::{OsRng, RngCore};
 use std::collections::BTreeMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 use stickleback::{
     Admission, JoinedSpace, MunimentStore, OperationPolicy, OperationProcessor, Reject, StoreTarget,
 };
-use zeroize::Zeroizing;
+use zeroize::{Zeroize, Zeroizing};
 
 /// Signed address of one device's per-ask log; prompt text stays encrypted.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -30,25 +31,102 @@ pub struct RunExt {
     pub space: [u8; 32],
     pub device: [u8; 32],
     pub run: [u8; 32],
+    /// Public domain-specific proof of the writer's stable root. Omitted on
+    /// existing persona-only operations so their signed bytes remain valid.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub authority: Vec<u8>,
 }
+/// The composing host supplies its existing group's protection and admission.
+/// This seam cannot create a group, change its members, or export its keys.
+pub trait RunGroupProtection: Send + Sync {
+    /// This device currently holds a writing seat and the current group epoch.
+    fn can_write(&self) -> bool;
+    /// Changes when the host installs keys or changes admission.
+    fn revision(&self) -> u64;
+    /// Authenticate the signed address inside the group envelope.
+    fn seal(&self, address: &RunExt, clear: &[u8]) -> Result<Vec<u8>, String>;
+    /// Check live admission and return authenticated plaintext for domain
+    /// validation before insertion. Historical reads use `open` instead.
+    fn admit(&self, writer: [u8; 32], address: &RunExt, sealed: &[u8]) -> Result<Vec<u8>, String>;
+    /// Open an already admitted operation without reapplying live membership.
+    fn open(&self, writer: [u8; 32], address: &RunExt, sealed: &[u8]) -> Result<Vec<u8>, String>;
+}
+
 #[derive(Clone)]
 struct Policy {
     space: [u8; 32],
     author: VerifyingKey,
+    group: Option<Arc<dyn RunGroupProtection>>,
+    key: Arc<Mutex<Option<Zeroizing<[u8; 32]>>>>,
+    has_parent: Arc<dyn Fn(&Hash, &[u8; 32]) -> Result<bool, String> + Send + Sync>,
 }
 impl OperationPolicy<RunExt> for Policy {
     type LogId = ([u8; 32], [u8; 32]);
     fn admit(&self, op: &Operation<RunExt>) -> Result<Admission<Self::LogId>, Reject> {
-        if op.header.extensions.space != self.space || op.header.verifying_key != self.author {
+        let key = self.key.lock().unwrap();
+        if key.is_none() {
+            return Err(Reject::new("inference-locked", "inference data is locked"));
+        }
+        if op.header.extensions.space != self.space {
             return Err(Reject::new(
-                "wrong-persona",
-                "inference log requires this persona's derived signer",
+                "wrong-space",
+                "inference log addresses another space",
             ));
         }
         if op.header.payload_size > 1024 * 1024 || op.body.is_none() {
             return Err(Reject::new(
                 "invalid-checkpoint",
                 "missing or oversized encrypted checkpoint",
+            ));
+        }
+        if let Some(group) = &self.group {
+            // Verify the attested writer and authenticated group envelope before
+            // insertion. Merely knowing this topic or endpoint grants nothing.
+            let clear = Zeroizing::new(
+                group
+                    .admit(
+                        *op.header.verifying_key.as_bytes(),
+                        &op.header.extensions,
+                        op.body.as_ref().unwrap().as_bytes(),
+                    )
+                    .map_err(|error| Reject::new("private-inference", error))?,
+            );
+            let mut delta: Delta = serde_json::from_slice(&clear)
+                .map_err(|error| Reject::new("invalid-checkpoint", error.to_string()))?;
+            // The parsed suffix is not needed for admission. Clear it even if
+            // the address or parent check below refuses the operation.
+            delta.tokens.zeroize();
+            delta.text.zeroize();
+            // Never persist a dangling cross-device child. A crash while
+            // catching up must leave a causally closed store that can reopen;
+            // LogSync can offer the child again after its parent is admitted.
+            if let Some(parent) = &delta.parent {
+                let parent: Hash = parent
+                    .parse()
+                    .map_err(|_| Reject::new("invalid-checkpoint", "invalid checkpoint parent"))?;
+                if !(self.has_parent)(&parent, &op.header.extensions.run)
+                    .map_err(|error| Reject::new("checkpoint-store", error))?
+                {
+                    return Err(Reject::new(
+                        "missing-parent",
+                        "missing checkpoint parent; retry after its parent",
+                    ));
+                }
+            }
+            if delta.record.as_ref().is_some_and(|record| {
+                *Hash::digest(record.view.run.as_bytes()).as_bytes() != op.header.extensions.run
+            }) {
+                return Err(Reject::new(
+                    "invalid-checkpoint",
+                    "checkpoint addresses another run",
+                ));
+            }
+        } else if op.header.verifying_key != self.author
+            || !op.header.extensions.authority.is_empty()
+        {
+            return Err(Reject::new(
+                "wrong-persona",
+                "inference log requires this persona's derived signer",
             ));
         }
         Ok(Admission::keep(StoreTarget::new(
@@ -87,11 +165,18 @@ pub struct PersonaRunJournal<B: Backend + Clone + Send + Sync + 'static> {
     signing: SigningKey,
     device: String,
     device_hash: [u8; 32],
-    key: Mutex<Option<Zeroizing<[u8; 32]>>>,
+    key: Arc<Mutex<Option<Zeroizing<[u8; 32]>>>>,
     heads: Mutex<BTreeMap<String, (String, RunRecord)>>,
     joined: Mutex<Option<JoinedSpace<RunExt>>>,
+    sync_task: Mutex<Option<tokio::task::JoinHandle<()>>>,
+    sync_wake: Arc<tokio::sync::Notify>,
+    sync_stop: AtomicBool,
+    sync_retry: AtomicBool,
+    prior_sync: Mutex<stickleback::SyncStatus>,
     /// Serializes local append and explicit refresh, including log frontier reads.
     writer: Mutex<()>,
+    authority: Vec<u8>,
+    import: Mutex<Option<Arc<Self>>>,
 }
 impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
     /// Bind a local store to the persona signer, stable device ID and data key.
@@ -103,29 +188,183 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
         key: [u8; 32],
     ) -> Self {
         let signing = SigningKey::from_bytes(&author.to_seed());
+        let key = Arc::new(Mutex::new(Some(Zeroizing::new(key))));
+        let store = MunimentStore::new(backend);
+        let parent_store = store.clone();
         Self {
-            store: MunimentStore::new(backend),
+            store,
             policy: Policy {
                 space,
                 author: signing.verifying_key(),
+                group: None,
+                key: key.clone(),
+                has_parent: Arc::new(move |hash, run| {
+                    match pollster::block_on(parent_store.get_operation(hash))
+                        .map_err(|error| error.to_string())?
+                    {
+                        None => Ok(false),
+                        Some(parent) if parent.header.extensions.run == *run => Ok(true),
+                        Some(_) => Err("checkpoint parent addresses another run".into()),
+                    }
+                }),
             },
             signing,
             device_hash: *Hash::digest(device.as_bytes()).as_bytes(),
             device,
-            key: Mutex::new(Some(Zeroizing::new(key))),
+            key,
             heads: Mutex::new(BTreeMap::new()),
             joined: Mutex::new(None),
+            sync_task: Mutex::new(None),
+            sync_wake: Arc::new(tokio::sync::Notify::new()),
+            sync_stop: AtomicBool::new(false),
+            sync_retry: AtomicBool::new(false),
+            prior_sync: Mutex::new(stickleback::SyncStatus::default()),
             writer: Mutex::new(()),
+            authority: Vec::new(),
+            import: Mutex::new(None),
         }
     }
+    /// Bind separately rooted devices through a host-owned encryption group.
+    /// The local key seals Eidetic materializations only; it never leaves this
+    /// device. Existing local-only history is imported when the group is keyed.
+    pub fn for_group(
+        backend: B,
+        space: [u8; 32],
+        author: &Ed25519Keypair,
+        device: String,
+        local_key: [u8; 32],
+        authority: Vec<u8>,
+        group: Arc<dyn RunGroupProtection>,
+        import: Option<Arc<Self>>,
+    ) -> Self {
+        let mut journal = Self::new(backend, space, author, device, local_key);
+        journal.authority = authority;
+        journal.policy.group = Some(group);
+        journal.import = Mutex::new(import);
+        journal
+    }
+
+    fn import_local(&self) -> Result<(), String> {
+        let mut pending = self.import.lock().unwrap();
+        let Some(source) = pending.as_ref() else {
+            return Ok(());
+        };
+        if !self
+            .policy
+            .group
+            .as_ref()
+            .is_some_and(|group| group.can_write())
+        {
+            return Ok(());
+        }
+        let records = source.load()?;
+        {
+            let _writer = self.writer.lock().unwrap();
+            *self.heads.lock().unwrap() = self.fold()?;
+        }
+        for record in records {
+            let existing = self.heads.lock().unwrap().get(&record.view.run).cloned();
+            if let Some((_, shared)) = existing {
+                let same_origin = record.view.question == shared.view.question
+                    && record.request == shared.request
+                    && record.continuations.len() <= shared.continuations.len()
+                    && record
+                        .continuations
+                        .iter()
+                        .zip(&shared.continuations)
+                        .all(|(a, b)| {
+                            a.device == b.device && a.at_token == b.at_token && a.reason == b.reason
+                        })
+                    && record.checkpoint.as_ref().is_none_or(|local| {
+                        shared.checkpoint.as_ref().is_some_and(|current| {
+                            local.session == current.session
+                                && local.request == current.request
+                                && local.prompt_ids == current.prompt_ids
+                                && current.token_ids.starts_with(&local.token_ids)
+                        })
+                    });
+                if !same_origin {
+                    return Err(format!(
+                        "local inference run {} collides with personal graph history; the local source is retained",
+                        record.view.run
+                    ));
+                }
+            } else {
+                self.append(&record)?;
+            }
+        }
+        *pending = None;
+        Ok(())
+    }
+
     /// Join the ask lane on the resident-owned endpoint and gossip overlay.
     pub async fn join(
         self: &Arc<Self>,
         endpoint: stickleback::Endpoint,
         gossip: stickleback::Gossip,
     ) -> Result<(), String> {
-        let store = self.store.clone();
-        let policy = self.policy.clone();
+        self.open_sync(endpoint.clone(), gossip.clone()).await?;
+        let weak = Arc::downgrade(self);
+        let wake = self.sync_wake.clone();
+        let mut revision = self
+            .policy
+            .group
+            .as_ref()
+            .map_or(0, |group| group.revision());
+        *self.sync_task.lock().unwrap() = Some(tokio::spawn(async move {
+            loop {
+                tokio::select! {
+                    _ = wake.notified() => {},
+                    _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {},
+                }
+                let Some(journal) = weak.upgrade() else { break };
+                if journal.sync_stop.load(Ordering::Acquire) {
+                    break;
+                }
+                let current = journal
+                    .policy
+                    .group
+                    .as_ref()
+                    .map_or(0, |group| group.revision());
+                if current == revision && !journal.sync_retry.load(Ordering::Acquire) {
+                    continue;
+                }
+                if journal.key.lock().unwrap().is_none() {
+                    continue;
+                }
+                revision = current;
+                journal.sync_retry.store(false, Ordering::Release);
+                // LogSync has no public force-reconcile hook. Reopening its
+                // session advertises the retained frontier, so refused locked
+                // or causally early operations can be fetched again.
+                let previous = journal.joined.lock().unwrap().take();
+                if let Some(previous) = previous {
+                    let status = previous.sync_status();
+                    {
+                        let mut prior = journal.prior_sync.lock().unwrap();
+                        prior.ops_received += status.ops_received;
+                        prior.sync_rounds += status.sync_rounds;
+                        prior.last_activity_ms = status.last_activity_ms.or(prior.last_activity_ms);
+                    }
+                    if let Err(error) = previous.leave_and_wait().await {
+                        eprintln!("close inference reconciliation before retry: {error}");
+                    }
+                }
+                if let Err(error) = journal.open_sync(endpoint.clone(), gossip.clone()).await {
+                    eprintln!("reopen inference reconciliation: {error}");
+                    journal.sync_retry.store(true, Ordering::Release);
+                }
+            }
+        }));
+        Ok(())
+    }
+
+    async fn open_sync(
+        self: &Arc<Self>,
+        endpoint: stickleback::Endpoint,
+        gossip: stickleback::Gossip,
+    ) -> Result<(), String> {
+        let journal = Arc::downgrade(self);
         let joined = JoinedSpace::join::<_, ([u8; 32], [u8; 32]), _, _>(
             stickleback::lane_id("inference/v1", self.policy.space),
             self.store.clone(),
@@ -133,12 +372,12 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
             gossip,
             self.policy.space,
             move |op| {
-                let processor = OperationProcessor::new(store.clone(), policy.clone());
+                let journal = journal.clone();
                 async move {
-                    processor
-                        .process(&op)
-                        .await
-                        .is_ok_and(|outcome| outcome.inserted())
+                    match journal.upgrade() {
+                        Some(journal) => journal.accept(&op).await.unwrap_or(false),
+                        None => false,
+                    }
                 }
             },
         )
@@ -149,6 +388,12 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
     }
     /// End replication and await release of captured store handles.
     pub async fn shutdown(&self) -> Result<(), String> {
+        self.sync_stop.store(true, Ordering::Release);
+        self.sync_wake.notify_one();
+        let task = self.sync_task.lock().unwrap().take();
+        if let Some(task) = task {
+            task.await.map_err(|error| error.to_string())?;
+        }
         let joined = self.joined.lock().unwrap().take();
         if let Some(joined) = joined {
             joined
@@ -160,22 +405,36 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
     }
     /// Clear decrypted heads and the retained data key.
     pub fn lock(&self) {
+        let pending = self.import.lock().unwrap();
         let _writer = self.writer.lock().unwrap();
         self.heads.lock().unwrap().clear();
         self.key.lock().unwrap().take();
+        if let Some(source) = pending.as_ref() {
+            source.lock();
+        }
     }
     /// Install the freshly re-derived persona data key.
     pub fn unlock(&self, key: [u8; 32]) {
+        let pending = self.import.lock().unwrap();
         let _writer = self.writer.lock().unwrap();
         *self.key.lock().unwrap() = Some(Zeroizing::new(key));
+        if let Some(source) = pending.as_ref() {
+            source.unlock(key);
+        }
+        self.sync_retry.store(true, Ordering::Release);
+        self.sync_wake.notify_one();
     }
     /// Read actual LogSync activity for this lane.
     pub fn sync_status(&self) -> Option<stickleback::SyncStatus> {
-        self.joined
-            .lock()
-            .unwrap()
-            .as_ref()
-            .map(|joined| joined.sync_status())
+        let mut status = self.prior_sync.lock().unwrap().clone();
+        if let Some(joined) = self.joined.lock().unwrap().as_ref() {
+            let live = joined.sync_status();
+            status.ops_received += live.ops_received;
+            status.sync_rounds += live.sync_rounds;
+            status.syncing = live.syncing;
+            status.last_activity_ms = live.last_activity_ms.or(status.last_activity_ms);
+        }
+        Some(status)
     }
     /// Read the underlying signed-operation store.
     pub fn store(&self) -> &MunimentStore<B, RunExt> {
@@ -183,11 +442,22 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
     }
     /// Verify persona authority and commit a received signed operation.
     pub async fn accept(&self, op: &Operation<RunExt>) -> Result<bool, String> {
-        OperationProcessor::new(self.store.clone(), self.policy.clone())
+        if self.key.lock().unwrap().is_none() {
+            return Err("inference data is locked".into());
+        }
+        let result = OperationProcessor::new(self.store.clone(), self.policy.clone())
             .process(op)
             .await
             .map(|outcome| outcome.inserted())
-            .map_err(|error| error.to_string())
+            .map_err(|error| error.to_string());
+        if result
+            .as_ref()
+            .err()
+            .is_some_and(|error| error.contains("missing checkpoint parent"))
+        {
+            self.sync_retry.store(true, Ordering::Release);
+        }
+        result
     }
     /// Read all retained operations under this persona topic.
     pub async fn operations(&self) -> Result<Vec<Operation<RunExt>>, String> {
@@ -368,14 +638,22 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
     }
     fn decode(&self, op: &Operation<RunExt>) -> Result<Delta, String> {
         let body = op.body.as_ref().ok_or("checkpoint body missing")?;
-        let sealed: Sealed =
-            serde_json::from_slice(body.as_bytes()).map_err(|error| error.to_string())?;
-        let clear = Zeroizing::new(self.crypt(
-            &sealed.bytes,
-            sealed.nonce,
-            &op.header.extensions,
-            false,
-        )?);
+        let key = self.key.lock().unwrap();
+        if key.is_none() {
+            return Err("inference data is locked".into());
+        }
+        let clear = if let Some(group) = &self.policy.group {
+            Zeroizing::new(group.open(
+                *op.header.verifying_key.as_bytes(),
+                &op.header.extensions,
+                body.as_bytes(),
+            )?)
+        } else {
+            drop(key);
+            let sealed: Sealed =
+                serde_json::from_slice(body.as_bytes()).map_err(|error| error.to_string())?;
+            Zeroizing::new(self.crypt(&sealed.bytes, sealed.nonce, &op.header.extensions, false)?)
+        };
         serde_json::from_slice(&clear).map_err(|error| error.to_string())
     }
     fn fold(&self) -> Result<BTreeMap<String, (String, RunRecord)>, String> {
@@ -518,6 +796,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> eidetic::PayloadSealer for Pers
             space: self.policy.space,
             device: [0; 32],
             run: *hash.as_bytes(),
+            authority: Vec::new(),
         };
         let mut nonce = [0; 24];
         OsRng.fill_bytes(&mut nonce);
@@ -553,6 +832,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> eidetic::PayloadSealer for Pers
             space: self.policy.space,
             device: [0; 32],
             run: *hash.as_bytes(),
+            authority: Vec::new(),
         };
         self.crypt(&sealed.bytes, sealed.nonce, &address, false)
             .map_err(eidetic::Error::new)
@@ -560,13 +840,27 @@ impl<B: Backend + Clone + Send + Sync + 'static> eidetic::PayloadSealer for Pers
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJournal<B> {
+    fn execution_permitted(&self) -> bool {
+        self.policy
+            .group
+            .as_ref()
+            .is_none_or(|group| group.can_write())
+    }
     fn remote_revision(&self) -> u64 {
-        self.sync_status().map_or(0, |status| status.ops_received)
+        self.sync_status()
+            .map_or(0, |status| status.ops_received)
+            .wrapping_add(
+                self.policy
+                    .group
+                    .as_ref()
+                    .map_or(0, |group| group.revision()),
+            )
     }
     fn device(&self) -> &str {
         &self.device
     }
     fn load(&self) -> Result<Vec<RunRecord>, String> {
+        self.import_local()?;
         let _writer = self.writer.lock().unwrap();
         let heads = self.fold()?;
         let runs = heads.values().map(|(_, record)| record.clone()).collect();
@@ -634,15 +928,24 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
             space: self.policy.space,
             device: self.device_hash,
             run: *Hash::digest(record.view.run.as_bytes()).as_bytes(),
+            authority: self.authority.clone(),
         };
-        let mut nonce = [0; 24];
-        OsRng.fill_bytes(&mut nonce);
         let clear = Zeroizing::new(serde_json::to_vec(&delta).map_err(|error| error.to_string())?);
-        let sealed = Sealed {
-            nonce,
-            bytes: self.crypt(&clear, nonce, &address, true)?,
+        let body = if let Some(group) = &self.policy.group {
+            let key = self.key.lock().unwrap();
+            if key.is_none() {
+                return Err("inference data is locked".into());
+            }
+            group.seal(&address, &clear)?
+        } else {
+            let mut nonce = [0; 24];
+            OsRng.fill_bytes(&mut nonce);
+            let sealed = Sealed {
+                nonce,
+                bytes: self.crypt(&clear, nonce, &address, true)?,
+            };
+            serde_json::to_vec(&sealed).map_err(|error| error.to_string())?
         };
-        let body = serde_json::to_vec(&sealed).map_err(|error| error.to_string())?;
         if body.len() > 1024 * 1024 {
             return Err("checkpoint exceeds the one MiB operation cap".into());
         }
@@ -665,6 +968,10 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
             .seq_num(sequence)
             .backlink(latest.map(|op| op.hash))
             .build(&self.signing, address);
+        // A locally built header must also survive the wire/storage codec.
+        // Reject unsupported extension sizes before committing a poisoned log.
+        let header =
+            Header::<RunExt>::decode(&header.encode()).map_err(|error| error.to_string())?;
         let op = Operation {
             hash: header.hash(),
             header,
