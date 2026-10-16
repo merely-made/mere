@@ -8,7 +8,10 @@ lifecycle and Knot supplier/intake gate are qualified by the continuation on
 Graphshell opened-link slice are qualified on `732c1537a`; Knot receiving
 qualification is published at `921b4e0`, and Woodshed receiving qualification is
 published at `943c762` on native source `474d10a`, including authoring, ordered
-audition and fresh-process sealed reopen. P4 rest-stroke and fan retirement is in progress; P6 and P7 (§8) remain later work.
+audition and fresh-process sealed reopen. Bounded P4 rest-stroke and fan
+retirement is qualified on Mere source `91467c0bb` and Woodshed receiving source `fe54425`, published with receipt
+`4716b71`: canonical resting links, exact member opening, acknowledged whole-link
+hides and reviewed browser/native reopening. P6 and P7 (§8) remain later work.
 Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The

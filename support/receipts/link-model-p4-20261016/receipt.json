@@ -8,7 +8,7 @@
     "594c5b383"
   ],
   "phase_status": {
-    "P4": "shared source and browser qualified; Woodshed receiving qualification in progress",
+    "P4": "bounded shared/browser and Woodshed receiving qualification complete",
     "P5": "prior bounded experiment remains qualified independently",
     "P6": "later",
     "P7": "later"
@@ -22,6 +22,7 @@
     "captures_reviewed": [
       "p4_link_rest_canvas_initial",
       "p4_link_rest_opened_resource_reading",
+      "p4_link_rest_surface_pick",
       "p4_link_rest_resource_hidden",
       "p4_link_rest_reopened_hidden",
       "p4_link_rest_reopened_shown"
@@ -39,8 +40,8 @@
     "initial_failure": "iterations/browser-initial/p4_tree_link_rest/result.json"
   },
   "receiving_host": {
-    "woodshed": "pending current immutable Mere intake and native/reopen gates",
-    "knot": "unchanged at its qualified P3 pin; no P4 intake claimed"
+    "woodshed": "qualified on integrated source fe54425786779753bf6af1d4f6ea243271f13203, published with receipt 4716b71591d74a1fc2b7fde44074dd0183e0cbe1; see receiving-hosts.json",
+    "knot": "This P4 lane did not perform a Knot native intake. Independent C5 constructor compatibility and receiving qualification keep their own scope."
   },
   "scope_limits": [
     "No new endpoint force law",
@@ -104,6 +105,12 @@
     "judgment_errors_unchanged": true,
     "judgment_errors": 15,
     "covered_active_docs": 271,
-    "active_docs": 285
-  }
+    "active_docs": 285,
+    "baseline_revision": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929",
+    "removed_audit_findings": {},
+    "normalization": "worktree roots and Markdown line positions; object line fields excluded; list findings compared as Counters",
+    "result": "No new findings or judgment errors; existing global debt retained",
+    "final_evidence": "doc-audit/final/comparison.json"
+  },
+  "upstream_doc_baseline": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929"
 }
