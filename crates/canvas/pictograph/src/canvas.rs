@@ -40,6 +40,7 @@ use genet_livery::LiveryDocument;
 use genet_scripted_dom::{NodeId as DomNodeId, ScriptedDom};
 use kernel::geometry::PortablePoint;
 use kernel::graph::{EdgeAssertion, FieldId, Graph, NodeKey, RelationSelector, SemanticSubKind};
+use scenograph::link::LinkKey;
 use seiche::{AffinitySpring, LayoutSnapshot, LayoutView};
 /// The declarative scene catalog, re-exported so hosts (and the standalone bin) can load
 /// a scene by name without depending on `seiche` directly. (Physics scenes P4a.)
@@ -58,7 +59,7 @@ use build::{
     sample_graph, surface_bg,
 };
 use paint_list_api::ColorF;
-use seiche_bridge::{build_simulation, visible_relation_edges};
+use seiche_bridge::{build_simulation, visible_relation_edges_with_link_hides};
 
 /// Build the seiche [`AffinitySpring`] from a cartography [`AffinityScores`](crate::signals::AffinityScores)
 /// signal: flatten the `((a, b), weight)` pairs into the force's `(a, b, weight)` triples at the
@@ -114,7 +115,8 @@ fn blend_affinity_pairs(
 mod types;
 pub use crate::signals::{BridgeMetric, ImportanceMetric};
 pub use types::{
-    CameraView, EdgeCell, Face, LayoutFraming, NodeShape, NodeState, PointerButton, Viewport,
+    CameraView, EdgeCell, Face, LayoutFraming, LinkAppearance, NodeShape, NodeState, PointerButton,
+    Viewport,
 };
 
 // The graph-scene paint lane, merged from platen in the 2026-07-09
@@ -370,7 +372,8 @@ pub struct ContextRequest {
 struct FoldViewState {
     folds: Vec<curation::FoldRecord>,
     selected: HashSet<NodeKey>,
-    selected_edges: HashSet<EdgeCell>,
+    selected_links: HashSet<LinkKey>,
+    selected_link_appearances: HashMap<LinkKey, (NodeKey, NodeKey)>,
 }
 
 /// The canvas content-root: the graph, its physics, the camera, and the abs-pos
@@ -440,13 +443,19 @@ pub struct Canvas {
     forme_held: HashSet<NodeKey>,
     /// Currently-selected nodes (click selects one; marquee selects many).
     selected: HashSet<NodeKey>,
-    /// Currently-selected relation cells (edge-pick, or covered by a marquee).
-    /// Layout stays pair-based, but selection is relation-selector-aware.
-    selected_edges: HashSet<EdgeCell>,
+    /// Canonical link identities selected by stroke hit-testing. Multiple
+    /// Resource appearances may share one selected key.
+    selected_links: HashSet<LinkKey>,
+    /// Display appearance used to open a selected link. This disambiguates
+    /// Resource aliases without changing the canonical LinkKey identity.
+    selected_link_appearances: HashMap<LinkKey, (NodeKey, NodeKey)>,
     /// Relation cells the user has hidden from the canvas. The relation and its physics
     /// spring persist; this is display-only. Persistence rides view-intent's
     /// `hidden_relations`.
     hidden_edges: HashSet<EdgeCell>,
+    /// Closed-link hides use canonical source identity; legacy directed-cell
+    /// filters remain separate compatibility state.
+    hidden_links: HashSet<LinkKey>,
     /// Disposable occurrence controllers supply disclosed endpoint pairs
     /// without minting graph assertions. Ordinary graph canvases use `None`.
     occurrence_edges: Option<Vec<(NodeKey, NodeKey)>>,

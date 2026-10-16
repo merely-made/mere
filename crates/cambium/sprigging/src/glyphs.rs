@@ -27,13 +27,81 @@ pub struct GraphGlyphNode {
 /// One independently painted relation route in normalized graph coordinates.
 ///
 /// The route is already resolved by the caller. Sprigging owns projection and
-/// paint only, so a straight edge, a fanned parallel edge, and an authored
-/// multi-segment route all travel through the same leaf path.
+/// paint only. Resting links and authored multi-segment routes travel
+/// through the same leaf path; member count does not create lanes.
 #[derive(Clone, Debug, PartialEq)]
 pub struct GraphGlyphRelation {
     pub points: Vec<(f32, f32)>,
     pub emphasized: bool,
     pub line: RelationLine,
+    pub start_arrow: bool,
+    pub end_arrow: bool,
+    pub opposed: bool,
+    pub strength: f32,
+}
+
+fn relation_mark_paths(
+    points: &[(f32, f32)],
+    start: bool,
+    end: bool,
+    opposed: bool,
+) -> Vec<Vec<(f32, f32)>> {
+    let segments = points
+        .windows(2)
+        .filter_map(|p| {
+            let dx = p[1].0 - p[0].0;
+            let dy = p[1].1 - p[0].1;
+            let length = dx.hypot(dy);
+            (length.is_finite() && length > 0.001).then_some((
+                p[0],
+                dx / length,
+                dy / length,
+                length,
+            ))
+        })
+        .collect::<Vec<_>>();
+    let total = segments.iter().map(|s| s.3).sum::<f32>();
+    if total <= 0.001 {
+        return Vec::new();
+    }
+    let sample = |fraction: f32| {
+        let mut remaining = total * fraction;
+        for &(p, dx, dy, length) in &segments {
+            if remaining <= length {
+                return ((p.0 + dx * remaining, p.1 + dy * remaining), (dx, dy));
+            }
+            remaining -= length;
+        }
+        (*points.last().unwrap(), (1.0, 0.0))
+    };
+    let mut marks = Vec::new();
+    let size = (total * 0.12).clamp(2.0, 8.0);
+    for (enabled, fraction, direction) in [(start, 0.22, -1.0), (end, 0.78, 1.0)] {
+        if !enabled {
+            continue;
+        }
+        let (tip, (dx, dy)) = sample(fraction);
+        let back = (tip.0 - dx * size * direction, tip.1 - dy * size * direction);
+        marks.push(vec![
+            (back.0 - dy * size * 0.55, back.1 + dx * size * 0.55),
+            tip,
+            (back.0 + dy * size * 0.55, back.1 - dx * size * 0.55),
+        ]);
+    }
+    if opposed {
+        let (center, (dx, dy)) = sample(0.5);
+        for sign in [-1.0, 1.0] {
+            let v = (
+                (dx - dy * sign) * size * 0.55,
+                (dy + dx * sign) * size * 0.55,
+            );
+            marks.push(vec![
+                (center.0 - v.0, center.1 - v.1),
+                (center.0 + v.0, center.1 + v.1),
+            ]);
+        }
+    }
+    marks
 }
 
 /// How a relation's line is drawn, so kinds of relation differ by more than
@@ -332,6 +400,11 @@ impl Leaf for GraphCanvas {
                 .map(|point| self.viewport.project(*point, s, inset))
                 .collect::<Vec<_>>();
             let heavy = relation.emphasized || relation.line == RelationLine::Heavy;
+            let contribution = if relation.strength.is_finite() {
+                relation.strength.max(1.0).sqrt().min(4.0)
+            } else {
+                1.0
+            };
             let mut stroke = round_stroke(
                 if relation.emphasized {
                     self.selection_color
@@ -339,9 +412,9 @@ impl Leaf for GraphCanvas {
                     self.edge_color
                 },
                 if heavy {
-                    self.edge_width * 2.0
+                    self.edge_width * contribution.max(2.0)
                 } else {
-                    self.edge_width
+                    self.edge_width * contribution
                 },
             );
             // Round caps turn the dotted pattern's short dashes into dots.
@@ -354,7 +427,23 @@ impl Leaf for GraphCanvas {
                 intervals,
                 offset: 0.0,
             });
+            let mark_stroke = round_stroke(
+                if relation.emphasized {
+                    self.selection_color
+                } else {
+                    self.edge_color
+                },
+                self.edge_width.max(1.5),
+            );
             cx.stroke_path(Path::polyline(&points), stroke);
+            for mark in relation_mark_paths(
+                &points,
+                relation.start_arrow,
+                relation.end_arrow,
+                relation.opposed,
+            ) {
+                cx.stroke_path(Path::polyline(&mark), mark_stroke.clone());
+            }
         }
         for (index, n) in self.nodes.iter().enumerate() {
             let (x, y) = place(n);
@@ -737,11 +826,19 @@ mod tests {
         );
         canvas.set_relations(vec![
             GraphGlyphRelation {
+                start_arrow: false,
+                end_arrow: false,
+                opposed: false,
+                strength: 1.0,
                 points: vec![(0.1, 0.5), (0.5, 0.25), (0.9, 0.5)],
                 emphasized: false,
                 line: RelationLine::Dashed,
             },
             GraphGlyphRelation {
+                start_arrow: false,
+                end_arrow: false,
+                opposed: false,
+                strength: 1.0,
                 points: vec![(0.1, 0.5), (0.5, 0.75), (0.9, 0.5)],
                 emphasized: true,
                 line: RelationLine::Solid,
@@ -831,5 +928,25 @@ mod tests {
             |c| matches!(c, PaintCmd::DrawPath(p) if p.stroke.is_some()),
         );
         assert_eq!(strokes0, 2, "track + needle only");
+    }
+}
+
+#[cfg(test)]
+mod link_mark_tests {
+    use super::*;
+    #[test]
+    fn direction_heads_and_opposition_marks_follow_the_authored_path() {
+        let marks = relation_mark_paths(&[(0.0, 0.0), (50.0, 0.0), (50.0, 50.0)], true, true, true);
+        assert_eq!(marks.len(), 4);
+        assert!(
+            marks[0][0].0 > marks[0][1].0,
+            "reverse arrow points toward route start"
+        );
+        assert!(
+            marks[1][0].1 < marks[1][1].1,
+            "forward arrow follows final vertical segment"
+        );
+        assert!(marks[2].iter().all(|p| p.0.is_finite() && p.1.is_finite()));
+        assert!(relation_mark_paths(&[(0.0, 0.0), (0.0, 0.0)], true, true, true).is_empty());
     }
 }

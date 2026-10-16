@@ -10,7 +10,8 @@ Graphshell opened-link slice are qualified on `732c1537a`. Knot receiving
 qualification is published at `921b4e0`; Woodshed is qualified on native source
 `474d10a`, published with receipt `943c762`. This completes bounded P3, including
 source-owned personal authoring/withdrawal, ordered audition and fresh-process
-sealed reopening. P4, P6 and P7 remain later work.
+sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d`;
+P6 and P7 remain later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -627,3 +628,41 @@ keep their own gates. The next integration phase is P4's responsive rest stroke
 and fan; the independently qualified P5 experiment remains evidence for that
 later dynamics adapter, with fields and sympathetic influences treated as
 forces acting on links rather than additional relationship assertions.
+
+
+## P4 continuation: rest stroke and fan retirement
+
+**Status (2026-10-16): in progress.** Mark authorized proceeding after bounded
+P3. Mere starts from refreshed `b31363d2d`; Woodshed starts from `284fa340`
+including the independent capture-accumulator work. Root owns the shared
+contract, rendering integration, receiving locks, qualification and publication.
+Independent source work covers Pictograph, Woodshed's relationship editor and
+Pandect/scene lowering; all Cargo and consumer intake remain serialized.
+
+The resting target is a canonical `LinkKey` with a separate displayed
+appearance, at most one per stratum on a displayed pair. Picking it opens the
+existing shared member reader. Original assertion IDs, direction and source
+provenance remain untouched. Direction heads and an opposition mark carry the
+closed link's meaning without per-assertion lanes. Default visual strength
+counts eligible held contributions, while the existing endpoint force law
+retains its exact source-row behavior; this phase does not introduce a force law.
+
+Only canonical key/stratum/paint-mark values move down into Sceno so routed
+scenes can carry them without a dependency cycle. Scenograph keeps the public
+`scenograph::link` path and owns readings/source authority. `RoutedRelation`
+adds optional source identity and view-local marks/strength; anonymous geometry
+stays explicitly unbound. Source-linked rendering must use the typed identity.
+
+New whole-link hides persist by canonical key. Existing directed member hides
+remain precise eligibility filters; migration never widens a user's partial
+hide to a whole link or to the other stratum. Closed selection and picking no
+longer use a selector or arbitrary first assertion as the link identity.
+
+Done conditions remain architecture §8 P4: Woodshed's relationship editor,
+Pictograph, Cambium and routed scenes use the shared key; all three fan drawing
+paths retire; direction/opposition and both strata remain legible and selectable;
+member actions resolve exact current source handles; and saved link hides
+round-trip without changing graph truth. Qualification requires focused CPU and
+compatibility checks, reviewed receiving native and browser captures, and a
+fresh-process reopen for retained presentation state. P4f, P6/P7, physical audio
+quality and endpoint feedback retain their independent gates.
