@@ -2842,8 +2842,9 @@ mod tests {
                 .expect("fixture has a migrated resource claim");
             let original_claim = claim.clone();
             claim.label = Some("changed valid checkpoint label".into());
+            claim.basis.note = claim.label.clone();
             let changed_claim = claim.clone();
-            claim.label = original_claim.label.clone();
+            *claim = original_claim.clone();
             assert_eq!(
                 *claim, original_claim,
                 "IDs, source, time and predicate stay exact"
@@ -2853,14 +2854,13 @@ mod tests {
                 serde_json::to_value(&checkpoint).unwrap(),
                 "no endpoints or other checkpoint truth were changed"
             );
-            changed_checkpoint
+            *changed_checkpoint
                 .resource_edges
                 .iter_mut()
                 .filter_map(|edge| edge.semantic.as_mut())
                 .flat_map(|semantic| &mut semantic.statements)
                 .next()
-                .unwrap()
-                .label = changed_claim.label;
+                .unwrap() = changed_claim;
 
             let mut changed_facets = facets.clone();
             changed_facets
@@ -2918,7 +2918,7 @@ mod tests {
             assert_eq!(
                 refused,
                 vec![true, true],
-                "changed label and foreign facet refuse"
+                "changed canonical note and foreign facet refuse"
             );
         });
     }

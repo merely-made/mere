@@ -11,7 +11,8 @@ Mark then clarified the dynamics purpose: links respond to fields and perhaps
 to compatible links, making different dynamics legible (§7.3). P5 explores
 that response independently of the other phases. The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
-owns current assignments, evidence and limits. P2–P4, P6 and P7 (§8) are unscheduled.
+owns current assignments, evidence and limits. P2's central lifecycle and
+reason-key work is underway; P3–P4, P6 and P7 (§8) remain unscheduled.
 Mark ruled the remaining open questions as L7–L13 on 2026-10-15 (§4); none
 remain open (§9).
 
@@ -277,13 +278,13 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | `VisualRelationKind` / `StrokeCue` (query view) | Keep | The stratum cue of the rest stroke. |
 | scenomise `DisclosedRelationship` with `RelationshipProvenance` | Keep | The disclosure shape of one assertion from a host. Its fields align with `basis`: method, method version, provider, evidence. |
 | Woodshed `MaterialRelation` | Keep, disclosed | A domain record disclosed as an assertion. `method` is the Woodshed computation and version. Its 0..100 weight is a domain value the strength function may read. |
-| `EdgePath` (`numen/edge_path.rs`) | Keep | Candidate path vocabulary for P5: `Spline` and `FieldLine` are declarations; a responsive-path evaluator remains to be designed (§7.3). |
+| `EdgePath` (`numen/edge_path.rs`) | Keep | `Spline` and `FieldLine` remain path declarations. Numen now has a separate bounded fixed-endpoint responsive-path evaluator; the implementation plan owns P5's host and visual proof (§7.3). |
 | Field couplings | Keep | Existing couplings remain node-targeted. P5 explores a view-local path response without adding an `EdgeFamily` or a stored link entity. |
 | Nested graph | Keep | Node-borne. Not used for links; promotion uses the freeze pattern instead. |
 | Swatch | Keep | Gains a **link** scope (§7.2). |
 | Timeline arrangement (sceno `score.rs`) | Keep | The default opened-link arrangement for dated data; list is the default for mostly undated data (§7.2). |
 | "Timeline" × 6 | Clarify | In this doc it means only the arrangement family. |
-| Linked-data first-arc surface projection (`linked-data/src/lib.rs`:360) | Retire | Reads every arc through `edges_between_undirected`, as the kernel already does. |
+| Linked-data first-arc surface projection (`linked-data/src/lib.rs`) | Retired in the bounded P1 delivery | Reads every outgoing bucket through the kernel's adjacency-indexed `surface_outgoing_relation_buckets`; preserves source direction and scope and excludes incoming-only arcs. |
 
 **Count.** Of 47 rows, 23 are retired or subsumed and two were already
 retired. They include three fans, three bundle
@@ -306,7 +307,9 @@ never a revived one. Asserter-claimed **valid time** ("these were related from
 
 Clock rule: the caller's time is used when the caller supplies one: Knot's
 signed header, an ingested `prov:generatedAtTime`, a sync event. Otherwise the
-kernel stamps wall clock at write. A record with no time is undated (legacy
+kernel stamps wall clock once at authored admission and records that value.
+Import, replay and restore preserve a missing source time. A record with no
+time is undated (legacy
 data, or a source that gives none). It is shown in the undated lane and never
 as 1970.
 
@@ -514,7 +517,8 @@ current storage, so a consumer benefits before any persistence change.
   semantic assertions, under §6.3's rules. Proof: Graphshell's inspector
   sorts by first time, shows withdrawn spans and lists undated assertions
   last. A Knot assertion and retraction round-trip with their times. Done
-  when no writer leaves time empty, replay reproduces recorded times exactly,
+  when authored writers record their admission time, import/replay preserve
+  an unknown source time, replay reproduces recorded times exactly,
   reassertion keeps the first time, withdraw-then-reassert yields two
   intervals, a stale assert does not revive a withdrawal, and default SPARQL
   shows held assertions only (L5).

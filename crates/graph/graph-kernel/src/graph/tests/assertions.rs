@@ -70,11 +70,24 @@ fn separate_asserters_keep_their_own_assertions_and_retract_alone() {
     assert!(graph.retract_semantic_statement(source, target, &first.statement_id));
     assert!(!graph.retract_semantic_statement(source, target, &first.statement_id));
     let statements = graph.get_relation(edge).unwrap().semantic_statements();
-    assert_eq!(statements, &[bob_before_update]);
+    assert_eq!(
+        statements.len(),
+        2,
+        "withdrawal retains the assertion record"
+    );
+    assert!(statements[0].withdrawn.is_some());
+    assert_eq!(statements[1], bob_before_update);
     assert!(graph.retract_semantic_statement(source, target, &second.statement_id));
-    assert!(graph.find_edge_key(source, target).is_none());
-    assert!(graph.get_relation(edge).is_none());
-    assert_eq!(graph.resource_relations().count(), 0);
+    assert!(graph.get_relation(edge).is_some());
+    assert_eq!(graph.resource_relations().count(), 1);
+    assert!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .semantic_statements()
+            .iter()
+            .all(|statement| statement.withdrawn.is_some())
+    );
 }
 
 #[test]
@@ -114,6 +127,9 @@ fn legacy_attribution_preserves_known_provenance_ids_and_times() {
         graph_scope: GraphScope::Source,
         provenance_iri: None,
         asserted_at_ms: Some(77),
+        first_asserted_ms: Some(77),
+        withdrawn: None,
+        basis: Default::default(),
     };
     let mut expected = unknown.clone();
     expected.provenance_iri = Some(UNKNOWN_LEGACY_ASSERTER_IRI.to_string());
@@ -144,6 +160,7 @@ fn legacy_attribution_preserves_known_provenance_ids_and_times() {
         provenance_iri: known.provenance_iri,
         asserted_at_ms: Some(88),
         label: None,
+        basis: Default::default(),
     });
     assert_ne!(asserted.statement_id, unknown.statement_id);
     assert_eq!(

@@ -353,9 +353,15 @@ mod tests {
                 predicate: "https://schema.org/citation".into(),
                 recognized_sub_kind: None,
                 label: Some("citation".into()),
+                basis: kernel::types::AssertionBasis {
+                    note: Some("citation".into()),
+                    ..Default::default()
+                },
                 graph_scope: kernel::types::GraphScope::Default,
                 provenance_iri: Some("https://author.test/".into()),
                 asserted_at_ms: Some(17),
+                first_asserted_ms: Some(17),
+                withdrawn: None,
             }],
             ..Default::default()
         });

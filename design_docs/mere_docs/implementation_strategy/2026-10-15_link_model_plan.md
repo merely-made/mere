@@ -1,11 +1,13 @@
-# Link model: bounded shared reading and responsive-path probe
+# Link model: shared readings, assertion lifecycle and responsive paths
 
 **Date:** 2026-10-15
 **Status:** in progress. The bounded P1 reading and independent P5 CPU probe
-are implemented and bounded-tested; phase acceptance remains open.
+are implemented and bounded-tested; phase acceptance remains open. Local
+host context, a visible P5 fixture and P2's lifecycle/reason-key contract are
+now in progress. The current integration baseline is `b2c8dcc28`.
 Work began at `d4d2f88c4`; the first source
-commit `339a86c9e` was based on `39035965a` after renderer adoption. The current
-combined source `4f4678522` also includes published native-fold integration
+commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
+delivery's combined source `4f4678522` also includes published native-fold integration
 `2d0d38f7c`.
 
 ## Authority and scope
@@ -19,12 +21,14 @@ stored pair entity. P1 does not introduce claim-editing UI or pair promotion.
 Use one integration owner for the portable contract and persistence. The core
 sequence remains P1 → P2 → P3 → P4 → P6. The independent P5 evaluator may
 advance on fixed fixtures while the core progresses. Shared host rendering
-and selection changes are serialized. P2–P4, P6 and P7 are later work, not silently
-included in this first delivery.
+and selection changes are serialized. P2–P4, P6 and P7 were outside the first
+delivery; the authorized continuation below starts P2 without claiming its
+remaining supplier and intake gates are complete.
 
 Mark ruled on 2026-10-15 (link model L13) that two independent reasons from
 the same asserter are two separately withdrawable assertions. P2 adds a reason
-key to the dedup key. P1 preserves every existing statement ID and leaves
+key to the dedup key: method IRI without version, plus sorted evidence refs.
+Existing relation-membership writers retain ensure semantics. P1 preserves every existing statement ID and leaves
 today's write-path deduplication unchanged.
 
 The link model's remaining open rulings were settled the same day as L7–L12.
@@ -175,7 +179,7 @@ keep fixture, package, host, native and persistence claims separate.
   populated the cache before the final offline checks. Neither setup failure
   is recorded as a test pass.
 
-## Combined check receipt and next review
+## First delivery: combined check receipt and next review
 
 The [compact check receipt](../../../support/receipts/link-model-20261015/checks.json)
 pins source commit `4f4678522cfb1bbf64655ddbd44cb7fa18919de6`, upstream
@@ -199,7 +203,8 @@ The first slice is implemented and bounded-tested. Phase acceptance remains
 open for receiving-host review: supply verified source binding/revision
 through the reader and Graphshell entry point, exercise the ordinary consumer
 inspection flows, and keep P5's real-link adapter and capture comparison
-separate. P2's assertion/evidence choice is now ruled (L13) and is P2's to implement.
+separate. At that delivery, P2's assertion/evidence choice remained pending;
+the subsequent ruling L13 now binds the continuation below.
 No new snapshot format, withdrawal state, opened-link layout or fan retirement
 is claimed by this delivery.
 
@@ -220,3 +225,116 @@ The receipt retains the earlier qualification basis; it does not apply the
 old result to the newer source. Link implementation files are unchanged by
 the merge, with the reader module declaration preserved over upstream's
 canvas module.
+
+
+## Continuation: owning source, visible dynamics and P2 lifecycle
+
+**2026-10-15, authorized continuation.** Work resumes from published
+`1977cb260`, which includes the resident-host port. Integration advanced to
+`cc801cbe0`, including the native-fold qualification and Mark's L7–L13 rulings. The core contract and
+persistence remain under one owner. Three cheaper agents own disjoint work:
+
+- The host adapter agent supplies MereHost's durable session/root graph
+  identity to local link and presentation inspection. Its namespace is local
+  source context, not authentication or a new registered authority. Revision
+  stays explicitly unavailable: an unflushed journal prefix can be reused
+  after reopen for different facts, so it is not an immutable public revision.
+- The P5 agent supplies the Pictograph bridge from a bounded cohort of real
+  link readings to Numen, preserving full source and appearance provenance
+  behind reversible batch-local evaluator handles. It then builds the pure
+  Graphshell fixture model. The integration owner owns the visible one-tree
+  mount, controls and review. Compatibility is explicitly declared per
+  appearance; no predicate-based semantic equivalence is inferred.
+- The P2 agent owns the central lifecycle implementation in an isolated
+  worktree. Settle L13 reason-key admission, exact-ID reconfirmation, authored
+  versus recorded time, held/history reads and snapshot compatibility before
+  RDF or sync adapters change. Journal exact-prefix replay remains exact;
+  stale remote assertion delivery cannot revive a withdrawn ID.
+
+Validation proceeds from focused CPU checks to combined consumers and the
+visible fixed-endpoint fixture. The Mac can remain locked for source/build
+work; visible interaction and capture review require an available desktop.
+P2's journal/snapshot/query/RDF and Knot time-roundtrip gates remain open until
+implemented and tested, separately from the responsive-path proof.
+
+Review of the central draft identified two admission requirements: a carried
+withdrawal must turn an existing held ID into a tombstone, and a pair-scoped
+withdrawal must verify Resource endpoints as well as Surface endpoints. The
+same review found a raw-history iterator in the default linked-data exporter;
+default RDF/SPARQL reads must exclude withdrawn assertions before this slice
+can be accepted. Unknown imported withdrawal IDs remain unapplied and must
+not be described as safely admitted merely because the kernel returns false.
+
+JSON compatibility and binary archive layout are separate gates. Actual
+`graph.json` and GraphSession stores use JSON; adding lifecycle fields to a
+persisted struct changes its postcard/rkyv shape. A same-version binary
+roundtrip is not evidence that pre-change archives decode. Keep any unprovided
+binary migration explicitly open.
+
+**Continuation review.** L13's reason key is method IRI without version plus
+sorted evidence references; the note is not part of identity. Empty-basis
+membership ensures stay idempotent. Method-version-only updates retain the
+reason's ID, and a new held reason after withdrawal gets a new ID. The P2
+owner implements the central basis and lifecycle before those contracts are
+qualified. Traversal occurrences remain in their existing sidecars for P6.
+
+The read adapter now has an explicit retained-history path, separate from
+GraphSession journal replay. Its Graphshell history result is ordered by
+first record time, with undated assertions last; presentation action lookup
+stays held-only. The separate RDF owner carries first/last/withdrawal and
+basis through reifiers. Withdrawn reifiers use an explicit history scope and
+carry their original assertion scope separately; their underlying triple is
+not emitted as a held fact.
+
+An independent source audit found retained-only edges leaking into ordinary
+topology queries, and surface reifiers leaking through a raw metadata
+iterator. Those paths require focused negative controls before acceptance.
+The standalone browser build first refused its stale lockfile under
+`--locked`; an offline targeted refresh updates the local Forme/curation
+versions and their changed path dependencies, plus an allowed existing
+`cssparser-macros` syn choice already used by the root lockfile. No external
+package version or Git revision was advanced. The locked browser rebuild is
+in progress; no visual acceptance is inferred from the host CPU tests.
+
+The current upstream dependency round advances Knot to
+`fe9d98ccc1eb7b0589bd90243683d4f6dfab3242` at Mere `b2c8dcc28`.
+A source audit of that exact Cargo checkout confirms that Knot signs the
+operation's `asserted_at_ms`, and projects it for assertions, but
+`KnotRelationRetractionV1` still carries only operation and author. Its fold
+drops the signed retraction time when constructing that DTO. Mere currently
+has no relation-intake consumer of `KnotDocumentProjection`; its resident and
+overmap routes do not establish that intake. P2's Knot proof therefore still
+requires a supplier projection change and a real Mere adapter, followed by
+authored-time, untimed, checkpoint/reopen and compatibility controls. A
+synthetic Mere fixture is not that proof, and this lane does not repin Knot
+again to imply it.
+
+The initial headed P5 scenario passed its controls, but capture review caught
+a shrinking plot box with overflowing paths. The corrected plot has fixed
+layout extent within the available viewport and visible active controls.
+Eight pre-integration captures show disabled, compatible-only, three field-only
+and three combined configurations. All paths preserve their endpoint and
+assertion identities; the incompatible control stays straight under
+compatible-only response. These reviewed fixture results still require a
+final combined-source rebuild and receipt before publication.
+
+
+The persistence proof now includes a dedicated native store probe with two
+child processes: write `graph.json`, exit, then reopen and compare retained
+IDs, first/last/withdrawal, basis and an explicit unknown-first/known-last
+record. This is a kernel JSON-store gate, distinct from Graphshell's browser
+persistence or Knot's checkpoint proof. The content-transfer compatibility
+path retains the original `Contribution` message shape and appends an
+explicit lifecycle-aware `ContributionV2`; it does not rely on missing-field
+defaults in positional postcard data.
+
+The combined kernel library gate with native store support passes **448 tests**.
+Scenograph passes **28**, and Pictograph's full canvas library passes **464**,
+with its 18 existing release/probe ignores. The broad Graphshell pass exposed
+three fixtures still assuming physical deletion or mutating only the legacy
+label while leaving the canonical basis note unchanged. Their controls now
+use held claims and canonical notes; collision rejection and snapshot/journal
+atomicity checks remain. Final Graphshell full library suites pass **300 tests**
+with `web` and **376 tests** with `personal-sync`, each with six existing
+ignores. The signed-sync probe binary also compiles. RDF/wire, session,
+fresh-process and final browser gates are still pending.

@@ -400,9 +400,12 @@ pub(crate) fn restore_persisted_payload(payload: &mut EdgePayload, pedge: &Persi
                     predicate: statement.predicate.clone(),
                     recognized_sub_kind: statement.recognized_sub_kind.map(semantic_sub_kind),
                     label: statement.label.clone(),
+                    basis: statement.basis.clone(),
                     graph_scope: statement.graph_scope.clone(),
                     provenance_iri: statement.provenance_iri.clone(),
+                    first_asserted_ms: statement.first_asserted_ms,
                     asserted_at_ms: statement.asserted_at_ms,
+                    withdrawn: statement.withdrawn.clone(),
                 });
             }
         } else {
@@ -414,6 +417,7 @@ pub(crate) fn restore_persisted_payload(payload: &mut EdgePayload, pedge: &Persi
                     graph_scope: crate::types::GraphScope::Default,
                     provenance_iri: Some(edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
                     asserted_at_ms: None,
+                    basis: Default::default(),
                 });
             }
             if semantic.predicate.is_some() {

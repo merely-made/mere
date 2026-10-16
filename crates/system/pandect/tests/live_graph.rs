@@ -188,6 +188,10 @@ fn fixture() -> (Graph, Uuid, Uuid) {
                     predicate: kernel::graph::predicate_iri(SemanticSubKind::Cites).into(),
                     recognized_sub_kind: Some(SemanticSubKind::Cites),
                     label: Some(label.into()),
+                    basis: kernel::types::AssertionBasis {
+                        note: Some(label.into()),
+                        ..Default::default()
+                    },
                     graph_scope: kernel::types::GraphScope::Custom("urn:scope:retained".into()),
                     provenance_iri: Some(Author::person("bob").asserter_iri()),
                     asserted_at_ms: Some(55),
@@ -234,16 +238,21 @@ fn whole(graph: &Graph) -> Value {
     json!({"snapshot": graph.to_snapshot_at(0), "facets": graph.facets()})
 }
 // Independent live executions mint different statement handles and creation
-// clocks. Preserve original handles/clocks; give each new handle a consistent
-// ordinal, preserving multiplicity and repeated references. Exact replay tests
-// below do not use this normalization.
+// clocks, including a newly authored withdrawal. Preserve original handles and
+// clocks; give each new handle a consistent ordinal, preserving multiplicity
+// and repeated references. Exact replay tests below do not use this normalization.
 fn canonical(mut value: Value, baseline: &Graph, created: Option<Uuid>) -> Value {
-    fn gather(value: &Value, ids: &mut BTreeSet<String>) {
+    fn gather(value: &Value, ids: &mut std::collections::BTreeMap<String, bool>) {
         match value {
             Value::Object(object) => {
                 for (name, value) in object {
                     if name == "statement_id" {
-                        ids.insert(value.as_str().unwrap().into());
+                        ids.insert(
+                            value.as_str().unwrap().into(),
+                            object
+                                .get("withdrawn")
+                                .is_some_and(|value| !value.is_null()),
+                        );
                     }
                     if name.ends_with("_json") && value.is_string() {
                         if let Ok(embedded) = serde_json::from_str::<Value>(value.as_str().unwrap())
@@ -265,7 +274,7 @@ fn canonical(mut value: Value, baseline: &Graph, created: Option<Uuid>) -> Value
     }
     fn visit(
         value: &mut Value,
-        original: &BTreeSet<String>,
+        original: &std::collections::BTreeMap<String, bool>,
         minted: &mut std::collections::BTreeMap<String, String>,
         created: Option<&str>,
         creation: bool,
@@ -275,7 +284,20 @@ fn canonical(mut value: Value, baseline: &Graph, created: Option<Uuid>) -> Value
                 let new_statement = object
                     .get("statement_id")
                     .and_then(Value::as_str)
-                    .is_some_and(|id| !original.contains(id));
+                    .is_some_and(|id| !original.contains_key(id));
+                let new_withdrawal = object
+                    .get("statement_id")
+                    .and_then(Value::as_str)
+                    .is_some_and(|id| !original.get(id).copied().unwrap_or(false));
+                if new_withdrawal
+                    && let Some(at_ms) = object
+                        .get_mut("withdrawn")
+                        .and_then(Value::as_object_mut)
+                        .and_then(|withdrawal| withdrawal.get_mut("at_ms"))
+                    && at_ms.is_number()
+                {
+                    *at_ms = json!(0);
+                }
                 let creation = creation
                     || created.is_some_and(|id| {
                         object.get("node_id").and_then(Value::as_str) == Some(id)
@@ -289,7 +311,8 @@ fn canonical(mut value: Value, baseline: &Graph, created: Option<Uuid>) -> Value
                                 .or_insert(next)
                                 .clone(),
                         );
-                    } else if ((name == "asserted_at_ms" && new_statement)
+                    } else if ((matches!(name.as_str(), "asserted_at_ms" | "first_asserted_ms")
+                        && new_statement)
                         || (creation
                             && matches!(name.as_str(), "last_visited_ms" | "timestamp_ms")))
                         && value.is_number()
@@ -321,7 +344,7 @@ fn canonical(mut value: Value, baseline: &Graph, created: Option<Uuid>) -> Value
             _ => {},
         }
     }
-    let mut original = BTreeSet::new();
+    let mut original = std::collections::BTreeMap::new();
     gather(&whole(baseline), &mut original);
     let created = created.map(|id| id.to_string());
     visit(
@@ -558,11 +581,20 @@ fn six_commands_match_complete_live_deltas_and_retain_exact_replay_history() {
                     })
                     .flat_map(|(_, _, payload)| payload.semantic_statements())
                     .collect::<Vec<_>>();
-                assert_eq!(shared.len(), 1);
+                assert_eq!(shared.len(), 2, "both authors' retained records survive");
+                let held: Vec<_> = shared
+                    .iter()
+                    .filter(|statement| statement.is_held())
+                    .collect();
+                assert_eq!(held.len(), 1);
                 assert_eq!(
-                    shared[0].provenance_iri,
+                    held[0].provenance_iri,
                     Some(Author::person("bob").asserter_iri())
                 );
+                assert!(shared.iter().any(|statement| {
+                    statement.provenance_iri == Some(Author::person("alice").asserter_iri())
+                        && statement.withdrawn.is_some()
+                }));
             }
             let exact = whole(live.graph());
             let history = live.journal().entries().to_vec();

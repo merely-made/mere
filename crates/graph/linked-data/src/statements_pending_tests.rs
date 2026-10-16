@@ -209,7 +209,10 @@ fn carried_import_preserves_its_handle_before_consuming_pending_extraction() {
                 graph_scope: kernel::types::GraphScope::Source,
                 provenance_iri: Some(source_url.into()),
                 label: Some("carried label".into()),
+                basis: Default::default(),
                 asserted_at_ms: Some(42),
+                first_asserted_ms: Some(42),
+                withdrawn: None,
             },
         )
         .unwrap();
@@ -482,7 +485,10 @@ fn refused_import_without_admission_does_not_derive_ambient_claims() {
             statement_id: Some(held.statement_id),
             label: None,
             provenance_iri: None,
+            first_asserted_ms: None,
             asserted_at_ms: None,
+            withdrawn: None,
+            basis: Default::default(),
             graph_scope: Default::default(),
         }],
     };

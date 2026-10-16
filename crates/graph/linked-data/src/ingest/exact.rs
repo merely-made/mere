@@ -134,10 +134,33 @@ pub(super) fn import_edge(
         predicate: edge.predicate.clone(),
         recognized_sub_kind: sub_kind_from_iri(&edge.predicate).map(persisted_kind),
         label: edge.label.clone(),
+        basis: edge.basis.clone(),
         graph_scope: edge.graph_scope.clone(),
         provenance_iri: edge.provenance_iri.clone(),
         asserted_at_ms: edge.asserted_at_ms,
+        first_asserted_ms: edge.first_asserted_ms,
+        withdrawn: edge.withdrawn.clone(),
     };
+    if graph.find_semantic_statement(id).is_some() {
+        return graph
+            .try_assert_persisted_semantic_statement(
+                from,
+                to,
+                kernel::graph::SemanticStatement {
+                    statement_id: id.clone(),
+                    predicate: edge.predicate.clone(),
+                    recognized_sub_kind: sub_kind_from_iri(&edge.predicate),
+                    label: edge.label.clone(),
+                    basis: edge.basis.clone(),
+                    graph_scope: edge.graph_scope.clone(),
+                    provenance_iri: edge.provenance_iri.clone(),
+                    first_asserted_ms: edge.first_asserted_ms,
+                    asserted_at_ms: edge.asserted_at_ms,
+                    withdrawn: edge.withdrawn.clone(),
+                },
+            )
+            .is_ok();
+    }
     let surface_pair = (
         graph.get_node(from).unwrap().id.to_string(),
         graph.get_node(to).unwrap().id.to_string(),
@@ -298,7 +321,10 @@ mod tests {
             statement_id: Some(held.statement_id.clone()),
             label: None,
             provenance_iri: None,
+            first_asserted_ms: None,
             asserted_at_ms: None,
+            withdrawn: None,
+            basis: Default::default(),
         };
         assert!(!import_edge(&mut graph, from, to, &edge));
         assert_eq!(truth(&graph), before);
@@ -361,9 +387,15 @@ mod tests {
                     predicate: "urn:predicate:held".into(),
                     recognized_sub_kind: None,
                     label: Some("held".into()),
+                    basis: kernel::types::AssertionBasis {
+                        note: Some("held".into()),
+                        ..Default::default()
+                    },
                     graph_scope: GraphScope::User,
                     provenance_iri: Some("urn:author:held".into()),
                     asserted_at_ms: Some(10),
+                    first_asserted_ms: Some(10),
+                    withdrawn: None,
                 }],
             }),
             traversal: None,
@@ -394,11 +426,14 @@ mod tests {
         traversal.metrics.backward_navigations = 1;
         traversal.metrics.last_navigated_at = Some(22);
         snapshot.edges = vec![first.clone(), second.clone()];
-        let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
+        let mut graph = Graph::try_from_recorded_snapshot(&snapshot)
+            .unwrap_or_else(|error| panic!("recorded load control failed: {error:?}"));
         let before = graph.to_snapshot().edges;
         assert!(
             before.contains(&first) && before.contains(&second),
-            "recorded load control"
+            "recorded load control: first_match={}, second_match={}, restored={before:#?}, expected_first={first:#?}, expected_second={second:#?}",
+            before.contains(&first),
+            before.contains(&second),
         );
         for sub_kind in [
             kernel::graph::ArrangementSubKind::TileGroup,
@@ -435,7 +470,10 @@ mod tests {
             statement_id: Some("incoming".into()),
             label: None,
             provenance_iri: Some("urn:author:incoming".into()),
+            first_asserted_ms: None,
             asserted_at_ms: None,
+            withdrawn: None,
+            basis: Default::default(),
         };
         assert!(import_edge(&mut graph, from, to, &incoming));
         let after_payloads: Vec<_> = graph

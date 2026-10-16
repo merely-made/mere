@@ -336,9 +336,15 @@ pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
             _ => unreachable!(),
         }),
         label: Some(id.into()),
+        basis: kernel::types::AssertionBasis {
+            note: Some(id.into()),
+            ..Default::default()
+        },
         graph_scope: Default::default(),
         provenance_iri: Some(format!("https://author.test/{id}")),
         asserted_at_ms: Some(17),
+        first_asserted_ms: Some(17),
+        withdrawn: None,
     };
     let pair = |from: uuid::Uuid, to: uuid::Uuid, statements| PersistedEdge {
         from_node_id: from.to_string(),
