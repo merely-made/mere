@@ -6,8 +6,10 @@ lifecycle/Knot intake and P5 fixed-endpoint experiment are qualified on their
 recorded sources. The P2 continuation is source `b69510949`, based on runtime
 `82e7fd718` with later upstream documentation merged. P3 began on 2026-10-16
 from published Mere `c01c0aa73`. Its chartulary prerequisite and shared
-Graphshell opened-link slice are qualified on `732c1537a`; Woodshed and Knot
-receiving-host proofs remain open. P4, P6 and P7 remain later work.
+Graphshell opened-link slice are qualified on `732c1537a`. Knot receiving
+qualification is published at `921b4e0`; Woodshed source tests and build pass
+on `374c75d`, with native acceptance awaiting an unlocked Mac. P4, P6 and P7
+remain later work.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -565,20 +567,48 @@ a solid point with explicit unknown-time wording. A later visual review removed
 a duplicated undated caption. Browser proof is separate from desktop-native
 application acceptance, real source authoring and physical-peer qualification.
 
-### Remaining P3 consumer work
+### Receiving-host continuation (2026-10-16)
 
-Woodshed was read at `aba2c7343` without edits. Its catalog/computed/evidence
-relations are derived, its relation IDs are view-local, and its hide action is
-presentation-only. It has no personal assertion store yet. Mark ruled on 2026-10-16 that withdrawal initially applies only to personal
-assertions; catalog, computed and evidence-derived claims stay read-only. A
-source-owned suppression policy for generated claims is outside this flow. Do not turn
-hide into withdrawal or manufacture a durable owner from a view key. The selected
-flow must keep independent reasons separately withdrawable, route exact actions
-to Woodshed's owner, and prove explanation, provenance, audition and reopen before
-deleting the superseded helpers listed in §8 of the design.
+The [receiving receipt](../../../support/receipts/link-model-p3-20261016/receiving-hosts.json)
+records published consumer commits, owner receipt hashes and each qualification gate.
 
-Knot's authenticated authored-time/retraction intake is already P2-qualified;
-its receiving opened-link consumer proof remains later in P3. The Chartulary
-prerequisite and Graphshell fixture do not close either receiving-host gate.
-P4 fan retirement, P6 all-family/history budgets, P7 promotion and automatic
-resident synchronization retain their own acceptance boundaries.
+Knot's read-only consumer is published at `921b4e06e7eb4fa034cfaefddd9735f3b80ebec6`
+with native source `e7b5c50`. Its receiving receipt records 694 root workspace
+suite cases (four existing ignores), a final focused signed-history check,
+desktop build, and native seed/fresh-process reopen at 1100 × 900 logical
+pixels. Each native process passes 37 frames and two captures; all four were
+reviewed. The reader preserves full signed operation/signer/space identity,
+original directions, basis, authored/withdrawal clocks and unknown dates. It
+truthfully labels the projection as a startup snapshot with unavailable public
+revision. The existing Knot checkpoint writer emits plaintext projection JSON;
+Knot's owner plan records that storage follow-up separately. This proof establishes
+signed history and encrypted-vault reopening, not checkpoint confidentiality.
+
+Woodshed's source implementation is `374c75d`, published with receipt `d365952`,
+including concurrent canonical-clock
+main `f83d4da`. The root lock advances Mere to published `ee324e517` and retains
+the other qualified dependency families and all nested port locks. Personal
+assertions live in an owner-held session journal with a persisted UUID and
+stable Chartulary `EdgeId`; the actual sealed persona supplies the actor.
+Independent reasons receive independent IDs. Exact source UUID, generation,
+endpoints, held state and actor are rechecked before acknowledged persistence.
+An unconfirmed write revokes the session's storage capability until reopen.
+Generated catalog/computed/evidence claims stay read-only, and hide stays a
+presentation choice, as Mark ruled. Mark also chose ordered audition of both
+endpoints in the original assertion direction.
+
+The opened reader uses the selected canonical pair independently of the canvas's
+lens/depth filter. Its source projection no longer collapses claims by pair and
+kind: all eleven Minor/Major catalog adjacency reasons retain their identities,
+original direction and progression/role evidence, including inverse display.
+Set and Related generated-edge selections open the shared reader. Set sequence
+and context source details retain their existing owners. The superseded compact
+summary, `StageRelationKey` and `SetGraphRelationChoice` helpers are removed.
+
+The affected five-package Woodshed gate passes 784 suite cases with seven
+existing ignores plus five additional fresh-process child invocations; the
+locked offline desktop build passes. Native author/withdraw/audition and
+fresh-process sealed reopen remain pending because the Mac locked before the
+first launch. This is not yet whole P3 qualification. Full P4f exploration,
+physical audio quality, P4 fan retirement, P6 all-family/history budgets, P7
+promotion and automatic resident synchronization keep their own gates.
