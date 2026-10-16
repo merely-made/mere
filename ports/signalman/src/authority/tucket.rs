@@ -15,13 +15,15 @@ pub struct ReleasedTucketStation {
 }
 
 /// Public authority state; contains no seed or released key.
-pub struct TucketCustodyLease {
+pub struct StationCustodyLease {
     authority: DjinnStationAuthority,
     wallet: [u8; 32],
     closed: Arc<AtomicBool>,
     stop: Arc<AtomicBool>,
     join: Option<std::thread::JoinHandle<()>>,
 }
+/// The original Tucket spelling of the shared station custody watch.
+pub type TucketCustodyLease = StationCustodyLease;
 
 fn locked() -> CustodyClientError {
     CustodyRefusal::Locked.into()
@@ -30,6 +32,9 @@ fn locked() -> CustodyClientError {
 impl DjinnStationAuthority {
     /// Public wallet root while custody is unlocked. No material is released.
     pub fn tucket_wallet(&self) -> Result<[u8; 32], CustodyClientError> {
+        self.unlocked_station_wallet()
+    }
+    pub(super) fn unlocked_station_wallet(&self) -> Result<[u8; 32], CustodyClientError> {
         let status = self.status()?;
         if status.lock != VaultLockView::Unlocked {
             return Err(locked());
@@ -62,7 +67,7 @@ impl DjinnStationAuthority {
     }
 }
 
-impl TucketCustodyLease {
+impl StationCustodyLease {
     /// Cheap live guard between I/O steps. Pair with `check` at the start of
     /// each driver turn; the independent lock watch closes it asynchronously.
     pub fn check_live(&self) -> Result<(), CustodyClientError> {
@@ -72,7 +77,7 @@ impl TucketCustodyLease {
             Ok(())
         }
     }
-    fn watch(
+    pub(super) fn watch(
         authority: DjinnStationAuthority,
         wallet: [u8; 32],
     ) -> Result<Self, CustodyClientError> {
@@ -140,7 +145,7 @@ impl TucketCustodyLease {
     }
 }
 
-impl Drop for TucketCustodyLease {
+impl Drop for StationCustodyLease {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::SeqCst);
         if let Some(join) = self.join.take() {
