@@ -439,6 +439,7 @@ impl Canvas {
         // scene orbs, then the underlay edges + demoted rects, then the on-screen node
         // DOM, then any marquee on top.
         let bg_cmds = background_cmds(w, h, self.backdrop);
+        let territory_cmds = self.territory_commands();
         let projection_backdrop_cmds = self.projection_backdrop_commands();
         let strategy_region_cmds = self.strategy_region_commands();
         // Ambient backdrop: the sim painted as the bottom layer (above the bg fill, below the scene),
@@ -465,6 +466,9 @@ impl Canvas {
         let node_commands = super::cull::visible_commands(nodes_plist.commands(), viewport_bounds);
         observer.mark(8);
         let mut layers = vec![CompositeLayer::commands_only(&bg_cmds)];
+        if !territory_cmds.is_empty() {
+            layers.push(CompositeLayer::commands_only(&territory_cmds));
+        }
         if !projection_backdrop_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&projection_backdrop_cmds));
         }

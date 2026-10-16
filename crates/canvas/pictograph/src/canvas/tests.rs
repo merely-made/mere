@@ -41,6 +41,7 @@ mod home_at_budget_end;
 mod layout_and_drag;
 mod live_physics;
 mod meaning;
+mod mosaic;
 pub(crate) mod meaning_topics;
 mod node_face;
 mod node_minting;
