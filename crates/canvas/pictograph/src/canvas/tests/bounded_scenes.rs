@@ -136,3 +136,32 @@ fn provenance_stands_sources_left() {
     assert!(x(1) > x(2), "an unrelated node stands past the derivations");
     assert_eq!(crate::canvas::scene_axes::derived_column(0), SOURCES_COLUMN);
 }
+
+#[test]
+fn the_territory_field_claims_ground_by_site_beneath_the_graph() {
+    let (mut canvas, keys) = canvas();
+    assert!(
+        canvas.territory_commands().is_empty(),
+        "off until asked for"
+    );
+    let spread = [(-220.0, 0.0), (-170.0, 60.0), (40.0, 220.0), (220.0, -40.0)];
+    for (key, (x, y)) in keys.iter().zip(spread) {
+        canvas.view.set_position(*key, PortablePoint::new(x, y));
+    }
+    canvas.set_physics_paused(true);
+    canvas.set_territory_field(true);
+    canvas.frame(VIEW.0, VIEW.1);
+    let runs = canvas.territory_runs();
+    let mut domains: Vec<usize> = runs.iter().map(|r| r.domain).collect();
+    domains.sort_unstable();
+    domains.dedup();
+    assert_eq!(
+        domains.len(),
+        3,
+        "woodshed, knot and search each claim ground"
+    );
+    assert!(runs.iter().any(|r| r.tier == 1) && runs.iter().any(|r| r.tier == 3));
+    assert_eq!(canvas.territory_commands().len(), runs.len());
+    crate::canvas::controls::CanvasCommand::ToggleTerritory.apply(&mut canvas, VIEW);
+    assert!(!canvas.territory_field());
+}

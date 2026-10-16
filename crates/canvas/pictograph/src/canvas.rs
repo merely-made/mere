@@ -442,6 +442,8 @@ pub struct Canvas {
     strategy_regions: Vec<::cartography::ProjectedRegion>,
     /// The person's arrangement of the Mosaic (`mosaic.rs`).
     mosaic: mosaic::MosaicState,
+    /// Whether the territory field is drawn beneath the graph (`territory.rs`).
+    territory_field: bool,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
@@ -841,6 +843,7 @@ pub mod responsive_link_adapter;
 mod roles;
 pub mod mosaic;
 pub mod scene_axes;
+pub mod territory;
 mod scene_regions;
 mod selection;
 mod source_time;
