@@ -301,6 +301,11 @@ path = "src/bin/dr_c_receipt_host.rs"
 required-features = ["custody-receipt-host"]
 
 [[bin]]
+name = "tucket-custody-receipt-host"
+path = "src/bin/tucket_custody_receipt_host.rs"
+required-features = ["custody-receipt-host"]
+
+[[bin]]
 name = "dramatis-review-host"
 path = "src/bin/dramatis_review_host.rs"
 required-features = ["custody-receipt-host", "cxf"]
