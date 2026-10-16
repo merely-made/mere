@@ -157,12 +157,15 @@ pub(crate) struct FrameTrace {
 }
 
 impl FrameTrace {
-    fn new(host: u64, last_presented: u64) -> Option<Self> {
+    fn enabled() -> bool {
         static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-        let enabled = ENABLED.get_or_init(|| {
+        *ENABLED.get_or_init(|| {
             std::env::var_os("CAMBIUM_HOST_FRAME_TRACE").is_some_and(|value| value != "0")
-        });
-        enabled.then(|| Self {
+        })
+    }
+
+    fn new(host: u64, last_presented: u64) -> Option<Self> {
+        Self::enabled().then(|| Self {
             started: crate::Instant::now(),
             host,
             last_presented,
@@ -718,6 +721,12 @@ where
     }
 
     pub(crate) fn refuse_producer_resource(&mut self, error: crate::ProducerGpuRemapError) {
+        if FrameTrace::enabled() {
+            eprintln!(
+                "[cambium-frame] host={} last-presented={} phase=producer-resource-refused {error}",
+                self.s.presentation_host, self.s.presentation_sequence,
+            );
+        }
         self.s.shared.producers.record_gpu_remap_failure(error);
         let refusal = crate::CaptureRefusal::ProducerResource {
             generation: self
