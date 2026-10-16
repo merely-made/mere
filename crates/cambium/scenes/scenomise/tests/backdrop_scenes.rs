@@ -164,3 +164,20 @@ fn ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts() {
     grid.lines[1].key = "line-1/syllable/0".into();
     assert_eq!(input.compile().unwrap_err().path, "marks");
 }
+
+#[test]
+fn ternary_template_keeps_actual_syllables_and_discloses_expected_extent() {
+    let mut input = SceneInput::parse(METRE).unwrap();
+    let SceneFacts::MetreGrid(grid) = &mut input.facts else {
+        unreachable!()
+    };
+    grid.positions_per_foot = 3;
+    let reading = input.compile().unwrap();
+    assert!(reading.marks[0].detail.contains("15 expected"));
+    assert!(reading.diagnostics.iter().any(|d| d.contains("expects 15")));
+    let SceneFacts::MetreGrid(grid) = &mut input.facts else {
+        unreachable!()
+    };
+    grid.positions_per_foot = 0;
+    assert!(input.compile().is_err());
+}

@@ -13,8 +13,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .ok_or("supply an output directory")?,
     );
     std::fs::create_dir_all(&output)?;
-    let fixtures =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../support/design-studies/backdrops");
+    let fixtures = std::env::args()
+        .nth(2)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../support/design-studies/backdrops")
+        });
     let font =
         include_bytes!("../../../cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf");
     let mut receipt = Vec::new();
@@ -29,7 +34,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut surface = BackdropSurface::new(&input)?;
         let original_reading = serde_json::to_value(surface.scene())?;
         surface.register_font(font.to_vec());
-        surface.select(Some(selected))?;
+        let selected = if surface
+            .scene()
+            .marks
+            .iter()
+            .any(|m| m.selectable && m.key == selected)
+        {
+            selected.to_owned()
+        } else {
+            surface
+                .scene()
+                .marks
+                .iter()
+                .find(|m| m.selectable)
+                .ok_or("recipe has no placed selectable occurrence")?
+                .key
+                .clone()
+        };
+        surface.select(Some(&selected))?;
         let scene = surface.paint(900, 540, &SurfaceTheme::default())?;
         let mut cpu = CpuSession::new(SparseResourceLimits::default());
         let pixmap = cpu.render(&scene)?;
@@ -54,10 +76,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .marks
             .iter()
             .find(|m| m.selectable && m.key != selected)
-            .unwrap()
-            .key
-            .clone();
-        surface.select(Some(&next))?;
+            .map(|m| m.key.clone());
+        surface.select(next.as_deref())?;
         let next_scene = surface.paint(900, 540, &SurfaceTheme::default())?;
         let next_pixels = cpu.render(&next_scene)?;
         assert_ne!(
@@ -68,7 +88,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let source_before = serde_json::to_value(surface.scene())?;
         surface.dismiss_retained();
         assert_eq!(source_before, serde_json::to_value(surface.scene())?);
-        if name == "terrain" {
+        if name == "terrain" && surface.scene().unplaced.iter().any(|m| m.key == "pocket") {
             let sample =
                 |pixels: &[u8]| pixels[(444 * 900 + 730) * 4..(444 * 900 + 730) * 4 + 4].to_vec();
             assert_eq!(

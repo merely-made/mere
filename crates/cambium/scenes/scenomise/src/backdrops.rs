@@ -44,7 +44,16 @@ pub enum SceneFacts {
 #[serde(deny_unknown_fields)]
 pub struct MetreGrid {
     pub feet: u16,
+    /// Two for binary feet; sources may disclose other templates explicitly.
+    #[serde(default = "binary_foot", skip_serializing_if = "is_binary_foot")]
+    pub positions_per_foot: u16,
     pub lines: Vec<VerseLine>,
+}
+fn binary_foot() -> u16 {
+    2
+}
+fn is_binary_foot(value: &u16) -> bool {
+    *value == 2
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -313,7 +322,9 @@ impl SceneInput {
         match &self.facts {
             SceneFacts::MetreGrid(grid) => {
                 check(
-                    (1..=32).contains(&grid.feet) && grid.lines.len() <= 256,
+                    (1..=32).contains(&grid.feet)
+                        && (1..=8).contains(&grid.positions_per_foot)
+                        && grid.lines.len() <= 256,
                     "metre",
                     "metre extent exceeds limits",
                 )?;
@@ -622,7 +633,8 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
     let slot = 47.0;
     let x = 48.0;
     let row = 94.0;
-    let n = grid.feet as usize * 2;
+    let positions = grid.positions_per_foot as f32;
+    let n = grid.feet as usize * grid.positions_per_foot as usize;
     let max_syllables = grid
         .lines
         .iter()
@@ -661,15 +673,15 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
         });
         rows.push(id);
         for foot in 0..grid.feet {
-            let a = x + foot as f32 * 2.0 * slot;
+            let a = x + foot as f32 * positions * slot;
             guide(
                 out,
                 src,
                 vec![
                     Vec2::new(a, y + 33.0),
                     Vec2::new(a, y + 37.0),
-                    Vec2::new(a + slot * 2.0 - 5.0, y + 37.0),
-                    Vec2::new(a + slot * 2.0 - 5.0, y + 33.0),
+                    Vec2::new(a + slot * positions - 5.0, y + 37.0),
+                    Vec2::new(a + slot * positions - 5.0, y + 33.0),
                 ],
             );
         }

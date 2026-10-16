@@ -88,6 +88,9 @@ bundle carries geometry, labels, relation explanations, source references,
 revision, diagnostics and unplaced readings. Export the bundle when passing
 compiled readings between hosts; a bare `sceno::Scene` omits label strings.
 Alternatively export the input recipe and compile it again in another host.
+Metre templates disclose `feet` and `positions_per_foot` (default two, omitted
+from ordinary binary recipes). Ternary feet use three positions; stress is
+still supplied independently at each syllable.
 
 The supplying application owns facts. Knot can supply syllables, stress and
 rhyme tails; Woodshed can supply tuning, positions and pitch identities;
@@ -154,6 +157,24 @@ The CPU receipt writes raw 900×540 RGBA frames, compiled bundles, input recipes
 and a JSON result. CPU paint evidence, WebAssembly compilation and headed browser
 presentation are separate checks; consult the receipt's qualification record for
 the actual environments exercised.
+
+The [app-adapter receipt](../../../support/design-studies/backdrops/adapters/qualification.json)
+exercises the actual Knot sound-reading exporter, Woodshed Stage chord exporter
+and Signalman GPX/capture exporter. Those app-owned adapters are behind their
+`portable-scenes` feature. Their outputs compile and render through the shared
+surface with no app-specific renderer. Signalman's current Survey evidence
+contains no admitted radio/track association or propagation estimate, so its
+radio identities remain unplaced and its whole plane stays unmeasured.
+
+For cross-repository qualification before the shared change is integrated,
+`support/design-studies/backdrops/with_local_scene_source.py MERE_CHECKOUT`
+runs the remaining Cargo arguments in the caller's app checkout against a
+temporary patch of all four scene crates. It preserves one type-bearing cohort
+and writes no local paths into tracked manifests. Cargo can update that app's
+lockfile, as with any ordinary repin. After integration, repin the canonical
+source and rerun the app's checks. The standalone CPU example accepts an
+optional input directory after its output directory, containing `metre.json`,
+`fretboard.json` and `terrain.json` from those exporters.
 
 ## Dependencies
 
