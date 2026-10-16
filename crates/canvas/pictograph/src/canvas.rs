@@ -847,6 +847,7 @@ mod roles;
 mod grammar_view;
 pub mod mosaic;
 pub mod scene_axes;
+mod suggestions;
 pub mod territory;
 mod scene_regions;
 mod selection;
