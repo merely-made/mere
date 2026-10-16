@@ -1,0 +1,121 @@
+   Compiling getrandom v0.4.3
+   Compiling smallvec v1.16.1
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling stable_deref_trait v1.2.1
+   Compiling yoke v0.8.3
+   Compiling num-traits v0.2.19
+   Compiling crypto-common v0.2.2
+   Compiling serde_json v1.0.151
+   Compiling zerovec v0.11.8
+   Compiling parking_lot_core v0.9.12
+   Compiling string_cache_codegen v0.6.1
+   Compiling web_atoms v0.2.6
+   Compiling parking_lot v0.12.5
+   Compiling euclid v0.22.14
+   Compiling tinystr v0.8.4
+   Compiling once_cell v1.21.4
+   Compiling writeable v0.6.4
+   Compiling log v0.4.34
+   Compiling litemap v0.8.3
+   Compiling simdutf8 v0.1.5
+   Compiling icu_locale_core v2.3.0
+   Compiling string_cache v0.9.0
+   Compiling zerotrie v0.2.5
+   Compiling potential_utf v0.1.6
+   Compiling phf v0.13.1
+   Compiling semver v1.0.28
+   Compiling icu_collections v2.3.0
+   Compiling rustc_version v0.4.1
+   Compiling uuid v1.27.0
+   Compiling bytemuck v1.25.2
+   Compiling zeroize v1.9.1
+   Compiling icu_provider v2.3.1
+   Compiling markup5ever v0.39.0
+   Compiling font-types v0.12.5
+   Compiling curve25519-dalek v5.0.0
+   Compiling digest v0.11.3
+   Compiling sceno v0.0.5 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/sceno)
+   Compiling polycool v0.4.0
+   Compiling bytecheck v0.8.3
+   Compiling kurbo v0.13.1
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling read-fonts v0.41.0
+   Compiling mere-curation v0.1.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/forme/curation)
+   Compiling signature v3.0.0
+   Compiling subtle v2.6.1
+   Compiling peniko v0.6.1
+   Compiling thiserror v2.0.21
+   Compiling guillotiere v0.7.0
+   Compiling ed25519 v3.0.0
+   Compiling sha2 v0.11.0
+   Compiling skrifa v0.44.0
+   Compiling idna_adapter v1.2.2
+   Compiling rend v0.5.4
+   Compiling universal-hash v0.6.1
+   Compiling cipher v0.5.2
+   Compiling app_units v0.7.8
+   Compiling bitflags v2.13.2
+   Compiling percent-encoding v2.3.2
+   Compiling getrandom v0.3.4
+   Compiling petgraph v0.8.3
+   Compiling form_urlencoded v1.2.2
+   Compiling png v0.18.1
+   Compiling rkyv v0.8.18
+   Compiling muniment v0.1.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/muniment)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling chacha20 v0.10.2
+   Compiling poly1305 v0.9.1
+   Compiling idna v1.1.0
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling ed25519-dalek v3.0.0
+   Compiling scenograph v0.0.4 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenograph)
+   Compiling aead v0.6.1
+   Compiling xml5ever v0.39.0
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling html5ever v0.39.0
+   Compiling tracing-core v0.1.36
+   Compiling tracing v0.1.44
+   Compiling encoding_rs v0.8.42
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling accesskit v0.24.1
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling chacha20poly1305 v0.11.0
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+   Compiling url v2.5.8
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling meristem v0.2.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/meristem)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/sprigging)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling scenomise v0.0.5 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenomise)
+   Compiling chartulary v0.2.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/eidetic/chartulary)
+   Compiling scenotime v0.0.4 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenotime)
+   Compiling command-menu v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/command-menu)
+   Compiling cambium v0.3.3 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium)
+warning: function `find_element_by_name` is never used
+    --> crates/cambium/cambium/src/tests.rs:1838:8
+     |
+1838 |     fn find_element_by_name(dom: &ScriptedDom, node: NodeId, name: &str) -> Option<NodeId> {
+     |        ^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cambium` (lib test) generated 1 warning
+   Compiling servitor v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/servitor)
+error[E0282]: type annotations needed for `&chartulary::EditSpec<_, _>`
+   --> crates/servitor/src/gate.rs:464:27
+    |
+464 |                     .any(|spec| matches!(spec, EditSpec::InsertNode(node) if node.id == id))
+    |                           ^^^^                                               ------- type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type, where the type for type parameter `N` is specified
+    |
+464 |                     .any(|spec: &chartulary::EditSpec<N, E>| matches!(spec, EditSpec::InsertNode(node) if node.id == id))
+    |                               +++++++++++++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `servitor` (lib test) due to 1 previous error

@@ -4,7 +4,9 @@
 **Status:** design with a qualified bounded P1 shared reading and P5
 fixed-endpoint Graphshell experiment on source `1e3fb426c`. P2's semantic
 lifecycle and Knot supplier/intake gate are qualified by the continuation on
-`b69510949`. P3–P4, P6 and P7 (§8) remain later work. Mark ruled L1–L6 on
+`b69510949`. P3 is in progress: its chartulary prerequisite and shared
+Graphshell opened-link slice are qualified on `732c1537a`; Woodshed and Knot
+receiving-host proofs remain open. P4, P6 and P7 (§8) remain later work. Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
 [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
@@ -699,3 +701,16 @@ effective withdrawal metadata refuses intake. Four reviewed Graphshell captures
 now demonstrate held, timed withdrawn, time-unknown withdrawn and undated held
 records. This closes P2's recorded gate; automatic sync, desktop-native editing
 and later phases remain separate. The implementation plan owns exact evidence.
+
+**2026-10-16, P3 prerequisite and first consumer.** Chartulary retains stable
+`EdgeId` assertions with source asserter, clocks, basis and terminal withdrawal;
+checkpoint/replay and scoped-admission controls pass. A shared link-scoped
+swatch compiles the existing Stack and Timeline arrangements and renders source
+metadata, exact actions and a chronological alternate. Graphshell's reviewed
+browser fixture shows timed, time-unknown and undated assertions while preserving
+selection. The source owner rechecks full source/stratum/direction/ID action
+targets. This qualifies the bounded supplier and first consumer on `732c1537a`,
+not P3 as a whole: Woodshed's source-owned action/audition flow and Knot's
+opened-link consumer proof remain. No ruling changed. The implementation plan
+records the personal-only Woodshed withdrawal choice and the exact test, browser and
+documentation evidence; desktop-native acceptance and later phases stay separate.

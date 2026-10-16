@@ -56,6 +56,7 @@ mod keyed;
 mod menu;
 mod multi;
 mod optional_action;
+mod opened_link;
 mod overlay;
 mod overlay_surface;
 mod frisket_presentation;
@@ -93,6 +94,9 @@ mod tests;
 
 pub use action_list::{ActionItem, ActionListEvent, ActionListState, action_list};
 pub use arrangement::{arrangement, placed, placed_with};
+pub use opened_link::{
+    LinkMemberAction, LinkMemberTarget, OpenedLinkEvent, opened_link_swatch,
+};
 pub use atlas::{
     GraphCanvasAtlas, GraphCanvasAtlasCallout, GraphCanvasAtlasCompoundOutline,
     GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,
