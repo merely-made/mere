@@ -281,8 +281,11 @@ graphshell-host = { version = "0.0.2", path = "crates/graphshell/graphshell-host
 # Then to b19eebf: Knot on Mere 0c03dff3 (P5: the app-route receipt is
 # Djinn's, `graphshell` is Knot's dev-dependency for `view` and `sessions`
 # only) with merges carried from its overlay to the route.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "b19eebfffe08f31a035f2695a44f516c9afce274" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "b19eebfffe08f31a035f2695a44f516c9afce274" }
+# Then to fe9d98c: Knot on Mere 75a2e6ae and Murm fb6360c12b, the one repin round
+# (remote mere route spec 7.3): sceno and scenomise 0.0.5, and `graphshell` is no
+# longer named by Knot at all (its `view` and `sessions` are `graphshell-host`'s).
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "fe9d98ccc1eb7b0589bd90243683d4f6dfab3242" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "fe9d98ccc1eb7b0589bd90243683d4f6dfab3242" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
