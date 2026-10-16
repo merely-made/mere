@@ -654,6 +654,7 @@ mod published_replay_regression {
                 host.examine_ambient(&detail.session.id, "focus", &item, true, 5000)
                     .unwrap();
                 let mut view = context.view;
+                view.snapshot.recipe.definition.arrangement.kind = "grid.ordered".into();
                 view.snapshot.selected_occurrence = Some(item.clone());
                 view.roles.insert(
                     item.clone(),
@@ -920,6 +921,10 @@ mod published_replay_regression {
                 let memories = host.ambient_memories().unwrap();
                 assert_eq!(views.len(), 1);
                 assert!(views[0].reduced_motion);
+                assert_eq!(
+                    views[0].snapshot.recipe.definition.arrangement.kind,
+                    "grid.ordered"
+                );
                 assert_eq!(memories.len(), 1);
                 assert!(memories[0].kept);
                 assert_eq!(views[0].roles[&memories[0].memory.item.id].id(), "pinned");
