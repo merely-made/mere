@@ -1,0 +1,9 @@
+{
+  "baseline": "ee324e517d501653aee8df7d5a430760a74749c0",
+  "candidate": "7a656097ebb6bb144e0877b36b501d791cf6759d",
+  "packages": 1762,
+  "changed_package": "cleromancy-core-acceptance",
+  "before": "git+https://github.com/merely-made/cleromancy.git?branch=main#a4364de98025b7f4af2359bfa1a89304c1c09fce",
+  "after": "git+https://github.com/merely-made/cleromancy.git?branch=main#277c6bd0cb6b4f63fc458d341678c0f8ed52830a",
+  "all_other_lock_bytes_exact": true
+}
