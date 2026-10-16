@@ -2703,6 +2703,9 @@ mod resource_capture_tests {
                     graph_scope: crate::types::GraphScope::User,
                     provenance_iri: Some(source_iri.into()),
                     asserted_at_ms: Some(time),
+                    first_asserted_ms: Some(time),
+                    withdrawn: None,
+                    basis: Default::default(),
                 },
             );
             persisted.extend(graph.persisted_edges_between(source, target));
@@ -2776,6 +2779,9 @@ mod resource_capture_tests {
                 graph_scope: crate::types::GraphScope::User,
                 provenance_iri: Some("https://people.test/surface".into()),
                 asserted_at_ms: Some(30),
+                first_asserted_ms: Some(30),
+                withdrawn: None,
+                basis: Default::default(),
             },
         );
         let baseline = graph.clone();

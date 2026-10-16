@@ -53,8 +53,7 @@ impl Graph {
             .filter(|(from, _, payload)| {
                 from.id() == id
                     && payload
-                        .semantic_statements()
-                        .iter()
+                        .held_semantic_statements()
                         .any(|statement| statement.predicate == TAGGED_WITH_IRI)
             })
             .filter_map(|(_, to, _)| {
@@ -124,7 +123,7 @@ impl Graph {
             None,
             GraphScope::Default,
             Some(asserter_iri),
-            None,
+            Some(crate::time::unix_epoch_millis()),
         );
         self.tag_resource_with_statement(resource_id, concept_iri, concept, statement)
     }
@@ -157,8 +156,7 @@ impl Graph {
                     from.id() == resource_id
                         && to.id() == target.id()
                         && payload
-                            .semantic_statements()
-                            .iter()
+                            .held_semantic_statements()
                             .any(|held| held.statement_id == statement.statement_id)
                 });
             if !same_pair || existing != &statement {
@@ -171,7 +169,8 @@ impl Graph {
             .filter_map(|edge| edge.semantic.as_ref())
             .flat_map(|semantic| &semantic.statements)
             .any(|held| {
-                held.predicate == TAGGED_WITH_IRI
+                held.withdrawn.is_none()
+                    && held.predicate == TAGGED_WITH_IRI
                     && held.graph_scope == statement.graph_scope
                     && held.provenance_iri == statement.provenance_iri
             })
@@ -242,8 +241,7 @@ impl Graph {
             })
             .flat_map(|(_, _, payload)| {
                 payload
-                    .semantic_statements()
-                    .iter()
+                    .held_semantic_statements()
                     .filter(|statement| {
                         statement.predicate == TAGGED_WITH_IRI
                             && statement.provenance_iri.as_deref() == Some(source.as_str())

@@ -37,6 +37,9 @@ fn exact_surface_pair_replay_keeps_parallel_traversals_and_complete_payloads() {
             graph_scope: crate::types::GraphScope::User,
             provenance_iri: Some("urn:author:control".into()),
             asserted_at_ms: Some(time),
+            first_asserted_ms: Some(time),
+            withdrawn: None,
+            basis: Default::default(),
         });
         payload.traversal = Some(TraversalData {
             traversals: vec![Traversal {
@@ -69,6 +72,55 @@ fn exact_surface_pair_replay_keeps_parallel_traversals_and_complete_payloads() {
         }],
     );
     assert_eq!(graph.persisted_edges_between(from, to), edges);
+}
+
+#[test]
+fn legacy_semantic_replay_never_stamps_missing_times() {
+    let mut graph = Graph::new();
+    let from = graph.add_node("https://from.test/".into(), Default::default());
+    let to = graph.add_node("https://to.test/".into(), Default::default());
+    let from_id = graph.get_node(from).unwrap().id;
+    let to_id = graph.get_node(to).unwrap().id;
+
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::ReplayAssertRelationByIds {
+            from_id,
+            to_id,
+            assertion: EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::Cites,
+                label: None,
+                decay_progress: None,
+            },
+            asserter_iri: "urn:legacy:replay".into(),
+        },
+    );
+    let relation = graph.find_edge_key(from, to).unwrap();
+    let legacy_assertion = graph.get_edge(relation).unwrap().semantic_statements()[0]
+        .statement_id
+        .clone();
+    let statement = graph.find_semantic_statement(&legacy_assertion).unwrap().1;
+    assert_eq!(statement.first_asserted_ms, None);
+    assert_eq!(statement.asserted_at_ms, None);
+
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::ReplayAssertSemanticPredicateByIds {
+            from_id,
+            to_id,
+            predicate: "urn:legacy:open-predicate".into(),
+            asserter_iri: "urn:legacy:replay".into(),
+        },
+    );
+    let open_statement = graph
+        .get_edge(relation)
+        .unwrap()
+        .semantic_statements()
+        .iter()
+        .find(|statement| statement.predicate == "urn:legacy:open-predicate")
+        .unwrap();
+    assert_eq!(open_statement.first_asserted_ms, None);
+    assert_eq!(open_statement.asserted_at_ms, None);
 }
 
 #[test]
@@ -130,9 +182,18 @@ fn assertion_updates_and_precise_retractions_replay_exactly() {
     );
     assert!(replayed.find_edge_key(from, to).is_none());
     let remaining = resource_statements(&replayed, from, to);
-    assert_eq!(remaining.len(), 1);
-    assert_eq!(remaining[0].statement_id, bob.statement_id);
-    assert_eq!(remaining[0].asserted_at_ms, Some(20));
+    assert_eq!(remaining.len(), 2);
+    assert!(
+        remaining
+            .iter()
+            .any(|statement| statement.statement_id == alice.statement_id
+                && statement.withdrawn.is_some())
+    );
+    let bob_statement = remaining
+        .iter()
+        .find(|statement| statement.statement_id == bob.statement_id)
+        .unwrap();
+    assert_eq!(bob_statement.asserted_at_ms, Some(20));
 }
 
 #[test]
@@ -198,11 +259,12 @@ fn predicate_replacement_mints_an_id_and_preserves_the_other_asserter_on_replay(
     );
     assert!(replayed.find_edge_key(from, to).is_none());
     let statements = resource_statements(&replayed, from, to);
-    assert_eq!(statements.len(), 2);
+    assert_eq!(statements.len(), 3);
     assert!(
-        !statements
+        statements
             .iter()
-            .any(|statement| statement.statement_id == original.statement_id)
+            .any(|statement| statement.statement_id == original.statement_id
+                && statement.withdrawn.is_some())
     );
     assert_eq!(
         statements
@@ -244,6 +306,9 @@ fn exact_replay_normalizes_legacy_buckets_and_aggregate_predicates() {
                 graph_scope: crate::types::GraphScope::User,
                 provenance_iri: Some(asserter.into()),
                 asserted_at_ms: Some(time),
+                first_asserted_ms: Some(time),
+                withdrawn: None,
+                basis: Default::default(),
             },
         );
     }
@@ -393,7 +458,7 @@ fn asserting_deltas_carry_source_attribution() {
 }
 
 #[test]
-fn reingest_updates_the_same_asserter_without_replacing_its_id() {
+fn exact_reingest_preserves_each_carried_assertion_id() {
     let mut graph = Graph::new();
     let from = graph.add_node("https://a.test/".into(), Default::default());
     let to = graph.add_node("https://b.test/".into(), Default::default());
@@ -405,6 +470,9 @@ fn reingest_updates_the_same_asserter_without_replacing_its_id() {
         graph_scope: crate::types::GraphScope::Source,
         provenance_iri: Some(asserter.into()),
         asserted_at_ms: Some(time),
+        first_asserted_ms: Some(time),
+        withdrawn: None,
+        basis: Default::default(),
     };
     graph.assert_persisted_semantic_statement(
         from,
@@ -423,11 +491,13 @@ fn reingest_updates_the_same_asserter_without_replacing_its_id() {
     );
     assert!(graph.find_edge_key(from, to).is_none());
     let statements = resource_statements(&graph, from, to);
-    assert_eq!(statements.len(), 2);
+    assert_eq!(statements.len(), 3);
     assert_eq!(statements[0].statement_id, "first");
-    assert_eq!(statements[0].asserted_at_ms, Some(30));
+    assert_eq!(statements[0].asserted_at_ms, Some(10));
     assert_eq!(statements[1].statement_id, "peer");
     assert_eq!(statements[1].asserted_at_ms, Some(20));
+    assert_eq!(statements[2].statement_id, "new-id");
+    assert_eq!(statements[2].asserted_at_ms, Some(30));
 }
 
 #[test]

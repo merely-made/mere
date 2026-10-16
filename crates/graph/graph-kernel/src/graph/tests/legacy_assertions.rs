@@ -27,6 +27,7 @@ fn legacy_statement_load_preserves_ids_times_and_known_attribution() {
                     graph_scope: GraphScope::Default,
                     provenance_iri: Some(asserter.into()),
                     asserted_at_ms: Some(time),
+                    basis: Default::default(),
                 },
             )
             .unwrap();

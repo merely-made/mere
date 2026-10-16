@@ -12,9 +12,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use kernel::graph::{CoverageLayer, EdgeFamily, EdgePayload, Graph, GraphStratum, RelationKey};
 use kernel::types::GraphScope;
 use scenograph::link::{
-    LinkAssertion, LinkBucket, LinkCoverage, LinkCoverageLayer, LinkCoverageLimit, LinkEndpoint,
-    LinkGraphScope, LinkKey, LinkLegacyFamily, LinkLegacyMember, LinkPairReading, LinkReading,
-    LinkSource, LinkStratum,
+    LinkAssertion, LinkAssertionBasis, LinkAssertionMethod, LinkBucket, LinkCoverage,
+    LinkCoverageLayer, LinkCoverageLimit, LinkEndpoint, LinkGraphScope, LinkKey, LinkLegacyFamily,
+    LinkLegacyMember, LinkPairReading, LinkReading, LinkSource, LinkStratum, LinkWithdrawal,
 };
 use uuid::Uuid;
 
@@ -58,16 +58,21 @@ fn legacy_data(
     let mut members = Vec::new();
     let mut out = Vec::new();
     if let Some(data) = &payload.semantic {
-        family(
-            EdgeFamily::Semantic,
-            || {
-                serde_json::json!({
-                    "sub_kinds": data.sub_kinds, "label": data.label, "predicate": data.predicate
-                })
-            },
-            &mut out,
-            include_summaries,
-        );
+        let has_held_assertion = data.held_statements().next().is_some();
+        let has_legacy_metadata =
+            !data.sub_kinds.is_empty() || data.label.is_some() || data.predicate.is_some();
+        if has_held_assertion || has_legacy_metadata {
+            family(
+                EdgeFamily::Semantic,
+                || {
+                    serde_json::json!({
+                        "sub_kinds": data.sub_kinds, "label": data.label, "predicate": data.predicate
+                    })
+                },
+                &mut out,
+                include_summaries,
+            );
+        }
     }
     if let Some(data) = &payload.traversal {
         family(
@@ -195,9 +200,19 @@ fn projected_endpoint_id(endpoint: &LinkEndpoint, stratum: LinkStratum) -> Strin
 /// supplied by the caller; no public source or revision is inferred here.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct LinkReadOptions {
+    /// Default public reads expose held assertions. History is opt-in and means
+    /// retained lifecycle records in this supplied graph snapshot.
+    pub scope: LinkReadScope,
     /// Include the transitional raw family summaries required by Graphshell's
     /// current inspector output. PairInputs should use the summary-free default.
     pub include_legacy_summaries: bool,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum LinkReadScope {
+    #[default]
+    Held,
+    History,
 }
 
 pub fn read_link(
@@ -207,6 +222,26 @@ pub fn read_link(
     source: LinkSource,
 ) -> Result<LinkPairReading, String> {
     read_link_with_options(graph, first, second, source, LinkReadOptions::default())
+}
+
+/// Explicitly include retained held and withdrawn assertion lifecycle records.
+/// This reads the supplied graph snapshot; it does not replay a journal.
+pub fn read_link_history(
+    graph: &Graph,
+    first: Uuid,
+    second: Uuid,
+    source: LinkSource,
+) -> Result<LinkPairReading, String> {
+    read_link_with_options(
+        graph,
+        first,
+        second,
+        source,
+        LinkReadOptions {
+            scope: LinkReadScope::History,
+            ..LinkReadOptions::default()
+        },
+    )
 }
 
 pub fn read_link_with_options(
@@ -242,7 +277,13 @@ pub fn read_link_with_options(
         ]
     };
     for (displayed_from, displayed_to, from_key, to_key) in pairs {
-        for (relation_key, payload) in graph.projected_relations_between(from_key, to_key) {
+        let pair_relations: Vec<(RelationKey, &EdgePayload)> = match options.scope {
+            LinkReadScope::Held => graph
+                .projected_relations_between(from_key, to_key)
+                .collect(),
+            LinkReadScope::History => graph.retained_relations_between(from_key, to_key).collect(),
+        };
+        for (relation_key, payload) in pair_relations {
             let stratum = match relation_key {
                 RelationKey::Surface(_) => GraphStratum::Surface,
                 RelationKey::Resource(_) => GraphStratum::Resource,
@@ -278,23 +319,53 @@ pub fn read_link_with_options(
                 projected_endpoint_id(&source_from, portable_stratum),
                 projected_endpoint_id(&source_to, portable_stratum),
             );
-            let assertions = payload
-                .semantic_statements()
-                .iter()
-                .map(|statement| LinkAssertion {
-                    id: statement.statement_id.clone(),
-                    predicate: statement.predicate.clone(),
-                    recognized_kind: statement
-                        .recognized_sub_kind
-                        .map(|kind| serialized_name(&kind)),
-                    label: statement.label.clone(),
-                    scope: scope(&statement.graph_scope),
-                    asserter: statement.provenance_iri.clone(),
-                    asserted_at_ms: statement.asserted_at_ms,
-                })
-                .collect();
+            let mut assertions = Vec::new();
+            let mut add_assertion =
+                |statement: &kernel::graph::SemanticStatement| {
+                    assertions.push(LinkAssertion {
+                        id: statement.statement_id.clone(),
+                        predicate: statement.predicate.clone(),
+                        recognized_kind: statement
+                            .recognized_sub_kind
+                            .map(|kind| serialized_name(&kind)),
+                        label: statement.label.clone(),
+                        scope: scope(&statement.graph_scope),
+                        asserter: statement.provenance_iri.clone(),
+                        first_asserted_ms: statement.first_asserted_ms,
+                        asserted_at_ms: statement.asserted_at_ms,
+                        withdrawn: statement
+                            .withdrawn
+                            .as_ref()
+                            .map(|withdrawal| LinkWithdrawal {
+                                at_ms: withdrawal.at_ms,
+                                by: withdrawal.by.clone(),
+                            }),
+                        basis: LinkAssertionBasis {
+                            note: statement.basis.note.clone(),
+                            method: statement.basis.method.as_ref().map(|method| {
+                                LinkAssertionMethod {
+                                    iri: method.iri.clone(),
+                                    version: method.version.clone(),
+                                }
+                            }),
+                            evidence: statement.basis.evidence.clone(),
+                        },
+                    })
+                };
+            match options.scope {
+                LinkReadScope::Held => payload
+                    .held_semantic_statements()
+                    .for_each(&mut add_assertion),
+                LinkReadScope::History => payload
+                    .semantic_statements()
+                    .iter()
+                    .for_each(&mut add_assertion),
+            }
             let (legacy_members, legacy_summaries) =
                 legacy_data(payload, options.include_legacy_summaries);
+            if assertions.is_empty() && legacy_members.is_empty() && legacy_summaries.is_empty() {
+                continue;
+            }
             links.entry(key).or_default().push(LinkBucket {
                 displayed_from: displayed_from.to_string(),
                 displayed_to: displayed_to.to_string(),

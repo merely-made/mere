@@ -354,7 +354,10 @@ fn apply_suppressed(
         let has_statement_metadata = edge.statement_id.is_some()
             || edge.label.is_some()
             || edge.provenance_iri.is_some()
-            || edge.asserted_at_ms.is_some();
+            || edge.first_asserted_ms.is_some()
+            || edge.asserted_at_ms.is_some()
+            || edge.withdrawn.is_some()
+            || edge.basis != Default::default();
         if has_statement_metadata {
             // A reified statement: write it statement-aware so the fact handle
             // and metadata survive (the Phase 2 round-trip contract). A carried
@@ -370,26 +373,30 @@ fn apply_suppressed(
                             predicate: edge.predicate.clone(),
                             recognized_sub_kind: sub_kind,
                             label: edge.label.clone(),
+                            basis: edge.basis.clone(),
                             graph_scope: edge.graph_scope.clone(),
                             provenance_iri: Some(asserter.clone()),
                             asserted_at_ms: edge.asserted_at_ms,
+                            first_asserted_ms: edge.first_asserted_ms,
+                            withdrawn: edge.withdrawn.clone(),
                         },
                     )
                     .is_some(),
                 None => graph
-                    .assert_semantic_statement(
+                    .try_import_semantic_statement(
                         from,
                         to,
                         SemanticStatementSpec {
                             predicate: edge.predicate.clone(),
                             recognized_sub_kind: sub_kind,
                             label: edge.label.clone(),
+                            basis: edge.basis.clone(),
                             graph_scope: edge.graph_scope.clone(),
                             provenance_iri: Some(asserter.clone()),
                             asserted_at_ms: edge.asserted_at_ms,
                         },
                     )
-                    .is_some(),
+                    .is_ok(),
             };
             if asserted {
                 outcome.edges_asserted += 1;

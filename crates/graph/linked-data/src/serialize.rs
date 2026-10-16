@@ -29,17 +29,24 @@ use oxttl::{NQuadsParser, NQuadsSerializer, TriGParser, TriGSerializer};
 
 use crate::ingest::{GraphContribution, ImportEnvelope, IngestError, from_quads_envelope};
 use crate::vocab::is_vocabulary_quad;
-use crate::{dataset_quads, vocabulary_alignment_quads};
+use crate::{dataset_quads, dataset_quads_with_history, vocabulary_alignment_quads};
 
 /// The whole graph as **N-Quads**: instance quads (scoped) plus the vocabulary
 /// alignment graph. Deterministic (the projection is sorted), so it is safe to
 /// pin in a golden test.
 pub fn to_nquads(graph: &Graph) -> String {
+    to_nquads_from_quads(dataset_quads(graph))
+}
+
+/// The whole graph as N-Quads with withdrawn assertion reifiers in the
+/// explicit history graph. Withdrawn base triples are never asserted.
+pub fn to_nquads_with_history(graph: &Graph) -> String {
+    to_nquads_from_quads(dataset_quads_with_history(graph))
+}
+
+fn to_nquads_from_quads(quads: Vec<oxrdf::Quad>) -> String {
     let mut serializer = NQuadsSerializer::new().for_writer(Vec::<u8>::new());
-    for quad in dataset_quads(graph)
-        .iter()
-        .chain(vocabulary_alignment_quads().iter())
-    {
+    for quad in quads.iter().chain(vocabulary_alignment_quads().iter()) {
         serializer
             .serialize_quad(quad)
             .expect("writing N-Quads to an in-memory Vec is infallible");
@@ -51,11 +58,18 @@ pub fn to_nquads(graph: &Graph) -> String {
 /// [`to_nquads`], grouped by graph and abbreviated. `Err` only on the rare
 /// serializer I/O fault (the writer is an in-memory `Vec`, so effectively never).
 pub fn to_trig(graph: &Graph) -> Result<String, String> {
+    to_trig_from_quads(dataset_quads(graph))
+}
+
+/// TriG serialization with withdrawn assertion reifiers in the explicit
+/// history graph. Withdrawn base triples are never asserted.
+pub fn to_trig_with_history(graph: &Graph) -> Result<String, String> {
+    to_trig_from_quads(dataset_quads_with_history(graph))
+}
+
+fn to_trig_from_quads(quads: Vec<oxrdf::Quad>) -> Result<String, String> {
     let mut serializer = TriGSerializer::new().for_writer(Vec::<u8>::new());
-    for quad in dataset_quads(graph)
-        .iter()
-        .chain(vocabulary_alignment_quads().iter())
-    {
+    for quad in quads.iter().chain(vocabulary_alignment_quads().iter()) {
         serializer.serialize_quad(quad).map_err(|e| e.to_string())?;
     }
     let bytes = serializer.finish().map_err(|e| e.to_string())?;

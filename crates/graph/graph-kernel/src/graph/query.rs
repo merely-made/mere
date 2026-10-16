@@ -17,8 +17,9 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 
 use petgraph::Direction;
-use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
-use petgraph::visit::{EdgeRef, IntoEdgeReferences, UndirectedAdaptor};
+use petgraph::algo::kosaraju_scc;
+use petgraph::graph::DiGraph;
+use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
 use super::edge_payload::EdgePayload;
@@ -28,8 +29,8 @@ use super::node::Node;
 use super::snapshot::containment_parent_url;
 use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, SemanticEdgeView};
 
-/// Expand one pair-local edge bucket into its [`RelationView`] rows: one
-/// per semantic statement (`Semantic(sub_kind)` when recognized, else
+/// Expand one pair-local edge bucket into held [`RelationView`] rows: one
+/// per held semantic statement (`Semantic(sub_kind)` when recognized, else
 /// `OpenPredicate`), one for traversal-sidecar presence, and one per
 /// sub-kind in each of the remaining families. Shared by every relation
 /// iterator so per-node and whole-graph reads agree row for row.
@@ -39,7 +40,7 @@ use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, Seman
 fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<RelationView> {
     use super::edge_taxonomy::RelationKind;
     let mut out: Vec<RelationView> = Vec::new();
-    for statement in payload.semantic_statements() {
+    for statement in payload.held_semantic_statements() {
         let kind = match statement.recognized_sub_kind {
             Some(sub_kind) => RelationKind::Semantic(sub_kind),
             None => RelationKind::OpenPredicate,
@@ -152,6 +153,9 @@ mod projected_relation_tests {
                         graph_scope: GraphScope::Default,
                         provenance_iri: Some("https://author.test/".into()),
                         asserted_at_ms: Some(17),
+                        first_asserted_ms: Some(17),
+                        withdrawn: None,
+                        basis: Default::default(),
                     });
                     super::super::snapshot::persisted_edge_for_ids(from, to, &payload)
                 })
@@ -294,8 +298,10 @@ impl Graph {
             .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
     }
 
-    /// Held Surface buckets without expanding statements or lifting Resource
-    /// relations. Each handle names its exact bucket, including parallel pairs.
+    /// Retained Surface buckets without expanding statements or lifting
+    /// Resource relations. Each handle names its exact bucket, including
+    /// parallel pairs. This is a raw retained-history view; use held relation
+    /// iterators for ordinary reads. Tombstone-only buckets remain included.
     pub fn surface_relation_buckets(
         &self,
     ) -> impl Iterator<Item = (EdgeKey, NodeKey, NodeKey, &EdgePayload)> + '_ {
@@ -382,8 +388,7 @@ impl Graph {
             let to = edge.target();
             let payload = edge.weight();
             payload
-                .semantic_statements()
-                .iter()
+                .held_semantic_statements()
                 .filter_map(|statement| {
                     statement
                         .recognized_sub_kind
@@ -585,19 +590,32 @@ impl Graph {
     pub fn out_neighbors(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
         self.inner
             .inner()
-            .neighbors_directed(key, Direction::Outgoing)
+            .edges_directed(key, Direction::Outgoing)
+            .filter(|edge| edge.weight().has_held_topology())
+            .map(|edge| edge.target())
     }
 
     /// Iterate incoming neighbor keys for a node
     pub fn in_neighbors(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
         self.inner
             .inner()
-            .neighbors_directed(key, Direction::Incoming)
+            .edges_directed(key, Direction::Incoming)
+            .filter(|edge| edge.weight().has_held_topology())
+            .map(|edge| edge.source())
     }
 
     /// Iterate undirected neighbor keys for a node.
     pub fn neighbors_undirected(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
-        self.inner.inner().neighbors_undirected(key)
+        let inner = self.inner.inner();
+        let outgoing = inner
+            .edges_directed(key, Direction::Outgoing)
+            .filter(|edge| edge.weight().has_held_topology())
+            .map(|edge| edge.target());
+        let incoming = inner
+            .edges_directed(key, Direction::Incoming)
+            .filter(|edge| edge.weight().has_held_topology() && edge.source() != edge.target())
+            .map(|edge| edge.source());
+        outgoing.chain(incoming)
     }
 
     /// Undirected neighbors sorted by stable node-key order.
@@ -676,28 +694,27 @@ impl Graph {
         if self.get_node(source).is_none() {
             return HashMap::new();
         }
-        dijkstra(&UndirectedAdaptor(self.inner.inner()), source, None, |_| {
-            1_usize
-        })
-        .into_iter()
-        .collect()
+        let mut distances = HashMap::from([(source, 0)]);
+        let mut queue = VecDeque::from([source]);
+        while let Some(node) = queue.pop_front() {
+            let next_distance = distances[&node] + 1;
+            for neighbor in self.neighbors_undirected(node) {
+                if let std::collections::hash_map::Entry::Vacant(entry) = distances.entry(neighbor)
+                {
+                    entry.insert(next_distance);
+                    queue.push_back(neighbor);
+                }
+            }
+        }
+        distances
     }
 
     /// Nodes with no incoming or outgoing edges.
     pub fn orphan_node_keys(&self) -> Vec<NodeKey> {
-        let inner = self.inner.inner();
-        inner
+        self.inner
+            .inner()
             .node_indices()
-            .filter(|&key| {
-                inner
-                    .edges_directed(key, Direction::Outgoing)
-                    .next()
-                    .is_none()
-                    && inner
-                        .edges_directed(key, Direction::Incoming)
-                        .next()
-                        .is_none()
-            })
+            .filter(|&key| self.neighbors_undirected(key).next().is_none())
             .collect()
     }
 
@@ -706,14 +723,28 @@ impl Graph {
         if self.get_node(from).is_none() || self.get_node(to).is_none() {
             return None;
         }
-        astar(
-            &UndirectedAdaptor(self.inner.inner()),
-            from,
-            |node| node == to,
-            |_| 1_usize,
-            |_| 0_usize,
-        )
-        .map(|(_, path)| path)
+        let mut previous = HashMap::from([(from, from)]);
+        let mut queue = VecDeque::from([from]);
+        while let Some(node) = queue.pop_front() {
+            if node == to {
+                break;
+            }
+            for neighbor in self.neighbors_undirected(node) {
+                if let std::collections::hash_map::Entry::Vacant(entry) = previous.entry(neighbor) {
+                    entry.insert(node);
+                    queue.push_back(neighbor);
+                }
+            }
+        }
+        if !previous.contains_key(&to) {
+            return None;
+        }
+        let mut path = vec![to];
+        while *path.last().unwrap() != from {
+            path.push(previous[path.last().unwrap()]);
+        }
+        path.reverse();
+        Some(path)
     }
 
     /// Reachability in the undirected graph.
@@ -721,7 +752,7 @@ impl Graph {
         if self.get_node(from).is_none() || self.get_node(to).is_none() {
             return false;
         }
-        has_path_connecting(&UndirectedAdaptor(self.inner.inner()), from, to, None)
+        self.shortest_path(from, to).is_some()
     }
 
     /// Weakly connected components of the surface stratum (undirected projection),
@@ -848,6 +879,9 @@ impl Graph {
                     .expect("walk resource exists");
                 for direction in [Direction::Outgoing, Direction::Incoming] {
                     for edge in self.resources.inner().edges_directed(key, direction) {
+                        if !edge.weight().has_held_topology() {
+                            continue;
+                        }
                         if !selectors.is_empty()
                             && !selectors
                                 .iter()
@@ -897,12 +931,39 @@ impl Graph {
 
     /// Strongly connected components in the directed graph.
     pub fn strongly_connected_components(&self) -> Vec<Vec<NodeKey>> {
-        kosaraju_scc(self.inner.inner())
+        let mut active = DiGraph::<(), ()>::new();
+        let mut keys = Vec::new();
+        let mut mapped = HashMap::new();
+        for key in self.inner.inner().node_indices() {
+            let mapped_key = active.add_node(());
+            keys.push(key);
+            mapped.insert(key, mapped_key);
+        }
+        for edge in self
+            .inner
+            .inner()
+            .edge_references()
+            .filter(|edge| edge.weight().has_held_topology())
+        {
+            active.add_edge(mapped[&edge.source()], mapped[&edge.target()], ());
+        }
+        kosaraju_scc(&active)
+            .into_iter()
+            .map(|component| {
+                component
+                    .into_iter()
+                    .map(|node| keys[node.index()])
+                    .collect()
+            })
+            .collect()
     }
 
     /// Check if a directed edge exists from `from` to `to`
     pub fn has_edge_between(&self, from: NodeKey, to: NodeKey) -> bool {
-        self.inner.inner().find_edge(from, to).is_some()
+        self.inner
+            .inner()
+            .edges_connecting(from, to)
+            .any(|edge| edge.weight().has_held_topology())
     }
 
     /// Count of nodes in the graph
@@ -910,7 +971,8 @@ impl Graph {
         self.inner.node_count()
     }
 
-    /// Count of edges in the graph
+    /// Count of retained Surface buckets, including tombstone-only history.
+    /// Use held topology queries when asking how many relations are active.
     pub fn edge_count(&self) -> usize {
         self.inner.edge_count()
     }
@@ -976,6 +1038,9 @@ mod derivation_tests {
                         graph_scope: GraphScope::Custom("https://scope.test/walk".into()),
                         provenance_iri: Some("https://author.test/walk".into()),
                         asserted_at_ms: Some(17),
+                        first_asserted_ms: Some(17),
+                        withdrawn: None,
+                        basis: Default::default(),
                     });
                     super::super::snapshot::persisted_edge_for_ids(from, to, &payload)
                 })

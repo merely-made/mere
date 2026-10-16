@@ -22,7 +22,19 @@ pub(crate) const RDF_OBJECT: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#
 pub(crate) fn is_statement_metadata(predicate: &str) -> bool {
     matches!(
         predicate,
-        crate::RDFS_LABEL | crate::PROV_WAS_ATTRIBUTED_TO | crate::PROV_GENERATED_AT_TIME
+        crate::RDFS_LABEL
+            | crate::PROV_WAS_ATTRIBUTED_TO
+            | crate::PROV_GENERATED_AT_TIME
+            | crate::PROV_INVALIDATED_AT_TIME
+            | crate::PROV_WAS_INVALIDATED_BY
+            | crate::PROV_WAS_GENERATED_BY
+            | crate::PROV_WAS_DERIVED_FROM
+            | crate::PROV_WAS_ASSOCIATED_WITH
+            | crate::MERE_LAST_ASSERTED_AT
+            | crate::MERE_METHOD_VERSION
+            | crate::MERE_LIFECYCLE_VERSION
+            | crate::MERE_ASSERTED_GRAPH_KIND
+            | crate::MERE_ASSERTED_GRAPH_NAME
     )
 }
 
@@ -32,6 +44,27 @@ pub(crate) fn representable_metadata(predicate: &str, object: &Term) -> bool {
             literal.language().is_none() && literal.datatype().as_str() == crate::XSD_STRING
         },
         (crate::PROV_WAS_ATTRIBUTED_TO, Term::NamedNode(_)) => true,
+        (
+            crate::PROV_WAS_GENERATED_BY
+            | crate::PROV_WAS_DERIVED_FROM
+            | crate::PROV_WAS_INVALIDATED_BY,
+            Term::NamedNode(_),
+        ) => true,
+        (
+            crate::PROV_INVALIDATED_AT_TIME | crate::MERE_LAST_ASSERTED_AT,
+            Term::Literal(literal),
+        ) => {
+            literal.datatype().as_str() == crate::XSD_DATETIME
+                && crate::ingest::parse_xsd_datetime_ms(literal.value()).is_some()
+        },
+        (
+            crate::MERE_METHOD_VERSION
+            | crate::MERE_LIFECYCLE_VERSION
+            | crate::MERE_ASSERTED_GRAPH_KIND
+            | crate::MERE_ASSERTED_GRAPH_NAME,
+            Term::Literal(literal),
+        ) => literal.language().is_none() && literal.datatype().as_str() == crate::XSD_STRING,
+        (crate::PROV_WAS_ASSOCIATED_WITH, Term::NamedNode(_)) => true,
         (crate::PROV_GENERATED_AT_TIME, Term::Literal(literal)) => {
             literal.datatype().as_str() == crate::XSD_DATETIME
                 && crate::ingest::parse_xsd_datetime_ms(literal.value()).is_some()
@@ -141,13 +174,25 @@ fn subject_object(
 }
 
 pub(crate) fn export(graph: &Graph, compact: bool) -> Value {
+    export_with_projection(graph, compact, crate::AssertionProjection::Held)
+}
+
+pub(crate) fn export_with_projection(
+    graph: &Graph,
+    compact: bool,
+    projection: crate::AssertionProjection,
+) -> Value {
     let mut graphs: BTreeMap<Option<String>, Subjects> = BTreeMap::new();
     // Preserve the legacy presentation of otherwise undescribed surfaces.
     let default = graphs.entry(None).or_default();
     for (_, node) in graph.nodes() {
         default.entry(crate::node_id(node)).or_default();
     }
-    for quad in classic_quads(crate::dataset_quad_iter(graph)) {
+    let dataset = match projection {
+        crate::AssertionProjection::Held => crate::dataset_quads(graph),
+        crate::AssertionProjection::History => crate::dataset_quads_with_history(graph),
+    };
+    for quad in classic_quads(dataset.into_iter()) {
         let graph_id = match &quad.graph_name {
             GraphName::DefaultGraph => None,
             GraphName::NamedNode(node) => Some(node.as_str().to_string()),
@@ -249,7 +294,16 @@ pub(crate) fn bridge_classic_reification(quads: Vec<Quad>) -> Vec<Quad> {
             object.clone(),
             graph.clone(),
         );
-        if !present.contains(&base) {
+        let history_only = graph
+            == &GraphName::NamedNode(NamedNode::new_unchecked(crate::ASSERTION_HISTORY_GRAPH_IRI))
+            && rows
+                .iter()
+                .any(|quad| quad.predicate.as_str() == crate::MERE_ASSERTED_GRAPH_KIND)
+            && rows.iter().any(|quad| {
+                quad.predicate.as_str() == crate::PROV_INVALIDATED_AT_TIME
+                    || quad.predicate.as_str() == crate::PROV_WAS_INVALIDATED_BY
+            });
+        if !present.contains(&base) && !history_only {
             continue;
         }
         if rows.iter().any(|quad| {
@@ -269,6 +323,14 @@ pub(crate) fn bridge_classic_reification(quads: Vec<Quad>) -> Vec<Quad> {
             crate::RDFS_LABEL,
             crate::PROV_WAS_ATTRIBUTED_TO,
             crate::PROV_GENERATED_AT_TIME,
+            crate::MERE_LAST_ASSERTED_AT,
+            crate::MERE_METHOD_VERSION,
+            crate::MERE_LIFECYCLE_VERSION,
+            crate::MERE_ASSERTED_GRAPH_KIND,
+            crate::MERE_ASSERTED_GRAPH_NAME,
+            crate::PROV_INVALIDATED_AT_TIME,
+            crate::PROV_WAS_INVALIDATED_BY,
+            crate::PROV_WAS_GENERATED_BY,
         ]
         .iter()
         .any(|predicate| {
