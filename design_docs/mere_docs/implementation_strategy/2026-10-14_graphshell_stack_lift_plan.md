@@ -508,7 +508,11 @@ wasm-clean) and the live lane behind `webrtc-session`; the transport note's
 shared admission entry and line codec came with it (Progress). *Kept in the
 port:* `native::resident_identity`, whose trait names the browser carrier's
 native-identity vocabulary and `identity_projection`'s unlock policy (Progress).
-*Open:* Cleromancy's receipt.
+*Cleromancy consumer receipt (2026-10-15):* `9aae258` uses
+`graphshell_host::endpoint_catalog::ResidentEndpointCatalog` and
+`graphshell_host::lifecycle::AdmittedEndpointContext`; its A18 admitted-context
+and A19 catalog-registration tests pass against locked Mere `59f88e63`.
+See Progress for scope.
 
 **P5. L3, Djinn takes the server halves.** After P4, because `app_broker` and
 `browser_host` use `session_loop` and `session_notices`.
@@ -1489,3 +1493,17 @@ fast-forward of local main; nothing built).**
   `validation/relationship-recipe` bin test target lacks a `tempfile`
   dev-dependency, which its manifest never declared. Still on `rev`, on purpose:
   `wavicle` (Woodshed), `turquet`, `wgpu-graft`, the `mark-ik` forks.
+
+- **2026-10-15 (P4, Cleromancy's second-host receipt):** Cleromancy `9aae258`
+  retains the extracted endpoint registration/admission path in
+  `cleromancy/src/admitted.rs`. `resident_catalog_opens_cleromancy_under_the_admitted_session`
+  and `admitted_context_scopes_cleromancy_to_the_browser_session_and_subject`
+  pass in the explicit `legacy-receipts,personal-sync,graphshell-admission`
+  harness against locked Mere `59f88e63`. Registration and admitted context
+  name `graphshell-host`, with local carrier/client types from their stack
+  crates. The only direct port import in the adapter is feature-gated
+  `graphshell::personal_sync::SyncProjection`; the Graphshell package also
+  remains in the resolved dependency graph. This is the P4 endpoint-path
+  consumer proof, not L13/P8 removal of the port or new native acceptance.
+  `cleromancy/receipts/family-intake_20261015.json` records the software intake
+  and preserves the original C1/C2 qualification identities.
