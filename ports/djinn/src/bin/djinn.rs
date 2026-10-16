@@ -1015,6 +1015,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // The credential keys follow the vault's lock (vault lock ruling 1).
     #[cfg(feature = "personal-sync")]
     personae.register_lock_holder(resident.credential_lock_holder());
+    #[cfg(feature = "inference")]
+    if let Some(holder) = resident.inference_lock_holder() {
+        personae.register_lock_holder(holder);
+    }
     #[cfg(feature = "cxf")]
     keeper.attach_credential_stores(
         profile_id.clone(),

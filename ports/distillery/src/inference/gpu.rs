@@ -38,34 +38,49 @@ pub fn open_gpu_library_lane<B: eidetic::Store + Send + 'static>(
     max_tokens: usize,
     access: GpuAccess,
 ) -> InferenceLane {
+    open_gpu_library_lane_with_journal(library, row, max_tokens, access, None)
+        .expect("ephemeral GPU lane")
+}
+
+pub fn open_gpu_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    row: eidetic::ManifestId,
+    max_tokens: usize,
+    access: GpuAccess,
+    journal: Option<Arc<dyn super::RunJournal>>,
+) -> Result<InferenceLane, String> {
     let loading = access.request();
-    InferenceLane::try_open_with_max_tokens(max_tokens, move || {
-        let _loading = loading;
-        let (device, facts) = discrete_gpu_inference_device().map_err(InferError::Backend)?;
-        let resolved = {
-            let mut store = library.blocking_lock();
-            pollster::block_on(esp::infer::library::resolve_library_session(
-                &mut *store,
-                row,
-            ))?
-        };
-        let capability = resolved.capability("burn-wgpu")?;
-        let session = resolved.session("burn-wgpu");
-        let identity = SessionIdentity {
-            session_id: session.id()?.to_string(),
-            prompt_template_hash: session.prompt_template_hash.to_string(),
-        };
-        // Facts come from the same explicit adapter selection as the device.
-        eprintln!("resident inference GPU: {facts}");
-        Ok(Box::new(GpuLibraryProvider {
-            resolved,
-            device,
-            access,
-            max_tokens,
-            capability,
-            identity,
-        }))
-    })
+    InferenceLane::try_open_with_journal(
+        max_tokens,
+        move || {
+            let _loading = loading;
+            let (device, facts) = discrete_gpu_inference_device().map_err(InferError::Backend)?;
+            let resolved = {
+                let mut store = library.blocking_lock();
+                pollster::block_on(esp::infer::library::resolve_library_session(
+                    &mut *store,
+                    row,
+                ))?
+            };
+            let capability = resolved.capability("burn-wgpu")?;
+            let session = resolved.session("burn-wgpu");
+            let identity = SessionIdentity {
+                session_id: session.id()?.to_string(),
+                prompt_template_hash: session.prompt_template_hash.to_string(),
+            };
+            // Facts come from the same explicit adapter selection as the device.
+            eprintln!("resident inference GPU: {facts}");
+            Ok(Box::new(GpuLibraryProvider {
+                resolved,
+                device,
+                access,
+                max_tokens,
+                capability,
+                identity,
+            }))
+        },
+        journal,
+    )
 }
 
 struct GpuLibraryProvider {
@@ -78,6 +93,40 @@ struct GpuLibraryProvider {
 }
 
 impl InferenceProvider for GpuLibraryProvider {
+    fn generate_checkpointed(
+        &self,
+        request: &GenerationRequest,
+        resume: Option<&esp::infer::provider::GenerationCheckpoint>,
+        commit: &mut dyn FnMut(
+            &esp::infer::provider::GenerationCheckpoint,
+        ) -> Result<(), InferError>,
+        stop: &mut dyn FnMut() -> bool,
+    ) -> Result<esp::infer::provider::GenerationCheckpoint, InferError> {
+        // A paused ask releases its device tensors and exclusive guard. The
+        // exact session's host buffers remain ready for the next prefill.
+        let reservation = self.access.request();
+        let Some(_guard) = reservation.acquire(stop) else {
+            // A fresh ask still needs its initial durable checkpoint; load
+            // and prefill have not begun, so the actor reports a boundary pause.
+            return resume.cloned().ok_or(InferError::Interrupted);
+        };
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let provider = self
+                .resolved
+                .load(&self.device, "burn-wgpu", self.max_tokens)?;
+            provider.generate_checkpointed(request, resume, commit, stop)
+        }))
+        .unwrap_or_else(|_| {
+            Err(InferError::Backend(
+                "GPU checkpoint generation panicked".into(),
+            ))
+        });
+        self.device
+            .sync()
+            .map_err(|error| InferError::Backend(format!("GPU synchronize: {error}")))?;
+        result
+    }
+
     fn capability(&self) -> &ModelCapability {
         &self.capability
     }

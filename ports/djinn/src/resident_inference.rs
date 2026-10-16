@@ -16,6 +16,9 @@
 
 use crate::settings::OwnerSettings;
 
+#[cfg(feature = "inference")]
+pub const INFERENCE_DATA_SALT: &[u8] = b"mere.djinn/inference/data/v1";
+
 /// Refuse inference settings this build or this resident cannot honour.
 /// Called before any lane opens, so a refusal leaves nothing to unwind.
 pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
@@ -104,6 +107,11 @@ mod lane {
     /// The open lane.
     pub struct ResidentInference {
         lane: InferenceLane,
+        journal: Option<
+            std::sync::Arc<
+                distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
+            >,
+        >,
     }
 
     impl ResidentInference {
@@ -112,7 +120,12 @@ mod lane {
             settings: &InferenceLaneSettings,
             library: Option<std::sync::Arc<tokio::sync::Mutex<muniment::RedbBackend>>>,
             gpu_access: distillery::gpu::GpuAccess,
-        ) -> Self {
+            journal: Option<
+                std::sync::Arc<
+                    distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
+                >,
+            >,
+        ) -> Result<Self, String> {
             #[cfg(not(feature = "inference-gpu"))]
             let _ = gpu_access;
             let lane = match &settings.model {
@@ -124,34 +137,51 @@ mod lane {
                     row,
                     max_tokens,
                     device: crate::settings::InferenceDeviceSettings::Gpu,
-                } => distillery::inference::open_gpu_library_lane(
+                } => distillery::inference::open_gpu_library_lane_with_journal(
                     library.expect("resident opens the model library first"),
                     distillery::inference::parse_model_row(row).expect("validated model row"),
                     *max_tokens,
                     gpu_access,
-                ),
+                    journal.as_ref().map(|journal| {
+                        journal.clone() as std::sync::Arc<dyn distillery::inference::RunJournal>
+                    }),
+                )?,
                 InferenceModelSettings::Library {
                     row,
                     max_tokens,
                     device: crate::settings::InferenceDeviceSettings::Cpu,
-                } => distillery::inference::open_library_lane(
+                } => distillery::inference::open_library_lane_with_journal(
                     library.expect("resident opens the model library first"),
                     distillery::inference::parse_model_row(row)
                         .expect("validated before opening lanes"),
                     *max_tokens,
-                ),
+                    journal.as_ref().map(|journal| {
+                        journal.clone() as std::sync::Arc<dyn distillery::inference::RunJournal>
+                    }),
+                )?,
                 #[cfg(not(feature = "inference-gpu"))]
                 InferenceModelSettings::Library {
                     device: crate::settings::InferenceDeviceSettings::Gpu,
                     ..
                 } => unreachable!("validate refuses GPU settings without inference-gpu"),
             };
-            Self { lane }
+            Ok(Self { lane, journal })
         }
 
         /// The lane itself, for in-process callers.
         pub fn lane(&self) -> &InferenceLane {
             &self.lane
+        }
+
+        pub fn lock_holder(
+            &self,
+            profile: personae::ProfileId,
+        ) -> std::sync::Arc<dyn castellan::lock::VaultLockHolder> {
+            std::sync::Arc::new(InferenceLock {
+                lane: self.lane.clone(),
+                journal: self.journal.clone(),
+                profile,
+            })
         }
 
         /// Register `inference.ask`; each admitted session gets its own
@@ -179,7 +209,54 @@ mod lane {
         pub async fn close(self) -> Result<(), String> {
             tokio::task::spawn_blocking(move || self.lane.close())
                 .await
-                .map_err(|error| format!("join the inference lane's close: {error}"))?
+                .map_err(|error| format!("join the inference lane's close: {error}"))??;
+            if let Some(journal) = self.journal {
+                journal.shutdown().await?;
+            }
+            Ok(())
+        }
+    }
+    struct InferenceLock {
+        lane: InferenceLane,
+        journal: Option<
+            std::sync::Arc<
+                distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
+            >,
+        >,
+        profile: personae::ProfileId,
+    }
+    impl castellan::lock::VaultLockHolder for InferenceLock {
+        fn name(&self) -> &str {
+            "resident inference"
+        }
+        fn key_profile(&self) -> Option<&personae::ProfileId> {
+            Some(&self.profile)
+        }
+        fn lock(&self) {
+            if let Err(error) = self.lane.set_locked(true) {
+                tracing::error!(%error, "inference pause failed at lock");
+            }
+            self.lane.forget_locked_materialization();
+            if let Some(journal) = &self.journal {
+                journal.lock();
+            }
+        }
+        fn unlock(
+            &self,
+            vault: &dyn personae::IdentityProvider,
+        ) -> Result<(), personae::IdentityError> {
+            if let Some(journal) = &self.journal {
+                journal.unlock(vault.derive_keypair(super::INFERENCE_DATA_SALT)?.to_seed());
+            }
+            if let Err(error) = self.lane.refresh_retained_runs() {
+                tracing::error!(%error, "inference retained runs could not reopen");
+                return Err(personae::IdentityError::Backend(error));
+            }
+            if let Err(error) = self.lane.set_locked(false) {
+                tracing::error!(%error, "inference resume failed at unlock");
+                return Err(personae::IdentityError::Backend(error));
+            }
+            Ok(())
         }
     }
 }

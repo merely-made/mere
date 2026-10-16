@@ -358,6 +358,26 @@ async fn exercise_route(library_model: bool) {
         .await,
         IntentResult::Rejected { .. }
     ));
+    if library_model {
+        let holder = resident
+            .inference_lock_holder()
+            .expect("library inference has a lock hook");
+        holder.lock();
+        assert!(
+            client.snapshot(request.clone()).await.is_err(),
+            "a previously admitted session cannot snapshot private runs while locked"
+        );
+        holder.unlock(&identity).unwrap();
+        // Some carriers close after a refused request. Reopen through the
+        // same app door and confirm the retained answer, not an empty lane.
+        let _ = client.close().await;
+        client = open(&endpoint, "turnstone").await.unwrap();
+        let opened = client.open_session().await.unwrap();
+        let unlocked_request = opened.descriptor.projections[0].request.clone();
+        let unlocked = read_runs(&mut client, &unlocked_request).await;
+        assert_eq!(unlocked.runs[0].text, expected_text);
+        assert_eq!(unlocked.runs[0].state, RunStateV1::Finished);
+    }
     client.close().await.unwrap();
 
     // Granted to Turnstone alone (ruling 8).

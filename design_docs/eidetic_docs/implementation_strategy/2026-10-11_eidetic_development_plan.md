@@ -458,7 +458,12 @@ Compose one real goal/query consumer with Fleece traversal and ESP assessment.
 Distillery's inference surface uses exact model sessions and retains input
 references, settings, output references and terminal status in Eidetic. Cancelled
 or partial work must remain distinguishable from completed work. Graph changes
-remain proposals admitted by the owning application. This is the evidence side
+remain proposals admitted by the owning application. The 2026-10-15 resident
+inference I3 slice adds the `models::inference::InferenceRunRecord` binding for
+question/output/checkpoint references, request and exact-session evidence,
+distinct terminal/paused states, device visits and actual comparison provenance.
+Distillery retains it in the encrypted checkpoint log; supplied passage refs
+remain empty until I4, and derived tag proposals remain separate. This is the evidence side
 of the Distillery plan's M2/M3, not another execution supervisor.
 
 **Done when:** restart accepts a matching embedding envelope and rejects a

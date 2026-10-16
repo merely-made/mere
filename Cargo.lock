@@ -4588,6 +4588,7 @@ dependencies = [
  "burn-ir",
  "burn-remote",
  "cambium",
+ "chacha20poly1305 0.11.0",
  "chirograph",
  "eidetic",
  "esp",
@@ -4607,9 +4608,11 @@ dependencies = [
  "muniment",
  "notochord",
  "p2panda-core",
+ "p2panda-store",
  "pandect",
  "personae",
  "pollster 0.4.0",
+ "rand_core 0.6.4",
  "safetensors 0.4.5",
  "sceno",
  "scenomise",
@@ -5366,6 +5369,7 @@ dependencies = [
  "tokenizers",
  "tracing",
  "wgpu",
+ "zeroize",
 ]
 
 [[package]]

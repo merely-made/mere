@@ -10,6 +10,11 @@ keywords = ["inference", "embedding", "mesh", "harness", "compute"]
 categories = ["concurrency"]
 
 [dependencies]
+stickleback = { workspace = true, optional = true }
+p2panda-store = { version = "0.7.0", default-features = false, optional = true }
+chacha20poly1305 = { version = "0.11", optional = true }
+rand_core = { version = "0.6", features = ["getrandom"], optional = true }
+zeroize = { version = "1", optional = true }
 insigne.workspace = true
 mesh = { workspace = true, features = ["admitted-ingress"] }
 incipit.workspace = true
@@ -62,9 +67,10 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 # model runtime: the host supplies the provider.
 inference = ["dep:esp", "esp/actor", "dep:armillary"]
 inference-gpu = ["inference-model", "esp/decoder-wgpu"]
-inference-model = ["inference", "esp/decoder", "esp/model-session", "dep:eidetic", "dep:pollster"]
+inference-model = ["inference", "esp/decoder", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]
 
 [dev-dependencies]
+safetensors = "0.4"
 notochord = { workspace = true, features = ["tokio"] }
 stickleback.workspace = true
 # Tests and examples bind throwaway identities (vault lock plan, ruling 96).

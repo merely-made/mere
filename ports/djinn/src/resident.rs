@@ -183,14 +183,79 @@ impl DjinnResident {
                 } else {
                     None
                 };
-                Some(ResidentInference::open(
-                    settings,
-                    library,
-                    distillery
-                        .as_ref()
-                        .expect("validated Distillery lane")
-                        .gpu_access(),
-                ))
+                let opening = async {
+                    let journal = if library.is_some() {
+                        let key = identity
+                            .derive_keypair(resident_inference::INFERENCE_DATA_SALT)
+                            .map_err(|error| error.to_string())?
+                            .to_seed();
+                        Some(
+                            distillery
+                                .as_ref()
+                                .expect("validated Distillery lane")
+                                .inference_journal(key)?,
+                        )
+                    } else {
+                        None
+                    };
+                    let opening = ResidentInference::open(
+                        settings,
+                        library,
+                        distillery
+                            .as_ref()
+                            .expect("validated Distillery lane")
+                            .gpu_access(),
+                        journal.clone(),
+                    );
+                    match opening {
+                        Ok(inference) => {
+                            if let Some(journal) = &journal {
+                                if let Err(error) = distillery
+                                    .as_ref()
+                                    .expect("validated Distillery lane")
+                                    .join_inference_journal(journal)
+                                    .await
+                                {
+                                    let closing = inference.close().await.err();
+                                    return Err(format!(
+                                        "join inference log: {error}; close: {closing:?}"
+                                    ));
+                                }
+                            }
+                            Ok(inference)
+                        },
+                        Err(error) => {
+                            if let Some(journal) = journal {
+                                if let Err(closing) = journal.shutdown().await {
+                                    return Err(format!("{error}; close inference log: {closing}"));
+                                }
+                            }
+                            Err(error)
+                        },
+                    }
+                }
+                .await;
+                match opening {
+                    Ok(lane) => Some(lane),
+                    Err(error) => {
+                        let mut message = format!("open resident inference: {error}");
+                        if let Some(lane) = distillery {
+                            if let Err(error) = lane.close().await {
+                                message.push_str(&format!("; close Distillery: {error}"));
+                            }
+                        }
+                        if let Some(lane) = knot {
+                            if let Err(error) = lane.close().await {
+                                message.push_str(&format!("; close Knot: {error}"));
+                            }
+                        }
+                        drop(site);
+                        if let Err(error) = blobs.shutdown().await {
+                            message.push_str(&format!("; close blob custody: {error}"));
+                        }
+                        return Err(message);
+                    },
+                }
             },
             None => None,
         };
@@ -255,6 +320,13 @@ impl DjinnResident {
     pub fn credential_lock_holder(&self) -> Arc<dyn VaultLockHolder> {
         self.credentials
             .lock_holder_for_profile(CASTELLAN_SALTS, self.credential_profile.clone())
+    }
+
+    #[cfg(feature = "inference")]
+    pub fn inference_lock_holder(&self) -> Option<Arc<dyn VaultLockHolder>> {
+        self.inference
+            .as_ref()
+            .map(|lane| lane.lock_holder(self.credential_profile.clone()))
     }
 
     /// Claim existing credential stores under each persisted persona's own keys.

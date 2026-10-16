@@ -3,7 +3,8 @@
 **Date:** 2026-10-15
 **Status (2026-10-15):** in progress. I1 and I2 done (§7): strict decoder,
 declared templates, CPU and GPU model rows, and native trainer owner reclaim
-pass on O-PC. I3 is next. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
+pass on O-PC. I3's checkpoint, restart and lock path is implemented; the
+production boundary for separately rooted paired devices remains open. Rulings 1 to 14 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
 
@@ -869,3 +870,73 @@ Stop and record the reason if any of these happen:
     repository baseline; this continuation adds no new audit findings.
   - *Next:* I3's durable ask checkpoints and lock pause/resume. I2 is closed;
     the installed-binary and headed answer-card gates are still separate.
+
+- **2026-10-15, I3 durable generation and local recovery.** ESP's portable
+  checkpoint carries the rendered request, exact session/template, prompt IDs,
+  generated IDs, actual seed, committed draw count, accumulated text and completion
+  marker. No KV tensors are serialized. The decoder pre-fills those IDs on resume
+  and advances splitmix64 by the recorded number of draws. A host-supplied commit
+  barrier runs before each checkpoint becomes visible; a failed write prevents
+  another token. Unsupported providers refuse durable generation. The legacy
+  stub and the actor-only Distillery feature remain ephemeral fixtures.
+  - *Retained evidence.* Eidetic owns `models::inference::InferenceRunRecord`:
+    question/output/checkpoint references, actual request settings, exact session,
+    status, device visits and explicit token-comparison evidence. Distillery's
+    encrypted journal carries those records and their schema reference beside
+    checkpoint deltas. State transitions also materialize sealed native Eidetic
+    manifests and opaque question/output/checkpoint blobs through `save_typed_sealed`;
+    retained reads use `load_typed_sealed` with `NoFetcher`. Remote log replay can
+    rebuild the same typed projection. Passage refs are empty until I4 supplies
+    retained passages. Paused, cancelled partial, failed and finished remain
+    distinct; a token-complete run ends only after provider synchronization.
+  - *Lifecycle and route.* Library asks are retained in `inference.redb` below
+    the existing Distillery mesh root. A local interrupted or shutdown-paused ask
+    resumes at reopen; a user-paused ask waits for Resume. Pause/Resume intents
+    use the run-name payload, and a separate sampled Ask intent records explicit
+    temperature, top-p, seed and owner-capped token count. A synchronous vault
+    lock holder refuses route access, waits for the actor boundary, clears run
+    materialization and registered endpoint caches, and drops the data key.
+    Unlock derives that key again, reloads retained state and resumes only
+    lock-paused asks. GPU pauses discard KV/device tensors and synchronize before
+    releasing the guard; keeping weights allocated is permitted, not required,
+    by ruling 11. Shutdown joins inference and its sync lane before Distillery.
+  - *Log mechanics.* `PersonaRunJournal` signs per-device, per-ask logs through
+    Stickleback's existing muniment store and policy-before-insert processor.
+    XChaCha20-Poly1305 seals checkpoint contents under a separate persona-derived
+    data salt, binding the signed log address as associated data. Immutable
+    prompt bytes occur at creation; ordinary token entries append only new IDs
+    and text. Explicit device/state visits carry snapshots. Replay retains
+    current prefixes rather than every historical prefix in memory. Concurrent
+    continuation tips are refused as a visible fork. An uninterrupted comparison
+    stores the reference token-ID hash and first differing position; an absent
+    comparison hash means unmeasured, not matched.
+  - *Qualification boundary.* The existing Distillery endpoint carries the
+    journal lane; a native two-host test uses independent transport endpoints
+    and the same journal persona key. It proves real p2panda catch-up, continuation
+    on the second host, device/position provenance and equal seeded IDs. It does
+    not prove a second physical computer, or grant separately rooted paired
+    personal-graph devices access. Personal sync already pairs such roots and
+    supplies its own key group. Whether private asks follow that keyed group or
+    only shared persona keys is an explicit pending boundary; the current
+    implementation preserves the narrower shared-persona admission. I3 stays
+    open until that production binding is settled and qualified. No installed
+    resident or heap-residue audit is claimed by these tests.
+  - *Checks.* ESP passes 160 release unit tests, both durable decoder tests
+    (every pause boundary under greedy and seeded top-p sampling, failed-commit
+    barrier and bad draw-position refusal), and 82 bare-feature tests. The pinned
+    real SmolLM2 GPU row matches all 39 independent greedy IDs and all 39 resumed
+    IDs after a three-token pause, with no differing position on this backend.
+    Distillery passes 36 unit tests and eight durability test entries, including
+    the child-process harness; these cover seven scenarios. The seven local
+    entries pass 20 repeated runs, excluding only the network scenario. A real
+    child process is killed while held after its committed third token, then its
+    redb log reopens and finishes at the recorded seed/draw position. The native
+    two-host LogSync test proves catch-up and an explicit transfer; cryptographic
+    negative controls refuse wrong persona signers, wrong keys, modified bodies
+    and unsealed reads, and concurrent continuation tips remain a visible fork.
+    Djinn passes all three real app-broker tests, now including lock/refusal and
+    sealed retained-answer reopen, all three GPU trainer-reclaim regressions, and
+    four default-feature settings tests. Formatting and the documentation audit
+    add no findings beyond the recorded repository baseline. Exact source and
+    binary hashes, commands and qualified limits are in
+    [the durable-ask receipt](../../../support/receipts/resident_inference_durable.json).

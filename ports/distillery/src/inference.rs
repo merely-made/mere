@@ -16,7 +16,8 @@
 //! which streamed fragments reach a client.
 //!
 //! `inference-model` adds local model-library resolution and a session-bound
-//! declared template. Pause/resume (I3) and recall/citations (I4) follow.
+//! declared template. A persona journal adds token checkpoints and lock pause/
+//! resume (I3); recall and citations remain I4.
 
 use std::collections::HashMap;
 use std::sync::mpsc::Receiver;
@@ -32,7 +33,11 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use esp::infer::{GenerationRequest, InferCommand, InferUpdate, spawn_inference_actor_fallible};
+use esp::infer::actor::spawn_inference_actor_with_checkpoints;
+use esp::infer::provider::GenerationCheckpoint;
+use esp::infer::{GenerationRequest, InferCommand, InferUpdate};
+#[cfg(feature = "inference-model")]
+pub mod durable;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
@@ -46,7 +51,9 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "inference-gpu")]
 mod gpu;
 #[cfg(feature = "inference-gpu")]
-pub use gpu::{discrete_gpu_inference_device, open_gpu_library_lane};
+pub use gpu::{
+    discrete_gpu_inference_device, open_gpu_library_lane, open_gpu_library_lane_with_journal,
+};
 
 #[cfg(feature = "inference-model")]
 pub use esp::infer::decoder::DecoderDevice as InferenceDevice;
@@ -75,17 +82,32 @@ pub fn open_library_lane<B: eidetic::Store + Send + 'static>(
     row: eidetic::ManifestId,
     max_tokens: usize,
 ) -> InferenceLane {
-    InferenceLane::try_open_with_max_tokens(max_tokens, move || {
-        let resolved = {
-            let mut store = library.blocking_lock();
-            pollster::block_on(esp::infer::library::resolve_library_session(
-                &mut *store,
-                row,
-            ))?
-        };
-        let provider = resolved.load(&InferenceDevice::ndarray(), "burn-ndarray", max_tokens)?;
-        Ok(Box::new(provider))
-    })
+    open_library_lane_with_journal(library, row, max_tokens, None).expect("ephemeral library lane")
+}
+
+#[cfg(feature = "inference-model")]
+pub fn open_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    row: eidetic::ManifestId,
+    max_tokens: usize,
+    journal: Option<Arc<dyn RunJournal>>,
+) -> Result<InferenceLane, String> {
+    InferenceLane::try_open_with_journal(
+        max_tokens,
+        move || {
+            let resolved = {
+                let mut store = library.blocking_lock();
+                pollster::block_on(esp::infer::library::resolve_library_session(
+                    &mut *store,
+                    row,
+                ))?
+            };
+            let provider =
+                resolved.load(&InferenceDevice::ndarray(), "burn-ndarray", max_tokens)?;
+            Ok(Box::new(provider))
+        },
+        journal,
+    )
 }
 
 /// The first-party route an application asks through.
@@ -103,6 +125,23 @@ pub const ASK_INTENT: &str = "distillery.inference/ask-v1";
 
 /// Cancel a run. Payload: [`CancelRequestV1`] as JSON.
 pub const CANCEL_INTENT: &str = "distillery.inference/cancel-v1";
+/// Pause a durable run, retaining its token checkpoint.
+pub const PAUSE_INTENT: &str = "distillery.inference/pause-v1";
+/// Resume a retained run with its recorded generation settings.
+pub const RESUME_INTENT: &str = "distillery.inference/resume-v1";
+/// Ask with explicit sampling settings, still bounded by the owner cap.
+pub const ASK_SAMPLED_INTENT: &str = "distillery.inference/ask-sampled-v1";
+
+/// Sampling controls accepted by [`ASK_SAMPLED_INTENT`].
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SampledAskRequestV1 {
+    pub ask: AskRequestV1,
+    pub max_tokens: usize,
+    pub temperature: f32,
+    pub top_p: Option<f32>,
+    pub seed: Option<u64>,
+}
 
 /// The `Ask` intent's payload. The caller names the run, so it can find the
 /// run in the table without a reply channel: an intent result carries no data.
@@ -131,6 +170,8 @@ pub enum RunStateV1 {
     Queued,
     /// Generating; `text` grows.
     Running,
+    /// Stopped at a durable token boundary.
+    Paused,
     /// Complete; `text` is the whole answer.
     Finished,
     /// Stopped by a cancel; `text` is what was generated before it.
@@ -161,6 +202,10 @@ pub struct RunV1 {
     pub error: Option<String>,
     /// Exact session used for this run, absent for a stub or failed load.
     pub session: Option<esp::infer::provider::SessionIdentity>,
+    #[serde(default)]
+    pub tokens: usize,
+    #[serde(default)]
+    pub continuations: Vec<Continuation>,
 }
 
 /// The run table, as the route serves it.
@@ -193,11 +238,57 @@ pub enum InferenceLaneError {
     /// The lane has closed.
     #[error("the inference lane is closed")]
     Closed,
+    #[error("the inference route is locked")]
+    Locked,
+    #[error("inference journal: {0}")]
+    Journal(String),
 }
 
-struct RunRecord {
+/// Retained host state. Journals serialize this beside Eidetic evidence;
+/// execution IDs and in-flight flags are local materialization details.
+#[derive(Clone, Serialize, Deserialize)]
+pub struct RunRecord {
     view: RunV1,
     actor_id: u64,
+    request: GenerationRequest,
+    checkpoint: Option<GenerationCheckpoint>,
+    #[serde(default)]
+    continuations: Vec<Continuation>,
+    #[serde(default)]
+    pause_reason: Option<String>,
+    #[serde(skip)]
+    executing: bool,
+}
+
+#[cfg(feature = "inference-model")]
+impl Drop for RunRecord {
+    fn drop(&mut self) {
+        use zeroize::Zeroize;
+        self.view.question.zeroize();
+        self.view.text.zeroize();
+        self.request.clear_private();
+    }
+}
+
+/// One actual visit to a device, recorded before continuation starts.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Continuation {
+    pub device: String,
+    pub at_token: usize,
+    pub reason: String,
+    pub first_differing_token: Option<usize>,
+    #[serde(default)]
+    pub compared_token_ids_hash: Option<String>,
+}
+
+/// Synchronous durable barrier supplied by the persona's log owner.
+pub trait RunJournal: Send + Sync {
+    fn device(&self) -> &str;
+    fn load(&self) -> Result<Vec<RunRecord>, String>;
+    fn append(&self, record: &RunRecord) -> Result<(), String>;
+    fn remote_revision(&self) -> u64 {
+        0
+    }
 }
 
 #[derive(Default)]
@@ -208,6 +299,8 @@ struct RunTable {
     runs: Vec<RunRecord>,
     by_actor_id: HashMap<u64, usize>,
     next_actor_id: u64,
+    locked: bool,
+    seen_remote_revision: u64,
     /// Bumped on every change a client can see.
     generation: u64,
 }
@@ -219,7 +312,19 @@ impl RunTable {
             model: self.model.clone(),
             session: self.session.clone(),
             load_error: self.load_error.clone(),
-            runs: self.runs.iter().map(|record| record.view.clone()).collect(),
+            runs: self
+                .runs
+                .iter()
+                .map(|record| {
+                    let mut view = record.view.clone();
+                    view.tokens = record
+                        .checkpoint
+                        .as_ref()
+                        .map_or(0, |cp| cp.token_ids.len());
+                    view.continuations = record.continuations.clone();
+                    view
+                })
+                .collect(),
         }
     }
 
@@ -235,33 +340,60 @@ impl RunTable {
             InferUpdate::Ready { capability } => self.model = Some(capability.model_id),
             InferUpdate::Session { identity } => {
                 for record in &mut self.runs {
-                    record.view.session = Some(identity.clone());
+                    if record.view.session.is_none()
+                        && matches!(record.view.state, RunStateV1::Queued | RunStateV1::Running)
+                    {
+                        record.view.session = Some(identity.clone());
+                    }
                 }
                 self.session = Some(identity);
             },
             InferUpdate::LoadFailed { error } => self.load_error = Some(error.to_string()),
             InferUpdate::Started { id } => {
+                if let Some(index) = self.by_actor_id.get(&id).copied() {
+                    self.runs[index].executing = true;
+                }
                 if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
                     run.state = RunStateV1::Running;
                 }
             },
+            InferUpdate::Paused { id } => {
+                if let Some(index) = self.by_actor_id.get(&id).copied() {
+                    self.runs[index].executing = false;
+                }
+                if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
+                    run.state = RunStateV1::Paused;
+                }
+            },
+            // The synchronous commit barrier already published this state.
+            // Replaying an earlier queued update would regress its token count.
+            InferUpdate::Checkpoint { .. } => {},
             InferUpdate::Fragment { id, text } => {
                 if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
                     run.text.push_str(&text);
                 }
             },
             InferUpdate::Finished { id, text } => {
+                if let Some(index) = self.by_actor_id.get(&id).copied() {
+                    self.runs[index].executing = false;
+                }
                 if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
                     run.state = RunStateV1::Finished;
                     run.text = text;
                 }
             },
             InferUpdate::Cancelled { id } => {
+                if let Some(index) = self.by_actor_id.get(&id).copied() {
+                    self.runs[index].executing = false;
+                }
                 if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
                     run.state = RunStateV1::Cancelled;
                 }
             },
             InferUpdate::Failed { id, error } => {
+                if let Some(index) = self.by_actor_id.get(&id).copied() {
+                    self.runs[index].executing = false;
+                }
                 if let Some(run) = self.by_actor(id).filter(|run| !run.state.is_terminal()) {
                     run.state = RunStateV1::Failed;
                     run.error = Some(error.to_string());
@@ -273,10 +405,12 @@ impl RunTable {
 }
 
 struct Shared {
-    table: Mutex<RunTable>,
+    table: Arc<Mutex<RunTable>>,
+    journal: Option<Arc<dyn RunJournal>>,
     actor: Mutex<Option<ActorHandle<InferCommand>>>,
     bridge: Mutex<Option<JoinHandle<()>>>,
     max_tokens: usize,
+    caches: Mutex<Vec<std::sync::Weak<Mutex<Option<(Vec<u8>, Vec<u8>)>>>>>,
 }
 
 impl Shared {
@@ -314,15 +448,84 @@ impl InferenceLane {
     where
         F: FnOnce() -> Result<Box<dyn InferenceProvider>, esp::infer::InferError> + Send + 'static,
     {
-        // The bridge thread blocks on the update channel, so the actor's
-        // wake has nothing to do.
+        Self::try_open_with_journal(max_tokens, build, None)
+            .expect("an ephemeral lane has no journal to fail")
+    }
+
+    /// Open retained runs before admitting work; local interrupted asks resume.
+    pub fn try_open_with_journal<F>(
+        max_tokens: usize,
+        build: F,
+        journal: Option<Arc<dyn RunJournal>>,
+    ) -> Result<Self, String>
+    where
+        F: FnOnce() -> Result<Box<dyn InferenceProvider>, esp::infer::InferError> + Send + 'static,
+    {
+        let mut table = RunTable::default();
+        let mut recover = Vec::new();
+        if let Some(journal) = &journal {
+            for mut record in journal.load()? {
+                record.actor_id = table.next_actor_id;
+                table.next_actor_id += 1;
+                let local = record
+                    .continuations
+                    .last()
+                    .is_some_and(|visit| visit.device == journal.device());
+                if !record.view.state.is_terminal() {
+                    if local
+                        && (record.view.state != RunStateV1::Paused
+                            || record.pause_reason.as_deref() == Some("shutdown")
+                            || record.pause_reason.as_deref() == Some("lock"))
+                    {
+                        recover.push(record.actor_id);
+                    }
+                    record.view.state = RunStateV1::Paused;
+                }
+                let index = table.runs.len();
+                table.by_actor_id.insert(record.actor_id, index);
+                table.runs.push(record);
+            }
+        }
+        let table = Arc::new(Mutex::new(table));
+        let commit_table = table.clone();
+        let commit_journal = journal.clone();
         let wake: Wake = Arc::new(|| {});
-        let (actor, updates) = spawn_inference_actor_fallible(wake, build);
+        let (actor, updates) =
+            spawn_inference_actor_with_checkpoints(wake, build, move |id, checkpoint| {
+                if commit_journal.is_some() && checkpoint.session.is_none() {
+                    return Err(esp::infer::InferError::InvalidRequest(
+                        "durable asks require an exact bound model session".into(),
+                    ));
+                }
+                let mut table = commit_table.lock().unwrap();
+                let index = *table
+                    .by_actor_id
+                    .get(&id)
+                    .ok_or_else(|| esp::infer::InferError::Backend("missing durable run".into()))?;
+                let record = &mut table.runs[index];
+                let mut next = record.clone();
+                next.checkpoint = Some(checkpoint.clone());
+                next.view.text = checkpoint.text.clone();
+                next.view.session = checkpoint.session.clone();
+                // A GPU provider still has to synchronize and release its
+                // guard after its final token. The actor ends the run.
+                next.view.state = RunStateV1::Running;
+                if let Some(journal) = &commit_journal {
+                    journal
+                        .append(&next)
+                        .map_err(esp::infer::InferError::Backend)?;
+                }
+                *record = next;
+                table.generation += 1;
+                Ok(())
+            });
         let shared = Arc::new(Shared {
-            table: Mutex::new(RunTable::default()),
+            table,
+            journal,
             actor: Mutex::new(Some(actor)),
             bridge: Mutex::new(None),
             max_tokens,
+            caches: Mutex::new(Vec::new()),
         });
         let bridge = std::thread::Builder::new()
             .name("inference-bridge".into())
@@ -335,11 +538,55 @@ impl InferenceLane {
             .bridge
             .lock()
             .expect("the bridge slot is never poisoned") = Some(bridge);
-        Self { shared }
+        let lane = Self { shared };
+        for id in recover {
+            let name = lane
+                .shared
+                .table()
+                .runs
+                .iter()
+                .find(|record| record.actor_id == id)
+                .unwrap()
+                .view
+                .run
+                .clone();
+            if let Err(error) = lane.resume(&name, "restart") {
+                let _ = lane.close();
+                return Err(error.to_string());
+            }
+        }
+        Ok(lane)
     }
 
     /// Ask a question as run `run`.
     pub fn ask(&self, request: AskRequestV1) -> Result<(), InferenceLaneError> {
+        let generation = GenerationRequest {
+            prompt: request.question.clone(),
+            max_tokens: self.shared.max_tokens,
+            ..GenerationRequest::default()
+        };
+        self.ask_with_generation(request, generation)
+    }
+
+    /// Sampling parameters are recorded with the ask; the owner still caps it.
+    pub fn ask_with_generation(
+        &self,
+        request: AskRequestV1,
+        mut generation: GenerationRequest,
+    ) -> Result<(), InferenceLaneError> {
+        generation.prompt = request.question.clone();
+        generation.max_tokens = generation.max_tokens.min(self.shared.max_tokens);
+        if generation.max_tokens == 0
+            || !generation.temperature.is_finite()
+            || generation.temperature < 0.0
+            || generation
+                .top_p
+                .is_some_and(|p| !p.is_finite() || p <= 0.0 || p > 1.0)
+        {
+            return Err(InferenceLaneError::Journal(
+                "invalid token limit, temperature or top-p".into(),
+            ));
+        }
         if request.run.is_empty() {
             return Err(InferenceLaneError::Empty("run"));
         }
@@ -353,6 +600,9 @@ impl InferenceLane {
             .expect("the actor slot is never poisoned");
         let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
         let mut table = self.shared.table();
+        if table.locked {
+            return Err(InferenceLaneError::Locked);
+        }
         if table
             .runs
             .iter()
@@ -362,17 +612,6 @@ impl InferenceLane {
         }
         let actor_id = table.next_actor_id;
         table.next_actor_id += 1;
-        let generation = GenerationRequest {
-            prompt: request.question.clone(),
-            max_tokens: self.shared.max_tokens,
-            ..GenerationRequest::default()
-        };
-        if !actor.command(InferCommand::Generate {
-            id: actor_id,
-            request: generation,
-        }) {
-            return Err(InferenceLaneError::Closed);
-        }
         let index = table.runs.len();
         let session = table.session.clone();
         table.runs.push(RunRecord {
@@ -383,10 +622,51 @@ impl InferenceLane {
                 text: String::new(),
                 error: None,
                 session,
+                tokens: 0,
+                continuations: Vec::new(),
             },
             actor_id,
+            request: generation.clone(),
+            checkpoint: None,
+            continuations: self
+                .shared
+                .journal
+                .as_ref()
+                .map(|journal| {
+                    vec![Continuation {
+                        device: journal.device().into(),
+                        at_token: 0,
+                        reason: "ask".into(),
+                        first_differing_token: None,
+                        compared_token_ids_hash: None,
+                    }]
+                })
+                .unwrap_or_default(),
+            pause_reason: None,
+            executing: false,
         });
+        if let Some(journal) = &self.shared.journal {
+            if let Err(error) = journal.append(&table.runs[index]) {
+                table.runs.pop();
+                return Err(InferenceLaneError::Journal(error));
+            }
+        }
         table.by_actor_id.insert(actor_id, index);
+        let command = if self.shared.journal.is_some() {
+            InferCommand::Checkpointed {
+                id: actor_id,
+                request: generation,
+                resume: None,
+            }
+        } else {
+            InferCommand::Generate {
+                id: actor_id,
+                request: generation,
+            }
+        };
+        if !actor.command(command) {
+            return Err(InferenceLaneError::Closed);
+        }
         table.generation += 1;
         Ok(())
     }
@@ -400,18 +680,234 @@ impl InferenceLane {
             .lock()
             .expect("the actor slot is never poisoned");
         let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
-        let table = self.shared.table();
+        let mut table = self.shared.table();
+        if table.locked {
+            return Err(InferenceLaneError::Locked);
+        }
         let record = table
             .runs
-            .iter()
+            .iter_mut()
             .find(|record| record.view.run == request.run)
             .ok_or_else(|| InferenceLaneError::UnknownRun(request.run.clone()))?;
-        if !record.view.state.is_terminal() {
+        if record.view.state == RunStateV1::Paused {
+            let mut next = record.clone();
+            next.view.state = RunStateV1::Cancelled;
+            if let Some(journal) = &self.shared.journal {
+                journal.append(&next).map_err(InferenceLaneError::Journal)?;
+            }
+            *record = next;
+            table.generation += 1;
+        } else if !record.view.state.is_terminal() {
             actor.command(InferCommand::Cancel {
                 id: record.actor_id,
             });
         }
         Ok(())
+    }
+
+    /// Pause a run without cancelling its retained answer.
+    pub fn pause(&self, run: &str, reason: &str) -> Result<(), InferenceLaneError> {
+        let actor = self.shared.actor.lock().unwrap();
+        let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
+        let mut table = self.shared.table();
+        if table.locked && reason != "lock" && reason != "shutdown" {
+            return Err(InferenceLaneError::Locked);
+        }
+        let record = table
+            .runs
+            .iter_mut()
+            .find(|record| record.view.run == run)
+            .ok_or_else(|| InferenceLaneError::UnknownRun(run.into()))?;
+        if !record.view.state.is_terminal() {
+            record.pause_reason = Some(reason.into());
+            actor.command(InferCommand::Pause {
+                id: record.actor_id,
+            });
+        }
+        Ok(())
+    }
+
+    /// Continue a paused run from its exact retained token and draw position.
+    pub fn resume(&self, run: &str, reason: &str) -> Result<(), InferenceLaneError> {
+        let actor = self.shared.actor.lock().unwrap();
+        let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
+        let mut table = self.shared.table();
+        if table.locked {
+            return Err(InferenceLaneError::Locked);
+        }
+        let record = table
+            .runs
+            .iter_mut()
+            .find(|record| record.view.run == run)
+            .ok_or_else(|| InferenceLaneError::UnknownRun(run.into()))?;
+        if record.view.state != RunStateV1::Paused {
+            return Err(InferenceLaneError::Journal(
+                "only paused runs can resume".into(),
+            ));
+        }
+        let journal = self.shared.journal.as_ref().ok_or_else(|| {
+            InferenceLaneError::Journal("this lane has no durable token journal".into())
+        })?;
+        let mut next = record.clone();
+        next.continuations.push(Continuation {
+            device: journal.device().into(),
+            at_token: record
+                .checkpoint
+                .as_ref()
+                .map_or(0, |cp| cp.token_ids.len()),
+            reason: reason.into(),
+            first_differing_token: None,
+            compared_token_ids_hash: None,
+        });
+        next.view.state = RunStateV1::Queued;
+        next.pause_reason = None;
+        journal.append(&next).map_err(InferenceLaneError::Journal)?;
+        *record = next;
+        actor.command(InferCommand::Checkpointed {
+            id: record.actor_id,
+            request: record.request.clone(),
+            resume: record.checkpoint.clone(),
+        });
+        table.generation += 1;
+        Ok(())
+    }
+
+    /// Refuse route access immediately, pause work, and wait for the durable
+    /// boundary. Unlock resumes only runs paused by this lock.
+    pub fn set_locked(&self, locked: bool) -> Result<(), String> {
+        self.shared.table().locked = locked;
+        let names: Vec<_> = self
+            .shared
+            .table()
+            .runs
+            .iter()
+            .filter(|record| {
+                !record.view.state.is_terminal()
+                    && (if locked {
+                        record.executing
+                            || matches!(record.view.state, RunStateV1::Running | RunStateV1::Queued)
+                    } else {
+                        record.pause_reason.as_deref() == Some("lock")
+                    })
+            })
+            .map(|record| record.view.run.clone())
+            .collect();
+        if locked {
+            for name in &names {
+                self.pause(name, "lock")
+                    .map_err(|error| error.to_string())?;
+            }
+            loop {
+                if self.shared.table().runs.iter().all(|record| {
+                    !record.executing
+                        && !matches!(record.view.state, RunStateV1::Running | RunStateV1::Queued)
+                }) {
+                    break;
+                }
+                std::thread::sleep(Duration::from_millis(2));
+            }
+        } else {
+            for name in names {
+                self.resume(&name, "unlock")
+                    .map_err(|error| error.to_string())?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Drop materialized persona data after a lock boundary. Actor IDs remain
+    /// monotonic; an unlock rehydrates records through the unlocked journal.
+    #[cfg(feature = "inference-model")]
+    pub fn forget_locked_materialization(&self) {
+        let mut table = self.shared.table();
+        assert!(table.locked);
+        table.runs.clear();
+        table.by_actor_id.clear();
+        table.generation += 1;
+        for cache in self
+            .shared
+            .caches
+            .lock()
+            .unwrap()
+            .iter()
+            .filter_map(|cache| cache.upgrade())
+        {
+            if let Some((mut card, mut runs)) = cache.lock().unwrap().take() {
+                use zeroize::Zeroize;
+                card.zeroize();
+                runs.zeroize();
+            }
+        }
+    }
+
+    fn refresh_remote(&self) -> Result<(), String> {
+        if self.is_locked() {
+            return Ok(());
+        }
+        let Some(journal) = &self.shared.journal else {
+            return Ok(());
+        };
+        let revision = journal.remote_revision();
+        if self.shared.table().seen_remote_revision == revision {
+            return Ok(());
+        }
+        match self.refresh_retained(false) {
+            Err(error) if error.contains("missing parent") => return Ok(()),
+            result => result?,
+        }
+        self.shared.table().seen_remote_revision = revision;
+        Ok(())
+    }
+
+    /// Rehydrate the current log heads, retaining active local execution IDs.
+    pub fn refresh_retained_runs(&self) -> Result<(), String> {
+        self.refresh_retained(true)
+    }
+
+    fn refresh_retained(&self, allow_locked: bool) -> Result<(), String> {
+        let Some(journal) = &self.shared.journal else {
+            return Ok(());
+        };
+        let records = journal.load()?;
+        let mut table = self.shared.table();
+        if table.locked && !allow_locked {
+            return Ok(());
+        }
+        for mut record in records {
+            if let Some(existing) = table
+                .runs
+                .iter_mut()
+                .find(|existing| existing.view.run == record.view.run)
+            {
+                if matches!(
+                    existing.view.state,
+                    RunStateV1::Running | RunStateV1::Queued
+                ) {
+                    continue;
+                }
+                record.actor_id = existing.actor_id;
+                if !record.view.state.is_terminal() {
+                    record.view.state = RunStateV1::Paused;
+                }
+                *existing = record;
+            } else {
+                record.actor_id = table.next_actor_id;
+                table.next_actor_id += 1;
+                if !record.view.state.is_terminal() {
+                    record.view.state = RunStateV1::Paused;
+                }
+                let index = table.runs.len();
+                table.by_actor_id.insert(record.actor_id, index);
+                table.runs.push(record);
+            }
+        }
+        table.generation += 1;
+        Ok(())
+    }
+
+    /// Whether the route currently refuses persona-data access.
+    pub fn is_locked(&self) -> bool {
+        self.shared.table().locked
     }
 
     /// The run table now.
@@ -440,11 +936,20 @@ impl InferenceLane {
                 .table()
                 .runs
                 .iter()
-                .filter(|record| !record.view.state.is_terminal())
+                .filter(|record| {
+                    matches!(record.view.state, RunStateV1::Running | RunStateV1::Queued)
+                })
                 .map(|record| record.actor_id)
                 .collect();
             for id in open {
-                actor.command(InferCommand::Cancel { id });
+                if self.shared.journal.is_some() {
+                    let mut table = self.shared.table();
+                    let index = table.by_actor_id[&id];
+                    table.runs[index].pause_reason = Some("shutdown".into());
+                    actor.command(InferCommand::Pause { id });
+                } else {
+                    actor.command(InferCommand::Cancel { id });
+                }
             }
             actor.join();
         }
@@ -464,11 +969,22 @@ impl InferenceLane {
 
     /// The route endpoint for one admitted session.
     pub fn endpoint(&self, session: ProjectionSession) -> InferenceAskEndpoint {
+        let current = Arc::new(Mutex::new(None));
+        self.shared
+            .caches
+            .lock()
+            .unwrap()
+            .retain(|cache| cache.strong_count() > 0);
+        self.shared
+            .caches
+            .lock()
+            .unwrap()
+            .push(Arc::downgrade(&current));
         InferenceAskEndpoint {
             lane: self.clone(),
             session,
             noticed: None,
-            current: None,
+            current,
         }
     }
 }
@@ -476,7 +992,24 @@ impl InferenceLane {
 /// Fold updates until the actor is gone and its channel closes.
 fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
     while let Ok(update) = updates.recv() {
-        shared.table().apply(update);
+        let changed = match &update {
+            InferUpdate::Paused { id }
+            | InferUpdate::Cancelled { id }
+            | InferUpdate::Failed { id, .. }
+            | InferUpdate::Finished { id, .. } => Some(*id),
+            _ => None,
+        };
+        let mut table = shared.table();
+        table.apply(update);
+        if let (Some(id), Some(journal)) = (changed, &shared.journal) {
+            if let Some(index) = table.by_actor_id.get(&id).copied() {
+                if let Err(error) = journal.append(&table.runs[index]) {
+                    table.runs[index].view.state = RunStateV1::Failed;
+                    table.runs[index].view.error =
+                        Some(format!("checkpoint commit failed: {error}"));
+                }
+            }
+        }
     }
 }
 
@@ -487,7 +1020,7 @@ pub struct InferenceAskEndpoint {
     noticed: Option<u64>,
     /// The bytes the last snapshot named, so its resources stay servable
     /// while the table moves on.
-    current: Option<(Vec<u8>, Vec<u8>)>,
+    current: Arc<Mutex<Option<(Vec<u8>, Vec<u8>)>>>,
 }
 
 const CARD_LABEL: &str = "Inference runs";
@@ -498,6 +1031,9 @@ fn score() -> Score {
 
 impl InferenceAskEndpoint {
     fn own_session(&self, session: &ProjectionSession, what: &str) -> Result<(), String> {
+        if self.lane.is_locked() {
+            return Err("inference.ask is locked".into());
+        }
         if *session == self.session {
             Ok(())
         } else {
@@ -574,10 +1110,12 @@ impl ProjectionSource for InferenceAskEndpoint {
 
     fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, Self::Error> {
         self.own_session(&request.session, "snapshot")?;
-        let (runs, generation) = {
-            let table = self.lane.shared.table();
-            (table.view(), table.generation)
-        };
+        self.lane.refresh_remote()?;
+        let table = self.lane.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        let (runs, generation) = (table.view(), table.generation);
         let runs_bytes = serde_json::to_vec(&runs).map_err(|error| error.to_string())?;
         let finished = runs
             .runs
@@ -601,7 +1139,7 @@ impl ProjectionSource for InferenceAskEndpoint {
         let card_bytes = serde_json::to_vec(&card).map_err(|error| error.to_string())?;
         let snapshot = self.card_snapshot(generation, &card_bytes);
         self.noticed = Some(generation);
-        self.current = Some((card_bytes, runs_bytes));
+        *self.current.lock().unwrap() = Some((card_bytes, runs_bytes));
         Ok(snapshot)
     }
 }
@@ -611,7 +1149,12 @@ impl PresentationSource for InferenceAskEndpoint {
 
     fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, Self::Error> {
         self.own_session(&request.session, "resource")?;
-        let Some((card, runs)) = self.current.as_ref() else {
+        let table = self.lane.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        let current = self.current.lock().unwrap();
+        let Some((card, runs)) = current.as_ref() else {
             return Err("request an inference.ask snapshot first".into());
         };
         let bytes = [card, runs]
@@ -638,6 +1181,29 @@ impl IntentSink for InferenceAskEndpoint {
                 Ok(ask) => self.lane.ask(ask),
                 Err(error) => return rejected(format!("{ASK_INTENT} payload: {error}")),
             },
+            ASK_SAMPLED_INTENT => {
+                match serde_json::from_slice::<SampledAskRequestV1>(&intent.payload) {
+                    Ok(sampled) => self.lane.ask_with_generation(
+                        sampled.ask,
+                        GenerationRequest {
+                            max_tokens: sampled.max_tokens,
+                            temperature: sampled.temperature,
+                            top_p: sampled.top_p,
+                            seed: sampled.seed,
+                            ..Default::default()
+                        },
+                    ),
+                    Err(error) => return rejected(error.to_string()),
+                }
+            },
+            PAUSE_INTENT => match serde_json::from_slice::<CancelRequestV1>(&intent.payload) {
+                Ok(run) => self.lane.pause(&run.run, "user"),
+                Err(error) => return rejected(error.to_string()),
+            },
+            RESUME_INTENT => match serde_json::from_slice::<CancelRequestV1>(&intent.payload) {
+                Ok(run) => self.lane.resume(&run.run, "user"),
+                Err(error) => return rejected(error.to_string()),
+            },
             CANCEL_INTENT => match serde_json::from_slice::<CancelRequestV1>(&intent.payload) {
                 Ok(cancel) => self.lane.cancel(&cancel),
                 Err(error) => return rejected(format!("{CANCEL_INTENT} payload: {error}")),
@@ -659,6 +1225,11 @@ impl ProjectionNoticeSource for InferenceAskEndpoint {
     type Error = String;
 
     fn poll_notice(&mut self) -> Result<Option<CarrierNotice>, Self::Error> {
+        if self.lane.is_locked() {
+            self.current.lock().unwrap().take();
+            return Err("inference.ask is locked".into());
+        }
+        self.lane.refresh_remote()?;
         let generation = self.lane.generation();
         if self.noticed == Some(generation) {
             return Ok(None);
