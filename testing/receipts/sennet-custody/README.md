@@ -19,6 +19,9 @@ vaults are not opened, and private runtime directories are excluded. This
 qualifies the cooperative scoped consumer route, not broader platform D13
 revocation. Murm R7 separately owns nonce reservations and native/RF results.
 
-Selected custody policy unit tests and strict port/example Clippy are still
-running at this publication checkpoint. Existing dependency warnings in the
-default build do not qualify aggregate Djinn/Graphshell Clippy.
+Both selected custody policy unit tests pass, including exact scope and
+wrong-app release refusal for Sennet and Tucket. Strict port/example Clippy
+passes. `policy-tests.log` and `port-clippy.log` retain those gates. Existing
+dependency warnings in the default build do not qualify aggregate
+Djinn/Graphshell Clippy. The concurrent upstream integration since `85f92f09`
+changed documentation/receipts only, preserving the qualified code and lock.
