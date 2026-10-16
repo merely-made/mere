@@ -1,0 +1,10 @@
+{
+  "baseline": "623e21bf1db3c068323b3c31e3e9647d02de1cad",
+  "source": "dc234d7f9b38e2930f44b3f9900b58ae870ec867",
+  "audit_deltas": {},
+  "judgment_errors_unchanged": true,
+  "judgment_errors": 15,
+  "covered_active_docs": 271,
+  "active_docs": 285,
+  "normalization": "worktree roots and Markdown line positions; object line fields excluded; list findings compared as Counters"
+}
