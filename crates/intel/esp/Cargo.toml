@@ -11,10 +11,11 @@ keywords = ["inference", "embeddings", "local", "webgpu", "retrieval"]
 categories = ["science", "api-bindings", "data-structures"]
 
 [dependencies]
+zeroize = "1"
 serde = { version = "1", features = ["derive"] }
 
 # Typed-payload persistence for `embed::VectorIndex` (2026-08-12 eidetic
-# reorg). Optional, so the default tree stays serde-only and portable: a
+# reorg). Optional, so the default tree stays serde/zeroize-only and portable: a
 # consumer that only computes embeddings never links the store.
 eidetic = { path = "../../eidetic/eidetic-core", version = "0.0.2", optional = true }
 
@@ -56,7 +57,7 @@ pollster = "0.4"
 async-trait = "0.1"
 eidetic = { path = "../../eidetic/eidetic-core", version = "0.0.2" }
 eidetic-search = { workspace = true }
-muniment = { path = "../../eidetic/muniment", version = "0.1.1" }
+muniment = { path = "../../eidetic/muniment", version = "0.1.1", features = ["redb"] }
 sha2 = { workspace = true }
 tempfile = "3"
 
@@ -66,6 +67,8 @@ default = []
 # esp::infer
 actor = ["dep:armillary"]
 decoder = ["dep:burn", "dep:serde_json", "dep:safetensors", "dep:half", "dep:tokenizers", "dep:tracing", "dep:getrandom"]
+decoder-flex = ["decoder", "burn/flex"]
+
 decoder-wgpu = ["decoder", "burn/wgpu", "dep:wgpu", "dep:pollster"]
 decoder-lora = ["decoder", "model-session"]
 # The autodiff LoRA trainer (v1). `burn/optim` already implies `burn/autodiff`
@@ -83,3 +86,11 @@ index-burn-wgpu = ["index-burn", "burn/wgpu"]
 bert = ["dep:burn", "dep:tokenizers", "dep:safetensors", "dep:serde_json", "dep:half", "dep:getrandom"]
 bert-wgpu = ["bert", "burn/wgpu"]
 bert-validation = ["bert"]
+
+[[example]]
+name = "import_inference_model"
+required-features = ["decoder", "model-session"]
+
+[[example]]
+name = "qualify_inference_model"
+required-features = ["decoder", "model-session"]

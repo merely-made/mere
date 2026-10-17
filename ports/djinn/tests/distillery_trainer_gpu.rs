@@ -85,6 +85,7 @@ use common::{
     lending, now_ms, open_vault, owner, profile, refusal_from, run_trainer_job, unlock,
     write_device_settings,
 };
+use distillery::mesh_host::Step;
 use distillery::{
     GpuDeviceType, TRAINER_AUTODIFF, TRAINER_FINITE_DIFFERENCE, TRAINER_RESOURCE, TrainReceipt,
     TrainRequest, TrainerGpuKind, probe_gpu_adapter,
@@ -95,7 +96,6 @@ use eidetic::models::{EvalMetric, EvalReport, OpaqueBlob};
 use eidetic::typed::load_typed;
 use eidetic::{ModelAdapterManifest, NoFetcher};
 use mesh::ResourceId;
-use distillery::mesh_host::Step;
 
 /// A failure bound, not an expectation. The run is stopped by the observer
 /// seeing `Step::Completed`; this only decides how long a *stuck* run is given
@@ -245,7 +245,7 @@ async fn the_gpu_lane_trains_on_a_discrete_adapter_or_refuses_to_compose_at_all(
         "the trainer runs because the device's stated posture permits it by \
          name, not because the allowed set was empty"
     );
-    let facts = *works.authority().host().facts();
+    let facts = works.authority().host().facts();
     assert!(
         facts.gpu,
         "a lane that composed a GPU trainer must advertise the GPU it composed: {facts:?}"

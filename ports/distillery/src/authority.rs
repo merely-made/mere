@@ -10,9 +10,9 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use crate::mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
 use mesh::JobBoard;
 use mesh::{BlobRef, MeshStoreError, RetentionCheckpoint, RetentionEffect};
-use crate::mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
 use muniment::Backend;
 
 type CustodyFuture<'a> = Pin<Box<dyn Future<Output = Result<u64, String>> + Send + 'a>>;
@@ -71,7 +71,7 @@ pub enum DistilleryError {
 }
 
 /// Type-erased board projection consumed by an optional remote-session lane.
-#[cfg(feature = "remote")]
+#[cfg(any(feature = "remote", feature = "inference-stages"))]
 pub trait RemoteSessionProjection: Send + Sync {
     /// Replace the admission snapshot with the host's current folded board.
     fn refresh(&self, board: JobBoard);
@@ -87,8 +87,10 @@ pub struct Distillery<B: Backend + Clone + Send + Sync + 'static> {
     host: MeshHost<B>,
     custody: Arc<dyn BlobCustody>,
     retention: RetentionSettings,
-    #[cfg(feature = "remote")]
-    remote: Option<Arc<dyn RemoteSessionProjection>>,
+    #[cfg(any(feature = "remote", feature = "inference-stages"))]
+    remote: Vec<Arc<dyn RemoteSessionProjection>>,
+    #[cfg(feature = "inference-stages")]
+    stage_planner: Option<Arc<crate::inference_stage::automatic::StagePlanner>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
@@ -103,24 +105,51 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
             host,
             custody,
             retention,
-            #[cfg(feature = "remote")]
-            remote: None,
+            #[cfg(any(feature = "remote", feature = "inference-stages"))]
+            remote: Vec::new(),
+            #[cfg(feature = "inference-stages")]
+            stage_planner: None,
         }
     }
 
     /// Attach the remote-session authority composed into this host's resource
     /// registry and transport endpoint.
-    #[cfg(feature = "remote")]
+    #[cfg(any(feature = "remote", feature = "inference-stages"))]
     pub fn attach_remote_sessions(&mut self, remote: Arc<dyn RemoteSessionProjection>) {
-        self.remote = Some(remote);
+        self.remote.push(remote);
+    }
+
+    /// Owner composition for automatic asks. Posting stays on this host's
+    /// serialized authoring path; the actor receives only a bounded handle.
+    #[cfg(feature = "inference-stages")]
+    pub fn attach_stage_planner(
+        &mut self,
+        planner: Arc<crate::inference_stage::automatic::StagePlanner>,
+    ) -> Result<(), String> {
+        if self.stage_planner.is_some() {
+            return Err("stage planner already attached".into());
+        }
+        self.remote.push(planner.clone());
+        self.stage_planner = Some(planner);
+        Ok(())
+    }
+
+    /// Read the owner-composed planner and its public-metadata diagnostics.
+    #[cfg(feature = "inference-stages")]
+    pub fn stage_planner(&self) -> Option<&Arc<crate::inference_stage::automatic::StagePlanner>> {
+        self.stage_planner.as_ref()
     }
 
     /// Drive one non-blocking supervisor tick.
     pub async fn tick(&mut self) -> Result<Vec<Step>, DistilleryError> {
-        #[cfg(feature = "remote")]
+        #[cfg(any(feature = "remote", feature = "inference-stages"))]
         self.refresh_remote().await?;
+        #[cfg(feature = "inference-stages")]
+        if let Some(planner) = &self.stage_planner {
+            planner.drive_posts(&self.host).await;
+        }
         let steps = self.host.tick().await?;
-        #[cfg(feature = "remote")]
+        #[cfg(any(feature = "remote", feature = "inference-stages"))]
         self.refresh_remote().await?;
         Ok(steps)
     }
@@ -136,11 +165,13 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
         Ok(self.host.synced().board().await?)
     }
 
-    #[cfg(feature = "remote")]
+    #[cfg(any(feature = "remote", feature = "inference-stages"))]
     async fn refresh_remote(&self) -> Result<(), DistilleryError> {
-        if let Some(remote) = &self.remote {
+        if !self.remote.is_empty() {
             let board = self.host.synced().board().await?;
-            remote.refresh(board);
+            for remote in &self.remote {
+                remote.refresh(board.clone());
+            }
         }
         Ok(())
     }

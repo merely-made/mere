@@ -278,6 +278,14 @@ impl ResourceError {
 pub trait MeshResource: Send + Sync {
     fn descriptor(&self) -> &ResourceDescriptor;
 
+    /// Host-side availability for this posted job, sampled during selection.
+    /// This never grants access or changes the board: execution and protocol
+    /// admission must still validate the current authority. Static resources
+    /// remain available; session resources can withdraw on lock or revocation.
+    fn available_for(&self, _job: &crate::board::Job) -> bool {
+        true
+    }
+
     /// Read and validate everything the run needs — through the namespace and
     /// nowhere else.
     fn prepare<'a>(
