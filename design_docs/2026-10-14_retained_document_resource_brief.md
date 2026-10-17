@@ -4,7 +4,8 @@
 working direction. The parser comparison, isolated document/pack proof, and
 bounded DOM batching experiment pass. Isocosm has published a private optional
 pack-authoring CLI with the batched backend and real manifest/full `GenValue`
-schema. Durable history and a shared resource API remain deferred. The earlier
+schema. Its real-pack CLI workflow passes at `285821ad` without product fixes.
+Durable history and a shared resource API remain deferred. The earlier
 proofs stay in testing; the private consumer lives in Isocosm.
 
 Use a retained document resource to inspect and revise authored data while
@@ -400,6 +401,45 @@ loader checks, without native GUI acceptance or new product timing/memory
 measurements. The fork is committed as a local optional dependency; publishing
 a tool distribution still requires separately qualifying that fork's packaging.
 
+**Private CLI workflow qualification — 2026-10-17.** The
+[workflow report](/Users/markik/Code/testing/pack-author-workflow-20261017/REPORT.md),
+[reproduction receipt](/Users/markik/Code/testing/pack-author-workflow-20261017/reproduction/qualification.json)
+and [command/response transcript](/Users/markik/Code/testing/pack-author-workflow-20261017/reproduction/transcript.json)
+record two successful runs against Isocosm
+[`285821ad`](https://github.com/merely-made/isocosm/commit/285821ad6663e75a289ea047769aa9dfb226195c),
+after fetching and fast-forwarding the clean checkout. Each run uses 45 JSON-line
+commands across five fresh CLI processes on a scratch copy of the real demo
+pack with its existing annotated manifest. The scripted caller uses public CLI
+responses only: an inspected value range locates the generator-name edit;
+revision-checked text edits insert a replacement preset and remove the old one.
+Real typed validation confirms ownership under the intended generator and no
+preset leakage. Comments and the complete foreign-extension tail survive.
+The raw transcripts contain five ready/exit pairs per run; the local report
+and receipt incorrectly label that count as six. The 45-command count and
+recorded pass/refusal outcomes agree in both runs.
+
+An incomplete string is saved explicitly; the existing loader rejects that
+draft. A fresh authoring process reopens the exact bytes, repairs the quote,
+checks and saves, then the existing loader executes
+`demo:forge_item fixtures/forge_item.json` successfully. A separate simulated
+editor changes disk while an authoring draft is pending: save refuses the
+external change, disk keeps the external text, and `read` retains the pending
+draft. The caller exports that draft before quitting, explicitly reopens the
+external version, reapplies the author change, and saves. A final fresh process
+confirms exact bytes and clean state; the real fixture passes again. Checking
+and saving remain separate from deliberate loader/fixture execution and report
+`admitted:false`; no live application session is mutated.
+
+No workflow blocker was found, so no product code or semantic editing command
+was added. Original pack files and unchanged scratch assets are hash-checked;
+the reproduction receipt also identifies the runner and built executables.
+Caller orchestration of offsets/TOML ownership and explicit pending-draft export
+remain concrete usability friction. This qualifies one scripted task, not
+general semantic editing, automatic merge, durable session recovery, GUI use,
+new performance/memory behavior or crash safety. The report, runner, transcript,
+scratch packs and exact intermediate/final manifests stay in local testing;
+none are copied into Mere. Shared API extraction remains deferred.
+
 **Next gates.** Keep this consumer private. A second consumer must establish
 common lifecycle needs before extracting a shared API; shared API work remains
 explicitly deferred. Durable identity/history, product retention and memory
@@ -415,7 +455,8 @@ in local testing directories: the
 [October 15 parser comparison](/Users/markik/Code/testing/retained-parser-20261015/REPORT.md),
 [October 16 document proof](/Users/markik/Code/testing/retained-document-20261016/REPORT.md),
 [lowering profile](/Users/markik/Code/testing/retained-lowering-profile-20261016/REPORT.md),
-and [batched DOM experiment](/Users/markik/Code/testing/retained-dom-batch-20261016/REPORT.md).
+[batched DOM experiment](/Users/markik/Code/testing/retained-dom-batch-20261016/REPORT.md),
+and [private CLI workflow](/Users/markik/Code/testing/pack-author-workflow-20261017/REPORT.md).
 Their absolute links resolve on the M4 host; the artifacts are not copied into
 this repository or available through those links on GitHub.
 
