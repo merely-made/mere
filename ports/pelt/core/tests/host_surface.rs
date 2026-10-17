@@ -761,3 +761,23 @@ fn surface_ime_commit_is_delivered_and_unsupported_preedit_is_explicit() {
         "the surface contract cannot silently drop composition state"
     );
 }
+
+#[test]
+fn surface_key_and_keyboard_text_pair_has_one_text_payload() {
+    use inker::{SessionButtonState, SessionInput, SessionKey};
+    let calls = Calls::default();
+    let mut content = hosted(&calls);
+    assert!(content.input(SessionInput::Key {
+        key: SessionKey::Character("é".into()),
+        state: SessionButtonState::Pressed,
+        modifiers: Default::default(),
+        repeat: false,
+    }, 1.0).handled);
+    assert!(content.input(SessionInput::KeyboardText("é".into()), 1.0).handled);
+    let keyboard = calls.lock().unwrap().iter()
+        .filter(|call| call.starts_with("keyboard "))
+        .cloned().collect::<Vec<_>>();
+    assert_eq!(keyboard.len(), 2);
+    assert!(keyboard[0].contains("text: None"), "{keyboard:?}");
+    assert!(keyboard[1].contains("text: Some(\"é\")"), "{keyboard:?}");
+}
