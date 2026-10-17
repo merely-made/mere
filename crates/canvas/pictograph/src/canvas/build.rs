@@ -52,7 +52,7 @@ const GNODE_BOX: &str = "position: absolute; left: 0; top: 0; width: 36px; heigh
 /// so the canvas and every other representation read one palette through the
 /// cascade. (Representations carry node identity.)
 fn build_node_sheet() -> Vec<String> {
-    vec![
+    let mut sheet = vec![
         "div { display: block; }".to_string(),
         // The palette enters the cascade here; `.gnode` and `.gcaption` are
         // `.stage` descendants, so they inherit every `--node-*` var.
@@ -90,6 +90,23 @@ fn build_node_sheet() -> Vec<String> {
         ".gnode-representation-glyph .gcaption { display: none; }".to_string(),
         ".gnode-representation-live-pane { box-shadow: 0 0 0 3px var(--node-caption-fg), 0 0 16px var(--node-caption-fg); }".to_string(),
         ".gnode-representation-live-pane .gcaption { font-weight: 700; }".to_string(),
+        // The graph grammar (`grammar_view.rs`): forward bodies round, ringed and
+        // lifted; sites square in their category; retained underlined; suggestions
+        // smallest; quiet nodes captionless.
+        format!(
+            ".gnode-body {{ {GNODE_BOX} border-radius: 50%; background-color: var(--node-selected-bg); \
+             color: var(--node-selected-fg); box-shadow: 0 0 0 2px var(--node-caption-fg), 0 4px 10px rgba(0, 0, 0, 0.35); }}"
+        ),
+        format!(".gnode-site {{ {GNODE_BOX} border-radius: 2px; color: rgb(20, 22, 30); }}"),
+        ".gnode-retained { border-bottom: 2px dashed var(--node-caption-fg); }".to_string(),
+        ".gnode-suggestion { border-radius: 50%; opacity: 0.6; }".to_string(),
+        ".gnode-quiet .gcaption { display: none; }".to_string(),
+        // A suggestion's mark, the person's choice: dot and ring are bare, word keeps
+        // its label even when quiet, glyph and face keep the face.
+        ".gnode-mark-dot { background-color: var(--node-caption-fg); }".to_string(),
+        ".gnode-mark-ring { background-color: transparent; border: 2px solid var(--node-caption-fg); }"
+            .to_string(),
+        ".gnode-mark-word .gcaption { display: block; }".to_string(),
         // The node's display label, riding beside the tile (not inside the 36px box):
         // absolutely positioned just right of the square so a long name reads in full on
         // the canvas instead of overflowing the tile. It is a child of the `.gnode`, so
@@ -103,7 +120,16 @@ fn build_node_sheet() -> Vec<String> {
             border-radius: 9px; font-size: 12px; line-height: 18px; white-space: nowrap; \
             background-color: var(--node-selected-bg); color: var(--node-selected-fg); }"
             .to_string(),
-    ]
+    ];
+    sheet.extend(CATEGORY_PALETTE.iter().enumerate().map(|(i, (r, g, b))| {
+        format!(
+            ".gnode-cat-{i} {{ background-color: rgb({}, {}, {}); }}",
+            (r * 255.0).round(),
+            (g * 255.0).round(),
+            (b * 255.0).round()
+        )
+    }));
+    sheet
 }
 
 static NODE_SHEET_STRINGS: LazyLock<Vec<String>> = LazyLock::new(build_node_sheet);
@@ -333,19 +359,21 @@ pub(crate) fn background_cmds(w: u32, h: u32, color: ColorF) -> Vec<PaintCmd> {
 /// by cluster index (clusters past the palette wrap — adjacent ones rarely sit together). (Graph
 /// signals — community to a ring.)
 pub(crate) fn cluster_color(index: usize) -> ColorF {
-    const PALETTE: [(f32, f32, f32); 8] = [
-        (0.36, 0.72, 0.96), // sky
-        (0.96, 0.55, 0.36), // coral
-        (0.56, 0.86, 0.46), // green
-        (0.86, 0.50, 0.90), // violet
-        (0.96, 0.80, 0.34), // amber
-        (0.45, 0.84, 0.80), // teal
-        (0.92, 0.46, 0.60), // rose
-        (0.66, 0.66, 0.96), // periwinkle
-    ];
-    let (r, g, b) = PALETTE[index % PALETTE.len()];
+    let (r, g, b) = CATEGORY_PALETTE[index % CATEGORY_PALETTE.len()];
     ColorF::new(r, g, b, 0.85)
 }
+
+/// The categorical palette: community rings, territory and grammar sites.
+pub(crate) const CATEGORY_PALETTE: [(f32, f32, f32); 8] = [
+    (0.36, 0.72, 0.96), // sky
+    (0.96, 0.55, 0.36), // coral
+    (0.56, 0.86, 0.46), // green
+    (0.86, 0.50, 0.90), // violet
+    (0.96, 0.80, 0.34), // amber
+    (0.45, 0.84, 0.80), // teal
+    (0.92, 0.46, 0.60), // rose
+    (0.66, 0.66, 0.96), // periwinkle
+];
 
 /// A stroked-circle path of `segments` chords approximating a ring at `center`. (Community rings.)
 fn circle_path(center: LayoutPoint, radius: f32, segments: usize) -> PathData {

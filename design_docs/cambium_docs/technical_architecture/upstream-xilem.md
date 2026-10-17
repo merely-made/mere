@@ -62,11 +62,42 @@ repository root for the rationale and receipts. The workspace now versions
 `meristem` as 0.2.0 for the removed public API; registry publication remains
 a separate release operation.
 
+## xilem_web derivatives in Cambium
+
+Cambium's Genet backend was templated on Linebender's Apache-2.0 `xilem_web`
+(then `xilem_serval`). Audit base: `linebender/xilem`
+`5d72ad41eb660fa620110e045d332fd95684ebae`, compared file by file on
+2026-10-16. Files that share structure, names or logic with it keep the Xilem
+Authors' copyright line above the MPL header, as Meristem's files do (Apache-2.0
+section 4). This is notice-keeping, not legal advice.
+
+| Cambium file (`crates/cambium/cambium/src/`) | Upstream (`xilem_web/src/`) | Class | Notice |
+|---|---|---|---|
+| `splice.rs` | `vec_splice.rs` (2023); `DomChildrenSplice` in `elements.rs` (2024) | Port: `VecSplice` keeps the struct, fields and the `new`/`skip`/`delete_next`/`insert`/`mutate`/`clear_tail` bodies; `GenetChildrenSplice` keeps `DomChildrenSplice`'s fields and `with_scratch` shape | 2023, 2024 |
+| `optional_action.rs` | `optional_action.rs` | Port: near-verbatim `Action`, sealed `OptionalAction` and its three impls | 2023 |
+| `text.rs` | `text.rs` | Port: same `impl_string_view!` / `impl_to_string_view!` macros, type list and `OrphanView` methods; `Pod`/`web_sys::Text` swapped for `GenetElement` | 2024 |
+| `pod.rs` | `pod.rs` | Adapted: `SuperElement`/`AnyElement` impls and `replace_inner` follow `AnyPod`'s; `parent` field and `reborrow_mut` mirror `PodMut` | 2024 |
+| `element.rs` | `elements.rs` | Adapted: `ElementState` fields and the build/rebuild/teardown/message splice flow follow `build_element`, `rebuild_element`, `teardown_element` and `message_element` | 2024 |
+| `event.rs` | `events.rs` | Adapted: `OnClick` is a trimmed `OnEvent` (child, handler, `capture` and its builder, `with_id` marker id, `OptionalAction` message result) | 2023 |
+
+Design influence only, with no upstream code carried over, so no Xilem
+notice: `tags.rs` (a tag-name list over `el`; upstream uses `define_element!`
+per tag), `context.rs` (`GenetCtx` is original; the `ViewPathTracker` impl is
+dictated by the trait), `runner.rs` (original; upstream's `App` differs),
+`pointer.rs` (original; upstream's `Pointer` view is a different design), and
+the `HTML_NS` constant in `lib.rs`.
+
+`key.rs`, `value.rs`, `hover.rs` and `wheel.rs` follow `event.rs`'s listener
+shape and were not compared separately; they carry no notice. If a later
+review finds shared code with `events.rs`, add them to this table.
+
 ## Update policy
 
 Reconcile against a recorded Xilem release or commit. Compare the retained core
 surface, update this ledger, and run the keyed and portable-move tests before
 accepting an upstream change.
 
-The `upstream-xilem` remote points to `mark-ik/xilem`. Fetching it does not
-merge the wider Xilem workspace; updates are filtered to the core path first.
+The `upstream-xilem` remote points to `linebender/xilem`. The `mark-ik/xilem`
+fork is archived; its recorded base `5d72ad41eb660fa620110e045d332fd95684ebae`
+is in upstream main's history. Fetching the remote does not merge the wider
+Xilem workspace; updates are filtered to the core path first.

@@ -40,6 +40,7 @@ use genet_livery::LiveryDocument;
 use genet_scripted_dom::{NodeId as DomNodeId, ScriptedDom};
 use kernel::geometry::PortablePoint;
 use kernel::graph::{EdgeAssertion, FieldId, Graph, NodeKey, RelationSelector, SemanticSubKind};
+use scenograph::link::LinkKey;
 use seiche::{AffinitySpring, LayoutSnapshot, LayoutView};
 /// The declarative scene catalog, re-exported so hosts (and the standalone bin) can load
 /// a scene by name without depending on `seiche` directly. (Physics scenes P4a.)
@@ -58,7 +59,7 @@ use build::{
     sample_graph, surface_bg,
 };
 use paint_list_api::ColorF;
-use seiche_bridge::{build_simulation, visible_relation_edges};
+use seiche_bridge::{build_simulation, visible_relation_edges_with_assertion_hides};
 
 /// Build the seiche [`AffinitySpring`] from a cartography [`AffinityScores`](crate::signals::AffinityScores)
 /// signal: flatten the `((a, b), weight)` pairs into the force's `(a, b, weight)` triples at the
@@ -114,7 +115,8 @@ fn blend_affinity_pairs(
 mod types;
 pub use crate::signals::{BridgeMetric, ImportanceMetric};
 pub use types::{
-    CameraView, EdgeCell, Face, LayoutFraming, NodeShape, NodeState, PointerButton, Viewport,
+    CameraView, EdgeCell, Face, LayoutFraming, LinkAppearance, NodeShape, NodeState, PointerButton,
+    Viewport,
 };
 
 // The graph-scene paint lane, merged from platen in the 2026-07-09
@@ -206,6 +208,7 @@ use seiche::Physics;
 /// A board scene: the cards and backdrops of a scene that is not a graph,
 /// painted where the physics board holds them.
 pub mod board_scene;
+pub mod backdrop_surface;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
@@ -370,7 +373,8 @@ pub struct ContextRequest {
 struct FoldViewState {
     folds: Vec<curation::FoldRecord>,
     selected: HashSet<NodeKey>,
-    selected_edges: HashSet<EdgeCell>,
+    selected_links: HashSet<LinkKey>,
+    selected_link_appearances: HashMap<LinkKey, (NodeKey, NodeKey)>,
 }
 
 /// The canvas content-root: the graph, its physics, the camera, and the abs-pos
@@ -432,6 +436,19 @@ pub struct Canvas {
     /// This is local view curation, never graph truth. Pointer pulls may update
     /// a held node, but only an explicit release returns it to the solver.
     pinned_nodes: HashSet<NodeKey>,
+    /// The graph grammar's attention and seed (`attention.rs`): view-local,
+    /// never graph truth.
+    grammar: attention::GrammarState,
+    /// Regions the active bounded arrangement draws (`scene_regions.rs`).
+    strategy_regions: Vec<::cartography::ProjectedRegion>,
+    /// The person's arrangement of the Mosaic (`mosaic.rs`).
+    mosaic: mosaic::MosaicState,
+    /// Whether the territory field is drawn beneath the graph (`territory.rs`).
+    territory_field: bool,
+    /// Whether nodes and links are presented by the graph grammar (`grammar_view.rs`).
+    graph_grammar: bool,
+    /// The theme's category colours (`grammar_view.rs`); empty uses the canvas's own.
+    category_colors: Vec<[u8; 3]>,
     /// An in-progress field move / resize drag, if any. (Field regions.)
     field_drag: Option<fields::FieldDrag>,
     forme_region: Option<FormeRegion>,
@@ -440,13 +457,22 @@ pub struct Canvas {
     forme_held: HashSet<NodeKey>,
     /// Currently-selected nodes (click selects one; marquee selects many).
     selected: HashSet<NodeKey>,
-    /// Currently-selected relation cells (edge-pick, or covered by a marquee).
-    /// Layout stays pair-based, but selection is relation-selector-aware.
-    selected_edges: HashSet<EdgeCell>,
+    /// Canonical link identities selected by stroke hit-testing. Multiple
+    /// Resource appearances may share one selected key.
+    selected_links: HashSet<LinkKey>,
+    /// Display appearance used to open a selected link. This disambiguates
+    /// Resource aliases without changing the canonical LinkKey identity.
+    selected_link_appearances: HashMap<LinkKey, (NodeKey, NodeKey)>,
     /// Relation cells the user has hidden from the canvas. The relation and its physics
     /// spring persist; this is display-only. Persistence rides view-intent's
     /// `hidden_relations`.
     hidden_edges: HashSet<EdgeCell>,
+    /// Closed-link hides use canonical source identity; legacy directed-cell
+    /// filters remain separate compatibility state.
+    hidden_links: HashSet<LinkKey>,
+    /// Exact assertion IDs hidden from this view. This remains narrower than
+    /// both canonical-link and selector/cell visibility filters.
+    hidden_assertions: HashSet<String>,
     /// Disposable occurrence controllers supply disclosed endpoint pairs
     /// without minting graph assertions. Ordinary graph canvases use `None`.
     occurrence_edges: Option<Vec<(NodeKey, NodeKey)>>,
@@ -679,6 +705,9 @@ pub struct Canvas {
     marquee: Option<(f32, f32)>,
     /// A left press on empty canvas, a click or a pan (SE23).
     empty_press: Option<EmptyPress>,
+    /// A left click on the loop geometry of a self-link, which sits over the
+    /// node's pick region and therefore needs its own press target.
+    self_link_press: Option<(LinkAppearance, (f32, f32))>,
     /// A right click waiting for the host's context menu (SE26).
     context_request: Option<ContextRequest>,
     /// Whether Ctrl is held (gates wheel-zoom vs wheel-pan).
@@ -806,6 +835,7 @@ impl Default for Canvas {
 
 mod actions;
 pub(crate) mod at_rest;
+mod attention;
 mod cartography;
 mod derived_face;
 mod framing;
@@ -816,6 +846,14 @@ mod nodes;
 mod reader;
 pub mod responsive_link_adapter;
 mod roles;
+mod grammar_view;
+pub mod mosaic;
+pub mod scene_axes;
+mod scene_state;
+mod suggestions;
+pub mod link_suggestions;
+pub mod territory;
+mod scene_regions;
 mod selection;
 mod source_time;
 mod strategy;

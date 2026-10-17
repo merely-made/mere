@@ -1,0 +1,28 @@
+
+running 1 test
+test published_replay_regression::recorded_situation_and_weather_survive_three_owners_and_refuse_tamper ... test child_serves_the_registered_domain ... READY mode=embedded pid=67926 validator-installed=true
+BOUNDED PRODUCT FIXTURE deltas=12 replay-valid-candidate=true
+BOUNDED PRODUCT FIXTURE deltas=124 replay-valid-candidate=true
+TYPED DECK REPLAY mode=embedded phase=0 decks=2 cards-per-deck=78 content-revisions-retained=true metadata-tamper-refused=true durable-bytes-unchanged=true
+SHUFFLED DECK REPLAY mode=embedded phase=0 full-deck=78 prefix=3 orientation-tamper-refused=true durable-bytes-unchanged=true
+SITUATION REPLAY mode=embedded phase=0 saved-response-exact=true network-free-replay=true weather-tamper-refused=true durable-bytes-unchanged=true
+RECEIPT REPLAY mode=embedded phase=0 case=candidate_id same-v1-schema=true replay-refused=true projection-revision-and-journal-history-and-durable-bytes-unchanged=true
+RECEIPT REPLAY mode=embedded phase=0 case=receipt_total_weight same-v1-schema=true replay-refused=true projection-revision-and-journal-history-and-durable-bytes-unchanged=true
+RELEASED mode=embedded pid=67926 validator-calls=0
+
+thread 'child_serves_the_registered_domain' (37825381) panicked at ports/djinn/tests/embedded_reservoir_validation.rs:533:10:
+called `Result::unwrap()` on an `Err` value: Timeout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'published_replay_regression::recorded_situation_and_weather_survive_three_owners_and_refuse_tamper' (37824461) panicked at ports/djinn/tests/embedded_reservoir_validation.rs:165:58:
+called `Result::unwrap()` on an `Err` value: Disconnected
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    published_replay_regression::recorded_situation_and_weather_survive_three_owners_and_refuse_tamper
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 50.82s
+

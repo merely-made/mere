@@ -30,14 +30,19 @@
 //! not per-node facets; they belong to the view-intent/settings stores.
 //!
 //! The family: `arrangement.position` (first wired), then size / sprite /
-//! sprite-hull / material / face — one facet id + payload shape + write/read
-//! pair each, all with the same rewrite-clears-stale save semantics. The
+//! sprite-hull / material / face / seed / regions / mosaic — one facet id +
+//! payload shape + write/read pair each, all with the same
+//! rewrite-clears-stale save semantics. Seed is per-node like the rest;
+//! regions and mosaic describe the whole arrangement, so they are facets of
+//! the scene's container node (as `scene.*` are), keyed by the caller's
+//! container id. The
 //! graph-scoped canvas flags the bespoke geometry carried (`size_by_degree`,
 //! `size_by_importance`, `importance_metric`) are deliberately NOT here; they
 //! await their view-settings home.
 
 use std::collections::BTreeSet;
 
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -66,6 +71,36 @@ pub const ARRANGEMENT_MATERIAL: &str = "arrangement.material";
 /// Facet id of a node's face override. Payload: a string code
 /// (`favicon` / `sprite` / `bare` — the canvas's `Face::from_code` vocabulary).
 pub const ARRANGEMENT_FACE: &str = "arrangement.face";
+
+/// Facet id of a node's place in the graph grammar's saved seed. Payload:
+/// `{"x": f32, "y": f32}`. No node carrying it means the recipe seed.
+pub const ARRANGEMENT_SEED: &str = "arrangement.seed";
+
+/// Facet id of the regions the active arrangement drew. Payload: an array of
+/// [`ArrangementRegion`]. Carried by the scene's container node.
+pub const ARRANGEMENT_REGIONS: &str = "arrangement.regions";
+
+/// Facet id of the person's Mosaic arrangement. Payload: an
+/// [`ArrangementMosaic`]. Carried by the scene's container node.
+pub const ARRANGEMENT_MOSAIC: &str = "arrangement.mosaic";
+
+/// One region an arrangement drew, in world coordinates, its members by id
+/// (the canvas's `SavedRegion`).
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct ArrangementRegion {
+    pub contour: Vec<(f32, f32)>,
+    pub label: Option<String>,
+    pub members: Vec<Uuid>,
+}
+
+/// The person's Mosaic arrangement by member (the canvas's `SavedMosaic`).
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct ArrangementMosaic {
+    pub group_of: Vec<(Uuid, String)>,
+    pub group_order: Vec<String>,
+    pub member_order: Vec<Uuid>,
+    pub scale: Vec<(Uuid, f32)>,
+}
 
 /// The [`ARRANGEMENT_POSITION`] facet id, constructed.
 pub fn arrangement_position_facet() -> FacetId {
@@ -277,6 +312,101 @@ pub fn read_arrangement_faces(store: &NodeFacetStore) -> Vec<(Uuid, String)> {
     })
 }
 
+/// Save-time write of [`ARRANGEMENT_SEED`] (rewrite-clears-stale). `None` is
+/// the recipe seed and writes nothing; an empty `Some` reads back as `None`.
+pub fn write_arrangement_seed(
+    store: &mut NodeFacetStore,
+    seed: Option<impl IntoIterator<Item = (Uuid, (f32, f32))>>,
+) {
+    rewrite_family(
+        store,
+        FacetId::new(ARRANGEMENT_SEED),
+        seed.into_iter()
+            .flatten()
+            .map(|(id, (x, y))| (id, json!({ "x": x, "y": y })))
+            .collect(),
+    );
+}
+
+/// Load-time read of [`ARRANGEMENT_SEED`], shaped for
+/// `CartographyGeometry::with_seed`: `None` when no node carries a seed place.
+pub fn read_arrangement_seed(store: &NodeFacetStore) -> Option<Vec<(Uuid, (f32, f32))>> {
+    let seed = read_family(store, ARRANGEMENT_SEED, |value| {
+        let x = value.get("x")?.as_f64()? as f32;
+        let y = value.get("y")?.as_f64()? as f32;
+        (x.is_finite() && y.is_finite()).then_some((x, y))
+    });
+    (!seed.is_empty()).then_some(seed)
+}
+
+/// Save-time write of [`ARRANGEMENT_REGIONS`] on `container` (rewrite-clears-stale;
+/// an empty set leaves no facet).
+pub fn write_arrangement_regions(
+    store: &mut NodeFacetStore,
+    container: Uuid,
+    regions: &[ArrangementRegion],
+) {
+    let entries = match regions {
+        [] => Vec::new(),
+        regions => vec![(container, json!(regions))],
+    };
+    rewrite_family(store, FacetId::new(ARRANGEMENT_REGIONS), entries);
+}
+
+/// Load-time read of [`ARRANGEMENT_REGIONS`] from `container`, in drawn order.
+/// A malformed payload or any non-finite contour point yields no regions: a
+/// partial set is a wrong picture of the arrangement.
+pub fn read_arrangement_regions(store: &NodeFacetStore, container: Uuid) -> Vec<ArrangementRegion> {
+    let regions: Option<Vec<ArrangementRegion>> = store
+        .get(&container, &FacetId::new(ARRANGEMENT_REGIONS))
+        .and_then(|value| serde_json::from_value(value.clone()).ok());
+    regions
+        .filter(|regions| {
+            regions.iter().all(|r| {
+                r.contour
+                    .iter()
+                    .all(|(x, y)| x.is_finite() && y.is_finite())
+            })
+        })
+        .unwrap_or_default()
+}
+
+/// Save-time write of [`ARRANGEMENT_MOSAIC`] on `container`
+/// (rewrite-clears-stale; `None` leaves no facet).
+pub fn write_arrangement_mosaic(
+    store: &mut NodeFacetStore,
+    container: Uuid,
+    mosaic: Option<&ArrangementMosaic>,
+) {
+    rewrite_family(
+        store,
+        FacetId::new(ARRANGEMENT_MOSAIC),
+        mosaic
+            .map(|mosaic| (container, json!(mosaic)))
+            .into_iter()
+            .collect(),
+    );
+}
+
+/// Load-time read of [`ARRANGEMENT_MOSAIC`] from `container`. A malformed
+/// payload or a non-finite scale yields `None` (the default arrangement).
+pub fn read_arrangement_mosaic(
+    store: &NodeFacetStore,
+    container: Uuid,
+) -> Option<ArrangementMosaic> {
+    let mosaic: ArrangementMosaic = serde_json::from_value(
+        store
+            .get(&container, &FacetId::new(ARRANGEMENT_MOSAIC))?
+            .clone(),
+    )
+    .ok()?;
+    mosaic
+        .scale
+        .iter()
+        .all(|(_, factor)| factor.is_finite())
+        .then_some(mosaic)
+}
+
 /// Drop every facet of every node not in `present` — the load-time reconcile,
 /// mirroring the graph-membership retain the bespoke geometry sidecar did. A
 /// node deleted between sessions takes its whole facet record with it (all
@@ -439,6 +569,172 @@ mod tests {
         assert!(
             read_arrangement_sprite_hulls(&store).is_empty(),
             "a partial polygon is a wrong collider; drop the hull"
+        );
+    }
+
+    #[test]
+    fn seed_round_trips_and_none_is_the_recipe_seed() {
+        let mut store = NodeFacetStore::new();
+        let a = Uuid::from_u128(1);
+        let b = Uuid::from_u128(2);
+        assert_eq!(read_arrangement_seed(&store), None);
+        write_arrangement_seed(&mut store, Some([(a, (1.0, 2.0)), (b, (-3.5, 0.0))]));
+        let mut seed = read_arrangement_seed(&store).unwrap();
+        seed.sort_by_key(|(id, _)| *id);
+        assert_eq!(seed, vec![(a, (1.0, 2.0)), (b, (-3.5, 0.0))]);
+        // Resetting to the recipe seed clears the stale places.
+        write_arrangement_seed(&mut store, None::<[(Uuid, (f32, f32)); 0]>);
+        assert_eq!(read_arrangement_seed(&store), None);
+    }
+
+    #[test]
+    fn a_malformed_seed_place_is_skipped_and_all_malformed_reads_none() {
+        let mut store = NodeFacetStore::new();
+        let good = Uuid::from_u128(1);
+        let bad = Uuid::from_u128(2);
+        let facet = FacetId::new(ARRANGEMENT_SEED);
+        store
+            .set(
+                bad,
+                facet.clone(),
+                json!({ "x": null, "y": 1.0 }),
+                &AcceptAll,
+            )
+            .unwrap();
+        assert_eq!(read_arrangement_seed(&store), None);
+        store
+            .set(good, facet, json!({ "x": 4.0, "y": 5.0 }), &AcceptAll)
+            .unwrap();
+        assert_eq!(
+            read_arrangement_seed(&store),
+            Some(vec![(good, (4.0, 5.0))])
+        );
+    }
+
+    fn sample_regions() -> Vec<ArrangementRegion> {
+        vec![
+            ArrangementRegion {
+                contour: vec![(0.0, 0.0), (10.0, 0.0), (5.0, 8.0)],
+                label: Some("Reading".into()),
+                members: vec![Uuid::from_u128(1), Uuid::from_u128(2)],
+            },
+            ArrangementRegion {
+                contour: vec![(20.0, 20.0), (30.0, 25.0)],
+                label: None,
+                members: vec![Uuid::from_u128(3)],
+            },
+        ]
+    }
+
+    #[test]
+    fn regions_round_trip_in_order_and_a_rewrite_clears_them() {
+        let mut store = NodeFacetStore::new();
+        let scene = Uuid::from_u128(100);
+        write_arrangement_regions(&mut store, scene, &sample_regions());
+        assert_eq!(read_arrangement_regions(&store, scene), sample_regions());
+        write_arrangement_regions(&mut store, scene, &[]);
+        assert!(read_arrangement_regions(&store, scene).is_empty());
+        assert!(
+            store
+                .facets_of(&scene)
+                .is_none_or(|f| !f.has(&FacetId::new(ARRANGEMENT_REGIONS)))
+        );
+    }
+
+    #[test]
+    fn malformed_regions_fall_back_to_none_without_touching_other_groups() {
+        let mut store = NodeFacetStore::new();
+        let scene = Uuid::from_u128(100);
+        let a = Uuid::from_u128(1);
+        write_arrangement_sizes(&mut store, [(a, 48.0)]);
+        write_arrangement_mosaic(&mut store, scene, Some(&sample_mosaic()));
+        store
+            .set(
+                scene,
+                FacetId::new(ARRANGEMENT_REGIONS),
+                json!([{ "contour": [[0.0, null]], "label": null, "members": [] }]),
+                &AcceptAll,
+            )
+            .unwrap();
+        assert!(read_arrangement_regions(&store, scene).is_empty());
+        assert_eq!(read_arrangement_sizes(&store), vec![(a, 48.0)]);
+        assert_eq!(
+            read_arrangement_mosaic(&store, scene),
+            Some(sample_mosaic())
+        );
+    }
+
+    fn sample_mosaic() -> ArrangementMosaic {
+        ArrangementMosaic {
+            group_of: vec![(Uuid::from_u128(1), "docs".into())],
+            group_order: vec!["docs".into(), "news".into()],
+            member_order: vec![Uuid::from_u128(2), Uuid::from_u128(1)],
+            scale: vec![(Uuid::from_u128(2), 1.5)],
+        }
+    }
+
+    #[test]
+    fn mosaic_round_trips_and_none_clears_it() {
+        let mut store = NodeFacetStore::new();
+        let scene = Uuid::from_u128(100);
+        assert_eq!(read_arrangement_mosaic(&store, scene), None);
+        write_arrangement_mosaic(&mut store, scene, Some(&sample_mosaic()));
+        assert_eq!(
+            read_arrangement_mosaic(&store, scene),
+            Some(sample_mosaic())
+        );
+        write_arrangement_mosaic(&mut store, scene, None);
+        assert_eq!(read_arrangement_mosaic(&store, scene), None);
+    }
+
+    #[test]
+    fn a_malformed_mosaic_reads_none() {
+        let mut store = NodeFacetStore::new();
+        let scene = Uuid::from_u128(100);
+        let facet = FacetId::new(ARRANGEMENT_MOSAIC);
+        store
+            .set(scene, facet.clone(), json!("not a mosaic"), &AcceptAll)
+            .unwrap();
+        assert_eq!(read_arrangement_mosaic(&store, scene), None);
+        store
+            .set(
+                scene,
+                facet,
+                json!({ "scale": [[Uuid::nil(), null]] }),
+                &AcceptAll,
+            )
+            .unwrap();
+        assert_eq!(read_arrangement_mosaic(&store, scene), None);
+    }
+
+    #[test]
+    fn a_facet_set_from_before_seed_regions_and_mosaic_still_loads() {
+        let mut store = NodeFacetStore::new();
+        let scene = Uuid::from_u128(100);
+        let a = Uuid::from_u128(1);
+        write_arrangement_positions(&mut store, [(a, (1.0, 2.0))]);
+        write_arrangement_sizes(&mut store, [(a, 48.0)]);
+        write_arrangement_faces(&mut store, [(a, "bare")]);
+        assert_eq!(read_arrangement_positions(&store), vec![(a, (1.0, 2.0))]);
+        assert_eq!(read_arrangement_sizes(&store), vec![(a, 48.0)]);
+        assert_eq!(read_arrangement_seed(&store), None);
+        assert!(read_arrangement_regions(&store, scene).is_empty());
+        assert_eq!(read_arrangement_mosaic(&store, scene), None);
+    }
+
+    #[test]
+    fn the_new_groups_rewrite_independently_of_the_rest_of_the_family() {
+        let mut store = NodeFacetStore::new();
+        let scene = Uuid::from_u128(100);
+        let a = Uuid::from_u128(1);
+        write_arrangement_seed(&mut store, Some([(a, (1.0, 1.0))]));
+        write_arrangement_regions(&mut store, scene, &sample_regions());
+        write_arrangement_mosaic(&mut store, scene, Some(&sample_mosaic()));
+        write_arrangement_regions(&mut store, scene, &[]);
+        assert_eq!(read_arrangement_seed(&store), Some(vec![(a, (1.0, 1.0))]));
+        assert_eq!(
+            read_arrangement_mosaic(&store, scene),
+            Some(sample_mosaic())
         );
     }
 

@@ -17,6 +17,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+pub mod attention;
 pub mod dataset;
 pub mod dynamics;
 pub use dynamics::{DynamicsSlot, DynamicsVariant, DYNAMICS_SLOT_VERSION};
@@ -24,6 +25,8 @@ pub mod link;
 pub mod options;
 pub mod presentation;
 pub mod relationship;
+pub mod seed;
+pub mod suggestion;
 pub mod swatch;
 
 /// The stable schema version for authored projection definitions.

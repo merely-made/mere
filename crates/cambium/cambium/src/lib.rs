@@ -32,6 +32,8 @@ mod atlas;
 mod command_surface;
 mod command_menu_bar;
 mod component;
+mod backdrop_scene;
+pub use backdrop_scene::{BackdropSceneEvent, BACKDROP_SCENE_CSS, backdrop_scene_reading};
 mod context;
 mod controls;
 mod detail_panel;
