@@ -1216,6 +1216,10 @@ is inferred from these debug packages.
 caps are unchanged. Measurements below were taken against the earlier
 3,407,872 B cap and are kept as recorded.
 
+**Amended 2026-10-16 (Mark's ruling):** the Wasm cap is now 3,670,016 B
+(3.50 MiB) per route artifact, after WebGPU measured 3,596,340 B; see the
+scenograph editor plan's 2026-10-16 viewer entry.
+
 Mark authorized reducing the viewer below R157's unchanged 3,407,872-byte
 (3.25 MiB) gzip limit so the site can replace its sandbox. Work starts on
 `codex/viewer-size-budget` from published `ea9239a3f`, preserving the accepted
