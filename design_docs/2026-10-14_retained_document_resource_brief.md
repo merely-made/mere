@@ -1,9 +1,10 @@
 # Retained document resource brief
 
-**Date:** 2026-10-14. **Revised:** 2026-10-16. **Status:** Rowan remains the
-working direction. The parser comparison and isolated retained-document/pack
-consumer proof pass. Product integration, full generator ABI, durable history,
-and a shared resource API remain unimplemented. The proof stays in testing.
+**Date:** 2026-10-14. **Revised:** 2026-10-17. **Status:** Rowan remains the
+working direction. The parser comparison, isolated document/pack proof, and
+bounded DOM batching experiment pass. Product integration, full generator ABI,
+durable history, and a shared resource API remain unimplemented. All proof
+implementations stay in testing.
 
 Use a retained document resource to inspect and revise authored data while
 preserving its text, comments, unknown content, and earlier revisions. The
@@ -284,8 +285,67 @@ medians were 102.42 and 223.62 microseconds respectively; for the 1,115-byte
 annotated pack, 251.22 and 655.05 microseconds. The synthetic 4,096-key table
 had substantially higher composite lowering cost. Raw samples show host-load
 variation, so these are bounded observations rather than latency guarantees
-or a like-for-like comparison with the earlier parser-only benchmark. Profile
-stages before attributing that cost or selecting an optimization.
+or a like-for-like comparison with the earlier parser-only benchmark. The
+subsequent stage profile and paired batching experiment below identify and
+reduce the dominant wide-table construction work.
+
+**Wide-table profile and bounded optimization — experiments 2026-10-16;
+recorded here 2026-10-17.** The
+[stage profile](/Users/markik/Code/testing/retained-lowering-profile-20261016/REPORT.md)
+measured DOM construction at 116.303 ms of a 124.426 ms lowering pass, about
+92.8% on the 4,096-key fixture. Separate counters and source inspection identify
+repeated cloning of accumulated table entries: each `Shared::update` loads an
+Arc still held by its slot, then `Arc::make_mut` clones the entry map/vector
+before the next insertion. The 8,386,657 counted vector entry pairs equal
+`4096 * 4095 / 2 + 97`; the fixed 97-pair addition comes from pack scaffolding.
+Validation and JSON conversion add no further entry-container clones in this
+valid corpus. These counts measure vector pairs, not allocation bytes or deep
+syntax-tree copying; each clone also copies the lookup map.
+
+The isolated
+[batching report](/Users/markik/Code/testing/retained-dom-batch-20261016/REPORT.md),
+[paired results](/Users/markik/Code/testing/retained-dom-batch-20261016/results/summary.json),
+and [patch](/Users/markik/Code/testing/retained-dom-batch-20261016/results/optimization.patch)
+retain the candidate and unchanged control. The candidate batches consecutive
+root entries and inline-table entries during private construction, stopping
+at header boundaries. It reuses the original per-entry conflict body, verified
+identical apart from indentation. Shared-container semantics and header/array
+handling remain unchanged. The same 64,446-byte wide fixture gives these paired
+local M4 release observations, with three fresh processes per backend and
+backend/fixture order reversed in the middle pair:
+
+| Measurement, 4,096 keys | Unchanged control | Batched candidate |
+|---|---:|---:|
+| DOM construction | 356.069 ms | 2.240 ms |
+| Whole lowering, interleaved uninstrumented control | 380.106 ms | 14.472 ms |
+| Vector entry pairs cloned during construction | 8,386,657 | 41 |
+
+That is about 159x for DOM construction and 26.3x for whole lowering in these
+paired runs. Counter binaries are separate from timing binaries. The optimized
+copy count stays at 41 over 256, 512, 1,024, 2,048 and 4,096 keys, removing the
+wide contiguous table's triangular term. Host-load variation prevents treating
+these timings as portable guarantees or comparing separate experiment dates
+as a speedup. Independent parsing and canonicalization account for more of the
+remaining total; neither was changed.
+
+Both libraries pass 101 inherited taplo tests each. Both resource backends pass
+12 release tests each; the optimized counter-enabled configuration passes the
+same 12. The direct differential corpus covers 20 named cases, 3,075 UTF-8-safe
+prefixes, 360 deterministic edits and all five widths. It compares syntax and
+semantic diagnostics, ordered DOM paths, primary/additional key source ranges,
+node/descendant ranges, valid values and formatter output; paired runs also
+require matching domain hashes. Duplicate keys, dotted-key merges, repeated
+and scalar/table headers, inline-table conflicts and array-of-table ownership
+are explicit controls. Formatting and probe Clippy pass. This is bounded
+agreement, not exhaustive equivalence or full grammar qualification.
+
+Keep the batched backend as a tested isolated candidate. Dotted/pseudo-table
+merges and repeated visits through separate headers can still clone populated
+containers; this does not establish global linearity. Root batching introduces
+an O(N) temporary vector, and peak allocation/RSS was not measured. Product
+compatibility, wider consumer/platform checks, and memory qualification remain
+separate. This optimization changes DOM construction only: full-reparse syntax
+history still has the sharing/retention limits measured above.
 
 **Next gates.** Product adoption remains open: settle the required TOML version
 and full schema/ABI, product identity encoding, retention budgets, save/reload
@@ -295,10 +355,12 @@ introduced, must match parsing of their resulting text before publication;
 that optimization path has not been exercised by this proof.
 
 The detailed reports, fixtures, code, lockfiles and reproduction runners stay
-in three local testing directories: the
+in local testing directories: the
 [October 13 probe](/Users/markik/Code/testing/redox-document-20261013/REPORT.md),
 [October 15 parser comparison](/Users/markik/Code/testing/retained-parser-20261015/REPORT.md),
-and [October 16 document proof](/Users/markik/Code/testing/retained-document-20261016/REPORT.md).
+[October 16 document proof](/Users/markik/Code/testing/retained-document-20261016/REPORT.md),
+[lowering profile](/Users/markik/Code/testing/retained-lowering-profile-20261016/REPORT.md),
+and [batched DOM experiment](/Users/markik/Code/testing/retained-dom-batch-20261016/REPORT.md).
 Their absolute links resolve on the M4 host; the artifacts are not copied into
 this repository or available through those links on GitHub.
 
