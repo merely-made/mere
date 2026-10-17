@@ -2,9 +2,10 @@
 
 **Date:** 2026-10-14. **Revised:** 2026-10-17. **Status:** Rowan remains the
 working direction. The parser comparison, isolated document/pack proof, and
-bounded DOM batching experiment pass. Product integration, full generator ABI,
-durable history, and a shared resource API remain unimplemented. All proof
-implementations stay in testing.
+bounded DOM batching experiment pass. Isocosm has published a private optional
+pack-authoring CLI with the batched backend and real manifest/full `GenValue`
+schema. Durable history and a shared resource API remain deferred. The earlier
+proofs stay in testing; the private consumer lives in Isocosm.
 
 Use a retained document resource to inspect and revise authored data while
 preserving its text, comments, unknown content, and earlier revisions. The
@@ -20,7 +21,8 @@ parser. Rowan supplies the immutable tree representation; the TOML parser must
 preserve all input and produce diagnostics. In the checked API,
 `Document::parse` and `FromStr` for `DocumentMut` return a document or a
 `TomlError`. Keep `toml_edit` useful for parseable documents while proving the
-Rowan consumer.
+Rowan consumer; the private Isocosm integration below is the first product
+consumer.
 
 ## Rowan revisions
 
@@ -164,8 +166,8 @@ from a second consumer.
 | Piece | Intended role |
 |---|---|
 | Rowan 0.17 | Lossless authored syntax and structurally shared revisions. A format parser must build the tree, including unknown and erroneous input. |
-| TOML parser | taplo 0.14 (MIT) builds lossless trees and collects syntax errors; DOM validation checks semantics such as duplicate keys. Its Rowan ^0.15.3 dependency resolved to 0.15.19 in the comparison. A manifest-only port to 0.17 passed the same tests and is used in the isolated document proof. Neither version supports the tested TOML 1.1 additions. |
-| `toml_edit` | Existing TOML editing with comment and formatting preservation, for documents that parse. Keep it as the backend until the Rowan consumer is proven. |
+| TOML parser | taplo 0.14 (MIT) builds lossless trees and collects syntax errors; DOM validation checks semantics such as duplicate keys. Its Rowan ^0.15.3 dependency resolved to 0.15.19 in the comparison. A manifest-only port to 0.17 passed the same tests and is used in the isolated document proof; the batched fork now also serves the private Isocosm CLI. Neither parser supports the tested TOML 1.1 additions; product typed decoding remains authoritative. |
+| `toml_edit` | Existing TOML editing with comment and formatting preservation, for documents that parse. Existing uses remain useful; the private Isocosm CLI uses the batched Rowan backend. |
 | Sonic | JSON ingestion and typed deserialization of machine interchange; not part of the authored-syntax slice. `OwnedLazyValue` remains an unmeasured candidate for deferred materialization. |
 | Source overlay | The probe's byte-exact JSON overlay remains the candidate where machine JSON must survive byte for byte. Rowan does not replace it. |
 | Serde and application schemas | Typed lowering, validation, and canonical domain encoding. |
@@ -339,20 +341,73 @@ and scalar/table headers, inline-table conflicts and array-of-table ownership
 are explicit controls. Formatting and probe Clippy pass. This is bounded
 agreement, not exhaustive equivalence or full grammar qualification.
 
-Keep the batched backend as a tested isolated candidate. Dotted/pseudo-table
+The isolated experiment remains the control/equivalence evidence for the
+batched backend adopted by the private Isocosm consumer below. Dotted/pseudo-table
 merges and repeated visits through separate headers can still clone populated
 containers; this does not establish global linearity. Root batching introduces
-an O(N) temporary vector, and peak allocation/RSS was not measured. Product
-compatibility, wider consumer/platform checks, and memory qualification remain
-separate. This optimization changes DOM construction only: full-reparse syntax
-history still has the sharing/retention limits measured above.
+an O(N) temporary vector, and peak allocation/RSS was not measured. The private
+product compatibility checks below do not replace wider consumer/platform
+checks or memory qualification. This optimization changes DOM construction
+only: full-reparse syntax history still has the sharing/retention limits
+measured above.
 
-**Next gates.** Product adoption remains open: settle the required TOML version
-and full schema/ABI, product identity encoding, retention budgets, save/reload
-coordination and crash behavior. A second consumer must establish common
-lifecycle needs before extracting a shared API. Direct structural edits, if
-introduced, must match parsing of their resulting text before publication;
-that optimization path has not been exercised by this proof.
+**Private Isocosm integration — published 2026-10-17.**
+[Isocosm commit `ecff5762`](https://github.com/merely-made/isocosm/commit/ecff57627cb8340cd1514432f84cda47de3d0c16)
+lands an optional, app-local `pack-author` CLI in `isometry-system`. The
+[owning plan](https://github.com/merely-made/isocosm/blob/ecff57627cb8340cd1514432f84cda47de3d0c16/design_docs/2026-10-17_private_pack_authoring_plan.md)
+and [qualification receipt](https://github.com/merely-made/isocosm/blob/ecff57627cb8340cd1514432f84cda47de3d0c16/design_docs/receipts/2026-10-17_pack_authoring/qualification.json)
+record the implementation and bounded checks. The receipt describes the
+pre-commit source state; the linked commit records publication. The optional
+MIT taplo fork pins Rowan 0.17.0 and retains the tested root/inline-table
+batching, conflict checks, source associations and ordering. Experiment-only
+counters are excluded. Normal runtime builds do not depend on this backend;
+no shared library API is introduced.
+
+This consumer uses the actual `ContentPackManifest`, validator and full
+`GenValue` schema rather than the earlier copied manifest/text-only stand-in.
+The existing loader, schema, runtime admission and session code are unchanged.
+TOML 1.x and externally supplied JSON keep their existing typed decoding and
+original saved format, including the refusal of two competing manifests.
+Unsupported TOML 1.1 syntax produces an advisory source-index diagnostic when
+the authoritative decoder succeeds; a complete syntax index is not claimed.
+Unknown content remains in authored text. No probe-specific domain hash or
+identity encoding is promoted into the product. Isocosm remains in development;
+this integration does not add ownership to its active campaign-retirement work.
+
+The CLI retains immutable snapshots, revision-fenced handles, expected-base
+UTF-8 text-edit batches and receipts, diagnostics, undo as a fresh revision,
+real typed checks, and explicit draft saving. Invalid drafts remain saveable;
+checking or saving never admits a manifest into live application state.
+History is limited to 32 revisions; authoring input is limited to 2 MiB and
+lexical TOML bracket/brace depth to 64. Cooperating saves use a per-path lease,
+source SHA-256 checks and same-directory synced temporary-file replacement.
+Tests cover external-change and stale-edit refusal, a newly conflicting second
+manifest, failed replacement, exact CRLF/Unicode source, Unix mode preservation,
+and refusal to replace symlink input. Noncooperating writers still have the
+hash-check/rename race; directory fsync, crash/stale-lease recovery, ACL/xattr
+preservation and nonlocal filesystem behavior are not qualified.
+
+The published verification records 68 feature-enabled package tests, 58
+default-path tests and 101 inherited backend tests passing, plus all-feature
+all-target compilation, Rust 1.97.1 compatibility, formatting and scoped
+Clippy. Package-wide `-D warnings` encounters an existing loader lint; strict
+package-wide lint success is not claimed. The real demo pack and annotated
+variant exercise the private consumer. Subprocess tests save an invalid draft,
+reopen and repair it in a fresh process, then load the result with the existing
+loader and execute the real demo generator fixture. The 8 authoring unit tests
+and 2 subprocess tests were rerun before publication. These are terminal and
+loader checks, without native GUI acceptance or new product timing/memory
+measurements. The fork is committed as a local optional dependency; publishing
+a tool distribution still requires separately qualifying that fork's packaging.
+
+**Next gates.** Keep this consumer private. A second consumer must establish
+common lifecycle needs before extracting a shared API; shared API work remains
+explicitly deferred. Durable identity/history, product retention and memory
+budgets, wider platform/consumer compatibility, external-writer coordination
+and crash behavior remain open. The private consumer resolves the real-schema
+and existing-format compatibility question within its tested scope. Direct
+structural edits, if introduced, must match parsing of their resulting text
+before publication; that optimization path remains unexercised.
 
 The detailed reports, fixtures, code, lockfiles and reproduction runners stay
 in local testing directories: the
