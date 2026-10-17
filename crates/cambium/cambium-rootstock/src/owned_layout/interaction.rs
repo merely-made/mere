@@ -78,14 +78,13 @@ impl OwnedLayout {
             return false;
         }
 
-        let phase = crate::Instant::now();
-        let styles = resolve_styles(dom, &self.style_set, &self.device, &self.interactions);
-        self.style_resolve_us = elapsed_us(phase.elapsed());
-        if styles == self.resolved_styles {
+        let before = self.style.styles().clone();
+        self.update_style(dom, &[]);
+        if *self.style.styles() == before {
             // Keep fragments, shaped text, scroll offsets and their generation.
             return false;
         }
-        self.layout_resolved(dom, styles);
+        self.layout_resolved(dom);
         true
     }
 }

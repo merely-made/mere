@@ -1,6 +1,6 @@
 # Cambium native hosts: incremental relayout adoption plan
 
-**Date:** 2026-10-17. **Status:** proposal for owner ruling; no code changed.
+**Date:** 2026-10-17. **Status:** approved by the owner 2026-10-17 as proposed; P1 landed be7906481.
 
 Citations are `file:line`. Mere paths are relative to `crates/cambium/cambium-rootstock/src/`
 (`mere:`), other Mere paths are repo-root-relative; Genet paths are relative to `components/genet-livery/src/` unless marked `genet:`.
@@ -81,6 +81,26 @@ over the final DOM (what `OwnedLayout::rebuild` does). The retained numbers are
 | 100 | 69 ms | 57-61 ms | 26-28 ms | 4.7 / 9.1 / 13.6 ms | 0.15 ms |
 | 1,000 | 685 ms | 668-697 ms | 300-311 ms | 52 / 124 / 126 ms | 1.6 ms |
 | 5,000 | 3,363 ms | 4,546-4,620 ms | 2,342-2,388 ms | 450 / 1,268 / 618 ms | 10.5 ms |
+
+### P1 timing gate (T), 2026-10-17
+
+One changed text node in the middle row of the keyed list, run through the real frame path
+(`Harness` over `GenetAppRunner`, `Host::relayout`; release, macOS, no fonts registered). Row =
+`div(span label, span count, button)` with `on_click`, so 8 nodes as above. Median of 5 frames
+(3 at 5,000) after one warm-up. "Before" is the same build with `IncrementalStyle::invalidate()`
+forced each frame, which is the old full `resolve_styles` path plus the plane bookkeeping; the
+probe was an untracked example and is deleted. Times in ms.
+
+| Rows | Style before | Style after | Layout (full, both) | Extent | `layout_update` before | `layout_update` after |
+|---|---|---|---|---|---|---|
+| 100 | 11.6 | 0.1 | 36 | 0.2 | 49.7 | 37.2 |
+| 1,000 | 133.3 | 1.2 | 396-409 | 3.1 | 546.6 | 424.5 |
+| 5,000 | 678.1 | 10.3 | 2,192-2,308 | 18.5 | 2,957.3 | 2,426.9 |
+
+The style stage fell to about 1 percent of its former cost (the residual is
+`resolve_counters` and plane bookkeeping); the frame fell about 22 percent, as the plan expected
+from leaving layout full. Layout is now 94-95 percent of the Rootstock frame at every size, so P2/P3
+carry the remaining gain. The 5,000-row text-change frame is 2.4 s against the P3 bar of 50 ms.
 
 Findings:
 
