@@ -1556,7 +1556,17 @@ Stop and record the reason if any of these happen:
     Native import completed into a **140,509,982,720-byte** model library.
     Native generation is running; completed native asks, exact reference parity
     and serialized checkpoint/provider-reload recovery are still open.
+  - The final Qwen2 CPU model-library row passes. Djinn's seven inference unit
+    tests pass; its full unit run has 218 passes and two failures in unchanged
+    identity-card and route-projection expectations. Both failures reproduce in
+    isolation. The relevant source/fixture bytes equal the upstream base;
+    concurrent primary-checkout fixture edits remain untouched. No separate
+    baseline rebuild was performed. The documentation judgment audit has the
+    same 16 findings as before this work.
   - The remaining consumer build and final small-Qwen model-library regressions
-    are running. Largest-per-family qualification, further decoder families,
+    are running. The [primitive checkpoint receipt](../../../support/receipts/resident_inference_architecture_primitives.json)
+    binds completed checks, source and binary hashes, independent references,
+    failed attempts and the exact evidence boundaries. It does not qualify the
+    native large-model run. Largest-per-family qualification, further families,
     physical-fleet execution and installed-resident invocation are not covered
     by this checkpoint. I9 remains in progress.
