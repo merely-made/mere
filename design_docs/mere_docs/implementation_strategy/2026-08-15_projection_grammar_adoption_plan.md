@@ -2316,8 +2316,8 @@ This is product direction, not a claim that the current `inker::pool` vector is
 already a Mere or that a specific Mere API satisfies the new requirements.
 Inspect existing Mere/Swatch/Canvas and history seams before extending the
 prototype; do not extract an independent Pool crate merely to bypass that review.
-Cross-Pool copy/move/reference behavior, workspace identity and cross-device
-availability remain open.
+Prompt 30 below selects Move as the default cross-Pool transfer. Workspace
+identity, non-default transfer actions and cross-device availability remain open.
 
 **Prompt 27 — removal and recovery:**
 
@@ -2325,9 +2325,9 @@ availability remain open.
 
 Removal must be undoable after reopening Pool. This replaces the prototype's
 immediate permanent removal. A separate Trash is not the selected recovery UI.
-Inserted independent copies remain unaffected. The extent of Pool history and
-its relationship to held-item content editing still need definition; this answer
-does not impose a history limit, expiry period or automatic purge.
+Inserted independent copies remain unaffected. Prompt 29 below defines Pool history as adding/removing and arranging items,
+with content edits in the normal editor history. This answer does not impose a
+history limit, expiry period or automatic purge.
 
 **Prompt 28 — inspecting nested groups:**
 
@@ -2344,3 +2344,51 @@ These decisions have not yet changed implementation or expanded the historical
 qualification claims. Validation for a future slice must include distinct scope
 selection, removal/undo across a fresh process, shared held-item editing ownership
 and both nested views preserving the same authored facts in metre and Woodshed.
+
+
+#### Pool review: history, transfer and alternatives (prompts 29–31)
+
+**Prompt 29 — undo ownership:**
+
+> Pool history covers adding/removing and arranging items; content edits use the item’s normal editor history (Recommended)
+
+Pool's collection/arrangement operations have their own history; editing held
+content uses that item's normal editor history, including when its shared
+editor is exposed on the canvas. The earlier requirement for removal undo to
+survive reopen still applies. Durable history policy for other operations is
+not additionally specified by this answer. Do not duplicate a content edit into
+an independently competing Pool content history.
+
+**Prompt 30 — default transfer between distinct scoped Pools:**
+
+> Move the held item to the other Pool
+
+Default cross-Pool transfer is Move. This is distinct from inserting independent
+content into a composition, which remains the agreed behavior. Non-default copy
+or shared-reference actions are not settled here. Multi-Pool operation/undo
+coordination remains an implementation and interaction question; do not treat
+an incomplete destination write as a completed move.
+
+**Prompt 31 — where alternative arrangements live:**
+
+> Save alternatives within the same composition or arrangement, with switching/comparison (Recommended)
+
+Alternatives belong to the same composition/arrangement and can be switched or
+compared. This does not yet settle whether their content pieces are shared or
+independent, how edits diverge, or how adopting an alternative affects the main
+arrangement. Ordinary document rearrangement remains a separate explicit action.
+
+#### Sidecar framing
+
+Mark added this framing while reviewing the decisions above:
+
+> ahhh. perhaps the best way to think about it is, this is what would be the browser extension, as a sidecar.
+
+This suggests a compact Mere surface alongside a host's ordinary activity, with
+a browser extension as a concrete host integration. It is a design framing, not
+a request to ship a browser extension now, a settled extension permission model,
+or a claim of existing cross-app support. Review whether Pool is a role/view of
+an ordinary Mere or a distinct utility built from Mere components before adding
+another collection system. The sidecar's attachment, context switching and
+capture interaction remain open. No implementation qualification is expanded by
+these notes.
