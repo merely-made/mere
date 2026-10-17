@@ -356,7 +356,7 @@ where
             Some(layout) if !size_changed && !titlebar_moved => {
                 rebuilt = true;
                 let phase = crate::Instant::now();
-                layout.rebuild(&view, lw, lh);
+                layout.rebuild(&view, lw, lh, &muts);
                 rebuild_us = elapsed_us(phase.elapsed());
             },
             _ => {
