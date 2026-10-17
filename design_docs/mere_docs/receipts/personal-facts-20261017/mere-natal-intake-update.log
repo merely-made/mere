@@ -1,0 +1,42 @@
+    Updating crates.io index
+    Updating git repository `https://github.com/merely-made/netrender.git`
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://github.com/merely-made/murm.git`
+    Updating git repository `https://github.com/merely-made/dramatis.git`
+    Updating git repository `https://github.com/mark-ik/vello`
+    Updating git repository `https://github.com/merely-made/cleromancy.git`
+    Updating git repository `https://github.com/merely-made/mere.git`
+    Updating git repository `https://github.com/merely-made/turquet.git`
+    Updating buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+      Adding chrono-tz v0.10.4
+    Updating cleromancy-core-acceptance v0.1.0 (https://github.com/merely-made/cleromancy.git?branch=main#d5c383c1) -> #a684361b
+    Updating document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85) -> #bd8fe1e5
+    Updating murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85) -> #bd8fe1e5
+    Updating netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8) -> #8960024f
+    Updating paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8) -> #8960024f
+    Updating paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8) -> #8960024f
+      Adding phf v0.12.1
+      Adding phf_shared v0.12.1
+    Updating regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85) -> #bd8fe1e5
+    Updating script-engine-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating selvage v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85) -> #bd8fe1e5
+    Updating taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7) -> #fa27ea54
+    Updating tulle v0.2.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85) -> #bd8fe1e5
+note: pass `--verbose` to see 140 unchanged dependencies behind latest
