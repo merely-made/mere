@@ -1817,3 +1817,49 @@ and edge gestures, keyboard movement, Escape and compact rest editing pass in
 portable document. Five captures were reviewed. The consumer keeps beat
 snapping and draft/Save semantics; the surface still supplies geometry only.
 Evidence: `woodshed/validation/native-arrangement-spans_20261016/receipt.json`.
+
+
+### Metre editing and shared span intents (2026-10-17)
+
+Prove native authored metre alignment in Knot before extracting editing overlap
+with Woodshed. Each source syllable has an optional explicit positive span (or
+unplaced value); omitted records retain legacy ordinal placement. Stress heights,
+pronunciation evidence, exact source identities and rhyme arcs stay independent
+of authored alignment. Metre positions are not playback durations.
+
+Done conditions: native pointer and keyboard edit/cancel/reopen over the shared
+surface; source/pronunciation preservation and stale proposal refusal; portable
+Graphshell rendering and local-copy editing; one bounded revision-qualified
+intent contract used by both real owners, with domain validation and persistence
+remaining in those owners. Read-only imports never gain source mutation authority.
+
+Implementation: `scenomise::span_edit` now supplies checked move/start/end math,
+placed-span targets and source/revision/occurrence/lane/before-qualified intents.
+Metre and Woodshed adapters accept the same contract; they retain their own
+history, source checks and durable writes. Zero movement preserves off-grid
+source spans. Graphshell offers explicit local-copy editing, preview/cancel and
+portable export; source imports retain read-only authority. The standalone
+product WebAssembly check and dependency boundaries pass. At that initial compile milestone, native and browser acceptance receipts were
+still pending; the final qualification below closes those bounded gates.
+The web lockfile reconciles two missing `zeroize` edges from the fetched
+owner-admission supplier update; no web Git source pins change.
+
+Bounded continuation complete: Knot `fdd6940` and Woodshed `28a0741` adopt the
+canonical shared `4c4ea11d8` source. Shared validation passes three span-intent,
+four sequence-template and six surface cases plus the dependency boundaries.
+Woodshed passes nine locked arrangement-editor route/model cases. Knot passes
+72 focused cases and two final macOS native processes (237 presented frames, six
+reviewed captures), including preview/Escape, body and edges, keyboard, history,
+explicit sealed collection and exact fresh-process SceneInput reopening.
+The lexical source, candidate stress and rhyme facts remain unchanged.
+
+Graphshell's actual WebGPU product host passes the committed copy-edit scenario
+for metre and progression inputs, with three functional captures and no page
+gate failures. The scrolled captures do not claim every viewport is visually
+qualified. Source imports remain read-only; explicit local copies receive a new
+Graphshell identity and exported copied facts. No generic command bus, history,
+playback clock or source-write capability was moved into the shared intent type.
+Evidence: [shared/browser receipt](../../../validation/shared-span-intents_20261017/receipt.json),
+`knot-editor/docs/receipts/2026-10-17_metre_editing/`, and
+`woodshed/validation/shared-span-intents_20261017/`. The older A5 and unrelated
+portable-grammar gates in this plan remain open.

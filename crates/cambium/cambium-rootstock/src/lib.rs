@@ -214,10 +214,9 @@ pub trait Surface {
         }
     }
 
-    /// The netrender renderer, for one operation. In the browser this is
-    /// Genet's frame-gate guard: never keep it across another renderer use
-    /// (rasterization, a producer callback) or across frames. Prefer
-    /// [`try_renderer`](Self::try_renderer), which refuses instead of panicking.
+    /// The native netrender renderer, for one operation. Browser callers use
+    /// [`try_renderer`](Self::try_renderer) so a busy or lost Core is refused.
+    #[cfg(not(target_arch = "wasm32"))]
     fn renderer(&self) -> RendererAccess<'_> {
         self.core().renderer()
     }

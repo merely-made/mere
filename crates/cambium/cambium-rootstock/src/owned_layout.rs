@@ -9,19 +9,22 @@
 use std::collections::HashMap;
 
 use genet_livery::{
-    Device, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane, StyleSet, TextPaintPhase,
-    TextRange, TextSystem, ViewportSizes, emit_paint_list_with_text_system_scrolled_with_images,
-    hit_test_with_scroll, layout_with_text_system, resolve_styles,
+    Device, IncrementalStyle, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane,
+    StyleSet, TextPaintPhase, TextRange, TextSystem, ViewportSizes,
+    emit_paint_list_with_text_system_scrolled_with_images, hit_test_with_scroll,
+    layout_with_text_system,
 };
 use genet_render::{VisualAffinity, VisualCaret, VisualMovement, VisualSelection};
 use genet_scripted_dom::NodeId;
-use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
+use layout_dom_api::{DomMutation, LayoutDom, LocalName, Namespace, NodeKind};
 use paint_list_api::{
     ColorF, CommonPlacement, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize, PaintCmd, RectItem,
 };
 
 #[cfg(test)]
 mod hidden_panel_tests;
+#[cfg(test)]
+mod incremental_tests;
 mod interaction;
 mod producer;
 #[cfg(test)]
@@ -60,8 +63,9 @@ pub struct OwnedLayout {
     interactions: InteractionStates<NodeId>,
     hovered: Option<NodeId>,
     focused: Option<NodeId>,
-    // Keep the cascade result separately: layout can adjust its output styles.
-    resolved_styles: StylePlane<NodeId>,
+    // The cascade result, kept across frames and updated from the drained DOM
+    // mutations. Layout adjusts a copy of it into `styles`.
+    style: IncrementalStyle<NodeId>,
     styles: StylePlane<NodeId>,
     fragments: LiveryLayout<NodeId>,
     text: TextSystem,
@@ -101,14 +105,15 @@ impl OwnedLayout {
         let device = Device::screen(width, height);
         let interactions = InteractionStates::default();
         let phase = crate::Instant::now();
-        let resolved_styles = resolve_styles(dom, &style_set, &device, &interactions);
+        let mut style = IncrementalStyle::new();
+        style.update(dom, &style_set, &device, &interactions, &[]);
         let style_resolve_us = elapsed_us(phase.elapsed());
         let mut text = TextSystem::new();
         let font_registration_errors = register_fonts(&mut text, fonts);
         let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
-            &resolved_styles,
+            style.styles(),
             width,
             height,
             ViewportSizes::uniform(width, height),
@@ -127,7 +132,7 @@ impl OwnedLayout {
             interactions,
             hovered: None,
             focused: None,
-            resolved_styles,
+            style,
             styles,
             fragments,
             text,
@@ -144,30 +149,45 @@ impl OwnedLayout {
         }
     }
 
+    /// Bring the session current with `dom`. `mutations` is every change made
+    /// since the last `new` or `rebuild`: the cascade re-resolves only what
+    /// they and the device could have touched. A stylesheet change is not a
+    /// mutation; the host builds a fresh session for it. Layout is full.
     pub(crate) fn rebuild<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
         width: f32,
         height: f32,
+        mutations: &[DomMutation<NodeId>],
     ) {
         self.viewport = (width, height);
         self.device.set_viewport_size(width, height);
-        let phase = crate::Instant::now();
-        let styles = resolve_styles(dom, &self.style_set, &self.device, &self.interactions);
-        self.style_resolve_us = elapsed_us(phase.elapsed());
-        self.layout_resolved(dom, styles);
+        self.update_style(dom, mutations);
+        self.layout_resolved(dom);
     }
 
-    fn layout_resolved<D: LayoutDom<NodeId = NodeId>>(
+    fn update_style<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
-        resolved_styles: StylePlane<NodeId>,
+        mutations: &[DomMutation<NodeId>],
     ) {
+        let phase = crate::Instant::now();
+        self.style.update(
+            dom,
+            &self.style_set,
+            &self.device,
+            &self.interactions,
+            mutations,
+        );
+        self.style_resolve_us = elapsed_us(phase.elapsed());
+    }
+
+    fn layout_resolved<D: LayoutDom<NodeId = NodeId>>(&mut self, dom: &D) {
         let (width, height) = self.viewport;
         let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
-            &resolved_styles,
+            self.style.styles(),
             width,
             height,
             self.device.viewport_sizes,
@@ -176,7 +196,6 @@ impl OwnedLayout {
         )
         .expect("Cambium's authored Livery layout must resolve");
         self.layout_with_text_us = elapsed_us(phase.elapsed());
-        self.resolved_styles = resolved_styles;
         self.styles = styles;
         self.fragments = fragments;
         let phase = crate::Instant::now();

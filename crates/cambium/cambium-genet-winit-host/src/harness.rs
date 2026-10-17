@@ -455,7 +455,12 @@ where
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
         let layout = self.host.s.layout.as_ref()?;
-        taproot::matching(&dom_ref, selector)
+        let projection = cambium_rootstock::document_projection(
+            &cambium_rootstock::WindowDom::document(&dom_ref),
+            layout,
+            self.host.s.last_focus,
+        );
+        taproot::matching_prefer_exact_with_projection(&dom_ref, selector, &projection)
             .into_iter()
             .filter(|node| layout.rendered_visible(&*dom_ref, *node))
             .find(|node| self.painted_rect(*node).is_some())

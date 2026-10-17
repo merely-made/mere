@@ -1,0 +1,64 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 4062797df..708a6498a 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1054,7 +1054,7 @@ dependencies = [
+  "bitflags 2.13.2",
+  "cexpr",
+  "clang-sys",
+- "itertools 0.11.0",
++ "itertools 0.12.1",
+  "log",
+  "prettyplease 0.2.37",
+  "proc-macro2",
+@@ -2666,7 +2666,7 @@ dependencies = [
+ [[package]]
+ name = "cleromancy-core-acceptance"
+ version = "0.1.0"
+-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#ca562db9cb15af5d6f80a153dd9a1e8c78275c22"
++source = "git+https://github.com/merely-made/cleromancy.git?branch=main#da495cfc75b2ee6bbb9476c8c03386e9057c36d3"
+ dependencies = [
+  "blake3",
+  "chartulary",
+@@ -2689,6 +2689,7 @@ dependencies = [
+  "servitor",
+  "thiserror 2.0.21",
+  "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b)",
++ "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802)",
+  "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306)",
+ ]
+ 
+@@ -8278,7 +8279,7 @@ dependencies = [
+  "bytes",
+  "cfg_aliases",
+  "chrono",
+- "constant_time_eq 0.1.5",
++ "constant_time_eq 0.4.2",
+  "data-encoding",
+  "derive_more",
+  "genawaiter",
+@@ -13572,7 +13573,7 @@ dependencies = [
+  "combine",
+  "downcast-rs 2.0.2",
+  "dyn-clone",
+- "hashbrown 0.13.2",
++ "hashbrown 0.17.1",
+  "hi_sparse_bitset",
+  "indexmap",
+  "inventory",
+@@ -17944,6 +17945,15 @@ dependencies = [
+  "sofars",
+ ]
+ 
++[[package]]
++name = "turquet"
++version = "0.17.0"
++source = "git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802#8e3755bbd0d40343eb4750b072801c941ff32802"
++dependencies = [
++ "hifitime",
++ "sofars",
++]
++
+ [[package]]
+ name = "turquet"
+ version = "0.17.0"

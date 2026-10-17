@@ -1780,3 +1780,83 @@ and the consumer retains an immutable authorized snapshot without moving
 Chatelaine autofill or credential custody. Numerical and native consumer
 qualification stay with Cleromancy. Implementation is in progress; no completion
 is inferred from the plain supplier types or the existing V1-V5 receipts.
+
+### Shared personal facts admission hardening (2026-10-17)
+
+The real daemon and embedded owner now resolve newly introduced profile subjects
+against their vault before journaling. Contact references require their retained
+same-persona contact resource. Historical replay remains structural and permits
+previously admitted facts after profile deletion. The transition hook follows
+staged transactions and forks. Thirteen personal-facts, 327 Pandect and 213 Djinn
+library tests pass; the two-application fresh-owner-process fixture passes, with
+its child entry point intentionally ignored by the direct harness. The owner
+route separately rejects an invented profile without changing its envelope and
+admits the actual stored profile. The library rerun uses TMPDIR=/tmp and updates
+the inherited lifecycle assertion to the canonical link.surface presentation,
+while verifying all three underlying source relations remain distinct. Earlier
+SUN_LEN and stale-link assertion failures remain diagnostic evidence.
+
+See [the bounded software receipt](../receipts/personal-facts-20261017/qualification.json).
+Cleromancy native intake and the daemon's new natal portable-validator intake
+are separate subsequent gates; this does not renew the full shared browser wall.
+
+### Immutable natal validator intake (2026-10-17)
+
+The stock daemon and embedded composition import published Cleromancy core
+`a684361b1553848c923912807d525aced61bc820`. The personal-facts patch binds its
+Graph types to this workspace's owning domain crate. The full Djinn library
+passes 214 tests, including real two-application natal admission, exact replay
+and refusal of a same-id altered record with an unchanged disclosed envelope.
+The existing eight owner/replay regressions and the two-application facts
+fresh-process regression also pass; two direct child entry points remain
+intentionally ignored and are exercised by their parent scenarios.
+
+The [immutable intake receipt](../receipts/personal-facts-20261017/natal-portable-intake.json)
+records exact lock/source inputs and scope. Cargo's generated intake aligns
+Genet/Murm branch sources and same-version registry dependency edges; this
+bounded daemon evidence does not recertify unrelated native/browser surfaces.
+Cleromancy retains its own rebuilt native birth-correction/offline-reopen receipt.
+
+### Natal houses portable-validator intake (2026-10-17)
+
+The resident imports immutable Cleromancy core `ca562db`, with planetary
+Turquet `30875f30` and corrected house geometry `e2f65c0`. Both Whole Sign
+and Equal receipts admit through two actual application routes; a modified
+cusp is refused with the disclosed envelope unchanged. The preintegration
+checkpoint passes 215 Djinn library tests and nine owner-process regressions
+(two child entry points intentionally ignored by the direct harness).
+See `receipts/natal-houses-20261017/preintegration.json`. Incoming main's
+span-edit and documentation commits remain distinct and require an integrated
+rerun. Product native and full browser-wall qualification remain separate.
+
+2026-10-17: integrated source `5147de0f3` preserves incoming main `4c4ea11d8`
+and passes the complete selected owner gates: 215 library tests plus nine
+real-process parents, with two intentional direct child ignores. The exact
+immutable core and both numerical revisions remain bound by
+`receipts/natal-houses-20261017/integrated.json`. Product native evidence is
+owned by Cleromancy; no shared browser-wall renewal is inferred.
+
+### Natal cap portable-validator intake (2026-10-17)
+
+Cleromancy core `da495cfc75b2ee6bbb9476c8c03386e9057c36d3` retains its
+original planetary and Whole Sign/Equal editions while admitting optional signed
+motion, observed IERS inputs and Placidus receipts through the same complete
+candidate validator. Two admitted applications witness accepted new receipts and
+refusal of altered motion without a candidate write. Product native evidence
+remains in Cleromancy and is not inferred from this owner fixture.
+
+Preintegration `3b70984e8` passes 225 tests (216 library, eight owner-process
+parents, one shared-facts process parent; two intentional child-entry ignores).
+Integrated source `a4b77014634807b7a82790d233bbaedb28312bd2` preserves incoming
+main `e3de60496` and its coordinated renderer cohort, then passes the same 225
+checks. New Turquet edition is immutable `8e3755bb`; no prior receipt changes.
+The narrow Cargo-generated intake and the separate integrated result are under
+`receipts/natal-cap-20261017/`. This is bounded domain/owner qualification;
+browser, native platform and whole-family acceptance retain their own receipts.
+
+The later incoming Cambium restyling source and documentation (`be7906481`,
+`62251777e`) are preserved by merge `65e9a29a1`. Root dependency lock, Djinn
+validator/owner source and fixture bytes remain exact to `a4b770146`; the three
+natal admission/refusal checks pass again after that merge. The full 225-test
+receipt retains its earlier source identity. This does not renew a renderer or
+native product receipt on the new Cambium implementation.

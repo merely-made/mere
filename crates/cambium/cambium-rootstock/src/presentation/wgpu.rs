@@ -157,6 +157,12 @@ impl<'a> WgpuPresentation<'a> {
                 trace!("acquire-surface-lost", "");
                 return Err(self.failure(packet, NativePresentationFailure::SurfaceLost));
             },
+            genet_render_host::SurfaceAcquire::Reconfigured => {
+                trace!("acquire-reconfigured", "");
+                profile.acquire_us = elapsed_us(phase.elapsed());
+                profile.total_us = elapsed_us(frame_started.elapsed());
+                return Ok(None);
+            },
             genet_render_host::SurfaceAcquire::Unavailable { reason } => {
                 trace!("acquire-unavailable", "{reason}");
                 profile.acquire_us = elapsed_us(phase.elapsed());

@@ -124,7 +124,7 @@ fn harness_at(zoom: f32) -> Harness<App, fn(&App) -> Child, Child> {
 fn painted(h: &Harness<App, fn(&App) -> Child, Child>, class: &str) -> (f32, f32, f32, f32) {
     let node = h
         .with_dom(|dom| {
-            taproot::matching(dom, &Selector::class(class))
+            taproot::matching_estimated_fixture(dom, &Selector::class(class))
                 .first()
                 .copied()
         })

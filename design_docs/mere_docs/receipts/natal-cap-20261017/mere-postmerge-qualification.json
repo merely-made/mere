@@ -1,0 +1,12 @@
+{
+  "source": "65e9a29a179f1416a7cb4b3bbf686e17b5c700ce",
+  "qualified_owner_source": "a4b77014634807b7a82790d233bbaedb28312bd2",
+  "owner_inputs_unchanged": true,
+  "delta": "Incoming Cambium incremental restyling and its documentation; no owner or lock changes",
+  "exit": 0,
+  "passed": 3,
+  "failed": 0,
+  "ignored": 0,
+  "log_sha256": "5cc4958d93c6ea6770f9d2684fad415bd4e1d440192e803c90bf7953f97a33f5",
+  "scope": "Three natal cross-application admission/refusal fixtures after incoming Cambium restyling; earlier 225-test result retains a4b770146 identity"
+}

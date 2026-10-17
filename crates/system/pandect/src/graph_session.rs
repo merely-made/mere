@@ -60,6 +60,10 @@ use crate::view_intent_store::ViewIntent;
 /// Product-owned validation of a complete candidate before graph/history installation.
 pub type GraphValidator = Arc<dyn Fn(&Graph) -> Result<(), String> + Send + Sync>;
 
+/// Owner policy for newly introduced references. Unlike replay validation, this
+/// sees the previously admitted graph and may consult current owner authority.
+pub type GraphAdmissionValidator = Arc<dyn Fn(&Graph, &Graph) -> Result<(), String> + Send + Sync>;
+
 /// Where a mere keeps its sessions.
 pub const SESSIONS_PREFIX: &str = "sessions";
 /// How many journal entries may accrue before the session writes a
@@ -592,6 +596,7 @@ impl Pending {
 pub struct GraphSession<B> {
     slots: JsonSlots<B>,
     validator: Option<GraphValidator>,
+    admission_validator: Option<GraphAdmissionValidator>,
     keys: Keys,
     manifest: GraphSessionManifest,
     baseline: Graph,
@@ -661,6 +666,7 @@ impl<B: Backend> GraphSession<B> {
         Self {
             slots: JsonSlots::new(backend),
             validator: None,
+            admission_validator: None,
             keys: Keys::new(manifest.session_id),
             manifest,
             baseline,
@@ -859,6 +865,7 @@ impl<B: Backend> GraphSession<B> {
         let mut session = Self {
             slots,
             validator: None,
+            admission_validator: None,
             keys,
             manifest,
             baseline,
@@ -1120,9 +1127,19 @@ impl<B: Backend> GraphSession<B> {
         Ok(self)
     }
 
+    /// Attach admission policy to an already admitted/replayed baseline. Pure
+    /// replay uses `with_validator`; history does not require live referents.
+    pub fn with_admission_validator(mut self, validator: GraphAdmissionValidator) -> Self {
+        self.admission_validator = Some(validator);
+        self
+    }
+
     fn validate(&self, graph: &Graph) -> Result<(), SessionError> {
         if let Some(validator) = &self.validator {
             validator(graph).map_err(SessionError::Validation)?;
+        }
+        if let Some(validator) = &self.admission_validator {
+            validator(&self.graph, graph).map_err(SessionError::Validation)?;
         }
         Ok(())
     }
@@ -2194,6 +2211,9 @@ impl<B: Backend + Clone> MereSessions<B> {
         }
         if let Some(validator) = &parent.validator {
             session = session.with_validator(Arc::clone(validator))?;
+        }
+        if let Some(validator) = &parent.admission_validator {
+            session = session.with_admission_validator(Arc::clone(validator));
         }
         Ok(session)
     }
@@ -3649,6 +3669,71 @@ mod tests {
                 [archived],
                 "a saved edit fork retains its immutable source in Eidetic lineage"
             );
+        });
+    }
+
+    #[test]
+    fn admission_policy_checks_transitions_preserves_history_and_follows_forks() {
+        pollster::block_on(async {
+            let store = muniment::MemoryBackend::default();
+            let sessions = MereSessions::new(store.clone());
+            let id = sessions.mint(person(), None).await.unwrap().session_id;
+            let available = Arc::new(std::sync::atomic::AtomicBool::new(true));
+            let held = available.clone();
+            let policy: GraphAdmissionValidator = Arc::new(move |before, after| {
+                if after.nodes().count() > before.nodes().count()
+                    && !held.load(std::sync::atomic::Ordering::SeqCst)
+                {
+                    Err("new reference unavailable".into())
+                } else {
+                    Ok(())
+                }
+            });
+            let mut session = sessions
+                .open(id)
+                .await
+                .unwrap()
+                .with_admission_validator(policy.clone());
+            session.apply(person(), vec![add(1)]).await.unwrap();
+            available.store(false, std::sync::atomic::Ordering::SeqCst);
+            session
+                .apply(person(), vec![retitle(1, "Historical reference retained")])
+                .await
+                .unwrap();
+            let before = (
+                whole(session.graph()),
+                session.changes().to_vec(),
+                session.revision(),
+                stored_bytes(&store).await,
+            );
+            assert!(matches!(
+                session.apply(person(), vec![add(2)]).await,
+                Err(SessionError::Validation(_))
+            ));
+            assert_eq!(
+                (
+                    whole(session.graph()),
+                    session.changes().to_vec(),
+                    session.revision(),
+                    stored_bytes(&store).await
+                ),
+                before
+            );
+            let mut fork = sessions
+                .begin_fork_at(&session, session.journal().live_cursor(), person())
+                .unwrap();
+            assert!(matches!(
+                fork.apply_now(person(), vec![add(2)]),
+                Err(SessionError::Validation(_))
+            ));
+            assert_eq!(whole(fork.graph()), whole(session.graph()));
+            let mut reopened = sessions
+                .open(id)
+                .await
+                .unwrap()
+                .with_admission_validator(policy);
+            reopened.flush(wall_clock_now()).await.unwrap();
+            assert_eq!(whole(reopened.graph()), whole(session.graph()));
         });
     }
 

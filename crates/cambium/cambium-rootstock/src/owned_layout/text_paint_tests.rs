@@ -227,7 +227,7 @@ fn a_positive_z_overlay_inside_a_field_also_covers_its_decorations() {
         "div",
         "position:absolute;left:0;top:0;width:220px;height:100px;z-index:20;background:rgb(0,0,255);",
     );
-    layout.rebuild(&dom, 300.0, 220.0);
+    layout.rebuild_drained(&mut dom, 300.0, 220.0);
     let list = emitted(&dom, &mut layout, field);
     let overlay = rect_index(&list, BLUE);
     assert!(rect_index(&list, SELECTION) < overlay);

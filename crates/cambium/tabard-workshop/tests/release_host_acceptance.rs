@@ -36,7 +36,7 @@ fn host() -> WorkshopHarness {
 
 fn node(host: &WorkshopHarness, selector: &Selector) -> NodeId {
     host.with_dom(|dom| {
-        let nodes = taproot::matching(dom, selector);
+        let nodes = taproot::matching_estimated_fixture(dom, selector);
         assert_eq!(nodes.len(), 1, "unique production control: {selector:?}");
         nodes[0]
     })

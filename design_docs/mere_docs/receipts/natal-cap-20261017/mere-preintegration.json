@@ -1,0 +1,17 @@
+{
+  "source": "3b70984e8ffec248ad29187535b1354bf166605b",
+  "files": {
+    "Cargo.toml": "59b5945edc6dcf6c5b4d8498e9324edfcdb877466ba22b67551720453516a136",
+    "Cargo.lock": "4b20af73a5253f418c07bbbc6949fe14005b175a67ea844e516c5278e08559c6",
+    "ports/djinn/Cargo.toml": "1562525119021ed8bddae13723da9fe640b818ad52cfdea4f759e0effefc2d3d",
+    "ports/djinn/src/resident_mere.rs": "15fb07d896c03af37041c6217632f5935930d50b78b17238873dd0494fab3558",
+    "ports/djinn/tests/fixtures/natal-cap-finals2000a.txt": "3d9180e4c6b421eef034bbf64ef2d2658d0272782ecc3e23eeb78dcb9a266b28"
+  },
+  "exit": 0,
+  "passed": 225,
+  "failed": 0,
+  "ignored": 2,
+  "log_sha256": "0568ade99dae7cc450ccf85dc2aa6ca744362667682a9d6d6226f035af7ea173",
+  "scope": "Preintegration source; includes new cross-application retained-observation/motion refusal fixture, library and actual owner-process parents",
+  "consumer": "da495cfc75b2ee6bbb9476c8c03386e9057c36d3"
+}
