@@ -256,6 +256,12 @@ impl winit::application::ApplicationHandler for MacosCALayerPresentApp {
                     return self.fail(event_loop, format!("default_compositor_for_window: {err}"));
                 },
             };
+        if compositor.presentation_route() != paint::PresentationRoute::Display {
+            return self.fail(
+                event_loop,
+                "CALayer factory selected capture instead of display".into(),
+            );
+        }
 
         self.state = Some(MacosPresentState {
             renderer,
@@ -358,12 +364,21 @@ impl winit::application::ApplicationHandler for MacosCALayerPresentApp {
                 // wants. Same pattern Paint::render uses internally
                 // (see `components/paint/netrender_painter.rs:468`).
                 let pc: &mut dyn paint::PaintCompositor = &mut *state.compositor;
+                let _ = pc.take_presentation_outcome();
                 state.renderer.render_with_compositor(
                     &scene,
                     wgpu::TextureFormat::Rgba8Unorm,
                     pc,
                     netrender::peniko::Color::new([0.0, 0.0, 0.0, 0.0]),
                 );
+
+                let outcome = pc.take_presentation_outcome();
+                if !matches!(outcome, Some(paint::PresentationOutcome::DisplayHandoff)) {
+                    return self.fail(
+                        event_loop,
+                        format!("CALayer display handoff failed: {outcome:?}"),
+                    );
+                }
 
                 self.frames_presented += 1;
 
