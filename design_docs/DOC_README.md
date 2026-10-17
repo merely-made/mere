@@ -710,7 +710,7 @@ engine adapters.
   source pair; CEF-enabled consumer, native and foreign accessibility gates
   stay distinct.)
 
-- **Pool workspace utility (2026-10-17):** provisional persistent holding utility in Graphshell and native Knot; shared independent text/Djot material in Inker, host-owned storage and insertion, no new crate. Prompts 23–28 set the next direction: distinct scoped Pools with personal as default, an embedded-minimere pocket, usual-editor editing with a canvas fallback, removal undo across reopen and in-place group expansion with scoped entry also available; these refinements are not yet implemented. See the [active projection plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) and [qualification receipt](../validation/pool_20261017/receipt.json).
+- **Pool workspace utility (2026-10-17):** provisional persistent holding utility in Graphshell and native Knot; shared independent text/Djot material in Inker, host-owned storage and insertion, no new crate. Prompts 23–31 set the next direction: distinct scoped Pools with personal as default, an embedded-minimere pocket, usual-editor editing with a canvas fallback, removal undo across reopen, separate Pool/editor histories, Move between Pools, saved alternatives within a composition and in-place group expansion with scoped entry also available. The browser-extension sidecar framing is recorded for further review; these refinements are not yet implemented. See the [active projection plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) and [qualification receipt](../validation/pool_20261017/receipt.json).
 
 ## nematic_docs/ — the smolweb engine and knot composition
 
