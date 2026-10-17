@@ -49,6 +49,7 @@ pub mod opened_link;
 pub mod projection;
 pub mod registry;
 pub mod template;
+pub mod span_edit;
 mod relax;
 mod solve;
 
