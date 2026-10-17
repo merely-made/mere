@@ -476,7 +476,9 @@ Viewer size levers remain options. Forms C and three-lanes are outside scope.
 
 ## Document scroll boundary adoption — 2026-10-17
 
-**Status: qualified locally; publication pending.** Shared source `2d95d95e9`
+**Status: qualified and published.** Mere qualification through `1eba417eb`
+and Woodshed receiving qualification through `b01c922` were pushed to their
+main branches on October 17. Shared source `2d95d95e9`
 is based on main `df30e97dd`. The axis-aware extent walker excludes descendant
 content behind nested hidden/clip/auto/scroll boundaries while retaining each
 boundary border box and visible outer overflow. Initial layout and relayout use
@@ -503,4 +505,4 @@ the historical October 15 capture providing a matching pre-adoption observation.
 binds source, gate and owning receiving evidence. The consumer owns the detailed
 receipt at `woodshed/validation/mere-scroll-adoption_20261017/README.md`. Native
 input, acoustic quality, browser/platform coverage and broader label-layout
-polish remain separate. Neither supplier nor consumer candidate is published.
+polish remain separate. The [publication record](../../../support/receipts/scroll-boundary-20261017/publication.json) preserves publication order and exact qualified revisions.
