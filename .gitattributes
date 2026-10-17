@@ -6,6 +6,8 @@ assets/** binary
 # bytes stable across Windows and Unix checkouts.
 ports/graphshell/docs/receipts/*.html text eol=lf
 ports/graphshell/docs/receipts/*.json text eol=lf
+# Djinn compares the generated identity-card projection byte for byte.
+ports/graphshell/tests/fixtures/identity_cards.json text eol=lf
 ports/distillery/tests/fixtures/** text eol=lf
 # Tabard compares its Lagrange palette golden byte for byte (b7ed0bdc; row
 # followed the crate from ports/tabard, 2026-10-10).
