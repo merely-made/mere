@@ -2261,3 +2261,43 @@ captures) pass. The browser export callback is exercised; downloaded bytes are
 not qualified. Expanded Pool plus existing Graphshell chrome still crowds the
 scene stage, so final utility placement/pocket presentation remains open.
 Canonical app supplier integration remains a separate step.
+
+
+#### Pool review: scope, presentation and editing (prompts 23–25)
+
+These answers refine the intended product beyond the qualified local prototype
+above. They do not claim that cross-application storage, the pocket presentation
+or editing held material has been implemented.
+
+**Prompt 23 — sharing across apps and workspaces:**
+
+> i was thinking 2, but 1 and 3 have merit as scope options
+
+The referenced choices were (1) same Pool for the same workspace, (2) one
+personal Pool across all workspaces and apps, and (3) separate per-app Pools with
+explicit transfer. Personal scope is the primary direction; workspace and app
+scope options have merit. Whether those scopes are distinct Pools, membership/
+filtered views or a combination is still open. Cross-device synchronization,
+workspace identity and transfer behavior are not settled by this answer.
+
+**Prompt 24 — presentation while composing:**
+
+> A small pocket that expands into a Swatch/Canvas (Recommended)
+
+**Prompt 25 — editing held material:**
+
+> 1 if available, 2 as fallback
+
+The referenced choices were (1) open the held item in its usual editor and save
+changes back to Pool, and (2) edit the held item directly on Pool's Swatch/Canvas.
+Prefer the usual editor when available, with the canvas as fallback. Inserted
+copies remain independent; revising the held item does not update them. Both
+paths should reuse existing domain editing and shared scene surfaces rather
+than introducing a separate authoring grammar. That reuse is an implementation
+direction; editor dispatch and save/session ownership still need definition.
+
+Next prompted topics: scoped-Pool ownership versus views, removal/recovery and
+the default way to inspect a nested group. Moving group contents together is
+already agreed; these questions must not reopen that decision. Other remaining
+topics include alternate arrangements, selected structural aspects and template
+updates, cross-app workspace identity and the held-item editing lifecycle.
