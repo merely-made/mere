@@ -2387,8 +2387,47 @@ Mark added this framing while reviewing the decisions above:
 This suggests a compact Mere surface alongside a host's ordinary activity, with
 a browser extension as a concrete host integration. It is a design framing, not
 a request to ship a browser extension now, a settled extension permission model,
-or a claim of existing cross-app support. Review whether Pool is a role/view of
-an ordinary Mere or a distinct utility built from Mere components before adding
-another collection system. The sidecar's attachment, context switching and
-capture interaction remain open. No implementation qualification is expanded by
-these notes.
+or a claim of existing cross-app support. Prompt 32 below refines the collection
+and view relationship. The sidecar's attachment and context switching remain
+open; material enters through deliberate action rather than passive browsing
+capture. No implementation qualification is expanded by these notes.
+
+
+#### Pool review: an editable nested-graph Swatch utility (prompt 32)
+
+**Prompt 32 — any Mere in a Pool role versus a dedicated utility:**
+
+> 2, but i guess it's a type of swatch; take a bit of canvas from a mere, embed it. in much of the cases we've seen before, swatches are pretty much scoped to their function and aren't manipulable. this is a utility of a mere that is like a swatch that's like a clipboard for a mere, almost like a nested mere... so probably the relation to pool and the mere it's embedded in is similar to a mere and the browser. but that of course doesn't mean we can't use it outside the mere as a lil catchall. where a mere would passively collect browsing history as you use your browser, the pool wouldn't; what you put in would form a subgraph nested within a node in the mere (with that node then serving as the pool container). idk, i'm just trying to work this out in my head. it's like a mere but it's not. it's like a swatch using more capabilities than they have before. swatches were meant to be embedded meres anyway. so idk, makes sense to me
+
+The referenced option 2 was "Pool is a dedicated collection type with its own
+rules, using shared Mere components". Mark refines that binary choice into a
+working design: Pool is a dedicated clipboard/catchall utility of a Mere,
+presented through a more capable, manipulable Swatch. Its material forms a
+subgraph nested within a container node in the Mere. The compact pocket and
+expanded Swatch/Canvas expose that material; the utility can also be presented
+outside its enclosing Mere, such as in a browser sidecar. Material is added
+deliberately; passive browsing-history collection is not Pool behavior. Source
+provenance attached to deliberately added material remains consistent with the
+previous answers.
+
+Treat this as exploratory product direction, preserving Mark's uncertainty and
+analogy rather than promoting it into a frozen type/schema ruling. It replaces
+the earlier assistant recommendation that any arbitrary Mere simply take a Pool
+role. A dedicated utility does not by itself require a separate crate, graph
+engine or storage system. Distinct scope choices, the personal default, Pool
+versus item-editor history, default Move between Pools and independent insertion
+into compositions remain applicable.
+
+The existing `scenograph::swatch` model describes a Swatch as a Mere seen at a
+scope, small enough to embed, and includes `Scope::NestedGraph(String)` for the
+graph nested within a node. This is a concrete representation seam to investigate,
+not proof of complete embedded editing, persistence, history or host integration.
+The current `inker::pool` material list and host-specific stores remain the
+qualified prototype; they have not been converted to the nested-graph utility.
+
+Remaining boundaries include the container's creation/selection and lifecycle
+when the sidecar runs outside the Mere, allowed manipulation through an embedded
+Swatch, transfer/undo coordination across scoped Pools, and the concrete content
+and membership mapping. Verify reuse against Graphshell plus a real composition
+consumer before defining shared APIs. No browser-extension implementation or
+new automatic capture behavior is authorized by the analogy alone.
