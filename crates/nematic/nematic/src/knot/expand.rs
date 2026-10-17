@@ -40,6 +40,10 @@ pub(super) fn expand_fenced_blocks(blocks: &mut Vec<Block>) {
                     text,
                 }),
             },
+            Block::Div { attributes, mut blocks } => {
+                expand_fenced_blocks(&mut blocks);
+                out.push(Block::Div { attributes, blocks });
+            },
             Block::Quote { mut blocks } => {
                 expand_fenced_blocks(&mut blocks);
                 out.push(Block::Quote { blocks });
@@ -242,6 +246,10 @@ pub(super) fn rewrite_inline_extensions(blocks: &mut Vec<Block>) {
                     level,
                     spans: rewritten,
                 });
+            },
+            Block::Div { attributes, mut blocks } => {
+                rewrite_inline_extensions(&mut blocks);
+                out.push(Block::Div { attributes, blocks });
             },
             Block::Quote { mut blocks } => {
                 rewrite_inline_extensions(&mut blocks);

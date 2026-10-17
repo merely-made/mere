@@ -311,7 +311,9 @@ impl<'a> DocumentLayouter<'a> {
                 .chain(rows.iter().flatten())
                 .map(|cell| links(cell))
                 .sum(),
-            Block::Quote { blocks } => blocks.iter().map(|b| self.link_identities(b)).sum(),
+            Block::Quote { blocks } | Block::Div { blocks, .. } => {
+                blocks.iter().map(|b| self.link_identities(b)).sum()
+            },
             Block::List { items, .. } => items
                 .iter()
                 .flatten()
@@ -417,6 +419,9 @@ impl<'a> DocumentLayouter<'a> {
             },
             Block::Preformatted { text } => {
                 Some(self.render_code_block(source_index, indent_level, text))
+            },
+            Block::Div { blocks, .. } => {
+                Some(self.render_group(source_index, indent_level, blocks))
             },
             Block::Quote { blocks } => {
                 Some(self.render_group(source_index, indent_level + 1, blocks))

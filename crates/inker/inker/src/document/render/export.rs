@@ -159,6 +159,11 @@ fn write_gophermap_block(block: &Block, ctx: &GophermapContext, out: &mut String
                 push_info(out, &format!("{prefix}{line}"));
             }
         },
+        Block::Div { blocks, .. } => {
+            for inner in blocks {
+                write_gophermap_block(inner, ctx, out, prefix);
+            }
+        },
         Block::Quote { blocks } => {
             for inner in blocks {
                 write_gophermap_block(inner, ctx, out, &format!("{prefix}> "));
@@ -274,6 +279,11 @@ fn write_text_block(block: &Block, out: &mut String, prefix: &str) {
                 out.push('\n');
             }
             out.push('\n');
+        },
+        Block::Div { blocks, .. } => {
+            for inner in blocks {
+                write_text_block(inner, out, prefix);
+            }
         },
         Block::Quote { blocks } => {
             for inner in blocks {

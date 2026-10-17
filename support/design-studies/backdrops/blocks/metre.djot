@@ -1,0 +1,124 @@
+{format="mere.scene-document"}
+::: metre
+```json
+{
+  "format": "mere.scene-document",
+  "version": 1,
+  "primary": {
+    "version": 1,
+    "source": {
+      "adapter": "knot.authored-metre",
+      "id": "file:///Users/markik/Code/output/editable-blocks-20261017/composition-original.djot#verse"
+    },
+    "revision": "1416031042d2c63971b608adcd0178b10be7e06256d152a46b49e0b5547b291c",
+    "title": "Free composition",
+    "facts": {
+      "kind": "metre_grid",
+      "data": {
+        "feet": 0,
+        "lines": [
+          {
+            "key": "verse/line/0",
+            "source": {
+              "adapter": "knot.authored-metre-line",
+              "id": "file:///Users/markik/Code/output/editable-blocks-20261017/composition-original.djot#verse/line/0"
+            },
+            "text": "the night keeps quux beyond the quiet light",
+            "syllables": [
+              {
+                "text": "the",
+                "stressed": false
+              },
+              {
+                "text": "night",
+                "stressed": true
+              },
+              {
+                "text": "keeps",
+                "stressed": true
+              },
+              {
+                "text": "quux",
+                "stressed": false,
+                "stress_known": false
+              },
+              {
+                "text": "be",
+                "stressed": false
+              },
+              {
+                "text": "yond",
+                "stressed": true
+              },
+              {
+                "text": "the",
+                "stressed": false
+              },
+              {
+                "text": "qui",
+                "stressed": true
+              },
+              {
+                "text": "et",
+                "stressed": false
+              },
+              {
+                "text": "light",
+                "stressed": true
+              }
+            ],
+            "rhyme_group": "A",
+            "rhyme_tail": null
+          },
+          {
+            "key": "verse/line/1",
+            "source": {
+              "adapter": "knot.authored-metre-line",
+              "id": "file:///Users/markik/Code/output/editable-blocks-20261017/composition-original.djot#verse/line/1"
+            },
+            "text": "the light is quiet in the night",
+            "syllables": [
+              {
+                "text": "the",
+                "stressed": false
+              },
+              {
+                "text": "light",
+                "stressed": true
+              },
+              {
+                "text": "is",
+                "stressed": false
+              },
+              {
+                "text": "qui",
+                "stressed": true
+              },
+              {
+                "text": "et",
+                "stressed": false
+              },
+              {
+                "text": "in",
+                "stressed": false
+              },
+              {
+                "text": "the",
+                "stressed": false
+              },
+              {
+                "text": "night",
+                "stressed": true
+              }
+            ],
+            "rhyme_group": "A",
+            "rhyme_tail": null
+          }
+        ]
+      }
+    }
+  },
+  "linked": []
+}
+```
+:::

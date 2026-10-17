@@ -199,6 +199,11 @@ impl Block {
                 out,
                 indent.saturating_add(presentation.indent_level as usize),
             ),
+            Self::Div { blocks, .. } => {
+                for block in blocks {
+                    block.write_markdown(out, indent);
+                }
+            },
             Self::Heading { level, spans } => {
                 let level = (*level).clamp(1, 6) as usize;
                 out.push_str(&pad);
@@ -344,6 +349,11 @@ impl Block {
     fn write_gemini(&self, out: &mut String) {
         match self {
             Self::Presented { block, .. } => block.write_gemini(out),
+            Self::Div { blocks, .. } => {
+                for block in blocks {
+                    block.write_gemini(out);
+                }
+            },
             Self::Menu { rows } => {
                 for block in menu_fallback_blocks(rows) {
                     block.write_gemini(out);
@@ -516,6 +526,11 @@ impl Block {
     /// `nematic::KnotEngine`'s fence expansion.
     fn write_knot(&self, out: &mut String) {
         match self {
+            Self::Div { blocks, .. } => {
+                for block in blocks {
+                    block.write_knot(out);
+                }
+            },
             Self::Presented {
                 presentation,
                 block,

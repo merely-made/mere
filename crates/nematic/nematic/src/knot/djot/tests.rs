@@ -67,13 +67,10 @@ fn inline_link_sits_between_text_runs() {
 }
 
 #[test]
-fn unknown_div_class_renders_generically_with_a_diagnostic() {
+fn unknown_div_class_preserves_its_structure_and_attributes() {
     let (blocks, diagnostics) = parse_djot_knot_body_validated("::: mystery\nx\n:::\n");
-    assert!(matches!(blocks.first(), Some(Block::Quote { .. })));
-    assert!(matches!(
-        diagnostics.first(),
-        Some(DocumentDiagnostic::UnsupportedConstruct(m)) if m.contains("mystery")
-    ));
+    assert!(matches!(blocks.first(), Some(Block::Div { .. })));
+    assert!(diagnostics.is_empty());
 }
 
 #[test]

@@ -45,6 +45,13 @@ pub fn parse_djot_knot_body(body: &str) -> Vec<Block> {
 /// vocabulary is declared data ([`KNOT_DIV_SCHEMA`]) — the Markdoc lesson
 /// (§10.4): validate against a schema, render the unrecognized generically.
 pub fn parse_djot_knot_body_validated(body: &str) -> (Vec<Block>, Vec<DocumentDiagnostic>) {
+    divs::parse(body)
+}
+
+pub mod divs;
+mod structure;
+
+fn parse_legacy_body(body: &str) -> (Vec<Block>, Vec<DocumentDiagnostic>) {
     let mut out = Vec::new();
     let mut diagnostics = Vec::new();
     let mut inline = Inline::default();
@@ -430,16 +437,17 @@ fn emit_djot_table(header: &[Vec<InlineSpan>], rows: &[Vec<Vec<InlineSpan>>], ou
 fn emit_block(block: &Block, out: &mut String) {
     match block {
         Block::Presented { block, .. } => emit_block(block, out),
+        Block::Div { attributes, blocks } => divs::emit(attributes, blocks, out),
         Block::Heading { level, spans } => {
             for _ in 0..(*level).max(1) {
                 out.push('#');
             }
             out.push(' ');
-            out.push_str(&inline_text(spans));
+            divs::emit_inline(spans, out);
             out.push('\n');
         },
         Block::Paragraph { spans } => {
-            out.push_str(&inline_text(spans));
+            divs::emit_inline(spans, out);
             out.push('\n');
         },
         Block::Table { header, rows, .. } => {

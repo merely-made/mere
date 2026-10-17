@@ -49,7 +49,7 @@ fn collect_block(block: &Block, out: &mut Vec<LinkStatement>) {
                 collect_span(span, out);
             }
         },
-        Block::Quote { blocks } => {
+        Block::Quote { blocks } | Block::Div { blocks, .. } => {
             for inner in blocks {
                 collect_block(inner, out);
             }

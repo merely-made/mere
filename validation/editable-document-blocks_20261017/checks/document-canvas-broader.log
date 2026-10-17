@@ -1,0 +1,173 @@
+   Compiling hashbrown v0.17.1
+   Compiling bytemuck_derive v1.12.1
+   Compiling serde v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling zerofrom v0.1.8
+   Compiling uuid v1.27.0
+   Compiling serde_json v1.0.151
+   Compiling objc2-core-foundation v0.3.2
+   Compiling objc2-foundation v0.3.2
+   Compiling linebender_resource_handle v0.1.1
+   Compiling yoke v0.8.3
+   Compiling accesskit v0.24.1
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling indexmap v2.14.2
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling objc2-core-text v0.3.2
+   Compiling bytemuck v1.25.2
+   Compiling font-types v0.11.3
+   Compiling petgraph v0.8.3
+   Compiling euclid v0.22.14
+   Compiling read-fonts v0.39.2
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling icu_provider v2.3.1
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_locale_fallback v2.3.0
+   Compiling inker v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/inker/inker)
+   Compiling icu_segmenter v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling parley_data v0.10.0
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling gemini-protocol v0.1.7
+   Compiling nex-protocol v0.1.1
+   Compiling finger-protocol v0.1.1
+   Compiling misfin v0.0.4
+   Compiling guppy-protocol v0.1.1
+   Compiling spartan-protocol v0.1.1
+   Compiling gopher-protocol v0.2.0
+   Compiling scroll-protocol v0.1.0
+   Compiling errand v0.4.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/errand)
+   Compiling harfrust v0.8.4
+   Compiling skrifa v0.42.1
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling nematic v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/nematic/nematic)
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates/nematic/nematic/src/knot/expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates/nematic/nematic/src/knot/expand/build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/inker/document-canvas)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 10s
+     Running unittests src/lib.rs (target/build/debug/deps/document_canvas-b462f0bb40cf3b2c)
+
+running 86 tests
+test font_table::tests::empty_table_get_is_none ... ok
+test font_table::tests::collection_faces_intern_separately_and_same_face_clones_dedup ... ok
+test layout::fold_tests::top_level_block_skips_group_children_that_reuse_its_index ... ok
+test layout::tests::document_dedups_shared_face ... ok
+test layout::tests::a_feed_entry_with_a_body_offers_its_own_document_first ... ok
+test layout::tests::a_long_menu_row_overflows_instead_of_wrapping ... ok
+test layout::tests::content_bounds_grow_with_blocks ... ok
+test layout::tests::duplicate_link_targets_keep_distinct_identities_and_lowered_labels ... ok
+test layout::tests::capped_content_column_is_centred_and_preserves_narrow_view_padding ... ok
+test layout::tests::empty_document_lays_out_to_empty_block_list ... ok
+test layout::fold_tests::a_wide_table_in_a_closed_fold_does_not_widen_the_content ... ok
+test layout::tests::feed_entry_composes_into_group_with_h2_summary_link ... ok
+test layout::tests::glyph_runs_carry_per_role_colors ... ok
+test layout::tests::heading_is_taller_than_paragraph ... ok
+test layout::tests::image_emits_image_block_with_url_and_alt ... ok
+test layout::tests::in_page_span_in_a_stale_table_is_an_inert_link_region ... ok
+test layout::tests::list_emits_group_block_with_children ... ok
+test layout::tests::many_narrow_table_columns_overflow_without_cell_overlap ... ok
+test layout::tests::menu_label_column_starts_at_one_x_in_every_row ... ok
+test layout::tests::metadata_row_lays_out_label_and_value ... ok
+test layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell ... FAILED
+test layout::tests::paragraph_with_link_emits_interaction_region ... ok
+test layout::tests::quote_emits_group_block_with_indented_children ... ok
+test layout::tests::rule_emits_rule_block ... ok
+test layout::tests::single_paragraph_produces_one_text_block ... ok
+test layout::fold_tests::probes_09_03_in_page_links_get_link_regions_that_never_navigate ... ok
+test layout::tests::nowrap_role_overflows_instead_of_wrapping ... ok
+test layout::tests::submission_span_emits_a_non_navigation_interaction ... ok
+test layout::tests::table_alignment_keeps_wrapped_mixed_style_links_inside_the_cell ... ok
+test layout::tests::table_links_with_same_target_keep_distinct_semantic_identities ... ok
+test layout::tests::table_renders_header_body_ragged_rows_with_source_identity ... ok
+test layout::tests::soft_breaks_reflow_by_default_and_are_kept_when_preserved ... ok
+test layout::fold_tests::p1b_probe_09_in_page_and_network_adornments_paint_independently ... ok
+test layout::tests::source_presentation_controls_inline_paint_and_block_geometry ... ok
+test layout::fold_tests::link_identity_after_a_closed_fold_matches_the_open_layout ... ok
+test layout::fold_tests::probe_08_a_heading_gets_a_fold_region_and_the_style_sheet_marker ... ok
+test layout::tests::table_wraps_narrow_cells_and_aligns_link_hit_regions ... ok
+test layout::tests::text_populates_font_sidecar ... ok
+test paint_list::tests::decoded_image_emits_draw_image_and_resource_sidecar ... ok
+test paint_list::tests::draw_text_carries_per_run_role_color ... ok
+test style_sheet::tests::badge_role_matches_badge_defaults ... ok
+test style_sheet::tests::block_spacing_equals_paragraph_spacing ... ok
+test style_sheet::tests::body_role_matches_paragraph_defaults ... ok
+test style_sheet::tests::code_role_matches_code_block_defaults ... ok
+test style_sheet::tests::explicit_family_and_absolute_size_resolve ... ok
+test style_sheet::tests::globals_are_built_in_defaults ... ok
+test style_sheet::tests::glyph_adornment_prefixes_every_link_verbatim ... ok
+test style_sheet::tests::heading_level_clamps_to_h1_h6 ... ok
+test style_sheet::tests::heading_role_matches_heading_defaults_every_level ... ok
+test style_sheet::tests::in_page_link_adornment_defaults_to_the_link_adornment ... ok
+test style_sheet::tests::line_height_uses_the_shared_ratio ... ok
+test style_sheet::tests::link_adornment_serde_keeps_old_spellings_and_round_trips_glyphs ... ok
+test style_sheet::tests::metadata_role_matches_metadata_row_defaults ... ok
+test style_sheet::tests::role_leading_is_optional_and_old_styles_round_trip_unchanged ... ok
+test style_sheet::tests::sheet_round_trips_through_serde ... ok
+test text::tests::adornment_prefix_carries_link_style ... ok
+test paint_list::tests::empty_packet_produces_no_commands ... ok
+test text::tests::external_link_gets_single_rightwards_arrow ... ok
+test paint_list::tests::each_run_ships_the_face_it_was_shaped_against ... ok
+test text::tests::in_page_and_network_adornments_apply_independently_in_one_run ... ok
+test text::tests::in_page_link_flattens_as_an_in_protocol_link ... ok
+test text::tests::in_protocol_link_gets_rightwards_double_arrow ... ok
+test text::tests::no_adornment_leaves_link_text_unprefixed ... ok
+test text::tests::relative_link_is_in_protocol ... ok
+test types::window_tests::block_at_finds_the_deepest_block ... ok
+test types::window_tests::link_at_returns_the_innermost_link_url ... ok
+test types::window_tests::window_filters_and_translates_interactions ... ok
+test types::window_tests::window_filters_group_children_to_the_band ... ok
+test types::window_tests::window_keeps_a_block_straddling_the_band_edge ... ok
+test types::window_tests::window_keeps_only_intersecting_blocks_translated_to_band_origin ... ok
+test types::window_tests::window_rect_clips_and_translates_x_coordinates_with_link_regions ... ok
+test paint_list::tests::group_recurses_into_children ... ok
+test paint_list::tests::rule_emits_line_command_in_rule_color ... ok
+test paint_list::tests::repeated_runs_share_one_font_side_table_entry ... ok
+test paint_list::tests::source_background_and_underline_paint_around_the_shaped_run ... ok
+test paint_list::tests::shipped_faces_come_from_the_sidecar ... ok
+test paint_list::tests::text_emits_drawtext_and_populates_fonts ... ok
+test paint_list::tests::viewport_rounds_to_device_int_size ... ok
+test layout::tests::wrapped_link_rectangles_share_one_identity_and_label ... ok
+test text::tests::explicit_code_family_is_the_actual_shaping_request ... ok
+test layout::fold_tests::p1c_probe_05_a_custom_network_glyph_leaves_the_in_page_arrows ... ok
+test layout::fold_tests::p1c_probe_05_a_custom_in_page_glyph_paints_beside_the_network_arrow ... ok
+test text::tests::generic_font_batch_refuses_before_mutating_existing_context ... ok
+test layout::fold_tests::closed_extents_are_skipped_like_a_filtered_copy_but_keep_block_indices ... ok
+test layout::fold_tests::fold_pages_with_nothing_closed_lay_out_like_the_unfolded_document ... ok
+test layout::fold_tests::p1b_probes_05_09_17_default_tokens_paint_as_p1_did ... ok
+
+failures:
+
+---- layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell stdout ----
+
+thread 'layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell' (41946924) panicked at crates/inker/document-canvas/src/layout/tests.rs:1159:5:
+unbroken first-cell glyphs must not paint into the next cell
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell
+
+test result: FAILED. 85 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.18s
+
+error: test failed, to rerun pass `-p document-canvas --lib`

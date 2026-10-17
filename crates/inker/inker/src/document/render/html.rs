@@ -78,6 +78,13 @@ fn escape_attr(text: &str, out: &mut String) {
 
 fn write_html_block(block: &Block, out: &mut String) {
     match block {
+        Block::Div { blocks, .. } => {
+            out.push_str("<div>\n");
+            for block in blocks {
+                write_html_block(block, out);
+            }
+            out.push_str("</div>\n");
+        },
         Block::Presented {
             presentation,
             block,

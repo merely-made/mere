@@ -37,6 +37,7 @@ fn metre_uses_supplied_stress_and_keeps_mismatches_visible() {
     grid.lines[2].rhyme_tail = None;
     grid.lines[0].syllables[0].stressed = true;
     grid.lines[0].syllables.push(Syllable {
+        stress_known: true,
         text: "extra".into(),
         stressed: false,
     });
@@ -60,10 +61,10 @@ fn metre_uses_supplied_stress_and_keeps_mismatches_visible() {
     assert!(
         matches!(out.scene.items[stress.instance.0 as usize].footprint, Footprint::Rect { size } if size.h == 24.0)
     );
-    assert!(!stress.selectable);
+    assert!(stress.selectable);
     assert_eq!(
         out.scene.items[stress.instance.0 as usize].hit,
-        Some(Footprint::Point)
+        None
     );
 }
 #[test]
@@ -162,7 +163,7 @@ fn ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts() {
         unreachable!()
     };
     grid.lines[1].key = "line-1/syllable/0".into();
-    assert_eq!(input.compile().unwrap_err().path, "marks");
+    assert_eq!(input.compile().unwrap_err().path, "metre.occurrences");
 }
 
 #[test]
@@ -180,4 +181,19 @@ fn ternary_template_keeps_actual_syllables_and_discloses_expected_extent() {
     };
     grid.positions_per_foot = 0;
     assert!(input.compile().is_err());
+}
+
+#[test]
+fn free_metre_does_not_invent_a_form_or_weak_stress() {
+    let mut input = SceneInput::parse(METRE).unwrap();
+    let SceneFacts::MetreGrid(grid) = &mut input.facts else { unreachable!() };
+    grid.feet = 0;
+    grid.lines[0].syllables[0].stress_known = false;
+    let compiled = input.compile().unwrap();
+    let mark = compiled.marks.iter().find(|m| m.key == "line-1/syllable/0").unwrap();
+    assert_eq!(mark.role, MarkRole::Node);
+    assert!(mark.detail.contains("unknown"));
+    assert!(!compiled.diagnostics.iter().any(|s| s.contains("expects 0")));
+    let reopened = SceneInput::parse(&serde_json::to_string(&input).unwrap()).unwrap();
+    assert_eq!(reopened, input);
 }

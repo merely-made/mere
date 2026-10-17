@@ -373,6 +373,27 @@ fn list_emits_group_block_with_children() {
 }
 
 #[test]
+fn domain_div_fallback_preserves_nested_links_without_quote_indentation() {
+    let style = DocumentStyleSheet::default();
+    let packet = layout_document(
+        &doc(vec![Block::Div {
+            attributes: [("class".into(), "metre".into()), ("rules".into(), "unrecognized".into())].into(),
+            blocks: vec![Block::Div {
+                attributes: [("class".into(), "progression".into())].into(),
+                blocks: vec![Block::Paragraph { spans: vec![InlineSpan::Link {
+                    url: "https://example.test/".into(), title: None, predicate: None,
+                    spans: vec![InlineSpan::Text("source content stays readable".into())],
+                }] }],
+            }],
+        }]), viewport(), &style,
+    ).packet;
+    let RenderedBlockKind::Group { children } = &packet.blocks[0].kind else {panic!("div group")};
+    let RenderedBlockKind::Group { children } = &children[0].kind else {panic!("nested div group")};
+    assert_eq!(children[0].bounds.origin.x, style.horizontal_padding);
+    assert_eq!(packet.interactions.len(), 1);
+}
+
+#[test]
 fn quote_emits_group_block_with_indented_children() {
     let style = DocumentStyleSheet::default();
     let packet = layout_document(

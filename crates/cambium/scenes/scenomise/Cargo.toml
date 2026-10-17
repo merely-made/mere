@@ -12,12 +12,15 @@ keywords = ["layout", "projection", "scene", "graph"]
 categories = ["visualization", "algorithms"]
 
 [features]
+# Inert attributed-block transport; geometry-only users do not take a parser.
+djot = ["dep:jotdown"]
 # The projection editor's reducer (`authoring`): a draft, its undo history and
 # a panel workbench. It carries state between calls, which the closed-form
 # solvers do not, so a consumer that only places scenes does not take it.
 authoring = ["dep:backstep", "dep:workbench"]
 
 [dependencies]
+jotdown = { version = "0.10", optional = true }
 sceno = { version = "0.0.5", path = "../sceno" }
 scenograph = { version = "0.0.4", path = "../scenograph" }
 # The registry's capability records serialize, and a custom arrangement's
