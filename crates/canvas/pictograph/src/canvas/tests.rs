@@ -29,6 +29,7 @@ mod combinators;
 mod density;
 mod density_admits;
 mod density_probe;
+mod link_suggestions;
 mod density_wander;
 mod dynamics_spec;
 mod face_on_body;

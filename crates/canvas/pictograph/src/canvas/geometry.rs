@@ -261,6 +261,12 @@ impl CartographyGeometry {
         self.mosaic.as_ref()
     }
 
+    /// [`Self::retain_members`], chainable.
+    pub fn retaining_members(mut self, keep: impl Fn(&GraphMemberId) -> bool) -> Self {
+        self.retain_members(keep);
+        self
+    }
+
     /// Keep only what belongs to members `keep` admits, across every
     /// member-keyed field; a region keeps its contour with its kept members.
     pub fn retain_members(&mut self, keep: impl Fn(&GraphMemberId) -> bool) {
