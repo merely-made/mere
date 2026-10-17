@@ -2,6 +2,7 @@
   "status": "shared geometry tests passed; native consumer pending",
   "tests": 6,
   "command": "cargo test -p pictograph --features canvas backdrop_surface --locked",
-  "source_file_sha256": "0a27e7a5103c3651ce3fe27dc67680e1e2ae834b10a23a1bda97a13007689c9e",
-  "scope": "Forward/inverse geometry, rectangular span bounds and optional affordances. Metre/progression specimens; no source-edit authority."
+  "source_file_sha256": "65c8d6d2add46eb62c18c60f8792d74097aa7d2ca522d10fea3fe75ebc82a696",
+  "scope": "Forward/inverse geometry, rectangular span bounds and optional affordances. Metre/progression specimens; no source-edit authority.",
+  "affordance_followup": "Small selected span centre keeps both edge handles visible"
 }
