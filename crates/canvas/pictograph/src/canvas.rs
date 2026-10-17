@@ -851,6 +851,7 @@ pub mod mosaic;
 pub mod scene_axes;
 mod scene_state;
 mod suggestions;
+pub mod link_suggestions;
 pub mod territory;
 mod scene_regions;
 mod selection;

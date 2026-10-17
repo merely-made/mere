@@ -103,7 +103,13 @@ impl Canvas {
         self.channels = crate::signals::ChannelRegistry::new();
         self.drag = None;
         self.pinned_nodes.clear();
+        // Attention and seeds are keyed by node; the host's suggestion settings
+        // and the pages' link offers (keyed by member) outlive the swap.
+        let suggestions = std::mem::take(&mut self.grammar.suggestions);
+        let links = std::mem::take(&mut self.grammar.links);
         self.grammar = Default::default();
+        self.grammar.suggestions = suggestions;
+        self.grammar.links = links;
         self.strategy_regions.clear();
         self.mosaic = Default::default();
         self.field_drag = None;

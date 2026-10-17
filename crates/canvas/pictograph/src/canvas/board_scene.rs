@@ -444,6 +444,7 @@ struct Fill([f32; 4], [f32; 4]);
 pub struct BoardText {
     text: genet_livery::TextSystem,
     generation: u64,
+    font_roles: String,
 }
 
 impl Default for BoardText {
@@ -457,6 +458,25 @@ impl BoardText {
         Self {
             text: genet_livery::TextSystem::new(),
             generation: 0,
+            font_roles: String::new(),
+        }
+    }
+
+    /// Declarations for the document's root custom properties, such as
+    /// `--tabard-font-interface: "IBM Plex Sans";`, so the titles' `var()`
+    /// resolves. Empty (the default) leaves the sheets as authored; a changed
+    /// value applies on the next paint.
+    pub fn set_font_roles(&mut self, declarations: &str) {
+        self.font_roles = declarations.to_owned();
+    }
+
+    /// `sheet` under the host's root declarations. Each label is its own
+    /// document root (no parent element), so `:root` reaches them.
+    pub(crate) fn rooted(&self, sheet: &str) -> String {
+        if self.font_roles.is_empty() {
+            sheet.to_owned()
+        } else {
+            format!(":root {{ {} }}\n{sheet}", self.font_roles)
         }
     }
 
@@ -506,9 +526,10 @@ impl BoardText {
             dom.append_child(line, words);
             dom.append_child(root, line);
         }
+        let sheet = self.rooted(sheet);
         let styles = genet_livery::resolve_styles(
             &dom,
-            &genet_livery::StyleSet::cambium(&[sheet]),
+            &genet_livery::StyleSet::cambium(&[sheet.as_str()]),
             &genet_livery::Device::screen(width as f32, height as f32),
             &genet_livery::InteractionStates::default(),
         );
@@ -536,6 +557,10 @@ impl BoardText {
 
 /// A title's line height, px; it is centred in its card.
 const TITLE_LINE: f32 = 16.0;
+// The title's family names Tabard's interface role. A host publishes the
+// role through `BoardText::set_font_roles`; until it does, the fallback is
+// the face that renders: Plex Sans where the host lends it (Graphshell),
+// else whatever the generic sans-serif resolves to among the lent faces.
 const TITLE_SHEET: &str = "\
     .board-title { position: absolute; margin: 0; padding: 0 6px; box-sizing: border-box; \
       font-family: var(--tabard-font-interface, IBM Plex Sans), sans-serif; font-size: 13px; line-height: 16px; \
@@ -831,6 +856,30 @@ mod tests {
         }
         let untitled = nameless.paint_titled(&board, 800, 400, page_fit(), &mut text);
         assert_eq!(glyphs(&untitled), 0);
+    }
+
+    #[test]
+    fn font_roles_ride_the_root_and_default_leaves_the_sheet_alone() {
+        let mut text = BoardText::new();
+        assert_eq!(text.rooted(TITLE_SHEET), TITLE_SHEET);
+        text.set_font_roles("--tabard-font-interface: \"Probe Sans\";");
+        let rooted = text.rooted(TITLE_SHEET);
+        assert!(rooted.starts_with(":root { --tabard-font-interface: \"Probe Sans\";"));
+        assert!(rooted.ends_with(TITLE_SHEET));
+        text.set_font_roles("");
+        assert_eq!(text.rooted(TITLE_SHEET), TITLE_SHEET);
+        // A title is a root of its own document, so the declaration reaches it.
+        let card = [("0".into(), "t".into(), BoardRect::new(0.0, 0.0, 80.0, 16.0))];
+        let probe = ".board-title { position: absolute; color: var(--probe, #00ff00); }";
+        let paint = |text: &mut BoardText| {
+            format!(
+                "{:?}",
+                text.labels(&card, 80, 16, probe).unwrap().commands()
+            )
+        };
+        let before = paint(&mut text);
+        text.set_font_roles("--probe: #ff0000;");
+        assert_ne!(paint(&mut text), before);
     }
 
     /// A title is one non-wrapping line, centred in its card. Livery ignored
