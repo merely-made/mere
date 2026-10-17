@@ -660,6 +660,7 @@ all = "warn"
 # names them through dramatis.git needs no entry, only the same revision
 # (Cargo refuses a patch from dramatis.git to dramatis.git).
 [patch."https://github.com/merely-made/mere.git"]
+mere-personal-facts = { path = "crates/domain/personal-facts" }
 murm = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
