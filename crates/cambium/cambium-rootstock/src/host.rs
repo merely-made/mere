@@ -861,6 +861,12 @@ where
         layout.visible_rect(&view, node)
     }
 
+    /// Current document scroll offset in logical coordinates. This observes
+    /// the host-owned scroll plane; no layout yet is distinct from zero.
+    pub fn document_scroll(&self) -> Option<(f32, f32)> {
+        self.layout.map(OwnedLayout::viewport_scroll)
+    }
+
     /// A computed value from the retained layout's own style set. No layout
     /// or absent property is unavailable, rather than a synthesized default.
     /// This observes an existing layout and never triggers style or layout work.
