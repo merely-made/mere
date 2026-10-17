@@ -1,0 +1,622 @@
+{
+  "schema": "mere.resident-inference/architecture-integration/v1",
+  "recorded_utc": "2026-10-17T14:35:14.487518+00:00",
+  "source_tip": "b22358ba513bbd0f0f05ffe9a5c72d3f9c03aaf9",
+  "integrated_main": "609b0a60373bdb54cd899254397bb061096a3221",
+  "checkpoint": "45f9550a8af03652cb9643a46b3439fd84c3951e",
+  "bounded_integration_qualified": true,
+  "i9_phase_complete": false,
+  "integrated_upstream": "128961d18795cafca51b39899c3c6fab58591705",
+  "checks_source_tip": "0d8f692893d280b278f104dbd930abde09ec86ef",
+  "current_upstream_followup": {
+    "source_tip": "b22358ba513bbd0f0f05ffe9a5c72d3f9c03aaf9",
+    "initial_checks_source_tip": "0d8f692893d280b278f104dbd930abde09ec86ef",
+    "upstream": "128961d18795cafca51b39899c3c6fab58591705",
+    "changed_rust_and_manifests": [
+      "Cargo.lock",
+      "ports/djinn/src/resident_mere.rs"
+    ],
+    "mere_production_rust_unchanged": true,
+    "checks": [
+      {
+        "name": "djinn-production-features",
+        "command": [
+          "cargo",
+          "tree",
+          "--locked",
+          "-p",
+          "djinn",
+          "--no-default-features",
+          "-e",
+          "normal,build",
+          "--prefix",
+          "none"
+        ],
+        "exit_code": 0,
+        "seconds": 16.70300000000134,
+        "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-djinn-production-features.log",
+        "log_sha256": "c4d630774c4fbda1d3b3090779772c780352030aedb501e60337d9bc8b3c6427",
+        "summaries": []
+      },
+      {
+        "name": "distillery-production-features",
+        "command": [
+          "cargo",
+          "tree",
+          "--locked",
+          "-p",
+          "distillery",
+          "--no-default-features",
+          "-e",
+          "normal,build",
+          "--prefix",
+          "none"
+        ],
+        "exit_code": 0,
+        "seconds": 2.95299999999952,
+        "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-distillery-production-features.log",
+        "log_sha256": "e74de391dfffa6edaa7bfdc3424f33874341e8c482a00908b5da1a0ca7638f44",
+        "summaries": []
+      },
+      {
+        "name": "build",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "--offline",
+          "--release",
+          "-p",
+          "esp",
+          "-p",
+          "distillery",
+          "-p",
+          "djinn",
+          "--features",
+          "esp/actor,esp/decoder-flex,esp/decoder-wgpu,esp/decoder-autodiff,esp/model-session,djinn/inference-stages,djinn/inference-gpu,djinn/trainer-gpu,djinn/trainer-autodiff",
+          "--lib",
+          "--no-run",
+          "--message-format=json"
+        ],
+        "exit_code": 0,
+        "seconds": 789.75,
+        "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-build.log",
+        "log_sha256": "ff47954a5231ac6f6e743807a472a566f0b219ef39e291503d6e9376a6c376f7",
+        "summaries": []
+      },
+      {
+        "name": "djinn-unit",
+        "command": [
+          "C:/t/cargo-targets/mere/build\\release\\deps\\djinn-f86551ed67a1bd09.exe",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "exit_code": 0,
+        "seconds": 121.67200000000048,
+        "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-djinn-unit.log",
+        "log_sha256": "efc13b81fcef08134d05f0e66b3775efe6a5a5b42ceb587e1a4a409467df6b6d",
+        "summaries": [
+          "test result: ok. 225 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 120.63s"
+        ],
+        "executable_sha256": "0349a15b1d879b32a81078cb426556f95a7649602cee8879f85005c8827b3098"
+      }
+    ],
+    "feature_graphs": [
+      {
+        "package": "djinn",
+        "model_backend_dependencies": [],
+        "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-djinn-production-features.log",
+        "log_sha256": "c4d630774c4fbda1d3b3090779772c780352030aedb501e60337d9bc8b3c6427"
+      },
+      {
+        "package": "distillery",
+        "model_backend_dependencies": [],
+        "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-distillery-production-features.log",
+        "log_sha256": "e74de391dfffa6edaa7bfdc3424f33874341e8c482a00908b5da1a0ca7638f44"
+      }
+    ],
+    "only_changed_dependency": {
+      "package": "cleromancy-core-acceptance",
+      "before": "git+https://github.com/merely-made/cleromancy.git?branch=main#da495cfc75b2ee6bbb9476c8c03386e9057c36d3",
+      "after": "git+https://github.com/merely-made/cleromancy.git?branch=main#3fa5a6db87cfa34df9fc1de0a0877181c9b4526f",
+      "other_packages_identical": true
+    },
+    "test_artifacts": {
+      "djinn": "C:/t/cargo-targets/mere/build\\release\\deps\\djinn-f86551ed67a1bd09.exe",
+      "distillery": "C:/t/cargo-targets/mere/build\\release\\deps\\distillery-4e2ca16b60a9a8cb.exe",
+      "esp": "C:/t/cargo-targets/mere/build\\release\\deps\\esp-616b1c6c7d92981a.exe"
+    },
+    "carried_unchanged_unit_binaries": [
+      "esp",
+      "distillery"
+    ],
+    "complete": true
+  },
+  "followup_preflight_repair": {
+    "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-upstream-driver.log",
+    "log_sha256": "5ede2b7318f1e403655e5509d47189ea61abedd1197b91f97f478277dc8893a9",
+    "scope": "The helper initially compared canonical Git source against a decoded working-file read. It now compares both canonical Git blobs; the production prefix is unchanged. This was a helper preflight failure, before Cargo or tests."
+  },
+  "prior_qualification": {
+    "path": "support/receipts/resident_inference_architecture_qualification.json",
+    "canonical_git_blob_sha256": "f07a92a588a2ef47ab222e796dcc3a65ed70d21b457e3c475b83eb4e81430aef"
+  },
+  "unchanged_inference_production_git_blob_sha256": {
+    "crates/intel/esp/Cargo.toml": "26369d59daa61cb46b5a31c92f04ecd57a7bbad1229f63e2f3f6baa435c340ff",
+    "crates/intel/esp/src/infer/decoder/architecture_tests.rs": "550c8d2867af4ac5ae23b72c51d466f665684cef648b2c81e4ae7378d4053caf",
+    "crates/intel/esp/src/infer/decoder/attention.rs": "6c6101ad1db5823e0a35005f41229b380a2e13511d5e5195e728a0986425102a",
+    "crates/intel/esp/src/infer/decoder/checkpoint.rs": "fe392b9a1a21944362a7d1f9fbcfa67ee40c137f78978667176d82e12e138469",
+    "crates/intel/esp/src/infer/decoder/config.rs": "e31ac64f57a154c63985e47ddeca9514107f5fc0b7392bbbd0c8bc6c57d01eab",
+    "crates/intel/esp/src/infer/decoder/layer.rs": "d8820a17be074a85423ae988b2c5f4da302ec704f9580ac5fe3b985909c612e2",
+    "crates/intel/esp/src/infer/decoder/loader.rs": "9664efa90f1800b3cabfec2788c950a26b98c7e334aa8d06754f7b25781c5881",
+    "crates/intel/esp/src/infer/decoder/lora.rs": "7a19831400983af976eaf866ee351b917112927a873b5b54a0bbe5766d6dd490",
+    "crates/intel/esp/src/infer/decoder/mod.rs": "c4c4d8235fb0159565bddd848e77322c1c449b8ef67530d1043873dcbb58f1dc",
+    "crates/intel/esp/src/infer/decoder/model.rs": "114709f5edc67d6e2112af665381846d86f9c903130f8fd4773ad51b52ee3450",
+    "crates/intel/esp/src/infer/decoder/moe.rs": "350eea70a9e52bb51b826b6f8c422a35b5bb292b551ee7960038dde97423d767",
+    "crates/intel/esp/src/infer/decoder/provider.rs": "f07c0fac5edb59f6a5192d13d6e21eee6b84395f1386072fde26ca8f8d9bc0a4",
+    "crates/intel/esp/src/infer/decoder/stage.rs": "75032e252e964c77dcd091498b964bf7d9b3963660dc6ad90fb8fc87ae3183a7",
+    "crates/intel/esp/src/infer/decoder/streaming.rs": "dc0705992efdc290fd273131bf8b66cb55941c6f4e87a525412e495149fa3fe0",
+    "crates/intel/esp/src/infer/decoder/train.rs": "2011591939a8da14971d0b28c508970df1e009e3ae3cb06619a2150d6c30526b",
+    "crates/intel/esp/src/infer/decoder/train_autodiff.rs": "0d6d3bae7211f901820ff832d0bbd91897900b8dc666323d7a2400c1c00cd64c",
+    "crates/intel/esp/src/infer/layer_library.rs": "2b65ff94982d022aa9fc99c6689dc59d4e40c3abeaf908d8b3e449f6524d1251",
+    "crates/intel/esp/src/infer/library.rs": "5284ddb3991ae1ec6f3f002b99ad9bfdff20ac4c487dc72073945bceb510c431",
+    "ports/distillery/Cargo.toml": "9c70783f72c0519f09276089065941975ba03b01fe25aefd7ac6c595ecaf6c00",
+    "ports/distillery/src/inference.rs": "f7fcd6a1d3d44d12e158d63b2fd4957ae9d05ab3f821bf5b96e05d7a385393df",
+    "ports/distillery/src/inference_stage.rs": "1070459fed5fafbe7a3ad7e89b73c93d9f9e297466b89ce37ec96db0fa394205",
+    "ports/djinn/Cargo.toml": "1562525119021ed8bddae13723da9fe640b818ad52cfdea4f759e0effefc2d3d"
+  },
+  "merged_manifests": {
+    "Cargo.toml": "1ae92b96b62c975fa38e2ca60bd4c97fc692fa4fd7014d589fe1320073c02fa4",
+    "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c"
+  },
+  "inference_dependency_comparison": {
+    "compared_base": "45f9550a8af03652cb9643a46b3439fd84c3951e",
+    "inference_dependency_changes": [],
+    "checked_packages": 69
+  },
+  "build_environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "runtime_environment": {
+    "ESP_ARCHITECTURE_WORK_DIR": "C:\\t\\cargo-targets\\mere\\inference-i9",
+    "ESP_STAGE_WORK_DIR": "C:/t/cargo-targets/mere/inference-i8",
+    "ESP_SMOLLM2_DIR": "C:/Users/mark_/.cache/huggingface/hub/models--HuggingFaceTB--SmolLM2-360M-Instruct/snapshots/a10cc1512eabd3dde888204e902eca88bddb4951"
+  },
+  "reproduce_after_integration_from": "C:/Users/mark_/Code/repos/mere",
+  "checks": [
+    {
+      "name": "build",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--release",
+        "-p",
+        "esp",
+        "-p",
+        "distillery",
+        "-p",
+        "djinn",
+        "--features",
+        "esp/actor,esp/decoder-flex,esp/decoder-wgpu,esp/decoder-autodiff,esp/model-session,djinn/inference-stages,djinn/inference-gpu,djinn/trainer-gpu,djinn/trainer-autodiff",
+        "--lib",
+        "--test",
+        "architecture_rows",
+        "--test",
+        "inference_layered",
+        "--test",
+        "inference_route",
+        "--test",
+        "inference_automatic",
+        "--test",
+        "inference_gpu_reclaim",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "environment_overrides": {},
+      "exit_code": 101,
+      "seconds": 1.7339999999994689,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-build.log",
+      "log_sha256": "99d5536cc4730a71726806966287e6e2ed31cef5391bb9f9195002d773955d01",
+      "log_bytes": 276,
+      "summaries": []
+    },
+    {
+      "name": "build-online",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "-p",
+        "esp",
+        "-p",
+        "distillery",
+        "-p",
+        "djinn",
+        "--features",
+        "esp/actor,esp/decoder-flex,esp/decoder-wgpu,esp/decoder-autodiff,esp/model-session,djinn/inference-stages,djinn/inference-gpu,djinn/trainer-gpu,djinn/trainer-autodiff",
+        "--lib",
+        "--test",
+        "architecture_rows",
+        "--test",
+        "inference_layered",
+        "--test",
+        "inference_route",
+        "--test",
+        "inference_automatic",
+        "--test",
+        "inference_gpu_reclaim",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 6187.844,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-build-online.log",
+      "log_sha256": "6438383c108abcd432fe47acc53a8852bf757eeab5898f1cf035418d5ae33f72",
+      "log_bytes": 1682870,
+      "summaries": []
+    },
+    {
+      "name": "esp-unit",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\esp-616b1c6c7d92981a.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 5.07799999999952,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-esp-unit.log",
+      "log_sha256": "ba1baa1e4b4c1ed057fc40bb6e084b2ce8666f19f18d4905a85cf09e4bfc5474",
+      "log_bytes": 15848,
+      "summaries": [
+        "test result: ok. 198 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 4.59s"
+      ],
+      "executable_sha256": "aeaf1a3c2fd60761896183949656383354910fee1b07bad55b6d0a9880683a2e"
+    },
+    {
+      "name": "distillery-unit",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\distillery-4e2ca16b60a9a8cb.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 2.1560000000008586,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-distillery-unit.log",
+      "log_sha256": "6e8f06c484f556e3fdd697d8c17c8f4235f7d487bac2adb9d33f26a7d1ae5156",
+      "log_bytes": 4995,
+      "summaries": [
+        "test result: ok. 54 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.76s"
+      ],
+      "executable_sha256": "5e5106248b527cb600889feffbcba78d5915d89a5a364707db5e6098c2a3969b"
+    },
+    {
+      "name": "djinn-unit",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\djinn-f86551ed67a1bd09.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 122.65600000000086,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-djinn-unit.log",
+      "log_sha256": "1fe7968323f2c56f8fd9e98de70e645b28a7ed90d5a7563cde36f530d2f5ede9",
+      "log_bytes": 20787,
+      "summaries": [
+        "test result: ok. 224 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 121.83s"
+      ],
+      "executable_sha256": "cb15defe11836bb994c614f3c3f2ca1b12975771ef4e5258ef81b01e012b6321"
+    },
+    {
+      "name": "architectures-gpu",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\esp-616b1c6c7d92981a.exe",
+        "--ignored",
+        "architecture_tests::",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 5.17200000000048,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-architectures-gpu.log",
+      "log_sha256": "eef2b86f06b6960d613d23bd195e01e9d998ca01b1e1bdd621bd238f126d9528",
+      "log_bytes": 216,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 5.02s"
+      ],
+      "executable_sha256": "aeaf1a3c2fd60761896183949656383354910fee1b07bad55b6d0a9880683a2e"
+    },
+    {
+      "name": "expert-library",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\architecture_rows-0e6d34721a5f5e7e.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.4220000000004802,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-expert-library.log",
+      "log_sha256": "e981e1c0f28ba06e18e05ad069b5a3ee6e7bcacb6a677c15c3693c3f3558a93b",
+      "log_bytes": 620,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ],
+      "executable_sha256": "5784a16825648a7df05f517816e02cbc8801cb9f3e60ccb328f3a6e04bac4c3f"
+    },
+    {
+      "name": "library-owner",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_layered-e21798c99f664cd0.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 0.6100000000005821,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-library-owner.log",
+      "log_sha256": "c7ac4f798881e2e7b12d4ae93c716163df04f05e74814f69002e88f63391d366",
+      "log_bytes": 340,
+      "summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s"
+      ],
+      "executable_sha256": "71ec6a3ff98ad0ffd70625107ccb4165ff99719075e427e4e8592e6ecaeaade2"
+    },
+    {
+      "name": "route",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_route-3617dd2b71affcda.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 30.34399999999914,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-route.log",
+      "log_sha256": "44d275e0d5bf28a8b1d75badc10b70328a8c950abef16d6391351f0e57f7f23d",
+      "log_bytes": 667,
+      "summaries": [
+        "test result: ok. 4 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 29.90s"
+      ],
+      "executable_sha256": "cfeb1ad7a60b6f85b727444f6b6e52dd2b1ca84a637819e555e85d3cff9af88b"
+    },
+    {
+      "name": "automatic-cpu",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_automatic-f967a704df65e2b6.exe",
+        "--exact",
+        "ordinary_asks_discover_keyed_stages_and_recover_when_a_worker_leaves",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 62.3119999999999,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-automatic-cpu.log",
+      "log_sha256": "a0050c561016cd3c5856440727e814d54b64a5af7ab6ca06255b6cb9ec178f66",
+      "log_bytes": 5840,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 61.88s"
+      ],
+      "executable_sha256": "0efba3544cf6d64a0cde2ed45c6449398766a9748106f69f189733033fb3c8b7"
+    },
+    {
+      "name": "reclaim-finite-difference",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_gpu_reclaim-8fb6e195fe776ca5.exe",
+        "--ignored",
+        "--exact",
+        "an_ask_reclaims_a_gpu_trainer_through_the_lease_owner",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {
+        "DJINN_INFERENCE_RECLAIM_RECEIPT": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-reclaim-finite-difference-result.json"
+      },
+      "exit_code": 0,
+      "seconds": 4.04700000000048,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-reclaim-finite-difference.log",
+      "log_sha256": "004eeb9bcea0ba1686019c4eac40e0d32de4eb2eed1ada95b4ea52c6473813c7",
+      "log_bytes": 14545,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 3.50s"
+      ],
+      "executable_sha256": "36389c9e3436aad77ef8c01c0624aa5ef3e33af47b3265bd5d0abfeb55cce039"
+    },
+    {
+      "name": "reclaim-autodiff",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_gpu_reclaim-8fb6e195fe776ca5.exe",
+        "--ignored",
+        "--exact",
+        "an_ask_reclaims_an_autodiff_gpu_trainer_through_the_lease_owner",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {
+        "DJINN_INFERENCE_RECLAIM_RECEIPT": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-reclaim-autodiff-result.json"
+      },
+      "exit_code": 0,
+      "seconds": 1.8589999999985594,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-reclaim-autodiff.log",
+      "log_sha256": "75e62b260ea3c7a83ebc4e09f60101f84b58f3a25ffc0ae2eb1d12bc18fdf15a",
+      "log_bytes": 4361,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 1.69s"
+      ],
+      "executable_sha256": "36389c9e3436aad77ef8c01c0624aa5ef3e33af47b3265bd5d0abfeb55cce039"
+    },
+    {
+      "name": "reclaim-checkpoint",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_gpu_reclaim-8fb6e195fe776ca5.exe",
+        "--ignored",
+        "--exact",
+        "an_ask_cancels_a_trainer_that_was_posted_as_checkpointable",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {
+        "DJINN_INFERENCE_RECLAIM_RECEIPT": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-reclaim-checkpoint-result.json"
+      },
+      "exit_code": 0,
+      "seconds": 1.7029999999995198,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-reclaim-checkpoint.log",
+      "log_sha256": "73a6dd59e1ee88ca96642a809e10ca03f1a2d25a33f2da9ac0637010e375d927",
+      "log_bytes": 5304,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 1.55s"
+      ],
+      "executable_sha256": "36389c9e3436aad77ef8c01c0624aa5ef3e33af47b3265bd5d0abfeb55cce039"
+    },
+    {
+      "name": "recall-gpu",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_route-3617dd2b71affcda.exe",
+        "--ignored",
+        "--exact",
+        "a_real_model_cites_exact_retained_versions_and_reopens_its_run",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 11.734999999998763,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-recall-gpu.log",
+      "log_sha256": "fc5027f67021593d1fc24878599df0cbfc7ff30f36fe3b4f1f50b0a3b106dfea",
+      "log_bytes": 360,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 11.56s"
+      ],
+      "executable_sha256": "cfeb1ad7a60b6f85b727444f6b6e52dd2b1ca84a637819e555e85d3cff9af88b"
+    },
+    {
+      "name": "automatic-gpu",
+      "command": [
+        "C:/t/cargo-targets/mere/build\\release\\deps\\inference_automatic-f967a704df65e2b6.exe",
+        "--ignored",
+        "--exact",
+        "real_smollm2_ordinary_asks_select_stages_and_recover",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "environment_overrides": {},
+      "exit_code": 0,
+      "seconds": 100.60999999999876,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-automatic-gpu.log",
+      "log_sha256": "d37e6eeac549e0abbd24fa57b25bc847a72586d582ae820f952ea7177700dce7",
+      "log_bytes": 6438,
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 100.32s"
+      ],
+      "executable_sha256": "0efba3544cf6d64a0cde2ed45c6449398766a9748106f69f189733033fb3c8b7"
+    }
+  ],
+  "required_checks": [
+    "build-online",
+    "esp-unit",
+    "distillery-unit",
+    "djinn-unit",
+    "architectures-gpu",
+    "expert-library",
+    "library-owner",
+    "route",
+    "automatic-cpu",
+    "reclaim-finite-difference",
+    "reclaim-autodiff",
+    "reclaim-checkpoint",
+    "recall-gpu",
+    "automatic-gpu"
+  ],
+  "test_artifacts": {
+    "inference_layered": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_layered-e21798c99f664cd0.exe",
+    "distillery": "C:/t/cargo-targets/mere/build\\release\\deps\\distillery-4e2ca16b60a9a8cb.exe",
+    "djinn": "C:/t/cargo-targets/mere/build\\release\\deps\\djinn-f86551ed67a1bd09.exe",
+    "inference_automatic": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_automatic-f967a704df65e2b6.exe",
+    "inference_gpu_reclaim": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_gpu_reclaim-8fb6e195fe776ca5.exe",
+    "inference_route": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_route-3617dd2b71affcda.exe",
+    "esp": "C:/t/cargo-targets/mere/build\\release\\deps\\esp-616b1c6c7d92981a.exe",
+    "architecture_rows": "C:/t/cargo-targets/mere/build\\release\\deps\\architecture_rows-0e6d34721a5f5e7e.exe"
+  },
+  "production_feature_graphs": [
+    {
+      "package": "djinn",
+      "command": [
+        "cargo",
+        "tree",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--no-default-features",
+        "-e",
+        "normal,build",
+        "--prefix",
+        "none"
+      ],
+      "model_backend_dependencies": [],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-djinn-production-features.log",
+      "log_sha256": "8fff72f68d63bff36e09c727e1c637b55139e9b73c53c18a87635409561f22db"
+    },
+    {
+      "package": "distillery",
+      "command": [
+        "cargo",
+        "tree",
+        "--locked",
+        "--offline",
+        "-p",
+        "distillery",
+        "--no-default-features",
+        "-e",
+        "normal,build",
+        "--prefix",
+        "none"
+      ],
+      "model_backend_dependencies": [],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-distillery-production-features.log",
+      "log_sha256": "e74de391dfffa6edaa7bfdc3424f33874341e8c482a00908b5da1a0ca7638f44"
+    }
+  ],
+  "documentation": {
+    "unchanged_findings": 18,
+    "final_audit_sha256": "5261712c139b6a8d2d4d54c8c9437264a56a3071320b5e52e4e291286c3588f1"
+  },
+  "whitespace": {
+    "own_and_merged_source_check_passed": true,
+    "inherited_immutable_receipt_warnings": [
+      "design_docs/mere_docs/receipts/natal-aspects-20261017/natal-committed.log:1274: new blank line at EOF",
+      "design_docs/mere_docs/receipts/natal-aspects-20261017/natal-owner-02.log:1275: new blank line at EOF",
+      "design_docs/mere_docs/receipts/natal-aspects-20261017/owner-gates.log:1670: new blank line at EOF"
+    ],
+    "receipt_bytes_preserved": true
+  },
+  "changes": [
+    "Merge the current committed main without concurrent primary working edits.",
+    "Keep the byte-compared identity-card fixture LF on all platforms. The current main already repairs the earlier projection expectation."
+  ],
+  "evidence_scope": "Fresh full build and native inference regression batch at checks_source_tip, which includes the committed local main. A later upstream natal-only test addition and Cleromancy pin are merged at source_tip and qualified by the affected full Djinn unit suite and fresh default feature graphs. Mere production Rust is unchanged across that later merge. Unit gates carry directly where executable hashes match; changed unit binaries are rerun. Earlier real-model reference and scale receipts remain valid for unchanged inference production sources; the 57B gate was not repeated. No full I9, installed-resident, new headed or physical-fleet qualification is claimed.",
+  "retained": {
+    "model_data_bytes": 296361639070,
+    "model_data_cap_bytes": 375000000000,
+    "compact_cap_bytes": 100000000,
+    "cargo_target": "C:/t/cargo-targets/mere",
+    "gate_data": "C:\\t\\cargo-targets\\mere\\inference-i9",
+    "isolated_cargo_homes_created": false
+  },
+  "remaining_phase_gates": [
+    "Largest licence-permitted reachable model of each newly admitted family",
+    "Remaining R12 primitives/families including YaRN, OLMo2, Mixtral and Qwen3 MoE",
+    "Complete graph-key device capacity inventory and physical fleet inference",
+    "Installed resident and new headed architecture receipts"
+  ]
+}
