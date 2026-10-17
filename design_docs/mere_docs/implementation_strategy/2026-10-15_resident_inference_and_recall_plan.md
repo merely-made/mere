@@ -24,7 +24,8 @@ references. The 57B streamed GPU row matches both reference answers and
 serialized checkpoint/provider-reload recovery; the trained Mistral CPU
 library row also passes on CPU and GPU. The bounded native architecture and
 consumer regression batch passes; largest-per-family and broader-family gates
-remain open. Djinn's full unit run retains one unchanged projection failure.
+remain open. The merged checkpoint passes the full Djinn unit suite and
+the resident CPU/GPU regressions.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -1633,3 +1634,26 @@ Stop and record the reason if any of these happen:
     Largest-per-family qualification, further families,
     physical-fleet execution and installed-resident invocation are not covered
     by this checkpoint. I9 remains in progress.
+
+- **2026-10-17, I9 integration qualified.** The
+  [integration receipt](../../../support/receipts/resident_inference_architecture_integration.json)
+  binds the fresh release build at `0d8f6928`, including committed main
+  `609b0a60`: **198 ESP, 54 Distillery and 224 Djinn unit tests pass**.
+  Native GPU architecture parity, verified expert/library ownership,
+  all four ordinary app-route cases, CPU and real-model GPU automatic
+  placement/recovery, all three GPU trainer-reclaim cases and exact-version
+  GPU recall pass. Default production feature graphs omit model backends.
+  The identity fixture now has an explicit LF rule; current main already
+  corrects the earlier projection expectation.
+  - Upstream `128961d1` landed during the build. Its only Mere Rust change
+    adds a natal-aspects test; its only package change is the Cleromancy
+    core pin. Mere production Rust and every other locked package are
+    unchanged. After merging it, **all 225 Djinn unit tests pass**,
+    including that new intake case; both default feature graphs pass again.
+    Unchanged unit binaries carry their checks by exact hash; rebuilt unit
+    suites are rerun. The receipt separates these source revisions and checks.
+  - Earlier trained-family and 57B model receipts remain bound to unchanged
+    inference production source. The long 57B run was not repeated. This
+    integration closes the current-main qualification gate for the bounded
+    checkpoint; largest-per-family, further-family, installed-resident,
+    new headed and physical-fleet gates remain open. I9 remains in progress.
