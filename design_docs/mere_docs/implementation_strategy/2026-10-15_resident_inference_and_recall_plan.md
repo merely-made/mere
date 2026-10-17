@@ -1657,3 +1657,11 @@ Stop and record the reason if any of these happen:
     integration closes the current-main qualification gate for the bounded
     checkpoint; largest-per-family, further-family, installed-resident,
     new headed and physical-fleet gates remain open. I9 remains in progress.
+  - Publication and cleanup: `d13bd040` is pushed on main. The inference
+    worktree and its local/remote branch are pruned after fresh cache-marker,
+    clean-tree, ancestry and process-owner checks. The
+    [closeout receipt](../../../support/receipts/resident_inference_architecture_closeout.json)
+    records removal of the obsolete 2,039,153,323-byte Cargo cache and exact
+    preservation of all 34 unrelated tracked edits. Untracked work remains
+    outside the merge paths. Model data and compact evidence stay under
+    their existing caps for the remaining I9 gates.
