@@ -1,0 +1,39 @@
+{
+  "schema": "mere.personal-facts-hardening/v1",
+  "baseline": "9a1af6f9e02b2743b1014c2e081b4b06cc4ce522",
+  "status": "software qualified; native consumer intake separate",
+  "checks": {
+    "mere-facts-hardened.log": {
+      "passed": 13,
+      "ignored": 0,
+      "sha256": "c8e059f8256f77830cf6f08154b13c7700a1e1ac1be251a16fb0678bf110bb95"
+    },
+    "pandect-admission-full.log": {
+      "passed": 327,
+      "ignored": 0,
+      "sha256": "1e3dae42529cc84c6c97539132a27c6288c5249f2779da34d693caf87562c200"
+    },
+    "djinn-owner-hardening-full-02.log": {
+      "passed": 213,
+      "ignored": 0,
+      "sha256": "107c611df62700f768e9ed8c0a077e53d99ca240a3cffd3dd78b32d614c3cc0d"
+    },
+    "mere-fresh-process-hardened.log": {
+      "passed": 1,
+      "ignored": 1,
+      "sha256": "73d4c23650914f8d879cdd3f366418bf34c750da0a606b97b5289083b3619e79"
+    },
+    "profile-owner-test-02.log": {
+      "passed": 1,
+      "ignored": 0,
+      "sha256": "e44e83f29d4976ea0bd8923c693b852f601ba043dcdfbba4560234bf7c4bdc53"
+    }
+  },
+  "policy": [
+    "New profile subjects resolve through the real owner vault before journal installation",
+    "New contact references require a retained same-persona contact resource",
+    "Pure historical replay does not require live profile availability",
+    "Transition hook propagates through detached transactions and forks",
+    "Personal-facts fixture crosses two admitted apps and two actual owner processes"
+  ]
+}

@@ -20,6 +20,7 @@ use kernel::{
     },
 };
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeSet;
 
 pub const DOMAIN: &str = "personal-facts";
 pub const BIRTH_FACET: &str = "dramatis.birth-facts/v1";
@@ -147,6 +148,8 @@ pub fn associations(graph: &Graph) -> Result<Vec<SubjectResourceAssociation>, St
 }
 
 /// This additional owner-bound check prevents cross-persona contact insertion.
+/// Structural validation requires every contact association to resolve to one
+/// of these retained scoped contacts, including links to external domains.
 pub fn validate_for_persona(graph: &Graph, persona: &str) -> Result<(), String> {
     validate(graph)?;
     for record in read_values::<ContactResource>(graph, CONTACT_FACET)? {
@@ -158,6 +161,51 @@ pub fn validate_for_persona(graph: &Graph, persona: &str) -> Result<(), String> 
     }
     Ok(())
 }
+
+/// Check first introduction of profile subjects at a resident admission boundary.
+/// Both complete graph shapes are checked before consulting the caller's lookup.
+/// Only profile IDs absent from `before` and present in `after` need a positive
+/// lookup, once per ID across birth and association facets. Existing references
+/// may survive profile removal or lookup unavailability, including new revisions
+/// concerning those same historical subjects. This neither mutates graphs nor
+/// performs credential operations; lookup authority belongs to the resident.
+/// Pure cold replay must use structural validation, not introduce an empty
+/// `before` graph here as a substitute for its already admitted history.
+pub fn validate_new_profile_subjects(
+    before: &Graph,
+    after: &Graph,
+    lookup: impl Fn(&personae::ProfileId) -> Result<bool, String>,
+) -> Result<(), String> {
+    validate(before)?;
+    validate(after)?;
+    let existing = profile_subjects(before)?;
+    let proposed = profile_subjects(after)?;
+    for id in proposed.difference(&existing) {
+        if !lookup(id)? {
+            return Err(format!("new profile subject is unavailable: {}", id.0));
+        }
+    }
+    Ok(())
+}
+
+fn profile_subjects(graph: &Graph) -> Result<BTreeSet<personae::ProfileId>, String> {
+    let mut subjects = BTreeSet::new();
+    for subject in read_values::<BirthFacts>(graph, BIRTH_FACET)?
+        .into_iter()
+        .map(|facts| facts.subject)
+        .chain(
+            read_values::<SubjectResourceAssociation>(graph, ASSOCIATION_FACET)?
+                .into_iter()
+                .map(|association| association.subject),
+        )
+    {
+        if let SubjectRef::Profile { id } = subject {
+            subjects.insert(id);
+        }
+    }
+    Ok(subjects)
+}
+
 pub fn validate(graph: &Graph) -> Result<(), String> {
     let mut required = Vec::new();
     let links = read_values::<SubjectResourceAssociation>(graph, ASSOCIATION_FACET)?;
@@ -243,7 +291,7 @@ fn require_contact(graph: &Graph, subject: &SubjectRef) -> Result<(), String> {
             .iter()
             .any(|r| &r.subject == subject)
     {
-        return Err("birth facts require an existing scoped contact resource".into());
+        return Err("personal records require an existing scoped contact resource".into());
     }
     Ok(())
 }
@@ -259,6 +307,9 @@ fn validate_subject(subject: &SubjectRef) -> Result<(), String> {
     }
 }
 fn check_binding(graph: &Graph, value: &SubjectResourceAssociation) -> Result<(), String> {
+    // Subject validity is independent of the target's owner. External links
+    // skip local target binding, never retained-contact existence/scope checks.
+    require_contact(graph, &value.subject)?;
     if value.resource.domain != DOMAIN {
         return Ok(());
     }

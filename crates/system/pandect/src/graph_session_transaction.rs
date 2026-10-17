@@ -259,6 +259,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         Self {
             slots: JsonSlots::new(self.slots.backend().clone()),
             validator: self.validator.clone(),
+            admission_validator: self.admission_validator.clone(),
             keys: Keys(self.keys.0.clone()),
             manifest: self.manifest.clone(),
             baseline: self.baseline.clone(),
