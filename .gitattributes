@@ -79,3 +79,4 @@ crates/intel/esp/templates/*.json text eol=lf
 crates/intel/esp/tests/*_reference.json text eol=lf
 crates/intel/esp/tests/support/architectures/**/*.json text eol=lf
 crates/intel/esp/tests/support/architectures/**/*.safetensors binary
+support/receipts/resident_inference_architecture*.json text eol=lf

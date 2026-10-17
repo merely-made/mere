@@ -1,0 +1,602 @@
+{
+  "schema": "mere.resident-inference/architecture-moe/v1",
+  "recorded_utc": "2026-10-17T09:07:24.477035+00:00",
+  "native_fixture_complete": true,
+  "i9_phase_complete": false,
+  "source_commit": "aa581385daec716a429ab2c814b9f7bcd3fce063",
+  "source_scope": "Production decoder and native MoE fixture unchanged from this commit. Binary built through 397b8838; only architecture_rows integration test fixes differ through aa581385.",
+  "canonical_source_files": {
+    "crates/intel/esp/tests/architecture_moe_real.rs": "3a919c7caf77a1aac2a245fee85b513bd933742a0f5c98b7504295f2c819839c",
+    "crates/intel/esp/tests/qwen2_57b_moe_reference.json": "0b0a624206c624de9c60425a8e45e009f671431577b54b620ce0db28848a0d4f",
+    "crates/intel/esp/templates/qwen2-instruct-v1.json": "77c4ff126008e98eecb8d24e22fd0446c6abf936d303cb276b5865d70ea2e331"
+  },
+  "production_binding": {
+    "path": "support/receipts/resident_inference_architecture_primitives.json",
+    "canonical_git_blob_sha256": "341869d461321692b54152c6ee18e17d14c43b02ba392c5e395c181b31c64a39"
+  },
+  "monitor": {
+    "command": [
+      "C:/t/cargo-targets/mere/build/release/deps/architecture_moe_real-3577581cc8c88272.exe",
+      "--ignored",
+      "--exact",
+      "larger_than_ram_moe_completes_with_selected_expert_streaming",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "cwd": "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference",
+    "exit_code": 0,
+    "seconds": 9512.420999999973,
+    "physical_ram_bytes": 33515835392,
+    "peak_sampled_process_rss_bytes": 8942919680,
+    "peak_os_process_working_set_bytes": 10769522688,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_total_mib": 8188,
+    "peak_sampled_whole_gpu_used_mib": 7659,
+    "gpu_scope": "whole GPU including unrelated applications; not per-process allocation",
+    "samples": 4435,
+    "sample_interval_seconds": 2,
+    "executable_sha256": "c7c09bb1e3279822e31b3a5ce3b48f3d0b155bd188ec198198126a0c2ae242fa",
+    "log_sha256": "7915c0e9531c3fe32822104976a4e14c253138deafa2aac888cf503364255c76"
+  },
+  "native_result": {
+    "adapter": {
+      "backend": "vulkan",
+      "device_type": "Discrete",
+      "matched_requested_class": true,
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+    },
+    "f32_weight_payload_bytes": 229634635776,
+    "final_reads": {
+      "encoded_bytes_read": 181859224144,
+      "expert_encoded_bytes_read": 419320478504,
+      "expert_reads": 7617,
+      "largest_encoded_expert": 55050608,
+      "largest_encoded_layer": 499613256,
+      "layer_reads": 364
+    },
+    "model": "Qwen/Qwen2-57B-A14B-Instruct",
+    "native_dtype": "f32",
+    "reference_dtype": "torch.float32",
+    "results": [
+      {
+        "after": {
+          "encoded_bytes_read": 223826737408,
+          "expert_encoded_bytes_read": 439854355168,
+          "expert_reads": 7990,
+          "largest_encoded_expert": 55050608,
+          "largest_encoded_layer": 499613256,
+          "layer_reads": 448
+        },
+        "before": {
+          "encoded_bytes_read": 0,
+          "expert_encoded_bytes_read": 0,
+          "expert_reads": 0,
+          "largest_encoded_expert": 0,
+          "largest_encoded_layer": 0,
+          "layer_reads": 0
+        },
+        "question": "What is the capital of France?",
+        "seconds": 3088.0976015,
+        "text": "The capital of France is Paris. It is one of the most iconic and historically",
+        "token_events": [
+          {
+            "at_token": 1,
+            "expert_reads": 4630,
+            "seconds": 1352.8519985
+          },
+          {
+            "at_token": 2,
+            "expert_reads": 4854,
+            "seconds": 1607.2911999
+          },
+          {
+            "at_token": 3,
+            "expert_reads": 5078,
+            "seconds": 1720.7888591
+          },
+          {
+            "at_token": 4,
+            "expert_reads": 5302,
+            "seconds": 1837.928502
+          },
+          {
+            "at_token": 5,
+            "expert_reads": 5526,
+            "seconds": 1959.7550953
+          },
+          {
+            "at_token": 6,
+            "expert_reads": 5750,
+            "seconds": 2069.2620565
+          },
+          {
+            "at_token": 7,
+            "expert_reads": 5974,
+            "seconds": 2179.9505741
+          },
+          {
+            "at_token": 8,
+            "expert_reads": 6198,
+            "seconds": 2287.8666568
+          },
+          {
+            "at_token": 9,
+            "expert_reads": 6422,
+            "seconds": 2389.8718852
+          },
+          {
+            "at_token": 10,
+            "expert_reads": 6646,
+            "seconds": 2498.0367019
+          },
+          {
+            "at_token": 11,
+            "expert_reads": 6870,
+            "seconds": 2598.0974676
+          },
+          {
+            "at_token": 12,
+            "expert_reads": 7094,
+            "seconds": 2695.6233659
+          },
+          {
+            "at_token": 13,
+            "expert_reads": 7318,
+            "seconds": 2799.0518665
+          },
+          {
+            "at_token": 14,
+            "expert_reads": 7542,
+            "seconds": 2894.9886426
+          },
+          {
+            "at_token": 15,
+            "expert_reads": 7766,
+            "seconds": 2990.291078
+          },
+          {
+            "at_token": 16,
+            "expert_reads": 7990,
+            "seconds": 3088.0947353
+          }
+        ],
+        "token_ids": [
+          785,
+          6722,
+          315,
+          9625,
+          374,
+          12095,
+          13,
+          1084,
+          374,
+          825,
+          315,
+          279,
+          1429,
+          26277,
+          323,
+          34801
+        ]
+      },
+      {
+        "after": {
+          "encoded_bytes_read": 321750935024,
+          "expert_encoded_bytes_read": 761845359256,
+          "expert_reads": 13839,
+          "largest_encoded_expert": 55050608,
+          "largest_encoded_layer": 499613256,
+          "layer_reads": 644
+        },
+        "before": {
+          "encoded_bytes_read": 223826737408,
+          "expert_encoded_bytes_read": 439854355168,
+          "expert_reads": 7990,
+          "largest_encoded_expert": 55050608,
+          "largest_encoded_layer": 499613256,
+          "layer_reads": 448
+        },
+        "question": "What is two plus two?",
+        "seconds": 1778.7930599,
+        "text": "Two plus two is four.",
+        "token_events": [
+          {
+            "at_token": 1,
+            "expert_reads": 12495,
+            "seconds": 1129.331341
+          },
+          {
+            "at_token": 2,
+            "expert_reads": 12719,
+            "seconds": 1223.3573561
+          },
+          {
+            "at_token": 3,
+            "expert_reads": 12943,
+            "seconds": 1350.0210741
+          },
+          {
+            "at_token": 4,
+            "expert_reads": 13167,
+            "seconds": 1488.1012869
+          },
+          {
+            "at_token": 5,
+            "expert_reads": 13391,
+            "seconds": 1585.2293788
+          },
+          {
+            "at_token": 6,
+            "expert_reads": 13615,
+            "seconds": 1672.7752816
+          },
+          {
+            "at_token": 6,
+            "expert_reads": 13839,
+            "seconds": 1778.7925661
+          }
+        ],
+        "token_ids": [
+          11613,
+          5519,
+          1378,
+          374,
+          3040,
+          13
+        ]
+      }
+    ],
+    "resume": {
+      "at_token": 3,
+      "before_restart_reads": {
+        "encoded_bytes_read": 363718448288,
+        "expert_encoded_bytes_read": 1041392344792,
+        "expert_reads": 18917,
+        "largest_encoded_expert": 55050608,
+        "largest_encoded_layer": 499613256,
+        "layer_reads": 728
+      },
+      "serialized_checkpoint_and_reloaded_provider": true,
+      "token_ids": [
+        785,
+        6722,
+        315,
+        9625,
+        374,
+        12095,
+        13,
+        1084,
+        374,
+        825,
+        315,
+        279,
+        1429,
+        26277,
+        323,
+        34801
+      ]
+    },
+    "revision": "50896d66b39f1425d63720541a66c7df13e053c0",
+    "row": "blake3:6b0b627c5274f09f30e862603a32ca068c6066d27a2efd658d249a6b9b42017c",
+    "scope": "One physical computer/GPU; library-backed core and selected-expert streaming; no installed resident or physical fleet claim",
+    "session": {
+      "prompt_template_hash": "blake3:eebfb08a04e3f9c45309b4d5b5f9270404eaf25b0e3bc02d1a4a96099bc53458",
+      "session_id": "blake3:9822df5396a8187ae96dc32ff524dca16da27881ae983bb95a8e7021f215f842"
+    },
+    "shared_matrix_layout": {
+      "embedding_shards": 3,
+      "largest_tensor_bytes": 1073737728,
+      "output_shards": 3
+    }
+  },
+  "independent_reference": {
+    "model_id": "Qwen/Qwen2-57B-A14B-Instruct",
+    "revision": "50896d66b39f1425d63720541a66c7df13e053c0",
+    "torch": "2.14.1+cpu",
+    "transformers": "4.57.6",
+    "dtype": "torch.float32",
+    "attention": "eager",
+    "max_tokens": 16,
+    "reference": "cached Transformers greedy tokens",
+    "official_template_match": true,
+    "template_sha256": "b7cd55e46fcbe3db8fe1c240bcc2022f7b6c29e19a630df83ae0a8ba09de5efe",
+    "artifacts": {
+      "config.json": "422bec9f6b52c33bbd23f2b5707ddb4b52cca480485cefc54e8e65831a212d4c",
+      "generation_config.json": "758d6aed2f4947bba541c57491ad53d8ba67067cbdfb9a0ce2821c834350501f",
+      "tokenizer.json": "f7c9b2dba4a296b1aa76c16a34b8225c0c118978400d4bb66bff0902d702f5b8",
+      "tokenizer_config.json": "b34ff231d7132e0d7f43e04544937d63f2edfcd91c6ca6a2c581b1078e42f166",
+      "model.safetensors.index.json": "9ced996b50d177c81b10af8d554f3ad3844aa3fcc1c2e374b9fee8a3b6c63e02",
+      "model-00001-of-00029.safetensors": "ca57fe6af12e0eebbc6b11ac31c9b5fde6ef8a9aec1fca0de2ebd02e39f19ca7",
+      "model-00002-of-00029.safetensors": "8cad09ebbea5214022fa0f73fe91852a6feb3e6a1c68de2505cc5466cc2807c4",
+      "model-00003-of-00029.safetensors": "bdf68771367ee467e7967258f2156e605430dd81bdc36823baca1020efa57435",
+      "model-00004-of-00029.safetensors": "be00366cf4fcb199761096f14eba5ea3ce8caada6d6f1b7cfedf43eadc4034d8",
+      "model-00005-of-00029.safetensors": "27013e94dbcd23d8bcdd490f819fc2f9de05ee69550417a1c256ef58b78be842",
+      "model-00006-of-00029.safetensors": "eed03d2ec20aeae9b4b2007e263aed073149178690c2d074bb96f0ee10542f55",
+      "model-00007-of-00029.safetensors": "0055a3131247962127bc8271bc3e4f46cb2c876747409fb7f2722bc3a54148cb",
+      "model-00008-of-00029.safetensors": "4ac20942deef743a792cf532220e02abec93ee1895fec96434471ebad77d2f46",
+      "model-00009-of-00029.safetensors": "f7381a2b1c884a2f27a09b25b82bc188daa0ec2abcf91ba3635f95ae293d9aa5",
+      "model-00010-of-00029.safetensors": "c18cdf3ce711a84cb7e0d8f497124325151f3b6fdca01c069706d35e134333b7",
+      "model-00011-of-00029.safetensors": "551629128f3114371279d7829e562a94ca13ad2a32214625a18b346c7fab7360",
+      "model-00012-of-00029.safetensors": "d68dbd946665e5fa8070fe14b03adb068cd5164fed3426254533ccef2ff1463a",
+      "model-00013-of-00029.safetensors": "da784966842a5ae8b7dd4e98abac253cde5519e65ff07bfc78e289d784bc1b75",
+      "model-00014-of-00029.safetensors": "478cdfec9f23b7f01e1cf8672f0413cb6dc3d406d47b758835155f349f7268e9",
+      "model-00015-of-00029.safetensors": "c9dc320656f785de6adbe3dab74baa4642405c097820ed15ca11879e632f64e3",
+      "model-00016-of-00029.safetensors": "f95c0b003ed37940c82ea7d4d9cb663abb2bcf51df2cd75827d151419b6ddbb5",
+      "model-00017-of-00029.safetensors": "ed01b9e8d28ac0d316865370809cc216f4c54cf30653ef22d9ff0ea91904af9f",
+      "model-00018-of-00029.safetensors": "4f5d53a73eaffa278345c74a0536442d10823b05d7963a83877050bb48bd4172",
+      "model-00019-of-00029.safetensors": "d5d5932ca2510dd2d2a9fbd2f164f861e47ce5deb41ad4ce86dece35c45afccf",
+      "model-00020-of-00029.safetensors": "7b0c35e57b2128bf21026a87a3b238fbe56759ae134ce3c8451e1a5f3c030ceb",
+      "model-00021-of-00029.safetensors": "dca80cc7a23e3ce928f254cff6b6160f866a7f1685c1863aef81d23fac4e1dcd",
+      "model-00022-of-00029.safetensors": "57ca4608bd3f00e4122d78ec96b7a27ff63b02b69fcc696a4398d8e45ca370b3",
+      "model-00023-of-00029.safetensors": "00e5fcacaacb0034c8cb6acd195d5c3e5723be6dd1ee0d28b35952b2aa1155c9",
+      "model-00024-of-00029.safetensors": "487c571d36af5f13956dfd6d30a0f9009281d54beb6502881147504fb03db48c",
+      "model-00025-of-00029.safetensors": "5851c675ffa0ce6c7d77d657b0a110132e805446c25c03044be8f4c2148bb945",
+      "model-00026-of-00029.safetensors": "0c54cddfa6132e13d207d66a0da788cd12426000ef634599606fa13ac89df490",
+      "model-00027-of-00029.safetensors": "99b04c7b37ea8b5f957f52392a8306abddb02c3df7e1d09e3bf81aead3c6710a",
+      "model-00028-of-00029.safetensors": "80df1ae3934022c0eee8fbc68a78db2886137519e93d58e4a777a67fe264edb7",
+      "model-00029-of-00029.safetensors": "e4d0e8bd5d23f13821e30a37dae9340decb05af405ea44c4f293384984f706a8"
+    },
+    "rows": [
+      {
+        "question": "What is the capital of France?",
+        "prompt": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n",
+        "prompt_ids": [
+          151644,
+          8948,
+          198,
+          2610,
+          525,
+          1207,
+          16948,
+          11,
+          3465,
+          553,
+          54364,
+          14817,
+          13,
+          1446,
+          525,
+          264,
+          10950,
+          17847,
+          13,
+          151645,
+          198,
+          151644,
+          872,
+          198,
+          3838,
+          374,
+          279,
+          6722,
+          315,
+          9625,
+          30,
+          151645,
+          198,
+          151644,
+          77091,
+          198
+        ],
+        "token_ids": [
+          785,
+          6722,
+          315,
+          9625,
+          374,
+          12095,
+          13,
+          1084,
+          374,
+          825,
+          315,
+          279,
+          1429,
+          26277,
+          323,
+          34801
+        ],
+        "text": "The capital of France is Paris. It is one of the most iconic and historically",
+        "seconds": 793.25
+      },
+      {
+        "question": "What is two plus two?",
+        "prompt": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhat is two plus two?<|im_end|>\n<|im_start|>assistant\n",
+        "prompt_ids": [
+          151644,
+          8948,
+          198,
+          2610,
+          525,
+          1207,
+          16948,
+          11,
+          3465,
+          553,
+          54364,
+          14817,
+          13,
+          1446,
+          525,
+          264,
+          10950,
+          17847,
+          13,
+          151645,
+          198,
+          151644,
+          872,
+          198,
+          3838,
+          374,
+          1378,
+          5519,
+          1378,
+          30,
+          151645,
+          198,
+          151644,
+          77091,
+          198
+        ],
+        "token_ids": [
+          11613,
+          5519,
+          1378,
+          374,
+          3040,
+          13
+        ],
+        "text": "Two plus two is four.",
+        "seconds": 486.875
+      }
+    ]
+  },
+  "independent_reference_memory": {
+    "schema": "mere.architecture-reference/memory-observation/v1",
+    "scope": "Sampled OS process high-water mark during the f32 reference run, including its earlier measured peak",
+    "physical_ram_bytes": 33515835392,
+    "samples": 402,
+    "peak_os_working_set_bytes": 6621368320,
+    "pid": 41488,
+    "observed_from": "2026-10-17T01:05:17.2641569-04:00"
+  },
+  "retained_reference_failure": {
+    "fault_time": "2026-10-17T00:56:34-04:00",
+    "root_cause": "undetermined; Windows Application Error event 1000 identifies the faulting Torch CPU module",
+    "log": "moe-reference.log",
+    "exception": "0xc0000005",
+    "dtype": "bf16",
+    "exit_code": -1073741819,
+    "module": "torch_cpu.dll",
+    "result_produced": false
+  },
+  "payload": {
+    "schema": "mere.resident-inference/forcing-row-payload/v1",
+    "source": "pinned safetensors headers; complete source hashes are in qwen2_57b_moe_reference.json",
+    "f32_tensor_payload_bytes": 229634635776,
+    "tensor_dtypes": {
+      "BF16": 5771
+    },
+    "core_layers": 28,
+    "routed_expert_artifacts": 1792,
+    "largest_core_raw_bytes": 499611648,
+    "largest_expert_raw_bytes": 55050240,
+    "shared_raw_bytes": 2178161664,
+    "redb_version": "2.6.3",
+    "redb_max_value_bytes": 3221225472,
+    "estimated_power_of_two_value_allocation_bytes": 139586437120,
+    "estimate_scope": "Conservative per-value rounding with 4096 bytes per artifact. Table/manifest/allocator metadata and free region capacity are additional; actual final database size will be measured.",
+    "redb_growth_scope": "page_manager::grow adds regions after its first full region; it does not keep doubling the whole database."
+  },
+  "library_bytes": 140509982720,
+  "import_cache": {
+    "import_seconds": 954.8529268,
+    "inputs": {
+      "architecture": "qwen2_moe",
+      "artifacts": {
+        "config.json": "422bec9f6b52c33bbd23f2b5707ddb4b52cca480485cefc54e8e65831a212d4c",
+        "generation_config.json": "758d6aed2f4947bba541c57491ad53d8ba67067cbdfb9a0ce2821c834350501f",
+        "model-00001-of-00029.safetensors": "ca57fe6af12e0eebbc6b11ac31c9b5fde6ef8a9aec1fca0de2ebd02e39f19ca7",
+        "model-00002-of-00029.safetensors": "8cad09ebbea5214022fa0f73fe91852a6feb3e6a1c68de2505cc5466cc2807c4",
+        "model-00003-of-00029.safetensors": "bdf68771367ee467e7967258f2156e605430dd81bdc36823baca1020efa57435",
+        "model-00004-of-00029.safetensors": "be00366cf4fcb199761096f14eba5ea3ce8caada6d6f1b7cfedf43eadc4034d8",
+        "model-00005-of-00029.safetensors": "27013e94dbcd23d8bcdd490f819fc2f9de05ee69550417a1c256ef58b78be842",
+        "model-00006-of-00029.safetensors": "eed03d2ec20aeae9b4b2007e263aed073149178690c2d074bb96f0ee10542f55",
+        "model-00007-of-00029.safetensors": "0055a3131247962127bc8271bc3e4f46cb2c876747409fb7f2722bc3a54148cb",
+        "model-00008-of-00029.safetensors": "4ac20942deef743a792cf532220e02abec93ee1895fec96434471ebad77d2f46",
+        "model-00009-of-00029.safetensors": "f7381a2b1c884a2f27a09b25b82bc188daa0ec2abcf91ba3635f95ae293d9aa5",
+        "model-00010-of-00029.safetensors": "c18cdf3ce711a84cb7e0d8f497124325151f3b6fdca01c069706d35e134333b7",
+        "model-00011-of-00029.safetensors": "551629128f3114371279d7829e562a94ca13ad2a32214625a18b346c7fab7360",
+        "model-00012-of-00029.safetensors": "d68dbd946665e5fa8070fe14b03adb068cd5164fed3426254533ccef2ff1463a",
+        "model-00013-of-00029.safetensors": "da784966842a5ae8b7dd4e98abac253cde5519e65ff07bfc78e289d784bc1b75",
+        "model-00014-of-00029.safetensors": "478cdfec9f23b7f01e1cf8672f0413cb6dc3d406d47b758835155f349f7268e9",
+        "model-00015-of-00029.safetensors": "c9dc320656f785de6adbe3dab74baa4642405c097820ed15ca11879e632f64e3",
+        "model-00016-of-00029.safetensors": "f95c0b003ed37940c82ea7d4d9cb663abb2bcf51df2cd75827d151419b6ddbb5",
+        "model-00017-of-00029.safetensors": "ed01b9e8d28ac0d316865370809cc216f4c54cf30653ef22d9ff0ea91904af9f",
+        "model-00018-of-00029.safetensors": "4f5d53a73eaffa278345c74a0536442d10823b05d7963a83877050bb48bd4172",
+        "model-00019-of-00029.safetensors": "d5d5932ca2510dd2d2a9fbd2f164f861e47ce5deb41ad4ce86dece35c45afccf",
+        "model-00020-of-00029.safetensors": "7b0c35e57b2128bf21026a87a3b238fbe56759ae134ce3c8451e1a5f3c030ceb",
+        "model-00021-of-00029.safetensors": "dca80cc7a23e3ce928f254cff6b6160f866a7f1685c1863aef81d23fac4e1dcd",
+        "model-00022-of-00029.safetensors": "57ca4608bd3f00e4122d78ec96b7a27ff63b02b69fcc696a4398d8e45ca370b3",
+        "model-00023-of-00029.safetensors": "00e5fcacaacb0034c8cb6acd195d5c3e5723be6dd1ee0d28b35952b2aa1155c9",
+        "model-00024-of-00029.safetensors": "487c571d36af5f13956dfd6d30a0f9009281d54beb6502881147504fb03db48c",
+        "model-00025-of-00029.safetensors": "5851c675ffa0ce6c7d77d657b0a110132e805446c25c03044be8f4c2148bb945",
+        "model-00026-of-00029.safetensors": "0c54cddfa6132e13d207d66a0da788cd12426000ef634599606fa13ac89df490",
+        "model-00027-of-00029.safetensors": "99b04c7b37ea8b5f957f52392a8306abddb02c3df7e1d09e3bf81aead3c6710a",
+        "model-00028-of-00029.safetensors": "80df1ae3934022c0eee8fbc68a78db2886137519e93d58e4a777a67fe264edb7",
+        "model-00029-of-00029.safetensors": "e4d0e8bd5d23f13821e30a37dae9340decb05af405ea44c4f293384984f706a8",
+        "model.safetensors.index.json": "9ced996b50d177c81b10af8d554f3ad3844aa3fcc1c2e374b9fee8a3b6c63e02",
+        "tokenizer.json": "f7c9b2dba4a296b1aa76c16a34b8225c0c118978400d4bb66bff0902d702f5b8",
+        "tokenizer_config.json": "b34ff231d7132e0d7f43e04544937d63f2edfcd91c6ca6a2c581b1078e42f166"
+      },
+      "expert_index_version": 1,
+      "options": {
+        "max_layer_bytes": 1073741824,
+        "max_shared_bytes": 3221225472,
+        "query_chunk": 8
+      },
+      "template": {
+        "assistant": {
+          "prefix": "<|im_start|>assistant\n",
+          "suffix": ""
+        },
+        "bos": "",
+        "context": {
+          "prefix": "Context:\n",
+          "suffix": "\n\n"
+        },
+        "eos": "<|im_end|>",
+        "schema": "esp.prompt-template/v1",
+        "stop": [
+          "<|im_end|>",
+          "<|endoftext|>"
+        ],
+        "system": {
+          "prefix": "<|im_start|>system\n",
+          "suffix": "<|im_end|>\n"
+        },
+        "system_prompt": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant.",
+        "user": {
+          "prefix": "<|im_start|>user\n",
+          "suffix": "<|im_end|>\n"
+        }
+      }
+    },
+    "row": "blake3:6b0b627c5274f09f30e862603a32ca068c6066d27a2efd658d249a6b9b42017c"
+  },
+  "evidence": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\native-moe-initial.log",
+      "sha256": "7915c0e9531c3fe32822104976a4e14c253138deafa2aac888cf503364255c76"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\native-moe-initial.json",
+      "sha256": "b8e44efbd44ea46e10b0f719c7cc52bd408ce9b806be382493fb1723f78386a4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\qwen2-moe-result.json",
+      "sha256": "4ab27cf27e7b9b49eabc9aaab01d63212dd52745109764e317865a58ef0a8853"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\moe-reference-f32.log",
+      "sha256": "358ecc664209dde0f051e2fc0faef28f90ff653046c2bdb3355fe72f8b31eef3"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\moe-reference-bf16-failure.json",
+      "sha256": "dec015f4aac63bd1222050d52978e90bda7fb3f44868c5e9f7abc71bddc8d927"
+    }
+  ],
+  "measurement_scope": "Process OS working-set peak includes source verification/import and generation. GPU high-water observation covers the whole GPU, including other applications. Verified artifact read counters include cache hits and exclude physical disk attribution.",
+  "answer_scope": "First answer is length-limited to sixteen tokens; second ends naturally at EOS with six content tokens. Both match the independent f32 reference exactly.",
+  "recovery_scope": "Checkpoint at token 3 is JSON round-tripped; provider is dropped, device synchronized and a provider reloaded from the same resolved row/store/session. Resumed sixteen tokens match. This is not a fresh process or store restart.",
+  "timing_scope": "Other consumer builds and Mistral CPU reference/library work overlap this fixture; timings are not isolated throughput.",
+  "fleet_scope": "One physical O-PC and requested discrete GPU. Known-alias RAM observations are not a complete graph-key membership/capacity inventory.",
+  "open_gates": [
+    "Remaining GPU consumer regressions and trained Mistral GPU row",
+    "Largest model in each added family",
+    "Other R12 primitives and families",
+    "Physical fleet, installed resident and new headed architecture qualification",
+    "Integration against newer main dependencies"
+  ]
+}
