@@ -533,8 +533,20 @@ fn a_page_login_through_the_actor_is_carried_by_a_ranged_read() {
         .recv_timeout(Duration::from_secs(10))
         .expect("the actor must wake its host");
     match updates.recv_timeout(Duration::from_secs(10)).unwrap() {
-        crate::FetchUpdate::Page(outcome) => assert_eq!(outcome.result.unwrap().body, "ok"),
-        _ => panic!("expected the page outcome"),
+        crate::FetchUpdate::PageProgress(progress) => {
+            assert_eq!(progress.request, 1);
+            assert_eq!(progress.url, server.url("/page").to_string());
+            assert_eq!(progress.response_url, server.url("/page").to_string());
+            assert_eq!(progress.bytes, b"ok");
+        },
+        _ => panic!("expected exact completed HTTP source progress before the page outcome"),
+    }
+    match updates.recv_timeout(Duration::from_secs(10)).unwrap() {
+        crate::FetchUpdate::Page(outcome) => {
+            assert_eq!(outcome.request, 1);
+            assert_eq!(outcome.result.unwrap().body, "ok");
+        },
+        _ => panic!("expected the terminal page outcome after its source progress"),
     }
     assert_eq!(jar.len(), 1, "the login landed in the host's jar");
 

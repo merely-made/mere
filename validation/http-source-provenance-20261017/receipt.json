@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-17",
+  "status": "pass",
+  "base": "00e4442868ee1cb014364a81ccaed657b512b218",
+  "platform": "macOS 15.8.1 x86_64",
+  "toolchain": "rustup run 1.99.1",
+  "command": "cargo test --locked -p mere-fetch -p mere-page-load --lib -j 2 -- --test-threads=2",
+  "tests": {
+    "mere_fetch": {
+      "passed": 34,
+      "failed": 0
+    },
+    "mere_page_load": {
+      "passed": 12,
+      "failed": 0
+    }
+  },
+  "source_sha256": {
+    "Cargo.lock": "e7e5c7c71ccbf4c894d4e8aeaa300b413a2aa7fbbb52794ffc2d4aeb05f8dcaa",
+    "Cargo.toml": "0ca0f8bb947d9b98ab95fe399521d275e185b1ddf8f8334667ab310db9959ce4",
+    "crates/system/fetch/Cargo.toml": "ef6dce2d49cd46df82c4616bd8f59d15d1f00db45baef24c9c99a8ad42012b0a",
+    "crates/system/fetch/src/cookies.rs": "f84102ee58449cdd42bbc9d6c47e6b537d9bd6c30371c8920a7247cc36fd2394",
+    "crates/system/fetch/src/cookies_flip.rs": "25ed9fcc56b7376d5ec5a0fc6c97ab4bae2566e59a424e9bd777d08f34969357",
+    "crates/system/fetch/src/cookies_persist.rs": "adb8a0464c086805c06d7cba005dce25b96cc76f036549e2567d3e7bc72855de",
+    "crates/system/fetch/src/crawler.rs": "0e0676df4d8331f5d0486f558054d0bcfd08a39eddc4e2b2cdc2969913677e46",
+    "crates/system/fetch/src/handle.rs": "720eceb128177d72c69426eaef5f494689189b28d1314d186e0a4e90e855a96e",
+    "crates/system/fetch/src/handle_tests.rs": "5e332a0d117ea55d022c83730056e87dc237d8a0c4a7921fbe6c36dc737cda8e",
+    "crates/system/fetch/src/https_blob.rs": "a6b6af2299a72b7dae1b63bec2fd34265ad6191a6598790f501a58278c745f98",
+    "crates/system/fetch/src/iroh_blob.rs": "5562b5a873188860ae08fee2247a2b8cbf1458f7cc99136cf772e552aceaf4e2",
+    "crates/system/fetch/src/lib.rs": "0d00fad0ac906350f0e5525b67c396022fa0a38757a86861d136ead72a9cabe7",
+    "crates/system/fetch/src/tests.rs": "5241c71f1b9ffac79411ffc5c2cf844f2bf96957be15dbaca9992b0c2ffe29f8",
+    "crates/system/page-load/Cargo.toml": "889652496d7592b05950f5acc8741340e64f157c1ff474980f2a4c962a523043",
+    "crates/system/page-load/src/lib.rs": "bd532977cd34de3bfa03666875798d45156e43c7c77b03a52b67ab4e5790b605",
+    "crates/system/page-load/src/tests.rs": "1fa3bd2ca0699766020ac5eb9322e9466420484f21c5dd539f3dd3bd58e67085"
+  },
+  "test_executables": [
+    {
+      "path": "target/build/debug/deps/fetch-45fc6ddf915a47ce",
+      "sha256": "b06a237c1cc4dcbd78ba18fe68f920961513caff50e63419cc58789a88318e14"
+    },
+    {
+      "path": "target/build/debug/deps/page_load-4fdb3a2f4362e68c",
+      "sha256": "9296f9549edebaa45dfb339de1c06805cb990378ae811d1f70d59a22038b686a"
+    }
+  ],
+  "notes": [
+    "HTTP uses actual final response URL; source callback precedes terminal outcome only after successful bounded document read.",
+    "Downloads retain terminal handling and do not announce document progress.",
+    "Same-address request acquisition context cannot borrow prior URL, MIME or timestamp.",
+    "Actual actor ordering and cookie continuity are asserted together.",
+    "No public Fetched API shape, Cargo manifest or lockfile changed.",
+    "Turnstone native integration is qualified separately in turnstone/docs/receipts/r1_source_keep_20261017/."
+  ],
+  "integrated_upstream": "45e5d40dfe4f69caa0410f79c5e9ad5ec1e5be39",
+  "integration_note": "Remote advanced only documentation; tested source and lock hashes remain exact after rebase."
+}

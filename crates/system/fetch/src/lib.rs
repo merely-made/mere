@@ -626,9 +626,17 @@ where
             return result;
         }
     }
-    do_fetch_ua_with_context(url, max_bytes, None, &stores.context())
-        .await
-        .map_err(FetchFailure::Failed)
+    do_fetch_ua_with_context_observed(
+        url,
+        max_bytes,
+        None,
+        &stores.context(),
+        |response_url, content_type, bytes| {
+            on_progress(response_url, content_type, bytes);
+        },
+    )
+    .await
+    .map_err(FetchFailure::Failed)
 }
 
 #[cfg(feature = "smolweb")]
@@ -884,6 +892,22 @@ async fn do_fetch_ua_with_context(
     user_agent: Option<&str>,
     cx: &netfetcher::FetchContext,
 ) -> Result<Fetched, String> {
+    do_fetch_ua_with_context_observed(url, max_bytes, user_agent, cx, |_, _, _| {}).await
+}
+
+/// HTTP page fetch with an optional complete-response observer. The callback
+/// runs only after the capped body has been read successfully, and receives
+/// netfetcher's actual final response URL rather than the requested address.
+async fn do_fetch_ua_with_context_observed<F>(
+    url: &str,
+    max_bytes: usize,
+    user_agent: Option<&str>,
+    cx: &netfetcher::FetchContext,
+    mut on_complete: F,
+) -> Result<Fetched, String>
+where
+    F: FnMut(&url::Url, Option<&str>, &[u8]),
+{
     let parsed = url::Url::parse(url).map_err(|e| format!("bad URL: {e}"))?;
     let mut request = netfetcher::Request::get(parsed);
     if let Some(ua) = user_agent {
@@ -910,14 +934,21 @@ async fn do_fetch_ua_with_context(
         .iter()
         .find(|(k, _)| k.eq_ignore_ascii_case("content-disposition"))
         .map(|(_, v)| v.clone());
+    let final_url = response.url_list.last().cloned();
     let bytes = read_capped(response.body, max_bytes).await?;
     let body = String::from_utf8_lossy(&bytes).into_owned();
-    Ok(Fetched {
+    let fetched = Fetched {
         content_type,
         content_disposition,
         bytes,
         body,
-    })
+    };
+    if !page_load::is_download_response(&fetched) {
+        if let Some(final_url) = final_url.as_ref() {
+            on_complete(final_url, fetched.content_type.as_deref(), &fetched.bytes);
+        }
+    }
+    Ok(fetched)
 }
 
 /// Fetch raw response bytes through the same scheme and trust routing as a page,
@@ -948,6 +979,179 @@ async fn fetch_bytes(url: &str, stores: &Stores) -> Result<Vec<u8>, String> {
 
 #[cfg(all(test, feature = "smolweb", feature = "actor"))]
 mod tests;
+
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod http_progress_tests {
+    use super::do_fetch_ua_with_context_observed;
+
+    #[tokio::test]
+    async fn http_redirect_reports_final_url_and_complete_body_before_return() {
+        let mut server = mockito::Server::new_async().await;
+        let redirect = server
+            .mock("GET", "/start")
+            .with_status(302)
+            .with_header("location", "/final")
+            .expect(1)
+            .create_async()
+            .await;
+        let final_response = server
+            .mock("GET", "/final")
+            .with_status(200)
+            .with_header("content-type", "text/html; charset=utf-8")
+            .with_body("redirected page")
+            .expect(1)
+            .create_async()
+            .await;
+        let context = netfetcher::FetchContext::permissive();
+        let mut events = Vec::new();
+        let mut reported = Vec::new();
+        let fetched = do_fetch_ua_with_context_observed(
+            &format!("{}/start", server.url()),
+            64,
+            None,
+            &context,
+            |response_url, content_type, bytes| {
+                events.push("complete-body");
+                reported.push((
+                    response_url.to_string(),
+                    content_type.map(str::to_owned),
+                    bytes.to_vec(),
+                ));
+            },
+        )
+        .await
+        .expect("redirected HTTP page fetch");
+
+        assert_eq!(fetched.bytes, b"redirected page");
+        assert_eq!(
+            reported,
+            vec![(
+                format!("{}/final", server.url()),
+                Some("text/html; charset=utf-8".to_owned()),
+                b"redirected page".to_vec(),
+            )]
+        );
+        events.push("terminal-outcome");
+        assert_eq!(events, ["complete-body", "terminal-outcome"]);
+        redirect.assert_async().await;
+        final_response.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn http_body_cap_failure_does_not_report_complete_source() {
+        let mut server = mockito::Server::new_async().await;
+        let response = server
+            .mock("GET", "/large")
+            .with_status(200)
+            .with_body("larger than cap")
+            .expect(1)
+            .create_async()
+            .await;
+        let context = netfetcher::FetchContext::permissive();
+        let mut progress = Vec::new();
+        let result = do_fetch_ua_with_context_observed(
+            &format!("{}/large", server.url()),
+            4,
+            None,
+            &context,
+            |response_url, content_type, bytes| {
+                progress.push((
+                    response_url.to_string(),
+                    content_type.map(str::to_owned),
+                    bytes.to_vec(),
+                ));
+            },
+        )
+        .await;
+
+        assert!(result.unwrap_err().contains("4-byte cap"));
+        assert!(
+            progress.is_empty(),
+            "partial bytes are not a completed source"
+        );
+        response.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn html_attachment_is_returned_without_streaming_as_a_document() {
+        let mut server = mockito::Server::new_async().await;
+        let response = server
+            .mock("GET", "/download")
+            .with_status(200)
+            .with_header("content-type", "text/html")
+            .with_header("content-disposition", "attachment; filename=page.html")
+            .with_body("downloaded bytes")
+            .expect(1)
+            .create_async()
+            .await;
+        let context = netfetcher::FetchContext::permissive();
+        let mut progress = Vec::new();
+        let fetched = do_fetch_ua_with_context_observed(
+            &format!("{}/download", server.url()),
+            64,
+            None,
+            &context,
+            |response_url, content_type, bytes| {
+                progress.push((
+                    response_url.to_string(),
+                    content_type.map(str::to_owned),
+                    bytes.to_vec(),
+                ));
+            },
+        )
+        .await
+        .expect("HTTP attachment fetch");
+
+        assert_eq!(fetched.bytes, b"downloaded bytes");
+        assert_eq!(
+            fetched.content_disposition.as_deref(),
+            Some("attachment; filename=page.html")
+        );
+        assert!(
+            progress.is_empty(),
+            "attachments are not streamed documents"
+        );
+        response.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn nonredirect_http_success_reports_final_url_and_body_once() {
+        let mut server = mockito::Server::new_async().await;
+        let response = server
+            .mock("GET", "/page")
+            .with_status(200)
+            .with_header("content-type", "text/plain")
+            .with_body("plain page")
+            .expect(1)
+            .create_async()
+            .await;
+        let requested_url = format!("{}/page", server.url());
+        let context = netfetcher::FetchContext::permissive();
+        let mut progress = Vec::new();
+        let fetched = do_fetch_ua_with_context_observed(
+            &requested_url,
+            64,
+            None,
+            &context,
+            |response_url, content_type, bytes| {
+                progress.push((
+                    response_url.to_string(),
+                    content_type.map(str::to_owned),
+                    bytes.to_vec(),
+                ));
+            },
+        )
+        .await
+        .expect("HTTP page fetch");
+
+        assert_eq!(fetched.bytes, b"plain page");
+        assert_eq!(progress.len(), 1);
+        assert_eq!(progress[0].0, requested_url);
+        assert_eq!(progress[0].1.as_deref(), Some("text/plain"));
+        assert_eq!(progress[0].2, b"plain page");
+        response.assert_async().await;
+    }
+}
 
 #[cfg(all(feature = "https-blobs", not(target_arch = "wasm32")))]
 pub mod https_blob;
