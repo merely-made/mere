@@ -16,5 +16,6 @@
 
 pub mod carriage_host;
 pub mod graph_keys;
+pub mod personal_seals;
 pub mod personal_sync_host;
 pub mod transfer_staging;

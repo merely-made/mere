@@ -1,7 +1,9 @@
 # Distillery models plan: the consolidated model, inference and mesh-host follow-ons
 
 **Date:** 2026-10-06
-**Status (2026-10-06):** plan; nothing started. Founded under ruling S63 of
+**Status (2026-10-16):** M1's three receipts all have stable results and
+the Fusion panic is gone (§3); the remote-autotune reclaim failure M1
+surfaced needs an owner. M2 is qualified through resident inference I5; M3 to M5 remain open. Founded under ruling S63 of
 the [stack seams plan](2026-10-04_stack_seams_plan.md), which consolidated the
 open items of four plans archived on 2026-10-06 (ruling S58: "These four need
 to be consolidated now that 0.22 is out"): the
@@ -89,6 +91,17 @@ with the per-model prompt template and an answer-card surface.
 Done when: one host sends a prompt through the actor and renders the answer,
 with cancellation, headed; the prompt template is per-model data, not code.
 
+**2026-10-15:** Mark chose djinn's resident as the host, with recall over
+retained material as the forcing consumer. The
+[resident inference and recall plan](2026-10-15_resident_inference_and_recall_plan.md)
+carries M2; its I5 closes this phase. **2026-10-16: closed.** The native
+Turnstone pane asks through Djinn's admitted route against retained text and
+the pinned GPU model, streams progress, pauses/resumes, cancels another ask,
+and reopens the answer and exact source after both processes restart with the
+origin offline. The I5 receipt in that plan records the source cuts, binary
+hashes and six native frames. Djinn is test-owned in this gate; its installed
+binary and physical second-device qualification stay separate.
+
 ### M3. Distillery operations
 
 Model manifest browsing and the streaming console as a Distillery surface;
@@ -123,3 +136,94 @@ standing a purpose; it is recorded in the archived plan tails backlog.
 
 - **2026-10-06.** Founded by the S14 pass (stack seams plan, rulings S58 and
   S63) from the four archived plans' open items; nothing started.
+- **2026-10-14, M1 status audit.** Read from the record, except the trainer
+  row, which was run on low-end hardware (next entry).
+  - *Lease-bound remote MiniLM: stable result recorded.* The burn 0.22
+    migration plan's §13.47 records the two-peer real-weight receipt passing
+    on stable 0.22.0 at `d346d945`:
+    `ports/distillery/probe/receipts/2026-10-06_stable_remote_minilm.json`.
+    It covers cancellation, fresh-session recovery, single-lease close and
+    allocator release. Its `backend_profile` is `plain` with `fusion`,
+    `autotune` and `fusion_autotune` all false.
+  - *Burn Fusion remote panic: gone on stable (2026-10-15 entry).* The
+    prerelease panic (fused-matmul autotune/ordering, [lease-bound remote
+    sessions](../technical_architecture/2026-08-10_lease_bound_remote_sessions.md))
+    had no stable run, because the stable receipt above is plain WGPU only.
+  - *`esp.train.peft-lora/v1` trainer mesh job: stable result recorded
+    (next entry).* §13.47 records Distillery's 26 library tests passing with
+    `remote,trainer-gpu,trainer-autodiff`, but the mesh-job receipt is the
+    integration test `ports/distillery/tests/trainer.rs`
+    (`each_trainer_arm_publishes_artifacts_and_a_strict_improvement_receipt`),
+    which that list does not name. It uses synthetic weights and a built-in
+    tokenizer, so the CPU arms need no GPU or model download.
+  - *Browser ceiling D2a to D2c: stable result recorded (2026-10-15
+    entry).* §13.47 records the full
+    Distillery browser probe building for `wasm32-unknown-unknown`, and the
+    headed Burn embedding/graph (21) and Cubek extrema (4) reproducer cases
+    passing (`ports/distillery/probe/repros/*/receipts/2026-10-06_stable_iab.json`).
+    Those are the reproducers, not the D2 rows, which were not re-run.
+  - *Where the other two can run.* The Fusion profile needs a GPU-backed
+    WGPU server and D2 needs headed Chromium; neither ran on the low-end
+    machine below (integrated Radeon, no PowerShell or wasm tooling).
+- **2026-10-14, M1 trainer row on low-end hardware.** Stable Burn 0.22.0 at
+  `23fe8064`, Linux, Rust 1.98.1, 8-thread Ryzen 5 Surface laptop with
+  5.8 GiB RAM and integrated Radeon (Raven), CPU only.
+  `cargo test --locked -p distillery --features trainer,trainer-autodiff
+  --test trainer`: 3 passed in 22 s, 71 MB peak RSS. Both arms published
+  their artifacts with a strict improvement at `RankingAt{3}`:
+  `esp-trainer-v0` (finite difference) baseline 0/6 vs adapter 4/6, and
+  `esp-trainer-v1-autodiff` baseline 0/6 vs adapter 3/6.
+  - *Running is cheap; building is the low-end limit.* The cold build is
+    655 crates. With desktop applications open (about 600 MiB free) it was
+    killed by the system out-of-memory killer twice, at 772 MB with two jobs
+    and at 660 MB with one job compiling `noq-proto`. With about 2.2 GiB
+    free it finished in 4 min 40 s with two jobs, debug info and
+    incremental compilation off, peaking at 1.7 GB. One `rustc` on iroh's
+    QUIC crate (`noq-proto`) did not fit in about 600 MiB on its own.
+- **2026-10-15, M1 Fusion and D2 rows on O-PC.** Stable Burn 0.22.0 at
+  `8757016c` plus the fixture repair below (receipts record
+  `dirty: true` for it), Windows 11, Rust 1.98.1, NVIDIA RTX 4060 Laptop
+  (8 GiB) beside a Radeon 780M. Receipts in `ports/distillery/probe/receipts/`
+  with the `2026-10-15_stable_` prefix.
+  - *Remote fixture repair.* Every remote row first failed at
+    `first-lease-active` with "the server's authorizer rejected the
+    credential". The fixture still bound both transports with the master
+    keypair; since `49451b30` (vault lock rulings 92 and 93) a peer must
+    connect as its derived mesh author key. The fixture now binds through
+    `P2pandaTransport::builder_for` with `derived_keypair(MESH_AUTHOR_SALT)`,
+    as Distillery's own tests do. Its `Cargo.lock` was also stale on this
+    branch: genet moves to the root's `7a8c5b8c` and the unused dramatis
+    `insigne` and `personae` rows drop; no Burn, iroh or p2panda row changes.
+  - *Remote MiniLM matrix* (`run-remote-minilm.ps1 -Matrix`, server on
+    `DiscreteGpu(0)`, wgpu's automatic graphics API): all four local rows
+    pass (plain, fusion, autotune, fusion with autotune). Remote plain and
+    remote fusion-only pass every stage: lease, owner reclaim of an
+    in-flight 512-row request, fresh-session recovery, second live lease and
+    allocator release. Fusion-only max error is `1.411e-7` against native
+    and `1.639e-7` against the browser reference; recovery is bit-identical.
+    `remote_minilm_fusion.json`, `remote_minilm_matrix.json`.
+  - *Remote autotune: new failure, not the old panic.* Remote autotune-only
+    and fusion-with-autotune pass the first remote execution and the native
+    control, then fail owner reclaim: "reclaim did not close the
+    lease-bound session", with the host in `AwaitingStop` for 401 steps.
+    Fusion is cleared; autotune over Burn Remote does not yet honour the
+    lease-bound close. Remote autotune stays out of production defaults.
+  - *D2c embedding matrix* (headed Chrome 155, WebGPU on the RTX 4060,
+    `browser_matrix.json`): all four rows pass, BGE Micro v2 (34.8 MB F16)
+    through E5-base-v2 (438.0 MB F32). Every cold and warm output is finite
+    and unit norm, repeats within and across workers, and is within
+    `1.42e-7` of its reference (prerelease `1.416e-7`). Integrity reopen,
+    termination at `executing` with zero late messages, and WebGPU error
+    scopes pass for every row. Frame p95 stayed near 6.2 ms against the
+    33.4 ms bound, with 23 over-bound intervals (prerelease 41). The largest
+    was 1,357.6 ms during BGE Micro's cold first execution, the page's first
+    model (prerelease largest 175.8 ms). Persistent storage was again
+    denied (`best_effort`).
+  - *D2c decoder row* (`browser_decoder.json`): SmolLM2-135M-Instruct
+    (269.1 MB BF16) passes. All eight tokens match the reference exactly
+    and cold and warm outputs are identical. Cancellation after one fragment
+    is acknowledged in 206.8 ms with zero later fragments. `GPUDevice.destroy()`
+    reports no errors, and a fresh worker recovers the exact output. Repeat
+    runs hold 22.2 to 23.6 tokens/s (prerelease 25.5 to 26.2). First runs
+    are slower than on the prerelease: first token 2,577 ms cold and 725 ms
+    warm, against 364 and 279 ms. No gate covers first-run latency.

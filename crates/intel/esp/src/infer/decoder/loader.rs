@@ -13,6 +13,8 @@
 //! eidetic corridor's `ModelComponents.weight_bytes` feeds this directly
 //! (P2), and a file path is just `std::fs::read` above it.
 
+use std::collections::HashSet;
+
 use safetensors::SafeTensors;
 use safetensors::tensor::TensorView;
 
@@ -21,13 +23,86 @@ use burn::tensor::Device;
 use super::config::DecoderConfig;
 use super::layer::LoadedDecoderLayer;
 use super::model::{DecoderModel, LoadedDecoder};
-use super::tensors::{extract_1d, extract_2d, extract_2d_transposed};
 use crate::infer::provider::InferError;
 
 fn view<'a>(tensors: &'a SafeTensors<'_>, name: &str) -> Result<TensorView<'a>, InferError> {
     tensors
         .tensor(name)
         .map_err(|_| InferError::InvalidWeights(format!("missing tensor: {name}")))
+}
+
+/// The per-layer tensors the Llama block consumes, under
+/// `model.layers.{i}.`; the loader below reads exactly these.
+pub(crate) const LAYER_TENSORS: [&str; 9] = [
+    "input_layernorm.weight",
+    "self_attn.q_proj.weight",
+    "self_attn.k_proj.weight",
+    "self_attn.v_proj.weight",
+    "self_attn.o_proj.weight",
+    "post_attention_layernorm.weight",
+    "mlp.gate_proj.weight",
+    "mlp.up_proj.weight",
+    "mlp.down_proj.weight",
+];
+
+/// Older checkpoints store RoPE's inverse frequencies as a buffer. They are
+/// derived from `rope_theta`, which the config already supplies, and a
+/// scaled variant is refused at the config.
+fn ignorable(name: &str) -> bool {
+    name.ends_with(".rotary_emb.inv_freq")
+}
+
+fn why_unconsumed(name: &str) -> &'static str {
+    if name.ends_with(".bias") {
+        "bias terms are not implemented"
+    } else if name.contains("q_norm") || name.contains("k_norm") {
+        "per-head QK-norm is not implemented"
+    } else if name.contains("experts")
+        || name.contains("block_sparse_moe")
+        || name.ends_with(".mlp.gate.weight")
+    {
+        "mixture-of-experts layers are not implemented"
+    } else if name.contains("norm") {
+        "normalization layers beyond the Llama block's two per layer are not implemented"
+    } else {
+        "the Llama-block decoder does not consume this tensor"
+    }
+}
+
+/// Refuse a checkpoint carrying tensors the decoder would not read. An
+/// unread bias, norm or expert weight means the checkpoint computes
+/// something this decoder does not, so loading it would answer wrongly.
+fn refuse_unconsumed(config: &DecoderConfig, tensors: &SafeTensors<'_>) -> Result<(), InferError> {
+    let mut consumed: HashSet<String> = [
+        "model.embed_tokens.weight",
+        "model.norm.weight",
+        "lm_head.weight",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect();
+    for i in 0..config.num_hidden_layers {
+        for suffix in LAYER_TENSORS {
+            consumed.insert(format!("model.layers.{i}.{suffix}"));
+        }
+    }
+    let mut unconsumed: Vec<&String> = tensors
+        .names()
+        .into_iter()
+        .filter(|name| !consumed.contains(name.as_str()) && !ignorable(name))
+        .collect();
+    unconsumed.sort();
+    match unconsumed.first() {
+        None => Ok(()),
+        Some(first) => Err(InferError::Unsupported {
+            feature: format!("tensor {first}"),
+            detail: format!(
+                "{}; {} unconsumed tensor(s) in this checkpoint",
+                why_unconsumed(first),
+                unconsumed.len()
+            ),
+        }),
+    }
 }
 
 /// Decode HF `model.safetensors` bytes into resident decoder tensors.
@@ -42,70 +117,47 @@ pub(crate) fn load_decoder_tensors_from_bytes(
 ) -> Result<LoadedDecoder, InferError> {
     let tensors = SafeTensors::deserialize(weights)
         .map_err(|e| InferError::InvalidWeights(format!("safetensors parse: {e}")))?;
-
-    let h = config.hidden_size;
-    let kv = config.kv_heads() * config.head_dim();
-    let inter = config.intermediate_size;
+    refuse_unconsumed(config, &tensors)?;
 
     let mut layers = Vec::with_capacity(config.num_hidden_layers);
     for i in 0..config.num_hidden_layers {
-        let p = format!("model.layers.{i}");
-        layers.push(LoadedDecoderLayer {
-            input_norm_gamma: extract_1d(
-                &view(&tensors, &format!("{p}.input_layernorm.weight"))?,
-                h,
-                device,
-            )?,
-            q_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.self_attn.q_proj.weight"))?,
-                h,
-                h,
-                device,
-            )?,
-            k_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.self_attn.k_proj.weight"))?,
-                kv,
-                h,
-                device,
-            )?,
-            v_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.self_attn.v_proj.weight"))?,
-                kv,
-                h,
-                device,
-            )?,
-            o_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.self_attn.o_proj.weight"))?,
-                h,
-                h,
-                device,
-            )?,
-            post_norm_gamma: extract_1d(
-                &view(&tensors, &format!("{p}.post_attention_layernorm.weight"))?,
-                h,
-                device,
-            )?,
-            gate_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.mlp.gate_proj.weight"))?,
-                inter,
-                h,
-                device,
-            )?,
-            up_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.mlp.up_proj.weight"))?,
-                inter,
-                h,
-                device,
-            )?,
-            down_w: extract_2d_transposed(
-                &view(&tensors, &format!("{p}.mlp.down_proj.weight"))?,
-                h,
-                inter,
-                device,
-            )?,
-        });
+        layers.push(load_decoder_layer(config, &tensors, i, device)?);
     }
 
+    let mut shared = load_decoder_shared_tensors(config, &tensors, device)?;
+    shared.layers = layers;
+    Ok(shared)
+}
+
+pub(crate) fn load_decoder_shared_tensors(
+    config: &DecoderConfig,
+    tensors: &SafeTensors<'_>,
+    device: &Device,
+) -> Result<LoadedDecoder, InferError> {
+    load_decoder_shared_tensors_with_format(
+        config,
+        tensors,
+        device,
+        super::weight_format::WeightFormat::F32,
+    )
+}
+
+pub(crate) fn load_decoder_shared_tensors_with_format(
+    config: &DecoderConfig,
+    tensors: &SafeTensors<'_>,
+    device: &Device,
+    format: super::weight_format::WeightFormat,
+) -> Result<LoadedDecoder, InferError> {
+    let extract_1d = |v: &TensorView<'_>, len, device: &Device| {
+        super::weight_format::extract(v, [len], device, format, false)
+    };
+    let extract_2d = |v: &TensorView<'_>, rows, cols, device: &Device| {
+        super::weight_format::extract(v, [rows, cols], device, format, false)
+    };
+    let extract_2d_transposed = |v: &TensorView<'_>, rows, cols, device: &Device| {
+        super::weight_format::extract(v, [rows, cols], device, format, true)
+    };
+    let h = config.hidden_size;
     let lm_head_w = match tensors.tensor("lm_head.weight") {
         Ok(v) => Some(extract_2d_transposed(&v, config.vocab_size, h, device)?),
         Err(_) if config.tie_word_embeddings => None,
@@ -123,9 +175,98 @@ pub(crate) fn load_decoder_tensors_from_bytes(
             h,
             device,
         )?,
-        layers,
+        layers: Vec::new(),
         final_norm_gamma: extract_1d(&view(&tensors, "model.norm.weight")?, h, device)?,
         lm_head_w,
+    })
+}
+
+/// Decode one layer without constructing tensors for any other layer.
+pub(crate) fn load_decoder_layer(
+    config: &DecoderConfig,
+    tensors: &SafeTensors<'_>,
+    i: usize,
+    device: &Device,
+) -> Result<LoadedDecoderLayer, InferError> {
+    load_decoder_layer_with_format(
+        config,
+        tensors,
+        i,
+        device,
+        super::weight_format::WeightFormat::F32,
+    )
+}
+
+pub(crate) fn load_decoder_layer_with_format(
+    config: &DecoderConfig,
+    tensors: &SafeTensors<'_>,
+    i: usize,
+    device: &Device,
+    format: super::weight_format::WeightFormat,
+) -> Result<LoadedDecoderLayer, InferError> {
+    let extract_1d = |v: &TensorView<'_>, len, device: &Device| {
+        super::weight_format::extract(v, [len], device, format, false)
+    };
+    let extract_2d_transposed = |v: &TensorView<'_>, rows, cols, device: &Device| {
+        super::weight_format::extract(v, [rows, cols], device, format, true)
+    };
+    let h = config.hidden_size;
+    let kv = config.kv_heads() * config.head_dim();
+    let inter = config.intermediate_size;
+    let p = format!("model.layers.{i}");
+    Ok(LoadedDecoderLayer {
+        input_norm_gamma: extract_1d(
+            &view(&tensors, &format!("{p}.input_layernorm.weight"))?,
+            h,
+            device,
+        )?,
+        q_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.self_attn.q_proj.weight"))?,
+            h,
+            h,
+            device,
+        )?,
+        k_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.self_attn.k_proj.weight"))?,
+            kv,
+            h,
+            device,
+        )?,
+        v_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.self_attn.v_proj.weight"))?,
+            kv,
+            h,
+            device,
+        )?,
+        o_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.self_attn.o_proj.weight"))?,
+            h,
+            h,
+            device,
+        )?,
+        post_norm_gamma: extract_1d(
+            &view(&tensors, &format!("{p}.post_attention_layernorm.weight"))?,
+            h,
+            device,
+        )?,
+        gate_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.mlp.gate_proj.weight"))?,
+            inter,
+            h,
+            device,
+        )?,
+        up_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.mlp.up_proj.weight"))?,
+            inter,
+            h,
+            device,
+        )?,
+        down_w: extract_2d_transposed(
+            &view(&tensors, &format!("{p}.mlp.down_proj.weight"))?,
+            h,
+            inter,
+            device,
+        )?,
     })
 }
 
@@ -140,7 +281,7 @@ pub fn load_decoder_from_bytes(
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::super::test_support::{det_vec, tiny_config};
     use super::*;
     use burn::tensor::{Int, Tensor};
@@ -150,7 +291,7 @@ mod tests {
 
     /// The full name → (shape, values) table for `tiny_config`, values
     /// deterministic per tensor.
-    fn tiny_tensor_table(
+    pub(crate) fn tiny_tensor_table(
         config: &DecoderConfig,
         with_lm_head: bool,
     ) -> Vec<(String, Vec<usize>, Vec<f32>)> {
@@ -191,7 +332,7 @@ mod tests {
         out
     }
 
-    fn serialize_f32(table: &[(String, Vec<usize>, Vec<f32>)]) -> Vec<u8> {
+    pub(crate) fn serialize_f32(table: &[(String, Vec<usize>, Vec<f32>)]) -> Vec<u8> {
         let buffers: Vec<(String, Vec<usize>, Vec<u8>)> = table
             .iter()
             .map(|(n, s, v)| {
@@ -297,6 +438,78 @@ mod tests {
         assert!(matches!(err, InferError::InvalidWeights(_)));
     }
 
+    /// Load the tiny checkpoint with one extra tensor and return the refused
+    /// feature.
+    fn refused_with_extra(name: &str, shape: Vec<usize>) -> String {
+        let config = tiny_config();
+        let mut table = tiny_tensor_table(&config, true);
+        let n = shape.iter().product();
+        table.push((name.to_string(), shape, det_vec(n, 3)));
+        match load_decoder_from_bytes(&config, &serialize_f32(&table), &Device::ndarray()) {
+            Err(InferError::Unsupported { feature, .. }) => feature,
+            Err(other) => panic!("expected Unsupported, got {other:?}"),
+            Ok(_) => panic!("expected Unsupported, got a model"),
+        }
+    }
+
+    #[test]
+    fn attention_bias_tensor_refused() {
+        // Qwen2 and 2.5 carry these; ignoring them answers wrongly.
+        let name = "model.layers.0.self_attn.q_proj.bias";
+        assert_eq!(refused_with_extra(name, vec![8]), format!("tensor {name}"));
+    }
+
+    #[test]
+    fn mlp_bias_tensor_refused() {
+        let name = "model.layers.1.mlp.down_proj.bias";
+        assert_eq!(refused_with_extra(name, vec![8]), format!("tensor {name}"));
+    }
+
+    #[test]
+    fn qk_norm_tensor_refused() {
+        // Qwen3 8B and 14B pass the shape checks but carry these.
+        let name = "model.layers.0.self_attn.q_norm.weight";
+        assert_eq!(refused_with_extra(name, vec![2]), format!("tensor {name}"));
+    }
+
+    #[test]
+    fn expert_tensor_refused() {
+        let name = "model.layers.0.block_sparse_moe.experts.0.w1.weight";
+        assert_eq!(
+            refused_with_extra(name, vec![16, 8]),
+            format!("tensor {name}")
+        );
+    }
+
+    #[test]
+    fn extra_norm_tensor_refused() {
+        // Gemma 2 and 3 add norms around the MLP.
+        let name = "model.layers.0.pre_feedforward_layernorm.weight";
+        assert_eq!(refused_with_extra(name, vec![8]), format!("tensor {name}"));
+    }
+
+    #[test]
+    fn layer_beyond_config_refused() {
+        // A checkpoint deeper than its config would silently drop layers.
+        let name = "model.layers.2.mlp.up_proj.weight";
+        assert_eq!(
+            refused_with_extra(name, vec![16, 8]),
+            format!("tensor {name}")
+        );
+    }
+
+    #[test]
+    fn rope_inv_freq_buffer_is_tolerated() {
+        let config = tiny_config();
+        let mut table = tiny_tensor_table(&config, true);
+        table.push((
+            "model.layers.0.self_attn.rotary_emb.inv_freq".to_string(),
+            vec![1],
+            vec![1.0],
+        ));
+        load_decoder_from_bytes(&config, &serialize_f32(&table), &Device::ndarray()).unwrap();
+    }
+
     #[test]
     fn missing_layer_tensor_names_the_tensor() {
         let config = tiny_config();
@@ -311,4 +524,22 @@ mod tests {
             other => panic!("wrong error: {other:?}"),
         }
     }
+}
+
+/// A streamed layer artifact must contain exactly this layer's nine tensors.
+pub(crate) fn validate_layer_names(
+    tensors: &SafeTensors<'_>,
+    index: usize,
+) -> Result<(), InferError> {
+    let expected: HashSet<String> = LAYER_TENSORS
+        .iter()
+        .map(|suffix| format!("model.layers.{index}.{suffix}"))
+        .collect();
+    let actual: HashSet<String> = tensors.names().into_iter().cloned().collect();
+    if actual != expected {
+        return Err(InferError::InvalidWeights(format!(
+            "layer {index} tensor names do not match the declared Llama block"
+        )));
+    }
+    Ok(())
 }
