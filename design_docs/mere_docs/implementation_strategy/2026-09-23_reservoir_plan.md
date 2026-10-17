@@ -1828,3 +1828,10 @@ checkpoint passes 215 Djinn library tests and nine owner-process regressions
 See `receipts/natal-houses-20261017/preintegration.json`. Incoming main's
 span-edit and documentation commits remain distinct and require an integrated
 rerun. Product native and full browser-wall qualification remain separate.
+
+2026-10-17: integrated source `5147de0f3` preserves incoming main `4c4ea11d8`
+and passes the complete selected owner gates: 215 library tests plus nine
+real-process parents, with two intentional direct child ignores. The exact
+immutable core and both numerical revisions remain bound by
+`receipts/natal-houses-20261017/integrated.json`. Product native evidence is
+owned by Cleromancy; no shared browser-wall renewal is inferred.
