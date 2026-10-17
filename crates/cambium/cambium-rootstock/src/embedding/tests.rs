@@ -205,6 +205,18 @@ fn egui_ime_character_ranges_are_lowered_to_unicode_byte_ranges() {
             .is_err()
     );
 }
+#[cfg(all(feature = "embedding-egui", not(target_arch = "wasm32")))]
+#[test]
+fn egui_keyboard_text_and_paste_keep_distinct_owners() {
+    use super::egui::toolkit::Event;
+    let mut input = super::egui::Input::default();
+    let units = ScrollUnits { line: [30., 40.], page: [100., 80.] };
+    assert_eq!(input.event(&Event::Text("é".into()), units).unwrap(),
+        vec![OwnerInput::Session(SessionInput::KeyboardText("é".into()))]);
+    assert_eq!(input.event(&Event::Paste("a\nb".into()), units).unwrap(),
+        vec![OwnerInput::Session(SessionInput::Text("a\nb".into()))]);
+    assert!(input.event(&Event::Text("\n".into()), units).unwrap().is_empty());
+}
 #[cfg(all(feature = "embedding-iced", not(target_arch = "wasm32")))]
 #[test]
 fn iced_ime_bytes_and_caller_wheel_units_survive_translation() {
@@ -252,4 +264,31 @@ fn iced_ime_bytes_and_caller_wheel_units_survive_translation() {
             delta: [-60., 40.]
         }]
     );
+}
+#[cfg(all(feature = "embedding-iced", not(target_arch = "wasm32")))]
+#[test]
+fn iced_printable_key_pairs_text_without_enter_control_text() {
+    use super::iced::backend::core::{Event, keyboard};
+    use document_session_api::SessionKey;
+    let mut input = super::iced::Input::default();
+    let units = ScrollUnits { line: [30., 40.], page: [100., 80.] };
+    let key = keyboard::Key::Character("a".into());
+    let events = input.event(&Event::Keyboard(keyboard::Event::KeyPressed {
+        key: key.clone(), modified_key: key,
+        physical_key: keyboard::key::Physical::Code(keyboard::key::Code::KeyA),
+        location: keyboard::Location::Standard, modifiers: keyboard::Modifiers::default(),
+        text: Some("a".into()), repeat: true,
+    }), units).unwrap();
+    assert!(matches!(&events[..],
+        [OwnerInput::Session(SessionInput::Key { key: SessionKey::Character(text), repeat: true, .. }),
+         OwnerInput::Session(SessionInput::KeyboardText(produced))] if text == "a" && produced == "a"));
+    let key = keyboard::Key::Named(keyboard::key::Named::Enter);
+    let events = input.event(&Event::Keyboard(keyboard::Event::KeyPressed {
+        key: key.clone(), modified_key: key,
+        physical_key: keyboard::key::Physical::Code(keyboard::key::Code::Enter),
+        location: keyboard::Location::Standard, modifiers: keyboard::Modifiers::default(),
+        text: Some("\r".into()), repeat: false,
+    }), units).unwrap();
+    assert!(matches!(&events[..],
+        [OwnerInput::Session(SessionInput::Key { key: SessionKey::Enter, .. })]));
 }

@@ -119,7 +119,9 @@ impl Input {
                     repeat: *repeat,
                 }
             },
-            egui::Event::Text(text) | egui::Event::Paste(text) => SessionInput::Text(text.clone()),
+            egui::Event::Text(text) if matches!(text.as_str(), "\r" | "\n" | "\r\n" | "\t") => return Ok(vec![]),
+            egui::Event::Text(text) => SessionInput::KeyboardText(text.clone()),
+            egui::Event::Paste(text) => SessionInput::Text(text.clone()),
             egui::Event::Ime(ime) => SessionInput::Ime(match ime {
                 egui::ImeEvent::Enabled => SessionIme::Enabled,
                 egui::ImeEvent::Disabled => SessionIme::Disabled,
