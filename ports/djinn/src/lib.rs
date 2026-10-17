@@ -26,6 +26,7 @@ pub mod knot_relation_intake;
 pub mod lock_triggers;
 pub mod pairing;
 pub mod personal_sync;
+pub mod personal_facts;
 pub mod profile;
 pub mod resident;
 pub mod resident_blobs;

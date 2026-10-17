@@ -27,6 +27,7 @@ members = [
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/apparatus",
+    "crates/domain/personal-facts",
     "crates/platen/platen",
     "crates/eidetic/eidetic-core",
     "crates/fleece",
@@ -481,6 +482,7 @@ forme = { package = "mere-forme", version = "0.2.0", path = "crates/forme/forme"
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
+personal-facts = { package = "mere-personal-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus" }
 eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-features = false }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
