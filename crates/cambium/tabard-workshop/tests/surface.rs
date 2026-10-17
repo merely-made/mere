@@ -63,7 +63,7 @@ fn click(host: &mut Host, selector: &Selector) {
 
 fn selected_node(host: &Host, selector: &Selector) -> NodeId {
     host.with_dom(|dom| {
-        let nodes = taproot::matching(dom, selector);
+        let nodes = taproot::matching_estimated_fixture(dom, selector);
         assert_eq!(
             nodes.len(),
             1,
@@ -375,7 +375,7 @@ fn locked_harmony_explains_dependent_hues_and_keeps_other_channels_editable() {
     );
 
     assert!(host.with_dom(|dom| {
-        taproot::matching(dom, &Selector::role("slider").containing("Secondary hue")).is_empty()
+        taproot::matching_estimated_fixture(dom, &Selector::role("slider").containing("Secondary hue")).is_empty()
     }));
     assert!(host.with_surfaces(|surfaces| {
         taproot::text_present(surfaces, "Hue follows Primary in this harmony")

@@ -318,12 +318,22 @@ impl winit::application::ApplicationHandler for WindowsDxgiPresentApp {
                 }
 
                 // 7b. render through the DCOMP composition swapchain
+                let _ = paint::PaintCompositor::take_presentation_outcome(&mut state.compositor);
                 state.renderer.render_with_compositor(
                     &scene,
                     wgpu::TextureFormat::Rgba8Unorm,
                     &mut state.compositor,
                     netrender::peniko::Color::new([0.0, 0.0, 0.0, 0.0]),
                 );
+
+                let outcome =
+                    paint::PaintCompositor::take_presentation_outcome(&mut state.compositor);
+                if !matches!(outcome, Some(paint::PresentationOutcome::DisplayHandoff)) {
+                    return self.fail(
+                        event_loop,
+                        format!("DXGI display handoff failed: {outcome:?}"),
+                    );
+                }
 
                 self.frames_presented += 1;
 

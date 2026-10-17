@@ -33,6 +33,7 @@
 //! helpers live in [`mod@build`].
 
 use std::collections::{BTreeMap, HashMap, HashSet};
+use std::sync::Arc;
 
 use crate::canvas::scene_paint::{Camera, ScenePaintStyle};
 use euclid::default::{Box2D, Point2D};
@@ -523,7 +524,7 @@ pub struct Canvas {
     /// of the abstract orb / polygon; unset handles fall back. A registry (persists across scenes,
     /// not cleared on `clear_scene`), populated via [`register_scene_sprite`](Self::register_scene_sprite).
     /// (Physics scenes — scene-prop sprites.)
-    scene_sprite_textures: HashMap<String, (Vec<u8>, u32, u32)>,
+    scene_sprite_textures: HashMap<String, (Arc<Vec<u8>>, u32, u32)>,
     /// Decoded pixels for the content-addressed images nodes now reference,
     /// keyed by [`kernel::types::ImageRef`] digest.
     ///

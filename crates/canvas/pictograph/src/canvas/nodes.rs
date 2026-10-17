@@ -102,7 +102,7 @@ impl Canvas {
         height: u32,
     ) {
         self.scene_sprite_textures
-            .insert(handle.into(), (rgba, width, height));
+            .insert(handle.into(), (rgba.into(), width, height));
     }
 
     /// Load Conway's Game of Life as the ambient backdrop: a wrapped grid of cells, seeded with a

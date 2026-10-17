@@ -147,6 +147,11 @@ mod linux_impl {
             apply_limit_buckets: false,
         }))
         .map_err(|err| format!("request_adapter: {err}"))?;
+        let adapter_info = adapter.get_info();
+        eprintln!(
+            "pelt wayland-present adapter name={:?} backend={:?} device_type={:?}",
+            adapter_info.name, adapter_info.backend, adapter_info.device_type
+        );
 
         let limits = wgpu::Limits {
             max_inter_stage_shader_variables: 28,
@@ -266,6 +271,12 @@ mod linux_impl {
                             .fail(event_loop, format!("default_compositor_for_window: {err}"));
                     },
                 };
+            if compositor.presentation_route() != paint::PresentationRoute::Display {
+                return self.fail(
+                    event_loop,
+                    "Wayland factory selected capture instead of display".into(),
+                );
+            }
 
             self.state = Some(WaylandPresentState {
                 renderer,
@@ -331,12 +342,21 @@ mod linux_impl {
                     }
 
                     let pc: &mut dyn paint::PaintCompositor = &mut *state.compositor;
+                    let _ = pc.take_presentation_outcome();
                     state.renderer.render_with_compositor(
                         &scene,
                         wgpu::TextureFormat::Rgba8Unorm,
                         pc,
                         netrender::peniko::Color::new([0.0, 0.0, 0.0, 0.0]),
                     );
+
+                    let outcome = pc.take_presentation_outcome();
+                    if !matches!(outcome, Some(paint::PresentationOutcome::DisplayHandoff)) {
+                        return self.fail(
+                            event_loop,
+                            format!("Wayland display handoff failed: {outcome:?}"),
+                        );
+                    }
 
                     self.frames_presented += 1;
 

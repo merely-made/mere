@@ -177,7 +177,7 @@ mod tests {
                 );
                 host.layout_at(width, 900.0);
                 let brand = host.with_dom(|dom| {
-                    let nodes = taproot::matching(dom, &Selector::class("brand-title"));
+                    let nodes = taproot::matching_classes(dom, &Selector::class("brand-title"));
                     assert_eq!(nodes.len(), 1);
                     nodes[0]
                 });
@@ -198,15 +198,20 @@ mod tests {
                     .collect();
                 assert!(!brand_rects.is_empty(), "brand must have real layout");
                 let mut controls = Vec::new();
+                let projection = host.a11y_projection();
                 for action in ["undo", "redo", "save"] {
                     let selector = Selector::role("button").with_attr("data-action", action);
-                    let nodes = host.with_dom(|dom| taproot::matching(dom, &selector));
+                    let nodes = host.with_dom(|dom| {
+                        taproot::matching_prefer_exact_with_projection(dom, &selector, &projection)
+                    });
                     assert_eq!(nodes.len(), 1, "missing header action {action}");
                     controls.push((action, nodes[0]));
                 }
                 for action in ["minimize", "maximize", "close"] {
                     let selector = Selector::role("button").with_attr("data-window-action", action);
-                    let nodes = host.with_dom(|dom| taproot::matching(dom, &selector));
+                    let nodes = host.with_dom(|dom| {
+                        taproot::matching_prefer_exact_with_projection(dom, &selector, &projection)
+                    });
                     let available = explicit_captions || !cfg!(target_os = "macos");
                     assert_eq!(nodes.len(), usize::from(available));
                     if let Some(node) = nodes.first() {
@@ -360,7 +365,10 @@ mod tests {
             panic!("text editing must not open an export chooser")
         });
         let selector = Selector::role("textbox").with_attr("data-field", "name");
-        let node = host.with_dom(|dom| taproot::matching(dom, &selector)[0]);
+        let projection = host.a11y_projection();
+        let node = host.with_dom(|dom| {
+            taproot::matching_prefer_exact_with_projection(dom, &selector, &projection)[0]
+        });
         assert_eq!(
             focused_field(&host.runner().dom(), node, host.state()).as_deref(),
             Some("name")
@@ -374,10 +382,12 @@ mod tests {
                 .text()
                 .contains('Ω')
         );
+        let projection = host.a11y_projection();
         let export = host.with_dom(|dom| {
-            taproot::matching(
+            taproot::matching_prefer_exact_with_projection(
                 dom,
                 &Selector::role("button").with_attr("data-action", "export"),
+                &projection,
             )[0]
         });
         assert!(focused_field(&host.runner().dom(), export, host.state()).is_none());
