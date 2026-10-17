@@ -1,0 +1,8 @@
+
+running 3 tests
+test accesskit_tree_discards_the_flat_fact_that_html_exposes ... ok
+test flat_html_and_rows_preserve_the_supplied_fact ... ok
+test folding_hides_readable_facts_from_every_frozen_output ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

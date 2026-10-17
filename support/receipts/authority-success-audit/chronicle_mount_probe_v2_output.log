@@ -1,0 +1,8 @@
+PASS normal applied diff advances acknowledged revision
+PASS failed resume still advertises resumed_by_diff=true at old revision
+PASS unapplied gap requests resynchronization but advertises resumed_by_diff=true
+PASS refused remount stamps snapshot revision 999 over acknowledged revision 1
+
+thread 'main' (63380) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\chronicle_mount_probe_v2.rs:105:5:
+assertion failed: html.contains("substituted resource")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -1,0 +1,83 @@
+{
+  "date_utc": "2026-10-17T08:28:02.044092+00:00",
+  "source_sha256": {
+    "crates/cambium/cambium/src/controls/text_input.rs": "ee11a646bf80891310ac12d904e33b428481c3dcfae88e23486e9927d3edf31a",
+    "crates/cambium/cambium/src/controls/text_input/command.rs": "8182582d1c325cf0d6c41ddd97863d689df4c754c1720244da5c3f536b91fe8d",
+    "crates/cambium/cambium/src/controls/text_input/core.rs": "a88ce2494a7aa939bba899030188a7024c0176fe9e010f507863a93ceb04c67c",
+    "crates/cambium/cambium/src/controls/text_input/multiline.rs": "8f75818862c76f7bcdade2eb8fe18adcfa066bf0a2ecbf5972b418bf782198af",
+    "crates/cambium/cambium/src/controls/text_input/word_motion.rs": "04ffbf17d0f166db6f526577d67ba9a975ae91c092a439f4d3af07828fa87bab",
+    "crates/cambium/cambium/src/editor.rs": "abbd0cb6416caea7a9f0d916110a65f5b081189204236af80c6b415c1afa0642"
+  },
+  "libraries": {
+    "cambium": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+      "sha256": "7dfb7f3d6cae98e1cb46982f082fc274612941e40b8d50f39be23cc0772f0102",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/cambium#0.3.3"
+    },
+    "backstep": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libbackstep-6a7821edf8bb7853.rlib",
+      "sha256": "6b6a78153e7e0950786e9f7b1acaa62c9c5555790ae79cfdfa76a947b017d725",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/backstep#0.1.0"
+    },
+    "genet_text": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_text-5403056dfa0aadcb.rlib",
+      "sha256": "ed73196c57c862ee82ac24f1734a7a4af76abf6745f811ce22819799020853f8",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/genet.git?branch=main#genet-text@0.1.0"
+    }
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\text_grapheme_probe_v2.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-text-grapheme-probe-v2.exe",
+    "--extern",
+    "cambium=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+    "--extern",
+    "backstep=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libbackstep-6a7821edf8bb7853.rlib",
+    "--extern",
+    "genet_text=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_text-5403056dfa0aadcb.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 7,
+  "probe_sha256": "7fc131c47edd194b27c00583dfe418173520119e2c6af5f950ce53cf3a27bb70",
+  "runner_sha256": "51af91d13178303d69528c47df3deb2c3d54a071558aefa3111c04b05b37c314",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-text-grapheme-probe-v2.exe",
+      "bytes": 382464,
+      "sha256": "cb8e33da530e82c8bc17cef2af20844dfa95dbb82b1e18d56c11cb0912e67c68"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-text-grapheme-probe-v2.pdb",
+      "bytes": 103469056,
+      "sha256": "c93a9950d9caf643c2e415b7e813614d95de335272bdc65121df238a9cad20fd"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Original current TextInput leaf modules and editor included by path through an audit-only module-path wrapper over retained exact key/event, segmentation and history dependency artifacts. Public buffer/command methods only; no component, DOM, headed host, IME hardware, persistence, GPU or fresh full-current Cargo gate."
+}

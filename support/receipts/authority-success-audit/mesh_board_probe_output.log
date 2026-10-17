@@ -1,0 +1,23 @@
+
+running 9 tests
+test completed_lease_checkpoint_passes_policy_then_empty_tail_loses_output ... OBSERVATION: accepted non-live checkpoint restores Claimed while lease phase remains Done
+ok
+test invalid_lower_hash_completion_supplies_output_after_valid_completion_closes_lease ... OBSERVATION: invalid 17-byte output against 16-byte grant selected; accepted closing fact remains valid at 400; hash attempts=7
+ok
+test mutated_decoded_mesh_field_is_accepted_while_cached_signed_bytes_name_foreign_mesh ... OBSERVATION: verify/fold trusts mutated parsed address; redecoded signed bytes still name foreign mesh
+ok
+test real_store_accepts_overgrant_completion_then_board_publishes_it ... OBSERVATION: store accepts self-valid over-grant record; real store board publishes rejected 17-byte output
+ok
+test real_store_build_accept_board_loses_completed_lease_output ... OBSERVATION: real in-memory store checkpoint acceptance loses completed output before pruning, original completion still retained
+ok
+test real_store_checkpoint_loses_attested_directory_before_prune ... OBSERVATION: real store checkpoint filters retained device attestation below frontier and snapshot omits directory
+ok
+test real_store_success_can_index_signed_foreign_header_under_mutated_mesh ... OBSERVATION: accept reports insertion under mesh M, retained signed bytes name foreign mesh and M board is empty
+ok
+test snapshot_only_roundtrip_drops_the_device_directory ... OBSERVATION: snapshot-only reconstruction loses device; live store retention/replay not asserted
+ok
+test two_signed_results_from_one_winner_make_fold_input_order_visible ... OBSERVATION: identical signed operation set yields result B or A by iteration order
+ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+

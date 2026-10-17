@@ -1,0 +1,186 @@
+warning: unused imports: `TextFieldMode` and `text_command_from_key`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\text_grapheme_probe_v2.rs:7:41
+  |
+7 | pub use command::{CaretMove,TextCommand,TextFieldMode,text_command_from_key};
+  |                                         ^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `CaretAffinity`, `CaretPosition`, and `Composition`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\text_grapheme_probe_v2.rs:9:16
+  |
+9 | pub use core::{CaretAffinity,CaretPosition,CaretSelection,Composition,TextInput};
+  |                ^^^^^^^^^^^^^ ^^^^^^^^^^^^^                ^^^^^^^^^^^
+
+warning: enum `TextFieldMode` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\command.rs:17:10
+   |
+17 | pub enum TextFieldMode {
+   |          ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: multiple variants are never constructed
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\command.rs:29:5
+   |
+27 | pub enum CaretMove {
+   |          --------- variants in this enum
+28 |     GraphemeLeft,
+29 |     GraphemeRight,
+   |     ^^^^^^^^^^^^^
+30 |     WordLeft,
+   |     ^^^^^^^^
+31 |     WordRight,
+   |     ^^^^^^^^^
+32 |     LineUp,
+   |     ^^^^^^
+33 |     LineDown,
+   |     ^^^^^^^^
+34 |     LineHome,
+   |     ^^^^^^^^
+35 |     LineEnd,
+   |     ^^^^^^^
+36 |     BufferHome,
+   |     ^^^^^^^^^^
+37 |     BufferEnd,
+   |     ^^^^^^^^^
+   |
+   = note: `CaretMove` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: multiple variants are never constructed
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\command.rs:45:5
+   |
+42 | pub enum TextCommand {
+   |          ----------- variants in this enum
+...
+45 |     Delete,
+   |     ^^^^^^
+46 |     DeleteWordLeft,
+   |     ^^^^^^^^^^^^^^
+47 |     DeleteWordRight,
+   |     ^^^^^^^^^^^^^^^
+...
+52 |     SelectAll,
+   |     ^^^^^^^^^
+53 |     SetSelection(CaretSelection),
+   |     ^^^^^^^^^^^^
+...
+58 |     CommitComposition(String),
+   |     ^^^^^^^^^^^^^^^^^
+59 |     CancelComposition,
+60 |     AcceptGhost,
+   |     ^^^^^^^^^^^
+61 |     Undo,
+   |     ^^^^
+62 |     Redo,
+   |     ^^^^
+   |
+   = note: `TextCommand` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: function `text_command_from_key` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\command.rs:70:8
+   |
+70 | pub fn text_command_from_key(event: &KeyEvent, mode: TextFieldMode) -> Option<TextCommand> {
+   |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `apply_key` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\command.rs:260:12
+    |
+168 | impl TextInput {
+    | -------------- method in this implementation
+...
+260 |     pub fn apply_key(&mut self, event: &KeyEvent, mode: TextFieldMode) -> bool {
+    |            ^^^^^^^^^
+
+warning: constant `CARET_MARKER` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\core.rs:16:7
+   |
+16 | const CARET_MARKER: char = '|';
+   |       ^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium\src\controls\text_input\core.rs:146:12
+    |
+114 | impl TextInput {
+    | -------------- methods in this implementation
+...
+146 |     pub fn preedit(&self) -> &str {
+    |            ^^^^^^^
+...
+160 |     pub fn set_preedit(&mut self, text: impl Into<String>) {
+    |            ^^^^^^^^^^^
+...
+188 |     pub fn ghost(&self) -> &str {
+    |            ^^^^^
+...
+194 |     pub fn set_ghost(&mut self, text: impl Into<String>) {
+    |            ^^^^^^^^^
+...
+199 |     pub fn clear_ghost(&mut self) {
+    |            ^^^^^^^^^^^
+...
+249 |     pub fn caret_byte_in_render(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+266 |     pub fn render_parts(&self) -> (String, String, String) {
+    |            ^^^^^^^^^^^^
+...
+300 |     pub fn anchor(&self) -> usize {
+    |            ^^^^^^
+...
+328 |     pub fn selected_text(&self) -> &str {
+    |            ^^^^^^^^^^^^^
+...
+334 |     pub fn selection_bytes(&self) -> (usize, usize) {
+    |            ^^^^^^^^^^^^^^^
+...
+532 |     pub fn can_undo(&self) -> bool {
+    |            ^^^^^^^^
+...
+537 |     pub fn can_redo(&self) -> bool {
+    |            ^^^^^^^^
+...
+565 |     pub fn display(&self) -> String {
+    |            ^^^^^^^
+
+warning: multiple associated items are never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\editor.rs:46:12
+    |
+ 38 | impl EditHistory {
+    | ---------------- associated items in this implementation
+...
+ 46 |     pub fn with_cap(cap: usize) -> Self {
+    |            ^^^^^^^^
+...
+ 54 |     pub fn snapshot(&mut self, input: &TextInput, coalesce_insert: bool) {
+    |            ^^^^^^^^
+...
+ 70 |     pub fn undo(&mut self, input: &mut TextInput) -> bool {
+    |            ^^^^
+...
+ 86 |     pub fn redo(&mut self, input: &mut TextInput) -> bool {
+    |            ^^^^
+...
+101 |     pub fn clear(&mut self) {
+    |            ^^^^^
+...
+106 |     pub fn can_undo(&self) -> bool {
+    |            ^^^^^^^^
+...
+111 |     pub fn can_redo(&self) -> bool {
+    |            ^^^^^^^^
+
+warning: function `pair_close` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\editor.rs:119:8
+    |
+119 | pub fn pair_close(open: char) -> Option<char> {
+    |        ^^^^^^^^^^
+
+warning: function `wrap_selection` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\editor.rs:139:8
+    |
+139 | pub fn wrap_selection(input: &mut TextInput, open: char) -> bool {
+    |        ^^^^^^^^^^^^^^
+
+warning: 12 warnings emitted
+

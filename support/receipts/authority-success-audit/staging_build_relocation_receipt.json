@@ -1,0 +1,22 @@
+{
+  "removed_outputs": [
+    {
+      "sha256": "47cc65f6df7410cd4aa571fd696f808869b9af01e407d3c419ee785b38b3f915",
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-staging-runtime\\target\\build\\debug\\deps\\authority_success_refresh_staging-27e5b8743da8fe97.exe",
+      "bytes": 2252288
+    },
+    {
+      "sha256": "769533c576956eb54eaff67adc8350e06d8069d9e6dd1121a5b2d6ded6c968e6",
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-staging-runtime\\target\\build\\debug\\deps\\authority_success_refresh_staging-27e5b8743da8fe97.pdb",
+      "bytes": 4296704
+    }
+  ],
+  "qualification": "A local Cargo build-dir setting redirected the CPU gate despite CARGO_TARGET_DIR. Only marker-identified generated output with no live owner was moved to the approved stable shared build directory; only this audit package executable/PDB were deleted. The fresh reusable supplier cache remains owned by the active full-source audit. Future gates must also override build.build-dir explicitly. No source or prior evidence deleted.",
+  "marker": "Cargo CACHEDIR.TAG signature",
+  "cache_bytes": 187458309.0,
+  "source": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-staging-runtime\\target\\build",
+  "destination": "C:\\t\\cargo-targets\\mere\\build",
+  "source_directory_removed": true,
+  "live_owners_before_move": 0,
+  "isolated_target_retained": false
+}

@@ -1,0 +1,6 @@
+PASS judgement_without_role: authenticated unrelated signer censures and pardons; no governance provider exists on this path
+PASS unsigned_weight_sign: ordinary +/-30 control; max unsigned pardon lowers by1 and censure raises by1
+PASS asserted_time_vs_log_order: forward-time control +10; backwards authored time sorts valid completion before creation and yields -20
+PASS repeat_and_self_vouch: two fresh same-edge vouches double newcomer boost; self-vouch then doubles voucher accrual
+PASS out_of_range_basis_points: documented10000 limit control yields1; signed65535 accepted and yields6
+PASS shared_store_moot_isolation: A and B share raw-author/log0; both score2 from one own event; separate-store control is1/0

@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "stage": "pre-mutation coverage assertion",
+  "reason": "Two historical harness source files were already protected by a previous checkpoint; additional whole files are 89, not the entire subtree count of 91. No notes, document or checkpoint receipt had been written.",
+  "original_recorder_sha256": "212bc173c5f169d417ce02071cd43eaec794aa4ddb55c3ee5cb97e5e854de166"
+}

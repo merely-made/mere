@@ -1,0 +1,88 @@
+{
+  "date_utc": "2026-10-16T21:36:39.907840+00:00",
+  "scope": "Current public native notifying loop over Tokio duplex, constructed admitted session with real signed grant/revocation; live, mid-session expiry and mid-session revocation. No admission handshake, remote network, WebRTC or installed resident executed.",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\host_notice_authority_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-host-notice-probe.exe",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+    "--extern",
+    "insigne=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-2c24fba33628fd1b.rlib",
+    "--extern",
+    "personae=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-6585db5ce29cfbf6.rlib",
+    "--extern",
+    "notochord=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnotochord-76a5063a3760f014.rlib",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-923a910f142327c8.rlib",
+    "--extern",
+    "graphshell_endpoint=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_endpoint-6b246d56de7e4800.rlib",
+    "--extern",
+    "graphshell_host=C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_host.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/graphshell/graphshell-host/src/session_loop.rs": "f1d350e69eaf1747e95ed8ebbafdf5baacd07cad6264fd1bdb5f7e1228d0f0ed",
+    "crates/graphshell/graphshell-host/src/session_notices.rs": "dbf8907667959858cb9501c0a67d7425a3584b5704275a1b4f5eab41f90d305a",
+    "crates/graphshell/graphshell-host/src/lifecycle.rs": "abebb9a9de920d476da56b492def3259caaaf79386f15387102f2a7ff43b78fe"
+  },
+  "library_sha256": {
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+      "sha256": "7e7647e8db91ea5aad887d653d9ca5ccc2eab8372973016a2ae68badfef297f6"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+      "sha256": "b89ad8844a54d45b0c7a302e6bb23099b5a9c77c38e799725b97170ab485fb5f"
+    },
+    "insigne": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-2c24fba33628fd1b.rlib",
+      "sha256": "e14c122b346957bd28d2fe6352a9d5af0404d09742e8e951ab3af0d9ff32d945"
+    },
+    "personae": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-6585db5ce29cfbf6.rlib",
+      "sha256": "eda91822bb9d01b48bcae10d236671f1198a7ea1a925fb924e92bf121db5d5bd"
+    },
+    "notochord": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnotochord-76a5063a3760f014.rlib",
+      "sha256": "7fd06ff105c3134fe681d9ea994d7d193a7281e58920237459449ca3fc4eedcb"
+    },
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-923a910f142327c8.rlib",
+      "sha256": "74a644f8eb9ca55cf629101c52f3dc327416761fad76d0edcfc772dabc7c8c1b"
+    },
+    "graphshell_endpoint": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_endpoint-6b246d56de7e4800.rlib",
+      "sha256": "a6b9c216532a476aa224f4b52f6a3a810db41250aa0508677950e032a3bc5d1f"
+    },
+    "graphshell_host": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_host.rlib",
+      "sha256": "e96598ac5a7aa515d28c00e426d76f8dbc4b98dfa7cb0379802326eabbfe90fd"
+    }
+  },
+  "harness_sha256": "9b19a83e384b8ad3644b9889ead11fb54b2f93e6d261dd826ea4b4a2d6e308b7",
+  "native_binary_sha256": "236153fc62ec077af9868c3085ae56063fb58fddbd59426f6b4840a885fc2153",
+  "generated_native_output_removed": true
+}

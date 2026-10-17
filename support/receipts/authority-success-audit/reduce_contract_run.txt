@@ -1,0 +1,22 @@
+
+running 17 tests
+test axis_equal_rank_panics_after_acceptance ... ok
+test axis_greater_rank_returns_error_control ... ok
+test finite_sort_control ... ok
+test forced_cube_accepts_lane_count_instead_of_plane_count ... ok
+test forced_cube_rejects_inferred_per_plane_slot_count ... ok
+test forced_unit_disabled_idle_admits_extra_cubes ... ok
+test forced_unit_enabled_idle_rejected_on_extra_cubes ... ok
+test forced_unit_partial_cube_guard_never_compares_units ... ok
+test legal_axis_control ... ok
+test rank_zero_axis_zero_panics_after_acceptance ... ok
+test seed_equal_coordinate_control ... ok
+test topk_mixed_finite_negative_infinity_keeps_invalid_second_slot ... ok
+test topk_nan_order_changes_winner ... ok
+test topk_negative_infinity_is_rejected_by_finite_seed ... ok
+test topk_values_only_also_retains_seed ... ok
+test zero_k_insert_panics ... ok
+test zero_k_is_admitted ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,83 @@
+{
+  "date_utc": "2026-10-17T05:03:52.259371+00:00",
+  "source_sha256": {
+    "ports/distillery/src/inference.rs": "9f44694090837c15bde7c8d54344fc30976f6da52fc87c919976cf290f238463",
+    "ports/distillery/src/inference/durable.rs": "6c4808a6f5645f97897962417278619e17d21a9db3e3ede1c85b2a4d0e75d9e3",
+    "crates/intel/esp/src/infer/actor.rs": "a3a43f3fedfd50b7392ee9571abea8e1d505234a53c449a364b57c595612e86d",
+    "crates/armillary/src/actor.rs": "4c6cafbc696b6f55d9c5085da35e368618a9df3a7ec70157f98f41bedff69836",
+    "ports/distillery/Cargo.toml": "c19308b8120a4fb1a6da11fe8797c02d84f5d52a40467cc7999d76410f208733",
+    "Cargo.toml": "07b53aecab2810e3dff9c344bf3c9e02045f1535711727b6e9811ee8aa3d23bd",
+    "Cargo.lock": "924fc0b93222131937e18d80384d4579db1e4e013cffd6540f54a602921d553e"
+  },
+  "libraries": {
+    "distillery": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdistillery-c44b1d8f55533071.rlib",
+      "sha256": "483f3126e01196bd22c88475d93a252c797e3aa0adede1e9156252314f494cb2",
+      "features": [
+        "default",
+        "inference",
+        "inference-model",
+        "inference-wire"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/ports/distillery#0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\src\\lib.rs"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+      "sha256": "4ee2e2efcf90f61ce85a257fe3a6d707890eff440805fb2ede877eddee6ce791",
+      "features": [
+        "alloc",
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.151\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\inference_crash_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-inference-crash-probe.exe",
+    "--extern",
+    "distillery=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdistillery-c44b1d8f55533071.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "b3dc9649e5385e227e518de794fe437bfd0453100921b38a397077cefc2370e0",
+  "tests": 3,
+  "test_exit": 0,
+  "generated_output_removed": true,
+  "scope": "Two public InferenceLane observations inject a gated provider-construction panic and use an in-memory RunJournal. Ordinary returned model-error control passes. No GPU, real model, disk journal, resident process, broker or network. Demonstrates ignored dead actor command delivery, queued state left by a rejected ask, successful pause/cancel/close despite stranded work, and successful queued resume to a disconnected actor. Lock waiting is source-qualified only; no lock-hang probe ran."
+}

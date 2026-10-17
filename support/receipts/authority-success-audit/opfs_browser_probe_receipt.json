@@ -1,0 +1,293 @@
+{
+  "date_utc": "2026-10-17T19:44:14.367441+00:00",
+  "source_sha256": {
+    "ports/muniment-opfs-probe/run-browser.mjs": "1cc7753f1c5d80f9a9ecec7733508d8b055e78de26b4342481d2486bc410302f",
+    "ports/muniment-opfs-probe/web/probe.js": "938214be5640b44c2c7ceace699f0828f1aca502fc08e54687a0ab4209908883"
+  },
+  "node": "v24.11.0",
+  "page_cases": {
+    "storage_states": [
+      {
+        "condition": "true",
+        "result": {
+          "state": "persistent",
+          "persisted_timed_out": false,
+          "quota_bytes": 100,
+          "usage_bytes": 1
+        }
+      },
+      {
+        "condition": "false",
+        "result": {
+          "state": "best_effort",
+          "persisted_timed_out": false,
+          "quota_bytes": 100,
+          "usage_bytes": 1
+        }
+      },
+      {
+        "condition": "reject",
+        "result": {
+          "state": "persistent",
+          "persisted_timed_out": false,
+          "quota_bytes": 100,
+          "usage_bytes": 1
+        }
+      }
+    ],
+    "run_all": [
+      {
+        "mode": "success",
+        "rejected": false,
+        "state": "complete",
+        "lane1": {
+          "ok": true
+        },
+        "conclusions": {
+          "lane1_wasm_transactions": true,
+          "lane2_opfs_create_commit_close_reopen": true,
+          "lane3_fault_trials": null,
+          "lane3_fault_all_recovered": null,
+          "lane3_fault_uninitialized_creation_cuts": null,
+          "lane3_termination_trials": null,
+          "lane3_termination_forced": null,
+          "lane3_termination_yielding": null,
+          "lane3_termination_all_recovered": null,
+          "lane3_unrecoverable": [],
+          "stop_condition_hit": false,
+          "lane4_second_writer_refused": null,
+          "lane4_refusal_name": null,
+          "lane4_release_after_kill_ms": null,
+          "lane4_two_tabs": null,
+          "lane4_two_tabs_ok": null,
+          "lane4_reload_reopen_ms": null,
+          "lane5_native_to_browser_ok": null,
+          "lane5_digests_agree": null,
+          "lane5_redb_over_indexeddb": null,
+          "lane5_bench_repeats": null,
+          "lane6_trials": null,
+          "lane6_creation_sweep": null,
+          "lane6_atomic_move": null,
+          "lane6_unopenable_stubs": null,
+          "lane6_promotion_kill": null,
+          "lane6_ok": true,
+          "receipt_gate_failures": [],
+          "receipt_gate_passed": true,
+          "browser_scope": {
+            "user_agent": null,
+            "note": "one host per receipt; Firefox/Safari/WKWebView are separate receipts"
+          }
+        }
+      },
+      {
+        "mode": "lane-false",
+        "rejected": false,
+        "state": "complete",
+        "lane1": {
+          "ok": false
+        },
+        "conclusions": {
+          "lane1_wasm_transactions": false,
+          "lane2_opfs_create_commit_close_reopen": true,
+          "lane3_fault_trials": null,
+          "lane3_fault_all_recovered": null,
+          "lane3_fault_uninitialized_creation_cuts": null,
+          "lane3_termination_trials": null,
+          "lane3_termination_forced": null,
+          "lane3_termination_yielding": null,
+          "lane3_termination_all_recovered": null,
+          "lane3_unrecoverable": [],
+          "stop_condition_hit": false,
+          "lane4_second_writer_refused": null,
+          "lane4_refusal_name": null,
+          "lane4_release_after_kill_ms": null,
+          "lane4_two_tabs": null,
+          "lane4_two_tabs_ok": null,
+          "lane4_reload_reopen_ms": null,
+          "lane5_native_to_browser_ok": null,
+          "lane5_digests_agree": null,
+          "lane5_redb_over_indexeddb": null,
+          "lane5_bench_repeats": null,
+          "lane6_trials": null,
+          "lane6_creation_sweep": null,
+          "lane6_atomic_move": null,
+          "lane6_unopenable_stubs": null,
+          "lane6_promotion_kill": null,
+          "lane6_ok": true,
+          "receipt_gate_failures": [],
+          "receipt_gate_passed": true,
+          "browser_scope": {
+            "user_agent": null,
+            "note": "one host per receipt; Firefox/Safari/WKWebView are separate receipts"
+          }
+        }
+      },
+      {
+        "mode": "lane-throws",
+        "rejected": true,
+        "state": "failed",
+        "lane1": {
+          "failed": true,
+          "error": "Error: AUDIT injected lane failure"
+        }
+      }
+    ]
+  },
+  "runner_cases": [
+    {
+      "name": "success",
+      "outer_exit": 0,
+      "per_lane": {
+        "lane 1": {
+          "ok": true,
+          "failed": false,
+          "error": null,
+          "seconds": 0
+        }
+      },
+      "conclusions": {
+        "receipt_gate_passed": true
+      }
+    },
+    {
+      "name": "lane-false",
+      "outer_exit": 0,
+      "per_lane": {
+        "lane 1": {
+          "ok": false,
+          "failed": false,
+          "error": null,
+          "seconds": 0
+        }
+      },
+      "conclusions": {
+        "receipt_gate_passed": true
+      }
+    },
+    {
+      "name": "lane-throws",
+      "outer_exit": 0,
+      "per_lane": {
+        "lane 1": {
+          "ok": false,
+          "error": "Error: AUDIT injected lane exception"
+        }
+      },
+      "conclusions": {
+        "receipt_gate_passed": true
+      }
+    },
+    {
+      "name": "gate-false",
+      "outer_exit": 0,
+      "per_lane": {
+        "lane 1": {
+          "ok": true,
+          "failed": false,
+          "error": null,
+          "seconds": 0
+        }
+      },
+      "conclusions": {
+        "receipt_gate_passed": false,
+        "receipt_gate_failures": [
+          "AUDIT planted page error"
+        ]
+      }
+    },
+    {
+      "name": "native-verify-false",
+      "outer_exit": 0,
+      "per_lane": {
+        "lane 5": {
+          "ok": true,
+          "failed": false,
+          "error": null,
+          "seconds": 0
+        }
+      },
+      "conclusions": {
+        "receipt_gate_passed": true,
+        "lane5_native_to_browser_ok": true
+      },
+      "lane5_ok": true,
+      "portability": {
+        "state": "ran",
+        "native_to_browser_ok": true,
+        "extended_to_generation": 8,
+        "browser_to_native": {
+          "verified_by": "native fixture verify",
+          "file": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\opfs-browser-fixtures\\native-verify-false\\fixtures\\firefox-export.redb",
+          "expected_generation": 8,
+          "exit_code": 1,
+          "result": {
+            "ok": false
+          }
+        },
+        "round_trip_both_ways_ok": false
+      }
+    },
+    {
+      "name": "native-verify-true",
+      "outer_exit": 0,
+      "per_lane": {
+        "lane 5": {
+          "ok": true,
+          "failed": false,
+          "error": null,
+          "seconds": 0
+        }
+      },
+      "conclusions": {
+        "receipt_gate_passed": true,
+        "lane5_native_to_browser_ok": true
+      },
+      "lane5_ok": true,
+      "portability": {
+        "state": "ran",
+        "native_to_browser_ok": true,
+        "extended_to_generation": 8,
+        "browser_to_native": {
+          "verified_by": "native fixture verify",
+          "file": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\opfs-browser-fixtures\\native-verify-true\\fixtures\\firefox-export.redb",
+          "expected_generation": 8,
+          "exit_code": 0,
+          "result": {
+            "ok": true
+          }
+        },
+        "round_trip_both_ways_ok": true
+      }
+    }
+  ],
+  "fixture_sha256": {
+    "opfs-browser-fixtures/page-probe.cjs": "1772c830e8698e4cd8f139fb884543089f21d4c00d92ab39892bf1409d97afd6",
+    "opfs-browser-fixtures/page-probe.log": "e42c44912ec9435112c919356320f82782f0b06989c8550e121b4f40872fd10f",
+    "opfs-browser-fixtures/preload.cjs": "35b5926349580540a0afde0e8e02eb5f7880e1f9b469e9e27ca457f14b196b3c",
+    "opfs-browser-fixtures/probe.js": "938214be5640b44c2c7ceace699f0828f1aca502fc08e54687a0ab4209908883",
+    "opfs-browser-fixtures/run-browser.mjs": "1cc7753f1c5d80f9a9ecec7733508d8b055e78de26b4342481d2486bc410302f",
+    "opfs-browser-fixtures/gate-false/injection.json": "c9b3002293257379fa945a9b4015af63d5b9eab3eeef906490662a7097a90c2e",
+    "opfs-browser-fixtures/gate-false/outer-output.log": "c91dda28d3255a67284046d0ca87d5bfd475dad511810d3eed7f6b317c991bfd",
+    "opfs-browser-fixtures/gate-false/output.json": "c1832278a0467fde5ce492bd9a711c5c0d8500218ff76583b9aaecbef369a047",
+    "opfs-browser-fixtures/lane-false/injection.json": "ec25de0fac7a6839b9d4b34587d859e4f24849e503ef2cf85e54f057e035e232",
+    "opfs-browser-fixtures/lane-false/outer-output.log": "0b461c60ab64ae8e5c91d79aef3e382ac0149216435994d9fb6726c36f669504",
+    "opfs-browser-fixtures/lane-false/output.json": "9ef0a94e0ccd5222863f74063c4f8e7e93153f189a5dfa4c007433a6e5746dd3",
+    "opfs-browser-fixtures/lane-throws/injection.json": "2d91b7ffa36ff7b493541a5f903b229c40c79c852947e95e983ad04fcfc628ba",
+    "opfs-browser-fixtures/lane-throws/outer-output.log": "4ed48d256270f22123bdc1dc6a4a75d2d9a50ea1b4a19cebb2683010ef729c6b",
+    "opfs-browser-fixtures/lane-throws/output.json": "1c92d45ff56a148067bee8cf51783ec53f60755ca28f6147987d3507e77d9a29",
+    "opfs-browser-fixtures/mock-playwright/index.js": "f1f5f8f6189314530139a6a76eb6c39da9e0a0b9a0f7cf807792aa3fa31c6bb4",
+    "opfs-browser-fixtures/native-verify-false/injection.json": "e6992dbd1e9fc7bff687682dce9acbc4e9ad79ba39d41c28ff91de62e4c455ec",
+    "opfs-browser-fixtures/native-verify-false/outer-output.log": "c98d2f5e24e0be9759fd667fd7eebcc9be9d426be9257e91959f9c18f0fab619",
+    "opfs-browser-fixtures/native-verify-false/output.json": "369056825397305cfb13e56c961c77d69b8514f2c56915d542fecaa0c6a141ef",
+    "opfs-browser-fixtures/native-verify-false/fixtures/firefox-export.redb": "c89aed8caaa1af8eac495319c6e34ef5df252d3b1ab3a43271455c1848b7f0a6",
+    "opfs-browser-fixtures/native-verify-true/injection.json": "4fab834d2652372082f60baafe111759033d5b58783c5dac71df61481d95a2da",
+    "opfs-browser-fixtures/native-verify-true/outer-output.log": "3974962638795ed76fbb0a2f038e6da9b5522da04d73ce680d888d3754f21aed",
+    "opfs-browser-fixtures/native-verify-true/output.json": "65cb9f6fe04db01a685a26ec1193c3688b16e9ff552913c71522d9f619b510a3",
+    "opfs-browser-fixtures/native-verify-true/fixtures/firefox-export.redb": "c89aed8caaa1af8eac495319c6e34ef5df252d3b1ab3a43271455c1848b7f0a6",
+    "opfs-browser-fixtures/success/injection.json": "2f4730bafab67c082690338e3a63727fda9b93996ad67e12b9d41c4aea33bdc4",
+    "opfs-browser-fixtures/success/outer-output.log": "70ecce1d348ee47a9e95bfd0ea0bac1d24404e981e005fcb1ca3c4b243be95cf",
+    "opfs-browser-fixtures/success/output.json": "08c495310ffb1091e8c2f7e95f56666f7642df1cb0ca6bfb6e242b7bdb2c07a5"
+  },
+  "runner_sha256": "7dcc6920a3a6faaa3b53ad6cc693ac196f398df44dcc148022947d4e1e1e72f8",
+  "qualification": "Complete byte-identical page source executed in Node VM with explicit inert DOM/sessionStorage/navigator boundaries; lane implementations injected only at LANES table and startReceipt acquisition boundary. Actual runAll/runLane/conclude/storageSnapshot execute. Six whole unchanged run-browser CLI copies execute in real Node processes, with an explicitly fake Playwright package, page evaluate outputs and native spawnSync result. Real outer exits and JSON/file writes, no actual browser/OPFS/IndexedDB/worker/server/network/Cargo/native database or power-loss acceptance. Fake database bytes clearly inert. Historical receipts and production source untouched."
+}

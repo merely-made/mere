@@ -1,0 +1,18 @@
+
+running 6 tests
+test same_rank_nonbroadcast_control_maps_offsets ... ok
+test same_rank_singleton_control_maps_zero ... ok
+test same_rank_two_axis_broadcast_control ... ok
+test shorter_batch_rank_has_fewer_strides_than_output_divisors ... ok
+test unbatched_operand_against_batched_output_has_no_stride_for_its_batch_axis ... ok
+test unbatched_output_control_has_no_batch_axis_to_index ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'shorter_batch_rank_has_fewer_strides_than_output_divisors' (24356) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_batch_layout_probe.rs:39:61:
+index out of bounds: the len is 1 but the index is 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'unbatched_operand_against_batched_output_has_no_stride_for_its_batch_axis' (27508) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_batch_layout_probe.rs:39:61:
+index out of bounds: the len is 0 but the index is 0

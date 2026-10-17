@@ -1,0 +1,13 @@
+
+running 3 tests
+test corrupt_subgraph_sidecar_loads_as_fresh_and_can_overwrite_prior_definitions ... Valid sidecar retains two definitions; truncated sidecar silently loads one default; subsequent save replaces the corrupt file without a refusal.
+ok
+test equal_titles_interleave_distinct_relation_bundles ... Two endpoint bundles with equal titles become four bundle starts; distinct-title control has two.
+ok
+test url_structure_outline_discards_distinct_query_scheme_and_fragment_nodes ... Graph nodes2, outline links1 for ["https://example.test/search?q=one", "https://example.test/search?q=two"]: ["https://example.test/search?q=two"]
+Graph nodes2, outline links1 for ["http://example.test/page", "https://example.test/page"]: ["https://example.test/page"]
+Graph nodes2, outline links1 for ["https://example.test/page#one", "https://example.test/page#two"]: ["https://example.test/page#two"]
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

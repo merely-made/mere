@@ -1,0 +1,9 @@
+error[E0463]: can't find crate for `cambium_rootstock`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\rootstock_embedding_info_probe.rs:1:5
+  |
+1 | use cambium_rootstock::{ProducerFrameInfo,ResolvedAppearance};
+  |     ^^^^^^^^^^^^^^^^^ can't find crate
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0463`.

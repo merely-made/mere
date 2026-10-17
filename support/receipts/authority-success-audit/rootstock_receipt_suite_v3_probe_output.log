@@ -1,0 +1,20 @@
+
+running 15 tests
+test capture_owner::disposal_during_poll_refuses_completion_and_releases_the_active_job ... ok
+test capture_owner::disposed_scope_refuses_before_allocating_readback ... ok
+test capture_owner::dropping_owner_releases_pending_resources_and_refuses_late_pixels ... ok
+test capture_owner::foreign_completion_stamp_is_refused_and_resources_release ... ok
+test capture_owner::restored_owner_never_revives_a_cancelled_capture ... ok
+test hover_motion::a_leave_handler_can_retire_the_next_hover_target_without_an_enter ... ok
+test hover_motion::a_move_handler_can_replace_its_own_hovered_subtree_before_the_next_event ... ok
+test hover_motion::hover_motion_resolves_ancestor_coordinates_and_leaves_without_clicking ... ok
+test hover_motion::replacing_a_hovered_subtree_does_not_deliver_leave_to_its_retired_node ... ok
+test prepared_frame::driver_cannot_commit_a_stamp_from_another_context ... ok
+test prepared_frame::ordinary_presentation_failure_is_observable_without_capture ... ok
+test prepared_frame::owned_capture_keeps_the_original_presentation_after_another_draw ... ok
+test prepared_frame::preparation_runs_hook_once_and_defers_zero_extent_without_a_gpu ... ok
+test prepared_frame::shared_redraw_observes_only_successful_driver_frames_and_refuses_failed_capture ... ok
+test prepared_frame::unsupported_leaf_refuses_with_its_key_and_does_not_repeat_a_stamp ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+

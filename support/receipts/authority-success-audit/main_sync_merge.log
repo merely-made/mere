@@ -1,0 +1,85 @@
+Merge made by the 'ort' strategy.
+ Cargo.lock                                         |  59 ++--
+ Cargo.toml                                         |  18 --
+ LICENSES.md                                        |   7 +-
+ crates/cambium/README.md                           |  11 +-
+ crates/cambium/cambium/src/element.rs              |   9 +-
+ crates/cambium/cambium/src/event.rs                |   9 +-
+ crates/cambium/cambium/src/instrument.css          |   6 +-
+ crates/cambium/cambium/src/optional_action.rs      |   9 +-
+ crates/cambium/cambium/src/pod.rs                  |   9 +-
+ crates/cambium/cambium/src/splice.rs               |  10 +-
+ crates/cambium/cambium/src/text.rs                 |   9 +-
+ crates/canvas/pictograph/src/canvas.rs             |   1 +
+ crates/canvas/pictograph/src/canvas/attention.rs   |   2 +
+ .../pictograph/src/canvas/backdrop_surface.rs      | 113 ++++++-
+ crates/canvas/pictograph/src/canvas/board_scene.rs |  51 ++-
+ crates/canvas/pictograph/src/canvas/cartography.rs |   2 +
+ crates/canvas/pictograph/src/canvas/frame.rs       |   1 +
+ crates/canvas/pictograph/src/canvas/geometry.rs    |   6 +
+ crates/canvas/pictograph/src/canvas/lifecycle.rs   |   6 +
+ .../pictograph/src/canvas/link_suggestions.rs      | 255 +++++++++++++++
+ crates/canvas/pictograph/src/canvas/suggestions.rs |  18 +-
+ crates/canvas/pictograph/src/canvas/tests.rs       |   1 +
+ .../src/canvas/tests/link_suggestions.rs           | 133 ++++++++
+ crates/fleece/Cargo.toml                           |   4 +-
+ crates/fleece/src/lib.rs                           |   2 +
+ crates/fleece/src/page_links.rs                    |  77 +++++
+ crates/system/pandect/src/arrangement_facets.rs    | 300 +++++++++++++++++-
+ crates/system/pandect/src/lib.rs                   |  11 +-
+ design_docs/DOC_README.md                          |   2 +
+ .../technical_architecture/upstream-xilem.md       |  35 ++-
+ .../2026-08-15_projection_grammar_adoption_plan.md |  26 ++
+ .../2026-09-25_graphshell_one_tree_plan.md         |   4 +
+ .../2026-10-07_scenograph_editor_plan.md           |   8 +
+ ports/graphshell/Cargo.toml                        |   5 +-
+ ports/graphshell/README.md                         |   4 +-
+ ports/graphshell/src/appearance.rs                 |  35 ++-
+ ports/graphshell/src/local_intake.rs               |   4 +
+ ports/graphshell/src/local_scene.rs                |   6 +-
+ ports/graphshell/src/web_appearance.rs             |   3 +
+ ports/graphshell/src/web_tree.rs                   |  78 ++---
+ ports/graphshell/src/web_tree/appearance.rs        |   4 +-
+ ports/graphshell/src/web_tree/applet.rs            |  18 +-
+ ports/graphshell/src/web_tree/backdrop.rs          |   4 +-
+ ports/graphshell/src/web_tree/forme.rs             |  19 ++
+ ports/graphshell/src/web_tree/instrument.rs        |   4 +-
+ ports/graphshell/src/web_tree/producer_scene.rs    |   3 +
+ ports/graphshell/src/web_tree/product.rs           |  31 ++
+ ports/graphshell/src/web_tree/product_off.rs       |  20 ++
+ ports/graphshell/src/web_tree/reading.rs           |   3 +-
+ ports/graphshell/web/Cargo.lock                    |   2 +
+ ports/graphshell/web/Cargo.toml                    |   2 +-
+ ports/graphshell/web/Newsreader-Regular.ttf        | Bin 0 -> 118280 bytes
+ ports/graphshell/web/OFL-Newsreader.txt            |  93 ++++++
+ ports/graphshell/web/extension/README.md           |   5 +-
+ .../graphshell/web/extension/prepare-extension.ps1 |   2 +-
+ .../graphshell/web/extension/prepare-extension.sh  |   2 +-
+ ports/graphshell/web/scripts/build-viewer.py       |   7 +-
+ ports/graphshell/web/scripts/test_viewer_budget.py |   4 +-
+ ports/graphshell/web/styles.css                    |   3 +-
+ ports/graphshell/web/tests/README.md               |   2 +-
+ .../template-scene-height_20261016/receipt.json    |   7 +
+ .../template-scene-height_20261016/tests.log       | 345 +++++++++++++++++++++
+ 62 files changed, 1760 insertions(+), 169 deletions(-)
+ create mode 100644 crates/canvas/pictograph/src/canvas/link_suggestions.rs
+ create mode 100644 crates/canvas/pictograph/src/canvas/tests/link_suggestions.rs
+ create mode 100644 crates/fleece/src/page_links.rs
+ create mode 100644 ports/graphshell/web/Newsreader-Regular.ttf
+ create mode 100644 ports/graphshell/web/OFL-Newsreader.txt
+ create mode 100644 validation/template-scene-height_20261016/receipt.json
+ create mode 100644 validation/template-scene-height_20261016/tests.log
+warning: in the working copy of 'crates/eidetic/chartulary/src/commit.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/graph.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/rdf.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/graph/graph-kernel/src/graph/chart.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/script/rhai/tests/scenograph_rules.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/system/pandect/src/wallet_grant/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/passphrase_storage.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/certs.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/mod.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/tests.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/refresh.rs', LF will be replaced by CRLF the next time Git touches it

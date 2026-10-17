@@ -1,0 +1,32 @@
+
+running 11 tests
+test cookie_expiry_without_a_write_does_not_trigger_durable_deletion ... Expiry: expired cookie no longer usable but persist retains its durable blob until an unrelated dirty mark; explicit mark deletes it
+ok
+test cookie_flip_export_erases_host_only_scope ... Flip cookie loss: source host-only and domain cookies have different child-host matching but identical exported portable cookies; no WebView import executed
+ok
+test cookie_persona_load_merges_and_persistence_shadow_is_global ... Persona state: empty persona B still sees A's session; marking dirty and persisting B skips the unchanged cookie because shadow is shared
+Persona state: a later inherited-cookie change lands under B's durable prefix; only in-memory Backend used
+ok
+test fetchable_selector_refuses_uppercase_scheme_that_fetch_api_serves ... Scheme admission: is_fetchable rejects HTTP:// while actual current fetch_page_capped successfully fetches the same address
+ok
+test five_redirect_budget_actually_allows_only_four_redirects_to_a_response ... Smolweb redirect budget: four redirects plus final response succeed; fifth redirect is refused before its target request; constant is described as most redirects5
+ok
+test https_only_blob_fetcher_accepts_plaintext_http_source ... HTTPS-only adapter: BlobSource::Https holding http:// loopback returns plaintext success; no TLS or remote service
+ok
+test identity_download_accepts_decoding_and_reports_encoded_length ... Identity download: sink receives18 decoded bytes while Facts declares38; crawler control refuses the same gzip response; no network
+ok
+test legacy_crawler_uses_browsing_cookies_and_follows_redirects ... Crawler split: legacy bot helper sends browser cookie on both followed hops; new crawler observes302 without cookie, and anonymous page control has no cookie
+ok
+test range_header_capacity_overflow_panics_before_body_read ... Range: admitted u64 Content-Range produces caught capacity-overflow panic instead of FetchError; no huge allocation or body transfer attempted
+ok
+test smolweb_body_cap_is_not_an_acquisition_stop ... Smolweb cap: eight received bytes under cap4 remain pending until EOF, then terminal refusal; no unbounded payload sent
+ok
+test titan_page_with_matching_family_identity_is_refused_before_transport ... Titan identity: host accepts a matching Titan identity but generic page fetch calls Gemini-only identity API and refuses unsupported titan before any connection; dummy key material never used for TLS
+ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.65s
+
+
+thread 'range_header_capacity_overflow_panics_before_body_read' (23136) panicked at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\raw_vec\mod.rs:28:5:
+capacity overflow
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -1,0 +1,17 @@
+PASS initial bubble click order control
+PASS retained click listener ignores capture change and stays in bubble phase
+PASS initially captured click listener control uses capture phase
+PASS retained key listener control correctly updates capture phase
+PASS nested same-element focus observers silently retain only outer handler
+PASS earlier-to-later Frisket move preserves node and component local count
+PASS later-to-earlier Frisket move retires node and resets component local count
+PASS click stop-mode 0: observed ["inner", "sibling", "ancestor"]
+PASS key stop-mode 0: observed ["inner", "sibling", "ancestor"]
+PASS click stop-mode 1: observed ["inner"]
+PASS key stop-mode 1: observed ["inner"]
+PASS click stop-mode 2: observed ["inner"]
+PASS key stop-mode 2: observed ["inner"]
+PASS requested programmatic focus changes the seat without delivering Gained
+PASS direct focus setter control delivers Lost and Gained
+PASS collapsed disclosure hidden action remains tabbable and Space-activatable
+PASS expanded disclosure control reaches its visible action

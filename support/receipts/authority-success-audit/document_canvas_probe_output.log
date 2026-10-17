@@ -1,0 +1,15 @@
+
+running 5 tests
+test adjacent_links_share_the_full_run_hitbox_and_first_click_navigates_to_second ... Distinct logical links share the whole shaping-run rectangle; first label glyph resolves second URL, with or without a space. Bold-font boundary control resolves first URL.
+ok
+test link_adornment_changes_renumber_later_retained_link_identities ... Same source later link gets a different retained ID when adornment hides an earlier empty-label link; nonempty-label control keeps ID, empty custom glyph repeats the change.
+ok
+test nested_block_source_indices_alias_unrelated_top_level_content_or_leave_range ... block_at on quoted child yields source index1 naming unrelated top-level text; quote at index1 emits child1000 outside the source array. Top-level lookup control remains correct.
+ok
+test ordered_and_unordered_lists_lose_their_distinction_before_paint ... Changing ordered=true to false leaves complete packet and paint-command Debug dump identical; changed content control differs.
+ok
+test paragraph_ignores_its_role_spacing_above ... Resolved body spacing_above80 leaves paragraph packet unchanged; body spacing_below and code spacing_above controls change geometry.
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+

@@ -1,0 +1,47 @@
+{
+  "date_utc": "2026-10-17T21:30:27.118769+00:00",
+  "exit": 0,
+  "passed": 10,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/multi_level/routines/gemm/launch.rs": "3af53b75b13baa5c34f77b5abd6f46ebfcfba35925f3361410b74ea87eb23f4a",
+    "support/patches/cubek-matmul/src/multi_level/routines/gemv_unit_perpendicular/launch.rs": "594402fb2f7a9f4912983eb4595b7773fe98f0a116c7d900475803587593998d",
+    "support/patches/cubek-matmul/src/multi_level/routines/batch/gemv_innerproduct.rs": "1c5b92bc1711dd06a5974c946755913afecc46bf7c5d47e90e6a3bbf5da2e83c",
+    "support/patches/cubek-matmul/src/multi_level/definition/blueprint.rs": "07d643d7693486a001392813802a2733d724c3f8a8a8af8e965427769100172b",
+    "support/patches/cubek-matmul/src/multi_level/components/batch/partitioned_matmul/setup.rs": "06c4530c1c06bb235810e8a840b03245f6dcd0b400beeaf394469a5ce6da416f"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_routine_contract_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-routine-contract.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-routine-contract.exe",
+      "bytes": 759296,
+      "sha256": "1d29badd7819b3570a1eec4b4ea07ceb11f550a27fc84e4587a2b82a9d0300b4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-routine-contract.pdb",
+      "bytes": 3026944,
+      "sha256": "d0b19af1f817cd25e352684d638a4b97b6729defe5364fc96e39009885334646"
+    }
+  ],
+  "extracted_body_sha256": {
+    "gemm": "2c5c0f52dc6e7f9ec735ddd9a66d12a15c0192c2d14be2c307b50ea9253d58e8",
+    "gemv": "14f99d484b04e57d8bcccf05fc3e724057b742533e907803c0ca7a1ab4013411",
+    "bounds": "6ac4e49887c4802053d70911dbb4c42b7381a839c6206fc079e739e12f753f78",
+    "group_admission": "8fbc40a9f8dd38d168380edf1bb4a62840353a86e85874a6f021bb671cec1804"
+  },
+  "evidence_sha256": {
+    "run_matmul_routine_contract_probe.py": "704b99d86c1690a15348d42ab5667d156f29684076f5df5bff47ce7e68acecfb",
+    "matmul_routine_contract_probe.rs": "0861166f8513697019617b1b162eb2c3f1f2735f86a9d05935827bd037790d95",
+    "matmul_routine_contract_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matmul_routine_contract_run.txt": "a9ba821ed949b7092a12da7502453041efd0b927e1a9e1eb073561c95125be4d"
+  },
+  "qualification": "Six exact launcher extent-fragment CPU tests use a shape-only InputBinding double, not the complete launcher or its normalization. Two rank-broadcast inputs panic; reverse rank inputs silently read incorrect dimensions; equal-rank controls pass. Four exact builder-bounds/first group-validator fragments use scalar DTO doubles and a double-stage GMM. infer_blueprint_vecmat is source-inspected, not executed: both callers share helper without stage_buffering and exact real builder default is1. Witness proves selected host fragments and missing helper setting, not full validator admission, actual algorithm/GPU result, CubeDSL or complete crate build. Owned executable/PDB removed."
+}

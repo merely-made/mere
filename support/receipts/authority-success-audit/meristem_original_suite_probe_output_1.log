@@ -1,0 +1,14 @@
+
+running 9 tests
+test element_splice::tests::move_extensions_default_to_unsupported_without_consuming_elements ... ok
+test message::tests::message_debug ... ok
+test message::tests::message_downcast ... ok
+test message::tests::message_downcast_wrong_type ... ok
+test message_context::tests::maybe_take_message ... ok
+test message_context::tests::take_message_nonempty_path - should panic ... ok
+test message_context::tests::take_message_twice - should panic ... ok
+test message_context::tests::take_message_wrong_type ... ok
+test message_context::tests::take_path_full_path ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

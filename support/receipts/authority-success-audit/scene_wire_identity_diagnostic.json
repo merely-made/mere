@@ -1,0 +1,17 @@
+{
+  "original_bytes": 10391,
+  "emitted_bytes": 11741,
+  "added_default_groups": 15,
+  "removing_only_new_default_groups_restores_exact_fixture": true,
+  "working_tree_matches_head_after_line_ending_normalization": [
+    "crates/cambium/scenes/sceno/src/scene.rs",
+    "crates/cambium/scenes/scenotime/tests/fixtures/mer3ly_projection_trace.json",
+    "crates/graphshell/graphshell-client/tests/site_fold_parity.rs"
+  ],
+  "source_sha256": {
+    "crates/cambium/scenes/sceno/src/scene.rs": "a5227296ee5eff7252b29c5f940ad51b11351277ccff1274ab17079011bc3bd7",
+    "crates/cambium/scenes/scenotime/tests/fixtures/mer3ly_projection_trace.json": "6a19b98b15e2d905e76543d45be135c51a49ed2f93495012fb8a29917733c879",
+    "crates/graphshell/graphshell-client/tests/site_fold_parity.rs": "40449c37bdbabf77114112931d8922e378b0664e4df202ec6efa1845c958adcd"
+  },
+  "scope": "Executed existing native trace test; serializer, fixture and test are unchanged from merged HEAD. No separate clean-checkout full-package run or product archive mutation claimed."
+}

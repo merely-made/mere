@@ -1,0 +1,23 @@
+
+running 6 tests
+test cold_parent_hides_active_child_geometry_but_not_accessibility ... Active child2 under Cold root has tab/UX Pane but no pane rect; Warm parent restores geometry.
+ok
+test duplicate_reorder_breaks_topology_invariants ... Reorder [2,2] retains duplicate child; invariant assertion fails; unique reorder repairs it.
+ok
+test failed_store_save_stamps_unsaved_document ... Failed save stamps created/updated100; first successful save at200 persists created100.
+ok
+test full_parity_promotes_unobserved_axes_to_matches ... Full match true with topology/active/expansion/order unobserved; explicit differing observations refuse parity.
+ok
+test load_by_id_accepts_another_documents_identity_and_list_accepts_arbitrary_filename ... Request B returns A from a mismatched valid file; arbitrary .json filename admits duplicate A into list.
+ok
+test nested_horizontal_subtree_displaces_outer_split_handle ... Outer split handle at375, actual subtree edge500
+ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+thread 'duplicate_reorder_breaks_topology_invariants' (4692) panicked at C:\Users\mark_\Code\repos\mere\crates\forme\forme\src\topology.rs:444:13:
+assertion `left == right` failed: parent 1 has duplicate children
+  left: 2
+ right: 3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

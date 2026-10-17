@@ -1,0 +1,111 @@
+{
+  "date_utc": "2026-10-17T10:22:48.964186+00:00",
+  "source_sha256": {
+    "crates/intel/esp/src/infer/decoder/provider.rs": "fb637714d91bcbce722bb4c91aa5e6f71b1349a2b411484e69aeeabd3e0a1a16",
+    "crates/intel/esp/src/infer/decoder/train.rs": "467db4d7866c8f963753d8981d65615531cb360e4f516231771ab1232e2f0507",
+    "crates/intel/esp/src/infer/provider.rs": "7ea288277fd0c08e82fbcf2b7c5053675c94c654f2a8ce2f1a8fc9d1d6b7ff5b",
+    "crates/intel/esp/src/infer/decoder/sample.rs": "fbd9bd10c546ed6b28caf2dd49686780d0fcad85db9a9e8e954fef51f8c2d918"
+  },
+  "qualification": "Exact unchanged StreamObserver, DecoderGeneration, decode method, and expected_token_rank extracted with hash binding; two unchanged full source modules include original tests. Fixture DecoderProvider holds only a real tokenizers 0.20.4 tokenizer. No model, full provider, Burn, inference/session or GPU execution.",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    },
+    "zeroize": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libzeroize-e1b59da53602fa93.rlib",
+      "sha256": "d75203b54144ae96fe406653a304e0c4452e28d145b955749c9564c08d3f5909",
+      "features": [
+        "alloc",
+        "default",
+        "zeroize_derive"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#zeroize@1.9.1"
+    },
+    "tokenizers": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokenizers-4cf55218e93967d1.rlib",
+      "sha256": "8e7f6742b635691267a18ef87cf9f318719fd37949b9ccb8d69854c547186dd4",
+      "version": "0.20.4",
+      "fingerprint": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\tokenizers-4cf55218e93967d1\\lib-tokenizers.json",
+      "fingerprint_sha256": "16021ddd2106f7638440a7b2a7fdca5a067a43c39817c89a4cc44c24f091059f",
+      "dep_info_sha256": "23bb3de71b49fe07a3d1809579f2c413a4bbb5435c239d49f4f085c0a8af4779",
+      "features": "[\"onig\"]"
+    }
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\decoder_text_math_probe_v2.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math-v2.exe",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+    "--extern",
+    "zeroize=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libzeroize-e1b59da53602fa93.rlib",
+    "--extern",
+    "tokenizers=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokenizers-4cf55218e93967d1.rlib",
+    "-L",
+    "native=C:\\t\\cargo-targets\\mere\\build\\debug\\build\\onig_sys-1537b6b3c209c839\\out",
+    "-L",
+    "native=C:\\t\\cargo-targets\\mere\\build\\debug\\build\\onig_sys-2366baf19c5134d7\\out",
+    "-L",
+    "native=C:\\t\\cargo-targets\\mere\\build\\debug\\build\\onig_sys-cea06882f8697f24\\out"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 15,
+  "audit_cases": 6,
+  "original_tests": 9,
+  "runner_sha256": "5731515460f869db0154e15dcc7c696af35b65b0bc3a1b6c080c7a9cd2374743",
+  "probe_sha256": "b3eb93319703d43846eac223b5e5f5dc209626b72aaabbf180339d474e73617c",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math-v2.exe",
+      "bytes": 5607936,
+      "sha256": "d4664c0abde0f9e222c4d640e0a4dac04536bd1437cc1c780da74465e1279b42"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math-v2.exp",
+      "bytes": 25375,
+      "sha256": "2e077e9483a0d872026ac14cfb4fa1982fb31326279921d748e8d5fb921490df"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math-v2.lib",
+      "bytes": 47134,
+      "sha256": "4e965b201d1751fcbe55ae4de803cda2375c19775c259f60e9b73d0647bb9a45"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math-v2.pdb",
+      "bytes": 41676800,
+      "sha256": "66be2cc8f83cc5b6f667f12812f83a49dc51a1c9c79f2dfbabd5a233d7a3218d"
+    }
+  ],
+  "generated_output_removed": true
+}

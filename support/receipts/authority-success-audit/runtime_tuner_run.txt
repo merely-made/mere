@@ -1,0 +1,14 @@
+
+running 3 tests
+test measured_success_control_is_committed_by_result_index ... ok
+test no_profile_measurement_is_a_different_all_failed_policy ... ok
+test refusal_before_execution_becomes_a_settled_unmeasured_winner ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'no_profile_measurement_is_a_different_all_failed_policy' (30232) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\runtime_tuner_probe.rs:532:17:
+Can't execute the autotune plan for key: 17
+ - plan: TunePlan { batches: [] }
+ - results: [AutotuneResult { outcome: Err(NotMeasured { name: "candidate0" }) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

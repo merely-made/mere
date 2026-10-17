@@ -1,0 +1,40 @@
+{
+  "date_utc": "2026-10-17T21:35:08.510093+00:00",
+  "exit": 0,
+  "passed": 4,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/multi_level/tile/variants/unit.rs": "a312d70ffa7cfbd7589a3a3087abb67088e82b10cc7461c75a3c2bb9c7e36489"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_unit_transpose_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-unit-transpose.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-unit-transpose.exe",
+      "bytes": 766976,
+      "sha256": "bb1d4fb59c30b9079795e8d658d3a1b31b620521d6233977bac7e7a43f3c6960"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-unit-transpose.pdb",
+      "bytes": 3026944,
+      "sha256": "4125e820046c6de0d3ab5c04f2233f30548134e87fee1076f9b7cc8c9b4006a3"
+    }
+  ],
+  "extracted_loop_sha256": "83d16c7426b95666a9a1769d1e723471f23c08a8c53130446a2cbefca97d8e3f",
+  "evidence_sha256": {
+    "run_matmul_unit_transpose_probe.py": "1fd2202ab6a881f76943934a19466eee4e18ebe27d91f39c9d801f2618e073ab",
+    "matmul_unit_transpose_probe.rs": "52e4c20847e6c2819b00b866c106606f909c507fec22f507de6e425d17d8ac6d",
+    "matmul_unit_transpose_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matmul_unit_transpose_run.txt": "70b302f7f190e8ee4e604e8530e77886d8b69c9b7a984f3ec47226f53732ec47",
+    "matmul_unit_transpose_initial.rs": "8d531e4df2100e0045b9cb4a70200bfe40e5a9d6ae5836d09f234a95ab6222ba",
+    "matmul_unit_transpose_initial_compile.txt": "d344df7a85ae2c1cdce5d027c4290719f1f32386ee5d3c017fc420b0853204ed"
+  },
+  "qualification": "Exact transposed UnitTile load loop CPU interpretation, removing one CubeDSL unroll attribute only; explicit comptime/vector/cast/slice doubles. Vector2 multi-vector rows overwrite indices and leave output holes; vector1 and single-vector controls pass. Separate wrong-axis divisibility assertion rejects valid input-row width. Whole-source search found no explicit true transposed-load constructor in current owned source; no current product invocation, CubeDSL lowering, GPU fault or full crate receipt claimed. Owned exe/PDB removed."
+}

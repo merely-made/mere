@@ -1,0 +1,26 @@
+{
+  "qualification": "Exact current source and trait-default trace only; no Welding 0.15 feature, live CEF or typed zoom invocation executed. Entire Weld source was read.",
+  "traces": [
+    {
+      "path": "crates/inker/engines/weld-engine/src/welding_0_15.rs",
+      "source_sha256": "4ae19fb327bb441cde7849ddb9bf389c7eecab02513f9899e42fc024ea4d5f3b",
+      "first_line": 974,
+      "last_line": 992,
+      "excerpt": "            contact_geometry: supported(caps.touch),\n            pressure: supported(caps.touch),\n            tangential_pressure: WebFeatureStatus::unsupported(\n                \"Welding touch input has no tangential pressure\",\n            ),\n            tilt: WebFeatureStatus::unsupported(\"Welding touch input has no tilt fields\"),\n            twist: supported(caps.touch),\n            altitude_azimuth: WebFeatureStatus::unsupported(\n                \"Welding touch input has no altitude/azimuth fields\",\n            ),\n        },\n        document: DocumentCapabilities {\n            find_in_page: WebFeatureStatus::Supported,\n            page_zoom: WebFeatureStatus::Supported,\n            page_capture: WebFeatureStatus::unsupported(\n                \"Welding snapshots are not yet mapped to Inker's correlated capture protocol\",\n            ),\n            navigation: WebFeatureStatus::Supported,\n        },\n"
+    },
+    {
+      "path": "crates/inker/inker/src/surface_engine.rs",
+      "source_sha256": "f70fd5eae7f4de601abb06fae6f0513415c99e4ecb537ae38fa3ed2aec5e8c8a",
+      "first_line": 1057,
+      "last_line": 1072,
+      "excerpt": "\n    /// Present the hosted document at an absolute page-zoom `factor`\n    /// (1.0 = 100 %), the same user-agent document scale retained sessions\n    /// answer through [`crate::DocumentSession::set_page_zoom`].\n    ///\n    /// This is the typed spelling of [`SurfaceSettings::zoom_factor`]: a\n    /// producer that implements it lets a host change zoom alone, without\n    /// resending an otherwise unrelated settings blob whose remaining fields it\n    /// would have to reconstruct. Producers still on `apply_settings` leave this\n    /// unsupported, and the returned state names the bounds they enforce.\n    fn set_page_zoom(&mut self, _factor: f32) -> Result<DocumentZoomState, SurfaceError> {\n        Err(SurfaceError::Unsupported(\n            \"page zoom is not wired for this surface\".into(),\n        ))\n    }\n\n"
+    },
+    {
+      "path": "crates/inker/engines/weld-engine/src/producer.rs",
+      "source_sha256": "658ae50803edb7f5ec1c7bf81d45e6636fe3c73d6365f31ee24388167fac230a",
+      "first_line": 279,
+      "last_line": 394,
+      "excerpt": "impl WebSurface for WeldProducer {\n    fn capabilities(&self) -> WebSurfaceCapabilities {\n        self.inner.web_capabilities()\n    }\n\n    fn navigate_to_url(&mut self, url: &str) -> Result<(), SurfaceError> {\n        self.inner.load_url(url)\n    }\n\n    fn navigate_to_string(&mut self, html: &str) -> Result<(), SurfaceError> {\n        self.inner.load_html(html)\n    }\n\n    fn reload(&mut self) -> Result<(), SurfaceError> {\n        self.inner.reload()\n    }\n\n    fn stop(&mut self) -> Result<(), SurfaceError> {\n        self.inner.stop()\n    }\n\n    fn go_back(&mut self) -> Result<(), SurfaceError> {\n        self.inner.go_back()\n    }\n\n    fn go_forward(&mut self) -> Result<(), SurfaceError> {\n        self.inner.go_forward()\n    }\n\n    fn can_go_back(&self) -> bool {\n        self.inner.can_go_back()\n    }\n\n    fn can_go_forward(&self) -> bool {\n        self.inner.can_go_forward()\n    }\n\n    fn document_find(\n        &mut self,\n        query: &DocumentFindQuery,\n        direction: DocumentFindDirection,\n        find_next: bool,\n    ) -> Result<(), SurfaceError> {\n        self.inner.document_find(query, direction, find_next)\n    }\n\n    fn clear_document_find(&mut self) -> Result<(), SurfaceError> {\n        self.inner.clear_document_find()\n    }\n\n    fn set_cookie(&mut self, cookie: &Cookie) -> Result<(), SurfaceError> {\n        self.inner.set_cookie(cookie)\n    }\n\n    fn request_cookies_for_url(&mut self, id: WebRequestId, url: &str) -> Result<(), SurfaceError> {\n        self.inner.request_cookies_for_url(id, url)\n    }\n\n    fn delete_cookie(&mut self, cookie: &Cookie) -> Result<(), SurfaceError> {\n        self.inner.delete_cookie(cookie)\n    }\n\n    fn answer_permission(\n        &mut self,\n        id: UserAgentRequestId,\n        answer: PermissionAnswer,\n    ) -> Result<(), SurfaceError> {\n        self.inner.answer_permission(id, answer)\n    }\n\n    fn answer_http_authentication(\n        &mut self,\n        id: UserAgentRequestId,\n        answer: &HttpAuthenticationAnswer,\n    ) -> Result<(), SurfaceError> {\n        self.inner.answer_http_authentication(id, answer)\n    }\n\n    fn request_script_result(\n        &mut self,\n        id: WebRequestId,\n        script: &str,\n    ) -> Result<(), SurfaceError> {\n        self.inner.request_script_result(id, script)\n    }\n\n    fn poll_web_event(&mut self) -> Option<WebSurfaceEvent> {\n        self.inner.poll_web_event()\n    }\n}\n"
+    }
+  ]
+}

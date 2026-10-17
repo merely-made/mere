@@ -1,0 +1,9 @@
+error[E0463]: can't find crate for `cambium_rootstock`
+ --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\tests\capture_owner.rs:3:5
+  |
+3 | use cambium_rootstock::{
+  |     ^^^^^^^^^^^^^^^^^ can't find crate
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0463`.

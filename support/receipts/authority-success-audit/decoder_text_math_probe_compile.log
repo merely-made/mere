@@ -1,0 +1,62 @@
+warning: variants `Interrupted`, `StageUnavailable`, `InvalidRequest`, `InvalidConfig`, `InvalidWeights`, and `Unsupported` are never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\infer\provider.rs:123:5
+    |
+117 | pub enum InferError {
+    |          ---------- variants in this enum
+...
+123 |     Interrupted,
+    |     ^^^^^^^^^^^
+...
+128 |     StageUnavailable(String),
+    |     ^^^^^^^^^^^^^^^^
+129 |     /// The request itself is invalid (empty prompt, zero max_tokens, ...).
+130 |     InvalidRequest(String),
+    |     ^^^^^^^^^^^^^^
+131 |     /// A model config could not be parsed or is internally inconsistent.
+132 |     InvalidConfig(String),
+    |     ^^^^^^^^^^^^^
+133 |     /// Model weights were missing, malformed, or shape-mismatched.
+134 |     InvalidWeights(String),
+    |     ^^^^^^^^^^^^^^
+...
+139 |     Unsupported { feature: String, detail: String },
+    |     ^^^^^^^^^^^
+    |
+    = note: `InferError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `SessionIdentity` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\infer\provider.rs:166:12
+    |
+166 | pub struct SessionIdentity {
+    |            ^^^^^^^^^^^^^^^
+
+warning: struct `GenerationCheckpoint` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\infer\provider.rs:176:12
+    |
+176 | pub struct GenerationCheckpoint {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `ExecutionPlacement` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\infer\provider.rs:193:12
+    |
+193 | pub struct ExecutionPlacement {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: trait `InferenceProvider` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\infer\provider.rs:220:11
+    |
+220 | pub trait InferenceProvider: Send + Sync {
+    |           ^^^^^^^^^^^^^^^^^
+
+warning: method `skip_draws` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\infer\decoder\sample.rs:64:12
+   |
+62 | impl Sampler {
+   | ------------ method in this implementation
+63 |     /// Advance exactly the recorded number of splitmix64 draws, in O(1).
+64 |     pub fn skip_draws(&mut self, draws: u64) {
+   |            ^^^^^^^^^^
+
+warning: 6 warnings emitted
+

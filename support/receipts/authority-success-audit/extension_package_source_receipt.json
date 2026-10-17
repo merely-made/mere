@@ -1,0 +1,27 @@
+{
+  "kind": "Source-only packaging dependency audit, not an executed shell/browser package trial",
+  "html_script_dependencies": [
+    "action-form.js",
+    "resource-chunk.js",
+    "bridge.js"
+  ],
+  "copied_by_posix_script": {
+    "action-form.js": false,
+    "resource-chunk.js": true,
+    "bridge.js": true
+  },
+  "copied_by_powershell_script": {
+    "action-form.js": true,
+    "resource-chunk.js": true,
+    "bridge.js": true
+  },
+  "effect": "A clean POSIX prepared package omits action-form.js despite bridge.html loading it. bridge.js sees no GraphshellActionForm and skips bounded forms, including advertised transfer accept actions. A stale file in an already existing destination can mask this omission. The Windows copy list includes it.",
+  "source_sha256": {
+    "ports/graphshell/web/extension/bridge.html": "14a19d741a12d6f4e4c838e0ab7c8c4f3bfff9c1d3456b54052551989daf2446",
+    "ports/graphshell/web/extension/prepare-extension.sh": "f710c2511b2f6f294aa82a80fecbf920c110a9ea93c636b45134d0694d7fc5ef",
+    "ports/graphshell/web/extension/prepare-extension.ps1": "2e87b8607cbd955aeb6dfa0e6a86415c3f7b08e58eb28e5fd59e7661d5847bec",
+    "ports/graphshell/web/extension/bridge.js": "91431452da6817acecf7b6f3e895be4e415c668199379fc6f66626717bf18659"
+  },
+  "installer_executed": false,
+  "installed_browser_executed": false
+}

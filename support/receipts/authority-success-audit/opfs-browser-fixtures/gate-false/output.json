@@ -1,0 +1,29 @@
+{
+  "lanes": {
+    "lane1": {
+      "ok": true
+    }
+  },
+  "conclusions": {
+    "receipt_gate_passed": false,
+    "receipt_gate_failures": [
+      "AUDIT planted page error"
+    ]
+  },
+  "runner": {
+    "engine": "firefox",
+    "playwright": true,
+    "headless": true,
+    "lanes": [
+      "1"
+    ],
+    "per_lane": {
+      "lane 1": {
+        "ok": true,
+        "failed": false,
+        "error": null,
+        "seconds": 0
+      }
+    }
+  }
+}

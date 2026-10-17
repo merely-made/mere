@@ -1,0 +1,4 @@
+PASS valid signed foreign domain/resource covers and commits; normal scope and outside-scope controls checked
+PASS distinct raw Subject values collapse to one commit author and suppress another subject's wake; different-label control wakes
+PASS expired read grant still wakes and reveals matched seq; explicit removal control stops it
+PASS peek names one subject but drain returns it twice for overlapping watches; replay cursor control is quiet

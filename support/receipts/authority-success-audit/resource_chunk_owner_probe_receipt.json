@@ -1,0 +1,114 @@
+{
+  "date_utc": "2026-10-17T06:32:07.037224+00:00",
+  "source_sha256": {
+    "crates/chirograph/src/lib.rs": "45bb6c12d1c58f7f581221b55b0ea206292581db71445f391082b4a4f43ec778"
+  },
+  "libraries": {
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-8275ee1461e11550.rlib",
+      "sha256": "0067182a2aad0946759b128eda78c4317d5fa83aaae02696552f0969a265edf9",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/chirograph#0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\chirograph\\src\\lib.rs"
+    },
+    "pollster": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+      "sha256": "58d7c143682aaad275af4e6de898b1f7d7a2449bd6044bc309d19247b011a6a1",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#pollster@0.4.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pollster-0.4.0\\src\\lib.rs"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-9818b09a3e6c399e.rlib",
+      "sha256": "c13f8ce7ef2c94df9a09df88b63b606fb39a8f403df9eaaf57ee850066960c8d",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "raw_value",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.151\\src\\lib.rs"
+    },
+    "async_trait": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+      "sha256": "06aa9294ef54ae79b3c1339e7aaf5c547633182869bd5e63d69dae98ee675cd9",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#async-trait@0.1.92",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\async-trait-0.1.92\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\resource_chunk_owner_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-resource-chunk-owner-probe.exe",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-8275ee1461e11550.rlib",
+    "--extern",
+    "pollster=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-9818b09a3e6c399e.rlib",
+    "--extern",
+    "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "6fd91714caa582033be8dee2c85394ee6f6027760c8b43d06b0ac81a1646a7a2",
+  "test_exit": 0,
+  "tests": 3,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-resource-chunk-owner-probe.exe",
+      "bytes": 1415680,
+      "sha256": "6fd91714caa582033be8dee2c85394ee6f6027760c8b43d06b0ac81a1646a7a2"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-resource-chunk-owner-probe.pdb",
+      "bytes": 16846848,
+      "sha256": "a9b9ae69ae0f86b3c680a433dafed0691474961413b57c76fcc14ca0da0b8b62"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Actual shared Chirograph ResourceAssembly over the exact BLAKE3 fixture used by the complete JavaScript-copy diagnostic. Corrupt chunk and wrong whole-resource are rejected; valid frame succeeds. Exact retained Cargo-built shared library source unchanged from recorded70a15376 basis. No browser, installed resources, native host, renderer, transport or network."
+}

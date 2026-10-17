@@ -1,0 +1,164 @@
+{
+  "date_utc": "2026-10-17T06:51:01.830212+00:00",
+  "source_sha256": {
+    "ports/graphshell/src/capture.rs": "b0c9c757763e86c9cdae6023bef408aa3307fa6a71a0de6b8754a78ebec355a7",
+    "ports/graphshell/src/mere_host.rs": "4710737e3534d509644f008d1b3c12251f77fa5c69c2d8b598033dcd95bc36bd",
+    "ports/graphshell/src/access.rs": "3469385c14e8606661dd0edb7e716b6c4ddf0e6c27175b750490012417701776",
+    "ports/graphshell/src/product.rs": "1a2c674efe8877a92c10e31498e4b3382bdc81af117750d505c49b9193ab5c89",
+    "ports/graphshell/src/transfer.rs": "f708eafabbbe340d963f3fc4f6e16b82ea73bca875ef0cd4eaa1a9f986eeb7f1",
+    "ports/graphshell/src/presentation_binding.rs": "67a41ca563143d82fef951eb171c4a112350fdf45dd5b1fa35bbe52b03469cbe",
+    "ports/graphshell/src/link_inspection.rs": "13864c2ea8ea95b09c9de4d53f792197dfd368a740c5728d191d12f0a98ad896"
+  },
+  "libraries": {
+    "graphshell": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell-2aa01bfa91b623b0.rlib",
+      "sha256": "89f465ec24f930fe245ffeceed382d5042a394392b06f3b17a02bb13fc28396e",
+      "features": [
+        "web"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/ports/graphshell#0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\lib.rs"
+    },
+    "mere": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmere-dc9950649502fa1d.rlib",
+      "sha256": "036bd07761c65d5b364738f124d03246e00655091bf498b5060a57e4d491051f",
+      "features": [
+        "canvas",
+        "graph"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/mere#0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mere\\src\\lib.rs"
+    },
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-364b4c6f4c802c0a.rlib",
+      "sha256": "c242022cb18beefb6ae839adc423db8412d3eaa05efc788dea766657eee8b4bf",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-9b5e7083014ee214.rlib",
+      "sha256": "6bef0b1186834b03a03d34454f27393df59194f937bd104deaf563c299ab4105",
+      "features": [
+        "default",
+        "directory",
+        "json",
+        "redb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/muniment#0.1.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\muniment\\src\\lib.rs"
+    },
+    "pollster": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-e9053154d13e6499.rlib",
+      "sha256": "40c7cfb71039e09f24cc7189d93bc8d55ae41f34adb979b0b78ee0d357801d5a",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#pollster@1.0.1",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pollster-1.0.1\\src\\lib.rs"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.151\\src\\lib.rs"
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "sha256": "f8769e0a5c56f7dc70484b648b3979d34b971a535d314be659744d1da2f8303a",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\uuid-1.27.0\\src\\lib.rs"
+    },
+    "async_trait": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+      "sha256": "06aa9294ef54ae79b3c1339e7aaf5c547633182869bd5e63d69dae98ee675cd9",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#async-trait@0.1.92",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\async-trait-0.1.92\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\presentation_family_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-presentation-family-probe.exe",
+    "--extern",
+    "graphshell=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell-2aa01bfa91b623b0.rlib",
+    "--extern",
+    "mere=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmere-dc9950649502fa1d.rlib",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-364b4c6f4c802c0a.rlib",
+    "--extern",
+    "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-9b5e7083014ee214.rlib",
+    "--extern",
+    "pollster=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-e9053154d13e6499.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+    "--extern",
+    "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+    "--extern",
+    "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "b23a561b9ea9fd55cc5bcecb85d611e64aebe119bfa39cb9f3ceb25475f0525f",
+  "test_exit": 0,
+  "tests": 2,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-presentation-family-probe.exe",
+      "bytes": 8226304,
+      "sha256": "b23a561b9ea9fd55cc5bcecb85d611e64aebe119bfa39cb9f3ceb25475f0525f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-presentation-family-probe.pdb",
+      "bytes": 373485568,
+      "sha256": "9f76ef74f0185f63e8d9ad0a321b743f29594253250b1cf0e42e974ecade0fef"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Actual current Graphshell host, canonical link inspector and presentation binding APIs with synthetic in-memory graph. Containment counterexample and semantic positive control compare shared canonical predicate classification with the actual family fact supplied to rules. No renderer, browser, user graph or persistence trial."
+}

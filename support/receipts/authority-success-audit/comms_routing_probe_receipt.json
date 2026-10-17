@@ -1,0 +1,216 @@
+{
+  "date_utc": "2026-10-17T12:52:29.146871+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/shell/comms/Cargo.toml": "6d179e87bb9e19dbdb3235dfb1269245f0bd769cdc152e688cf4c9086ba69904",
+    "crates/shell/comms/src/adapter.rs": "4f99a03c895a77fbd8fcae4b4111b87b04f6134462a3188a45716a6842f8471a",
+    "crates/shell/comms/src/comms.rs": "e08fe190ab5e91425b2f10792186d3ed0c05b20f3aa4c0ed117e5f346f9af0a5",
+    "crates/shell/comms/src/in_memory.rs": "667b6e44aaac316e56b8d1c05f14e2e485d51bab9353898967068b731d707394",
+    "crates/shell/comms/src/lib.rs": "b69dc1376709c858e3a1f0656dcd906846f506b8872d522c14d6e7bfadc2765e",
+    "crates/shell/comms/src/misfin_adapter.rs": "690f07767622053b6b773415869a48fe5b925afbfc7babac858f398d45739018",
+    "crates/shell/comms/src/model.rs": "02fa7f2a9489d2c8d6e92311fdbc75c79764654b95c8bc8fa6d7cf0b9893ecce",
+    "crates/shell/comms/src/murm_adapter.rs": "7e4409b9e81b34bc94f17ff0bdc27aa6a5ba5c429b919bfab57f9f723b231e98",
+    "crates/shell/comms/src/pane.rs": "780994281c115c03e45de82f32dc2bc6ea16c94a38d3120e835af2ba2fc9b6bc",
+    "crates/shell/comms/src/tests.rs": "5ac2681a74661e5aa88b8d2c980c5c1c92194c4a32db99e1af7a0d684708e8b8"
+  },
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+      "sha256": "c23f7d7dd7ff77ed4a3d498dee89b3cbe2761bf4451a9267fef43b80102b7d7f",
+      "fingerprint_value": 17874236646337937021,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\serde-319fad388f9668c8\\lib-serde.json",
+      "metadata_sha256": "412543fde42acf0b2f010acc23d9e2c18323acfe03025c71c524887532b2123e"
+    },
+    "async_trait": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-62b6fb7145910b7f.dll",
+      "sha256": "f6fdf22e0cf284a043b44bd5a64d03c6480936025e008a36129e71507c2df63f",
+      "fingerprint_value": 109596474719808464,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\async-trait-62b6fb7145910b7f\\lib-async_trait.json",
+      "metadata_sha256": "b8a2208879e7256398df933fce0e46ab0ca8a927b838bd43af67dcf51d7ea6d9"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+      "sha256": "4ee2e2efcf90f61ce85a257fe3a6d707890eff440805fb2ede877eddee6ce791",
+      "fingerprint_value": 4249599500631641897,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\serde_json-f141e4af6929013b\\lib-serde_json.json",
+      "metadata_sha256": "c53dd2a6b645af1e3211851386033200777b5c544f91afcb4d778e9f5333e73b"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+      "sha256": "7e7647e8db91ea5aad887d653d9ca5ccc2eab8372973016a2ae68badfef297f6",
+      "features": [
+        "bytes",
+        "default",
+        "fs",
+        "io-std",
+        "io-util",
+        "libc",
+        "macros",
+        "mio",
+        "net",
+        "rt",
+        "rt-multi-thread",
+        "socket2",
+        "sync",
+        "test-util",
+        "time",
+        "tokio-macros",
+        "tracing",
+        "windows-sys"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-1.53.2\\src\\lib.rs"
+    }
+  },
+  "supplier_metadata": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\muniment-e5568116731b97d6\\lib-muniment.json",
+    "sha256": "cf09beca72f157a2e9c9024ed365d6dc4ab76065231051cd2ea2221deb388510"
+  },
+  "results": {
+    "owner_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--crate-name",
+        "comms_audit",
+        "--crate-type",
+        "rlib",
+        "--cfg",
+        "feature=\"test-support\"",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\shell\\comms\\src\\lib.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+        "--extern",
+        "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-62b6fb7145910b7f.dll",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\libauthority_success_comms_core.rlib"
+      ],
+      "exit": 0
+    },
+    "unit_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--test",
+        "--crate-name",
+        "comms_audit_tests",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\shell\\comms\\src\\lib.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+        "--extern",
+        "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-62b6fb7145910b7f.dll",
+        "--extern",
+        "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+        "--extern",
+        "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.exe"
+      ],
+      "exit": 1
+    },
+    "consumer_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\comms_routing_probe.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--extern",
+        "comms_audit=C:\\t\\cargo-targets\\mere\\libauthority_success_comms_core.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-comms-routing.exe"
+      ],
+      "exit": 0
+    },
+    "output": {
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\authority-success-comms-routing.exe"
+      ],
+      "exit": 0
+    }
+  },
+  "CARGO_PKG_VERSION": "0.0.1",
+  "original_core_tests": 0,
+  "audit_cases": 2,
+  "runner_sha256": "4cefa03cc2525e1d6691dfb990d70c4eae0b002523e75408b694da8fc9a08b90",
+  "probe_sha256": "e0dfc5156902b3a5931844d7a6bf766980f0b27c8287b65d4db6932587697bd5",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-routing.exe",
+      "bytes": 233984,
+      "sha256": "bdf8b4f271704f0ff7eb6ed763da4f85828395c761da128da1a6ecaf6bc0e1fa"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-routing.pdb",
+      "bytes": 1716224,
+      "sha256": "9da29119946bd95d921d89fae34bcda6afc8a497961156c2c07f27060b723309"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.c304whsi14lakplnthpdpccy6.rcgu.o",
+      "bytes": 1355,
+      "sha256": "0ac1a1300394ab247586261b04d797fc37dd45e20974e5e3e4bc24d5d8b28651"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.0.rcgu.o",
+      "bytes": 197754,
+      "sha256": "1172106d3c5ffec5fe364439c4239c9cda21cda45d333165feac601e51f0d019"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.1.rcgu.o",
+      "bytes": 138470,
+      "sha256": "cb1ae3869f7442dab06bb3c4272802e4226c93fc9e348a6441ce903467a4221a"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.2.rcgu.o",
+      "bytes": 199724,
+      "sha256": "579d759735056ce48c16cb9feb2784c230e2a0b2ec3c7291594195ba7c37e92b"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.3.rcgu.o",
+      "bytes": 130482,
+      "sha256": "2faeb3ae68fbcad3b71c29e57de91ca3b5e59171f229084902f0dcf37d9a910f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.4.rcgu.o",
+      "bytes": 102818,
+      "sha256": "029edc58b6f448b51ca43ce6b2546b84742cb875be4d205e355c2065a0c6a82e"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.5.rcgu.o",
+      "bytes": 178472,
+      "sha256": "6590a334e498cc7e149e49d2221251f65143ab246175fc7447c8a5e4aa988257"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.6.rcgu.o",
+      "bytes": 123609,
+      "sha256": "20d3fa9f70e64d6e28bf25956ccb00df6b396d62bc4980d1a852104ced130365"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.comms_audit_tests.d76d196488bb4835-cgu.7.rcgu.o",
+      "bytes": 126557,
+      "sha256": "e78b49c868900af08275f3cfa2c77862c0852e753acd8926db5c53eb6fcc6b7f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.pdb",
+      "bytes": 67584,
+      "sha256": "7088cf247eb92772664fff9592606e8708d9fb5b3b82ffcbbf49901ed0059986"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_comms_core.rlib",
+      "bytes": 1371664,
+      "sha256": "e5b12799a4cda0bc4857a83df5300a110b1b9d45ee0ebfe7e1b35cf1e983cd0d"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Unchanged complete portable Comms core freshly compiled with test-support and two exact retained direct suppliers. Original core tests additionally use exact retained Tokio/serde_json suppliers; optional Misfin/Murm adapters are source-reviewed but disabled and unexecuted. Two public routing cases use the supplied InMemoryAdapter, including its deterministic fake-send IDs and immediate ready futures; no real message authoring/delivery, external account, live inbox, network, hardware or fresh Cargo dependency graph."
+}

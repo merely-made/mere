@@ -1,0 +1,63 @@
+
+running 17 tests
+test churn::tests::each_generation_verifies_and_drops_two_back ... ok
+test churn::tests::fresh_database_is_generation_zero_and_ok ... ok
+test churn::tests::values_are_deterministic_and_distinct ... ok
+test fault::tests::cut_sweep_every_write_and_resize_recovers_a_committed_generation ... ok
+test fault::tests::error_faults_at_every_index_leave_a_reopenable_store ... ok
+test fault::tests::no_faults_completes_every_generation ... ok
+test fault::tests::shared_memory_extends_on_write_and_refuses_short_reads ... ok
+test idb_keys::tests::bound_admits_every_ascii_continuation_and_excludes_the_next_prefix ... ok
+test idb_keys::tests::carrying_past_del_drops_to_the_previous_byte ... ok
+test idb_keys::tests::prefix_bound_is_the_immediate_successor ... ok
+test idb_keys::tests::rust_and_utf16_orders_disagree_outside_the_bmp ... ok
+test idb_keys::tests::the_contract_refuses_what_it_cannot_order ... ok
+test redb_backend::tests::put_get_delete_list_scan_apply ... ok
+test tests::commands_reject_unknown_controls ... ok
+test tests::commands_round_trip_through_json ... ok
+test tests::reopen_defaults_its_shape ... ok
+test workload::tests::every_workload_digests_identically_across_backends ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.56s
+
+
+running 2 tests
+test content_oracle_equates_missing_listed_key_with_real_empty_value ... AUDIT real empty value and missing listed value produce identical digest/count: ("75e3547e97759ab9c6db854c2307b012dc45a32bb4a979eda2b44dd0803c7694", 1)
+ok
+test named_half_write_policies_actually_repeat_full_write ... AUDIT native=[0, 8, 8] browser=[0, 8, 8]; explicit torn_bytes=4 actually writes half of the eight-byte buffer
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Locking 2 packages to highest Rust 1.99.0 compatible versions
+    Updating muniment v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment) -> v0.1.2
+    Updating serde_json v1.0.151 -> v1.0.154
+   Compiling unicode-ident v1.0.24
+   Compiling find-msvc-tools v0.1.11
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling cc v1.4.4
+   Compiling syn v3.0.3
+   Compiling cfg-if v1.0.4
+   Compiling blake3 v1.8.7
+   Compiling cpufeatures v0.3.0
+   Compiling redb v4.2.0
+   Compiling getrandom v0.4.3
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling async-trait v0.1.92
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling pollster v0.4.0
+   Compiling tempfile v3.27.0
+   Compiling authority-success-opfs v0.0.0 (C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\cpu-opfs-runtime)
+    Finished `test` profile [unoptimized] target(s) in 14.30s
+     Running unittests ..\..\..\..\ports\muniment-opfs-probe\src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\muniment_opfs_probe-a9de082df269d784.exe)
+two_phase=false: 464 cut trials over 154 writes and 2 resizes; reopened at the preceding commit 436 times, at the completed commit 24 times; uninitialized (creation cut) 4 times: ["two_phase=false cut_at_write=1 torn=0", "two_phase=false cut_at_write=1 torn=9223372036854775807", "two_phase=false cut_at_write=1 torn=18446744073709551615", "two_phase=false cut_at_write=2 torn=0"]
+two_phase=true: 500 cut trials over 166 writes and 2 resizes; reopened at the preceding commit 469 times, at the completed commit 27 times; uninitialized (creation cut) 4 times: ["two_phase=true cut_at_write=1 torn=0", "two_phase=true cut_at_write=1 torn=9223372036854775807", "two_phase=true cut_at_write=1 torn=18446744073709551615", "two_phase=true cut_at_write=2 torn=0"]
+error faults: uninitialized (creation cut) cases: ["fail_write_at #1", "fail_write_at #2", "short_write_at #1", "fail_sync_at #1"]
+SmallSlots: 600 ops, 153600 bytes, 200 keys, phases [("put", 97), ("get", 1), ("overwrite", 103), ("digest", 1)]
+OrderedLog: 1051 ops, 192000 bytes, 1000 keys, phases [("put_shuffled", 527), ("scan_full", 0), ("scan_windows", 1), ("digest", 7)]
+LogBatched: 1051 ops, 256000 bytes, 2666 keys, phases [("apply_shuffled", 669), ("scan_full", 1), ("scan_windows", 1), ("digest", 21)]
+AtomicBatches: 200 ops, 457600 bytes, 601 keys, phases [("apply", 90), ("verify", 1), ("digest", 4)]
+LargeBlobs: 20 ops, 50331648 bytes, 10 keys, phases [("put", 866), ("get_verify", 8), ("digest", 8)]
+     Running ..\opfs_owner_probe.rs (C:/t/cargo-targets/mere/build\debug\deps\opfs_audit_contracts-dfb12c5bdca02976.exe)

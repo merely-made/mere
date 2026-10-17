@@ -1,0 +1,7 @@
+PASS separately inserted combining mark leaves caret beyond grapheme count and first Backspace deletes no text
+PASS second Backspace finally removes combined grapheme
+PASS precombined buffer control deletes the same grapheme in one Backspace
+PASS combining insertion before suffix jumps over b and next character appends after b
+PASS ordinary insertion control stays before suffix
+PASS no-op caret move clears composition and changes render while reporting false
+PASS explicit composition cancellation control reports true

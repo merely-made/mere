@@ -1,0 +1,13 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "2 public custody-flow observations pass: narrower issuance stores mismatching refs; missing wrapping key refuses only after durable payload writes; keyed retry positive control passes",
+  "reproduction_sha256": "7e09034e159fa97e7e622f5098eacd1914f5f4052a69657701a9fa929614a934",
+  "output_file": "castellan_wallet_output.txt",
+  "affected_sources": {
+    "ports/djinn/castellan/src/custody/wallet/issue.rs": "69754b7ab863a444732ed1062948ce19b1cc645520e7cc854b694d84bb3e0d7a",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "8dee1d1990108f0817b0d3d46963409d05f9e41a044a604db8c2bc13e28f60f6",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "ddf770538ed8dd84f7ffa1f2ee056932e97a75ee2cc128a9ca95feb79899181a"
+  },
+  "scope": "Public APIs with isolated temporary wallets and fixture keys, Windows native --features wallet, locked offline dependencies. No real profiles or credentials used. Network delivery/adversarial peer execution is not claimed."
+}

@@ -1,0 +1,60 @@
+{
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "type": "diagnostic observations of defects, not correctness tests",
+  "production_changes_this_pass": false,
+  "commands": [
+    {
+      "command": "cargo test -p chartulary --test audit_assertion_diagnostics --locked --offline --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+      "exit_code": 0,
+      "passed": 3,
+      "source": "chartulary_assertion_diagnostics.rs",
+      "output": "chartulary_assertion_output.txt"
+    },
+    {
+      "command": "cargo test -p mere-kernel --test audit_authority_current --locked --offline --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+      "exit_code": 0,
+      "passed": 4,
+      "source": "kernel_authority_current.rs",
+      "output": "kernel_authority_current_output.txt"
+    },
+    {
+      "command": "cargo test -p mere-kernel --test audit_frozen_admission --locked --offline --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+      "exit_code": 0,
+      "passed": 1,
+      "source": "kernel_frozen_admission.rs",
+      "output": "kernel_frozen_admission_output.txt"
+    }
+  ],
+  "source_hashes": {
+    "crates/eidetic/chartulary/src/commit.rs": "bf95703fc9ac6613863b88ff44e6fe5c6873273a132c83469e08e49aa617e36b",
+    "crates/eidetic/chartulary/src/spine.rs": "1046af3a0e478660bb3e371ef91bf989a7eef9b452563ef6ecffc750ec7bdaa2",
+    "crates/graph/graph-kernel/src/graph/capture.rs": "1aeb407f294163a2e28e2b46b9a08847df1483593896107065481a793659d74e",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "573493c06a6e68f6e2c64a2748ff43b985f783d578c61e40db11147d45f56048",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "0b8c9561353c1f7388faa2350e169afd1a8c429ad00b14e32e60852f70e927cc",
+    "crates/graph/graph-kernel/src/graph/import_records.rs": "4c9ce79a578f3c6d38c3ca05ae2eab20368d714e185f83c7ddd688c5effa7431",
+    "crates/graph/graph-kernel/src/graph/edge_payload.rs": "d16229d27b93c68edd1119880b9db0ed699d96b7a50bab52fff21cbcb2202b93",
+    "crates/graph/graph-kernel/src/graph/frozen_link.rs": "bd8dc6e728d6f0e2ef37d95ceb9c731854878e6292b16eca1231de039b430b95",
+    "crates/graph/graph-kernel/src/graph/frozen_selection.rs": "ba235f28a1861ff43fa531b3667ada7a9522c1865a2efd47f5683e1866661042",
+    "crates/graph/graph-kernel/src/graph/resource.rs": "6faf5c039a7a78e707b1359d0b83a29cec4aca413dc15066ddf9252c8ac4c081",
+    "crates/graph/graph-kernel/src/graph/edge_data.rs": "a4cd3773dd158d43e56268903e9a150870d2e349bfa9ea49aab34367cc1c925d",
+    "crates/graph/graph-kernel/src/graph/edge_ops.rs": "5f6dcf41c96ee6091e5d5012c35b2b074231dc6e540f44593cf325d82daf5b3b",
+    "crates/graph/graph-kernel/src/graph/edge_taxonomy.rs": "7cbc2453770be0917fe7fc3a0aa39aa897c6b69fc8de2fd5f3a721969c77a817",
+    "crates/graph/graph-kernel/src/graph/journal.rs": "75e6345ee7010c53bd8302045dc57733ef2553a79b2fe8db37a743565171a8d4",
+    "crates/graph/graph-kernel/src/graph/legacy_family_attribution.rs": "0449d7a734aa5f61cc2e17f2633724a38d2bd0271cd81bf98574c12065312855"
+  },
+  "controls": [
+    "Correct checkpoint matches durable journal.",
+    "Ahead-of-journal checkpoint now refuses.",
+    "Withdrawn generic projection has no held statements or topology.",
+    "Single-bucket link freezes successfully.",
+    "Duplicate exact copies pass checked Graph snapshot admission and frozen selection admission.",
+    "Refused link freeze adds no Resource."
+  ],
+  "cleanup": "Temporary integration copies removed after SHA-256 equality with preserved diagnostic sources. Shared target reused; no isolated target, Cargo home or worktree.",
+  "limits": [
+    "No production checkpoint caller found in Mere search; external users not checked.",
+    "New Q030 is public Chartulary batch behavior; Servitor petition delegates to that seam, but no product petition sequence reproduced.",
+    "Q002 old ahead-of-journal reproducer is addressed; same-length foreign checkpoint remains divergent.",
+    "Frozen link/selection discrepancy is public kernel behavior; product invocation on migrated parallel copies remains unqualified."
+  ]
+}

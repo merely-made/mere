@@ -1,0 +1,31 @@
+
+running 13 tests
+test camera_zoom_helper_clears_a_ctrl_key_that_is_still_held ... Programmatic zoom clears stored Ctrl; a subsequent wheel pans until the host sends Ctrl=true again
+ok
+test canceled_self_link_press_can_still_select_on_release ... pointer_cancel misses self_link_press; it reports no changed interaction and the later release still selects the link
+ok
+test degree_encodings_ignore_a_resource_link_that_the_shared_channel_counts ... Resource Cites contributes degree to the shared weight channel but not face size/height; Surface UserGrouped control grows and lifts the endpoint
+ok
+test exact_assertion_hide_disagrees_with_the_shared_topology_inspector ... The same dynamics inspection reports zero controller rows but one visible input row after exact assertion hide
+ok
+test explicit_pan_command_becomes_zoom_while_ctrl_is_held ... Explicit Pan shares the raw modifier-sensitive wheel path and zooms with Ctrl held; the released-key control does not zoom
+ok
+test fold_boundary_ignores_canonical_link_hide ... Canonical hide removes the source controller row but leaves its fold boundary route
+ok
+test fold_boundary_ignores_exact_assertion_hide ... Exact assertion hide removes the controller row but fold_routes counts and returns it
+ok
+test isolate_selection_omits_resource_neighbors ... Isolate promises immediate neighbors but follows Surface-only topology, excluding the Resource Cites endpoint; Surface control includes it
+ok
+test node_color_uses_a_stale_copy_of_the_canonical_palette ... Canvas chrome-facing color accessors use old hex constants while the canonical palette/CSS declarations use different RGB values
+ok
+test retired_field_still_emits_visual_coupling_paint ... Retirement leaves visual halo paint identical; this public painter has no active-field check while Canvas coupling-force rebuild does
+ok
+test selected_pair_unrelate_ignores_resource_semantics ... Pair Unrelate only enumerates Surface edge semantics; the same Cites is removable through the explicit member/selector action
+ok
+test size_mutation_restarts_the_controller_while_canvas_stays_paused ... A size mutation bypasses settle_physics, starts the backend budget and advances its clock while Canvas still reports paused
+ok
+test unsupported_root_weight_is_explicitly_refused_control ... Ruled-out candidate: shared derive refuses an unsupported weighted root before Canvas binding
+ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

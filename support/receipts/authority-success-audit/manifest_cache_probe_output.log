@@ -1,0 +1,11 @@
+
+running 3 tests
+test corrupt_declared_cache_bytes_are_rejected ... CONTROL: a declared cache hit still verifies its bytes against the manifest hash
+ok
+test fetched_cache_is_not_reused_without_a_matching_declared_local_source ... OBSERVATION: successful remote resolution writes valid canonical cache bytes, but the next offline resolution fails without reading them for remote-only or nonmatching-local manifests
+ok
+test matching_canonical_local_source_reuses_the_same_cache ... CONTROL: the canonical Local source makes the warm read succeed without another fetch
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

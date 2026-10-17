@@ -1,0 +1,11 @@
+{
+  "exit": 1,
+  "stage": "retained supplier lookup, before compilation or test fixtures",
+  "error": "FileNotFoundError: prior libsemver-9d5968e7bccfd5af.rlib no longer present; old build/debug dependency family absent",
+  "runner_sha256": "6a563984df98a44ef6a8cc023bd85517218654718fe4fa61ce3903dafac1fb7a",
+  "projection_files_created": [
+    "main_refresh_staging_production.rs",
+    "main_refresh_comparison_projection.rs"
+  ],
+  "qualification": "Prior test receipts are historical evidence; missing supplier artifacts cannot be revalidated or reused. No production edit, compilation, model test, installer or runtime fixture ran in this attempt."
+}

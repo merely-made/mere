@@ -1,0 +1,1201 @@
+{
+  "path": "ports/djinn/src/resident_mere.rs",
+  "git_basis": "70a153769ec5ef22b0af6a911a818518e073d946",
+  "git_blob_sha256": "eb9f6cdbca2f0fc2f4a6f0cd95d352ac0acb11d14eed0fb50627e1ec79478021",
+  "prior_coverage": {
+    "sha256": "15d8678ae5fe34aa26d4b2a521eef598f3570483c3fbb018c8bb8a648b973b26",
+    "through": 209215
+  },
+  "current_sha256": "084464e3291bd2fc893328ef4e8dfd7f811277a58dbedb707b53fc1b4eddd531",
+  "current_chars": 218638,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        5020
+      ],
+      "new_chars": [
+        0,
+        5020
+      ],
+      "text_sha256": "7b8afc1d2ac2349a27e9d017068f66de0d23adf3b357c5699a31ecbf26733d0f"
+    },
+    {
+      "old_chars": [
+        5020,
+        5235
+      ],
+      "new_chars": [
+        5117,
+        5332
+      ],
+      "text_sha256": "cf7fd262fe2995032efe00096572bf08304de62f20832557a05cfa2239e9b72e"
+    },
+    {
+      "old_chars": [
+        5235,
+        6164
+      ],
+      "new_chars": [
+        5376,
+        6305
+      ],
+      "text_sha256": "275f6d7ec305276055d54ead94b8d29b477cdafdbea0de25e21d5caa49d29c7a"
+    },
+    {
+      "old_chars": [
+        6207,
+        6420
+      ],
+      "new_chars": [
+        6358,
+        6571
+      ],
+      "text_sha256": "bfd6e74fc5b6c75b479b4d74f9d915eb3e44ed37d1492f93f1f0e8ee9b1a3ef5"
+    },
+    {
+      "old_chars": [
+        6558,
+        6565
+      ],
+      "new_chars": [
+        6747,
+        6754
+      ],
+      "text_sha256": "1419a6dcc04e213a3c7a77a456b01e76d1ef78cd00bbec1d8f81458fe93edc56"
+    },
+    {
+      "old_chars": [
+        6565,
+        7100
+      ],
+      "new_chars": [
+        7383,
+        7918
+      ],
+      "text_sha256": "6a7894d82f5c5da351a91e694cde8231190c88049aa424a58012d088a7b45b19"
+    },
+    {
+      "old_chars": [
+        7100,
+        12963
+      ],
+      "new_chars": [
+        7957,
+        13820
+      ],
+      "text_sha256": "8f586e7ad50789706750d20df6e9aab2216eae0464c60d06248ac88e11f6e806"
+    },
+    {
+      "old_chars": [
+        13182,
+        13773
+      ],
+      "new_chars": [
+        14093,
+        14684
+      ],
+      "text_sha256": "4829923805c15bf8a8165d22069831b8caa0ffd399ed25644fa0d4e3e9f86c58"
+    },
+    {
+      "old_chars": [
+        13773,
+        14878
+      ],
+      "new_chars": [
+        15261,
+        16366
+      ],
+      "text_sha256": "5ed81b0f2bbc12820ca4b969eec7078f8c688c86600bab0fb0ad69f02e3b60b6"
+    },
+    {
+      "old_chars": [
+        15113,
+        19358
+      ],
+      "new_chars": [
+        16504,
+        20749
+      ],
+      "text_sha256": "13b5811c35d219761b83c2c2cd5606b613ec43bf02e3a5fcec0380f8a50a9f8c"
+    },
+    {
+      "old_chars": [
+        19488,
+        25087
+      ],
+      "new_chars": [
+        20925,
+        26524
+      ],
+      "text_sha256": "516f90dc4c8cd92cd4b049e9e1efa4c12e141d45bffda1f1077d0bf997fd92c5"
+    },
+    {
+      "old_chars": [
+        25087,
+        28315
+      ],
+      "new_chars": [
+        26592,
+        29820
+      ],
+      "text_sha256": "9bb95a281bbbcff0da9ce05a9d2887389f897ed90b1d49b19dbbd546d20ca5e3"
+    },
+    {
+      "old_chars": [
+        28315,
+        63522
+      ],
+      "new_chars": [
+        30001,
+        65208
+      ],
+      "text_sha256": "bea465cffc1c4c4089395b4a102e3669de17c91c17b0fae44781e37b2ad99fe8"
+    },
+    {
+      "old_chars": [
+        63641,
+        82616
+      ],
+      "new_chars": [
+        65349,
+        84324
+      ],
+      "text_sha256": "8621f412ea8be66c36147fb828cc10652d77293f4ad98b485da0bceb7dbc0381"
+    },
+    {
+      "old_chars": [
+        82616,
+        86254
+      ],
+      "new_chars": [
+        85043,
+        88681
+      ],
+      "text_sha256": "a51abfd351d41c1bb20340a0e8094199dc7c4dedeaf6de5c73630bc577852f05"
+    },
+    {
+      "old_chars": [
+        86254,
+        104384
+      ],
+      "new_chars": [
+        91937,
+        110067
+      ],
+      "text_sha256": "161b1c692d10531cc0a1581a69e93d07843abe6f4716e9e68ec143e6c94e391f"
+    },
+    {
+      "old_chars": [
+        104500,
+        104542
+      ],
+      "new_chars": [
+        110184,
+        110226
+      ],
+      "text_sha256": "3ee488904e9f24114662678a03054498a12196243232acbb62487c7fb4af20ba"
+    },
+    {
+      "old_chars": [
+        104604,
+        107279
+      ],
+      "new_chars": [
+        110299,
+        112974
+      ],
+      "text_sha256": "6636c4c2ad2770405109798e7279ed67817991b9c9bc0b6c6692185f18c1f71f"
+    },
+    {
+      "old_chars": [
+        107415,
+        109233
+      ],
+      "new_chars": [
+        113098,
+        114916
+      ],
+      "text_sha256": "6603a6b95b88a8403410c43250b4e5957f439f31447accc6ecc3c1d5f2fe96c2"
+    },
+    {
+      "old_chars": [
+        109369,
+        110147
+      ],
+      "new_chars": [
+        115040,
+        115818
+      ],
+      "text_sha256": "93210ac7e206e73eb0e002508cdcb50653ce2d7bf2139175948a8c1dcd9efba6"
+    },
+    {
+      "old_chars": [
+        110234,
+        110977
+      ],
+      "new_chars": [
+        115947,
+        116690
+      ],
+      "text_sha256": "2b84d2ba934f4a361ad718c7ed6c974e0cb1db16918a1cf40b9770a05858b256"
+    },
+    {
+      "old_chars": [
+        111066,
+        111879
+      ],
+      "new_chars": [
+        116821,
+        117634
+      ],
+      "text_sha256": "332691dbce34376aadc25b221f21dcf2b722861619386f17b5c88c5c0fe7eec6"
+    },
+    {
+      "old_chars": [
+        111968,
+        121047
+      ],
+      "new_chars": [
+        117765,
+        126844
+      ],
+      "text_sha256": "941a0ff495c10565e6f4036d548c38b38e73acf909c49d0fbbb92cd7361af7a0"
+    },
+    {
+      "old_chars": [
+        121133,
+        123240
+      ],
+      "new_chars": [
+        127000,
+        129107
+      ],
+      "text_sha256": "5f0eb69ace4d44e9277d6c5f6e79c200bf0f95685dde534f0548776d8de3be01"
+    },
+    {
+      "old_chars": [
+        123320,
+        123461
+      ],
+      "new_chars": [
+        129107,
+        129248
+      ],
+      "text_sha256": "a624ec26a5e2a5f9e2f776781724d39d5f00593365c52eee13d6651c9802f71c"
+    },
+    {
+      "old_chars": [
+        123461,
+        156875
+      ],
+      "new_chars": [
+        129328,
+        162742
+      ],
+      "text_sha256": "997ad1373500b6dfa83bdb57a0993ad8e31cd4b6c55b5bbfc21dc04fff7c43c2"
+    },
+    {
+      "old_chars": [
+        157202,
+        157526
+      ],
+      "new_chars": [
+        163212,
+        163536
+      ],
+      "text_sha256": "92e6c232acf1ed2ca5f0ea71a82b7b72b5548724c67f2fa51cce67cec9a6340a"
+    },
+    {
+      "old_chars": [
+        157549,
+        157686
+      ],
+      "new_chars": [
+        163569,
+        163706
+      ],
+      "text_sha256": "3fb4a97f2f3dfb530c8a9920070c8577b0a19cd00101c447821c33643cef4297"
+    },
+    {
+      "old_chars": [
+        157776,
+        157899
+      ],
+      "new_chars": [
+        163833,
+        163956
+      ],
+      "text_sha256": "1a5d400b7b1f16bc7084fd95f246f4beb7e72c583bc378c33cfc469749ccfaa9"
+    },
+    {
+      "old_chars": [
+        157984,
+        158223
+      ],
+      "new_chars": [
+        164078,
+        164317
+      ],
+      "text_sha256": "0ed875d7fe17b47bed0b9a59c2d043e47247e1557c2724ef0592f7d66ba6ed51"
+    },
+    {
+      "old_chars": [
+        158517,
+        158558
+      ],
+      "new_chars": [
+        164825,
+        164866
+      ],
+      "text_sha256": "f028eed991518e79286aabfb585dbbed7dc4c3871805628de6c7bbcbb7a2462c"
+    },
+    {
+      "old_chars": [
+        158656,
+        189472
+      ],
+      "new_chars": [
+        167078,
+        197894
+      ],
+      "text_sha256": "20f583b13df74142b87aab7773410cb6c7b3d89f75e1c93873a8db277df15e8e"
+    },
+    {
+      "old_chars": [
+        189598,
+        190946
+      ],
+      "new_chars": [
+        198051,
+        199399
+      ],
+      "text_sha256": "42aacabaa153dd18e40a932c0cfff9c92162b28429524dff83747f14f9c16af3"
+    },
+    {
+      "old_chars": [
+        191015,
+        191203
+      ],
+      "new_chars": [
+        200206,
+        200394
+      ],
+      "text_sha256": "afa2dd0e3414bafde77fd498c0e4ee76b6980953e2d9d32b8f44ecbcb9cb9d05"
+    },
+    {
+      "old_chars": [
+        191274,
+        192519
+      ],
+      "new_chars": [
+        200510,
+        201755
+      ],
+      "text_sha256": "61610e8ddc0e7533f8b60619496c04b8231338afddee695bcf14b6fbbc945beb"
+    },
+    {
+      "old_chars": [
+        192581,
+        209215
+      ],
+      "new_chars": [
+        202004,
+        218638
+      ],
+      "text_sha256": "1de7dde2d09d2fa83b00542c12f68e2d3532ee7e4b6eab79c9649f0b782c7883"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "insert",
+      "old_lines": [
+        106,
+        105
+      ],
+      "new_lines": [
+        106,
+        107
+      ],
+      "old_chars": [
+        5020,
+        5020
+      ],
+      "new_chars": [
+        5020,
+        5117
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        113,
+        112
+      ],
+      "new_lines": [
+        115,
+        115
+      ],
+      "old_chars": [
+        5235,
+        5235
+      ],
+      "new_chars": [
+        5332,
+        5376
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        132,
+        132
+      ],
+      "new_lines": [
+        135,
+        136
+      ],
+      "old_chars": [
+        6164,
+        6207
+      ],
+      "new_chars": [
+        6305,
+        6358
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        138,
+        138
+      ],
+      "new_lines": [
+        142,
+        145
+      ],
+      "old_chars": [
+        6420,
+        6558
+      ],
+      "new_chars": [
+        6571,
+        6747
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        140,
+        139
+      ],
+      "new_lines": [
+        147,
+        160
+      ],
+      "old_chars": [
+        6565,
+        6565
+      ],
+      "new_chars": [
+        6754,
+        7383
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        157,
+        156
+      ],
+      "new_lines": [
+        178,
+        178
+      ],
+      "old_chars": [
+        7100,
+        7100
+      ],
+      "new_chars": [
+        7918,
+        7957
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        288,
+        289
+      ],
+      "new_lines": [
+        310,
+        315
+      ],
+      "old_chars": [
+        12963,
+        13182
+      ],
+      "new_chars": [
+        13820,
+        14093
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        302,
+        301
+      ],
+      "new_lines": [
+        328,
+        339
+      ],
+      "old_chars": [
+        13773,
+        13773
+      ],
+      "new_chars": [
+        14684,
+        15261
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        327,
+        334
+      ],
+      "new_lines": [
+        365,
+        366
+      ],
+      "old_chars": [
+        14878,
+        15113
+      ],
+      "new_chars": [
+        16366,
+        16504
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        459,
+        459
+      ],
+      "new_lines": [
+        491,
+        495
+      ],
+      "old_chars": [
+        19358,
+        19488
+      ],
+      "new_chars": [
+        20749,
+        20925
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        595,
+        594
+      ],
+      "new_lines": [
+        631,
+        631
+      ],
+      "old_chars": [
+        25087,
+        25087
+      ],
+      "new_chars": [
+        26524,
+        26592
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        685,
+        684
+      ],
+      "new_lines": [
+        722,
+        725
+      ],
+      "old_chars": [
+        28315,
+        28315
+      ],
+      "new_chars": [
+        29820,
+        30001
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        1556,
+        1556
+      ],
+      "new_lines": [
+        1597,
+        1599
+      ],
+      "old_chars": [
+        63522,
+        63641
+      ],
+      "new_chars": [
+        65208,
+        65349
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        1989,
+        1988
+      ],
+      "new_lines": [
+        2032,
+        2044
+      ],
+      "old_chars": [
+        82616,
+        82616
+      ],
+      "new_chars": [
+        84324,
+        85043
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        2091,
+        2090
+      ],
+      "new_lines": [
+        2147,
+        2212
+      ],
+      "old_chars": [
+        86254,
+        86254
+      ],
+      "new_chars": [
+        88681,
+        91937
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2547,
+        2548
+      ],
+      "new_lines": [
+        2669,
+        2670
+      ],
+      "old_chars": [
+        104384,
+        104500
+      ],
+      "new_chars": [
+        110067,
+        110184
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2550,
+        2551
+      ],
+      "new_lines": [
+        2672,
+        2674
+      ],
+      "old_chars": [
+        104542,
+        104604
+      ],
+      "new_chars": [
+        110226,
+        110299
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2608,
+        2610
+      ],
+      "new_lines": [
+        2731,
+        2732
+      ],
+      "old_chars": [
+        107279,
+        107415
+      ],
+      "new_chars": [
+        112974,
+        113098
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2650,
+        2652
+      ],
+      "new_lines": [
+        2772,
+        2773
+      ],
+      "old_chars": [
+        109233,
+        109369
+      ],
+      "new_chars": [
+        114916,
+        115040
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2668,
+        2668
+      ],
+      "new_lines": [
+        2789,
+        2792
+      ],
+      "old_chars": [
+        110147,
+        110234
+      ],
+      "new_chars": [
+        115818,
+        115947
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2685,
+        2685
+      ],
+      "new_lines": [
+        2809,
+        2812
+      ],
+      "old_chars": [
+        110977,
+        111066
+      ],
+      "new_chars": [
+        116690,
+        116821
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2712,
+        2712
+      ],
+      "new_lines": [
+        2839,
+        2842
+      ],
+      "old_chars": [
+        111879,
+        111968
+      ],
+      "new_chars": [
+        117634,
+        117765
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        2944,
+        2944
+      ],
+      "new_lines": [
+        3074,
+        3079
+      ],
+      "old_chars": [
+        121047,
+        121133
+      ],
+      "new_chars": [
+        126844,
+        127000
+      ]
+    },
+    {
+      "kind": "delete",
+      "old_lines": [
+        3005,
+        3005
+      ],
+      "new_lines": [
+        3140,
+        3139
+      ],
+      "old_chars": [
+        123240,
+        123320
+      ],
+      "new_chars": [
+        129107,
+        129107
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        3010,
+        3009
+      ],
+      "new_lines": [
+        3144,
+        3144
+      ],
+      "old_chars": [
+        123461,
+        123461
+      ],
+      "new_chars": [
+        129248,
+        129328
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        3814,
+        3816
+      ],
+      "new_lines": [
+        3949,
+        3962
+      ],
+      "old_chars": [
+        156875,
+        157202
+      ],
+      "new_chars": [
+        162742,
+        163212
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        3821,
+        3821
+      ],
+      "new_lines": [
+        3967,
+        3968
+      ],
+      "old_chars": [
+        157526,
+        157549
+      ],
+      "new_chars": [
+        163536,
+        163569
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        3824,
+        3824
+      ],
+      "new_lines": [
+        3971,
+        3974
+      ],
+      "old_chars": [
+        157686,
+        157776
+      ],
+      "new_chars": [
+        163706,
+        163833
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        3827,
+        3827
+      ],
+      "new_lines": [
+        3977,
+        3980
+      ],
+      "old_chars": [
+        157899,
+        157984
+      ],
+      "new_chars": [
+        163956,
+        164078
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        3832,
+        3834
+      ],
+      "new_lines": [
+        3985,
+        3997
+      ],
+      "old_chars": [
+        158223,
+        158517
+      ],
+      "new_chars": [
+        164317,
+        164825
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        3836,
+        3836
+      ],
+      "new_lines": [
+        3999,
+        4041
+      ],
+      "old_chars": [
+        158558,
+        158656
+      ],
+      "new_chars": [
+        164866,
+        167078
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        4622,
+        4623
+      ],
+      "new_lines": [
+        4827,
+        4828
+      ],
+      "old_chars": [
+        189472,
+        189598
+      ],
+      "new_chars": [
+        197894,
+        198051
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        4661,
+        4661
+      ],
+      "new_lines": [
+        4866,
+        4885
+      ],
+      "old_chars": [
+        190946,
+        191015
+      ],
+      "new_chars": [
+        199399,
+        200206
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        4668,
+        4668
+      ],
+      "new_lines": [
+        4892,
+        4893
+      ],
+      "old_chars": [
+        191203,
+        191274
+      ],
+      "new_chars": [
+        200394,
+        200510
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        4697,
+        4697
+      ],
+      "new_lines": [
+        4922,
+        4925
+      ],
+      "old_chars": [
+        192519,
+        192581
+      ],
+      "new_chars": [
+        201755,
+        202004
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 102,
+      "new_start_line": 102,
+      "text": " pub struct MereRoutes {\r\n     inner: Arc<Routes>,\r\n }\r\n \r\n+type ProfileLookup = Arc<dyn Fn(&personae::ProfileId) -> Result<bool, String> + Send + Sync>;\r\n+\r\n struct Routes {\r\n     shared_root: PathBuf,\r\n     persona: PersonaId,\r\n     catalog: AppEndpointCatalog,\r\n     grants: AppRouteGrants,\r\n     apps: Vec<AppId>,\r\n     validators: BTreeMap<String, pandect::GraphValidator>,\r\n+    profile_lookup: Option<ProfileLookup>,\r\n     /// The dialable projection host's catalog, when one serves these routes\r\n     /// to remote peers (remote mere route admission note, \u00a76).\r\n     remote: Option<graphshell_host::projection_host::SharedCatalog>,\r\n     served: Mutex<BTreeMap<String, Arc<MereShared>>>,\r\n"
+    },
+    {
+      "old_start_line": 128,
+      "new_start_line": 131,
+      "text": "             Arc::new(|graph| {\r\n                 cleromancy_domain::host::validate_divination_graph(graph)\r\n                     .map_err(|error| error.to_string())\r\n             }),\r\n-        ).with_personal_facts_authority()\r\n+        )\r\n+        .with_personal_facts_authority()\r\n     }\r\n \r\n     /// Install the same biographical-fact rules in daemon and embedded owners.\r\n     pub fn with_personal_facts_authority(self) -> Self {\r\n         let persona = self.inner.persona.as_uuid().to_string();\r\n-        self.with_domain_validator(personal_facts::DOMAIN, Arc::new(move |graph| personal_facts::validate_for_persona(graph, &persona)))\r\n+        self.with_domain_validator(\r\n+            personal_facts::DOMAIN,\r\n+            Arc::new(move |graph| personal_facts::validate_for_persona(graph, &persona)),\r\n+        )\r\n     }\r\n+    /// Resolve newly introduced profile subjects through the actual owner vault.\r\n+    /// Existing admitted references continue to replay after profile deletion.\r\n+    pub fn with_profile_subject_authority<S: castellan::custody::IdentityStorage + 'static>(\r\n+        mut self,\r\n+        host: Arc<castellan::authority::PersonaeHost<S>>,\r\n+    ) -> Self {\r\n+        Arc::get_mut(&mut self.inner)\r\n+            .expect(\"set profile authority before serving routes\")\r\n+            .profile_lookup = Some(Arc::new(move |id| {\r\n+            Ok(host.with_profile_authority(id, || true).unwrap_or(false))\r\n+        }));\r\n+        self\r\n+    }\r\n+\r\n     /// Routes for `persona`'s meres, registered in `catalog` and granted to\r\n     /// `apps` as each is served.\r\n     pub fn new(\r\n         shared_root: PathBuf,\r\n"
+    },
+    {
+      "old_start_line": 153,
+      "new_start_line": 174,
+      "text": "                 catalog,\r\n                 grants,\r\n                 apps,\r\n                 validators: BTreeMap::new(),\r\n+                profile_lookup: None,\r\n                 remote: None,\r\n                 served: Mutex::new(BTreeMap::new()),\r\n                 access: Mutex::new(BTreeMap::new()),\r\n                 access_loaded: AtomicBool::new(false),\r\n"
+    },
+    {
+      "old_start_line": 284,
+      "new_start_line": 306,
+      "text": "         }\r\n         let domain = mere.domain.to_string();\r\n         // Product records must never be writable under generic graph authority.\r\n         // Both daemon and embedded composition install the same product callback.\r\n-        if matches!(domain.as_str(), \"divination\" | \"personal-facts\") && !self.inner.validators.contains_key(&domain) {\r\n-            return Err(format!(\"{domain} domain authority is not composed into this resident\"));\r\n+        if matches!(domain.as_str(), \"divination\" | \"personal-facts\")\r\n+            && !self.inner.validators.contains_key(&domain)\r\n+        {\r\n+            return Err(format!(\r\n+                \"{domain} domain authority is not composed into this resident\"\r\n+            ));\r\n         }\r\n         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)\r\n             .map_err(|error| error.to_string())?;\r\n         let mut served = self.inner.served.lock().await;\r\n"
+    },
+    {
+      "old_start_line": 298,
+      "new_start_line": 324,
+      "text": "             .map_err(|error| error.to_string())?;\r\n         let shared = Arc::new(MereShared {\r\n             domain: domain.clone(),\r\n             validator: self.inner.validators.get(&domain).cloned(),\r\n+            admission_validator: if domain == personal_facts::DOMAIN {\r\n+                let lookup = self.inner.profile_lookup.clone();\r\n+                Some(Arc::new(move |before, after| {\r\n+                    personal_facts::validate_new_profile_subjects(before, after, |id| match &lookup\r\n+                    {\r\n+                        Some(resolve) => resolve(id),\r\n+                        None => Err(\"profile subjects require the resident vault authority\".into()),\r\n+                    })\r\n+                }))\r\n+            } else {\r\n+                None\r\n+            },\r\n             archive: open_mere_archive_backend(\r\n                 &self.inner.shared_root,\r\n                 self.inner.persona,\r\n                 mere.id,\r\n"
+    },
+    {
+      "old_start_line": 323,
+      "new_start_line": 361,
+      "text": "         if let Some(remote) = &self.inner.remote {\r\n             let mut remote = remote\r\n                 .lock()\r\n                 .map_err(|_| \"the remote catalog lock is poisoned\".to_string())?;\r\n-            register_mere_routes(\r\n-                &mut remote,\r\n-                &route,\r\n-                &ambient,\r\n-                &shared,\r\n-                &grants,\r\n-            )\r\n-            .map_err(|error| error.to_string())?;\r\n+            register_mere_routes(&mut remote, &route, &ambient, &shared, &grants)\r\n+                .map_err(|error| error.to_string())?;\r\n         }\r\n         for app in &self.inner.apps {\r\n             self.inner.grants.grant(app.clone(), route.clone());\r\n         }\r\n"
+    },
+    {
+      "old_start_line": 455,
+      "new_start_line": 487,
+      "text": "         if self.ambient && request.session.0 != MERE_GRAPH {\r\n             return Err(\"ambient routes expose graph material only\".into());\r\n         }\r\n         let mut snapshot = self.endpoint.snapshot(request)?;\r\n-        if matches!(self.endpoint.shared.domain.as_str(), \"divination\" | \"personal-facts\") && snapshot.session.0 == MERE_GRAPH {\r\n+        if matches!(\r\n+            self.endpoint.shared.domain.as_str(),\r\n+            \"divination\" | \"personal-facts\"\r\n+        ) && snapshot.session.0 == MERE_GRAPH\r\n+        {\r\n             for binding in &snapshot.presentation.bindings {\r\n                 if binding.instance != InstanceId(0) {\r\n                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {\r\n                         for offer in offers {\r\n"
+    },
+    {
+      "old_start_line": 591,
+      "new_start_line": 627,
+      "text": " /// attached to.\r\n struct MereShared {\r\n     domain: String,\r\n     validator: Option<pandect::GraphValidator>,\r\n+    admission_validator: Option<pandect::GraphAdmissionValidator>,\r\n     backend: DirectoryBackend,\r\n     archive: RedbBackend,\r\n     persona: PersonaId,\r\n     hosts: Mutex<HashMap<SessionId, SharedHost>>,\r\n"
+    },
+    {
+      "old_start_line": 681,
+      "new_start_line": 718,
+      "text": "         .await\r\n         .map_err(|error| error.to_string())?\r\n         .with_projection_session(ProjectionSession(MERE_GRAPH.to_string()))\r\n         .with_session_item();\r\n+        let host = match &self.admission_validator {\r\n+            Some(validator) => host.with_graph_admission_validator(validator.clone()),\r\n+            None => host,\r\n+        };\r\n         let host = Arc::new(Mutex::new(host));\r\n         hosts.insert(id, Arc::clone(&host));\r\n         Ok(host)\r\n     }\r\n"
+    },
+    {
+      "old_start_line": 1552,
+      "new_start_line": 1593,
+      "text": "         })\r\n     }\r\n \r\n     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {\r\n-        if matches!(self.shared.domain.as_str(), \"divination\" | \"personal-facts\") && intent.target != InstanceId(0) {\r\n+        if matches!(self.shared.domain.as_str(), \"divination\" | \"personal-facts\")\r\n+            && intent.target != InstanceId(0)\r\n+        {\r\n             return Ok(IntentResult::Rejected {\r\n                 reason: \"domain writes require a complete journaled session candidate\".into(),\r\n             });\r\n         }\r\n"
+    },
+    {
+      "old_start_line": 1985,
+      "new_start_line": 2028,
+      "text": "             catalog.clone(),\r\n             grants.clone(),\r\n             vec![AppId::new(\"turnstone\"), AppId::new(\"knot-editor\")],\r\n         );\r\n+        let storage = castellan::custody::InMemoryStorage::new();\r\n+        let profile = castellan::custody::Profile::new(\r\n+            personae::ProfileId(\"fixture-profile\".into()),\r\n+            \"Public fixture profile\",\r\n+            personae::Ed25519Keypair::from_seed([0x33; 32]),\r\n+        );\r\n+        castellan::custody::IdentityStorage::save_profile(&storage, &profile).unwrap();\r\n+        let owner = Arc::new(castellan::authority::PersonaeHost::new(\r\n+            castellan::custody::IdentityVault::with_profile(storage, profile),\r\n+            None,\r\n+            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,\r\n+        ));\r\n+        let routes = routes.with_profile_subject_authority(owner);\r\n         let routes = if let Some(validator) = validator {\r\n             routes.with_domain_validator(domain, validator)\r\n         } else {\r\n             routes.with_divination_authority()\r\n"
+    },
+    {
+      "old_start_line": 2087,
+      "new_start_line": 2143,
+      "text": "     }\r\n \r\n     fn nodes(snapshot: &ProjectionSnapshot) -> usize {\r\n         snapshot.scene.active_items_in_order().len() - 1\r\n+    }\r\n+\r\n+    #[tokio::test(flavor = \"multi_thread\")]\r\n+    async fn natal_product_authority_admits_replay_and_refuses_tampering_across_apps() {\r\n+        let fixture = fixture(0x4e4154, \"divination\").await;\r\n+        let mut product = fixture.attach(\"turnstone\").await;\r\n+        let mut other = fixture.attach(\"knot-editor\").await;\r\n+        let initial = graph(&mut product);\r\n+        let mut candidate = disclosed_graph(&mut product, &initial)\r\n+            .into_graph()\r\n+            .unwrap();\r\n+        let captured = Arc::new(std::sync::Mutex::new(Vec::new()));\r\n+        let held = captured.clone();\r\n+        candidate.set_recorder(Some(Arc::new(move |delta| {\r\n+            held.lock().unwrap().push(delta.clone())\r\n+        })));\r\n+        let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({\"schema\":\"dramatis.birth-facts/v1\",\"subject\":{\"Profile\":{\"id\":\"public-natal-subject\"}},\"date\":{\"year\":2000,\"month\":1,\"day\":1},\"time\":{\"Known\":{\"hour\":12,\"minute\":0,\"second\":0}},\"place\":null,\"timezone\":\"UTC\",\"source\":{\"label\":\"Public product-authority fixture\",\"reference\":null}})).unwrap();\r\n+        let birth = personal_facts::birth_resource(&facts).unwrap();\r\n+        let record = cleromancy_domain::natal::NatalReading::new(\r\n+            \"public-source-persona\".into(),\r\n+            \"Public natal subject\".into(),\r\n+            birth,\r\n+            \"A synthetic natal question\".into(),\r\n+            cleromancy_domain::natal::FoldChoice::Refuse,\r\n+            1792149302000,\r\n+            \"00000000000000000000000000000008\".into(),\r\n+        )\r\n+        .unwrap();\r\n+        let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();\r\n+        host.insert_natal_reading(&record).unwrap();\r\n+        assert_eq!(\r\n+            product\r\n+                .invoke(apply(&initial, captured.lock().unwrap().clone()))\r\n+                .unwrap(),\r\n+            IntentResult::Accepted\r\n+        );\r\n+        let shared = graph(&mut other);\r\n+        let current = disclosed_graph(&mut other, &shared);\r\n+        let host =\r\n+            cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())\r\n+                .unwrap();\r\n+        assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);\r\n+        let mut bad = record.clone();\r\n+        bad.question = \"Tampered under the sealed id\".into();\r\n+        assert!(matches!(\r\n+            other\r\n+                .invoke(apply(\r\n+                    &shared,\r\n+                    vec![pandect::CapturedDelta::ReplaySetNodeFacetById {\r\n+                        node_id: kernel::graph::Graph::node_namespace_id(&format!(\r\n+                            \"cleromancy://natal/{}\",\r\n+                            record.id\r\n+                        ))\r\n+                        .to_string(),\r\n+                        facet: cleromancy_domain::natal::NATAL_FACET.into(),\r\n+                        value_json: serde_json::to_string(&bad).unwrap()\r\n+                    }]\r\n+                ))\r\n+                .unwrap(),\r\n+            IntentResult::Rejected { .. }\r\n+        ));\r\n+        let after = graph(&mut other);\r\n+        assert_eq!(\r\n+            serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),\r\n+            serde_json::to_value(current).unwrap()\r\n+        );\r\n     }\r\n \r\n     #[tokio::test(flavor = \"multi_thread\")]\r\n     async fn two_applications_edit_one_session_and_hear_each_other() {\r\n"
+    },
+    {
+      "old_start_line": 2543,
+      "new_start_line": 2665,
+      "text": "             use personae::IdentityProvider;\r\n             use transport::PeerID;\r\n             let device_peer =\r\n                 PeerID::from_bytes(&self.device.master_public_key().to_bytes()).unwrap();\r\n-            let host_peer =\r\n-                PeerID::from_bytes(&personae::InMemoryProvider::from_seed([0x66; 32])\r\n+            let host_peer = PeerID::from_bytes(\r\n+                &personae::InMemoryProvider::from_seed([0x66; 32])\r\n                     .master_public_key()\r\n-                    .to_bytes())\r\n-                .unwrap();\r\n+                    .to_bytes(),\r\n+            )\r\n+            .unwrap();\r\n             let (server, client) = transport::memory::MemoryTransport::pair(host_peer, device_peer);\r\n             let hello = graphshell_host::admission::open_session_for(\r\n                 &self.device,\r\n                 self.network,\r\n"
+    },
+    {
+      "old_start_line": 2604,
+      "new_start_line": 2727,
+      "text": "         let stream = dialler\r\n             .dial(&mut host, &request, grant)\r\n             .await\r\n             .expect(\"the device is admitted\");\r\n-        let profile = chirograph::CapabilityProfile::new([\r\n-            chirograph::PresentationCapability::PortableCard,\r\n-        ]);\r\n+        let profile =\r\n+            chirograph::CapabilityProfile::new([chirograph::PresentationCapability::PortableCard]);\r\n         let mut pump = LinePump::new(stream);\r\n         let opened = pump.open(profile.clone()).await.expect(\"the route opens\");\r\n         let mut panel =\r\n             MereRouteSession::from_descriptor(opened.descriptor, profile, \"turnstone\").unwrap();\r\n"
+    },
+    {
+      "old_start_line": 2646,
+      "new_start_line": 2768,
+      "text": "         assert_eq!(\r\n             writer.invoke(apply(&start, vec![node(1)])).unwrap(),\r\n             IntentResult::Accepted\r\n         );\r\n-        let profile = chirograph::CapabilityProfile::new([\r\n-            chirograph::PresentationCapability::PortableCard,\r\n-        ]);\r\n+        let profile =\r\n+            chirograph::CapabilityProfile::new([chirograph::PresentationCapability::PortableCard]);\r\n \r\n         // The grant names knot-editor; the hello asks as turnstone. The chain\r\n         // covers the path no more than it covers the application: refused at\r\n         // the handshake.\r\n"
+    },
+    {
+      "old_start_line": 2664,
+      "new_start_line": 2785,
+      "text": " \r\n         // A broad grant (every mere) admits nothing here: the leaf must name\r\n         // the application.\r\n         let grant = dialler.grant(mere_overmap::wire::REMOTE_MERE_SERVICE, \"connect\");\r\n-        let stream = dialler.dial(&mut host, &asked, grant).await.expect(\"admitted\");\r\n+        let stream = dialler\r\n+            .dial(&mut host, &asked, grant)\r\n+            .await\r\n+            .expect(\"admitted\");\r\n         assert!(\r\n             LinePump::new(stream).open(profile.clone()).await.is_err(),\r\n             \"a grant that names no application serves no route\"\r\n         );\r\n"
+    },
+    {
+      "old_start_line": 2681,
+      "new_start_line": 2805,
+      "text": " \r\n         // An ambient grant for an application the owner has not opted in:\r\n         // admitted, but the route will not open for it.\r\n         let grant = dialler.grant(&ambient.path(), ambient.action());\r\n-        let stream = dialler.dial(&mut host, &ambient, grant).await.expect(\"admitted\");\r\n+        let stream = dialler\r\n+            .dial(&mut host, &ambient, grant)\r\n+            .await\r\n+            .expect(\"admitted\");\r\n         assert!(\r\n             LinePump::new(stream).open(profile.clone()).await.is_err(),\r\n             \"ambient needs the owner's opt-in\"\r\n         );\r\n"
+    },
+    {
+      "old_start_line": 2708,
+      "new_start_line": 2835,
+      "text": "             )\r\n             .await\r\n             .unwrap();\r\n         let grant = dialler.grant(&ambient.path(), ambient.action());\r\n-        let stream = dialler.dial(&mut host, &ambient, grant).await.expect(\"admitted\");\r\n+        let stream = dialler\r\n+            .dial(&mut host, &ambient, grant)\r\n+            .await\r\n+            .expect(\"admitted\");\r\n         let opened = LinePump::new(stream)\r\n             .open(profile)\r\n             .await\r\n             .expect(\"the ambient route opens once opted in\");\r\n"
+    },
+    {
+      "old_start_line": 2940,
+      "new_start_line": 3070,
+      "text": "                 .unwrap(),\r\n             None,\r\n             \"the route takes Knot's merge into source\"\r\n         );\r\n-        let pending = overlay.read().await.unwrap().merge.expect(\"a pending merge\");\r\n+        let pending = overlay\r\n+            .read()\r\n+            .await\r\n+            .unwrap()\r\n+            .merge\r\n+            .expect(\"a pending merge\");\r\n         assert_eq!(pending.source, branch);\r\n         assert_eq!(pending.conflicts.len(), 1, \"the title conflicts\");\r\n         let key = pending.conflicts[0].key.clone();\r\n         assert_eq!(pending.conflicts[0].chosen, None);\r\n"
+    },
+    {
+      "old_start_line": 3001,
+      "new_start_line": 3136,
+      "text": " \r\n     #[tokio::test(flavor = \"multi_thread\")]\r\n     async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {\r\n         use crate::door::app_broker::serve_app_broker;\r\n-        use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;\r\n         use castellan::{\r\n             authority::PersonaeHost,\r\n             custody::{IdentityVault, InMemoryStorage, Profile},\r\n         };\r\n+        use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;\r\n         use graphshell_endpoint::door::tasks::ResidentTasks;\r\n         use personae::{Ed25519Keypair, ProfileId};\r\n         let fixture = fixture(33, \"divination\").await;\r\n         fixture\r\n"
+    },
+    {
+      "old_start_line": 3810,
+      "new_start_line": 3945,
+      "text": "         let start = graph(&mut first);\r\n         let mut candidate = disclosed_graph(&mut first, &start).into_graph().unwrap();\r\n         let edits = Arc::new(std::sync::Mutex::new(Vec::new()));\r\n         let held = edits.clone();\r\n-        candidate.set_recorder(Some(Arc::new(move |d| held.lock().unwrap().push(d.clone()))));\r\n-        let scope = fixture.reservoir.meres().await[0].persona.as_uuid().to_string();\r\n-        let subject = personal_facts::create_contact(&mut candidate, &scope, gaz::LocalId::from_random([3;16]), \"Synthetic subject\").unwrap();\r\n+        candidate.set_recorder(Some(Arc::new(move |d| {\r\n+            held.lock().unwrap().push(d.clone())\r\n+        })));\r\n+        let scope = fixture.reservoir.meres().await[0]\r\n+            .persona\r\n+            .as_uuid()\r\n+            .to_string();\r\n+        let subject = personal_facts::create_contact(\r\n+            &mut candidate,\r\n+            &scope,\r\n+            gaz::LocalId::from_random([3; 16]),\r\n+            \"Synthetic subject\",\r\n+        )\r\n+        .unwrap();\r\n         let facts: dramatis::birth::BirthFacts = serde_json::from_value(serde_json::json!({\r\n             \"schema\":\"dramatis.birth-facts/v1\", \"subject\":subject,\r\n             \"date\":{\"year\":2000,\"month\":1,\"day\":1}, \"time\":\"Unknown\",\r\n             \"place\":null,\"timezone\":null,\"source\":{\"label\":\"Public test\",\"reference\":null}\r\n-        })).unwrap();\r\n+        }))\r\n+        .unwrap();\r\n         let expected = personal_facts::save_birth(&mut candidate, &facts).unwrap();\r\n         let steps = edits.lock().unwrap().clone();\r\n-        assert_eq!(first.invoke(apply(&start, steps)).unwrap(), IntentResult::Accepted);\r\n+        assert_eq!(\r\n+            first.invoke(apply(&start, steps)).unwrap(),\r\n+            IntentResult::Accepted\r\n+        );\r\n         let shared = graph(&mut second);\r\n         let data = disclosed_graph(&mut second, &shared).into_graph().unwrap();\r\n-        assert_eq!(personal_facts::births(&data).unwrap(), vec![expected.clone()]);\r\n+        assert_eq!(\r\n+            personal_facts::births(&data).unwrap(),\r\n+            vec![expected.clone()]\r\n+        );\r\n         let before = serde_json::to_value(disclosed_graph(&mut second, &shared)).unwrap();\r\n         let id = kernel::graph::Graph::node_namespace_id(&expected.resource.id);\r\n         let mut changed = facts;\r\n         changed.date.day = 2;\r\n-        assert!(matches!(second.invoke(apply(&shared, vec![pandect::CapturedDelta::ReplaySetNodeFacetById {\r\n-            node_id:id.to_string(), facet:personal_facts::BIRTH_FACET.into(), value_json:serde_json::to_string(&changed).unwrap()\r\n-        }])).unwrap(), IntentResult::Rejected{..}));\r\n+        assert!(matches!(\r\n+            second\r\n+                .invoke(apply(\r\n+                    &shared,\r\n+                    vec![pandect::CapturedDelta::ReplaySetNodeFacetById {\r\n+                        node_id: id.to_string(),\r\n+                        facet: personal_facts::BIRTH_FACET.into(),\r\n+                        value_json: serde_json::to_string(&changed).unwrap()\r\n+                    }]\r\n+                ))\r\n+                .unwrap(),\r\n+            IntentResult::Rejected { .. }\r\n+        ));\r\n         let after = graph(&mut second);\r\n-        assert_eq!(serde_json::to_value(disclosed_graph(&mut second, &after)).unwrap(), before);\r\n+        assert_eq!(\r\n+            serde_json::to_value(disclosed_graph(&mut second, &after)).unwrap(),\r\n+            before\r\n+        );\r\n+    }\r\n+\r\n+    #[tokio::test(flavor = \"multi_thread\")]\r\n+    async fn profile_subject_admission_uses_owner_vault_and_refuses_fabricated_ids() {\r\n+        let fixture = fixture(0x50524f, \"personal-facts\").await;\r\n+        let mut app = fixture.attach(\"turnstone\").await;\r\n+        let mut other = fixture.attach(\"knot-editor\").await;\r\n+        for (profile, accept) in [(\"fabricated-profile\", false), (\"fixture-profile\", true)] {\r\n+            let before = graph(&mut app);\r\n+            let envelope = disclosed_graph(&mut app, &before);\r\n+            let mut candidate = envelope.clone().into_graph().unwrap();\r\n+            let edits = Arc::new(std::sync::Mutex::new(Vec::new()));\r\n+            let held = edits.clone();\r\n+            candidate.set_recorder(Some(Arc::new(move |d| {\r\n+                held.lock().unwrap().push(d.clone())\r\n+            })));\r\n+            let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({\"schema\":\"dramatis.birth-facts/v1\",\"subject\":{\"Profile\":{\"id\":profile}},\"date\":{\"year\":2000,\"month\":1,\"day\":1},\"time\":\"Unknown\",\"place\":null,\"timezone\":null,\"source\":{\"label\":\"Public profile-admission fixture\",\"reference\":null}})).unwrap();\r\n+            personal_facts::save_birth(&mut candidate, &facts).unwrap();\r\n+            let outcome = app\r\n+                .invoke(apply(&before, edits.lock().unwrap().clone()))\r\n+                .unwrap();\r\n+            if accept {\r\n+                assert_eq!(outcome, IntentResult::Accepted);\r\n+            } else {\r\n+                assert!(matches!(outcome, IntentResult::Rejected { .. }));\r\n+                let after = graph(&mut app);\r\n+                assert_eq!(\r\n+                    serde_json::to_value(disclosed_graph(&mut app, &after)).unwrap(),\r\n+                    serde_json::to_value(envelope).unwrap()\r\n+                );\r\n+            }\r\n+        }\r\n+        let shared = graph(&mut other);\r\n+        assert_eq!(\r\n+            personal_facts::births(&disclosed_graph(&mut other, &shared).into_graph().unwrap())\r\n+                .unwrap()\r\n+                .len(),\r\n+            1\r\n+        );\r\n     }\r\n \r\n     #[tokio::test(flavor = \"multi_thread\")]\r\n     async fn divination_requires_product_authority_and_refuses_unknown_domain_facets() {\r\n"
+    },
+    {
+      "old_start_line": 4618,
+      "new_start_line": 4823,
+      "text": "             IntentResult::Accepted\r\n         );\r\n \r\n         // The model shows the route: the mere, its one session attached, and\r\n-        // that session's graph. Three relations share one pair and stay\r\n-        // apart, each by its family (\u00a77 item 43).\r\n+        // that session's graph. The shared link grammar paints one pair while\r\n+        // its admitted graph retains the three distinct source assertions.\r\n         let first = read_route(&mut knot);\r\n         assert_eq!(first.model.title, \"notes\");\r\n         assert!(first.model.can_mint);\r\n         let [parent] = first.model.sessions.as_slice() else {\r\n"
+    },
+    {
+      "old_start_line": 4657,
+      "new_start_line": 4862,
+      "text": "             .iter()\r\n             .map(|relation| relation.provenance.token())\r\n             .collect();\r\n         kinds.sort();\r\n-        assert_eq!(kinds, [\"containment\", \"semantic\", \"semantic\"]);\r\n+        assert_eq!(kinds, [\"link.surface\"]);\r\n+        let projected = graph(&mut knot);\r\n+        let material = disclosed_graph(&mut knot, &projected).into_graph().unwrap();\r\n+        let source_kinds: Vec<_> = material.relations().map(|r| r.kind).collect();\r\n+        assert_eq!(source_kinds.len(), 3);\r\n+        assert!(\r\n+            source_kinds.contains(&kernel::graph::RelationKind::Containment(\r\n+                ContainmentSubKind::UserFolder\r\n+            ))\r\n+        );\r\n+        assert!(\r\n+            source_kinds.contains(&kernel::graph::RelationKind::Semantic(\r\n+                SemanticSubKind::Hyperlink\r\n+            ))\r\n+        );\r\n+        assert!(\r\n+            source_kinds.contains(&kernel::graph::RelationKind::Semantic(\r\n+                SemanticSubKind::UserGrouped\r\n+            ))\r\n+        );\r\n         let mut keys: Vec<&str> = relations\r\n             .iter()\r\n             .map(|relation| relation.key.as_str())\r\n             .collect();\r\n         keys.sort();\r\n         keys.dedup();\r\n-        assert_eq!(keys.len(), 3, \"each relation keeps its own key\");\r\n+        assert_eq!(keys.len(), 1, \"the canonical pair keeps one link key\");\r\n+        assert!(!keys[0].is_empty());\r\n \r\n         // Mint, then fork the attached session from the first list, which the\r\n         // mint has moved past (\u00a77 item 33).\r\n         assert_eq!(\r\n"
+    },
+    {
+      "old_start_line": 4693,
+      "new_start_line": 4918,
+      "text": "             .map(|entry| entry.id)\r\n             .collect();\r\n         assert_eq!(attached, [fork]);\r\n         assert_eq!(switched.model.graph.nodes.len(), 2);\r\n-        assert_eq!(switched.model.graph.relations.len(), 3);\r\n+        assert_eq!(switched.model.graph.relations.len(), 1);\r\n+        let projected = graph(&mut knot);\r\n+        let fork_graph = disclosed_graph(&mut knot, &projected).into_graph().unwrap();\r\n+        assert_eq!(fork_graph.relations().count(), 3);\r\n \r\n         // Trash the minted session and restore it. A step its card does not\r\n         // offer now is declined with the route's reason.\r\n         let trash = MereViewRequest::Session(fresh, SessionStep::Trash);\r\n"
+    }
+  ],
+  "certificate": "transition_ef78a4c5ce38_084464e3291b.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T05:42:40.094652+00:00"
+}

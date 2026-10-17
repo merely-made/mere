@@ -1,0 +1,16 @@
+
+running 11 tests
+test door::identity_endpoint::tests::no_reader_means_no_invention ... ok
+test door::identity_endpoint::tests::accepting_without_a_place_to_record_it_is_refused ... ok
+test door::identity_endpoint::tests::a_resource_absent_from_memory_is_read_through ... ok
+test door::identity_endpoint::tests::only_an_advertised_target_can_generate_a_key ... ok
+test door::identity_endpoint::tests::supplemental_public_cards_share_the_device_projection ... ok
+test door::identity_endpoint::tests::accepting_a_transfer_records_one_decision_and_never_reaches_the_vault ... ok
+test door::identity_endpoint::tests::portable_client_mounts_only_public_identity_resources ... ok
+test door::identity_endpoint::tests::only_released_blobs_are_servable_and_they_arrive_in_verified_chunks ... ok
+test door::identity_endpoint::tests::graphshells_identity_cards_fixture_is_this_endpoints_projection ... ok
+test door::identity_endpoint::tests::a_transfer_over_the_ceiling_is_refused_whole ... ok
+test door::identity_endpoint::tests::the_read_cache_evicts_oldest_first ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 199 filtered out; finished in 0.07s
+

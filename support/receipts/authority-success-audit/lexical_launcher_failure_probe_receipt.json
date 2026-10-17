@@ -1,0 +1,43 @@
+{
+  "date_utc": "2026-10-17T12:28:51.071569+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/probes/mesh-lexical-wasm/run.ps1": "5b2d10b38ff5776c717bdbde4406c7aac072472bdd21694130d7afb9e6b8112d"
+  },
+  "command": [
+    "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\probes\\mesh-lexical-wasm\\run.ps1"
+  ],
+  "checks": 2,
+  "audit_cases": 2,
+  "original_tests": 0,
+  "cases": [
+    {
+      "case": "successful_build_control",
+      "cargo_stub_exit": 0,
+      "launcher_exit": 0,
+      "node_reached": true,
+      "stdout": "AUDIT_CARGO_STUB_EXIT_0\nAUDIT_NODE_STUB_REACHED\n",
+      "stderr": ""
+    },
+    {
+      "case": "failed_build_still_runs_node",
+      "cargo_stub_exit": 7,
+      "launcher_exit": 0,
+      "node_reached": true,
+      "stdout": "AUDIT_CARGO_STUB_EXIT_7\nAUDIT_NODE_STUB_REACHED\n",
+      "stderr": ""
+    }
+  ],
+  "runner_sha256": "44f06420f4013bacb9d88bfed0779e8b7eb65e84f72dcdae5f0e645cfc02170c",
+  "stub_sha256": {
+    "cargo.cmd": "839b94fc2d85261b604a0d433f10897126ea701489379ee2af541fec4c23dc9c",
+    "node.cmd": "299ad38a85292fcb48b959da7729fb6c1ef182d166164568ca6e1d4eeb4be2d3"
+  },
+  "generated_build_output": false,
+  "qualification": "Unchanged complete production PowerShell launcher executed in fresh no-profile child PowerShell. Child-only PATH selects explicit cargo.cmd and node.cmd doubles. Cargo exit7 is ignored; Node double is invoked and launcher exits0, with successful-build control. No real Cargo build, stale Wasm loading, native/wasm digest comparison, Node engine or hardware execution; stale-artifact reuse is the source-level consequence if the existing Wasm path is present."
+}

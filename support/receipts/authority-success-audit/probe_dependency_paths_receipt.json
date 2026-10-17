@@ -1,0 +1,77 @@
+{
+  "date_utc": "2026-10-17T12:30:00.462327+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/probes/pack-distribution/Cargo.toml": "c353265de088d082a9002629e30b79562e2037d4eccb64bf6ebc5f4a83deadf7",
+    "crates/probes/wing-three-paths/Cargo.toml": "7fcb7b8c1e9234089e699bcc4c3f1f7c23050362184b85ca545498f0fee93f88",
+    ".cargo/config.toml": "520d074f2ae865a3a2146e4f31cb1229f97c58b4e2a2e17a0e2eea5c634ec3f3"
+  },
+  "paths": [
+    {
+      "manifest": "crates/probes/pack-distribution/Cargo.toml",
+      "dependency": "eidetic",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core",
+      "manifest_exists": true
+    },
+    {
+      "manifest": "crates/probes/pack-distribution/Cargo.toml",
+      "dependency": "retinue",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\retinue\\crates\\retinue",
+      "manifest_exists": true
+    },
+    {
+      "manifest": "crates/probes/pack-distribution/Cargo.toml",
+      "dependency": "tulle",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\retinue\\crates\\tulle",
+      "manifest_exists": true
+    },
+    {
+      "manifest": "crates/probes/wing-three-paths/Cargo.toml",
+      "dependency": "netrender",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\netrender\\netrender",
+      "manifest_exists": true
+    },
+    {
+      "manifest": "crates/probes/wing-three-paths/Cargo.toml",
+      "dependency": "netrender_device",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\netrender\\netrender_device",
+      "manifest_exists": true
+    },
+    {
+      "manifest": "crates/probes/wing-three-paths/Cargo.toml",
+      "dependency": "mesocosm-core",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\isometry\\mesocosm\\crates\\mesocosm-core",
+      "manifest_exists": false
+    },
+    {
+      "manifest": "crates/probes/wing-three-paths/Cargo.toml",
+      "dependency": "mesocosm-mesh",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\isometry\\mesocosm\\crates\\mesocosm-mesh",
+      "manifest_exists": false
+    },
+    {
+      "manifest": "crates/probes/wing-three-paths/Cargo.toml",
+      "dependency": "mesocosm-render",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\isometry\\mesocosm\\crates\\mesocosm-render",
+      "manifest_exists": false
+    }
+  ],
+  "command": [
+    "cargo",
+    "metadata",
+    "--offline",
+    "--locked",
+    "--no-deps",
+    "--format-version",
+    "1",
+    "--manifest-path",
+    "crates/probes/wing-three-paths/Cargo.toml"
+  ],
+  "metadata_exit": 0,
+  "stderr": "",
+  "lock_before_sha256": "1bd04a46f491174c1f8c05ca4999c33f9dde68d3866e1ae9c757aa3d845a2747",
+  "lock_after_sha256": "1bd04a46f491174c1f8c05ca4999c33f9dde68d3866e1ae9c757aa3d845a2747",
+  "runner_sha256": "fa1b6b62150128aa6b1f8af9f8352f9d478f33cb2def21dade9cc80519869823",
+  "metadata_output_sha256": "8e38916a27a0833fa1266191072afbe79c5f811bff86fcbc5a595f8a5492696d",
+  "qualification": "Current exact local path existence plus locked/offline/no-deps Cargo metadata, no compilation or execution. Missing three legacy nested Mesocosm dependency manifests is a checkout/standalone-probe buildability finding, not a GPU rendering or upstream library defect. Existing pack-distribution Retinue and Netrender paths are present. No lock changed, worktree/target/home created, or source modified."
+}

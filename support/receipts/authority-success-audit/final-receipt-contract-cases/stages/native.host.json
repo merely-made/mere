@@ -1,0 +1,28 @@
+{
+  "schema": "esp.inference-stage-host-profile/v1",
+  "machine": "O-PC",
+  "os": "Microsoft Windows 10.0.26220",
+  "executable": "C:\\t\\cargo-targets\\mere\\audit-final-receipt-empty.exe",
+  "executable_sha256": "bc47fed1d5473889675a3393418ca797632430ed3f5a73885af699daad0c7434",
+  "arguments": [
+    "--ignored",
+    "--exact",
+    "real_smollm2_f16_stages_match_and_recover_under_supervised_leases",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "source_model": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit",
+  "source_qualification": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit",
+  "work": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final-receipt-contract-cases\\stages",
+  "started_utc": "2026-10-17T21:59:37.4442430Z",
+  "ended_utc": "2026-10-17T21:59:37.8322734Z",
+  "wall_seconds": 0.3880304,
+  "exit_code": 0,
+  "peak_process_working_set_bytes": 2723840,
+  "sampled_whole_gpu_peak_bytes": 0,
+  "gpu_samples": 0,
+  "gpu_before": "Synthetic adapter,4096,2048",
+  "scope": "Three separately rooted software devices and libraries on one physical computer/GPU. Process peak includes imports, shared tensors, stages, KV and fallback. GPU samples include unrelated processes. Timings are execution costs, not isolated throughput.",
+  "stdout_sha256": "5c6acfa932777944a032caa256c302b1a42755bc804840c02ac2d108aa3127e9",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

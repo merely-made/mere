@@ -1,0 +1,183 @@
+{
+  "date_utc": "2026-10-17T12:07:33.153121+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/moot/gemot/src/moot/constitution/event.rs": "6145be0a50a8dd24835e81265ba77c075e050fce2ab729eb5ff3054dbbb0b497",
+    "crates/moot/gemot/src/moot/constitution/fold.rs": "5947c4637986b89a14ba5ab2a603d43911fd885784254fa967848f2ca4cad73a",
+    "crates/moot/gemot/src/moot/constitution/wire.rs": "26b84fe315d6bddb48fa554fc326e852e64ac9a7a42fd6cab237f046b309c682",
+    "crates/moot/gemot/src/moot/constitution/store.rs": "7910e3cec8c52eb565bdbcf7110d26357dbfb5b3eabc012cb7d7602bfd803528"
+  },
+  "libraries": {
+    "proofs": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libproofs-edd9937a550376fa.rlib",
+      "sha256": "d570b3ad5befb80700d0186167c1da04dbd6220a6f44da7c1fdde7dbfa7c1078",
+      "fingerprint_value": 2296921977845237715,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\mere-proofs-edd9937a550376fa\\lib-proofs.json",
+      "metadata_sha256": "c70073c31a69f967e81da9abfe8c440761a0c8c0bae84bfda3cd1183e1e15272",
+      "marker_sha256": "2787b4acd33cb28d26df13c4208afa984c44770db8ed8c29e4c40e0bc8ada403"
+    },
+    "identity": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+      "sha256": "c0f0c0d29580214e3285d567d3e726192d4b7187f68218de9fcb6f88c4eee3d5",
+      "fingerprint_value": 16393081860439893135,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-2b0f6cacb453c490\\lib-personae.json",
+      "metadata_sha256": "ec1f18c144ba1dc165b0e28a8a6cb003db84aa95984bfca700f8e45305d75b2d",
+      "marker_sha256": "4d12c96195536ab5ad0e6b642c72c7a36611b3fd7fdf9dc878ca61d1bcc47a90"
+    },
+    "p2panda_core": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-192072137e855602.rlib",
+      "sha256": "054e7030e46d65e383e8e573617b761d863d7daa80d4ff512e949ec365881456",
+      "fingerprint_value": 7687455399713559706,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\p2panda-core-192072137e855602\\lib-p2panda_core.json",
+      "metadata_sha256": "c2b00656ce6e3bbe7a4856e909a46736f651619e0ff64456959adc1df9891f10",
+      "marker_sha256": "90a3fc8d64be7bc2e7850fa68c44f9a71fac9dd2308bd5b221b3b9129227e9eb"
+    },
+    "p2panda_store": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_store-cf925cc36f7625b0.rlib",
+      "sha256": "008051bcd1a534729e766921a4481ca4b91fc1ea3c62dc6cc161583041dc09c6",
+      "fingerprint_value": 7180799131302704848,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\p2panda-store-cf925cc36f7625b0\\lib-p2panda_store.json",
+      "metadata_sha256": "5842ff3836264a928dcd853fced5e007f720654025ed48bcdbd902a360e8c3cd",
+      "marker_sha256": "e3a679079d54c188cd8ac75e282fd7c154c8aae23191374a865ddd89a40c4e3f"
+    },
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-e5568116731b97d6.rlib",
+      "sha256": "06b947d0ac95b743541f161e37749072fcdb6ddefba35aac420746a4f0e68ce3",
+      "fingerprint_value": 11664509036242741996,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\muniment-e5568116731b97d6\\lib-muniment.json",
+      "metadata_sha256": "cf09beca72f157a2e9c9024ed365d6dc4ab76065231051cd2ea2221deb388510",
+      "marker_sha256": "c302510768924aebd27bfc1d133083a5c9e40c4d6093098bc0a3beb40870b6f9"
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+      "sha256": "c23f7d7dd7ff77ed4a3d498dee89b3cbe2761bf4451a9267fef43b80102b7d7f",
+      "fingerprint_value": 17874236646337937021,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\serde-319fad388f9668c8\\lib-serde.json",
+      "metadata_sha256": "412543fde42acf0b2f010acc23d9e2c18323acfe03025c71c524887532b2123e",
+      "marker_sha256": "8aff5ca9a9f4fd89808b5dc4d6b4ba110c1445a32c52620b96a256204afa75b3"
+    },
+    "thiserror": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-d6ab184dfa38b956.rlib",
+      "sha256": "e246307ad46c8093c24c91130562105ad2fc4661099963309fd7ce4bbef81ec4",
+      "fingerprint_value": 3129520401534615927,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\thiserror-d6ab184dfa38b956\\lib-thiserror.json",
+      "metadata_sha256": "7cfa19ccc4f720009de5cf5f81debab6ac618c7e54fce30ada1aa376bf19d773",
+      "marker_sha256": "a5ed05f4f8ec6d8552149cb71b373da9d717027d6f200186e6d2aa9456218f6b"
+    },
+    "stickleback": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libstickleback-3877838a72b57b2b.rlib",
+      "sha256": "e647ea48ab03489ab4e236b4cd2881dba5dcc69b7d19612dc0276aa08ee5e79d",
+      "fingerprint_value": 13880250169666310531,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\stickleback-3877838a72b57b2b\\lib-stickleback.json",
+      "metadata_sha256": "ad493fec4be1c86a6215e165222359c27cf42ef67f88e6af8b39b53aec86b008",
+      "marker_sha256": "0732324c06a537e4ceae7edc6fdaae98c13107f5a05ae4103827c81b428fbf59"
+    },
+    "mien": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmien-02047f43e62a1666.rlib",
+      "sha256": "51c8de46bbca9bd818b5e457424fa96e3d11b0d3cd1e207fc53c12ef7e8cc74b",
+      "fingerprint_value": 1937297716123391858,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\mien-02047f43e62a1666\\lib-mien.json",
+      "metadata_sha256": "38d950530cabc385bd833b52c6872203051d69d89f274529e76bea73438938db",
+      "marker_sha256": "497301a50b423002383efd6de00eec28f3de60893a0b49542892c10d3f12bb68"
+    },
+    "mooting": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmooting-493af4d7212d30ed.rlib",
+      "sha256": "ea4939b8c11548b153fc3bf941a56fb59231583d9a29fed8bd277bc8e952a299",
+      "fingerprint_value": 2770906612093239788,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\mooting-493af4d7212d30ed\\lib-mooting.json",
+      "metadata_sha256": "c745b1f6c9a918a5bc8c185d48d7f577ecee56a926a4def2711e165386959de6",
+      "marker_sha256": "cb6f096780dbc83417aea4770c31672306f1a6d7a74c6c10d3c45cddda1336af"
+    }
+  },
+  "supplier_family": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\gemot-2a2dd68ccc68833a\\lib-gemot.json",
+    "sha256": "edced8d9d04f9d5ee1ae64a7f7bc60dfc82c00a08bbfc407850b752198ab8419"
+  },
+  "native_link_searches": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\gemot_constitution_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-gemot-constitution.exe",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+    "--extern",
+    "proofs=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libproofs-edd9937a550376fa.rlib",
+    "--extern",
+    "identity=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+    "--extern",
+    "p2panda_core=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-192072137e855602.rlib",
+    "--extern",
+    "p2panda_store=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_store-cf925cc36f7625b0.rlib",
+    "--extern",
+    "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-e5568116731b97d6.rlib",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+    "--extern",
+    "thiserror=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-d6ab184dfa38b956.rlib",
+    "--extern",
+    "stickleback=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libstickleback-3877838a72b57b2b.rlib",
+    "--extern",
+    "mien=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmien-02047f43e62a1666.rlib",
+    "--extern",
+    "mooting=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmooting-493af4d7212d30ed.rlib"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 3,
+  "audit_cases": 3,
+  "original_tests": 0,
+  "runner_sha256": "b3b4e2ffa4f8aaffc4fb0432ef7e637993f94ba7b2ff0418233231c2862fb804",
+  "probe_sha256": "95999e6ed56a738a6bae98d1f4d89806d5550112e2b8bc1e0dda02622deaafa0",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-gemot-constitution.exe",
+      "bytes": 2720256,
+      "sha256": "01863313e5ab15bd85a19afbb02c7a00b99fbcf6d968a12ad47658c3a7a15041"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-gemot-constitution.pdb",
+      "bytes": 153686016,
+      "sha256": "6962db6176677f024987af067351fa2f28af604e734b66880249d92418907240"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Four unchanged complete current constitutional event/fold/wire/store modules freshly compiled over ten exact retained suppliers selected by the named Gemot Cargo fingerprint family. Real signatures, OperationProcessor and MemoryBackend; independent eligible member authors each use sequence zero, no same-signer fork. Sequential and missing-parent/retry controls plus opposite-arrival competing amendment counterexample. No whole Gemot/current Cargo graph, live LogSync, aggregate service, disk, child, headed or physical carrier execution."
+}

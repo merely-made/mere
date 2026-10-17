@@ -1,0 +1,11 @@
+
+running 3 tests
+test face_and_body_separate_by_the_degree_lift_at_each_zoom ... Degree3 lifts the CPU body24/48/96px at zoom0.5/1/2 while the face stays on the ground anchor; height-off controls align.
+ok
+test face_center_misses_the_raised_nodes_pick_while_body_center_selects_it ... Clicking the generated face center selects nothing; clicking its raised CPU body center selects the node.
+ok
+test suggestion_body_shrinks_while_its_derived_face_keeps_the_full_size ... Suggestion body shrinks to16.20px but its derived face stays25.92px; grammar-off control restores0.72 inset.
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+

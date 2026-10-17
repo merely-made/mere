@@ -1,0 +1,203 @@
+{
+  "date_utc": "2026-10-17T19:26:38.397988+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-tabard-runtime\\Cargo.toml",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "--lib",
+    "--tests",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "source_sha256": {
+    "crates/system/tabard/src/appearance.rs": "f51500c9b4dc08883c431387ead3dac031d85c19f6f6da7549e59aa53efb870b",
+    "crates/system/tabard/src/artifact.rs": "8d38b40ef1d777cc639e80f1831cad52e33966bcb7d19c0758a97a79305f6fa6",
+    "crates/system/tabard/src/lib.rs": "9aff24099bd9634fc53adc9d00cf8fcc1d85e8a0e60b26bbe1bc4226bb0eaf69",
+    "crates/system/tabard/src/library.rs": "825ea30be6d8ac12027f20b4b4e89282ff9d04a893239154de9ea9db861cd569",
+    "crates/system/tabard/src/portable.rs": "f56daa2122b170b951713855d009d1769236e00e8873ba6d270c1a07e09cd7a7",
+    "crates/system/tabard/src/smolweb.rs": "802599340c24f0bbd061b682af8f1ff26d62828323c2c3e0cf21093ba8366847",
+    "crates/system/tabard/src/theme.rs": "64d1e788bf0608ae4f588bba9f50fa3a11ffa7f6ba3793cc7331dba594dd85f6",
+    "crates/system/tabard/src/theme_styles.rs": "e1f9008313b5e954e541943b5445d1a23c9f28196718c7b3a1e159be4febb26c",
+    "crates/system/tabard/src/typography.rs": "65fc045bae13aa7691d8791b5e88cacbaaf96ddf2c8dff5c947875442295eab5",
+    "crates/system/tabard/src/workshop.rs": "1d23229c31253e512a3862edc2c1c7766941ccb9a0f9eacb8770684f72ebfe9b",
+    "crates/system/tabard/src/theme/choice.rs": "629a0156dbe77cc4a6e59c333d2a119e73e4af28146ad5e94ba85f5eeebca458",
+    "crates/system/tabard/src/theme/chrome.rs": "704dba4a5803e3844a175e28ab6d46ec47094699a188fc02eef360c81d4d9857",
+    "crates/system/tabard/src/theme/data.rs": "2a015f4b615e7f482d21cb6f1a5bcece86f8e9aa8df260832f3ede89704a8281",
+    "crates/system/tabard/src/theme/edge_style.rs": "4c9ccd7ce4d9eff0be94d373866e2a480d51803ba63b668f8be327bd0a1e5b08",
+    "crates/system/tabard/src/theme/mode_calc.rs": "c297af1e13f5358d0b905e48a23b58bd5634dadb30aa87f39b44042fac162b0f",
+    "crates/system/tabard/src/theme/registry.rs": "f7c079218acbb4ec3220b4f271497b986f8c51d8927049597b04a089c9428bc7",
+    "crates/system/tabard/src/theme/seed.rs": "e088e98f53bf679e061c322abf14273e9835d018391284e7bf859ce66236c2e0",
+    "crates/system/tabard/src/theme/edge_style/tests.rs": "51a1eff958ee44ae8e5fe969725c0afd3d90d2d429204db1b81b0e9f4ead9762",
+    "crates/system/tabard/src/theme/registry/tests.rs": "a0e0545688876080d0609625055380e2ac0e1c5aa0c56f7acef500fc9e32c799",
+    "crates/system/tabard/tests/categories.rs": "c32a083bf0a8ecb9afd36c089b54dd108045542f63613967270adc4070ae7432",
+    "crates/system/tabard/tests/choice_resolution.rs": "963c2d23a6ad2520347064025dbd0599116ac7c523619e48b1e2f49fa270ed00",
+    "crates/system/tabard/tests/library.rs": "5775a0fa05241af9a8e7003c5a98721953a00daeee285b2f57d3729d17f01a09",
+    "crates/system/tabard/tests/mode_artifacts.rs": "8d523660c1978bece7e32906dfcf24bb578715af07eedbd81fb39e4884dce6e8",
+    "crates/system/tabard/tests/portable.rs": "88d54d2713e775a2fd3750c64d93a2d4a24ea6ebac4daff491181205ace9c10c",
+    "crates/system/tabard/tests/theme.rs": "f9110d4c9649268c9048931330f881bfa488690aad559901a191573da2ad20ba",
+    "crates/system/tabard/tests/typography.rs": "6c2e51af8177207490279410fd8772d994427218fd8f0b85a181065771416faf",
+    "crates/system/tabard/tests/workshop.rs": "bff01d2f7ce33ebb59076795c192223f0a04a4d8112fbbb708b8364e1eab1d25",
+    "crates/cambium/tinct/src/gated.rs": "684f6afd7af2527db54a67dfcd8410b78967c19210b12e8cc06bdfd6397eb72c",
+    "crates/cambium/tinct/src/lib.rs": "af43624c5494faef101ec8969970abc8224cdd453877a9d26cff8fa2e6d79eab",
+    "crates/cambium/tinct/src/syntax.rs": "06e3e1726ce8f931b0b9c670177835c3eeb8d422590ee0eda6dd8a816024c0de"
+  },
+  "results": [
+    {
+      "passed": 37,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "passed": 81,
+  "original_tests": 79,
+  "audit_tests": 2,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\tabard-496fc27d3eea06e0.exe",
+      "bytes": 1863168,
+      "sha256": "062dab2324e9be12062e157d104ba8c4534970a496c7721ce0888c2318f1ee72"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\tabard-496fc27d3eea06e0.pdb",
+      "bytes": 4042752,
+      "sha256": "da0a60245b822cd78ca2eb70b03ab3ba50e0f38c5af6165237b7fbd25f4f466c"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\audit_contracts-a78e4be39ae11f42.exe",
+      "bytes": 1330176,
+      "sha256": "567934a42036cc2a76cf05d31a85d0c302af3bd07b17f85b5ec148baff522e43"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\audit_contracts-a78e4be39ae11f42.pdb",
+      "bytes": 3616768,
+      "sha256": "586f99fee970b3ddb467b320f1b691bbb70803a2fe96799868bee8d7ea1e591d"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\categories-0eeb410f17377075.exe",
+      "bytes": 1175552,
+      "sha256": "21ac5b60b2ef8878d748d0a84ad8764c3bd91ec41e70e0492aaff5aff40a0e04"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\categories-0eeb410f17377075.pdb",
+      "bytes": 3510272,
+      "sha256": "7d773dbb70f70497e06918599c11cd1ea1ecce1971cfdb2daf4997d194664616"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\choice_resolution-d02f2b8aa41ba78e.exe",
+      "bytes": 1629696,
+      "sha256": "60aae773c24c09c4af41cfe65e690d0ce341a299c5b6acf1334da8137c21e20f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\choice_resolution-d02f2b8aa41ba78e.pdb",
+      "bytes": 3985408,
+      "sha256": "e3ec98150875feecb9572b3e8fb0e49f35caba13154931e370afac215d1390c3"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\library-137a6f5c13e16dc1.exe",
+      "bytes": 1641984,
+      "sha256": "a7ebed8819dfa17835e8f89ef1de6d49623a91c4b7e3e5ecf835396386e29be4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\library-137a6f5c13e16dc1.pdb",
+      "bytes": 3985408,
+      "sha256": "a6dae72bce723848085894315f7ad1d72fbf32094491ab23ca0b924557f5ad9f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mode_artifacts-64872a614fa1b70f.exe",
+      "bytes": 2279424,
+      "sha256": "54851b24c2ae2be38d3d87c12d3e7dffbebba327548c92e7b104063c17b1227b"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mode_artifacts-64872a614fa1b70f.pdb",
+      "bytes": 4526080,
+      "sha256": "dd20dd4841b638396d79e9c14d89e0624689d9fc032bd92a2327cfc983cca61b"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\portable-830c8f6dbdf8ba64.exe",
+      "bytes": 1787392,
+      "sha256": "d7a766566ae941d3a347bba84a001b292d5230c9844953a95338c27cfe9b3b76"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\portable-830c8f6dbdf8ba64.pdb",
+      "bytes": 4157440,
+      "sha256": "b5f4b74246a3ecda8e1676d6523604ac873001a5713b54f6aab3895387d5e62c"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\typography-f9d1ba1a29f47af2.exe",
+      "bytes": 1775104,
+      "sha256": "88b227f652d84bc3365d5798059fc8a86cd76c13877af3d2b3353b695f0623d7"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\typography-f9d1ba1a29f47af2.pdb",
+      "bytes": 4100096,
+      "sha256": "a42a33aa37e8b741ebba5590481e99f42f5f73e4743badf35cdd0a347700ce96"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\workshop-90f2d0cf6da73eb8.exe",
+      "bytes": 1116160,
+      "sha256": "56a0ceaf2b90c353b18695540440ae694749df631683c5bb144e18efb95e7fa5"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\workshop-90f2d0cf6da73eb8.pdb",
+      "bytes": 3444736,
+      "sha256": "b1732db4c5fe7a7bcd1d18ecf0ab020cdb0874873dde78eb7b2e6e60587dc11a"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_tabard_owner_probe.py": "284859b77834e76508267a1f5a180a429705bc24f8849ce0c1a974c4613941d9",
+    "tabard_owner_probe.rs": "2690456b38c3d7f881a3eb7838ab3c4be1525b76430c0350656f9424465ef063",
+    "tabard_owner_probe_output.log": "168e5e5b97ebf5a284d0c2b8104fe012350176ee142c7c7868d5f701af501849",
+    "cpu-tabard-runtime/Cargo.toml": "5a3fa526488086f07f23ce500b8764c38b9ab24878d19cea8f57f3d72fd7360f",
+    "cpu-tabard-runtime/Cargo.lock": "06aa4db663495e846b036b4eb5268666cef510c7be29cce3d3aceaeb7fbaa7f3"
+  },
+  "qualification": "Actual current Tabard lib.rs crate root and complete transitive source modules, actual local Tinct path supplier. Original unit tests and seven selected unchanged pure CPU integration files execute; original theme.rs Genet/Livery integration is intentionally not linked. Two additional public-API cases with controls, no synthetic registry/runtime facade. Owned temporary files are created/cleaned by original tests; no live host settings/user files, browser, font engine realization, Genet CSS/layout/GPU, network or external consumer. Stable shared Cargo target/build-dir, generated test exe/PDB removed only for binaries named by this completed run; unrelated active compilers untouched."
+}

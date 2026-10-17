@@ -1,0 +1,20 @@
+{
+  "prior_inventory_sha256": "76c1ff2046b1a901b7c9a7ae0810940316eebfafb52836b4071ef2a98992a041",
+  "current_inventory_sha256": "6dea95627dac0f8593d1a19ae12340972f9541f989df77a6f0391a3f8ed71694",
+  "prior_files": 3725,
+  "current_files": 3727,
+  "added_source_paths": {
+    "ports/graphshell/web/extension/manifest.chromium.json": {
+      "sha256": "cd8d9ebcbc7dc9b45ccbf91a8f0cd3c8db2f1048d30c3d629650d8b45ebc79bb",
+      "chars": 929,
+      "lines": 25
+    },
+    "ports/graphshell/web/extension/manifest.firefox.json": {
+      "sha256": "b391d4b915133f277d818d153c5710e77c9094fcb1ad3613c922ef85343d6845",
+      "chars": 654,
+      "lines": 32
+    }
+  },
+  "read_credit_added": 0,
+  "reason": "Production browser extension manifests select executable entry points, extension identity, permissions and content policy. They are source configuration; they were incorrectly excluded by the general JSON-data filter. The original reader stays unchanged and all prior exact-basis receipts remain historical. Read/ack the new source through the ordinary reader."
+}

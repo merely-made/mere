@@ -1,0 +1,61 @@
+{
+  "members": 103,
+  "members_without_workspace_path_alias": [
+    "crates/system/state-witness",
+    "crates/script/document-host",
+    "crates/script/app-host",
+    "crates/conatus/tenant",
+    "ports/graphshell",
+    "ports/djinn",
+    "ports/dramatis",
+    "ports/signalman",
+    "ports/tabard/desktop",
+    "ports/pelt",
+    "crates/system/djinn-testkit"
+  ],
+  "first_party_workspace_source_selectors": {
+    "https://github.com/merely-made/dramatis.git": [
+      [
+        "main",
+        null,
+        null
+      ]
+    ],
+    "https://github.com/merely-made/knot-editor.git": [
+      [
+        "main",
+        null,
+        null
+      ]
+    ],
+    "https://github.com/merely-made/genet.git": [
+      [
+        "main",
+        null,
+        null
+      ]
+    ],
+    "https://github.com/merely-made/netrender.git": [
+      [
+        "main",
+        null,
+        null
+      ]
+    ],
+    "https://github.com/merely-made/murm.git": [
+      [
+        "main",
+        null,
+        null
+      ]
+    ],
+    "https://github.com/merely-made/wgpu-weld.git": [
+      [
+        "main",
+        null,
+        null
+      ]
+    ]
+  },
+  "scope": "Root manifest declarations only. Not resolved Cargo metadata or dependency graph; member manifests parsed neither for source reading nor source parity."
+}

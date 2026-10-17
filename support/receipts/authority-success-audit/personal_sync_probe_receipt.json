@@ -1,0 +1,178 @@
+{
+  "date_utc": "2026-10-17T07:29:17.621215+00:00",
+  "source_sha256": {
+    "ports/graphshell/src/personal_sync.rs": "ca2b41a9526dbfba43337f492d065167d18a6e7a921a39f3736f6aa9e0cf5afd",
+    "ports/graphshell/src/personal_sync/assertions.rs": "00dd11630d8b14d0b4a9885b71bff56775e3b8c1cd2f94af642d41bee0e40de1",
+    "crates/graph/graph-kernel/src/graph/apply.rs": "67c8a5b784d1651ac5cc229f6ea7056d70d9e081d7e676d40d15007a0c1ac820",
+    "crates/graph/graph-kernel/src/graph/resource_tags.rs": "c8fa35d91d6680ace16bf4c0f2306a072dfbbb28cbbba6e4f0797b4a4707588d"
+  },
+  "libraries": {
+    "graphshell": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell-a9b0d167ebed643a.rlib",
+      "sha256": "1e0851cc48b61464497b25a0207c71c04521e6fc4dadee790b2b95faa07a012d",
+      "features": [
+        "native",
+        "personal-sync",
+        "web",
+        "webrtc-join"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/ports/graphshell#0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\lib.rs"
+    },
+    "mere": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmere-955a20ec0e1945b5.rlib",
+      "sha256": "5f0545fdb28e251dd1155b57d9cc8158fd7f848d441a70db96e686ebadaf777e",
+      "features": [
+        "canvas",
+        "graph"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/mere#0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mere\\src\\lib.rs"
+    },
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-388c28620ad15718.rlib",
+      "sha256": "9ce0c4a27f5daa9421e6114cd8c0b6c7b9ec6a28f1980ac307915f5938b6c36e",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-3fdd40d17e777d9f.rlib",
+      "sha256": "a04e7ef4625f29803f79ede0de2d7257ec611efad8119b7a93f8dd533fcc67de",
+      "features": [
+        "default",
+        "directory",
+        "json",
+        "redb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/muniment#0.1.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\muniment\\src\\lib.rs"
+    },
+    "pollster": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-e9053154d13e6499.rlib",
+      "sha256": "40c7cfb71039e09f24cc7189d93bc8d55ae41f34adb979b0b78ee0d357801d5a",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#pollster@1.0.1",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pollster-1.0.1\\src\\lib.rs"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+      "sha256": "b89ad8844a54d45b0c7a302e6bb23099b5a9c77c38e799725b97170ab485fb5f",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.151\\src\\lib.rs"
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-93f1c30ebf0ec255.rlib",
+      "sha256": "c2596a020417bfc68ac8259b3bb4220c0cde4b3973162576615c29ba511b221b",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\uuid-1.27.0\\src\\lib.rs"
+    },
+    "p2panda_core": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-e5d215b73ae2b5b3.rlib",
+      "sha256": "fd9341e5f00bb0d09f748302f3507086a1e99cced3c55ca16886d533b7f84ec6",
+      "features": [
+        "default"
+      ],
+      "package_id": "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#p2panda-core@0.7.1",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b\\p2panda-core\\src\\lib.rs"
+    },
+    "async_trait": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+      "sha256": "06aa9294ef54ae79b3c1339e7aaf5c547633182869bd5e63d69dae98ee675cd9",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#async-trait@0.1.92",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\async-trait-0.1.92\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-7b9c1ee0251f576c\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\personal_sync_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-personal-sync-probe.exe",
+    "--extern",
+    "graphshell=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell-a9b0d167ebed643a.rlib",
+    "--extern",
+    "mere=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmere-955a20ec0e1945b5.rlib",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-388c28620ad15718.rlib",
+    "--extern",
+    "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-3fdd40d17e777d9f.rlib",
+    "--extern",
+    "pollster=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-e9053154d13e6499.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+    "--extern",
+    "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-93f1c30ebf0ec255.rlib",
+    "--extern",
+    "p2panda_core=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-e5d215b73ae2b5b3.rlib",
+    "--extern",
+    "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-7b9c1ee0251f576c\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "cee9e65256e130576109333cb755032f372beb50a76f8cb3e46eca3d5c97573d",
+  "test_exit": 0,
+  "tests": 5,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-personal-sync-probe.exe",
+      "bytes": 12129280,
+      "sha256": "cee9e65256e130576109333cb755032f372beb50a76f8cb3e46eca3d5c97573d"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-personal-sync-probe.pdb",
+      "bytes": 567447552,
+      "sha256": "96d60420721a487204f65816a9ece3a3c886eaeed0a031389dff7ecc30e931b8"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Actual public PersonalGraphReplica with fresh current personal-sync-feature artifacts, synthetic signed operations and in-memory stores. Tests check tag stratum, changed-versus-identical access facts, missing-endpoint admission/materialization and valid endpoint control. No installed profile, network, physical disk, custody or headed run."
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "graphshell-renderer-browser-identity-v1",
+  "sealed": false,
+  "features": [
+    "product"
+  ],
+  "target": "wasm32-unknown-unknown",
+  "sources": [
+    {
+      "root": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\source-seal-verified\\repo",
+      "head": "AUDIT_INERT_SOURCE_FIXTURE_NO_REAL_GIT_COMMIT",
+      "source_sha256": {
+        "Cargo.toml": "4ce872b5fbd0fa2a92ad61bdddc65f22c2664ae6eb341a3d969c7c0ea017ff4e",
+        "crates\\cambium\\cambium\\src\\workspace_chrome.rs": "bda64b94139b01aa6be6128d28d818c9522ee0203e39e4200c79c1a19d143515"
+      },
+      "fingerprint": "dfa404a4aa4fbd47f0bb8d3333505454548f7a161fa7fed63603d989cb41bef2"
+    }
+  ]
+}

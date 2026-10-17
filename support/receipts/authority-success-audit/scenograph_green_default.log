@@ -1,0 +1,56 @@
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.69s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\scenograph-d6e7ee6316f3f285.exe)
+
+running 48 tests
+test attention::tests::suggestions_yield_to_the_persons_attention ... ok
+test attention::tests::a_pending_deselection_reads_as_retained ... ok
+test link::tests::keys_are_unordered_within_their_stratum ... ok
+test attention::tests::reselection_lifts_retained_back_forward ... ok
+test attention::tests::deselection_retains_until_dismissed ... ok
+test attention::tests::foreground_pin_holds_forward_across_selection ... ok
+test attention::tests::retain_prunes_every_set ... ok
+test attention::tests::view_states_name_each_supplied_state ... ok
+test link::tests::prior_p1_assertion_json_defaults_new_lifecycle_and_basis_fields ... ok
+test link::tests::custom_assertion_scope_round_trips_without_normalization ... ok
+test dynamics::tests::equivalent_json_has_one_identity_without_interpreting_terms ... ok
+test link::tests::compatibility_summaries_do_not_change_the_default_layout ... ok
+test dynamics::tests::a_variant_cannot_name_both_replacements ... ok
+test options::tests::each_kind_refuses_in_the_readers_words ... ok
+test link::tests::rest_summary_preserves_independent_reasons_and_excludes_withdrawal ... ok
+test link::tests::source_and_revision_availability_round_trip_explicitly ... ok
+test options::tests::a_declaration_round_trips_and_serializes_the_same_way_twice ... ok
+test presentation::tests::a_shared_resource_does_not_share_selection_or_occurrence_targets ... ok
+test presentation::tests::compact_rungs_enter_hold_and_exit_without_moving_the_item ... ok
+test presentation::tests::malformed_sets_are_refused_before_any_effect_is_applied ... ok
+test presentation::tests::duplicate_ids_disabled_rules_and_unbounded_conditions_are_checked ... ok
+test presentation::tests::missing_facts_and_wrong_types_do_not_coerce_to_zero ... ok
+test presentation::tests::priorities_ties_and_overridden_matches_are_explained ... ok
+test presentation::tests::without_an_engine_a_set_with_a_script_is_refused ... ok
+test presentation::tests::script_conditions_validate_and_round_trip ... ok
+test seed::tests::identity_seed_is_pinned_to_its_derivation ... ok
+test presentation::tests::storage_roundtrips_and_flags_are_independent ... ok
+test seed::tests::identity_seed_is_stable_and_inside_its_disc ... ok
+test seed::tests::reset_moves_skip_held_seedless_and_home_occurrences ... ok
+test seed::tests::saved_seed_wins_then_falls_back_to_the_recipe ... ok
+test seed::tests::seed_move_eases_from_start_to_seed ... ok
+test suggestion::tests::admit_keeps_order_within_budget_and_sources ... ok
+test suggestion::tests::off_by_default_for_every_host ... ok
+test suggestion::tests::settings_round_trip_and_fill_missing_fields ... ok
+test suggestion::tests::suggestions_taper_over_the_last_tenth_and_as_the_plate_fills ... ok
+test swatch::tests::a_scale_left_out_is_shared ... ok
+test swatch::tests::a_facet_mixing_a_reflection_and_a_projection_validates_and_round_trips ... ok
+test swatch::tests::link_scope_round_trips_without_minting_another_identity ... ok
+test swatch::tests::misplaced_repeated_and_dangling_cells_are_refused ... ok
+test tests::definition_json_is_repeatable_and_round_trips ... ok
+test tests::authored_definition_binds_each_named_source_without_changing_recipe ... ok
+test tests::ordinary_binding_cannot_bypass_a_runtime_witness ... ok
+test tests::runtime_binding_requires_runtime_evidence ... ok
+test tests::dynamics_survives_authored_binding_and_variant_replacement ... ok
+test tests::runtime_witness_stays_out_of_the_durable_definition ... ok
+test tests::validation_reports_useful_fields ... ok
+test tests::variant_changes_arrangement_options_without_creating_another_recipe ... ok
+test tests::variant_for_another_definition_is_refused ... ok
+
+test result: ok. 48 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

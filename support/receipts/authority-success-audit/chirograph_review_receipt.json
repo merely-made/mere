@@ -1,0 +1,129 @@
+{
+  "date_utc": "2026-10-16T21:52:51.779024+00:00",
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "previous_turn_classification": "progress",
+  "kind": "Complete Chirograph source review, package tests and bounded public-API diagnostics; no repairs",
+  "findings": [
+    "Q067",
+    "Q068"
+  ],
+  "authority_entries": [
+    "A064",
+    "A065",
+    "A066",
+    "A067"
+  ],
+  "complete_areas": [
+    "crates/chirograph/",
+    "crates/cambium/scenes/sceno/"
+  ],
+  "source_files": 5,
+  "source_chars": 132836,
+  "coverage": {
+    "complete_files": 504,
+    "total_files": 3345,
+    "read_chars": 7922708,
+    "total_chars": 36772639,
+    "changed_since_inventory": [],
+    "pending_chunks": 0
+  },
+  "next_read": {
+    "path": "crates/cambium/scenes/scenotime/Cargo.toml",
+    "start": 0
+  },
+  "production_edits_this_pass": false,
+  "preserved_production_and_test_hashes": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    ".gitattributes": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "ab40f1887af4ad301a033b409eb2d5413238b33db3771db5693f06691a2866ab",
+    "ports/graphshell/tests/fixtures/identity_cards.json": "ec614d208fcefd51c2039db047f8707abc3daf70108a032bf847681d25dbc046"
+  },
+  "source_sha256": {
+    "crates/chirograph/Cargo.toml": "a871ea488d321435d31dc526c2862e79e42cec57204bc8eea54d9f483386f513",
+    "crates/chirograph/src/capture.rs": "5d1cdac9439cef8d987655f1bab8313e1060d9f25ede3c24f145d06ef4dba760",
+    "crates/chirograph/src/lib.rs": "45bb6c12d1c58f7f581221b55b0ea206292581db71445f391082b4a4f43ec778",
+    "crates/chirograph/src/line.rs": "637d5f2c6919408ca0a72c009454c1bd61e94d0484870d11d090794341b41ff7",
+    "crates/chirograph/src/titulus.rs": "98f94ffbc607a8d56fe12fe68193fed5e2321fac27809838c475da6d0f4da6f5"
+  },
+  "governing_document_sha256": {
+    "design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md": "db5fa6e78cb2d74d1dce5a2c3ebffcab4cf98dea629a1aa96addbb804b2cff36"
+  },
+  "unit_tests": {
+    "exit": 0,
+    "passed": 52,
+    "failed": 0,
+    "command": "cargo test -p chirograph --lib --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build --message-format=json"
+  },
+  "native_builds": {
+    "client": 0,
+    "host_native": 0
+  },
+  "diagnostic_tests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "coverage_limits": [
+    "No whole-source completion claim.",
+    "No browser, network/DTLS, wasm, installed resident or durable-user-capture gate.",
+    "Targeted port excerpts/searches do not count as full source coverage.",
+    "App-client private chunk wrapper source read; its existing tests not rerun this pass."
+  ],
+  "generated_output_removed": true,
+  "retained_isolation": [],
+  "diff_check": {
+    "exit": 0,
+    "log": "chirograph_review_diff_check.txt"
+  },
+  "evidence_sha256": {
+    "chirograph_unit_test_output.jsonl": "771dd0a091658e8a69255f9823c12e9a714c66c7ce35b2df4450d3ace505053c",
+    "chirograph_client_probe_build_output.jsonl": "78f2e719bfacd20aaf6ed484cbe042163d09998abe81324083716c83a78bb16e",
+    "chirograph_native_host_build_output.jsonl": "55473c833216d46b3d66a99636b4fe05f4352f4f9f39e9ea73ae45ba2d5ded99",
+    "chirograph_review_probe.rs": "f977ded295311d0b8797ac3344c63dd3151d672dd3acf14b15ea6a77ace1379c",
+    "run_chirograph_review_probe.py": "b1bc553172606a4c91bdca856831058a3a80e937ea3f97f1c4440a5bddf203e6",
+    "chirograph_review_probe_build_output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chirograph_review_probe_output.txt": "7db91eaeec0b90c81d1537bdfcf9880a5b9033d80ac6365d714482a2ce4f625e",
+    "chirograph_review_probe_receipt.json": "d769ea24e8c4cb6c32a626eed417ac14270873cf1a64350578053242f1661a9b",
+    "sceno_unit_test_output.jsonl": "0c919547dc17b7f0555d889acbc932dcee7b06303f602de1e8a543ebf1de6700"
+  },
+  "sceno": {
+    "source_files": 9,
+    "source_chars": 102216,
+    "source_sha256": {
+      "crates/cambium/scenes/sceno/Cargo.toml": "018aa4717f3623a4d241830031e20425614f96ac06401f224b8073d20c862ac2",
+      "crates/cambium/scenes/sceno/src/fold.rs": "db65269a752439fbc8e04bd6bdbdd4305daab259e0786a41b8a831a99401d03b",
+      "crates/cambium/scenes/sceno/src/footprint.rs": "31b5806ad0b8289050efad84600f771c2cf2448ddb38bb61291b5209d8fd0739",
+      "crates/cambium/scenes/sceno/src/geometry.rs": "e5750eca5ede9e58493629a6027ff384e71c83c7b55cd6ce394e2521a6c86a43",
+      "crates/cambium/scenes/sceno/src/lib.rs": "9ecc920a309b711d0cb7df1ed2c53739b8754d4bda50023bbf3f1df9c712c675",
+      "crates/cambium/scenes/sceno/src/link.rs": "89f7e8262974a8fce2d2abf185fcd8855cf8b5082d5bf7e163fde42b62b0865b",
+      "crates/cambium/scenes/sceno/src/scene.rs": "a5227296ee5eff7252b29c5f940ad51b11351277ccff1274ab17079011bc3bd7",
+      "crates/cambium/scenes/sceno/src/score.rs": "d7e6ced452016cf5efeaeca8e89d6554c10437b2760559a88c38df076e1d386b",
+      "crates/cambium/scenes/sceno/src/subdivision.rs": "1068063850752103ca120b3688ebd5f1cef8fafb96c5376264af68eaba18c461"
+    },
+    "unit_tests": {
+      "exit": 0,
+      "passed": 37,
+      "failed": 0
+    }
+  }
+}

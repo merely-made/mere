@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "completed_cases": 0,
+  "diagnostic_sha256": "c161abcd38386d21afeca0bbb36ee39d7a6f8fb354a0b5dab846c784d96313f9",
+  "reason": "In-memory MemoryPath lacked ordering required by the original packager sorted(glob). TypeError occurred in the first case before any diagnostic assertion completed. All fixture writes were memory-only. Original diagnostic preserved."
+}

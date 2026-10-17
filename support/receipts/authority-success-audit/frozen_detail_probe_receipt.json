@@ -1,0 +1,148 @@
+{
+  "date_utc": "2026-10-17T11:32:22.339759+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/graphshell/graphshell-client/src/action_draft.rs": "fc4748418b0bdee8d297d430cbad43f260d90e56bce65ab2150e87257a924048",
+    "crates/graphshell/graphshell-client/src/core.rs": "3bfbc36731969a504fafe61e22d2b74f9e00d1e6aa0df832b487669a154181b2",
+    "crates/graphshell/graphshell-client/src/driver.rs": "57e5d47a94b175de00951c6798e69922140701ee12a3ebf29ee7679335f23dc7",
+    "crates/graphshell/graphshell-client/src/fold.rs": "b82db6e03719460ca61891b44345c45029c3453e1a68985b30d9b4caf879e109",
+    "crates/graphshell/graphshell-client/src/frozen.rs": "5f0377d00f6960a2bbff9955d5fe5340f9041a76d3ae45e87e2e917913f0b7d6",
+    "crates/graphshell/graphshell-client/src/lib.rs": "388b3d86ee1094ceecc6dc4558ed965be3bf4c8da966fab1fdae908eea175d29",
+    "crates/graphshell/graphshell-client/src/pump.rs": "f25a454d531b27baa1d3207e59abf8652b5e002cdc0ed44eca8040791849212c",
+    "crates/graphshell/graphshell-client/src/remote.rs": "0918f8c152a71ddcdfa524f31d4f499f21087f1151d55c9b3f004cc9680efc2b",
+    "crates/graphshell/graphshell-client/src/session.rs": "0890d30eebe9a08b896094c32e8a640e79ce9e1fbe397de4933b4d53f073d26b",
+    "crates/graphshell/graphshell-client/src/remote/tests.rs": "55a364b55a994fe9871168f77ca080bc6a0dec24d1291d999bd11b405fb80a40"
+  },
+  "libraries": {
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-15b5484398dcd058.rlib",
+      "sha256": "6c5e89b1eb9bc99cf40e7a3b30e3ad24424146e1d9db4de2e8a4a54c8907f2e6",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/chirograph#0.0.2"
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-c1cfe82624dead66.rlib",
+      "sha256": "eda547612d43980082db463f19d278a9fb29eae22c439f6552d7dd692075e3c0",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/scenes/sceno#0.0.5"
+    },
+    "scenotime": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-7b32ba06117a334b.rlib",
+      "sha256": "28a9269b2a6adda53a3cdaed6b7a98c77fe9f291dbd2bba4fbf5798e12831377",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/scenes/scenotime#0.0.4"
+    },
+    "uxtree": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuxtree-61cb70b466429b80.rlib",
+      "sha256": "0f9b5a16cbfab582052352de514d0b0461f07548d57d93b9367eead4637d48ce",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/forme/uxtree#0.0.2"
+    },
+    "accesskit": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "sha256": "113f80f588814d49bc0ed457eba5c1d257f1d439859b0bf32cdf5829ba5befd9",
+      "features": [
+        "enumn",
+        "serde"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#accesskit@0.24.1"
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    }
+  },
+  "library_command": [
+    "rustc",
+    "--edition=2024",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--crate-type=rlib",
+    "--crate-name=audit_graphshell_client",
+    "--cfg",
+    "feature=\"accesskit\"",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\graphshell\\graphshell-client\\src\\lib.rs",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\libauthority_success_graphshell_facts.rlib",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-15b5484398dcd058.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-c1cfe82624dead66.rlib",
+    "--extern",
+    "scenotime=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-7b32ba06117a334b.rlib",
+    "--extern",
+    "uxtree=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuxtree-61cb70b466429b80.rlib",
+    "--extern",
+    "accesskit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib"
+  ],
+  "cases_command": [
+    "rustc",
+    "--edition=2024",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\frozen_detail_cases.rs",
+    "--extern",
+    "audit_graphshell_client=C:\\t\\cargo-targets\\mere\\libauthority_success_graphshell_facts.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-c1cfe82624dead66.rlib",
+    "--extern",
+    "scenotime=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-7b32ba06117a334b.rlib",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-frozen-detail.exe"
+  ],
+  "build_exit": 0,
+  "cases_build_exit": 0,
+  "run_exit": 0,
+  "checks": 3,
+  "original_tests": 0,
+  "audit_cases": 3,
+  "runner_sha256": "09c24dcbb4769b60257a6201919c00e20b7b771bb822e70db5bea2a0ebfa16a3",
+  "cases_sha256": "91d5c58a306a830e2e056b044429c5ac6434e034c6c502f92d942f81b064ee6b",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_graphshell_facts.rlib",
+      "bytes": 22534318,
+      "sha256": "da4fba80bbe6423f5678acca778ad7d6605b63b10b5151d24748c0fcc8fa79eb"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-frozen-detail.exe",
+      "bytes": 1187840,
+      "sha256": "9a82b7821d5d254c25fd1ba1cccc4d1b64c6d2d04cdd14bb1952a5de3a961818"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-frozen-detail.pdb",
+      "bytes": 20000768,
+      "sha256": "a13df3ae83c80db45582bf07d734ee2eb1ca8ed4deee9416d87c794e50de1df8"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Complete current graphshell-client production library compiled from source with accesskit only, over7exact retained suppliers. Three public API cases use validated real scene snapshots. No original library unit suite, fresh dependency/Cargo graph, Tokio pump, DOM/OS screen reader, renderer or native/GPU run."
+}

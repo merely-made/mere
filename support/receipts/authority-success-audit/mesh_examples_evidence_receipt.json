@@ -1,0 +1,85 @@
+{
+  "date_utc": "2026-10-17T01:31:54.422514+00:00",
+  "missing_includes": [
+    {
+      "source": "crates/mesh/mesh/examples/inventory_ingress/main.rs",
+      "line": 117,
+      "include": "../../../../murm/transport/src/p2panda_transport/bounded_accept.rs",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\murm\\transport\\src\\p2panda_transport\\bounded_accept.rs",
+      "exists": false
+    },
+    {
+      "source": "crates/mesh/mesh/examples/inventory_ingress/main.rs",
+      "line": 118,
+      "include": "../../../../murm/transport/src/p2panda_transport.rs",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\murm\\transport\\src\\p2panda_transport.rs",
+      "exists": false
+    },
+    {
+      "source": "crates/mesh/mesh/examples/retained_receive/identity.rs",
+      "line": 24,
+      "include": "../../../../murm/transport/src/transport.rs",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\murm\\transport\\src\\transport.rs",
+      "exists": false
+    },
+    {
+      "source": "crates/mesh/mesh/examples/retained_receive/identity.rs",
+      "line": 36,
+      "include": "../../../../murm/transport/src/p2panda_transport.rs",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\murm\\transport\\src\\p2panda_transport.rs",
+      "exists": false
+    },
+    {
+      "source": "crates/mesh/mesh/examples/retained_receive/identity.rs",
+      "line": 40,
+      "include": "../../../../murm/transport/src/accepted.rs",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\murm\\transport\\src\\accepted.rs",
+      "exists": false
+    },
+    {
+      "source": "crates/mesh/mesh/examples/retained_receive/identity.rs",
+      "line": 44,
+      "include": "../../../../murm/transport/src/peer_route.rs",
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\murm\\transport\\src\\peer_route.rs",
+      "exists": false
+    }
+  ],
+  "inventory_example_check": {
+    "shell_exit": 1,
+    "rust_errors": 2,
+    "kind": "missing compile-time source includes"
+  },
+  "retained_example_check": {
+    "shell_exit": 1,
+    "rust_errors": 4,
+    "kind": "missing compile-time source includes"
+  },
+  "positive_check": {
+    "shell_exit": 0,
+    "targets": [
+      "mere-mesh admitted-ingress library",
+      "mesh-peer example"
+    ]
+  },
+  "hardcoded_p2panda_revision": "d8acabc96ecc59016e40edf4a47ed5eaf5360285",
+  "actual_p2panda_revision": "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+  "current_supplier": {
+    "id": "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#mere-p2panda-net@0.7.5",
+    "source": "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+    "manifest_path": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b\\p2panda-net\\Cargo.toml"
+  },
+  "current_transport": {
+    "id": "git+https://github.com/merely-made/murm.git?branch=main#mere-transport@0.0.2",
+    "source": "git+https://github.com/merely-made/murm.git?branch=main#cba46d859d12660b8d85002d0a203e250a88975a",
+    "manifest_path": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\murm-ebfa134ea22785bd\\cba46d8\\native\\crates\\transport\\Cargo.toml"
+  },
+  "provenance_line": 438,
+  "trace_sha256": {
+    "C:\\Users\\mark_\\Code\\repos\\mere\\Cargo.lock": "6872db7d031f5d6ff5e19b52caa95b3fe04b900e8902b9b01c1649b993904155",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mesh\\mesh\\examples\\retained_receive\\carrier.rs": "c54a212ca14eaaea536e250c7b3d064268635266769b5705ec43b04662cdd987",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\Cargo.toml": "cdf20fbcb5136af9a7bced5bed2e065841cde697d247dd64aa849907b4257eda",
+    "C:\\Users\\mark_\\.cargo\\git\\checkouts\\p2panda-d3fc8d2ceee505e1\\1f69c9b\\p2panda-net\\Cargo.toml": "e3554f1bde06bf31f6bd7677540b02139902f872d2eccdb7ae912ae2f0243100",
+    "C:\\Users\\mark_\\.cargo\\git\\checkouts\\murm-ebfa134ea22785bd\\cba46d8\\native\\crates\\transport\\Cargo.toml": "704464163c595ebb6e48b89c89b3df52e6d8aa0e10f1cde1476c7b11ac88c709"
+  },
+  "scope": "Two actual fresh Cargo check failures and one positive check. Literal revision disagreement is source/locked resolved Cargo metadata evidence; failed examples were not executed and no newly emitted false report is claimed. No Retinue subprocess, network endpoint, durable store, worker execution or physical carrier ran."
+}

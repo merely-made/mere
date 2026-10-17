@@ -1,0 +1,20 @@
+{
+  "date_utc": "2026-10-17T20:29:57.876546+00:00",
+  "exit": 0,
+  "passed": 4,
+  "source_sha256": {
+    "support/dramatis_package_receipts.py": "54781d32b376aca4f160af4924911c09bc3eaef926f3c3ac100fe51e563fa103",
+    "support/dramatis_review_receipts.py": "4aa87cadf608f3165e802518a1c7ff4a4a0b32fd185dd161eadca1f5b3bd9534"
+  },
+  "extracted_function_sha256": {
+    "support/dramatis_package_receipts.py:run": "b6c0388ad3a8d80048b6c83fcfe563903f4eb8507b61b735008978430f02180e",
+    "support/dramatis_review_receipts.py:consent_control": "4adc53963461b4f1baf2c4256d9455bc5cf2ec9902d1431b4225bee6776ab772"
+  },
+  "evidence_sha256": {
+    "run_support_driver_probe.py": "92cb46cbc1d4616a7f3a568783a9371564c47b3e5622ac09baa25eb78d71e263",
+    "support_driver_cases.json": "a0535f40050a08b4c48aef7aefcd10de406bc31c78d1034b8864162593816472",
+    "support_driver_zero_tests.log": "12993e544425adee2a67d87357d3ecb9d3677871f2fa5e9bdcc30c28863e200e",
+    "support_driver_nonzero_control.log": "12993e544425adee2a67d87357d3ecb9d3677871f2fa5e9bdcc30c28863e200e"
+  },
+  "qualification": "Only original AST-extracted run and consent_control functions evaluated. Process double emits a successful zero-test log and nonzero control; source double exists entirely in memory and simulates a concurrent edit during the negative-control call. Four cases. No actual cargo, signed installer, source mutation, consent backdoor in product, Djinn, native window, account, credential or existing receipt operated. No binary/isolation/live process retained."
+}

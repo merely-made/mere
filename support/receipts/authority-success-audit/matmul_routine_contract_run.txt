@@ -1,0 +1,15 @@
+
+running 10 tests
+test double_vecmat_even_stage_control ... ok
+test double_vecmat_single_stage_bounds_refuse_odd_stage_count ... ok
+test explicit_double_stage_bounds_admit_tail_control ... ok
+test gemm_equal_rank_control ... ok
+test gemm_rank2_lhs_rank3_rhs_panics ... ok
+test gemm_rank3_lhs_rank2_rhs_misreads_dimensions ... ok
+test gemv_equal_rank_control ... ok
+test gemv_rank2_lhs_rank3_rhs_panics ... ok
+test gemv_rank3_lhs_rank2_rhs_misreads_dimensions ... ok
+test single_stage_nonmultiple_gets_bounds_control ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

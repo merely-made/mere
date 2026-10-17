@@ -1,0 +1,89 @@
+   Compiling digest v0.11.3
+   Compiling windows-sys v0.59.0
+   Compiling curve25519-dalek v5.0.0
+   Compiling sha2 v0.11.0
+   Compiling idna v1.1.0
+   Compiling hyper-rustls v0.27.9
+   Compiling url v2.5.8
+   Compiling netwatch v0.19.3
+   Compiling tower-http v0.6.11
+   Compiling attohttpc v0.30.1
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling rcgen v0.14.10
+   Compiling crc32fast v1.5.2
+   Compiling acto v0.8.2
+   Compiling igd-next v0.17.1
+   Compiling hickory-proto v0.26.3
+   Compiling hmac v0.13.0
+   Compiling simd-adler32 v0.3.10
+   Compiling rand v0.9.5
+   Compiling webpki-roots v0.26.11
+   Compiling ed25519-dalek v3.0.0
+   Compiling hkdf v0.13.0
+   Compiling sha1 v0.10.7
+   Compiling x25519-dalek v3.0.0
+   Compiling miniz_oxide v0.9.1
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling hpke-rs-rust-crypto v0.7.0
+   Compiling h3 v0.0.8
+   Compiling rcgen v0.13.2
+   Compiling gemini-protocol v0.1.7
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling quinn-udp v0.5.15
+   Compiling iroh-base v1.3.0
+   Compiling p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling reqwest v0.13.5
+   Compiling noq-proto v1.3.0
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling quinn-proto v0.11.18
+   Compiling flate2 v1.1.10
+   Compiling p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling tungstenite v0.29.0
+   Compiling compression-codecs v0.4.43
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling tinct v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\tinct)
+   Compiling n0-dns-resolver v0.1.0
+   Compiling portmapper v0.19.3
+   Compiling swarm-discovery v0.6.3 (https://github.com/mark-ik/swarm-discovery.git?branch=mere#99dd24c5)
+   Compiling tokio-tungstenite v0.29.0
+   Compiling iroh-tickets v1.0.0
+   Compiling iroh-dns v1.3.0
+   Compiling quinn v0.11.12
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling tabard v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling async-compression v0.4.48
+   Compiling misfin v0.0.4
+   Compiling scroll-protocol v0.1.0
+   Compiling nex-protocol v0.1.1
+   Compiling h3-quinn v0.0.10
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling finger-protocol v0.1.1
+   Compiling spartan-protocol v0.1.1
+   Compiling guppy-protocol v0.1.1
+   Compiling noq v1.3.0
+   Compiling gopher-protocol v0.2.0
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling ureq v2.12.1
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling armillary v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\armillary)
+   Compiling iroh-relay v1.3.0
+   Compiling irpc v0.17.0
+   Compiling iroh v1.3.0
+   Compiling mere-alembic v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\distillery\alembic)
+   Compiling pandect v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\system\pandect)
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling iroh-gossip v0.101.0
+   Compiling iroh-util v0.6.0
+   Compiling iroh-blobs v0.103.1
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling mere-fetch v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\fetch)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 41s

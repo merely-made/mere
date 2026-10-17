@@ -1,0 +1,38 @@
+{
+  "date_utc": "2026-10-17T09:10:25.876634+00:00",
+  "source_sha256": {
+    "crates/cambium/cambium-genet-web-host/src/lifetime.rs": "a0bb3a4c36696a70aef63c88439d42ba0f5c2f052baab229294cd8cbbc3b1e39"
+  },
+  "runner_sha256": "737103c618ea7db5e795d0c3337ce8936c289146bcfd8c92a4ad8b8fc9a48206",
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium-genet-web-host\\src\\lifetime.rs",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-browser-lifetime-probe.exe"
+    ]
+  ],
+  "build_exits": [
+    0
+  ],
+  "run_exit": 0,
+  "checks": 5,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-browser-lifetime-probe.exe",
+      "bytes": 801280,
+      "sha256": "eb930e7b0efb35a3a4b2c5569d4bae41cab1d74ad0422dcd3b02af9a0529a467"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-browser-lifetime-probe.pdb",
+      "bytes": 3067904,
+      "sha256": "ba38c8a4008c814e76f6510c46a26c086d720561a01f27b5d8e122191b8a4156"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Five original current lifetime.rs tests, compiled directly with the standard library. Native phase/startup/future/cleanup semantics only; no browser cleanup scheduling, DOM listener removal, WebGPU promise cancellation, or GPU acceptance."
+}

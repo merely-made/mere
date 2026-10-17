@@ -1,0 +1,25 @@
+{
+  "lanes": {
+    "lane1": {
+      "failed": true,
+      "error": "AUDIT injected lane exception"
+    }
+  },
+  "conclusions": {
+    "receipt_gate_passed": true
+  },
+  "runner": {
+    "engine": "firefox",
+    "playwright": true,
+    "headless": true,
+    "lanes": [
+      "1"
+    ],
+    "per_lane": {
+      "lane 1": {
+        "ok": false,
+        "error": "Error: AUDIT injected lane exception"
+      }
+    }
+  }
+}

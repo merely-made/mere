@@ -1,0 +1,51 @@
+{
+  "machine": "O-PC",
+  "platform": "Windows-10-10.0.26220-SP0",
+  "bundle_sha256": "2f1f434fda1128169966af6c233c831cb7a6a76fcb44a117cbc5fce95ccdb66c",
+  "bundle_bytes": 18,
+  "scenario": "fixture",
+  "scenario_sha256": "f9d8785589c46b224558a50a71cdfd552da9ea1fc8640c8ee9d8eec182dd0388",
+  "query": "",
+  "load_before": [
+    0,
+    0,
+    0
+  ],
+  "unsafe_webgpu": false,
+  "cpu_samples": [],
+  "page": "tree.html",
+  "profile": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\community_headed_exit_fixture\\scenario-ok\\chrome-profile",
+  "origin": "http://127.0.0.1:8960",
+  "profile_shared": false,
+  "cpu_before_percent": 100.0,
+  "command": [
+    "flatpak",
+    "run",
+    "--filesystem=C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\community_headed_exit_fixture\\scenario-ok",
+    "--filesystem=C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\community_headed_exit_fixture\\scenario-ok\\chrome-profile",
+    "com.google.Chrome",
+    "--user-data-dir=C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\community_headed_exit_fixture\\scenario-ok\\chrome-profile",
+    "--remote-debugging-port=8961",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--enable-logging=stderr",
+    "--ozone-platform=wayland",
+    "--disable-features=CalculateNativeWinOcclusion",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding",
+    "--new-window",
+    "--window-size=1400,900",
+    "http://127.0.0.1:8960/tree.html?scenario=scenarios/fixture.scn&sink=http://127.0.0.1:8960/scenario-receipt&"
+  ],
+  "result": "ok",
+  "page_errors": [],
+  "gate_failures": [],
+  "whole_frame_capture": "whole-frame.png",
+  "whole_page_accessibility": "whole-page-accessibility.json",
+  "elapsed_seconds": 0.02,
+  "load_after": [
+    0,
+    0,
+    0
+  ]
+}

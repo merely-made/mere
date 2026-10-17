@@ -1,0 +1,31 @@
+{
+  "date_utc": "2026-10-17T20:26:43.918616+00:00",
+  "exit": 0,
+  "export_cases_passed": 3,
+  "source_classifier_cases_passed": 4,
+  "original_unit_tests_passed": 4,
+  "source_sha256": {
+    "scripts/cross-repo-smoke.ps1": "583194557c03acaba68ca3bbcb3f64005b92628331f19319a19b7e36e38e78e1",
+    "scripts/firefox_history_export.py": "e0c3209bf3cef7aa6a166bcba09efd6c5236dc21d95872bda156c66c8f91fb9d",
+    "scripts/test_firefox_history_export.py": "bf47a658495e481e98a894539db33257735d3445c1c02189eee26fdc1f9f396a",
+    "scripts/test_mere_doc_judgment_audit.py": "9aba3a38e098793f5baaf0e77301bd4a21a369aaa039901a7066a68848c9996a",
+    "scripts/mere_doc_judgment_audit.py": "0be33f8c578fa3284c595dc2269dd175a5fc270977a2755b848681c4ab479f80"
+  },
+  "external_context_sha256": {
+    "C:\\Users\\mark_\\Code\\repos\\genet\\Cargo.toml": "961954ff98fae346266f1eb6fc11e26ceb1085acb1c615d08494cd38bed55999"
+  },
+  "membership_observation": {
+    "mere_remote_receipt_exists": false,
+    "genet_remote_receipt_exists": true,
+    "genet_manifest_pelt_extraction_comment_present": true
+  },
+  "evidence_sha256": {
+    "run_script_owner_probe.py": "fd3256b34f36b6c4545eb95c5c5895072145c9e5425feb2d6ddab2c2445f43d8",
+    "script_owner_probe.ps1": "5adca28fb5707afa6ad1b57967af6a37dfe9768faac2d0b11ae2f6cc3ee6130b",
+    "script_local_source_cases.json": "8f867d2dfc602f1cbe4550d0061d336e730344b01f8c1a322a83156f809fb5ae",
+    "script_export_match_cases.json": "600986894a3e607bbfe17eef10c2e0dab1afea6da3efb6ea997e034ceccb1c54",
+    "script_original_unit_tests.txt": "99fd719316b3c8f0c19879b4bdf385e1d419feb7443f790fb0d3fe9e14ccc086",
+    "script_local_source_run.txt": "e505d6542a7888c2ccf48aa324a0ec83127459a0a17c402315ead2357be30866"
+  },
+  "qualification": "Three calls to unmodified current exporter using only synthetic in-memory SQLite. Four actual PowerShell Assert-Local function executions parsed from source with mocked Cargo tree output; no full cross-repo builds. Four original Python unit tests executed. Missing remote helper and Genet extraction checked read-only; no native window, SSH, account setup, browser profile, receipt driver mutation or physical input executed. No binaries, isolation or live process retained."
+}

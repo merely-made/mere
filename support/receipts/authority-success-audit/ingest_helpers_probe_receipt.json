@@ -1,0 +1,60 @@
+{
+  "date_utc": "2026-10-17T09:52:08.264018+00:00",
+  "source_sha256": {
+    "crates/graph/linked-data/src/ingest.rs": "602585bc01add516a68450b9209f55d668f1b7803932b84b7b8ba1b3adfe01e3",
+    "crates/distillery/alembic/src/memory_levels.rs": "4d15b3877ed1c3653a2a6f90a01e1aad22bc9f301fe91a764f2c51cc8f474bcb"
+  },
+  "extracted_code_sha256": [
+    "b0f0e57936aca0b2307586225fcf5de7da9f231de85f68c9ae7e8c0b94ea8502",
+    "9a11be148ef710446fd7d0cfa097ff093953cad5eeee19a9f2d8074772ad5164"
+  ],
+  "qualification": "Exact original scanner functions and cycled method; local enum fixture uses matching variants without serde derives. No whole linked-data/Alembic feature, kernel, JSON-LD expansion or network execution.",
+  "libraries": {
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\ingest_helpers_probe.rs",
+      "--extern",
+      "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-ingest-helpers.exe"
+    ]
+  ],
+  "build_exits": [
+    0
+  ],
+  "run_exit": 0,
+  "checks": 4,
+  "runner_sha256": "2788b612619574a3ff1fef5b857d8f9ff529121010c22c106db9e007b54be771",
+  "probe_sha256": "d39656f8aa7dee0ae3ecb5811a9ab1a65e4ed1b21b6c811b88be7c8cd3b1871c",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-ingest-helpers.exe",
+      "bytes": 1026560,
+      "sha256": "7a8898494b862627bc4e294fedccfeae900ad26c91b4e9d6ddf3c190d76345f3"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-ingest-helpers.pdb",
+      "bytes": 5214208,
+      "sha256": "983a799d479a8a80476e778a8aa960f30eeea2941bf8123d46a5a7f8534dd921"
+    }
+  ],
+  "generated_output_removed": true
+}

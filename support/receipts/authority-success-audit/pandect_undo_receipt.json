@@ -1,0 +1,18 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "3 diagnostic reproductions passed: parent-navigation undo panic; recorded branch profile loss; navigation replay rejection caused only by unordered collections",
+  "samples": {
+    "raw_live_replay_order_mismatches": 52,
+    "session_navigation_rejections": 45,
+    "trials_each": 64
+  },
+  "normalization_control": "Sorting only navigation visits.bindings and owners.owned_visits makes the complete snapshot-plus-facets values equal in all 64 trials. Sample frequencies are observations, not fixed rates.",
+  "reproduction_sha256": "35779eae839c67e14943c5ec0d802b4dc318aa05a9082d23971ef5a6f6ebaedf",
+  "output_file": "pandect_undo_output.txt",
+  "affected_sources": {
+    "crates/system/pandect/src/graph_session.rs": "7fae5cfdba774e5c6b9527d131d11571fb804779b691928c5cf68f63feb7180a",
+    "crates/eidetic/chartulary/src/stemma/snapshot.rs": "c374db69e67054a049c5f37d55a27b7d3b826cd5ea829feef960537e11d5ae7a",
+    "crates/eidetic/chartulary/src/stemma/mod.rs": "3cb73c2ab5163531a2b2662daf3d53a38ec97a8a4c5107c26a014e7319743151"
+  }
+}

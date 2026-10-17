@@ -1,0 +1,14 @@
+
+running 5 tests
+test a_folder_without_a_name_keeps_its_parent_for_the_following_sibling ... ok
+test a_named_folder_pushes_and_pops_only_its_own_path_component ... ok
+test an_in_range_i64_timestamp_panics_in_the_public_result_returning_parser ... ok
+test the_chrome_epoch_offset_control_maps_to_unix_zero ... ok
+test whitespace_named_folder_pops_its_parent_before_the_following_sibling ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'an_in_range_i64_timestamp_panics_in_the_public_result_returning_parser' (48392) panicked at crates\eidetic\eidetic-core\src\import\parser.rs:364:5:
+attempt to subtract with overflow
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

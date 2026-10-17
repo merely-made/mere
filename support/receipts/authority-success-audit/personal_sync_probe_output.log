@@ -1,0 +1,10 @@
+
+running 5 tests
+test accepted_missing_endpoint_assertion_prevents_projection_even_after_later_nodes_arrive ... ok
+test assertion_with_prior_endpoints_is_a_working_projection_control ... ok
+test changed_access_fact_under_the_same_id_is_accepted_then_silently_discarded ... ok
+test identical_access_replay_is_a_working_idempotence_control ... ok
+test synchronized_tag_is_legacy_surface_metadata_and_absent_from_current_content_tags ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+

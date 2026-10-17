@@ -1,0 +1,54 @@
+{
+  "date_utc": "2026-10-17T20:06:39.891634+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-pelt-workspace-runtime\\Cargo.toml",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "--lib",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "passed": 7,
+  "original_tests": 0,
+  "source_sha256": {
+    "ports/pelt/desktop/workspace_viewer.rs": "4cca3d1b2bcf23a81a98a2f8391fa9af0c72a30b59a762deb3f3283abba2a4f1",
+    "ports/pelt/desktop/workspace_viewer/accessibility.rs": "f02d43afad76fa9989a5884b5bf6b4b7ddd1d1ab2f56398496fe3a26752e1018"
+  },
+  "extracted_body_sha256": {
+    "neutral_child_types": "43ef4519ba77aae3c20d1a6f70ff45a2f0a60da8d0d28b15664a3073c20664b7",
+    "append_document_child": "9fb7c45177391627b8af05f6c04c6b5cadb3bdbe801137f07f25b42d3fca7e0c",
+    "role_and_actions": "a057a8044d81a3a2d3a3bf371b8fc07841f63e038ea04dca9c60663968b01068",
+    "primary_projection": "7bbe520ad289d74a1e57600574194a2bbd5fc264fea1217dfa9938ba5771db72",
+    "receipt_validation": "ee199cce1548620f879dbf819dca3de372dcbdbb053f5c5525c5782400a1ac2c",
+    "receipt_driver_guards": "ac5ae3600bf3a56b9d0c046bffc687a4b5c92562fab235dd2c82b71403261bc5"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\authority_success_pelt_workspace-e26245f348067474.exe",
+      "bytes": 923648,
+      "sha256": "8678921dd4ac9aa2841a70270d141579197fd768bc9cefd91c7026f34900f56b"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\authority_success_pelt_workspace-e26245f348067474.pdb",
+      "bytes": 3354624,
+      "sha256": "03b56b809efb8f4a40731e66a0d8b71099a1aa6cb18a50f9d34b4187fcb67c02"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_pelt_workspace_owner_probe.py": "5f23325893fd6cfb7b44998eb12813189766b7e8393d902718c40245243324bd",
+    "pelt_workspace_owner_probe.rs": "2f45aafdc6e64116c14e6e05559580008fc5f931fc239f9bd039fbe3931468e4",
+    "cpu-pelt-workspace-runtime/Cargo.toml": "8d81f5eec978725707501274e0c49bcc53cbb12e4f87e9a43992f9093419d3de",
+    "cpu-pelt-workspace-runtime/Cargo.lock": "af28eead10c948da6fadb5fdaf48b3631cdd791ebc379fad54d424d4f6bd1915",
+    "pelt_workspace_owner_probe_output.log": "505c353eaa36df42f84c06b994a68a4a959292c8269dfca6f891c958eff2d4d3"
+  },
+  "qualification": "Seven source-extracted CPU cases. Complete unchanged primary child-lowering method, secondary append helper and role/action conversion over actual local Inker/Pelt core geometry/session-identity and exact lock-seeded neutral contract plus AccessKit0.24.1. Deterministic shell/namespace fixture. Exact config validation and render-driver guard prefix with deterministic driver/native event-loop doubles. Type-only shell NodeId and method visibility adapted; no executable lowering/guard rewrite. No whole desktop compilation, original desktop tests, real engine DOM, native window/GPU, display/input or physical AT run."
+}

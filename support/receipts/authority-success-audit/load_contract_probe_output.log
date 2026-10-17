@@ -1,0 +1,15 @@
+
+running 5 tests
+test framing_strict_header_and_declared_legacy_limits_remain_distinct ... Framing controls: magic/version checked before payload; declared trailing-byte compatibility and no-magic legacy fallback are intentionally weaker. Legacy reading is not schema authentication or full byte exhaustion
+ok
+test new_same_address_request_inherits_old_response_metadata ... Request metadata: new bytes under same URL inherit prior time/redirect/MIME; even fresh progress inherits prior time. Explicit forget control starts fresh, as Pelt's Reload source currently does
+ok
+test reused_transfer_cache_replaces_new_image_with_old_image_at_recycled_key ... Scene image identity: actual document packet/paint-list translator recycles image key; reused worker cache silently restores prior red1px image over new blue2px image. Fresh cache roundtrip preserves blue; no GPU rendering
+ok
+test supported_registered_formats_are_classified_as_downloads ... Format authority: actual default registry renders Nex/Guppy/Titan/JSON Feed, but PageLoad hands all four back as Download; Gemini/Gopher controls stay renderable
+ok
+test transfer_buffer_direction_is_external_to_the_envelope ... Wire qualification: one legitimate Scroll command buffer also decodes as TextSelection update; direction/schema are channel/caller context, not self-identified. No production misdelivery or forged authority claim
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

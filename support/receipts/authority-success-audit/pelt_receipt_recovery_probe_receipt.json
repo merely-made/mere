@@ -1,0 +1,48 @@
+{
+  "date_utc": "2026-10-17T20:12:30.969898+00:00",
+  "compile_command": [
+    "rustc",
+    "--edition",
+    "2024",
+    "--test",
+    "-C",
+    "debuginfo=0",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pelt_receipt_recovery_probe.rs",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-pelt-receipt-recovery.exe"
+  ],
+  "compile_exit": 0,
+  "exit": 0,
+  "passed": 5,
+  "source_sha256": {
+    "ports/pelt/desktop/workspace_viewer.rs": "4cca3d1b2bcf23a81a98a2f8391fa9af0c72a30b59a762deb3f3283abba2a4f1",
+    "ports/pelt/desktop/workspace_viewer/receipts/routing.rs": "0b7e031cdd051702a10e2e976161d3f3ec1bd6b26801c8032852c786d447a5d3"
+  },
+  "extracted_body_sha256": {
+    "receipt_enum": "f5f9a0fc4b6f61b9bb275861633c89e0c5f8fd49a7e899a5e4bcc22d1deeaaaa",
+    "receipt_id": "a9651d54b46af211816c663d48c5e4bb7376cf8069d54ef87a10174236ee8ab7",
+    "workspace_receipt_timeout_error": "1e24df3b07ec0bf7b4302c2ff6cf892da81a9239df14a8292ea4ae6cb4e4c3ef",
+    "primary_failed_acquire": "ea7abee10efa97e1955e9b9a93389d99cd5b4d2a4c830db6c59e5328c6def429",
+    "primary_startup_retry": "e208a19971b54a94c99af15309c1f0bbec5c4e4fc9668acb72ecd6ca182f4946"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-pelt-receipt-recovery.exe",
+      "bytes": 774144,
+      "sha256": "f34debc6e7d1880aa937a9e6b86bf4871d518601f9ff80b7fca4342bcee1de25"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-pelt-receipt-recovery.pdb",
+      "bytes": 3043328,
+      "sha256": "71da5df2d0379827141ea76dff62b49226b6bad39f0f04be29e1306e6aceb3ca"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_pelt_receipt_recovery_probe.py": "77c0b3326599dcfbae03cfb8ce518c047dcc1cbd501bbdad887cffd86c5b879d",
+    "pelt_receipt_recovery_probe.rs": "2ac1c5a2f86c03f2c8c85f717b2045a5b4213b97815646f6123b89a23e468926",
+    "pelt_receipt_recovery_compile.txt": "e5cf7d935f5f33e74546c090244fe4eb02d6ce5366f5e04dadcceb46bf99e0cb",
+    "pelt_receipt_recovery_output.txt": "a96055cace85664cb0902e4a6611299dcb6ac77b4eb23004021dc8ec73514d83"
+  },
+  "qualification": "Complete unchanged timeout method, complete failed-acquire let-else/recovery statement, startup predicate and receipt enum/id extracted from current source. Timeout method visibility widened only. Deterministic unavailable-acquire, native-statistics, event-loop and tearout-timeout doubles. Proves missing retry/deadline after semantic completion, not an observed whole-app/GPU stall. No whole desktop compilation or original desktop tests, native window, GPU, physical input/AT or external state mutation."
+}

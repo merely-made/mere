@@ -1,0 +1,36 @@
+   Compiling workbench v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\workbench)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.94s
+     Running unittests lib.rs (C:/t/cargo-targets/mere/build\debug\deps\workbench-656ee5d269b24075.exe)
+
+running 22 tests
+   Doc-tests workbench
+test float::tests::a_float_resolves_inside_its_area_within_its_constraints ... ok
+test tests::apply_activate ... ok
+test presentation::tests::transient_fractions_validate_and_leave_canonical_shares_to_the_host ... ok
+test presentation::tests::folding_and_opening_preserve_the_entire_canonical_tree ... ok
+test tests::n_ary_even_split ... ok
+test float::tests::docking_to_the_root_needs_an_empty_tree ... ok
+test float::tests::raise_reorders_z_and_pinned_floats_outlive_a_hidden_layer ... ok
+test tests::an_open_lane_is_carried_not_interpreted ... ok
+test float::tests::a_tile_moves_through_every_station_and_is_at_one_station_throughout ... ok
+test tests::apply_drag_bad_target_preserves_tile ... ok
+test tests::apply_drag_into_stack ... ok
+test tests::apply_drag_onto_edge_splits ... ok
+test tests::apply_drag_outside_preserves_tile ... ok
+test tests::apply_close_collapses_split ... ok
+test float::tests::a_workspace_round_trips_through_serde_with_every_station_intact ... ok
+test tests::apply_divider_move ... ok
+test tests::recursive_asymmetric_quad_and_split ... ok
+test tests::settings_lane ... ok
+test tests::single_tile_tree ... ok
+test tests::split_visits_all_tiles_in_order ... ok
+test tests::workbench_outside_drop_requests_tear_out_without_mutating_tree ... ok
+test tests::workbench_unknown_outside_drop_is_unchanged_without_effect ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

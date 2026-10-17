@@ -1,0 +1,155 @@
+{
+  "date_utc": "2026-10-17T11:41:07.546798+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/intel/reference-data/Cargo.toml": "f3f88050a176fa54eab4f2a9c710864b438c9e3b7978f9a36c87d494c28ed660",
+    "crates/intel/reference-data/src/lib.rs": "6ca79bd8bcfd8cb7a56290663ea8fe004ad0ddf70c5cf37a8158f238ed076f55",
+    "crates/intel/reference-data/src/registry.rs": "d79176400dbb2e13f1b5952ae71613d2e0c9abaed1253e4c43335eb13b1688ec",
+    "crates/intel/reference-data/src/tests.rs": "704df43f520b1981aeccf73873336d0a5e8c150237dc9be35a33bb651a1d9130",
+    "crates/intel/reference-data/src/validation.rs": "0ad5a68f0d5946414550d0172efc125a8d5da7a5d30454686355b0001e16c24c",
+    "crates/intel/mora-cmudict/Cargo.toml": "f911bf13230a62b5fc77f596c54d99d67b18e71c0c2d92dad719cb1129feb4f6",
+    "crates/intel/mora-cmudict/src/lib.rs": "1670efd5226d167ddc82b205b974d381319b5e1c880fa3d1a2e680b5c40918af"
+  },
+  "runtime_input_sha256": {
+    "crates/intel/reference-data/fixtures/bilingual.json": "966f7e926dca10d4ed904c7a5dca5cad38ba163b55aaa98e9d9d68dc244960b1",
+    "crates/intel/mora-cmudict/data/cmudict.dict": "59d6398f55297e59afb2ca3276380827524c0940fcbbfcd19022bb76fd55f719"
+  },
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    },
+    "blake3": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libblake3-e6332eafb6e40a9e.rlib",
+      "sha256": "9c34e65ab42002b8ca22ed5c2b2330731c4d57adcaa44db51a56f0df8a96e242",
+      "features": [
+        "default",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#blake3@1.8.7"
+    },
+    "mora": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmora-66153f59195438cf.rlib",
+      "sha256": "216eed3984702a2ea4d337a5da2b688509ba0d23a5d1fab30e7a5cff8f71c100",
+      "fingerprint_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\mora-66153f59195438cf\\lib-mora.json",
+      "fingerprint_sha256": "9542f2239f689660a87e48eff4030160d2442a5def6d73b78374df885a97e55a",
+      "fingerprint": {
+        "rustc": 17664546606611198464,
+        "features": "[\"alloc\", \"default\", \"english\"]",
+        "declared_features": "[\"alloc\", \"default\", \"english\"]",
+        "target": 2487761517131855253,
+        "profile": 11926785003450549200,
+        "path": 17727695248092355748,
+        "deps": [],
+        "local": [
+          {
+            "CheckDepInfo": {
+              "dep_info": "debug\\.fingerprint\\mora-66153f59195438cf\\dep-lib-mora",
+              "checksum": false
+            }
+          }
+        ],
+        "rustflags": [],
+        "config": 9396254390672932401,
+        "compile_kind": 0
+      },
+      "package_id": "Cargo.lock registry mora0.1.0; retained matching fingerprint; no fresh dependency build"
+    }
+  },
+  "results": {
+    "reference-data": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--test",
+        "--crate-name",
+        "reference_data",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\intel\\reference-data\\src\\lib.rs",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-reference-data.exe",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+        "--extern",
+        "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+        "--extern",
+        "blake3=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libblake3-e6332eafb6e40a9e.rlib"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "passed": 23,
+      "failed": 0,
+      "ignored": 1
+    },
+    "mora-cmudict": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--test",
+        "--crate-name",
+        "mora_cmudict",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\intel\\mora-cmudict\\src\\lib.rs",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-mora-cmudict.exe",
+        "--extern",
+        "mora=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmora-66153f59195438cf.rlib"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "runner_sha256": "d05f2208acbd2a10bc393846f78798f7e1bfdab2d771f03143e078890931f576",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-reference-data.exe",
+      "bytes": 2052608,
+      "sha256": "8d4fba8938659fe6ab37c7ff06a559457f2bbba0c17c952e6c68fce404dfb851"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-reference-data.pdb",
+      "bytes": 6705152,
+      "sha256": "abfed424dd8f7cf5108e29e0b9f2e42da97395e0cd49f9b5b2b8fcb361ae479e"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-mora-cmudict.exe",
+      "bytes": 4608512,
+      "sha256": "08fe1afe00d903fa19eb820acf0807bfbcb036f560d6bb207f98f9bc28575508"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-mora-cmudict.pdb",
+      "bytes": 3665920,
+      "sha256": "f3ef0e3ede3eace675b960fe3cea9a585b162dbb32add6399cf3cb3859518f3b"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Fresh compilation and execution of unchanged current reference-data and mora-cmudict library unit suites, with exact retained serde/serde_json/blake3/mora suppliers. Full shipped CMUdict parsed by original test. Native Windows CPU/filesystem and subprocess lock exit only; no fresh Cargo graph, Unix symlink/directory-sync path, physical power-cut, host import UI or source authenticity acceptance."
+}

@@ -1,0 +1,120 @@
+{
+  "date_utc": "2026-10-17T19:32:43.018628+00:00",
+  "source_sha256": {
+    "design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/run.py": "a7fdd1525965d36326313341fb5a00a886d63c05c8570aab3d4ff74463206d3e",
+    "design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/qualify_final_graphs.py": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a"
+  },
+  "preserved_historical_receipt_sha256": {
+    "design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/run.json": "20a0162aa0981013f6c2d29548a5dfaed2c61f1c8cc5af780da925b22d1d3aab",
+    "design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/run.log": "a394743d7d7109da45973daf1e4b2ead1f5e8ce7059c1bcde3fa2f7b1c4eade8",
+    "design_docs/cambium_docs/testing/receipts/2026-10-12_flattening_and_device_recovery/final-supplier-qualification.json": "2cec431e0627d48dc57f7ec8b2bddb573b26c113c0801b1df004102d90ecbe8d"
+  },
+  "initial_harness_failure": {
+    "source": "receipt_wrapper_probe_initial.py",
+    "source_sha256": "6a66bfa4166ae1ed4f1e63cfe88e061bd16ae1e35bb39324a227ae7ae84c8607",
+    "error": "Initial injected stdout was str for the byte-mode custody call, so write_bytes refused. No run.json was created. Failure fixture/bootstrap/log preserved under receipt-wrapper-fixtures; repaired injection follows each call text flag."
+  },
+  "results": [
+    {
+      "case": "custody-child-success",
+      "kind": "custody",
+      "outer_process_exit": 0,
+      "injected_child_exit": 0,
+      "source_copy_sha256": "a7fdd1525965d36326313341fb5a00a886d63c05c8570aab3d4ff74463206d3e",
+      "recorded_child_exit": 0
+    },
+    {
+      "case": "custody-child-failure",
+      "kind": "custody",
+      "outer_process_exit": 0,
+      "injected_child_exit": 101,
+      "source_copy_sha256": "a7fdd1525965d36326313341fb5a00a886d63c05c8570aab3d4ff74463206d3e",
+      "recorded_child_exit": 101
+    },
+    {
+      "case": "metadata-matched",
+      "kind": "metadata",
+      "outer_process_exit": 0,
+      "injected_child_exit": 0,
+      "source_copy_sha256": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a",
+      "accepted_roots": 5,
+      "supplier_packages_per_root": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "case": "metadata-registry-only",
+      "kind": "metadata",
+      "outer_process_exit": 0,
+      "injected_child_exit": 0,
+      "source_copy_sha256": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a",
+      "accepted_roots": 5,
+      "supplier_packages_per_root": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case": "metadata-mismatched",
+      "kind": "metadata",
+      "outer_process_exit": 1,
+      "injected_child_exit": 0,
+      "source_copy_sha256": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a"
+    }
+  ],
+  "fixture_sha256": {
+    "receipt-wrapper-verified/bootstrap.py": "049fa8f43ace313465daab37600cedb4f722a9ba8af20f350eb841033eb67e8a",
+    "receipt-wrapper-verified/custody-child-failure/injection.json": "0ff083b6c14581d839c762bb1c4afbb3613eddcd5e82fa822242bffff6aabc82",
+    "receipt-wrapper-verified/custody-child-failure/outer-output.log": "138634302d99cc95c4250d84c8e48047154bed9df545c562259af241d6a93c03",
+    "receipt-wrapper-verified/custody-child-failure/run.json": "70d5460cd0cb94a4ebfaac958808d84c2a90d8ef875d9b098339c388e1b6a918",
+    "receipt-wrapper-verified/custody-child-failure/run.log": "b7cb992a8db7e66b19ed3f7351af921b046d9b342a5b50cfb2885b52850e6a44",
+    "receipt-wrapper-verified/custody-child-failure/run.py": "a7fdd1525965d36326313341fb5a00a886d63c05c8570aab3d4ff74463206d3e",
+    "receipt-wrapper-verified/custody-child-success/injection.json": "c82b1b2fc35194d42658005468ae7a52c33b81d81d9c048e0f10d9b85601bc25",
+    "receipt-wrapper-verified/custody-child-success/outer-output.log": "cdd086bbcdef7adb5ece27cbab148a320a718f418515ce5e5fbe9bda4cc6cba4",
+    "receipt-wrapper-verified/custody-child-success/run.json": "831dd4e5c94823878d88737741d7e63b18ac366c94d9f69c9f70ac78a913a133",
+    "receipt-wrapper-verified/custody-child-success/run.log": "91b9e4d36656d752b4fae731238891f0d22c944d4f007f6ff0f0003aa0209741",
+    "receipt-wrapper-verified/custody-child-success/run.py": "a7fdd1525965d36326313341fb5a00a886d63c05c8570aab3d4ff74463206d3e",
+    "receipt-wrapper-verified/metadata-matched/final-supplier-qualification.json": "edd6df6b169a352ceef12ea460c6c6e09fc5182395788cc3bd666de1fdbf37aa",
+    "receipt-wrapper-verified/metadata-matched/injection.json": "68c334e621d7a817ff8b503545d51cb04b569a85717b7616201c6a8609b37c89",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-0.json": "2e40e95704bfdc45877205488d99b0e075080f30e00b2a9ff8496433363f999e",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-0.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-1.json": "2e40e95704bfdc45877205488d99b0e075080f30e00b2a9ff8496433363f999e",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-1.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-2.json": "2e40e95704bfdc45877205488d99b0e075080f30e00b2a9ff8496433363f999e",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-2.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-3.json": "2e40e95704bfdc45877205488d99b0e075080f30e00b2a9ff8496433363f999e",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-3.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-4.json": "2e40e95704bfdc45877205488d99b0e075080f30e00b2a9ff8496433363f999e",
+    "receipt-wrapper-verified/metadata-matched/mere-final-graph-4.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-matched/outer-output.log": "71918dedd285e91dbe13ce074f3f55698cbd7a72594a92279e423a155863ed8d",
+    "receipt-wrapper-verified/metadata-matched/run.py": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a",
+    "receipt-wrapper-verified/metadata-mismatched/injection.json": "45d74800b457ca327fb7607d4849407f865dd0ac019c1bd291c85177533f9c80",
+    "receipt-wrapper-verified/metadata-mismatched/mere-final-graph-0.json": "198245ac6ba1f7556c93b7fd12e4273e680aed9a14a800279f52da5570a88362",
+    "receipt-wrapper-verified/metadata-mismatched/mere-final-graph-0.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-mismatched/outer-output.log": "698419575c8ae74ad883de8c8010719e67f27f2389073686fd1e93a8b8170630",
+    "receipt-wrapper-verified/metadata-mismatched/run.py": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a",
+    "receipt-wrapper-verified/metadata-registry-only/final-supplier-qualification.json": "ea25196b8bf1a3dc3902611739243dd73fb464b7bf32afbf10c2009e18752199",
+    "receipt-wrapper-verified/metadata-registry-only/injection.json": "ea725b4d5e0f518aba9b14524559d932ece62465b8b722940e101d3ef7443027",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-0.json": "cc0e520b4bc38333fa174dbde61eabdd1e76b03244cdd1e1697347ab8366187c",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-0.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-1.json": "cc0e520b4bc38333fa174dbde61eabdd1e76b03244cdd1e1697347ab8366187c",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-1.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-2.json": "cc0e520b4bc38333fa174dbde61eabdd1e76b03244cdd1e1697347ab8366187c",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-2.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-3.json": "cc0e520b4bc38333fa174dbde61eabdd1e76b03244cdd1e1697347ab8366187c",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-3.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-4.json": "cc0e520b4bc38333fa174dbde61eabdd1e76b03244cdd1e1697347ab8366187c",
+    "receipt-wrapper-verified/metadata-registry-only/mere-final-graph-4.log": "49584c48e0203720c00a489980c0b677178f23437d4b700da8732a0db6e70fb6",
+    "receipt-wrapper-verified/metadata-registry-only/outer-output.log": "52d9fbac178a0423efdfbfc00236a9a4958bbd53c4fe0cca6637d4c11ccf10a1",
+    "receipt-wrapper-verified/metadata-registry-only/run.py": "f445595419de3f97297a668ac4f86a7e642fe496b979e4acb18dc4b9c180211a"
+  },
+  "runner_sha256": "c851ba83059e227632fb0f448e9f5c4ea6cdbede3f7fb5a528da293ed4c27045",
+  "qualification": "Five complete byte-identical historical runner-copy executions in separate real Python processes. Child subprocess boundary is explicitly mocked: injected Cargo status/metadata and compiler string, no actual Cargo/compiler/build/host/browser/network/GPU. Outer exits, file writes and checker branches are actual. Metadata registry-only input is a controlled fixture, not freshly resolved real workspace metadata. Historical published custody child exit0/three tests and nonempty supplier receipts remain byte-preserved; these findings do not invalidate their recorded successful runs."
+}

@@ -1,0 +1,3 @@
+PASS sequential_control
+PASS competing_eligible_members: deterministic full fold; stored laws differ; cross-deliveries refused before retention
+PASS missing_parent_retry_control

@@ -1,0 +1,49 @@
+{
+  "date_utc": "2026-10-17T05:47:27.650748+00:00",
+  "verified_transitions": [
+    {
+      "certificate": "transition_2a1155a6ba9e_b4881a05e5d2.json",
+      "sha256": "534e4f399f386efb3c610b049434ce1348d77c684f35e306b614d4950326db65",
+      "path": "ports/djinn/src/bin/djinn.rs",
+      "old_fully_reviewed_chars": 67293,
+      "current_chars": 67360,
+      "unchanged_previously_read_chars": 67293,
+      "new_changed_lines_inspected": 1,
+      "hunks_verified": 1
+    },
+    {
+      "certificate": "transition_2e9d962a0832_ba29083d33fd.json",
+      "sha256": "608122d44b070f9fcdbe3304f1017fd150195a35796887869485a72299a4aa22",
+      "path": "Cargo.toml",
+      "old_fully_reviewed_chars": 54309,
+      "current_chars": 54374,
+      "unchanged_previously_read_chars": 54309,
+      "new_changed_lines_inspected": 1,
+      "hunks_verified": 1
+    },
+    {
+      "certificate": "transition_8ccb880cb412_9f48ad89674f.json",
+      "sha256": "e3f201f2cc1a91c96e96ac4b91fdf98ec0ab8b27bec4db26980b51aa43843b87",
+      "path": "ports/djinn/src/embedded_reservoir.rs",
+      "old_fully_reviewed_chars": 23805,
+      "current_chars": 23860,
+      "unchanged_previously_read_chars": 23793,
+      "new_changed_lines_inspected": 2,
+      "hunks_verified": 1
+    },
+    {
+      "certificate": "transition_ef78a4c5ce38_084464e3291b.json",
+      "sha256": "a5f548f7feb36a482305b593f7d7a33b54797e726e781989b02e82b0b4cc9128",
+      "path": "ports/djinn/src/resident_mere.rs",
+      "old_fully_reviewed_chars": 209215,
+      "current_chars": 218638,
+      "unchanged_previously_read_chars": 206205,
+      "new_changed_lines_inspected": 272,
+      "hunks_verified": 24
+    }
+  ],
+  "unread_old_source_refused_without_coverage_or_pending_write": true,
+  "unread_control_exit": 1,
+  "unread_control_log_sha256": "b941f4c1b7a130c48e90e2fe7b5fa8421fb25e89d1c4915453845bbc6be5fbe1",
+  "limits": "Retained coverage only: not a claim that unchanged current source was emitted again. Every old file was previously fully acknowledged at its reconstructed checkout hash; all new current characters are either text-identical mapped spans or printed and separately acknowledged insertion/replacement lines. Deleted lines were also emitted and checked."
+}

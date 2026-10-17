@@ -1,0 +1,16 @@
+error[E0282]: type annotations needed for `Focusable<OnClick<El<String, u32, _>, u32, _, {closure@...}>>`
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\forest_overlay_probe.rs:24:114
+   |
+24 | ...),mount.node(),|count:&u32|button(count.to_string(),|count:&mut u32,_|*count+=1),0u32);let original=owner.root();owner.dispatch_c...
+   |                   ^^^^^^^^^^^^----------------------------------------------------- type must be known at this point
+   |
+   = note: the full name for the type has been written to 'C:\t\cargo-targets\mere\authority-success-forest-overlay-probe.long-type-3181223025784934794.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+help: try giving this closure an explicit return type
+   |
+24 |  let d=dom();let mount=RetainedMount::new(d.clone());let mut owner=GenetAppRunner::new_at(d.clone(),mount.node(),|count:&u32| -> Focusable<OnClick<El<_, _, Action>, _, Action, _>> {button(count.to_string(),|count:&mut u32,_|*count+=1) },0u32);let original=owner.root();owner.dispatch_click(original,PointerClick::at((1.,1.)));
+   |                                                                                                                               +++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                      +
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0282`.

@@ -1,0 +1,17 @@
+
+running 5 tests
+QUALIFIED shared-assembler scope-change-and-empty-progress-accepted=true native-app-wrapper-adds-these-checks-in-source=true
+test chunk_assembler_only_verifies_chunk_hash_and_final_resource ... ok
+CONTROL valid-capture live-and-capture-accept=true
+OBSERVED absent-item live-refuses=true v1-v2-validate-decode-resource-check-accept=true
+OBSERVED duplicate-binding live-refuses=true v1-v2-validate-decode-resource-check-accept=true
+test valid_capture_and_live_client_control_agree ... ok
+OBSERVED wrong-capability live-refuses=true v1-v2-validate-decode-resource-check-accept=true
+OBSERVED invalid-utf8 frame-assembler=accepted-with-replacement native-line-reader=InvalidData unterminated-tail-also-rewritten=true
+CONTROL split-multibyte-utf8 readers-agree=true
+test malformed_presentations_survive_capture_validation_and_decode ... ok
+test invalid_utf8_is_rewritten_into_valid_json_by_frame_assembler ... ok
+test valid_utf8_split_across_frames_control_agrees ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

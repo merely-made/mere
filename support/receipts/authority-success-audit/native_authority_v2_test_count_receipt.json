@@ -1,0 +1,18 @@
+{
+  "date_utc": "2026-10-17T09:15:19.145056+00:00",
+  "original_receipt": "native_authority_v2_probe_receipt.json",
+  "original_receipt_sha256": "113fee0946f380490ef225212d95c54b9723177aa11fabe6124ecb52d8ca34d4",
+  "output_sha256": "67213e5c9080e61b6067a7a2c089d6e78cde21152040d47d920547006c0259fc",
+  "runner_reported_checks": 3,
+  "tests_passed": 4,
+  "tests_failed": 0,
+  "run_exit": 0,
+  "test_start_lines": [
+    "test referenced_name_is_projected_but_native_lookup_misses_it ... ok",
+    "test superseded_raw_label_is_still_the_native_target ... ok",
+    "test t4_bare_control_paints_at_overriding_local_offset ... actual bare control rect: (4.0, 4.0, 64.0, 48.0)",
+    "test text_name_is_projected_but_native_lookup_misses_it ... ok"
+  ],
+  "qualification": "The --nocapture geometry print interrupts one test line before its final ok, so the runner suffix-count reports three. The unchanged original test runner summary and four named test start lines establish four passed, zero failed. No rerun, overwritten evidence, or extra execution is claimed.",
+  "recorder_sha256": "8a50583c7a078be85fa55bbdd87b26cd109d61d8a586fa1f22fdfc584e8781da"
+}

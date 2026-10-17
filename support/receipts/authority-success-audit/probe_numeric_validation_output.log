@@ -1,0 +1,4 @@
+OBSERVATION: session max_abs silently drops NaN differences, including equal infinities; remote max_abs_error refuses non-finite inputs
+CONTROL: finite inputs agree on the maximum difference
+CONTROL: both helpers refuse mismatched lengths
+3 checks passed

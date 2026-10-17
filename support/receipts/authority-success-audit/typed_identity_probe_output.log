@@ -1,0 +1,11 @@
+
+running 3 tests
+test different_payload_bytes_keep_both_schema_reads_working ... CONTROL: different serialized payloads retain independent readable typed records
+ok
+test identical_bytes_under_different_schemas_replace_the_first_schema ... OBSERVATION: a successful second typed save aliases the first id and invalidates the first schema's read
+ok
+test same_payload_can_replace_privacy_and_provenance_in_place ... OBSERVATION: the same payload id retains replacement privacy and provenance metadata, not an immutable manifest
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

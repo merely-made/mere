@@ -1,0 +1,35 @@
+{
+  "date_utc": "2026-10-17T05:44:19.9859107Z",
+  "source": "ports/distillery/probe/fetch-model-matrix.ps1",
+  "source_sha256": "fb1309c7b12cf047128861dda9a9215dd68eec2a0d912d4e19539275be22bcad",
+  "exact_production_guard": "$relativeDirectory = $model.model_base_url -replace '^/models/', ''\nif (-not $relativeDirectory -or $relativeDirectory -match '[\\\\/:*?\"<>|]') {\r\n        throw \"Unsafe model directory from '$($model.model_base_url)'\"\r\n    }\n$directory = Join-Path $modelsRoot $relativeDirectory",
+  "checks": 3,
+  "exit": 0,
+  "rows": [
+    {
+      "input": "/models/..",
+      "accepted_by_production_guard": true,
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere",
+      "is_model_root_itself": false,
+      "is_repository_root": true,
+      "strictly_below_model_root": false
+    },
+    {
+      "input": "/models/.",
+      "accepted_by_production_guard": true,
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\models",
+      "is_model_root_itself": true,
+      "is_repository_root": false,
+      "strictly_below_model_root": false
+    },
+    {
+      "input": "/models/all-MiniLM-L6-v2",
+      "accepted_by_production_guard": true,
+      "resolved": "C:\\Users\\mark_\\Code\\repos\\mere\\models\\all-MiniLM-L6-v2",
+      "is_model_root_itself": false,
+      "is_repository_root": false,
+      "strictly_below_model_root": true
+    }
+  ],
+  "scope": "The production guard AST is extracted and evaluated directly with synthetic model_base_url values. No curl, network, model download, directory creation, move or production/original-test edit is executed. This demonstrates malformed caller-supplied matrix paths being accepted; no externally reachable attack, actual overwrite, or current committed matrix damage is claimed."
+}

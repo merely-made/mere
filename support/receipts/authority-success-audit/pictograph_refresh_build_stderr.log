@@ -1,0 +1,41 @@
+   Compiling thiserror v2.0.21
+   Compiling naga-types v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling naga v30.0.1
+   Compiling gpu-allocator v0.28.0
+   Compiling polycool v0.4.0
+   Compiling kurbo v0.13.1
+   Compiling blake3 v1.8.7
+   Compiling windows-sys v0.61.2
+   Compiling nalgebra v0.35.0
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling peniko v0.6.1
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling stacker v0.1.25
+   Compiling nu-ansi-term v0.50.3
+   Compiling tracing-subscriber v0.3.23
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling glamx v0.3.1
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling parry2d v0.31.1
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling rapier2d v0.36.0
+   Compiling wgpu v30.0.1
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling mere-cartography v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\canvas\cartography)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+   Compiling pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 43s

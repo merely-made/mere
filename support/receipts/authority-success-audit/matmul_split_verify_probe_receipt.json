@@ -1,0 +1,37 @@
+{
+  "date_utc": "2026-10-17T21:37:30.238881+00:00",
+  "exit": 0,
+  "passed": 4,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/tiled/eval/split_cubes/mod.rs": "b2ce244acc92bf8eeb399153fa228ab6ba762550bacdd22e48b12ec2ac82dd43"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_split_verify_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-split-verify.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-split-verify.exe",
+      "bytes": 741888,
+      "sha256": "039f0a91d4c173e09d3d4d618a439f0a6c8d68b7f5cb5e906ab157a24e4b46c7"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-split-verify.pdb",
+      "bytes": 3018752,
+      "sha256": "e0ba78c5215b1942b72c2ed9801ae7fe48dcb55d5a0e9b8a44c441d6101b260e"
+    }
+  ],
+  "evidence_sha256": {
+    "run_matmul_split_verify_probe.py": "e09725b5e549dbb76d72e56f3faabf0d941ad6f48b6e2b471950be40910f8aaf",
+    "matmul_split_verify_probe.rs": "2566c38431950e5cf7b2c45b24f05f4197b73933a1db826ba3b4c35fda68492c",
+    "matmul_split_verify_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matmul_split_verify_run.txt": "d2044e0071982a8824d73c79d5f63fc5198b23f130792462627bccfc50cbde3c"
+  },
+  "qualification": "Exact f32 comparison expression extracted from split-cube verify, without any semantic substitutions. NaN actual output is admitted against finite expected; wrong finite/infinite outputs rejected and finite equal control admitted. Tests predicate only, not a complete verify run, benchmark, DSL lowering, physical GPU NaN occurrence or atomic benchmark repetition."
+}

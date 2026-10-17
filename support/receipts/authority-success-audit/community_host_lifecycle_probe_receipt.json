@@ -1,0 +1,24 @@
+{
+  "tests": 8,
+  "passed": [
+    "control: duplicate live root is refused",
+    "counterexample: closed handle reviews and installs another scope",
+    "counterexample: pending review installs after close",
+    "counterexample: repeated stale close displaces remount and removes live root guard",
+    "control: worker completion consumes exact pending request",
+    "control: close rejects pending work and ignores late worker completion",
+    "control: deadline terminates worker and rejects all pending turns",
+    "counterexample: asynchronous Auto fallback load failure clears refusal and leaves mounted latch"
+  ],
+  "source_sha256": {
+    "ports/graphshell/web/applets/host.mjs": "3b5fa55eefea79fc891206803bbf11e032e8035344ee82edf232892d5899b731",
+    "ports/graphshell/web/applets/runtime.mjs": "8cdb458ff2fec764d9d81b6c696c6b33e8a810e9e1b3562fed92cf577c6c12d1",
+    "ports/graphshell/web/mount.js": "e0df8ad9f38aad94b255503ba35f2768edee1c939cd047b55aabd50ae27583b0",
+    "ports/graphshell/src/bin/moot_resources_host.rs": "79ffd7b4677f8e0af212bcc2c3f5641231ce125dc3ef15139e680ae9fea3efbd",
+    "ports/graphshell/src/web_tree/applet.rs": "336bc53fcb5e4cb33c6e4f6d421914a80be9fb07d8d91d2d71220e5ab85f032c",
+    "ports/graphshell/web/tests/presentation-mount.mjs": "eebb8a934f107c586afcb726afdb095bdbda38c4562947cb5d09d5eb21bf6cdb"
+  },
+  "diagnostic_sha256": "ad432dbf2b794d1a605aefad5cce11d5ec4bb8b0f9d651f89869914740756270",
+  "scope": "Actual unmodified JS host/runtime and element module; synthetic root, gs callbacks, fetch responses, workers and MutationObserver. No browser renderer, Rust signature validation, real worker process, network, installed profile or device qualification.",
+  "production_changes": false
+}

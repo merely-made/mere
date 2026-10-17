@@ -1,0 +1,53 @@
+{
+  "qualification": "Exact current source traces only. Current touched files fully reread; unchanged neighboring host callers were previously fully read and retraced here. No compiled/OS/GPU/presentation proof.",
+  "traces": [
+    {
+      "title": "Reconfiguration has no presentation output",
+      "path": "crates/cambium/cambium-rootstock/src/presentation/wgpu.rs",
+      "source_sha256": "871f15f95b0a939267884dbac3f769ab7e9158a5f3615f7817ec738c279aae7b",
+      "first_line": 160,
+      "last_line": 166,
+      "excerpt": "            genet_render_host::SurfaceAcquire::Reconfigured => {\n                trace!(\"acquire-reconfigured\", \"\");\n                profile.acquire_us = elapsed_us(phase.elapsed());\n                profile.total_us = elapsed_us(frame_started.elapsed());\n                return Ok(None);\n            },\n"
+    },
+    {
+      "title": "Native host returns before presentation sequence mutation",
+      "path": "crates/cambium/cambium-rootstock/src/frame.rs",
+      "source_sha256": "c993cb94171cddd4452ee5c376c07408017fc1851fe3da0b453c295b59e76140",
+      "first_line": 785,
+      "last_line": 797,
+      "excerpt": "        let output = match output {\n            Ok(Some(output)) => output,\n            Ok(None) => {\n                profile.total_us = elapsed_us(frame_started.elapsed());\n                self.s.last_frame_profile = Some(profile);\n                return;\n            },\n            Err(failure) => {\n                self.refuse_presentation(failure);\n                return;\n            },\n        };\n"
+    },
+    {
+      "title": "Wgpu driver stamps only a real presenter output",
+      "path": "crates/cambium/cambium-rootstock/src/presentation/wgpu_driver.rs",
+      "source_sha256": "c88a8d36ffbd241c82cad6e8514af79f74a6b305e66301a97f1461878e9d9568",
+      "first_line": 127,
+      "last_line": 138,
+      "excerpt": "        self.profile = Some(profile);\n        let Some(output) = result? else {\n            return Ok(None);\n        };\n        let stamp = frame.presentation_stamp();\n        let _ = self\n            .captures\n            .resume(self.backend(), stamp.context_generation);\n        self.output = Some((stamp, output));\n        Ok(Some(stamp))\n    }\n"
+    },
+    {
+      "title": "Installed driver host returns before recording a missing output",
+      "path": "crates/cambium/cambium-rootstock/src/presentation/drive.rs",
+      "source_sha256": "7f1fe48195d302f57df4e401d570870d7ce7a4467518131e17ebedf0cc29f5cd",
+      "first_line": 31,
+      "last_line": 59,
+      "excerpt": "        let presented = match result {\n            Ok(Some(stamp)) if stamp == expected => stamp,\n            Ok(Some(_)) => {\n                let driver = self\n                    .s\n                    .presentation_driver\n                    .as_ref()\n                    .expect(\"installed driver\");\n                self.refuse_presentation(PresentationFailure {\n                    backend: driver.backend(),\n                    generation: prepared.generation,\n                    producer_key: None,\n                    message: \"driver returned a foreign presentation identity\".into(),\n                    native: None,\n                });\n                return;\n            },\n            Ok(None) => {\n                let mut profile = prepared.profile;\n                profile.total_us = micros(prepared.started.elapsed());\n                self.s.last_frame_profile = Some(profile);\n                return;\n            },\n            Err(failure) => {\n                self.refuse_presentation(failure);\n                return;\n            },\n        };\n"
+    },
+    {
+      "title": "Direct harness resolver uses retained semantics",
+      "path": "crates/cambium/cambium-genet-winit-host/src/harness.rs",
+      "source_sha256": "7839e06bb5a201fbde7ea25659721eedee485a8aed7ff7dc0bf0ef195ce1f232",
+      "first_line": 454,
+      "last_line": 468,
+      "excerpt": "    fn resolve_node(&self, selector: &Selector) -> Option<NodeId> {\n        let dom = self.runner().dom();\n        let dom_ref = dom.borrow();\n        let layout = self.host.s.layout.as_ref()?;\n        let projection = cambium_rootstock::document_projection(\n            &cambium_rootstock::WindowDom::document(&dom_ref),\n            layout,\n            self.host.s.last_focus,\n        );\n        taproot::matching_prefer_exact_with_projection(&dom_ref, selector, &projection)\n            .into_iter()\n            .filter(|node| layout.rendered_visible(&*dom_ref, *node))\n            .find(|node| self.painted_rect(*node).is_some())\n    }\n"
+    },
+    {
+      "title": "Native host policy surrounds runner key dispatch",
+      "path": "crates/cambium/cambium-rootstock/src/input.rs",
+      "source_sha256": "2eb75fb55e30dc7af7022e35a937923757e6a4dae34af7145c708abdf7a17aa2",
+      "first_line": 485,
+      "last_line": 588,
+      "excerpt": "    pub fn key(&mut self, press: &KeyPress) {\n        // `CAMBIUM_HOST_KEY_TRACE=1` reports every key the host was handed and\n        // what became of it. It exists because \"typing does not work\" has three\n        // very different causes \u2014 the window never got the event, winit could\n        // not name the key, or the tree dropped it \u2014 and from outside they look\n        // identical. One line per press tells them apart.\n        let trace = key_trace();\n        if trace {\n            eprintln!(\n                \"[cambium-host] key {:?} text={:?} mods={:?} focus={:?}\",\n                press.key,\n                press.text,\n                press.modifiers,\n                self.s.runner.as_ref().and_then(|r| r.focus()),\n            );\n        }\n        // Hold-Tab spatial navigation, before anything else can claim the keys.\n        //\n        // \"Held\" means physically down, not \"down long enough\": you press Tab\n        // and arrow immediately, the way a chord feels, rather than waiting out\n        // the OS repeat delay. The press itself still traverses \u2014 a tap is\n        // exactly what it always was \u2014 so the mode costs nothing until an arrow\n        // arrives, and the initial traversal is simply where the steering\n        // starts from.\n        if self.options.spatial_focus {\n            if let Key::Named(NamedKey::Tab) = press.key {\n                if press.repeat {\n                    // Already held: swallow the repeat rather than walking\n                    // document order sixty times while steering.\n                    return;\n                }\n                if trace {\n                    eprintln!(\"[cambium-host]   Tab down: spatial focus armed\");\n                }\n                self.s.tab_held = true;\n                // Fall through: this press traverses as it always did.\n            } else if self.s.tab_held\n                && let Some(dir) = press.direction()\n            {\n                let moved = self.focus_spatial(dir);\n                if trace {\n                    eprintln!(\"[cambium-host]   spatial {dir:?} moved={moved}\");\n                }\n                return;\n            }\n        }\n        // The application's own policy first (an Escape that closes a popover, a\n        // global shortcut): it can consume the event before the tree sees it.\n        {\n            let Some(runner) = self.s.runner.as_mut() else {\n                return;\n            };\n            if (self.hooks.key_intercept)(runner, press) {\n                if trace {\n                    eprintln!(\"[cambium-host]   consumed by key_intercept\");\n                }\n                self.after_dispatch();\n                return;\n            }\n        }\n        if self.zoom_chord(press) {\n            if trace {\n                eprintln!(\n                    \"[cambium-host]   zoom chord: ui_zoom now {}\",\n                    self.ui_zoom()\n                );\n            }\n            return;\n        }\n        let Some(kev) = press.to_runner_key() else {\n            // No runner key and no injected text: a dead key, or an\n            // unidentified one the platform reported no text for.\n            if trace {\n                eprintln!(\"[cambium-host]   dropped: no Cambium key and no text\");\n            }\n            return;\n        };\n        if trace {\n            eprintln!(\"[cambium-host]   dispatching {:?}\", kev.key);\n        }\n        // Snapshot the caret before dispatch: the host's visual movement below\n        // recomputes from this rather than from whatever logical move the field\n        // just applied.\n        let base = self.focused_text_selection();\n        let prevented = {\n            let Some(runner) = self.s.runner.as_mut() else {\n                return;\n            };\n            // Tab included: the runner routes it to the focused element's\n            // handlers and applies its own traversal default only if none of\n            // them prevented it.\n            runner.dispatch_key(kev);\n            runner.default_prevented()\n        };\n        if !prevented {\n            self.move_focused_text_visual(press, base);\n        }\n        self.after_dispatch();\n        // Focus may have moved (Tab, or a handler's `set_focus`): refresh the\n        // `:hover` / `:focus` restyle. Cheap \u2014 it returns early unless the\n        // hovered/focused pair actually changed.\n        self.hover();\n    }\n"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "burn-cubecl",
+    "version": "0.22.0",
+    "source": "registry+https://github.com/rust-lang/crates.io-index"
+  },
+  {
+    "name": "burn-remote",
+    "version": "0.22.0",
+    "source": null
+  },
+  {
+    "name": "cubecl-runtime",
+    "version": "0.11.0",
+    "source": null
+  },
+  {
+    "name": "cubecl-wgpu",
+    "version": "0.11.0",
+    "source": "registry+https://github.com/rust-lang/crates.io-index"
+  },
+  {
+    "name": "cubek-matmul",
+    "version": "0.3.0",
+    "source": null
+  },
+  {
+    "name": "cubek-reduce",
+    "version": "0.3.0",
+    "source": "registry+https://github.com/rust-lang/crates.io-index"
+  }
+]

@@ -1,0 +1,108 @@
+{
+  "schema": "mere.djinn.receipt/v1",
+  "plan": "pre-guard-write",
+  "test": "pre-guard-write",
+  "run": "20261016T211434Z-bca47cbc",
+  "commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "dirty": true,
+  "binary": {
+    "path": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-probe.exe",
+    "sha256": "4ba8d14b9f1753e8322d0de19935ad479aec4dbae045ec1dfce116b1e7f348a1"
+  },
+  "machine": {
+    "name": "O-PC",
+    "os": "windows",
+    "arch": "x86_64"
+  },
+  "host": {
+    "kind": "local",
+    "remote": null
+  },
+  "quiet": {
+    "requested": false,
+    "waited_ms": 0,
+    "achieved": null
+  },
+  "lock_wait_ms": 0,
+  "load": {
+    "before": {
+      "at_ms": 1792185274408,
+      "rustc": 1,
+      "cargo": 2,
+      "cpu_queue": 0.0,
+      "cpu_busy": 0.25680933852140075
+    },
+    "after": {
+      "at_ms": 1792185274910,
+      "rustc": 1,
+      "cargo": 2,
+      "cpu_queue": 0.0,
+      "cpu_busy": 0.29230769230769227
+    }
+  },
+  "walls": {
+    "before": {
+      "installed_candidates": [],
+      "installed": [],
+      "standard_endpoints": {},
+      "canaries": [],
+      "session_bus": null
+    },
+    "after": {
+      "installed_candidates": [],
+      "installed": [],
+      "standard_endpoints": {},
+      "canaries": [],
+      "session_bus": null
+    },
+    "differences": []
+  },
+  "started_ms": 1792185274705,
+  "finished_ms": 1792185275223,
+  "steps": [
+    {
+      "t_ms": 142,
+      "at_ms": 1792185274847,
+      "label": "run begun",
+      "detail": {
+        "dir": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-fixtures\\receipts\\pre-guard-write\\20261016T211434Z-bca47cbc",
+        "lock_wait_ms": 0
+      }
+    },
+    {
+      "t_ms": 145,
+      "at_ms": 1792185274850,
+      "label": "spawn refused",
+      "detail": {
+        "program": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-probe.exe",
+        "resident": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-fixtures\\outside-run-root",
+        "why": "LOCALAPPDATA=C:\\t\\cargo-targets\\mere\\authority-success-testkit-fixtures\\outside-run-root\\local is outside the run"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "t_ms": 151,
+      "name": "every spawned process has exited",
+      "bound": "state",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "t_ms": 153,
+      "name": "no endpoint of this run remains",
+      "bound": "state",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    }
+  ],
+  "controls": [],
+  "attended": [],
+  "evidence": [],
+  "outcome": {
+    "passed": true,
+    "failures": []
+  }
+}

@@ -1,0 +1,39 @@
+error[E0583]: file not found for module `command`
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\text_input.rs:29:1
+   |
+29 | mod command;
+   | ^^^^^^^^^^^^
+   |
+   = help: to create the module `command`, create file "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\command.rs" or "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\command\mod.rs"
+   = note: if there is a `mod command` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `core`
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\text_input.rs:30:1
+   |
+30 | mod core;
+   | ^^^^^^^^^
+   |
+   = help: to create the module `core`, create file "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\core.rs" or "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\core\mod.rs"
+   = note: if there is a `mod core` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `multiline`
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\text_input.rs:31:1
+   |
+31 | mod multiline;
+   | ^^^^^^^^^^^^^^
+   |
+   = help: to create the module `multiline`, create file "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\multiline.rs" or "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\multiline\mod.rs"
+   = note: if there is a `mod multiline` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `word_motion`
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\text_input.rs:32:1
+   |
+32 | mod word_motion;
+   | ^^^^^^^^^^^^^^^^
+   |
+   = help: to create the module `word_motion`, create file "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\word_motion.rs" or "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\cambium\cambium\src\controls\word_motion\mod.rs"
+   = note: if there is a `mod word_motion` elsewhere in the crate already, import it with `use crate::...` instead
+
+error: aborting due to 4 previous errors
+
+For more information about this error, try `rustc --explain E0583`.

@@ -1,0 +1,7 @@
+error: failed to load source for dependency `mere-transport`
+
+Caused by:
+  unable to update https://github.com/merely-made/murm.git?branch=main#bd8fe1e5
+
+Caused by:
+  can't checkout from 'https://github.com/merely-made/murm.git': you are in the offline mode (--offline)

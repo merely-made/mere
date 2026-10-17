@@ -1,0 +1,12 @@
+{
+  "session_id": 87735,
+  "exit_code": 0,
+  "build_finished": {
+    "reason": "build-finished",
+    "success": true
+  },
+  "basis_commit": "c1b5d47156f2c940ccd67799963ed203df96362a",
+  "stdout_sha256": "4e62875cf8899eda0a0b5e84775138f5415c31cdb89dcd4366d56d110ab1c921",
+  "stderr_sha256": "fded18cc07e996c6a1c136ed810f6fcfdbbd0a5c549356bb2a5eb097f6eaf768",
+  "scope": "Terminal result from original exec session; successful library build, not a test run."
+}

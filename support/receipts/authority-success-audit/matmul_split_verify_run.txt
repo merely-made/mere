@@ -1,0 +1,9 @@
+
+running 4 tests
+test equal_finite_output_control ... ok
+test infinite_output_is_rejected ... ok
+test nan_output_is_not_rejected ... ok
+test wrong_finite_output_is_rejected ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

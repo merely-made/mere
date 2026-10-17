@@ -1,0 +1,11 @@
+{
+  "status": "audit fixture failed compile before execution",
+  "cause": "builder_for requires DerivedKeypair, fixture supplied Ed25519Keypair",
+  "production_edits": false,
+  "tests_executed": false,
+  "evidence_sha256": {
+    "supervisor_preliminary_supervisor_boundary_probe.rs": "086f1a5c39e606cc1581e727e834348eecb3d38d68d339432043367f69e306ff",
+    "supervisor_preliminary_run_supervisor_boundary_probe.py": "dfad2fd9e995e28c061568a1dc44210e403ca39e103077ce234295d20220db26",
+    "supervisor_preliminary_supervisor_boundary_probe_compile.log": "ed61bfa20600c4de608d02d2f586ab681996aa5e8f370078bf88f30b858fdebf"
+  }
+}

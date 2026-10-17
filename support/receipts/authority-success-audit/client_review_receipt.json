@@ -1,0 +1,112 @@
+{
+  "date_utc": "2026-10-16T21:45:18.071795+00:00",
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "previous_turn_classification": "progress",
+  "kind": "Complete client source reading and bounded native public-API defect diagnostics; no repairs",
+  "findings": [
+    "Q062",
+    "Q063",
+    "Q064",
+    "Q065",
+    "Q066"
+  ],
+  "authority_entries": [
+    "A058",
+    "A059",
+    "A060",
+    "A061",
+    "A062",
+    "A063"
+  ],
+  "complete_areas": [
+    "crates/graphshell/graphshell-client/"
+  ],
+  "client_files": 15,
+  "client_chars": 331603,
+  "coverage": {
+    "complete_files": 490,
+    "total_files": 3345,
+    "read_chars": 7687656,
+    "total_chars": 36772639,
+    "changed_since_inventory": [],
+    "pending_chunks": 0
+  },
+  "next_read": {
+    "path": "crates/chirograph/Cargo.toml",
+    "start": 0
+  },
+  "production_edits_this_pass": false,
+  "preserved_production_and_test_hashes": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    ".gitattributes": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "ab40f1887af4ad301a033b409eb2d5413238b33db3771db5693f06691a2866ab",
+    "ports/graphshell/tests/fixtures/identity_cards.json": "ec614d208fcefd51c2039db047f8707abc3daf70108a032bf847681d25dbc046"
+  },
+  "client_source_sha256": {
+    "crates/graphshell/graphshell-client/Cargo.toml": "b38185b8370154d1fe85453c2060dd0b0501496c69fef9cb84a6826b0c79e74b",
+    "crates/graphshell/graphshell-client/src/action_draft.rs": "fc4748418b0bdee8d297d430cbad43f260d90e56bce65ab2150e87257a924048",
+    "crates/graphshell/graphshell-client/src/core.rs": "3bfbc36731969a504fafe61e22d2b74f9e00d1e6aa0df832b487669a154181b2",
+    "crates/graphshell/graphshell-client/src/driver.rs": "57e5d47a94b175de00951c6798e69922140701ee12a3ebf29ee7679335f23dc7",
+    "crates/graphshell/graphshell-client/src/fold.rs": "b82db6e03719460ca61891b44345c45029c3453e1a68985b30d9b4caf879e109",
+    "crates/graphshell/graphshell-client/src/frozen.rs": "eb561ba87480ff3662694e5aed41cdc20c81e78876b73222f26d0f917d7b9039",
+    "crates/graphshell/graphshell-client/src/lib.rs": "388b3d86ee1094ceecc6dc4558ed965be3bf4c8da966fab1fdae908eea175d29",
+    "crates/graphshell/graphshell-client/src/pump.rs": "f25a454d531b27baa1d3207e59abf8652b5e002cdc0ed44eca8040791849212c",
+    "crates/graphshell/graphshell-client/src/remote.rs": "15a2fe799928127d84622801dfc84cf1744fdad10cda16e2d4890e89dec0d014",
+    "crates/graphshell/graphshell-client/src/remote/tests.rs": "76c51dd689b309395a0e4b0ccf177becee0be8bc9931a3c23c12f4ec68890c52",
+    "crates/graphshell/graphshell-client/src/session.rs": "0890d30eebe9a08b896094c32e8a640e79ce9e1fbe397de4933b4d53f073d26b",
+    "crates/graphshell/graphshell-client/tests/facet_frozen.rs": "c2c34fd15f33ef5ead1391cba1a52b661ea4c2fd67416d24fec5f8e390b1fa46",
+    "crates/graphshell/graphshell-client/tests/fold_remote.rs": "e43bbea58a1eff354afe159df0c3a39d3021bc40a8c1babcacf2ae02a150b450",
+    "crates/graphshell/graphshell-client/tests/portable_projection.rs": "3622bac8e2827ba8aa8cc2cbc8f67825db07b66ba87a6aa1616d80f78fcff299",
+    "crates/graphshell/graphshell-client/tests/site_fold_parity.rs": "40449c37bdbabf77114112931d8922e378b0664e4df202ec6efa1845c958adcd"
+  },
+  "governing_document_sha256": {
+    "design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md": "ccccade60c177323c25a46346e7c8ca7cc697823fd0744418c53dc4855b9ac26"
+  },
+  "build": {
+    "exit": 0,
+    "command": "cargo build -p graphshell-client --lib --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build --message-format=json"
+  },
+  "diagnostic_test_count": 8,
+  "diagnostic_test_exit": 0,
+  "coverage_limits": [
+    "Existing client unit/integration tests read, not run this pass.",
+    "No browser, network, live accessibility bridge or installed resident scenario.",
+    "Targeted port call sites do not count as full port source coverage.",
+    "No whole-repository completion claim."
+  ],
+  "generated_output_removed": true,
+  "retained_isolation": [],
+  "diff_check": {
+    "exit": 0,
+    "log": "client_review_diff_check.txt"
+  },
+  "evidence_sha256": {
+    "graphshell_client_build_output.jsonl": "38cd0bfc43a4590475f039e28676b729e1b78896db37494f4afb6e3cbbb47a6f",
+    "client_review_probe.rs": "79d94f3d08ca8abab3309181972f97dd36bc4a669f572ea9e5961f42b5bd977a",
+    "run_client_review_probe.py": "fe6bebc14ce35a3c239cd8054c44137ded9f4aebf13928fa12e806c216116ffd",
+    "client_review_probe_build_output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client_review_probe_output.txt": "02d6370757467165c1eb04db901b8eb9c27dc43616932d4784f303a62185b998",
+    "client_review_probe_receipt.json": "20467a3ea884db9cb0740551e63dcb820a57f38930027194f7f6b83c9b2a352c"
+  }
+}

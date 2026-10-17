@@ -1,0 +1,68 @@
+{
+  "date_utc": "2026-10-16T21:44:38.326609+00:00",
+  "scope": "Current public native client core, state, frozen and remote lifecycle APIs on generated validated snapshots/replies. No network, browser, live accessibility stack or installed resident executed.",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\client_review_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-client-review-probe.exe",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+    "--extern",
+    "scenotime=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-26e30005ae0e166e.rlib",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-dbc60af0f8900962.rlib",
+    "--extern",
+    "graphshell_client=C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_client.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "tests": 8,
+  "source_sha256": {
+    "crates/graphshell/graphshell-client/src/core.rs": "3bfbc36731969a504fafe61e22d2b74f9e00d1e6aa0df832b487669a154181b2",
+    "crates/graphshell/graphshell-client/src/driver.rs": "57e5d47a94b175de00951c6798e69922140701ee12a3ebf29ee7679335f23dc7",
+    "crates/graphshell/graphshell-client/src/fold.rs": "b82db6e03719460ca61891b44345c45029c3453e1a68985b30d9b4caf879e109",
+    "crates/graphshell/graphshell-client/src/frozen.rs": "eb561ba87480ff3662694e5aed41cdc20c81e78876b73222f26d0f917d7b9039",
+    "crates/graphshell/graphshell-client/src/lib.rs": "388b3d86ee1094ceecc6dc4558ed965be3bf4c8da966fab1fdae908eea175d29",
+    "crates/graphshell/graphshell-client/src/pump.rs": "f25a454d531b27baa1d3207e59abf8652b5e002cdc0ed44eca8040791849212c",
+    "crates/graphshell/graphshell-client/src/remote.rs": "15a2fe799928127d84622801dfc84cf1744fdad10cda16e2d4890e89dec0d014",
+    "crates/graphshell/graphshell-client/src/session.rs": "0890d30eebe9a08b896094c32e8a640e79ce9e1fbe397de4933b4d53f073d26b"
+  },
+  "library_sha256": {
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+      "sha256": "5217cd48a147df645cd924eada44f053696f2fa82d1b49f4383fd0c73a24f1dc"
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+      "sha256": "398b81ba7e1443daa91a756fe7ea33fa73140a0e1adceaf4d91610f0da931f51"
+    },
+    "scenotime": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-26e30005ae0e166e.rlib",
+      "sha256": "4e168eba97a82909f84ff5ae16c9ff04bc1903a52e7cc6c9123e5e222ca34e1f"
+    },
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-dbc60af0f8900962.rlib",
+      "sha256": "0ea6ef2d35d91501ffe51a1912cfe6db56c9f35ae88c9ede82bcb404818e7ad9"
+    },
+    "graphshell_client": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_client.rlib",
+      "sha256": "89cd05fa90ddb045737ff25d710579b571afcf3ff22032bc143f89d333bd93fb"
+    }
+  },
+  "harness_sha256": "79d94f3d08ca8abab3309181972f97dd36bc4a669f572ea9e5961f42b5bd977a",
+  "native_binary_sha256": "f9240ae3ec63d07a02e19498832574616a38c91f60ead64f9127e9a6edf00422",
+  "generated_native_output_removed": true
+}

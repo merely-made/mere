@@ -1,0 +1,3 @@
+PASS unchanged float order preserves owner-one node and local count
+PASS raising float one reassigns its local count/node to owner two and resets owner one
+PASS wrong-owner count remains live and increments through actual current callback

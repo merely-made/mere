@@ -1,0 +1,17 @@
+{
+  "removed": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-inference-crash-probe.lib",
+      "bytes": 47316,
+      "sha256": "d829e95e30374db7c8d7982ee3ed6c25b9cc949b5fafaf91c7fe28714115ff33",
+      "kind": "Rust probe linker import/export output; header and executable owner name verified"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-inference-crash-probe.exp",
+      "bytes": 25376,
+      "sha256": "3c4d72b221a13bb8e61b2bdf341815cf3ff96e7d3f8fe384feb0e8fe3e7512ec",
+      "kind": "Rust probe linker import/export output; header and executable owner name verified"
+    }
+  ],
+  "remaining_probe_outputs": []
+}

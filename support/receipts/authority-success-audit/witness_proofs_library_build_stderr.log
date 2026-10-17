@@ -1,0 +1,5 @@
+   Compiling mere-proofs v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\proofs)
+   Compiling postcard v1.1.3
+   Compiling mere-framing v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\framing)
+   Compiling state-witness v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\state-witness)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.31s

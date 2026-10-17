@@ -1,0 +1,162 @@
+{
+  "date_utc": "2026-10-16T22:13:31.510573+00:00",
+  "basis_commit": "4523cb6f4b3998a27dc474ba30a7f1df537c5ec3",
+  "kind": "Complete Scenograph source review, partial Scenomise source review and four contained repairs",
+  "new_findings": [
+    "Q070",
+    "Q071",
+    "Q072",
+    "Q073"
+  ],
+  "prior_finding_repaired": "Q066",
+  "authority_entries": [
+    "A072",
+    "A073",
+    "A074",
+    "A075",
+    "A076",
+    "A077",
+    "A078",
+    "A079"
+  ],
+  "production_edits_this_pass": true,
+  "source_files_in_complete_area": 14,
+  "source_chars_in_complete_area": 168070,
+  "coverage": {
+    "complete_files": 537,
+    "total_files": 3352,
+    "read_chars": 8349560,
+    "total_chars": 36854820,
+    "changed_since_inventory": [],
+    "pending_chunks": 0
+  },
+  "next_read": {
+    "path": "crates/cambium/scenes/scenomise/src/catalog.rs",
+    "start": 0
+  },
+  "source_sha256": {
+    "crates/cambium/scenes/scenograph/Cargo.toml": "080396f4df443854ddd35f80dd01a83545bba7c109e7d981f2e10497b6437155",
+    "crates/cambium/scenes/scenograph/examples/presentation_rules.rs": "a4bb98a936e1169b57f8ca73e9da7c89b438ba72c2eaf6e9913f1891bce36f05",
+    "crates/cambium/scenes/scenograph/src/attention.rs": "8554d138fe87594fe3dcc7391291b0a8c404b6a686c14eaca25e671cd7f41215",
+    "crates/cambium/scenes/scenograph/src/dataset.rs": "22185b7f7e7fb117d866af168eb4665b97807433b62d125fb7d3d2879f3dda98",
+    "crates/cambium/scenes/scenograph/src/dynamics.rs": "c17ae42e3383598120b4d112d04929078e8bc3b160f83004cfa891a4fa4d407b",
+    "crates/cambium/scenes/scenograph/src/lib.rs": "6201eab4fe0bfeb152ba4ac8ac010b6b70f2d27798103980797fba6b9c0c058d",
+    "crates/cambium/scenes/scenograph/src/link.rs": "42f1c3328693d90aec125ed3b3d60ce2a45d4b4b93659ce7a43b2e2749c0694f",
+    "crates/cambium/scenes/scenograph/src/options.rs": "5626033cac9548d8ea76d4eb827e0939fcf3529300f4e1a4b18006babff53049",
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "5d4d8cf451e22ee3481881c9f87fd1d4c6df74e124e70b6ae37a37deb4e1b2f6",
+    "crates/cambium/scenes/scenograph/src/presentation/scripts.rs": "0efdcf8901fe64ebc897cfca002d54c4fa946008f06d85cac148dc88c5c34643",
+    "crates/cambium/scenes/scenograph/src/relationship.rs": "a5aa5e3fc180b151c001f11819946eceebae94995318bb4fd154cf7fe1f5ea1b",
+    "crates/cambium/scenes/scenograph/src/seed.rs": "d26a60cbbbecc790ec8b7c33c9e402692c9c4198c23b901d59756eafa1fdd429",
+    "crates/cambium/scenes/scenograph/src/suggestion.rs": "6f939f921b5093707e579906cc963f9a9570c3985d00c18d3b2a012c1ad4963e",
+    "crates/cambium/scenes/scenograph/src/swatch.rs": "9c0517a76ea8dcae2c15cb9b933894fccbe730744d49b4a01445c4d5aff7b8ae",
+    "crates/cambium/scenes/scenomise/Cargo.toml": "eb58994dbc2c64bdeef828b56f42ee2d0856d44c06913539c7d689d25c2a1909",
+    "crates/cambium/scenes/scenomise/src/arrangement.rs": "845a930856819b16c4003f49937ff76c6699c407420db4b219a79a0a4281155c",
+    "crates/cambium/scenes/scenomise/src/authoring.rs": "7d15157962c7be55aaf0b56578e530ff21997c0620760c74e3cdc88779c7d37c",
+    "crates/cambium/scenes/scenomise/src/backdrops.rs": "a32f6b22a6078df73d51ed94d099905a3d1f31a90e4f1747e4d55e16d1ebd427",
+    "crates/cambium/scenes/scenomise/src/opened_link.rs": "727fd157715bbd27aae7fe6d3ffb45ec2a6c3c9a5f0f9957d3d155551585ca21",
+    "crates/script/rhai/tests/scenograph_rules.rs": "c4bde16ef3c4f25b5a3e7f058cc09f69d44a552402dc9317ffe51877bb4d4686",
+    "crates/graphshell/graphshell-client/src/remote.rs": "0918f8c152a71ddcdfa524f31d4f499f21087f1151d55c9b3f004cc9680efc2b",
+    "crates/graphshell/graphshell-client/src/remote/tests.rs": "55a364b55a994fe9871168f77ca080bc6a0dec24d1291d999bd11b405fb80a40"
+  },
+  "preserved_production_and_test_hashes": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    ".gitattributes": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "ab40f1887af4ad301a033b409eb2d5413238b33db3771db5693f06691a2866ab",
+    "ports/graphshell/tests/fixtures/identity_cards.json": "ec614d208fcefd51c2039db047f8707abc3daf70108a032bf847681d25dbc046"
+  },
+  "upstream_integration": {
+    "before": "b567660d67c4d900f1d638345c89715e1f36c575",
+    "fetched_main": "434aa49c",
+    "merge": "4523cb6f4b3998a27dc474ba30a7f1df537c5ec3",
+    "conflicts": false
+  },
+  "regression_controls": {
+    "new_pre_fix_failures": 3,
+    "final_scene_script_test_executions": 364,
+    "client_passed": 91,
+    "client_failed": 1,
+    "client_test_results": [
+      [
+        "ok",
+        "79",
+        "0"
+      ],
+      [
+        "ok",
+        "1",
+        "0"
+      ],
+      [
+        "ok",
+        "5",
+        "0"
+      ],
+      [
+        "ok",
+        "2",
+        "0"
+      ],
+      [
+        "FAILED",
+        "4",
+        "1"
+      ]
+    ]
+  },
+  "client_command": "cargo test -p graphshell-client --lib --tests --all-features --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+  "documents": {
+    "design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md": {
+      "preserved_prefix_sha256": "503963757790e28b744ab5829514d6dfb4b4273c9aca6ab8dbfbbded59759fcb",
+      "preserved_prefix_bytes": 260369,
+      "sha256": "4f3ade8cdd227dae22c9f0741d81100dcede62fe749cd3a895abfb21326c5770"
+    },
+    "design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md": {
+      "preserved_prefix_sha256": "db5fa6e78cb2d74d1dce5a2c3ebffcab4cf98dea629a1aa96addbb804b2cff36",
+      "preserved_prefix_bytes": 47785,
+      "sha256": "db012b59d66da6d74eb59079cf27cc55400d4f3c5f2131a44b501dbbff7b5cfb"
+    }
+  },
+  "retained_isolation": [],
+  "coverage_limits": [
+    "Whole Mere source review remains incomplete.",
+    "Package test success is not source-reading credit.",
+    "No headed browser, wasm, actual network teardown or product durability qualification."
+  ],
+  "diff_check": 0,
+  "evidence_sha256": {
+    "run_scenograph_gates.py": "0eafbf3cccd39f910a71c9e9d15b420c6ee430ef0e6d69b08c6ab55378f3ca34",
+    "scenograph_red_gates.json": "e5375cf2be5f2832935ce2255c6211a9018a82218cad884bc9c1080426b6f430",
+    "scenograph_green_gates.json": "c08085dac68c9b56b898aa84b6c57cf7281af813454c93dd9a67a0b9a7623f48",
+    "scenograph_red_rows.log": "81c387e354eb81afe76409ef2ae7ccd7fe32199be44bc2f3aff2778a50f5a4f8",
+    "scenograph_green_client.log": "afb00f99e46b058a33399616d5dff3c07bb0686d9f809478ca7470094d367a22",
+    "scene_wire_identity_diagnostic.json": "16554e4879029b2ed6729f7ba2b9da0f2566c2e7e3c2dabcfdb7d673b3890edf",
+    "scenograph_review_diff_check.txt": "737263050b3ae9dd3d3b8c6579763925000e4f85b9d341a273e90d79b57697ec",
+    "scenograph_red_layout.log": "5c8350a27891c6b31755359bad053f39cd091a695a3be2da79022845868fc192",
+    "scenograph_red_scripts.log": "bd4e90d04073bca194176b6caf198c1639e23d73013cf2dae4b34ed8810825b9",
+    "scenograph_green_default.log": "1ace5e12f9c03cf973440363ba4a30e05335df171603575221c67103763db422",
+    "scenograph_green_scripts.log": "09dc8ffb6e82f1bc5173e918b1e8c4945493638cf4e34ca2a8179f156a0046ea",
+    "scenograph_green_rhai.log": "d1d4610052e0f6b83cc074d83ab750ddd690022fff9c5f87274b30c99d6fd7d5",
+    "scenograph_green_compiler.log": "ee379bab966e403eca277e4202a5ebf612394c13e28c42f6b9fc30aef443f6fd"
+  }
+}

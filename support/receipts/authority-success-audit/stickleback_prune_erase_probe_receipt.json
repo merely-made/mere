@@ -1,0 +1,310 @@
+{
+  "date_utc": "2026-10-17T15:06:58.692401+00:00",
+  "basis_commit": "7c71810550234ccbe11f7429cd44e369b279ec06",
+  "source_sha256": {
+    "crates/stickleback/Cargo.toml": "46d534e6fada4c100bd300f6a1a59c8e9c4812142a69f831a082dcd513ccafa9",
+    "crates/stickleback/examples/inventory_compare/main.rs": "15491c5a76eed733709d8cd07d7030969ef4f1a6107e0d079d7dcecac804446c",
+    "crates/stickleback/examples/inventory_compare/model.rs": "b64cd872b1f601ad3e9d671798c64309ab9952848d6a775938d6dbed0e433574",
+    "crates/stickleback/examples/inventory_compare/run.py": "74d616a0a1f6fcd5384adf36817e60eed1093891e415d4a903f2375723b4c4ec",
+    "crates/stickleback/examples/ledger.rs": "47afd9653353dcea4437ab7f8c27724df5a2e102dd9eeb4498f41ee3e54e18f4",
+    "crates/stickleback/src/address_book.rs": "6bb5702770a407d61ed0314f9b0b3489106ef2edff89e6139cfdb5aa2e1c0bbc",
+    "crates/stickleback/src/address_book/tests.rs": "8722d4c65cb4dffa7109162650d993f98d850525a5d0854cb92ba82f3b9fd24a",
+    "crates/stickleback/src/authority.rs": "b428572e714fad25617b0fb5292a5ed4e86e25541b163c01314e63ad49eb5df5",
+    "crates/stickleback/src/causal.rs": "084c8deba3629fd2d8ea1b25e4dea69c5341f73fef5900616df4eda96595e869",
+    "crates/stickleback/src/drop.rs": "b7bb0d44c7e5a9953a7dc94e1c92c2ce6b58e2329aa87f0863da073adc7033e2",
+    "crates/stickleback/src/drop_io.rs": "1a519840ca58c85dfe43da91d84f31ea6021dc9c57ebfb9b45e1da718e23bb11",
+    "crates/stickleback/src/epoch_retention.rs": "216b695c18179b33512c94cffa0235dab622ba6348f788b47cd9687f002ca304",
+    "crates/stickleback/src/group_crypto.rs": "f00d407f2b275483f9a2c07671a5ff2b16a8bf2022cb85f54206080b68a61844",
+    "crates/stickleback/src/group_lane.rs": "7cc5f9029af6f4de8e22c11457b9b82e58fd85c9a0a173c548b84ab434651830",
+    "crates/stickleback/src/group_session.rs": "cdf0ebf28452f27a0817578be26c3e9573d5d6c7650bad15373d77c07ae5a59b",
+    "crates/stickleback/src/inventory/filter.rs": "391a0ffdda6eb24050cb964dbb98f5eb729b434c6f8463e9cb0fad19562b5fdc",
+    "crates/stickleback/src/inventory/mod.rs": "bb74c7ba1831c5ae825da9f28e7790e95604cd62d5317f5f1627183d68f7368d",
+    "crates/stickleback/src/inventory/peers.rs": "ef9981df8d1724e7e1351a0c8960bff3180297422a510ed00ef86b0ddd79ef33",
+    "crates/stickleback/src/inventory/tests.rs": "58109339afdba4c9f35f8f28b5706416c38facb46c6ced1c20fe5ebc426edcb3",
+    "crates/stickleback/src/inventory/wire.rs": "f3056428d62439fbde9a79ba0da93a3d4b41e962fe9d6ced526004cb6ccf3a76",
+    "crates/stickleback/src/joined_space.rs": "403364594d3e85709fc9a41fae294ddd35633c967368a832c97f718d45385967",
+    "crates/stickleback/src/lib.rs": "70451cac93dc87c90c57455b97b68004a6a5747467116dc6c63f9986e1e31a79",
+    "crates/stickleback/src/object_stream.rs": "4431f31c2349fa0cb889af45896c9626df331f0afda111d58a8fec002ce57c46",
+    "crates/stickleback/src/processor.rs": "96e1a203c1f4f7fc0073f76bf6f46a23fc625b70f158b887307fc587e21dbfe7",
+    "crates/stickleback/src/prune_proof.rs": "a62b4098d8c5aaf6e7beed9667a22102fcbfbabdc0931014c5c0b462f851d212",
+    "crates/stickleback/src/receipt.rs": "51d869ef841e7e504f2bcbde12a167f84ed6dd34ae527bca0c99b52c56812720",
+    "crates/stickleback/src/store.rs": "5c798eb895bcfc5321ce3fc4d92df3a70ee1b2962b39e42d51c6b4b7312e3239",
+    "crates/stickleback/src/synced_space.rs": "eeca665b68381e1e77a4e48157b44ce962e3a7894f8726f0607f48120d783783",
+    "crates/stickleback/src/writer.rs": "78d7054375f6590bb4c54e6f3c1893fabaf1da71f1c9db940c8c6daa2cb08411",
+    "crates/stickleback/tests/boundary.rs": "3d46bffdbaf20b547f0ef1f09775ac13a3c7e9ce2b681fb2757414fa8e6466a4"
+  },
+  "libraries": {
+    "proofs": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libproofs-edd9937a550376fa.rlib",
+      "sha256": "d570b3ad5befb80700d0186167c1da04dbd6220a6f44da7c1fdde7dbfa7c1078",
+      "fingerprint_value": 2296921977845237715,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\mere-proofs-edd9937a550376fa\\lib-proofs.json",
+      "metadata_sha256": "c70073c31a69f967e81da9abfe8c440761a0c8c0bae84bfda3cd1183e1e15272"
+    },
+    "hex": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libhex-333537305a022e64.rlib",
+      "sha256": "931b2eb9f41dbb6c5eb6b6fb63ca3a2f0f34ef6019003a1a3f09577db4207800",
+      "fingerprint_value": 38792862498813746,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\hex-333537305a022e64\\lib-hex.json",
+      "metadata_sha256": "bf174e2c79d5882c8dc2b68a96cb8df48bd7f1a1b6f86b8adda0cbcff153d7c7"
+    },
+    "identity": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+      "sha256": "c0f0c0d29580214e3285d567d3e726192d4b7187f68218de9fcb6f88c4eee3d5",
+      "fingerprint_value": 16393081860439893135,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-2b0f6cacb453c490\\lib-personae.json",
+      "metadata_sha256": "ec1f18c144ba1dc165b0e28a8a6cb003db84aa95984bfca700f8e45305d75b2d"
+    },
+    "p2panda_encryption": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_encryption-d8d37e9e55a6c80b.rlib",
+      "sha256": "f835739a03cd3a15f6da92fbf561407880f8b75c5f0ce8afc7767687519cc636",
+      "fingerprint_value": 4866361621906948016,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\p2panda-encryption-d8d37e9e55a6c80b\\lib-p2panda_encryption.json",
+      "metadata_sha256": "3c03888166dd5eb5a26a1c1c3d7224e16f35357edd0e265b90e86d70f309241f"
+    },
+    "p2panda_core": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-192072137e855602.rlib",
+      "sha256": "054e7030e46d65e383e8e573617b761d863d7daa80d4ff512e949ec365881456",
+      "fingerprint_value": 7687455399713559706,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\p2panda-core-192072137e855602\\lib-p2panda_core.json",
+      "metadata_sha256": "c2b00656ce6e3bbe7a4856e909a46736f651619e0ff64456959adc1df9891f10"
+    },
+    "futures_util": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libfutures_util-1d71170346063592.rlib",
+      "sha256": "6b3345d380b37fc2307f14d6d8af69f8d660b01a6864d947d88d819f47089c3c",
+      "fingerprint_value": 13561405913112022729,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\futures-util-1d71170346063592\\lib-futures_util.json",
+      "metadata_sha256": "267ed1a84ac4b5348c0ecf8d5c791dcf34f94ac89a3b4e0dd36225ccc1dfb94f"
+    },
+    "tokio_stream": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio_stream-139160939be28794.rlib",
+      "sha256": "4bdcff5a675d22cede286733d7f8926cefba7de07b4c4a2963ee0d6c19ae3aab",
+      "fingerprint_value": 17402467562004787103,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\tokio-stream-139160939be28794\\lib-tokio_stream.json",
+      "metadata_sha256": "3112033f7bdbef4154669aa988693c28033317cff3462daf46436d317f2ba80f"
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+      "sha256": "c23f7d7dd7ff77ed4a3d498dee89b3cbe2761bf4451a9267fef43b80102b7d7f",
+      "fingerprint_value": 17874236646337937021,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\serde-319fad388f9668c8\\lib-serde.json",
+      "metadata_sha256": "412543fde42acf0b2f010acc23d9e2c18323acfe03025c71c524887532b2123e"
+    },
+    "thiserror": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-d6ab184dfa38b956.rlib",
+      "sha256": "e246307ad46c8093c24c91130562105ad2fc4661099963309fd7ce4bbef81ec4",
+      "fingerprint_value": 3129520401534615927,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\thiserror-d6ab184dfa38b956\\lib-thiserror.json",
+      "metadata_sha256": "7cfa19ccc4f720009de5cf5f81debab6ac618c7e54fce30ada1aa376bf19d773"
+    },
+    "p2panda_sync": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_sync-e890c61f5bcf7564.rlib",
+      "sha256": "9bf2ec9af4be64d917a36a44f1ae804f9c5e93bc5d4ec428f22f1208aff3cc00",
+      "fingerprint_value": 1980246333081344390,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\p2panda-sync-e890c61f5bcf7564\\lib-p2panda_sync.json",
+      "metadata_sha256": "29ee33149d1b56a94ea224bcf823a8941832a24966874a02cfe05fc3c0c90e94"
+    },
+    "blake3": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libblake3-4fc75360eccfbd5e.rlib",
+      "sha256": "28e3a4590ad988fd733258f891ee810e9fafa8cf8f634c0fab1f797f45fb5bff",
+      "fingerprint_value": 12172016806442764425,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\blake3-4fc75360eccfbd5e\\lib-blake3.json",
+      "metadata_sha256": "069db944cd04c012d0c2b1c6f814e62ce7be43b62cab9aec3a08a4e38b12221c"
+    },
+    "p2panda_store": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_store-cf925cc36f7625b0.rlib",
+      "sha256": "008051bcd1a534729e766921a4481ca4b91fc1ea3c62dc6cc161583041dc09c6",
+      "fingerprint_value": 7180799131302704848,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\p2panda-store-cf925cc36f7625b0\\lib-p2panda_store.json",
+      "metadata_sha256": "5842ff3836264a928dcd853fced5e007f720654025ed48bcdbd902a360e8c3cd"
+    },
+    "insigne": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-955b80afa4630e77.rlib",
+      "sha256": "3bfcdcbc1e04074663ce735da4ad1eb5487a26fb5d93749a9ab136e95462dc91",
+      "fingerprint_value": 3492335656838042627,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-955b80afa4630e77\\lib-insigne.json",
+      "metadata_sha256": "45449470c3073cb18e1e508e8e7355ec3833aee884791ce6ff429cfdfdead08b"
+    },
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-e5568116731b97d6.rlib",
+      "sha256": "06b947d0ac95b743541f161e37749072fcdb6ddefba35aac420746a4f0e68ce3",
+      "fingerprint_value": 11664509036242741996,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\muniment-e5568116731b97d6\\lib-muniment.json",
+      "metadata_sha256": "cf09beca72f157a2e9c9024ed365d6dc4ab76065231051cd2ea2221deb388510"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-1b00264e995209d2.rlib",
+      "sha256": "b7e81666337855494035e00a72401ad2625cb5f05c998718aebaef3a4eb50aee",
+      "fingerprint_value": 8474438508411528969,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\tokio-1b00264e995209d2\\lib-tokio.json",
+      "metadata_sha256": "abacde68056cb0480ffb419677bb84bb080654d8758cca4ff7f4bb5892af34bd"
+    },
+    "serde_bytes": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_bytes-72e4e73f095913a1.rlib",
+      "sha256": "a2b1144035b4a87f7f2bf86ad30f160d349a585d40dfba385ed37c5f155a9ccd",
+      "fingerprint_value": 13280546207356391728,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\serde_bytes-72e4e73f095913a1\\lib-serde_bytes.json",
+      "metadata_sha256": "91716d074f335e578be1bf70157c77351bca91001f026bc2bb9809c8e1b9f22d"
+    },
+    "p2panda_net": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_net-fe1a280de5ab5626.rlib",
+      "sha256": "090c761b4fa695f66c5f9622422bd14200fd0f6ebbdb175881684853354bdc07",
+      "fingerprint_value": 14563859890594928764,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\mere-p2panda-net-fe1a280de5ab5626\\lib-p2panda_net.json",
+      "metadata_sha256": "938533eae769f2429d9d5056b572d6c4400cea75cb8ad37444911819d945695a"
+    }
+  },
+  "family": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\stickleback-3877838a72b57b2b\\lib-stickleback.json",
+    "sha256": "ad493fec4be1c86a6215e165222359c27cf42ef67f88e6af8b39b53aec86b008"
+  },
+  "results": {
+    "owner_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--crate-name",
+        "stickleback_audit",
+        "--crate-type",
+        "rlib",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\stickleback\\src\\lib.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+        "-L",
+        "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\libauthority_success_prune_erase_owner.rlib",
+        "--extern",
+        "proofs=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libproofs-edd9937a550376fa.rlib",
+        "--extern",
+        "hex=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libhex-333537305a022e64.rlib",
+        "--extern",
+        "identity=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+        "--extern",
+        "p2panda_encryption=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_encryption-d8d37e9e55a6c80b.rlib",
+        "--extern",
+        "p2panda_core=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-192072137e855602.rlib",
+        "--extern",
+        "futures_util=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libfutures_util-1d71170346063592.rlib",
+        "--extern",
+        "tokio_stream=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio_stream-139160939be28794.rlib",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+        "--extern",
+        "thiserror=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-d6ab184dfa38b956.rlib",
+        "--extern",
+        "p2panda_sync=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_sync-e890c61f5bcf7564.rlib",
+        "--extern",
+        "blake3=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libblake3-4fc75360eccfbd5e.rlib",
+        "--extern",
+        "p2panda_store=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_store-cf925cc36f7625b0.rlib",
+        "--extern",
+        "insigne=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-955b80afa4630e77.rlib",
+        "--extern",
+        "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-e5568116731b97d6.rlib",
+        "--extern",
+        "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-1b00264e995209d2.rlib",
+        "--extern",
+        "serde_bytes=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_bytes-72e4e73f095913a1.rlib",
+        "--extern",
+        "p2panda_net=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_net-fe1a280de5ab5626.rlib"
+      ],
+      "exit": 0
+    },
+    "consumer_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\stickleback_prune_erase_probe.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+        "-L",
+        "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+        "--extern",
+        "stickleback_audit=C:\\t\\cargo-targets\\mere\\libauthority_success_prune_erase_owner.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-prune-erase.exe",
+        "--extern",
+        "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-e5568116731b97d6.rlib",
+        "--extern",
+        "p2panda_core=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-192072137e855602.rlib",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib"
+      ],
+      "exit": 0
+    },
+    "output": {
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\authority-success-prune-erase.exe"
+      ],
+      "exit": 0
+    }
+  },
+  "audit_cases": 2,
+  "original_tests": 0,
+  "runner_sha256": "c6d1ac7276fc0fc39c139a21f84d53ccbc2315a7bd996a24407d4f1c08361158",
+  "probe_sha256": "0b91bc5a842a3e52b29096f19587c9fb835d8cf783121441d5e567f8d54f13d0",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-prune-erase.exe",
+      "bytes": 2933760,
+      "sha256": "87cdb2d7a831f6fffa10bac7cc771acb3ea06fb3c39701e3e0bd5603ad4df355"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-prune-erase.pdb",
+      "bytes": 143691776,
+      "sha256": "c3cb90f0f432770dbc99d2a98f311337ee3d701df54cbd67a7a67a6980a674bd"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_prune_erase_owner.rlib",
+      "bytes": 17037934,
+      "sha256": "f78f7f4912ce98dcedaf2448e8822649226d04ce0299fd1497378398c2fc4757"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Fresh whole unchanged Stickleback owner over17exact retained suppliers. Real signed three-operation corpus, real OperationProcessor/MemoryBackend, same policy in single-operation and native-drop batch paths. Single-operation prune+erase recreates a removed prefix header without its pointer; batch control leaves only the checkpoint. Neutral policy explicitly authorizes effects; no governance/destruction policy chosen, no actual user data or live network, original tests0. Counts describe exact observed paths, not every retention combination. Compile hashes do not grant read credit."
+}

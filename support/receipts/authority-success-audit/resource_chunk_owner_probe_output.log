@@ -1,0 +1,8 @@
+
+running 3 tests
+test shared_owner_rejects_the_corrupt_chunk_the_js_copy_accepts ... ok
+test shared_owner_rejects_the_wrong_resource_the_js_copy_accepts ... ok
+test valid_fixture_control_is_accepted_by_the_shared_owner ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

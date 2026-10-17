@@ -1,0 +1,15 @@
+{
+  "qualification": "Source literals reconciled in exact current function bodies. No Rust bridge, registry startup, host, browser or external consumer execution.",
+  "source": "crates/system/ux-events/src/ux_diagnostics.rs",
+  "source_sha256": "57a1ea264b8115e8d520a416840cd82fbb26e44820db3add3b19c068dea7fc6b",
+  "mapped_surface_channels": 40,
+  "listed_surface_channels": 36,
+  "missing": [
+    "ux.inspector_pane.dismissed",
+    "ux.inspector_pane.opened",
+    "ux.steward_pane.dismissed",
+    "ux.steward_pane.opened"
+  ],
+  "fixed_count_test": "all_channel_ids_covers_every_surface_and_dispatch_kind asserts38total; actual mapper has40surface IDs plus2dispatch IDs",
+  "runner_sha256": "a0d9554b43389e3bbce9602f8fb892af24a7dced8b6ebc0ca225a21e067adf6e"
+}

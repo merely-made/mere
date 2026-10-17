@@ -1,0 +1,11 @@
+
+running 6 tests
+test browser_history_forget_retracts_another_applications_traversal_for_the_same_object ... ok
+test refused_capture_graph_changes_are_committed_by_a_different_delivery_without_their_ledger_or_trace ... ok
+test refused_forget_graph_changes_survive_a_different_capture_while_old_evidence_remains ... ok
+test retrying_the_identical_delivery_masks_the_partial_graph_rollback ... ok
+test segment_size_one_and_sixty_four_both_store_all_batch_events_in_one_trace ... ok
+test successful_capture_keeps_graph_ledger_access_records_and_memory_consistent ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

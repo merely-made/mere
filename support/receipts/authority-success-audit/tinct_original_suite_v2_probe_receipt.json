@@ -1,0 +1,63 @@
+{
+  "date_utc": "2026-10-17T09:46:14.034262+00:00",
+  "source_sha256": {
+    "crates/cambium/tinct/Cargo.toml": "7dfd16741c4ac7288fc5e12660ca9f6e9c6bd8388f2bf61e0496c9de66ad7086",
+    "crates/cambium/tinct/README.md": "1a3b5a85b1bfd7b3aa771066d01a1ab09142547c8dc596aed31fa06c8e4a48cb",
+    "crates/cambium/tinct/src/gated.rs": "684f6afd7af2527db54a67dfcd8410b78967c19210b12e8cc06bdfd6397eb72c",
+    "crates/cambium/tinct/src/lib.rs": "af43624c5494faef101ec8969970abc8224cdd453877a9d26cff8fa2e6d79eab",
+    "crates/cambium/tinct/src/syntax.rs": "06e3e1726ce8f931b0b9c670177835c3eeb8d422590ee0eda6dd8a816024c0de"
+  },
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "--crate-name",
+      "tinct",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\tinct\\src\\lib.rs",
+      "--extern",
+      "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-tinct-original-v2-unit.exe"
+    ]
+  ],
+  "build_exits": [
+    0
+  ],
+  "run_exit": 0,
+  "checks": 23,
+  "runner_sha256": "9436fbfa301273382c879de6cc82e02a6070817145dc4293d8969826bd2481d6",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-tinct-original-v2-unit.exe",
+      "bytes": 865792,
+      "sha256": "1310762e53f9b22e2eb93056e6871f3f17f20f0b5f387154241d22fe12f59a7e"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-tinct-original-v2-unit.pdb",
+      "bytes": 3461120,
+      "sha256": "3b90e80abf0faf546f4d54be74c8c7deb8f8f434eaca1b4bdae8cbed62f8b89e"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "All unchanged original current Tinct unit cases, fresh direct source build over one exact retained serde library. Not doctests, cross-language design-system equivalence, alpha compositing or a fresh whole supplier graph."
+}

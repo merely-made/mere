@@ -1,0 +1,191 @@
+{
+  "date_utc": "2026-10-17T08:21:58.680837+00:00",
+  "source_sha256": {
+    "crates/cambium/mere-view/examples/fold_acceptance.rs": "b9123eba04e2788923ce42b4018022c2f27c47470bec81c7e502b775f98117d9",
+    "crates/cambium/mere-view/examples/harness.rs": "b07e1898a0bc0eb4ccca5ee2e9f09ba78b73ff6ea16884d999931f303aa875dd",
+    "crates/cambium/mere-view/src/folds.rs": "ca8020b9875887c21765a9cc6546deb3b09fdf5d0db76d709d7b258472edc20c",
+    "crates/cambium/mere-view/src/layout.rs": "38bbdf0de5684048153e01083b61796bb8fcde4c2da64143bb41fe8adad14f4e",
+    "crates/cambium/mere-view/src/lib.rs": "7dac519ab359c813be3a3e519767046cf0f0061b5a8b1558ff2558d33356c811",
+    "crates/cambium/mere-view/src/model.rs": "57eb1f8812094b38a3633ba31c648b532c37baaba0672576dfb5223a4613b558",
+    "crates/cambium/mere-view/src/tests.rs": "c82e625089531fc48d0134fac6730ec562806aadcb2ae2e884ed74459047501a",
+    "crates/cambium/mere-view/src/tier.rs": "93408643e6eae2172ddd064ba4a3a805b6aae6f3a54da18ddafc93849b066e7f",
+    "crates/cambium/mere-view/src/view.rs": "d72a6becf6d04ecc6760b1a8bee63e9ce277eaa0f647154fa1038b5ac1e5f00b",
+    "crates/cambium/mere-view/tests/host_routing.rs": "db378696ada544006e892a38e07ef4d2ab9286009d912b1c0fa0928e008ababe"
+  },
+  "libraries": {
+    "curation": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-84215a77c902be1e.rlib",
+      "sha256": "6843c8a8f72d0edfa2c6070d058b0251c0b2423424ba28c722d1ff9483bb4fff",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/forme/curation#mere-curation@0.1.1",
+      "features": []
+    },
+    "cambium": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+      "sha256": "7dfb7f3d6cae98e1cb46982f082fc274612941e40b8d50f39be23cc0772f0102",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/cambium#0.3.3",
+      "features": []
+    },
+    "cartography": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcartography-c2d1b512fb75aca8.rlib",
+      "sha256": "040cd98e8ac34d9d2f0b5757848045e3520f3bfc4a0013e3c1fd6038ba8c33e0",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/canvas/cartography#mere-cartography@0.0.2",
+      "features": [
+        "default"
+      ]
+    },
+    "pictograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpictograph-a1a0aceb16ae05d5.rlib",
+      "sha256": "8ae47d0d43289c78e73f546c06e34db6aa68b8fb8c19f9510f557da0d8350817",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/canvas/pictograph#0.2.0",
+      "features": [
+        "canvas",
+        "signals"
+      ]
+    },
+    "incipit": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libincipit-f55baa9ff4674fa6.rlib",
+      "sha256": "36335e929efaa3c2b68bb958c59bb1869a2372737d8d594029abb8a07624f0e3",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/incipit#0.2.0",
+      "features": []
+    },
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-76076108a8bbfe78.rlib",
+      "sha256": "0bc74dfc82023c57c193a9a8babe7f9f6adcb8cdaa26351367e1111956045149",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/graph/graph-kernel#mere-kernel@0.0.2",
+      "features": []
+    },
+    "sprigging": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsprigging-d3cac49a21a5b0f7.rlib",
+      "sha256": "1d3de910f7f0706abb58e33d6fcab21d1bd33401d6394bb2c329a087e4c1f531",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/sprigging#0.2.1",
+      "features": []
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "sha256": "f8769e0a5c56f7dc70484b648b3979d34b971a535d314be659744d1da2f8303a",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ]
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--crate-name",
+      "mere_view",
+      "--crate-type",
+      "rlib",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\mere-view\\src\\lib.rs",
+      "-C",
+      "metadata=authority_success_mere_view",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-mere-view.rlib",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "curation=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-84215a77c902be1e.rlib",
+      "--extern",
+      "cambium=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+      "--extern",
+      "cartography=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcartography-c2d1b512fb75aca8.rlib",
+      "--extern",
+      "pictograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpictograph-a1a0aceb16ae05d5.rlib",
+      "--extern",
+      "incipit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libincipit-f55baa9ff4674fa6.rlib",
+      "--extern",
+      "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-76076108a8bbfe78.rlib",
+      "--extern",
+      "sprigging=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsprigging-d3cac49a21a5b0f7.rlib",
+      "--extern",
+      "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+      "-L",
+      "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\mere_view_state_probe.rs",
+      "--extern",
+      "mere_view=C:\\t\\cargo-targets\\mere\\authority-success-mere-view.rlib",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-mere-view-state-probe.exe",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "curation=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-84215a77c902be1e.rlib",
+      "--extern",
+      "cambium=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+      "--extern",
+      "cartography=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcartography-c2d1b512fb75aca8.rlib",
+      "--extern",
+      "pictograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpictograph-a1a0aceb16ae05d5.rlib",
+      "--extern",
+      "incipit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libincipit-f55baa9ff4674fa6.rlib",
+      "--extern",
+      "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-76076108a8bbfe78.rlib",
+      "--extern",
+      "sprigging=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsprigging-d3cac49a21a5b0f7.rlib",
+      "--extern",
+      "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+      "-L",
+      "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+    ]
+  ],
+  "build_exits": [
+    0,
+    1
+  ],
+  "run_exit": null,
+  "checks": 0,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-mere-view.rlib",
+      "bytes": 3682026,
+      "sha256": "2f7a360738a5db941e67a93ee623eb50750c2e9f1d8caaf5849a2785f5c972bb"
+    }
+  ],
+  "generated_output_removed": true,
+  "probe_sha256": "100e77197fdb6486bb6a0b578cb17a2cf5d3c259e5f219dfe5690d931201e215",
+  "runner_sha256": "ca748bc7d51acb7b8aa7be199645454c4bb4ea66c7320f4798523a973ffff0a3",
+  "scope": "Entire original current Mere-view crate compiled fresh over exact retained dependency bytes from earlier successful Graphshell build. Public state and Swatch methods only. No rendered DOM, native GUI, owner merge apply, persistence, network, or full-current Cargo gate."
+}

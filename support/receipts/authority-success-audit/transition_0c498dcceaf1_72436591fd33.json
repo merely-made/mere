@@ -1,0 +1,66 @@
+{
+  "path": "crates/cambium/scenes/scenomise/src/lib.rs",
+  "git_basis": "a6e6b94140b0b227f2ac19356571e3decfa98975",
+  "git_blob_sha256": "83d4230e3a1595c37cbc1eb00a085ac980c3ebc6cd368f2fb92fc9b7f4027a30",
+  "prior_coverage": {
+    "sha256": "83d4230e3a1595c37cbc1eb00a085ac980c3ebc6cd368f2fb92fc9b7f4027a30",
+    "through": 2765
+  },
+  "current_sha256": "72436591fd33fbe44ba0f76cc0290e0540ba9734cb8d4ed44db95410df791b8c",
+  "current_chars": 2784,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        2330
+      ],
+      "new_chars": [
+        0,
+        2330
+      ],
+      "text_sha256": "770f33e33382493348ac67c03e3b793e46eeced03b7fc172de8dc51fc9ec8443"
+    },
+    {
+      "old_chars": [
+        2330,
+        2765
+      ],
+      "new_chars": [
+        2349,
+        2784
+      ],
+      "text_sha256": "282b9ca2cad05205f9a9fb3f7006359254dae0b436c82b8414db4e1818f7af44"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "insert",
+      "old_lines": [
+        52,
+        51
+      ],
+      "new_lines": [
+        52,
+        52
+      ],
+      "old_chars": [
+        2330,
+        2330
+      ],
+      "new_chars": [
+        2330,
+        2349
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 48,
+      "new_start_line": 48,
+      "text": " pub mod opened_link;\n pub mod projection;\n pub mod registry;\n pub mod template;\n+pub mod span_edit;\n mod relax;\n mod solve;\n \n pub use opened_link::{\n"
+    }
+  ],
+  "certificate": "transition_0c498dcceaf1_72436591fd33.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T06:12:05.470935+00:00"
+}

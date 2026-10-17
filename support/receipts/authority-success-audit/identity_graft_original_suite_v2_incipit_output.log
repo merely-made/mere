@@ -1,0 +1,10 @@
+
+running 5 tests
+test tests::composed_shelfmark_keeps_each_input_separately_checkable ... ok
+test tests::graph_and_session_ids_are_distinct_types_over_the_same_uuid ... ok
+test tests::ids_round_trip_through_serde ... ok
+test tests::nil_graph_id_is_the_unbound_marker ... ok
+test tests::shelfmark_refuses_an_uncheckable_input ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

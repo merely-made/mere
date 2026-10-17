@@ -1,0 +1,10 @@
+
+running 5 tests
+test completed_mixed_semantics_also_disable_capture_recovery ... ok
+test first_presentation_only_startup_retry_control ... ok
+test pending_semantics_expiry_is_an_error_control ... ok
+test pending_semantics_get_a_recovery_redraw_control ... ok
+test semantic_completion_disables_error_and_recovery_while_capture_is_unavailable ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

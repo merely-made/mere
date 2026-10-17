@@ -1,0 +1,17 @@
+   Compiling ndarray v0.17.2
+   Compiling burn-ndarray v0.22.0
+   Compiling burn-dispatch v0.22.0
+   Compiling num v0.4.3
+   Compiling burn-tensor v0.22.0
+   Compiling burn-core v0.22.0
+   Compiling fraction v0.15.4
+   Compiling jsonschema v0.18.3
+   Compiling burn-linalg v0.22.0
+   Compiling burn-nn v0.22.0
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling burn v0.22.0
+   Compiling esp v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\intel\esp)
+   Compiling pandect v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\system\pandect)
+   Compiling mere-mesh v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\mesh\mesh)
+   Compiling distillery v0.0.1 (C:\Users\mark_\Code\repos\mere\ports\distillery)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6m 46s

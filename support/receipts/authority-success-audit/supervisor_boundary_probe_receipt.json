@@ -1,0 +1,155 @@
+{
+  "date_utc": "2026-10-17T05:16:37.344559+00:00",
+  "source_sha256": {
+    "ports/distillery/src/authority.rs": "d46cf378039a6b3690f2eb4820e2209052fdfdb73d64feb239b4dae79c7b36b6",
+    "ports/distillery/src/mesh_host.rs": "8058b5f4c879b4314933279743edb869f836ad434557a84b28233a4598f294f2",
+    "ports/distillery/src/mesh_host/courier.rs": "5e88c3168854c51fd3ca5da80a0cf790789f0ba386c3a9da66db1f43c7dfa287",
+    "ports/distillery/src/mesh_host/host.rs": "41b141401fe897b0ec148fbbf00cde9ca62c3352c6263f8ac6c3bfcaf805699f",
+    "ports/distillery/src/mesh_host/inflight.rs": "ddcb0acefa795446638e26156cd794973a608f745a8cc114ef95254fcd7e06e4",
+    "ports/distillery/src/mesh_host/sense.rs": "f9dfb040f7a89b18306bb6792ce857ccf0e1287ff27e7736966b88b610a385fc",
+    "crates/mesh/mesh/src/board.rs": "001abc953f1e954eef684a35ef6e43b7e58c80fa439f7857bd5e41b01629d25c",
+    "crates/mesh/mesh/src/lease.rs": "22d24f3eef672738113b547c6bfce63a9752dbe6f9ab74dfb53a863d249d0327"
+  },
+  "libraries": {
+    "distillery": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdistillery-c44b1d8f55533071.rlib",
+      "sha256": "483f3126e01196bd22c88475d93a252c797e3aa0adede1e9156252314f494cb2",
+      "features": [
+        "default",
+        "inference",
+        "inference-model",
+        "inference-wire"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/ports/distillery#0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\src\\lib.rs"
+    },
+    "mesh": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmesh-384a7a228bbde737.rlib",
+      "sha256": "97d3c702754b51064a262c9ebf4519e96042cc57514b304b21aa64efe788480b",
+      "features": [
+        "admitted-ingress"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/mesh/mesh#mere-mesh@0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mesh\\mesh\\src\\lib.rs"
+    },
+    "personae": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-be711869a2628b3f.rlib",
+      "sha256": "767d1f1bb58a101dc5dc85b9d28a43d7168af343c653b11dd4fb8c735968b057",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/dramatis.git?branch=main#personae@0.3.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\dramatis-c1632f2f3bdc2597\\cf562f4\\crates\\personae\\src\\lib.rs"
+    },
+    "transport": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtransport-2b6768e365816f88.rlib",
+      "sha256": "5179730df5a8dc222029c3bd9aa3a20205d6100b3ae856dc659f20639496868e",
+      "features": [
+        "notochord"
+      ],
+      "package_id": "git+https://github.com/merely-made/murm.git?branch=main#mere-transport@0.0.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\murm-ebfa134ea22785bd\\cba46d8\\native\\crates\\transport\\src\\lib.rs"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-f93b8eec18cffcea.rlib",
+      "sha256": "aa65082705a96bf125386fc879504983d5c724d22ce11769538a697bb2c978ff",
+      "features": [
+        "bytes",
+        "default",
+        "fs",
+        "io-std",
+        "io-util",
+        "libc",
+        "macros",
+        "mio",
+        "net",
+        "rt",
+        "rt-multi-thread",
+        "socket2",
+        "sync",
+        "test-util",
+        "time",
+        "tokio-macros",
+        "tracing",
+        "windows-sys"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-1.53.2\\src\\lib.rs"
+    }
+  },
+  "prior_build_receipt": {
+    "path": "inference_crash_probe_receipt.json",
+    "sha256": "37a9bbaac612f01c69945602a3749e7cf2051408f5774af7ded8dbb4ba1a82a0"
+  },
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\supervisor_boundary_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-supervisor-boundary-probe.exe",
+    "--extern",
+    "distillery=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdistillery-c44b1d8f55533071.rlib",
+    "--extern",
+    "mesh=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmesh-384a7a228bbde737.rlib",
+    "--extern",
+    "personae=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-be711869a2628b3f.rlib",
+    "--extern",
+    "transport=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtransport-2b6768e365816f88.rlib",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-f93b8eec18cffcea.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "native_binary_sha256": "2653cd9e06c15eaa7b1756fd8c6279ec0b5e5a746437dd990f3fe30ad95c95f0",
+  "probe_build_exit": 0,
+  "test_exit": 0,
+  "tests": 4,
+  "generated_output_removed": true,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-supervisor-boundary-probe.exe",
+      "bytes": 43890176,
+      "sha256": "2653cd9e06c15eaa7b1756fd8c6279ec0b5e5a746437dd990f3fe30ad95c95f0"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-supervisor-boundary-probe.exp",
+      "bytes": 25384,
+      "sha256": "3a63a3350ab36436026d1fee898052345dc23f258104f13fb34f5a8159385084"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-supervisor-boundary-probe.lib",
+      "bytes": 48016,
+      "sha256": "3ee03d9ca4cc08cb3b0a7b7b5c7da7761b2e033249530dfd8252310508485c04"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-supervisor-boundary-probe.pdb",
+      "bytes": 559403008,
+      "sha256": "b15f8eb7859effe50f0d0af53dfc3c92db0d75745870df2b1606e86c95908408"
+    }
+  ],
+  "scope": "Public native APIs using one local collecting blob store for cached-input custody and a single local P2panda/SyncedMesh endpoint for supervisor reaping. Two positive controls. Synthetic in-memory data and manual clock only; no remote peer, real job payload, multi-computer run or forced GC of user storage. Exact previous successful library build reused under unchanged source/artifact hashes; no new Cargo build is implied."
+}

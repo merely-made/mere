@@ -1,0 +1,19 @@
+{
+  "tests": 4,
+  "passed": [
+    "control: 204",
+    "counterexample: HTTP 500 is reported delivered",
+    "control: transport rejection",
+    "control: page gate"
+  ],
+  "source_sha256": {
+    "ports/graphshell/web/loader.js": "6d1ebe2e1087b5ba8982e3f7033b241fe5985469c904a1ddd5d9a684636ec7ca"
+  },
+  "exact_extracted_listener": {
+    "start_char": 23684,
+    "end_char": 25052,
+    "sha256": "df646c117af0ff74740c680e35f1de3d03bd94259543a19a9abad7f237893059"
+  },
+  "diagnostic_sha256": "e5d1d2cf438138cf29f0d3c14d0ec9df976dfbede30f14580eecc11e0a675afc",
+  "scope": "Exact current scenario-complete listener, unchanged; synthetic DOM and fetch responses. No browser, server, network or durable sink write. HTTP rejection is distinguished from transport rejection; existing page gate still forces a failed scenario."
+}

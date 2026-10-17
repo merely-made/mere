@@ -1,0 +1,6 @@
+PASS normal applied diff advances acknowledged revision
+PASS failed resume still advertises resumed_by_diff=true at old revision
+PASS unapplied gap requests resynchronization but advertises resumed_by_diff=true
+PASS refused remount stamps snapshot revision 999 over acknowledged revision 1
+PASS self-validating unrequested resource enters frozen card details
+5 checks passed; 1 positive control and 4 counterexamples

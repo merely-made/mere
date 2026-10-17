@@ -1,0 +1,7 @@
+PASS forest 0->1 unchanged-owner control retains local count and node
+PASS forest 0->1 move updates shared truth but replaces node and resets component count
+PASS forest 1->0 unchanged-owner control retains local count and node
+PASS forest 1->0 move updates shared truth but replaces node and resets component count
+PASS separate RetainedMount control preserves actual runner node/state across destination-first mount
+PASS aria-modal dialog leaves background in Tab traversal and Space invokes background callback
+PASS nonmodal control exposes background without modal ARIA claim

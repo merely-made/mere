@@ -1,0 +1,73 @@
+{
+  "date_utc": "2026-10-16T21:14:36.202752+00:00",
+  "kind": "Public current djinn-testkit API on Windows, generated decoy roots and environment-only child; no Djinn/SSH process or real endpoint connection",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\testkit_boundary_probe.rs",
+    "--extern",
+    "djinn_testkit=C:\\t\\cargo-targets\\mere\\debug\\libdjinn_testkit.rlib",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-testkit-probe.exe",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib"
+  ],
+  "build_exit": 0,
+  "library_path": "C:\\t\\cargo-targets\\mere\\debug\\libdjinn_testkit.rlib",
+  "library_sha256": "1a6fbaca573f5c42e082bab2cd8f946193885c3a3166212b941cea9d5110a1f5",
+  "test_exit": 0,
+  "native_binary_sha256": "4ba8d14b9f1753e8322d0de19935ad479aec4dbae045ec1dfce116b1e7f348a1",
+  "harness_sha256": "d7bfc368c1ec38fdabd96f54c1204452b6e5b52a9c21fd5e47f8f5c01c2162cd",
+  "source_sha256": {
+    "crates/system/djinn-testkit/Cargo.toml": "caf2b6eda38d49571d77d82ceca641ccc393aa3f36ccbcf17070fc01639d4a80",
+    "crates/system/djinn-testkit/src/guard.rs": "b672732365a2c7080e69f5cba52776834d32d3501afafd5f7124a767e987743c",
+    "crates/system/djinn-testkit/src/lib.rs": "8677ca871250a194c77cdc0488da6b2b1fc5a17bddfbb0abaf2e44f2c86db3c6",
+    "crates/system/djinn-testkit/src/load.rs": "4d94b9edae2452d7c8abad2c13af8df991fdd97de6281fd877b9c80c7cd1ea1e",
+    "crates/system/djinn-testkit/src/receipt.rs": "d30c0c93f03cea80ad43e2996518554f311d910a91e58fc15a3d92b9886a35d3",
+    "crates/system/djinn-testkit/src/resident.rs": "5eeb70df1a4c9fbf6e88c35fe53011b1fdf0e33b723931227158e6834a0d1480",
+    "crates/system/djinn-testkit/src/run.rs": "374108ac87f1e0d76fe1f7bd152c85d7b51c1b16aaebba9b5b0bda1e5c9031ff",
+    "crates/system/djinn-testkit/src/status.rs": "663b26c78b3a3bcee80888995c2d29e0a45d6ed6b40a5d2c46f8439338fd3b88",
+    "crates/system/djinn-testkit/src/walls.rs": "cf9b361d39867c9da4d5c9ed56718e0c11036ee8982aa62a33c40085623463e8",
+    "crates/system/djinn-testkit/src/bin/djinn-receipt.rs": "e0d0eb4488689ff7493d32b3cd00e7df5362f1fe586cce36451e359375f9c5bb",
+    "crates/system/djinn-testkit/src/sys/mod.rs": "e755f62dca66417fd1735d459e80564d5edc5c3d3077e68aeea2097b7d1a7901",
+    "crates/system/djinn-testkit/src/sys/unix.rs": "6e10ce2f11aa093679cacafa534965a134c688675d7e4cd2f9b191963ef6753e",
+    "crates/system/djinn-testkit/src/sys/windows.rs": "716602b20c1c2c40e124965ae8e5048bbdd917ee7028f84a648aad6d8152f3e8",
+    "crates/system/djinn-testkit/tests/controls.rs": "e33ead419d8aab381c64e6d734011c52f72775ff5bf3a3889e8e59eda7af6f83"
+  },
+  "saved_evidence": [
+    {
+      "path": "testkit_evidence-control_receipt.json",
+      "sha256": "1da33a7772fe95c05b4346f078947ae55257db3c234f4cd100889ec842b160b9"
+    },
+    {
+      "path": "testkit_evidence-control_summary.txt",
+      "sha256": "d09eebf6b70b94894072f5f3c9ccab7fc28af8240a21565d6cdfbbc0ba7a7b9c"
+    },
+    {
+      "path": "testkit_missing-evidence_receipt.json",
+      "sha256": "3e7b38a9cf093ee411150094593d97e309b75cdc5ebde3e852cff52abe820638"
+    },
+    {
+      "path": "testkit_missing-evidence_summary.txt",
+      "sha256": "f11d6b1ae92012a4677a8c20fc529f43c917490241fb9e4ac3028c986d224801"
+    },
+    {
+      "path": "testkit_pre-guard-write_receipt.json",
+      "sha256": "bb34baab64f77e83f6670cc0bbc39d97fef4061a5b1c005f715e8081f2d4207e"
+    },
+    {
+      "path": "testkit_pre-guard-write_summary.txt",
+      "sha256": "250f5d5c3968ee873341e246ab55414fa1945a1b6806b43dc9dabeb76ef98033"
+    },
+    {
+      "path": "testkit_write-failure_summary.txt",
+      "sha256": "f54819b50bf12a852603f840f23e4e6a92508f1f74f228b9b3071d77293c0465"
+    }
+  ],
+  "generated_native_output_and_fixtures_removed": true
+}

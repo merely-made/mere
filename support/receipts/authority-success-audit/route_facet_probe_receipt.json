@@ -1,0 +1,123 @@
+{
+  "date_utc": "2026-10-17T08:15:56.282180+00:00",
+  "source_sha256": {
+    "crates/cambium/mere-overmap/src/route.rs": "c4d0efdc06bbefc4f0b2421497d024101f335601da0aed247c122a501c48022a",
+    "crates/cambium/mere-overmap/src/route_session.rs": "f14fe789d132d7fa5a5152e5ca60be15baa9485fe9a3bd1d322dd7d30c78ecb9",
+    "ports/graphshell/src/bin/graphshell_mere.rs": "644c23b8ad956d4f7b421a1f14e7566700c36b405305d89b94d438abefc2f944"
+  },
+  "libraries": {
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-76076108a8bbfe78.rlib",
+      "sha256": "0bc74dfc82023c57c193a9a8babe7f9f6adcb8cdaa26351367e1111956045149",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/graph/graph-kernel#mere-kernel@0.0.2",
+      "features": []
+    },
+    "chartulary": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchartulary-489012fe0485c630.rlib",
+      "sha256": "e50e96b6e29bcb0f36a4b660202685d8987526868a863e186372a4554cdc4e66",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/chartulary#0.2.2",
+      "features": []
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "sha256": "f8769e0a5c56f7dc70484b648b3979d34b971a535d314be659744d1da2f8303a",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ]
+    },
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-15b5484398dcd058.rlib",
+      "sha256": "6c5e89b1eb9bc99cf40e7a3b30e3ad24424146e1d9db4de2e8a4a54c8907f2e6",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/chirograph#0.0.2",
+      "features": []
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ]
+    }
+  },
+  "verbatim_functions": {
+    "start": 24786,
+    "end": 26377,
+    "sha256": "e5b9a7f591a46cb7a6ec67d54200104f210be1365ed98629550773b3489f855d"
+  },
+  "probe_sha256": "a34dbdbf0f851594092515e7289ca8a617f759bc2a4acd7488ee2c728b6dc705",
+  "runner_sha256": "46d05f9fe3b2b3feb63c3eea511538971326ac2fd6850a0971586b3272aaf2b1",
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\route_facet_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-route-facet-probe.exe",
+    "--extern",
+    "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-76076108a8bbfe78.rlib",
+    "--extern",
+    "chartulary=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchartulary-489012fe0485c630.rlib",
+    "--extern",
+    "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-15b5484398dcd058.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 3,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-route-facet-probe.exe",
+      "bytes": 571392,
+      "sha256": "8c2e77c4106992f5bc81b33089532edb5468ee44fde60519c79cf98e296d90e5"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-route-facet-probe.pdb",
+      "bytes": 66129920,
+      "sha256": "2e11d3808bb06485a68ccf821f1ef70cdbc7dc313e920ae20ed4d21e87874680"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Exact current add_node_facets and record_values functions extracted verbatim; retained real card/facet-store types, one shadowing observation and two controls. No complete MereRouteSession, native viewer, owner SetView invocation, persistence, network or GUI executed. Dependency bytes retained from an earlier successful build; not a full-current Cargo gate."
+}

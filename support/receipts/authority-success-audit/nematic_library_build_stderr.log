@@ -1,0 +1,36 @@
+   Compiling serde v1.0.229
+   Compiling zerofrom v0.1.8
+   Compiling web_atoms v0.2.6
+   Compiling serde_json v1.0.151
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling petgraph v0.8.3
+   Compiling markup5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling xml5ever v0.39.0
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling icu_provider v2.3.1
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling gemini-protocol v0.1.7
+   Compiling spartan-protocol v0.1.1
+   Compiling finger-protocol v0.1.1
+   Compiling nex-protocol v0.1.1
+   Compiling gopher-protocol v0.2.0
+   Compiling guppy-protocol v0.1.1
+   Compiling misfin v0.0.4
+   Compiling scroll-protocol v0.1.0
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+   Compiling nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 50.03s

@@ -1,0 +1,46 @@
+{
+  "date_utc": "2026-10-17T19:59:57.937916+00:00",
+  "compile_command": [
+    "rustc",
+    "--edition",
+    "2024",
+    "--test",
+    "-C",
+    "debuginfo=0",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pelt_desktop_success_probe.rs",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-pelt-desktop-success-probe.exe"
+  ],
+  "compile_exit": 0,
+  "exit": 0,
+  "passed": 6,
+  "source_sha256": {
+    "ports/pelt/desktop/static_viewer.rs": "0cca83b9f3bd9e0652f4962d0cba9b3dd5d322dd88b1e96c3f73fa3b98347f45",
+    "ports/pelt/desktop/smoke_netrender.rs": "8ecce75402a4052d07e8c571d0c1d40c6708206d96685fde5e3ac28064540c60"
+  },
+  "extracted_body_sha256": {
+    "run_headed_with": "4d5c73ea99e5a55da0432ae9567941a8057a489ddc1702477ff5b7cb179e17d5",
+    "resumed": "2fa3a3be9b1e34a207b2b52d2ac228a284a32b29454df5db318fddfdbac6e0c0",
+    "outcome": "a5ddebea9c53329d17420b5e54ab2f018ab4b7add24c8d61d35ff7f6093d59d2",
+    "run_netrender_smoke": "d28a2e47899f9a2ba8a7beb2ac49c004ff0225f1bac51f42078f9fb33d3c4c4c"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-pelt-desktop-success-probe.exe",
+      "sha256": "28e6e0b7243a26928560d8907dfde5e09ddece951fd56e4cb5b666f8de2ae27c",
+      "bytes": 786944
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-pelt-desktop-success-probe.pdb",
+      "sha256": "0af274d4b5662019472fdafad97f871b15195a68fca0b42356f13bd96b4851a6",
+      "bytes": 3043328
+    }
+  ],
+  "evidence_sha256": {
+    "run_pelt_desktop_success_probe.py": "bf328edb89e287828cfd8dc65404e3693fbd789592446e82000bf63464dd9803",
+    "pelt_desktop_success_probe.rs": "068399b664f742ca058f2e54a048d604217f71e10a38065065136ab5d4a76fe9",
+    "pelt_desktop_success_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pelt_desktop_success_output.txt": "5e7ce7ea11a2793cb0e8c0a1e92a1dea2d599f8e6be73b48133c71d10b4b5431"
+  },
+  "qualification": "Exact source-extracted startup/caller/outcome and complete netrender-smoke executable bodies with deterministic event-loop/window/SurfaceHost/GPU doubles. Callback visibility widened only. No whole desktop compilation, actual OS/GPU startup failure, real pixels, presentation or physical AT. CPU failure-propagation proof, not platform acceptance."
+}

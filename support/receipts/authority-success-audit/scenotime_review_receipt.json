@@ -1,0 +1,114 @@
+{
+  "date_utc": "2026-10-16T21:58:10.413691+00:00",
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "previous_turn_classification": "progress",
+  "kind": "Complete Scenotime source review, package tests and bounded public-API diagnostics; no repairs",
+  "findings": [
+    "Q069"
+  ],
+  "authority_entries": [
+    "A068",
+    "A069",
+    "A070",
+    "A071"
+  ],
+  "complete_areas": [
+    "crates/cambium/scenes/scenotime/"
+  ],
+  "source_files": 13,
+  "source_chars": 120829,
+  "coverage": {
+    "complete_files": 517,
+    "total_files": 3345,
+    "read_chars": 8043537,
+    "total_chars": 36772639,
+    "changed_since_inventory": [],
+    "pending_chunks": 0
+  },
+  "next_read": {
+    "path": "crates/cambium/scenes/scenograph/Cargo.toml",
+    "start": 0
+  },
+  "production_edits_this_pass": false,
+  "preserved_production_and_test_hashes": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    ".gitattributes": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "ab40f1887af4ad301a033b409eb2d5413238b33db3771db5693f06691a2866ab",
+    "ports/graphshell/tests/fixtures/identity_cards.json": "ec614d208fcefd51c2039db047f8707abc3daf70108a032bf847681d25dbc046"
+  },
+  "source_sha256": {
+    "crates/cambium/scenes/scenotime/Cargo.toml": "d44ca07361656dc556308a11cb6a972248fb471ba8e1c2a8465f9303ff5f507f",
+    "crates/cambium/scenes/scenotime/src/clock.rs": "339c3ad8c6a138ce982625f05f865533d08c0396d5b6de81b48d5ea9bf9a94ac",
+    "crates/cambium/scenes/scenotime/src/diff.rs": "898933fc446e1b5751669d30419e08906e0a0615a01c361d62c9ca50ffdafc92",
+    "crates/cambium/scenes/scenotime/src/ids.rs": "7bf6bae4e6b8ba0426e00d8645e862487972f3a612cd4fd4aef58c4ec01429b8",
+    "crates/cambium/scenes/scenotime/src/lib.rs": "fabc8f86ea8d78ef27f78064b8cde2fbdf9281550a33ed2ad98363ae10ebb9f5",
+    "crates/cambium/scenes/scenotime/src/pick.rs": "6c7f10094a40fa29c22739e57d7a45b46b5909508fce1813a2127e7d6ac4c229",
+    "crates/cambium/scenes/scenotime/src/return_motion.rs": "0a14305977c9df105dfb636f19fc83f0e4d2f42f926ffb8ed71482d9cc47fb26",
+    "crates/cambium/scenes/scenotime/src/snapshot.rs": "4d08c8521bb06ea8ab3f3b5a65730063ac5ea24219199ff2778c8caca30bc607",
+    "crates/cambium/scenes/scenotime/src/trace.rs": "5f61765a46c1dda1e3deaa2b3fd2115a0f1a868c08c561bed37190a1d8532231",
+    "crates/cambium/scenes/scenotime/src/transition.rs": "a0f25194f9f56cc1fea28ebe4c847e13f180079930f1721974faf4b22921a988",
+    "crates/cambium/scenes/scenotime/tests/fold.rs": "bd68f73649220289c11bf867ac8c1ed953076fee7b26beb81a693c5a9d99c5d4",
+    "crates/cambium/scenes/scenotime/tests/history.rs": "3479b48ffec0fcc3f0260a305f2bf982459e662b33ae925e2def9707b84c9d07",
+    "crates/cambium/scenes/scenotime/tests/site_projection.rs": "87dc35e6e93d02e4614fca6653ed13300b555dd77673eb092abe4f0051b7eb57"
+  },
+  "governing_document_sha256": {
+    "design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md": "06ccdadb771ad184f6d33077e18f5ed482179bc1c828ed10e2d743e54e056112"
+  },
+  "package_tests": {
+    "exit": 0,
+    "passed": 54,
+    "failed": 0,
+    "library": 43,
+    "integration": {
+      "fold": 6,
+      "history": 3,
+      "site_projection": 2
+    },
+    "command": "cargo test -p scenotime --lib --tests --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build --message-format=json"
+  },
+  "diagnostic_tests": {
+    "passed": 6,
+    "failed": 0
+  },
+  "coverage_limits": [
+    "No whole-source completion claim.",
+    "No renderer, browser, real clock callback, network, user archive or wasm gate.",
+    "Link-key and backwards-clock observations have qualified consumer/policy scope."
+  ],
+  "generated_output_removed": true,
+  "retained_isolation": [],
+  "diff_check": {
+    "exit": 0,
+    "log": "scenotime_review_diff_check.txt"
+  },
+  "evidence_sha256": {
+    "scenotime_unit_integration_output.jsonl": "b7cb6982937cf910678181471f2defb98152b55413db90a966c123748fa97e37",
+    "scenotime_probe_library_build_output.jsonl": "56540dd68e8a861102693ad023a37fdb0a5d53d6cb91b1e4e9899ec00b1c3283",
+    "scenotime_review_probe.rs": "82bcba7fc96180ec5dad623d46f996d415df4e4ca8bc01e970b7abc60ee43a90",
+    "run_scenotime_review_probe.py": "b02e14605560f63e6772da0f6b69c81b8578aa9a42b8ddd348ddb3f0cf234d55",
+    "scenotime_review_probe_build_output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scenotime_review_probe_output.txt": "f66361d6c8a547e8b1076093eff941b039907be0f62993ae0897819e9814d268",
+    "scenotime_review_probe_receipt.json": "ffc59e861dde31c72bc9b3765bd3201189fc114dc542ccadb01cea8a1c2d6c3c"
+  }
+}

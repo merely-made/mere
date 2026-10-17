@@ -1,0 +1,16 @@
+error[E0599]: no method named `comptime` found for type `usize` in the current scope
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_unit_transpose_probe.rs:11:34
+   |
+11 |     let vector_size = N::value().comptime() as u32;
+   |                                  ^^^^^^^^ method not found in `usize`
+   |
+   = help: items from traits can only be used if the trait is implemented and in scope
+note: `Comptime` defines an item `comptime`, perhaps you need to implement it
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_unit_transpose_probe.rs:2:1
+   |
+ 2 | trait Comptime:Sized{fn comptime(self)->Self{self}}impl Comptime for u32{}
+   | ^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.

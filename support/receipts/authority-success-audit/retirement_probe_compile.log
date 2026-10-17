@@ -1,0 +1,144 @@
+warning: constant `CONSOLIDATION_CANDIDATE_CAP` is never used
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:77:7
+   |
+77 | const CONSOLIDATION_CANDIDATE_CAP: usize = 50;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `SAME_MATERIAL_OVERLAP` is never used
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:83:7
+   |
+83 | const SAME_MATERIAL_OVERLAP: f64 = 0.5;
+   |       ^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `ForgetProposal` is never constructed
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:91:12
+   |
+91 | pub struct ForgetProposal {
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `is_empty` and `len` are never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:97:12
+    |
+ 96 | impl ForgetProposal {
+    | ------------------- methods in this implementation
+ 97 |     pub fn is_empty(&self) -> bool {
+    |            ^^^^^^^^
+...
+101 |     pub fn len(&self) -> usize {
+    |            ^^^
+
+warning: function `propose_forgetting` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:116:8
+    |
+116 | pub fn propose_forgetting(
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `apply_forgetting` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:141:14
+    |
+141 | pub async fn apply_forgetting(store: &mut dyn Store, proposal: &ForgetProposal) -> Result<usize> {
+    |              ^^^^^^^^^^^^^^^^
+
+warning: struct `ImageGcProposal` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:157:12
+    |
+157 | pub struct ImageGcProposal {
+    |            ^^^^^^^^^^^^^^^
+
+warning: methods `is_empty` and `len` are never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:162:12
+    |
+161 | impl ImageGcProposal {
+    | -------------------- methods in this implementation
+162 |     pub fn is_empty(&self) -> bool {
+    |            ^^^^^^^^
+...
+166 |     pub fn len(&self) -> usize {
+    |            ^^^
+
+warning: function `referenced_image_hexes` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:171:4
+    |
+171 | fn referenced_image_hexes(snapshot: &GraphSnapshot) -> HashSet<String> {
+    |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `propose_image_gc` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:182:8
+    |
+182 | pub fn propose_image_gc(
+    |        ^^^^^^^^^^^^^^^^
+
+warning: function `apply_image_gc` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:198:14
+    |
+198 | pub async fn apply_image_gc(
+    |              ^^^^^^^^^^^^^^
+
+warning: struct `ImageReferenceDrop` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:217:12
+    |
+217 | pub struct ImageReferenceDrop {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: struct `ImageReferenceForgetProposal` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:224:12
+    |
+224 | pub struct ImageReferenceForgetProposal {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `propose_image_reference_forgetting` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:232:8
+    |
+232 | pub fn propose_image_reference_forgetting(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `apply_image_reference_forgetting` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:263:8
+    |
+263 | pub fn apply_image_reference_forgetting(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `ConsolidationProposal` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:295:12
+    |
+295 | pub struct ConsolidationProposal {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `is_empty` and `len` are never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:302:12
+    |
+301 | impl ConsolidationProposal {
+    | -------------------------- methods in this implementation
+302 |     pub fn is_empty(&self) -> bool {
+    |            ^^^^^^^^
+...
+306 |     pub fn len(&self) -> usize {
+    |            ^^^
+
+warning: function `propose_consolidation` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:321:14
+    |
+321 | pub async fn propose_consolidation(store: &mut dyn Store) -> Result<ConsolidationProposal> {
+    |              ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `apply_consolidation` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:372:14
+    |
+372 | pub async fn apply_consolidation(
+    |              ^^^^^^^^^^^^^^^^^^^
+
+warning: methods `is_empty` and `len` are never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\distillery\athanor\src\lib.rs:406:12
+    |
+405 | impl RetirementProposal {
+    | ----------------------- methods in this implementation
+406 |     pub fn is_empty(&self) -> bool {
+    |            ^^^^^^^^
+...
+410 |     pub fn len(&self) -> usize {
+    |            ^^^
+
+warning: 20 warnings emitted
+

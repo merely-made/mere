@@ -1,0 +1,203 @@
+{
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "production": [
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\app-host\\src\\lib.rs",
+      "sha256": "1109d36375927f03b8baae39693ddb0837aa5eb754f9fcc12ce5e276000cbeeb",
+      "excerpts": [
+        {
+          "first_line": 176,
+          "last_line": 212,
+          "text": "pub struct AppScript<S: ActionSink + 'static> {\n    store: Store<AppHostState<S>>,\n    bindings: AppCore,\n}\n\nimpl<S: ActionSink + 'static> AppScript<S> {\n    /// Instantiate the component at `path` on `engine` with `sink` backing\n    /// `emit`. `granted` is what `caps.granted()` reports (the grant is\n    /// authoritative elsewhere; this is the guest's read-only window onto it,\n    /// so a component can skip a feature instead of emitting into a denial).\n    /// `epoch_deadline` of `Some(ticks)` arms epoch interruption \u2014 the engine\n    /// must come from [`guarded_engine`] and a [`Watchdog`] must be running.\n    pub async fn attach(\n        engine: &Engine,\n        path: &Path,\n        sink: S,\n        granted: Vec<String>,\n        limits: StoreLimits,\n        epoch_deadline: Option<u64>,\n    ) -> wasmtime::Result<Self> {\n        let component = Component::from_file(engine, path)?;\n        Self::attach_component(engine, &component, sink, granted, limits, epoch_deadline).await\n    }\n\n    /// Instantiate an `app-core` component from the exact bytes supplied by\n    /// the caller. Hosts can read and verify a body once, then pass those same\n    /// bytes here without reopening a mutable path.\n    pub async fn attach_bytes(\n        engine: &Engine,\n        bytes: &[u8],\n        sink: S,\n        granted: Vec<String>,\n        limits: StoreLimits,\n        epoch_deadline: Option<u64>,\n    ) -> wasmtime::Result<Self> {\n        let component = Component::from_binary(engine, bytes)?;\n        Self::attach_component(engine, &component, sink, granted, limits, epoch_deadline).await"
+        },
+        {
+          "first_line": 239,
+          "last_line": 274,
+          "text": "        let mut store = Store::new(\n            engine,\n            AppHostState {\n                sink,\n                logs: Vec::new(),\n                granted,\n                wasi: WasiCtxBuilder::new().build(),\n                table: ResourceTable::new(),\n                limits,\n            },\n        );\n        store.limiter(|s| &mut s.limits);\n        if let Some(ticks) = epoch_deadline {\n            store.set_epoch_deadline(ticks);\n        }\n        let bindings = AppCore::instantiate_async(&mut store, &component, &linker).await?;\n        Ok(Self { store, bindings })\n    }\n\n    pub async fn activate(&mut self) -> wasmtime::Result<()> {\n        self.bindings.call_activate(&mut self.store).await\n    }\n\n    /// Deliver one host event. The component emits during this call; the\n    /// accepted emissions land in the sink, which the caller drains after.\n    pub async fn on_event(&mut self, kind: &str, payload: &str) -> wasmtime::Result<()> {\n        self.bindings\n            .call_on_event(&mut self.store, kind, payload)\n            .await\n    }\n\n    pub async fn deactivate(&mut self) -> wasmtime::Result<()> {\n        self.bindings.call_deactivate(&mut self.store).await\n    }\n\n    pub fn sink(&self) -> &S {"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\app-host\\build.rs",
+      "sha256": "26dfafa4b2e5bb5980d1dbd76286f43554554594ff55b5f30780e86fa2157193",
+      "excerpts": [
+        {
+          "first_line": 17,
+          "last_line": 29,
+          "text": "use std::path::Path;\nuse std::process::Command;\n\nconst GUEST: (&str, &str) = (\"guest\", \"app_core_guest.wasm\");\n\nfn main() {\n    let root = std::env::var(\"CARGO_MANIFEST_DIR\").expect(\"CARGO_MANIFEST_DIR\");\n    let root = Path::new(&root);\n    let (dir, artifact) = GUEST;\n    let guest = root.join(dir);\n    if !guest.join(\"Cargo.toml\").exists() {\n        println!(\"cargo::warning={dir}: no Cargo.toml; skipping guest build\");\n        return;"
+        },
+        {
+          "first_line": 65,
+          "last_line": 91,
+          "text": "    }\n\n    match cmd.status() {\n        Ok(status) if status.success() => {},\n        Ok(status) => {\n            println!(\n                \"cargo::warning={dir}: guest build failed ({status}). The tests that load \\\n                 it will fail and name the command to run by hand.\"\n            );\n            return;\n        },\n        Err(err) => {\n            println!(\"cargo::warning={dir}: could not run cargo ({err})\");\n            return;\n        },\n    }\n\n    let built = guest.join(\"target/wasm32-wasip2/release\").join(artifact);\n    if !built.exists() {\n        println!(\n            \"cargo::warning={dir}: build reported success but {} is missing\",\n            built.display()\n        );\n    }\n}"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\app-host\\tests\\emit.rs",
+      "sha256": "27b9909aa299f43e78bef8e1414896c4e4d33fa0f6ffa1c99aefb44fbc68a415",
+      "excerpts": [
+        {
+          "first_line": 20,
+          "last_line": 40,
+          "text": "\n/// Where build.rs left the guest component.\nfn guest_component() -> PathBuf {\n    if let Some(path) = std::env::var_os(\"APP_HOST_GUEST_WASM\") {\n        return PathBuf::from(path);\n    }\n    let path = PathBuf::from(\"guest/target/wasm32-wasip2/release/app_core_guest.wasm\");\n    assert!(\n        path.exists(),\n        \"guest component missing at {}. Build it with:\\n  \\\n         cd crates/script/app-host/guest && cargo build --target wasm32-wasip2 --release\",\n        path.display()\n    );\n    path\n}\n\n/// A stand-in for turnstone's ring gate: `granted` names pass, known-but-\n/// ungranted names are denied by ring, unknown names are unknown, and\n/// `open-address` needs a `url` in its payload.\nstruct StubGate {\n    granted: Vec<&'static str>,"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\build.rs",
+      "sha256": "b3b6b32ec0dbd72105fa523984541ff90ed686ce4d616fef83cbabfcfa049cbf",
+      "excerpts": [
+        {
+          "first_line": 65,
+          "last_line": 109,
+          "text": "        for (key, _) in std::env::vars() {\n            // Keep the caller's cache/config boundary and resource limit.\n            // Clearing CARGO_HOME would escape a portable-check isolation home.\n            if key == \"CARGO_HOME\" || key == \"CARGO_BUILD_JOBS\" {\n                continue;\n            }\n            if key.starts_with(\"CARGO\")\n                || key.starts_with(\"RUSTC\")\n                || key.starts_with(\"RUSTUP\")\n                || key == \"RUSTFLAGS\"\n                || key == \"RUSTDOCFLAGS\"\n                || key == \"TARGET\"\n            {\n                cmd.env_remove(key);\n            }\n        }\n\n        match cmd.status() {\n            Ok(status) if status.success() => {},\n            Ok(status) => {\n                println!(\n                    \"cargo::warning={dir}: guest build failed ({status}). The tests that load \\\n                     it will fail and name the command to run by hand.\"\n                );\n                continue;\n            },\n            Err(err) => {\n                println!(\"cargo::warning={dir}: could not run cargo ({err})\");\n                continue;\n            },\n        }\n\n        let built = guest.join(\"target/wasm32-wasip2/release\").join(artifact);\n        if !built.exists() {\n            println!(\n                \"cargo::warning={dir}: build reported success but {} is missing\",\n                built.display()\n            );\n        }\n    }\n}"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\src\\capabilities.rs",
+      "sha256": "1a9b8fbb5123d2cd2b5e18441dd238eb261c887cff63699c3448c59731d8078d",
+      "excerpts": [
+        {
+          "first_line": 218,
+          "last_line": 263,
+          "text": "/// Load a `document-core` component: a precompiled `.cwasm` via `deserialize` (the\n/// P2.6 AOT path \u2014 no Cranelift on the hot path), else a `.wasm` via `from_file`\n/// (JIT). `.cwasm` is for trusted first-party bundled components only.\npub(crate) fn load_component(engine: &Engine, path: &Path) -> wasmtime::Result<Component> {\n    if path.extension().and_then(|e| e.to_str()) == Some(\"cwasm\") {\n        // SAFETY: a `.cwasm` is a trusted first-party build artifact produced by\n        // `precompile_to_cwasm` with a config-matching engine; `deserialize` loads\n        // precompiled machine code (no Cranelift). Never deserialize untrusted bytes.\n        unsafe { Component::deserialize_file(engine, path) }\n    } else {\n        Component::from_file(engine, path)\n    }\n}\n\n/// Ahead-of-time compile a `document-core` `.wasm` component to a `.cwasm` byte blob\n/// (P2.6): Cranelift runs *here* (build time), not at `attach`. Write the bytes to a\n/// `.cwasm` file and load it with [`DocumentScript::attach`], which `deserialize`s\n/// with codegen off. Trusted / first-party components only (`deserialize` trusts the\n/// bytes). The blob is a per-target build artifact \u2014 never commit it.\npub fn precompile_to_cwasm(component_path: &Path) -> wasmtime::Result<Vec<u8>> {\n    let engine = guarded_engine()?;\n    let component = Component::from_file(&engine, component_path)?;\n    component.serialize()\n}\n\npub(crate) async fn build_instance(\n    engine: &Engine,\n    component_path: &Path,\n    dom: ScriptedDom,\n    grant: &Grant,\n    limits: StoreLimits,\n) -> wasmtime::Result<(Store<ScriptHost>, DocumentCore)> {\n    let component = load_component(engine, component_path)?;\n    let mut linker = Linker::new(engine);\n    link_with_grant(&mut linker, grant)?;\n    let mut store = Store::new(engine, new_host(dom, grant.granted_names(), limits));\n    // Harmless when `limits` is the unlimited default; enforces the cap otherwise.\n    store.limiter(|h| &mut h.limits);\n    let bindings = DocumentCore::instantiate_async(&mut store, &component, &linker).await?;\n    Ok((store, bindings))\n}\n\n/// Try to instantiate (and `activate`) the component under `grant`. Succeeds only\n/// if every import the component *requires* is granted; a denied required\n/// capability makes instantiation fail \u2014 the capability boundary, enforced by the\n/// runtime, not by host convention. The seed DOM + granted names are wired so the"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\src\\script.rs",
+      "sha256": "afed22c24a8025ae4a79669c8ff92c8400e6d636e058992bddacc3d7648f034f",
+      "excerpts": [
+        {
+          "first_line": 94,
+          "last_line": 125,
+          "text": "    pub fn attach(\n        component_path: &Path,\n        dom: ScriptedDom,\n        grant: &Grant,\n        quota: Quota,\n        fetcher: Option<std::sync::Arc<dyn NetFetcher>>,\n        net_origins: Vec<String>,\n    ) -> wasmtime::Result<Self> {\n        let engine = guarded_engine()?;\n        let limits = StoreLimitsBuilder::new()\n            .memory_size(quota.mem_bytes)\n            .build();\n        let (mut store, bindings) =\n            pollster::block_on(build_instance(&engine, component_path, dom, grant, limits))?;\n        // The network backend for `net.fetch` (None = unconfigured -> fetch errors)\n        // plus the origin allowlist gating which URLs it may reach (\u00a7E1) and the\n        // per-turn fetch cap (\u00a7A6).\n        store.data_mut().fetcher = fetcher;\n        store.data_mut().net_origins = net_origins;\n        store.data_mut().max_fetches_per_turn = quota.max_fetches_per_turn;\n        store.set_epoch_deadline(quota.epoch_deadline_ticks);\n        let engine = store.engine().clone();\n        let activate = bindings.call_activate(&mut store);\n        guarded_block_on(engine, activate)?;\n        Ok(Self {\n            store,\n            bindings,\n            epoch_deadline_ticks: quota.epoch_deadline_ticks,\n        })\n    }\n\n    /// Deliver one event under the guards; apply the returned batch to the live DOM;"
+        },
+        {
+          "first_line": 129,
+          "last_line": 155,
+          "text": "    pub fn deliver_event(&mut self, kind: &str, payload: &str) -> wasmtime::Result<TurnOutcome> {\n        let ev = Event {\n            kind: kind.to_string(),\n            payload: payload.to_string(),\n        };\n        self.store.set_epoch_deadline(self.epoch_deadline_ticks);\n        self.store.data_mut().fetches_this_turn = 0; // fresh per-turn fetch budget (\u00a7A6)\n        let engine = self.store.engine().clone();\n        let turn = self.bindings.call_handle_event(&mut self.store, &ev);\n        let result = guarded_block_on(engine, turn)?;\n        Ok(match result {\n            Ok(batch) => {\n                let h = self.store.data_mut();\n                match dom_view::apply(&mut h.dom, &mut h.revision, batch) {\n                    Ok(rev) => TurnOutcome::Applied(rev),\n                    Err(TurnError::RevisionConflict(c)) => TurnOutcome::Conflict(c),\n                    Err(TurnError::UnknownNode(id)) => TurnOutcome::UnknownNode(id),\n                    Err(TurnError::Refused(w)) => TurnOutcome::Refused(w),\n                }\n            },\n            Err(TurnError::RevisionConflict(c)) => TurnOutcome::Conflict(c),\n            Err(TurnError::UnknownNode(id)) => TurnOutcome::UnknownNode(id),\n            Err(TurnError::Refused(w)) => TurnOutcome::Refused(w),\n        })\n    }\n\n    /// The live (possibly script-mutated) page DOM, for the caller to render."
+        },
+        {
+          "first_line": 165,
+          "last_line": 176,
+          "text": "\n    /// Run `deactivate` (guarded) and return the page DOM to the caller. A trap in\n    /// `deactivate` is reported as `Err`, but the DOM is still recovered on success.\n    pub fn detach(mut self) -> wasmtime::Result<ScriptedDom> {\n        self.store.set_epoch_deadline(self.epoch_deadline_ticks);\n        let engine = self.store.engine().clone();\n        let deactivate = self.bindings.call_deactivate(&mut self.store);\n        guarded_block_on(engine, deactivate)?;\n        Ok(self.store.into_data().dom)\n    }\n}"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\src\\runtime.rs",
+      "sha256": "21e895d674f9cdaa248c5e6a1f6d865727263f0fa1fa9947cf082184ec2d0e57",
+      "excerpts": [
+        {
+          "first_line": 119,
+          "last_line": 177,
+          "text": "/// (`log`, `document`) are intrinsic to a document mod, so both are granted; the\n/// host `ModCapability`s are policy-checked in [`DocumentScriptRuntime::activate`]\n/// (they gate future imports like `fetch`, which do not exist yet).\nfn grant_for(_manifest: &ModManifest) -> Grant {\n    Grant::allow_all()\n}\n\nimpl WasmModRuntime for DocumentScriptRuntime {\n    fn activate(&self, manifest: &ModManifest, source: &WasmModSource) -> Result<(), String> {\n        // 1. Host-policy capability check \u2014 before any instantiation.\n        if let Some(denied) = manifest\n            .capabilities\n            .iter()\n            .find(|c| !self.allowed.contains(c))\n        {\n            return Err(format!(\n                \"mod '{}' requests capability {:?} not granted by this surface\",\n                manifest.mod_id, denied\n            ));\n        }\n\n        // 2. No double-activation (the loader should not, but be defensive).\n        {\n            let active = self\n                .active\n                .lock()\n                .map_err(|_| \"runtime lock poisoned\".to_string())?;\n            if active.contains_key(&manifest.mod_id) {\n                return Err(format!(\"mod '{}' already active\", manifest.mod_id));\n            }\n        }\n\n        // 3. Build the instance under the grant + run the `activate` lifecycle\n        //    export. Instantiation itself fails if the component requires an import\n        //    the grant omitted (the runtime-enforced capability boundary).\n        // Extension mods get a fresh seeded DOM (they are not page-attached) and are\n        // unguarded for P2.4 (the page-script guards live in `DocumentScript`).\n        let grant = grant_for(manifest);\n        let (mut store, bindings) = pollster::block_on(build_instance(\n            &self.engine,\n            &source.module_path,\n            seed_dom(),\n            &grant,\n            StoreLimits::default(),\n        ))\n        .map_err(|e| format!(\"instantiate '{}': {e}\", manifest.mod_id))?;\n        pollster::block_on(bindings.call_activate(&mut store))\n            .map_err(|e| format!(\"activate '{}': {e}\", manifest.mod_id))?;\n\n        // 4. Retain the live instance for `deactivate`.\n        self.active\n            .lock()\n            .map_err(|_| \"runtime lock poisoned\".to_string())?\n            .insert(manifest.mod_id.clone(), ActiveMod { store, bindings });\n        Ok(())\n    }\n\n    fn deactivate(&self, mod_id: &str) -> Result<(), String> {\n        // Remove under the lock, then run the export with the lock released so a"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\src\\host.rs",
+      "sha256": "f74dc831bd0046596edface3947026e57053db3967e644290a88aa0cb57e51a4",
+      "excerpts": [
+        {
+          "first_line": 58,
+          "last_line": 100,
+          "text": "/// host thread stays live. The real backend (netfetcher for http(s), errand for\n/// smolweb) is supplied by the content actor when it wires `net`. Linked only under\n/// the `net` grant, and gated here to the instance's origin allowlist (\u00a7E1): `net`\n/// means \"may reach these origins\", so a cross-origin URL is refused before the\n/// backend runs (closes the credentialed-SSRF / cross-origin-exfil channel).\nimpl crate::mere::script::net::Host for ScriptHost {\n    async fn fetch(\n        &mut self,\n        req: crate::mere::script::net::Request,\n    ) -> Result<crate::mere::script::net::Response, String> {\n        // Per-turn rate cap first (\u00a7A6): bound how many fetches one turn can issue, so\n        // a granted script cannot flood egress in a loop. Reset each turn.\n        if self.fetches_this_turn >= self.max_fetches_per_turn {\n            return Err(format!(\n                \"net.fetch: per-turn request limit reached ({})\",\n                self.max_fetches_per_turn\n            ));\n        }\n        self.fetches_this_turn += 1;\n        // Origin gate: the script may only reach its granted origins (default\n        // same-origin), so a granted `net` cannot exfiltrate to or read an arbitrary\n        // third-party host. Enforced before the backend is even consulted.\n        if !host_in_origins(&req.url, &self.net_origins) {\n            return Err(format!(\n                \"net.fetch: {} is outside this script's net origins\",\n                req.url\n            ));\n        }\n        // Call the injected backend (netfetcher/errand, supplied by the content actor).\n        // Blocking on the turn's fiber: the host thread parks for the I/O, then the\n        // fiber resumes with the result. No backend configured = an error to the guest.\n        let fetcher = self\n            .fetcher\n            .as_ref()\n            .ok_or_else(|| \"net backend not configured\".to_string())?;\n        let resp = fetcher.fetch(&req.url)?;\n        Ok(crate::mere::script::net::Response {\n            status: resp.status,\n            content_type: resp.content_type,\n            body: resp.body,\n        })\n    }\n}"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\src\\dom_view.rs",
+      "sha256": "dc137a9ba608f9a91f0eb5fa377161d8db2a5869ce7a60c9ef91238b007d5ca3",
+      "excerpts": [
+        {
+          "first_line": 76,
+          "last_line": 143,
+          "text": "/// Apply a batch atomically against the host-side `revision`. Every referenced id\n/// is checked live before mutating (unknown-node, nothing applied); an empty batch\n/// is a no-op that does not advance the revision. Returns the new (or unchanged)\n/// revision.\npub fn apply(\n    dom: &mut ScriptedDom,\n    revision: &mut u64,\n    batch: ApplyBatch,\n) -> Result<u64, TurnError> {\n    if batch.expected_revision != *revision {\n        return Err(TurnError::RevisionConflict(*revision));\n    }\n    for m in &batch.changes {\n        let referenced = match m {\n            Mutation::SetText(a) => Some(a.node),\n            Mutation::Remove(id) => Some(*id),\n            Mutation::InsertBefore(a) => Some(a.reference),\n            Mutation::AppendChild(a) => Some(a.parent),\n        };\n        if let Some(raw) = referenced {\n            if !dom.is_live(NodeId::from_raw(raw as u64)) {\n                return Err(TurnError::UnknownNode(raw));\n            }\n        }\n    }\n    if batch.changes.is_empty() {\n        return Ok(*revision);\n    }\n    for m in batch.changes {\n        apply_one(dom, m);\n    }\n    *revision += 1;\n    Ok(*revision)\n}\n\nfn apply_one(dom: &mut ScriptedDom, m: Mutation) {\n    match m {\n        Mutation::SetText(SetTextArgs { node, text }) => {\n            dom.set_text(NodeId::from_raw(node as u64), &text);\n        },\n        Mutation::Remove(id) => {\n            dom.remove(NodeId::from_raw(id as u64));\n        },\n        Mutation::InsertBefore(InsertArgs { reference, new }) => {\n            let reference = NodeId::from_raw(reference as u64);\n            if let Some(parent) = dom.parent(reference) {\n                let child = create_block(dom, new);\n                dom.insert_before(parent, child, Some(reference));\n            }\n        },\n        Mutation::AppendChild(AppendArgs { parent, new }) => {\n            let parent = NodeId::from_raw(parent as u64);\n            let child = create_block(dom, new);\n            dom.append_child(parent, child);\n        },\n    }\n}\n\n/// A block becomes one DOM node: `#text` \u2192 a text node; otherwise an element named\n/// by `kind` (element text content is a separate `#text` block).\nfn create_block(dom: &mut ScriptedDom, block: Block) -> NodeId {\n    if block.kind == \"#text\" {\n        dom.create_text(&block.text)\n    } else {\n        dom.create_element(qual(&block.kind))\n    }\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\registry\\src\\mod_loader\\loader\\free_fns.rs",
+      "sha256": "8f30c952919ac611b2ad509658776a655aefbda5116d715d757d046c1022b328",
+      "excerpts": [
+        {
+          "first_line": 90,
+          "last_line": 100,
+          "text": "\npub(super) fn read_wasm_mod_from_path(\n    path: &Path,\n) -> Result<(ModManifest, WasmModSource), ModLoadPathError> {\n    if path.extension().and_then(|ext| ext.to_str()) != Some(\"wasm\") {\n        return Err(ModLoadPathError::UnsupportedModPath(path.to_path_buf()));\n    }\n\n    validate_wasm_binary(path)?;\n\n    let manifest_path = candidate_manifest_paths(path)"
+        },
+        {
+          "first_line": 130,
+          "last_line": 139,
+          "text": "    );\n    manifest.document_script_origins = disk_manifest.document_script_origins;\n\n    Ok((\n        manifest,\n        WasmModSource {\n            module_path: path.to_path_buf(),\n            manifest_path,\n        },\n    ))"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\registry\\src\\mod_loader\\loader\\types.rs",
+      "sha256": "46d417d38ecefba78ec8c2213b1c68dc69e909c38a0db7f505ceb401bd1f2f2d",
+      "excerpts": [
+        {
+          "first_line": 151,
+          "last_line": 158,
+          "text": "}\n\n#[derive(Debug, Clone, PartialEq, Eq)]\npub struct WasmModSource {\n    pub module_path: PathBuf,\n    pub manifest_path: PathBuf,\n}\n"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\moot\\gemot\\examples\\capsule-library\\native.rs",
+      "sha256": "1c01bb6654cca008ff5ffed4ca26567903921fb6094433c476221bbe266b9ae4",
+      "excerpts": [
+        {
+          "first_line": 142,
+          "last_line": 161,
+          "text": "        ..Default::default()\n    };\n    let engine = guarded_engine()?;\n    let _watchdog = Watchdog::start(engine.clone(), Duration::from_millis(5));\n    let mut guest = AppScript::attach_blocking_bytes(\n        &engine,\n        component,\n        sink,\n        vec![\"power:capsule-view\".into(), \"power:navigate\".into()],\n        StoreLimitsBuilder::new()\n            .memory_size(64 * 1024 * 1024)\n            .build(),\n        Some(400),\n    )?;\n    guest.activate_blocking()?;\n    for query in [\"\", \"garden\"] {\n        guest.on_event_blocking(\n            \"catalogue\",\n            &serde_json::to_string(&Catalogue {\n                query: query.into(),"
+        },
+        {
+          "first_line": 210,
+          "last_line": 222,
+          "text": "    // Another instance keeps a trapping guest from poisoning the useful session.\n    let runaway_interrupted = limited.on_event_blocking(\"spin\", \"\").is_err();\n    ensure(\n        missing_capability_reported && signed_grant_revocation_refused && runaway_interrupted,\n        \"grant or containment negative control failed\",\n    )?;\n    Ok(NativeReceipt {\n        pid: std::process::id(),\n        browse: guest.sink().views[0].clone(),\n        search: guest.sink().views[1].clone(),\n        opened: guest.sink().opened.clone(),\n        refusals: guest.sink().refusals.clone(),\n        missing_capability_reported,"
+        }
+      ]
+    }
+  ],
+  "external_contract": [
+    {
+      "path": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wasmtime-45.0.3\\src\\runtime\\store.rs",
+      "sha256": "02b1634151ded8c5ec3c1926cece5fb44450ca26533b7c7efb2a3e45478266d7",
+      "excerpts": [
+        {
+          "first_line": 1110,
+          "last_line": 1140,
+          "text": "\n    /// Sets the epoch deadline to a certain number of ticks in the future.\n    ///\n    /// When the Wasm guest code is compiled with epoch-interruption\n    /// instrumentation\n    /// ([`Config::epoch_interruption()`](crate::Config::epoch_interruption)),\n    /// and when the `Engine`'s epoch is incremented\n    /// ([`Engine::increment_epoch()`](crate::Engine::increment_epoch))\n    /// past a deadline, execution can be configured to either trap or\n    /// yield and then continue.\n    ///\n    /// This deadline is always set relative to the current epoch:\n    /// `ticks_beyond_current` ticks in the future. The deadline can\n    /// be set explicitly via this method, or refilled automatically\n    /// on a yield if configured via\n    /// [`epoch_deadline_async_yield_and_update()`](Store::epoch_deadline_async_yield_and_update). After\n    /// this method is invoked, the deadline is reached when\n    /// [`Engine::increment_epoch()`] has been invoked at least\n    /// `ticks_beyond_current` times.\n    ///\n    /// By default a store will trap immediately with an epoch deadline of 0\n    /// (which has always \"elapsed\"). This method is required to be configured\n    /// for stores with epochs enabled to some future epoch deadline.\n    ///\n    /// See documentation on\n    /// [`Config::epoch_interruption()`](crate::Config::epoch_interruption)\n    /// for an introduction to epoch-based interruption.\n    #[cfg(target_has_atomic = \"64\")]\n    pub fn set_epoch_deadline(&mut self, ticks_beyond_current: u64) {\n        self.inner.set_epoch_deadline(ticks_beyond_current);\n    }"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wasmtime-45.0.3\\src\\runtime\\component\\component.rs",
+      "sha256": "7b88d545efe9271b4ec57340b43b69e67811069b4c49b27de4b84df17dc2b800",
+      "excerpts": [
+        {
+          "first_line": 242,
+          "last_line": 267,
+          "text": "        Component::from_parts(engine, code, None)\n    }\n\n    /// Same as [`Module::deserialize_file`], but for components.\n    ///\n    /// Note that the file referenced here must contain contents previously\n    /// produced by [`Engine::precompile_component`] or\n    /// [`Component::serialize`].\n    ///\n    /// For more information see the [`Module::deserialize_file`] method.\n    ///\n    /// # Unsafety\n    ///\n    /// The unsafety of this method is the same as that of the\n    /// [`Module::deserialize_file`] method.\n    ///\n    /// [`Module::deserialize_file`]: crate::Module::deserialize_file\n    #[cfg(feature = \"std\")]\n    pub unsafe fn deserialize_file(engine: &Engine, path: impl AsRef<Path>) -> Result<Component> {\n        let file = open_file_for_mmap(path.as_ref())?;\n        let code = engine\n            .load_code_file(file, ObjectKind::Component)\n            .with_context(|| format!(\"failed to load code for: {}\", path.as_ref().display()))?;\n        Component::from_parts(engine, code, None)\n    }\n"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wasmtime-45.0.3\\src\\runtime\\module.rs",
+      "sha256": "1f2847f3a6a2b7329764fbad0eb546dfd2eb45388e7e389074285072d598dd6c",
+      "excerpts": [
+        {
+          "first_line": 376,
+          "last_line": 405,
+          "text": "    /// # Unsafety\n    ///\n    /// This function is marked as `unsafe` because if fed invalid input or used\n    /// improperly this could lead to memory safety vulnerabilities. This method\n    /// should not, for example, be exposed to arbitrary user input.\n    ///\n    /// The structure of the binary blob read here is only lightly validated\n    /// internally in `wasmtime`. This is intended to be an efficient\n    /// \"rehydration\" for a [`Module`] which has very few runtime checks beyond\n    /// deserialization. Arbitrary input could, for example, replace valid\n    /// compiled code with any other valid compiled code, meaning that this can\n    /// trivially be used to execute arbitrary code otherwise.\n    ///\n    /// For these reasons this function is `unsafe`. This function is only\n    /// designed to receive the previous input from [`Module::serialize`] and\n    /// [`Engine::precompile_module`]. If the exact output of those functions\n    /// (unmodified) is passed to this function then calls to this function can\n    /// be considered safe. It is the caller's responsibility to provide the\n    /// guarantee that only previously-serialized bytes are being passed in\n    /// here.\n    ///\n    /// Note that this function is designed to be safe receiving output from\n    /// *any* compiled version of `wasmtime` itself. This means that it is safe\n    /// to feed output from older versions of Wasmtime into this function, in\n    /// addition to newer versions of wasmtime (from the future!). These inputs\n    /// will deterministically and safely produce an `Err`. This function only\n    /// successfully accepts inputs from the same version of `wasmtime`, but the\n    /// safety guarantee only applies to externally-defined blobs of bytes, not\n    /// those defined by any version of wasmtime. (this means that if you cache\n    /// blobs across versions of wasmtime you can be safely guaranteed that"
+        }
+      ]
+    }
+  ],
+  "qualification": "Exact source excerpts and complete-file hashes, not executable containment, AOT safety, race or stale-artifact test receipts. External dependency excerpts do not count toward Mere source coverage."
+}

@@ -1,0 +1,27 @@
+{
+  "source_function_sha256": "7992c506288ac4f611386da0b44e5386ebd4fe86ce295766a81b999cdf28a971",
+  "cases": [
+    {
+      "name": "registry_mislabelled_local",
+      "tree": "netrender v0.1.0",
+      "failures": []
+    },
+    {
+      "name": "ssh_git_mislabelled_local",
+      "tree": "netrender v0.1.0 (ssh://git@example.invalid/netrender#12345678)",
+      "failures": []
+    },
+    {
+      "name": "https_git_refused_control",
+      "tree": "netrender v0.1.0 (https://example.invalid/netrender#12345678)",
+      "failures": [
+        "patch audit/netrender"
+      ]
+    },
+    {
+      "name": "path_accepted_control",
+      "tree": "netrender v0.1.0 (C:\\fixture\\netrender)",
+      "failures": []
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+C:\Users\mark_\.cargo\git\checkouts\genet-0bbbe1b4c8511eb3\fa27ea5\components\taproot\lib.rs
+sha256 2949580b0154bc411eb5af46d85a1db37a598738ddb86e150df1e05e5c193d6c
+C:\Users\mark_\.cargo\git\checkouts\genet-0bbbe1b4c8511eb3\fa27ea5\components\taproot\projection.rs
+sha256 b16b4db81d7d06a962035905833f3e766834760799ce04e051cb761e12a1c9f5
+C:\Users\mark_\.cargo\git\checkouts\genet-0bbbe1b4c8511eb3\fa27ea5\components\taproot\scenario.rs
+sha256 c2c1fcf7f39ab3157e60885a327bfaf99f6cd29a13bef9ec9fab5c9637570689
+
+pub struct Selector {
+    /// Optional host surface family, matched exactly against [`Hit::surface`]
+    /// or the legacy [`ProbeSurface::name`].
+    /// This scopes attribution, not pane instance identity or accessible labels.
+    pub surface: Option<String>,
+    pub matcher: Match,
+    pub text: Option<String>,
+    /// `(name, value-substring)`: the element's `name` attribute must contain it.
+    pub attr: Option<(String, String)>,
+}
+
+impl Selector {
+    /// Select by a class token.
+    pub fn class(class: impl Into<String>) -> Self {
+        Self {
+            surface: None,
+            matcher: Match::Class(class.into()),
+            text: None,
+            attr: None,
+        }
+    }
+
+    /// Select by role. [`matching_with_projection`] uses the owner-computed
+    /// role; [`matching`] retains explicit/native DOM compatibility rules.
+    pub fn role(role: impl Into<String>) -> Self {
+        Self {
+            surface: None,
+            matcher: Match::Role(role.into()),
+            text: None,
+            attr: None,
+        }
+    }
+
+    /// Restrict this request to one host surface family.
+    pub fn on_surface(mut self, surface: impl Into<String>) -> Self {
+        self.surface = Some(surface.into());
+        self
+    }
+
+    /// Whether a host surface belongs to this request's scope.
+    pub fn matches_surface(&self, name: &str) -> bool {
+        self.surface.as_deref().is_none_or(|wanted| wanted == name)
+    }
+
+    /// Narrow to elements whose child text or `aria-label` contains `text`.
+    /// With [`matching_with_projection`], role selectors instead search the
+    /// owner-computed accessible name; class selectors retain this DOM meaning.
+    pub fn containing(mut self, text: impl Into<String>) -> Self {
+        self.text = Some(text.into());
+        self
+    }
+
+    /// Narrow to elements whose `name` attribute value contains `value` — for
+    /// targeting by a stable key the DOM carries (e.g. `data-key`) rather than by
+    /// a visible label that may not be unique.
+    pub fn with_attr(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+        self.attr = Some((name.into(), value.into()));
+        self
+    }
+}
+
+pub trait AutomatableExt: Automatable {
+    /// Resolve `sel` to a window point across this app's surfaces.
+    fn resolve(&self, sel: &Selector) -> Option<Hit> {
+        match self.selector_target(sel) {
+            SelectorTarget::Unsupported => self.with_surfaces(|surfaces| resolve(surfaces, sel)),
+            SelectorTarget::Miss => None,
+            SelectorTarget::Hit(hit) => sel.matches_surface(hit.surface).then_some(hit),
+        }
+    }
+
+    /// Resolve `sel` and click it (press+release at its centre). `true` if it
+    /// hit; `false` is the driver's attributable miss.
+    fn click(&mut self, sel: &Selector) -> bool {
+        if sel.surface.is_some() {
+            // Host geometry identifies the family without a legacy probe DOM,
+            // and a mismatched Hit must be refused before the mutable hook.
+            match self.selector_target(sel) {
+                SelectorTarget::Hit(hit) if !sel.matches_surface(hit.surface) => return false,
+                SelectorTarget::Hit(_) => {},
+                // Miss may describe an offscreen target the hook can reveal.
+                // Unsupported retains legacy hooks; both still need known scope.
+                SelectorTarget::Miss | SelectorTarget::Unsupported => {
+                    if !self.with_surfaces(|surfaces| {
+                        surfaces
+                            .iter()
+                            .any(|surface| sel.matches_surface(surface.name))
+                    }) {
+                        return false;
+                    }
+                },
+            }
+        }
+        if let Some(handled) = self.click_target(sel) {
+            return handled;
+        }
+        // `resolve` returns an owned Option<Hit> and the surfaces borrow ends
+        // with it, so the mutable pointer delivery below does not alias it.
+        match self.resolve(sel) {
+            Some(hit) => {
+                self.press(hit.point.0, hit.point.1);
+                self.release(hit.point.0, hit.point.1);
+                true
+            },
+            None => false,
+        }
+    }
+
+pub fn matching_with_projection(
+    dom: &ScriptedDom,
+    sel: &Selector,
+    projection: &DocumentA11yProjection,
+) -> Vec<NodeId> {
+    let Match::Role(role) = &sel.matcher else {
+        return matching(dom, sel);
+    };
+    let nodes: BTreeMap<_, _> = projection
+        .nodes()
+        .iter()
+        .map(|node| (node.id.get(), node))
+        .collect();
+    let mut pending = vec![dom.document()];
+    let mut result = Vec::new();
+    while let Some(node) = pending.pop() {
+        if let Some(semantic) = nodes.get(&dom.opaque_id(node))
+            && !semantic.state.hidden
+            && role_matches(semantic.role, role)
+            && sel.text.as_ref().is_none_or(|text| {
+                semantic
+                    .name
+                    .as_ref()
+                    .is_some_and(|name| name.contains(text))
+            })
+            && sel.attr.as_ref().is_none_or(|(name, value)| {
+                attr(dom, node, name).is_some_and(|attr| attr.contains(value))
+            })
+        {
+            result.push(node);
+        }
+        let children: Vec<_> = dom.dom_children(node).collect();
+        pending.extend(children.into_iter().rev());
+    }
+    result
+}
+
+/// Prefer an exact owner-computed name among projected role matches.
+///
+/// This is an opt-in selection policy: [`matching_with_projection`] and the
+/// legacy DOM matcher keep their substring and document-order contracts. For a
+/// role selector with text, return the exact-name subset if it is nonempty;
+/// otherwise retain every original match. Class selectors and roles without
+/// text or with empty text are unchanged. All role, hidden-state and attribute filters are applied
+/// before this preference. Duplicate exact names retain their document order.
+/// The host still supplies geometry and owns click delivery.
+pub fn matching_prefer_exact_with_projection(
+    dom: &ScriptedDom,
+    sel: &Selector,
+    projection: &DocumentA11yProjection,
+) -> Vec<NodeId> {
+    let matched = matching_with_projection(dom, sel, projection);
+    let (Match::Role(_), Some(text)) = (&sel.matcher, &sel.text) else {
+        return matched;
+    };
+    if text.is_empty() {
+        return matched;
+    }
+    let exact_names: BTreeMap<_, _> = projection
+        .nodes()
+        .iter()
+        .filter(|node| node.name.as_deref() == Some(text.as_str()))
+        .map(|node| (node.id.get(), ()))
+        .collect();
+    let exact: Vec<_> = matched
+        .iter()
+        .copied()
+        .filter(|node| exact_names.contains_key(&dom.opaque_id(*node)))
+        .collect();
+    if exact.is_empty() { matched } else { exact }
+}
+

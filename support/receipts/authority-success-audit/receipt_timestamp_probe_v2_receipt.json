@@ -1,0 +1,41 @@
+{
+  "date_utc": "2026-10-17T07:56:41.946725+00:00",
+  "tests": 6,
+  "source_sha256": {
+    "ports/graphshell/src/receipts/manifest.rs": "d88228b41175777eb49dff16904e07288a884a33a8d7a661d1796fbc2126025c"
+  },
+  "verbatim_function": {
+    "char_start": 7553,
+    "char_end": 8998,
+    "sha256": "7e6160e271e6739827cbc893779f06fe61772ff871976edf5e9c35884bbf79c3"
+  },
+  "probe_sha256": "246904f2e1d60d95453d1a6ca90f7731d044fc79210949d0fe7066f8b11011bc",
+  "runner_sha256": "4a326d1f71ffb0b311cc85115677a464ccae5e33e66519a39ffb59bb01b3ec35",
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\receipt_timestamp_probe_v2.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-receipt_timestamp_probe_v2.exe"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "binary_sha256": "efb05080ebfe6b649277f497bec8f4b37212ce199d9977d2091cdfaed1b10dad",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-receipt_timestamp_probe_v2.exe",
+      "bytes": 771072,
+      "sha256": "efb05080ebfe6b649277f497bec8f4b37212ce199d9977d2091cdfaed1b10dad"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-receipt_timestamp_probe_v2.pdb",
+      "bytes": 3035136,
+      "sha256": "be08cb1a7f24fa018a821f19046aa54bbf3f520ad4203deec6def5d4b521dcf2"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Six observations of the exact current parse_rfc3339_ms function extracted verbatim, standard library only. UTC and invalid-text controls; positive-offset mismeasurement, negative offset ignored with fractional seconds and refused without a fraction, malformed Unicode panic, checked-arithmetic overflow panic and invalid date acceptance. No full manifest/importer/graph/Cargo runtime executed. Source/original tests unchanged."
+}

@@ -1,0 +1,54 @@
+{
+  "date_utc": "2026-10-17T21:09:55.623351+00:00",
+  "exit": 0,
+  "passed": 7,
+  "source_sha256": {
+    "support/patches/cubecl-wgpu/src/compute/stream.rs": "97501594e0424c70cd65cbebfedf3b1f1578ecccb4b7ef1e3a873e85141cc35e",
+    "support/patches/cubecl-wgpu/src/runtime.rs": "5333ff76cc14cdb74be7eb09d15a45e29dae54d4502b8e697116207ee6e8fbfa",
+    "support/patches/cubecl-wgpu/src/device.rs": "6cd4c24002bd3a1f9e550e9f1a9e8a57ee4063aba9443617bc524eed946619e3"
+  },
+  "external_context_sha256": {
+    "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wgpu-30.0.1\\src\\api\\queue.rs": "14dae3b36f75911a5ac4ed556d48875930e097990649110f9a5e53deada8d846",
+    "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wgpu-30.0.1\\src\\api\\device.rs": "6adbd3b5bb966fb20601cd55f0cf1b0cffd48fc615c72029dfe3c116b9c88e8f",
+    "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wgpu-30.0.1\\src\\api\\buffer.rs": "a304040166251cb1f1e60d6e1407b2e951dc3836144b40b95852749005095042",
+    "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\wgpu-30.0.1\\src\\api\\adapter.rs": "fc21ce5d1aebc1f21512d23e7ecceb2905c951c036782652f3198754d7fbf090"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\retained_wgpu_completion_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-retained-wgpu-completion.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-wgpu-completion.exe",
+      "bytes": 823808,
+      "sha256": "1b5ec156ada161f35276602e3a961ac31cc266a5472f2313515cb22505ebd513"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-wgpu-completion.pdb",
+      "bytes": 3108864,
+      "sha256": "bb484289c49d7e7ba0462132b33d41ccb11344e3b7303f6723d8fcd497ced524"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "write_to_buffer": "d996293429b4257af3cf8186e6d81965437a060a6e3efc3538aff673d8361d13",
+    "flush": "3d70bffbb3a3c2cc15080d909fef1cb8464cf7e81f1ed858477624a2f091f14b",
+    "enumerate_all_devices": "76a45fb515dd0851b2db09c9df33590dc6bbb6fdd7f47e0ad682f8935708b739",
+    "enumerate_devices": "e3bdb93d930c79f1095642c102bcd1f6f05c6b600ba4f64bc24da7823fc9e20e",
+    "select_from_adapter_list": "1a842e9067a274c5e14dccbac10427c2f6e7bab7bbea95968a0f599fded6be0a",
+    "device": "6cd4c24002bd3a1f9e550e9f1a9e8a57ee4063aba9443617bc524eed946619e3"
+  },
+  "evidence_sha256": {
+    "run_retained_wgpu_completion_probe.py": "21cdde209937412a24c0fe73dffe7decb66dad7faa7cd26e80d0acb1cc4a2147",
+    "retained_wgpu_completion_probe.rs": "cc23441f32128d22aabbcecb90f1ac80d90e46a48d8a14a7224fee744a6aca64",
+    "retained_wgpu_completion_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained_wgpu_completion_run.txt": "2c79613f29c6970f5b2e63c9a4e92e058b1633e39bd746fa2842b91870d8260d"
+  },
+  "qualification": "Exact write_to_buffer/flush/enumerate_devices/enumerate_all_devices/select_from_adapter_list plus full device.rs. CPU queue, adapter inventory, DeviceId and stream field doubles; aligned write path only. Queue submit model matches inspected local wgpu30.0.1 API contract. No actual sync callback, real GPU, driver enumeration, existing-device registration, full backend build or current deployed failure. Root-unselected retained0.10 copy. Owned exe/PDB removed."
+}

@@ -1,0 +1,42 @@
+{
+  "lanes": {
+    "lane5": {
+      "ok": true,
+      "portability": {
+        "state": "ran",
+        "native_to_browser_ok": true,
+        "extended_to_generation": 8,
+        "browser_to_native": {
+          "verified_by": "native fixture verify",
+          "file": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\opfs-browser-fixtures\\native-verify-false\\fixtures\\firefox-export.redb",
+          "expected_generation": 8,
+          "exit_code": 1,
+          "result": {
+            "ok": false
+          }
+        },
+        "round_trip_both_ways_ok": false
+      }
+    }
+  },
+  "conclusions": {
+    "receipt_gate_passed": true,
+    "lane5_native_to_browser_ok": true
+  },
+  "runner": {
+    "engine": "firefox",
+    "playwright": true,
+    "headless": true,
+    "lanes": [
+      "5"
+    ],
+    "per_lane": {
+      "lane 5": {
+        "ok": true,
+        "failed": false,
+        "error": null,
+        "seconds": 0
+      }
+    }
+  }
+}

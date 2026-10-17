@@ -1,0 +1,4 @@
+error: failed to open: C:/t/cargo-targets/mere\debug\.cargo-lock
+
+Caused by:
+  The process cannot access the file because it is being used by another process. (os error 32)

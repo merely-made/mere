@@ -1,0 +1,9 @@
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" "C:\\t\\cargo-targets\\mere\\rustcmZLWox\\symbols.o" "<9 object files omitted>" "C:\\t\\cargo-targets\\mere\\build\\debug\\deps/{libserde_json-f141e4af6929013b,libmemchr-102dc1580a544b2c,libzmij-71c165423b435dd3,libitoa-f142addd5c0ea3c5,libtokio-fe234b010fa84800,libsocket2-a883dcfa9b2124cf,libwindows_sys-9f6ca1358194abc4,libwindows_targets-e496e772e9a7ec51,libbytes-8606d45069bc2b0f,libmio-8ffb329bb1e90eec,libwindows_sys-b00f136f32088842,libwindows_link-a7bbe0756963d8bc,libpin_project_lite-c6eb94cd3d0d017f}.rlib" "<sysroot>\\lib\\rustlib\\x86_64-pc-windows-msvc\\lib/{libtest-*,libgetopts-*,librustc_std_workspace_std-*}.rlib" "C:\\t\\cargo-targets\\mere\\build\\debug\\deps/{libserde-319fad388f9668c8,libserde_core-636b546556021d5b}.rlib" "<sysroot>\\lib\\rustlib\\x86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_link-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "windows.0.53.0.lib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" "dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\t\\cargo-targets\\mere\\authority-success-comms-unit.exe" "/OPT:REF,NOICF" "/DEBUG" "/PDBALTPATH:%_PDB%" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'windows.0.53.0.lib'
+          
+
+error: aborting due to 1 previous error
+

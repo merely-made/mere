@@ -1,0 +1,207 @@
+{
+  "date_utc": "2026-10-17T09:59:27.610681+00:00",
+  "source_sha256": {
+    "crates/incipit/Cargo.toml": "4a512c3ee00250db0ab844b3e4c344568a2f9e6ea92f6702dcca500c46d4d6eb",
+    "crates/incipit/src/lib.rs": "dbc6d8d384f944b4641d26776fcf35bcd84805fdbfbc4997c0a7bd6dd5b0bc45",
+    "crates/inker/engines/graft-engine/Cargo.toml": "c42414bd570d93b34d4255f2737beb6bf132d3dd32875b3c543f670d62da0c5c",
+    "crates/inker/engines/graft-engine/src/engine.rs": "3ce6c860077f4c54465b37cf58a84f057bcc02627fbf55a9838a62c4f1d189b1",
+    "crates/inker/engines/graft-engine/src/lib.rs": "e96c9332608559e656c521f4276e44b01de8a94ac743fccec5509195102ead98",
+    "crates/inker/engines/graft-engine/src/producer.rs": "b95f94e778ed1d725e91f1f874472100612bfb61558688df42ce2d3004517e2b"
+  },
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "sha256": "f8769e0a5c56f7dc70484b648b3979d34b971a535d314be659744d1da2f8303a",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0"
+    },
+    "inker": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-377e50b7d1f71fdd.rlib",
+      "sha256": "72b9910ad02b1f0bec22ac6d9c1dff376dc9e9b64aa11b564a6580957ee3fd28",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/inker#0.1.1"
+    },
+    "tracing": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib",
+      "sha256": "1ec97cae29ea0bd57aa60d548b055bc75a621befcd7fc702feb34ccff21e2e85",
+      "features": [
+        "attributes",
+        "default",
+        "std",
+        "tracing-attributes"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tracing@0.1.44"
+    },
+    "accesskit": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "sha256": "113f80f588814d49bc0ed457eba5c1d257f1d439859b0bf32cdf5829ba5befd9",
+      "features": [
+        "enumn",
+        "serde"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#accesskit@0.24.1"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "--crate-name",
+      "incipit",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\incipit\\src\\lib.rs",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-incipit-original.exe",
+      "--extern",
+      "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "--extern",
+      "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "--extern",
+      "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-4392a3f7b99f398a.rlib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+      "-L",
+      "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "--crate-name",
+      "graft_engine",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\inker\\engines\\graft-engine\\src\\lib.rs",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-graft_engine-original.exe",
+      "--extern",
+      "inker=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-377e50b7d1f71fdd.rlib",
+      "--extern",
+      "tracing=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib",
+      "--extern",
+      "accesskit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+      "-L",
+      "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+    ]
+  ],
+  "builds": [
+    {
+      "crate": "incipit",
+      "exit": 0
+    },
+    {
+      "crate": "graft_engine",
+      "exit": 0
+    }
+  ],
+  "runs": [
+    {
+      "crate": "incipit",
+      "exit": 0,
+      "checks": 5
+    },
+    {
+      "crate": "graft_engine",
+      "exit": 0,
+      "checks": 6
+    }
+  ],
+  "runner_sha256": "62a1f50dbf6f658ac64b1253340ff8cc76d9169e9e217dd39901802e610c4289",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-incipit-original.exe",
+      "sha256": "ece568eb23896c6db7400604355b1ce56ff4304b04df290f06266eda3e21cfef",
+      "bytes": 1290240
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-incipit-original.pdb",
+      "sha256": "76011122f3c819472bd1aca73b98d85002e5d1564976eba74ede23d8dbe113e2",
+      "bytes": 5779456
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-graft_engine-original.exe",
+      "sha256": "4a9707a12dbdb326658bce0ef3e46557939778b54fceb8886c02d854ef874b28",
+      "bytes": 1129472
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-graft_engine-original.pdb",
+      "sha256": "7aeeabc3347c3137da98845a0fb3502028208c4a7cc1a615fd2a69b511043363",
+      "bytes": 7491584
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Fresh unchanged original Incipit and Graft test sources, using exact retained Cargo-built supplier artifacts. Graft tests use explicit stub/witness surfaces; no Servo, live producer, GPU import, window or product acceptance. No full linked-data build or RDF/query execution."
+}

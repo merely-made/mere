@@ -1,0 +1,11 @@
+
+running 4 tests
+test hidden_node_missing_from_tree_remains_mappable_and_activates ... ok
+test leaf_author_name_differs_between_native_and_browser_lowering ... ok
+test nested_scroll_native_and_neutral_bounds_disagree ... pane=true painted=(0.0, 150.0, 100.0, 40.0) neutral=DocumentA11yBounds { x: 0.0, y: 150.0, width: 100.0, height: 40.0 } native=Rect { x0: 0.0, y0: 300.0, x1: 100.0, y1: 340.0 }
+ok
+test viewport_scroll_native_and_neutral_bounds_disagree ... pane=false painted=(0.0, 150.0, 100.0, 40.0) neutral=DocumentA11yBounds { x: 0.0, y: 150.0, width: 100.0, height: 40.0 } native=Rect { x0: 0.0, y0: 300.0, x1: 100.0, y1: 340.0 }
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

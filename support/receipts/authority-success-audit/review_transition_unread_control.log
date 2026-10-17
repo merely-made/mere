@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\review_transition.py", line 94, in <module>
+    if args.command=='prepare':prepare(args.path,args.base)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\review_transition.py", line 20, in prepare
+    held=read('read_coverage.json')[path]
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'ports/distillery/probe/src/lib.rs'

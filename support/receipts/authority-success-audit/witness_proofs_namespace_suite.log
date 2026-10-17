@@ -1,0 +1,70 @@
+    Blocking waiting for file lock on build directory
+   Compiling windows-sys v0.61.2
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling iroh-base v1.3.0
+   Compiling noq-proto v1.3.0
+   Compiling yasna v0.6.0
+   Compiling p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling iroh-tickets v1.0.0
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling rcgen v0.14.10
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling mio v1.2.3
+   Compiling noq-udp v1.3.0
+   Compiling ipconfig v0.3.4
+   Compiling netdev v0.45.1
+   Compiling tokio v1.53.2
+   Compiling tokio-util v0.7.19
+   Compiling tokio-rustls v0.26.6
+   Compiling tower v0.5.3
+   Compiling backon v1.6.0
+   Compiling acto v0.8.2
+   Compiling iroh-io v0.6.2
+   Compiling ractor v0.16.5
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling bao-tree v0.16.1
+   Compiling tower-http v0.6.11
+   Compiling swarm-discovery v0.6.3 (https://github.com/mark-ik/swarm-discovery.git?branch=mere#99dd24c5)
+   Compiling h2 v0.4.19
+   Compiling n0-future v0.3.2
+   Compiling tokio-stream v0.1.19
+   Compiling tokio-websockets v0.13.3
+   Compiling n0-watcher v1.0.0
+   Compiling noq v1.3.0
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling netwatch v0.19.3
+   Compiling irpc v0.17.0
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.20
+   Compiling hyper-rustls v0.27.9
+   Compiling igd-next v0.17.1
+   Compiling reqwest v0.13.5
+   Compiling portmapper v0.19.3
+   Compiling n0-dns-resolver v0.1.0
+   Compiling iroh-dns v1.3.0
+   Compiling iroh-relay v1.3.0
+   Compiling iroh v1.3.0
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling iroh-gossip v0.101.0
+   Compiling iroh-util v0.6.0
+   Compiling iroh-blobs v0.103.1
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling mere-mesh v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\mesh\mesh)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 11s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\mesh-cb1a4c286351105e.exe)
+
+running 6 tests
+test namespace::tests::only_the_granted_output_slot_is_writable ... ok
+test namespace::tests::an_input_the_device_does_not_hold_is_missing_not_empty ... ok
+test namespace::tests::a_granted_input_reads_and_an_ungranted_one_does_not ... ok
+test namespace::tests::an_oversized_output_fails_without_committing_anything ... ok
+test namespace::tests::many_named_inputs_each_resolve_to_their_own_blob ... ok
+test namespace::tests::a_digest_mismatch_fails_before_the_adapter_sees_bytes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 117 filtered out; finished in 0.00s
+

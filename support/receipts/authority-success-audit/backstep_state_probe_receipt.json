@@ -1,0 +1,39 @@
+{
+  "date_utc": "2026-10-17T09:27:30.325385+00:00",
+  "source_sha256": {
+    "crates/cambium/backstep/src/lib.rs": "be552a519506a54cf2136642429ccc57b662348f9b5b934675d6e1dbf300f518",
+    "support/receipts/authority-success-audit/backstep_state_probe.rs": "9e41f6061f3af452d3c0429f6ad1acb35764d3e14d5074c2eb6d22e5e79b0569"
+  },
+  "runner_sha256": "6ac86b48b781e1e67c6cedd90d5e3f3c90385f7c07d9830cda4a110cacefb0e3",
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\backstep_state_probe.rs",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-backstep-state-probe.exe"
+    ]
+  ],
+  "build_exits": [
+    0
+  ],
+  "run_exit": 0,
+  "checks": 10,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-backstep-state-probe.exe",
+      "bytes": 765952,
+      "sha256": "11635533ea3824e909ee5e6810e437997440b601a277df6ab9a083fa4f740c94"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-backstep-state-probe.pdb",
+      "bytes": 3026944,
+      "sha256": "76362dc03063c8c73f6658c736290faa31ffdeeeb73e401fd86a469c3fce2d07"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Eight unmodified original Backstep unit tests and two public History API counterexamples, directly compiled with the standard library. No retained supplier artifacts. Actual Scenomise editor save/UI, persistence or native browser execution not run."
+}

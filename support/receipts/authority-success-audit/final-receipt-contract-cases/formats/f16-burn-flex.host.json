@@ -1,0 +1,26 @@
+{
+  "recorded_at_utc": "2026-10-17T21:59:38.9581527Z",
+  "command": [
+    "C:\\t\\cargo-targets\\mere\\audit-final-receipt-fake.exe",
+    "--ignored",
+    "--exact",
+    "measure_real_weight_format",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "binary_sha256": "28cf0525dcf676062f2b85278d7b9a3e88e1b9a99252c30703e45fde671173d2",
+  "exit_code": 0,
+  "fresh_software_receipt": true,
+  "elapsed_seconds": 0.0675553,
+  "process_peak_working_set_bytes": 2732032,
+  "host_memory_bytes": 1073741824,
+  "host_available_bytes_before": 536870912,
+  "gpu_before": {
+    "name": "Synthetic adapter",
+    "free_bytes": 2147483648,
+    "total_bytes": 4294967296
+  },
+  "gpu_global_peak_used_bytes": 2147483648,
+  "samples": 1,
+  "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+}

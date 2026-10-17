@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt-wrapper-fixtures\bootstrap.py", line 8, in <module>
+    runpy.run_path(str(target),run_name="__main__")
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt-wrapper-fixtures\custody-child-success\run.py", line 13, in <module>
+    (p/'run.log').write_bytes(r.stdout)
+  File "C:\Users\mark_\AppData\Roaming\uv\python\cpython-3.11.14-windows-x86_64-none\Lib\pathlib.py", line 1066, in write_bytes
+    view = memoryview(data)
+           ^^^^^^^^^^^^^^^^
+TypeError: memoryview: a bytes-like object is required, not 'str'

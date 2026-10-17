@@ -1,0 +1,23 @@
+
+running 7 tests
+test clickable_image_has_no_accessibility_activation ... image: pointer navigates; semantic image has only ScrollIntoView and no click target
+ok
+test nested_images_are_absent_from_resource_requests ... subresources: top-level image requested; identical image inside Quote/List omitted
+ok
+test ragged_table_semantics_take_the_preceding_rows_padding_box ... ragged table: semantic B0 gets row0 column1 padding geometry; B1 gets row1 column0
+ok
+test redirect_final_metadata_is_discarded_before_inline_image_resolution ... load: rich mock response final URL discarded; relative image uses requested alias directory instead of final directory
+ok
+test retained_focus_retargets_after_empty_link_adornment_is_hidden ... Q144 consumer: retained keyboard focus moves Second -> Third after hiding earlier empty-link adornment; nonempty-label control retains Second
+ok
+test selected_text_engine_still_spawns_gemtext_parser ... selected engine nematic.text -> actual nematic.gemtext and Heading; no fetch
+ok
+test synchronous_http_bridge_panics_inside_a_tokio_task_before_fetching ... remote bridge: nested Runtime::block_on panics in async task before polling HTTP future; unsupported-scheme control returns None
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
+thread 'synchronous_http_bridge_panics_inside_a_tokio_task_before_fetching' (34232) panicked at C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.53.2\src\runtime\scheduler\multi_thread\mod.rs:91:9:
+Cannot start a runtime from within a runtime. This happens because a function (like `block_on`) attempted to block the current thread while the thread is being used to drive asynchronous tasks.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

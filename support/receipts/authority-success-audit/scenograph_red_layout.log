@@ -1,0 +1,25 @@
+   Compiling mere-curation v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\forme\curation)
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.61s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\scenograph-d6e7ee6316f3f285.exe)
+
+running 1 test
+test link::tests::compatibility_summaries_do_not_change_the_default_layout ... FAILED
+
+failures:
+
+---- link::tests::compatibility_summaries_do_not_change_the_default_layout stdout ----
+
+thread 'link::tests::compatibility_summaries_do_not_change_the_default_layout' (26000) panicked at crates\cambium\scenes\scenograph\src\link.rs:419:9:
+assertion `left == right` failed
+  left: List { group_by: Family, stack: Stack { layer_gap: 180.0, row_gap: 110.0, center: Vec2 { x: 0.0, y: 0.0 } } }
+ right: Timeline { lane_by: Family, timeline: Timeline { origin: Vec2 { x: 0.0, y: 0.0 }, axis_length: 800.0, row_gap: 40.0, fallback: LeaveInPlace } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    link::tests::compatibility_summaries_do_not_change_the_default_layout
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p scenograph --lib`

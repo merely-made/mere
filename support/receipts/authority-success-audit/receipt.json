@@ -1,0 +1,23 @@
+{
+  "source_commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "recorded_at": "2026-10-16T13:09:29.5017873-04:00",
+  "scope": "Native MemoryBackend API reproductions; asserts observed defects, not desired regression behavior. Registry finding checked in source only.",
+  "build_command": "cargo test -p pandect --test audit_authority --locked --offline --target-dir C:\\t\\cargo-targets\\mere -- --nocapture",
+  "build_dir_note": "Existing repository config selected target/build despite --target-dir. Task-created cache files removed after receipt capture.",
+  "rerun": {
+    "cleanup": "Remove the temporary tests/audit_authority.rs after running.",
+    "command": "cargo test -p pandect --test audit_authority --locked --offline --target-dir C:\\t\\cargo-targets\\mere --config build.build-dir=\"C:/t/cargo-targets/mere/build\" -- --nocapture",
+    "copy_source_to": "crates/system/pandect/tests/audit_authority.rs"
+  },
+  "exit_code": 0,
+  "output": "\nrunning 4 tests\ntest transaction_accepts_a_batch_with_an_unapplied_missing_target ... ok\ntest stale_flush_overwrites_another_acknowledged_writer ... ok\ntest refused_merge_installs_unacknowledged_state_and_locks_source ... ok\ntest successful_merge_leaves_the_published_graph_at_the_old_generation ... ok\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n",
+  "sha256": {
+    "ports/graphshell/src/mere_host_resident.rs": "5C2C8DF426956D27C44B20E42905D08CC368015BA443F13E5BB3CDCDAF34803F",
+    "crates/system/registry/src/mod_loader/loader/registry.rs": "5D7379479740700EB7C58957E60A399351BE40BBAFED773C47BC857062B6EDD9",
+    "crates/system/pandect/src/graph_session_merge.rs": "D4BF72EEF97C40FDA01303654E46C971A7B5CD0C60F357F46C43321696BA9B45",
+    "ports/djinn/src/resident_mere.rs": "9C33866DACDD3921BA1F076848E8B7B2C3295A6A1512F5C0A03CAD890A4B4F56",
+    "crates/system/pandect/src/graph_session.rs": "7FAE5CFDBA774E5C6B9527D131D11571FB804779B691928C5CF68F63FEB7180A",
+    "crates/system/registry/src/mod_loader/loader/registry/registry_impl.rs": "9BE04ED95B0D8E803CBAF7EA58542BCE4888FBB69172BF8A834626D0B14A3432",
+    "crates/system/pandect/src/graph_session_transaction.rs": "22EC56627BF8C84EAFAF4CE3E2BBB17745CD1CEE33D53340EFBDBA13BEBD8C32"
+  }
+}

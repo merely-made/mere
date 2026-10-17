@@ -1,0 +1,39 @@
+
+running 34 tests
+test audit_configured_command_classification_and_suggestions_disagree ... ok
+test audit_explicit_search_provider_is_replaced_by_duckduckgo ... ok
+test nav::tests::classify_passes_through_scheme_urls ... ok
+test nav::tests::classify_prefixes_bare_hosts ... ok
+test nav::tests::classify_routes_sigil_prefix_to_command ... ok
+test nav::tests::classify_treats_free_text_as_search ... ok
+test nav::tests::classify_with_honors_a_custom_sigil ... ok
+test nav::tests::history_back_forward_round_trip ... ok
+test nav::tests::history_reload_does_not_grow_stack ... ok
+test nav::tests::history_starts_with_one_entry_and_no_steps ... ok
+test nav::tests::history_visit_advances_and_enables_back ... ok
+test nav::tests::history_visit_truncates_forward_branch ... ok
+test nav::tests::resolve_href_passes_through_absolute_and_joins_relative ... ok
+test nav::tests::search_resolves_to_encoded_provider_query ... ok
+test nav::tests::url_resolves_to_itself ... ok
+test omnibar::tests::deadline_comparison_against_now_drives_fire_decision ... ok
+test omnibar::tests::historical_node_match_equality_uses_url_only ... ok
+test omnibar::tests::mailbox_arm_new_request_bumps_generation_monotonically ... ok
+test omnibar::tests::mailbox_clear_pending_resets_deadline_and_query ... ok
+test omnibar::tests::mailbox_debounced_stores_portable_deadline ... ok
+test omnibar::tests::mailbox_idle_is_not_pending ... ok
+test omnibar::tests::omnibar_match_variants_can_coexist_in_hashset ... ok
+test omnibar::tests::session_new_graph_starts_with_idle_mailbox ... ok
+test omnibar::tests::session_new_search_provider_uses_supplied_mailbox ... ok
+test suggest::tests::blank_query_has_no_suggestions ... ok
+test suggest::tests::direct_nav_and_history_do_not_duplicate ... ok
+test suggest::tests::free_text_offers_only_a_search ... ok
+test suggest::tests::frequency_outranks_a_single_visit_within_a_tier ... ok
+test suggest::tests::history_substring_matches_are_offered ... ok
+test suggest::tests::host_match_outranks_a_more_recent_path_match ... ok
+test suggest::tests::recency_breaks_ties_within_a_tier ... ok
+test suggest::tests::search_label_quotes_the_query ... ok
+test suggest::tests::url_like_query_offers_direct_navigation_first ... ok
+test suggest::tests::www_prefix_is_ignored_for_host_ranking ... ok
+
+test result: ok. 34 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

@@ -1,0 +1,180 @@
+{
+  "date_utc": "2026-10-17T01:01:52.127364+00:00",
+  "tests": 11,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/system/fetch/Cargo.toml": "0c8108834f6b3cfb3264680619280f5cd66972519e98630b9504dc518e8ccb46",
+    "crates/system/fetch/src/cookies.rs": "10887da40bdec3dedc15cbd89524cb44a4278c53951b5c107238f2ac7aadb7e3",
+    "crates/system/fetch/src/cookies_flip.rs": "5e4312b0a39e1a813dad6cc829034fb26f5bcc936d6001975a08ce1335fab68f",
+    "crates/system/fetch/src/cookies_persist.rs": "638fcd2ca5476b68bb62209e0210f7a8beeb5b65801015ad7cf43caadc7bde41",
+    "crates/system/fetch/src/crawler.rs": "774958bc975a3f27bdc5057a940010fd7a09626be13855666354626c6630736b",
+    "crates/system/fetch/src/handle.rs": "38cd2d9e730ee4f10f78dd41b42ffcda043243efef51c2b112b68ec5843c39c7",
+    "crates/system/fetch/src/handle_tests.rs": "ed599a5dd2ce2fda903a4ac36a1544c07321f7ac41a420333797f41487b8c10f",
+    "crates/system/fetch/src/https_blob.rs": "a6b6af2299a72b7dae1b63bec2fd34265ad6191a6598790f501a58278c745f98",
+    "crates/system/fetch/src/iroh_blob.rs": "5562b5a873188860ae08fee2247a2b8cbf1458f7cc99136cf772e552aceaf4e2",
+    "crates/system/fetch/src/lib.rs": "c100c74a1c1ecb632b65d69e2cb102ff694317fc75f325d66865680e64d5dc73",
+    "crates/system/fetch/src/tests.rs": "fce0e58a5dcbc56cddf7975e2827aebc12b070252c935fcb901428d630b42201"
+  },
+  "libraries": {
+    "fetch": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libfetch-91db7bf61915f757.rlib",
+      "sha256": "965f07fd558956ec91247b6b55f58aaf128deb9f88a12e7f96aedbdb1ad98fab",
+      "features": [
+        "actor",
+        "default",
+        "flip",
+        "https-blobs",
+        "iroh-blobs",
+        "persona-cookies",
+        "smolweb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/fetch#mere-fetch@0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\fetch\\src\\lib.rs"
+    },
+    "netfetcher": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnetfetcher-3ce8ac0bdb19e093.rlib",
+      "sha256": "43b826d00d4ccda21e8dfb96d7d63d6cdb3cb2893ddd4f241cae240550cf7792",
+      "features": [
+        "default",
+        "h3",
+        "hyper-transport",
+        "websocket"
+      ],
+      "package_id": "git+https://github.com/merely-made/genet.git?branch=main#netfetcher@0.1.1",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\genet-0bbbe1b4c8511eb3\\e37762d\\components\\netfetcher\\src\\lib.rs"
+    },
+    "pandect": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpandect-8dbad554a8205bde.rlib",
+      "sha256": "0c4ff6696a4e903fe1b666a6c0b4c85d6c2b17c92733011ff0124f8c2ac84d7e",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/pandect#0.1.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\pandect\\src\\lib.rs"
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-93f1c30ebf0ec255.rlib",
+      "sha256": "c2596a020417bfc68ac8259b3bb4220c0cde4b3973162576615c29ba511b221b",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\uuid-1.27.0\\src\\lib.rs"
+    },
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-9c3cebe7332aeb91.rlib",
+      "sha256": "bfd17299d7fded2e80d92b7e5543ab73af672a7830a0b92057436e8958dc035c",
+      "features": [
+        "default",
+        "directory",
+        "json",
+        "redb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/muniment#0.1.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\muniment\\src\\lib.rs"
+    },
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-f9243e3cdd6200b2.rlib",
+      "sha256": "c517b5a34d893a200a80219b665e5148d4d9f6fc1c85ce6bf11f77d2b3e49f66",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+      "sha256": "7e7647e8db91ea5aad887d653d9ca5ccc2eab8372973016a2ae68badfef297f6",
+      "features": [
+        "bytes",
+        "default",
+        "fs",
+        "io-std",
+        "io-util",
+        "libc",
+        "macros",
+        "mio",
+        "net",
+        "rt",
+        "rt-multi-thread",
+        "socket2",
+        "sync",
+        "test-util",
+        "time",
+        "tokio-macros",
+        "tracing",
+        "windows-sys"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-1.53.2\\src\\lib.rs"
+    },
+    "url": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\liburl-4ec4e131feef8124.rlib",
+      "sha256": "03e10b2ab7854745d320aa6069227e48ec2268dc08dd6af538a8c6feafee759b",
+      "features": [
+        "default",
+        "serde",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#url@2.5.8",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\url-2.5.8\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-7b9c1ee0251f576c\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\fetch_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-fetch-probe.exe",
+    "--extern",
+    "fetch=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libfetch-91db7bf61915f757.rlib",
+    "--extern",
+    "netfetcher=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnetfetcher-3ce8ac0bdb19e093.rlib",
+    "--extern",
+    "pandect=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpandect-8dbad554a8205bde.rlib",
+    "--extern",
+    "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-93f1c30ebf0ec255.rlib",
+    "--extern",
+    "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-9c3cebe7332aeb91.rlib",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-f9243e3cdd6200b2.rlib",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+    "--extern",
+    "url=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\liburl-4ec4e131feef8124.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-7b9c1ee0251f576c\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "519bbaf1aa10eecb326e1f152325560078e478d752e7907b21539b08f5de8f13",
+  "generated_output_removed": true,
+  "scope": "Eleven public API observations using current all-feature Cargo library. Synthetic cookies in process-global jar and MemoryBackend only. Host-only flip loss is an export collision, not an executed WebView import. Owned HTTP/Gopher/Spartan loopback listeners and joined fixture threads. Titan identity fails before connection and dummy key bytes never enter TLS. Header-capacity panic caught without huge allocation. No remote user data, real credentials, public server, browser, GPU or durable user files."
+}

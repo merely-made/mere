@@ -1,0 +1,17 @@
+{
+  "exit_code": 1,
+  "native_tests_passed": 5,
+  "native_tests_failed": 1,
+  "reason": "Harness expected every negative offset to return None. Actual fractional negative offset is ignored after taking the first three fraction bytes. Integral-second negative offset remains unparsed. Corrected observation uses both cases.",
+  "original_probe_and_compile_output_preserved": true,
+  "generated_output_removed": true,
+  "source_sha256": {
+    "ports/graphshell/src/receipts/manifest.rs": "d88228b41175777eb49dff16904e07288a884a33a8d7a661d1796fbc2126025c"
+  },
+  "evidence_sha256": {
+    "run_receipt_timestamp_probe.py": "e25a6d33c505cc7f4650596ab79f028b87b904760671c1f6ed1f394be93a27a9",
+    "receipt_timestamp_probe.rs": "07ad59a2c8242aafcc0ac577bebf4488b0359a6e1c7e047db754bde4f32dd0a1",
+    "receipt_timestamp_probe_compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "receipt_timestamp_probe_output.log": "5f06bb068a107e65f8e300663add735a4da3d604ec4737834c91bf90d1897dd8"
+  }
+}

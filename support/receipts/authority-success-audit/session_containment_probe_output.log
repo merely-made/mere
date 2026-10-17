@@ -1,0 +1,10 @@
+PASS first leaf call panic is caught and retires guest
+PASS second leaf call panic escapes containment and guest still reports available
+PASS stable registry control returns leaves without retiring guest
+
+thread 'main' (58556) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\session_containment_probe.rs:23:97:
+guest leaves failure
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'main' (58556) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\session_containment_probe.rs:23:97:
+guest leaves failure

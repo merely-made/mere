@@ -1,0 +1,115 @@
+{
+  "date_utc": "2026-10-17T05:35:35.157177+00:00",
+  "source_sha256": {
+    "ports/distillery/athanor/src/lib.rs": "5837dc84416f89ee202d26d94a25b9080dfa19ca339443085a7e21770634fc93",
+    "ports/distillery/athanor/Cargo.toml": "4bb645a347cb04112d07064b984b3c78a2394098c42dc198bf2c399234e75fd9",
+    "crates/eidetic/eidetic-core/src/deleted.rs": "5676e87a07a0dc78ff2be3b8e0f5f3767a9684865935fb1f9785673856312bb7",
+    "crates/eidetic/eidetic-core/src/typed.rs": "fc2989bdce0284ef3ade5632405de772c7dd682fc41e830c28541a3b2b47b243",
+    "crates/eidetic/eidetic-core/src/manifest.rs": "45a8efbbfd338c7f24fd0c1f0c358ef292610897508ca22c1009cb9ff8f65a35"
+  },
+  "libraries": {
+    "alembic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libalembic-a03f16dc2c4cc03e.rlib",
+      "sha256": "b1451a88bf890f3ae3991da23ec84e41ad8bde597bd8ff0de67762622ce8a8c4",
+      "features": [
+        "recall"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/distillery/alembic#mere-alembic@0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\distillery\\alembic\\src\\lib.rs"
+    },
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+      "sha256": "e743e7b736c462a1cd45d01cc6e33c3a834cf6fd2648cdd86b469d3f24cd88e1",
+      "features": [
+        "default",
+        "json-schema",
+        "pack-signing"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-5edfc75275c57ad9.rlib",
+      "sha256": "369881cd5e74fd43282c79c157f2bea008170e778bdfd64a0f075fccda7f6ff3",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/graph/graph-kernel#mere-kernel@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\graph\\graph-kernel\\src\\lib.rs"
+    },
+    "pandect": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpandect-8efc6a22b70b9f80.rlib",
+      "sha256": "0fdfa14a7f67b814114535dd6b4cd7c8926bec753e1e995378eab6e52013b715",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/pandect#0.1.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\pandect\\src\\lib.rs"
+    },
+    "pollster": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+      "sha256": "58d7c143682aaad275af4e6de898b1f7d7a2449bd6044bc309d19247b011a6a1",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#pollster@0.4.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pollster-0.4.0\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\retirement_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-retirement-probe.exe",
+    "--extern",
+    "alembic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libalembic-a03f16dc2c4cc03e.rlib",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+    "--extern",
+    "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-5edfc75275c57ad9.rlib",
+    "--extern",
+    "pandect=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpandect-8efc6a22b70b9f80.rlib",
+    "--extern",
+    "pollster=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "8f3c6b697c494f406855a199c690125911317d1624b34d445b5ebb1d14ecf8c8",
+  "test_exit": 0,
+  "checks": 2,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-retirement-probe.exe",
+      "bytes": 1336320,
+      "sha256": "8f3c6b697c494f406855a199c690125911317d1624b34d445b5ebb1d14ecf8c8"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-retirement-probe.pdb",
+      "bytes": 113782784,
+      "sha256": "d376b40737d6c342dcc685be4cd441b138ab7a0450e020e42fd2c4fa2984c4fb"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Exact production Athanor module compiled directly into the native audit executable, using retained Cargo-built dependencies from trainer_flora_probe_build.jsonl. Public propose_retirement/apply_retirement and real Eidetic record/list APIs. Synthetic memory-backed tombstones only; same-node expired/unexpired pair and different-node control. This is not a new Cargo package test or resident scheduler, disk, UI, user-data or network qualification."
+}

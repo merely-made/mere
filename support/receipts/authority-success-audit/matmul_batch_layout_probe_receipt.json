@@ -1,0 +1,43 @@
+{
+  "date_utc": "2026-10-17T21:16:58.135149+00:00",
+  "exit": 0,
+  "passed": 6,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/multi_level/components/global/memory/layout.rs": "edfeb16e26b07a289dc912cf97f1baec00fcb9113ea27975d0500829def16fa8"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_batch_layout_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-batch-layout.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-batch-layout.exe",
+      "bytes": 792576,
+      "sha256": "8f0cf6d7d22cf9cd0016323e38f51828759545176717d486083b4b383a4ad302"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-batch-layout.pdb",
+      "bytes": 3076096,
+      "sha256": "f173fbb46b36708f0553edf2e5b6999af09dd677fdd59226041291d7e1f442d7"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "from_handle": "f51f2bf61c31ca33075f24e6690b05c9ba13cf7a9c70d0f7b2a1a6da4d4e01d8",
+    "to_source_pos_original": "aa3a8cfd888a6de616b3cafe65134e561b9e30b5a5575f5c34f3cf9c3027676e",
+    "to_source_pos_interpreted": "9cd30d15250434a8da34f62ab9e6b42fc6cc35f44f8697822a3833dc3bc44d89"
+  },
+  "evidence_sha256": {
+    "run_matmul_batch_layout_probe.py": "83e21b0fbfb4180db1401f29b3ce933260ac9675a498feb74ca4d2d087536426",
+    "matmul_batch_layout_probe.rs": "8a75ef80ed2b76803acb7de0e19d72222343cb2a57a88dd619c8b8f121ffae7e",
+    "matmul_batch_layout_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matmul_batch_layout_run.txt": "578f907b7e1e4d318d3e561464986c82f4a7e61e714d36ee5cfb254ac956f1d8"
+  },
+  "qualification": "Exact host BatchLayoutLaunch.from_handle with shape-equivalent TensorBinding/problem/generated-launch DTO. Kernel layout to_source_pos body interpreted as CPU Rust after removal of one #[unroll] attribute; Sequence/reversed/FastDivmod are explicit scalar doubles. Proves actual host payload rank mismatch and scalar interpretation bounds failure, not CubeDSL lowering, GPU memory access, actual launcher acceptance or current product incidence. Same-rank/unbatched controls pass. No full crate build or GPU. Owned exe/PDB removed."
+}

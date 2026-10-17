@@ -1,0 +1,26 @@
+{
+  "lanes": {
+    "lane1": {
+      "ok": false
+    }
+  },
+  "conclusions": {
+    "receipt_gate_passed": true
+  },
+  "runner": {
+    "engine": "firefox",
+    "playwright": true,
+    "headless": true,
+    "lanes": [
+      "1"
+    ],
+    "per_lane": {
+      "lane 1": {
+        "ok": false,
+        "failed": false,
+        "error": null,
+        "seconds": 0
+      }
+    }
+  }
+}

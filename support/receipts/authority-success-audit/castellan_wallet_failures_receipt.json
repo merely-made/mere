@@ -1,0 +1,13 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "2 diagnostic observations pass: successful retry leaves exposed old epoch current; read-only legacy seed loader refuses when existing auto-unlock root changes decoder choice",
+  "reproduction_sha256": "2fa539106092d7112f7b24e1e6c78b3e7d1fc9af275a32233a0c8e26686e301e",
+  "output_file": "castellan_wallet_failures_output.txt",
+  "affected_sources": {
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "921ce0f697990a1850bc55b8a5cc9106523495c278ac6b57ab0fff5938ceba78",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "636ae6c1908dc0562569c07f555b67f3f17faf4bbc8a0e8fc9481348b5c02679",
+    "crates/system/pandect/src/wallet_store/io.rs": "4f2fee95a188a5010cefde605c0a71439e1610745bf1ef9caf5d567036b30d99"
+  },
+  "scope": "Windows fixture-only native APIs. Revocation uses denied-share file handle on persona wallet temporary path; first attempt fails before wallet replacement, after carriage removal. Retry succeeds with original epoch. Legacy read-only fresh-root positive control and existing unit test both pass; existing OS root triggers failure, ordinary loader still succeeds/migrates. Original raw seed bytes remain recoverable."
+}

@@ -1,0 +1,34 @@
+
+running 29 tests
+test angle::tests::edge_marks_inset_their_centers_by_the_marker_radius ... ok
+test angle::tests::marks_normalize_modulo_one_and_non_finite_positions_to_zero ... ok
+test angle::tests::normalized_mark_updates_are_the_dirty_gate ... ok
+test angle::tests::paints_track_and_all_marks_inside_its_own_clip ... ok
+test angle::tests::retained_strip_repaints_only_when_its_layout_size_changes ... ok
+test arrange::tests::placement_style_realizes_position_and_z ... ok
+test arrange::tests::window_clamps_at_the_edges ... ok
+test arrange::tests::window_materializes_a_slice_not_the_collection ... ok
+test dimension::tests::changed_measurement_dirties_and_resize_renders_again ... ok
+test dimension::tests::coincident_direct_endpoints_remain_two_distinct_marker_shapes ... ok
+test dimension::tests::direct_line_paints_one_measured_span_and_target_tick ... ok
+test dimension::tests::non_finite_and_out_of_range_measurements_clamp_deterministically ... ok
+test dimension::tests::wrapped_line_paints_two_measured_segments ... ok
+test glyphs::link_mark_tests::direction_heads_and_opposition_marks_follow_the_authored_path ... ok
+test glyphs::tests::graph_canvas_camera_and_emphasis_share_one_paint_path ... ok
+test glyphs::tests::graph_canvas_paints_authored_and_fanned_routes_as_polylines ... ok
+test glyphs::tests::graph_glyph_paints_edges_under_nodes ... ok
+test glyphs::tests::knob_paints_track_value_needle_and_clamps ... ok
+test glyphs::tests::meter_at_zero_paints_track_only ... ok
+test glyphs::tests::meter_paints_track_fill_peak_and_gates_on_change ... ok
+test grid::tests::columns_lay_out_by_prefix_sum ... ok
+test grid::tests::window_and_scroll_clamp_are_consistent ... ok
+test path::tests::arc_endpoints_land_on_the_circle ... ok
+test path::tests::builder_emits_verbs_in_order ... ok
+test path::tests::circle_is_move_plus_four_cubics_closed ... ok
+test path::tests::polyline_joins_points ... ok
+test slot::tests::scene_slot_splices_external_texture_and_gates_epochs ... ok
+test tests::render_into_respects_the_paint_dirty_gate ... ok
+test tests::swatch_measures_paints_and_clears_dirty ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s
+

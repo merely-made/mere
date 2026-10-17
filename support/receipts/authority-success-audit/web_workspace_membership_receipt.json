@@ -1,0 +1,51 @@
+{
+  "rows": [
+    {
+      "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--no-deps",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "73bc9820fa44ab09094c600e93d3cde085e2aa8d5def7e601c1748a45be63658",
+      "stderr": "",
+      "workspace_root": "C:\\Users\\mark_\\Code\\repos\\mere",
+      "graphshell_web": [],
+      "workspace_member_count": 104
+    },
+    {
+      "cwd": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--no-deps",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "80b8a895da5a2de89fbda3295f825a2a66f95c1a140be94e8d5808eeeb09eb19",
+      "stderr": "",
+      "workspace_root": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web",
+      "graphshell_web": [
+        {
+          "manifest_path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web\\Cargo.toml",
+          "workspace_member": true
+        }
+      ],
+      "workspace_member_count": 1
+    }
+  ],
+  "source_sha256": {
+    "Cargo.toml": "ba29083d33fdf96126c1feba1c9eee34994c47b2d83334c6671ab87bb7147063",
+    "ports/graphshell/web/Cargo.toml": "d5ba7b42e0ff143b78fa11ce6bc19723949bf859043e377c03b1de7aa68bb282",
+    "ports/graphshell/src/web.rs": "8f1bf854f047361eb34b3ba9ec39ded40056cc9cb6cb04a7b4ef53cdb1fbba89"
+  },
+  "scope": "Read-only current Cargo metadata, locked/offline/no-deps. No compilation, feature acceptance, transitive supplier resolution or browser execution."
+}

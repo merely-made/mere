@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "tests_executed": 0,
+  "diagnostic_sha256": "cc957182de64f3028666260cff51efdc6f8429726ea055663097b4439ebae5f4",
+  "reason": "The exact listener anchor assumed LF but current loader.js uses CRLF. Extraction assertion failed before a handler was evaluated. Original diagnostic preserved."
+}

@@ -1,0 +1,5 @@
+PASS list pointer control updates state and returns navigation action
+PASS list Enter invokes handler but drops navigation action
+PASS list Space invokes handler but drops navigation action
+PASS enabled segmented control selects prior enabled item
+PASS directly routed arrow selects disabled item zero when no enabled positions exist

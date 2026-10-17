@@ -1,0 +1,135 @@
+{
+  "date_utc": "2026-10-17T09:50:05.457410+00:00",
+  "source_sha256": {
+    "crates/domain/apparatus/Cargo.toml": "9a66ced1f71b56090785ada38eea228bc317a1fc81b89e3e8d74a4965d290cc9",
+    "crates/domain/apparatus/README.md": "70cf263fac0d80fb68b0a36d70111db7bb9c5558c0258d249741bc7d38802f36",
+    "crates/domain/apparatus/src/inspection.rs": "2c4ee0ac6100920a64b5c60dd5682af564ead89a19a0f21c878013aecdbb2d4c",
+    "crates/domain/apparatus/src/lib.rs": "ac2cfc1893909d7dbb352fc777560e28550b9469cc47e299c2b34f3626502b45",
+    "crates/domain/apparatus/src/observation.rs": "2b2da68af36fac22cce5f93abe5da044d455f12452407a37db0fad7081e37fba",
+    "crates/domain/apparatus/src/observation/tests.rs": "9664498d06bb0f7f8ad1f0ef86d58083c7a65bf52dd855175ffc3ceeb04373e3"
+  },
+  "libraries": {
+    "accesskit": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "sha256": "113f80f588814d49bc0ed457eba5c1d257f1d439859b0bf32cdf5829ba5befd9",
+      "features": [
+        "enumn",
+        "serde"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#accesskit@0.24.1"
+    },
+    "tracing": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib",
+      "sha256": "1ec97cae29ea0bd57aa60d548b055bc75a621befcd7fc702feb34ccff21e2e85",
+      "features": [
+        "attributes",
+        "default",
+        "std",
+        "tracing-attributes"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tracing@0.1.44"
+    },
+    "uxtree": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuxtree-61cb70b466429b80.rlib",
+      "sha256": "0f9b5a16cbfab582052352de514d0b0461f07548d57d93b9367eead4637d48ce",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/forme/uxtree#0.0.2"
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "--crate-name",
+      "apparatus",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\domain\\apparatus\\src\\lib.rs",
+      "-C",
+      "debuginfo=0",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-apparatus-core-unit.exe"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "--crate-name",
+      "apparatus",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\domain\\apparatus\\src\\lib.rs",
+      "-C",
+      "debuginfo=0",
+      "--cfg",
+      "feature=\"projection\"",
+      "--cfg",
+      "feature=\"serde\"",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-apparatus-projection-unit.exe",
+      "--extern",
+      "accesskit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "--extern",
+      "tracing=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib",
+      "--extern",
+      "uxtree=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuxtree-61cb70b466429b80.rlib",
+      "--extern",
+      "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib"
+    ]
+  ],
+  "environment": {
+    "CARGO_PKG_VERSION": "0.0.1"
+  },
+  "build_exits": [
+    0,
+    0
+  ],
+  "runs": [
+    {
+      "exit": 0,
+      "checks": 18
+    },
+    {
+      "exit": 0,
+      "checks": 22
+    }
+  ],
+  "checks": 40,
+  "runner_sha256": "3704c9b29edd95a60e1474c658d44f8e2ed8025b75857747d89693ee2682bfd5",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-apparatus-core-unit.exe",
+      "bytes": 984064,
+      "sha256": "d7ec7a91743b033f59af9230964f099ff9a75608471f0bccd0207f55d9e943cf"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-apparatus-core-unit.pdb",
+      "bytes": 3223552,
+      "sha256": "6119c3c8e6ae0673b65327e10711fb6e335055bf8043a5904f2646cdd6ad04fc"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-apparatus-projection-unit.exe",
+      "bytes": 1113600,
+      "sha256": "fd784cc023312eaa3660daefe1827777a7a077d464e4b52bda8d42c8477ed7ac"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-apparatus-projection-unit.pdb",
+      "bytes": 8015872,
+      "sha256": "d3cc264860426d43d6f4c3b067a621821add3097e9825254062fe9cfd2484a80"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Original current Apparatus std-only core and projection+serde unit configurations, built fresh. First config standard library only; second four exact retained dependencies including Mere uxtree. No fresh whole supplier graph, product diagnostics/export, OS accessibility or application success acceptance."
+}

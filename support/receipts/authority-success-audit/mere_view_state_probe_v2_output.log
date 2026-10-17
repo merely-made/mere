@@ -1,0 +1,7 @@
+PASS unfolded focus refers to a present node
+PASS folded focus remains on removed member and has no stand-in focus request
+PASS focus outside a fold remains present
+PASS same pending merge keeps an edited hand draft
+PASS replacement merge with same conflict key retains prior branch draft
+PASS replacement with different conflict key clears old draft
+PASS absent pending merge clears hand drafts

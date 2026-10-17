@@ -1,0 +1,25 @@
+
+running 10 tests
+test absolute_url_detection_loses_mailto_target ... Absolute URL: valid mailto becomes a local gopher selector; https remains external
+ok
+test directory_hides_dotfile_from_menu_but_serves_direct_request ... Directory: dotfile omitted from listing, directly readable despite not-published comment
+ok
+test directory_lexical_root_check_follows_junction_outside_published_root ... Directory: parent traversal refused; an owned junction serves an owned file outside published root
+ok
+test feed_namespace_spelling_overrules_binding_and_foreign_title_overrules_core_title ... Feed identity: equal namespace URI with another prefix loses extension facts; unrelated URI with itunes prefix gains them; foreign title wins before core title
+ok
+test feed_parser_diagnostics_are_discarded_by_portable_projection ... Feed: unsupported-extension and invalid-enclosure-length diagnostics exist in source AST; both disappear from EngineDocument
+ok
+test generic_xml_is_successfully_projected_as_empty_feed_or_fabricated_entry ... Feed admission: arbitrary well-formed XML returns success with empty document/no diagnostic; generic entry name fabricates feed entry outside a feed root
+ok
+test nex_directory_base_resolution_uses_slashes_in_query ... Nex: directory child appended inside query rather than path; query-free control resolves /path/child
+ok
+test one_listing_entry_can_project_additional_gemtext_and_gopher_links ... Projection: one public Entry yields two parsed gemtext links or three gopher rows, including an injected destination; benign control yields one
+ok
+test timeout_returns_failure_without_the_promised_errand_event ... Trace: loopback timeout returns Error::Timeout with zero errand events; unsupported-scheme control emits one
+ok
+test trace_url_removes_query_and_fragment_but_keeps_synthetic_userinfo ... Trace redaction: synthetic password retained=true, query retained=false, fragment retained=false; no network
+ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+

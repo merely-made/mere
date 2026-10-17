@@ -1,0 +1,15 @@
+
+running 5 tests
+OBSERVED N4-template access=Public projection-domain=mere.network graphshell-hello-refused=true
+test n4_projection_public_rule_offers_the_foreign_domain ... ok
+CONTROL policy-not-offered wire=reject local=refused
+test owner_policy_refusal_control_agrees_on_failure ... ok
+OBSERVED implementation-not-offered wire=accept local=ActionNotOffered
+test service_vocabulary_refusal_retains_the_accept_reply ... ok
+CONTROL connect wire=accept local=accepted
+test supported_action_control_agrees_on_success ... ok
+OBSERVED repeated-hello both-admitted=true same-session-id=true fresh-nonce-id-differs=true
+test repeated_hello_reuses_the_session_id_but_fresh_nonce_changes_it ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

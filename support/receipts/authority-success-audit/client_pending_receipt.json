@@ -1,0 +1,57 @@
+{
+  "date_utc": "2026-10-16T21:37:48.411735+00:00",
+  "scope": "Current public native SessionDriver/SessionCore on encoded NDJSON replies; no carrier, browser or product UI executed.",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\client_pending_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-client-pending-probe.exe",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-923a910f142327c8.rlib",
+    "--extern",
+    "graphshell_client=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_client-e8accababb5a0f11.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/graphshell/graphshell-client/src/core.rs": "3bfbc36731969a504fafe61e22d2b74f9e00d1e6aa0df832b487669a154181b2",
+    "crates/graphshell/graphshell-client/src/driver.rs": "57e5d47a94b175de00951c6798e69922140701ee12a3ebf29ee7679335f23dc7"
+  },
+  "library_sha256": {
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+      "sha256": "b89ad8844a54d45b0c7a302e6bb23099b5a9c77c38e799725b97170ab485fb5f"
+    },
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-923a910f142327c8.rlib",
+      "sha256": "74a644f8eb9ca55cf629101c52f3dc327416761fad76d0edcfc772dabc7c8c1b"
+    },
+    "graphshell_client": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_client-e8accababb5a0f11.rlib",
+      "sha256": "558e064ca50702a11e5fcd646de03e8e51d4f42dea0f7ffa0a33542f913fa84a"
+    }
+  },
+  "harness_sha256": "675738a4001a2f6d06d0d2e09142eedf2c004fce349b48911b17f244d9730183",
+  "native_binary_sha256": "b5100f943e03fa23ac779a92c06374fe9faae0630cb811871c061d49197e7ae7",
+  "generated_native_output_removed": true
+}

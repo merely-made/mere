@@ -1,0 +1,134 @@
+{
+  "checks": [
+    {
+      "variant": "main-050e7d542",
+      "condition": "zero-test-success",
+      "returned_normally": true,
+      "actual_fixture_tests": 0,
+      "claimed_cpu_tests": 68,
+      "new_source_labels_earlier_binary": true,
+      "continuation_flags": {
+        "packaging_complete": true,
+        "current_compiled_package_source": "8ad44a5c7",
+        "all_68_cpu_tests_pass": true,
+        "viewer_product_main_wasm": true
+      }
+    },
+    {
+      "variant": "main-050e7d542",
+      "condition": "failed-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "main-050e7d542",
+      "condition": "missing-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "main-8568f42fd",
+      "condition": "zero-test-success",
+      "returned_normally": true,
+      "actual_fixture_tests": 0,
+      "claimed_cpu_tests": 72,
+      "new_source_labels_earlier_binary": true,
+      "continuation_flags": {
+        "packaging_complete": true,
+        "current_compiled_package_source": "abaed67c1",
+        "all_72_cpu_tests_pass": true,
+        "viewer_product_main_wasm": true
+      }
+    },
+    {
+      "variant": "main-8568f42fd",
+      "condition": "failed-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "main-8568f42fd",
+      "condition": "missing-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "command-option-name-repair",
+      "condition": "zero-test-success",
+      "returned_normally": true,
+      "actual_fixture_tests": 0,
+      "claimed_cpu_tests": 72,
+      "new_source_labels_earlier_binary": true,
+      "continuation_flags": {
+        "packaging_complete": true,
+        "current_compiled_package_source": "source-after-option-name-repair",
+        "all_72_cpu_tests_pass": true,
+        "viewer_product_main_wasm": true
+      }
+    },
+    {
+      "variant": "command-option-name-repair",
+      "condition": "failed-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "command-option-name-repair",
+      "condition": "missing-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "option-mirror-repair",
+      "condition": "zero-test-success",
+      "returned_normally": true,
+      "actual_fixture_tests": 0,
+      "claimed_cpu_tests": 83,
+      "new_source_labels_earlier_binary": true,
+      "continuation_flags": {
+        "packaging_complete": true,
+        "current_compiled_package_source": "source-after-option-name-repair",
+        "all_72_cpu_tests_pass": true,
+        "viewer_product_main_wasm": true
+      }
+    },
+    {
+      "variant": "option-mirror-repair",
+      "condition": "failed-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "option-mirror-repair",
+      "condition": "missing-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "retired-hover-repair",
+      "condition": "zero-test-success",
+      "returned_normally": true,
+      "actual_fixture_tests": 0,
+      "claimed_cpu_tests": 88,
+      "new_source_labels_earlier_binary": true,
+      "continuation_flags": {
+        "packaging_complete": true,
+        "current_compiled_package_source": "source-after-option-name-repair",
+        "all_72_cpu_tests_pass": true,
+        "viewer_product_main_wasm": true
+      }
+    },
+    {
+      "variant": "retired-hover-repair",
+      "condition": "failed-gate",
+      "refused_before_writes": true
+    },
+    {
+      "variant": "retired-hover-repair",
+      "condition": "missing-gate",
+      "refused_before_writes": true
+    }
+  ],
+  "tests": 15,
+  "source_sha256": {
+    "ports/graphshell/docs/receipts/host_presenter_20261012/main-050e7d542/package.py": "6e1682e8e6dd14b8892a0a94ac81907c1c7ddfcf8f14b4afafff89b5eecd3af0",
+    "ports/graphshell/docs/receipts/host_presenter_20261012/main-8568f42fd/package.py": "f428c4d408ea645c0daa3fe1d8a18bfbd9f4699b36d8bf21b8b5ab94d59a1a89",
+    "ports/graphshell/docs/receipts/host_presenter_20261012/command-option-name-repair/package.py": "5d3c1ed87e1b3e002827b6438263174198938eab935e65370099c7ce3725a896",
+    "ports/graphshell/docs/receipts/host_presenter_20261012/option-mirror-repair/package.py": "16704ede1fa75ed599bf5b59ab265baee8b4e6f0775e9eceaceb7ca1362db821",
+    "ports/graphshell/docs/receipts/host_presenter_20261012/retired-hover-repair/package.py": "905a07df66b1679b41fdb21fdaf6433fc7b580a3f0698f3c28308cfe404b3992"
+  },
+  "diagnostic_sha256": "b7bf30645524cc9c2d1b1c9bc6434ab89eff2c689cfb00833c842d192ca5056c",
+  "scope": "Five exact current historical packaging scripts executed unchanged. Path/filesystem, bindgen/copy and git-head dependencies substituted entirely in memory. No actual source, package, historical receipt, build, browser or deployment was changed. Shows verification weaknesses when rerun; does not establish historical test totals or packages were false at their original basis."
+}

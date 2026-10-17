@@ -1,0 +1,53 @@
+{
+  "qualification": "Exact source traces only for BERT/Burn. Portable core executes separately; no BERT model, tokenizer artifact, native GPU or full ESP inference build.",
+  "traces": [
+    {
+      "title": "Tokenizer retains the mask with batch-longest padding",
+      "path": "crates/intel/esp/src/embed/bert/tokenizer.rs",
+      "source_sha256": "552922ef2e0d77a5195cd7ea273570cbf4a2c303d403804922f018466d882e10",
+      "first_line": 95,
+      "last_line": 138,
+      "excerpt": "    pub fn encode_batch(&self, texts: &[&str]) -> Result<EncodedBatch, EmbedError> {\n        if texts.is_empty() {\n            return Ok(EncodedBatch {\n                input_ids: Vec::new(),\n                attention_mask: Vec::new(),\n                batch_size: 0,\n                seq_len: 0,\n            });\n        }\n        let inputs: Vec<String> = texts.iter().map(|s| s.to_string()).collect();\n        let encodings = self\n            .inner\n            .encode_batch(inputs, true)\n            .map_err(|e| EmbedError::Backend(format!(\"tokenizer encode_batch: {e}\")))?;\n\n        let batch_size = encodings.len();\n        let seq_len = encodings\n            .iter()\n            .map(|e| e.get_ids().len())\n            .max()\n            .unwrap_or(0);\n\n        let mut input_ids = Vec::with_capacity(batch_size * seq_len);\n        let mut attention_mask = Vec::with_capacity(batch_size * seq_len);\n        for enc in &encodings {\n            let ids = enc.get_ids();\n            let mask = enc.get_attention_mask();\n            // BatchLongest already padded to seq_len, so ids.len() == seq_len.\n            for &id in ids {\n                input_ids.push(id as i64);\n            }\n            for &m in mask {\n                attention_mask.push(m as i64);\n            }\n        }\n        Ok(EncodedBatch {\n            input_ids,\n            attention_mask,\n            batch_size,\n            seq_len,\n        })\n    }\n}\n"
+    },
+    {
+      "title": "Provider sends IDs without the mask",
+      "path": "crates/intel/esp/src/embed/bert/provider.rs",
+      "source_sha256": "a2dc12b0bf79bf7bdff64731b8b9e7ab7a3e35ce207bda43160b140b6338604b",
+      "first_line": 338,
+      "last_line": 359,
+      "excerpt": "    fn forward_sentence_batch(&self, texts: &[&str]) -> Result<Option<Tensor<2>>, EmbedError> {\n        let model = self.model.as_ref().ok_or(EmbedError::ModelNotLoaded)?;\n        let tokenizer = self.tokenizer.as_ref().ok_or(EmbedError::ModelNotLoaded)?;\n\n        if texts.is_empty() {\n            return Ok(None);\n        }\n\n        let batch = tokenizer.encode_batch(texts)?;\n        let input_ids: Tensor<2, Int> = Tensor::from_data(\n            TensorData::new(batch.input_ids, [batch.batch_size, batch.seq_len]),\n            &self.device,\n        );\n\n        Ok(Some(model.forward_sentence(\n            input_ids,\n            self.pooling,\n            self.l2_normalize,\n        )))\n    }\n}\n"
+    },
+    {
+      "title": "Self attention softmax has no padding mask input",
+      "path": "crates/intel/esp/src/embed/bert/attention.rs",
+      "source_sha256": "39c12caf9a7fae523598b876fbc5aec634347406b28818170c43475ef7ad2ee1",
+      "first_line": 83,
+      "last_line": 119,
+      "excerpt": "    pub fn forward(&self, hidden: Tensor<3>) -> Tensor<3> {\n        let [batch, seq_len, hidden_size] = hidden.dims();\n        let num_heads = self.num_heads;\n        let head_dim = self.head_dim;\n\n        let q = self.query.forward(hidden.clone());\n        let k = self.key.forward(hidden.clone());\n        let v = self.value.forward(hidden);\n\n        // Reshape for multi-head: [B, S, H] -> [B, S, num_heads, head_dim] ->\n        // [B, num_heads, S, head_dim]\n        let q = q\n            .reshape([batch, seq_len, num_heads, head_dim])\n            .swap_dims(1, 2);\n        let k = k\n            .reshape([batch, seq_len, num_heads, head_dim])\n            .swap_dims(1, 2);\n        let v = v\n            .reshape([batch, seq_len, num_heads, head_dim])\n            .swap_dims(1, 2);\n\n        // Scaled-dot-product: Q @ K^T / sqrt(d_k)\n        let scale = (head_dim as f32).sqrt();\n        let scores = q.matmul(k.swap_dims(2, 3)).div_scalar(scale);\n        let attn = softmax(scores, 3);\n\n        // Apply attention to V: [B, num_heads, S, head_dim]\n        let context = attn.matmul(v);\n\n        // Reshape back: [B, num_heads, S, head_dim] -> [B, S, num_heads, head_dim]\n        // -> [B, S, hidden_size]\n        context\n            .swap_dims(1, 2)\n            .reshape([batch, seq_len, hidden_size])\n    }\n}\n"
+    },
+    {
+      "title": "Mean pooling uses every sequence position",
+      "path": "crates/intel/esp/src/embed/bert/model.rs",
+      "source_sha256": "07476f40f1a116d796ee5798b05f1a3004582d92ca64e1adf548ccbaa494bf4a",
+      "first_line": 108,
+      "last_line": 148,
+      "excerpt": "    pub fn forward_sentence(\n        &self,\n        input_ids: Tensor<2, Int>,\n        pooling: Pooling,\n        l2_normalize: bool,\n    ) -> Tensor<2> {\n        let token_repr = self.forward_tokens(input_ids);\n        let pooled = match pooling {\n            Pooling::Mean => mean_pool(token_repr),\n            Pooling::Cls => cls_pool(token_repr),\n        };\n        if l2_normalize {\n            l2_normalize_rows(pooled)\n        } else {\n            pooled\n        }\n    }\n}\n\n/// Mean-pool along the sequence (dim 1). `[B, S, H]` \u2192 `[B, H]`.\nfn mean_pool(token_repr: Tensor<3>) -> Tensor<2> {\n    let [batch, _, hidden] = token_repr.dims();\n    token_repr.mean_dim(1).reshape([batch, hidden])\n}\n\n/// Take the first token's representation. `[B, S, H]` \u2192 `[B, H]`.\nfn cls_pool(token_repr: Tensor<3>) -> Tensor<2> {\n    let [batch, _, hidden] = token_repr.dims();\n    token_repr\n        .slice([0..batch, 0..1, 0..hidden])\n        .reshape([batch, hidden])\n}\n\n/// L2-normalise along the last dim. `[B, H]` rows \u2192 unit norm.\nfn l2_normalize_rows(rows: Tensor<2>) -> Tensor<2> {\n    let squared = rows.clone() * rows.clone();\n    let sum = squared.sum_dim(1);\n    let norm = sum.sqrt().clamp_min(f32::EPSILON);\n    rows / norm\n}\n"
+    },
+    {
+      "title": "Batched cosine has independent normalization and ranking",
+      "path": "crates/intel/esp/src/embed/index_burn.rs",
+      "source_sha256": "b99c91b8597dd9d08fca692b0ec733d247b6afd817d58bc94c235908c76a81c7",
+      "first_line": 53,
+      "last_line": 136,
+      "excerpt": "pub fn cosine_top_k(\n    queries: &[Vec<f32>],\n    corpus: &[Vec<f32>],\n    k: usize,\n    device: &Device,\n) -> Vec<Vec<(usize, f32)>> {\n    let q = queries.len();\n    let n = corpus.len();\n    if q == 0 {\n        return Vec::new();\n    }\n    if n == 0 || k == 0 {\n        return vec![Vec::new(); q];\n    }\n    let dim = corpus[0].len();\n    let k = k.min(n);\n\n    // [Q, N] cosine similarity as one matmul on unit-normalized rows.\n    let qn = l2_normalize_rows(rows_to_tensor(queries, dim, device));\n    let cn = l2_normalize_rows(rows_to_tensor(corpus, dim, device));\n    let sim = qn.matmul(cn.swap_dims(0, 1)); // [Q, d] \u00b7 [d, N] = [Q, N]\n    let scores = sim\n        .into_data()\n        .try_to_vec::<f32>()\n        .expect(\"similarity readback is f32\");\n\n    // Per-query top-k over the read-back row (cheap O(N) vs the matmul above).\n    let mut out = Vec::with_capacity(q);\n    for qi in 0..q {\n        let row = &scores[qi * n..(qi + 1) * n];\n        let mut scored: Vec<(usize, f32)> = row.iter().copied().enumerate().collect();\n        scored.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));\n        scored.truncate(k);\n        out.push(scored);\n    }\n    out\n}\n\n/// Stack `rows` (each length `dim`) into a `[rows.len(), dim]` tensor on `B`.\nfn rows_to_tensor(rows: &[Vec<f32>], dim: usize, device: &Device) -> Tensor<2> {\n    let mut flat = Vec::with_capacity(rows.len() * dim);\n    for row in rows {\n        flat.extend_from_slice(row);\n    }\n    Tensor::from_data(TensorData::new(flat, [rows.len(), dim]), device)\n}\n\n/// Scale each row of a `[R, d]` tensor to unit L2 length. A zero row (norm ~0)\n/// stays ~zero (the `1e-12` guard divides it by epsilon, not by zero), so its\n/// cosine against anything is 0 \u2014 matching [`VectorIndex`](crate::embed::VectorIndex).\nfn l2_normalize_rows(t: Tensor<2>) -> Tensor<2> {\n    let sq_sum = (t.clone() * t.clone()).sum_dim(1); // [R, 1]\n    let inv_norm = sq_sum.sqrt().add_scalar(1e-12).recip(); // [R, 1]\n    t * inv_norm // [R, d] * [R, 1] broadcasts over the row\n}\n\n/// [`cosine_top_k`] over a [`VectorIndex`]'s entries, returning results keyed by\n/// the index's own `K` (not corpus positions). The GPU path for recall / search;\n/// a consumer routes to it when the index has at least [`SEARCH_GPU_MIN_ENTRIES`].\n/// Cosine only.\npub fn nearest_over_index<K>(\n    index: &VectorIndex<K>,\n    queries: &[Vec<f32>],\n    k: usize,\n    device: &Device,\n) -> Vec<Vec<(K, f32)>>\nwhere\n    K: Hash + Eq + Clone,\n{\n    let entries: Vec<(K, Vec<f32>)> = index\n        .iter()\n        .map(|(key, v)| (key.clone(), v.clone()))\n        .collect();\n    let corpus: Vec<Vec<f32>> = entries.iter().map(|(_, v)| v.clone()).collect();\n    cosine_top_k(queries, &corpus, k, device)\n        .into_iter()\n        .map(|row| {\n            row.into_iter()\n                .map(|(pos, score)| (entries[pos].0.clone(), score))\n                .collect()\n        })\n        .collect()\n}\n"
+    },
+    {
+      "title": "BERT feed-forward unconditionally uses GELU",
+      "path": "crates/intel/esp/src/embed/bert/feed_forward.rs",
+      "source_sha256": "3390e40043565c18bbe32acf0ada13e03f0bf99e50c93d18ee223577ce4fa54f",
+      "first_line": 27,
+      "last_line": 49,
+      "excerpt": "impl BertIntermediate {\n    pub fn new(config: &BertConfig, device: &Device) -> Self {\n        Self {\n            dense: LinearConfig::new(config.hidden_size, config.intermediate_size).init(device),\n        }\n    }\n\n    pub fn from_loaded(loaded: &super::loaded::LoadedBertLayer, device: &Device) -> Self {\n        Self {\n            dense: super::construct::linear_from_loaded(\n                loaded.inter_w.clone(),\n                loaded.inter_b.clone(),\n                device,\n            ),\n        }\n    }\n\n    /// `gelu(dense(x))`. Input `[B, S, hidden]`, output `[B, S, intermediate]`.\n    pub fn forward(&self, hidden: Tensor<3>) -> Tensor<3> {\n        gelu(self.dense.forward(hidden))\n    }\n}\n"
+    }
+  ]
+}

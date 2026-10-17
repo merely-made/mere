@@ -1,0 +1,1 @@
+{"format":"mere-native","schema_id":"eidetic.OpaqueBlob/v1","body":{"version":1,"description":"An uninterpreted byte buffer.","required":["bytes"],"fields":{"bytes":{"type":"string"}}}}

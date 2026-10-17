@@ -1,0 +1,13 @@
+
+running 8 tests
+test baseline_compile_error_also_skips ... ok
+test equal_rank2_key_control ... ok
+test equal_rank3_key_control ... ok
+test key_lhs_rank2_rhs_rank3_misreads_n ... ok
+test key_lhs_rank3_rhs_rank2_panics ... ok
+test passing_baseline_wrong_broadcast_still_panics ... ok
+test passing_controls_execute_both_broadcast_axes ... ok
+test wrong_numeric_baseline_silently_skips_broadcast ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

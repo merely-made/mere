@@ -1,0 +1,70 @@
+{
+  "date_utc": "2026-10-17T00:09:28.647166+00:00",
+  "tests": 5,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/inker/document-canvas/Cargo.toml": "9eefd4e37bfe3a0f1b6ed4707c7cb499fbf811f4c6e388a7e042c316b2f624b3",
+    "crates/inker/document-canvas/src/font.rs": "8f5f9031eb977abbab350f7f7d7f2e51e1487a9f6d5acb366d9eb4771c17e8ea",
+    "crates/inker/document-canvas/src/font_table.rs": "72ff6f4d4eb3815558597c00e172300f65bc055472386a8712d3d1bce3fa4eaa",
+    "crates/inker/document-canvas/src/layout.rs": "e83c204764bde10b5d1508b877433568bb1b0d2dabc647c0331b6444839134c9",
+    "crates/inker/document-canvas/src/layout/fold_tests.rs": "137ffb7420d28e8d756e0d7e5491df98b3151cf8672c8d015e62b59decb3d812",
+    "crates/inker/document-canvas/src/layout/tests.rs": "05f4c94a3835084aace4bcb42f27e7d8a103014ac50f48a14137b24e71f0c6c8",
+    "crates/inker/document-canvas/src/lib.rs": "edec46aadc01b633a9504b07e2555d7ea130a6e9d1fb27154a57d5814559d771",
+    "crates/inker/document-canvas/src/netrender_backend.rs": "681316ab9d2309d2461d69c89fb8f35b819fbe21dbfe8ceabc30e7e1a73becfe",
+    "crates/inker/document-canvas/src/paint_list.rs": "5667cc93b4aa190e70ca185dfe491cbcf13fdfa806356e02e006423b15b0c06e",
+    "crates/inker/document-canvas/src/style.rs": "e8736bddb0203211e0dd9e9540b08f9efa39ce69eaa284439407c6033c905e1b",
+    "crates/inker/document-canvas/src/style_sheet.rs": "e64049ac457c42ca7e74c2c9215b665535f500159c3732612b09e2fb1925cda6",
+    "crates/inker/document-canvas/src/text.rs": "4b552e0a1398b0ac0aafcecbece18283959c11b2f7342b2603d04e4e8a645217",
+    "crates/inker/document-canvas/src/types.rs": "2dd74ff25d2ddb4237e882ae5a4aec032174b1940e6fa0fa7c62f9478b13c4e7"
+  },
+  "libraries": {
+    "document_canvas": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libdocument_canvas.rlib",
+      "sha256": "8aea0f19e7cc6bff56ae95e4b48ad2e37b5c588b312e3ea0a3599525ccb195fd",
+      "features": [
+        "default"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/document-canvas#0.1.0",
+      "artifact_log": "document_canvas_library_build.jsonl",
+      "artifact_log_sha256": "6ea785f7c106eb328c9971698229fe556c04b6ad998cf99d3836cd84d9c4fa62"
+    },
+    "inker": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-b0dfabd76dbed6fa.rlib",
+      "sha256": "89078c310aadd5c273f738a25face887e1995abfe03465a5b022b5d71ee612f0",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/inker#0.1.1",
+      "artifact_log": "document_canvas_library_build.jsonl",
+      "artifact_log_sha256": "6ea785f7c106eb328c9971698229fe556c04b6ad998cf99d3836cd84d9c4fa62"
+    },
+    "paint_list_api": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_api-a1d249fc957a3c91.rlib",
+      "sha256": "87d200b7b373ea43fa5133b9417381e20c538c73ac19915b1d31b646e002ff26",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/netrender.git?branch=main#paint_list_api@0.1.2",
+      "artifact_log": "document_canvas_library_build.jsonl",
+      "artifact_log_sha256": "6ea785f7c106eb328c9971698229fe556c04b6ad998cf99d3836cd84d9c4fa62"
+    }
+  },
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\document_canvas_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--extern",
+    "document_canvas=C:\\t\\cargo-targets\\mere\\debug\\libdocument_canvas.rlib",
+    "--extern",
+    "inker=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-b0dfabd76dbed6fa.rlib",
+    "--extern",
+    "paint_list_api=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_api-a1d249fc957a3c91.rlib",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-document-canvas-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "ff0386b701145cee55afc25039c0ab2084deb6b47666167773b2bc8c769cf6ce",
+  "generated_output_removed": true,
+  "scope": "Five native default document-canvas public layout/packet/paint-data observations with ordinary controls. Packet equality is exact; paint-command equality is Debug-dump equality, not serialized-wire proof. Host Windows font environment, no custom font mutation. No netrender feature, GPU, renderer, hosted session or OS accessibility execution."
+}

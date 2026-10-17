@@ -1,0 +1,24 @@
+
+running 19 tests
+test clock::tests::cap_defers_without_dropping_steps ... ok
+test clock::tests::interpolation_ignores_whole_step_backlog ... ok
+test clock::tests::sixty_hertz_does_not_drift ... ok
+test engine::tests::after_physics_systems_receive_the_current_step_update ... ok
+test engine::tests::invalid_engine_configuration_is_refused ... ok
+test engine::tests::several_steps_publish_only_latest_transform ... ok
+test engine::tests::systems_run_in_phase_then_registration_order ... ok
+test engine::tests::systems_share_resources_and_apply_commands_between_phases ... ok
+test engine::tests::uneven_host_frames_drive_whole_fixed_steps ... ok
+test engine::tests::zero_step_frames_publish_despawns ... ok
+test engine::tests::zero_step_frames_publish_voxel_edits ... ok
+test engine::tests::zero_step_frames_still_publish_spawned_bodies ... ok
+test world::rapier::queries::tests::parry_still_needs_the_compensated_margin ... ok
+test world::tests::a_dynamic_body_falls_and_reports_changed_state ... ok
+test world::tests::character_movement_stops_at_world_collision ... ok
+test world::tests::ids_are_stable_and_stale_ids_do_not_alias_replacements ... ok
+test world::tests::raycast_returns_conatus_collider_identity ... ok
+test world::tests::sensor_entries_and_exits_are_frame_events ... ok
+test world::tests::voxel_colliders_edit_in_place_and_revise ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

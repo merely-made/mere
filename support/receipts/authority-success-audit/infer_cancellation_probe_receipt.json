@@ -1,0 +1,88 @@
+{
+  "date_utc": "2026-10-17T10:24:32.699147+00:00",
+  "source_sha256": {
+    "crates/intel/esp/src/infer/provider.rs": "7ea288277fd0c08e82fbcf2b7c5053675c94c654f2a8ce2f1a8fc9d1d6b7ff5b",
+    "crates/intel/esp/src/infer/stub.rs": "ba11a0fffdb88bd501a6064f0623e6828666dcb73daac97f1a605f83ec32845c"
+  },
+  "qualification": "Two unchanged complete current portable inference provider and stub modules. Public generate_streaming_controlled API only. No actor, session wrapper, model, decoder or GPU execution.",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    },
+    "zeroize": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libzeroize-e1b59da53602fa93.rlib",
+      "sha256": "d75203b54144ae96fe406653a304e0c4452e28d145b955749c9564c08d3f5909",
+      "features": [
+        "alloc",
+        "default",
+        "zeroize_derive"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#zeroize@1.9.1"
+    }
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\infer_cancellation_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-infer-cancellation.exe",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+    "--extern",
+    "zeroize=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libzeroize-e1b59da53602fa93.rlib",
+    "-L",
+    "native=C:\\t\\cargo-targets\\mere\\build\\debug\\build\\onig_sys-1537b6b3c209c839\\out",
+    "-L",
+    "native=C:\\t\\cargo-targets\\mere\\build\\debug\\build\\onig_sys-2366baf19c5134d7\\out",
+    "-L",
+    "native=C:\\t\\cargo-targets\\mere\\build\\debug\\build\\onig_sys-cea06882f8697f24\\out"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 14,
+  "audit_cases": 2,
+  "original_tests": 12,
+  "runner_sha256": "ebc1e5204088156658d395399d1dffccdcf8ee9b5e11e6524437d2a48b0aa406",
+  "probe_sha256": "9cebf6e7a13aad8aee06e39e1be2cc87c152b830bcfd1abb46d8db55a409c497",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-infer-cancellation.exe",
+      "bytes": 1192960,
+      "sha256": "82c9aaaa6c526f31d981e701686839313c7faab0d907f3de2a7052e9e0428a4d"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-infer-cancellation.pdb",
+      "bytes": 5484544,
+      "sha256": "bc4d84a7b4f54ab3c6ff097c9c4468f517e8b323fb3af4b8a0a6f56e991ac6a9"
+    }
+  ],
+  "generated_output_removed": true
+}

@@ -1,0 +1,39 @@
+{
+  "date_utc": "2026-10-17T05:46:07.245253+00:00",
+  "source_sha256": {
+    "ports/distillery/probe/session-fixture/src/main.rs": "52bc1045e9dfec20c1362564913a4e99a70d098caa8b4dd28f0f342d012b09e8",
+    "ports/distillery/probe/remote-fixture/src/main.rs": "5eb702baf0fa23d3713d31fefc4ebca97b2da5ab3ea6ced620bd78e1453a0720"
+  },
+  "verbatim_extracted_functions": {
+    "session_max_abs": "fn max_abs(a: &[f32], b: &[f32]) -> Result<f32, Box<dyn Error>> {\n    if a.len() != b.len() {\n        return Err(format!(\"vector length mismatch: {} != {}\", a.len(), b.len()).into());\n    }\n    Ok(a.iter()\n        .zip(b)\n        .map(|(left, right)| (left - right).abs())\n        .fold(0.0_f32, f32::max))\n}\n\n",
+    "remote_max_abs_error": "fn max_abs_error(left: &[f32], right: &[f32]) -> Result<f32, String> {\n    if left.len() != right.len() {\n        return Err(format!(\n            \"numerical comparison length mismatch: {} != {}\",\n            left.len(),\n            right.len()\n        ));\n    }\n    if !left.iter().chain(right).all(|value| value.is_finite()) {\n        return Err(\"numerical comparison contains a non-finite value\".to_string());\n    }\n    Ok(left\n        .iter()\n        .zip(right)\n        .map(|(a, b)| (a - b).abs())\n        .fold(0.0, f32::max))\n}\n\n"
+  },
+  "probe_source_sha256": "e04ea5b461462e80dd1193556bc96fe62c1913b4b98d3650802e145a81fd1011",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\probe_numeric_validation.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-probe-numeric-validation.exe"
+  ],
+  "build_exit": 0,
+  "native_binary_sha256": "6321de10854666165fa851138bd27f597d6bc7065208dad7ec40a80556b272f0",
+  "exit": 0,
+  "checks": 3,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-probe-numeric-validation.exe",
+      "bytes": 177664,
+      "sha256": "6321de10854666165fa851138bd27f597d6bc7065208dad7ec40a80556b272f0"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-probe-numeric-validation.pdb",
+      "bytes": 1363968,
+      "sha256": "fb7f0bbc24b0bacb12ba44e06aa795e1a3325db1cc47826608d1f8e6d18cd0dc"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Exact pure std-only helpers extracted verbatim from the current two source files and compiled natively. Synthetic float values, finite and length controls only. Session fixture separately checks adapted/independent logits for finiteness, so this is not proof that a complete model receipt passes NaNs. No actual model, GPU, browser, network, installed owner or original tests ran."
+}

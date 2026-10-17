@@ -1,0 +1,13 @@
+
+running 4 tests
+test adapter_definition_is_not_parseable_by_its_declared_native_validator ... OBSERVATION: a domain-valid adapter cannot use its exact declared schema: mere-native schema body parse: unknown variant `number`, expected one of `string`, `u64`, `i64`, `f64`, `bool`, `object`, `array`, `enum`
+ok
+test bootstrap_does_not_make_unknown_built_in_definitions_present ... CONTROL: meta bootstrap leaves adapter definition absent; the documented tolerant validator skips its payload rather than proving validity
+ok
+test current_training_corpus_binding_conforms_to_its_exact_schema ... CONTROL: the current training corpus binding validates against its own exact schema
+ok
+test raw_opaque_binding_does_not_conform_to_its_json_object_definition ... OBSERVATION: the raw opaque binding is rejected by its exact declared object/bytes-string schema: payload parse (mere-native): expected value at line 1 column 1
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

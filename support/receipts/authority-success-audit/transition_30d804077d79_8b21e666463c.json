@@ -1,0 +1,66 @@
+{
+  "path": "crates/canvas/pictograph/src/canvas/backdrop_surface.rs",
+  "git_basis": "a6e6b94140b0b227f2ac19356571e3decfa98975",
+  "git_blob_sha256": "65c8d6d2add46eb62c18c60f8792d74097aa7d2ca522d10fea3fe75ebc82a696",
+  "prior_coverage": {
+    "sha256": "4482260d064ab03ab6b1bf8be1136a1f34c00c3c071de3f7e8b615151d221ef5",
+    "through": 30657
+  },
+  "current_sha256": "8b21e666463c5b54b8f441f3793710ff56cd790f62d7963fa9260f7d66f7aec6",
+  "current_chars": 30982,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        14779
+      ],
+      "new_chars": [
+        0,
+        14779
+      ],
+      "text_sha256": "0b936e510c87833abb990a78c579c6c6f28c3e6a006a21dcd8fe4a3c3f40d915"
+    },
+    {
+      "old_chars": [
+        14859,
+        30657
+      ],
+      "new_chars": [
+        15184,
+        30982
+      ],
+      "text_sha256": "dda8d2f21779cc99330b7fda61481187be66ec8c78a7d52e3c537adacddb2537"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "replace",
+      "old_lines": [
+        382,
+        382
+      ],
+      "new_lines": [
+        382,
+        391
+      ],
+      "old_chars": [
+        14779,
+        14859
+      ],
+      "new_chars": [
+        14779,
+        15184
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 378,
+      "new_start_line": 378,
+      "text": "                 if let Footprint::Rect { size } = item.footprint {\r\n                     commands.push(path(\r\n                         &rect(at, size.w * fit.scale_x, size.h * fit.scale_y),\r\n                         true,\r\n-                        Some(alpha(color, if forward { 0.32 } else { 0.16 })),\r\n+                        Some(alpha(\r\n+                            color,\r\n+                            if forward {\r\n+                                0.58\r\n+                            } else if mark.role == MarkRole::StrongStress {\r\n+                                0.50\r\n+                            } else {\r\n+                                0.16\r\n+                            },\r\n+                        )),\r\n                         Some(stroke(alpha(color, 0.45), 1.0, None)),\r\n                     ));\r\n                 }\r\n                 if forward && self.show_span_handles {\r\n"
+    }
+  ],
+  "certificate": "transition_30d804077d79_8b21e666463c.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T06:12:17.324649+00:00"
+}

@@ -1,0 +1,111 @@
+[
+  {
+    "name": "named_product_skipped_by_smoke",
+    "args": [
+      "--product-receipt",
+      "article",
+      "--artifact",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pelt_cli_dispatch_must_not_exist.png",
+      "--netrender-smoke"
+    ],
+    "workspace_js_fixture": null,
+    "exit": 0,
+    "stdout": "pelt host profile=livery url=C:\\Users\\mark_\\Code\\repos\\mere\\ports\\pelt\\examples\\livery-route\\index.html javascript=false webdriver=false devtools=false webgpu=false webxr=false\nAUDIT netrender called\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "named_workspace_skipped_by_smoke",
+    "args": [
+      "--workspace-receipt",
+      "appearance",
+      "--artifact",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pelt_cli_dispatch_must_not_exist.png",
+      "--netrender-smoke"
+    ],
+    "workspace_js_fixture": null,
+    "exit": 0,
+    "stdout": "pelt host profile=livery url=about:blank javascript=false webdriver=false devtools=false webgpu=false webxr=false\nAUDIT netrender called\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "workspace_missing_artifact_validation_skipped",
+    "args": [
+      "--workspace-receipt",
+      "mixed",
+      "--netrender-smoke"
+    ],
+    "workspace_js_fixture": null,
+    "exit": 0,
+    "stdout": "pelt host profile=livery url=about:blank javascript=false webdriver=false devtools=false webgpu=false webxr=false\nAUDIT netrender called\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "second_requested_smoke_skipped",
+    "args": [
+      "--netrender-smoke",
+      "--webgl-wgpu-smoke"
+    ],
+    "workspace_js_fixture": null,
+    "exit": 0,
+    "stdout": "pelt host profile=livery url=about:blank javascript=false webdriver=false devtools=false webgpu=false webxr=false\nAUDIT netrender called\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "product_required_artifact_control_refuses_before_smoke",
+    "args": [
+      "--product-receipt",
+      "article",
+      "--netrender-smoke"
+    ],
+    "workspace_js_fixture": null,
+    "exit": 2,
+    "stdout": "",
+    "stderr": "--product-receipt article needs --artifact <png>\n",
+    "artifact_exists": false
+  },
+  {
+    "name": "named_workspace_without_smoke_reaches_later_dispatch_control",
+    "args": [
+      "--workspace-receipt",
+      "appearance",
+      "--artifact",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pelt_cli_dispatch_must_not_exist.png"
+    ],
+    "workspace_js_fixture": null,
+    "exit": 0,
+    "stdout": "pelt host profile=livery url=about:blank javascript=false webdriver=false devtools=false webgpu=false webxr=false\nAUDIT owner dispatch reached\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "workspace_unknown_js_silently_selects_boa",
+    "args": [],
+    "workspace_js_fixture": "misspelled-backend",
+    "exit": 0,
+    "stdout": "AUDIT workspace engine=Some(\"genet.scripted\")\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "workspace_boa_control",
+    "args": [],
+    "workspace_js_fixture": "boa",
+    "exit": 0,
+    "stdout": "AUDIT workspace engine=Some(\"genet.scripted\")\n",
+    "stderr": "",
+    "artifact_exists": false
+  },
+  {
+    "name": "workspace_nova_control",
+    "args": [],
+    "workspace_js_fixture": "nova",
+    "exit": 0,
+    "stdout": "AUDIT workspace engine=Some(\"genet.scripted.nova\")\n",
+    "stderr": "",
+    "artifact_exists": false
+  }
+]

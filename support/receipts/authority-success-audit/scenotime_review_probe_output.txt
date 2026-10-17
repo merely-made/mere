@@ -1,0 +1,20 @@
+
+running 6 tests
+CONTROL monotonic-clock repeated-host-timestamp adds-nothing=true
+QUALIFIED host-samples=[100,110,105,110] elapsed=15 already-seen-host-time-charged-again=true normal-browser-monotonic-clock-not-exercised=true
+test monotonic_clock_and_repeated_timestamp_control ... ok
+test qualified_backward_clock_sample_rewinds_the_delta_baseline ... ok
+QUALIFIED noncanonical-link-key snapshot-admitted=true differing-view-token=true consumer-grouping-failure-not-exercised=true
+test qualified_snapshot_checks_do_not_canonicalize_routed_link_keys ... ok
+OBSERVED nonfinite-diff committed-revision=2 trace-built=true trace-serialized=true own-trace-bytes-reopen=false
+OBSERVED nonfinite-item-position snapshot-and-trace-validate=true serialization-success=true own-bytes-reopen=false
+CONTROL finite-trace validates-encodes-reopens=true
+test nonfinite_diff_commits_revision_and_builds_a_non_reopenable_trace ... ok
+test finite_trace_round_trip_control ... ok
+OBSERVED nonfinite-item-scale snapshot-and-trace-validate=true serialization-success=true own-bytes-reopen=false
+OBSERVED nonfinite-footprint-width snapshot-and-trace-validate=true serialization-success=true own-bytes-reopen=false
+OBSERVED nonfinite-scene-bounds snapshot-and-trace-validate=true serialization-success=true own-bytes-reopen=false
+test nonfinite_scene_values_validate_and_serialize_but_do_not_reopen ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

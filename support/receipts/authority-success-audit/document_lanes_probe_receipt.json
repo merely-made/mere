@@ -1,0 +1,122 @@
+{
+  "date_utc": "2026-10-17T00:23:13.660770+00:00",
+  "tests": 7,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/system/document-lanes/Cargo.toml": "025067b5b1d8b05344de7dcd125edc89eeabe6d39637bd23fd8101af48c49bab",
+    "crates/system/document-lanes/src/lib.rs": "5766a14dbd08151d6f40b27913d4fd01e4243fae8504891497d1601f27389aca",
+    "crates/system/document-lanes/src/reader.rs": "653f4cdb1f11a1412ca6571b1f70c717e1dc1fcd8b4850574020dc64e4c28dd5",
+    "crates/system/document-lanes/src/remote.rs": "b20c0201dc22496b5a047377f0f1f2253663fe1de26d8b371e18a61f090a0e66",
+    "crates/system/document-lanes/src/retained_clip.rs": "0049ee3161b93b65c08c067057f4685774361d643685be19e2509d2e6c082727",
+    "crates/system/document-lanes/src/retained_clip/tests.rs": "c52174c112549ec959477ad833ff6c17523181223623889b3d5f73c373117eaf",
+    "crates/system/document-lanes/src/session.rs": "d98bb0f3524af2843fc39ff07b366c2cc1a48f0aaaca8e8da37251694e689ad3",
+    "crates/system/document-lanes/src/session/navigation_tests.rs": "472e387f210003f6292547c2a83cd1bd4452d699ede6ee098780d1001e49e50f",
+    "crates/system/document-lanes/src/smolweb.rs": "bd9d482fc77f43640e8ea4dbee7be31784bd7e6abb3d24e529e5fae4aadbaa2a",
+    "crates/system/document-lanes/src/smolweb/a11y.rs": "cfc20097a4e61b39bdf921c12e32d04b42d0b4d6a90e5b8b61e8a4a2a0fc15ed",
+    "crates/system/document-lanes/src/typography.rs": "d82bec507381c0a90ed9b5c1ab657e7b6015551e8258bdaff3c84b567e933514",
+    "crates/system/document-lanes/tests/smolweb_streaming_render.rs": "fcac2dcf4cd70d16314cda6a4f38ddbb3ce8f88a1618bf21bba9adf957774494"
+  },
+  "libraries": {
+    "mere_document_lanes": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libmere_document_lanes.rlib",
+      "sha256": "7ab909fd6f81ec3b18bcbfdbddcb4cfe62106c0605d5ca831aade834de376a52",
+      "features": [
+        "default",
+        "netfetch",
+        "retained-clips",
+        "smolweb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/document-lanes#mere-document-lanes@0.1.0"
+    },
+    "inker": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-e4319f4f5361a07f.rlib",
+      "sha256": "d5ffa57dd7351f2136144e1ad580097289064ca209255693e9557800d9cdf9ae",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/inker#0.1.1"
+    },
+    "document_canvas": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdocument_canvas-f4c88e165d1740fa.rlib",
+      "sha256": "ae8866bd16a5a8d0b7b7e6b086d28c11bcc4b4c85fb91715e53b0d10b2f78402",
+      "features": [
+        "default",
+        "netrender"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/document-canvas#0.1.0"
+    },
+    "genet_host_api": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_host_api-9bfaf96fe418af0f.rlib",
+      "sha256": "54f5be21605e108a8e14e84548f6d9d0e0618dfe1296edb46e9ed13dc4dbabb1",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/genet.git?branch=main#genet-host-api@0.2.0"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-927562d7d02a5b08.rlib",
+      "sha256": "f43dbd67a7a06323268d19fa4f5d183799f860d38ecef099573ca4dbf14e0651",
+      "features": [
+        "bytes",
+        "default",
+        "fs",
+        "io-util",
+        "libc",
+        "macros",
+        "mio",
+        "net",
+        "rt",
+        "rt-multi-thread",
+        "socket2",
+        "sync",
+        "time",
+        "tokio-macros",
+        "windows-sys"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-7b9c1ee0251f576c\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\document_lanes_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-document-lanes-probe.exe",
+    "--extern",
+    "mere_document_lanes=C:\\t\\cargo-targets\\mere\\debug\\libmere_document_lanes.rlib",
+    "--extern",
+    "inker=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-e4319f4f5361a07f.rlib",
+    "--extern",
+    "document_canvas=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdocument_canvas-f4c88e165d1740fa.rlib",
+    "--extern",
+    "genet_host_api=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_host_api-9bfaf96fe418af0f.rlib",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-927562d7d02a5b08.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-7b9c1ee0251f576c\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "92e1c0144508b69e3c18aa0b85f2ad9bb9d4b72152d101015a675f4719b4f89f",
+  "generated_output_removed": true,
+  "scope": "Seven current feature-enabled Cargo-built native CPU observations. Mock fetchers, retained layout/session/semantic actions and expected Tokio nesting panic before polling HTTP future. No real network response, GPU rendering, browser or OS accessibility.",
+  "removed_failed_link_objects": []
+}

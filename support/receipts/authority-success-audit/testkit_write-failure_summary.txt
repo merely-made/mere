@@ -1,0 +1,23 @@
+# write-failure / write-failure: passed
+
+- schema: `mere.djinn.receipt/v1`
+- run: `20261016T211435Z-f7b0effa`
+- commit: `b567660d67c4d900f1d638345c89715e1f36c575` (dirty)
+- binary sha256: `4ba8d14b9f1753e8322d0de19935ad479aec4dbae045ec1dfce116b1e7f348a1`
+- machine: O-PC (windows x86_64), host local
+- load before: rustc 1, cargo 2, queue Some(0.0), busy Some(0.2734375)
+- load after: rustc 1, cargo 2, queue Some(0.0), busy Some(0.2692307692307693)
+- duration: 506 ms; lock wait 0 ms
+- installed before: 
+- installed after: 
+- walls: unchanged
+
+## Assertions
+
+| t (ms) | name | bound | expected | observed | |
+|---|---|---|---|---|---|
+| 143 | every spawned process has exited | State | [] | [] | pass |
+| 144 | no endpoint of this run remains | State | [] | [] | pass |
+
+## Evidence
+

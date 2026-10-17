@@ -1,0 +1,123 @@
+{
+  "date_utc": "2026-10-17T06:13:34.538937+00:00",
+  "source_sha256": {
+    "crates/eidetic/eidetic-core/src/browsing/mod.rs": "1ab631ed945996936a4d65069cbd4f48404ce9efd310cb3f7449706159720838",
+    "crates/eidetic/eidetic-core/src/browsing/text.rs": "a091d7ab5a8eb7cbe5e02624fb444af77aa1cbf7134fb8057e3155c40b61f49d",
+    "crates/eidetic/muniment/src/backend.rs": "f39440cb96ebc922ba182300c7e9c65420f730c6b58fe7b611882fc569da806d",
+    "crates/eidetic/muniment/src/blob.rs": "4b16e4c4aff72c4d6396d2fff916dd655800d362108f523a19adcbeaf95e09c6"
+  },
+  "libraries": {
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+      "sha256": "e743e7b736c462a1cd45d01cc6e33c3a834cf6fd2648cdd86b469d3f24cd88e1",
+      "features": [
+        "default",
+        "json-schema",
+        "pack-signing"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-2b3055c95978c4ca.rlib",
+      "sha256": "cd109da36b9d9c364c943bc4bacd9fe6594402656ce98dcb421360b5f2e2b6ab",
+      "features": [
+        "default",
+        "directory",
+        "json",
+        "redb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/muniment#0.1.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\muniment\\src\\lib.rs"
+    },
+    "pollster": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+      "sha256": "58d7c143682aaad275af4e6de898b1f7d7a2449bd6044bc309d19247b011a6a1",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#pollster@0.4.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pollster-0.4.0\\src\\lib.rs"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+      "sha256": "4ee2e2efcf90f61ce85a257fe3a6d707890eff440805fb2ede877eddee6ce791",
+      "features": [
+        "alloc",
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.151\\src\\lib.rs"
+    },
+    "async_trait": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-62b6fb7145910b7f.dll",
+      "sha256": "f6fdf22e0cf284a043b44bd5a64d03c6480936025e008a36129e71507c2df63f",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#async-trait@0.1.92",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\async-trait-0.1.92\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\browsing_failure_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-browsing-failure-probe.exe",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+    "--extern",
+    "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-2b3055c95978c4ca.rlib",
+    "--extern",
+    "pollster=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+    "--extern",
+    "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-62b6fb7145910b7f.dll",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "27baa7e29e73a6a9a5340afff2e9b39e32f2fe4de0e246d985944eac682b5ef2",
+  "test_exit": 0,
+  "tests": 8,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-browsing-failure-probe.exe",
+      "bytes": 2339328,
+      "sha256": "27baa7e29e73a6a9a5340afff2e9b39e32f2fe4de0e246d985944eac682b5ef2"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-browsing-failure-probe.pdb",
+      "bytes": 48107520,
+      "sha256": "268f2a9e5b23b5605b3728278ab0e1dc22e1ae6f19a946f616ee86e694ce5fd3"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Actual public BrowsingMemory and PageTextStore with MemoryBackend and an explicit failure-injection wrapper. Write refusal and delete refusal verify uncommitted-event loss and memory/disk divergence; happy-path controls pass. Individually ordered owner traces demonstrate chronological read failures. A deliberately corrupted synthetic blob demonstrates different integrity contracts for current and exact page-text readers; ordinary text control agrees. Retained exact Cargo-built libraries; relevant sources unchanged through both authorized merges. No installed/user history, physical disk error, network, rendering or live browser exercised."
+}

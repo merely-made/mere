@@ -1,0 +1,48 @@
+{
+  "date_utc": "2026-10-17T21:02:46.327815+00:00",
+  "exit": 0,
+  "passed": 3,
+  "source_sha256": {
+    "support/patches/cubecl-runtime/src/tune/schedule.rs": "9e3ee3e01a17d9787b35d11ee77827c0b100d8d5d395cbb32d93b6c8d04f7c6a",
+    "support/patches/cubecl-runtime/src/tune/tune_cache.rs": "8425174a38d3792211b415ac4ddf912a85eb33d14e4439514294b98a5f5e56c3",
+    "support/patches/cubecl-runtime/src/tune/tuner.rs": "89952f3fecc276efe622a88138480a0c5833884d5b6487271821b0a4124c0b9b",
+    "support/patches/cubecl-runtime/src/tune/log.rs": "82a23d39f974d16e7f7fe62f920f75e339ae98953daaf4753e7f8161c6ddf948",
+    "support/patches/cubecl-runtime/src/client.rs": "92e16aec65cd0bc718c50ae9a503665b4befe1ab780ed198d6bcdb07e6b3f195"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\runtime_tuner_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-runtime-tuner.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-tuner.exe",
+      "bytes": 858624,
+      "sha256": "b4bde0fb10188cef4b2ad3c49a7cbb7d4b3d7cd75038c4c867420af1913b0792"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-tuner.pdb",
+      "bytes": 3125248,
+      "sha256": "8829608de62c4651a0579dc86aa0317e8828ad49fe7402f057b2e9bbc85cb7b3"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "run_batch": "8968facdd142837f0fbd51fd4d65b678ae518b988d38af570c2f087cfadebcd7",
+    "run_plan": "624a4584a899db50802ee7a1ca53ec90fa9885cf179d346041b04a738ecb59a2",
+    "process_request": "a2edddcab508f598cf960a55ac8978bb6ef2890741bd15cf69fef6a314e3b1a3",
+    "cache": "5bbe85dff833f977036475077f20dbc94d3efbfb5050fac55e3386b7e2f1bd74"
+  },
+  "evidence_sha256": {
+    "run_runtime_tuner_probe.py": "5f85179b19b8c272ff458c194b93dec6914ce30c99ea5f13550665ac42cb5ce8",
+    "runtime_tuner_probe.rs": "350c88d5631b1a45126259a7d89bb2b73657047986e702d68fcaac77f2a2e21b",
+    "runtime_tuner_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime_tuner_run.txt": "f259b5bd60984ea50d6241f9d82da586d5d8ef28403cb35ce60d2b7e019eaef6"
+  },
+  "qualification": "Exact run_batch/run_plan/process_request plus full tune_cache.rs under non-persistence cfg. Explicit CPU client refuses exclusive acquisition and never enters drive; shape-equivalent plan/candidate/error/score/log/mutex types. No pending profile or real kernel, backend/GPU, browser, persistent Store, current contention or full runtime build. Non-persistence cache settled witness only; source independently excludes unmeasured decisions from disk. Owned exe/PDB removed."
+}

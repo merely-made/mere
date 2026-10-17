@@ -1,0 +1,108 @@
+{
+  "date_utc": "2026-10-17T01:22:24.698883+00:00",
+  "tests": 4,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/mesh/mesh/src/namespace.rs": "407c097d34366f342a4a4d468fb96772108b0a6532467ad11f2d86fc2b6e2771",
+    "crates/system/proofs/Cargo.toml": "cfa91b8ebc61be9c5a704180dea1e12904da85ab57ddc8fa7bace921db7417c6",
+    "crates/system/proofs/src/lib.rs": "a95f2efaafa71a02a9ff3de8febca3bc18a623a81dc798982ca993f3d94a6feb",
+    "crates/system/state-witness/Cargo.toml": "ba238711959f4adbf1fa42a43df0e3ca7cc313f5e9c34dbd647e7166a78b4cc1",
+    "crates/system/state-witness/src/lib.rs": "f0040b355395aaa0f2c8709267d66375be2f93df87929d8daba5074f05a9cdca",
+    "crates/system/state-witness/src/trace.rs": "2b320cfb39d58496e1d5dc0d0448fa92b5f24947c2c136de8e0954109b853007",
+    "crates/system/state-witness/src/witness.rs": "db80635950f9a52cf5116772bb7956814daf724e4e4fb49e5935908a02dddef4",
+    "crates/system/state-witness/tests/formats.rs": "d6475eddd5dd5a35d421af989597ad5bbd5bcc47fe92db5474d73477cc15818f",
+    "crates/system/state-witness/tests/hash.rs": "535f086faadeb69dd35ce39e8ce041c6dae80c05066666f35b71cb9266fc36ca",
+    "crates/system/state-witness/tests/trace.rs": "30b2430105bc9b646f6b7799223bf8e987933955f71d273d44fb1881255d9d37",
+    "crates/system/state-witness/tests/witness.rs": "10fd4d21cd7ab19c092c49773a189a4ad120f0b77e4f01c9191356a6208e7bc8"
+  },
+  "libraries": {
+    "state_witness": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libstate_witness-e916516d2eed75f3.rlib",
+      "sha256": "90f03748cd88a57492a4946f2e9696310a7257a698e3a103caeb737d3cf71514",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/state-witness#0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\state-witness\\src\\lib.rs"
+    },
+    "proofs": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libproofs-ad4b67011440b483.rlib",
+      "sha256": "36d2162abcabc383b57c54d438754f711131ae0e0228adb22f813e34c816ec05",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/proofs#mere-proofs@0.1.0",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\proofs\\src\\lib.rs"
+    },
+    "mesh": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmesh-c3471e5b0ad66477.rlib",
+      "sha256": "a508bdf7f8db8e871019d5febb812f28ef22e04ab33df967b1211cb9688fec0d",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/mesh/mesh#mere-mesh@0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mesh\\mesh\\src\\lib.rs"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+      "sha256": "7e7647e8db91ea5aad887d653d9ca5ccc2eab8372973016a2ae68badfef297f6",
+      "features": [
+        "bytes",
+        "default",
+        "fs",
+        "io-std",
+        "io-util",
+        "libc",
+        "macros",
+        "mio",
+        "net",
+        "rt",
+        "rt-multi-thread",
+        "socket2",
+        "sync",
+        "test-util",
+        "time",
+        "tokio-macros",
+        "tracing",
+        "windows-sys"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-1.53.2\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\witness_proofs_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-witness-proofs-probe.exe",
+    "--extern",
+    "state_witness=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libstate_witness-e916516d2eed75f3.rlib",
+    "--extern",
+    "proofs=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libproofs-ad4b67011440b483.rlib",
+    "--extern",
+    "mesh=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmesh-c3471e5b0ad66477.rlib",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "cfab49801092a540a7f93b6c31d412093e800563e4c173f97fc24a6a3d284507",
+  "generated_output_removed": true,
+  "scope": "Four current Cargo-built native CPU/API observations: one misleading refusal, ambient typed-reference mismatch with an executed resource-view guard, and two qualified format/tag limits. Witness/proofs all source read; Mesh namespace entire file read, broader Mesh not claimed. Synthetic bytes and MemoryBackend only. No network, signatures, peer sync, browser, GPU, user files or durable user state."
+}

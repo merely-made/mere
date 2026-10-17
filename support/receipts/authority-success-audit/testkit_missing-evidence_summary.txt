@@ -1,0 +1,23 @@
+# missing-evidence / missing-evidence: passed
+
+- schema: `mere.djinn.receipt/v1`
+- run: `20261016T211433Z-3e9fcb55`
+- commit: `b567660d67c4d900f1d638345c89715e1f36c575` (dirty)
+- binary sha256: `4ba8d14b9f1753e8322d0de19935ad479aec4dbae045ec1dfce116b1e7f348a1`
+- machine: O-PC (windows x86_64), host local
+- load before: rustc 1, cargo 2, queue Some(0.0), busy Some(0.30078125)
+- load after: rustc 1, cargo 2, queue Some(0.0), busy Some(0.26819923371647514)
+- duration: 514 ms; lock wait 0 ms
+- installed before: 
+- installed after: 
+- walls: unchanged
+
+## Assertions
+
+| t (ms) | name | bound | expected | observed | |
+|---|---|---|---|---|---|
+| 148 | every spawned process has exited | State | [] | [] | pass |
+| 150 | no endpoint of this run remains | State | [] | [] | pass |
+
+## Evidence
+

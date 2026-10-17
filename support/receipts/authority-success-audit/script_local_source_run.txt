@@ -1,0 +1,6 @@
+== patch audit: netrender local
+== patch audit: netrender local
+== patch audit: netrender resolves from GIT, not the local checkout
+   netrender v0.1.0 (https://example.invalid/netrender#12345678)
+   the [patch] table's URL probably does not match the dependency's URL
+== patch audit: netrender local

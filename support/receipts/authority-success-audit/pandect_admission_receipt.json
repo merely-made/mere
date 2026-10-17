@@ -1,0 +1,11 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "Public session write acknowledges and persists a cross-owner handle collision; reopen refuses",
+  "reproduction_sha256": "6b0ccc5eb0e3a0080eeb633a029e3386b36ad190a4e022967d9b107577d1f444",
+  "output_file": "pandect_admission_output.txt",
+  "affected_sources": {
+    "crates/system/pandect/src/graph_session.rs": "7fae5cfdba774e5c6b9527d131d11571fb804779b691928c5cf68f63feb7180a",
+    "crates/system/pandect/src/graph_session_merge.rs": "d4bf72eef97c40fda01303654e46c971a7b5cd0c60f357f46c43321696ba9b45"
+  }
+}

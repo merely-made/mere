@@ -1,0 +1,56 @@
+{
+  "test_exit": 0,
+  "tests": 10,
+  "harness_sha256": "f605ba24785ee18de5f2cb8797603e4f0a5c6bc763974788df0714fdd775c97c",
+  "source_sha256": {
+    "crates/cambium/scenes/scenomise/src/history.rs": "99ed8852ee4ab55e9ecb6bbf8cf454beb998c8e2fc186e7f0aaa4d614f63031a",
+    "crates/cambium/scenes/scenomise/src/host_dataset.rs": "3e498c73165828892ed45bcbc1a1aa3994d0997600cdf53765624f3a83c1da9a",
+    "crates/cambium/scenes/scenomise/src/host_dataset/folds.rs": "1fc6815fe5619f675a6146c1c1efaf7277b80d5f7ac616dcfe16254b30d7711a",
+    "crates/cambium/scenes/scenomise/src/projection.rs": "9be3d049db7ca8162035169331391605933846ea4eeeb5ae9e06e63538c61420",
+    "crates/cambium/scenes/scenomise/src/registry.rs": "788253adcb86f64e4d1ac44929a71f11ae5b0dd20805af249a041bb4c4f367e7",
+    "crates/cambium/scenes/scenomise/src/relax.rs": "088e8432a0f89f2a62d6bf8e9a31c99aa05d6f80181b7b93f76120049916cb3f",
+    "crates/cambium/scenes/scenomise/src/matrix.rs": "bed8028430fbaa554ae4097ac9083627d2b017d7ccb9aefbe6b3c3d7b70a2f9b"
+  },
+  "library_sha256": {
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+      "sha256": "5217cd48a147df645cd924eada44f053696f2fa82d1b49f4383fd0c73a24f1dc"
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+      "sha256": "398b81ba7e1443daa91a756fe7ea33fa73140a0e1adceaf4d91610f0da931f51"
+    },
+    "scenograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenograph-344a5dac3f0026f3.rlib",
+      "sha256": "4216c00b70d4033869b636157d08f551a2999149e1c77f1b8318d12769212e92"
+    },
+    "scenomise": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libscenomise.rlib",
+      "sha256": "fa72705f081bdbe2f7bb07aa0281dc0cf6f8ec270f5d10fb7f4d7407e6236885"
+    }
+  },
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\scenomise_boundary_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-scenomise-boundary-probe.exe",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+    "--extern",
+    "scenograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenograph-344a5dac3f0026f3.rlib",
+    "--extern",
+    "scenomise=C:\\t\\cargo-targets\\mere\\debug\\libscenomise.rlib"
+  ],
+  "build_exit": 0,
+  "native_binary_sha256": "a9160c5c5647029403c1472d38ea6a2f111292e09848f8ad5bb64072c3fe52c8",
+  "generated_output_removed": true,
+  "scope": "Bounded public native APIs with generated input. Includes ordinary controls, reproduced defects and three explicitly qualified identity/focus/cache boundaries. No product renderer, transport, real store, source writes or hazardous expansion."
+}

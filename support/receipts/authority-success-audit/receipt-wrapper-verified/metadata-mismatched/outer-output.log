@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt-wrapper-verified\bootstrap.py", line 12, in <module>
+    runpy.run_path(str(target),run_name="__main__")
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt-wrapper-verified\metadata-mismatched\run.py", line 21, in <module>
+    rev=source.split('#')[-1];assert rev==expected[repo],(file,pkg['name'],source,expected[repo])
+                                     ^^^^^^^^^^^^^^^^^^^
+AssertionError: ('Cargo.toml', 'genet-audit-package', 'git+https://github.com/audit/genet.git?rev=0000000000000000000000000000000000000000#0000000000000000000000000000000000000000', '2c7ef73bfa44c07744e0643e3c6f98be3cbd7947')

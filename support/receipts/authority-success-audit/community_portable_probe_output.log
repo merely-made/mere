@@ -1,0 +1,33 @@
+
+running 28 tests
+test coop::tests::a_conformance_walk_round_trips_through_serde ... ok
+test coop::tests::a_declared_capability_does_not_skip_the_verdict_check ... ok
+test coop::tests::a_driver_that_reports_joined_after_revoke_fails_at_the_revoke_step ... ok
+test coop::tests::a_grant_that_is_all_authority_must_refuse_reconnect_after_expiry ... ok
+test coop::tests::a_report_round_trips_through_serde ... ok
+test coop::tests::every_step_is_walked_in_order ... ok
+test coop::tests::joined_has_no_reason_and_every_other_verdict_has_one ... ok
+test coop::tests::the_reference_driver_conforms_under_the_fixture_profile ... ok
+test coop::tests::the_reference_driver_conforms_under_the_turnstone_profile ... ok
+test coop::tests::the_wire_shape_is_pinned ... ok
+test direct_root_change_is_refused_and_preserves_the_first_snapshot ... ok
+test first_disclosure_of_a_previously_unknown_root_is_valid ... ok
+test hidden_sharing_root_allows_a_different_root_under_the_same_contribution ... ok
+test resource_coop::control::tests::a_changed_collection_version_refuses_before_dispatch ... ok
+test resource_coop::control::tests::independent_readings_and_owner_refusal_preserve_their_reads ... ok
+test resource_coop::control::tests::withdrawal_before_dispatch_never_calls_owner_command ... ok
+test resource_coop::tests::a_collection_fork_offers_no_copy_or_content_fork_right ... ok
+test resource_coop::tests::a_disclosed_sharing_root_is_immutable_without_inventing_content_authorship ... ok
+test resource_coop::tests::bad_reads_are_refused_without_replacing_the_current_snapshot ... ok
+test resource_coop::tests::duplicate_payloads_keep_contributions_and_new_revisions_do_not_retarget_attention ... ok
+test resource_coop::tests::independent_readings_keep_resource_and_activity_attention_and_completions_separate ... ok
+test resource_coop::tests::membership_and_a_hosting_promise_never_supply_action_offers_or_live_presence ... ok
+test resource_coop::tests::offered_collection_fork_requires_a_named_different_reviewed_destination ... ok
+test resource_coop::tests::owner_acceptance_changes_feedback_only_and_cannot_invent_retained_bytes_or_hosting ... ok
+test resource_coop::tests::refreshed_authority_invalidates_the_old_request_and_preserves_exact_resource_attention ... ok
+test resource_coop::tests::requests_cannot_be_relabelled_to_attach_a_completion_to_another_resource ... ok
+test resource_coop::tests::view_json_round_trips_without_becoming_a_capability_and_future_reports_are_refused ... ok
+test resource_coop::tests::withdrawal_clears_only_missing_attention_and_does_not_fabricate_content_for_activity_links ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

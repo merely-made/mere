@@ -1,0 +1,22 @@
+
+running 3 tests
+test sequential_arrivals_obey_the_record_bound ... ok
+test simultaneous_arrivals_exceed_the_byte_bound ... FAILED
+test simultaneous_arrivals_exceed_the_record_bound ... ok
+
+failures:
+
+---- simultaneous_arrivals_exceed_the_byte_bound stdout ----
+
+thread 'simultaneous_arrivals_exceed_the_byte_bound' (26348) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\commons_parking_probe.rs:81:22:
+assertion `left == right` failed
+  left: 362
+ right: 360
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    simultaneous_arrivals_exceed_the_byte_bound
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

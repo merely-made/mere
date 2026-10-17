@@ -1,0 +1,73 @@
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.17s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\numen-b36f52bc35422f05.exe)
+
+running 65 tests
+test coupling::tests::coupling_serde_roundtrip ... ok
+test coupling::tests::open_canonicalizes_recognized_iri ... ok
+test coupling::tests::open_response_serde_roundtrip ... ok
+test coupling::tests::recognized_response_iri_round_trips ... ok
+test coupling::tests::selector_and_response_variants_roundtrip ... ok
+test edge_path::tests::edge_path_rule_serde ... ok
+test edge_path::tests::edge_path_serde ... ok
+test eval::tests::add_and_mul_compose ... ok
+test eval::tests::analytic_gradient_of_add_is_sum ... ok
+test eval::tests::analytic_gradient_of_coord_x ... ok
+test eval::tests::analytic_gradient_of_gaussian_points_inward ... ok
+test eval::tests::analytic_gradient_of_linear ... ok
+test eval::tests::const_evaluates_constant ... ok
+test eval::tests::coord_returns_position ... ok
+test eval::tests::disk_hard_is_one_inside ... ok
+test eval::tests::disk_is_zero_outside_radius ... ok
+test eval::tests::disk_linear_falloff ... ok
+test eval::tests::dot_product_is_correct ... ok
+test eval::tests::finite_diff_gradient_for_unknown_form ... ok
+test eval::tests::gaussian_decays_with_distance ... ok
+test eval::tests::gaussian_peak_is_one_at_center ... ok
+test eval::tests::negate_flips_sign ... ok
+test eval::tests::sample_resolves_through_registry ... ok
+test eval::tests::sample_returns_zero_for_missing ... ok
+test eval::tests::time_returns_t ... ok
+test eval::tests::vector_coord_returns_position ... ok
+test eval::tests::vector_perp_rotates_90 ... ok
+test eval::tests::vector_sample_resolves ... ok
+test field::inclusive_boundary_tests::polygon_reference_points_include_every_edge_and_vertex_in_both_windings ... ok
+test field::tests::a_degenerate_polygon_contains_nothing ... ok
+test field::tests::a_polygon_extent_contains_and_measures ... ok
+test field::tests::a_polygon_extent_round_trips ... ok
+test field::tests::attachment_is_a_question_for_a_graph ... ok
+test field::tests::defaults_are_global_active ... ok
+test field::tests::field_serde_roundtrip ... ok
+test field::tests::ids_are_distinct_types_but_uuid_backed ... ok
+test field_ast::tests::disk_falloff_roundtrip ... ok
+test field_ast::tests::scalar_field_serde_roundtrip ... ok
+test field_ast::tests::vector_field_serde_roundtrip ... ok
+test projection::tests::add_coupling_appends ... ok
+test projection::tests::add_edge_path_rule_appends ... ok
+test projection::tests::add_scalar_returns_lookup_id ... ok
+test projection::tests::new_projection_is_empty ... ok
+test projection::tests::serde_roundtrip_preserves_projection ... ok
+test registry::tests::duplicate_name_keeps_id_and_overwrites_value ... ok
+test registry::tests::ids_are_distinct_across_kinds ... ok
+test registry::tests::insert_and_lookup_scalar ... ok
+test registry::tests::insert_and_lookup_vector ... ok
+test registry::tests::iter_yields_all_entries ... ok
+test registry::tests::name_of_returns_registered_name ... ok
+test registry::tests::remove_clears_both_maps ... ok
+test registry::tests::remove_returns_false_for_unknown_id ... ok
+test registry::tests::serde_roundtrip_preserves_registry ... ok
+test responsive_path::tests::a_cycle_hidden_behind_scalar_scale_is_rejected_before_evaluation ... ok
+test responsive_path::tests::attractor_flow_and_vortex_each_change_the_path_shape ... ok
+test responsive_path::tests::disabled_responses_return_the_straight_fixed_endpoint_path ... ok
+test responsive_path::tests::field_and_compatible_link_responses_are_independently_switchable ... ok
+test responsive_path::tests::field_expression_depth_is_limited_before_evaluation ... ok
+test responsive_path::tests::finite_work_and_input_limits_fail_closed ... ok
+test responsive_path::tests::geometric_correspondence_ignores_labels_and_handles_reversed_direction ... ok
+test responsive_path::tests::incompatible_links_do_not_attract_and_ids_and_input_order_survive ... ok
+test responsive_path::tests::nested_gradient_expansion_is_included_in_the_work_budget ... ok
+test responsive_path::tests::non_finite_field_outputs_are_refused ... ok
+test responsive_path::tests::recursive_field_samples_are_bounded_and_cycles_refused ... ok
+test responsive_path::tests::zero_response_gains_disable_each_influence_independently ... ok
+
+test result: ok. 65 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

@@ -1,0 +1,273 @@
+{
+  "date_utc": "2026-10-17T19:52:06.187720+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-pelt-core-runtime\\Cargo.toml",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "--lib",
+    "--tests",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "source_sha256": {
+    "ports/pelt/core/src/content.rs": "db16c0ea1c4dd5f63ef0b7f4de232b4ac51b42bb0b3fcccf01d9d428ebc6a368",
+    "ports/pelt/core/src/input.rs": "c907b4da693b0ed012261718057cff625de50180c833eb8de8eaafe7e6ee41f0",
+    "ports/pelt/core/src/lib.rs": "ae0d735337f91f60324999e7634870d05eb01439091c96df523e3a266b25b782",
+    "ports/pelt/core/src/native.rs": "36499952b3a4c8a5f39bd885e8d7b66288fba2421248746f9bc1c287ea328d05",
+    "ports/pelt/core/src/pool.rs": "e379a27cfd074fe182c5e19c85f52cdd955e213cea7f2b458e298e95b13a9c44",
+    "ports/pelt/core/src/pool_a11y.rs": "32b347002da2d2bdc4da1b9c24be6c05503114118e6f6aa2e1359df6e0b49de8",
+    "ports/pelt/core/src/surface_policy.rs": "a2e2fd80738e3484e1e2a92ae2e0015b2c09b22830c1132237f779b4e5be324d",
+    "ports/pelt/core/src/workspace.rs": "f422b3af81b8924ce7057fca519cc4403da09068ddb0138c1ab8c59add49793b",
+    "ports/pelt/core/tests/capture_geometry.rs": "07096a3475c84de09433735b54bc257f9f89408f60f6f6335f2dc7e66b591631",
+    "ports/pelt/core/tests/capture_terminals.rs": "e8dfbed57d51ae6cdb65d0505b05e845044e174a3bee7d3f5ff9a3ca15f0d848",
+    "ports/pelt/core/tests/content.rs": "d27c606c9685bab30a10b42d4aed60803277941e4c282b40ca67edaa5dc887ce",
+    "ports/pelt/core/tests/embedder.rs": "14934732e2254a94d0940a14f0919d1e5dd248b7f7e0fd15d57282995d740b24",
+    "ports/pelt/core/tests/host_history.rs": "3c747da598ec7102e0e9aefe6bea4105964c36bb49f2140f3edbf84d7501d09c",
+    "ports/pelt/core/tests/host_loading.rs": "84b0228f232421872b6ce211f92740211a7ba31098978554374e1508d51b6a33",
+    "ports/pelt/core/tests/host_surface.rs": "8fd647263fbba5f00df5e7590a3cfedfdd8c8d32469df3a28041b47525736807",
+    "ports/pelt/core/tests/pool.rs": "1636b2c88407ed5ea8a914fccfd87340c9a6e85a1e43e72fb03e5abb4a6ffd7c",
+    "ports/pelt/core/tests/pool_a11y.rs": "997ef47989fadd24b3ebca5e867f29ff1b45b553e476b9958b8ba695718c8e4c",
+    "ports/pelt/core/tests/routing.rs": "44adc3764c1000a06a7d361b59864ee505dc71fcbb3cb1ea3f5e9c1dfa162aa3",
+    "ports/pelt/core/tests/workspace.rs": "7e343560bac2c657cb3ec7e1e9cfe74ba06e369cc1c18983aa6d489c17fdbbaa",
+    "ports/pelt/core/tests/workspace_retirement.rs": "4a7336b95dc5f45b24c9901c870faa37993de81df07774158827a1f659cf9570",
+    "crates/cambium/workbench/float.rs": "be8ae54379c1a5772baebcbabf77dc85711fda672e43b9436e131e42dc39cc12",
+    "crates/cambium/workbench/lib.rs": "6cef9d71ab26b1f16d20866bdb6f48412fd498eb022fbfcbe859296cc7c1b74b",
+    "crates/cambium/workbench/presentation.rs": "f23ad4e6b49ebc1f0bcb5e71130c9cc6db9a9283711084cf9da2ca91bd0ce828",
+    "crates/system/page-load/src/lib.rs": "bbb80ef9a26fb86fa9c76c96e99f603fbe329f26471277447380108c17aacbb6",
+    "crates/system/page-load/src/tests.rs": "263ef7dddca33f764885114ce44b00693885c722433f5ad385924b389bd5d6b7"
+  },
+  "results": [
+    {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 25,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "passed": 114,
+  "original_tests": 111,
+  "audit_tests": 3,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pelt_core-59f37ace0c3f586c.exe",
+      "bytes": 760320,
+      "sha256": "a03d6f3aebe3443519e8a6a401127f7f1ecf05e5cba3de2e036dfe20845b5c74"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pelt_core-59f37ace0c3f586c.pdb",
+      "bytes": 3125248,
+      "sha256": "41ce57e882e2d9a743516562f18b91c257c4c5be662c4c62f9b708ea10b5ab19"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pelt_core_audit_contracts-6eef034d1f6ebfd7.exe",
+      "bytes": 1327616,
+      "sha256": "4e7bd3d64925a64050bdd3736656cd5dac7e229075611278ffa500c79a20e5ac"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pelt_core_audit_contracts-6eef034d1f6ebfd7.pdb",
+      "bytes": 3756032,
+      "sha256": "093af07ecbfa91e1cad0d1b569d3b76687843780fcf137d2d25dc633164ab741"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\capture_geometry-db52e9af68de6dcc.exe",
+      "bytes": 1462784,
+      "sha256": "f5209569c8ac76eea2d336cacdab20fec57ab8fba3bfc5ab21a4ad131be70d05"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\capture_geometry-db52e9af68de6dcc.pdb",
+      "bytes": 3969024,
+      "sha256": "f95f5bff6ec4815d45c60e6a764117edd8c4c5cd4c35ba15fa7e2d20770e5274"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\capture_terminals-7571f8d8f308379e.exe",
+      "bytes": 1436672,
+      "sha256": "efab36e094b0e460b20d9a34f8ba6a41916fd589ae620476d6e216224aff7ff1"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\capture_terminals-7571f8d8f308379e.pdb",
+      "bytes": 3870720,
+      "sha256": "b950ba802f5ce864bab060df13b69cb8fd510eb959c962634ebaa78d68e4fd38"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\content-999f2ae6a3f966a2.exe",
+      "bytes": 1324544,
+      "sha256": "18e95f39c4015e09bb54918c452c5e7667ee9d970bac480a71a131141f34c64f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\content-999f2ae6a3f966a2.pdb",
+      "bytes": 3665920,
+      "sha256": "63974c50ca9afb7dd426e6fbc42c9f75b39f663b88db25c4693069fadf348233"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\embedder-a56a6f19aa720dc6.exe",
+      "bytes": 1074688,
+      "sha256": "7a9aecd8f998263d4ceceb0485c46aef010a8bf8d8ab0137e3d93071b2f14f60"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\embedder-a56a6f19aa720dc6.pdb",
+      "bytes": 3428352,
+      "sha256": "fbc23767b4b5d50fdf1a5fc68251da1f14c46a0eea4ec4c1a7f768e329da60e5"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\host_history-663d87154b517737.exe",
+      "bytes": 1084928,
+      "sha256": "d9bda0637ead980856631b5fb88b62b57d57bfa86c3b128afac31630cdb873d5"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\host_history-663d87154b517737.pdb",
+      "bytes": 3436544,
+      "sha256": "f87a7dde6d63dd70f0659ba8c625d070a08bcfaa4dc94bd7bdc16a63238cc632"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\host_loading-c001a6b31870bce4.exe",
+      "bytes": 1170944,
+      "sha256": "d65f084a3088828d710dd1c64a83630852910e62126c933c275ae064cee0028d"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\host_loading-c001a6b31870bce4.pdb",
+      "bytes": 3493888,
+      "sha256": "114255e5608389e8df8f07cc03364cd1c23be1504f6a5d9314bfe28b43c1ef6f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\host_surface-a5b379aac65911e8.exe",
+      "bytes": 1448960,
+      "sha256": "88c0b9c378fc1296332293352072699fca74aa500c7101c26aac0ac1762c2557"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\host_surface-a5b379aac65911e8.pdb",
+      "bytes": 3919872,
+      "sha256": "09262e2ab10e839b2ec699ef4160af96e40df1d49b482e658b4c6e9d52a82bb6"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pool-5ad3eb70ada93f15.exe",
+      "bytes": 1725952,
+      "sha256": "a63f0d8595eab51375db7afec1fb9d4d5cfa06f4846c81ffa716f9895a790b96"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pool-5ad3eb70ada93f15.pdb",
+      "bytes": 4222976,
+      "sha256": "22fc9e75312a87141e9164e0a8387d173ca433ff2d5e0ce379ac5b7bc2983ea4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pool_a11y-75fc78e2a180be5d.exe",
+      "bytes": 1342464,
+      "sha256": "d0412ad8c298cb2c1f9eb64e0d07f23d682127eecf1a7b53783437761d6734b3"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pool_a11y-75fc78e2a180be5d.pdb",
+      "bytes": 3764224,
+      "sha256": "9132251c25efac40553732d8f3d975f34cc648dad0aae6f69b607fcbfa680054"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\routing-2784141e304b06e2.exe",
+      "bytes": 1607680,
+      "sha256": "e7130f4850ef520ef5a642a16b72e0e7ca6dfbd6259671f2502fdf96ae5ac508"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\routing-2784141e304b06e2.pdb",
+      "bytes": 4075520,
+      "sha256": "5fe66ab4eca463a207da4c6a7c11d22910340b8cd039113eda220e2d810c742c"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\workspace-c58e3117fe9ea5c7.exe",
+      "bytes": 1644544,
+      "sha256": "b2bbbae1c30d801feb879be250fa13ff08d6d48c0d67b22bce0ea6fb17510dce"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\workspace-c58e3117fe9ea5c7.pdb",
+      "bytes": 4100096,
+      "sha256": "b4e1c80e96d6cabed675f6988dacec709c8998c4875a12fca47a3276728c4433"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\workspace_retirement-e50437bef5a4b0ef.exe",
+      "bytes": 1498624,
+      "sha256": "0ba105f7255142940b73e3c0dff2a5b233e0546cae2889a838c0bd88c43c16ba"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\workspace_retirement-e50437bef5a4b0ef.pdb",
+      "bytes": 3928064,
+      "sha256": "7d04463d24cd88f2b02386fab99b50da6124c5ee5a7d47b929820d76a0ac4445"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_pelt_core_owner_probe.py": "62fb1cb0046c0ccda1a6c0c78fbd4042ea165d4ea77beb0b6cab4947f3120328",
+    "pelt_core_owner_probe.rs": "2e8f6707978a253bdf27bb26a17f1b3fb571f4eb0bbab193df6f2acec72ab095",
+    "pelt_core_owner_probe_output.log": "22c513c9124a9c7570d41984ce60ac012cf690bb5d03d06b6bb4b1772cb68cb6",
+    "cpu-pelt-core-runtime/Cargo.toml": "d9cb486c8372c35eac3a20da1be1572c1e20c11709da5ab9a8fe15198909d1f1",
+    "cpu-pelt-core-runtime/Cargo.lock": "6e5bff47df1ce3df3ec8cf34844a102e6d86edc99b4d575886efa3bc661a6bdf"
+  },
+  "qualification": "Actual unchanged current Pelt core lib.rs and its complete engine-free default transitive source; actual local Inker/Workbench/PageLoad plus lock-seeded Genet contract suppliers. Original unit tests and all12 unchanged default integration source files plus3 audit cases. Engines/sessions are supplied test factories, not real rendered documents. native.rs/genet feature source read but not compiled; no desktop/browser/real document engine/GPU/transport/native surface/input hardware/physical AT execution. Expected caught public API panic is the observation, not a failed test. Stable shared target/build-dir, only exact completed run exe/PDB outputs removed."
+}

@@ -1,0 +1,12 @@
+[workspace]
+[package]
+name = "authority-success-pelt-workspace"
+version = "0.0.0"
+edition = "2024"
+[dependencies]
+accesskit = "=0.24.1"
+inker = { path = "../../../../crates/inker/inker" }
+workbench = { path = "../../../../crates/cambium/workbench" }
+pelt-core = { package = "authority-success-pelt-core", path = "../cpu-pelt-core-runtime" }
+[lib]
+path = "../pelt_workspace_owner_probe.rs"

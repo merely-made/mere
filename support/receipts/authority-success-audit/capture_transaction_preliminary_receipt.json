@@ -1,0 +1,9 @@
+{
+  "compile_exit": 1,
+  "tests_executed": 0,
+  "reason": "Retained Graphshell library could not resolve its crate dependency graph. No native test binary was produced. Rebuild the actual current public library rather than infer a test result from this failure.",
+  "evidence_sha256": {
+    "capture_transaction_preliminary_run_capture_transaction_probe.py": "e1dfbfd7571ffa753b4a35b999b9388c6ffe5298ba388a4573728e9653299431",
+    "capture_transaction_preliminary_capture_transaction_probe_compile.log": "ba4215743f44255b82bbb7c90cbded7c761f1bed48531dafb6cf6233d255d843"
+  }
+}

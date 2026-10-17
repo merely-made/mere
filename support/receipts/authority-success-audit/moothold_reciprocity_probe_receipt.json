@@ -1,0 +1,50 @@
+{
+  "date_utc": "2026-10-17T12:23:26.782664+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/moot/moothold/src/reciprocity.rs": "4d4215a990a5754e3a3c154faf14da1762830d6cac8ced92570a52cbac78ad5c",
+    "crates/moot/gemot/src/moot/id.rs": "acfe87ba0075dc3dc969071d7171ba2e030c51e445f115f2552dab58c0d16677"
+  },
+  "supplier": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+    "sha256": "c23f7d7dd7ff77ed4a3d498dee89b3cbe2761bf4451a9267fef43b80102b7d7f",
+    "fingerprint_value": 17874236646337937021,
+    "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\serde-319fad388f9668c8\\lib-serde.json",
+    "metadata_sha256": "412543fde42acf0b2f010acc23d9e2c18323acfe03025c71c524887532b2123e"
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\moothold_reciprocity_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-moothold-reciprocity.exe"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 8,
+  "original_tests": 5,
+  "audit_cases": 3,
+  "runner_sha256": "cf66857228e2fc6cab331b7d0761032af7dc9709e3e62ac79973cef78b3cf166",
+  "probe_sha256": "5f276a3d49d3dc32acda5e1b9be4455ad80d16d16665df1423f3a19044f75a7f",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-moothold-reciprocity.exe",
+      "bytes": 781824,
+      "sha256": "d3a59cdfe1af9f95199412dee7480b2acecf2ef8b62aec4debc2a7920fd69db7"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-moothold-reciprocity.pdb",
+      "bytes": 3354624,
+      "sha256": "a5708a1f167ae267486f2751a0bc34e86a24fc9475517d3af30181f4c5e3b4a1"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Two unchanged complete current modules (Reciprocity and actual Gemot MootId) compiled with minimal Gemot namespace scaffolding and one exact retained serde supplier. Five original module tests and three audit cases execute CPU/in-memory arithmetic only. Not the complete Moothold/Gemot owner, current Cargo graph, durable credit ledger, real request router, network or resource-service execution."
+}

@@ -1,0 +1,166 @@
+{
+  "date_utc": "2026-10-17T21:59:39.813771+00:00",
+  "exit": 0,
+  "source_sha256": {
+    "support/run_resident_inference_stages.ps1": "fe91a5d81a94b83f541a8c7fe4c3f09d8f81180177f56d9a826d86e99efabd05",
+    "support/run_resident_layer_streaming.ps1": "523bc75886d81f9cc705498f5c180e0208ce8b431cfa344cb51eec5c5241d22b",
+    "support/run_resident_weight_formats.ps1": "68fd673f346c06e2e372b094632f9f0e5e84eb9846f1aa48ce20c770757a02cc",
+    "testing/run_sennet_custody.ps1": "dc4665e71e9fa1aabac5c510627e72967f29be231621d532648d8be3d4860cca",
+    "testing/run_tucket_custody.ps1": "7599bb85ada28cb6a6d346915af067ff3e4c2a704702ba4a6ea56a169552511b",
+    "support/receipts/instrument_workspace_20261012/verify-browser.cjs": "89841d3bb616eb77808044350404f9cc5f7a9409d1361d59aa6acfc4d84b3e4d"
+  },
+  "compiles": [
+    {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final_receipt_empty_tests.rs",
+        "-C",
+        "debuginfo=0",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\audit-final-receipt-empty.exe",
+        "--test"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final_receipt_fake_process.rs",
+        "-C",
+        "debuginfo=0",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\audit-final-receipt-fake.exe"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "runs": [
+    {
+      "mode": "stages",
+      "exit": 0,
+      "command": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final_receipt_contract_harness.ps1",
+        "-Config",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final-receipt-contract-cases\\config.json",
+        "-Mode",
+        "stages"
+      ]
+    },
+    {
+      "mode": "streaming",
+      "exit": 0,
+      "command": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final_receipt_contract_harness.ps1",
+        "-Config",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final-receipt-contract-cases\\config.json",
+        "-Mode",
+        "streaming"
+      ]
+    },
+    {
+      "mode": "formats",
+      "exit": 0,
+      "command": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final_receipt_contract_harness.ps1",
+        "-Config",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final-receipt-contract-cases\\config.json",
+        "-Mode",
+        "formats"
+      ]
+    },
+    {
+      "mode": "custody",
+      "exit": 0,
+      "command": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+        "-NoProfile",
+        "-File",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final_receipt_contract_harness.ps1",
+        "-Config",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\final-receipt-contract-cases\\config.json",
+        "-Mode",
+        "custody"
+      ]
+    }
+  ],
+  "cases": {
+    "stages_accepts_zero_named_tests": true,
+    "streaming_accepts_empty_software_receipt": true,
+    "formats_accepts_empty_software_receipt": true,
+    "custody_functions_return_failed_result_without_rejecting": 2,
+    "browser_release_claims_closed_after_close_errors": true
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-final-receipt-empty.exe",
+      "bytes": 739840,
+      "sha256": "bc47fed1d5473889675a3393418ca797632430ed3f5a73885af699daad0c7434"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-final-receipt-empty.pdb",
+      "bytes": 3018752,
+      "sha256": "eee1663148a809aa0ffe3ade0d4ff9834e67671f4768d1e4bb4fd9ce66ef1a52"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-final-receipt-fake.exe",
+      "bytes": 179712,
+      "sha256": "28cf0525dcf676062f2b85278d7b9a3e88e1b9a99252c30703e45fde671173d2"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-final-receipt-fake.pdb",
+      "bytes": 1380352,
+      "sha256": "b78324c82fa965f39d46f7c70ec6aa89f7ef21be900e4fe3df4d956c9c41fe24"
+    }
+  ],
+  "finally_body_sha256": "888b762f1a2e68bd545d479afcca25daed81df0957be9d274878af4465a63c29",
+  "evidence_sha256": {
+    "final-receipt-contract-cases/browser-close.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/browser-close.stdout.txt": "29a0201fb0590628857308674dbea90aa957669bf70fdfd762d2bffca671face",
+    "final-receipt-contract-cases/config.json": "f9baea77d1e14aeeef0140e574549ce167593bec5fede844de8c57e490e8dcbf",
+    "final-receipt-contract-cases/custody-functions.json": "14733faa9972c3b259d5ebed42c1d7487a41dabe9bb6c734b26cc05b0a256f42",
+    "final-receipt-contract-cases/custody.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/custody.stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/formats.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/formats.stdout.txt": "d56f6de950c153a5e0caa48ae0c7747d442251ce578bf243fb34fec8cf741fb2",
+    "final-receipt-contract-cases/stages.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/stages.stdout.txt": "e208564c8bd3f1f8450b219b4acb267faa87aebd86c813d6f6c5152d6793cf63",
+    "final-receipt-contract-cases/streaming.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/streaming.stdout.txt": "b29ede33a81df2286b8308c3520df6427cd71c64af7df90ffb053de0778de768",
+    "final-receipt-contract-cases/custody/run_sennet_custody-probe.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/custody/run_sennet_custody.json": "fa3cc0b04104ceba13dff79cee2b7d67926196ca68a7da175cf9322dc1d00991",
+    "final-receipt-contract-cases/custody/run_tucket_custody-probe.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/custody/run_tucket_custody.json": "fa3cc0b04104ceba13dff79cee2b7d67926196ca68a7da175cf9322dc1d00991",
+    "final-receipt-contract-cases/formats/f16-burn-flex.host.json": "d56f6de950c153a5e0caa48ae0c7747d442251ce578bf243fb34fec8cf741fb2",
+    "final-receipt-contract-cases/formats/f16-burn-flex.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "final-receipt-contract-cases/formats/f16-burn-flex.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/formats/f16-burn-flex.stdout.log": "e4042b98d03b1e9e2b0a9ac3942903e4c87e3cfc5a053fa3116eeb61eeb07ba1",
+    "final-receipt-contract-cases/stages/native.host.json": "a2dbcb636c45b4aa4da41ef9236b4ac37c39971f37ca02445b9ab8781e75f491",
+    "final-receipt-contract-cases/stages/native.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/stages/native.stdout.log": "5c6acfa932777944a032caa256c302b1a42755bc804840c02ac2d108aa3127e9",
+    "final-receipt-contract-cases/streaming/burn-wgpu-software.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "final-receipt-contract-cases/streaming/gpu.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-receipt-contract-cases/streaming/gpu.stdout.log": "e4042b98d03b1e9e2b0a9ac3942903e4c87e3cfc5a053fa3116eeb61eeb07ba1",
+    "final-receipt-contract-cases/streaming/host-measurement.json": "b29ede33a81df2286b8308c3520df6427cd71c64af7df90ffb053de0778de768",
+    "run_final_receipt_contract_probe.py": "7c7e767070c652c83d949c7dd345595ecaacc8dac00ffdd8a6dfd729168116a4",
+    "final_receipt_empty_tests.rs": "237647de2e9ee7d679cce37922697d552f9020321baad0bfd2d6b13ffdf53166",
+    "final_receipt_fake_process.rs": "6194a48279ce9ec05319b79f13459ddcea194fec4ca49ec52a9b9fa53358ce44",
+    "final_receipt_contract_harness.ps1": "cbe1449df93b0ba42f3a59ca69bd571711fced0ba204e2abb49f95f5dfcaa447",
+    "final_receipt_close_probe.cjs": "a9cd1ee1714efc4fd9628c936a8e07501bb2921222a484f9f59fd02da3b8b4dd"
+  },
+  "qualification": "Three unchanged resident wrapper scripts executed with explicit synthetic nvidia-smi/Get-CimInstance functions. Stages used a real rustc empty-filter test executable; other two used a deliberate benign no-test executable writing emptyJSON. No model read, GPU, native acceptance or performance receipt. Both actual AST-extracted Invoke-Probe functions used a fake child returning failedJSON with exit0; outer broker/watch lifecycle not executed. Actual browser finally callback ran with rejecting context/browser doubles and in-memory filesystem; no browser opened. All product source unchanged; generated EXE/PDB removed."
+}

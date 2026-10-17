@@ -1,0 +1,1923 @@
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> crates\graph\graph-kernel\src\graph\legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> crates\graph\graph-kernel\src\graph\query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> crates\graph\graph-kernel\src\graph\assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates\graph\graph-kernel\src\graph\mod.rs:722:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+722 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+748 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+758 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates\graph\graph-kernel\src\graph\query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 19 warnings (run `cargo fix --lib -p mere-kernel` to apply 8 suggestions)
+warning: unused variable: `time_range`
+   --> crates\cambium\scenes\scenomise\src\opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+warning: unused import: `std::io`
+  --> crates\system\pandect\src\wallet_grant\pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> crates\system\pandect\src\wallet_grant\records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates\system\pandect\src\wallet_grant\records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> crates\system\pandect\src\wallet_grant\records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> crates\system\pandect\src\wallet_grant\types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> crates\system\pandect\src\wallet_grant\types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> crates\system\pandect\src\graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `into_graph` is never used
+   --> crates\system\pandect\src\graph_codicil.rs:185:19
+    |
+184 | impl GraphCodicil {
+    | ----------------- method in this implementation
+185 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+warning: function `build_affinity_spring` is never used
+  --> crates\canvas\pictograph\src\canvas.rs:67:4
+   |
+67 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `visible_link_appearances` is never used
+  --> crates\canvas\pictograph\src\canvas\edge_cells.rs:25:15
+   |
+25 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> crates\canvas\pictograph\src\canvas\edge_cells.rs:337:15
+    |
+337 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> crates\canvas\pictograph\src\canvas\edge_cells.rs:385:15
+    |
+385 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> crates\canvas\pictograph\src\canvas\edge_cells.rs:467:15
+    |
+467 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> crates\canvas\pictograph\src\canvas\edge_cells.rs:525:15
+    |
+525 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+warning: `pictograph` (lib) generated 6 warnings
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates\nematic\nematic\src\knot\expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates\nematic\nematic\src\knot\expand\build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\producer\registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates\cambium\cambium-rootstock\src\producer\registry.rs:678:13
+    |
+678 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+678 -             drop(renderer);
+678 +             let _ = renderer;
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ports\pelt\core\src\pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ports\pelt\core\src\lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: `cambium-rootstock` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+warning: `pelt-core` (lib) generated 2 warnings (run `cargo fix --lib -p pelt-core` to apply 2 suggestions)
+warning: unused import: `happens_before`
+  --> ports\graphshell\src\personal_sync.rs:35:5
+   |
+35 |     happens_before, observed_frontier, stable_writer_subject, validate_causal_metadata,
+   |     ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ports\graphshell\src\retained_content\producer.rs:32:14
+   |
+32 |         NEXT.fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+32 -         NEXT.fetch_update(
+32 +         NEXT.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ports\graphshell\src\retained_content\producer.rs:136:30
+    |
+136 |                         NEXT.fetch_update(
+    |                              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+136 -                         NEXT.fetch_update(
+136 +                         NEXT.try_update(
+    |
+
+warning: method `begin_session` is never used
+   --> ports\graphshell\src\mere_host.rs:433:19
+    |
+269 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+433 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `relation_kind_label` is never used
+    --> ports\graphshell\src\mere_host.rs:1470:4
+     |
+1470 | fn relation_kind_label(kind: RelationKind) -> &'static str {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `codicil_graph` is never used
+    --> ports\graphshell\src\product.rs:1063:4
+     |
+1063 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> ports\graphshell\src\product.rs:1413:15
+     |
+1413 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+   Compiling distillery v0.0.1 (C:\Users\mark_\Code\repos\mere\ports\distillery)
+warning: `graphshell` (lib) generated 7 warnings (run `cargo fix --lib -p graphshell` to apply 3 suggestions)
+warning: missing documentation for a constant
+  --> ports\djinn\castellan\src\authority.rs:68:1
+   |
+68 | pub const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+note: the lint level is defined here
+  --> ports\djinn\castellan\src\lib.rs:82:9
+   |
+82 | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\djinn\castellan\src\authority.rs:97:5
+   |
+97 |     UnknownIntent,
+   |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\djinn\castellan\src\authority.rs:99:5
+   |
+99 |     InvalidPayload(#[from] serde_json::Error),
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:101:5
+    |
+101 |     Decision(#[from] DecisionError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:103:5
+    |
+103 |     Identity(IdentityError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:111:5
+    |
+111 |     KeyGeneration,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:113:5
+    |
+113 |     PublicEncoding,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:115:5
+    |
+115 |     InvalidComment,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:120:5
+    |
+120 |     InvalidProfileId,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:122:5
+    |
+122 |     InvalidProfileName,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:124:5
+    |
+124 |     InvalidIdleWindow,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:126:5
+    |
+126 |     ConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:128:5
+    |
+128 |     KeyNotFound,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:130:5
+    |
+130 |     NativeHandoffRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:132:5
+    |
+132 |     DeviceRevocationConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:134:5
+    |
+134 |     CarryUnavailable,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\djinn\castellan\src\authority.rs:136:5
+    |
+136 |     DeviceRevocation(std::io::ErrorKind),
+    |     ^^^^^^^^^^^^^^^^
+
+warning: `castellan` (lib) generated 17 warnings
+warning: unused imports: `Deserialize` and `Serialize`
+  --> ports\distillery\src\inference\recall.rs:13:13
+   |
+13 | use serde::{Deserialize, Serialize};
+   |             ^^^^^^^^^^^  ^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> ports\distillery\src\resident.rs:500:13
+    |
+500 |         let mut authority_error = report.failure("authority").map(str::to_owned);
+    |             ----^^^^^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated associated function `esp::infer::decoder::DecoderDevice::ndarray`: burn-ndarray is deprecated and will be removed in a future release. Use `Device::flex()` for pure-Rust CPU execution instead.
+   --> ports\distillery\src\inference.rs:138:35
+    |
+138 |                 (InferenceDevice::ndarray(), "burn-ndarray")
+    |                                   ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: missing documentation for a function
+   --> ports\distillery\src\inference.rs:119:1
+    |
+119 | / pub fn open_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
+120 | |     library: Arc<tokio::sync::Mutex<B>>,
+121 | |     row: eidetic::ManifestId,
+122 | |     max_tokens: usize,
+123 | |     journal: Option<Arc<dyn RunJournal>>,
+124 | | ) -> Result<InferenceLane, String> {
+    | |__________________________________^
+    |
+note: the lint level is defined here
+   --> ports\distillery\src\lib.rs:45:9
+    |
+ 45 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: missing documentation for a type alias
+   --> ports\distillery\src\inference.rs:159:1
+    |
+159 | pub type RunV1 = crate::inference_protocol::RunV1<esp::infer::provider::SessionIdentity>;
+    | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a type alias
+   --> ports\distillery\src\inference.rs:160:1
+    |
+160 | pub type InferenceRunsV1 =
+    | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\inference.rs:179:5
+    |
+179 |     Locked,
+    |     ^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\inference.rs:181:5
+    |
+181 |     Journal(String),
+    |     ^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\inference.rs:183:5
+    |
+183 |     Recall(String),
+    |     ^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference.rs:216:5
+    |
+216 |     fn device(&self) -> &str;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference.rs:217:5
+    |
+217 |     fn load(&self) -> Result<Vec<RunRecord>, String>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference.rs:218:5
+    |
+218 |     fn append(&self, record: &RunRecord) -> Result<(), String>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference.rs:223:5
+    |
+223 |     fn remote_revision(&self) -> u64 {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference.rs:686:5
+    |
+686 | /     pub fn ask_recalled(
+687 | |         &self,
+688 | |         request: recall::RecallAskRequestV1,
+689 | |     ) -> Result<(), InferenceLaneError> {
+    | |_______________________________________^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference\durable.rs:31:5
+   |
+31 |     pub space: [u8; 32],
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference\durable.rs:32:5
+   |
+32 |     pub device: [u8; 32],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference\durable.rs:33:5
+   |
+33 |     pub run: [u8; 32],
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\inference\recall.rs:20:5
+   |
+20 |     fn snapshot(&self) -> Result<Vec<RetainedSourceText>, String>;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\inference\recall.rs:21:5
+   |
+21 |     fn current_version(&self, source: &RecallSourceId) -> Result<Option<String>, String>;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> ports\distillery\src\inference\recall.rs:186:1
+    |
+186 | pub struct RecallIndex {
+    | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference\recall.rs:187:5
+    |
+187 |     pub corpus: Arc<dyn RecallCorpus>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> ports\distillery\src\inference\recall.rs:193:5
+    |
+193 |     pub fn build(corpus: Arc<dyn RecallCorpus>, config: RecallConfig) -> Result<Self, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference\recall.rs:257:5
+    |
+257 | /     pub fn prepare(
+258 | |         &self,
+259 | |         question: &str,
+260 | |         scope: &[RecallSourceId],
+261 | |     ) -> Result<(RecallEvidence, String), String> {
+    | |_________________________________________________^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:17:5
+   |
+17 |     pub session_id: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:18:5
+   |
+18 |     pub prompt_template_hash: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:47:5
+   |
+47 |     pub ask: AskRequestV1,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:48:5
+   |
+48 |     pub max_tokens: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:49:5
+   |
+49 |     pub temperature: f32,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:50:5
+   |
+50 |     pub top_p: Option<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol.rs:51:5
+   |
+51 |     pub seed: Option<u64>,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:114:5
+    |
+114 |     pub tokens: usize,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:116:5
+    |
+116 |     pub continuations: Vec<Continuation>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:119:5
+    |
+119 |     pub recall: Option<recall::RecallEvidence>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:140:5
+    |
+140 |     pub device: String,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:141:5
+    |
+141 |     pub at_token: usize,
+    |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:142:5
+    |
+142 |     pub reason: String,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:143:5
+    |
+143 |     pub first_differing_token: Option<usize>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol.rs:145:5
+    |
+145 |     pub compared_token_ids_hash: Option<String>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports\distillery\src\inference_protocol\recall.rs:12:1
+   |
+12 | pub const RECALL_ASK_INTENT: &str = "distillery.inference/ask-recall-v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports\distillery\src\inference_protocol\recall.rs:13:1
+   |
+13 | pub const ASK_PUBLISHED_INTENT: &str = "distillery.inference/ask-published-v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports\distillery\src\inference_protocol\recall.rs:14:1
+   |
+14 | pub const PUBLISH_CORPUS_INTENT: &str = "distillery.inference/publish-corpus-v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports\distillery\src\inference_protocol\recall.rs:15:1
+   |
+15 | pub const CHUNKER_VERSION: &str = "mere.unicode-chunks/v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:21:1
+   |
+21 | pub struct PublishCorpusRequestV1 {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:24:5
+   |
+24 |     pub sources: Vec<RetainedSourceText>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:29:1
+   |
+29 | pub struct RecallConfig {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:30:5
+   |
+30 |     pub chunk_chars: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:31:5
+   |
+31 |     pub max_passages: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:36:5
+   |
+36 |     pub max_context_chars: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:37:5
+   |
+37 |     pub max_corpus_chars: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:55:1
+   |
+55 | pub struct RecallAskRequestV1 {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:56:5
+   |
+56 |     pub ask: super::AskRequestV1,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:58:5
+   |
+58 |     pub scope: Vec<RecallSourceId>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:61:1
+   |
+61 | pub struct SuppliedPassage {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:64:5
+   |
+64 |     pub passage: InferencePassage,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:67:1
+   |
+67 | pub struct StalePassage {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:68:5
+   |
+68 |     pub source: RecallSourceId,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:69:5
+   |
+69 |     pub indexed_version: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:70:5
+   |
+70 |     pub current_version: Option<String>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:71:5
+   |
+71 |     pub error: Option<String>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:74:1
+   |
+74 | pub struct Citation {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:75:5
+   |
+75 |     pub handle: u32,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:76:5
+   |
+76 |     pub passage: eidetic::ManifestId,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:77:5
+   |
+77 |     pub basis: CitationBasis,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an enum
+  --> ports\distillery\src\inference_protocol\recall.rs:83:1
+   |
+83 | pub enum CitationBasis {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\inference_protocol\recall.rs:84:5
+   |
+84 |     ModelMarker,
+   |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\inference_protocol\recall.rs:85:5
+   |
+85 |     VerbatimPassage,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports\distillery\src\inference_protocol\recall.rs:88:1
+   |
+88 | pub struct RecallEvidence {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:90:5
+   |
+90 |     pub owner: Option<String>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:92:5
+   |
+92 |     pub scope: Vec<RecallSourceId>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:93:5
+   |
+93 |     pub config: RecallConfig,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:94:5
+   |
+94 |     pub passages: Vec<SuppliedPassage>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:95:5
+   |
+95 |     pub stale: Vec<StalePassage>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:97:5
+   |
+97 |     pub citations: Vec<Citation>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\inference_protocol\recall.rs:99:5
+   |
+99 |     pub unknown_citations: Vec<u32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol\recall.rs:106:5
+    |
+106 |     pub owner: String,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol\recall.rs:107:5
+    |
+107 |     pub ask: super::AskRequestV1,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\inference_protocol\recall.rs:109:5
+    |
+109 |     pub scope: Vec<RecallSourceId>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\inference_protocol\recall.rs:112:5
+    |
+112 |     pub fn validate(&self) -> Result<(), String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\courier.rs:42:5
+   |
+42 |     MalformedDigest,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\courier.rs:44:5
+   |
+44 |     Store(String),
+   |     ^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\courier.rs:131:5
+    |
+131 |     pub async fn has(&self, blob: &BlobRef) -> bool {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> ports\distillery\src\mesh_host\courier.rs:219:5
+    |
+219 |     pub fn new(transport: Arc<P2pandaTransport>, blobs: Arc<BlobStore>) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\host.rs:33:5
+   |
+33 |     fn as_source(&self) -> &dyn BlobSource;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\host.rs:34:5
+   |
+34 |     fn as_sink(&self) -> &dyn BlobSink;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:48:5
+   |
+48 |     pub registry: ResourceRegistry,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:49:5
+   |
+49 |     pub blobs: Arc<dyn BlobSpace>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:52:5
+   |
+52 |     pub clock: Arc<dyn Clock>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:53:5
+   |
+53 |     pub conditions: Arc<dyn ConditionSource>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:54:5
+   |
+54 |     pub facts: HostFacts,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:55:5
+   |
+55 |     pub policy: DevicePolicy,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:56:5
+   |
+56 |     pub lease: LeasePolicy,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\host.rs:84:5
+   |
+84 |     Claimed {
+   |     ^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:85:9
+   |
+85 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\host.rs:87:5
+   |
+87 |     Granted {
+   |     ^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:88:9
+   |
+88 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:89:9
+   |
+89 |         epoch: u32,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:90:9
+   |
+90 |         lease: LeaseId,
+   |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports\distillery\src\mesh_host\host.rs:92:5
+   |
+92 |     Heartbeat {
+   |     ^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:93:9
+   |
+93 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:94:9
+   |
+94 |         lease: LeaseId,
+   |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:95:9
+   |
+95 |         progress: LeaseProgress,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\host.rs:99:9
+   |
+99 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:100:9
+    |
+100 |         lease: Option<LeaseId>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:102:5
+    |
+102 |     Completed {
+    |     ^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:103:9
+    |
+103 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:104:9
+    |
+104 |         lease: Option<LeaseId>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:106:5
+    |
+106 |     Released {
+    |     ^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:107:9
+    |
+107 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:108:9
+    |
+108 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:109:9
+    |
+109 |         reason: ReleaseReason,
+    |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:114:9
+    |
+114 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:119:9
+    |
+119 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:120:9
+    |
+120 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:121:9
+    |
+121 |         reason: ReclaimReason,
+    |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:122:9
+    |
+122 |         stopped_at: LeaseProgress,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:128:9
+    |
+128 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports\distillery\src\mesh_host\host.rs:129:9
+    |
+129 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:131:5
+    |
+131 |     Idle,
+    |     ^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:138:5
+    |
+138 |     Sync(#[from] MeshSyncError),
+    |     ^^^^
+
+warning: missing documentation for a variant
+   --> ports\distillery\src\mesh_host\host.rs:140:5
+    |
+140 |     Store(#[from] MeshStoreError),
+    |     ^^^^^
+
+warning: missing documentation for an associated function
+   --> ports\distillery\src\mesh_host\host.rs:172:5
+    |
+172 |     pub fn new(synced: SyncedMesh<B>, keypair: Ed25519Keypair, config: HostConfig) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\host.rs:185:5
+    |
+185 |     pub fn me(&self) -> [u8; 32] {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\host.rs:232:5
+    |
+232 |     pub fn synced(&self) -> &SyncedMesh<B> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\host.rs:246:5
+    |
+246 |     pub fn policy(&self) -> &DevicePolicy {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:30:5
+   |
+30 |     pub reason: ReclaimReason,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:41:5
+   |
+41 |     pub handle: JobControlHandle,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:42:5
+   |
+42 |     pub task: JoinHandle<Result<RunOutcome, RunError>>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports\distillery\src\mesh_host\inflight.rs:45:5
+   |
+45 |     pub reclaim: Option<Reclaiming>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:27:5
+   |
+27 |     fn now_ms(&self) -> u64;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> ports\distillery\src\mesh_host\sense.rs:52:5
+   |
+52 |     pub fn at(now_ms: u64) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:58:5
+   |
+58 |     pub fn set(&self, now_ms: u64) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:62:5
+   |
+62 |     pub fn advance(&self, by_ms: u64) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports\distillery\src\mesh_host\sense.rs:80:5
+   |
+80 |     fn conditions(&self) -> DeviceConditions;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> ports\distillery\src\mesh_host\sense.rs:91:5
+   |
+91 |     pub fn new(conditions: DeviceConditions) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports\distillery\src\mesh_host\sense.rs:102:5
+    |
+102 |     pub fn set(&self, conditions: DeviceConditions) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling djinn v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\djinn)
+warning: `distillery` (lib) generated 135 warnings (run `cargo fix --lib -p distillery` to apply 2 suggestions)
+warning: unused import: `Graph`
+  --> ports\djinn\src\knot_relation_intake.rs:19:20
+   |
+19 |     CapturedDelta, Graph, SemanticStatement, apply::GraphDelta, sub_kind_from_iri,
+   |                    ^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Hash`
+  --> ports\djinn\src\sync\carriage_host.rs:30:26
+   |
+30 | use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
+   |                          ^^^^
+
+warning: unused import: `HeldLease`
+  --> ports\djinn\src\sync\carriage_host_commissioning.rs:42:64
+   |
+42 | use super::{CarriageCeilings, CarriageHost, CarriageHostError, HeldLease, now_ms};
+   |                                                                ^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> ports\djinn\src\resident_distillery.rs:875:24
+    |
+875 |     pub async fn close(mut self) -> Result<(), String> {
+    |                        ----^^^^
+    |                        |
+    |                        help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `ceilings` is never read
+  --> ports\djinn\src\sync\carriage_host.rs:72:5
+   |
+62 | pub struct CarriageHost {
+   |            ------------ field in this struct
+...
+72 |     ceilings: CarriageCeilings,
+   |     ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `djinn` (lib) generated 5 warnings (run `cargo fix --lib -p djinn` to apply 4 suggestions)
+warning: use of deprecated associated function `distillery::inference::InferenceDevice::ndarray`: burn-ndarray is deprecated and will be removed in a future release. Use `Device::flex()` for pure-Rust CPU execution instead.
+   --> ports\djinn\tests\inference_route.rs:127:31
+    |
+127 |             &InferenceDevice::ndarray(),
+    |                               ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated associated function `distillery::inference::InferenceDevice::ndarray`: burn-ndarray is deprecated and will be removed in a future release. Use `Device::flex()` for pure-Rust CPU execution instead.
+   --> ports\djinn\tests\inference_route.rs:542:27
+    |
+542 |         &InferenceDevice::ndarray(),
+    |                           ^^^^^^^
+
+memory allocation of 1343504 bytes failed
+stack backtrace:
+   0:     0x7ffe595cf529 - std::backtrace_rs::backtrace::win64::trace
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\win64.rs:85
+   1:     0x7ffe595cf529 - std::backtrace_rs::backtrace::trace_unsynchronized
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\mod.rs:66
+   2:     0x7ffe595cf529 - std::sys::backtrace::_print_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:74
+   3:     0x7ffe595cf529 - std::sys::backtrace::impl$0::print::impl$0::fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:44
+   4:     0x7ffe595f8d0e - core::fmt::write
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\fmt\mod.rs:0
+   5:     0x7ffe595df5c4 - core::io::write::default_write_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:402
+   6:     0x7ffe595df5c4 - core::io::write::Write::write_fmt<std::sys::stdio::windows::Stderr>
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:335
+   7:     0x7ffe595c0c8c - std::sys::backtrace::BacktraceLock::print
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:47
+   8:     0x7ffe595c0c8c - std::alloc::default_alloc_error_hook
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:409
+   9:     0x7ffe595a48fc - std::alloc::rust_oom::closure$0
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:440
+  10:     0x7ffe595a1f3f - std::sys::backtrace::__rust_end_short_backtrace<std::alloc::rust_oom::closure_env$0,never$>
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:182
+  11:     0x7ffe595c0d2b - std::alloc::rust_oom
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:436
+  12:     0x7ffe595a5728 - std::alloc::_::__rust_alloc_error_handler
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:435
+  13:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error::rt_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:643
+  14:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:649
+  15:     0x7ffe595e5b05 - hashbrown::raw::Fallibility::alloc_err
+                               at /rust/deps\hashbrown-0.17.1/src\raw.rs:45
+  16:     0x7ffe590501a2 - <rustc_lint[70418c5f2d497bd6]::builtin::SpecialModuleName as rustc_lint[70418c5f2d497bd6]::passes::EarlyLintPass>::check_crate
+  17:     0x7ffe5a318852 - RINvMs6_NtCs2O8JDGS5WXh_9hashbrown3rawINtB6_8RawTableTNtNtCsev1nOjUyF4w_10rustc_span6def_id5DefIdINtNtCsffhnNfUftZ_21rustc_data_structures5unord8UnordMapRINtNtNtCs6nQKifQ0JvU_12rustc_middle2ty4list7RawListuNtNtB2x_12generic_args10GenericArgENtBS_8CrateNumE
+  18:     0x7ffe5a33c935 - rustc_codegen_ssa[ad3394acd2bd5335]::back::symbol_export::upstream_monomorphizations_provider
+  19:     0x7ffe58fe8d04 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  20:     0x7ffe58eec019 - <rustc_privacy[ebd30d0033d9e595]::DefIdsToImplsCollector as rustc_privacy[ebd30d0033d9e595]::DefIdVisitor>::visit_def_id
+memory allocation of 2097152 bytes failed
+stack backtrace:
+  21:     0x7ffe5c6367ef - rustc_query_impl[3dba6669a32673fd]::job::collect_active_query_jobs
+  22:     0x7ffe5a33ecee - rustc_codegen_ssa[ad3394acd2bd5335]::back::symbol_export::upstream_monomorphizations_for_provider
+  23:     0x7ffe5a1fed70 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  24:     0x7ffe5a113cf8 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  25:     0x7ffe58fea997 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  26:     0x7ffe5af0c16c - <rustc_middle[4a5dce3f3199c450]::ty::instance::Instance>::upstream_monomorphization
+  27:     0x7ffe59ba1852 - rustc_monomorphize[747beb846f8cb1]::collector::items_of_instance
+  28:     0x7ffe59b99e0a - rustc_monomorphize[747beb846f8cb1]::collector::items_of_instance
+  29:     0x7ffe5a1f41c3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  30:     0x7ffe5a192346 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  31:     0x7ffe5a1f3a52 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  32:     0x7ffe59b8e45c - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  33:     0x7ffe58d6c850 - core[6dff922281fde550]::slice::sort::stable::quicksort::quicksort::<rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit, <[rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit]>::sort_by<rustc_monomorphize[747beb846f8cb1]::partitioning::merge_codegen_units::{closure#6}>::{closure#0}>
+  34:     0x7ffe59b7bf3e - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  35:     0x7ffe58feaf87 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  36:     0x7ffe58ee0e94 - <rustc_privacy[ebd30d0033d9e595]::DefIdsToImplsCollector as rustc_privacy[ebd30d0033d9e595]::DefIdVisitor>::visit_def_id
+  37:     0x7ffe5c637a31 - rustc_query_impl[3dba6669a32673fd]::job::collect_active_query_jobs
+  38:     0x7ffe55d73962 - <rustc_interface[c1a9cd50ae6ae2c5]::passes::LintStoreExpandImpl as rustc_expand[16986bf0ff6bb21c]::base::LintStoreExpand>::pre_expansion_lint
+  39:     0x7ffe55ddc53c - <rustc_codegen_llvm[75bd0364f548e319]::LlvmCodegenBackend as rustc_codegen_ssa[ad3394acd2bd5335]::traits::backend::CodegenBackend>::codegen_crate
+  40:     0x7ffe55d4e37c - <rustc_interface[c1a9cd50ae6ae2c5]::queries::Linker>::codegen_and_build_linker
+   0:     0x7ffe595cf529 - std::backtrace_rs::backtrace::win64::trace
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\win64.rs:85
+   1:     0x7ffe595cf529 - std::backtrace_rs::backtrace::trace_unsynchronized
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\mod.rs:66
+   2:     0x7ffe595cf529 - std::sys::backtrace::_print_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:74
+   3:     0x7ffe595cf529 - std::sys::backtrace::impl$0::print::impl$0::fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:44
+   4:     0x7ffe595f8d0e - core::fmt::write
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\fmt\mod.rs:0
+   5:     0x7ffe595df5c4 - core::io::write::default_write_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:402
+   6:     0x7ffe595df5c4 - core::io::write::Write::write_fmt<std::sys::stdio::windows::Stderr>
+  41:     0x7ffe55d200e7 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+  42:     0x7ffe55d19865 - RINvNtNtCsljvfXcM3w8L_3std3sys9backtrace28___rust_begin_short_backtraceNCNCINvNtCsgCRDBWUayeD_15rustc_interface4util26run_in_thread_with_globalsNCINvB1e_31run_in_thread_pool_with_globalsNCINvNtB1g_9interface12run_compileruNCNvCslMOFQbSFibu_17rustc_driver_i
+  43:     0x7ffe55d24a27 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+  44:     0x7ffe595cc053 - std::sys::thread::windows::impl$0::new::thread_start
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\thread\windows.rs:58
+  45:     0x7fff97c0cdf7 - BaseThreadInitThunk
+  46:     0x7fff98ed9c2c - RtlUserThreadStart
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:335
+   7:     0x7ffe595c0c8c - std::sys::backtrace::BacktraceLock::print
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:47
+   8:     0x7ffe595c0c8c - std::alloc::default_alloc_error_hook
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:409
+   9:     0x7ffe595a48fc - std::alloc::rust_oom::closure$0
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:440
+  10:     0x7ffe595a1f3f - std::sys::backtrace::__rust_end_short_backtrace<std::alloc::rust_oom::closure_env$0,never$>
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:182
+  11:     0x7ffe595c0d2b - std::alloc::rust_oom
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:436
+  12:     0x7ffe595a5728 - std::alloc::_::__rust_alloc_error_handler
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:435
+  13:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error::rt_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:643
+  14:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:649
+  15:     0x7ffe5d598255 - alloc::raw_vec::handle_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\raw_vec\mod.rs:890
+  16:     0x7ffe5b0c7003 - <rustc_arena[bac78cab0a3ec1b2]::DroplessArena>::grow
+  17:     0x7ffe5af6a80f - <rustc_middle[4a5dce3f3199c450]::ty::context::TyCtxt>::mk_args
+  18:     0x7ffe5a33c727 - rustc_codegen_ssa[ad3394acd2bd5335]::back::symbol_export::upstream_monomorphizations_provider
+  19:     0x7ffe58fe8d04 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  20:     0x7ffe58eec019 - <rustc_privacy[ebd30d0033d9e595]::DefIdsToImplsCollector as rustc_privacy[ebd30d0033d9e595]::DefIdVisitor>::visit_def_id
+  21:     0x7ffe5c6367ef - rustc_query_impl[3dba6669a32673fd]::job::collect_active_query_jobs
+  22:     0x7ffe5a33ecee - rustc_codegen_ssa[ad3394acd2bd5335]::back::symbol_export::upstream_monomorphizations_for_provider
+  23:     0x7ffe5a1fed70 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  24:     0x7ffe5a113cf8 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  25:     0x7ffe58fea997 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  26:     0x7ffe5af0c16c - <rustc_middle[4a5dce3f3199c450]::ty::instance::Instance>::upstream_monomorphization
+  27:     0x7ffe59ba1852 - rustc_monomorphize[747beb846f8cb1]::collector::items_of_instance
+  28:     0x7ffe59b99e0a - rustc_monomorphize[747beb846f8cb1]::collector::items_of_instance
+  29:     0x7ffe5a1f41c3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  30:     0x7ffe5a192346 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  31:     0x7ffe5a1f3a52 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+memory allocation of 2097152 bytes failed
+memory allocation of 133136 bytes failed
+  32:     0x7ffe59b8e45c - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+stack backtrace:
+stack backtrace:
+  33:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  34:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  35:     0x7ffe58d6c850 - core[6dff922281fde550]::slice::sort::stable::quicksort::quicksort::<rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit, <[rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit]>::sort_by<rustc_monomorphize[747beb846f8cb1]::partitioning::merge_codegen_units::{closure#6}>::{closure#0}>
+  36:     0x7ffe59b7bf3e - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  37:     0x7ffe58feaf87 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  38:     0x7ffe58ee0e94 - <rustc_privacy[ebd30d0033d9e595]::DefIdsToImplsCollector as rustc_privacy[ebd30d0033d9e595]::DefIdVisitor>::visit_def_id
+  39:     0x7ffe5c637a31 - rustc_query_impl[3dba6669a32673fd]::job::collect_active_query_jobs
+  40:     0x7ffe55d73962 - <rustc_interface[c1a9cd50ae6ae2c5]::passes::LintStoreExpandImpl as rustc_expand[16986bf0ff6bb21c]::base::LintStoreExpand>::pre_expansion_lint
+  41:     0x7ffe55ddc53c - <rustc_codegen_llvm[75bd0364f548e319]::LlvmCodegenBackend as rustc_codegen_ssa[ad3394acd2bd5335]::traits::backend::CodegenBackend>::codegen_crate
+  42:     0x7ffe55d4e37c - <rustc_interface[c1a9cd50ae6ae2c5]::queries::Linker>::codegen_and_build_linker
+  43:     0x7ffe55d200e7 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+  44:     0x7ffe55d19865 - RINvNtNtCsljvfXcM3w8L_3std3sys9backtrace28___rust_begin_short_backtraceNCNCINvNtCsgCRDBWUayeD_15rustc_interface4util26run_in_thread_with_globalsNCINvB1e_31run_in_thread_pool_with_globalsNCINvNtB1g_9interface12run_compileruNCNvCslMOFQbSFibu_17rustc_driver_i
+  45:     0x7ffe55d24a27 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+  46:     0x7ffe595cc053 - std::sys::thread::windows::impl$0::new::thread_start
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\thread\windows.rs:58
+   0:     0x7ffe595cf529 - std::backtrace_rs::backtrace::win64::trace
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\win64.rs:85
+   1:     0x7ffe595cf529 - std::backtrace_rs::backtrace::trace_unsynchronized
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\mod.rs:66
+   2:     0x7ffe595cf529 - std::sys::backtrace::_print_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:74
+   3:     0x7ffe595cf529 - std::sys::backtrace::impl$0::print::impl$0::fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:44
+  47:     0x7fff97c0cdf7 - BaseThreadInitThunk
+   4:     0x7ffe595f8d0e - core::fmt::write
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\fmt\mod.rs:0
+   5:     0x7ffe595df5c4 - core::io::write::default_write_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:402
+   6:     0x7ffe595df5c4 - core::io::write::Write::write_fmt<std::sys::stdio::windows::Stderr>
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:335
+   7:     0x7ffe595c0c8c - std::sys::backtrace::BacktraceLock::print
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:47
+   8:     0x7ffe595c0c8c - std::alloc::default_alloc_error_hook
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:409
+   9:     0x7ffe595a48fc - std::alloc::rust_oom::closure$0
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:440
+  10:     0x7ffe595a1f3f - std::sys::backtrace::__rust_end_short_backtrace<std::alloc::rust_oom::closure_env$0,never$>
+   0:     0x7ffe595cf529 - std::backtrace_rs::backtrace::win64::trace
+  48:     0x7fff98ed9c2c - RtlUserThreadStart
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:182
+  11:     0x7ffe595c0d2b - std::alloc::rust_oom
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:436
+  12:     0x7ffe595a5728 - std::alloc::_::__rust_alloc_error_handler
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:435
+  13:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error::rt_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:643
+  14:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:649
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\win64.rs:85
+  15:     0x7ffe5d5957de - <hashbrown[8756e68dc1c9ce98]::raw::Fallibility>::alloc_err
+   1:     0x7ffe595cf529 - std::backtrace_rs::backtrace::trace_unsynchronized
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\..\..\backtrace\src\backtrace\mod.rs:66
+   2:     0x7ffe595cf529 - std::sys::backtrace::_print_fmt
+  16:     0x7ffe5a0b7561 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTINtNtCs6nQKifQ0JvU_12rustc_middle2ty20PseudoCanonicalInputINtNtCsgzDWP0zGOTc_13rustc_type_ir9predicate8TraitRefNtNtBT_7context6TyCtxtEETINtNtNtBV_5query5erase10ErasedDataAhj10_ENtNtNtBV_9dep_graph5graph
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:74
+   3:     0x7ffe595cf529 - std::sys::backtrace::impl$0::print::impl$0::fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:44
+   4:     0x7ffe595f8d0e - core::fmt::write
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\fmt\mod.rs:0
+   5:     0x7ffe595df5c4 - core::io::write::default_write_fmt
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:402
+   6:     0x7ffe595df5c4 - core::io::write::Write::write_fmt<std::sys::stdio::windows::Stderr>
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\core\src\io\write.rs:335
+   7:     0x7ffe595c0c8c - std::sys::backtrace::BacktraceLock::print
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:47
+   8:     0x7ffe595c0c8c - std::alloc::default_alloc_error_hook
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:409
+   9:     0x7ffe595a48fc - std::alloc::rust_oom::closure$0
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:440
+  10:     0x7ffe595a1f3f - std::sys::backtrace::__rust_end_short_backtrace<std::alloc::rust_oom::closure_env$0,never$>
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\backtrace.rs:182
+  17:     0x7ffe5a120034 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  18:     0x7ffe58fe65fc - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  11:     0x7ffe595c0d2b - std::alloc::rust_oom
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:436
+  12:     0x7ffe595a5728 - std::alloc::_::__rust_alloc_error_handler
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\alloc.rs:435
+  13:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error::rt_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:643
+  14:     0x7ffe5d598238 - alloc::alloc::handle_alloc_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\alloc.rs:649
+  19:     0x7ffe597a1c12 - rustc_ty_utils[1c79e97decc6fc3f]::instance::resolve_instance_raw
+  15:     0x7ffe5d598255 - alloc::raw_vec::handle_error
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\alloc\src\raw_vec\mod.rs:890
+  20:     0x7ffe5a1f90f3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  21:     0x7ffe5a1446c7 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  22:     0x7ffe5a1f86c4 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  23:     0x7ffe5af7d8c8 - <rustc_middle[4a5dce3f3199c450]::ty::instance::Instance>::expect_resolve
+  24:     0x7ffe59b99de4 - rustc_monomorphize[747beb846f8cb1]::collector::items_of_instance
+  25:     0x7ffe5a1f41c3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  26:     0x7ffe5a192346 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  27:     0x7ffe5a1f3a52 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  16:     0x7ffe5b0c7003 - <rustc_arena[bac78cab0a3ec1b2]::DroplessArena>::grow
+  17:     0x7ffe5ab5bf9a - <rustc_metadata[a8fb78d8770a1405]::creader::CStore>::expn_that_defined_untracked
+  28:     0x7ffe59b8e45c - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  18:     0x7ffe5a1fd25f - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  29:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  30:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  19:     0x7ffe5a18c692 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  31:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  20:     0x7ffe5a1fc666 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  32:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  33:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  21:     0x7ffe5b00221b - rustc_middle[4a5dce3f3199c450]::ty::trait_def::trait_impls_of_provider
+  34:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  35:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  22:     0x7ffe58fd70c6 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  36:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  23:     0x7ffe5a113cf8 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  37:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  38:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  39:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  40:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  24:     0x7ffe58fd7007 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  41:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  42:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  25:     0x7ffe5a8be79f - <rustc_trait_selection[54b530171dd55ef0]::solve::fulfill::ObligationStorage>::register
+  43:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  26:     0x7ffe5a919383 - <rustc_trait_selection[54b530171dd55ef0]::traits::select::SelectionContext>::evaluate_root_obligation
+  27:     0x7ffe5a86522c - <thin_vec[b3c23d2082c309e5]::IntoIter<_> as core[6dff922281fde550]::ops::drop::Drop>::drop::drop_non_singleton::<rustc_trait_selection[54b530171dd55ef0]::traits::fulfill::PendingPredicateObligation>
+  28:     0x7ffe5a913d8b - <rustc_trait_selection[54b530171dd55ef0]::traits::select::SelectionContext>::evaluate_root_obligation
+  44:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  45:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  29:     0x7ffe5a91c481 - <rustc_trait_selection[54b530171dd55ef0]::traits::select::SelectionContext>::evaluate_root_obligation
+  46:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  30:     0x7ffe5a92ee68 - <rustc_trait_selection[54b530171dd55ef0]::traits::select::SelectionContext>::select
+  31:     0x7ffe597d1b68 - rustc_traits[2a7ab27123a48eed]::codegen::codegen_select_candidate
+  32:     0x7ffe5a1fc1b3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  47:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  48:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  49:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  50:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  51:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  52:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  53:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  54:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  55:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  56:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  57:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  33:     0x7ffe5a11fb59 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  58:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  34:     0x7ffe58fe65fc - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  59:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  60:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  35:     0x7ffe597a1c12 - rustc_ty_utils[1c79e97decc6fc3f]::instance::resolve_instance_raw
+  36:     0x7ffe5a1f90f3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  37:     0x7ffe5a1446c7 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  38:     0x7ffe5a1f86c4 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  39:     0x7ffe5af7d8c8 - <rustc_middle[4a5dce3f3199c450]::ty::instance::Instance>::expect_resolve
+  40:     0x7ffe59b99de4 - rustc_monomorphize[747beb846f8cb1]::collector::items_of_instance
+  61:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  41:     0x7ffe5a1f41c3 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  62:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  42:     0x7ffe5a192346 - RINvMs6_NtCsbCpldyfh1Yy_9hashbrown3rawINtB6_8RawTableTTNtNtNtCs6nQKifQ0JvU_12rustc_middle2ty8instance8InstanceNtNtBX_4mono14CollectionModeETINtNtNtBX_5query5erase10ErasedDataAhj20_ENtNtNtBX_9dep_graph5graph12DepNodeIndexEEE14reserve_rehashNCNvMs1_NtCsffhnN
+  63:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  64:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  65:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  66:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  43:     0x7ffe5a1f3a52 - rustc_query_impl[3dba6669a32673fd]::dep_kind_vtables::make_dep_kind_vtables
+  67:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  44:     0x7ffe59b8e45c - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  68:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  69:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  45:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  70:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  46:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  71:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  47:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  72:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  48:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  73:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  49:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  74:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  50:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  75:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  51:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  76:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  52:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  77:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  53:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  78:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  54:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  55:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  56:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  57:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  58:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  79:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  80:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  81:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  82:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  59:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  60:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  83:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  61:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  84:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  85:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  86:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  87:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  88:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  62:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  89:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  90:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  63:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  91:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  92:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  93:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  94:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  95:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  96:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  64:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  97:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  98:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  65:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  99:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  66:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 100:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  67:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 101:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  68:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 102:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 103:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 104:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  69:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  70:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 105:     0x7ffe58d6c850 - core[6dff922281fde550]::slice::sort::stable::quicksort::quicksort::<rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit, <[rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit]>::sort_by<rustc_monomorphize[747beb846f8cb1]::partitioning::merge_codegen_units::{closure#6}>::{closure#0}>
+  71:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 106:     0x7ffe59b7bf3e - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  72:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  73:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 107:     0x7ffe58feaf87 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+  74:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 108:     0x7ffe58ee0e94 - <rustc_privacy[ebd30d0033d9e595]::DefIdsToImplsCollector as rustc_privacy[ebd30d0033d9e595]::DefIdVisitor>::visit_def_id
+  75:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  76:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 109:     0x7ffe5c637a31 - rustc_query_impl[3dba6669a32673fd]::job::collect_active_query_jobs
+  77:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 110:     0x7ffe55d73962 - <rustc_interface[c1a9cd50ae6ae2c5]::passes::LintStoreExpandImpl as rustc_expand[16986bf0ff6bb21c]::base::LintStoreExpand>::pre_expansion_lint
+ 111:     0x7ffe55ddc53c - <rustc_codegen_llvm[75bd0364f548e319]::LlvmCodegenBackend as rustc_codegen_ssa[ad3394acd2bd5335]::traits::backend::CodegenBackend>::codegen_crate
+ 112:     0x7ffe55d4e37c - <rustc_interface[c1a9cd50ae6ae2c5]::queries::Linker>::codegen_and_build_linker
+  78:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 113:     0x7ffe55d200e7 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+ 114:     0x7ffe55d19865 - RINvNtNtCsljvfXcM3w8L_3std3sys9backtrace28___rust_begin_short_backtraceNCNCINvNtCsgCRDBWUayeD_15rustc_interface4util26run_in_thread_with_globalsNCINvB1e_31run_in_thread_pool_with_globalsNCINvNtB1g_9interface12run_compileruNCNvCslMOFQbSFibu_17rustc_driver_i
+  79:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 115:     0x7ffe55d24a27 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+  80:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 116:     0x7ffe595cc053 - std::sys::thread::windows::impl$0::new::thread_start
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\thread\windows.rs:58
+  81:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  82:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  83:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 117:     0x7fff97c0cdf7 - BaseThreadInitThunk
+  84:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  85:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 118:     0x7fff98ed9c2c - RtlUserThreadStart
+  86:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  87:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  88:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  89:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  90:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  91:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  92:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  93:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  94:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  95:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  96:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  97:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  98:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+  99:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 100:     0x7ffe59b93a5a - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 101:     0x7ffe58d6c850 - core[6dff922281fde550]::slice::sort::stable::quicksort::quicksort::<rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit, <[rustc_middle[4a5dce3f3199c450]::mono::CodegenUnit]>::sort_by<rustc_monomorphize[747beb846f8cb1]::partitioning::merge_codegen_units::{closure#6}>::{closure#0}>
+ 102:     0x7ffe59b7bf3e - rustc_monomorphize[747beb846f8cb1]::partitioning::collect_and_partition_mono_items
+ 103:     0x7ffe58feaf87 - rustc_query_impl[3dba6669a32673fd]::self_profile::alloc_self_profile_query_strings
+ 104:     0x7ffe58ee0e94 - <rustc_privacy[ebd30d0033d9e595]::DefIdsToImplsCollector as rustc_privacy[ebd30d0033d9e595]::DefIdVisitor>::visit_def_id
+ 105:     0x7ffe5c637a31 - rustc_query_impl[3dba6669a32673fd]::job::collect_active_query_jobs
+ 106:     0x7ffe55d73962 - <rustc_interface[c1a9cd50ae6ae2c5]::passes::LintStoreExpandImpl as rustc_expand[16986bf0ff6bb21c]::base::LintStoreExpand>::pre_expansion_lint
+ 107:     0x7ffe55ddc53c - <rustc_codegen_llvm[75bd0364f548e319]::LlvmCodegenBackend as rustc_codegen_ssa[ad3394acd2bd5335]::traits::backend::CodegenBackend>::codegen_crate
+ 108:     0x7ffe55d4e37c - <rustc_interface[c1a9cd50ae6ae2c5]::queries::Linker>::codegen_and_build_linker
+ 109:     0x7ffe55d200e7 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+ 110:     0x7ffe55d19865 - RINvNtNtCsljvfXcM3w8L_3std3sys9backtrace28___rust_begin_short_backtraceNCNCINvNtCsgCRDBWUayeD_15rustc_interface4util26run_in_thread_with_globalsNCINvB1e_31run_in_thread_pool_with_globalsNCINvNtB1g_9interface12run_compileruNCNvCslMOFQbSFibu_17rustc_driver_i
+ 111:     0x7ffe55d24a27 - std[f8439e2c5135d149]::sys::backtrace::__rust_begin_short_backtrace::<std[f8439e2c5135d149]::thread::lifecycle::spawn_unchecked<ctrlc[4e10d8c04fa988b7]::set_handler_inner<rustc_driver_impl[fdc5636fb4aaa74a]::install_ctrlc_handler::{closure#0}>::{closure#0}, ()>::{closure#1}::{closure#0}::{closure#0}, ()>
+ 112:     0x7ffe595cc053 - std::sys::thread::windows::impl$0::new::thread_start
+                               at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library\std\src\sys\thread\windows.rs:58
+ 113:     0x7fff97c0cdf7 - BaseThreadInitThunk
+ 114:     0x7fff98ed9c2c - RtlUserThreadStart
+error: could not compile `djinn` (bin "h4e_browser_import_receipt_host")
+
+Caused by:
+  process didn't exit successfully: `C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name h4e_browser_import_receipt_host --edition=2024 ports\djinn\src\bin\h4e_browser_import_receipt_host.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --cfg "feature=\"cxf\"" --cfg "feature=\"default\"" --cfg "feature=\"inference\"" --cfg "feature=\"passphrase-fd\"" --cfg "feature=\"personal-sync\"" --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values(\"custody-receipt-host\", \"cxf\", \"default\", \"distillery-chronicle-receipt-host\", \"inference\", \"inference-gpu\", \"inference-stages\", \"passphrase-fd\", \"personal-sync\", \"trainer\", \"trainer-autodiff\", \"trainer-gpu\"))" -C metadata=69dde24ba2e1bcd2 --out-dir C:/t/cargo-targets/mere/build\debug\deps -C incremental=C:/t/cargo-targets/mere/build\debug\incremental -L dependency=C:/t/cargo-targets/mere/build\debug\deps --extern base64=C:/t/cargo-targets/mere/build\debug\deps\libbase64-a4efa77fb77ed019.rlib --extern blake3=C:/t/cargo-targets/mere/build\debug\deps\libblake3-ec2424811329f687.rlib --extern castellan=C:/t/cargo-targets/mere/build\debug\deps\libcastellan-4b50a884f004f7a9.rlib --extern chartulary=C:/t/cargo-targets/mere/build\debug\deps\libchartulary-732e10b644c3b715.rlib --extern chatelaine=C:/t/cargo-targets/mere/build\debug\deps\libchatelaine-0983e5804b5c988c.rlib --extern chirograph=C:/t/cargo-targets/mere/build\debug\deps\libchirograph-739a953f832dfcae.rlib --extern cleromancy_domain=C:/t/cargo-targets/mere/build\debug\deps\libcleromancy-e393f05f78f8d958.rlib --extern distillery=C:/t/cargo-targets/mere/build\debug\deps\libdistillery-fd507eba5e46725b.rlib --extern djinn=C:/t/cargo-targets/mere/build\debug\deps\libdjinn-214bb5bce95835f0.rlib --extern dramatis=C:/t/cargo-targets/mere/build\debug\deps\libdramatis-2fef86304a29be5e.rlib --extern eidetic=C:/t/cargo-targets/mere/build\debug\deps\libeidetic-7c638dc04d977650.rlib --extern gaz=C:/t/cargo-targets/mere/build\debug\deps\libgaz-2521b84ed82cc891.rlib --extern gemini_protocol=C:/t/cargo-targets/mere/build\debug\deps\libgemini_protocol-e7635fc3e15d7d91.rlib --extern graphshell=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell-9248c727732d621e.rlib --extern graphshell_endpoint=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_endpoint-07e37a98c258b61e.rlib --extern graphshell_host=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_host-821d6725172a53da.rlib --extern incipit=C:/t/cargo-targets/mere/build\debug\deps\libincipit-0f6f03d0ffbe246c.rlib --extern insigne=C:/t/cargo-targets/mere/build\debug\deps\libinsigne-1101eedfabd117e9.rlib --extern knot_editor=C:/t/cargo-targets/mere/build\debug\deps\libknot_editor-fd12bba3db4eb92a.rlib --extern knot_site=C:/t/cargo-targets/mere/build\debug\deps\libknot_site-c70cf2dbe5d1a3b4.rlib --extern light_file_dialog=C:/t/cargo-targets/mere/build\debug\deps\liblight_file_dialog-272facc65d145010.rlib --extern kernel=C:/t/cargo-targets/mere/build\debug\deps\libkernel-7f7f5a56641cbb36.rlib --extern mesh=C:/t/cargo-targets/mere/build\debug\deps\libmesh-18d4dcef70d53e5a.rlib --extern mere_overmap=C:/t/cargo-targets/mere/build\debug\deps\libmere_overmap-08229a3512aaf3c2.rlib --extern personal_facts=C:/t/cargo-targets/mere/build\debug\deps\libmere_personal_facts-2bdde57a09db8061.rlib --extern transport=C:/t/cargo-targets/mere/build\debug\deps\libtransport-361e3775b984cf44.rlib --extern muniment=C:/t/cargo-targets/mere/build\debug\deps\libmuniment-cd0b6332e4138915.rlib --extern notochord=C:/t/cargo-targets/mere/build\debug\deps\libnotochord-2f6159a83be31f36.rlib --extern p2panda_core=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_core-c55b3fd2b296103a.rlib --extern p2panda_store=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_store-8be50b2d1d8fcf69.rlib --extern pandect=C:/t/cargo-targets/mere/build\debug\deps\libpandect-b3c38354a730cbaa.rlib --extern personae=C:/t/cargo-targets/mere/build\debug\deps\libpersonae-6c0d6ad986e5c676.rlib --extern rand_core=C:/t/cargo-targets/mere/build\debug\deps\librand_core-00b7a3eb8d12ed33.rlib --extern rcgen=C:/t/cargo-targets/mere/build\debug\deps\librcgen-af0b57714cfd9349.rlib --extern rpassword=C:/t/cargo-targets/mere/build\debug\deps\librpassword-785e6cb89e68aeaf.rlib --extern rustls=C:/t/cargo-targets/mere/build\debug\deps\librustls-42f712c713126b42.rlib --extern sceno=C:/t/cargo-targets/mere/build\debug\deps\libsceno-fdbb1f4b22544994.rlib --extern scenograph=C:/t/cargo-targets/mere/build\debug\deps\libscenograph-7e71c19a9c987688.rlib --extern scenotime=C:/t/cargo-targets/mere/build\debug\deps\libscenotime-e3ce7edcf5f0647e.rlib --extern serde=C:/t/cargo-targets/mere/build\debug\deps\libserde-9d07a9c8fb7c68aa.rlib --extern serde_json=C:/t/cargo-targets/mere/build\debug\deps\libserde_json-78005aee4bae3aba.rlib --extern sha2=C:/t/cargo-targets/mere/build\debug\deps\libsha2-efc5517e4602d9c4.rlib --extern signature=C:/t/cargo-targets/mere/build\debug\deps\libsignature-d28f1ccab8a5d929.rlib --extern ssh_agent_lib=C:/t/cargo-targets/mere/build\debug\deps\libssh_agent_lib-48e929c350ce7d44.rlib --extern ssh_key=C:/t/cargo-targets/mere/build\debug\deps\libssh_key-2d436ad1bcc5a92c.rlib --extern stickleback=C:/t/cargo-targets/mere/build\debug\deps\libstickleback-e9176b679e976368.rlib --extern thiserror=C:/t/cargo-targets/mere/build\debug\deps\libthiserror-0072a8e15e7c62db.rlib --extern tokio=C:/t/cargo-targets/mere/build\debug\deps\libtokio-aa62e6bebdcce719.rlib --extern tokio_rustls=C:/t/cargo-targets/mere/build\debug\deps\libtokio_rustls-5ec49426df215ebc.rlib --extern toml=C:/t/cargo-targets/mere/build\debug\deps\libtoml-08d22a003ac0b357.rlib --extern tracing=C:/t/cargo-targets/mere/build\debug\deps\libtracing-a955467cf7ab405a.rlib --extern tracing_subscriber=C:/t/cargo-targets/mere/build\debug\deps\libtracing_subscriber-e0a975ed2b9a8958.rlib --extern uuid=C:/t/cargo-targets/mere/build\debug\deps\libuuid-93f1c30ebf0ec255.rlib --extern windows=C:/t/cargo-targets/mere/build\debug\deps\libwindows-c44a42ab57918069.rlib --extern zeroize=C:/t/cargo-targets/mere/build\debug\deps\libzeroize-d67fff99eec0dec8.rlib -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\ring-614b68a2d23fb37e\out -L native=C:/t/cargo-targets/mere/build\debug\build\onig_sys-2366baf19c5134d7\out -L native=C:/t/cargo-targets/mere/build\debug\build\stacker-92e0bcfd606e5c9a\out -L native=C:/t/cargo-targets/mere/build\debug\build\psm-e67583dbaa874146\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\zstd-sys-efbddcad13311a5c\out -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.53.1\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.48.5\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64"` (exit code: 0xc0000409, STATUS_STACK_BUFFER_OVERRUN)
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `djinn` (bin "h4_identity_receipt")
+
+Caused by:
+  process didn't exit successfully: `C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name h4_identity_receipt --edition=2024 ports\djinn\src\bin\h4_identity_receipt.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --cfg "feature=\"cxf\"" --cfg "feature=\"default\"" --cfg "feature=\"inference\"" --cfg "feature=\"passphrase-fd\"" --cfg "feature=\"personal-sync\"" --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values(\"custody-receipt-host\", \"cxf\", \"default\", \"distillery-chronicle-receipt-host\", \"inference\", \"inference-gpu\", \"inference-stages\", \"passphrase-fd\", \"personal-sync\", \"trainer\", \"trainer-autodiff\", \"trainer-gpu\"))" -C metadata=1a755f7d1202736f --out-dir C:/t/cargo-targets/mere/build\debug\deps -C incremental=C:/t/cargo-targets/mere/build\debug\incremental -L dependency=C:/t/cargo-targets/mere/build\debug\deps --extern base64=C:/t/cargo-targets/mere/build\debug\deps\libbase64-a4efa77fb77ed019.rlib --extern blake3=C:/t/cargo-targets/mere/build\debug\deps\libblake3-ec2424811329f687.rlib --extern castellan=C:/t/cargo-targets/mere/build\debug\deps\libcastellan-4b50a884f004f7a9.rlib --extern chartulary=C:/t/cargo-targets/mere/build\debug\deps\libchartulary-732e10b644c3b715.rlib --extern chatelaine=C:/t/cargo-targets/mere/build\debug\deps\libchatelaine-0983e5804b5c988c.rlib --extern chirograph=C:/t/cargo-targets/mere/build\debug\deps\libchirograph-739a953f832dfcae.rlib --extern cleromancy_domain=C:/t/cargo-targets/mere/build\debug\deps\libcleromancy-e393f05f78f8d958.rlib --extern distillery=C:/t/cargo-targets/mere/build\debug\deps\libdistillery-fd507eba5e46725b.rlib --extern djinn=C:/t/cargo-targets/mere/build\debug\deps\libdjinn-214bb5bce95835f0.rlib --extern dramatis=C:/t/cargo-targets/mere/build\debug\deps\libdramatis-2fef86304a29be5e.rlib --extern eidetic=C:/t/cargo-targets/mere/build\debug\deps\libeidetic-7c638dc04d977650.rlib --extern gaz=C:/t/cargo-targets/mere/build\debug\deps\libgaz-2521b84ed82cc891.rlib --extern gemini_protocol=C:/t/cargo-targets/mere/build\debug\deps\libgemini_protocol-e7635fc3e15d7d91.rlib --extern graphshell=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell-9248c727732d621e.rlib --extern graphshell_endpoint=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_endpoint-07e37a98c258b61e.rlib --extern graphshell_host=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_host-821d6725172a53da.rlib --extern incipit=C:/t/cargo-targets/mere/build\debug\deps\libincipit-0f6f03d0ffbe246c.rlib --extern insigne=C:/t/cargo-targets/mere/build\debug\deps\libinsigne-1101eedfabd117e9.rlib --extern knot_editor=C:/t/cargo-targets/mere/build\debug\deps\libknot_editor-fd12bba3db4eb92a.rlib --extern knot_site=C:/t/cargo-targets/mere/build\debug\deps\libknot_site-c70cf2dbe5d1a3b4.rlib --extern light_file_dialog=C:/t/cargo-targets/mere/build\debug\deps\liblight_file_dialog-272facc65d145010.rlib --extern kernel=C:/t/cargo-targets/mere/build\debug\deps\libkernel-7f7f5a56641cbb36.rlib --extern mesh=C:/t/cargo-targets/mere/build\debug\deps\libmesh-18d4dcef70d53e5a.rlib --extern mere_overmap=C:/t/cargo-targets/mere/build\debug\deps\libmere_overmap-08229a3512aaf3c2.rlib --extern personal_facts=C:/t/cargo-targets/mere/build\debug\deps\libmere_personal_facts-2bdde57a09db8061.rlib --extern transport=C:/t/cargo-targets/mere/build\debug\deps\libtransport-361e3775b984cf44.rlib --extern muniment=C:/t/cargo-targets/mere/build\debug\deps\libmuniment-cd0b6332e4138915.rlib --extern notochord=C:/t/cargo-targets/mere/build\debug\deps\libnotochord-2f6159a83be31f36.rlib --extern p2panda_core=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_core-c55b3fd2b296103a.rlib --extern p2panda_store=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_store-8be50b2d1d8fcf69.rlib --extern pandect=C:/t/cargo-targets/mere/build\debug\deps\libpandect-b3c38354a730cbaa.rlib --extern personae=C:/t/cargo-targets/mere/build\debug\deps\libpersonae-6c0d6ad986e5c676.rlib --extern rand_core=C:/t/cargo-targets/mere/build\debug\deps\librand_core-00b7a3eb8d12ed33.rlib --extern rcgen=C:/t/cargo-targets/mere/build\debug\deps\librcgen-af0b57714cfd9349.rlib --extern rpassword=C:/t/cargo-targets/mere/build\debug\deps\librpassword-785e6cb89e68aeaf.rlib --extern rustls=C:/t/cargo-targets/mere/build\debug\deps\librustls-42f712c713126b42.rlib --extern sceno=C:/t/cargo-targets/mere/build\debug\deps\libsceno-fdbb1f4b22544994.rlib --extern scenograph=C:/t/cargo-targets/mere/build\debug\deps\libscenograph-7e71c19a9c987688.rlib --extern scenotime=C:/t/cargo-targets/mere/build\debug\deps\libscenotime-e3ce7edcf5f0647e.rlib --extern serde=C:/t/cargo-targets/mere/build\debug\deps\libserde-9d07a9c8fb7c68aa.rlib --extern serde_json=C:/t/cargo-targets/mere/build\debug\deps\libserde_json-78005aee4bae3aba.rlib --extern sha2=C:/t/cargo-targets/mere/build\debug\deps\libsha2-efc5517e4602d9c4.rlib --extern signature=C:/t/cargo-targets/mere/build\debug\deps\libsignature-d28f1ccab8a5d929.rlib --extern ssh_agent_lib=C:/t/cargo-targets/mere/build\debug\deps\libssh_agent_lib-48e929c350ce7d44.rlib --extern ssh_key=C:/t/cargo-targets/mere/build\debug\deps\libssh_key-2d436ad1bcc5a92c.rlib --extern stickleback=C:/t/cargo-targets/mere/build\debug\deps\libstickleback-e9176b679e976368.rlib --extern thiserror=C:/t/cargo-targets/mere/build\debug\deps\libthiserror-0072a8e15e7c62db.rlib --extern tokio=C:/t/cargo-targets/mere/build\debug\deps\libtokio-aa62e6bebdcce719.rlib --extern tokio_rustls=C:/t/cargo-targets/mere/build\debug\deps\libtokio_rustls-5ec49426df215ebc.rlib --extern toml=C:/t/cargo-targets/mere/build\debug\deps\libtoml-08d22a003ac0b357.rlib --extern tracing=C:/t/cargo-targets/mere/build\debug\deps\libtracing-a955467cf7ab405a.rlib --extern tracing_subscriber=C:/t/cargo-targets/mere/build\debug\deps\libtracing_subscriber-e0a975ed2b9a8958.rlib --extern uuid=C:/t/cargo-targets/mere/build\debug\deps\libuuid-93f1c30ebf0ec255.rlib --extern windows=C:/t/cargo-targets/mere/build\debug\deps\libwindows-c44a42ab57918069.rlib --extern zeroize=C:/t/cargo-targets/mere/build\debug\deps\libzeroize-d67fff99eec0dec8.rlib -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\ring-614b68a2d23fb37e\out -L native=C:/t/cargo-targets/mere/build\debug\build\onig_sys-2366baf19c5134d7\out -L native=C:/t/cargo-targets/mere/build\debug\build\stacker-92e0bcfd606e5c9a\out -L native=C:/t/cargo-targets/mere/build\debug\build\psm-e67583dbaa874146\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\zstd-sys-efbddcad13311a5c\out -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.53.1\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.48.5\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64"` (exit code: 0xc0000409, STATUS_STACK_BUFFER_OVERRUN)
+warning: `djinn` (test "inference_route") generated 2 warnings
+error: could not compile `djinn` (test "inference_route"); 2 warnings emitted
+
+Caused by:
+  process didn't exit successfully: `C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name inference_route --edition=2024 ports\djinn\tests\inference_route.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --cfg "feature=\"cxf\"" --cfg "feature=\"default\"" --cfg "feature=\"inference\"" --cfg "feature=\"passphrase-fd\"" --cfg "feature=\"personal-sync\"" --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values(\"custody-receipt-host\", \"cxf\", \"default\", \"distillery-chronicle-receipt-host\", \"inference\", \"inference-gpu\", \"inference-stages\", \"passphrase-fd\", \"personal-sync\", \"trainer\", \"trainer-autodiff\", \"trainer-gpu\"))" -C metadata=d7934c1ea1d72fd6 -C extra-filename=-62b7f8fbbe765bff --out-dir C:/t/cargo-targets/mere/build\debug\deps -C incremental=C:/t/cargo-targets/mere/build\debug\incremental -L dependency=C:/t/cargo-targets/mere/build\debug\deps --extern base64=C:/t/cargo-targets/mere/build\debug\deps\libbase64-a4efa77fb77ed019.rlib --extern blake3=C:/t/cargo-targets/mere/build\debug\deps\libblake3-ec2424811329f687.rlib --extern castellan=C:/t/cargo-targets/mere/build\debug\deps\libcastellan-4b50a884f004f7a9.rlib --extern chartulary=C:/t/cargo-targets/mere/build\debug\deps\libchartulary-732e10b644c3b715.rlib --extern chatelaine=C:/t/cargo-targets/mere/build\debug\deps\libchatelaine-0983e5804b5c988c.rlib --extern chirograph=C:/t/cargo-targets/mere/build\debug\deps\libchirograph-739a953f832dfcae.rlib --extern cleromancy_domain=C:/t/cargo-targets/mere/build\debug\deps\libcleromancy-e393f05f78f8d958.rlib --extern distillery=C:/t/cargo-targets/mere/build\debug\deps\libdistillery-fd507eba5e46725b.rlib --extern djinn=C:/t/cargo-targets/mere/build\debug\deps\libdjinn-214bb5bce95835f0.rlib --extern djinn=C:/t/cargo-targets/mere/build\debug\deps\libdjinn-214bb5bce95835f0.rlib --extern djinn_testkit=C:/t/cargo-targets/mere/build\debug\deps\libdjinn_testkit-056123cfe590cbb2.rlib --extern dramatis=C:/t/cargo-targets/mere/build\debug\deps\libdramatis-2fef86304a29be5e.rlib --extern eidetic=C:/t/cargo-targets/mere/build\debug\deps\libeidetic-7c638dc04d977650.rlib --extern gaz=C:/t/cargo-targets/mere/build\debug\deps\libgaz-2521b84ed82cc891.rlib --extern gemini_protocol=C:/t/cargo-targets/mere/build\debug\deps\libgemini_protocol-e7635fc3e15d7d91.rlib --extern graphshell=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell-9248c727732d621e.rlib --extern graphshell_client=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_client-6b539f417ce60b07.rlib --extern graphshell_endpoint=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_endpoint-07e37a98c258b61e.rlib --extern graphshell_host=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_host-821d6725172a53da.rlib --extern incipit=C:/t/cargo-targets/mere/build\debug\deps\libincipit-0f6f03d0ffbe246c.rlib --extern insigne=C:/t/cargo-targets/mere/build\debug\deps\libinsigne-1101eedfabd117e9.rlib --extern iroh=C:/t/cargo-targets/mere/build\debug\deps\libiroh-e01bb3799021d9b8.rlib --extern knot_editor=C:/t/cargo-targets/mere/build\debug\deps\libknot_editor-fd12bba3db4eb92a.rlib --extern knot_site=C:/t/cargo-targets/mere/build\debug\deps\libknot_site-c70cf2dbe5d1a3b4.rlib --extern light_file_dialog=C:/t/cargo-targets/mere/build\debug\deps\liblight_file_dialog-272facc65d145010.rlib --extern kernel=C:/t/cargo-targets/mere/build\debug\deps\libkernel-7f7f5a56641cbb36.rlib --extern mesh=C:/t/cargo-targets/mere/build\debug\deps\libmesh-18d4dcef70d53e5a.rlib --extern mere_overmap=C:/t/cargo-targets/mere/build\debug\deps\libmere_overmap-08229a3512aaf3c2.rlib --extern p2panda_net=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_net-f52e963934eaa5d2.rlib --extern personal_facts=C:/t/cargo-targets/mere/build\debug\deps\libmere_personal_facts-2bdde57a09db8061.rlib --extern transport=C:/t/cargo-targets/mere/build\debug\deps\libtransport-361e3775b984cf44.rlib --extern mere_view=C:/t/cargo-targets/mere/build\debug\deps\libmere_view-cfff0346a53b09bd.rlib --extern muniment=C:/t/cargo-targets/mere/build\debug\deps\libmuniment-cd0b6332e4138915.rlib --extern notochord=C:/t/cargo-targets/mere/build\debug\deps\libnotochord-2f6159a83be31f36.rlib --extern p2panda_core=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_core-c55b3fd2b296103a.rlib --extern p2panda_store=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_store-8be50b2d1d8fcf69.rlib --extern pandect=C:/t/cargo-targets/mere/build\debug\deps\libpandect-b3c38354a730cbaa.rlib --extern personae=C:/t/cargo-targets/mere/build\debug\deps\libpersonae-6c0d6ad986e5c676.rlib --extern pollster=C:/t/cargo-targets/mere/build\debug\deps\libpollster-5fd711b1c29af1c6.rlib --extern rand_core=C:/t/cargo-targets/mere/build\debug\deps\librand_core-00b7a3eb8d12ed33.rlib --extern rcgen=C:/t/cargo-targets/mere/build\debug\deps\librcgen-af0b57714cfd9349.rlib --extern rpassword=C:/t/cargo-targets/mere/build\debug\deps\librpassword-785e6cb89e68aeaf.rlib --extern rustls=C:/t/cargo-targets/mere/build\debug\deps\librustls-42f712c713126b42.rlib --extern safetensors=C:/t/cargo-targets/mere/build\debug\deps\libsafetensors-27d7a87f3de7c310.rlib --extern sceno=C:/t/cargo-targets/mere/build\debug\deps\libsceno-fdbb1f4b22544994.rlib --extern scenograph=C:/t/cargo-targets/mere/build\debug\deps\libscenograph-7e71c19a9c987688.rlib --extern scenotime=C:/t/cargo-targets/mere/build\debug\deps\libscenotime-e3ce7edcf5f0647e.rlib --extern serde=C:/t/cargo-targets/mere/build\debug\deps\libserde-9d07a9c8fb7c68aa.rlib --extern serde_json=C:/t/cargo-targets/mere/build\debug\deps\libserde_json-78005aee4bae3aba.rlib --extern sha2=C:/t/cargo-targets/mere/build\debug\deps\libsha2-efc5517e4602d9c4.rlib --extern signature=C:/t/cargo-targets/mere/build\debug\deps\libsignature-d28f1ccab8a5d929.rlib --extern ssh_agent_lib=C:/t/cargo-targets/mere/build\debug\deps\libssh_agent_lib-48e929c350ce7d44.rlib --extern ssh_key=C:/t/cargo-targets/mere/build\debug\deps\libssh_key-2d436ad1bcc5a92c.rlib --extern stickleback=C:/t/cargo-targets/mere/build\debug\deps\libstickleback-e9176b679e976368.rlib --extern tempfile=C:/t/cargo-targets/mere/build\debug\deps\libtempfile-5c0e655acb904f54.rlib --extern thiserror=C:/t/cargo-targets/mere/build\debug\deps\libthiserror-0072a8e15e7c62db.rlib --extern tokio=C:/t/cargo-targets/mere/build\debug\deps\libtokio-aa62e6bebdcce719.rlib --extern tokio_rustls=C:/t/cargo-targets/mere/build\debug\deps\libtokio_rustls-5ec49426df215ebc.rlib --extern toml=C:/t/cargo-targets/mere/build\debug\deps\libtoml-08d22a003ac0b357.rlib --extern tracing=C:/t/cargo-targets/mere/build\debug\deps\libtracing-a955467cf7ab405a.rlib --extern tracing_subscriber=C:/t/cargo-targets/mere/build\debug\deps\libtracing_subscriber-e0a975ed2b9a8958.rlib --extern uuid=C:/t/cargo-targets/mere/build\debug\deps\libuuid-93f1c30ebf0ec255.rlib --extern windows=C:/t/cargo-targets/mere/build\debug\deps\libwindows-c44a42ab57918069.rlib --extern zeroize=C:/t/cargo-targets/mere/build\debug\deps\libzeroize-d67fff99eec0dec8.rlib -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\ring-614b68a2d23fb37e\out -L native=C:/t/cargo-targets/mere/build\debug\build\onig_sys-2366baf19c5134d7\out -L native=C:/t/cargo-targets/mere/build\debug\build\stacker-92e0bcfd606e5c9a\out -L native=C:/t/cargo-targets/mere/build\debug\build\psm-e67583dbaa874146\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\zstd-sys-efbddcad13311a5c\out -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.53.1\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.48.5\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64"` (exit code: 0xc0000409, STATUS_STACK_BUFFER_OVERRUN)
+error: could not compile `djinn` (bin "djinn")
+
+Caused by:
+  process didn't exit successfully: `C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name djinn --edition=2024 ports\djinn\src\bin\djinn.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --cfg "feature=\"cxf\"" --cfg "feature=\"default\"" --cfg "feature=\"inference\"" --cfg "feature=\"passphrase-fd\"" --cfg "feature=\"personal-sync\"" --check-cfg cfg(docsrs,test) --check-cfg "cfg(feature, values(\"custody-receipt-host\", \"cxf\", \"default\", \"distillery-chronicle-receipt-host\", \"inference\", \"inference-gpu\", \"inference-stages\", \"passphrase-fd\", \"personal-sync\", \"trainer\", \"trainer-autodiff\", \"trainer-gpu\"))" -C metadata=c673a1bdf8c6c54b --out-dir C:/t/cargo-targets/mere/build\debug\deps -C incremental=C:/t/cargo-targets/mere/build\debug\incremental -L dependency=C:/t/cargo-targets/mere/build\debug\deps --extern base64=C:/t/cargo-targets/mere/build\debug\deps\libbase64-a4efa77fb77ed019.rlib --extern blake3=C:/t/cargo-targets/mere/build\debug\deps\libblake3-ec2424811329f687.rlib --extern castellan=C:/t/cargo-targets/mere/build\debug\deps\libcastellan-4b50a884f004f7a9.rlib --extern chartulary=C:/t/cargo-targets/mere/build\debug\deps\libchartulary-732e10b644c3b715.rlib --extern chatelaine=C:/t/cargo-targets/mere/build\debug\deps\libchatelaine-0983e5804b5c988c.rlib --extern chirograph=C:/t/cargo-targets/mere/build\debug\deps\libchirograph-739a953f832dfcae.rlib --extern cleromancy_domain=C:/t/cargo-targets/mere/build\debug\deps\libcleromancy-e393f05f78f8d958.rlib --extern distillery=C:/t/cargo-targets/mere/build\debug\deps\libdistillery-fd507eba5e46725b.rlib --extern djinn=C:/t/cargo-targets/mere/build\debug\deps\libdjinn-214bb5bce95835f0.rlib --extern dramatis=C:/t/cargo-targets/mere/build\debug\deps\libdramatis-2fef86304a29be5e.rlib --extern eidetic=C:/t/cargo-targets/mere/build\debug\deps\libeidetic-7c638dc04d977650.rlib --extern gaz=C:/t/cargo-targets/mere/build\debug\deps\libgaz-2521b84ed82cc891.rlib --extern gemini_protocol=C:/t/cargo-targets/mere/build\debug\deps\libgemini_protocol-e7635fc3e15d7d91.rlib --extern graphshell=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell-9248c727732d621e.rlib --extern graphshell_endpoint=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_endpoint-07e37a98c258b61e.rlib --extern graphshell_host=C:/t/cargo-targets/mere/build\debug\deps\libgraphshell_host-821d6725172a53da.rlib --extern incipit=C:/t/cargo-targets/mere/build\debug\deps\libincipit-0f6f03d0ffbe246c.rlib --extern insigne=C:/t/cargo-targets/mere/build\debug\deps\libinsigne-1101eedfabd117e9.rlib --extern knot_editor=C:/t/cargo-targets/mere/build\debug\deps\libknot_editor-fd12bba3db4eb92a.rlib --extern knot_site=C:/t/cargo-targets/mere/build\debug\deps\libknot_site-c70cf2dbe5d1a3b4.rlib --extern light_file_dialog=C:/t/cargo-targets/mere/build\debug\deps\liblight_file_dialog-272facc65d145010.rlib --extern kernel=C:/t/cargo-targets/mere/build\debug\deps\libkernel-7f7f5a56641cbb36.rlib --extern mesh=C:/t/cargo-targets/mere/build\debug\deps\libmesh-18d4dcef70d53e5a.rlib --extern mere_overmap=C:/t/cargo-targets/mere/build\debug\deps\libmere_overmap-08229a3512aaf3c2.rlib --extern personal_facts=C:/t/cargo-targets/mere/build\debug\deps\libmere_personal_facts-2bdde57a09db8061.rlib --extern transport=C:/t/cargo-targets/mere/build\debug\deps\libtransport-361e3775b984cf44.rlib --extern muniment=C:/t/cargo-targets/mere/build\debug\deps\libmuniment-cd0b6332e4138915.rlib --extern notochord=C:/t/cargo-targets/mere/build\debug\deps\libnotochord-2f6159a83be31f36.rlib --extern p2panda_core=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_core-c55b3fd2b296103a.rlib --extern p2panda_store=C:/t/cargo-targets/mere/build\debug\deps\libp2panda_store-8be50b2d1d8fcf69.rlib --extern pandect=C:/t/cargo-targets/mere/build\debug\deps\libpandect-b3c38354a730cbaa.rlib --extern personae=C:/t/cargo-targets/mere/build\debug\deps\libpersonae-6c0d6ad986e5c676.rlib --extern rand_core=C:/t/cargo-targets/mere/build\debug\deps\librand_core-00b7a3eb8d12ed33.rlib --extern rcgen=C:/t/cargo-targets/mere/build\debug\deps\librcgen-af0b57714cfd9349.rlib --extern rpassword=C:/t/cargo-targets/mere/build\debug\deps\librpassword-785e6cb89e68aeaf.rlib --extern rustls=C:/t/cargo-targets/mere/build\debug\deps\librustls-42f712c713126b42.rlib --extern sceno=C:/t/cargo-targets/mere/build\debug\deps\libsceno-fdbb1f4b22544994.rlib --extern scenograph=C:/t/cargo-targets/mere/build\debug\deps\libscenograph-7e71c19a9c987688.rlib --extern scenotime=C:/t/cargo-targets/mere/build\debug\deps\libscenotime-e3ce7edcf5f0647e.rlib --extern serde=C:/t/cargo-targets/mere/build\debug\deps\libserde-9d07a9c8fb7c68aa.rlib --extern serde_json=C:/t/cargo-targets/mere/build\debug\deps\libserde_json-78005aee4bae3aba.rlib --extern sha2=C:/t/cargo-targets/mere/build\debug\deps\libsha2-efc5517e4602d9c4.rlib --extern signature=C:/t/cargo-targets/mere/build\debug\deps\libsignature-d28f1ccab8a5d929.rlib --extern ssh_agent_lib=C:/t/cargo-targets/mere/build\debug\deps\libssh_agent_lib-48e929c350ce7d44.rlib --extern ssh_key=C:/t/cargo-targets/mere/build\debug\deps\libssh_key-2d436ad1bcc5a92c.rlib --extern stickleback=C:/t/cargo-targets/mere/build\debug\deps\libstickleback-e9176b679e976368.rlib --extern thiserror=C:/t/cargo-targets/mere/build\debug\deps\libthiserror-0072a8e15e7c62db.rlib --extern tokio=C:/t/cargo-targets/mere/build\debug\deps\libtokio-aa62e6bebdcce719.rlib --extern tokio_rustls=C:/t/cargo-targets/mere/build\debug\deps\libtokio_rustls-5ec49426df215ebc.rlib --extern toml=C:/t/cargo-targets/mere/build\debug\deps\libtoml-08d22a003ac0b357.rlib --extern tracing=C:/t/cargo-targets/mere/build\debug\deps\libtracing-a955467cf7ab405a.rlib --extern tracing_subscriber=C:/t/cargo-targets/mere/build\debug\deps\libtracing_subscriber-e0a975ed2b9a8958.rlib --extern uuid=C:/t/cargo-targets/mere/build\debug\deps\libuuid-93f1c30ebf0ec255.rlib --extern windows=C:/t/cargo-targets/mere/build\debug\deps\libwindows-c44a42ab57918069.rlib --extern zeroize=C:/t/cargo-targets/mere/build\debug\deps\libzeroize-d67fff99eec0dec8.rlib -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\blake3-60cd86991815b163\out -L native=C:/t/cargo-targets/mere/build\debug\build\ring-614b68a2d23fb37e\out -L native=C:/t/cargo-targets/mere/build\debug\build\onig_sys-2366baf19c5134d7\out -L native=C:/t/cargo-targets/mere/build\debug\build\stacker-92e0bcfd606e5c9a\out -L native=C:/t/cargo-targets/mere/build\debug\build\psm-e67583dbaa874146\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\fontsan-054e91f39c3a15ff\out -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\libz-sys-ab1ddcea88a4497f\out\lib -L native=C:/t/cargo-targets/mere/build\debug\build\zstd-sys-efbddcad13311a5c\out -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.53.1\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.48.5\lib -L native=C:\Users\mark_\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64" -L "native=C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\atlmfc\lib\x64"` (exit code: 0xc0000409, STATUS_STACK_BUFFER_OVERRUN)

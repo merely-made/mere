@@ -1,0 +1,8 @@
+
+running 3 tests
+test identical_delivery_control_is_idempotent ... ok
+test ledger_rejects_the_changed_locality_the_js_queue_discards ... ok
+test ledger_rejects_the_changed_microseconds_the_js_queue_discards ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

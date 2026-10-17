@@ -1,0 +1,21 @@
+
+running 3 tests
+test crashed_actor_leaves_queued_work_while_cancel_pause_and_close_report_success ... OBSERVATION: actor disconnected; cancel/pause/close all returned success; admitted run and rejected late ask remain queued, including journal state
+ok
+test ordinary_model_errors_produce_a_terminal_failed_run ... CONTROL: returned model error is visible and the ask becomes Failed
+ok
+test resume_commits_queued_state_and_reports_success_after_actor_disconnect ... OBSERVATION: resume returned success and journaled a queued continuation after actor disconnection
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+thread '<unnamed>' (61028) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\inference_crash_probe.rs:47:9:
+synthetic audit model-construction panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread '<unnamed>' (60560) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\inference_crash_probe.rs:75:9:
+synthetic audit seed-construction panic
+
+thread '<unnamed>' (59468) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\inference_crash_probe.rs:90:9:
+synthetic audit resumed-model construction panic

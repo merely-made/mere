@@ -1,0 +1,6 @@
+PASS context keyboard activates non-leaf Export while HTML remains absent
+PASS context pointer disclosure reopens root submenu without exposing HTML
+PASS menubar control reaches same tree HTML leaf with full original path
+PASS context child still activates after its open parent becomes disabled
+PASS menubar child still activates after its open parent becomes disabled
+PASS individually disabled child remains inert

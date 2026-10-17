@@ -1,0 +1,38 @@
+{
+  "build_exit": 0,
+  "run_exit": 101,
+  "passed": 14,
+  "failed": 1,
+  "failure": "Audit hypothesis expected unique maximum token1 to be lost at tiny temperature, but original sampler selected token1. This invalidates that counterexample. Check tied maxima separately.",
+  "cleanup_failure": "Original runner recognized executable/PDB only. Actual tokenizer-linked test also creates COFF .exp and ar .lib. Executable was removed before marker refusal, but its digest was not persisted because final receipt was never reached. Remaining three outputs now verified and removed.",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math.exp",
+      "bytes": 25368,
+      "sha256": "8ffed2e327eb3426b8bc204afa93b4a118e87c751bd4260e5eb7102a6fc960dc",
+      "marker": "PDB MSF, COFF AMD64 or ar archive by extension"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math.lib",
+      "bytes": 46616,
+      "sha256": "536a5c2e29e6dd6cc1fdc4ae78db524561a92987abaf6d3c66c2ee1adf21d070",
+      "marker": "PDB MSF, COFF AMD64 or ar archive by extension"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-decoder-text-math.pdb",
+      "bytes": 41668608,
+      "sha256": "fb1d12866f12b28c6775f0cc7bcce980ff9181fa9c51ed84e72ddbd6e526ee40",
+      "marker": "PDB MSF, COFF AMD64 or ar archive by extension"
+    }
+  ],
+  "generated_output_removed": true,
+  "evidence_sha256": {
+    "run_decoder_text_math_probe.py": "ea2f6db72504484782d317c13eeedb49c312297add5c891c45d9d4cfbd05a6bc",
+    "prepare_decoder_text_math_probe.py": "3507b3be487015c78c5db724b54d63cc74bfcce479a1a1682d4166d1063f7c13",
+    "decoder_text_math_probe.rs": "d9c53ccf04f8efadfe68fc3c03dfc5a649adc0e76139afbc584dbe33fbdaa332",
+    "decoder_text_math_source.json": "65885253f6e27364b2a455563aca91fdae431e1e81e8abb8c4c7221f1c42b612",
+    "decoder_text_math_cases.rs": "e8e6220e022b1cbcc5a79169297db4b34291276c924e4eb0c2b19572653bb931",
+    "decoder_text_math_probe_compile.log": "bc25275716c04f1bddce629bbf1f53413306d407839379d792d7335deed78c9e",
+    "decoder_text_math_probe_output.log": "8e8cb72d31795628c01c3cd58420a5e92f81c6a33a4af3de140b2fd305742e90"
+  }
+}

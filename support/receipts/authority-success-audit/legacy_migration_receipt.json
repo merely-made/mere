@@ -1,0 +1,33 @@
+{
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "type": "one observed defect with permitted-version and exact-row controls",
+  "command": "cargo test -p mere-kernel --test audit_legacy_migration --locked --offline --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+  "source": "legacy_migration_diagnostics.rs",
+  "output": "legacy_migration_output.txt",
+  "exit_code": 0,
+  "passed": 2,
+  "source_hashes": {
+    "crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs": "f29f6d42b4a5f88a4027bd4e6773f7e4c99d34904094dfb5f81ea033e9cf296f",
+    "crates/graph/graph-kernel/src/graph/assertion_write.rs": "cc5fbf70daabe072c54064b6f543b821fecc820fd931bc138d527a6a6cc278a7",
+    "crates/graph/graph-kernel/src/graph/edge_ops.rs": "5f6dcf41c96ee6091e5d5012c35b2b074231dc6e540f44593cf325d82daf5b3b",
+    "crates/system/pandect/src/graph_session.rs": "fcf7410c3ca8e7590f9edf61cc3caf38af219ce86592e992954daca593a5bcf1",
+    "crates/system/pandect/src/graph_placement.rs": "cb023914b5b266679b4c3af16f9cf12bd6886a408a28a8684b520d0de8214ac3"
+  },
+  "positive_controls": [
+    "Checked writer accepts same method with changed version.",
+    "Migrator accepts method-version-only metadata update.",
+    "Single and parallel Surface rows reconstruct exactly through emitted migration effects."
+  ],
+  "observed_defect": "Migrator accepts changed method IRI or evidence on the same ID; checked exact-ID writer rejects both. ClaimIdentity omits basis reason identity.",
+  "ruled_out": "Row-order divergence hypothesis failed to reproduce; initial diagnostic assertion was false. Initial source/output preserved separately.",
+  "initial_attempt": {
+    "source": "legacy_migration_initial.rs",
+    "output": "legacy_migration_initial_output.txt",
+    "exit_code": 101,
+    "passed": 1,
+    "failed": 1,
+    "interpretation": "Reason-identity gap reproduced; row-order suspicion contradicted by exact equality."
+  },
+  "consumer_tracing": "GraphSession::qualify_legacy_content calls migrator and persists the translation; LegacyTranslationReceipt validates reconstruction and active handles, without reason-identity history checking. No actual durable GraphSession fixture reproduced for this new input yet.",
+  "workspace": "No production changes this pass; temporary integration copy removed after SHA-256 equality check. Shared target reused."
+}

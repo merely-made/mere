@@ -1,0 +1,15 @@
+
+running 10 tests
+test original::tests::a_lapsed_window_starts_a_step ... ok
+test original::tests::a_new_edit_after_undoing_past_the_save_stays_dirty ... ok
+test original::tests::a_new_key_starts_a_step ... ok
+test original::tests::a_saved_entry_past_the_cap_stays_dirty ... ok
+test original::tests::no_key_and_break_run_never_coalesce ... ok
+test original::tests::same_key_within_the_window_is_one_step ... ok
+test original::tests::saves_shift_with_the_cap ... ok
+test original::tests::undoing_back_to_the_save_reads_clean ... ok
+test reducing_a_populated_history_cap_does_not_enforce_the_new_depth ... ok
+test saving_during_a_run_keeps_later_changed_content_clean_and_skips_saved_state ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

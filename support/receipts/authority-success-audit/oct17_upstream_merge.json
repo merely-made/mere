@@ -1,0 +1,9 @@
+{
+  "head": "c1b5d47156f2c940ccd67799963ed203df96362a",
+  "integrated_upstream": "4c4ea11d8ea4b0210fd70af62638484e25f29d5e",
+  "preserved_dirty_paths": 34,
+  "premerge_receipt_sha256": "5341db4fc0c58d64f4a7200df1b498ea28d7f31a17729959acf17b6fbc72ac9d",
+  "all_dirty_bytes_preserved": true,
+  "historical_gate_basis": "a6e6b94140b0b227f2ac19356571e3decfa98975",
+  "note": "Two upstream commits merged. Previous receipts retain their exact earlier basis. No new test run claimed on the new merged revision."
+}

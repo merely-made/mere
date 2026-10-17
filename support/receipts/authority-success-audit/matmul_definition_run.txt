@@ -1,0 +1,22 @@
+
+running 13 tests
+test conflicting_broadcast_control ... ok
+test cpu_reference_same_rank_broadcast_control ... ok
+test cpu_reference_same_rank_control ... ok
+test cpu_reference_valid_rank_mismatch_panics_in_host_stride_lookup ... ok
+test equal_zero_broadcast_control ... ok
+test implicit_leading_singleton_also_loses_empty_dimension ... ok
+test ordinary_broadcast_control ... ok
+test rectangular_lhs_column_stride_view_exceeds_its_allocation ... ok
+test rectangular_rhs_column_stride_view_exceeds_its_allocation ... ok
+test row_layout_control ... ok
+test square_column_stride_control ... ok
+test tall_column_stride_view_aliases_distinct_logical_indices ... ok
+test zero_and_singleton_broadcast_loses_empty_dimension ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'cpu_reference_valid_rank_mismatch_panics_in_host_stride_lookup' (18460) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_definition_probe.rs:64:24:
+index out of bounds: the len is 2 but the index is 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

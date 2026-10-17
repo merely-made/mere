@@ -1,0 +1,12 @@
+{
+  "source_sha256": {
+    "crates/intel/esp/src/embed/index.rs": "0fa17d4442928db98bf5df1894bd41100c9009d352d0409c945de9dd9ab65fc3",
+    "crates/intel/esp/src/embed/provider.rs": "c0273227fb5a8e4d4663cf156d9196d50ebdece3e06f0ad9362ee140e171d80d",
+    "crates/intel/esp/src/embed/sparse.rs": "1cc8ea3b9cfe978f4800d905e653f013cda70f2da31e63994822ba5b1d09b22a",
+    "crates/intel/esp/src/embed/lexical.rs": "eaa9690a95398f1063c5762a24f3c062bdcf55ca8ea4a320f92877822fcb2764",
+    "crates/intel/esp/src/embed/stub.rs": "668927f03bef751e293fdc966f83df1b6bb732ccb300a72223ec8b437b8e627f",
+    "crates/intel/esp/src/embed/search.rs": "c5027219e2c02dc743d00960286fffc190a934ba19170b7e59281169560708b3",
+    "crates/intel/esp/src/embed/affinity.rs": "800ece6b64361ac5e5755e98c310e2fbeec42f156bd753095d417914fc8cc37d"
+  },
+  "qualification": "Seven unchanged current embedding source modules compiled together in their original embed namespace, including their original unit tests. No whole ESP infer/Burn/actor/model-session build."
+}

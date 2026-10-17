@@ -1,0 +1,445 @@
+{
+  "date_utc": "2026-10-17T15:11:06.391238+00:00",
+  "old_basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "basis_commit": "7c71810550234ccbe11f7429cd44e369b279ec06",
+  "kind": "externally advanced shared main; refreshed inventory and invalidated changed source credit",
+  "old_inventory_sha256": "3f0e497f02297115642c704e0c8a016da47a3bf6b233d5e63a67fc23ae63f0ef",
+  "preserved_coverage_sha256": "88fba73b6a5996869df3455f709810d49bf588bd8cdb3a5e8831d344de04e887",
+  "source_inventory_sha256": "c7d6d2572d1d421b25078ebf232f70403f8bb8fd7add1919697073e7d53770cb",
+  "coverage_unchanged": true,
+  "inventory_added": [
+    "crates/intel/esp/src/infer/decoder/architecture_tests.rs",
+    "crates/intel/esp/src/infer/decoder/moe.rs",
+    "crates/intel/esp/tests/architecture_moe_real.rs",
+    "crates/intel/esp/tests/architecture_rows.rs",
+    "crates/intel/esp/tests/measure_architecture_gate.py",
+    "crates/intel/esp/tests/mistral_library.rs",
+    "crates/intel/esp/tests/reference_architectures.py"
+  ],
+  "inventory_removed": [
+    "design_docs/mere_docs/receipts/natal-cap-20261017/mere-intake-narrow-final.diff",
+    "ports/graphshell/web/extension/manifest.chromium.json",
+    "ports/graphshell/web/extension/manifest.firefox.json"
+  ],
+  "inventory_changed": {
+    ".gitattributes": {
+      "before": {
+        "sha256": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+        "chars": 4651,
+        "lines": 77
+      },
+      "after": {
+        "sha256": "9442e3921e008627a71e210e514584be79301fc61000db2625074eed6636ee5b",
+        "chars": 5044,
+        "lines": 84
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/attention.rs": {
+      "before": {
+        "sha256": "12e31813ef25ada4de2640d882e0d27978746a8a2c057b3b9384b2065429f40f",
+        "chars": 21322,
+        "lines": 548
+      },
+      "after": {
+        "sha256": "2554ee0ce9f9419a1648e8f13723bca3135d0173284270d1fd8987f6edf206e7",
+        "chars": 24384,
+        "lines": 636
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/checkpoint.rs": {
+      "before": {
+        "sha256": "441c786f0758d00b5fc01fb6861c999fc4968ac0d3c331ffeed6634a72c6e848",
+        "chars": 10305,
+        "lines": 256
+      },
+      "after": {
+        "sha256": "54d419ccfba9447179c19bedd32b1db303a64650ca411dead7b64f420e9dc609",
+        "chars": 11705,
+        "lines": 293
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/config.rs": {
+      "before": {
+        "sha256": "d39b073f56c2d79272ddddbe1feef7d458a65ef3118db9c9a7459d51cab26a29",
+        "chars": 19919,
+        "lines": 553
+      },
+      "after": {
+        "sha256": "ddd102ca5e118526cc402df6b9975494519950ba64c98b7df4bf3f818201384c",
+        "chars": 30649,
+        "lines": 839
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/layer.rs": {
+      "before": {
+        "sha256": "7b6db68198af1838670d97a318eea3260f12694168c99815c5c06b3263878aa4",
+        "chars": 8824,
+        "lines": 252
+      },
+      "after": {
+        "sha256": "baa1cbb97d0b4f1847c4e55e7aa17fbe2d2fec74a83192092a2cecc598a79cf4",
+        "chars": 10348,
+        "lines": 285
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/loader.rs": {
+      "before": {
+        "sha256": "ab0d17abf6c487f9015359537377bd83b08f68b91a27ec46f231eed6ed63b70b",
+        "chars": 19880,
+        "lines": 545
+      },
+      "after": {
+        "sha256": "57a18eddb9a666455c1dc9f9fad502e33916be5d5be63996ec717b2df0dd8d17",
+        "chars": 30624,
+        "lines": 846
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/lora.rs": {
+      "before": {
+        "sha256": "3b55c83591fc522a7b93516bc4788ce9a411fd8b27c7876d7405383505185d9a",
+        "chars": 16651,
+        "lines": 437
+      },
+      "after": {
+        "sha256": "b53562dffd9f350059c8e80e9e18296738e64998f03d26e32115114ea16c0089",
+        "chars": 17399,
+        "lines": 441
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/mod.rs": {
+      "before": {
+        "sha256": "bbf76da304531ccff79aeeda9f450f6f0772144e5c7d5bb834a865a749bc94df",
+        "chars": 5771,
+        "lines": 152
+      },
+      "after": {
+        "sha256": "089384630f77bab14810c89897026c81719ed3af2ad9cba5ea0ecb98a1f5bfac",
+        "chars": 6121,
+        "lines": 164
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/model.rs": {
+      "before": {
+        "sha256": "03e6cac0fe4127218815bbda6cf81b2afab6e96bf692db13a5a4aa5e256adb75",
+        "chars": 18018,
+        "lines": 477
+      },
+      "after": {
+        "sha256": "ff2319241c49a840ebfbed255336ce947fe3595c4a534f07988afbb845ffebd6",
+        "chars": 24692,
+        "lines": 657
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/provider.rs": {
+      "before": {
+        "sha256": "fb637714d91bcbce722bb4c91aa5e6f71b1349a2b411484e69aeeabd3e0a1a16",
+        "chars": 31947,
+        "lines": 818
+      },
+      "after": {
+        "sha256": "23ea7c252c399c1569408b31cddfe0bb52ee997c647eff4e65f82c1de79575f0",
+        "chars": 33931,
+        "lines": 868
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/stage.rs": {
+      "before": {
+        "sha256": "a6bbd9bbd4f625e68ae92d53090a79f430106cbaf5644c403a2060888c369769",
+        "chars": 21405,
+        "lines": 590
+      },
+      "after": {
+        "sha256": "d1525ff61c2058e37afe0a738edad41b9ef38c0f6589c13f5531c671d90f9437",
+        "chars": 24970,
+        "lines": 682
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/streaming.rs": {
+      "before": {
+        "sha256": "625e98182e021ea1433a8c13e25c496d94dc23e956b44c01790ff94a794c72cd",
+        "chars": 4001,
+        "lines": 118
+      },
+      "after": {
+        "sha256": "e7ccc8b5f05fae5aeb7ea65f2a8a0108f556a96dfd35bb4be362046972bcf072",
+        "chars": 6334,
+        "lines": 186
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/train.rs": {
+      "before": {
+        "sha256": "467db4d7866c8f963753d8981d65615531cb360e4f516231771ab1232e2f0507",
+        "chars": 25085,
+        "lines": 650
+      },
+      "after": {
+        "sha256": "d0ab0d57973399df52fc31f39a05e58ccc6509141c27a146d9fe63b29900b89c",
+        "chars": 25324,
+        "lines": 653
+      }
+    },
+    "crates/intel/esp/src/infer/decoder/train_autodiff.rs": {
+      "before": {
+        "sha256": "dc95fd82b68e1a4a7e8dd0a18f897027c0b604402a50078180170245e49d0b10",
+        "chars": 22936,
+        "lines": 563
+      },
+      "after": {
+        "sha256": "0d706a0489224bef63155ae7cf0a59b14930a6ea914ff125952eda1152ac6814",
+        "chars": 23129,
+        "lines": 566
+      }
+    },
+    "crates/intel/esp/src/infer/layer_library.rs": {
+      "before": {
+        "sha256": "4302510c921b47726b94422b095e715d02117fc45a55522beeb2f94e39525e88",
+        "chars": 30502,
+        "lines": 799
+      },
+      "after": {
+        "sha256": "a6c109ba64c68b98686e1a4609c6160f209e11bc7909dfa572f2ec75538df6e6",
+        "chars": 32098,
+        "lines": 833
+      }
+    },
+    "crates/intel/esp/src/infer/library.rs": {
+      "before": {
+        "sha256": "6a38de140b075cc8bccd32136b58ad1144e9dfc97658ca614a511eeb230b62d9",
+        "chars": 18498,
+        "lines": 462
+      },
+      "after": {
+        "sha256": "152dd70fe1404cf7972d29ae4e2aa0cf474527fc381ce6793dbc808b398e8d32",
+        "chars": 22002,
+        "lines": 550
+      }
+    },
+    "ports/distillery/src/inference.rs": {
+      "before": {
+        "sha256": "9f44694090837c15bde7c8d54344fc30976f6da52fc87c919976cf290f238463",
+        "chars": 82833,
+        "lines": 2139
+      },
+      "after": {
+        "sha256": "9c432785d4d91d2315176ec569bdfaf600b030e1558244aead65d0ae010e9c6f",
+        "chars": 82552,
+        "lines": 2134
+      }
+    },
+    "ports/distillery/src/inference_stage.rs": {
+      "before": {
+        "sha256": "f90453ca59bda9769ba124b08478da4e38191fd5d52c1d52283153a30f00f842",
+        "chars": 48307,
+        "lines": 1261
+      },
+      "after": {
+        "sha256": "afb53cc09ab6b2eac7a6e88e17161ebbf749c3239c6c909cab9ddf4fc86f59e2",
+        "chars": 48580,
+        "lines": 1267
+      }
+    },
+    "ports/distillery/tests/inference_layered.rs": {
+      "before": {
+        "sha256": "30cee1484c6648f628201506c8f56ee5c1ff4939e7165c3b5bb455e59a883896",
+        "chars": 10754,
+        "lines": 288
+      },
+      "after": {
+        "sha256": "802709eb4ed5507fbf7f8c6ffa8ce4c172e14024cd05f4f9ecc9e90956e6c183",
+        "chars": 12008,
+        "lines": 328
+      }
+    },
+    "ports/djinn/src/resident_mere.rs": {
+      "before": {
+        "sha256": "23bcf5a71ecc04bedb552557162ac0a30540d013bbe9b49ec3b334ec06fcb9a7",
+        "chars": 227115,
+        "lines": 5518
+      },
+      "after": {
+        "sha256": "752f7fce917ab0489b77829169c99ff08f240add632597ba9501a2ae09fa3ef4",
+        "chars": 233688,
+        "lines": 5657
+      }
+    }
+  },
+  "coverage": {
+    "complete_files": 2609,
+    "total_files": 3735,
+    "read_chars": 30571064,
+    "total_chars": 39553236,
+    "changed_since_inventory": [
+      ".gitattributes",
+      "crates/intel/esp/src/infer/decoder/attention.rs",
+      "crates/intel/esp/src/infer/decoder/checkpoint.rs",
+      "crates/intel/esp/src/infer/decoder/config.rs",
+      "crates/intel/esp/src/infer/decoder/layer.rs",
+      "crates/intel/esp/src/infer/decoder/loader.rs",
+      "crates/intel/esp/src/infer/decoder/lora.rs",
+      "crates/intel/esp/src/infer/decoder/mod.rs",
+      "crates/intel/esp/src/infer/decoder/model.rs",
+      "crates/intel/esp/src/infer/decoder/provider.rs",
+      "crates/intel/esp/src/infer/decoder/stage.rs",
+      "crates/intel/esp/src/infer/decoder/streaming.rs",
+      "crates/intel/esp/src/infer/decoder/train.rs",
+      "crates/intel/esp/src/infer/decoder/train_autodiff.rs",
+      "crates/intel/esp/src/infer/layer_library.rs",
+      "crates/intel/esp/src/infer/library.rs",
+      "ports/distillery/src/inference.rs",
+      "ports/distillery/src/inference_stage.rs",
+      "ports/distillery/tests/inference_layered.rs",
+      "ports/djinn/src/resident_mere.rs"
+    ],
+    "pending_chunks": 0
+  },
+  "protected_source_changes": {
+    ".gitattributes": {
+      "before": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+      "after": "9442e3921e008627a71e210e514584be79301fc61000db2625074eed6636ee5b"
+    },
+    "ports/djinn/src/resident_mere.rs": {
+      "before": "23bcf5a71ecc04bedb552557162ac0a30540d013bbe9b49ec3b334ec06fcb9a7",
+      "after": "752f7fce917ab0489b77829169c99ff08f240add632597ba9501a2ae09fa3ef4"
+    },
+    "ports/distillery/src/inference.rs": {
+      "before": "9f44694090837c15bde7c8d54344fc30976f6da52fc87c919976cf290f238463",
+      "after": "9c432785d4d91d2315176ec569bdfaf600b030e1558244aead65d0ae010e9c6f"
+    },
+    "ports/distillery/src/inference_stage.rs": {
+      "before": "f90453ca59bda9769ba124b08478da4e38191fd5d52c1d52283153a30f00f842",
+      "after": "afb53cc09ab6b2eac7a6e88e17161ebbf749c3239c6c909cab9ddf4fc86f59e2"
+    },
+    "ports/distillery/tests/inference_layered.rs": {
+      "before": "30cee1484c6648f628201506c8f56ee5c1ff4939e7165c3b5bb455e59a883896",
+      "after": "802709eb4ed5507fbf7f8c6ffa8ce4c172e14024cd05f4f9ecc9e90956e6c183"
+    },
+    "crates/intel/esp/src/infer/decoder/lora.rs": {
+      "before": "3b55c83591fc522a7b93516bc4788ce9a411fd8b27c7876d7405383505185d9a",
+      "after": "b53562dffd9f350059c8e80e9e18296738e64998f03d26e32115114ea16c0089"
+    },
+    "crates/intel/esp/src/infer/decoder/attention.rs": {
+      "before": "12e31813ef25ada4de2640d882e0d27978746a8a2c057b3b9384b2065429f40f",
+      "after": "2554ee0ce9f9419a1648e8f13723bca3135d0173284270d1fd8987f6edf206e7"
+    },
+    "crates/intel/esp/src/infer/decoder/checkpoint.rs": {
+      "before": "441c786f0758d00b5fc01fb6861c999fc4968ac0d3c331ffeed6634a72c6e848",
+      "after": "54d419ccfba9447179c19bedd32b1db303a64650ca411dead7b64f420e9dc609"
+    },
+    "crates/intel/esp/src/infer/decoder/config.rs": {
+      "before": "d39b073f56c2d79272ddddbe1feef7d458a65ef3118db9c9a7459d51cab26a29",
+      "after": "ddd102ca5e118526cc402df6b9975494519950ba64c98b7df4bf3f818201384c"
+    },
+    "crates/intel/esp/src/infer/decoder/layer.rs": {
+      "before": "7b6db68198af1838670d97a318eea3260f12694168c99815c5c06b3263878aa4",
+      "after": "baa1cbb97d0b4f1847c4e55e7aa17fbe2d2fec74a83192092a2cecc598a79cf4"
+    },
+    "crates/intel/esp/src/infer/decoder/loader.rs": {
+      "before": "ab0d17abf6c487f9015359537377bd83b08f68b91a27ec46f231eed6ed63b70b",
+      "after": "57a18eddb9a666455c1dc9f9fad502e33916be5d5be63996ec717b2df0dd8d17"
+    },
+    "crates/intel/esp/src/infer/decoder/mod.rs": {
+      "before": "bbf76da304531ccff79aeeda9f450f6f0772144e5c7d5bb834a865a749bc94df",
+      "after": "089384630f77bab14810c89897026c81719ed3af2ad9cba5ea0ecb98a1f5bfac"
+    },
+    "crates/intel/esp/src/infer/decoder/model.rs": {
+      "before": "03e6cac0fe4127218815bbda6cf81b2afab6e96bf692db13a5a4aa5e256adb75",
+      "after": "ff2319241c49a840ebfbed255336ce947fe3595c4a534f07988afbb845ffebd6"
+    },
+    "crates/intel/esp/src/infer/decoder/provider.rs": {
+      "before": "fb637714d91bcbce722bb4c91aa5e6f71b1349a2b411484e69aeeabd3e0a1a16",
+      "after": "23ea7c252c399c1569408b31cddfe0bb52ee997c647eff4e65f82c1de79575f0"
+    },
+    "crates/intel/esp/src/infer/decoder/stage.rs": {
+      "before": "a6bbd9bbd4f625e68ae92d53090a79f430106cbaf5644c403a2060888c369769",
+      "after": "d1525ff61c2058e37afe0a738edad41b9ef38c0f6589c13f5531c671d90f9437"
+    },
+    "crates/intel/esp/src/infer/decoder/streaming.rs": {
+      "before": "625e98182e021ea1433a8c13e25c496d94dc23e956b44c01790ff94a794c72cd",
+      "after": "e7ccc8b5f05fae5aeb7ea65f2a8a0108f556a96dfd35bb4be362046972bcf072"
+    },
+    "crates/intel/esp/src/infer/decoder/train.rs": {
+      "before": "467db4d7866c8f963753d8981d65615531cb360e4f516231771ab1232e2f0507",
+      "after": "d0ab0d57973399df52fc31f39a05e58ccc6509141c27a146d9fe63b29900b89c"
+    },
+    "crates/intel/esp/src/infer/decoder/train_autodiff.rs": {
+      "before": "dc95fd82b68e1a4a7e8dd0a18f897027c0b604402a50078180170245e49d0b10",
+      "after": "0d706a0489224bef63155ae7cf0a59b14930a6ea914ff125952eda1152ac6814"
+    },
+    "crates/intel/esp/src/infer/layer_library.rs": {
+      "before": "4302510c921b47726b94422b095e715d02117fc45a55522beeb2f94e39525e88",
+      "after": "a6c109ba64c68b98686e1a4609c6160f209e11bc7909dfa572f2ec75538df6e6"
+    },
+    "crates/intel/esp/src/infer/library.rs": {
+      "before": "6a38de140b075cc8bccd32136b58ad1144e9dfc97658ca614a511eeb230b62d9",
+      "after": "152dd70fe1404cf7972d29ae4e2aa0cf474527fc381ce6793dbc808b398e8d32"
+    }
+  },
+  "runtime_input_changes": {
+    "Cargo.lock": {
+      "before": "19acd3f4365ec8f4e0c5c8df317692ee86805f8d86dcdf704e585b189a961e13",
+      "after": "38507a9d09afbe7601b569190302aa3aacb7d4f0b41cbfe77c9c3c4ac86c0793"
+    }
+  },
+  "shared_working_file_changes": {
+    ".gitattributes": {
+      "before": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+      "after": "9442e3921e008627a71e210e514584be79301fc61000db2625074eed6636ee5b"
+    }
+  },
+  "current_git_index_sha256": "86ac8db1bfbff79dbb590aa25145c8030e0ed58722d88ad035ded83459ffe51e",
+  "current_shared_working_file_sha256": {
+    ".gitattributes": "9442e3921e008627a71e210e514584be79301fc61000db2625074eed6636ee5b",
+    "crates/cambium/scenes/scenograph/src/link.rs": "42f1c3328693d90aec125ed3b3d60ce2a45d4b4b93659ce7a43b2e2749c0694f",
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "5d4d8cf451e22ee3481881c9f87fd1d4c6df74e124e70b6ae37a37deb4e1b2f6",
+    "crates/cambium/scenes/scenograph/src/presentation/scripts.rs": "0efdcf8901fe64ebc897cfca002d54c4fa946008f06d85cac148dc88c5c34643",
+    "crates/cambium/scenes/scenomise/src/opened_link.rs": "727fd157715bbd27aae7fe6d3ffb45ec2a6c3c9a5f0f9957d3d155551585ca21",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "crates/graphshell/graphshell-client/src/remote.rs": "0918f8c152a71ddcdfa524f31d4f499f21087f1151d55c9b3f004cc9680efc2b",
+    "crates/graphshell/graphshell-client/src/remote/tests.rs": "55a364b55a994fe9871168f77ca080bc6a0dec24d1291d999bd11b405fb80a40",
+    "crates/script/rhai/tests/scenograph_rules.rs": "c4bde16ef3c4f25b5a3e7f058cc09f69d44a552402dc9317ffe51877bb4d4686",
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "design_docs/dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md": "33c253688dc01a00640a2ac303bfbe5ec96eca90bc4a62a0afd06ebe9bc74037",
+    "design_docs/mere_docs/implementation_strategy/2026-10-05_djinn_test_harness_plan.md": "6f3f0705f930f3a0fc3b7e41ce49c93fdf73f7d01f07a47df2d251b8fd1781af",
+    "design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md": "ec14a01bae35c47bf51589f1feb40aa5e94285ba22bb4b1b5e40a39943abdc54",
+    "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md": "d2fcaed3fe7ca654a92b1969ae2173303d6ee1d1a87d53547ed6ce032eeef42d",
+    "design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md": "db012b59d66da6d74eb59079cf27cc55400d4f3c5f2131a44b501dbbff7b5cfb",
+    "design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md": "06ccdadb771ad184f6d33077e18f5ed482179bc1c828ed10e2d743e54e056112",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "ab40f1887af4ad301a033b409eb2d5413238b33db3771db5693f06691a2866ab",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d"
+  },
+  "current_runtime_input_sha256": {
+    "crates/intel/reference-data/fixtures/bilingual.json": "966f7e926dca10d4ed904c7a5dca5cad38ba163b55aaa98e9d9d68dc244960b1",
+    "crates/intel/mora-cmudict/data/cmudict.dict": "59d6398f55297e59afb2ca3276380827524c0940fcbbfcd19022bb76fd55f719",
+    "Cargo.lock": "38507a9d09afbe7601b569190302aa3aacb7d4f0b41cbfe77c9c3c4ac86c0793"
+  },
+  "report_unchanged": true,
+  "stickleback_30_compile_and_read_hashes_unchanged": true,
+  "audit_authored_production_edits": false,
+  "old_evidence_sha256": {
+    "before_main_refresh_source_inventory.json": "3f0e497f02297115642c704e0c8a016da47a3bf6b233d5e63a67fc23ae63f0ef",
+    "before_main_refresh_read_coverage.json": "88fba73b6a5996869df3455f709810d49bf588bd8cdb3a5e8831d344de04e887",
+    "record_stickleback_completion_review_initial.py": "03dcafe1b1bc535bd77b58c19aff692feac4596ae02ad5714b2fc5f88f067748",
+    "stickleback_completion_initial_failure.json": "ce297c1ccf0e72d23926702be7ceb6d202a25e20499e5044e63ee2cf14558c7f",
+    "refresh_main_after_stickleback.py": "6f3639c1b3d6f7b62dc256d6ad4c7b82d554f6d140e2675e0492c4a201068a06"
+  },
+  "qualification": "External main publication changed old inference sources and added source; no pull, merge, reset, commit or production edit by audit. Changed prior source credit is invalid until reread at new hash. All historical findings retain their recorded basis. Current Stickleback source hashes match both diagnostic receipts; retained suppliers are qualified, not a fresh Cargo graph at new Cargo.lock."
+}

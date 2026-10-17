@@ -1,0 +1,29 @@
+
+running 3 tests
+test installing_transfer_rule_replaces_callers_synthetic_projection_policy ... FAILED
+test stale_endpoint_hint_save_loses_successfully_added_pair ... FAILED
+test stale_endpoint_hint_save_restores_successfully_unpaired_authority ... FAILED
+
+failures:
+
+failures:
+    installing_transfer_rule_replaces_callers_synthetic_projection_policy
+    stale_endpoint_hint_save_loses_successfully_added_pair
+    stale_endpoint_hint_save_restores_successfully_unpaired_authority
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+
+thread 'installing_transfer_rule_replaces_callers_synthetic_projection_policy' (50832) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\djinn_settings_probe.rs:73:305:
+called `Result::unwrap()` on an `Err` value: NotSelected("node/00000000-0000-0000-0000-000000000001")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'stale_endpoint_hint_save_loses_successfully_added_pair' (36464) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\djinn_settings_probe.rs:9:5:
+assertion `left == right` failed
+  left: "authority-success audit generated settings fixture\r\n"
+ right: "authority-success audit generated settings fixture\n"
+
+thread 'stale_endpoint_hint_save_restores_successfully_unpaired_authority' (46988) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\djinn_settings_probe.rs:9:5:
+assertion `left == right` failed
+  left: "authority-success audit generated settings fixture\r\n"
+ right: "authority-success audit generated settings fixture\n"

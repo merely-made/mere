@@ -1,0 +1,10 @@
+
+running 4 tests
+test referenced_name_is_projected_but_native_lookup_misses_it ... ok
+test superseded_raw_label_is_still_the_native_target ... ok
+test t4_bare_control_paints_at_overriding_local_offset ... actual bare control rect: (4.0, 4.0, 64.0, 48.0)
+ok
+test text_name_is_projected_but_native_lookup_misses_it ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+

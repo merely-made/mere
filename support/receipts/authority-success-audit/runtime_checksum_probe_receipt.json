@@ -1,0 +1,39 @@
+{
+  "date_utc": "2026-10-17T20:57:38.280579+00:00",
+  "exit": 0,
+  "passed": 3,
+  "source_sha256": {
+    "support/patches/cubecl-runtime/src/tune/operation.rs": "438f2c90dc570112fc78c9052fcbc3b5b76940138d34f7aab848aeb46ccc6bfc"
+  },
+  "extracted_accumulation_prefix_sha256": "f2d09e22d493fb593e8b2ba365cc89fac166d2cac6713ed19c0c42d51e5bebe9",
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\runtime_checksum_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-runtime-checksum.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-checksum.exe",
+      "bytes": 754688,
+      "sha256": "20a1a59d67e251f89a3416436a7668cc81c10406657c093a45c124566b24f0e4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-checksum.pdb",
+      "bytes": 3026944,
+      "sha256": "84fef542a7629f99510817a1db04b38ec68025b258709d8cc8b93f6a18e117e0"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_runtime_checksum_probe.py": "458532beb835011478c8fb660310009be6e56fbee61c314b8577587db7c6718d",
+    "runtime_checksum_probe.rs": "be847b67f3d3ea3c16254a096f362ee28f971d3a2237a2fde8499a5ef4eb392c",
+    "runtime_checksum_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime_checksum_run.txt": "2832dc9315feb2c3c3119824023b87edba23fedd2d5cf7a910528e8811e3ab94"
+  },
+  "qualification": "Exact compute_checksum name-accumulation prefix before StableHasher call, compiled with minimal candidate/function/set structs. Three CPU cases: same-count rename and changed-count name lists produce identical String preimage, a distinct concatenation control differs. No replacement hasher: equal input necessarily produces same deterministic StableHasher result, but that crate was not built/run. No actual persistent cache load, stale index execution, tuner or GPU run. Owned exe/PDB removed."
+}

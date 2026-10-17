@@ -1,0 +1,9 @@
+
+running 2 tests
+test audit_busy_worker_control_starts_both_actors_before_release ... Busy-worker control starts both actors on two workers before either is released.
+ok
+test audit_queued_actors_can_share_an_unreserved_idle_worker_and_strand ... Idle-worker race observed at Some((0, 1)): second actor starts only after first is released; both jobs subsequently finish.
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.22s
+

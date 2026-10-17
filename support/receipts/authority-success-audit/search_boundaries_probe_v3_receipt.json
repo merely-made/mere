@@ -1,0 +1,207 @@
+{
+  "date_utc": "2026-10-17T10:05:17.710958+00:00",
+  "source_sha256": {
+    "crates/intel/eidetic-search/Cargo.toml": "3c0a157635923e89653d78eb1dfb2707a033b3d049a22b8b1aa9d3b297dfaeb0",
+    "crates/intel/eidetic-search/examples/eidetic-recall.rs": "e4daa1e10868edc42fcfa6c9ed9dbf928b6f2a3c1820ffef79e3b46cca8fa60c",
+    "crates/intel/eidetic-search/src/bm25.rs": "5f228b4054cef341c74175dedf289b9efb8a5bedc2f6d86bc5c5ea0d2f63bd55",
+    "crates/intel/eidetic-search/src/candidates.rs": "3f1e0f67bd7ca88459156fe4793f43d4e983e6d49bdc9e222b4c402145e3dcd0",
+    "crates/intel/eidetic-search/src/document.rs": "e3d5389948cdd662c080eebb60c98aebbdddf56f4defd073872391af4887a400",
+    "crates/intel/eidetic-search/src/fusion.rs": "13a865f0e5a98e00e3f3c78342c25b6b9ba57a13da056bc614f88d81af051c80",
+    "crates/intel/eidetic-search/src/index.rs": "2b75df5c0d28158cb2219705399aa894ee3e7d75daeef15a1ae3722beb845324",
+    "crates/intel/eidetic-search/src/lib.rs": "7866f3da65aa075edaabb8fe48667b756e0789744f1b6d33e9f555f992be70a8",
+    "crates/intel/eidetic-search/src/spec.rs": "2106f89843dd93da19ea0cd8b33cace747186a668f729326b2dbbb281c3c92aa",
+    "crates/intel/eidetic-search/src/tokenize.rs": "f2f94255488fbe25e89b22d866366b56e5c29778a77f7889248798580e7a791d",
+    "crates/intel/eidetic-search/tests/mint_ladder.rs": "7590530ed5cfac9e3862a63f9c65f1c5548fcf8beb6e974ee9cd94a1d09c6f78"
+  },
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    },
+    "thiserror": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-0072a8e15e7c62db.rlib",
+      "sha256": "de4d8a09ebf42a9d4b45d639ac9600f5caf36342729d00578f797e8366f591cd",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#thiserror@1.0.69"
+    },
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-364b4c6f4c802c0a.rlib",
+      "sha256": "c242022cb18beefb6ae839adc423db8412d3eaa05efc788dea766657eee8b4bf",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2"
+    },
+    "genet_text": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_text-5403056dfa0aadcb.rlib",
+      "sha256": "ed73196c57c862ee82ac24f1734a7a4af76abf6745f811ce22819799020853f8",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/genet.git?branch=main#genet-text@0.1.0"
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+      "-L",
+      "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+      "--crate-name",
+      "eidetic_search",
+      "--crate-type",
+      "rlib",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\intel\\eidetic-search\\src\\lib.rs",
+      "--extern",
+      "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "--extern",
+      "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "--extern",
+      "thiserror=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-0072a8e15e7c62db.rlib",
+      "--extern",
+      "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-364b4c6f4c802c0a.rlib",
+      "--extern",
+      "genet_text=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_text-5403056dfa0aadcb.rlib",
+      "-C",
+      "metadata=authority_success_search",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\libauthority_success_eidetic_search.rlib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+      "-L",
+      "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+      "-L",
+      "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+      "-L",
+      "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+      "--test",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\search_boundaries_probe_v3.rs",
+      "--extern",
+      "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "--extern",
+      "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "--extern",
+      "thiserror=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libthiserror-0072a8e15e7c62db.rlib",
+      "--extern",
+      "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-364b4c6f4c802c0a.rlib",
+      "--extern",
+      "genet_text=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_text-5403056dfa0aadcb.rlib",
+      "--extern",
+      "eidetic_search=C:\\t\\cargo-targets\\mere\\libauthority_success_eidetic_search.rlib",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-search-boundaries.exe"
+    ]
+  ],
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "build_exits": [
+    0,
+    0
+  ],
+  "run_exit": 0,
+  "checks": 14,
+  "runner_sha256": "6df81bd69bb8870bd16d1ddba1b8071c3e41de38dd02054c23df461db83a582b",
+  "probe_sha256": "c8e38f4cd8ab36d6ef32635d146bb61afe46792146d4b58c45c0dc20d0fe1832",
+  "fixture_files_before_cleanup": {
+    ".audit-generated": {
+      "bytes": 48,
+      "sha256": "2b4925c221b0dc9b0acf6a8f3f1a75344e7ae4cd8a31d632b7d7cbab2c3dc255"
+    },
+    "replacement/mere-search-spec.json": {
+      "bytes": 92,
+      "sha256": "b5b7e2a0d7c9cf898edfc92e5f20a14578394e88307eb469614ae4d11787ffd3"
+    },
+    "replacement/trail-projection.json": {
+      "bytes": 187,
+      "sha256": "4090e6afce2774a311eac143b8abd156147292d2bacab32582552712fe2e1e96"
+    },
+    "stem/mere-search-spec.json": {
+      "bytes": 92,
+      "sha256": "b5b7e2a0d7c9cf898edfc92e5f20a14578394e88307eb469614ae4d11787ffd3"
+    },
+    "stem/trail-projection.json": {
+      "bytes": 187,
+      "sha256": "4090e6afce2774a311eac143b8abd156147292d2bacab32582552712fe2e1e96"
+    },
+    "transient/unrelated-marker.txt": {
+      "bytes": 39,
+      "sha256": "46f9746e53e8aad57da0a72aad9add292aaa76ee3eef15a23899e07d5a1e20f0"
+    }
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_eidetic_search.rlib",
+      "bytes": 2961398,
+      "sha256": "bbd7721e1d0b02112bbfa579374bce5fe892d12d60dafcd22142007ae8575f3c"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-search-boundaries.exe",
+      "bytes": 1730048,
+      "sha256": "a8bf1df89198e19ccc9eb0a96b1a759aefe802e3ee90cc9ee2f5841bc88700d9"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-search-boundaries.pdb",
+      "bytes": 28504064,
+      "sha256": "b8396b429a8d0bfcf04fd0cc66d9fe21014838441739bd25852227146027393d"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Fresh current entire eidetic-search production library over exact retained Eidetic/Genet text/serde/JSON/thiserror suppliers. Five public-API integration observations plus nine original BM25/fusion module tests. No full Cargo dev/example graph, ESP/embedding, live corpus or product acceptance; destructive-path observation only touches marker-identified disposable fixtures under the approved reusable target."
+}

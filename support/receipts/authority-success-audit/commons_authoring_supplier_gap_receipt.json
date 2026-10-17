@@ -1,0 +1,149 @@
+{
+  "date_utc": "2026-10-17T11:56:32.820011+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "selected_retained_gemot_fingerprint": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\gemot-d1280ffacb26c7cf\\lib-gemot.json",
+    "sha256": "2b203c2fbe1ec53d99f45d927fe2e7bb53ff249932648cea0756e935e748b00c"
+  },
+  "expected_insigne_fingerprint": 4242438457091662878,
+  "observed_insigne_fingerprints": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-08224636e0c6e49a\\lib-insigne",
+      "sha256": "7942176ae5a6d0393f8c19d374bf273f61c582d8df87bff5cfbfc8b5e96f52c2",
+      "value": 5842605656953911784,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-0fdd7a2c3cfcefb2\\lib-insigne",
+      "sha256": "da7d1be47350d9b1a8cadb315d7354c356e43dc91abbe267e67d6ac0d27747e9",
+      "value": 3050636448790221365,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-1101eedfabd117e9\\lib-insigne",
+      "sha256": "838c5ec14d6c1d0011faecb50d93c89c0460ebdcd7adacb02fe87e9e6daa3b16",
+      "value": 14551551828848097359,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-12ea9cf474a8f6fc\\lib-insigne",
+      "sha256": "fb0b13bdd4ea08236b6a64dcfd84390869ade30e32ba4eaa0c1bb9cecb1f5406",
+      "value": 7718587918560652708,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-1a5b7827870d354a\\lib-insigne",
+      "sha256": "1002f3f3936e5e73b786e18f05001dba6b65c27b2acee01957662567424f36a4",
+      "value": 18326865567644270051,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-2c24fba33628fd1b\\lib-insigne",
+      "sha256": "afc6e3dc4a98421544f68ac18030a2eb64c32ec6b7d0afec196ff78659d6ff76",
+      "value": 243896964179266070,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-2eae9c443171f90b\\lib-insigne",
+      "sha256": "b6b102ab7a3bfc9cb1969e5e743258f6f132be0a0edc4d14fe4b9fc7c53de26a",
+      "value": 14222972706250544203,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-39b85aecfba09fc5\\lib-insigne",
+      "sha256": "42c6c0201e0b99d359deb1a1bb75dda07275b65ef88eab215a1a88cc536e77a5",
+      "value": 4339576671016169961,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-47385d9f28273288\\lib-insigne",
+      "sha256": "dd363729429b2199aa7e70ab733b8b46287037253492c246328b8253144d65e2",
+      "value": 14401355568943524109,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-48624bcc5b7461ad\\lib-insigne",
+      "sha256": "3030e9940597cb04e4bfe49b1b7ba7cfb44028220072d2b47a048f8b015ae9cd",
+      "value": 1100029203966151910,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-69fdd2b73b9582f1\\lib-insigne",
+      "sha256": "455dd6b8f32d602dd0ef2bc56092443d9af190a7ccf18019b1e9f2bb4f21ac21",
+      "value": 7798466915868374545,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-881330df5e4fe6b4\\lib-insigne",
+      "sha256": "a7d01b71232786c96a2b43bba4664e4a9e8aa50b12bfd0c6fe61377d52ef2e09",
+      "value": 2626747515144139290,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-8d0f2190ec298296\\lib-insigne",
+      "sha256": "062f4a8adc7600c3c219f9a156fe597eb3160dc9addf923107b20ad6ee1cb182",
+      "value": 2438541329315367422,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-955b80afa4630e77\\lib-insigne",
+      "sha256": "c4f73d4ef38d28765ac89ccc0d03b43b479e0f09ad307fa10bb29effd26cd2b6",
+      "value": 3492335656838042627,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-bcd72d05fadd1432\\lib-insigne",
+      "sha256": "04a117cdb46d8a49938467ca73def4650c1f3ba271ae6af770e3dbe38b8e5923",
+      "value": 11902895981604599363,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-c0d43ee68e8c4587\\lib-insigne",
+      "sha256": "d89a78b5dd9196d640fbfbcc2476f3d67b78cb89be134562ac47992ee8763191",
+      "value": 5829092445364734193,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-c6b505fca240fdce\\lib-insigne",
+      "sha256": "06d95968faf122587395361af0496cf8c6ca3bf9c7a8a2be4fccf6009879a7bc",
+      "value": 4853446234291332576,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-c73a7cd2382a289c\\lib-insigne",
+      "sha256": "d955d9f18b737f09cad59f4ca9a89dac89c89cbc934890c79ce1c3bf11991450",
+      "value": 17853261626459947329,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-cb06a887d17109d3\\lib-insigne",
+      "sha256": "6f232e83686cd4ffafd0496c7e306bc2f048bdd90f755876897aa44bfadfd066",
+      "value": 3948662138308378231,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-e2a0371a6f752d97\\lib-insigne",
+      "sha256": "3e55554d01ee86241af71cead79671198301dc5dd929d4ae9ff061d769766c45",
+      "value": 11917743794669312362,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-f1bca8c121dede87\\lib-insigne",
+      "sha256": "f5ba38ceccc09416a1fe0f193444586a32ec69219cfe5bcc0869192cfa0722da",
+      "value": 13208213163354094781,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-f4aa6b46394eba1f\\lib-insigne",
+      "sha256": "8d5ec56ee07fcf5cb2f738a39711a7956c649586733f761066e7914a1c6a6613",
+      "value": 13005783154616788745,
+      "artifact_exists": false
+    }
+  ],
+  "selector_sha256": "d6d676ffa456fa5e372e29e0e6eee68574546085037268c004c9de34ba0db5bd",
+  "prepared_consumer_sha256": "f86b07dc9412c5d216019f37a66330a59b5ae274b2ed186a32b95473b1a1c79c",
+  "unexecuted_runner_sha256": "d4696439a24dfcdb81cd648741a082deb3b96234000ed03031047461ee3bb39f",
+  "executed_library_build": false,
+  "executed_public_api_checks": 0,
+  "qualification": "The selected retained Gemot family could not be proven coherent using current matching Insigne fingerprint/artifact pairs. This records that bounded selection failure, not absence of every possible supplier set or a current Cargo build failure. The prepared whole-library/public consumer runner was not executed. Continue source review; Q352 remains source-confirmed."
+}

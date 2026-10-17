@@ -1,0 +1,87 @@
+{
+  "date_utc": "2026-10-16T21:49:30.920876+00:00",
+  "scope": "Current public capture/codec/chunk APIs and graphshell-host LineReader, generated in-memory data and Tokio duplex only. Exact live-client comparison. No browser, network, installed resident or persisted user capture executed. Chunk wrapper qualification is source-reviewed, not invoked by this standalone probe.",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\chirograph_review_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-chirograph-review-probe.exe",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-16d9d90723aa8f18.rlib",
+    "--extern",
+    "scenotime=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-edd2b0e7fb2358b2.rlib",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-923a910f142327c8.rlib",
+    "--extern",
+    "graphshell_client=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_client-e8accababb5a0f11.rlib",
+    "--extern",
+    "graphshell_host=C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_host.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "tests": 5,
+  "source_sha256": {
+    "crates/chirograph/src/capture.rs": "5d1cdac9439cef8d987655f1bab8313e1060d9f25ede3c24f145d06ef4dba760",
+    "crates/chirograph/src/lib.rs": "45bb6c12d1c58f7f581221b55b0ea206292581db71445f391082b4a4f43ec778",
+    "crates/chirograph/src/line.rs": "637d5f2c6919408ca0a72c009454c1bd61e94d0484870d11d090794341b41ff7",
+    "crates/chirograph/src/titulus.rs": "98f94ffbc607a8d56fe12fe68193fed5e2321fac27809838c475da6d0f4da6f5",
+    "crates/graphshell/graphshell-client/src/lib.rs": "388b3d86ee1094ceecc6dc4558ed965be3bf4c8da966fab1fdae908eea175d29",
+    "crates/graphshell/graphshell-host/src/line.rs": "a14ac53fbbf87d7eb2914bdb7663e6f624098b4810e5106dcc353eb7a0ebf6a7",
+    "crates/graphshell/graphshell-endpoint/src/door/app_client.rs": "86bb92eb91564ea071a18eb982a8b07ab80bf31244badf0da807eadc6324a88c"
+  },
+  "library_sha256": {
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-fe234b010fa84800.rlib",
+      "sha256": "7e7647e8db91ea5aad887d653d9ca5ccc2eab8372973016a2ae68badfef297f6"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-e9fdedadfb188e4c.rlib",
+      "sha256": "b89ad8844a54d45b0c7a302e6bb23099b5a9c77c38e799725b97170ab485fb5f"
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-16d9d90723aa8f18.rlib",
+      "sha256": "05edc762e970a05d30c3d48f6f4de0bff2e8fe5cfc3983e28656c283186f174c"
+    },
+    "scenotime": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenotime-edd2b0e7fb2358b2.rlib",
+      "sha256": "28714ab095a899c9365146c14b9a8e54afdaaa49a8870a14c31c13791764806c"
+    },
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-923a910f142327c8.rlib",
+      "sha256": "74a644f8eb9ca55cf629101c52f3dc327416761fad76d0edcfc772dabc7c8c1b"
+    },
+    "graphshell_client": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_client-e8accababb5a0f11.rlib",
+      "sha256": "558e064ca50702a11e5fcd646de03e8e51d4f42dea0f7ffa0a33542f913fa84a"
+    },
+    "graphshell_host": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_host.rlib",
+      "sha256": "e96598ac5a7aa515d28c00e426d76f8dbc4b98dfa7cb0379802326eabbfe90fd"
+    }
+  },
+  "harness_sha256": "f977ded295311d0b8797ac3344c63dd3151d672dd3acf14b15ea6a77ace1379c",
+  "native_binary_sha256": "8d530cd8825aa42b23c1c914cab4c32023c977dead5b1320a9ed9ad24b81ab44",
+  "generated_native_output_removed": true
+}

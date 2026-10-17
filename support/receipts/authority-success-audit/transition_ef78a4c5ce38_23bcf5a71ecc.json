@@ -1,0 +1,67 @@
+{
+  "path": "ports/djinn/src/resident_mere.rs",
+  "git_basis": "c1b5d47156f2c940ccd67799963ed203df96362a",
+  "git_blob_sha256": "3c33059b77df17566d12851243f7ef2c604840fd580aa5476994bef7c16e913d",
+  "prior_coverage": {
+    "sha256": "084464e3291bd2fc893328ef4e8dfd7f811277a58dbedb707b53fc1b4eddd531",
+    "through": 218638,
+    "transition_evidence": "transition_ef78a4c5ce38_084464e3291b.json"
+  },
+  "current_sha256": "23bcf5a71ecc04bedb552557162ac0a30540d013bbe9b49ec3b334ec06fcb9a7",
+  "current_chars": 227115,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        91937
+      ],
+      "new_chars": [
+        0,
+        91937
+      ],
+      "text_sha256": "667addeaa661b729a9190460aca83cdadd75585da8060a27cd8cb54dc4ecb702"
+    },
+    {
+      "old_chars": [
+        91937,
+        218638
+      ],
+      "new_chars": [
+        100414,
+        227115
+      ],
+      "text_sha256": "3f66ccfe36feb33bada17ffd764bdd011a63245f2bfc445bcd902b7a2995be18"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "insert",
+      "old_lines": [
+        2213,
+        2212
+      ],
+      "new_lines": [
+        2213,
+        2374
+      ],
+      "old_chars": [
+        91937,
+        91937
+      ],
+      "new_chars": [
+        91937,
+        100414
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 2209,
+      "new_start_line": 2209,
+      "text": "         assert_eq!(\r\n             serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),\r\n             serde_json::to_value(current).unwrap()\r\n         );\r\n+    }\r\n+\r\n+    #[tokio::test(flavor = \"multi_thread\")]\r\n+    async fn natal_houses_authority_admits_both_systems_and_refuses_cusp_tamper() {\r\n+        for system in [\r\n+            cleromancy_domain::natal_houses::HouseSystem::WholeSign,\r\n+            cleromancy_domain::natal_houses::HouseSystem::Equal,\r\n+        ] {\r\n+            let fixture = fixture(0x4e4155, \"divination\").await;\r\n+            let mut product = fixture.attach(\"turnstone\").await;\r\n+            let mut other = fixture.attach(\"knot-editor\").await;\r\n+            let initial = graph(&mut product);\r\n+            let mut candidate = disclosed_graph(&mut product, &initial)\r\n+                .into_graph()\r\n+                .unwrap();\r\n+            let captured = Arc::new(std::sync::Mutex::new(Vec::new()));\r\n+            let held = captured.clone();\r\n+            candidate.set_recorder(Some(Arc::new(move |delta| {\r\n+                held.lock().unwrap().push(delta.clone())\r\n+            })));\r\n+            let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({\"schema\":\"dramatis.birth-facts/v1\",\"subject\":{\"Profile\":{\"id\":\"public-natal-subject\"}},\"date\":{\"year\":2000,\"month\":1,\"day\":1},\"time\":{\"Known\":{\"hour\":12,\"minute\":0,\"second\":0}},\"place\":{\"label\":\"Public coordinate fixture\",\"latitude_microdegrees\":40712800,\"longitude_microdegrees\":-74006000,\"precision\":\"Public synthetic\"},\"timezone\":\"UTC\",\"source\":{\"label\":\"Public product-authority fixture\",\"reference\":null}})).unwrap();\r\n+            let birth = personal_facts::birth_resource(&facts).unwrap();\r\n+            let record = cleromancy_domain::natal::NatalReading::new(\r\n+                \"public-source-persona\".into(),\r\n+                \"Public natal subject\".into(),\r\n+                birth,\r\n+                \"A synthetic natal question\".into(),\r\n+                cleromancy_domain::natal::FoldChoice::Refuse,\r\n+                1792149302000,\r\n+                \"00000000000000000000000000000008\".into(),\r\n+            )\r\n+            .unwrap()\r\n+            .with_houses(system)\r\n+            .unwrap();\r\n+            let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();\r\n+            host.insert_natal_reading(&record).unwrap();\r\n+            assert_eq!(\r\n+                product\r\n+                    .invoke(apply(&initial, captured.lock().unwrap().clone()))\r\n+                    .unwrap(),\r\n+                IntentResult::Accepted\r\n+            );\r\n+            let shared = graph(&mut other);\r\n+            let current = disclosed_graph(&mut other, &shared);\r\n+            let host =\r\n+                cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())\r\n+                    .unwrap();\r\n+            assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);\r\n+            let mut bad = record.clone();\r\n+            if let cleromancy_domain::natal_houses::HouseOutcome::Calculated {\r\n+                cusps_microdegrees,\r\n+                ..\r\n+            } = &mut bad.houses.as_mut().unwrap().outcome\r\n+            {\r\n+                cusps_microdegrees[0] = (cusps_microdegrees[0] + 1) % 360_000_000;\r\n+            } else {\r\n+                panic!(\"expected actual houses\");\r\n+            }\r\n+            assert!(matches!(\r\n+                other\r\n+                    .invoke(apply(\r\n+                        &shared,\r\n+                        vec![pandect::CapturedDelta::ReplaySetNodeFacetById {\r\n+                            node_id: kernel::graph::Graph::node_namespace_id(&format!(\r\n+                                \"cleromancy://natal/{}\",\r\n+                                record.id\r\n+                            ))\r\n+                            .to_string(),\r\n+                            facet: cleromancy_domain::natal::NATAL_FACET.into(),\r\n+                            value_json: serde_json::to_string(&bad).unwrap()\r\n+                        }]\r\n+                    ))\r\n+                    .unwrap(),\r\n+                IntentResult::Rejected { .. }\r\n+            ));\r\n+            let after = graph(&mut other);\r\n+            assert_eq!(\r\n+                serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),\r\n+                serde_json::to_value(current).unwrap()\r\n+            );\r\n+        }\r\n+    }\r\n+\r\n+    #[tokio::test(flavor = \"multi_thread\")]\r\n+    async fn natal_cap_authority_admits_retained_observations_and_refuses_motion_tamper() {\r\n+        for observed in [false, true] {\r\n+            let fixture = fixture(0x4e4155, \"divination\").await;\r\n+            let mut product = fixture.attach(\"turnstone\").await;\r\n+            let mut other = fixture.attach(\"knot-editor\").await;\r\n+            let initial = graph(&mut product);\r\n+            let mut candidate = disclosed_graph(&mut product, &initial)\r\n+                .into_graph()\r\n+                .unwrap();\r\n+            let captured = Arc::new(std::sync::Mutex::new(Vec::new()));\r\n+            let held = captured.clone();\r\n+            candidate.set_recorder(Some(Arc::new(move |delta| {\r\n+                held.lock().unwrap().push(delta.clone())\r\n+            })));\r\n+            let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({\"schema\":\"dramatis.birth-facts/v1\",\"subject\":{\"Profile\":{\"id\":\"public-natal-subject\"}},\"date\":{\"year\":2000,\"month\":1,\"day\":1},\"time\":{\"Known\":{\"hour\":12,\"minute\":0,\"second\":0}},\"place\":{\"label\":\"Public coordinate fixture\",\"latitude_microdegrees\":40712800,\"longitude_microdegrees\":-74006000,\"precision\":\"Public synthetic\"},\"timezone\":\"UTC\",\"source\":{\"label\":\"Public product-authority fixture\",\"reference\":null}})).unwrap();\r\n+            let birth = personal_facts::birth_resource(&facts).unwrap();\r\n+            let record = cleromancy_domain::natal::NatalReading::new(\r\n+                \"public-source-persona\".into(),\r\n+                \"Public natal subject\".into(),\r\n+                birth,\r\n+                \"A synthetic natal question\".into(),\r\n+                cleromancy_domain::natal::FoldChoice::Refuse,\r\n+                1792149302000,\r\n+                \"00000000000000000000000000000008\".into(),\r\n+            )\r\n+            .unwrap()\r\n+            .with_supplement(\r\n+                Some(cleromancy_domain::natal_cap::HouseChoice::Placidus),\r\n+                observed.then(|| cleromancy_domain::natal_cap::OrientationSnapshot {\r\n+                    finals2000a: include_str!(\"../tests/fixtures/natal-cap-finals2000a.txt\").into(),\r\n+                }),\r\n+            )\r\n+            .unwrap();\r\n+            let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();\r\n+            host.insert_natal_reading(&record).unwrap();\r\n+            assert_eq!(\r\n+                product\r\n+                    .invoke(apply(&initial, captured.lock().unwrap().clone()))\r\n+                    .unwrap(),\r\n+                IntentResult::Accepted\r\n+            );\r\n+            let shared = graph(&mut other);\r\n+            let current = disclosed_graph(&mut other, &shared);\r\n+            let host =\r\n+                cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())\r\n+                    .unwrap();\r\n+            assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);\r\n+            let mut bad = record.clone();\r\n+            if let cleromancy_domain::natal_cap::MotionOutcome::Calculated { planets, .. } =\r\n+                &mut bad.supplement.as_mut().unwrap().motion\r\n+            {\r\n+                planets[0].microdegrees_per_tt_day += 1;\r\n+            } else {\r\n+                panic!(\"expected motion\")\r\n+            };\r\n+            assert!(matches!(\r\n+                other\r\n+                    .invoke(apply(\r\n+                        &shared,\r\n+                        vec![pandect::CapturedDelta::ReplaySetNodeFacetById {\r\n+                            node_id: kernel::graph::Graph::node_namespace_id(&format!(\r\n+                                \"cleromancy://natal/{}\",\r\n+                                record.id\r\n+                            ))\r\n+                            .to_string(),\r\n+                            facet: cleromancy_domain::natal::NATAL_FACET.into(),\r\n+                            value_json: serde_json::to_string(&bad).unwrap()\r\n+                        }]\r\n+                    ))\r\n+                    .unwrap(),\r\n+                IntentResult::Rejected { .. }\r\n+            ));\r\n+            let after = graph(&mut other);\r\n+            assert_eq!(\r\n+                serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),\r\n+                serde_json::to_value(current).unwrap()\r\n+            );\r\n+        }\r\n     }\r\n \r\n     #[tokio::test(flavor = \"multi_thread\")]\r\n     async fn two_applications_edit_one_session_and_hear_each_other() {\r\n"
+    }
+  ],
+  "certificate": "transition_ef78a4c5ce38_23bcf5a71ecc.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T08:11:21.770766+00:00"
+}

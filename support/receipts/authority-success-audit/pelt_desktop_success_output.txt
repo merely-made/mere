@@ -1,0 +1,13 @@
+
+running 6 tests
+test audit_tests::blank_netrender_is_ok_zero_pixels ... ok
+test audit_tests::failed_host_is_ok_without_receipt ... ok
+test audit_tests::failed_window_is_ok_without_receipt ... ok
+test audit_tests::semantic_failure_positive_control_is_err ... ok
+test audit_tests::successful_startup_control_has_window ... ok
+test audit_tests::wrong_white_netrender_is_ok_full_pixels ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+[pelt-viewer] injected host boot failure
+[pelt-viewer] could not create window: injected window failure

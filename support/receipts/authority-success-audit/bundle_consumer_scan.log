@@ -1,0 +1,50 @@
+crates\system\registry\src\protocol\provider.rs:27:/// Bundle of provider closures collected during mod activation. The
+crates\cambium\cambium-rootstock\src\producer\portable_tests.rs:169:        Err(PortableCaptureError::Bundle(BundleError::MissingProducer(
+crates\cambium\cambium-rootstock\src\producer\portable_tests.rs:194:        Err(PortableCaptureError::Bundle(_))
+crates\cambium\cambium-rootstock\src\producer\portable_tests.rs:235:        Err(PortableCaptureError::Bundle(BundleError::Budget {
+crates\cambium\cambium-rootstock\src\producer\portable_tests.rs:333:        Err(PortableCaptureError::Bundle(BundleError::Budget {
+crates\cambium\cambium-rootstock\src\producer\portable.rs:25:    Bundle(BundleError),
+crates\cambium\cambium-rootstock\src\producer\portable.rs:218:        .map_err(PortableCaptureError::Bundle)?;
+crates\cambium\cambium-rootstock\src\producer\portable.rs:230:                    .map_err(PortableCaptureError::Bundle)?;
+crates\cambium\cambium-rootstock\src\producer\portable.rs:236:                .map_err(PortableCaptureError::Bundle)?;
+crates\cambium\cambium-rootstock\src\producer\portable.rs:289:            .map_err(PortableCaptureError::Bundle)?;
+crates\eidetic\eidetic-core\src\bundle.rs:7://! `Bundle` — a typed payload that carries a list of typed memory
+crates\eidetic\eidetic-core\src\bundle.rs:11://! ## Why a generic Bundle
+crates\eidetic\eidetic-core\src\bundle.rs:22://! shared `Bundle` schema lets a recipient that knows nothing about
+crates\eidetic\eidetic-core\src\bundle.rs:45:/// Canonical bytes of the `Bundle` schema codicil payload.
+crates\eidetic\eidetic-core\src\bundle.rs:50:const BUNDLE_SCHEMA_PAYLOAD: &[u8] = br#"{"format":"mere-native","schema_id":"eidetic.Bundle/v1","body":{"version":1,"description":"A composite engram referencing other engrams by manifest id.","required":["bundle_id","bundle_kind","members"],"fields":{"bundle_id":{"type":"string"},"bundle_kind":{"type":"string"},"description":{"type":"string"},"members":{"type":"array"}}}}"#;
+crates\eidetic\eidetic-core\src\bundle.rs:52:/// Compute the well-known `Bundle` schema reference (lazy).
+crates\eidetic\eidetic-core\src\bundle.rs:57:/// The well-known schema reference for `Bundle` codicils.
+crates\eidetic\eidetic-core\src\bundle.rs:63:pub struct BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:81:pub struct Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:90:    pub members: Vec<BundleMember>,
+crates\eidetic\eidetic-core\src\bundle.rs:93:impl TypedPayload for Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:99:impl Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:102:    pub fn member(&self, kind: &str) -> Option<&BundleMember> {
+crates\eidetic\eidetic-core\src\bundle.rs:107:    pub fn required_members(&self) -> impl Iterator<Item = &BundleMember> {
+crates\eidetic\eidetic-core\src\bundle.rs:114:pub async fn save_bundle(
+crates\eidetic\eidetic-core\src\bundle.rs:116:    bundle: &Bundle,
+crates\eidetic\eidetic-core\src\bundle.rs:140:) -> Result<Option<Bundle>> {
+crates\eidetic\eidetic-core\src\bundle.rs:141:    load_typed::<Bundle>(store, fetcher, id).await
+crates\eidetic\eidetic-core\src\bundle.rs:151:pub async fn verify_required_members(
+crates\eidetic\eidetic-core\src\bundle.rs:154:    bundle: &Bundle,
+crates\eidetic\eidetic-core\src\bundle.rs:213:    fn fake_member(kind: &str, blob: &[u8], required: bool) -> BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:214:        BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:228:            let bundle = Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:239:            let id = save_bundle(
+crates\eidetic\eidetic-core\src\bundle.rs:261:        let bundle = Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:280:    fn verify_required_members_passes_when_all_present() {
+crates\eidetic\eidetic-core\src\bundle.rs:291:            let bundle = Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:296:                    BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:302:                    BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:311:            verify_required_members(&mut store, &mut fetcher, &bundle)
+crates\eidetic\eidetic-core\src\bundle.rs:318:    fn verify_required_members_errors_listing_missing() {
+crates\eidetic\eidetic-core\src\bundle.rs:323:            // Bundle references members that were never saved.
+crates\eidetic\eidetic-core\src\bundle.rs:324:            let bundle = Bundle {
+crates\eidetic\eidetic-core\src\bundle.rs:329:                    BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:335:                    BundleMember {
+crates\eidetic\eidetic-core\src\bundle.rs:344:            let result = verify_required_members(&mut store, &mut fetcher, &bundle).await;
+crates\eidetic\eidetic-core\src\lib.rs:102:    BUNDLE_SCHEMA_REF, Bundle, BundleMember, bundle_schema_ref, load_bundle, save_bundle,
+crates\eidetic\eidetic-core\src\lib.rs:103:    verify_required_members,
+crates\graph\linked-data\src\ingest.rs:1184:    /// Bundle a context document under its URL (builder style).
+crates\stickleback\src\group_session.rs:873:            GroupSecretOutput::Bundle(bundle) => self.keyring.install_bundle(bundle),

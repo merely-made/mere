@@ -1,0 +1,11 @@
+
+running 3 tests
+test legacy_reader_returns_corpora_that_violate_current_domain_invariants ... OBSERVATION: legacy corpus loader returns empty, overlapping, duplicated and reverse-ordered source partitions without validating them
+ok
+test the_current_schema_refuses_the_same_malformed_partitions ... CONTROL: current corpus serializer rejects all four equivalent malformed partitions
+ok
+test valid_legacy_and_current_corpora_load_to_the_same_valid_value ... CONTROL: valid v1 and v2 corpus loads agree and satisfy the shared domain validator
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,26 @@
+{
+  "date_utc": "2026-10-17T07:30:34.948370+00:00",
+  "source": "ports/moot/docs/receipts/resource_coop_draft_20261011/harness/src/lib.rs",
+  "source_sha256": "348cb446b5453ac0173ff6329a8cbc0fb2b953c05ed6b7126ee3b12d6eaae3a9",
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--crate-type",
+    "lib",
+    "--emit=metadata",
+    "-A",
+    "dead_code",
+    "-L",
+    "dependency=C:/t/cargo-targets/mere/build/debug/deps",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "ports\\moot\\docs\\receipts\\resource_coop_draft_20261011\\harness\\src\\lib.rs",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-community-portable-harness.rmeta"
+  ],
+  "exit_code": 1,
+  "expected_diagnostic": "E0583 child module control not found",
+  "output_sha256": "fcd64a375765c97338fe4253e2e5c6196786bf7c0bf82cb17751d48b899269d1",
+  "generated_output_present": false,
+  "scope": "Direct compilation of the unchanged historical portable source-contract harness against current portable source. This expected failure is a current harness reproducibility defect, not a claim that its old dated receipt never passed."
+}

@@ -1,0 +1,24 @@
+error[E0599]: no associated function or constant named `issue` found for struct `SignedDelegationCertificate` in the current scope
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\servitor_owner_probe.rs:19:51
+    |
+ 19 |         let signed = SignedDelegationCertificate::issue(&root, certificate).unwrap();
+    |                                                   ^^^^^ associated function or constant not found in `SignedDelegationCertificate`
+    |
+note: if you're trying to build a new `SignedDelegationCertificate`, consider using `SignedDelegationCertificate::from_parts` which returns `SignedDelegationCertificate`
+   --> C:\Users\mark_\.cargo\git\checkouts\dramatis-c1632f2f3bdc2597\cf562f4\crates\insigne\src\delegation.rs:223:5
+    |
+223 | /     pub fn from_parts(
+224 | |         certificate: DelegationCertificate,
+225 | |         signer: DerivedKeyAttestation,
+226 | |         signature: Vec<u8>,
+227 | |     ) -> Self {
+    | |_____________^
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Issue` which provides `issue` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use personae::delegation::Issue;
+    |
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.

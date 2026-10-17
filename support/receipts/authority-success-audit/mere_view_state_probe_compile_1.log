@@ -1,0 +1,21 @@
+error: extern location for mere_view is of an unknown type: C:\t\cargo-targets\mere\authority-success-mere-view.rlib
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\mere_view_state_probe.rs:1:5
+  |
+1 | use mere_view::*;
+  |     ^^^^^^^^^
+
+error: file name should be lib*.rlib or *.dll
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\mere_view_state_probe.rs:1:5
+  |
+1 | use mere_view::*;
+  |     ^^^^^^^^^
+
+error[E0463]: can't find crate for `mere_view`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\mere_view_state_probe.rs:1:5
+  |
+1 | use mere_view::*;
+  |     ^^^^^^^^^ can't find crate
+
+error: aborting due to 3 previous errors
+
+For more information about this error, try `rustc --explain E0463`.

@@ -1,0 +1,293 @@
+{
+  "date_utc": "2026-10-16T23:53:20.456011+00:00",
+  "tests": 6,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/forme/curation/Cargo.toml": "b2bcecced3e0d9508015deb8ffbbd4737ebf9452a49c19cef8ac96405f96bc60",
+    "crates/forme/curation/src/fold.rs": "119d666a642dd5d9b679369cf854c35aceb7d067eb89f55644bdd74185693228",
+    "crates/forme/curation/src/lib.rs": "191529a8aa4b66b072b0c437f5e7c013d6b3fbd70b7ac804e99d88c6cdc746ae",
+    "crates/forme/forme/Cargo.toml": "5ee527636db036d06218eb62b803cde9830435c375bcf519f3e00aaf28807b8d",
+    "crates/forme/forme/src/arrangement.rs": "c60485548fd65334b819b55657a9916ecd599042306d8b7bf35df21e33de13ce",
+    "crates/forme/forme/src/forme_document.rs": "dc283d7ac9f2c7aa1c69a213c803c0a9c53baa9abb8563127c1736c1e68e30bd",
+    "crates/forme/forme/src/layout.rs": "d581358f0add14095d7b0baadaf6da9c7857c012b04f49d98b5eab03a72a9a96",
+    "crates/forme/forme/src/lens.rs": "debadb541904fa431a51214414e6bf5a2a8ffb6fc1f122c478a69d182abb81f1",
+    "crates/forme/forme/src/lib.rs": "cbf754687b2d4defb205cfd211fa2412680ee772ea1d6797ceff66adf814e976",
+    "crates/forme/forme/src/member.rs": "261e6d95dd3554d231f162577b67c59a9e92a82155a321b21849006c2f5c45ef",
+    "crates/forme/forme/src/nav.rs": "44a0bded8e721d911ddc14fd3b8f93095f5929646f4a69c4a35079f8faeae650",
+    "crates/forme/forme/src/parity.rs": "427148ad134283b539aa91c9854bd0da48648bc034cb364083e785f31d5f91cb",
+    "crates/forme/forme/src/pressure.rs": "fdd362cb59ee6a561c6d225ded110b821e91bbe91e720aeaab35346ece3f7992",
+    "crates/forme/forme/src/query.rs": "0f50dd387b1536918226fab5dcee5d4204885cd25990f02d679c501e9c4b9eea",
+    "crates/forme/forme/src/reconciliation.rs": "866bba4c9e0e57918ba03c5a811b8eef4d49bf4f47fb2f6676abf22d11f0cb49",
+    "crates/forme/forme/src/store.rs": "3a7df5992b14f56e8b0225700ba137cd64ec3d71456c97e358c60fce0a310aaf",
+    "crates/forme/forme/src/subgraph.rs": "1c6fda95a4f59849d66f185a8b2bb2c6e585398f3a165d77b211dec0ac5a7bfa",
+    "crates/forme/forme/src/topology.rs": "4c2a00bd773dab4ce4f53d4feacbfcb7e38bf0d7901fd7c28fefbb54be0f0701",
+    "crates/forme/forme/src/topology/tests.rs": "00d2d09eb20c4e720d3b805ed7ba705d37b4ccbeb043f38283e7b8a88b169305",
+    "crates/forme/forme/src/tree.rs": "a1d9b377913e1619d4b644157360a0d4604e8947e7ea923978ca08ec879825e3",
+    "crates/forme/forme/src/tree/actions.rs": "2ff933b80453502a67df21d626faed8b7891e113662a3afd94bff5234adfb107",
+    "crates/forme/forme/src/tree/layout.rs": "2f722ff38d37c62421101fa504755ebc7ddf91662bd4642a705f4dc267fbb014",
+    "crates/forme/forme/src/tree/tests.rs": "48d6ae2f3ec595fc9b2fb194c81b863333b87082da6c84c413afd6e28248872e",
+    "crates/forme/forme/src/tree/tests/basic.rs": "e0ec70132a9437010dc33b1abe5ee0d2104768d2489cfe7c8575c3a538cc6a65",
+    "crates/forme/forme/src/tree/tests/layout_rects.rs": "f9b7ff3bcba29e1de29719f05c630415e2bf3f570189762e006ed54b9ce500ee",
+    "crates/forme/forme/src/tree/tests/layout_structure.rs": "27413652c2be8f3e49ead648d9db5264f45f86d91c0c6dea8dd08d20217ccc01",
+    "crates/forme/forme/src/ux.rs": "764034c4fff827b2bdc5e39a3b98d7b9508bd6736228d94a47b8454a08717a1c",
+    "crates/forme/forme/tests/property_tests.rs": "9b007dd96aad27f6bbb1f59f917ecee41260a994490d684287f4a06c96be57eb"
+  },
+  "dependencies": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-abc0b70bbfd6bb44.rlib",
+      "sha256": "d514c8d4bbde48213ba276e23f69816276c710999e7f83e801578d1bb3f60b37",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "serde_derive",
+        "std"
+      ]
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-5faaa0a41ed9edcf.rlib",
+      "sha256": "aefc0a18d21a3b2e0f317ec61146ed51ec17c0d450dbab258a3747d4a378a816",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ]
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-637ac0edaf8bcacd.rlib",
+      "sha256": "4f87a963b3b88dbf211ef51e1fdc6e3c048653fa7fb4feaadbc96f939b5831be",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "sha1",
+        "std",
+        "v4",
+        "v5"
+      ]
+    },
+    "taffy": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtaffy-73bda94ce3bc0a02.rlib",
+      "sha256": "504c76462cb46817908f7083af5764489e058566ad1a3535cf14163658cfd2cd",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#taffy@0.11.0-experimental-cache-fix.3",
+      "features": [
+        "alloc",
+        "block_layout",
+        "calc",
+        "content_size",
+        "default",
+        "detailed_layout_info",
+        "flexbox",
+        "float_layout",
+        "grid",
+        "std",
+        "taffy_tree"
+      ]
+    },
+    "curation": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-6aff2c5ebef63ee4.rlib",
+      "sha256": "693799da6d1f9b8566f6fa6a110536d419969ab54efcd98254a9b3689323d73e",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/forme/curation#mere-curation@0.1.1",
+      "features": []
+    },
+    "petgraph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpetgraph-35283f1bd1f5363a.rlib",
+      "sha256": "33cb52591f314c5c64b6f12361a835eb3f16a7ceac07c88ab17e9b849d92d40e",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#petgraph@0.8.3",
+      "features": [
+        "default",
+        "graphmap",
+        "matrix_graph",
+        "serde",
+        "serde-1",
+        "serde_derive",
+        "stable_graph",
+        "std"
+      ]
+    }
+  },
+  "direct_library_sha256": "f30fe9a9ef6f176103f74c31e692299fee8586ecc6e62e7d42fbe20df0008c22",
+  "kernel_import_dependency": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-698082ec7ae12c18.rlib",
+    "sha256": "c85bb662ae7384f7e816278c925802681eabb3bce380fcefebb5355e9c5cc8c1",
+    "scope": "cached fixtures dependency imported by original unit sources; no fresh kernel build claim"
+  },
+  "commands": [
+    {
+      "name": "forme_direct_library_build",
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--crate-name",
+        "forme",
+        "--crate-type",
+        "rlib",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\forme\\forme\\src\\lib.rs",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-abc0b70bbfd6bb44.rlib",
+        "--extern",
+        "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-5faaa0a41ed9edcf.rlib",
+        "--extern",
+        "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-637ac0edaf8bcacd.rlib",
+        "--extern",
+        "taffy=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtaffy-73bda94ce3bc0a02.rlib",
+        "--extern",
+        "curation=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-6aff2c5ebef63ee4.rlib",
+        "--extern",
+        "petgraph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpetgraph-35283f1bd1f5363a.rlib",
+        "--cfg",
+        "feature=\"store\"",
+        "--cfg",
+        "feature=\"petgraph\"",
+        "-C",
+        "metadata=authority_success_forme",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\libauthority_success_forme.rlib"
+      ]
+    },
+    {
+      "name": "forme_probe_build",
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--test",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\forme_probe.rs",
+        "--extern",
+        "forme=C:\\t\\cargo-targets\\mere\\libauthority_success_forme.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-forme-probe.exe"
+      ]
+    },
+    {
+      "name": "forme_probe_output",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\authority-success-forme-probe.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "name": "forme_direct_unit_build",
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--crate-name",
+        "forme",
+        "--test",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\forme\\forme\\src\\lib.rs",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-abc0b70bbfd6bb44.rlib",
+        "--extern",
+        "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-5faaa0a41ed9edcf.rlib",
+        "--extern",
+        "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-637ac0edaf8bcacd.rlib",
+        "--extern",
+        "taffy=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtaffy-73bda94ce3bc0a02.rlib",
+        "--extern",
+        "curation=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-6aff2c5ebef63ee4.rlib",
+        "--extern",
+        "petgraph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpetgraph-35283f1bd1f5363a.rlib",
+        "--cfg",
+        "feature=\"store\"",
+        "--cfg",
+        "feature=\"petgraph\"",
+        "--extern",
+        "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-698082ec7ae12c18.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-forme-unit.exe"
+      ]
+    },
+    {
+      "name": "forme_direct_unit_output",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\authority-success-forme-unit.exe",
+        "--skip",
+        "store::tests",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "name": "curation_direct_unit_build",
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "--crate-name",
+        "curation",
+        "--test",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\forme\\curation\\src\\lib.rs",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-abc0b70bbfd6bb44.rlib",
+        "--extern",
+        "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-5faaa0a41ed9edcf.rlib",
+        "--extern",
+        "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-637ac0edaf8bcacd.rlib",
+        "--extern",
+        "taffy=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtaffy-73bda94ce3bc0a02.rlib",
+        "--extern",
+        "curation=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-6aff2c5ebef63ee4.rlib",
+        "--extern",
+        "petgraph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpetgraph-35283f1bd1f5363a.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-curation-unit.exe"
+      ]
+    },
+    {
+      "name": "curation_direct_unit_output",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\authority-success-curation-unit.exe",
+        "--test-threads=1"
+      ]
+    }
+  ],
+  "runs": {
+    "forme_direct_library_build": {
+      "exit": 0,
+      "log": "forme_direct_library_build.log"
+    },
+    "forme_probe_build": {
+      "exit": 0,
+      "log": "forme_probe_build.log"
+    },
+    "forme_probe_output": {
+      "exit": 0,
+      "log": "forme_probe_output.log"
+    },
+    "forme_direct_unit_build": {
+      "exit": 0,
+      "log": "forme_direct_unit_build.log"
+    },
+    "forme_direct_unit_output": {
+      "exit": 0,
+      "log": "forme_direct_unit_output.log"
+    },
+    "curation_direct_unit_build": {
+      "exit": 0,
+      "log": "curation_direct_unit_build.log"
+    },
+    "curation_direct_unit_output": {
+      "exit": 0,
+      "log": "curation_direct_unit_output.log"
+    }
+  },
+  "generated_output_removed": true,
+  "scope": "Current Forme Rust library compiled directly with store/petgraph against exact hashed prior Cargo dependency artifacts; six observations, original unit tests excluding four store tests, current curation original unit tests. Cargo package gate failed before compilation on shared target lock; no Cargo success claimed. No product UI, renderer or GPU."
+}

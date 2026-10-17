@@ -1,0 +1,18 @@
+{
+  "observed_utc": "2026-10-17T07:04:39.539211+00:00",
+  "session_id": 60676,
+  "processes": [
+    {
+      "ProcessId": 48224,
+      "ParentProcessId": 39664,
+      "CreationDate": "2026-10-17T02:56:56.573714-04:00"
+    },
+    {
+      "ProcessId": 22716,
+      "ParentProcessId": 48224,
+      "CreationDate": "2026-10-17T02:56:56.690854-04:00"
+    }
+  ],
+  "stdout_bytes": 458752,
+  "scope": "Exact current personal-sync-feature build independently confirmed live; original exec session was polled. This is not a terminal build/test result."
+}

@@ -1,0 +1,1 @@
+{"receipt": {"lanes": {"lane5": {"ok": true, "portability": {"state": "ran", "native_to_browser_ok": true, "extended_to_generation": 8}}}, "conclusions": {"receipt_gate_passed": true, "lane5_native_to_browser_ok": true}}, "laneThrows": false, "native": {"exit": 0, "ok": true}}

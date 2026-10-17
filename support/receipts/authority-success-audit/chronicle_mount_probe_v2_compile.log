@@ -1,0 +1,30 @@
+warning: methods `rediscover_same_session`, `replace_endpoint`, `receipt_json`, `client`, and `descriptor` are never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\ports\graphshell\src\distillery_w1.rs:128:12
+    |
+ 69 | / impl<E> ChronicleMount<E>
+ 70 | | where
+ 71 | |     E: ProjectionCatalog + ProjectionSource + PresentationSource + ResumableProjectionSource,
+ 72 | |     <E as ProjectionSource>::Error: Display,
+ 73 | |     <E as PresentationSource>::Error: Display,
+ 74 | |     <E as ResumableProjectionSource>::Error: Display,
+    | |_____________________________________________________- methods in this implementation
+...
+128 |       pub fn rediscover_same_session(&mut self) -> Result<&EndpointDescriptor, String> {
+    |              ^^^^^^^^^^^^^^^^^^^^^^^
+...
+149 |       pub fn replace_endpoint(&mut self, endpoint: E) {
+    |              ^^^^^^^^^^^^^^^^
+...
+236 |       pub fn receipt_json(&self, name: &str) -> Result<String, String> {
+    |              ^^^^^^^^^^^^
+...
+246 |       pub fn client(&self) -> &ClientState {
+    |              ^^^^^^
+...
+250 |       pub fn descriptor(&self) -> &EndpointDescriptor {
+    |              ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

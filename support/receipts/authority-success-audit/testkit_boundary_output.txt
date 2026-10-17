@@ -1,0 +1,20 @@
+
+running 6 tests
+test case_aliases_pass_the_guard_and_override_the_child_environment ... OBSERVED canonical-names-refused=true case-aliases-admitted=true child-selected-outside-root-and-standard-agent=true no-endpoint-opened=true
+ok
+test evidence_control_is_retained_and_checked ... RECEIPT 20261016T211432Z-f3e98302 passed at C:\t\cargo-targets\mere\authority-success-testkit-fixtures\receipts\evidence-control\20261016T211432Z-f3e98302\receipt.json
+CONTROL requested=1 retained=1 checked=1
+ok
+test missing_requested_evidence_still_reports_passed ... RECEIPT 20261016T211433Z-3e9fcb55 passed at C:\t\cargo-targets\mere\authority-success-testkit-fixtures\receipts\missing-evidence\20261016T211433Z-3e9fcb55\receipt.json
+OBSERVED requested=1 retained=0 outcome=passed verifier=ok checked=0
+ok
+test read_only_environment_child ... ignored, only reads two environment variables in a child; never opens a root or endpoint
+test rejected_resident_name_has_already_written_outside_the_run ... RECEIPT 20261016T211434Z-bca47cbc passed at C:\t\cargo-targets\mere\authority-success-testkit-fixtures\receipts\pre-guard-write\20261016T211434Z-bca47cbc\receipt.json
+OBSERVED spawn-refused=true child-spawned=false lock-settings-written-outside-run=true
+ok
+test unwritable_receipt_path_still_reports_passed ... RECEIPT 20261016T211435Z-f7b0effa passed at C:\t\cargo-targets\mere\authority-success-testkit-fixtures\receipts\write-failure\20261016T211435Z-f7b0effa\receipt.json
+OBSERVED outcome=passed receipt-file-absent=true summary-written=true verifier=error
+ok
+
+test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 4.02s
+

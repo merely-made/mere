@@ -1,0 +1,17 @@
+C:\Users\mark_\.cargo\git\checkouts\genet-0bbbe1b4c8511eb3\fa27ea5\components\genet-render\src\a11y.rs
+sha256 8e39192c10280ce11c154b65c147d4fdfc4f20f0b7e28de7ce6ec4e8b3ab17f8
+
+pub fn accesskit_tree_with_style<D>(
+    dom: &D,
+    fragments: &LiveryLayout<D::NodeId>,
+    focus: Option<D::NodeId>,
+    style: &A11yStyleQueries<'_, D::NodeId>,
+) -> TreeUpdate
+where
+    D: LayoutDom,
+    D::NodeId: Copy + Eq + Hash,
+{
+    accesskit_tree_from_projection(document_a11y_projection_with_style(
+        dom, fragments, focus, 0, None, style,
+    ))
+}
