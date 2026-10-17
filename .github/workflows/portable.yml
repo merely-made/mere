@@ -15,9 +15,9 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install viewer toolchain
-        run: rustup toolchain install 1.99.0 --profile minimal --target wasm32-unknown-unknown,wasm32-wasip2
+        run: rustup toolchain install 1.99.1 --profile minimal --target wasm32-unknown-unknown,wasm32-wasip2
       - name: Install matching Wasm packager
-        run: cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked
+        run: cargo +1.99.1 install wasm-bindgen-cli --version 0.2.129 --locked
       - name: Exercise budget acceptance and refusal
         run: python3 ports/graphshell/web/scripts/test_viewer_budget.py
       - name: Build viewer and enforce interaction caps
@@ -44,17 +44,17 @@ jobs:
       - name: Check owned sources carry the MPL-2.0 header
         run: python scripts/relicense_headers.py --check
       - name: Install integration toolchain
-        run: rustup toolchain install 1.99.0 --profile minimal --target wasm32-wasip2,wasm32-unknown-unknown
+        run: rustup toolchain install 1.99.1 --profile minimal --target wasm32-wasip2,wasm32-unknown-unknown
       - name: Exercise local lock isolation
         run: python scripts/test_cargo_mode.py
       - name: Check portable workspace and lock provenance
-        run: python scripts/cargo_mode.py verify +1.99.0
+        run: python scripts/cargo_mode.py verify +1.99.1
       - name: Check embedded guests explicitly
         shell: pwsh
         run: |
           foreach ($guest in @('crates/script/app-host/guest', 'crates/script/document-host/guest', 'crates/script/document-host/guest-bomb')) {
-            python scripts/cargo_mode.py verify +1.99.0 --manifest-path "$guest/Cargo.toml" --metadata-only
+            python scripts/cargo_mode.py verify +1.99.1 --manifest-path "$guest/Cargo.toml" --metadata-only
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            cargo +1.99.0 build --locked --manifest-path "$guest/Cargo.toml" --target wasm32-wasip2 --release
+            cargo +1.99.1 build --locked --manifest-path "$guest/Cargo.toml" --target wasm32-wasip2 --release
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }

@@ -191,7 +191,7 @@ def main():
     parser.add_argument("--format", choices=["nsis", "app", "appimage"], default={"Windows": "nsis", "Darwin": "app", "Linux": "appimage"}[platform.system()])
     parser.add_argument("--jobs", type=int, default=1)
     parser.add_argument("--target-dir")
-    parser.add_argument("--toolchain", default="1.99.0")
+    parser.add_argument("--toolchain", default="1.99.1")
     parser.add_argument("--artifact-url")
     parser.add_argument("--macos-signing-identity", default=os.environ.get("DRAMATIS_MACOS_SIGNING_IDENTITY"), help="Public code-signing identity on the signing Mac; does not contain notarization credentials")
     args = parser.parse_args()
