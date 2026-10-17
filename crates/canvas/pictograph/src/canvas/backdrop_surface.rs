@@ -398,7 +398,16 @@ impl BackdropSurface {
                     }
                 }
                 if forward {
-                    let disc = circle(at, 15.0);
+                    let disc = circle(
+                        at,
+                        if self.show_span_handles
+                            && matches!(item.footprint, Footprint::Rect { .. })
+                        {
+                            4.0
+                        } else {
+                            15.0
+                        },
+                    );
                     commands.push(path(
                         &disc,
                         true,
