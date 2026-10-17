@@ -21,17 +21,27 @@ use std::time::{Duration, Instant};
 
 #[test]
 fn resident_lane_reads_layers_from_its_owner_and_releases_the_library_on_close() {
-    exercise_layer_owner(false);
+    exercise_layer_owner(false, false);
 }
 
 #[test]
 fn resident_lane_selects_flex_for_a_qualified_bf16_row() {
-    exercise_layer_owner(true);
+    exercise_layer_owner(true, false);
 }
 
-fn exercise_layer_owner(half: bool) {
+#[test]
+fn resident_lane_reads_selected_experts_through_the_library_owner() {
+    exercise_layer_owner(false, true);
+}
+
+fn exercise_layer_owner(half: bool, moe: bool) {
     let directory = tempfile::tempdir().unwrap();
-    let mut config: serde_json::Value = serde_json::from_str(fixture::CONFIG_JSON).unwrap();
+    let mut config: serde_json::Value = serde_json::from_str(if moe {
+        include_str!("../../../crates/intel/esp/tests/support/architectures/qwen2_moe/config.json")
+    } else {
+        fixture::CONFIG_JSON
+    })
+    .unwrap();
     config["max_position_embeddings"] = serde_json::json!(256);
     std::fs::write(
         directory.path().join("config.json"),
@@ -45,12 +55,19 @@ fn exercise_layer_owner(half: bool) {
     .unwrap();
     std::fs::write(
         directory.path().join("model.safetensors"),
-        fixture::weights_bytes(),
+        if moe {
+            include_bytes!(
+                "../../../crates/intel/esp/tests/support/architectures/qwen2_moe/model.safetensors"
+            )
+            .to_vec()
+        } else {
+            fixture::weights_bytes()
+        },
     )
     .unwrap();
     let path = directory.path().join("library.redb");
     let mut store = muniment::RedbBackend::open(&path).unwrap();
-    let (row, damaged_key) = pollster::block_on(async {
+    let (row, damaged_keys) = pollster::block_on(async {
         let model = if half {
             esp::infer::layer_library::import_formatted_model(
                 &mut store,
@@ -210,20 +227,41 @@ fn exercise_layer_owner(half: bool) {
             row
         };
         let resolved = resolve_library_session(&mut store, row).await.unwrap();
-        let artifact = resolved.layer_artifacts().unwrap().remove(1);
-        let manifest = eidetic::manifest::load_manifest(&mut store, artifact.blob)
+        let artifacts = if moe {
+            let manifest = eidetic::ModelLibrary::load_model(&mut store, model)
+                .await
+                .unwrap()
+                .unwrap();
+            eidetic::typed::load_typed::<esp::infer::layer_library::ExpertWeightIndex>(
+                &mut store,
+                &mut eidetic::NoFetcher,
+                manifest.weight_blob,
+            )
             .await
             .unwrap()
-            .unwrap();
-        let key = manifest
-            .sources
-            .into_iter()
-            .find_map(|source| match source {
-                eidetic::BlobSource::Local { key } => Some(key),
-                _ => None,
-            })
-            .unwrap();
-        (row, key)
+            .unwrap()
+            .experts
+            .remove(1)
+        } else {
+            vec![resolved.layer_artifacts().unwrap().remove(1)]
+        };
+        let mut keys = Vec::new();
+        for artifact in artifacts {
+            let manifest = eidetic::manifest::load_manifest(&mut store, artifact.blob)
+                .await
+                .unwrap()
+                .unwrap();
+            let key = manifest
+                .sources
+                .into_iter()
+                .find_map(|source| match source {
+                    eidetic::BlobSource::Local { key } => Some(key),
+                    _ => None,
+                })
+                .unwrap();
+            keys.push(key);
+        }
+        (row, keys)
     });
     let store = Arc::new(tokio::sync::Mutex::new(store));
     let journal = Arc::new(distillery::inference::durable::PersonaRunJournal::new(
@@ -269,9 +307,11 @@ fn exercise_layer_owner(half: bool) {
             .as_deref(),
         Some(if half { "bf16" } else { "f32" })
     );
-    // Corrupt the second layer after provider construction. A subsequent ask
-    // must read it again and fail before publishing its first generated token.
-    pollster::block_on(store.blocking_lock().put(&damaged_key, b"corrupt")).unwrap();
+    // Damage the second core layer, or all separately addressed routed experts
+    // in that layer. A subsequent ask must fail before publishing a token.
+    for key in &damaged_keys {
+        pollster::block_on(store.blocking_lock().put(key, b"corrupt")).unwrap();
+    }
     lane.ask(AskRequestV1 {
         run: "missing".into(),
         question: "t3 t7".into(),
