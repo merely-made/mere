@@ -1,0 +1,134 @@
+{
+  "schema": "mere.resident-inference/architecture-closeout/v1",
+  "recorded_utc": "2026-10-17T14:41:19.806018+00:00",
+  "integrated_and_pushed_commit": "d13bd040e837277e5e5f3f531ea2e6cc21a77cb9",
+  "qualification": {
+    "path": "support/receipts/resident_inference_architecture_integration.json",
+    "canonical_git_blob_sha256": "6d66274d167720fd994cb7f42bd3ea3317221a7f2f05c112c676ea8cf389b219"
+  },
+  "bounded_checkpoint_qualified": true,
+  "i9_phase_complete": false,
+  "pruned": {
+    "worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference",
+    "local_branch": "codex/mere-presentation-rules",
+    "remote_branch": "origin/codex/mere-presentation-rules",
+    "worktree_absent": true,
+    "local_branch_absent": true,
+    "remote_branch_absent": true,
+    "generated_cargo_cache_logical_bytes_removed": 2039153323,
+    "explicit_current_user_prune_request": true,
+    "scope": "Clean committed worktree after pushed main integration. Earlier cache retention records remain unchanged; current cache signatures, reparse checks and ownership checks passed before removal."
+  },
+  "prune_preflight": {
+    "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\prune-preflight.json",
+    "sha256": "fba37ec9d32b30f3c0a735f50a2be71747d2590a40ef717cfa14a196d9b0985a",
+    "checks": {
+      "recorded_utc": "2026-10-17T14:37:40.254611+00:00",
+      "worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference",
+      "tip": "d13bd040e837277e5e5f3f531ea2e6cc21a77cb9",
+      "branch": "codex/mere-presentation-rules",
+      "committed_and_pushed_into_main": true,
+      "working_tree_clean": true,
+      "ignored_paths": 3973,
+      "allowed_ignored_caches": [
+        "target/build",
+        "scripts/__pycache__"
+      ],
+      "generated_cache_bytes": 2039153323,
+      "cache_marker_sha256": "6d9d1d216e0f83abc5e5662ca62c92b4f23009466b54fa27321a69acdb778bb2",
+      "reparse_points": [],
+      "live_owners": [],
+      "inaccessible_relevant_processes": [],
+      "python_bytecode_cache": {
+        "files": 1,
+        "verified_magic": {
+          "312": "cb0d0d0a",
+          "311": "a70d0d0a"
+        },
+        "default_runtime": {
+          "tag": "311",
+          "magic": "a70d0d0a",
+          "executable": "C:\\Users\\mark_\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.EXE"
+        }
+      }
+    }
+  },
+  "primary_preservation": {
+    "head": "d13bd040e837277e5e5f3f531ea2e6cc21a77cb9",
+    "preserved_other_tracked_dirty_files": 34,
+    "untracked_paths_outside_merge": 1399,
+    "changed_other_tracked_dirty_files": [],
+    "attributes_delta_already_present": true,
+    "untracked_content_not_opened_or_modified": true
+  },
+  "preservation_evidence": {
+    "before": "C:\\t\\cargo-targets\\mere\\inference-i9\\primary-before-integration.json",
+    "before_sha256": "7cacb3b353eb47f419b2a0649a82bf07500692eb1e00f7c5bf03903cddc83069",
+    "after": "C:\\t\\cargo-targets\\mere\\inference-i9\\primary-after-integration.json",
+    "after_sha256": "f862c24083101f14aee651d8e44072d2c8ccc77a2ff5f827c8a56a356e677b37"
+  },
+  "retained": {
+    "owner": "Mere I9 architecture qualification",
+    "reason": "Reproducible model rows and evidence for remaining family and scale gates.",
+    "model_data_logical_bytes": 296361639070,
+    "model_data_cap_bytes": 375000000000,
+    "model_paths": [
+      {
+        "path": "C:\\Users\\mark_\\.cache\\huggingface\\hub\\models--Qwen--Qwen2.5-0.5B-Instruct",
+        "logical_bytes": 995153935
+      },
+      {
+        "path": "C:\\Users\\mark_\\.cache\\huggingface\\hub\\models--Qwen--Qwen3-0.6B",
+        "logical_bytes": 1514758987
+      },
+      {
+        "path": "C:\\Users\\mark_\\.cache\\huggingface\\hub\\models--Qwen--Qwen2-57B-A14B-Instruct",
+        "logical_bytes": 114825597637
+      },
+      {
+        "path": "C:\\Users\\mark_\\.cache\\huggingface\\hub\\models--mistralai--Mistral-7B-Instruct-v0.1",
+        "logical_bytes": 14485321143
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\qwen2",
+        "logical_bytes": 2150125568
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\qwen3",
+        "logical_bytes": 3221762048
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\qwen2-moe",
+        "logical_bytes": 140509987401
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral",
+        "logical_bytes": 18658932131
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\reference-offload",
+        "logical_bytes": 110
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\reference-offload-mistral",
+        "logical_bytes": 110
+      }
+    ],
+    "compact_bytes_before_closeout": 6645302,
+    "closeout_publication_allowance_bytes": 1000000,
+    "compact_bound_bytes": 7645302,
+    "compact_cap_bytes": 100000000,
+    "gate_data": "C:\\t\\cargo-targets\\mere\\inference-i9",
+    "shared_cargo_target": "C:/t/cargo-targets/mere",
+    "shared_reference_python": "C:/t/cargo-targets/mere/reference-python",
+    "isolated_targets_or_cargo_homes_created": false,
+    "retained_isolated_worktrees": []
+  },
+  "observed_free_disk_bytes": 124187164672,
+  "documentation_publication_audit": {
+    "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\integration-doc-audit-publication.json",
+    "sha256": "5261712c139b6a8d2d4d54c8c9437264a56a3071320b5e52e4e291286c3588f1",
+    "unchanged_upstream_findings": 18
+  },
+  "remaining_phase_scope": "Largest licence-permitted reachable models, further architectures, installed-resident/new headed rows and physical-fleet qualification remain open."
+}
