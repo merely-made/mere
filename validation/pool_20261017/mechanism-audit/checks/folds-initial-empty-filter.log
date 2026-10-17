@@ -1,0 +1,16 @@
+   Compiling scenomise v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib test) generated 1 warning (run `cargo fix --lib -p scenomise --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.65s
+     Running unittests src/lib.rs (target/build/debug/deps/scenomise-5273b30d2dccdc02)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s
