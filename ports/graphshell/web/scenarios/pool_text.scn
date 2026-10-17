@@ -1,0 +1,15 @@
+settle 12
+click role:button Pool
+settle 3
+assert text Pool is empty
+click role:textbox @id=pool-text
+input-text An unfinished line for later
+click role:button Add text to Pool
+settle 20
+assert text 1 item
+assert text Pool saved in this workspace
+capture 06_pool_plain_text
+click role:button Export Pool item
+settle 3
+assert text Exported independent Pool material
+capture 07_pool_export_requested

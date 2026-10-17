@@ -1,0 +1,19 @@
+{
+  "base": "18b195dcd12286238a76d8576f9f2fa09eaedf55",
+  "changed_files": {
+    "crates/inker/inker/src/pool.rs": "8f01c77a1c1d58d8e23d2e9e1ddcf446a1ef4328c3bd5b3727695adf439e9ea8",
+    "crates/inker/inker/src/lib.rs": "5eae9fba00eca4488c671789cb45fb9723cfb91938c8adfcdb81aa2caec6cd23",
+    "ports/graphshell/src/web_tree.rs": "c1c81dbbed1d2b9154197f1ef9d6eab9ced65915a9edba0211001694d61df5f4",
+    "ports/graphshell/src/web_tree/pool.rs": "bf12f13b9bcaba5c84ec242604c61e7e25477c228b461c6d8c5b951bf462153e",
+    "ports/graphshell/src/web_tree/backdrop.rs": "373b2b0962b589595ef0263383dd6515c1e29ee29226195fc0c19c4bf8ebefeb",
+    "ports/graphshell/web/Cargo.toml": "c5502b5c2e7ca72344f3a8e7b76a7b61ac9b84b2738a30804feff33297df399c",
+    "ports/graphshell/web/Cargo.lock": "816e650a897b17d4a8db48b40b80b8696fc4139967cf200796b95f14ac49cd29"
+  },
+  "scenarios": {
+    "ports/graphshell/web/scenarios/pool_text_reopen.scn": "3f7bd69373f9174f65874f361aa12f67bef2b83ecf42dd6ae2bad427692f7f6a",
+    "ports/graphshell/web/scenarios/pool_empty_reopen.scn": "4088b3d4821b358d3c6b1d064aa69d56875fc4548fe05af3bdbdc78cc05ea506",
+    "ports/graphshell/web/scenarios/pool.scn": "fbbe1105dcd26d5096bd733bc4f7f2fe99b94f2131c96051ff9475a33829d35b",
+    "ports/graphshell/web/scenarios/pool_text.scn": "c1b6a0bda0ddccfd66d3c17bd9255835ca66cca005acb66e70c81c92f8ce922c",
+    "ports/graphshell/web/scenarios/pool_reopen.scn": "5d02cc96283d7df11cf88cf98a60d32d21113c3e0d46ca47707467369a4e9437"
+  }
+}

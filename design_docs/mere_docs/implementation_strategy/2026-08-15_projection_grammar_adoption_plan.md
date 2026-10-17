@@ -2211,6 +2211,53 @@ Qualification is recorded in
 a temporary local Mere source cohort; canonical app lockfile integration is a
 separate unqualified step. The reusable-template relationship/bulk update UI,
 source provenance insertion UI, meaningful group moves, alternate arrangements,
-workspace holding utility, explicit arrangement practice and lexical/form
+explicit arrangement practice and lexical/form
 suggestion integration remain open. Attribute names and encoded authorship are
 prototype serialization details, not a frozen shared grammar.
+
+
+### Pool workspace utility
+
+Mark selected the provisional name and authorized implementation on 2026-10-17:
+
+> Pool it is for now. Let’s build the workspace utility, and extract a crate if the shared use calls for it.
+
+Pool holds independent material across the workspace's open documents and across
+reopen until explicitly removed. Adding copies content; insertion does not consume
+it. A source address is provenance/navigation, not a live content binding. Pool
+is distinct from ordinary document Save, explicit Collect snapshots and the
+Retained attention state. Finished and unresolved material have the same lifetime.
+
+The first implementation adds a small `inker::pool` data module, consumed by
+Graphshell and native Knot. No separate crate is justified yet: text/material
+identity and validation are shared, while storage and editing remain host-owned.
+The versioned UTF-8 payload envelope is provisional; this slice supports plain
+text and attributed Djot, not a general binary asset or template-update protocol.
+
+Graphshell stores Pool in an origin-wide IndexedDB key independent of its current
+graph session. It can add the current portable scene (including Woodshed's real
+progression export), add text, open an independent scene copy, export held bytes,
+and remove material. Commits compare the expected stored value within the
+existing backend transaction. Browser origin storage policy still applies.
+
+Knot stores Pool beside workspace preferences, outside document tabs. It copies
+a selection or an authored metre block, inserts at the destination selection
+through normal document history, and offers provenance navigation. Inserted metre
+blocks receive fresh block IDs; no universal reference-remapping grammar is
+introduced. Pool writes use a private temporary file and atomic replacement,
+refuse changed/unsupported/corrupt storage, and leave visible state unchanged on
+failure. The stale-value check is not a cross-process filesystem lock.
+
+The expandable bounded panel is an initial utility presentation. The pocket/
+minimap swatch appearance, drag/drop, richer item previews, grouping and native
+Woodshed integration remain subsequent refinements. Pool is workspace-local to
+each host, not a cross-application synchronized library. Template-rule application
+remains separate from inserting held content.
+
+Qualification and source binding: `validation/pool_20261017/receipt.json`.
+One shared model test, three native integration tests, three actual macOS
+processes (six inspected captures) and five browser page loads (eight inspected
+captures) pass. The browser export callback is exercised; downloaded bytes are
+not qualified. Expanded Pool plus existing Graphshell chrome still crowds the
+scene stage, so final utility placement/pocket presentation remains open.
+Canonical app supplier integration remains a separate step.

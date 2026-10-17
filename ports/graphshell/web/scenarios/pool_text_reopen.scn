@@ -1,0 +1,9 @@
+settle 12
+click role:button Pool
+settle 3
+assert text 1 item
+assert text An unfinished line for later
+capture 08_pool_text_reopened
+click role:button Remove from Pool
+settle 20
+assert text Pool is empty

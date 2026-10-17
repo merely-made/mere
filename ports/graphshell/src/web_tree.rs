@@ -471,6 +471,8 @@ pub(crate) struct TreePage {
     #[cfg(feature = "product")]
     backdrop: Rc<RefCell<backdrop::Pane>>,
     #[cfg(feature = "product")]
+    pool: pool::Pane,
+    #[cfg(feature = "product")]
     promoted_links: promoted_links::Pane,
     #[cfg(feature = "product")]
     dynamics_inspector: dynamics_inspection::Pane,
@@ -780,6 +782,8 @@ fn view(page: &TreePage) -> Child {
                         .attr("class", "tree-status")
                         .attr("role", "status"),
                     history::region(page),
+                    #[cfg(feature = "product")]
+                    pool::view(page),
                     page.presenter
                         .is_none()
                         .then(|| hosted_dataset(page))
@@ -1300,6 +1304,8 @@ async fn boot_inner(root: Element, epoch: u64) -> Result<(), String> {
         product::open(&root).await?
     };
     #[cfg(feature = "product")]
+    let pool = pool::Pane::open(product.as_ref()).await;
+    #[cfg(feature = "product")]
     let (mut forme, mut forme_error) = match &product {
         Some(p) => match forme::Pane::open(p).await {
             Ok(pane) => (Some(pane), None),
@@ -1541,6 +1547,8 @@ async fn boot_inner(root: Element, epoch: u64) -> Result<(), String> {
                 query_views: query_view::Pane::default(),
                 #[cfg(feature = "product")]
                 backdrop: Rc::new(RefCell::new(backdrop::Pane::default())),
+                #[cfg(feature = "product")]
+                pool,
                 #[cfg(feature = "product")]
                 promoted_links: promoted_links::Pane::default(),
                 #[cfg(feature = "product")]
@@ -1893,6 +1901,11 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
             }
             #[cfg(feature = "product")]
             {
+                if ctx.runner.state().pool.wake.is_none() {
+                    let wake = ctx.wake.clone();
+                    ctx.runner.update(|p| p.pool.wake=Some(wake));
+                }
+                if ctx.runner.state().pool.ready() { ctx.runner.update(|p|p.pool.poll()); }
                 reading::prepare(ctx.runner.state());
                 backdrop::register(ctx);
                 frame_shared.reading.borrow_mut().register(ctx);
@@ -2204,6 +2217,8 @@ mod inspection;
 mod instrument;
 #[cfg(feature = "product")]
 mod backdrop;
+#[cfg(feature = "product")]
+mod pool;
 mod lane;
 #[cfg(feature = "product")]
 mod link_inspection;

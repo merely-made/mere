@@ -1,0 +1,10 @@
+{
+  "toolchain": "rustup 1.99.1",
+  "features": "product,presentation-webgpu; no default features",
+  "rustflags": "-C link-arg=-zstack-size=16777216",
+  "packaged": {
+    "graphshell_web.js": "f1d05db07d53437a0b9b67fb149d3783555ae402f7ced4a61865c966f2046701",
+    "graphshell_web_bg.wasm": "9125206005102a414f765dacd96f3843806965c84fe93242b78d4075c7119059"
+  },
+  "raw_wasm_sha256": "e0d28edb0636cf77e49f426a84bf128760924d3a1c56877b77bef7ec7cdc3e47"
+}

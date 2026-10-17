@@ -1,0 +1,19 @@
+# Desktop viewport; compact Graph tools drawer is not present.
+settle 8
+click role:button Portable scenes
+settle 3
+click role:button Woodshed progression block
+settle 4
+click role:button Pool
+settle 2
+click role:button Add scene to Pool
+settle 20
+assert text Pool saved in this workspace
+assert text 1 item
+capture 01_pool_progression
+click role:button Manual verse block
+settle 3
+click role:button Open Pool scene
+settle 5
+assert text Opened independent Pool material
+capture 02_pool_independent
