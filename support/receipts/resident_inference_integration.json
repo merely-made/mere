@@ -1,0 +1,632 @@
+{
+  "schema": "mere.resident-inference/main-integration/v1",
+  "recorded_utc": "2026-10-17T03:28:39.572603+00:00",
+  "host": "O-PC",
+  "focused_gate_complete": true,
+  "passed_tests": 10,
+  "prior_qualification": "support/receipts/resident_inference_automatic.json",
+  "inference_tip": "1f4809918154b4c4232ed00d8b837b196f10fe99",
+  "tested_merge_source": "26416283f700fd85cf872b22aa9f71aff1b8b60f",
+  "tested_upstream_main": "641f684a76250501654104fbcd239ee8ae22d710",
+  "final_merge_source": "98d80535ea757ed77851789afeedff84f59a93f3",
+  "integrated_upstream_main": "d1e1d7aaed1b2b3f99fceca6fa7301ab09f5aa46",
+  "merge_conflicts": [],
+  "post_test_upstream_files": [
+    "crates/canvas/pictograph/src/canvas/backdrop_surface.rs",
+    "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
+    "validation/template-scene-interaction_20261016/affordances.log",
+    "validation/template-scene-interaction_20261016/receipt.json",
+    "validation/template-scene-interaction_20261016/tests.log"
+  ],
+  "post_test_boundary": "Two upstream Pictograph backdrop commits plus their plan and receipts; no change to inference, mesh, resident, Cargo manifest or Cargo lock inputs. These visual changes were not rebuilt into the runtime executables.",
+  "post_test_owner_receipt": "validation/template-scene-interaction_20261016/receipt.json",
+  "build": {
+    "source": "26416283f700fd85cf872b22aa9f71aff1b8b60f",
+    "exit_code": 0,
+    "seconds": 1314.3979743,
+    "log": "C:/t/cargo-targets/mere/inference-i8/integrated-djinn-build.log",
+    "arguments": [
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "djinn",
+      "--release",
+      "--features",
+      "inference-stages,inference-gpu,trainer-gpu,trainer-autodiff",
+      "--test",
+      "inference_automatic",
+      "--test",
+      "inference_route",
+      "--test",
+      "inference_gpu_reclaim",
+      "--no-run"
+    ],
+    "log_sha256": "ced100ba5893deb7810103724a6b7c882e358a4da5662c2dd886b45a63e174d1"
+  },
+  "environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build",
+    "CARGO_BUILD_JOBS": "4",
+    "ESP_STAGE_WORK_DIR": "C:\\t\\cargo-targets\\mere\\inference-i8",
+    "DJINN_AUTOMATIC_RECEIPT_DIR": "C:\\t\\cargo-targets\\mere\\inference-i8\\integration",
+    "ESP_SMOLLM2_DIR": "C:/Users/mark_/.cache/huggingface/hub/models--HuggingFaceTB--SmolLM2-360M-Instruct/snapshots/a10cc1512eabd3dde888204e902eca88bddb4951"
+  },
+  "checks": [
+    {
+      "name": "automatic-cpu",
+      "executable": "C:/t/cargo-targets/mere/build/release/deps/inference_automatic-7bdea0062e53d543.exe",
+      "executable_sha256": "485fb404259d5a9f8d883a83ff043acbcf52f830ac4e79fc15f62a7024e13a33",
+      "arguments": [
+        "--exact",
+        "ordinary_asks_discover_keyed_stages_and_recover_when_a_worker_leaves",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 57.4899667,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integration\\automatic-cpu.log",
+      "log_sha256": "7805523ce23a4cb4195d219f28b29ffa122afe08c5628cf1a404c155984c2bd0",
+      "summary": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 54.81s"
+      ]
+    },
+    {
+      "name": "automatic-gpu",
+      "executable": "C:/t/cargo-targets/mere/build/release/deps/inference_automatic-7bdea0062e53d543.exe",
+      "executable_sha256": "485fb404259d5a9f8d883a83ff043acbcf52f830ac4e79fc15f62a7024e13a33",
+      "arguments": [
+        "--ignored",
+        "--exact",
+        "real_smollm2_ordinary_asks_select_stages_and_recover",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 152.2393625,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integration\\automatic-gpu.log",
+      "log_sha256": "f1c92d884342a8d5663240170fd4063d43450ee0c55d5e264f1afe1c40f74fe9",
+      "summary": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 151.76s"
+      ]
+    },
+    {
+      "name": "route",
+      "executable": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_route-118704f79d7f21c4.exe",
+      "executable_sha256": "083069caff2ffb6a2d876b13dc9389027ad46fe9af54cf17e7fc1a8b4119f696",
+      "arguments": [
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 33.182354,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integration\\route.log",
+      "log_sha256": "5a4bf7f4a0f0d8d02cdba2174bde7178ab1979d9d3db2157ca25444963a97164",
+      "summary": [
+        "test result: ok. 4 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 31.18s"
+      ]
+    },
+    {
+      "name": "gpu-reclaim",
+      "executable": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_gpu_reclaim-8bc180c7b8ef5867.exe",
+      "executable_sha256": "adf952d2eb270ae0d3c294b5a91d646de4676f0941a87e5c6173cd74aecee688",
+      "arguments": [
+        "--ignored",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 19.0693604,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integration\\gpu-reclaim.log",
+      "log_sha256": "42b47d8a776cce16e7436db1eb2af854c079981ee4cc8bb7ff5a13f95cd9aaf2",
+      "summary": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.83s"
+      ]
+    },
+    {
+      "name": "real-recall",
+      "executable": "C:/t/cargo-targets/mere/build\\release\\deps\\inference_route-118704f79d7f21c4.exe",
+      "executable_sha256": "083069caff2ffb6a2d876b13dc9389027ad46fe9af54cf17e7fc1a8b4119f696",
+      "arguments": [
+        "--ignored",
+        "--exact",
+        "a_real_model_cites_exact_retained_versions_and_reopens_its_run",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 22.9380812,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integration\\real-recall.log",
+      "log_sha256": "baaffee6c2fb148bed323156ac74c9611aa68adb3fab600d8f0b1de6ca419866",
+      "summary": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 22.32s"
+      ]
+    }
+  ],
+  "automatic_results": {
+    "cpu": {
+      "backend": "burn-ndarray/f32",
+      "fixture_seconds": 54.6803154,
+      "independent_roots": 3,
+      "physical_computers": 1,
+      "row": "blake3:ee1eff4e11deffeac4094ecae037d5af3874b189edcbbc952df1e89ec3631db7",
+      "rung_change_preserved_history": true,
+      "runs": [
+        {
+          "ask_seconds": 1.2060528,
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:95f139aa288d4ec233616a5408920391",
+              "reason": "layer stages: 3751aa7fea0d22a3669979975cfb820f6d79d7e1fe520e5a5c57b61468adbda8 layers 0..1; 40cc8df4f751e2379d86540935072d2cdda3718361b7379fc68e4a8d9fd6ae56 layers 1..2"
+            }
+          ],
+          "run": "staged",
+          "session": {
+            "prompt_template_hash": "blake3:d977badfb32350424b5017599c7931c104e5464e169a31d70eb7366371a3145f",
+            "session_id": "blake3:eafed66ec5f1c57a33af6f2bb39c43afab2a66bc495e416247d910b24d92b1ec"
+          },
+          "text": "t10 t31 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12",
+          "token_ids": [
+            10,
+            31,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12
+          ]
+        },
+        {
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:2096f22a31a2ecf50d61fb1010b6bba7",
+              "reason": "whole model resident within owner payload budget"
+            }
+          ],
+          "run": "resident",
+          "session": {
+            "prompt_template_hash": "blake3:d977badfb32350424b5017599c7931c104e5464e169a31d70eb7366371a3145f",
+            "session_id": "blake3:eafed66ec5f1c57a33af6f2bb39c43afab2a66bc495e416247d910b24d92b1ec"
+          },
+          "text": "t10 t31 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12",
+          "token_ids": [
+            10,
+            31,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12
+          ]
+        },
+        {
+          "ask_seconds": 1.189928,
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:95f139aa288d4ec233616a5408920391",
+              "reason": "layer stages: 3751aa7fea0d22a3669979975cfb820f6d79d7e1fe520e5a5c57b61468adbda8 layers 0..1; 40cc8df4f751e2379d86540935072d2cdda3718361b7379fc68e4a8d9fd6ae56 layers 1..2"
+            },
+            {
+              "at_token": 3,
+              "device": "O-PC:95f139aa288d4ec233616a5408920391",
+              "reason": "leased stage unavailable; resumed by local layer streaming"
+            }
+          ],
+          "run": "departure",
+          "session": {
+            "prompt_template_hash": "blake3:d977badfb32350424b5017599c7931c104e5464e169a31d70eb7366371a3145f",
+            "session_id": "blake3:eafed66ec5f1c57a33af6f2bb39c43afab2a66bc495e416247d910b24d92b1ec"
+          },
+          "text": "t10 t31 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12",
+          "token_ids": [
+            10,
+            31,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12
+          ]
+        },
+        {
+          "ask_seconds": 10.5848249,
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:95f139aa288d4ec233616a5408920391",
+              "reason": "stage plan unavailable; local layer streaming"
+            }
+          ],
+          "run": "offline",
+          "session": {
+            "prompt_template_hash": "blake3:d977badfb32350424b5017599c7931c104e5464e169a31d70eb7366371a3145f",
+            "session_id": "blake3:eafed66ec5f1c57a33af6f2bb39c43afab2a66bc495e416247d910b24d92b1ec"
+          },
+          "text": "t10 t31 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12 t5 t12",
+          "token_ids": [
+            10,
+            31,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12,
+            5,
+            12
+          ]
+        }
+      ]
+    },
+    "gpu": {
+      "backend": "burn-wgpu/f16",
+      "fixture_seconds": 151.3436813,
+      "independent_roots": 3,
+      "physical_computers": 1,
+      "row": "blake3:a8abb177fa5b71377d943c88927c6c5327d755602c3abca00077ae6d1eecd4e5",
+      "rung_change_preserved_history": true,
+      "runs": [
+        {
+          "ask_seconds": 11.790885,
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:58d5495c61bc80401d49c4b5d85e5376",
+              "reason": "layer stages: 3548e3b0c109674eef515d574f793985fe658421cc0746cea0dd28fa566e8982 layers 0..16; d34437b2a5368c7be4b34b2a0af3ca748c5cdd88103a103e23d097c320aeedd7 layers 16..32"
+            }
+          ],
+          "run": "staged",
+          "session": {
+            "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+            "session_id": "blake3:85e9c478e02cd1e9a09fa5d105ea4e90e926713d71e87b1f0405f2e971439e8b"
+          },
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:a627fa0f9941e522d170e0b7acb110ee",
+              "reason": "whole model resident within owner payload budget"
+            }
+          ],
+          "run": "resident",
+          "session": {
+            "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+            "session_id": "blake3:85e9c478e02cd1e9a09fa5d105ea4e90e926713d71e87b1f0405f2e971439e8b"
+          },
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "ask_seconds": 29.5622683,
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:58d5495c61bc80401d49c4b5d85e5376",
+              "reason": "layer stages: 3548e3b0c109674eef515d574f793985fe658421cc0746cea0dd28fa566e8982 layers 0..16; d34437b2a5368c7be4b34b2a0af3ca748c5cdd88103a103e23d097c320aeedd7 layers 16..32"
+            },
+            {
+              "at_token": 3,
+              "device": "O-PC:58d5495c61bc80401d49c4b5d85e5376",
+              "reason": "leased stage unavailable; resumed by local layer streaming"
+            }
+          ],
+          "run": "departure",
+          "session": {
+            "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+            "session_id": "blake3:85e9c478e02cd1e9a09fa5d105ea4e90e926713d71e87b1f0405f2e971439e8b"
+          },
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "ask_seconds": 29.9524319,
+          "placements": [
+            {
+              "at_token": 0,
+              "device": "O-PC:58d5495c61bc80401d49c4b5d85e5376",
+              "reason": "stage plan unavailable; local layer streaming"
+            }
+          ],
+          "run": "offline",
+          "session": {
+            "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+            "session_id": "blake3:85e9c478e02cd1e9a09fa5d105ea4e90e926713d71e87b1f0405f2e971439e8b"
+          },
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        }
+      ]
+    }
+  },
+  "primary_checkout": {
+    "path": "C:/Users/mark_/Code/repos/mere",
+    "head": "0447473120ec607b45bf009fa0863b1fbd66e5e3",
+    "dirty_entries": 39,
+    "action": "left untouched; concurrent edits and local commits retained"
+  },
+  "retained": {
+    "worktree": "C:/Users/mark_/Code/worktrees/mere-resident-inference",
+    "owner": "resident inference integration and qualification",
+    "reason": "preserve existing qualification evidence while the shared primary checkout has active edits",
+    "artifacts": "C:\\t\\cargo-targets\\mere\\inference-i8",
+    "new_isolated_targets_or_homes": []
+  },
+  "limits": [
+    "One physical computer and one RTX 4060 Laptop GPU; three independently rooted software devices.",
+    "Real resident and app connection in-process; installed djinn binary was not run.",
+    "No additional headed client, second physical device or 20-run flakiness qualification.",
+    "Prior broader unit, feature and native receipts retain their original source identities."
+  ],
+  "documentation": {
+    "new_findings": {},
+    "before_log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integrated-doc-audit-before.json",
+    "before_sha256": "55723e1f1e4b06f48b4e50515fa00780d5ac4e50bc76aa79a3147f4caa76ddac",
+    "after_log": "C:\\t\\cargo-targets\\mere\\inference-i8\\integrated-doc-audit-final.json",
+    "after_sha256": "55723e1f1e4b06f48b4e50515fa00780d5ac4e50bc76aa79a3147f4caa76ddac",
+    "working_tree_diff_check_exit_code": 0,
+    "upstream_whitespace": "Existing upstream license and receipt whitespace retained; focused inference diff and integration edits pass git diff --check."
+  }
+}
