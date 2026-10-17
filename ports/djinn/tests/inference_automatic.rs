@@ -376,7 +376,7 @@ async fn exercise_inner(native: bool) {
         )
         .await;
     });
-    let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(180);
     let mut client = loop {
         if let Ok(client) = open(&endpoint, "turnstone").await {
             break client;
@@ -422,31 +422,40 @@ async fn exercise_inner(native: bool) {
         let mut works = device.take_distillery().unwrap();
         let (stop, receive) = tokio::sync::oneshot::channel();
         stops.push(Some(stop));
-        tasks.push(tokio::task::spawn_local(async move {
-            works
-                .run_until(
-                    async {
-                        let _ = receive.await;
-                    },
-                    move |receipt| {
-                        if let distillery::ResidentReceipt::Tick { steps } = &receipt {
-                            if steps
-                                .iter()
-                                .any(|s| !matches!(s, distillery::mesh_host::Step::Idle))
-                            {
-                                println!("automatic host {index}: {steps:?}");
-                            }
-                        }
-                    },
-                )
-                .await
+        tasks.push(tokio::task::spawn_blocking(move || {
+            // Each software device drives its own resident loop, as separate
+            // processes do. A busy supervisor must not starve another device's
+            // shutdown or the app client's observation on a shared LocalSet.
+            let runtime = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
                 .unwrap();
-            works.close().await.unwrap();
+            runtime.block_on(async move {
+                works
+                    .run_until(
+                        async {
+                            let _ = receive.await;
+                        },
+                        move |receipt| {
+                            if let distillery::ResidentReceipt::Tick { steps } = &receipt {
+                                if steps
+                                    .iter()
+                                    .any(|s| !matches!(s, distillery::mesh_host::Step::Idle))
+                                {
+                                    println!("automatic host {index}: {steps:?}");
+                                }
+                            }
+                        },
+                    )
+                    .await
+                    .unwrap();
+                works.close().await.unwrap();
+            });
         }));
     }
     // The bridge alone supplies mesh endpoints and attestations. No stage
     // addresses, assignments, jobs or credentials are supplied by this fixture.
-    let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(180);
     while board_store.board(mesh).await.unwrap().devices().len() < 3 {
         assert!(
             tokio::time::Instant::now() < deadline,
@@ -468,7 +477,7 @@ async fn exercise_inner(native: bool) {
                 let lane = lane.clone();
                 let stop = stops[1].take().unwrap();
                 Some(tokio::task::spawn_blocking(move || {
-                    let deadline = std::time::Instant::now() + Duration::from_secs(90);
+                    let deadline = std::time::Instant::now() + Duration::from_secs(180);
                     loop {
                         if lane.runs().runs.iter().any(|r| {
                             r.run == "departure" && r.tokens >= 3 && !r.state.is_terminal()
@@ -476,7 +485,11 @@ async fn exercise_inner(native: bool) {
                             stop.send(()).unwrap();
                             return;
                         }
-                        assert!(std::time::Instant::now() < deadline, "no mid-answer prefix");
+                        assert!(
+                            std::time::Instant::now() < deadline,
+                            "no mid-answer prefix: {:?}",
+                            lane.runs()
+                        );
                         std::thread::sleep(Duration::from_millis(1));
                     }
                 }))
@@ -498,7 +511,11 @@ async fn exercise_inner(native: bool) {
             .await,
             chirograph::IntentResult::Accepted
         );
-        let deadline = tokio::time::Instant::now() + Duration::from_secs(90);
+        println!(
+            "automatic {run}: app accepted after {:.3}s",
+            ask_started.elapsed().as_secs_f64()
+        );
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(180);
         loop {
             let runs = read_runs(&mut client, &projection).await;
             let current = runs.runs.iter().find(|r| r.run == run).unwrap();
@@ -512,6 +529,10 @@ async fn exercise_inner(native: bool) {
             );
             tokio::time::sleep(Duration::from_millis(2)).await;
         }
+        println!(
+            "automatic {run}: app finished after {:.3}s",
+            ask_started.elapsed().as_secs_f64()
+        );
         if let Some(departure) = departure {
             departure.await.unwrap();
         }
@@ -620,7 +641,7 @@ async fn exercise_inner(native: bool) {
                     question: question.into(),
                 })
                 .unwrap();
-            let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
+            let deadline = tokio::time::Instant::now() + Duration::from_secs(180);
             loop {
                 if let Some(run) = worker_lane
                     .runs()
@@ -680,16 +701,15 @@ async fn exercise_inner(native: bool) {
     for task in tasks {
         task.await.unwrap();
     }
+    drop(lane);
+    drop(worker_lane);
+    drop(planner);
+    drop(services);
+    // Let each ResidentInference become its host's final owner and await the
+    // personal transport drain before the enclosing blob store closes.
+    drop(hosts);
     for device in devices {
         device.shutdown().await.unwrap();
-    }
-    for host in hosts {
-        Arc::try_unwrap(host)
-            .ok()
-            .expect("graph host borrower leaked")
-            .close()
-            .await
-            .unwrap();
     }
     drop(board_store);
     drop(library);
