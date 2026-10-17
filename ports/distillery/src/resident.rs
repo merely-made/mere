@@ -201,6 +201,8 @@ pub struct ResidentAuthority<B: Backend + Clone + Send + Sync + 'static> {
     storage: ResidentStorage,
     settings: ResidentSettings,
     ingress: Option<IngressHandle<B>>,
+    #[cfg(feature = "inference-stages")]
+    stages: Vec<Arc<crate::inference_stage::StageService>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
@@ -225,6 +227,8 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
             storage,
             settings,
             ingress: None,
+            #[cfg(feature = "inference-stages")]
+            stages: Vec::new(),
         })
     }
 
@@ -246,6 +250,56 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
     /// The live transport, for pairing and reachability projection.
     pub fn transport(&self) -> &Arc<P2pandaTransport> {
         &self.transport
+    }
+
+    /// Compose leased stages on this resident's existing mesh and endpoint.
+    /// The owner supplies the same clock/lease policy used by its supervisor
+    /// and live personal graph read authority. Shutdown drains stages before
+    /// closing transport, leases or storage.
+    #[cfg(feature = "inference-stages")]
+    pub async fn enable_inference_stages(
+        &mut self,
+        clock: Arc<dyn crate::mesh_host::Clock>,
+        policy: mesh::LeasePolicy,
+        settings: crate::inference_stage::StageSettings,
+        factory: Arc<crate::inference_stage::StageFactory>,
+        readers: Arc<crate::inference_stage::StageReaders>,
+    ) -> Result<Arc<crate::inference_stage::StageService>, String> {
+        if !self.stages.is_empty() {
+            return Err("this resident already has a stage service".into());
+        }
+        if settings.requires.memory_mib > self.authority.host().facts().memory_mib {
+            return Err("stage offer exceeds the resident's composed host facts".into());
+        }
+        let service = crate::inference_stage::StageService::mount(
+            self.transport.clone(),
+            self.storage.mesh_id(),
+            self.authority.host().me(),
+            clock,
+            policy,
+            settings,
+            factory,
+            readers,
+        )
+        .await?;
+        if let Err(error) = self
+            .authority
+            .host_mut()
+            .register_resource(service.resource())
+        {
+            service.shutdown().await?;
+            return Err(error.to_string());
+        }
+        service.refresh(self.authority.board().await.map_err(|e| e.to_string())?);
+        self.authority.attach_remote_sessions(service.clone());
+        self.stages.push(service.clone());
+        Ok(service)
+    }
+
+    /// Owned private stage workers, for the embedding host's vault lock hook.
+    #[cfg(feature = "inference-stages")]
+    pub fn inference_stage_services(&self) -> Vec<Arc<crate::inference_stage::StageService>> {
+        self.stages.clone()
     }
 
     /// Opt in to admitted signed-record submission and separately authorized exact
@@ -381,9 +435,30 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
             transport,
             storage,
             ingress,
+            #[cfg(feature = "inference-stages")]
+            stages,
             ..
         } = self;
         let report = close_all(vec![
+            #[cfg(feature = "inference-stages")]
+            (
+                "inference-stages",
+                Box::new(move || {
+                    Box::pin(async move {
+                        let mut errors = Vec::new();
+                        for service in stages {
+                            if let Err(error) = service.shutdown().await {
+                                errors.push(error);
+                            }
+                        }
+                        if errors.is_empty() {
+                            Ok(())
+                        } else {
+                            Err(errors.join("; "))
+                        }
+                    }) as CloseFuture<'static>
+                }) as CloseAction<'static>,
+            ),
             (
                 "transport",
                 Box::new(move || {
@@ -422,7 +497,13 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
         ])
         .await;
         let transport_error = report.failure("transport").map(str::to_owned);
-        let authority_error = report.failure("authority").map(str::to_owned);
+        let mut authority_error = report.failure("authority").map(str::to_owned);
+        #[cfg(feature = "inference-stages")]
+        if let Some(error) = report.failure("inference-stages") {
+            authority_error = Some(format!(
+                "stage shutdown: {error}; host: {authority_error:?}"
+            ));
+        }
         let storage_error = report.failure("storage").map(str::to_owned);
         if transport_error.is_none() && authority_error.is_none() && storage_error.is_none() {
             Ok(())

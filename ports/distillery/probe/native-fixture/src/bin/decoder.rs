@@ -55,6 +55,7 @@ fn main() -> Result<(), String> {
 
     let request = GenerationRequest {
         prompt: prompt.clone(),
+        context: String::new(),
         max_tokens,
         temperature: 0.0,
         top_p: None,

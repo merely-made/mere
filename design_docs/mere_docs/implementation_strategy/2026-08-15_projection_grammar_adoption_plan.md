@@ -1797,7 +1797,7 @@ document equal the earlier fixture. Consumer evidence lives in
 
 ### Native arrangement interaction geometry (2026-10-16)
 
-**Status:** shared geometry qualified; Woodshed interaction adoption in progress.
+**Status:** shared geometry and native Woodshed interaction adoption qualified.
 
 BackdropSurface now exposes forward/inverse viewport transforms and rectangular
 occurrence bounds through its existing fit. A host can opt into selected-span
@@ -1808,3 +1808,12 @@ across three viewports, verifies round trips and visible-edge picking, and rejec
 invalid queries. Six surface tests pass (`validation/template-scene-interaction_20261016/tests.log`).
 A shared editing-intent API still requires a second concrete editing consumer;
 metre geometry evidence alone does not qualify source editing in Knot/Graphshell.
+
+
+Woodshed adoption (2026-10-16): source `b3afe76` pins shared `d1e1d7aae`.
+Fourteen focused consumer tests and the locked desktop build pass. Native body
+and edge gestures, keyboard movement, Escape and compact rest editing pass in
+229 frames; a 94-frame fresh process reopens the exact sealed Set and complete
+portable document. Five captures were reviewed. The consumer keeps beat
+snapping and draft/Save semantics; the surface still supplies geometry only.
+Evidence: `woodshed/validation/native-arrangement-spans_20261016/receipt.json`.

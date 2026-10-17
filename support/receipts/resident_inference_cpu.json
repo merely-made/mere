@@ -1,0 +1,111 @@
+{
+  "backend": "burn-ndarray",
+  "load_seconds": 1.071441,
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+  "row": "blake3:cc753a9cfd8b2657c66b962e508b97845b6c2bda7c42940d5ea4ae5386952a01",
+  "rows": [
+    {
+      "question": "What is the capital of France?",
+      "seconds": 15.7432063,
+      "text": "The capital of France is Paris.",
+      "token_ids": [
+        504,
+        3575,
+        282,
+        4649,
+        314,
+        7042,
+        30
+      ]
+    },
+    {
+      "question": "Count from one to five.",
+      "seconds": 33.4288915,
+      "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+      "token_ids": [
+        33,
+        30,
+        1963,
+        198,
+        34,
+        30,
+        5713,
+        198,
+        35,
+        30,
+        8696,
+        198,
+        36,
+        30,
+        8920,
+        198
+      ]
+    },
+    {
+      "question": "What color is a clear daytime sky?",
+      "seconds": 36.1716651,
+      "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+      "token_ids": [
+        49,
+        2437,
+        23703,
+        6376,
+        314,
+        3431,
+        253,
+        2276,
+        11615,
+        282,
+        4461,
+        28,
+        1129,
+        351,
+        253,
+        11682
+      ]
+    }
+  ],
+  "session": {
+    "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+    "session_id": "blake3:27b717ec871178569bd15e8819af1c83ac26bac211547c09d67385e5d3b489f1"
+  },
+  "host": {
+    "machine": "O-PC",
+    "platform": "Windows-10-10.0.26220-SP0",
+    "processor": "AMD64 Family 25 Model 116 Stepping 1, AuthenticAMD",
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "store": "muniment::MemoryBackend",
+    "peak_working_set_observed_bytes": 3626852352,
+    "peak_measurement": "Windows Get-Process.PeakWorkingSet64 sampled while this test was generating"
+  },
+  "basis_parent": "b97ea98476983d50a349835fa51541fbb1b87d77",
+  "test_binary_sha256": "16647dae0a5766ea78cf2b1c7f3363f1a4addefe3139e7784fdae900ffb8923e",
+  "source_sha256": {
+    "Cargo.lock": "5d668824de30bb3065a198b8ac32d1d0c9583ac782fd7ca0552611761593d523",
+    "crates/intel/esp/Cargo.toml": "fc55fd031928dcc022cc5dde3a38a92d688be368a967ed577c98ed3b5508a7d5",
+    "crates/intel/esp/examples/import_inference_model.rs": "5c6cf5cb43348538e58f09e95a1a8ffa89cf23ec724d395b5d1ad4027a5f4a3a",
+    "crates/intel/esp/src/infer/actor.rs": "0bbdb069d69e97332ca42f754608886e282c1bf2d7a181c4971f37e761b41688",
+    "crates/intel/esp/src/infer/decoder/provider.rs": "a1bdfd38c357bfd27672935629e3d988c7a40c71151a3cbba773cde8f3ab9e79",
+    "crates/intel/esp/src/infer/library.rs": "a76402b40ab94091ce0de96116720a88c0e73b395e03dce80b4b96e37b0dcd03",
+    "crates/intel/esp/src/infer/mod.rs": "8761ddcd7007c505ff874123793b98fe968aec7886eaa8f6236d8e385f03ad58",
+    "crates/intel/esp/src/infer/prompt.rs": "1d6b73f74827366c90a919e1bf6cadfc401530bf8531d4e1efc1c2e26a8dcb6e",
+    "crates/intel/esp/src/infer/provider.rs": "7bd05653dc4a38b2f1be3830aa5784a748a7240babf3cc4dd9418a05b18b0a29",
+    "crates/intel/esp/templates/smollm2-instruct-v1.json": "e74608112d6fa9812f416799ac7a6d8d63a50f4b98a20b470b05f018c0ee4daf",
+    "crates/intel/esp/tests/eidetic_corridor.rs": "d60d8fc868305e1bb9edc54d9870e966d9813d899bdb28a92dbb976dcf4c51e5",
+    "crates/intel/esp/tests/library_session.rs": "ca15e3352895512d459946c692247d61f3672c2d5d965ef8f28ceb93275b43cf",
+    "crates/intel/esp/tests/prompt_template.rs": "f88caace50e968086957afd6e19f5bf64cc3fade95606e34d4ccc5f120353cc4",
+    "crates/intel/esp/tests/reference_smollm2.py": "6d987714241ad661d97121b07e370e078efa692e548114b2eb8a387fbeaf9d19",
+    "crates/intel/esp/tests/smollm2_360m_reference.json": "194bb491105aa8fb90f314c68b2d52a1453129c2863f4f5a11f74c4bbd898564",
+    "crates/intel/esp/tests/smollm2_library.rs": "9b9dcb0266ac0f0f55ea8e7e769918cce87bdc1542d77c20e84907e8bb59da31",
+    "crates/intel/esp/tests/support/decoder.rs": "479586c2a502be425118d6c27b691d5a1a93274c3d77d8574a978572eb69da42",
+    "ports/distillery/Cargo.toml": "1b993d548b23ce9ffc83c266b20d3d8147785aecb5fade2451d54b2db9da124a",
+    "ports/distillery/src/inference.rs": "a75f702fbf185baf480c01702665e93256236be93af1709d86d13f153feb7521",
+    "ports/djinn/Cargo.toml": "d9267326dcec63349ec38d2d017e5399233166f3faee32c9930677bd14b8083f",
+    "ports/djinn/src/resident.rs": "613f23661fa2d71bbeac80f93dc90b62c181373c03f48ccc03fce023bd3edf48",
+    "ports/djinn/src/resident_distillery.rs": "f65c8038718c91fee4665f01e37ca93499a39379dd4d90635051130bdee035a7",
+    "ports/djinn/src/resident_inference.rs": "531bec574fc8b73081244c384a844cebab090ce384d5144c72652dd8d7664874",
+    "ports/djinn/src/settings.rs": "8ac5664ad00873eb8c93935cbc679885f9ca0e261adb479eba557f98df2a84e9",
+    "ports/djinn/tests/inference_route.rs": "e5e57af00651913c6e8a704c930a6ab17b4161a28ef3d7cd8c433aa34b279100"
+  }
+}

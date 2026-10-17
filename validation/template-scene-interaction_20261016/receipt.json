@@ -1,8 +1,21 @@
 {
-  "status": "shared geometry tests passed; native consumer pending",
+  "status": "shared geometry and native Woodshed adoption qualified",
   "tests": 6,
-  "command": "cargo test -p pictograph --features canvas backdrop_surface --locked",
+  "command": "cargo test -p pictograph --features canvas --lib backdrop_surface --locked",
   "source_file_sha256": "65c8d6d2add46eb62c18c60f8792d74097aa7d2ca522d10fea3fe75ebc82a696",
   "scope": "Forward/inverse geometry, rectangular span bounds and optional affordances. Metre/progression specimens; no source-edit authority.",
-  "affordance_followup": "Small selected span centre keeps both edge handles visible"
+  "affordance_followup": "Small selected span centre keeps both edge handles visible",
+  "native_adoption": {
+    "consumer_source": "b3afe76a655b9ce6f08cd08d2b73ff3ec5a0588e",
+    "shared_source": "d1e1d7aaed1b2b3f99fceca6fa7301ab09f5aa46",
+    "receipt": "woodshed/validation/native-arrangement-spans_20261016/receipt.json",
+    "consumer_tests": 14,
+    "native_frames": 323,
+    "reviewed_captures": 5
+  },
+  "integration": {
+    "source": "affb9bbcec7aa22ff54a4b1b99ff13347fccbbad",
+    "tests_passed": 6,
+    "backdrop_surface_unchanged_from_native_qualified_source": true
+  }
 }

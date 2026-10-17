@@ -32,11 +32,11 @@
 
 use std::path::{Path, PathBuf};
 
+use castellan::custody::IdentityVault;
+use castellan::custody::bootstrap::{self, Unlock};
 use djinn::resident::DjinnResident;
 use djinn::settings::{DistilleryLaneSettings, OwnerSettings};
 use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
-use castellan::custody::IdentityVault;
-use castellan::custody::bootstrap::{self, Unlock};
 use personae::ProfileId;
 
 pub const PASSPHRASE: &[u8] = b"djinn-distillery-lane-receipt-passphrase";
@@ -65,7 +65,10 @@ pub fn now_ms() -> u64 {
 /// here would fail at that second open rather than at its assertion.
 pub fn open_vault(
     root: &Path,
-) -> (PathBuf, IdentityVault<Box<dyn castellan::custody::IdentityStorage>>) {
+) -> (
+    PathBuf,
+    IdentityVault<Box<dyn castellan::custody::IdentityStorage>>,
+) {
     let vault_dir = root.join("vault");
     let opened = bootstrap::open_storage(&vault_dir, unlock()).expect("open vault storage");
     let (record, _created) =
@@ -480,10 +483,10 @@ pub async fn run_trainer_job(
 ) -> PostedJob {
     use std::sync::Arc;
 
+    use distillery::mesh_host::Step;
     use distillery::{ResidentReceipt, TRAINER_REQUEST_INPUT, TRAINER_RESOURCE};
     use mesh::spec::{DeterminismClass, JobSpec};
     use mesh::{BlobSource as _, ResourceId};
-    use distillery::mesh_host::Step;
     use tokio::sync::Notify;
 
     let request_blob = works
@@ -591,3 +594,6 @@ pub async fn run_trainer_job(
         },
     }
 }
+
+#[cfg(feature = "inference")]
+pub mod inference_door;

@@ -9,16 +9,17 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use personae::Ed25519Keypair;
 use insigne::DerivedKeyAttestation;
 use mesh::{
     BlobSink, BlobSource, DevicePolicy, HostFacts, HostOffer, JobControl, JobId, LeaseId,
     LeasePolicy, LeaseProgress, MeshEvent, MeshStoreError, MeshSyncError, ReclaimReason,
-    ReleaseReason, ResourceRegistry, RunContext, SyncedMesh, WorkerAction, next_action,
+    ReleaseReason, ResourceRegistry, RunContext, SyncedMesh, WorkerAction,
+    next_action_with_availability,
     registry::{run_job_for, run_legacy},
     spec::CheckpointClass,
 };
 use muniment::Backend;
+use personae::Ed25519Keypair;
 
 use crate::mesh_host::courier::{BlobCourier, NoCourier, deliver_inputs};
 use crate::mesh_host::inflight::{InFlight, Reclaiming, RunOutcome, release_reason, still_held};
@@ -142,7 +143,7 @@ pub enum HostError {
 /// The host supervisor.
 ///
 /// Owns the in-flight job map and their control handles, the registry, blob
-/// access, and the OS-facing seams. Drives [`next_action`] on a tick that never
+/// access, and the OS-facing seams. Drives [`mesh::next_action`] on a tick that never
 /// blocks on execution, which is what makes heartbeats and owner reclaim
 /// possible at all.
 pub struct MeshHost<B: Backend + Clone + Send + Sync + 'static> {
@@ -151,9 +152,23 @@ pub struct MeshHost<B: Backend + Clone + Send + Sync + 'static> {
     me: [u8; 32],
     config: HostConfig,
     inflight: BTreeMap<JobId, InFlight>,
+    gpu: Option<crate::gpu::GpuAccess>,
+    admission: Option<Arc<dyn Fn(&mesh::Job, &mesh::JobBoard) -> bool + Send + Sync>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
+    /// Register an owner-composed resource between supervisor ticks. Existing
+    /// runs retain their adapters; host facts and lending policy still govern
+    /// whether the new offer may claim work.
+    pub fn register_resource(
+        &mut self,
+        resource: std::sync::Arc<dyn mesh::MeshResource>,
+    ) -> Result<(), mesh::RegistryError> {
+        let gpu = resource.descriptor().requires.compute == mesh::ComputeClass::Gpu;
+        self.config.registry.register(resource)?;
+        self.config.facts.gpu |= gpu;
+        Ok(())
+    }
     pub fn new(synced: SyncedMesh<B>, keypair: Ed25519Keypair, config: HostConfig) -> Self {
         let me = keypair.public_key().to_bytes();
         Self {
@@ -162,11 +177,56 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             me,
             config,
             inflight: BTreeMap::new(),
+            gpu: None,
+            admission: None,
         }
     }
 
     pub fn me(&self) -> [u8; 32] {
         self.me
+    }
+
+    /// Owner stage posts are drained on the supervisor's single authoring
+    /// path. Actor threads never race the mesh author's log sequence.
+    #[cfg(feature = "inference-stages")]
+    pub(crate) async fn post_inference_stage(
+        &self,
+        peer: [u8; 32],
+        request: &crate::inference_stage::StageRequest,
+        requires: mesh::ResourceRequirements,
+        terms: mesh::LeaseTerms,
+        nonce: u64,
+    ) -> Result<JobId, String> {
+        let bytes = serde_json::to_vec(request).map_err(|e| e.to_string())?;
+        let input = self
+            .config
+            .blobs
+            .as_sink()
+            .commit(&bytes)
+            .await
+            .map_err(|e| e.to_string())?;
+        let mut spec = mesh::JobSpec::simple(
+            crate::inference_stage::stage_resource(peer),
+            "stage",
+            input.clone(),
+            "receipt",
+            256,
+            mesh::DeterminismClass::Observed,
+        )
+        .leased(terms);
+        spec.inputs.push(mesh::spec::JobInput {
+            name: "reservation".into(),
+            blob: input,
+        });
+        spec.requirements = requires;
+        self.author(&MeshEvent::JobPostedV2 {
+            spec: Box::new(spec),
+            nonce,
+            at_ms: self.config.clock.now_ms(),
+        })
+        .await
+        .map(JobId)
+        .map_err(|e| e.to_string())
     }
 
     pub fn synced(&self) -> &SyncedMesh<B> {
@@ -187,15 +247,43 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
         &self.config.policy
     }
 
-    /// What this device advertises about itself, as the composer installed it.
+    /// The composed device offer, with the GPU withdrawn while foreground
+    /// inference waits for or holds it.
     ///
     /// Exposed for the same reason [`policy`](Self::policy) is: a composition
     /// that claims it reached the supervisor is making a claim somebody has to
     /// be able to check. `HostFacts` decides which jobs this device will admit
     /// at all, so a receipt that asserts on the composed facts is asserting on
     /// the offer the ring actually sees.
-    pub fn facts(&self) -> &HostFacts {
-        &self.config.facts
+    pub fn facts(&self) -> HostFacts {
+        let mut facts = self.config.facts;
+        if self
+            .gpu
+            .as_ref()
+            .is_some_and(|gpu| gpu.foreground_requested())
+        {
+            facts.gpu = false;
+        }
+        facts
+    }
+
+    /// Compose the same ownership gate into the GPU resource and foreground
+    /// lane. CPU resources retain their normal admission and reclaim policy.
+    pub fn set_gpu_access(&mut self, gpu: crate::gpu::GpuAccess) {
+        self.gpu = Some(gpu);
+    }
+    /// Attach delivery for owner-composed multi-device resources.
+    pub fn set_courier(&mut self, courier: Arc<dyn BlobCourier>) {
+        self.config.courier = courier;
+    }
+
+    /// A product's live author boundary. Decisions are sampled outside the pure
+    /// worker; withdrawing admission reclaims existing work at the next tick.
+    pub fn set_admission(
+        &mut self,
+        admission: Arc<dyn Fn(&mesh::Job, &mesh::JobBoard) -> bool + Send + Sync>,
+    ) {
+        self.admission = Some(admission);
     }
 
     /// Replace the owner's settings. The new policy governs the very next tick:
@@ -264,6 +352,14 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
         for (_, flight) in inflight {
             let _ = flight.task.await;
         }
+        // Aborting an async job cannot abort its spawn_blocking worker. A
+        // cancelled GPU trainer releases this guard only after its tensors
+        // drop and the device synchronizes. Include lost-lease workers too.
+        if let Some(gpu) = &self.gpu {
+            while gpu.is_occupied() {
+                tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+            }
+        }
         self.synced.leave().await?;
         Ok(())
     }
@@ -287,7 +383,44 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
     /// most one new action. Never awaits a job's execution.
     pub async fn tick(&mut self) -> Result<Vec<Step>, HostError> {
         let now_ms = self.config.clock.now_ms();
-        let mut steps = self.reap(now_ms).await?;
+        let mut steps = Vec::new();
+        if let Some(admit) = self.admission.clone() {
+            let board = self.synced.board().await?;
+            let rejected: Vec<_> = self
+                .inflight
+                .keys()
+                .filter_map(|id| {
+                    let job = board.job(*id)?;
+                    (!admit(job, &board)).then_some((*id, job.spec.as_ref()?.checkpoint))
+                })
+                .collect();
+            for (job, class) in rejected {
+                self.begin_reclaim(job, ReclaimReason::PolicyChange, class, now_ms);
+                steps.push(Step::AwaitingStop { job });
+            }
+        }
+        if self
+            .gpu
+            .as_ref()
+            .is_some_and(|gpu| gpu.foreground_requested())
+        {
+            let board = self.synced.board().await?;
+            let jobs: Vec<_> = self
+                .inflight
+                .keys()
+                .filter_map(|job| {
+                    let spec = board.job(*job)?.spec.as_ref()?;
+                    let resource = self.config.registry.get(&spec.resource)?;
+                    (resource.descriptor().requires.compute == mesh::spec::ComputeClass::Gpu)
+                        .then_some((*job, spec.checkpoint))
+                })
+                .collect();
+            for (job, class) in jobs {
+                self.begin_reclaim(job, ReclaimReason::ForegroundActivity, class, now_ms);
+                steps.push(Step::AwaitingStop { job });
+            }
+        }
+        steps.extend(self.reap(now_ms).await?);
         let board = self.synced.board().await?;
         steps.extend(self.abandon_lost_leases(&board, now_ms));
         self.escalate_reclaims(now_ms);
@@ -298,16 +431,29 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             // talk the device past its own concurrency limit.
             conditions.running_jobs = self.inflight.len() as u32;
             let running: Vec<JobId> = self.inflight.keys().copied().collect();
-            let offer = HostOffer::new(
-                &self.config.registry,
-                self.config.facts,
-                &self.config.policy,
-            )
-            .at(now_ms)
-            .observing(conditions)
-            .running(&running)
-            .with_lease_policy(self.config.lease);
-            next_action(&board, &self.me, &offer)
+            let offer = HostOffer::new(&self.config.registry, self.facts(), &self.config.policy)
+                .at(now_ms)
+                .observing(conditions)
+                .running(&running)
+                .with_lease_policy(self.config.lease);
+            let unavailable: Vec<JobId> = board
+                .jobs()
+                .filter(|job| {
+                    if self
+                        .admission
+                        .as_ref()
+                        .is_some_and(|admit| !admit(job, &board))
+                    {
+                        return true;
+                    }
+                    job.spec
+                        .as_ref()
+                        .and_then(|spec| self.config.registry.get(&spec.resource))
+                        .is_some_and(|adapter| !adapter.available_for(job))
+                })
+                .map(|job| job.id)
+                .collect();
+            next_action_with_availability(&board, &self.me, &offer, &unavailable)
         };
 
         match action {

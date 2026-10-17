@@ -1,0 +1,1861 @@
+{
+  "schema": "mere.resident-inference/personal/v1",
+  "status": "passed",
+  "recorded_at_utc": "2026-10-16T04:56:37.911454+00:00",
+  "branch": "codex/mere-presentation-rules",
+  "proof_basis": {
+    "parent": "9a4418ce1c05731429220545553ab6ce76ea0d79",
+    "source_sha256": {
+      "Cargo.lock": "46f36c76353f08ae6d7f3dcd7e39dd690a6c19c759235629381c624aa316dd1c",
+      "design_docs/DOC_README.md": "9a07b5010324bc02f648eb03738ffef10b51f2e55bbeb5b589b184b4341d17a1",
+      "design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md": "80031165593f3afd431d6c8df6ab9bbf1776801ddb4074f8590d29c459c61233",
+      "ports/distillery/README.md": "501a643faee17132fc2b0c89156cfc7c44033a2c8d1fa3876a8d358aaae63078",
+      "ports/distillery/src/inference.rs": "ee3f5db4864b305035739ea746ad459dfdb2776dd12fdbf2cc03a0d58e45e306",
+      "ports/distillery/src/inference/durable.rs": "8ef134f552feb64d60958ce9158c2d335e5d7c6207b05707980f01be7d633f24",
+      "ports/distillery/tests/inference_durable.rs": "e223f403d0e90f75faac37ecf46d7d265deda3fe4c5a5bdf6e3492b8cff870c1",
+      "ports/djinn/Cargo.toml": "b0039a16cacc09b0103fe083328769a9e11d9556faa625d6564046c48d62225e",
+      "ports/djinn/README.md": "277fa8b3a448338ccbf642f4d3c2a6384e24364e0ee36d1d771c7644e71d3e19",
+      "ports/djinn/src/bin/djinn.rs": "952bb4aa2fb23e53706c0a2401ac090096fc7655c22a724a809db9b16f708b57",
+      "ports/djinn/src/personal_sync.rs": "7f137463f2f0d36cf69716f32aaa4d11074f4228795855a8c17869635af309d6",
+      "ports/djinn/src/resident.rs": "49b879790adcc65e904d2c2134fe42086ab1d126fec80ead1f47bbc75f5dbb68",
+      "ports/djinn/src/resident_distillery.rs": "fa1f044ad603c918517ed5f3c75c579e821144f497e4e905a3ad51dee210a143",
+      "ports/djinn/src/resident_inference.rs": "09d5a864afda4e8c9665b6b11ba82530179ae2c89ec8871b6ab1b325456d6a3f",
+      "ports/djinn/src/resident_inference/personal.rs": "31a4edf37205fec7a3633cf4295ae5841e5d44426ef91121d24146d9d8f32fe1",
+      "ports/djinn/tests/inference_gpu_reclaim.rs": "523b1862e30e26fda5a610bd372bdea416388b682b89b4ae6d105ca43df5adc2",
+      "ports/djinn/tests/inference_route.rs": "a9502f3921de818f91f6ef0496563ea98df77c193dfbdf6d851a7fe294d44de0",
+      "ports/graphshell/src/native/mod.rs": "aff2a5c59b570e4a63d7e704f901b27bc3794fb12ccb9f580bf58bbb50c314a3",
+      "ports/graphshell/src/native/personal_seals.rs": "da30c064dfdb525330b4713b8df42d6cb963dc9d5c885425ec4286b672e2d7e2",
+      "ports/graphshell/src/native/personal_sync_host.rs": "7452ed24c02b77ea62525e74cfdff60721d10854718407c73aedc7f33a257fe5",
+      "rust-toolchain.toml": "f10eb0c15d94c711481625198a3a8bc239e8cd48a77ff43d3dfee36d687499ba"
+    },
+    "normalized_git_blob_hashes": {
+      "Cargo.lock": "d7cebd0e6d45b9c613ce26a4e88dc8cc098ed51a",
+      "design_docs/DOC_README.md": "26bdaffe15691087f1c935b59ae91abbb4d2b6f5",
+      "design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md": "95724a93f6d2b18d1bd0c08d312fbeba150f4355",
+      "ports/distillery/README.md": "a6ecd4b57da5fd1a3f7948bca75dba5a5b24e71f",
+      "ports/distillery/src/inference.rs": "2fb3cadb446c07ffb3e04f6168027715e1abbff0",
+      "ports/distillery/src/inference/durable.rs": "bf79d1e9c2ba754333501fd086e7aaddd149085b",
+      "ports/distillery/tests/inference_durable.rs": "e5d5c12a8220822cafca378441f4db68dd70997f",
+      "ports/djinn/Cargo.toml": "22642129ddd87e8e5f97dee8db642eae1046f95c",
+      "ports/djinn/README.md": "9700b529d7838eea6b8b16327e5ca47e2eca92fc",
+      "ports/djinn/src/bin/djinn.rs": "f2ec82c4c9cf1ccee07146b48868ada1c08a1cdb",
+      "ports/djinn/src/personal_sync.rs": "867ee3ea50c757713bf8aaf9f3f9058938b5650d",
+      "ports/djinn/src/resident.rs": "40ff2f32c978d68a54cc15f4f5b635181c8579cc",
+      "ports/djinn/src/resident_distillery.rs": "0ba508fc735ca5184d02b092e5741baa500ef812",
+      "ports/djinn/src/resident_inference.rs": "f77c1584139e093d372858e25af995312bf925bc",
+      "ports/djinn/src/resident_inference/personal.rs": "794cdbf3de529eeb6855e4069214118839a59ecf",
+      "ports/djinn/tests/inference_gpu_reclaim.rs": "ede52eb0873ce268deec151cdb68a234cd5a95ab",
+      "ports/djinn/tests/inference_route.rs": "5aaa82fe89943b2c464980b8da3f6eb170932a64",
+      "ports/graphshell/src/native/mod.rs": "457b94bb9bb30cce65ad3c1a1f7aa2e41996e392",
+      "ports/graphshell/src/native/personal_seals.rs": "129c8bb3e5930c088c8aae5e41187b322adf7019",
+      "ports/graphshell/src/native/personal_sync_host.rs": "ec66267865d3ecf9de1b5525d6c4bdcdf15da22c",
+      "rust-toolchain.toml": "053cf1e4cbef246bd44fa9778f105df1cc3a3673"
+    },
+    "note": "SHA256 covers exact Windows working bytes. Git blob hashes apply repository line-ending filters. Receipt itself is excluded."
+  },
+  "host": "O-PC",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "boundary": "every keyed personal-graph device, using the existing graph group and endpoint; independent identity roots",
+  "checks": {
+    "inference-personal-route-final.log": {
+      "command": "cargo test --locked -p djinn --features inference-gpu,trainer-gpu,trainer-autodiff --test inference_route -- --exact keyed_personal_graph_devices_continue_a_seeded_ask",
+      "passed_groups": [
+        1
+      ],
+      "log_sha256": "a647c97c1ee3c6ac0a6bbddccf7c77559c7dfe9fb1a3e3506dc4e07e85223547"
+    },
+    "inference-personal-route-regressions.log": {
+      "command": "inference_route-d765841925c67cd8.exe --skip keyed_personal_graph_devices_continue_a_seeded_ask",
+      "passed_groups": [
+        3
+      ],
+      "log_sha256": "a92729154a380dc544af73073d629e139ba80baecf6a8ed91707962f1b4ce8ea"
+    },
+    "inference-personal-gpu-final.log": {
+      "command": "cargo test --locked -p djinn --features inference-gpu,trainer-gpu,trainer-autodiff --test inference_gpu_reclaim -- --include-ignored",
+      "passed_groups": [
+        3
+      ],
+      "log_sha256": "de982012f8d691b07d4f5ea6b55d6e820c07f403914df7858c0b35a7d3bc0ce6"
+    },
+    "inference-personal-host-unit-final.log": {
+      "command": "cargo test --locked -p djinn --features inference-gpu,trainer-gpu,trainer-autodiff --lib resident_inference",
+      "passed_groups": [
+        6
+      ],
+      "log_sha256": "e102b6fed85bf96ecd8fec0475ff0c4dfae834d1f46303c3769a27a33d745017"
+    },
+    "inference-personal-durable-final.log": {
+      "command": "cargo test --locked -p distillery --features inference-model --lib --test inference_durable",
+      "passed_groups": [
+        37,
+        8
+      ],
+      "log_sha256": "7ed63de1c2fb5bd91ef468679f198724a674ffde5dbb5c13374119123636a796"
+    },
+    "inference-personal-default-final.log": {
+      "command": "cargo test --locked -p djinn --lib resident_inference",
+      "passed_groups": [
+        4
+      ],
+      "log_sha256": "341aebc3b9bef21a7740c3f65cb0b0e163ffd93c56755b8646664d2fc6745e99"
+    },
+    "inference-personal-sync-host.log": {
+      "command": "cargo test --locked -p graphshell --features personal-sync --lib native::personal_sync_host::tests -- --test-threads=1",
+      "passed_groups": [
+        15
+      ],
+      "log_sha256": "e88800cd20bc9db418d00e5e2db8f7198ac5c916d3d9635772f6140f66675a05"
+    }
+  },
+  "binaries_sha256": {
+    "inference_route-d765841925c67cd8.exe": "36c9fb5ac1457f2ada67bc523613a24e0d3c7666320dc58db45ad3c9c5b5d3a9",
+    "inference_gpu_reclaim-59cb3ec8291a41d4.exe": "160fc006318171c22a392379c5891cb84959e5585478d3c9061de23d9e74d2af",
+    "djinn-019b41b55bd1bfda.exe": "36b61fc57fd53ae93e9f038cde660d73259c9d1c1b3d2435d0c7324cb6dd9d09",
+    "distillery-e2029bb6c76645c3.exe": "2b402d3df044d2eeee165ad96f864439166dd374b77612250a7444180a0d1fc8",
+    "inference_durable-b721e4ba7ecc5c37.exe": "5c6f224cbdb824ffc661a8618a892c76a515746d33a22ebf03bfcc5f1a1c8c9f",
+    "djinn-782add0115b261a8.exe": "198fc3bd7fa2300eab49fdcde3d8ad9838874eddd404cd4350cc3c9ac3f1aef5",
+    "graphshell-01b84bde2cff8a00.exe": "097647401a47d9b897421830325ddcd3ea6530d6fbc5322ff5c8ed402fa0dc90"
+  },
+  "personal_devices": {
+    "a_sync_ops_received": 9,
+    "b_sync_ops_received": 18,
+    "boundary": "two independently rooted resident compositions on one computer; actual personal graph key agreement and endpoints; tiny CPU model; no installed binary or physical second computer",
+    "completed_tokens": 8,
+    "conflicting_local_history_preserved": true,
+    "continuations": [
+      {
+        "at_token": 0,
+        "compared_token_ids_hash": null,
+        "device": "O-PC:0bfa006c05b3f93489dd4a8ea600a32b",
+        "first_differing_token": null,
+        "reason": "ask"
+      },
+      {
+        "at_token": 3,
+        "compared_token_ids_hash": null,
+        "device": "O-PC:0cda5062cbb37c5a530a85a0cb024760",
+        "first_differing_token": null,
+        "reason": "device-transfer"
+      }
+    ],
+    "cross_run_parent_refused": true,
+    "first_differing_token": null,
+    "former_reader_current_epoch_write_refused": true,
+    "keyed_reader_need_not_write_graph": true,
+    "late_history_after_revocation": true,
+    "local_history_imported": true,
+    "locked_refused": true,
+    "model_row": "blake3:bf10c43242d253522cfe45aff852491e99d11c9b416bdec79ad653d1bfc0f3f1",
+    "new_epoch_excludes_retired_reader": true,
+    "out_of_order_child_refused_before_persistence": true,
+    "outside_key_group_refused": true,
+    "paused_tokens": 3,
+    "plaintext_fallback_refused": true,
+    "reference_token_ids": [
+      27,
+      29,
+      21,
+      23,
+      11,
+      5,
+      21,
+      2
+    ],
+    "resumed_token_ids": [
+      27,
+      29,
+      21,
+      23,
+      11,
+      5,
+      21,
+      2
+    ],
+    "retained_evidence": {
+      "checkpoint_blob": "blake3:12072bf3e1978cd126e29e859385c6e427d18114b044245d7b04b9887004a029",
+      "continuations": [
+        {
+          "at_token": 0,
+          "compared_token_ids_hash": null,
+          "device": "O-PC:0bfa006c05b3f93489dd4a8ea600a32b",
+          "first_differing_token": null,
+          "reason": "ask"
+        },
+        {
+          "at_token": 3,
+          "compared_token_ids_hash": "blake3:47092d99c4eefc18bd3a8ba766e415067083995889399040e861a8e91babc779",
+          "device": "O-PC:0cda5062cbb37c5a530a85a0cb024760",
+          "first_differing_token": null,
+          "reason": "device-transfer"
+        }
+      ],
+      "error": null,
+      "output_blob": "blake3:67bfc6024da4c8c11dbeb7cb3a3918c988892264e7c1827625ee173e665fe408",
+      "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+      "question_blob": "blake3:3787b72138e1aeeb4fc9195106b5b5bb6fd577f4df97dd3ed7dc626bccecadac",
+      "request": {
+        "max_tokens": 8,
+        "prompt": "t1 t4 t2 t3 ",
+        "seed": 42,
+        "stop": [
+          "<|im_end|>"
+        ],
+        "temperature": 0.8500000238418579,
+        "top_p": 0.949999988079071
+      },
+      "run": "across",
+      "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262",
+      "status": "finished",
+      "supplied_passages": [],
+      "weight_format": "f32"
+    },
+    "retained_history_survives_roster_removal": true,
+    "retired_reader_retains_history": true,
+    "seed": 42,
+    "separate_identity_roots": true,
+    "separate_transport_nodes": true,
+    "session": {
+      "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+      "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+    },
+    "shared_custody_shutdown_drained": true,
+    "sync_catches_up_after_unlock": true,
+    "transplanted_envelope_refused": true,
+    "unkeyed_refused": true,
+    "wrong_graph_refused": true,
+    "wrong_writer_domain_refused": true
+  },
+  "repeat": {
+    "completed": 20,
+    "passed": 20,
+    "binary_sha256": "36c9fb5ac1457f2ada67bc523613a24e0d3c7666320dc58db45ad3c9c5b5d3a9",
+    "log_sha256": "8ed77e5b918074cdbf75fd3da370df880d3eb3506b8d6e50873b9025c48e3dde",
+    "evidence_sha256": "db7a11ea72acdffd5baf54a969150036644c22fc6034e6b8a1b4c595e806c196",
+    "runs": [
+      {
+        "run": 1,
+        "exit_code": 0,
+        "seconds": 77.375,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:8fa3e5c86b4dbb03ee4caad68fc2dbb3",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:2a406748a6469b3144585c35b65f8a0e",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 2,
+        "exit_code": 0,
+        "seconds": 75.094,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:035960648fbd1d5db1dd621284407a91",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:3afc12e81a0efb845244b75678839ce7",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 3,
+        "exit_code": 0,
+        "seconds": 75.438,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:9f9e86161c8d6a5377dba4b7f3bd177f",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:562dead8c15a2af0a46ee13492212a22",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 4,
+        "exit_code": 0,
+        "seconds": 80.234,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:fc547ec3b7d5ecf319099755de709b6f",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:0539b0c4bdd9771678fe41a84dafd4d9",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 5,
+        "exit_code": 0,
+        "seconds": 75.203,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:753c1817a8f0de27dae8660ac07c3235",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:e52f6d017693eec69db6b4263e827c72",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 6,
+        "exit_code": 0,
+        "seconds": 73.125,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:99a303f35819023466ac36dcc01577a3",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:f9b8ab117c7d1bf3409d5c92c1fb5fba",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 7,
+        "exit_code": 0,
+        "seconds": 72.343,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:c74d194134cb90c0b5012e300660b039",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:bf19270d141af5a88945e43cf1ac1891",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 8,
+        "exit_code": 0,
+        "seconds": 68.922,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:4dc771ab483706da56c7186b0a1db38a",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:23bd561735598968f8d9fb518cde78aa",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 9,
+        "exit_code": 0,
+        "seconds": 69.578,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:17a43ea286967d8d1e830fa2ba87b19f",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:b3cf2fddd6d9e18f5308ed0ce62a76a2",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 10,
+        "exit_code": 0,
+        "seconds": 69.0,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:683e0d9aaf770c823c998ffcde398960",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:7f6756bb5d1e55f8771f80c8cbe3fbb5",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 11,
+        "exit_code": 0,
+        "seconds": 66.391,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:3bfa6800890701899339335ff52563bc",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:7320b99258708d17dce6cefd636ebd98",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 12,
+        "exit_code": 0,
+        "seconds": 63.766,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:603117320d1634292520f4201489a7fc",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:e85a34904c93afdad492f38a655a13a8",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 13,
+        "exit_code": 0,
+        "seconds": 62.453,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:15cbb41d32703845a870eb8ec32068e9",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:7322a8fbab7a50d683fe9938fb9593c0",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 14,
+        "exit_code": 0,
+        "seconds": 62.281,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:16c40a2bda2ee4e00e1d67f39fb9678e",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:88f7fc56bf547ad45a13f97a4e306924",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 15,
+        "exit_code": 0,
+        "seconds": 63.109,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:48225a2a98bf4851ae187f526284f177",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:c9d526d1c7dce8c2daa26bddeab50e9e",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 16,
+        "exit_code": 0,
+        "seconds": 62.016,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:ec503be5782b06c8d37066714d64fbc3",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:14869394299cba4479fcc586e98d4578",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 17,
+        "exit_code": 0,
+        "seconds": 62.266,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:d9f165e5a11fff340071caac2ccb289b",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:094a834754f4fe31ff9528116b217a98",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 18,
+        "exit_code": 0,
+        "seconds": 63.031,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:bf4b3ac0b7b1c075ddda526e15dcb683",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:3088d0970e9343603ae6d586f6e66a79",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 19,
+        "exit_code": 0,
+        "seconds": 63.906,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:5b2c27526a3232d442a41e832fc87ff9",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:ebaccc5a8b3d92b07c570bd950b75a29",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      },
+      {
+        "run": 20,
+        "exit_code": 0,
+        "seconds": 65.078,
+        "evidence": {
+          "completed_tokens": 8,
+          "conflicting_local_history_preserved": true,
+          "continuations": [
+            {
+              "at_token": 0,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:4e38ffeeb2912bbcbba40dfdb038f71f",
+              "first_differing_token": null,
+              "reason": "ask"
+            },
+            {
+              "at_token": 3,
+              "compared_token_ids_hash": null,
+              "device": "O-PC:56f325e0b3174a0576ad73ad6b49e338",
+              "first_differing_token": null,
+              "reason": "device-transfer"
+            }
+          ],
+          "cross_run_parent_refused": true,
+          "first_differing_token": null,
+          "former_reader_current_epoch_write_refused": true,
+          "keyed_reader_need_not_write_graph": true,
+          "late_history_after_revocation": true,
+          "local_history_imported": true,
+          "locked_refused": true,
+          "new_epoch_excludes_retired_reader": true,
+          "out_of_order_child_refused_before_persistence": true,
+          "outside_key_group_refused": true,
+          "paused_tokens": 3,
+          "plaintext_fallback_refused": true,
+          "reference_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "resumed_token_ids": [
+            27,
+            29,
+            21,
+            23,
+            11,
+            5,
+            21,
+            2
+          ],
+          "retained_history_survives_roster_removal": true,
+          "retired_reader_retains_history": true,
+          "seed": 42,
+          "separate_identity_roots": true,
+          "separate_transport_nodes": true,
+          "session": {
+            "prompt_template_hash": "blake3:335d1c15bc72678f9f7d0912d96ab27f9a7d462360bae8b7f39ffe5bc7a7bc70",
+            "session_id": "blake3:6482f0920c9b5d1663fa166522a1a06aa7beeb83d979c0c8ae5bdfe2b5da4262"
+          },
+          "shared_custody_shutdown_drained": true,
+          "sync_catches_up_after_unlock": true,
+          "transplanted_envelope_refused": true,
+          "unkeyed_refused": true,
+          "wrong_graph_refused": true,
+          "wrong_writer_domain_refused": true
+        }
+      }
+    ]
+  },
+  "gpu_reclaim": {
+    "autodiff": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Restart",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "continuations": [
+              {
+                "at_token": 0,
+                "compared_token_ids_hash": null,
+                "device": "O-PC:f9cb4236cb91935f4c225f680059f80c",
+                "first_differing_token": null,
+                "reason": "ask"
+              }
+            ],
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5",
+            "tokens": 4
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792125472147,
+      "steps": "[Claimed { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Granted { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]), epoch: 0, lease: LeaseId([148, 145, 160, 237, 135, 96, 232, 86, 75, 94, 150, 216, 171, 21, 40, 144, 235, 13, 197, 104, 202, 203, 246, 52, 123, 154, 69, 162, 115, 172, 76, 26]) }, Started { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]), lease: Some(LeaseId([148, 145, 160, 237, 135, 96, 232, 86, 75, 94, 150, 216, 171, 21, 40, 144, 235, 13, 197, 104, 202, 203, 246, 52, 123, 154, 69, 162, 115, 172, 76, 26])) }, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Idle, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Idle, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Idle, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Idle, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Heartbeat { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]), lease: LeaseId([148, 145, 160, 237, 135, 96, 232, 86, 75, 94, 150, 216, 171, 21, 40, 144, 235, 13, 197, 104, 202, 203, 246, 52, 123, 154, 69, 162, 115, 172, 76, 26]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Idle, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Idle, AwaitingStop { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }, Reclaimed { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]), lease: LeaseId([148, 145, 160, 237, 135, 96, 232, 86, 75, 94, 150, 216, 171, 21, 40, 144, 235, 13, 197, 104, 202, 203, 246, 52, 123, 154, 69, 162, 115, 172, 76, 26]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Claimed { job: JobId([20, 107, 50, 19, 66, 31, 170, 0, 241, 213, 132, 217, 23, 51, 142, 154, 4, 64, 212, 65, 92, 164, 186, 108, 160, 36, 85, 129, 145, 252, 187, 24]) }]"
+    },
+    "checkpoint_request": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Resumable",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "continuations": [
+              {
+                "at_token": 0,
+                "compared_token_ids_hash": null,
+                "device": "O-PC:4fd1b747b0d4fc85b774abeec7358332",
+                "first_differing_token": null,
+                "reason": "ask"
+              }
+            ],
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5",
+            "tokens": 4
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792125472782,
+      "steps": "[Claimed { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Granted { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), epoch: 0, lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]) }, Started { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: Some(LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42])) }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Heartbeat { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Heartbeat { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Heartbeat { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Heartbeat { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Heartbeat { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Idle, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Heartbeat { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }, Reclaimed { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]), lease: LeaseId([39, 233, 63, 81, 247, 142, 117, 231, 241, 217, 163, 99, 150, 206, 103, 60, 140, 243, 8, 238, 54, 76, 216, 192, 243, 215, 10, 142, 215, 83, 224, 42]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle, Claimed { job: JobId([223, 117, 230, 43, 19, 140, 135, 1, 144, 78, 20, 44, 28, 157, 162, 95, 147, 50, 7, 215, 235, 145, 136, 50, 31, 215, 243, 165, 200, 109, 218, 77]) }]"
+    },
+    "finite_difference": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Restart",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "continuations": [
+              {
+                "at_token": 0,
+                "compared_token_ids_hash": null,
+                "device": "O-PC:a1ce18a6989922953785a7f07fdf5fb6",
+                "first_differing_token": null,
+                "reason": "ask"
+              }
+            ],
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5",
+            "tokens": 4
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792125472326,
+      "steps": "[Claimed { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Granted { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), epoch: 0, lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]) }, Started { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: Some(LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149])) }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Heartbeat { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Heartbeat { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Heartbeat { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Heartbeat { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Heartbeat { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Idle, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Heartbeat { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]) }, Reclaimed { job: JobId([26, 204, 82, 100, 199, 179, 186, 40, 132, 192, 142, 137, 101, 171, 205, 89, 126, 129, 156, 73, 40, 223, 94, 251, 107, 6, 168, 36, 69, 197, 23, 117]), lease: LeaseId([230, 151, 73, 151, 230, 42, 254, 195, 164, 153, 115, 157, 221, 48, 6, 202, 1, 246, 8, 40, 50, 125, 31, 7, 124, 25, 132, 19, 199, 72, 171, 149]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle]"
+    }
+  },
+  "documentation": {
+    "no_new_findings_against": "inference-doc-audit.json",
+    "audit_sha256": "aad1e15b24af83e9a244aaa2008a5c7035664ce55149c559eb0ca1efc667e180",
+    "counts": {
+      "active_docs": 270,
+      "indexed_active_docs": 268,
+      "index_orphans": 1,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 28,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 105,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 24,
+      "missing_known_root_paths": 124,
+      "historical_missing_known_root_paths": 235,
+      "planned_missing_known_root_paths": 6,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 32,
+      "exhibit_b_sources": 0
+    }
+  },
+  "independent_prior_qualification": {
+    "receipt": "resident_inference_durable.json",
+    "source": "9a4418ce1c05731429220545553ab6ce76ea0d79",
+    "facts": "Real SmolLM2 GPU 39 independent and 39 resumed IDs matched; killed-child recovery; decoder/provider unchanged by this continuation."
+  },
+  "limits": [
+    "Two actual endpoints and separately rooted vaults on one O-PC; tiny CPU model for the new personal-graph boundary.",
+    "No installed Djinn binary, second physical computer, headed application or heap-residue audit was run.",
+    "Revocation protects future epochs; retained old key holders can still construct old-epoch ciphertext.",
+    "I4 recall, I5 answer card and later model/fleet work remain separate."
+  ],
+  "workspace": {
+    "retained_worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference",
+    "owner": "I3 inference branch pending integration",
+    "cargo_target": "C:\\t\\cargo-targets\\mere",
+    "new_cargo_homes": [],
+    "new_worktrees": []
+  }
+}

@@ -35,11 +35,11 @@ use eidetic::{
     PrivacyClass, ProvenanceRecord, Store, Timestamp, TrustEnvelope,
 };
 #[cfg(feature = "trainer-autodiff")]
-use esp::infer::decoder::train_peft_lora_autodiff;
+use esp::infer::decoder::train_peft_lora_autodiff_controlled;
 use esp::infer::decoder::{
     AutodiffLoraSettings, DecoderDevice, LoraTrainerSettings, PEFT_LORA_NDARRAY_LOADER,
     PeftLoraAdapterLoader, TRAINED_ADAPTER_FORMAT_VERSION, TRAINED_ADAPTER_FORMAT_VERSION_AUTODIFF,
-    TrainedLoraAdapter, TrainingCase, ranking_tally, train_peft_lora,
+    TrainedLoraAdapter, TrainingCase, ranking_tally, train_peft_lora_controlled,
 };
 #[cfg(feature = "trainer-gpu")]
 use esp::infer::decoder::{DecoderGpuKind as TrainerGpuKind, GpuAdapterFacts, GpuDeviceType};
@@ -292,6 +292,7 @@ pub struct TrainerResource<B> {
     descriptor: ResourceDescriptor,
     store: Arc<Mutex<B>>,
     device: DecoderDevice,
+    gpu: Option<crate::gpu::GpuAccess>,
 }
 
 impl<B> TrainerResource<B> {
@@ -309,12 +310,30 @@ impl<B> TrainerResource<B> {
             },
             store,
             device,
+            gpu: None,
         }
+    }
+
+    /// Compose GPU admission and ownership together. CPU trainers use `new`.
+    pub fn with_gpu_access(mut self, gpu: crate::gpu::GpuAccess) -> Self {
+        self.descriptor.requires.compute = mesh::spec::ComputeClass::Gpu;
+        self.gpu = Some(gpu);
+        self
     }
 }
 
 fn backend(error: impl std::fmt::Display) -> ResourceError {
     ResourceError::Backend(error.to_string())
+}
+
+// These trainer arms preserve no resumable state. A checkpoint request is
+// therefore an owner stop too: cancel cleanly rather than ignoring it while
+// foreground inference waits. Never claim that a checkpoint was retained.
+fn check_training(control: &JobControl) -> Result<(), ResourceError> {
+    if control.signal() != mesh::ControlSignal::Continue {
+        return Err(mesh::Cancelled.into());
+    }
+    Ok(())
 }
 
 fn load_cases(
@@ -388,7 +407,7 @@ fn run_train_job<B: Store>(
     corpus.validate().map_err(backend)?;
     let train_cases = load_cases(store, &corpus.training_source_codicils, "training")?;
     let eval_cases = load_cases(store, &corpus.evaluation_source_codicils, "evaluation")?;
-    control.check()?;
+    check_training(control)?;
 
     // The trainer the request named, over the training partition only. Both
     // arms produce the same artifact triple; they differ in how the factors
@@ -396,7 +415,7 @@ fn run_train_job<B: Store>(
     let model_id = resolved.manifest.model_id.as_str();
     let components = &resolved.components;
     let trained: TrainedLoraAdapter = match &request.settings {
-        TrainerSettings::FiniteDifference(settings) => train_peft_lora(
+        TrainerSettings::FiniteDifference(settings) => train_peft_lora_controlled(
             &components.config_bytes,
             &components.tokenizer_bytes,
             &components.weight_bytes,
@@ -404,10 +423,18 @@ fn run_train_job<B: Store>(
             &train_cases,
             settings,
             device,
+            &mut || {
+                check_training(control)
+                    .map_err(|error| esp::infer::InferError::Backend(error.to_string()))
+            },
         )
-        .map_err(backend)?,
+        .map_err(|error| {
+            check_training(control)
+                .err()
+                .unwrap_or_else(|| backend(error))
+        })?,
         #[cfg(feature = "trainer-autodiff")]
-        TrainerSettings::Autodiff(settings) => train_peft_lora_autodiff(
+        TrainerSettings::Autodiff(settings) => train_peft_lora_autodiff_controlled(
             &components.config_bytes,
             &components.tokenizer_bytes,
             &components.weight_bytes,
@@ -415,15 +442,23 @@ fn run_train_job<B: Store>(
             &train_cases,
             settings,
             device,
+            &mut || {
+                check_training(control)
+                    .map_err(|error| esp::infer::InferError::Backend(error.to_string()))
+            },
         )
-        .map_err(backend)?,
+        .map_err(|error| {
+            check_training(control)
+                .err()
+                .unwrap_or_else(|| backend(error))
+        })?,
         // `prepare` already refused this, but the job body is the last place
         // the refusal can still be true, so it is stated here too rather than
         // assumed.
         #[cfg(not(feature = "trainer-autodiff"))]
         TrainerSettings::Autodiff(_) => return Err(backend(autodiff_unavailable())),
     };
-    control.check()?;
+    check_training(control)?;
 
     // The manifest the receipt publishes; its blob refs are the content
     // addresses the store must land on when the bytes are saved below, and
@@ -515,7 +550,7 @@ fn run_train_job<B: Store>(
         limit,
     )
     .map_err(backend)?;
-    control.check()?;
+    check_training(control)?;
 
     // Publish the artifacts; content addressing must land on exactly the ids
     // the manifest and the evaluated session already named.
@@ -599,7 +634,7 @@ impl<B: Store + Send + 'static> MeshResource for TrainerResource<B> {
         control: &'a JobControl,
     ) -> BoxFuture<'a, Result<Vec<u8>, ResourceError>> {
         Box::pin(async move {
-            control.check()?;
+            check_training(control)?;
             let request = prepared.take::<TrainRequest>()?;
             let EvalMetric::RankingAt { limit } = request.metric else {
                 unreachable!("prepare validated the metric");
@@ -607,8 +642,21 @@ impl<B: Store + Send + 'static> MeshResource for TrainerResource<B> {
             let store = Arc::clone(&self.store);
             let device = self.device.clone();
             let control_for_run = control.clone();
+            let gpu = self.gpu.clone();
             let receipt = tokio::task::spawn_blocking(move || {
-                run_train_job(&store, &device, &request, limit, &control_for_run)
+                let _gpu = match gpu {
+                    Some(gpu) => Some(
+                        gpu.try_background()
+                            .ok_or_else(|| backend("GPU reserved for foreground inference"))?,
+                    ),
+                    None => None,
+                };
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    run_train_job(&store, &device, &request, limit, &control_for_run)
+                }))
+                .unwrap_or_else(|_| Err(backend("trainer task panicked")));
+                device.sync().map_err(backend)?;
+                result
             })
             .await
             .map_err(|error| backend(format!("trainer task: {error}")))??;

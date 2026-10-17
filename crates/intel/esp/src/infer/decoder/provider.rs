@@ -24,7 +24,7 @@ use std::ops::ControlFlow;
 use tokenizers::Tokenizer;
 
 use super::config::DecoderConfig;
-use super::generate::{TokenPicker, generate_ids_with, generate_ids_with_async_controlled};
+use super::generate::{TokenPicker, generate_ids_with_async_controlled, try_generate_ids_with};
 use super::loader::load_decoder_from_bytes;
 use super::model::DecoderModel;
 use super::sample::{Sampler, SplitMix64};
@@ -36,6 +36,7 @@ pub struct DecoderProvider {
     model: DecoderModel,
     tokenizer: Tokenizer,
     capability: ModelCapability,
+    add_special_tokens: bool,
 }
 
 /// Decoder-specific details that the portable [`InferenceProvider`] seam does
@@ -66,7 +67,16 @@ struct StreamObserver<'a> {
     emitted: String,
     emitted_fragments: usize,
     stopped_by_callback: bool,
+    stopped_by_string: bool,
     decode_error: Option<InferError>,
+}
+
+impl Drop for StreamObserver<'_> {
+    fn drop(&mut self) {
+        use zeroize::Zeroize;
+        self.generated_ids.zeroize();
+        self.emitted.zeroize();
+    }
 }
 
 impl<'a> StreamObserver<'a> {
@@ -85,6 +95,7 @@ impl<'a> StreamObserver<'a> {
             emitted: String::new(),
             emitted_fragments: 0,
             stopped_by_callback: false,
+            stopped_by_string: false,
             decode_error: None,
         }
     }
@@ -104,34 +115,64 @@ impl<'a> StreamObserver<'a> {
         if !full.starts_with(&self.emitted) || full.len() == self.emitted.len() {
             return ControlFlow::Continue(());
         }
-        if self
+        let stop_at = self
             .request
             .stop
             .iter()
-            .any(|stop| full.contains(stop.as_str()))
-        {
-            // Truncate before the completing fragment, like
-            // StubInferenceProvider: nothing past the stop is emitted.
-            return ControlFlow::Break(());
+            .filter(|stop| !stop.is_empty())
+            .filter_map(|stop| full.find(stop))
+            .min();
+        self.stopped_by_string = stop_at.is_some();
+        // Hold a suffix which could become a stop across later fragments.
+        // Every prefix length is a UTF-8 boundary; content is never sliced
+        // through a character.
+        let withheld = self
+            .request
+            .stop
+            .iter()
+            .flat_map(|stop| {
+                stop.char_indices()
+                    .map(|(index, _)| index)
+                    .filter(|index| *index > 0)
+                    .filter(|index| full.ends_with(&stop[..*index]))
+            })
+            .max()
+            .unwrap_or(0);
+        let end = stop_at.unwrap_or(full.len() - withheld);
+        if end > self.emitted.len() {
+            let delta = &full[self.emitted.len()..end];
+            self.stopped_by_callback = (self.on_fragment)(delta).is_break();
+            self.emitted_fragments += 1;
+            self.emitted = full[..end].to_string();
         }
-        let delta = full[self.emitted.len()..].to_string();
-        let flow = (self.on_fragment)(&delta);
-        self.emitted_fragments += 1;
-        self.emitted = full;
-        self.stopped_by_callback = flow.is_break();
-        flow
+        if self.stopped_by_callback || self.stopped_by_string {
+            ControlFlow::Break(())
+        } else {
+            ControlFlow::Continue(())
+        }
     }
 
     fn finish(
-        self,
+        mut self,
         token_ids: Vec<u32>,
         cooperatively_cancelled: bool,
     ) -> Result<DecoderGeneration, InferError> {
-        if let Some(error) = self.decode_error {
+        if let Some(error) = self.decode_error.take() {
             return Err(error);
         }
+        // At a normal token limit an incomplete stop prefix is ordinary text.
+        // A cancellation never flushes held bytes after the stop boundary.
+        if !self.stopped_by_callback && !self.stopped_by_string && !cooperatively_cancelled {
+            let full = self.provider.decode(&self.generated_ids)?;
+            if full.starts_with(&self.emitted) && full.len() > self.emitted.len() {
+                self.stopped_by_callback =
+                    (self.on_fragment)(&full[self.emitted.len()..]).is_break();
+                self.emitted_fragments += 1;
+                self.emitted = full;
+            }
+        }
         Ok(DecoderGeneration {
-            text: self.emitted,
+            text: std::mem::take(&mut self.emitted),
             token_ids,
             emitted_fragments: self.emitted_fragments,
             stopped_by_callback: self.stopped_by_callback,
@@ -141,6 +182,20 @@ impl<'a> StreamObserver<'a> {
 }
 
 impl DecoderProvider {
+    /// Keep all verified indexed layers resident under host admission.
+    pub fn with_resident_layers(mut self) -> Result<Self, InferError> {
+        self.model = self.model.with_resident_layers()?;
+        Ok(self)
+    }
+    /// Use a session-bound remote layer chain with this provider's ordinary
+    /// embedding, output head, tokenizer and checkpoint generation loop.
+    pub fn with_stages(
+        mut self,
+        stages: Box<dyn super::stage::StageExecutor>,
+    ) -> Result<Self, InferError> {
+        self.model = self.model.with_stages(stages)?;
+        Ok(self)
+    }
     /// Assemble from already-built parts (tests; pre-loaded models).
     pub fn from_parts(
         model: DecoderModel,
@@ -159,7 +214,19 @@ impl DecoderProvider {
             model,
             tokenizer,
             capability,
+            add_special_tokens: true,
         }
+    }
+
+    /// The declared template owns BOS/EOS and role tokens. Disable tokenizer
+    /// postprocessing so it cannot silently prepend a second BOS.
+    pub fn with_literal_prompt(mut self) -> Self {
+        self.add_special_tokens = false;
+        self
+    }
+
+    pub fn streaming_stats(&self) -> Option<super::streaming::StreamingReadStats> {
+        self.model.streaming_stats()
     }
 
     /// Build from the HF artifact triple as byte buffers — the shape
@@ -180,6 +247,77 @@ impl DecoderProvider {
         Ok(Self::from_parts(model, tokenizer, model_id, loader))
     }
 
+    /// Build a provider from the resident shared artifact and a source of
+    /// independently verified layers. The ordinary tokenizer and generation
+    /// checkpoint paths are used unchanged.
+    pub fn from_layer_source(
+        config_bytes: &[u8],
+        tokenizer_bytes: &[u8],
+        shared_bytes: &[u8],
+        source: Box<dyn super::streaming::LayerSource>,
+        options: super::streaming::StreamingOptions,
+        model_id: impl Into<String>,
+        loader: impl Into<String>,
+        device: &Device,
+    ) -> Result<Self, InferError> {
+        Self::from_layer_source_with_format(
+            config_bytes,
+            tokenizer_bytes,
+            shared_bytes,
+            source,
+            options,
+            model_id,
+            loader,
+            device,
+            super::WeightFormat::F32,
+        )
+    }
+
+    pub fn from_layer_source_with_format(
+        config_bytes: &[u8],
+        tokenizer_bytes: &[u8],
+        shared_bytes: &[u8],
+        source: Box<dyn super::streaming::LayerSource>,
+        options: super::streaming::StreamingOptions,
+        model_id: impl Into<String>,
+        loader: impl Into<String>,
+        device: &Device,
+        format: super::WeightFormat,
+    ) -> Result<Self, InferError> {
+        options.validate()?;
+        if shared_bytes.len() > options.max_shared_bytes {
+            return Err(InferError::InvalidWeights(
+                "shared artifact exceeds its byte limit".into(),
+            ));
+        }
+        let config = DecoderConfig::from_json_bytes(config_bytes)?;
+        let tokenizer = Tokenizer::from_bytes(tokenizer_bytes)
+            .map_err(|error| InferError::InvalidConfig(format!("tokenizer: {error}")))?;
+        let tensors = safetensors::SafeTensors::deserialize(shared_bytes)
+            .map_err(|error| InferError::InvalidWeights(format!("shared tensors: {error}")))?;
+        if tensors.names().iter().any(|name| {
+            !matches!(
+                name.as_str(),
+                "model.embed_tokens.weight" | "model.norm.weight" | "lm_head.weight"
+            )
+        }) {
+            return Err(InferError::InvalidWeights(
+                "unexpected tensor in shared artifact".into(),
+            ));
+        }
+        format.validate_device(device)?;
+        let shared = super::loader::load_decoder_shared_tensors_with_format(
+            &config, &tensors, device, format,
+        )?;
+        let model = DecoderModel::from_layer_source_with_format(
+            config, shared, source, options, device, format,
+        )?;
+        let mut provider = Self::from_parts(model, tokenizer, model_id, loader);
+        provider.capability.quantization =
+            (format != super::WeightFormat::F32).then(|| format.id().into());
+        Ok(provider)
+    }
+
     /// Full vocabulary logits for the token immediately following a rendered
     /// prompt. This decoder-specific diagnostic supports numerical adapter and
     /// backend receipts without widening the portable provider trait.
@@ -189,7 +327,7 @@ impl DecoderProvider {
         }
         let encoding = self
             .tokenizer
-            .encode(rendered_prompt, true)
+            .encode(rendered_prompt, self.add_special_tokens)
             .map_err(|error| InferError::InvalidRequest(format!("tokenize: {error}")))?;
         let prompt_ids = encoding.get_ids();
         if prompt_ids.len() > self.capability.context_window {
@@ -199,13 +337,13 @@ impl DecoderProvider {
             });
         }
         let input: Vec<i32> = prompt_ids.iter().map(|&token| token as i32).collect();
-        let logits = self.model.logits(
+        let logits = self.model.try_forward_cached_last(
             Tensor::<2, Int>::from_data(
                 TensorData::new(input, [1, prompt_ids.len()]),
                 &self.model.device(),
             ),
-            0,
-        );
+            &mut self.model.new_cache(),
+        )?;
         let [_, sequence, vocabulary] = logits.dims();
         logits
             .slice([0..1, (sequence - 1)..sequence, 0..vocabulary])
@@ -216,7 +354,9 @@ impl DecoderProvider {
 
     fn decode(&self, ids: &[u32]) -> Result<String, InferError> {
         self.tokenizer
-            .decode(ids, true)
+            // A declared template's stop strings can themselves be special
+            // tokens. Keep them visible to the stop matcher in literal mode.
+            .decode(ids, self.add_special_tokens)
             .map_err(|e| InferError::Backend(format!("detokenize: {e}")))
     }
 
@@ -251,7 +391,7 @@ impl DecoderProvider {
 
         let encoding = self
             .tokenizer
-            .encode(request.prompt.as_str(), true)
+            .encode(request.prompt.as_str(), self.add_special_tokens)
             .map_err(|e| InferError::InvalidRequest(format!("tokenize: {e}")))?;
         let prompt_ids = encoding.get_ids().to_vec();
         let window = self.capability.context_window;
@@ -276,14 +416,14 @@ impl DecoderProvider {
     ) -> Result<DecoderGeneration, InferError> {
         let (prompt_ids, max_new, mut picker) = self.prepare_generation(request)?;
         let mut observer = StreamObserver::new(self, request, on_fragment, on_generated_token);
-        let token_ids = generate_ids_with(
+        let token_ids = try_generate_ids_with(
             &self.model,
             &prompt_ids,
             max_new,
             &self.model.config().eos_token_id,
             &mut picker,
             &mut |token| observer.observe(token),
-        );
+        )?;
         observer.finish(token_ids, false)
     }
 
@@ -332,6 +472,125 @@ impl DecoderProvider {
 }
 
 impl InferenceProvider for DecoderProvider {
+    fn generate_checkpointed(
+        &self,
+        request: &GenerationRequest,
+        resume: Option<&crate::infer::provider::GenerationCheckpoint>,
+        commit: &mut dyn FnMut(
+            &crate::infer::provider::GenerationCheckpoint,
+        ) -> Result<(), InferError>,
+        stop: &mut dyn FnMut() -> bool,
+    ) -> Result<crate::infer::provider::GenerationCheckpoint, InferError> {
+        use crate::infer::provider::GenerationCheckpoint;
+        let mut request = zeroize::Zeroizing::new(
+            resume.map_or_else(|| request.clone(), |cp| cp.request.clone()),
+        );
+        if request.temperature > 0.0 && request.seed.is_none() {
+            request.seed = Some(SplitMix64::from_entropy().1);
+        }
+        let (prompt_ids, max_new, mut picker) = self.prepare_generation(&request)?;
+        let mut cp = resume.cloned().unwrap_or_else(|| GenerationCheckpoint {
+            placements: Vec::new(),
+            session: None,
+            request: (*request).clone(),
+            prompt_ids: prompt_ids.clone(),
+            token_ids: Vec::new(),
+            draws: 0,
+            text: String::new(),
+            complete: false,
+        });
+        let sampled = request.temperature > 0.0;
+        if cp.prompt_ids != prompt_ids
+            || cp.token_ids.len() > max_new
+            || cp
+                .token_ids
+                .iter()
+                .any(|&id| id as usize >= self.model.config().vocab_size)
+            || (!cp.complete
+                && cp.draws
+                    != if sampled {
+                        cp.token_ids.len() as u64
+                    } else {
+                        0
+                    })
+        {
+            return Err(InferError::InvalidRequest(
+                "invalid generation checkpoint tokens or draw position".into(),
+            ));
+        }
+        if cp.complete {
+            return Ok(cp);
+        }
+        if let TokenPicker::Sampled(sampler) = &mut picker {
+            sampler.skip_draws(cp.draws);
+        }
+        let mut discard = |_: &str| ControlFlow::Continue(());
+        let mut unobserved = |_: u32| {};
+        let mut observer = StreamObserver::new(self, &request, &mut discard, &mut unobserved);
+        for &token in &cp.token_ids {
+            let _ = observer.observe(token);
+        }
+        if observer.emitted != cp.text || observer.stopped_by_string {
+            return Err(InferError::InvalidRequest(
+                "checkpoint text or stop state does not match token IDs".into(),
+            ));
+        }
+        commit(&cp)?;
+        if stop() {
+            return Ok(cp);
+        }
+        let mut prefix = prompt_ids;
+        prefix.extend_from_slice(&cp.token_ids);
+        if prefix.len() >= self.capability.context_window {
+            return Err(InferError::PromptTooLong {
+                length: prefix.len(),
+                limit: self.capability.context_window,
+            });
+        }
+        let device = self.model.device();
+        let mut cache = self.model.new_cache();
+        let input: Tensor<2, Int> = Tensor::from_data(
+            TensorData::new(
+                prefix.iter().map(|&token| token as i32).collect::<Vec<_>>(),
+                [1, prefix.len()],
+            ),
+            &device,
+        );
+        let mut logits = self.model.try_forward_cached_last(input, &mut cache)?;
+        while cp.token_ids.len() < max_new {
+            // No draw is spent on a paused, cancelled or stopped device.
+            if stop() {
+                return Ok(cp);
+            }
+            let token = picker.pick(&logits);
+            cp.draws += u64::from(sampled);
+            if self.model.config().eos_token_id.contains(&token) {
+                cp.complete = true;
+            } else {
+                cp.token_ids.push(token);
+                let _ = observer.observe(token);
+                if let Some(error) = observer.decode_error.take() {
+                    return Err(error);
+                }
+                cp.complete = observer.stopped_by_string || cp.token_ids.len() == max_new;
+            }
+            cp.text = observer.emitted.clone();
+            if cp.complete && !observer.stopped_by_string {
+                cp.text = self.decode(&cp.token_ids)?;
+            }
+            commit(&cp)?;
+            if cp.complete || stop() {
+                return Ok(cp);
+            }
+            let step: Tensor<2, Int> =
+                Tensor::from_data(TensorData::new(vec![token as i32], [1, 1]), &device);
+            logits = self.model.try_forward_cached_last(step, &mut cache)?;
+        }
+        cp.complete = true;
+        commit(&cp)?;
+        Ok(cp)
+    }
+
     fn capability(&self) -> &ModelCapability {
         &self.capability
     }
@@ -387,6 +646,43 @@ mod tests {
             prompt: prompt.to_string(),
             max_tokens,
             ..Default::default()
+        }
+    }
+
+    #[test]
+    fn a_stop_across_fragments_never_leaks_its_prefix() {
+        let provider = provider();
+        let mut request = request("t1", 4);
+        request.stop = vec!["t1 t2".into()];
+        let mut text = String::new();
+        let mut sink = |fragment: &str| {
+            text.push_str(fragment);
+            ControlFlow::Continue(())
+        };
+        let mut token = |_| {};
+        let mut observer = StreamObserver::new(&provider, &request, &mut sink, &mut token);
+        assert!(observer.observe(1).is_continue());
+        assert!(observer.observe(2).is_break());
+        assert_eq!(observer.finish(vec![1, 2], false).unwrap().text, "");
+        assert_eq!(text, "");
+    }
+
+    #[test]
+    fn a_normal_limit_flushes_an_incomplete_stop_but_cancellation_does_not() {
+        let provider = provider();
+        let mut request = request("t1", 4);
+        request.stop = vec!["t1 t2".into()];
+        for cancelled in [false, true] {
+            let mut text = String::new();
+            let mut sink = |fragment: &str| {
+                text.push_str(fragment);
+                ControlFlow::Continue(())
+            };
+            let mut token = |_| {};
+            let mut observer = StreamObserver::new(&provider, &request, &mut sink, &mut token);
+            assert!(observer.observe(1).is_continue());
+            observer.finish(vec![1], cancelled).unwrap();
+            assert_eq!(text, if cancelled { "" } else { "t1" });
         }
     }
 
