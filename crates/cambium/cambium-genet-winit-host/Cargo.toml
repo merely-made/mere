@@ -51,6 +51,7 @@ genet-render-host = { workspace = true }
 winit = { workspace = true }
 
 [dev-dependencies]
+taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
 workbench = { workspace = true }
 serde_json = { workspace = true }
 mesquite = { version = "0.1.0", path = "../mesquite" }

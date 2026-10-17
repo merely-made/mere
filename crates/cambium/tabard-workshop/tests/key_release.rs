@@ -15,7 +15,7 @@ type Host = Harness<WorkshopState, fn(&WorkshopState) -> WorkshopView, WorkshopV
 
 fn hue(host: &Host) -> NodeId {
     host.with_dom(|dom| {
-        let nodes = taproot::matching(dom, &Selector::role("slider").containing("Primary hue"));
+        let nodes = taproot::matching_estimated_fixture(dom, &Selector::role("slider").containing("Primary hue"));
         assert_eq!(
             nodes.len(),
             1,

@@ -620,10 +620,8 @@ impl Canvas {
             else {
                 continue;
             };
-            // Bump the LRU clock, then *borrow* the pixels: the degenerate
-            // entries are rejected before anything is copied, so a frame pays
-            // one buffer copy per painted favicon rather than one per resident
-            // favicon.
+            // Bump the LRU clock, then borrow the pixels. A painted favicon
+            // shares the cache's immutable buffer with the frame sidecar.
             if !self.resolved_images.touch(&favicon.digest) {
                 self.request_image(favicon);
                 continue;
@@ -639,7 +637,7 @@ impl Canvas {
                 key: img_key,
                 width: fav_w,
                 height: fav_h,
-                data: rgba.to_vec(),
+                data: rgba.clone(),
             });
             // Billboard the favicon too: an upright screen-space square centered on the
             // node's projected anchor (not two projected corners, which would foreshorten
