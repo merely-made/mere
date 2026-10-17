@@ -701,6 +701,18 @@ ask now matches sixteen independent reference tokens; its
 covers one physical computer. The remaining reference question and recovery
 checks are running; fleet and largest-per-family qualification remain open.
 
+Dense-family trained row (2026-10-17): add `mistralai/Mistral-7B-Instruct-v0.1`
+at `ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca`, ungated Apache-2.0, with its
+literal `[INST]` template and independent Transformers f32 tokens for bounded
+eight-token requests. Its indexed
+checkpoint/tokenizer/config inputs total 14,485,321,143 bytes. Acquisition is
+bounded to 15 GB of inputs, 45 GB of library data and 30 GB of regenerable
+reference working cache, within the existing 375 GB aggregate model-data cap.
+Require streamed CPU/GPU model-library and checkpoint parity; whole-model
+residence is not required on this GPU. This is a trained-family row, not a
+largest-per-family receipt. CPU reference work can proceed during the long MoE
+GPU gate; native GPU checks remain serialized.
+
 Done when: each added family has a reference-matched row and a template
 artifact; the largest model of each family whose licence permits the use,
 and which the fleet can reach, has completed an ask by some rung; and at
