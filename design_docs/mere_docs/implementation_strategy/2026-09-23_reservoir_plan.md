@@ -1860,3 +1860,24 @@ validator/owner source and fixture bytes remain exact to `a4b770146`; the three
 natal admission/refusal checks pass again after that merge. The full 225-test
 receipt retains its earlier source identity. This does not renew a renderer or
 native product receipt on the new Cambium implementation.
+
+### Cleromancy natal-aspect validator intake (2026-10-17)
+
+Receiving source `8c8e048ea` advances only the Cleromancy portable core lock to
+published product `3fa5a6d`, retaining the incoming Genet `7f13b85f` and all other
+supplier identities. The new owner test admits a valid saved aspect policy,
+observes the exact record from a second application, and rejects resealed result
+and rule tampering with each application's full response, graph revision and
+durable session bytes unchanged. Each application is compared with its own
+complete baseline; the original cross-application envelope assertion failure is
+preserved separately.
+
+The [intake receipt](../receipts/natal-aspects-20261017/qualification.json) binds
+217 library tests, four two-process owner tests, eight validator-parent tests
+and one shared-facts parent test: 230 passes, three intentional child-entry
+ignores. Four focused natal tests pass again from the committed source. The
+broader run's two changed inputs are byte-identical to that source commit.
+Evidence commit `8eef90598` keeps the source and qualification identities
+separate. All 173 guarded earlier manifests/configurations/receipt files remain
+unchanged. This is a resident software intake, with no renewed graphical unlock,
+Cleromancy native scene or Graphshell browser-wall claim.
