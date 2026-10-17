@@ -56,7 +56,7 @@ fn harness(fonts: Vec<HostFont>) -> Harness<App, fn(&App) -> Child, Child> {
 fn run_width(h: &Harness<App, fn(&App) -> Child, Child>) -> f32 {
     let node = h
         .with_dom(|dom| {
-            taproot::matching(dom, &Selector::class("run"))
+            taproot::matching_estimated_fixture(dom, &Selector::class("run"))
                 .first()
                 .copied()
         })
