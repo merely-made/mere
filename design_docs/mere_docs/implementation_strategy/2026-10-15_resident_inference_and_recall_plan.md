@@ -1536,3 +1536,27 @@ Stop and record the reason if any of these happen:
   remain untouched. Qualification still uses one physical computer and GPU;
   installed-binary, further headed and physical-fleet gates remain separate.
   This is not another 20-run flakiness check. I9 remains next.
+
+- **2026-10-17: I9 architecture implementation checkpoint; qualification in
+  progress.** The dense decoder now implements declared linear/Llama3 RoPE,
+  independent head dimensions, projection biases, per-layer sliding attention
+  and Qwen3 head norms. Qwen2 MoE adds routed and shared experts, separately
+  verified expert artifacts, bounded query chunks and exact shared-matrix row
+  shards. Eight independent Transformers f32 fixtures pass resident, streamed,
+  staged and sharded paths on CPU and GPU. The GPU fixture checks full logits
+  within `2e-5` and four exact generated tokens per case. ESP passes **198 unit
+  tests**, with its explicit GPU case passing separately; Distillery passes
+  **54 unit tests**. The library identity/read-failure fixture and all **three
+  resident library-owner cases** pass, including unreadable experts refusing
+  before any answer token and library release on close. Existing SmolLM2 CPU
+  and GPU rows still match their independent references through pause/resume.
+  - The independent f32 Transformers reference for pinned Qwen2-57B-A14B-Instruct
+    completed both questions. The earlier bf16 reference crashed in
+    `torch_cpu.dll`; its cause is undetermined and its failed receipt is kept.
+    Native import completed into a **140,509,982,720-byte** model library.
+    Native generation is running; completed native asks, exact reference parity
+    and serialized checkpoint/provider-reload recovery are still open.
+  - The remaining consumer build and final small-Qwen model-library regressions
+    are running. Largest-per-family qualification, further decoder families,
+    physical-fleet execution and installed-resident invocation are not covered
+    by this checkpoint. I9 remains in progress.
