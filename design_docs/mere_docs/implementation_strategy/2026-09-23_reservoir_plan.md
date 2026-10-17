@@ -1816,3 +1816,15 @@ records exact lock/source inputs and scope. Cargo's generated intake aligns
 Genet/Murm branch sources and same-version registry dependency edges; this
 bounded daemon evidence does not recertify unrelated native/browser surfaces.
 Cleromancy retains its own rebuilt native birth-correction/offline-reopen receipt.
+
+### Natal houses portable-validator intake (2026-10-17)
+
+The resident imports immutable Cleromancy core `ca562db`, with planetary
+Turquet `30875f30` and corrected house geometry `e2f65c0`. Both Whole Sign
+and Equal receipts admit through two actual application routes; a modified
+cusp is refused with the disclosed envelope unchanged. The preintegration
+checkpoint passes 215 Djinn library tests and nine owner-process regressions
+(two child entry points intentionally ignored by the direct harness).
+See `receipts/natal-houses-20261017/preintegration.json`. Incoming main's
+span-edit and documentation commits remain distinct and require an integrated
+rerun. Product native and full browser-wall qualification remain separate.
