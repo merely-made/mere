@@ -364,7 +364,7 @@ fn document_extent_preserves_inline_bounds_and_rebuild_reclamps_after_clipping()
         owner,
         "width:220px;height:40px;line-height:600px;overflow:hidden;",
     );
-    layout.rebuild(&dom, VIEWPORT.0, VIEWPORT.1);
+    layout.rebuild_drained(&mut dom, VIEWPORT.0, VIEWPORT.1);
     assert_eq!(layout.viewport_scroll(), (0.0, 0.0));
 }
 
