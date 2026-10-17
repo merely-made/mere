@@ -2147,6 +2147,72 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread")]
+    async fn natal_product_authority_admits_replay_and_refuses_tampering_across_apps() {
+        let fixture = fixture(0x4e4154, "divination").await;
+        let mut product = fixture.attach("turnstone").await;
+        let mut other = fixture.attach("knot-editor").await;
+        let initial = graph(&mut product);
+        let mut candidate = disclosed_graph(&mut product, &initial)
+            .into_graph()
+            .unwrap();
+        let captured = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let held = captured.clone();
+        candidate.set_recorder(Some(Arc::new(move |delta| {
+            held.lock().unwrap().push(delta.clone())
+        })));
+        let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({"schema":"dramatis.birth-facts/v1","subject":{"Profile":{"id":"public-natal-subject"}},"date":{"year":2000,"month":1,"day":1},"time":{"Known":{"hour":12,"minute":0,"second":0}},"place":null,"timezone":"UTC","source":{"label":"Public product-authority fixture","reference":null}})).unwrap();
+        let birth = personal_facts::birth_resource(&facts).unwrap();
+        let record = cleromancy_domain::natal::NatalReading::new(
+            "public-source-persona".into(),
+            "Public natal subject".into(),
+            birth,
+            "A synthetic natal question".into(),
+            cleromancy_domain::natal::FoldChoice::Refuse,
+            1792149302000,
+            "00000000000000000000000000000008".into(),
+        )
+        .unwrap();
+        let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();
+        host.insert_natal_reading(&record).unwrap();
+        assert_eq!(
+            product
+                .invoke(apply(&initial, captured.lock().unwrap().clone()))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let shared = graph(&mut other);
+        let current = disclosed_graph(&mut other, &shared);
+        let host =
+            cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())
+                .unwrap();
+        assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);
+        let mut bad = record.clone();
+        bad.question = "Tampered under the sealed id".into();
+        assert!(matches!(
+            other
+                .invoke(apply(
+                    &shared,
+                    vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
+                        node_id: kernel::graph::Graph::node_namespace_id(&format!(
+                            "cleromancy://natal/{}",
+                            record.id
+                        ))
+                        .to_string(),
+                        facet: cleromancy_domain::natal::NATAL_FACET.into(),
+                        value_json: serde_json::to_string(&bad).unwrap()
+                    }]
+                ))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        let after = graph(&mut other);
+        assert_eq!(
+            serde_json::to_value(disclosed_graph(&mut other, &after)).unwrap(),
+            serde_json::to_value(current).unwrap()
+        );
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
     async fn two_applications_edit_one_session_and_hear_each_other() {
         let fixture = fixture(21, "divination").await;
         for app in ["turnstone", "knot-editor"] {
