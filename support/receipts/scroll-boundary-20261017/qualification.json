@@ -1,0 +1,42 @@
+{
+  "schema": "mere-document-scroll-qualification/v1",
+  "status": "qualified locally; publication pending",
+  "code_revision": "2d95d95e9d843ed6ebb0d38f47f77444823834bb",
+  "base_revision": "df30e97dddcf8f3dc5e9f0da93c76350687212e6",
+  "source_changes": [
+    "Axis-aware document and element extent traversal respects nested overflow boundaries; boundary border boxes and visible outer overflow still contribute.",
+    "Initial layout and rebuild use the same extent calculation.",
+    "Optional AppCtx document_scroll observation preserves absent layout as unavailable.",
+    "Regression mutates overflow then rebuilds through current drained mutation path."
+  ],
+  "software": {
+    "rootstock_and_native_host_passed": 315,
+    "failed": 0,
+    "ignored": 8,
+    "document_extent_regressions": 5,
+    "earlier_repeated_owned_layout_tests_not_added": 34
+  },
+  "suppliers": {
+    "genet": "917f88e6004d17e1eff19598468e12d9b3c5ab5b",
+    "netrender": "e8cda06efc11c11595f2fa1bb30bce7e72979537"
+  },
+  "receiving": {
+    "product": "Woodshed",
+    "source_revision": "6b2c6b3e48cd7c029830a0928cf1b8d1afa24fcf",
+    "owning_receipt": "woodshed/validation/mere-scroll-adoption_20261017/README.md",
+    "seed_and_sealed_fresh_reopen_scroll_matrix_passed": true,
+    "p2_three_canvas_surfaces_passed": true,
+    "captures": 31,
+    "native_seed_reopen_and_separate_reference_wavs_exact": true,
+    "capture_owner_clock_decoded_pcm_retained": true,
+    "input_unopened": true,
+    "synthetic_fixture": "stepped-triangle-v1",
+    "physical_microphone_qualification": false,
+    "process_exit_status": "Three recorded normal zero exits with executable/source/scenario identity; original Keeper fixtures and companions unchanged"
+  },
+  "residuals": [
+    "Background occluded receiving attempt excluded; foreground Finder retry passes on same product binary.",
+    "Related graph-label overlap remains, also present in qualified October15 capture; camera/scroll acceptance does not claim label-layout polish."
+  ],
+  "publication": "Supplier and consumer commits await requested publication approval; canonical Git cache was seeded from exact local candidate for qualification."
+}

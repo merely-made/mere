@@ -472,3 +472,35 @@ Viewer size levers remain options. Forms C and three-lanes are outside scope.
   binds the source, binary, supplier graph and owning consumer receipt.
   Failed/mixed earlier trials are excluded. Physical audio, other platforms
   and portable shadow-mask composition retain their separate qualification.
+
+
+## Document scroll boundary adoption — 2026-10-17
+
+**Status: qualified locally; publication pending.** Shared source `2d95d95e9`
+is based on main `df30e97dd`. The axis-aware extent walker excludes descendant
+content behind nested hidden/clip/auto/scroll boundaries while retaining each
+boundary border box and visible outer overflow. Initial layout and relayout use
+the same calculation. The optional host document-scroll observation returns
+unavailable when no layout exists. Its five regressions cover repeated nested
+wheels, all clipping modes, axis independence, visible/border-box contributions
+and a drained-mutation overflow edit/reclamp.
+
+The unchanged Mere locked Genet `917f88e6` / Netrender `e8cda06` supplier graph
+passes 315 Rootstock/native-host cases, zero failures and eight existing ignores;
+the earlier 34-case focused run is not counted again. Committed Woodshed
+receiving source `6b2c6b3` passes the wide/compact/short/125% scroll matrix and
+a sealed fresh-process reopen without reseeding or opening input. It also
+passes the existing P2 camera and native wheel lane on Session Mere, relationship
+editor and Related, producing 31 captures across the three phases. Synthetic
+envelope owner, Seconds clock and decoded PCM remain exact; seed/reopen worker
+WAVs and a separate sealed reference are byte-identical. Product executable and
+scenario identity plus three normal zero exits are recorded. Background
+occlusion is a preserved failed attempt; a foreground retry passes the same
+product binary. Related label overlap remains graph-readability polish, with
+the historical October 15 capture providing a matching pre-adoption observation.
+
+[Supplier qualification](../../../support/receipts/scroll-boundary-20261017/qualification.json)
+binds source, gate and owning receiving evidence. The consumer owns the detailed
+receipt at `woodshed/validation/mere-scroll-adoption_20261017/README.md`. Native
+input, acoustic quality, browser/platform coverage and broader label-layout
+polish remain separate. Neither supplier nor consumer candidate is published.
