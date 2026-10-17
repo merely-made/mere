@@ -1853,3 +1853,10 @@ checks. New Turquet edition is immutable `8e3755bb`; no prior receipt changes.
 The narrow Cargo-generated intake and the separate integrated result are under
 `receipts/natal-cap-20261017/`. This is bounded domain/owner qualification;
 browser, native platform and whole-family acceptance retain their own receipts.
+
+The later incoming Cambium restyling source and documentation (`be7906481`,
+`62251777e`) are preserved by merge `65e9a29a1`. Root dependency lock, Djinn
+validator/owner source and fixture bytes remain exact to `a4b770146`; the three
+natal admission/refusal checks pass again after that merge. The full 225-test
+receipt retains its earlier source identity. This does not renew a renderer or
+native product receipt on the new Cambium implementation.
