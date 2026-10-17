@@ -1,3 +1,5 @@
+Metre editing continuation (2026-10-17): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#metre-editing-and-shared-span-intents-2026-10-17-in-progress) records shared revision-qualified span intents after the concrete Knot/Woodshed consumers, explicit Graphshell copy editing and pending native/browser qualification.
+
 Template scene framing follow-up (2026-10-16): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#template-scene-vertical-framing-2026-10-16) records qualified shared vertical framing and inverse picking for long template timelines, with five surface checks and three reviewed native Woodshed captures.
 
 # Mere Documentation Index
