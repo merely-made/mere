@@ -1,7 +1,7 @@
 # Resident Inference and Recall Plan
 
 **Date:** 2026-10-15
-**Status (2026-10-16):** in progress. I1 to I8 native gates done (§7):
+**Status (2026-10-17):** in progress. I1 to I8 native gates done (§7):
 strict decoder, declared templates, CPU and GPU model rows, native trainer
 owner reclaim, durable checkpoints, restart, lock recovery and keyed
 personal-graph continuation pass on O-PC. I4's native gate adds BM25 recall,
@@ -18,7 +18,9 @@ software devices have independent roots and model libraries on one computer
 and GPU. Ordinary app asks now discover attested keyed peers and select
 owner-budgeted residence, leased stages or local streaming through `automatic`
 JSON settings. Worker departure resumes the same checkpoint locally. Physical
-second-computer and installed-binary receipts remain separate. I9 is next.
+second-computer and installed-binary receipts remain separate. I9 is in progress:
+the dense variants and Qwen2 routed/shared experts have independent small
+references; final consumer, GPU and larger-than-RAM qualification is running.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -666,11 +668,63 @@ remain separate receipts.
 R12, in its order: the Llama block completed, then mixture of experts, then
 the rest.
 
+Execution brief (2026-10-16): complete the dense Llama-derived primitives
+first: declared RoPE scaling, independent head dimensions, per-layer sliding
+attention, projection biases and per-head QK normalization. Require independent
+Transformers logits/token references, resident/streamed/staged parity,
+malformed-config and unread-tensor refusals, and real model-library rows with
+data templates for each newly admitted family. Then add expert routing and
+expert-granular verified reads before attempting the larger-than-device MoE
+gate. A primitive or small-family receipt does not close I9's scale gate.
+
+New retained I9 receipts across repositories have a **100,000,000-byte total
+cap**: compact source/command/hash summaries, reference JSON, small deterministic
+fixture weights and required measurement logs. Ordinary Cargo outputs remain
+in the stable Mere target; do not freeze additional executable copies. Model
+checkpoint inputs remain in the existing model cache/library and their sizes
+are recorded separately. Preserve all cited prior I1-I8 evidence unchanged.
+
+MoE forcing row (2026-10-17): `Qwen/Qwen2-57B-A14B-Instruct` at
+`50896d66b39f1425d63720541a66c7df13e053c0` is ungated Apache-2.0;
+its 29 safetensors shards total 114,818,032,896 bytes. Its f32 runtime weights
+exceed this computer's RAM as well as GPU memory. Required receipts are a
+Transformers routing/reference row, verified selected-expert reads, completed
+native asks, memory/read counters and checkpoint recovery. For this forcing
+row, the **total new model-input, model-library and reference working-cache
+budget is 375,000,000,000 bytes**, within the measured 528,980,234,240 free
+bytes before acquisition. This is an explicit exception to the default
+100 MB retained-byte budget; the compact receipts themselves keep their
+100,000,000-byte cap. Acquire only indexed HF shards and tokenizer/config
+inputs, not duplicate consolidated formats. No such scale receipt exists yet.
+
 Done when: each added family has a reference-matched row and a template
 artifact; the largest model of each family whose licence permits the use,
 and which the fleet can reach, has completed an ask by some rung; and at
 least one mixture-of-experts model larger than any single device's memory
 has completed an ask with streamed experts.
+
+Implementation boundaries (2026-10-17): `llama`, `mistral`, `qwen2`, `qwen3`
+and `qwen2_moe` configs select declared operations. Linear and Llama3 RoPE,
+independent head width, projection biases, per-layer windows and QK norms
+have small independent Transformers fixtures. Dynamic/YaRN RoPE, partial
+rotation, other activations, undeclared weights and other families still
+refuse. The first MoE implementation is f32 execution; expert weight formats
+and differentiable expert adapters require their own qualification.
+
+`ExpertWeightIndex` (`esp.expert-weights/v1`) keeps each routed expert in a
+separate content-verified library artifact. A forward materializes one selected
+expert at a time, synchronizes before releasing it, and bounds MoE prefill by
+the row's query chunk. Shared embedding/output matrices are split by vocabulary
+rows under the configured tensor byte bound without changing values. Resident
+and leased-stage admission reserves the full expert bank and KV, rather than
+admitting only the active experts. Artifact counters count verified logical
+reads, including cache hits; they do not measure physical disk traffic.
+
+The Qwen2/2.5 ChatML and Qwen3 non-thinking prompts are literal template
+artifacts checked against each pinned tokenizer's own renderer. The template's
+declared literal EOS also stops generation, including Qwen instruct checkpoints
+whose base-config EOS differs from the end-of-turn token. Model/session identity
+continues to bind those exact template and weight artifacts.
 
 ### I10. The envelope and a vector lane
 

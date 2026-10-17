@@ -82,14 +82,10 @@ pub(crate) fn library_layer_source<B: eidetic::Store + Send + 'static>(
     library: Arc<tokio::sync::Mutex<B>>,
     resolved: &esp::infer::library::ResolvedInferenceRow,
 ) -> Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>> {
-    let artifacts = resolved.layer_artifacts()?;
-    Some(Arc::new(move |index: usize, limit: usize| {
-        let artifact = artifacts.get(index).ok_or_else(|| {
-            esp::infer::InferError::InvalidWeights(format!("layer {index} missing from index"))
-        })?;
+    resolved.artifact_source(move |artifact, limit| {
         let mut store = library.blocking_lock();
         pollster::block_on(artifact.read(&mut *store, limit))
-    }))
+    })
 }
 
 #[cfg(feature = "inference-model")]
@@ -98,8 +94,7 @@ pub(crate) fn borrow_layer_source(
 ) -> Option<Box<dyn esp::infer::decoder::streaming::LayerSource>> {
     source.as_ref().map(|source| {
         let source = source.clone();
-        Box::new(move |index, limit| source.read_layer(index, limit))
-            as Box<dyn esp::infer::decoder::streaming::LayerSource>
+        Box::new(source) as Box<dyn esp::infer::decoder::streaming::LayerSource>
     })
 }
 

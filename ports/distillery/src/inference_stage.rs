@@ -223,10 +223,16 @@ pub fn library_stage_factory<B: eidetic::Store + Send + 'static>(
         }
         let source = crate::inference::library_layer_source(library.clone(), &resolved)
             .ok_or("stage requires a layer-indexed row")?;
-        let guarded_source = |index, limit| {
-            control.check().map_err(|_| InferError::Interrupted)?;
-            source.read_layer(index, limit)
-        };
+        let guarded_source = esp::infer::decoder::streaming::with_expert_reader(
+            |index, limit| {
+                control.check().map_err(|_| InferError::Interrupted)?;
+                source.read_layer(index, limit)
+            },
+            |layer, expert, limit| {
+                control.check().map_err(|_| InferError::Interrupted)?;
+                source.read_expert(layer, expert, limit)
+            },
+        );
         let stage = resolved
             .load_stage(&device, &loader, request.range, &guarded_source)
             .map_err(|e| e.to_string())?;
