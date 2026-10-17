@@ -1799,3 +1799,20 @@ SUN_LEN and stale-link assertion failures remain diagnostic evidence.
 See [the bounded software receipt](../receipts/personal-facts-20261017/qualification.json).
 Cleromancy native intake and the daemon's new natal portable-validator intake
 are separate subsequent gates; this does not renew the full shared browser wall.
+
+### Immutable natal validator intake (2026-10-17)
+
+The stock daemon and embedded composition import published Cleromancy core
+`a684361b1553848c923912807d525aced61bc820`. The personal-facts patch binds its
+Graph types to this workspace's owning domain crate. The full Djinn library
+passes 214 tests, including real two-application natal admission, exact replay
+and refusal of a same-id altered record with an unchanged disclosed envelope.
+The existing eight owner/replay regressions and the two-application facts
+fresh-process regression also pass; two direct child entry points remain
+intentionally ignored and are exercised by their parent scenarios.
+
+The [immutable intake receipt](../receipts/personal-facts-20261017/natal-portable-intake.json)
+records exact lock/source inputs and scope. Cargo's generated intake aligns
+Genet/Murm branch sources and same-version registry dependency edges; this
+bounded daemon evidence does not recertify unrelated native/browser surfaces.
+Cleromancy retains its own rebuilt native birth-correction/offline-reopen receipt.

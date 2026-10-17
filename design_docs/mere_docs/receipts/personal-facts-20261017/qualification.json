@@ -27,6 +27,11 @@
       "passed": 1,
       "ignored": 0,
       "sha256": "e44e83f29d4976ea0bd8923c693b852f601ba043dcdfbba4560234bf7c4bdc53"
+    },
+    "embedded-hardening.log": {
+      "passed": 8,
+      "ignored": 1,
+      "sha256": "c9abd8ea2c6374e98ca7cbe6c8e31a6ed9d1536c8ec306e0fc66d72c85d7320a"
     }
   },
   "policy": [
@@ -35,5 +40,6 @@
     "Pure historical replay does not require live profile availability",
     "Transition hook propagates through detached transactions and forks",
     "Personal-facts fixture crosses two admitted apps and two actual owner processes"
-  ]
+  ],
+  "owner_capsule_scope": "Existing immutable product authority only; natal intake is subsequent"
 }

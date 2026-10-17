@@ -1,0 +1,29 @@
+{
+  "schema": "mere.natal-portable-intake/v1",
+  "baseline": "d03e367bd64a8dc2c03e67458539aa8dc5ccf9a5",
+  "cleromancy_core": "a684361b1553848c923912807d525aced61bc820",
+  "dramatis": "cf562f47f33ab0b6ad0db1c5ac3123775769979e",
+  "checks": {
+    "djinn-natal-intake-full.log": {
+      "passed": 214,
+      "ignored": 0,
+      "sha256": "f470419d32e5b8c5f9c1c8d5a343f4f35e74337d2f52514aa6e3fcee0a65c5ce"
+    },
+    "owner-natal-intake-processes.log": {
+      "passed": 9,
+      "ignored": 2,
+      "sha256": "57868a333411e4d84bc3688b82c38f4110ffb6b54c0a1bdd2f4c0552af9bd4ca"
+    }
+  },
+  "source_files": {
+    "Cargo.toml": "59b5945edc6dcf6c5b4d8498e9324edfcdb877466ba22b67551720453516a136",
+    "Cargo.lock": "68a4e77dd0ed29ede84f2a5e1f6a87f35cd44827fa17481991fad9d47f076d6e",
+    "ports/djinn/src/resident_mere.rs": "3c33059b77df17566d12851243f7ef2c604840fd580aa5476994bef7c16e913d"
+  },
+  "limits": [
+    "Software and real-process owner qualification; no full Graphshell browser wall renewal",
+    "New natal replay/tamper is an actual two-app resident-route test; native fresh-process natal qualification belongs to Cleromancy",
+    "Cargo-generated lock intake also aligns Genet and Murm branch sources and same-version registry dependency edges; exact lock and compile logs bind this evidence",
+    "Prior source and failed diagnostic artifacts remain preserved"
+  ]
+}
