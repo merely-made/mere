@@ -25,16 +25,6 @@ fn scene_graph() -> (Graph, Vec<NodeKey>) {
     .iter()
     .map(|url| graph.add_node(url.to_string(), PortablePoint::zero()))
     .collect();
-    for (key, tags) in [
-        (keys[0], ["song", "practice"]),
-        (keys[2], ["song", "publishing"]),
-    ] {
-        graph
-            .get_node_mut(key)
-            .unwrap()
-            .tags
-            .extend(tags.map(String::from));
-    }
     graph.assert_relation(
         keys[0],
         keys[3],
@@ -55,6 +45,15 @@ fn scene_graph() -> (Graph, Vec<NodeKey>) {
 fn canvas() -> (Canvas, Vec<NodeKey>) {
     let (graph, keys) = scene_graph();
     let mut canvas = Canvas::with_graph(graph);
+    for (key, tags) in [
+        (keys[0], ["song", "practice"]),
+        (keys[2], ["song", "publishing"]),
+    ] {
+        let member = canvas.graph().get_node(key).unwrap().id;
+        for tag in tags {
+            assert!(canvas.tag_node(member, tag));
+        }
+    }
     canvas.resize(VIEW.0, VIEW.1);
     (canvas, keys)
 }
@@ -122,6 +121,54 @@ fn sets_draw_the_common_tags_and_place_by_membership() {
     let song = &canvas.strategy_regions()[0];
     assert!(song.members.contains(&keys[0]) && song.members.contains(&keys[2]));
     assert!(!song.members.contains(&keys[1]), "untagged sits outside");
+}
+
+#[test]
+fn sets_read_public_resource_tags_without_legacy_surface_tags() {
+    let mut canvas = Canvas::new();
+    let members = [
+        canvas.open_member_as_new_node(None, "https://songs.example/shared"),
+        canvas.open_member_as_new_node(None, "https://songs.example/shared"),
+        canvas.open_member_as_new_node(None, "https://songs.example/other"),
+    ];
+    let keys: Vec<_> = members
+        .iter()
+        .map(|member| canvas.graph().get_node_by_id(*member).unwrap().0)
+        .collect();
+    assert_ne!(members[0], members[1]);
+    assert_eq!(
+        canvas.graph().shown_resource_id(keys[0]),
+        canvas.graph().shown_resource_id(keys[1])
+    );
+    assert!(canvas.tag_node(members[0], "song"));
+    assert!(canvas.tag_node(members[0], "practice"));
+    assert!(canvas.tag_node(members[2], "song"));
+    for key in &keys {
+        assert!(canvas.graph().node_tags(*key).unwrap().is_empty());
+        assert!(
+            canvas
+                .graph()
+                .node_content_tags(*key)
+                .unwrap()
+                .contains("song")
+        );
+    }
+    canvas.resize(VIEW.0, VIEW.1);
+    apply_arrangement(&mut canvas, "sets.default", VIEW).unwrap();
+    let song = canvas
+        .strategy_regions()
+        .iter()
+        .find(|region| region.label.as_deref() == Some("song"))
+        .expect("Sets must read canonical Resource tags written through Canvas");
+    assert!(keys.iter().all(|key| song.members.contains(key)));
+    let practice = canvas
+        .strategy_regions()
+        .iter()
+        .find(|region| region.label.as_deref() == Some("practice"))
+        .expect("each canonical membership produces its bounded region");
+    assert_eq!(practice.members.len(), 2);
+    assert!(practice.members.contains(&keys[0]) && practice.members.contains(&keys[1]));
+    assert!(!practice.members.contains(&keys[2]));
 }
 
 #[test]

@@ -21,8 +21,8 @@ pub const UNRELATED_COLUMN: &str = "unrelated";
 pub fn tag_sets(graph: &Graph) -> HashMap<NodeKey, AxisValue> {
     graph
         .nodes()
-        .filter_map(|(key, node)| {
-            let tags: BTreeSet<&str> = node.tags.iter().map(String::as_str).collect();
+        .filter_map(|(key, _)| {
+            let tags: BTreeSet<String> = graph.node_content_tags(key)?.into_iter().collect();
             (!tags.is_empty()).then(|| {
                 let joined = tags.into_iter().collect::<Vec<_>>().join("|");
                 (key, AxisValue::Categorical(joined))

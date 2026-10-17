@@ -1863,3 +1863,58 @@ Evidence: [shared/browser receipt](../../../validation/shared-span-intents_20261
 `knot-editor/docs/receipts/2026-10-17_metre_editing/`, and
 `woodshed/validation/shared-span-intents_20261017/`. The older A5 and unrelated
 portable-grammar gates in this plan remain open.
+
+
+### Sets canonical tag admission (2026-10-17)
+
+**Status:** focused native CPU qualification complete; consumer adoption pending.
+The full library run has one unchanged timing-control failure, detailed below.
+
+Feature target: Sets reads the Resource tags written by public Canvas tagging,
+including two Surface members showing the same Resource, while retaining the
+existing accessor's legacy unbound-Surface fallback.
+
+Done conditions: public `Canvas::tag_node` writes produce bounded song/practice
+regions when legacy member tag fields are empty; shared Resource views receive
+the same memberships; existing bounded-scene controls pass. Turnstone must
+then adopt the published supplier and rerun its unchanged scene assertion.
+
+Findings (2026-10-17): Turnstone's current scene fixture writes canonical tags
+through Canvas and confirms they survive reconciliation. On Mere `55c479bc7`,
+`canvas::scene_axes::tag_sets` still reads `node.tags`, so Sets receives an empty
+axis and produces no bounded regions. The supplier's older fixture directly
+mutates that legacy field and hides the mismatch. This is independent of
+Turnstone's source-capture save acknowledgement work and frame scheduling.
+
+Progress (2026-10-17): the shared axis now uses `Graph::node_content_tags`, whose
+existing contract reads shown Resource tags and falls back only for unbound
+legacy members. A public-write regression covers two views of one Resource and
+an independent Resource, with empty legacy tag fields. The initial bounded run
+passed five cases and failed the older Sets fixture: it directly mutated legacy
+member tags before provenance bound those members to Resources. Its tag setup
+now uses public `Canvas::tag_node`; the exact expected song/practice/publishing
+regions and member assertions remain unchanged. The standalone unbound Graph
+tag-axis unit control still proves the accessor's existing legacy fallback.
+
+Qualification (2026-10-17), locked canonical dependencies at base `55c479bc7`,
+Rust 1.99.1 on macOS, `pictograph` with `canvas` and default features:
+
+- `cargo test --locked -p pictograph --features canvas --lib
+  canvas::tests::bounded_scenes`: six passed, zero failures/ignores.
+- The same command with `canvas::scene_axes`: two passed, zero failures/ignores.
+- The full `--lib` run: 516 passed, one failed, 18 existing ignores in 374.93 s.
+  The unchanged `speed::fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed`
+  failed its wall-clock forecast bound at `tests/speed.rs:223`: frame 0 took
+  133.087014 ms against a 5.452144 ms budget plus a 94.022302 ms prior worst tick.
+- Running that exact control alone in the same test binary with
+  `--exact ... --nocapture --test-threads=1`, without another Cargo invocation,
+  reproduced the failure: zero passed, one failed in 53.90 s; frame 0 took
+  101.536396 ms against 5.018372 ms plus 11.826586 ms. Substantial unrelated
+  compiler load remained on the host. This is a measured remaining timing gate,
+  not a full-library pass. The control uses a free force canvas and does not
+  call the tag axis or select an arrangement; no physics source or assertion
+  was changed. No further retry was taken.
+
+Live tag-edit cache invalidation and headed/GPU acceptance retain separate
+scope; this correction does not change the layout cache. Turnstone's receiving
+scene check must run against the subsequently published supplier revision.
