@@ -1092,6 +1092,32 @@ impl genet_host_api::ResourceFetcher for ReceiptResourceFetcher {
             url,
         )
     }
+
+    fn fetch_request(
+        &self,
+        request: &genet_host_api::ResourceRequest,
+    ) -> Option<genet_host_api::ResourceFetchResponse> {
+        if let Some((requested_url, final_url, body_path)) = &self.redirect
+            && requested_url == &request.url
+        {
+            if !request.is_plain_get() {
+                return None;
+            }
+            self.record(&request.url);
+            let bytes = std::fs::read(body_path).ok()?;
+            let mut response = genet_host_api::ResourceFetchResponse::from_local_plain_get(
+                genet_host_api::ResourceResponse::new(final_url.clone(), bytes)
+                    .with_content_type("text/html"),
+            );
+            response.redirected = final_url != &request.url;
+            return Some(response);
+        }
+        genet_host_api::ResourceFetcher::fetch_request(
+            &genet_documents::LocalFetcher
+                .with_fallback(mere_document_lanes::RemoteFetcher::shared()),
+            request,
+        )
+    }
 }
 
 /// Compatibility entrypoint for callers of the former static viewer. Script-free

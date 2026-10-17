@@ -27,6 +27,36 @@ impl genet_host_api::ResourceFetcher for HeldResources {
             self.0.get(address).cloned()
         }
     }
+
+    fn fetch_request(
+        &self,
+        request: &genet_host_api::ResourceRequest,
+    ) -> Option<genet_host_api::ResourceFetchResponse> {
+        if request.url.starts_with("data:") {
+            genet_documents::LocalFetcher.fetch_request(request)
+        } else {
+            // The held inventory records bytes, not their transport status or
+            // response headers, even when a key happens to look like HTTPS.
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod held_resource_contract {
+    use super::*;
+
+    #[test]
+    fn held_https_bytes_do_not_claim_http_response_metadata() {
+        let address = "https://example.test/held";
+        let mut held = HeldResources::default();
+        held.0.insert(address.into(), b"cached".to_vec());
+        assert_eq!(held.fetch(address), Some(b"cached".to_vec()));
+        assert!(
+            held.fetch_request(&genet_host_api::ResourceRequest::plain_get(address))
+                .is_none()
+        );
+    }
 }
 
 pub const DOCUMENT_ENGINE_ID: &str = "mere.document";

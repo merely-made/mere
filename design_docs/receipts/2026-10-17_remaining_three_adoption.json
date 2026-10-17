@@ -1,0 +1,41 @@
+{
+  "findings": [
+    "I6",
+    "H5",
+    "R7"
+  ],
+  "genet_commit": "4db9557c9c155e5e157a863996b17017d947bb4f",
+  "mere_base": "515b30bed4572d1811a4e80d34c1c930f2f3843e",
+  "source_sha256": {
+    "crates/system/document-lanes/src/remote.rs": "61edbd0e4a3c870b089574cbf81db786c90dfaddf6a44e350d62aa5feac3b72b",
+    "crates/system/document-lanes/src/session.rs": "edbdb0e7c331deef2056eb98959722e3afac41a0cda1693c9cfb0dde6f6ea39e",
+    "crates/system/document-lanes/src/smolweb.rs": "3e625f864f3753ab5cf389e2bb1344fbe2a959c74dafa905c5214bd131fd45e5",
+    "crates/system/fetch/src/handle.rs": "720eceb128177d72c69426eaef5f494689189b28d1314d186e0a4e90e855a96e",
+    "crates/system/fetch/src/handle_tests.rs": "0c4b04332010db6a847a5cbdf3dfd192312820502e61d05687308ec690c611d2",
+    "ports/pelt/core/src/native.rs": "ed426630c9e022b99f22147482bc8d4f8ec91a11fb4c29db48c4b41ff11919f6",
+    "ports/pelt/desktop/smolweb_glue.rs": "d225a5a1f0c388eea231d2d0318b5b705967e338d7d30cc52d640acaa982ede2",
+    "ports/pelt/desktop/static_viewer.rs": "f18f06faaad6da8b58371c4048565f55456e7799b6a59dd7da0bc801c0873f5d",
+    "ports/pelt/desktop/workspace_viewer/tests.rs": "3948aecffb35cc66e1885e211aab23e1fe594713cf2e0c09fe82e22678d865a6"
+  },
+  "verification": {
+    "native_tests": 40,
+    "native_log": "/home/markik/Code/testing/audits/genet-architecture-20261017/remaining-slices/r3-mere-fetch-corrected.log",
+    "graphshell_wasm_check": "/home/markik/Code/testing/audits/genet-architecture-20261017/remaining-slices/r3-graphshell-final.log",
+    "publication": "Offline locked metadata versions, enabled features and dependency edges match tested local graph for root and Graphshell web.",
+    "metadata_sha256": {
+      "r3-mere-integrated": "88ae68515ee53ad4929c1ed4a5d17b7cce109594e4fa7fe20a94c35cb7091ef4",
+      "r3-mere-published": "e4fe77b91acee487bf6a4b2717211c7f55406f66b05cbd06bea4ec8d8cff0031",
+      "r3-graphshell-local": "671f362a46b10cce8f43676306b84f899973a1fe493b78da53a301e9235282d5",
+      "r3-graphshell-published": "aae378ed8d82e2b50cbffd2a128637927207f917848d6728207e815e001f2ca8"
+    },
+    "lock_sha256": {
+      "Cargo.lock": "0f1786c4034e9f0c05e87db0352c313b95995ecc724e0315404943f3112369ef",
+      "ports/graphshell/web/Cargo.lock": "c7a48bc5a871ce0b25fcfbc0781e180c5fec0f19710f9fb85e4587572e86fc80"
+    }
+  },
+  "limits": [
+    "Mere source tests used local Genet sources; published Git graph and source hashes verified identical.",
+    "Upstream documentation-only 515b30bed incorporated after tests.",
+    "Worker helper deployment and Windows/macOS reclamation are not qualified here."
+  ]
+}
