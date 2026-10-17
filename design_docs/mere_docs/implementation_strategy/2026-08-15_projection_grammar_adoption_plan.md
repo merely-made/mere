@@ -1817,3 +1817,29 @@ and edge gestures, keyboard movement, Escape and compact rest editing pass in
 portable document. Five captures were reviewed. The consumer keeps beat
 snapping and draft/Save semantics; the surface still supplies geometry only.
 Evidence: `woodshed/validation/native-arrangement-spans_20261016/receipt.json`.
+
+
+### Metre editing and shared span intents (2026-10-17, in progress)
+
+Prove native authored metre alignment in Knot before extracting editing overlap
+with Woodshed. Each source syllable has an optional explicit positive span (or
+unplaced value); omitted records retain legacy ordinal placement. Stress heights,
+pronunciation evidence, exact source identities and rhyme arcs stay independent
+of authored alignment. Metre positions are not playback durations.
+
+Done conditions: native pointer and keyboard edit/cancel/reopen over the shared
+surface; source/pronunciation preservation and stale proposal refusal; portable
+Graphshell rendering and local-copy editing; one bounded revision-qualified
+intent contract used by both real owners, with domain validation and persistence
+remaining in those owners. Read-only imports never gain source mutation authority.
+
+Implementation: `scenomise::span_edit` now supplies checked move/start/end math,
+placed-span targets and source/revision/occurrence/lane/before-qualified intents.
+Metre and Woodshed adapters accept the same contract; they retain their own
+history, source checks and durable writes. Zero movement preserves off-grid
+source spans. Graphshell offers explicit local-copy editing, preview/cancel and
+portable export; source imports retain read-only authority. The standalone
+product WebAssembly check and dependency boundaries pass. Native and browser
+acceptance receipts remain in progress; compilation alone does not close them.
+The web lockfile reconciles two missing `zeroize` edges from the fetched
+owner-admission supplier update; no web Git source pins change.

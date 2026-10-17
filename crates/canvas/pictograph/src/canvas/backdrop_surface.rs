@@ -379,7 +379,16 @@ impl BackdropSurface {
                     commands.push(path(
                         &rect(at, size.w * fit.scale_x, size.h * fit.scale_y),
                         true,
-                        Some(alpha(color, if forward { 0.32 } else { 0.16 })),
+                        Some(alpha(
+                            color,
+                            if forward {
+                                0.58
+                            } else if mark.role == MarkRole::StrongStress {
+                                0.50
+                            } else {
+                                0.16
+                            },
+                        )),
                         Some(stroke(alpha(color, 0.45), 1.0, None)),
                     ));
                 }
