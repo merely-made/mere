@@ -137,7 +137,7 @@ fn frame_controls_do_not_skin_the_graphs_semantic_hit_targets() {
             &device,
             &states,
         );
-        let save = taproot::matching(
+        let save = taproot::matching_estimated_fixture(
             surface.dom,
             &taproot::Selector::role("button").with_attr("data-action", "save"),
         )[0];

@@ -341,7 +341,22 @@ fn semantic_name_precedence_does_not_change_explicit_class_text_selectors() {
     );
     assert!(receipt.starts_with("RESULT ok"), "{receipt}");
     assert_eq!(h.state().count, 1);
+    assert!(
+        h.resolve(&taproot::Selector::role("button").containing("Shared action"))
+            .is_some(),
+        "the direct harness resolver uses the retained semantic name"
+    );
+    assert!(
+        h.resolve(&taproot::Selector::class("semantic-control").containing("Visual label"))
+            .is_some(),
+        "class selectors keep their DOM text contract"
+    );
     for label in ["Visual label", "Superseded label"] {
+        assert!(
+            h.resolve(&taproot::Selector::role("button").containing(label))
+                .is_none(),
+            "raw DOM text and aria-label cannot override the retained name"
+        );
         let (receipt, h) = run(
             "semantic-no-fallback",
             &format!("click role:button {label}\n"),
@@ -561,7 +576,7 @@ fn exercise_editor_click(selector: taproot::Selector) {
     let toolbar = taproot::Selector::class("toolbar");
     let before = host.resolve(&toolbar).expect("toolbar is laid out");
     let textbox = host
-        .with_dom(|dom| taproot::matching(dom, &taproot::Selector::role("textbox")))
+        .with_dom(|dom| taproot::matching_estimated_fixture(dom, &taproot::Selector::role("textbox")))
         .into_iter()
         .next()
         .expect("textbox is in the DOM");

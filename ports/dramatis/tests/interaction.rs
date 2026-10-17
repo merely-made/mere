@@ -186,7 +186,7 @@ fn focus_follow_preserves_manual_scrolling_until_focus_changes() {
     let mut h = host(false, false, 420.0);
     h.set_ui_zoom(2.0);
     let delete =
-        h.with_dom(|dom| taproot::matching(dom, &Selector::role("button").containing("Delete"))[0]);
+        h.with_dom(|dom| taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Delete"))[0]);
     for _ in 0..12 {
         if h.focus() == Some(delete) {
             break;
@@ -213,8 +213,8 @@ fn focus_follow_preserves_manual_scrolling_until_focus_changes() {
 fn locked_persona_controls_are_excluded_from_keyboard_order() {
     let mut h = host(true, false, 420.0);
     let disabled = h.with_dom(|dom| {
-        let mut nodes = taproot::matching(dom, &Selector::role("button").containing("Family"));
-        nodes.extend(taproot::matching(
+        let mut nodes = taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Family"));
+        nodes.extend(taproot::matching_estimated_fixture(
             dom,
             &Selector::role("button").containing("Work"),
         ));

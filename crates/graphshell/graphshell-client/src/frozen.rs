@@ -1753,7 +1753,7 @@ mod tests {
 
     #[test]
     fn a_probe_can_reach_every_instance_by_carried_identity() {
-        use taproot::{ProbeSurface, Selector, resolve};
+        use taproot::{ProbeSurface, Selector, resolve_estimated_fixture};
 
         let names = named(&[
             ("fixture.map", "harbor", "Harbor"),
@@ -1773,8 +1773,8 @@ mod tests {
         for instance in &frozen.instances {
             let selector = Selector::role("graphics-symbol")
                 .with_attr("data-source-id", instance.source.id.clone());
-            let by_symbol = resolve(&surfaces, &selector);
-            let by_object = resolve(
+            let by_symbol = resolve_estimated_fixture(&surfaces, &selector);
+            let by_object = resolve_estimated_fixture(
                 &surfaces,
                 &Selector::role("graphics-object")
                     .with_attr("data-source-id", instance.source.id.clone()),
@@ -1789,7 +1789,7 @@ mod tests {
 
     #[test]
     fn a_probe_resolves_an_instance_by_its_announced_name() {
-        use taproot::{ProbeSurface, Selector, resolve, text_present};
+        use taproot::{ProbeSurface, Selector, resolve_estimated_fixture, text_present};
 
         let names = named(&[("fixture.map", "harbor", "Harbor")]);
         let frozen = FrozenScene::freeze(&coastal(), "Coastal map", &names);
@@ -1804,12 +1804,12 @@ mod tests {
         // The aria-label path: a scenario written against what a person hears
         // resolves the same element as one written against the id.
         assert!(
-            resolve(
+            resolve_estimated_fixture(
                 &surfaces,
                 &Selector::role("graphics-object").containing("Harbor")
             )
             .is_some()
-                || resolve(
+                || resolve_estimated_fixture(
                     &surfaces,
                     &Selector::role("graphics-symbol").containing("Harbor")
                 )
@@ -1825,7 +1825,7 @@ mod tests {
 
     #[test]
     fn two_instances_sharing_a_name_stay_distinguishable() {
-        use taproot::{ProbeSurface, Selector, resolve};
+        use taproot::{ProbeSurface, Selector, resolve_estimated_fixture};
 
         // The documented reason data attributes exist: a visible label that is
         // not unique. Two sources, one name.
@@ -1860,11 +1860,11 @@ mod tests {
             sheet: "",
         }];
 
-        let first = resolve(
+        let first = resolve_estimated_fixture(
             &surfaces,
             &Selector::role("graphics-symbol").with_attr("data-source-id", "first"),
         );
-        let second = resolve(
+        let second = resolve_estimated_fixture(
             &surfaces,
             &Selector::role("graphics-symbol").with_attr("data-source-id", "second"),
         );
@@ -1875,7 +1875,7 @@ mod tests {
         assert!(first.is_some(), "the first twin is unreachable by its id");
         assert!(second.is_some(), "the second twin is unreachable by its id");
         assert!(
-            resolve(
+            resolve_estimated_fixture(
                 &surfaces,
                 &Selector::role("graphics-symbol").with_attr("data-source-id", "third"),
             )

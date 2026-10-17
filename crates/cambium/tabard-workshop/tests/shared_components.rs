@@ -65,7 +65,7 @@ fn by_id(host: &Host, id: &str) -> NodeId {
 
 fn selector_node(host: &Host, selector: &Selector) -> NodeId {
     host.with_dom(|dom| {
-        let nodes = taproot::matching(dom, selector);
+        let nodes = taproot::matching_estimated_fixture(dom, selector);
         assert_eq!(nodes.len(), 1, "ambiguous target {selector:?}");
         nodes[0]
     })
