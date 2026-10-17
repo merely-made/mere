@@ -1,0 +1,358 @@
+{
+  "schema": "mere.resident-inference/architecture-mistral-cpu/v1",
+  "recorded_utc": "2026-10-17T08:36:10.370466+00:00",
+  "phase": "I9 in progress",
+  "native_cpu_complete": true,
+  "native_gpu_complete": false,
+  "source_commit": "2b1c63300a8172422f39d092b219a3f9133157ae",
+  "production_source_binding": {
+    "path": "support/receipts/resident_inference_architecture_primitives.json",
+    "sha256": "5ae821fe2723f7e5ca3a717caf484548f2bc27e94f75d9d6b3e363bae7a0c507",
+    "scope": "ESP production source and Distillery library-owner source unchanged from aa581385; new trained-model fixture and reference tooling only."
+  },
+  "source_git_blob_sha256": {
+    "crates/intel/esp/tests/mistral_library.rs": "286faeba03f3009690a61ff9416ba139f6c1ffd1d12482073210b9d21bca16d9",
+    "crates/intel/esp/tests/mistral_7b_reference.json": "6fb1599d4bbcee57cd7c046578feb67b28b2ff68ba8dc05f7eefe79afb87faa8",
+    "crates/intel/esp/templates/mistral-instruct-v01.json": "092c62dac3621a6f695108e5b74eb5377b6db67f3c395b28665d656bae5d0c0a",
+    "crates/intel/esp/tests/reference_architectures.py": "467a85dd430ff9cf96dc504ae3d177585ab875343c82edcf553dcaa0bcf69ab6"
+  },
+  "input_catalog": {
+    "model": "mistralai/Mistral-7B-Instruct-v0.1",
+    "revision": "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+    "gated": false,
+    "license": "apache-2.0",
+    "files": [
+      {
+        "name": "config.json",
+        "bytes": 571
+      },
+      {
+        "name": "generation_config.json",
+        "bytes": 116
+      },
+      {
+        "name": "model-00001-of-00002.safetensors",
+        "bytes": 9942981696
+      },
+      {
+        "name": "model-00002-of-00002.safetensors",
+        "bytes": 4540516344
+      },
+      {
+        "name": "model.safetensors.index.json",
+        "bytes": 25125
+      },
+      {
+        "name": "tokenizer.json",
+        "bytes": 1795188
+      },
+      {
+        "name": "tokenizer_config.json",
+        "bytes": 2103
+      }
+    ],
+    "input_bytes": 14485321143
+  },
+  "payload": {
+    "model": "mistralai/Mistral-7B-Instruct-v0.1",
+    "revision": "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+    "source_dtype_counts": {
+      "BF16": 291
+    },
+    "tensors": 291,
+    "raw_tensor_payload_bytes": 14483464192,
+    "f32_tensor_payload_bytes": 28966928384,
+    "largest_f32_tensor_bytes": 524288000,
+    "largest_core_raw_bytes": 436224000,
+    "shared_raw_bytes": 524296192,
+    "scope": "Actual pinned safetensors headers; no parameter-label estimate."
+  },
+  "reference": {
+    "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
+    "revision": "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+    "torch": "2.14.1+cpu",
+    "transformers": "4.57.6",
+    "dtype": "torch.float32",
+    "attention": "eager",
+    "max_tokens": 8,
+    "reference": "cached Transformers greedy tokens",
+    "official_template_match": true,
+    "template_sha256": "092c62dac3621a6f695108e5b74eb5377b6db67f3c395b28665d656bae5d0c0a",
+    "artifacts": {
+      "config.json": "cf25cdf4719f181d1d1d371973285d9afe9afde0d0c6a6fd48de857555ce1e0d",
+      "generation_config.json": "afcf2a1da583dbeb66bb367a759713901e23ce19ed83ed8f5a21b0e877addd5b",
+      "tokenizer.json": "11c08db21487c885d8c792180f0be237f6a261b89a46f128a6a80a3aa4bd1720",
+      "tokenizer_config.json": "475361439e5c012de9dffdedc416a66a50f1a29f7aa80b375ba014fb13d6bb8a",
+      "model.safetensors.index.json": "c94ab46aaf5fcca44720c10bcc498c1b0d9759d47534a396e3512edc451ebd06",
+      "model-00001-of-00002.safetensors": "a464228d9c9427bf035cfd5a2e18bf0494d7231bfacc478ec5fc9f57a612d051",
+      "model-00002-of-00002.safetensors": "5734c77cf2ff6482713d474ee9c8791cd712b59dd36b05d096af5a4cb41f3f02"
+    },
+    "rows": [
+      {
+        "question": "What is the capital of France?",
+        "prompt": "<s> [INST] What is the capital of France? [/INST]",
+        "prompt_ids": [
+          1,
+          733,
+          16289,
+          28793,
+          1824,
+          349,
+          272,
+          5565,
+          302,
+          4843,
+          28804,
+          733,
+          28748,
+          16289,
+          28793
+        ],
+        "token_ids": [
+          415,
+          5565,
+          302,
+          4843,
+          349,
+          5465,
+          28723
+        ],
+        "text": "The capital of France is Paris.",
+        "seconds": 131.89099999994505
+      },
+      {
+        "question": "What is two plus two?",
+        "prompt": "<s> [INST] What is two plus two? [/INST]",
+        "prompt_ids": [
+          1,
+          733,
+          16289,
+          28793,
+          1824,
+          349,
+          989,
+          3285,
+          989,
+          28804,
+          733,
+          28748,
+          16289,
+          28793
+        ],
+        "token_ids": [
+          6005,
+          3285,
+          989,
+          349,
+          2308,
+          28723
+        ],
+        "text": "Two plus two is four.",
+        "seconds": 113.73400000005495
+      }
+    ]
+  },
+  "reference_memory": {
+    "command": [
+      "C:/t/cargo-targets/mere/reference-python/Scripts/python.exe",
+      "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference\\crates\\intel\\esp\\tests\\reference_architectures.py",
+      "real",
+      "C:\\Users\\mark_\\.cache\\huggingface\\hub\\models--mistralai--Mistral-7B-Instruct-v0.1\\snapshots\\ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+      "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference\\crates\\intel\\esp\\templates\\mistral-instruct-v01.json",
+      "mistralai/Mistral-7B-Instruct-v0.1",
+      "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+      "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral-reference.json"
+    ],
+    "exit_code": 0,
+    "seconds": 282.155999999959,
+    "samples": 139,
+    "sample_interval_seconds": 2,
+    "physical_ram_bytes": 33515835392,
+    "peak_sampled_process_tree_rss_bytes": 11479498752,
+    "peak_sampled_sum_os_highwater_bytes": 12719235072,
+    "scope": "Reference process and venv launcher only; sum of OS high-water observations is conservative across child lifetimes, not a system-memory or GPU measurement.",
+    "cpu_placement_limit_bytes": 4000000000,
+    "max_tokens": 8
+  },
+  "native_monitor": {
+    "command": [
+      "C:/t/cargo-targets/mere/build/release/deps/mistral_library-4cdab6db2be78bee.exe",
+      "--ignored",
+      "--exact",
+      "streamed_mistral_cpu_matches_reference",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "cwd": "C:\\Users\\mark_\\Code\\worktrees\\mere-resident-inference",
+    "exit_code": 0,
+    "seconds": 1834.405999999959,
+    "physical_ram_bytes": 33515835392,
+    "peak_sampled_process_rss_bytes": 3488649216,
+    "peak_os_process_working_set_bytes": 3489468416,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_total_mib": 8188,
+    "peak_sampled_whole_gpu_used_mib": 7639,
+    "gpu_scope": "whole GPU including unrelated applications; not per-process allocation",
+    "samples": 868,
+    "sample_interval_seconds": 2,
+    "executable_sha256": "af1abce1f5e2d2208b1ed4d35b8572c24509a1ce587bea0ec3ad15475877b071",
+    "log_sha256": "aa0dd97e8c25da97b55e2fe4de69433f3094101b3c685e057d872a122d6cb4d2"
+  },
+  "native_result": {
+    "dtype": "f32",
+    "loader": "burn-flex",
+    "model": "mistralai/Mistral-7B-Instruct-v0.1",
+    "options": {
+      "max_layer_bytes": 536870912,
+      "max_shared_bytes": 2147483648,
+      "query_chunk": 32
+    },
+    "reads": {
+      "encoded_bytes_read": 307102415136,
+      "expert_encoded_bytes_read": 0,
+      "expert_reads": 0,
+      "largest_encoded_expert": 0,
+      "largest_encoded_layer": 436225024,
+      "layer_reads": 704
+    },
+    "resume": {
+      "boundary": 3,
+      "serialized_checkpoint": true,
+      "token_ids": [
+        6005,
+        3285,
+        989,
+        349,
+        2308,
+        28723
+      ]
+    },
+    "revision": "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+    "row": "blake3:60ac2c990f938b4c25a9a03853984be047c49e327aacdc4c1986b47584d4ab90",
+    "rows": [
+      {
+        "question": "What is the capital of France?",
+        "seconds": 655.7378405,
+        "text": "The capital of France is Paris.",
+        "token_ids": [
+          415,
+          5565,
+          302,
+          4843,
+          349,
+          5465,
+          28723
+        ]
+      },
+      {
+        "question": "What is two plus two?",
+        "seconds": 542.0247269,
+        "text": "Two plus two is four.",
+        "token_ids": [
+          6005,
+          3285,
+          989,
+          349,
+          2308,
+          28723
+        ]
+      }
+    ],
+    "scope": "Streamed trained-family model-library row on one computer; no whole-model residence, installed resident or largest-per-family claim",
+    "session": {
+      "prompt_template_hash": "blake3:b1963cdb023dd4bd8dedd56c61194be3bec008aabf5b3350f646ead3921501e2",
+      "session_id": "blake3:70624be5d67203f5668681692feca859a263f26d5dbcfe5cc64b559606cd37ee"
+    }
+  },
+  "library_bytes": 18658930688,
+  "logical_layer_bytes_per_forward": 13959200688,
+  "read_scope": "Verified logical core-layer payload reads including OS-cache hits. Shared-artifact loading, source verification/import and physical disk traffic are not included in these counters.",
+  "timing_scope": "CPU test overlaps the 57B GPU fixture. Total case time includes source verification/import and checkpoint checks; this is not isolated throughput.",
+  "checkpoint_scope": "JSON round-trip at token 3 and continuation on the same provider; store closes and reopens after completion. No process restart or whole-model residence claim.",
+  "reference_byte_scope": "The raw reference output has Windows CRLF; the tracked reference uses canonical LF. JSON values and token vectors are identical. Template bytes are canonical LF and their hash is asserted.",
+  "additional_completed_consumer_checks": [
+    {
+      "name": "automatic-cpu-final",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\inference_automatic-dedcfa39fb1ad8f1.exe",
+        "--exact",
+        "ordinary_asks_discover_keyed_stages_and_recover_when_a_worker_leaves",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 54.04700000002049,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\automatic-cpu-final.log",
+      "log_sha256": "da1bdbaccf8600772ca0e58c847aa02d84601dfb153b53c6857adc4675489fc8",
+      "executable_sha256": "0360b4f00e4e39711bd384865e8bbd196999c567c0dce3f88a6d5162411cf9e3",
+      "summary": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 53.21s"
+      ]
+    },
+    {
+      "name": "route-final",
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\inference_route-3396a9e995fd86d5.exe",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 32.04599999997299,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i9\\route-final.log",
+      "log_sha256": "b1479405e04baa7dc86b63dc7f6db2f69e34e52cc387c416179c9b9789bd99d7",
+      "executable_sha256": "13c65aa4d12f2b97ee3e27d7c568e28561767d4aca6ae4550a066bac8e76a70d",
+      "summary": [
+        "test result: ok. 4 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 31.15s"
+      ]
+    }
+  ],
+  "djinn_full_unit": {
+    "passed": 219,
+    "failed": 1,
+    "remaining_test": "resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route",
+    "source_unchanged_from": "8498608c",
+    "separate_baseline_rebuild": false,
+    "identity_fixture": "Initial CRLF failure passes after restoring canonical Git LF bytes in focused worktree; primary checkout rule/fixture WIP untouched."
+  },
+  "evidence": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral-canonical-build.log",
+      "sha256": "249482b7a1588a22c04d0a6af61a5fba782e059d8676df5ddff3b674a5fc47ad"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral-reference.log",
+      "sha256": "4d5f7b0f60b98b4ea8c3f1782e306706b3287173d8e3306d459162ec2b5a5ed7"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral-reference-memory.json",
+      "sha256": "adeab44f5e7730922a817b3519ef2fd74a05727d0d4ecf33a9081d69db64934b"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral-cpu-final.log",
+      "sha256": "aa0dd97e8c25da97b55e2fe4de69433f3094101b3c685e057d872a122d6cb4d2"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\mistral-cpu-final.json",
+      "sha256": "b14056323c8ddf58daebf12a3f442f1f7673f7d25d5444c757f746c2c05a849d"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\djinn-unit-canonical-lf.log",
+      "sha256": "b2fe0980a3d9692570e8764ed05f22257de6699b69c784a6f00a3c8add51df0a"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\identity-canonical-lf.log",
+      "sha256": "38f23ed45a51773366461137544c17bd885d21415ef20d7d281bedbfd74b2666"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\consumer-resumed-build.log",
+      "sha256": "496fe28e6f9d72d3926f5621d5ab1945b19fb1d92d24abaf1a4acabd0aa811c9"
+    }
+  ],
+  "open_gates": [
+    "Mistral GPU row",
+    "57B serialized checkpoint/provider reload",
+    "Remaining GPU consumer checks",
+    "Largest-per-family and further R12 coverage"
+  ],
+  "scope": "One physical O-PC; trained Mistral CPU model-library row and listed completed consumer regressions only. I9 is not complete."
+}

@@ -20,7 +20,9 @@ owner-budgeted residence, leased stages or local streaming through `automatic`
 JSON settings. Worker departure resumes the same checkpoint locally. Physical
 second-computer and installed-binary receipts remain separate. I9 is in progress:
 the dense variants and Qwen2 routed/shared experts have independent small
-references; final consumer, GPU and larger-than-RAM qualification is running.
+references. The 57B streamed GPU row matches both reference answers, and the
+trained Mistral CPU library row passes. Recovery and remaining GPU checks are
+running; largest-per-family and broader-family gates remain open.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -698,8 +700,9 @@ bytes before acquisition. This is an explicit exception to the default
 inputs, not duplicate consolidated formats. The first native streamed-expert
 ask now matches sixteen independent reference tokens; its
 [receipt](../../../support/receipts/resident_inference_architecture_first_ask.json)
-covers one physical computer. The remaining reference question and recovery
-checks are running; fleet and largest-per-family qualification remain open.
+covers one physical computer. The second question also matches six tokens and
+ends at EOS; recovery checks are running. Fleet and largest-per-family
+qualification remain open.
 
 Dense-family trained row (2026-10-17): add `mistralai/Mistral-7B-Instruct-v0.1`
 at `ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca`, ungated Apache-2.0, with its
@@ -1576,9 +1579,10 @@ Stop and record the reason if any of these happen:
     per single-token decode step. The observed process working-set peak is
     10,769,522,688 bytes, including import; final monitoring is still running.
     The [first-ask receipt](../../../support/receipts/resident_inference_architecture_first_ask.json)
-    freezes the completed-question log prefix. The naturally terminating second
-    reference question and serialized checkpoint/provider-reload recovery are
-    still open. This is a local GPU/library fixture, not an installed resident
+    freezes the first completed-question log prefix. The second question also
+    matches all six reference tokens and ends at EOS in **1,778.792 seconds**.
+    Serialized checkpoint/provider-reload recovery is still open. This is a
+    local GPU/library fixture, not an installed resident
     or a complete graph-key fleet inventory.
   - Both final small-Qwen CPU model-library rows pass. Djinn's seven inference
     unit tests pass. Its initial full unit run has 218 passes and two failures.
@@ -1588,10 +1592,24 @@ Stop and record the reason if any of these happen:
     untouched. The full rerun has **219 passes and one failure** in the unchanged
     route-projection expectation. Its source equals the upstream base; no
     separate baseline rebuild was performed. The documentation judgment audit
-    has the same 16 findings as before this work. All 22 changed Rust files
+    has the same 16 findings as before this work. All 23 changed Rust files
     pass formatting.
-  - The remaining consumer build and final small-Qwen model-library regressions
-    are running. The [primitive checkpoint receipt](../../../support/receipts/resident_inference_architecture_primitives.json)
+  - The trained Mistral 7B CPU library row passes both natural-EOS reference
+    answers, JSON checkpoint continuation from token 3, and library release and
+    reopen. Its actual f32 tensor payload is **28,966,928,384 bytes**; the
+    observed native working-set peak is **3,489,468,416 bytes**, including
+    import. Its **18,658,930,688-byte** library streams 704 layers and
+    307,102,415,136 verified logical layer bytes over the full fixture. The
+    **1,832.17-second** CPU case overlaps the 57B GPU fixture; it is not an
+    isolated throughput measurement. Its data template matches the pinned
+    tokenizer's official rendering. The [Mistral CPU receipt](../../../support/receipts/resident_inference_architecture_mistral_cpu.json)
+    records exact inputs, sessions, tokens and measurement scope. The trained
+    GPU row is queued behind the other GPU checks.
+  - The resumed consumer build completes successfully. CPU automatic placement
+    and all four app-route cases pass, including keyed-device continuation.
+    GPU automatic placement, trainer reclaim, retained-version recall and the
+    final small-Qwen GPU regressions are queued. The
+    [primitive checkpoint receipt](../../../support/receipts/resident_inference_architecture_primitives.json)
     binds completed checks, source and binary hashes, independent references,
     failed attempts and the exact evidence boundaries. It does not qualify the
     native large-model run. Largest-per-family qualification, further families,
