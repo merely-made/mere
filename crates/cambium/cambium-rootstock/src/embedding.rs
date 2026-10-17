@@ -275,6 +275,7 @@ impl<P: TextureProducer> View<P> {
             return Err(crate::PortableProducerError::InvalidSource);
         }
         let info = ProducerFrameInfo {
+            purpose: crate::ProducerFramePurpose::Presentation,
             logical_size: (self.placement.bounds[2], self.placement.bounds[3]),
             physical_size: self.placement.physical_size(),
             layout_scale: self.placement.scale,

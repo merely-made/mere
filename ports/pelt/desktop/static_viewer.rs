@@ -2672,6 +2672,17 @@ pub(crate) mod windowed {
                     let editable = action.editable;
                     self.apply_action(action);
                     if event.state == ElementState::Pressed
+                        && !self.modifiers.meta
+                        && !(self.modifiers.control && !self.modifiers.alt)
+                        && matches!(&event.logical_key, Key::Character(_) | Key::Named(NamedKey::Space))
+                        && let Some(text) = event.text.as_deref().or_else(||
+                            matches!(&event.logical_key, Key::Named(NamedKey::Space)).then_some(" "))
+                            .filter(|text| !text.is_empty() && text.chars().all(|c| !c.is_control()))
+                    {
+                        let action = self.doc.input(SessionInput::KeyboardText(text.to_owned()));
+                        self.apply_action(action);
+                    }
+                    if event.state == ElementState::Pressed
                         && !handled
                         && !editable
                         && let Some(key) =
