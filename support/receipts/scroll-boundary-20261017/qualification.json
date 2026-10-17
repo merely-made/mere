@@ -1,6 +1,6 @@
 {
   "schema": "mere-document-scroll-qualification/v1",
-  "status": "qualified locally; publication pending",
+  "status": "qualified and published",
   "code_revision": "2d95d95e9d843ed6ebb0d38f47f77444823834bb",
   "base_revision": "df30e97dddcf8f3dc5e9f0da93c76350687212e6",
   "source_changes": [
@@ -38,5 +38,5 @@
     "Background occluded receiving attempt excluded; foreground Finder retry passes on same product binary.",
     "Related graph-label overlap remains, also present in qualified October15 capture; camera/scroll acceptance does not claim label-layout polish."
   ],
-  "publication": "Supplier and consumer commits await requested publication approval; canonical Git cache was seeded from exact local candidate for qualification."
+  "publication": "Supplier qualification through 1eba417eb and consumer qualification through b01c922 published to main on 2026-10-17; see publication.json"
 }
