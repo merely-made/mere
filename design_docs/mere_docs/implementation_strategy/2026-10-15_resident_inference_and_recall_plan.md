@@ -20,9 +20,10 @@ owner-budgeted residence, leased stages or local streaming through `automatic`
 JSON settings. Worker departure resumes the same checkpoint locally. Physical
 second-computer and installed-binary receipts remain separate. I9 is in progress:
 the dense variants and Qwen2 routed/shared experts have independent small
-references. The 57B streamed GPU row matches both reference answers, and the
-trained Mistral CPU library row passes. Recovery and remaining GPU checks are
-running; largest-per-family and broader-family gates remain open.
+references. The 57B streamed GPU row matches both reference answers and
+serialized checkpoint/provider-reload recovery; the trained Mistral CPU
+library row also passes. Remaining GPU checks are running; largest-per-family
+and broader-family gates remain open.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -700,8 +701,9 @@ bytes before acquisition. This is an explicit exception to the default
 inputs, not duplicate consolidated formats. The first native streamed-expert
 ask now matches sixteen independent reference tokens; its
 [receipt](../../../support/receipts/resident_inference_architecture_first_ask.json)
-covers one physical computer. The second question also matches six tokens and
-ends at EOS; recovery checks are running. Fleet and largest-per-family
+covers one physical computer. The [full native MoE receipt](../../../support/receipts/resident_inference_architecture_moe.json)
+adds the naturally terminating six-token second answer and exact serialized
+checkpoint/provider-reload recovery. Fleet and largest-per-family
 qualification remain open.
 
 Dense-family trained row (2026-10-17): add `mistralai/Mistral-7B-Instruct-v0.1`
@@ -1577,12 +1579,18 @@ Stop and record the reason if any of these happen:
     **3,088.095 seconds** after loading, including **1,352.851 seconds** to the
     first token. It makes 7,990 verified expert reads overall and exactly 224
     per single-token decode step. The observed process working-set peak is
-    10,769,522,688 bytes, including import; final monitoring is still running.
+    10,769,522,688 bytes, including import. The sampled whole-GPU peak is
+    7,659 MiB of 8,188 MiB, including other applications.
     The [first-ask receipt](../../../support/receipts/resident_inference_architecture_first_ask.json)
     freezes the first completed-question log prefix. The second question also
     matches all six reference tokens and ends at EOS in **1,778.792 seconds**.
-    Serialized checkpoint/provider-reload recovery is still open. This is a
-    local GPU/library fixture, not an installed resident
+    JSON checkpoint recovery at token 3 drops the provider, synchronizes the
+    device and reloads the same row/store/session; its sixteen resumed tokens
+    also match exactly. The **9,511.22-second** full case passes. The
+    [MoE receipt](../../../support/receipts/resident_inference_architecture_moe.json)
+    binds the completed fixture and measured counters. Recovery is within one
+    process, using the same open store. This is a local GPU/library fixture,
+    not an installed resident
     or a complete graph-key fleet inventory.
   - Both final small-Qwen CPU model-library rows pass. Djinn's seven inference
     unit tests pass. Its initial full unit run has 218 passes and two failures.
