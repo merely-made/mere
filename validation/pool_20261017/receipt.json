@@ -1,0 +1,77 @@
+{
+  "schema": "mere.pool-workspace-prototype/v1",
+  "date": "2026-10-17",
+  "status": "first local prototype qualified; provisional presentation and material envelope",
+  "source": "source.json",
+  "runtime": "runtime.json",
+  "checks": {
+    "shared_model": {
+      "passed": 1,
+      "log": "pool-inker.log"
+    },
+    "port_boundaries": {
+      "passed": true,
+      "log": "pool-boundaries-final.log"
+    },
+    "wasm_build": {
+      "passed": true,
+      "log": "pool-web-build-qualified.log",
+      "toolchain": "rustup 1.99.1",
+      "features": "product,presentation-webgpu",
+      "stack_bytes": 16777216
+    },
+    "headed_browser": {
+      "passed": true,
+      "runs": [
+        "pool",
+        "pool_reopen",
+        "pool_empty_reopen",
+        "pool_text",
+        "pool_text_reopen"
+      ],
+      "page_loads": 5,
+      "captures": 8,
+      "renderer": "BrowserWebGpu through existing shared host RenderCore",
+      "page_errors": [],
+      "gate_failures": [],
+      "covers": [
+        "real Woodshed progression Djot material added to workspace Pool",
+        "switch to metre sample then reopen independent held progression; held item unchanged",
+        "fresh-page reopening from IndexedDB",
+        "explicit removal persists through another fresh page",
+        "ordinary plain text uses the same Pool and survives another fresh page",
+        "export action prepares download and reports success"
+      ],
+      "export_download_bytes_qualified": false,
+      "visual_review": "All eight full-frame captures inspected at 1280x720 logical viewport. Pool controls and material are legible. With Pool expanded, existing Graphshell chrome crowds the scene overview below the viewport; this is utility/functional evidence, not final full-scene layout acceptance.",
+      "storage_policy": "IndexedDB reopened successfully; this browser reports storage is not persistent and may be evicted."
+    },
+    "native_knot": {
+      "receipt": "/Users/markik/Code/worktrees/knot-portable-metre/docs/receipts/2026-10-17_pool/receipt.json",
+      "tests_passed": 3,
+      "native_processes": 3,
+      "captures": 6,
+      "temporary_local_supplier_cohort": true
+    }
+  },
+  "design": {
+    "name": "Pool, provisional name accepted by Mark",
+    "shared_code": "inker::pool; no standalone crate",
+    "content": "independent UTF-8 plain text or Djot, optional provenance address",
+    "lifetime": "no application expiry; explicit removal; browser storage policy applies",
+    "authority": "reading a Pool never follows provenance or mutates source",
+    "host_persistence": "Graphshell origin-wide key workspace/pool/v1; Knot file beside workspace preferences",
+    "app_scope": "workspace-local to each host, no cross-application sync"
+  },
+  "excluded_attempts": {
+    "pool-initial-desktop-harness-failure": "Prior toolbar build performed add/open, but its scenario expected compact Graph tools controls that do not exist at this wider viewport. Receipt retained as failed; final desktop scenario uses direct portable-scene controls.",
+    "pool-initial-reopen-before-toolbar-refinement": "Passing reopen/removal on the earlier toolbar, kept separately and excluded from final-build counts."
+  },
+  "limits": [
+    "Native Woodshed Pool UI is not added in this slice; its real portable progression export is exercised in Graphshell.",
+    "Knot canonical supplier dependency integration remains separate; native receipt uses a temporary local cohort and restores its canonical lockfile.",
+    "Pocket/minimap Swatch presentation, drag/drop, grouping, richer previews and binary assets remain open.",
+    "Template application remains separate from content insertion.",
+    "No full file-picker/download roundtrip, external accessibility or other-platform qualification claimed."
+  ]
+}

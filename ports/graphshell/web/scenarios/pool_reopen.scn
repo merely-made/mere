@@ -1,0 +1,13 @@
+settle 12
+click role:button Pool
+settle 3
+assert text 1 item
+click role:button Open Pool scene
+settle 5
+assert text Opened independent Pool material
+capture 03_pool_reopened
+click role:button Remove from Pool
+settle 20
+assert text Pool saved in this workspace
+assert text Pool is empty
+capture 04_pool_removed

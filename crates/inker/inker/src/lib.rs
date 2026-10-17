@@ -41,6 +41,9 @@ pub mod routing;
 /// Portable document model — what engines produce.
 pub mod document;
 
+/// Workspace-held independent document material, with host-owned storage.
+pub mod pool;
+
 /// Engine trait and registry.
 pub mod engine;
 

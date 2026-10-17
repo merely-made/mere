@@ -141,14 +141,14 @@ pub(super) struct Pane {
     pending: Option<Result<String, String>>,
     import_generation: u64,
     surface: Option<BackdropSurface>,
-    document: Option<SceneDocument>,
+    pub(super) document: Option<SceneDocument>,
     related: Option<BackdropSurface>,
     related_key: Option<String>,
-    sample: Option<usize>,
+    pub(super) sample: Option<usize>,
     error: String,
     revision: u64,
     export_url: Option<String>,
-    original: Option<SceneDocument>,
+    pub(super) original: Option<SceneDocument>,
     drag: Option<SpanDrag>,
 }
 impl Default for Pane {
@@ -180,7 +180,7 @@ impl Drop for Pane {
     }
 }
 impl Pane {
-    fn install(&mut self, json: &str) -> Result<(), String> {
+    pub(super) fn install(&mut self, json: &str) -> Result<(), String> {
         let document = SceneDocument::parse_text(json)?;
         let input = &document.primary;
         if let Some(surface) = self.surface.as_mut() {
@@ -526,24 +526,25 @@ pub(super) fn control(page: &TreePage) -> Child {
     )
 }
 fn export_recipe(json: &str) -> Result<String, String> {
-    let input = SceneDocument::parse(json)?;
+    let input = SceneDocument::parse_text(json)?;
     let bare = serde_json::from_str::<serde_json::Value>(json)
-        .map_err(|e| e.to_string())?
-        .get("format")
-        .is_none();
+        .ok().is_some_and(|value| value.get("format").is_none());
     let bytes = if bare {
         serde_json::to_vec_pretty(&input.primary)
     } else {
         serde_json::to_vec_pretty(&input)
     }
     .map_err(|e| e.to_string())?;
+    export_material(&bytes, "application/json", "scene-recipe.json")
+}
+pub(super) fn export_material(bytes: &[u8], media_type: &str, filename: &str) -> Result<String, String> {
     let document = web_sys::window()
         .and_then(|w| w.document())
         .ok_or("No browser document")?;
     let parts = js_sys::Array::new();
-    parts.push(&js_sys::Uint8Array::from(bytes.as_slice()));
+    parts.push(&js_sys::Uint8Array::from(bytes));
     let options = web_sys::BlobPropertyBag::new();
-    options.set_type("application/json");
+    options.set_type(media_type);
     let blob = web_sys::Blob::new_with_u8_array_sequence_and_options(&parts, &options)
         .map_err(|e| format!("Cannot prepare recipe export: {e:?}"))?;
     let url = web_sys::Url::create_object_url_with_blob(&blob)
@@ -558,7 +559,7 @@ fn export_recipe(json: &str) -> Result<String, String> {
             .set_attribute("href", &url)
             .map_err(|e| format!("Cannot set download URL: {e:?}"))?;
         anchor
-            .set_attribute("download", "scene-recipe.json")
+            .set_attribute("download", filename)
             .map_err(|e| format!("Cannot name recipe: {e:?}"))?;
         document
             .body()

@@ -4473,6 +4473,7 @@ dependencies = [
  "genet-scripted-dom",
  "graphshell",
  "graphshell-client",
+ "inker",
  "js-sys",
  "layout-dom-api",
  "mere",

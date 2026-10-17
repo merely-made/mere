@@ -710,6 +710,8 @@ engine adapters.
   source pair; CEF-enabled consumer, native and foreign accessibility gates
   stay distinct.)
 
+- **Pool workspace utility (2026-10-17):** provisional persistent holding utility in Graphshell and native Knot; shared independent text/Djot material in Inker, host-owned storage and insertion, no new crate. See the [active projection plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) and [qualification receipt](../validation/pool_20261017/receipt.json).
+
 ## nematic_docs/ — the smolweb engine and knot composition
 
 Same round trip as `inker_docs/` above. It describes `crates/nematic/`
