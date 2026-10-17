@@ -7,11 +7,11 @@
 //! The own llama-family decoder body (inference plan P1).
 //!
 //! HF-config-driven: [`config::DecoderConfig`] parses a HuggingFace
-//! `config.json` directly, so one body runs the open llama-family class
-//! (TinyLlama, Llama 3.2, SmolLM) from the standard artifact triple
-//! (`config.json` / `tokenizer.json` / `model.safetensors`) — the same
-//! triple `embed`'s BERT uses, and the byte shape the eidetic model
-//! corridor stores.
+//! `config.json` directly, so one body runs the Llama block (TinyLlama,
+//! SmolLM2) from the standard artifact triple (`config.json` /
+//! `tokenizer.json` / `model.safetensors`) — the same triple `embed`'s BERT
+//! uses, and the byte shape the eidetic model corridor stores. Configs and
+//! checkpoints outside that block are refused by name; see [`config`].
 //!
 //! Built from burn-nn primitives (`RmsNorm`, `RotaryEncoding`, `SwiGlu`)
 //! against the workspace burn pin; the GQA attention wiring in
@@ -24,6 +24,8 @@
 //! `InferenceProvider` impl are the next slices.
 
 pub mod attention;
+#[cfg(not(target_family = "wasm"))]
+pub mod checkpoint;
 pub mod config;
 pub mod generate;
 #[cfg(feature = "decoder-wgpu")]
@@ -35,7 +37,11 @@ pub mod lora;
 pub mod model;
 pub mod provider;
 pub mod sample;
+pub mod stage;
+pub mod streaming;
 pub mod tensors;
+pub mod weight_format;
+pub use weight_format::WeightFormat;
 #[cfg(feature = "decoder-lora")]
 pub mod train;
 #[cfg(feature = "decoder-autodiff")]
@@ -64,13 +70,13 @@ pub use sample::Sampler;
 #[cfg(feature = "decoder-lora")]
 pub use train::{
     LoraTrainerSettings, TRAINED_ADAPTER_FORMAT_VERSION, TRAINED_PEFT_VERSION, TrainedLoraAdapter,
-    TrainingCase, expected_token_rank, ranking_tally, train_peft_lora,
+    TrainingCase, expected_token_rank, ranking_tally, train_peft_lora, train_peft_lora_controlled,
 };
 // The v1 vocabulary rides with the loader, not with the trainer: a consumer
 // must be able to name a v1 adapter's version and settings on a build that
 // will never train one. Only the function is behind `decoder-autodiff`.
 #[cfg(feature = "decoder-autodiff")]
-pub use train_autodiff::train_peft_lora_autodiff;
+pub use train_autodiff::{train_peft_lora_autodiff, train_peft_lora_autodiff_controlled};
 #[cfg(feature = "decoder-lora")]
 pub use train_autodiff_settings::{
     AutodiffLoraSettings, TRAINED_ADAPTER_FORMAT_VERSION_AUTODIFF, TRAINED_PEFT_VERSION_AUTODIFF,

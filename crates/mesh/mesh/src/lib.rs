@@ -132,7 +132,7 @@ pub use wire::{
     JobKind, MeshEvent, MeshExt, MeshLogId, WireError, from_operation, to_operation,
     to_prune_operation, verify,
 };
-pub use worker::{HostOffer, WorkerAction, next_action};
+pub use worker::{HostOffer, WorkerAction, next_action, next_action_with_availability};
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

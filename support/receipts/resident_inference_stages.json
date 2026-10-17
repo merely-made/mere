@@ -1,0 +1,552 @@
+{
+  "schema": "mere.resident-inference/layer-stages-qualification/v1",
+  "recorded_date": "2026-10-16",
+  "host": "O-PC",
+  "native_source_commit": "60107aa15b0bfcace7e1e8e9584b4fe89ec2abe9",
+  "source_hash_definition": "SHA-256 of Git blob bytes at native_source_commit; working-tree CRLF may differ.",
+  "source_git_blob_sha256": {
+    "Cargo.lock": "3272173f91550d7f528eb61f8bcdd9710ad6ebda0f47d196cf66f53bfa8428b6",
+    "Cargo.toml": "6576fc57028b7b2d9b18beb7670f238c3a1aa9a1107eca857eaa489ab00459a1",
+    "crates/intel/esp/Cargo.toml": "26369d59daa61cb46b5a31c92f04ecd57a7bbad1229f63e2f3f6baa435c340ff",
+    "crates/intel/esp/README.md": "5eaf577893941ceab792f99d67a9f62d42fce2db9e50afeb61815106a312435e",
+    "crates/intel/esp/src/infer/decoder/attention.rs": "7e43aebdfa0c3dfe9c723574946c85e4d28df8779c274aa5090750e40c3833d7",
+    "crates/intel/esp/src/infer/decoder/loader.rs": "c8b3e64c46a6e784202f4e502eeeec85ed7e497f44ff43cefb4c52369683bdd7",
+    "crates/intel/esp/src/infer/decoder/mod.rs": "f9783c8814abd79498d101e9e612d4996b03f2783a4fd79b1ec642634f647b1e",
+    "crates/intel/esp/src/infer/decoder/model.rs": "1c8045851a0ab2a04ae4b9850d73772422766780663a05fa7973286375c34cd9",
+    "crates/intel/esp/src/infer/decoder/provider.rs": "002ecf86355b7e52408100675dfa943ab866e1ebcb15e9c3618b62eb4ec8ddcb",
+    "crates/intel/esp/src/infer/decoder/stage.rs": "656e891c875738009f0f4bcd8828dd99f095595051abd6db18d6034daa4882a9",
+    "crates/intel/esp/src/infer/decoder/weight_format.rs": "e3bd48d87fba07a895b813d920486ece462f2ee2fea1a811a5024919e7ab2f5a",
+    "crates/intel/esp/src/infer/layer_library.rs": "0aec13edf7e924e1b57bcf0a10806a99c194f7596cad03fcf57fbc8746240980",
+    "crates/intel/esp/src/infer/library.rs": "41ccc7a7bb645645ba3c71a3736f3ac4cfac2c5b97f4a786c8afddfdc9a6f474",
+    "crates/intel/esp/src/infer/provider.rs": "b9efa24c08c6ad7c7d5c2a9cbb2d4f1c7fd4e7f48dc8c240c7efff917b368157",
+    "crates/intel/esp/templates/smollm2-instruct-v1.json": "e74608112d6fa9812f416799ac7a6d8d63a50f4b98a20b470b05f018c0ee4daf",
+    "crates/intel/esp/tests/smollm2_360m_reference.json": "10eb7c94f68d06cea07779f16d7e90fc9a1fec583cf2a90f41b07b04688ce346",
+    "crates/mesh/mesh/src/lib.rs": "26ce10f04300c2cd42c8b986428f6d6dd263f6224378aa4c7de17afb489e4f82",
+    "crates/mesh/mesh/src/resource.rs": "965c619eb6f7271ee5750956659428bb2281fd8d3aa6e1dcb2ff2c508bdce8ac",
+    "crates/mesh/mesh/src/worker.rs": "06cb820b73a7c71fffb056988dd5ff12e7646359db5211e53b0f85f2153441aa",
+    "ports/distillery/Cargo.toml": "9c70783f72c0519f09276089065941975ba03b01fe25aefd7ac6c595ecaf6c00",
+    "ports/distillery/README.md": "61dabf0d25a39e5384288e53d62e3e7873988d1c0a5f0477e724ea99d440324e",
+    "ports/distillery/src/authority.rs": "fb7e717887a96f0452917adad6b75570d6a62fd71905856e5b3a586f976814d2",
+    "ports/distillery/src/gpu.rs": "b257d07eb4e280b79b9ce49b3cb56ca07c14513c20320d05dd68f797f9f71566",
+    "ports/distillery/src/inference.rs": "b23d0d54e6ad750b07d9ce4d7bc78d5f2809b6af49557518c8dbaa66adba6e16",
+    "ports/distillery/src/inference/durable.rs": "677b0fdf7055446d9b965c10309ee91ecbc805adaaa2ec19736017a20a0bcf3c",
+    "ports/distillery/src/inference/gpu.rs": "1bbe887d262ffcb746068998787fe2bb2fc655162bc34d11ea724d5a0368539d",
+    "ports/distillery/src/inference/recall.rs": "64f7d8e1851699cf59bfd1d7868d0e19841ec26b7256232861e3741f8537cbd8",
+    "ports/distillery/src/inference_stage.rs": "1edb4437938aeaac273d15cda91d6475c9a13dbcf944fab5169d0f6a2cb2a4f5",
+    "ports/distillery/src/inference_stage/fallback.rs": "8347ccd1241406c5694c52212010f4760ed11471e51ed7b1d9549ae0a53e6dd8",
+    "ports/distillery/src/inference_stage/lane.rs": "2a8543e09afe8c69fe7bd16b783f986b7cf76532e01f7469e67fe8a4f5f89dca",
+    "ports/distillery/src/lib.rs": "9c2060e287e0198bb28f3801a04d2f78d9ad30aeeb26e41b68d880181a9e707b",
+    "ports/distillery/src/mesh_host/host.rs": "de278ba0be5b6fab7d920e9e7240c89fa302245a577d84c85cf03110cc4c099f",
+    "ports/distillery/src/resident.rs": "c8ee565788868cda61a9825cfa4632bdfb32f3a23de1b40884608de3beae6049",
+    "ports/distillery/tests/inference_layered.rs": "bd22bec35f1d733ec02173bc40c002b1b3bc74a3b38852b24e3e0791c4c8ba58",
+    "ports/distillery/tests/inference_stages.rs": "8bb01127ff8d4f17c033e87fe1701e38fe6dfde160ac008f83303a5114912add",
+    "ports/djinn/Cargo.toml": "23f828fc813ca2bd7b6b093df5d780ac3a8a5cb37ecae37d85be0d7927d8c25b",
+    "ports/djinn/README.md": "df5a1970adfced8a57dc3ce728f8158e456ad2fd5532da09205602f42b2217aa",
+    "ports/djinn/src/bin/djinn.rs": "f48d30f0db4f0e4ac009f091279a1d594bf53a3e92b75c2a938348a365c5e761",
+    "ports/djinn/src/resident.rs": "223470f877cfddf215a85d509814285ec668494646f0280c046d6a2a09bf4163",
+    "ports/djinn/src/resident_distillery.rs": "20638c0cb0ed69213af818cf0f9ed1c3ceeb50daad1899e586446b4688244ca6",
+    "ports/djinn/src/resident_inference/personal.rs": "ed5bd8538e01550d9830bc66da44f5f9cfbbd683e0e76c56a299b1f984adc03d",
+    "ports/djinn/src/sync/personal_seals.rs": "cb8f466f46aedd664a54cf1a710ad7fbe2c034dfcfdc2165f14ad87f56154ba5",
+    "support/patches/cubek-matmul/src/multi_level/routines/selector/unit.rs": "0026bcd862583b734d67c9a5619863fa53301d6ec899e65b67b3ba1b24c9490c",
+    "support/run_resident_inference_stages.ps1": "052c2ffad4e831f857ff8af0b6d64601a6556903f6866b6d7a3c2bef5ae28d92"
+  },
+  "gate_complete": true,
+  "status": "I8 native gate complete: separately rooted leased GPU stages, exact token parity and checkpointed streaming recovery; physical fleet and automatic peer/rung/settings integration remain unqualified",
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+  "model_file_sha256": {
+    "config.json": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+    "model.safetensors": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+    "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+    "tokenizer_config.json": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df"
+  },
+  "library_row": "blake3:a8abb177fa5b71377d943c88927c6c5327d755602c3abca00077ae6d1eecd4e5",
+  "weight_format": "f16",
+  "backend_class": "burn-wgpu",
+  "execution_loader": "burn-wgpu/layer-stream-v2/f16",
+  "prior_format_receipt": "support/receipts/resident_inference_weight_formats.json",
+  "topology": {
+    "physical_computers": 1,
+    "physical_gpus": 1,
+    "separately_rooted_software_devices": 3,
+    "independent_model_libraries": 3,
+    "layer_workers": 2,
+    "coordinator": "embedding, seeded sampling, token/draw checkpoint and streamed fallback",
+    "final_worker": "layers 16..32 plus final norm/head; returns last-position f32 logits",
+    "carrier": "real iroh connections on shared P2pandaTransport endpoints",
+    "admission": "signed RemoteSessionClaim, current live supervised mesh lease, attested transport/root, signed canonical StageRequest and host-supplied current graph-reader authority"
+  },
+  "native_row": {
+    "continued": [
+      504,
+      3575,
+      282,
+      4649,
+      314,
+      7042,
+      30
+    ],
+    "departure": "Owner",
+    "devices": [
+      {
+        "transport_author_hex": "e30f4acffa9dac2e88b0ce1e81b7d907821c002e539965266c5e87b4c89e7829",
+        "layer_range": {
+          "end": 16,
+          "first": 0
+        }
+      },
+      {
+        "transport_author_hex": "f50a728e35af835c98435f5661b8e2f375fd42e8fdbccf7423938881ab051837",
+        "layer_range": {
+          "end": 32,
+          "first": 16
+        }
+      }
+    ],
+    "format": "f16",
+    "loader": "burn-wgpu",
+    "normal_traffic": {
+      "elapsed_seconds": 0.7351343,
+      "forwards": 8,
+      "payload_bytes_received": 1742080,
+      "payload_bytes_sent": 338176
+    },
+    "placements": [
+      {
+        "at_token": 3,
+        "device": "coordinator",
+        "reason": "leased stage unavailable; resumed by local layer streaming"
+      }
+    ],
+    "recovery_seconds": 7.1000575,
+    "reference": [
+      504,
+      3575,
+      282,
+      4649,
+      314,
+      7042,
+      30
+    ],
+    "reference_seconds": 16.9237969,
+    "row": "blake3:a8abb177fa5b71377d943c88927c6c5327d755602c3abca00077ae6d1eecd4e5",
+    "staged": [
+      504,
+      3575,
+      282,
+      4649,
+      314,
+      7042,
+      30
+    ],
+    "staged_seconds": 0.7510506,
+    "staged_seconds_per_token": 0.10729294285714286,
+    "traffic": {
+      "elapsed_seconds": 0.9566039999999999,
+      "forwards": 11,
+      "payload_bytes_received": 2485616,
+      "payload_bytes_sent": 641648
+    }
+  },
+  "question": "What is the capital of France?",
+  "answer": "The capital of France is Paris.",
+  "checkpoint": {
+    "session": {
+      "session_id": "blake3:85e9c478e02cd1e9a09fa5d105ea4e90e926713d71e87b1f0405f2e971439e8b",
+      "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f"
+    },
+    "prompt_ids": [
+      1,
+      9690,
+      198,
+      2683,
+      359,
+      253,
+      5356,
+      5646,
+      11173,
+      3365,
+      3511,
+      308,
+      34519,
+      28,
+      7018,
+      411,
+      407,
+      19712,
+      8182,
+      2,
+      198,
+      1,
+      4093,
+      198,
+      1780,
+      314,
+      260,
+      3575,
+      282,
+      4649,
+      47,
+      2,
+      198,
+      1,
+      520,
+      9531,
+      198
+    ],
+    "token_ids": [
+      504,
+      3575,
+      282,
+      4649,
+      314,
+      7042,
+      30
+    ],
+    "draws": 0,
+    "complete": true,
+    "placements": [
+      {
+        "at_token": 3,
+        "device": "coordinator",
+        "reason": "leased stage unavailable; resumed by local layer streaming"
+      }
+    ]
+  },
+  "traffic": {
+    "normal_completed_tensor_bytes": 2080256,
+    "bytes_per_output_token_including_prefill_and_eos_pass": 297179.4285714286,
+    "warm_single_token_pass_tensor_bytes": 208192,
+    "wire": "u64 sequence, u64 width, little-endian lossless f32 values; half activations widen exactly",
+    "scope": "coordinator-relayed completed hidden-state requests/intermediate replies and final-logits replies, including 16-byte tensor headers. Notochord framing, QUIC overhead, readiness/control messages and partial failed calls are excluded."
+  },
+  "tensor_payload_admission": {
+    "context_limit": 8192,
+    "per_layer_weights_bytes": 19664640,
+    "per_layer_full_context_kv_bytes": 10485760,
+    "each_worker_layer_and_kv_budget_bytes": 482406400,
+    "coordinator_embedding_bytes": 94371840,
+    "final_worker_output_head_and_norm_bytes": 94373760,
+    "scope": "Derived runtime tensor payloads. Worker capacities are after shared/output, activation, RoPE and backend reservations. These are not process-RSS or allocator limits; actual fixture KV is shorter than full context."
+  },
+  "host_profile": {
+    "schema": "esp.inference-stage-host-profile/v1",
+    "machine": "O-PC",
+    "os": "Microsoft Windows 10.0.26220",
+    "executable": "C:\\t\\cargo-targets\\mere\\inference-i8\\native-stage.exe",
+    "executable_sha256": "0a51454ff35dcfd8989564ff0ae160e4f73bf36c241e648767753900812d27c6",
+    "arguments": [
+      "--ignored",
+      "--exact",
+      "real_smollm2_f16_stages_match_and_recover_under_supervised_leases",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "source_model": "C:\\Users\\mark_\\.cache\\huggingface\\hub\\models--HuggingFaceTB--SmolLM2-360M-Instruct\\snapshots\\a10cc1512eabd3dde888204e902eca88bddb4951",
+    "source_qualification": "C:\\t\\cargo-targets\\mere\\inference-i7",
+    "work": "C:\\t\\cargo-targets\\mere\\inference-i8",
+    "started_utc": "2026-10-16T20:58:04.1149889Z",
+    "ended_utc": "2026-10-16T20:58:57.4234159Z",
+    "wall_seconds": 53.308427,
+    "exit_code": 0,
+    "peak_process_working_set_bytes": 3595534336,
+    "sampled_whole_gpu_peak_bytes": 2736783360,
+    "gpu_samples": 161,
+    "gpu_before": "NVIDIA GeForce RTX 4060 Laptop GPU, 610.88, 8188, 1285",
+    "scope": "Three separately rooted software devices and libraries on one physical computer/GPU. Process peak includes imports, shared tensors, stages, KV and fallback. GPU samples include unrelated processes. Timings are execution costs, not isolated throughput.",
+    "stdout_sha256": "8fe7cfedf5ba07642efe38143ad2c01f8f48a1e1d2af697c958aafed0aebd230",
+    "stderr_sha256": "69b1bb3d4ab3c44aefa5f7d98e9de6ffe0881c516782db2abbcceed6b1ef1d62"
+  },
+  "timing_scope": "The normal staged timer starts with workers already holding their ranges and the coordinator provider constructed. Single-device reference includes provider construction and streamed reads. Whole-fixture wall time includes imports, three libraries, lease setup, reference, staged generation, reclaim/fallback and shutdown. Concurrent workspace work and compilation prevent an isolated throughput comparison.",
+  "native_artifacts": {
+    "C:\\t\\cargo-targets\\mere\\inference-i8\\native-stage.exe": {
+      "sha256": "0a51454ff35dcfd8989564ff0ae160e4f73bf36c241e648767753900812d27c6"
+    },
+    "C:\\t\\cargo-targets\\mere\\inference-i8\\native.stdout.log": {
+      "sha256": "8fe7cfedf5ba07642efe38143ad2c01f8f48a1e1d2af697c958aafed0aebd230"
+    },
+    "C:\\t\\cargo-targets\\mere\\inference-i8\\native.stderr.log": {
+      "sha256": "69b1bb3d4ab3c44aefa5f7d98e9de6ffe0881c516782db2abbcceed6b1ef1d62"
+    },
+    "C:\\t\\cargo-targets\\mere\\inference-i8\\native.host.json": {
+      "sha256": "0b7a39521a136d56a263aba187cfeaefb0a38241a32b8b2c0ad24463c89d6431"
+    },
+    "C:\\t\\cargo-targets\\mere\\inference-i8\\stage-result.json": {
+      "sha256": "f0fb7aa3a81e94528ddba1e0afb64c547c2e34a35176a01ef211e02088e95775"
+    },
+    "C:\\t\\cargo-targets\\mere\\inference-i8\\checkpoint.json": {
+      "sha256": "884b9b853c992bfd7761aa9a4bc5b7b20829be596ba99974f3f5615c4d6f9377"
+    }
+  },
+  "checks": [
+    {
+      "name": "unit-final",
+      "sha256": "93a367b170d2ba702e1573a0cb8cfbb083aa1d5f9cb7061b9a7c83711d97beef",
+      "exit_code": 0,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\unit-final.log",
+      "arguments": [
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "esp",
+        "-p",
+        "distillery",
+        "-p",
+        "mere-mesh",
+        "--release",
+        "--features",
+        "esp/decoder-flex,esp/decoder-wgpu,esp/decoder-autodiff,distillery/inference-stages,distillery/inference-gpu,distillery/trainer-gpu,distillery/trainer-autodiff",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ],
+      "seconds": 267.9143247
+    },
+    {
+      "name": "esp-integration-final",
+      "sha256": "41502abe3389d893406770fabdddcab75a318032d3212efd67cdb867d835f302",
+      "exit_code": 0,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\esp-integration-final.log",
+      "arguments": [
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "esp",
+        "--release",
+        "--features",
+        "decoder-flex,decoder-wgpu,decoder-autodiff,actor",
+        "--test",
+        "durable_generation",
+        "--test",
+        "library_session",
+        "--test",
+        "prompt_template",
+        "--test",
+        "trainer_autodiff",
+        "--test",
+        "weight_formats_real",
+        "--",
+        "--test-threads=1"
+      ],
+      "seconds": 44.1973349
+    },
+    {
+      "name": "distillery-integration-final",
+      "sha256": "313d9c2f94948c97f606f2dcff13dc7facba373be57dcd407c38bfc4f3c8f6e4",
+      "exit_code": 0,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\distillery-integration-final.log",
+      "arguments": [
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "distillery",
+        "--release",
+        "--features",
+        "inference-stages,inference-gpu,trainer-gpu,trainer-autodiff",
+        "--test",
+        "inference_stages",
+        "--test",
+        "inference_layered",
+        "--test",
+        "inference_durable",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "seconds": 175.337207
+    },
+    {
+      "seconds": 456.3124422,
+      "exit_code": 0,
+      "name": "actor-wire-final",
+      "sha256": "db5ed9800d660ddad143b4c7909349065dc086115960e4b146ffe33ede2da2f7",
+      "arguments": [
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "distillery",
+        "--release",
+        "--features",
+        "inference,inference-wire",
+        "--lib"
+      ],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\actor-wire-final.log"
+    },
+    {
+      "seconds": 3.7987455,
+      "exit_code": 0,
+      "name": "actor-wire-features-final",
+      "sha256": "1497e3daf1c253813b575b9efad0cf5f00a3038483a9163a57152fbc9f6c460b",
+      "arguments": [
+        "tree",
+        "--locked",
+        "--offline",
+        "-p",
+        "distillery",
+        "--features",
+        "inference,inference-wire",
+        "-e",
+        "features,no-dev",
+        "-i",
+        "esp"
+      ],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\actor-wire-features-final.log"
+    },
+    {
+      "seconds": 20.4897576,
+      "exit_code": 0,
+      "name": "examples-final",
+      "sha256": "83c6c91971e523ec401909722daeef5f89c37a432002fca7c3bbe6c967b0f0fd",
+      "arguments": [
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "esp",
+        "--release",
+        "--features",
+        "decoder-flex,decoder-wgpu,decoder-autodiff",
+        "--examples"
+      ],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\examples-final.log"
+    },
+    {
+      "seconds": 621.1091998,
+      "exit_code": 0,
+      "name": "djinn-final-build",
+      "sha256": "30e0c9465e253d69b33c4db6000956d85ce2328da5e53067f71511248b1234f1",
+      "arguments": [
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--release",
+        "--features",
+        "inference-stages,inference-gpu,trainer-gpu,trainer-autodiff",
+        "--lib",
+        "--test",
+        "inference_route",
+        "--test",
+        "inference_gpu_reclaim",
+        "--no-run"
+      ],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\djinn-final-build.log"
+    }
+  ],
+  "blocked_attempts": [
+    {
+      "name": "actor-wire debug attempt",
+      "outcome": "own waiting Cargo invocation stopped after confirming another Djinn job held the debug build-directory lock; rerun in the existing release cache",
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\actor-wire-blocked.log",
+      "sha256": "2f1252c7b268aa812310695ac32e7b3e27abe94d9806f8611b975001e22a875e"
+    }
+  ],
+  "limits": [
+    "The native measurement uses separately rooted software devices on one computer/GPU; it does not qualify physical inter-computer latency, pooled physical VRAM or independent-device high-water memory.",
+    "The selected f16 row and all its artifacts are preinstalled independently in all three libraries.",
+    "The host supplies explicit leased stage plans through embedding APIs. Automatic peer discovery/rung selection and a staged JSON settings variant remain integration work.",
+    "No new headed Turnstone run or installed Djinn binary run was performed.",
+    "Only this pinned SmolLM2 f16 GPU stage row is measured; larger staged models, other formats and other backend classes need their own native rows."
+  ],
+  "toolchain_host": {
+    "cpu": "AMD Ryzen 9 7940HS w/ Radeon 780M Graphics     ",
+    "physical_memory_bytes": 33515835392,
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+  },
+  "source_checks": {
+    "rustfmt_exit": 0,
+    "profiler_parse_errors": 0
+  },
+  "documentation_audit": {
+    "unchanged_from_I7": true,
+    "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\doc-audit-final.json",
+    "sha256": "cc1f440c91152c691b2f58c5907ceb97544e08263b5d4e96d31269f188b0f505"
+  },
+  "djinn_runtime_checks": [
+    {
+      "name": "djinn-current-key-final",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\djinn-1553ae66f774d185.exe",
+      "executable_sha256": "cf07436532fdd4b1872f5fb853f7dec0c20b321fb5f6ced636a1b57e84698105",
+      "arguments": [
+        "--exact",
+        "sync::personal_seals::tests::stage_reads_require_a_current_seat_and_current_local_key",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_passed": 1,
+      "verified_passed": true,
+      "seconds": 0.43700000003445894,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\djinn-current-key-final.log",
+      "sha256": "66fce0ca88be07faae70fa29fb21133d5be8904f16c7291acc09042456c8664b"
+    },
+    {
+      "name": "djinn-route-final",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\inference_route-33c8935505564d20.exe",
+      "executable_sha256": "62b5a47e5c819b2591f026bf1eeef89f008688f3b9160947d83615b4c7961e2f",
+      "arguments": [
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_passed": 4,
+      "verified_passed": true,
+      "seconds": 30.5,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\djinn-route-final.log",
+      "sha256": "88bbe297126151a8352891eb1d3324464244772e2d608b93199d2023a40dfd26"
+    },
+    {
+      "name": "djinn-reclaim-final",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\inference_gpu_reclaim-0eba2b9f8d357fdb.exe",
+      "executable_sha256": "81051f8f1276cc085dd6a0e71def6e3857504a5d27fefd2e86a3ad448bfe6145",
+      "arguments": [
+        "--ignored",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_passed": 3,
+      "verified_passed": true,
+      "seconds": 6.952999999979511,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\djinn-reclaim-final.log",
+      "sha256": "824f6acf515f95cbdaeb76ff3ac7fe936d7f18f78a854f78967bbfa09a671b81"
+    },
+    {
+      "name": "djinn-recall-final",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\inference_route-33c8935505564d20.exe",
+      "executable_sha256": "62b5a47e5c819b2591f026bf1eeef89f008688f3b9160947d83615b4c7961e2f",
+      "arguments": [
+        "--ignored",
+        "--exact",
+        "a_real_model_cites_exact_retained_versions_and_reopens_its_run",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "expected_passed": 1,
+      "verified_passed": true,
+      "seconds": 10.984000000054948,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i8\\djinn-recall-final.log",
+      "sha256": "4d08cd3c1090d6718385efee3bc97d62f412cb146b6c12ae4fe1514522ad0c62"
+    }
+  ],
+  "verification_counts": {
+    "esp_unit": 188,
+    "distillery_unit": 54,
+    "mesh_unit": 125,
+    "esp_integration": 15,
+    "distillery_integration": 15,
+    "actor_wire_unit": 38,
+    "djinn_current_key": 1,
+    "djinn_routes": 4,
+    "djinn_explicit_gpu_reclaim": 3,
+    "djinn_explicit_real_model_recall": 1,
+    "explicit_native_gpu_stage_row": 1
+  }
+}

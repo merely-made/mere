@@ -31,7 +31,9 @@ use std::sync::mpsc::Receiver;
 use armillary::actor::spawn_named;
 use armillary::{ActorHandle, Wake};
 
-use crate::infer::provider::{GenerationRequest, InferError, InferenceProvider, ModelCapability};
+use crate::infer::provider::{
+    GenerationCheckpoint, GenerationRequest, InferError, InferenceProvider, ModelCapability,
+};
 
 /// Commands the kernel sends the inference actor.
 #[derive(Debug, Clone, PartialEq)]
@@ -42,6 +44,14 @@ pub enum InferCommand {
     /// Cancel request `id`: stops it mid-stream if running, drops it if
     /// still queued. Unknown/finished ids are ignored.
     Cancel { id: u64 },
+    /// Durable generation, or continuation from an exact checkpoint.
+    Checkpointed {
+        id: u64,
+        request: GenerationRequest,
+        resume: Option<GenerationCheckpoint>,
+    },
+    /// Pause at the next committed token boundary. Resume is a new Checkpointed command.
+    Pause { id: u64 },
 }
 
 /// Updates the actor streams back to the kernel.
@@ -50,10 +60,23 @@ pub enum InferUpdate {
     /// The provider is loaded and ready; sent once at actor startup so
     /// status surfaces can show the real capability, not a guess.
     Ready { capability: ModelCapability },
+    /// Exact session used by this actor, emitted before it takes any ask.
+    Session {
+        identity: super::provider::SessionIdentity,
+    },
+    /// Provider construction failed. No Ready is emitted for this actor.
+    LoadFailed { error: InferError },
     /// Generation `id` began.
     Started { id: u64 },
     /// One streamed fragment of generation `id`, in production order.
     Fragment { id: u64, text: String },
+    /// A durable checkpoint has committed before this update is emitted.
+    Checkpoint {
+        id: u64,
+        checkpoint: GenerationCheckpoint,
+    },
+    /// The generation stopped at a durable token boundary.
+    Paused { id: u64 },
     /// Generation `id` completed; `text` is the full assembled output.
     Finished { id: u64, text: String },
     /// Generation `id` was cancelled (mid-stream or while queued).
@@ -72,14 +95,52 @@ pub fn spawn_inference_actor<F>(
 where
     F: FnOnce() -> Box<dyn InferenceProvider> + Send + 'static,
 {
+    spawn_inference_actor_fallible(wake, move || Ok(build()))
+}
+
+/// Fallible model construction on the actor thread. A load failure is visible
+/// immediately and every queued ask fails with that error, without a fallback.
+pub fn spawn_inference_actor_fallible<F>(
+    wake: Wake,
+    build: F,
+) -> (ActorHandle<InferCommand>, Receiver<InferUpdate>)
+where
+    F: FnOnce() -> Result<Box<dyn InferenceProvider>, InferError> + Send + 'static,
+{
+    spawn_inference_actor_with_checkpoints(wake, build, |_, _| Ok(()))
+}
+
+/// A durable host supplies a synchronous commit barrier. No checkpoint update
+/// or subsequent token can escape a failed commit.
+pub fn spawn_inference_actor_with_checkpoints<F, C>(
+    wake: Wake,
+    build: F,
+    mut commit: C,
+) -> (ActorHandle<InferCommand>, Receiver<InferUpdate>)
+where
+    F: FnOnce() -> Result<Box<dyn InferenceProvider>, InferError> + Send + 'static,
+    C: FnMut(u64, &GenerationCheckpoint) -> Result<(), InferError> + Send + 'static,
+{
     spawn_named::<InferCommand, InferUpdate, _>("infer", wake, move |commands, out| {
         let provider = build();
-        out.emit(InferUpdate::Ready {
-            capability: provider.capability().clone(),
-        });
+        match &provider {
+            Ok(provider) => {
+                if let Some(identity) = provider.session_identity() {
+                    out.emit(InferUpdate::Session { identity });
+                }
+                out.emit(InferUpdate::Ready {
+                    capability: provider.capability().clone(),
+                });
+            },
+            Err(error) => out.emit(InferUpdate::LoadFailed {
+                error: error.clone(),
+            }),
+        }
 
-        let mut pending: VecDeque<(u64, GenerationRequest)> = VecDeque::new();
+        let mut pending: VecDeque<(u64, GenerationRequest, Option<Option<GenerationCheckpoint>>)> =
+            VecDeque::new();
         let mut cancelled: HashSet<u64> = HashSet::new();
+        let mut paused: HashSet<u64> = HashSet::new();
 
         loop {
             // Refill the queue: block for one command when idle (a closed
@@ -89,44 +150,88 @@ where
             // blocking recv above ends the loop afterwards.
             if pending.is_empty() {
                 match commands.recv() {
-                    Ok(c) => absorb(c, &mut pending, &mut cancelled),
+                    Ok(c) => absorb(c, &mut pending, &mut cancelled, &mut paused),
                     Err(_) => break,
                 }
             }
             while let Ok(c) = commands.try_recv() {
-                absorb(c, &mut pending, &mut cancelled);
+                absorb(c, &mut pending, &mut cancelled, &mut paused);
             }
 
-            let Some((id, request)) = pending.pop_front() else {
+            let Some((id, mut request, checkpointed)) = pending.pop_front() else {
                 continue;
             };
             if cancelled.remove(&id) {
+                request.clear_private();
                 out.emit(InferUpdate::Cancelled { id });
                 continue;
             }
 
+            if paused.remove(&id) {
+                request.clear_private();
+                out.emit(InferUpdate::Paused { id });
+                continue;
+            }
             out.emit(InferUpdate::Started { id });
             let streamed = out.clone();
             let mut was_cancelled = false;
-            let result = provider.generate_streaming(&request, &mut |fragment| {
-                // Drain commands mid-stream so a Cancel can land while
-                // tokens flow; other commands queue for later.
-                loop {
-                    match commands.try_recv() {
-                        Ok(c) => absorb(c, &mut pending, &mut cancelled),
-                        Err(_) => break,
+            let mut was_paused = false;
+            let mut should_stop = || {
+                while let Ok(c) = commands.try_recv() {
+                    absorb(c, &mut pending, &mut cancelled, &mut paused);
+                }
+                was_cancelled |= cancelled.remove(&id);
+                was_paused |= paused.remove(&id);
+                was_cancelled || was_paused
+            };
+            let result = provider
+                .as_ref()
+                .map_err(Clone::clone)
+                .and_then(|provider| {
+                    if let Some(resume) = checkpointed {
+                        provider
+                            .generate_checkpointed(
+                                &request,
+                                resume.as_ref(),
+                                &mut |checkpoint| {
+                                    commit(id, checkpoint)?;
+                                    streamed.emit(InferUpdate::Checkpoint {
+                                        id,
+                                        checkpoint: checkpoint.clone(),
+                                    });
+                                    Ok(())
+                                },
+                                &mut should_stop,
+                            )
+                            .map(|checkpoint| {
+                                if checkpoint.complete {
+                                    checkpoint.text.clone()
+                                } else {
+                                    String::new()
+                                }
+                            })
+                    } else {
+                        provider.generate_streaming_controlled(
+                            &request,
+                            &mut |fragment| {
+                                streamed.emit(InferUpdate::Fragment {
+                                    id,
+                                    text: fragment.to_string(),
+                                });
+                                ControlFlow::Continue(())
+                            },
+                            &mut should_stop,
+                        )
                     }
-                }
-                if cancelled.remove(&id) {
-                    was_cancelled = true;
-                    return ControlFlow::Break(());
-                }
-                streamed.emit(InferUpdate::Fragment {
-                    id,
-                    text: fragment.to_string(),
                 });
-                ControlFlow::Continue(())
-            });
+            request.clear_private();
+            if was_paused
+                && !was_cancelled
+                && (result.is_ok() || matches!(result, Err(InferError::Interrupted)))
+            {
+                out.emit(InferUpdate::Paused { id });
+                continue;
+            }
             match (was_cancelled, result) {
                 (true, _) => out.emit(InferUpdate::Cancelled { id }),
                 (false, Ok(text)) => out.emit(InferUpdate::Finished { id, text }),
@@ -138,11 +243,26 @@ where
 
 fn absorb(
     command: InferCommand,
-    pending: &mut VecDeque<(u64, GenerationRequest)>,
+    pending: &mut VecDeque<(u64, GenerationRequest, Option<Option<GenerationCheckpoint>>)>,
     cancelled: &mut HashSet<u64>,
+    paused: &mut HashSet<u64>,
 ) {
     match command {
-        InferCommand::Generate { id, request } => pending.push_back((id, request)),
+        InferCommand::Generate { id, request } => {
+            paused.remove(&id);
+            pending.push_back((id, request, None));
+        },
+        InferCommand::Checkpointed {
+            id,
+            request,
+            resume,
+        } => {
+            paused.remove(&id);
+            pending.push_back((id, request, Some(resume)));
+        },
+        InferCommand::Pause { id } => {
+            paused.insert(id);
+        },
         InferCommand::Cancel { id } => {
             cancelled.insert(id);
         },
@@ -158,6 +278,40 @@ mod tests {
 
     fn no_wake() -> Wake {
         Arc::new(|| {})
+    }
+
+    #[test]
+    fn load_failure_never_announces_ready_or_falls_back() {
+        let failure = InferError::InvalidConfig("missing template".into());
+        let expected = failure.clone();
+        let (handle, updates) = spawn_inference_actor_fallible(no_wake(), move || Err(failure));
+        for id in 0..2 {
+            handle.command(InferCommand::Generate {
+                id,
+                request: GenerationRequest {
+                    prompt: "ask".into(),
+                    ..Default::default()
+                },
+            });
+        }
+        handle.join();
+        let got: Vec<_> = updates.iter().collect();
+        assert_eq!(
+            got[0],
+            InferUpdate::LoadFailed {
+                error: expected.clone()
+            }
+        );
+        assert!(!got.iter().any(|update| matches!(
+            update,
+            InferUpdate::Ready { .. } | InferUpdate::Finished { .. }
+        )));
+        for id in 0..2 {
+            assert!(got.contains(&InferUpdate::Failed {
+                id,
+                error: expected.clone()
+            }));
+        }
     }
 
     #[test]

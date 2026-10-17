@@ -1,0 +1,1475 @@
+{
+  "schema": "mere.resident-inference/weight-formats-qualification/v1",
+  "recorded_date": "2026-10-16",
+  "host": "O-PC",
+  "native_source_commit": "963067cbc30c3c705dc16b197c994b74945f3dba",
+  "source_hash_definition": "SHA-256 of Git blob bytes at native_source_commit; working-tree CRLF may differ.",
+  "source_git_blob_sha256": {
+    "Cargo.toml": "6576fc57028b7b2d9b18beb7670f238c3a1aa9a1107eca857eaa489ab00459a1",
+    "Cargo.lock": "3272173f91550d7f528eb61f8bcdd9710ad6ebda0f47d196cf66f53bfa8428b6",
+    "crates/intel/esp/Cargo.toml": "26369d59daa61cb46b5a31c92f04ecd57a7bbad1229f63e2f3f6baa435c340ff",
+    "crates/intel/esp/src/infer/decoder/weight_format.rs": "4232820ddbde18ea9134ac39d24232a9ff4125f4642201f42fcb8abbf5d9c036",
+    "crates/intel/esp/src/infer/decoder/attention.rs": "7e43aebdfa0c3dfe9c723574946c85e4d28df8779c274aa5090750e40c3833d7",
+    "crates/intel/esp/src/infer/decoder/loader.rs": "c8b3e64c46a6e784202f4e502eeeec85ed7e497f44ff43cefb4c52369683bdd7",
+    "crates/intel/esp/src/infer/decoder/model.rs": "b886be285145250cf813bb48f46947848eec1c234913aef1e1fb3554f37c7fbc",
+    "crates/intel/esp/src/infer/decoder/provider.rs": "49a634b240957cf161079ef56d56cb4c68b49a683531929572b40220167e5870",
+    "crates/intel/esp/src/infer/layer_library.rs": "0aec13edf7e924e1b57bcf0a10806a99c194f7596cad03fcf57fbc8746240980",
+    "crates/intel/esp/src/infer/library.rs": "8850b396fc0e8d675f56e7ceab8c87723148dace21b759196b80393c662617d9",
+    "ports/distillery/Cargo.toml": "9c9ec076ecf42d20a4ac282dd5d0179c2633cd2c25e7fe9212894982e32db360",
+    "ports/distillery/src/inference.rs": "a61232918bb1d9a42c0826c2244393676cd1471fb9f0d9b57cbb2b90ae8c7ef4",
+    "support/patches/cubek-matmul/src/multi_level/routines/selector/unit.rs": "0026bcd862583b734d67c9a5619863fa53301d6ec899e65b67b3ba1b24c9490c",
+    "crates/intel/esp/tests/weight_formats_real.rs": "af6d447fe89d0723d47da7ab7353c9321f6899413f24f59bf193a8e0ac541aa0",
+    "support/run_resident_weight_formats.ps1": "7f9e4572014f1fe6e2b78f98b5304360bd8fdcdefce82ce159abded3acf4e5e5",
+    "crates/intel/esp/templates/smollm2-instruct-v1.json": "e74608112d6fa9812f416799ac7a6d8d63a50f4b98a20b470b05f018c0ee4daf",
+    "crates/intel/esp/tests/smollm2_360m_reference.json": "10eb7c94f68d06cea07779f16d7e90fc9a1fec583cf2a90f41b07b04688ce346"
+  },
+  "runtime_weight_format_prefix_sha256": "059c3021a3e1715a5fe7989e6b18671b2fde72754be2ba6ff92369521ab928c5",
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+  "model_file_sha256": {
+    "config.json": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+    "model.safetensors": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+    "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+    "tokenizer_config.json": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df"
+  },
+  "bf16_reference": "CPU burn-flex, exact same source checkpoint and three rendered prompts. Logit errors compare the next-token vocabulary; token sequences expose autoregressive drift.",
+  "profiles": [
+    {
+      "row": "bf16-burn-flex",
+      "format": "bf16",
+      "candidate_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+      "qualified_model": "blake3:cef010550125eadc1317a30335c9e5835f663edd3b7e2c4d55b7e8871dc69c8c",
+      "qualified_row": "blake3:1d6e41df376710ab28d0233697018d7e77bf83ca2ea282749cf1e2a8c007a228",
+      "qualification": {
+        "baseline_loader": "burn-flex/layer-stream-v2/bf16",
+        "baseline_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+        "elapsed_seconds": 86.2350166,
+        "encoded_weight_bytes": 723674096,
+        "largest_layer_bytes": 19665632,
+        "logical_stream_bytes": 32094307344,
+        "measured_loader": "burn-flex/layer-stream-v2/bf16",
+        "prompts": [
+          {
+            "baseline_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "format_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "logit_max_abs": 0.0,
+            "logit_rmse": 0.0,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "format_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "logit_max_abs": 0.0,
+            "logit_rmse": 0.0,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nCount from one to five.<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "format_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "logit_max_abs": 0.0,
+            "logit_rmse": 0.0,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat color is a clear daytime sky?<|im_end|>\n<|im_start|>assistant\n"
+          }
+        ],
+        "streaming_resident_payload_bytes": 114038400,
+        "weight_payload_bytes": 723642240
+      },
+      "rows": [
+        {
+          "question": "What is the capital of France?",
+          "seconds": 12.0341351,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "question": "Count from one to five.",
+          "seconds": 28.0441427,
+          "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+          "token_ids": [
+            33,
+            30,
+            1963,
+            198,
+            34,
+            30,
+            5713,
+            198,
+            35,
+            30,
+            8696,
+            198,
+            36,
+            30,
+            8920,
+            198
+          ]
+        },
+        {
+          "question": "What color is a clear daytime sky?",
+          "seconds": 25.5249799,
+          "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ]
+        }
+      ],
+      "identical_bf16_sequences": 3,
+      "matching_bf16_token_positions": 39,
+      "baseline_token_positions": 39,
+      "deviation_from_gpu_f16": [
+        {
+          "next_token_logit_rmse": 0.06218146110197806,
+          "next_token_logit_max_abs": 0.25
+        },
+        {
+          "next_token_logit_rmse": 0.05260451741393107,
+          "next_token_logit_max_abs": 0.208984375
+        },
+        {
+          "next_token_logit_rmse": 0.05738946413581499,
+          "next_token_logit_max_abs": 0.240234375
+        }
+      ],
+      "encoded_layer_pass_bytes": 629300144,
+      "shared_encoded_bytes": 94373952,
+      "statistics": {
+        "encoded_bytes_read": 32094307344,
+        "largest_encoded_layer": 19665632,
+        "layer_reads": 1632
+      },
+      "import_seconds": 3.3330802999999998,
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T17:21:57.2387737Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/weight_formats_real-d4795cccceb1060f.exe",
+          "--ignored",
+          "--exact",
+          "measure_real_weight_format",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "aa8f37aaff4d7e4984f28a539784b3906dd751c0af870ac6caf1af3b6da40789",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 91.2722384,
+        "process_peak_working_set_bytes": 1358127104,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 17574621184,
+        "gpu_before": {
+          "total_bytes": 8585740288,
+          "free_bytes": 7085228032,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        },
+        "gpu_global_peak_used_bytes": 1514143744,
+        "samples": 322,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "software_receipt_path": "C:\\t\\cargo-targets\\mere\\inference-i7\\bf16-burn-flex.json",
+      "software_receipt_sha256": "5ea1d608f02911e88bc6adc2b46f7a506f9aa2442b9fc6664d4282cb03dcef67",
+      "host_receipt_sha256": "57acb9894ba4104829ba6cced4231360558fc1d35848c266f3d8d3e9fe09932e",
+      "candidate_selection_refused": true,
+      "pause_resume_matches": true,
+      "format_change_resume_refused": true
+    },
+    {
+      "row": "f16-burn-flex",
+      "format": "f16",
+      "candidate_model": "blake3:e1379f4de24bafa1f06f30349b94b8846e68c9152ea3d94c80c74daae8a47948",
+      "qualified_model": "blake3:c363fef9c01a8fbac2ca7bcbb7d63d8cfea52c774398f500b270ffb04641c2f3",
+      "qualified_row": "blake3:03a4b20378ccba75320021d9e3e7e38676c555c6d5997850308d5265750bfbae",
+      "qualification": {
+        "baseline_loader": "burn-flex/layer-stream-v2/bf16",
+        "baseline_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+        "elapsed_seconds": 70.4008559,
+        "encoded_weight_bytes": 723673840,
+        "largest_layer_bytes": 19665624,
+        "logical_stream_bytes": 32094294288,
+        "measured_loader": "burn-flex/layer-stream-v2/f16",
+        "prompts": [
+          {
+            "baseline_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "format_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "logit_max_abs": 0.279296875,
+            "logit_rmse": 0.06542916780569247,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "format_tokens": [
+              57,
+              5248,
+              22657,
+              28,
+              564,
+              347,
+              253,
+              1694,
+              29,
+              2542,
+              5646,
+              28,
+              339,
+              1326,
+              982,
+              457
+            ],
+            "logit_max_abs": 0.3203125,
+            "logit_rmse": 0.0550036947181607,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nCount from one to five.<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "format_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682,
+              35336
+            ],
+            "logit_max_abs": 0.34375,
+            "logit_rmse": 0.06270477102089671,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat color is a clear daytime sky?<|im_end|>\n<|im_start|>assistant\n"
+          }
+        ],
+        "streaming_resident_payload_bytes": 114038400,
+        "weight_payload_bytes": 723642240
+      },
+      "rows": [
+        {
+          "question": "What is the capital of France?",
+          "seconds": 10.9715022,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "question": "Count from one to five.",
+          "seconds": 20.8443785,
+          "text": "I'm sorry, but as a text-based AI, I don't have",
+          "token_ids": [
+            57,
+            5248,
+            22657,
+            28,
+            564,
+            347,
+            253,
+            1694,
+            29,
+            2542,
+            5646,
+            28,
+            339,
+            1326,
+            982,
+            457
+          ]
+        },
+        {
+          "question": "What color is a clear daytime sky?",
+          "seconds": 20.986106200000002,
+          "text": "A clear daytime sky is typically a shade of blue, often with a slight tint",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682,
+            35336
+          ]
+        }
+      ],
+      "identical_bf16_sequences": 1,
+      "matching_bf16_token_positions": 14,
+      "baseline_token_positions": 39,
+      "deviation_from_gpu_f16": [
+        {
+          "next_token_logit_rmse": 0.027091998802442317,
+          "next_token_logit_max_abs": 0.265625
+        },
+        {
+          "next_token_logit_rmse": 0.024668093516448008,
+          "next_token_logit_max_abs": 0.2109375
+        },
+        {
+          "next_token_logit_rmse": 0.02423690724284426,
+          "next_token_logit_max_abs": 0.203125
+        }
+      ],
+      "encoded_layer_pass_bytes": 629299888,
+      "shared_encoded_bytes": 94373952,
+      "statistics": {
+        "encoded_bytes_read": 32094294288,
+        "largest_encoded_layer": 19665624,
+        "layer_reads": 1632
+      },
+      "import_seconds": 4.3484509,
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T17:23:28.9398425Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/weight_formats_real-d4795cccceb1060f.exe",
+          "--ignored",
+          "--exact",
+          "measure_real_weight_format",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "aa8f37aaff4d7e4984f28a539784b3906dd751c0af870ac6caf1af3b6da40789",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 76.911322,
+        "process_peak_working_set_bytes": 1368788992,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 15348404224,
+        "gpu_before": {
+          "total_bytes": 8585740288,
+          "free_bytes": 7082082304,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        },
+        "gpu_global_peak_used_bytes": 1528823808,
+        "samples": 272,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "software_receipt_path": "C:\\t\\cargo-targets\\mere\\inference-i7\\f16-burn-flex.json",
+      "software_receipt_sha256": "594e50010ce43c364ea4506edcc24c4f470c1e69c826c6d25a57b1ce995fe08b",
+      "host_receipt_sha256": "3a74641306cb4c8e5c56fe398c32500c065e030caa2c8fe80c5e024d397cd64a",
+      "candidate_selection_refused": true,
+      "pause_resume_matches": true,
+      "format_change_resume_refused": true
+    },
+    {
+      "row": "f16-burn-wgpu",
+      "format": "f16",
+      "candidate_model": "blake3:e1379f4de24bafa1f06f30349b94b8846e68c9152ea3d94c80c74daae8a47948",
+      "qualified_model": "blake3:0b1ed4029494a0aa3b134f4f30a11835a20ce5e14563a682691a83c52763293b",
+      "qualified_row": "blake3:a8abb177fa5b71377d943c88927c6c5327d755602c3abca00077ae6d1eecd4e5",
+      "qualification": {
+        "baseline_loader": "burn-flex/layer-stream-v2/bf16",
+        "baseline_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+        "elapsed_seconds": 87.942399,
+        "encoded_weight_bytes": 723673840,
+        "largest_layer_bytes": 19665624,
+        "logical_stream_bytes": 32094294288,
+        "measured_loader": "burn-wgpu/layer-stream-v2/f16",
+        "prompts": [
+          {
+            "baseline_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "format_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "logit_max_abs": 0.25,
+            "logit_rmse": 0.06218146110197806,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "format_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "logit_max_abs": 0.208984375,
+            "logit_rmse": 0.05260451741393107,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nCount from one to five.<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "format_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "logit_max_abs": 0.240234375,
+            "logit_rmse": 0.05738946413581499,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat color is a clear daytime sky?<|im_end|>\n<|im_start|>assistant\n"
+          }
+        ],
+        "streaming_resident_payload_bytes": 114038400,
+        "weight_payload_bytes": 723642240
+      },
+      "rows": [
+        {
+          "question": "What is the capital of France?",
+          "seconds": 14.7438992,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "question": "Count from one to five.",
+          "seconds": 25.6791708,
+          "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+          "token_ids": [
+            33,
+            30,
+            1963,
+            198,
+            34,
+            30,
+            5713,
+            198,
+            35,
+            30,
+            8696,
+            198,
+            36,
+            30,
+            8920,
+            198
+          ]
+        },
+        {
+          "question": "What color is a clear daytime sky?",
+          "seconds": 25.0157832,
+          "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ]
+        }
+      ],
+      "identical_bf16_sequences": 3,
+      "matching_bf16_token_positions": 39,
+      "baseline_token_positions": 39,
+      "deviation_from_gpu_f16": [
+        {
+          "next_token_logit_rmse": 0.0,
+          "next_token_logit_max_abs": 0.0
+        },
+        {
+          "next_token_logit_rmse": 0.0,
+          "next_token_logit_max_abs": 0.0
+        },
+        {
+          "next_token_logit_rmse": 0.0,
+          "next_token_logit_max_abs": 0.0
+        }
+      ],
+      "encoded_layer_pass_bytes": 629299888,
+      "shared_encoded_bytes": 94373952,
+      "statistics": {
+        "encoded_bytes_read": 32094294288,
+        "largest_encoded_layer": 19665624,
+        "layer_reads": 1632
+      },
+      "import_seconds": 4.4970745,
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T17:24:46.2979398Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/weight_formats_real-d4795cccceb1060f.exe",
+          "--ignored",
+          "--exact",
+          "measure_real_weight_format",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "aa8f37aaff4d7e4984f28a539784b3906dd751c0af870ac6caf1af3b6da40789",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 95.9597406,
+        "process_peak_working_set_bytes": 1642582016,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 15050362880,
+        "gpu_before": {
+          "total_bytes": 8585740288,
+          "free_bytes": 7086276608,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        },
+        "gpu_global_peak_used_bytes": 1892679680,
+        "samples": 330,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "software_receipt_path": "C:\\t\\cargo-targets\\mere\\inference-i7\\f16-burn-wgpu.json",
+      "software_receipt_sha256": "84b3faa1a01b2bc07c870b0854dd019ceb396122511381597bb2a7702a7ae101",
+      "host_receipt_sha256": "3364e14727add0dbdfa0656a9b0f2f0910beb0fb2b10508907b800a870944819",
+      "candidate_selection_refused": true,
+      "pause_resume_matches": true,
+      "format_change_resume_refused": true
+    },
+    {
+      "row": "q8-block32-burn-wgpu",
+      "format": "q8-k32-f32-scale-f16-shared-v1",
+      "candidate_model": "blake3:9965f17bdefc9e1ccde501bcfb698d5569b3f7c4c6252d5f817a7945d4e1a099",
+      "qualified_model": "blake3:8df84eaa39a8272badc77ff0e7c5ee1344c9c053bf0ad4c110abc8f1b5cc2330",
+      "qualified_row": "blake3:a58742d570cc37f8de4130f981ae4abc838ecc2c90f17fd9e8559b7e14c3db4b",
+      "qualification": {
+        "baseline_loader": "burn-flex/layer-stream-v2/bf16",
+        "baseline_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+        "elapsed_seconds": 46.5780258,
+        "encoded_weight_bytes": 448421872,
+        "largest_layer_bytes": 11064000,
+        "logical_stream_bytes": 18056443920,
+        "measured_loader": "burn-wgpu/layer-stream-v2/q8-k32-f32-scale-f16-shared-v1",
+        "prompts": [
+          {
+            "baseline_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "format_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "logit_max_abs": 0.41259765625,
+            "logit_rmse": 0.09202600712800475,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "format_tokens": [
+              57,
+              5248,
+              22657,
+              28,
+              564,
+              347,
+              253,
+              1694,
+              29,
+              2542,
+              5646,
+              28,
+              339,
+              1326,
+              982,
+              457
+            ],
+            "logit_max_abs": 0.44140625,
+            "logit_rmse": 0.09091546358084172,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nCount from one to five.<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "format_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "logit_max_abs": 0.36376953125,
+            "logit_rmse": 0.08326782833880486,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat color is a clear daytime sky?<|im_end|>\n<|im_start|>assistant\n"
+          }
+        ],
+        "streaming_resident_payload_bytes": 105436800,
+        "weight_payload_bytes": 448391040
+      },
+      "rows": [
+        {
+          "question": "What is the capital of France?",
+          "seconds": 7.5947175,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "question": "Count from one to five.",
+          "seconds": 13.9498569,
+          "text": "I'm sorry, but as a text-based AI, I don't have",
+          "token_ids": [
+            57,
+            5248,
+            22657,
+            28,
+            564,
+            347,
+            253,
+            1694,
+            29,
+            2542,
+            5646,
+            28,
+            339,
+            1326,
+            982,
+            457
+          ]
+        },
+        {
+          "question": "What color is a clear daytime sky?",
+          "seconds": 14.9838351,
+          "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ]
+        }
+      ],
+      "identical_bf16_sequences": 2,
+      "matching_bf16_token_positions": 23,
+      "baseline_token_positions": 39,
+      "deviation_from_gpu_f16": [
+        {
+          "next_token_logit_rmse": 0.067559384915521,
+          "next_token_logit_max_abs": 0.310546875
+        },
+        {
+          "next_token_logit_rmse": 0.07029192528021282,
+          "next_token_logit_max_abs": 0.33984375
+        },
+        {
+          "next_token_logit_rmse": 0.0570482355307824,
+          "next_token_logit_max_abs": 0.25
+        }
+      ],
+      "encoded_layer_pass_bytes": 354047920,
+      "shared_encoded_bytes": 94373952,
+      "statistics": {
+        "encoded_bytes_read": 18056443920,
+        "largest_encoded_layer": 11064000,
+        "layer_reads": 1632
+      },
+      "import_seconds": 3.810962,
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T17:26:22.6500146Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/weight_formats_real-d4795cccceb1060f.exe",
+          "--ignored",
+          "--exact",
+          "measure_real_weight_format",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "aa8f37aaff4d7e4984f28a539784b3906dd751c0af870ac6caf1af3b6da40789",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 53.7018103,
+        "process_peak_working_set_bytes": 1576071168,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 15867428864,
+        "gpu_before": {
+          "total_bytes": 8585740288,
+          "free_bytes": 7088373760,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        },
+        "gpu_global_peak_used_bytes": 1833959424,
+        "samples": 179,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "software_receipt_path": "C:\\t\\cargo-targets\\mere\\inference-i7\\q8-block32-burn-wgpu.json",
+      "software_receipt_sha256": "ddace611a0f707de1997da399a8a5e7a1839891a32d684f7d87c2f84481c8b0a",
+      "host_receipt_sha256": "ef61e5cd0cef82416710dc06aa103e7e33dab7a0d0812763537b372f199d5740",
+      "candidate_selection_refused": true,
+      "pause_resume_matches": true,
+      "format_change_resume_refused": true
+    },
+    {
+      "row": "q4-block32-burn-wgpu",
+      "format": "q4-k32-f32-scale-f16-shared-v1",
+      "candidate_model": "blake3:016f9060cb417255b9ba3490d3bdda6a49d053f7f0c1ecdf7a14e973c491ac43",
+      "qualified_model": "blake3:8815f014de482357e55441d8e7f8797313bffd4d9bf55035825f0beeafe96536",
+      "qualified_row": "blake3:0bf2156ebacb4848b835ed0674322853a5947b0cd45de08a9ad69199455ef160",
+      "qualification": {
+        "baseline_loader": "burn-flex/layer-stream-v2/bf16",
+        "baseline_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+        "elapsed_seconds": 28.1904803,
+        "encoded_weight_bytes": 291135216,
+        "largest_layer_bytes": 6148792,
+        "logical_stream_bytes": 10034824464,
+        "measured_loader": "burn-wgpu/layer-stream-v2/q4-k32-f32-scale-f16-shared-v1",
+        "prompts": [
+          {
+            "baseline_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "format_tokens": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "logit_max_abs": 5.435546875,
+            "logit_rmse": 1.2618003060475271,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "format_tokens": [
+              57,
+              5248,
+              22657,
+              28,
+              564,
+              347,
+              354,
+              5646,
+              28,
+              339,
+              1326,
+              982,
+              457,
+              260,
+              2470,
+              288
+            ],
+            "logit_max_abs": 5.078125,
+            "logit_rmse": 1.1124374470766423,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nCount from one to five.<|im_end|>\n<|im_start|>assistant\n"
+          },
+          {
+            "baseline_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "format_tokens": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              1420,
+              28,
+              33391,
+              28,
+              284,
+              2406,
+              2537,
+              355,
+              11487
+            ],
+            "logit_max_abs": 4.71875,
+            "logit_rmse": 1.1158973870885984,
+            "rendered_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nWhat color is a clear daytime sky?<|im_end|>\n<|im_start|>assistant\n"
+          }
+        ],
+        "streaming_resident_payload_bytes": 100521600,
+        "weight_payload_bytes": 291104640
+      },
+      "rows": [
+        {
+          "question": "What is the capital of France?",
+          "seconds": 4.559304,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "question": "Count from one to five.",
+          "seconds": 8.2278747,
+          "text": "I'm sorry, but as an AI, I don't have the ability to",
+          "token_ids": [
+            57,
+            5248,
+            22657,
+            28,
+            564,
+            347,
+            354,
+            5646,
+            28,
+            339,
+            1326,
+            982,
+            457,
+            260,
+            2470,
+            288
+          ]
+        },
+        {
+          "question": "What color is a clear daytime sky?",
+          "seconds": 8.3495682,
+          "text": "A clear daytime sky is typically a light, fluffy, and sometimes white or pale",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            1420,
+            28,
+            33391,
+            28,
+            284,
+            2406,
+            2537,
+            355,
+            11487
+          ]
+        }
+      ],
+      "identical_bf16_sequences": 1,
+      "matching_bf16_token_positions": 14,
+      "baseline_token_positions": 39,
+      "deviation_from_gpu_f16": [
+        {
+          "next_token_logit_rmse": 1.2700133898542438,
+          "next_token_logit_max_abs": 5.30859375
+        },
+        {
+          "next_token_logit_rmse": 1.0871431257978648,
+          "next_token_logit_max_abs": 4.9375
+        },
+        {
+          "next_token_logit_rmse": 1.0988110237250739,
+          "next_token_logit_max_abs": 4.65625
+        }
+      ],
+      "encoded_layer_pass_bytes": 196761264,
+      "shared_encoded_bytes": 94373952,
+      "statistics": {
+        "encoded_bytes_read": 10034824464,
+        "largest_encoded_layer": 6148792,
+        "layer_reads": 1632
+      },
+      "import_seconds": 4.5971322,
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T17:27:16.7713332Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/weight_formats_real-d4795cccceb1060f.exe",
+          "--ignored",
+          "--exact",
+          "measure_real_weight_format",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "aa8f37aaff4d7e4984f28a539784b3906dd751c0af870ac6caf1af3b6da40789",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 35.6657707,
+        "process_peak_working_set_bytes": 1636671488,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 14450688000,
+        "gpu_before": {
+          "total_bytes": 8585740288,
+          "free_bytes": 7076839424,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        },
+        "gpu_global_peak_used_bytes": 1861222400,
+        "samples": 123,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "software_receipt_path": "C:\\t\\cargo-targets\\mere\\inference-i7\\q4-block32-burn-wgpu.json",
+      "software_receipt_sha256": "57c755e7f5fb2fd4a6736a9c0587e65e6268a8db45bc09285cd9a7872c9e5f19",
+      "host_receipt_sha256": "9b86417540ae8ad0a8bee702513d3058b9fe13cf4d370e35e5dad44fef93024e",
+      "candidate_selection_refused": true,
+      "pause_resume_matches": true,
+      "format_change_resume_refused": true
+    }
+  ],
+  "kernel_patch": {
+    "crate": "cubek-matmul 0.3.0",
+    "upstream_commit": "b6ac1f2ee54c773f345c0bfbd9f330c9022cc3a8",
+    "archive_sha256": "59816f7d5baf51ca06f417899ee194d46d76f633541907c94091163b4ade20ff",
+    "source": "support/patches/cubek-matmul",
+    "initial_q4_failure": "Required 69632 bytes of workgroup memory, available 49152. The selector now reduces working units after register partitions reach one; packed weights remain packed.",
+    "root_adoption": "Embedding Cargo roots must adopt this patch to reproduce this qualified Q4 row."
+  },
+  "checks": {
+    "esp_regression": {
+      "unit_passed": 178,
+      "durable_generation_passed": 2,
+      "library_session_passed": 2,
+      "prompt_template_passed": 5,
+      "trainer_autodiff_passed": 6,
+      "ignored_native_tests": 2,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\esp-final.log",
+      "sha256": "650bec0dc1d43c227e87e818265d1a15a6338686ea287e10f91ad9afca9069c5"
+    },
+    "packed_projection_checks": {
+      "passed": 5,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\format-correctness.log",
+      "sha256": "338f99ba4276894ac305423ea404f2cf8b80b7adb3caa02a9871b3884bbdea0e"
+    },
+    "untied_head_and_warm_decode": {
+      "passed": 1,
+      "supplemental_to_native_source": true,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\untied-head.log",
+      "sha256": "21d1468e5ae8eb7dacb5c028f4c363ae3aedf6ce51781d4fd6a554512d04a937"
+    },
+    "half_artifact_identity": {
+      "passed": 1,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\half-artifact-identity.log",
+      "sha256": "c1e5dcf333aa4254bc73b45c8a5c63ec55952215568af60b7b459a821b09f01e"
+    },
+    "distillery_unit": {
+      "passed": 53,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\distillery-unit.log",
+      "sha256": "401d358a4deaa48cdb79d8a48d90cbc2214ec88412ae57ab730e20f7b1f95901"
+    },
+    "distillery_durability": {
+      "passed": 8,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\distillery-durable.log",
+      "sha256": "d54d5e608c10dbcd9f209b48781f2474987fb83de391ff1dd6e5e95b29c8943e"
+    },
+    "distillery_layer_owner": {
+      "passed": 2,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\distillery-layered.log",
+      "sha256": "e26cdac670cd49ae645a41aeeb6b63e23050d6815a103ad355fcf45f945ab0d6"
+    },
+    "selector_shared_memory_budget": {
+      "passed": 1,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\cubek-budget.log",
+      "sha256": "47cb2ec65c8f409ef2448fe003e17c115e892e7b38270532a3260cd1f0015784"
+    },
+    "actor_wire_feature_graph": {
+      "esp_features": [
+        "actor",
+        "default"
+      ],
+      "decoder_enabled": false,
+      "model_session_enabled": false,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\actor-wire-features.log",
+      "sha256": "510d7ef05e3072595f919fe94f2ee04b67462a8d59974608836366275a2860db"
+    },
+    "documentation_audit": {
+      "counts": {
+        "active_docs": 286,
+        "indexed_active_docs": 285,
+        "index_orphans": 0,
+        "index_ghosts": 0,
+        "memory_directory_links": 0,
+        "statusless_plans": 0,
+        "broken_relative_links": 41,
+        "historical_broken_relative_links": 245,
+        "planned_broken_relative_links": 0,
+        "ambiguous_known_root_paths": 175,
+        "ignored_known_root_patterns": 24,
+        "reserved_identifier_paths": 31,
+        "missing_known_root_paths": 178,
+        "historical_missing_known_root_paths": 243,
+        "planned_missing_known_root_paths": 9,
+        "invalid_historical_annotations": 0,
+        "stale_historical_annotations": 1,
+        "unheaded_owned_sources": 70,
+        "exhibit_b_sources": 0
+      },
+      "same_as_i6_baseline": true,
+      "sha256": "cc1f440c91152c691b2f58c5907ceb97544e08263b5d4e96d31269f188b0f505",
+      "full_report_equals_i6_baseline": true
+    },
+    "quantized_untied_output_width": {
+      "passed": 1,
+      "vocab_size": 79,
+      "formats": [
+        "f16",
+        "q8-k32-f32-scale-f16-shared-v1",
+        "q4-k32-f32-scale-f16-shared-v1"
+      ],
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\untied-output-width.log",
+      "sha256": "af068ef248305ba64aaf5b3561c36cd08d97ca73fd18f4e8781c2c6ae4fdf7f1"
+    },
+    "djinn_route": {
+      "passed": 4,
+      "ignored": 2,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\djinn-route.log",
+      "sha256": "84bdb51128fa07a0071f21ac16dcbb342013013cbf2ba83086513819e3fedadc"
+    },
+    "djinn_gpu_trainer_reclaim": {
+      "passed": 3,
+      "explicit_ignored_tests": true,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\djinn-reclaim.log",
+      "sha256": "f165a44493e918518f3ecb613a7a3bb37200811c9768b20be36c6c2b47e2c1c8"
+    },
+    "djinn_real_retained_version_recall": {
+      "passed": 1,
+      "explicit_ignored_test": true,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\djinn-recall.log",
+      "sha256": "3a3e860a573cd336dbbe02438b00894b0f17bc40f64692e9808273f521c8e26e"
+    },
+    "actor_wire_regressions": {
+      "passed": 38,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\actor-wire.log",
+      "sha256": "2d89b62eaf3774dbab5d24abe99628cc3670738d165e6da2994c3ab2ccc8a750"
+    },
+    "examples": {
+      "success": true,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\examples-final.log",
+      "sha256": "30eaa3057e56f4ed6dda8ed6830268ed32a377ead79dd174579a489d1e3bb363"
+    },
+    "djinn_release_build": {
+      "success": true,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\djinn-build.log",
+      "sha256": "f538b6bb3416019ec93f1b64dd930ff57e118c9dec456d81dbedbf77b56b3c1d"
+    },
+    "formatting": {
+      "exit_code": 0,
+      "log": "C:\\t\\cargo-targets\\mere\\inference-i7\\formatting.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "gate_complete": true,
+  "limits": [
+    "SmolLM2 native provider rows qualify these formats; larger quantized models were not measured in this gate.",
+    "Three fixed prompts measure execution and deviation, not general answer quality. CPU f16 and both quantized rows show answer drift from bf16.",
+    "The bf16 comparison across GPU rows includes backend arithmetic differences; supplemental errors compare against GPU f16.",
+    "Encoded payload and shared-plus-largest-layer counts exclude allocator overhead, activations, KV, temporary kernel buffers, library caches and import buffers.",
+    "Process peak working set covers the full fixture including import, diagnostics and pause/resume.",
+    "GPU memory sampling covers the entire GPU including unrelated processes, not isolated per-process VRAM.",
+    "Logical layer bytes include OS-cache hits; physical disk traffic and cold-disk throughput were not measured.",
+    "A compile-only Distillery build overlapped the measurements; elapsed costs are not an isolated throughput comparison.",
+    "The installed Djinn binary, a new headed browser row, physical second-device execution and Metal bf16 were not run in I7."
+  ],
+  "retained_outputs": [
+    {
+      "path": "C:/Users/mark_/Code/worktrees/mere-resident-inference",
+      "owner": "resident inference lane",
+      "reason": "Unintegrated branch and subsequent I8 work; primary checkout has concurrent work."
+    },
+    {
+      "path": "C:/t/cargo-targets/mere/inference-i7",
+      "owner": "I7 qualification",
+      "reason": "Pinned model library, raw logits, measurements, failure evidence and logs for reproduction."
+    },
+    {
+      "path": "C:/t/cargo-targets/mere",
+      "owner": "shared Mere Cargo builds",
+      "reason": "Stable reusable target and build directories; no isolated Cargo home was created."
+    }
+  ],
+  "bf16_baseline_candidate_model": "blake3:043bccefc53855e4d92201fe61a981c963c660b4960a33e350500de6e994ebc0",
+  "cpu_bf16_matches_independent_f32_reference_token_ids": 39,
+  "native_build_head_commit": "d3365b49892c206b3696ee99a9fa8ff58b1a4216",
+  "native_source_note": "The measurement executable was built from the working-tree content later committed as 963067cb, while Git HEAD still named d3365b49. The recorded source blob hashes identify that qualified content.",
+  "supplemental_source_commit": "7d9bffe3ac15d2a2493f2f23fbc73623ced6e881",
+  "supplemental_source_note": "The later guard admits arbitrary positive projection output widths while retaining K32 input alignment; it does not change the qualified aligned SmolLM2 encodings or arithmetic. The added 79-entry untied-head test covers this admission. Other changes are tests, headers, license provenance and the standalone patch gate lockfile.",
+  "supplemental_git_blob_sha256": {
+    "crates/intel/esp/src/infer/decoder/weight_format.rs": "e3bd48d87fba07a895b813d920486ece462f2ee2fea1a811a5024919e7ab2f5a",
+    "crates/intel/esp/tests/weight_formats_real.rs": "3a47930cb7277e66e033f0a0df397e1c8f155e2bb2b833c3e3f5ce599131b5e7",
+    "crates/intel/esp/examples/qualify_inference_model.rs": "65654269bb31ca506e09dfd4103865fc383f988e0e76423d33b4b244b4c88137",
+    "LICENSES.md": "c4b7f9d7b8028b7f297ec81b9f0f3e625e54dfb51667adff97083436a4e45009",
+    "support/patches/cubek-matmul/Cargo.lock": "5fea797d1e04fbde2faf58917955c83db53c6cb0105aefdffaee2d50ae4ee1e0"
+  },
+  "toolchain": {
+    "rustc": "1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "1.99.0 (5f94df478 2026-08-27)",
+    "burn": "0.22.0",
+    "cubecl": "0.11.0",
+    "cubek-matmul": "0.3.0 + recorded patch",
+    "safetensors": "0.4.5",
+    "half": "2.7.1",
+    "tokenizers": "0.20.4",
+    "gpu_driver": "610.88",
+    "gpu_backend": "Vulkan"
+  },
+  "format_guard_evidence_note": "The bf16 baseline fixture rejects a candidate checkpoint after qualification changes its envelope. CPU bf16-to-f16 and every other native row-to-bf16 comparison exercise actual format changes.",
+  "commands": [
+    "cargo test --locked --offline -p esp --release --features decoder-flex,decoder-wgpu,decoder-autodiff --lib --test durable_generation --test library_session --test prompt_template --test trainer_autodiff --test weight_formats_real --no-fail-fast -- --test-threads=1",
+    "support/run_resident_weight_formats.ps1 -TestBinary <recorded executable> -ModelDirectory <pinned snapshot> -WorkDirectory C:/t/cargo-targets/mere/inference-i7 -Format <bf16|f16|q8-block32|q4-block32> -Loader <burn-flex|burn-wgpu>",
+    "cargo test --locked --offline --manifest-path support/patches/cubek-matmul/Cargo.toml --release --lib packed_q4_minimum_tile --no-default-features --features std,multi-level",
+    "cargo test --locked --offline -p distillery --release --features inference-gpu,trainer-gpu,trainer-autodiff --lib --test inference_layered --test inference_durable --no-run",
+    "<recorded distillery/unit/durable/layered executables> --test-threads=1",
+    "cargo test --locked --offline -p djinn --release --features inference-gpu,trainer-gpu,trainer-autodiff --test inference_route --test inference_gpu_reclaim --no-run",
+    "<inference_route executable> --test-threads=1",
+    "<inference_gpu_reclaim executable> --ignored --test-threads=1 --nocapture",
+    "<inference_route executable> --ignored --exact a_real_model_cites_exact_retained_versions_and_reopens_its_run --test-threads=1 --nocapture",
+    "cargo test --locked --offline -p distillery --features inference,inference-wire --lib",
+    "cargo check --locked --offline -p esp --release --features decoder-flex,decoder-wgpu,decoder-autodiff --examples",
+    "python scripts/mere_doc_audit.py --json"
+  ],
+  "regression_binaries": {
+    "inference_route-3074c8a47056f5ca.exe": "053e7d050f08aee7097cccfdd12db62fb1b10985a809c284833c186750456690",
+    "inference_gpu_reclaim-27949336796435e5.exe": "ccc82e7aa8bcdf4df06412456efd8e54cab54e357602711e0c470ba915ccd4a7",
+    "distillery-476c1d3d2a22de84.exe": "02a85c52aecdfce5e051494d7255049a22446275f5b3e5e96c2231ae26cd816d",
+    "inference_layered-8367fda7534dbd67.exe": "5c37fddd3b8ef9a30fd845d30d45afbc036d5ce159e51e1e085ea149a4940e28",
+    "inference_durable-025fbb9eb172d9d0.exe": "fa2163987cfc0b5a2f288577aaf92831a6e6d741425aa4188e1cdd0ab1b5752e"
+  }
+}

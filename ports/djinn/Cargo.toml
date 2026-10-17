@@ -26,6 +26,12 @@ custody-receipt-host = []
 # settings name a trainer this build does not carry is refused loudly rather
 # than composed diminished.
 trainer = ["distillery/trainer"]
+# The resident inference lane (`src/resident_inference.rs`; resident inference
+# and recall plan, I1). Gated for the trainer's reason: a default build stays
+# light, and settings naming the lane in a build without it are refused.
+inference = ["distillery/inference-model"]
+inference-gpu = ["inference", "distillery/inference-gpu"]
+inference-stages = ["inference", "personal-sync", "distillery/inference-stages"]
 # The same trainer, composed on this machine's discrete GPU. Additive over
 # `trainer`, and honest about the difference: a lane that says `device: "gpu"`
 # on a build without this feature refuses `open` by name rather than quietly
@@ -84,12 +90,14 @@ chirograph.workspace = true
 cleromancy-domain = { package = "cleromancy-core-acceptance", git = "https://github.com/merely-made/cleromancy.git", branch = "main" }
 # The identity tier's plain types: views, intents, the roster (DR-A, DR-C).
 dramatis.workspace = true
+personal-facts.workspace = true
+gaz.workspace = true
 incipit.workspace = true
 # The operational works composed as this resident's fourth lane
 # (`src/resident_distillery.rs`). Default features only unless djinn's own
 # `trainer` feature is on: `remote` would pull the burn stack into the desktop
 # resident, and `trainer` pulls it deliberately and by the owner's request.
-distillery.workspace = true
+distillery = { workspace = true, features = ["inference-wire"] }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).

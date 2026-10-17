@@ -1,0 +1,344 @@
+{
+  "adapter": {
+    "backend": "vulkan",
+    "device_type": "Discrete",
+    "matched_requested_class": true,
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+  },
+  "backend": "burn-wgpu",
+  "load_seconds": 2.5300292,
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+  "row": "blake3:cc753a9cfd8b2657c66b962e508b97845b6c2bda7c42940d5ea4ae5386952a01",
+  "rows": [
+    {
+      "question": "What is the capital of France?",
+      "seconds": 4.2878872,
+      "text": "The capital of France is Paris.",
+      "token_ids": [
+        504,
+        3575,
+        282,
+        4649,
+        314,
+        7042,
+        30
+      ]
+    },
+    {
+      "question": "Count from one to five.",
+      "seconds": 2.0970246,
+      "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+      "token_ids": [
+        33,
+        30,
+        1963,
+        198,
+        34,
+        30,
+        5713,
+        198,
+        35,
+        30,
+        8696,
+        198,
+        36,
+        30,
+        8920,
+        198
+      ]
+    },
+    {
+      "question": "What color is a clear daytime sky?",
+      "seconds": 1.6942143,
+      "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+      "token_ids": [
+        49,
+        2437,
+        23703,
+        6376,
+        314,
+        3431,
+        253,
+        2276,
+        11615,
+        282,
+        4461,
+        28,
+        1129,
+        351,
+        253,
+        11682
+      ]
+    }
+  ],
+  "session": {
+    "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+    "session_id": "blake3:e98a2d6d857bbeea8f431367885d4a5ddee51d3751f69e9ade6943c19314f925"
+  },
+  "resident_reclaim": {
+    "autodiff": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Restart",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5"
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792105300462,
+      "steps": "[Claimed { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Granted { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), epoch: 0, lease: LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40]) }, Started { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), lease: Some(LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40])) }, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Heartbeat { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), lease: LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Heartbeat { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), lease: LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Heartbeat { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), lease: LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Heartbeat { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), lease: LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Idle, AwaitingStop { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }, Reclaimed { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]), lease: LeaseId([179, 69, 174, 66, 48, 233, 166, 10, 35, 91, 184, 121, 187, 172, 23, 234, 22, 34, 236, 207, 56, 112, 137, 255, 222, 31, 91, 235, 145, 210, 235, 40]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Claimed { job: JobId([39, 10, 166, 57, 238, 123, 136, 216, 130, 200, 229, 170, 191, 189, 12, 129, 222, 190, 31, 212, 136, 14, 162, 137, 123, 44, 107, 125, 144, 223, 102, 24]) }]",
+      "steps_kind_counts": {
+        "Claimed": 2,
+        "Granted": 1,
+        "Started": 1,
+        "AwaitingStop": 29,
+        "Heartbeat": 4,
+        "Reclaimed": 1
+      }
+    },
+    "checkpoint_request": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Resumable",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5"
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792105290829,
+      "steps": "[Claimed { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Granted { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), epoch: 0, lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]) }, Started { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: Some(LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211])) }, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Heartbeat { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Heartbeat { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Heartbeat { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Heartbeat { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Idle, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Heartbeat { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }, Reclaimed { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]), lease: LeaseId([210, 159, 248, 88, 243, 236, 127, 241, 85, 61, 17, 99, 73, 250, 191, 22, 83, 17, 150, 75, 235, 99, 87, 91, 120, 214, 168, 141, 27, 48, 247, 211]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Claimed { job: JobId([202, 51, 246, 6, 148, 100, 58, 90, 63, 80, 142, 39, 95, 121, 219, 193, 158, 22, 126, 239, 70, 68, 27, 182, 202, 133, 123, 46, 24, 154, 47, 48]) }]",
+      "steps_kind_counts": {
+        "Claimed": 2,
+        "Granted": 1,
+        "Started": 1,
+        "AwaitingStop": 30,
+        "Heartbeat": 5,
+        "Reclaimed": 1
+      }
+    },
+    "finite_difference": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Restart",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5"
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792105293254,
+      "steps": "[Claimed { job: JobId([172, 43, 150, 49, 65, 232, 8, 77, 0, 231, 185, 53, 81, 152, 173, 107, 133, 164, 135, 45, 71, 7, 120, 204, 207, 57, 126, 49, 239, 134, 249, 137]) }, Granted { job: JobId([172, 43, 150, 49, 65, 232, 8, 77, 0, 231, 185, 53, 81, 152, 173, 107, 133, 164, 135, 45, 71, 7, 120, 204, 207, 57, 126, 49, 239, 134, 249, 137]), epoch: 0, lease: LeaseId([118, 32, 193, 179, 243, 32, 202, 159, 145, 141, 216, 116, 107, 214, 17, 170, 29, 181, 26, 134, 168, 69, 28, 190, 129, 177, 146, 183, 188, 6, 177, 128]) }, Started { job: JobId([172, 43, 150, 49, 65, 232, 8, 77, 0, 231, 185, 53, 81, 152, 173, 107, 133, 164, 135, 45, 71, 7, 120, 204, 207, 57, 126, 49, 239, 134, 249, 137]), lease: Some(LeaseId([118, 32, 193, 179, 243, 32, 202, 159, 145, 141, 216, 116, 107, 214, 17, 170, 29, 181, 26, 134, 168, 69, 28, 190, 129, 177, 146, 183, 188, 6, 177, 128])) }, AwaitingStop { job: JobId([172, 43, 150, 49, 65, 232, 8, 77, 0, 231, 185, 53, 81, 152, 173, 107, 133, 164, 135, 45, 71, 7, 120, 204, 207, 57, 126, 49, 239, 134, 249, 137]) }, Idle, AwaitingStop { job: JobId([172, 43, 150, 49, 65, 232, 8, 77, 0, 231, 185, 53, 81, 152, 173, 107, 133, 164, 135, 45, 71, 7, 120, 204, 207, 57, 126, 49, 239, 134, 249, 137]) }, Reclaimed { job: JobId([172, 43, 150, 49, 65, 232, 8, 77, 0, 231, 185, 53, 81, 152, 173, 107, 133, 164, 135, 45, 71, 7, 120, 204, 207, 57, 126, 49, 239, 134, 249, 137]), lease: LeaseId([118, 32, 193, 179, 243, 32, 202, 159, 145, 141, 216, 116, 107, 214, 17, 170, 29, 181, 26, 134, 168, 69, 28, 190, 129, 177, 146, 183, 188, 6, 177, 128]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle]",
+      "steps_kind_counts": {
+        "Claimed": 1,
+        "Granted": 1,
+        "Started": 1,
+        "AwaitingStop": 2,
+        "Heartbeat": 0,
+        "Reclaimed": 1
+      }
+    }
+  },
+  "qualification_scope": {
+    "model_reference": "real pinned SmolLM2 through MemoryBackend and the session-bound decoder; each question repeated through the provider seam",
+    "resident_reclaim": "native DjinnResident with a tiny model and real GPU TrainerResource; clean owner revocation, GPU ask, restored offer and drained shutdown asserted",
+    "installed_binary_run": false,
+    "headed_run": false,
+    "gpu_tensors": "loaded per ask, synchronized and dropped before releasing foreground ownership",
+    "app_route": "Separate native resident app-broker harness: stub and tiny CPU library model, Turnstone-only grant, real local app connection and clean shutdown; rerun in the GPU-capable build."
+  },
+  "host": {
+    "machine": "O-PC",
+    "platform": "Windows-10-10.0.26220-SP0",
+    "cpu": "AMD Ryzen 9 7940HS with Radeon 780M Graphics",
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "nvidia_driver": "610.88",
+    "gpu_memory_total_mib": 8188,
+    "peak_memory_measured": false
+  },
+  "basis_parent": "cc9c81e00d5ca6012d441623e840f8bad0846e47",
+  "source_sha256": {
+    "Cargo.lock": "5d668824de30bb3065a198b8ac32d1d0c9583ac782fd7ca0552611761593d523",
+    "crates/intel/esp/Cargo.toml": "0cbb24117748a29b631739e702c5720dece861f8d9708ddcfcf8e4f2a89009c6",
+    "crates/intel/esp/examples/import_inference_model.rs": "5c6cf5cb43348538e58f09e95a1a8ffa89cf23ec724d395b5d1ad4027a5f4a3a",
+    "crates/intel/esp/src/infer/actor.rs": "63a6c026f8e01bfc37d461830b5f5f6bf18d27d3b6e12151380a1cfe536f3a46",
+    "crates/intel/esp/src/infer/decoder/mod.rs": "5733d81d8d362783602e0f253f8ae4a7a9d2a73da76405267c55a5dde6ce769e",
+    "crates/intel/esp/src/infer/decoder/provider.rs": "a1bdfd38c357bfd27672935629e3d988c7a40c71151a3cbba773cde8f3ab9e79",
+    "crates/intel/esp/src/infer/decoder/train.rs": "0183b47cee0f762a938ae45133fd40c407546507eec3e0c5614331dedaffef13",
+    "crates/intel/esp/src/infer/decoder/train_autodiff.rs": "9df30a1fee905024d4a16bbeab7d2ee2d7fdc5ddc0da9a1f7945a92866ccb309",
+    "crates/intel/esp/src/infer/library.rs": "9b14fc2a12c65bf31862d07e29a61d457a30f297c798ceb43ab6c7e987199f91",
+    "crates/intel/esp/src/infer/mod.rs": "8761ddcd7007c505ff874123793b98fe968aec7886eaa8f6236d8e385f03ad58",
+    "crates/intel/esp/src/infer/prompt.rs": "1d6b73f74827366c90a919e1bf6cadfc401530bf8531d4e1efc1c2e26a8dcb6e",
+    "crates/intel/esp/src/infer/provider.rs": "82b9cc943a1ac07b0ca25709492a7dae688280ed6f7da68fd3d8b33c4928f374",
+    "crates/intel/esp/templates/smollm2-instruct-v1.json": "e74608112d6fa9812f416799ac7a6d8d63a50f4b98a20b470b05f018c0ee4daf",
+    "crates/intel/esp/tests/eidetic_corridor.rs": "d60d8fc868305e1bb9edc54d9870e966d9813d899bdb28a92dbb976dcf4c51e5",
+    "crates/intel/esp/tests/library_session.rs": "ca15e3352895512d459946c692247d61f3672c2d5d965ef8f28ceb93275b43cf",
+    "crates/intel/esp/tests/prompt_template.rs": "f88caace50e968086957afd6e19f5bf64cc3fade95606e34d4ccc5f120353cc4",
+    "crates/intel/esp/tests/reference_smollm2.py": "6d987714241ad661d97121b07e370e078efa692e548114b2eb8a387fbeaf9d19",
+    "crates/intel/esp/tests/smollm2_360m_reference.json": "194bb491105aa8fb90f314c68b2d52a1453129c2863f4f5a11f74c4bbd898564",
+    "crates/intel/esp/tests/smollm2_library.rs": "9372e792de3281b24875067dbbc41aec1e7c2e9b7341ffd6ee6cd14e19a68cee",
+    "crates/intel/esp/tests/support/decoder.rs": "479586c2a502be425118d6c27b691d5a1a93274c3d77d8574a978572eb69da42",
+    "ports/distillery/Cargo.toml": "7239e0b2ebb74eb1eed3d38a23d9a48920fd16b4241505133e64d20d916549f3",
+    "ports/distillery/src/gpu.rs": "2b0bbcf3ee42fb50d78411955e0ddbb51857deefccfa83e5bb08320263e64fbf",
+    "ports/distillery/src/inference.rs": "9da6220f623bfa1a2f0911baa5fbb3ebe3b4f9720f5a6c49532051898f78726f",
+    "ports/distillery/src/inference/gpu.rs": "95f76adb804c8c7b49eb687127316b6354a766aa8fa72616325571294d56cdfd",
+    "ports/distillery/src/lib.rs": "c1bdce8956903dff886976a6b99c1d2348d1c8aa4ae5719b6b1a3bc518d13d86",
+    "ports/distillery/src/mesh_host/host.rs": "6addb94291e01bb77ae6711d294f0d3415639da93724f9b38e5224377a7d738a",
+    "ports/distillery/src/trainer.rs": "88be82c143d60bc0d807306ab20955ade6f4d9b1994c80b16c2b1ce0294f292f",
+    "ports/djinn/Cargo.toml": "8f1468b2fb40992e083ab9efadebe8d528c4043ab39fac6c999e0b7f993ba3d9",
+    "ports/djinn/src/resident.rs": "e87537f9b45e91e72c5aafe1b20b93cf279523e82eed2cf9d979d66aefd1020d",
+    "ports/djinn/src/resident_distillery.rs": "f5af7407a7ea956842997028c439267dbccbb7305a5d36dc6a90133a82ec251d",
+    "ports/djinn/src/resident_inference.rs": "62ffcc1b04387492cd23040d00c222f2b529c70f38c7f3bf6babe527529a7c42",
+    "ports/djinn/src/settings.rs": "d29dd1a3abf1ec88649b91fc39e8f1fe3129a054053bb4364a9c210ed1c6a5f3",
+    "ports/djinn/tests/distillery_trainer_gpu.rs": "b4783196db4defb977a3384a52b2cd39e304b0a9405ae89c9713b1a2f7667390",
+    "ports/djinn/tests/inference_gpu_reclaim.rs": "523b1862e30e26fda5a610bd372bdea416388b682b89b4ae6d105ca43df5adc2",
+    "ports/djinn/tests/inference_route.rs": "e5e57af00651913c6e8a704c930a6ab17b4161a28ef3d7cd8c433aa34b279100"
+  },
+  "test_binaries_sha256": {
+    "smollm2_library-e6e1fcef4b054345.exe": "09175d1b67c8678d807918b9490a4effef814a61aa52f1638d30794925fa96ec",
+    "inference_gpu_reclaim-a2f30a4d4fd9fbb0.exe": "fd0f2aa4e32c06540ec610a8951634903c2fc16df0bb24d930e936b2442f25ea",
+    "gpu-access-tests.exe": "7374f633a7a3749f3485a73dabd82f8437b87c2e644d4a9a800f69222e6db22f",
+    "inference_route-f3065bac410c43b5.exe": "a5087e0c9c8190337dc006c2cd38421dc0fce6ce45902ffdc2fa091244c4ece6"
+  },
+  "gpu_access_control": {
+    "positive_repeats": 20,
+    "tests_per_repeat": 2,
+    "negative_mutation": "replace if !state.occupied with if true in a generated copy outside the checkout",
+    "negative_expected_failure": "a_waiter_cancels_without_releasing_a_detached_workers_guard",
+    "negative_result": "1 passed, 1 failed as expected",
+    "checkout_mutated": false,
+    "positive_log_sha256": "c76a86fc92f3a630f9cec819df28379958bd1eb1654436bcc892fa5d70fae20a",
+    "negative_log_sha256": "d63cbda4a1d3c72adce0cd8e8399bc66aacae2c6eb690ca711d25cdb31af45d0"
+  },
+  "logs_sha256": {
+    "inference-smollm2-gpu.log": "c36ee276731935a950171d2f4f0d533a3b1f03b04eb84d4a680d7831a5a86eff",
+    "inference-reclaim.log": "1c2c17c35b01063ccccf5aae73d54bf1aee9e585789f7b265349c05d405160ef",
+    "inference-esp-controlled.log": "ad0377d61f0e686ad1141c16b942cad304b9d651e9387a69e6f32323d31de5dc",
+    "inference-nodefault.log": "219fce6567385b26b2f3710cb6d6b1af27bb8fb0855875a5457b966448081b14",
+    "inference-default.log": "6f74778770ebca4b93e34448a9badfc07a180175d8a184e910b39af672a06f4d",
+    "inference-import.log": "36708ca7adc5f490c28b8c0de8f8856d28d808aafcca307001eaf4a7075df3e9",
+    "inference-distillery-final.log": "c3b5cb1304a2774175826bb1c4c5a1b6988fd3902d55172748de26d4533175b7",
+    "inference-gpu-build.log": "fc78d61bfe6cb706238af68569831d07b7c93dfbff34c06b30ce8315817daba0",
+    "inference-host-reclaim.log": "09a6daad88dc2cb8f51a249cba595f52484d656576edaef5fb3918eb60bcb60c",
+    "inference-route-gpu-build.log": "e8c0c5c4f18814986729b489c8f181e7e8eb0338a2f1cf5a64a2ef4b6009c333",
+    "inference-esp-corridors.log": "7ae031e01d2a61b59e7e54e27bf1e4c2fcb4da69570fa2d8bc3517df5e680de0"
+  },
+  "checks": {
+    "esp_release_units": {
+      "passed": 169,
+      "log_sha256": "ad0377d61f0e686ad1141c16b942cad304b9d651e9387a69e6f32323d31de5dc"
+    },
+    "esp_no_default_units": {
+      "passed": 82,
+      "log_sha256": "219fce6567385b26b2f3710cb6d6b1af27bb8fb0855875a5457b966448081b14"
+    },
+    "djinn_default_settings": {
+      "passed": 4,
+      "log_sha256": "6f74778770ebca4b93e34448a9badfc07a180175d8a184e910b39af672a06f4d"
+    },
+    "djinn_gpu_settings": {
+      "passed": 5,
+      "log_sha256": "fc78d61bfe6cb706238af68569831d07b7c93dfbff34c06b30ce8315817daba0"
+    },
+    "distillery_units": {
+      "passed": 34,
+      "log_sha256": "c3b5cb1304a2774175826bb1c4c5a1b6988fd3902d55172748de26d4533175b7"
+    },
+    "mesh_supervised_reclaim": {
+      "passed": 1,
+      "log_sha256": "09a6daad88dc2cb8f51a249cba595f52484d656576edaef5fb3918eb60bcb60c"
+    },
+    "djinn_gpu_reclaim": {
+      "passed": 3,
+      "log_sha256": "1c2c17c35b01063ccccf5aae73d54bf1aee9e585789f7b265349c05d405160ef"
+    },
+    "djinn_app_route": {
+      "passed": 3,
+      "log_sha256": "e8c0c5c4f18814986729b489c8f181e7e8eb0338a2f1cf5a64a2ef4b6009c333"
+    },
+    "smollm2_gpu_reference": {
+      "passed": 1,
+      "log_sha256": "c36ee276731935a950171d2f4f0d533a3b1f03b04eb84d4a680d7831a5a86eff"
+    },
+    "esp_template_library_corridors": {
+      "passed": 6,
+      "log_sha256": "7ae031e01d2a61b59e7e54e27bf1e4c2fcb4da69570fa2d8bc3517df5e680de0"
+    },
+    "import_example": {
+      "build": "passed",
+      "log_sha256": "36708ca7adc5f490c28b8c0de8f8856d28d808aafcca307001eaf4a7075df3e9"
+    }
+  },
+  "source_hash_basis": "Exact tested Windows worktree bytes. Git may normalize line endings on a later checkout."
+}

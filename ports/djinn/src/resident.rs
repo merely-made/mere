@@ -25,6 +25,7 @@ use transport::BlobScope;
 
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
+use crate::resident_inference::{self, ResidentInference};
 use crate::resident_knot::{KnotGate, ResidentKnot};
 use crate::resident_mere::MereRoutes;
 use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
@@ -49,6 +50,13 @@ pub struct DjinnResident {
     /// its route was registered over (vault lock ruling 48).
     knot_reopen: Option<(PathBuf, KnotResidentSettings, KnotGate)>,
     distillery: Option<ResidentDistillery>,
+    /// The inference lane, which borrows the Distillery lane's model
+    /// library and so closes before it.
+    inference: Option<ResidentInference>,
+    #[cfg(feature = "inference")]
+    inference_pending: Option<crate::settings::InferenceLaneSettings>,
+    #[cfg(feature = "inference")]
+    data_root: PathBuf,
     reservoir_settings: ReservoirLaneSettings,
     /// Off until [`DjinnResident::open_reservoir`] opens it under a shared
     /// root the caller names.
@@ -56,6 +64,31 @@ pub struct DjinnResident {
 }
 
 impl DjinnResident {
+    /// Open a resident with local-only inference. Hosts with personal sync use
+    /// `open_deferred_inference`, then start inference against that live host.
+    pub async fn open<P: IdentityProvider + ?Sized>(
+        identity: &P,
+        data_root: &Path,
+        profile: &ProfileId,
+        owner: OwnerSettings,
+        vault_dir: &Path,
+        unlock: Unlock,
+    ) -> Result<Self, String> {
+        let resident =
+            Self::open_deferred_inference(identity, data_root, profile, owner, vault_dir, unlock)
+                .await?;
+        #[cfg(feature = "inference")]
+        let mut resident = resident;
+        #[cfg(feature = "inference")]
+        if let Err(error) = resident.start_inference(identity, None).await {
+            let cleanup = resident.shutdown().await.err();
+            return Err(format!(
+                "open resident inference: {error}; cleanup: {cleanup:?}"
+            ));
+        }
+        Ok(resident)
+    }
+
     /// Open the credential, content, and optional Knot and Distillery
     /// authorities selected for one already-unlocked Personae profile.
     ///
@@ -67,7 +100,7 @@ impl DjinnResident {
     /// vault instead would mean either handing this constructor a Personae
     /// internal or moving the derivation out of Distillery, and both cost more
     /// than one extra open.
-    pub async fn open<P: IdentityProvider + ?Sized>(
+    pub async fn open_deferred_inference<P: IdentityProvider + ?Sized>(
         identity: &P,
         data_root: &Path,
         profile: &ProfileId,
@@ -75,6 +108,8 @@ impl DjinnResident {
         vault_dir: &Path,
         unlock: Unlock,
     ) -> Result<Self, String> {
+        // Before anything opens, so a refusal leaves nothing to unwind.
+        resident_inference::validate(&owner)?;
         let credentials = claim_credentials(identity, data_root, profile)?;
         let blobs = ResidentBlobCustody::open(data_root, &owner.content).await?;
         let site_root = published_site_profile_root(data_root, profile);
@@ -110,9 +145,34 @@ impl DjinnResident {
             },
             None => None,
         };
+        let automatic_mesh = if matches!(
+            owner.inference.as_ref().map(|s| &s.model),
+            Some(crate::settings::InferenceModelSettings::Automatic { .. })
+        ) {
+            Some(resident_inference::compute_space(
+                crate::personal_sync::personal_graph_id(
+                    &owner
+                        .sync
+                        .as_ref()
+                        .ok_or("automatic inference requires personal sync settings")?
+                        .graph,
+                ),
+            ))
+        } else {
+            None
+        };
         let distillery = match owner.distillery {
             Some(lane) => {
-                match ResidentDistillery::open(data_root, profile, vault_dir, unlock, lane).await {
+                match ResidentDistillery::open_mesh(
+                    data_root,
+                    profile,
+                    vault_dir,
+                    unlock,
+                    lane,
+                    automatic_mesh,
+                )
+                .await
+                {
                     Ok(distillery) => Some(distillery),
                     Err(open_error) => {
                         // Unwind in reverse construction order: the Knot lane
@@ -149,9 +209,102 @@ impl DjinnResident {
             knot,
             knot_reopen,
             distillery,
+            inference: None,
+            #[cfg(feature = "inference")]
+            inference_pending: owner.inference,
+            #[cfg(feature = "inference")]
+            data_root: data_root.to_path_buf(),
             reservoir_settings: owner.reservoir,
             reservoir: ReservoirLane::Off,
         })
+    }
+
+    /// Complete inference composition after personal sync opens, before its
+    /// lock holder or route is registered. No actor runs during this handoff.
+    #[cfg(feature = "inference")]
+    pub async fn start_inference<P: IdentityProvider + ?Sized>(
+        &mut self,
+        identity: &P,
+        personal: Option<Arc<crate::sync::personal_sync_host::PersonalSyncHost>>,
+    ) -> Result<(), String> {
+        let Some(settings) = self.inference_pending.as_ref() else {
+            return Ok(());
+        };
+        let works = self
+            .distillery
+            .as_mut()
+            .ok_or("inference needs Distillery during composition")?;
+        let library = if settings.model.library().is_some() {
+            Some(works.inference_model_library(&self.data_root)?)
+        } else {
+            None
+        };
+        let journal = if library.is_some() {
+            let key = identity
+                .derive_keypair(resident_inference::INFERENCE_DATA_SALT)
+                .map_err(|error| error.to_string())?
+                .to_seed();
+            let local = works.inference_journal(key)?;
+            Some(match personal.as_ref() {
+                Some(host) => resident_inference::personal::open(
+                    identity,
+                    works.inference_root(),
+                    host,
+                    local,
+                    key,
+                )?,
+                None => local,
+            })
+        } else {
+            None
+        };
+        #[cfg(feature = "inference-stages")]
+        let stages = if let crate::settings::InferenceModelSettings::Automatic {
+            row,
+            device,
+            stages,
+            ..
+        } = &settings.model
+        {
+            Some(
+                works
+                    .prepare_automatic_inference(
+                        &self.data_root,
+                        personal
+                            .as_ref()
+                            .ok_or("automatic inference requires the live keyed personal graph")?,
+                        row,
+                        *device,
+                        stages.clone(),
+                        identity
+                            .attest_derived_key(mesh::MESH_AUTHOR_SALT)
+                            .map_err(|e| e.to_string())?,
+                    )
+                    .await?,
+            )
+        } else {
+            None
+        };
+        let mut inference = ResidentInference::open(
+            settings,
+            library,
+            works.gpu_access(),
+            journal.clone(),
+            #[cfg(feature = "inference-stages")]
+            stages,
+        )?;
+        if let (Some(host), Some(journal)) = (&personal, &journal) {
+            if let Err(error) = resident_inference::personal::join(host, journal).await {
+                let closed = inference.close().await.err();
+                return Err(format!(
+                    "join private inference log: {error}; close: {closed:?}"
+                ));
+            }
+            inference.retain_personal_sync(host.clone());
+        }
+        self.inference = Some(inference);
+        self.inference_pending = None;
+        Ok(())
     }
 
     /// Open the reservoir lane under `shared_root` as the owner's settings say.
@@ -195,6 +348,21 @@ impl DjinnResident {
     pub fn credential_lock_holder(&self) -> Arc<dyn VaultLockHolder> {
         self.credentials
             .lock_holder_for_profile(CASTELLAN_SALTS, self.credential_profile.clone())
+    }
+
+    #[cfg(feature = "inference")]
+    pub fn inference_lock_holder(&self) -> Option<Arc<dyn VaultLockHolder>> {
+        self.inference
+            .as_ref()
+            .map(|lane| lane.lock_holder(self.credential_profile.clone()))
+    }
+
+    /// Private stage workers remain lock holders even without a local ask lane.
+    #[cfg(feature = "inference-stages")]
+    pub fn inference_stage_lock_holder(&self) -> Option<Arc<dyn VaultLockHolder>> {
+        self.distillery
+            .as_ref()
+            .and_then(|works| works.inference_stage_lock_holder())
     }
 
     /// Claim existing credential stores under each persisted persona's own keys.
@@ -244,6 +412,38 @@ impl DjinnResident {
         };
         knot.register(catalog)?;
         Ok(Some(ResidentKnot::route()))
+    }
+
+    /// Register the inference route when this run composes the lane.
+    pub fn register_inference_route(
+        &self,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<Option<ResidentEndpointRoute>, ResidentEndpointCatalogError> {
+        self.inference
+            .as_ref()
+            .map(|inference| inference.register(catalog))
+            .transpose()
+    }
+
+    /// The open inference lane, when this run composes it.
+    pub fn inference(&self) -> Option<&ResidentInference> {
+        self.inference.as_ref()
+    }
+
+    /// Borrow a retained corpus from its source owner; never reopen its store.
+    /// Desktop and embedded compositions share this adapter before admitting
+    /// `ask-recall-v1`. Source acquisition and disclosure remain caller-owned.
+    #[cfg(feature = "inference")]
+    pub fn configure_inference_recall(
+        &self,
+        corpus: Arc<dyn distillery::inference::recall::RecallCorpus>,
+        config: distillery::inference::recall::RecallConfig,
+    ) -> Result<(), String> {
+        self.inference
+            .as_ref()
+            .ok_or("inference is not open")?
+            .lane()
+            .configure_recall(corpus, config)
     }
 
     /// Refresh mutable Knot pairing and evidence-reader authority.
@@ -341,10 +541,27 @@ impl DjinnResident {
             knot,
             knot_reopen: _,
             distillery,
+            inference,
+            #[cfg(feature = "inference")]
+                inference_pending: _,
+            #[cfg(feature = "inference")]
+                data_root: _,
             reservoir_settings: _,
             reservoir,
         } = self;
         let report = close_all(vec![
+            (
+                // Before the Distillery lane, whose model library it borrows.
+                "inference",
+                Box::new(move || {
+                    Box::pin(async move {
+                        match inference {
+                            Some(inference) => inference.close().await,
+                            None => Ok(()),
+                        }
+                    }) as CloseFuture<'static>
+                }) as CloseAction<'static>,
+            ),
             (
                 // First: the works borrow nothing from blob custody or
                 // credentials, and stopping work the ring believes is running
