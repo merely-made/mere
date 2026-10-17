@@ -11,8 +11,9 @@
 use std::io;
 use std::sync::Arc;
 use std::time::Duration;
+use std::time::Instant;
 
-use genet_host_api::{ResourceFetcher, ResourceResponse};
+use genet_host_api::{ResourceFetchResponse, ResourceFetcher, ResourceRequest, ResourceResponse};
 use netfetcher::{
     AltSvcStore, CacheMode, CookieRecord, CookieStore, FetchContext, HstsStore, HttpCache,
     InMemoryAltSvc, InMemoryCookieJar, InMemoryHsts, InMemoryHttpCache, Request, Response,
@@ -102,6 +103,18 @@ impl std::error::Error for FetchError {}
 /// Blocking fetches under one host policy. Call from a plain thread, never from
 /// inside an async runtime.
 pub trait Fetch: Send + Sync {
+    /// A full host request. Implementations without this capability explicitly
+    /// refuse it instead of turning a POST or policy choice into a plain GET.
+    fn read_request(
+        &self,
+        _request: &ResourceRequest,
+        _limit: u64,
+    ) -> Result<ResourceFetchResponse, FetchError> {
+        Err(FetchError::BadAddress(
+            "rich requests unsupported by this handle".into(),
+        ))
+    }
+
     /// One byte range. With `if_range` (an ETag or Last-Modified from an earlier
     /// reply), a changed object is [`FetchError::Changed`] rather than wrong bytes.
     fn read_range(
@@ -248,10 +261,18 @@ impl NetFetch {
 
     /// Send, and wait for headers.
     fn send(&self, request: Request) -> Result<Response, FetchError> {
+        self.send_with_timeout(request, self.patience)
+    }
+
+    fn send_with_timeout(
+        &self,
+        request: Request,
+        timeout: Duration,
+    ) -> Result<Response, FetchError> {
         let response = self
             .runtime
             .block_on(async {
-                tokio::time::timeout(self.patience, netfetcher::fetch(request, &self.context)).await
+                tokio::time::timeout(timeout, netfetcher::fetch(request, &self.context)).await
             })
             .map_err(|_| FetchError::Unreachable("timed out waiting for a response".into()))?;
         if response.is_network_error() {
@@ -263,17 +284,31 @@ impl NetFetch {
     /// Drain a body into `take`, stopping past `limit`.
     fn drain(
         &self,
+        response: Response,
+        limit: Option<u64>,
+        take: impl FnMut(&[u8]) -> Result<(), FetchError>,
+    ) -> Result<(), FetchError> {
+        self.drain_until(response, limit, None, take)
+    }
+
+    fn drain_until(
+        &self,
         mut response: Response,
         limit: Option<u64>,
+        deadline: Option<Instant>,
         mut take: impl FnMut(&[u8]) -> Result<(), FetchError>,
     ) -> Result<(), FetchError> {
         let mut seen = 0_u64;
         loop {
+            let timeout = deadline.map_or(self.patience, |deadline| {
+                deadline.saturating_duration_since(Instant::now())
+            });
+            if timeout.is_zero() {
+                return Err(FetchError::Body(io::ErrorKind::TimedOut.into()));
+            }
             let chunk = self
                 .runtime
-                .block_on(async {
-                    tokio::time::timeout(self.patience, response.body.next_chunk()).await
-                })
+                .block_on(async { tokio::time::timeout(timeout, response.body.next_chunk()).await })
                 .map_err(|_| FetchError::Body(io::ErrorKind::TimedOut.into()))?;
             let Some(chunk) = chunk else { return Ok(()) };
             let chunk = chunk.map_err(FetchError::Body)?;
@@ -326,6 +361,52 @@ fn content_range(value: &str) -> Option<(u64, u64, u64)> {
 }
 
 impl Fetch for NetFetch {
+    fn read_request(
+        &self,
+        request: &ResourceRequest,
+        limit: u64,
+    ) -> Result<ResourceFetchResponse, FetchError> {
+        let deadline = Instant::now()
+            .checked_add(self.patience)
+            .ok_or_else(|| FetchError::Unreachable("request deadline out of range".into()))?;
+        let wire = Request::from_host(request)
+            .ok_or_else(|| FetchError::BadAddress("unsupported host request".into()))?;
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        let response = self.send_with_timeout(wire, remaining)?;
+        let final_url = response
+            .url_list
+            .last()
+            .map_or_else(|| request.url.clone(), ToString::to_string);
+        let content_type = header(&response, "content-type").map(str::to_owned);
+        let status = response.status;
+        let headers = response.headers.clone();
+        let response_type = match response.response_type {
+            netfetcher::ResponseType::Basic => "basic",
+            netfetcher::ResponseType::Cors => "cors",
+            netfetcher::ResponseType::Opaque => "opaque",
+            netfetcher::ResponseType::OpaqueRedirect => "opaqueredirect",
+            netfetcher::ResponseType::Error => "error",
+        }
+        .to_owned();
+        let redirected = response.url_list.len() > 1;
+        let mut bytes = Vec::new();
+        self.drain_until(response, Some(limit), Some(deadline), |chunk| {
+            bytes.extend_from_slice(chunk);
+            Ok(())
+        })?;
+        Ok(ResourceFetchResponse {
+            final_url,
+            content_type,
+            bytes,
+            status,
+            // netfetcher exposes only the numeric status.
+            status_text: String::new(),
+            headers,
+            response_type,
+            redirected,
+        })
+    }
+
     fn read_range(
         &self,
         url: &str,
@@ -454,6 +535,12 @@ pub struct Resources<F = NoFallback> {
 pub struct NoFallback;
 
 impl ResourceFetcher for NoFallback {
+    fn fetch_request(
+        &self,
+        _request: &genet_host_api::ResourceRequest,
+    ) -> Option<genet_host_api::ResourceFetchResponse> {
+        None
+    }
     fn fetch(&self, _url: &str) -> Option<Vec<u8>> {
         None
     }
@@ -497,16 +584,26 @@ impl<F: ResourceFetcher> ResourceFetcher for Resources<F> {
         if parse(url).is_err() {
             return self.fallback.fetch_response(url);
         }
-        match self.fetch.read_all(url, None, self.limit) {
-            Ok(body) => {
-                let mut response = ResourceResponse::new(body.facts.final_url, body.bytes);
-                if let Some(content_type) = body.facts.content_type {
-                    response = response.with_content_type(content_type);
-                }
-                Some(response)
-            },
+        let response = self.fetch_request(&ResourceRequest::plain_get(url))?;
+        (200..300).contains(&response.status).then(|| {
+            let mut legacy = response.into_legacy_response();
+            // The byte-document view historically exposes the MIME essence;
+            // rich callers retain the original Content-Type header.
+            legacy.content_type = legacy
+                .content_type
+                .map(|value| value.split(';').next().unwrap_or(&value).trim().to_owned());
+            legacy
+        })
+    }
+
+    fn fetch_request(&self, request: &ResourceRequest) -> Option<ResourceFetchResponse> {
+        if parse(&request.url).is_err() {
+            return self.fallback.fetch_request(request);
+        }
+        match self.fetch.read_request(request, self.limit) {
+            Ok(response) => Some(response),
             Err(error) => {
-                tracing::debug!(url, %error, "resource fetch failed");
+                tracing::debug!(url = %request.url, %error, "rich resource fetch failed");
                 None
             },
         }

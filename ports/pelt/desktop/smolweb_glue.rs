@@ -26,6 +26,12 @@ const GEMTEXT_RECEIPT_NEXT_URL: &str = "gemini://pelt.test/p5-gemtext/next.gmi";
 struct GemtextReceiptFetcher;
 
 impl ResourceFetcher for GemtextReceiptFetcher {
+    fn fetch_request(
+        &self,
+        _request: &genet_host_api::ResourceRequest,
+    ) -> Option<genet_host_api::ResourceFetchResponse> {
+        None
+    }
     fn fetch(&self, url: &str) -> Option<Vec<u8>> {
         match url {
             GEMTEXT_RECEIPT_START_URL => Some(

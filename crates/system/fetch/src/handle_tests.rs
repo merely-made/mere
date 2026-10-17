@@ -628,6 +628,12 @@ fn a_supplied_transport_is_the_wire_the_handle_sends_through() {
 struct Recording(Arc<Mutex<Vec<String>>>);
 
 impl ResourceFetcher for Recording {
+    fn fetch_request(
+        &self,
+        _request: &genet_host_api::ResourceRequest,
+    ) -> Option<genet_host_api::ResourceFetchResponse> {
+        None
+    }
     fn fetch(&self, url: &str) -> Option<Vec<u8>> {
         self.0.lock().unwrap().push(url.to_owned());
         Some(b"from the fallback".to_vec())
@@ -648,6 +654,18 @@ fn the_handle_serves_a_documents_resources_and_hands_other_schemes_on() {
     assert_eq!(feed.bytes, b"<rss></rss>");
     assert_eq!(feed.final_url, server.url("/feed.xml").to_string());
     assert_eq!(feed.content_type.as_deref(), Some("application/rss+xml"));
+    let rich = alone
+        .fetch_request(&ResourceRequest::plain_get(
+            server.url("/feed.xml").to_string(),
+        ))
+        .unwrap();
+    assert_eq!(
+        rich.content_type.as_deref(),
+        Some("application/rss+xml; charset=utf-8")
+    );
+    assert!(rich.headers.iter().any(|(name, value)| {
+        name.eq_ignore_ascii_case("content-type") && value == "application/rss+xml; charset=utf-8"
+    }));
     assert!(alone.fetch("gemini://example.test/").is_none());
     // A redirect reports where the bytes really came from.
     let moved = alone.fetch_response(server.url("/moved").as_str()).unwrap();
@@ -683,4 +701,87 @@ fn the_handle_serves_a_documents_resources_and_hands_other_schemes_on() {
     Resources::new(Arc::new(handle(&stores))).fetch(server.url("/episode.mp3").as_str());
     let last = server.seen("/episode.mp3").last().cloned().unwrap();
     assert_eq!(last.header("cookie"), Some("session=persona-a"));
+}
+
+#[test]
+fn scoped_resource_fetch_keeps_request_and_http_error_metadata() {
+    let mut server = mockito::Server::new();
+    let mock = server
+        .mock("POST", "/submit")
+        .match_header("content-type", "application/octet-stream")
+        .match_body(vec![0, 128, 255])
+        .with_status(409)
+        .with_header("content-type", "text/plain")
+        .with_header("x-result", "conflict")
+        .with_body("conflict")
+        .create();
+    let stores = Stores::in_memory();
+    let resources = Resources::new(Arc::new(handle(&stores)));
+    let mut request = ResourceRequest::plain_get(format!("{}/submit", server.url()));
+    request.method = "POST".into();
+    request
+        .headers
+        .push(("content-type".into(), "application/octet-stream".into()));
+    request.body = Some(vec![0, 128, 255]);
+    let response = resources
+        .fetch_request(&request)
+        .expect("HTTP error is a response");
+    assert_eq!(response.status, 409);
+    assert_eq!(response.bytes, b"conflict");
+    assert_eq!(response.final_url, request.url);
+    assert_eq!(response.content_type.as_deref(), Some("text/plain"));
+    assert!(
+        response
+            .headers
+            .iter()
+            .any(|(name, value)| name == "x-result" && value == "conflict")
+    );
+    mock.assert();
+}
+
+#[test]
+fn scoped_resource_fetch_refuses_unknown_request_policy() {
+    let stores = Stores::in_memory();
+    let resources = Resources::new(Arc::new(handle(&stores)));
+    let mut request = ResourceRequest::plain_get("http://127.0.0.1:9/unused");
+    request.credentials = "ambient".into();
+    assert!(resources.fetch_request(&request).is_none());
+}
+
+struct DripWire;
+
+impl Transport for DripWire {
+    fn send(&self, _request: WireRequest) -> TransportFuture<'_> {
+        Box::pin(async {
+            let body = futures_util::stream::unfold(0, |index| async move {
+                if index >= 3 {
+                    return None;
+                }
+                tokio::time::sleep(Duration::from_millis(20)).await;
+                Some((
+                    Ok::<bytes::Bytes, std::io::Error>(bytes::Bytes::from_static(b"x")),
+                    index + 1,
+                ))
+            });
+            Some(RawResponse {
+                status: 200,
+                headers: Vec::new(),
+                body: Box::pin(body),
+            })
+        })
+    }
+}
+
+#[test]
+fn rich_request_deadline_covers_all_body_chunks() {
+    let mut stores = Stores::in_memory();
+    stores.transport = Some(Arc::new(DripWire));
+    let fetch = handle(&stores).with_patience(Duration::from_millis(45));
+    let request = ResourceRequest::plain_get("http://example.test/drip");
+    let started = std::time::Instant::now();
+    assert!(matches!(
+        fetch.read_request(&request, 1024),
+        Err(FetchError::Body(error)) if error.kind() == std::io::ErrorKind::TimedOut
+    ));
+    assert!(started.elapsed() < Duration::from_secs(1));
 }
