@@ -15491,6 +15491,7 @@ name = "scenomise"
 version = "0.0.5"
 dependencies = [
  "backstep",
+ "jotdown",
  "libm",
  "sceno",
  "scenograph",

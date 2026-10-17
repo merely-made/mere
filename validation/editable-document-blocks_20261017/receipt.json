@@ -1,0 +1,70 @@
+{
+  "schema": "mere.editable-document-block-prototype/v1",
+  "created_at": "2026-10-17T19:17:50.148341+00:00",
+  "status": "first local prototype slice qualified; implementation remains provisional",
+  "source": "source.json",
+  "runtime": "runtime.json",
+  "checks": {
+    "inker_library": {
+      "pass": 123
+    },
+    "nematic_default_library": {
+      "pass": 240,
+      "includes": "generic div attributes/nesting, quote/list parents, existing semantic containers and link round trips"
+    },
+    "shared_backdrop_cases": {
+      "pass": 8,
+      "includes": "free metre and explicitly unknown stress"
+    },
+    "scene_document_cases": {
+      "pass": 4,
+      "includes": "JSON/Djot exact codec roundtrip, nested context and ambiguous/undeclared refusal"
+    },
+    "document_canvas_focused": {
+      "pass": 1,
+      "covers": "nested domain fallback remains readable, retains link interaction and avoids quote indentation"
+    },
+    "document_canvas_broader": {
+      "pass": 85,
+      "fail": 1,
+      "failure": "layout::tests::normal_width_table_wraps_unbroken_link_inside_its_cell: unbroken first-cell glyphs must not paint into the next cell",
+      "status": "unresolved broader-suite table-wrapping failure; not counted as a passing full suite, and no baseline reproduction claim"
+    },
+    "port_boundaries": "pass",
+    "product_wasm_check": "pass with rustup 1.99.1",
+    "product_wasm_build": "pass; separately packaged WebGPU product, 16 MiB linear stack override",
+    "headed_browser": {
+      "state": "ok",
+      "route": "tree.html?app=local",
+      "captures": 3,
+      "renderer": "BrowserWebGpu through shared host RenderCore",
+      "page_errors": [],
+      "gate_failures": [],
+      "scope": [
+        "actual Knot manual-metre Djot export",
+        "actual current Woodshed progression Djot export",
+        "explicit independent copy/discard through ordinary controls"
+      ],
+      "visual_review": "All three captures inspected. The 435px logical browser pane crops the wide overview; this is functional source/host evidence, not full-viewport or narrow-layout acceptance.",
+      "file_picker_qualified": false
+    },
+    "consumers": {
+      "knot": "/Users/markik/Code/worktrees/knot-portable-metre/docs/receipts/2026-10-17_document_blocks/receipt.json",
+      "woodshed": "/Users/markik/Code/worktrees/woodshed-portable-fretboard/validation/document-blocks_20261017/receipt.json"
+    }
+  },
+  "design": "Existing projection grammar adoption plan records the 22 verbatim audit answers and the remaining implementation boundaries. No universal terminology/schema ruling is introduced.",
+  "format": "Attributed Djot containers are opaque data. Scene blocks carry the existing canonical scene-document JSON, not a new music grammar or executable rule evaluator.",
+  "excluded_browser_attempts": [
+    "Initial route did not enter app=local and omitted Graph tools.",
+    "Second route still lacked app=local.",
+    "Tools-overlay run rendered the manual block but obscured later copy/sample controls; no copy acceptance claimed."
+  ],
+  "limits": [
+    "Consumer receipts use a temporary local supplier cohort; canonical app dependency integration is not qualified.",
+    "Broader table-wrapping suite failure remains visible in checks/document-canvas-broader.log.",
+    "New grammar/serialized fields remain provisional; compatibility/version promotion is separate.",
+    "Meaningful groups, reusable-template instance changes, alternate arrangement UI, workspace holding and explicit arrangement practice remain subsequent slices.",
+    "Woodshed consumer refresh includes other playback work; this receipt does not requalify that work or reinterpret its acceptance."
+  ]
+}

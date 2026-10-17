@@ -14,7 +14,7 @@ use scenomise::{
 
 const KEY: u64 = 0x6261_636b;
 const RELATED_KEY: u64 = KEY + 1;
-const SAMPLES: [(&str, &str); 7] = [
+const SAMPLES: [(&str, &str); 9] = [
     (
         "Metre grid",
         include_str!("../../../../support/design-studies/backdrops/metre.json"),
@@ -38,6 +38,14 @@ const SAMPLES: [(&str, &str); 7] = [
         include_str!(
             "../../../../support/design-studies/backdrops/templates/arrangement-varied.json"
         ),
+    ),
+    (
+        "Manual verse block",
+        include_str!("../../../../support/design-studies/backdrops/blocks/metre.djot"),
+    ),
+    (
+        "Woodshed progression block",
+        include_str!("../../../../support/design-studies/backdrops/blocks/progression.djot"),
     ),
     (
         "Fretboard",
@@ -69,7 +77,7 @@ fn begin_import(pane: &Rc<RefCell<Pane>>) -> Result<(), String> {
         .dyn_into()
         .map_err(|_| "Recipe picker unavailable")?;
     input.set_type("file");
-    input.set_accept("application/json,.json");
+    input.set_accept("application/json,text/plain,.json,.djot");
     input
         .set_attribute("hidden", "")
         .map_err(|e| format!("Cannot prepare picker: {e:?}"))?;
@@ -173,7 +181,7 @@ impl Drop for Pane {
 }
 impl Pane {
     fn install(&mut self, json: &str) -> Result<(), String> {
-        let document = SceneDocument::parse(json)?;
+        let document = SceneDocument::parse_text(json)?;
         let input = &document.primary;
         if let Some(surface) = self.surface.as_mut() {
             surface.replace(input).map_err(|e| e.to_string())?;

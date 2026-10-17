@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MPL-2.0
 //! A bounded portable document binds source occurrences to supplied readings.
 //! Each reading uses the existing scene contract; no domain resolver is needed.
+#[cfg(feature = "djot")]
+mod djot;
+
 use crate::backdrops::{MAX_SCENE_INPUT_BYTES, SceneInput, strict_core_records};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;

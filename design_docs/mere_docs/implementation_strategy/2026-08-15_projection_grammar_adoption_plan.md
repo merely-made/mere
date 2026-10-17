@@ -1863,3 +1863,354 @@ Evidence: [shared/browser receipt](../../../validation/shared-span-intents_20261
 `knot-editor/docs/receipts/2026-10-17_metre_editing/`, and
 `woodshed/validation/shared-span-intents_20261017/`. The older A5 and unrelated
 portable-grammar gates in this plan remain open.
+
+### Shared scene prototype design review (2026-10-17)
+
+**Status: initial audit answered; prototype refinement in progress.** Mark explicitly identified
+these implementations as prototypes and requested a prompted review of each
+consequential choice, followed by refinement. The qualification above records
+observed implementation behavior, not agreement on every product choice. No
+previous receipt is withdrawn or expanded by this review.
+
+Keep this review here as the cross-repository record; Knot and Woodshed refer
+to it from their existing consumer plans. Ask in small rounds, record explicit
+answers, and distinguish decisions, recommendations and current behavior. An
+unanswered prompt stays open. Routine implementation corrections do not need
+to become product questions.
+
+| Topic | Prototype behavior or proposal to review | Decision |
+| --- | --- | --- |
+| Metre authoring scope (prompt 1) | Edits syllable spans; supplied stress/rhyme are preserved. Authored scansion and expected-form editing are absent. | Answered: alignment, scansion, metrical unit and editable poetic-form templates in composition lenses; see verbatim answer below. |
+| Incomplete analysis (prompt 2) | Starting native metre requires a complete current CMUdict reading. | Answered: manual work with unknown words/incomplete analysis; disclose unknowns. |
+| Vocabulary (prompts 3, 21) | Technical occurrence/placement/slot/lane terms have appeared in product descriptions; universal versus domain vocabulary is unsettled. | Answered: domain language in each app; prefer commonly accepted technical terms. Lane is not a queue here, and no new shared naming scheme is adopted. |
+| Attention and durable keeping (prompt 16) | Some UI uses retained for a saved copy, while the supplied brief uses Retained for attention. | Answered: reserve Retained for attention; Save is ordinary saving and Collect makes explicit snapshots. |
+| Source relationship (prompt 4) | Knot captures a reading; live source changes block edits, while reopened saved copies are independent. | Answered: preserve authorship where the match is clear; flag affected passages for review and offer fresh analysis. |
+| Rearrangement and document order (prompt 5) | Current alignment edits leave source bytes unchanged. | Answered: offer document rearrangement and alternative arrangements, with an explicit distinction. |
+| Saving and document lifecycle (prompt 6) | Knot collects immutable typed scenes; Graphshell edits/exports an explicit local copy; Woodshed saves Set-owned drafts. | Answered for Knot: ordinary composition save/reopen includes authored information; collecting a snapshot stays separate. Storage format and other hosts remain open. |
+| Editor location and switching | Active metre takes over Sound and must be closed/discarded to return to its controls. | Answered in prompt 1: lenses within composition editing, not a special editor within the editor. Detailed interaction remains open. |
+| Template configuration (prompts 7, 19) | Metre setup precedes capture, defaults to five binary feet, and offers none/paired expected rhyme only. | Answered: choose/edit a form while composing, preserve work and flag conflicts; start without an imposed form, offer templates and manual units/structure. |
+| Small-window presentation (prompt 8) | Native metre uses a 600px logical scene with horizontal scroll; template scene fitting stretches axes independently. | Answered for metre: follow document wrapping, preserve readable structure across wraps, offer a wider overview. Other scene fitting remains open. |
+| General template scope (prompt 10) | Implemented sequences use lanes, integer spans, expected slots, and same-lane nested groups with a three-level limit. | Answered: option 1, test contextual pieces against both consumers; nesting also has lateral/in-plane presentations, not just depth. See full answer below. |
+| Meaning of span/group edits (prompt 11) | One already-placed span changes within its lane/extent; expected structure and group edits are excluded. Metre spans are positions, not measured performance. | Answered: move meaningful groups preserving internal relationships; distinguish content moves from editing expected structure. Mark identifies this grouping as nesting. |
+| Woodshed arrangement and practice (prompt 9) | Scene movement does not reorder Cards, infer harmonic roles, or alter their playback instructions. | Answered: an explicitly chosen arrangement can drive practice; retain the Set-order path. Playback implementation remains future work. |
+| History experience (prompt 12) | Knot has bounded local history; Graphshell copy editing lacks undo/redo. Shared snapshot history already exists in cambium/backstep; review reuse as an engineering follow-up. | Answered: one chronological history per composition or arrangement; one gesture per step; analysis refresh preserves authorship. |
+| Djot block and Swatch/Canvas integration (prompt 13) | Domain block parsing and portable scene presentation currently lack a general editable round-trip connection. | Answered: both insert composed content as an editable block and apply reusable rules/templates to existing content. |
+| Template update relationship (prompt 14) | The prototype captures template facts; it does not establish reusable-template update behavior. | Answered: linked template with explicit updates, preserving local edits and flagging conflicts; related instances can be selected for chosen changes. |
+| Inserted block identity (prompts 15, 17) | Local copied scenes and reflected views have different relationships to their sources. | Answered: independent by default; source/provenance link does not create live shared content. |
+| Placement interaction (prompt 18) | An unplaced-items tray and select/preview/place workflow were proposed in conversation, not implemented or agreed. | Answered: keep unresolved pieces in context plus an optional holding utility; pocket/minimap Swatch appearance is exploratory. |
+| Holding utility lifecycle (prompt 20) | A workspace/document holding area has no established scope or persistence contract. | Answered: workspace utility shared across open documents, saved across reopen until items are removed. |
+| Next implementation priority (prompt 22) | Placement/unplacement ahead of template or group editing was a recommendation, not an agreed sequence. | Answered: editable document-block path first, normal save/reopen, shared Swatch/Canvas view and metre lens; validate shared pieces with Woodshed. |
+
+#### First-round answers and their limits
+
+The following are Mark's answers, verbatim and contiguous within each answer.
+
+**Prompt 1 — metre authoring scope:**
+
+> alignment, scansion, metrical unit, poetic form (analysis says to me offer as templates for now, let people edit them, and later analyze and identify when people stumble on structures (poetic form autocomplete?) or are close to/could follow possible forms. as a suggestion). clearly rhyme, synonym, grammar, word parts definition, etymology, and a dictionary are valuable here too, and the pieces exist. i think metrical editing should be part of the rest of the editing, not a special editor within the editor. more like lenses on composition lines. the shared bit is the arrangement of contextualized pieces relative to a context (bars in music, lines, sentences, paragraphs, extracted web content?), i'd think. although it's clear that music and language grammars share common constraints, here... perhaps i should give this more thought...
+
+**Prompt 2 — incomplete analysis:**
+
+> No. Allow manual work with unknown words or incomplete analysis; show what is unknown.
+
+**Prompt 3 — vocabulary:**
+
+> Use domain language in each app; review shared technical names separately.
+
+Implementation consequences: replace the analysis-completeness entry gate and
+separate-editor assumption; make room for authored scansion, units and editable
+form templates without conflating them with source analysis. Related lexical
+tools are relevant composition context, not a mandate to add every tool in this
+pass. Form recognition/autocomplete is a later suggestion idea, not an immediate
+implementation requirement. The proposed commonality of contextualized pieces
+and contexts, and a broader music/language grammar, remain explicitly exploratory;
+this answer does not approve a universal template schema or its technical names.
+Detailed interaction and scope sequencing remain open and are prompted
+separately. Source reconciliation and saving direction are answered below;
+their implementation mechanisms remain to be assessed.
+
+#### Second-round answers and their limits
+
+**Prompt 4 — source changes:**
+
+> Keep authorship attached where the match is clear; flag affected passages for review and offer fresh analysis.
+
+**Prompt 5 — document order and alternatives:**
+
+> Offer both: distinguish rearranging the document from trying an alternative arrangement.
+
+**Prompt 6 — ordinary saving:**
+
+> As part of the composition’s ordinary save/reopen workflow; collecting a snapshot remains a separate action.
+
+Implementation consequences: the captured-reading global edit freeze is not
+the intended composition-lens lifecycle. Preserve clearly matched authored
+work after text edits, expose affected/uncertain passages and offer reanalysis;
+do not silently transfer authorship across ambiguous matches. Distinguish
+document-changing arrangement actions from experimental alternatives. Ordinary
+composition save/reopen must include authored scansion, metrical units and
+chosen/edited forms; snapshot collection remains a separate capability. This
+does not select a file encoding, sidecar, journal format, attachment scheme,
+matching algorithm or conflict interface, and does not change the established
+ownership of collected copies in Knot's mere. Assess existing document/source
+anchor mechanisms before choosing the implementation.
+
+#### Third-round answers and their limits
+
+**Prompt 7 — changing forms:**
+
+> Let me choose or edit a form while composing; preserve my work and flag conflicts with the changed form.
+
+**Prompt 8 — wrapping:**
+
+> Follow the document’s wrapping and keep metrical structure understandable across wraps; offer a wider overview when useful.
+
+**Prompt 9 — Woodshed practice:**
+
+> An arrangement can drive playback when I explicitly choose to practice it; keep the existing Set-order path available.
+
+Implementation consequences: allow form changes within the composition flow;
+retain authored work and report conflicts instead of forcing a fresh captured
+draft or silently coercing it to the changed form. A wrapped visual continuation
+must remain part of the same authored verse line, with understandable metrical
+structure; the fixed-width scrolling prototype is not the default lens target.
+A wider overview is complementary. Woodshed needs an explicit arrangement
+practice choice alongside existing Set-order practice; editing or saving an
+arrangement does not by itself choose that playback path. This answer does not
+settle tempo/duration conversion, overlapping spans, repetitions, missing Cards,
+live edits during playback, or how alternative arrangements are saved/selected.
+Those semantics need inspection and focused prompts before implementation.
+
+#### Fourth-round answers and their limits
+
+**Prompt 10 — shared model and nesting:**
+
+> 1, but nesting is a property that extends laterally as well as depth. words are nested in a sentence. notes are nested in a chord. and if you want to represent nesting within a plane's scope, you basically use a field. think an ios home screen folder: that's nested, when you click it, it arranges the members within that scope. it could also expand the folder within the homescreen's original scope, pushing other icons out of the way; that's representing a nest too, just without depth, no?
+
+The selected option 1 was: "Use the contextual-pieces idea as a working
+hypothesis; refine metre and progressions, then extract only what both
+demonstrate."
+
+**Prompt 11 — group movement:**
+
+> yes, 1, that is the nesting.
+
+The selected option 1 was: "Yes; preserve internal relationships, and make
+moving the contents distinct from editing the expected form."
+
+**Prompt 12 — history:**
+
+> One chronological undo history per edited composition or arrangement; one gesture is one step, and analysis refresh does not erase authorship.
+
+Interpretation to test in the prototypes: membership/nesting is independent
+of its presentation. A field enclosing members in the current plane and a
+focused view arranging members within a nested scope can express the same
+grouping. Do not equate the existing three-level sequence rendering bound with
+a universal nesting law, and do not infer that every expansion must displace
+neighbors. Preserve source distinctions between structural membership, a selected
+subgraph, and a temporary display fold. Group movement preserves internal
+relationships; changing expectations is a distinct action. Reuse existing shared
+snapshot history where appropriate rather than maintaining avoidable parallel
+mechanisms; ownership stays with the edited composition/arrangement.
+
+#### Djot and block integration question
+
+Mark then asked, verbatim:
+
+> feels like, wasn't the point of djot that we could say, this block has these rules we can define per domain/protocol/format? wouldn't that be useful for different domains? and then, so like can't we compose that in a swatch/canvas and then apply that as a block to an editor?
+
+This is an architectural question and proposed connection, not approval of new
+syntax or a universal domain grammar. Existing grounding:
+
+- The [polyglot Knot design](../../nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md),
+  section 10, explicitly chose Djot divs/attributes for meaningful typed blocks
+  and preserved protocol content in fences.
+- `crates/nematic/nematic/src/knot/djot.rs` currently lowers a fixed recognized
+  div vocabulary; unknown classes become generic quotes. It does not preserve
+  arbitrary domain-rule bindings and nested containers as a generic editable
+  block model. `knot/expand.rs` separately dispatches known protocol fences.
+- The [polyglot block resolver plan](../../nematic_docs/implementation_strategy/2026-06-13_polyglot_block_resolver_plan.md)
+  still records its unified resolver as planned. Current source inspection
+  confirms separate fence expansion, transclusion and evaluation mechanisms.
+- `scenograph::swatch` already declares scoped projection/reflection views;
+  shared BackdropSurface hosts the metre/progression scene prototypes. Neither
+  by itself completes a Djot document block's editable save/reopen round trip.
+
+Prompt 13 asked whether the operations should include both inserting composed
+content as an editable block and applying its reusable rules/template to existing
+content. Mark answered, verbatim:
+
+> Both
+
+Direction: support both operations, retaining content, domain rules/template
+bindings and authored structure through the document path, with Swatch/Canvas
+and editor views operating on the same domain-owned model. Applying rules to
+existing content and inserting composed content are distinct operations.
+This does not settle new syntax, encoding, reference-versus-copy semantics,
+template-update behavior or the domain adapters. Prompts 14 and 15 address
+template updates and inserted content identity separately; answers follow below.
+Inspect and extend the existing seams before creating another block system.
+
+#### Template relationships, insertion and terminology answers
+
+**Prompt 14 — template updates and applying selected structure:**
+
+> 1, because all the instances of the template are themselves related as effectively nodes in the document, no? so selecting them all and applying changes to them should be simple.
+>
+> for the previous question I responded both to, i think of it as, if i'm editing a sentence, and I choose to arrange the sentence relative to some poetic form, then that should affect what i arranged. however, if i take an arrangement of words from elsewhere, then putting it in there would require insertion, not application. if i wanted to apply some structural aspect of the arrangement of words from elsewhere, i'd choose that aspect and apply it to the words i'm editing. now there's probably some simplification to work out there, but that feels consistent to me; keeping the distinction between things accurate
+
+The selected option 1 was: "Keep a link to the template and offer updates
+explicitly; preserve local edits and flag conflicts."
+
+**Prompt 15 — inserted block identity:**
+
+> default independent, offer link to source
+
+**Prompt 16 — attention versus saving:**
+
+> Reserve Retained for attention; use Save for ordinary saving and Collect for explicit snapshots.
+
+Implementation consequences: preserve the relationship from a template instance
+to its template so related instances can be found/selected for an explicitly
+chosen update. Do not infer that every template update immediately changes all
+instances or selects them automatically. Applying a form or a selected structural
+aspect acts on the target content; importing external words/content is insertion.
+This does not prescribe a new graph identity scheme or a universal structural
+transfer algorithm. Inserted content is independent by default. "Offer link to
+source" does not yet settle provenance/navigation versus live shared-content
+insertion; prompt 17 asks that distinction. User-facing durable actions use
+Save/Collect, while Retained remains attention. Existing lower-level storage
+API names are not renamed by this vocabulary decision.
+
+#### Source links, optional holding and initial form answers
+
+**Prompt 17 — source link:**
+
+> A source/provenance link; the inserted content remains independent.
+
+**Prompt 18 — unresolved pieces and holding utility:**
+
+> 2; an arboard/clipboard utility, didn't we think about that before? idk, like a lil minimap pocket swatch you can throw stuff in maybe.
+
+The selected option 2 was: "Keep them in context and also offer an optional
+holding area for arranging pieces."
+
+**Prompt 19 — initial form:**
+
+> No imposed poetic form; offer templates and let me define units or structure manually.
+
+Implementation consequences: a source link records provenance/navigation and
+does not make inserted content follow its source. Unresolved alignment must
+remain inspectable in its original context; an optional holding utility
+complements that experience. Its name, exact appearance, item semantics, scope
+and persistence have not been decided. A pocket/minimap Swatch is a suggested
+presentation, not a new component specification. Start composition without
+silently imposing five binary feet or another form; templates and manual
+units/structure remain available.
+
+Precedent check: the historical
+[workbench staging plan](../../archive_docs/2026-09-02_retired_plans/2026-06-09_workbench_staging_plan.md)
+described host-owned staging into workbench tiles, and current
+`scenograph::swatch` supplies scoped views. These are adjacent precedents, not
+proof that the proposed pocket utility was previously specified or implemented.
+The targeted memory and Mere/Knot/Genet documentation searches did not locate
+the exact earlier pocket/clipboard discussion. Prompt 20 asks its scope/lifetime;
+inspect existing clipboard/transfer capabilities before choosing implementation.
+
+Historical checkpoint after prompt 19 (superseded by the answers below): remaining prompts were 20 (holding lifecycle), 21 (provisional internal
+vocabulary), 22 (implementation priority). Detailed Woodshed playback semantics
+and any ambiguity in these answers require a focused follow-up before their
+corresponding behavior is implemented; they are not implied by closing the
+initial prototype audit.
+
+Refinement criteria: record the intended behavior and vocabulary before changing
+the corresponding experience; inspect existing shared mechanisms before adding
+new ones; update the affected consumers together where a shared contract changes.
+Verification must cover the revised behavior and retain source-bound historical
+evidence without presenting it as acceptance of the new design.
+
+#### Final first-pass answers and selected implementation
+
+**Prompt 20 — holding utility:**
+
+> A workspace utility shared across open documents, saved across reopen until I remove things.
+
+**Prompt 21 — internal terminology:**
+
+> a lane feels like a queue to me. is it that? or is it a line? eh. it's not a huge deal either way. tend towards what's commonly accepted
+
+**Prompt 22 — implementation priority:**
+
+> The editable document-block path: Djot structure/rules, normal save/reopen, shared Swatch/Canvas view, and a metre lens; validate the shared pieces with Woodshed.
+
+The initial prompted audit is answered. Internal terms remain provisional;
+prefer established format/domain terminology. A sequence lane currently indexes
+a parallel row, without queue semantics. The workspace holding utility is
+persistent across reopen; its implementation follows the selected document-block
+path rather than becoming a prerequisite for ordinary composition.
+
+### Editable domain blocks and composition lenses
+
+**Status (2026-10-17): first local prototype slice qualified; broader refinement remains open.** Selected by Mark in prompt 22. The prior
+prototype receipts remain historical evidence. No user-visible vocabulary or
+universal template grammar is frozen by this implementation.
+
+Feature targets and checks:
+
+1. Preserve Djot div attributes and nested content through the portable document
+   model and round-trip writer. Opaque domain declarations remain data; unknown
+   domains render their content. Verify nesting, escaped attributes, source
+   preservation, protocol traversal and ordinary fallback rendering.
+2. Bind block edits to the existing document source and one chronological text
+   history; normal Save/reopen retains authored block data without collection.
+   Verify one-step undo/redo, stale/read-only refusal, exact unaffected source,
+   and actual temporary-file fresh-session reopening.
+3. Connect the same authored block to a shared scene view and a composition lens.
+   Support manual/incomplete metre without imposing a form. Preserve authored
+   facts separately from analysis; source changes preserve clear matches and
+   disclose uncertain ones. Verify views agree and preview/cancel is reversible.
+4. Exercise the shared document-block behavior with Woodshed progression facts;
+   distinguish applying selected rules from inserting independent content with
+   provenance. Keep explicit arrangement playback and workspace holding as
+   subsequent features with their own focused semantics/acceptance.
+
+Inspect existing document, Djot, source-anchor, Swatch and history seams before
+adding mechanisms. Use existing domain facts for the first two consumers and
+keep serialization choices identified as prototype details. CPU source proof,
+normal-save file proof and actual host interaction are separate checks.
+
+
+Implementation slice (2026-10-17): generic `Block::Div` retains opaque attributes
+and nested children. The Djot parser preserves quote/list parents and existing
+semantic containers; fallback readers show the contents, and protocol/inline
+expansion traverses the container. This is not a claim of full Djot conformance:
+the existing inline/table lowering limits remain.
+
+Knot now applies declarations to existing source or inserts independent block
+content through source-bound document operations. Declaration edits preserve
+nested bodies and quote/list markers. Both operations use the normal text undo
+and file Save/reopen path, with stale/read-only refusal. The composition lens
+supports manually supplied units, strong/weak/unknown scansion, optional form,
+metrical-unit and rhyme expectations, with no dictionary or default form.
+Unique unchanged line text retains authorship across unrelated edits/moves;
+changed or ambiguous lines remain in context and retain their old authored
+records for review. This is conservative matching, not a settled line identity
+scheme. The wrapping lens and optional shared overview are both attached to the
+ordinary source document. The source editor is still visible: this slice proves
+the data/history connection rather than a finished rich-text block interface.
+
+The optional scene-document Djot codec wraps the existing versioned JSON facts;
+it introduces no second music grammar. Woodshed's real arrangement export uses
+that codec with its Card/rest spans and linked voicings. Graphshell admits the
+same Djot payload through its existing surface/import path; bundled domain
+exports exercise this reference host. Reading/inserting a progression block
+never implicitly changes a live Set or selects arrangement playback.
+
+Qualification is recorded in
+`validation/editable-document-blocks_20261017/receipt.json`. Consumer checks use
+a temporary local Mere source cohort; canonical app lockfile integration is a
+separate unqualified step. The reusable-template relationship/bulk update UI,
+source provenance insertion UI, meaningful group moves, alternate arrangements,
+workspace holding utility, explicit arrangement practice and lexical/form
+suggestion integration remain open. Attribute names and encoded authorship are
+prototype serialization details, not a frozen shared grammar.

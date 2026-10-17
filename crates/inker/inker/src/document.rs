@@ -216,6 +216,13 @@ pub enum Block {
         presentation: BlockPresentation,
         block: Box<Block>,
     },
+    /// An attributed content container, as expressed by a Djot div. Attributes
+    /// are opaque domain data; the reader does not execute or infer their rules.
+    /// Children retain their structure independently of how a host presents it.
+    Div {
+        attributes: std::collections::BTreeMap<String, String>,
+        blocks: Vec<Block>,
+    },
     /// AccessKit `Role::Heading` with the heading level set on the node.
     Heading { level: u8, spans: Vec<InlineSpan> },
     /// AccessKit `Role::Paragraph`.
@@ -306,6 +313,7 @@ impl Block {
     pub fn kind_name(&self) -> &'static str {
         match self {
             Block::Presented { block, .. } => block.kind_name(),
+            Block::Div { .. } => "div",
             Block::Heading { .. } => "heading",
             Block::Paragraph { .. } => "paragraph",
             Block::CodeBlock { .. } => "code block",
@@ -582,7 +590,7 @@ fn collect_block_spans<'a>(block: &'a Block, out: &mut Vec<&'a InlineSpan>) {
                 out.push(span);
             }
         },
-        Block::Quote { blocks } => {
+        Block::Quote { blocks } | Block::Div { blocks, .. } => {
             for inner in blocks {
                 collect_block_spans(inner, out);
             }
@@ -627,7 +635,7 @@ fn collect_block_link_urls<'a>(block: &'a Block, out: &mut Vec<&'a str>) {
                 collect_link_urls(span, out);
             }
         },
-        Block::Quote { blocks } => {
+        Block::Quote { blocks } | Block::Div { blocks, .. } => {
             for inner in blocks {
                 collect_block_link_urls(inner, out);
             }

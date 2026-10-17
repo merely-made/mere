@@ -1,0 +1,1135 @@
+    Blocking waiting for file lock on package cache
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling cfg-if v1.0.5
+   Compiling once_cell v1.21.4
+   Compiling unicode-ident v1.0.26
+   Compiling arrayvec v0.7.8
+   Compiling pin-project-lite v0.2.17
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling wasm-bindgen-shared v0.2.129
+   Compiling libm v0.2.16
+   Compiling memchr v2.8.3
+   Compiling getrandom v0.4.3
+   Compiling num-traits v0.2.19
+   Compiling rand_core v0.10.1
+   Compiling slab v0.4.12
+   Compiling stable_deref_trait v1.2.1
+   Compiling futures-core v0.3.34
+   Compiling foldhash v0.2.0
+   Compiling typenum v1.20.1
+   Compiling futures-task v0.3.34
+   Compiling log v0.4.34
+   Compiling bytemuck v1.25.2
+   Compiling equivalent v1.0.2
+   Compiling itoa v1.0.18
+   Compiling hashbrown v0.17.1
+   Compiling zerofrom v0.1.8
+   Compiling zmij v1.0.23
+   Compiling futures-util v0.3.34
+   Compiling thiserror v2.0.21
+   Compiling serde_json v1.0.151
+   Compiling yoke v0.8.3
+   Compiling writeable v0.6.4
+   Compiling scopeguard v1.2.0
+   Compiling parking_lot_core v0.9.12
+   Compiling lock_api v0.4.14
+   Compiling zerovec v0.11.8
+   Compiling litemap v0.8.3
+   Compiling zerotrie v0.2.5
+   Compiling sha1_smol v1.0.1
+   Compiling hybrid-array v0.4.15
+   Compiling utf8_iter v1.0.4
+   Compiling zerocopy v0.8.57
+   Compiling bitflags v2.13.2
+   Compiling icu_properties_data v2.2.0
+   Compiling block-buffer v0.12.1
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.2.0
+   Compiling siphasher v1.0.3
+   Compiling const-oid v0.10.2
+   Compiling phf_shared v0.13.1
+   Compiling new_debug_unreachable v1.0.6
+   Compiling profiling v1.0.18
+   Compiling phf v0.13.1
+   Compiling tracing-core v0.1.36
+   Compiling byteorder v1.5.0
+   Compiling wasm-bindgen v0.2.129
+   Compiling icu_provider v2.3.1
+   Compiling polycool v0.4.0
+   Compiling simd-adler32 v0.3.10
+   Compiling rustc-hash v1.1.0
+   Compiling tracing v0.1.44
+   Compiling font-types v0.12.5
+   Compiling adler2 v2.0.1
+   Compiling static_assertions v1.1.0
+   Compiling svg_fmt v0.4.5
+   Compiling precomputed-hash v0.1.1
+   Compiling percent-encoding v2.3.2
+   Compiling crc32fast v1.5.2
+   Compiling web_atoms v0.2.6
+   Compiling form_urlencoded v1.2.2
+   Compiling read-fonts v0.41.0
+   Compiling raw-window-handle v0.6.2
+   Compiling blake3 v1.8.7
+   Compiling miniz_oxide v0.9.1
+   Compiling tendril v0.5.1
+   Compiling constant_time_eq v0.4.2
+   Compiling crossbeam-utils v0.8.23
+   Compiling wgpu v30.0.1
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling indexmap v2.14.2
+   Compiling serde_bytes v0.11.19
+   Compiling foldhash v0.1.5
+   Compiling smallvec v1.16.1
+   Compiling euclid v0.22.14
+   Compiling linebender_resource_handle v0.1.1
+   Compiling kurbo v0.13.1
+   Compiling naga-types v30.0.1
+   Compiling color v0.3.3
+   Compiling hashbrown v0.15.5
+   Compiling heapless v0.7.17
+   Compiling guillotiere v0.7.0
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling parking_lot v0.12.5
+   Compiling string_cache v0.9.0
+   Compiling icu_properties v2.2.0
+   Compiling peniko v0.6.1
+   Compiling hash32 v0.2.1
+   Compiling icu_normalizer v2.2.0
+   Compiling futures-channel v0.3.34
+   Compiling fixedbitset v0.5.7
+   Compiling futures-intrusive v0.5.0
+   Compiling petgraph v0.8.3
+   Compiling cobs v0.3.0
+   Compiling font-types v0.11.3
+   Compiling flate2 v1.1.10
+   Compiling bit-vec v0.9.1
+   Compiling allocator-api2 v0.2.21
+   Compiling unicode-width v0.2.2
+   Compiling icu_locale_data v2.2.0
+   Compiling idna_adapter v1.2.2
+   Compiling png v0.18.1
+   Compiling codespan-reporting v0.13.1
+   Compiling idna v1.1.0
+   Compiling hashbrown v0.16.1
+   Compiling read-fonts v0.39.2
+   Compiling js-sys v0.3.106
+   Compiling url v2.5.8
+   Compiling crypto-common v0.2.2
+   Compiling uuid-rng-internal v1.27.0
+   Compiling uuid v1.27.0
+   Compiling bit-set v0.10.0
+   Compiling ptr_meta v0.3.2
+   Compiling slotmap v1.1.1
+   Compiling sceno v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/sceno)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling markup5ever v0.39.0
+   Compiling accesskit v0.24.1
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/forme/curation)
+   Compiling naga v30.0.1
+   Compiling libc v0.2.190
+   Compiling postcard v1.1.3
+   Compiling digest v0.11.3
+   Compiling fearless_simd v0.7.0
+   Compiling icu_segmenter_data v2.2.0
+   Compiling sha2 v0.11.0
+   Compiling zeroize v1.9.1
+   Compiling vello_gpu_shaders v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling rancor v0.1.3
+   Compiling num-integer v0.1.47
+   Compiling simdutf8 v0.1.5
+   Compiling unicode-segmentation v1.13.3
+   Compiling thiserror v1.0.69
+   Compiling skrifa v0.44.0
+   Compiling num-bigint v0.4.8
+   Compiling bytecheck v0.8.3
+   Compiling icu_locale v2.2.0
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling half v2.7.1
+   Compiling parlance v0.1.0
+   Compiling memmap2 v0.9.11
+   Compiling munge v0.4.7
+   Compiling rend v0.5.4
+   Compiling parley_data v0.10.0
+   Compiling app_units v0.7.8
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling dtoa v1.0.11
+   Compiling either v1.18.0
+   Compiling dtoa-short v0.3.5
+   Compiling encoding_rs v0.8.42
+   Compiling icu_segmenter v2.2.0
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling psm v0.1.32
+   Compiling num-rational v0.4.2
+   Compiling command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/command-menu)
+   Compiling cssparser v0.37.0
+   Compiling stacker v0.1.25
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling workbench v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/workbench)
+   Compiling genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling crossbeam-epoch v0.9.21
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling ppv-lite86 v0.2.21
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling grid v1.0.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling strum v0.28.0
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling generic-array v0.14.7
+   Compiling data-url v0.3.2
+   Compiling fnv v1.0.7
+   Compiling cfb v0.7.3
+   Compiling rayon-core v1.13.0
+   Compiling equator v0.4.2
+   Compiling glifo v0.4.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling numen v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/conatus/numen)
+   Compiling mime_guess v2.0.5
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/forme/forme)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling scenograph v0.0.4 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenograph)
+   Compiling approx v0.5.1
+   Compiling oxilangtag v0.1.6
+   Compiling num-conv v0.2.2
+   Compiling oxiri v0.2.11
+   Compiling powerfmt v0.2.0
+   Compiling time-core v0.1.9
+   Compiling jotdown v0.10.0
+   Compiling skrifa v0.42.1
+   Compiling harfrust v0.8.4
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling rkyv v0.8.18
+   Compiling backstep v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/backstep)
+   Compiling mime v0.3.17
+   Compiling unicase v2.9.0
+   Compiling deranged v0.5.8
+   Compiling anyhow v1.0.104
+   Compiling matrixmultiply v0.3.11
+   Compiling aligned-vec v0.6.4
+   Compiling infer v0.19.0
+   Compiling crossbeam-channel v0.5.17
+   Compiling num-complex v0.4.6
+   Compiling inout v0.2.2
+   Compiling wide v1.7.1
+   Compiling time v0.3.55
+   Compiling aho-corasick v1.1.5
+   Compiling rawpointer v0.2.1
+   Compiling cmov v0.5.4
+   Compiling regex-syntax v0.8.11
+   Compiling scenomise v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling ctutils v0.4.2
+   Compiling getrandom v0.3.4
+   Compiling curve25519-dalek v5.0.0
+   Compiling rayon v1.12.0
+   Compiling v_frame v0.3.9
+   Compiling glam v0.33.8
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling regex-automata v0.4.18
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling inker v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/inker/inker)
+   Compiling scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenotime)
+   Compiling tinct v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/tinct)
+   Compiling as-slice v0.2.1
+   Compiling subtle v2.6.1
+   Compiling base64 v0.22.1
+warning: unused variable: `time_range`
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling signature v3.0.0
+   Compiling av-scenechange v0.14.1
+   Compiling ed25519 v3.0.0
+   Compiling aligned v0.4.3
+   Compiling digest v0.10.7
+   Compiling universal-hash v0.6.1
+   Compiling cipher v0.5.2
+   Compiling nom v8.0.0
+   Compiling no_std_io2 v0.9.4
+   Compiling robust v1.2.0
+   Compiling web-sys v0.3.106
+   Compiling web-time v1.1.0
+   Compiling wasm-bindgen-futures v0.4.79
+   Compiling getrandom v0.2.17
+   Compiling oxsdatatypes v0.2.3
+   Compiling chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/chirograph)
+   Compiling rand_core v0.6.4
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling y4m v0.8.0
+   Compiling peg-runtime v0.8.6
+   Compiling anymore v1.0.0
+   Compiling meristem v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/meristem)
+   Compiling peg v0.8.6
+   Compiling ed25519-dalek v3.0.0
+   Compiling spade v2.15.1
+   Compiling maybe-rayon v0.1.1
+   Compiling chacha20 v0.10.2
+   Compiling pin-project v1.1.13
+   Compiling bitstream-io v4.10.0
+   Compiling sha2 v0.10.9
+   Compiling oxrdf v0.3.4
+   Compiling winit v0.30.13
+   Compiling poly1305 v0.9.1
+   Compiling rav1e v0.8.1
+   Compiling tabard v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/tabard)
+   Compiling aead v0.6.1
+   Compiling mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/surface-api)
+   Compiling itertools v0.14.0
+   Compiling ordered-float v5.5.0
+   Compiling ena v0.14.4
+   Compiling dpi v0.1.2
+   Compiling imgref v1.12.3
+   Compiling downcast-rs v2.0.2
+   Compiling json-event-parser v0.2.3
+   Compiling smol_str v0.2.2
+   Compiling av1-grain v0.2.5
+   Compiling hex v0.4.3
+   Compiling unicode-bidi v0.3.18
+   Compiling cursor-icon v1.2.0
+   Compiling quick-error v2.0.1
+   Compiling loop9 v0.1.5
+   Compiling chacha20poly1305 v0.11.0
+   Compiling spargebra v0.4.7
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+   Compiling gloo-timers v0.3.0
+   Compiling quick-xml v0.37.5
+   Compiling avif-serialize v0.8.9
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling pxfm v0.1.30
+   Compiling weezl v0.1.12
+   Compiling rgb v0.8.53
+   Compiling ciborium-io v0.2.2
+   Compiling option-ext v0.2.0
+   Compiling byteorder-lite v0.1.0
+   Compiling color_quant v1.1.0
+   Compiling lazy_static v1.5.0
+   Compiling zune-core v0.5.3
+   Compiling image-webp v0.2.4
+   Compiling sharded-slab v0.1.7
+   Compiling gif v0.14.2
+   Compiling dirs-sys v0.4.1
+   Compiling ciborium-ll v0.2.2
+   Compiling simba v0.10.2
+   Compiling zune-jpeg v0.5.15
+   Compiling sparesults v0.3.4
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+   Compiling matchers v0.2.0
+   Compiling regex v1.13.1
+   Compiling md-5 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling armillary v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/armillary)
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling ryu-js v1.0.3
+   Compiling nu-ansi-term v0.50.3
+   Compiling rustc-hash v2.1.3
+   Compiling ciborium v0.2.2
+   Compiling dirs v5.0.1
+   Compiling uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/forme/uxtree)
+   Compiling oxttl v0.2.4
+   Compiling oxjsonld v0.2.6
+   Compiling esp v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/intel/esp)
+   Compiling incipit v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/incipit)
+   Compiling tracing-subscriber v0.3.23
+   Compiling sparopt v0.3.7
+   Compiling browsing-context-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling bitflags v1.3.2
+   Compiling emblem v0.2.0
+   Compiling png v0.17.16
+   Compiling graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graphshell/graphshell-client)
+   Compiling spareval v0.2.7
+   Compiling moxcms v0.8.1
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+   Compiling graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graphshell/graphshell-endpoint)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling mere-apparatus v0.0.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/domain/apparatus)
+   Compiling mere-page-load v0.0.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/page-load)
+   Compiling console_error_panic_hook v0.1.7
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling graphshell-host v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graphshell/graphshell-host)
+   Compiling ravif v0.13.0
+   Compiling image v0.25.10
+   Compiling nalgebra v0.35.0
+   Compiling glamx v0.3.1
+   Compiling parry2d v0.31.1
+   Compiling rapier2d v0.36.0
+   Compiling wgpu-types v30.0.1
+   Compiling muniment v0.1.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/eidetic/muniment)
+   Compiling chartulary v0.2.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/eidetic/chartulary)
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel)
+   Compiling eidetic v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/eidetic/eidetic-core)
+   Compiling seiche v0.0.6 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/conatus/seiche)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+   Compiling mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/fleece)
+warning: unused import: `EdgeRef`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling vello_gpu v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/sprigging)
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/mod.rs:719:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+719 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+745 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+755 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel/src/graph/query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+   Compiling cambium v0.3.3 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/cartography)
+   Compiling mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/distillery/alembic)
+   Compiling mere-linked-data v0.0.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/linked-data)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling pandect v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-winit)
+warning: methods `is_plain_property` and `is_plain_edge` are never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/linked-data/src/ingest/envelope.rs:163:12
+    |
+ 53 | impl ImportEvidence {
+    | ------------------- methods in this implementation
+...
+163 |     pub fn is_plain_property(&self, subject: &str, property: &NodeProperty) -> bool {
+    |            ^^^^^^^^^^^^^^^^^
+...
+168 |     pub fn is_plain_edge(&self, index: usize) -> bool {
+    |            ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/inker/document-canvas)
+warning: variable does not need to be mutable
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-rootstock)
+   Compiling genet-documents v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/document-lanes)
+   Compiling platen v0.0.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/platen/platen)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-rootstock/src/producer/registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-rootstock/src/scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-rootstock/src/host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+   Compiling pelt-core v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/pelt/core)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/mesquite)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/pelt/core/src/pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/pelt/core/src/lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: method `into_graph` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/system/pandect/src/graph_codicil.rs:185:19
+    |
+184 | impl GraphCodicil {
+    | ----------------- method in this implementation
+185 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling cambium-genet-web-host v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-genet-web-host)
+warning: `cambium-rootstock` (lib) generated 3 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+warning: `pelt-core` (lib) generated 2 warnings (run `cargo fix --lib -p pelt-core` to apply 2 suggestions)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-genet-web-host/src/recovery.rs:33:18
+   |
+33 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+33 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+33 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: function `build_affinity_spring` is never used
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph/src/canvas.rs:68:4
+   |
+68 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `visible_link_appearances` is never used
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph/src/canvas/edge_cells.rs:25:15
+   |
+25 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph/src/canvas/edge_cells.rs:337:15
+    |
+337 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph/src/canvas/edge_cells.rs:385:15
+    |
+385 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph/src/canvas/edge_cells.rs:467:15
+    |
+467 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph/src/canvas/edge_cells.rs:525:15
+    |
+525 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+warning: function `next_frame` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/cambium-genet-web-host/src/presentation/boot.rs:146:21
+    |
+146 | pub(crate) async fn next_frame() -> Result<(), String> {
+    |                     ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-linked-data` (lib) generated 1 warning
+warning: `mere-kernel` (lib) generated 20 warnings (run `cargo fix --lib -p mere-kernel` to apply 9 suggestions)
+warning: `cambium-genet-web-host` (lib) generated 2 warnings (run `cargo fix --lib -p cambium-genet-web-host` to apply 1 suggestion)
+   Compiling mere-overmap v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/mere-overmap)
+   Compiling mere v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/mere)
+   Compiling graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell)
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/src/retained_content/producer.rs:32:14
+   |
+32 |         NEXT.fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+32 -         NEXT.fetch_update(
+32 +         NEXT.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/src/retained_content/producer.rs:136:30
+    |
+136 |                         NEXT.fetch_update(
+    |                              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+136 -                         NEXT.fetch_update(
+136 +                         NEXT.try_update(
+    |
+
+warning: method `begin_session` is never used
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/src/mere_host.rs:433:19
+    |
+269 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+433 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `relation_kind_label` is never used
+    --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/src/mere_host.rs:1479:4
+     |
+1479 | fn relation_kind_label(kind: RelationKind) -> &'static str {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `codicil_graph` is never used
+    --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/src/product.rs:1091:4
+     |
+1091 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/src/product.rs:1441:15
+     |
+1441 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `pictograph` (lib) generated 6 warnings
+warning: `graphshell` (lib) generated 6 warnings (run `cargo fix --lib -p graphshell` to apply 2 suggestions)
+   Compiling graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/ports/graphshell/web)
+warning: unused import: `std::rc::Rc`
+  --> ../src/web_timing.rs:24:5
+   |
+24 | use std::rc::Rc;
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2218:7
+     |
+2218 | #[cfg(feature = "main-page")]
+     |       ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+     = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2220:11
+     |
+2220 | #[cfg(not(feature = "main-page"))]
+     |           ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unused import: `PresentedLink`
+ --> ../src/web_tree/query_view.rs:9:31
+  |
+9 | use graphshell::query_views::{PresentedLink, presented_links};
+  |                               ^^^^^^^^^^^^^
+
+warning: unused import: `LayoutDom`
+ --> ../src/web_tree/lane/overlay_observation.rs:9:22
+  |
+9 | use layout_dom_api::{LayoutDom as _, LocalName, Namespace};
+  |                      ^^^^^^^^^
+
+warning: unused variable: `inspection`
+  --> ../src/web_tree/promoted_links.rs:84:13
+   |
+84 |         (Ok(inspection), None) => {
+   |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_inspection`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `mount` is never used
+  --> ../src/web_appearance.rs:91:15
+   |
+91 | pub(crate) fn mount(root: Element, owned: bool) -> Result<Handle, String> {
+   |               ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `supplied` is never used
+  --> ../src/web_dataset.rs:40:15
+   |
+40 | pub(crate) fn supplied(root: &Element) -> Option<Result<HostDatasetV1, String>> {
+   |               ^^^^^^^^
+
+warning: field `active` is never read
+  --> ../src/web_capture.rs:61:16
+   |
+60 | pub(crate) struct HistoryControlSummary {
+   |                   --------------------- field in this struct
+61 |     pub(crate) active: bool,
+   |                ^^^^^^
+   |
+   = note: `HistoryControlSummary` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: constant `STORAGE` is never used
+  --> ../src/web_practice.rs:32:7
+   |
+32 | const STORAGE: &str = "graphshellPracticeWorkspaceV1";
+   |       ^^^^^^^
+
+warning: constant `HISTORY_LIMIT` is never used
+  --> ../src/web_practice.rs:33:7
+   |
+33 | const HISTORY_LIMIT: usize = 64;
+   |       ^^^^^^^^^^^^^
+
+warning: struct `Face` is never constructed
+  --> ../src/web_practice.rs:36:19
+   |
+36 | pub(crate) struct Face {
+   |                   ^^^^
+
+warning: struct `Control` is never constructed
+  --> ../src/web_practice.rs:45:19
+   |
+45 | pub(crate) struct Control {
+   |                   ^^^^^^^
+
+warning: struct `Metrics` is never constructed
+  --> ../src/web_practice.rs:54:8
+   |
+54 | struct Metrics {
+   |        ^^^^^^^
+
+warning: struct `SavedPractice` is never constructed
+  --> ../src/web_practice.rs:69:8
+   |
+69 | struct SavedPractice {
+   |        ^^^^^^^^^^^^^
+
+warning: struct `PracticeHost` is never constructed
+  --> ../src/web_practice.rs:74:19
+   |
+74 | pub(super) struct PracticeHost {
+   |                   ^^^^^^^^^^^^
+
+warning: function `encoded_axes` is never used
+  --> ../src/web_practice.rs:99:4
+   |
+99 | fn encoded_axes(definition: &ProjectionDefinition) -> Axes {
+   |    ^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ../src/web_practice.rs:110:19
+    |
+107 | impl PracticeHost {
+    | ----------------- associated items in this implementation
+...
+110 |     pub(super) fn new(supplied: Option<Result<HostDatasetV1, String>>) -> Result<Self, String> {
+    |                   ^^^
+...
+172 |     pub(super) fn needs_frame(&self) -> bool {
+    |                   ^^^^^^^^^^^
+...
+179 |     fn sync_slots(&mut self, width: u32, height: u32) {
+    |        ^^^^^^^^^^
+...
+230 |     fn sync_permitted(&mut self) {
+    |        ^^^^^^^^^^^^^^
+...
+239 |     pub(super) fn command(&mut self, command: &str) -> Result<(), String> {
+    |                   ^^^^^^^
+...
+392 |     fn relations_spoken(&self) -> String {
+    |        ^^^^^^^^^^^^^^^^
+...
+417 |     pub(crate) fn controls(&self, width: u32, height: u32) -> Vec<Control> {
+    |                   ^^^^^^^^
+...
+829 |     pub(crate) fn advance(&mut self, width: u32, height: u32, host_ms: f64) -> bool {
+    |                   ^^^^^^^
+...
+861 |     pub(crate) fn board_pointer(
+    |                   ^^^^^^^^^^^^^
+...
+904 |     pub(crate) fn relation_lines(&self) -> Vec<([f32; 4], bool)> {
+    |                   ^^^^^^^^^^^^^^
+...
+940 |     pub(crate) fn set_error(&mut self, error: String) {
+    |                   ^^^^^^^^^
+...
+944 |     pub(crate) fn fields(&self) -> Result<Vec<(&'static str, String)>, String> {
+    |                   ^^^^^^
+
+warning: function `label` is never used
+   --> ../src/web_speed.rs:313:15
+    |
+313 | pub(crate) fn label(speed: Speed) -> String {
+    |               ^^^^^
+
+warning: function `board_line` is never used
+   --> ../src/web_speed.rs:331:15
+    |
+331 | pub(crate) fn board_line(speed: Speed) -> String {
+    |               ^^^^^^^^^^
+
+warning: field `practice` is never read
+   --> ../src/web_tree.rs:495:5
+    |
+440 | pub(crate) struct TreePage {
+    |                   -------- field in this struct
+...
+495 |     practice: Option<practice::Practice>,
+    |     ^^^^^^^^
+
+warning: field `gestures` is never read
+    --> ../src/web_tree.rs:1090:5
+     |
+1085 | struct Tree {
+     |        ---- field in this struct
+...
+1090 |     gestures: gestures::GestureOwner,
+     |     ^^^^^^^^
+
+warning: method `rebind_host_presenter` is never used
+   --> ../src/web_tree/presenter.rs:134:19
+    |
+109 | impl TreePage {
+    | ------------- method in this implementation
+...
+134 |     pub(super) fn rebind_host_presenter(&mut self, envelope: HostDatasetV1) -> Result<(), String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `pump` and `form_mut` are never used
+  --> ../src/web_tree/remote_off.rs:88:19
+   |
+73 | impl TreeRemote {
+   | --------------- methods in this implementation
+...
+88 |     pub(super) fn pump(&mut self) {
+   |                   ^^^^
+...
+96 |     pub(super) fn form_mut(&mut self) -> &mut ActionForm {
+   |                   ^^^^^^^^
+
+warning: field `fields` is never read
+   --> ../src/web_tree/remote_off.rs:139:16
+    |
+138 | pub(super) struct DraftControls {
+    |                   ------------- field in this struct
+139 |     pub(super) fields: Vec<SelectState>,
+    |                ^^^^^^
+
+warning: `graphshell-web` (lib) generated 25 warnings (run `cargo fix --lib -p graphshell-web` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8m 05s
