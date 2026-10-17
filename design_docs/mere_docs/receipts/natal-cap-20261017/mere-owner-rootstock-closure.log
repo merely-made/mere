@@ -1,0 +1,7 @@
+cambium-rootstock v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/cambium-rootstock)
+└── graphshell v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/graphshell)
+    └── djinn v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/djinn)
+        [dev-dependencies]
+        └── djinn v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/djinn) (*)
+    [dev-dependencies]
+    └── djinn v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/djinn) (*)

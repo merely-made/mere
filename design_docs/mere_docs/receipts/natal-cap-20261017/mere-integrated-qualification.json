@@ -1,0 +1,17 @@
+{
+  "source": "a4b77014634807b7a82790d233bbaedb28312bd2",
+  "files": {
+    "Cargo.toml": "59b5945edc6dcf6c5b4d8498e9324edfcdb877466ba22b67551720453516a136",
+    "Cargo.lock": "d0211f98b05974adb49b9abb63a7c3c83ca864945abf8bf34151999cb0dfbe5a",
+    "ports/djinn/Cargo.toml": "1562525119021ed8bddae13723da9fe640b818ad52cfdea4f759e0effefc2d3d",
+    "ports/djinn/src/resident_mere.rs": "15fb07d896c03af37041c6217632f5935930d50b78b17238873dd0494fab3558",
+    "ports/djinn/tests/fixtures/natal-cap-finals2000a.txt": "3d9180e4c6b421eef034bbf64ef2d2658d0272782ecc3e23eeb78dcb9a266b28"
+  },
+  "exit": 0,
+  "passed": 225,
+  "failed": 0,
+  "ignored": 2,
+  "log_sha256": "ea24c8aca262c76a3fe6529c1eb7ae89d49280cb534ea4492b397e6995b6be6e",
+  "scope": "Integrated supplier graph after preserving incoming main e3de60496 renderer pin; library, stock/embedded owner-process parents and shared facts fresh-owner parent",
+  "consumer": "da495cfc75b2ee6bbb9476c8c03386e9057c36d3"
+}
