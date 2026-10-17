@@ -5,14 +5,16 @@
 //! No graph, application session, persistence, private GPU, clock, or source
 //! mutation is required. Hosts lend fonts, theme roles and a viewport.
 
-use super::{BoardFit, BoardRect, BoardText, BoardTransform};
+use super::{BoardFit, BoardRect, BoardText};
 use paint_list_api::{
     ColorF, CommonPlacement, DashPattern, DeviceIntSize, LayoutPoint, LayoutRect, PaintCmd,
     PaintList, PathCommand, PathData, PathItem, StrokeCap, StrokeJoin, StrokeStyle,
 };
 use paint_list_render::{CompositeLayer, composite_paint_layers};
 use sceno::{Footprint, Vec2};
-use scenomise::backdrops::{BackdropScene, CoverageTier, MarkRole, SceneInput, SceneInputError};
+use scenomise::backdrops::{
+    BackdropScene, CoverageTier, MarkRole, SceneFacts, SceneInput, SceneInputError,
+};
 use std::collections::BTreeSet;
 
 /// Applied appearance belongs to the embedding host. Defaults are the quiet
@@ -41,12 +43,29 @@ impl Default for SurfaceTheme {
     }
 }
 
+/// Presentation transform. Sequence rows can use the available height without
+/// shortening musical spans or changing the source's coordinates.
+struct SurfaceFit {
+    scale_x: f32,
+    scale_y: f32,
+    origin: (f32, f32),
+}
+impl SurfaceFit {
+    fn to_viewport(&self, (x, y): (f32, f32)) -> (f32, f32) {
+        (
+            self.origin.0 + x * self.scale_x,
+            self.origin.1 + y * self.scale_y,
+        )
+    }
+}
+
 pub struct BackdropSurface {
     compiled: BackdropScene,
     selected: Option<String>,
     retained: BTreeSet<String>,
     text: BoardText,
     font_ready: bool,
+    fill_template_height: bool,
     pub show_coverage: bool,
     pub show_links: bool,
 }
@@ -59,6 +78,7 @@ impl BackdropSurface {
             retained: BTreeSet::new(),
             text: BoardText::new(),
             font_ready: false,
+            fill_template_height: matches!(&input.facts, SceneFacts::TemplatedSequence(_)),
             show_coverage: true,
             show_links: true,
         })
@@ -115,6 +135,7 @@ impl BackdropSurface {
     pub fn replace(&mut self, input: &SceneInput) -> Result<(), SceneInputError> {
         let next = input.compile()?;
         self.compiled = next;
+        self.fill_template_height = matches!(&input.facts, SceneFacts::TemplatedSequence(_));
         let keys: BTreeSet<_> = self
             .compiled
             .marks
@@ -133,18 +154,28 @@ impl BackdropSurface {
         }
         Ok(())
     }
-    fn fit(&self, width: u32, height: u32) -> Result<BoardTransform, String> {
+    fn fit(&self, width: u32, height: u32) -> Result<SurfaceFit, String> {
         if width <= 48 || height <= 48 {
             return Err("scene viewport must exceed its 24px margins".into());
         }
         let b = self.compiled.scene.bounds;
-        Ok(BoardFit::new(24.0, 24.0, 24.0, 24.0)
+        let base = BoardFit::new(24.0, 24.0, 24.0, 24.0)
             .framing_bounds()
             .transform(
                 BoardRect::new(b.origin.x, b.origin.y, b.size.w, b.size.h),
                 width as f32,
                 height as f32,
-            ))
+            );
+        let scale_y = if self.fill_template_height {
+            (height as f32 - 48.0) / b.size.h.max(1.0)
+        } else {
+            base.scale
+        };
+        Ok(SurfaceFit {
+            scale_x: base.scale,
+            scale_y,
+            origin: (base.origin.0, 24.0 - b.origin.y * scale_y),
+        })
     }
     pub fn pick(&self, x: f32, y: f32, width: u32, height: u32) -> Option<&str> {
         if !x.is_finite() || !y.is_finite() {
@@ -152,8 +183,8 @@ impl BackdropSurface {
         }
         let fit = self.fit(width, height).ok()?;
         let world = Vec2::new(
-            (x - fit.origin.0) / fit.scale,
-            (y - fit.origin.1) / fit.scale,
+            (x - fit.origin.0) / fit.scale_x,
+            (y - fit.origin.1) / fit.scale_y,
         );
         self.compiled
             .marks
@@ -261,7 +292,7 @@ impl BackdropSurface {
                 &points.iter().copied().map(point).collect::<Vec<_>>(),
                 false,
                 None,
-                Some(stroke(theme.guide, width * fit.scale, None)),
+                Some(stroke(theme.guide, width * fit.scale_x, None)),
             ));
         }
         if self.show_links {
@@ -309,7 +340,7 @@ impl BackdropSurface {
                 // extent remains visible while attention marks its centre.
                 if let Footprint::Rect { size } = item.footprint {
                     commands.push(path(
-                        &rect(at, size.w * fit.scale, size.h * fit.scale),
+                        &rect(at, size.w * fit.scale_x, size.h * fit.scale_y),
                         true,
                         Some(alpha(color, if forward { 0.32 } else { 0.16 })),
                         Some(stroke(alpha(color, 0.45), 1.0, None)),
@@ -348,7 +379,7 @@ impl BackdropSurface {
                     0.22
                 };
                 commands.push(path(
-                    &rect(at, size.w * fit.scale, size.h * fit.scale),
+                    &rect(at, size.w * fit.scale_x, size.h * fit.scale_y),
                     true,
                     Some(alpha(color, opacity)),
                     None,
@@ -589,6 +620,50 @@ mod tests {
                 .text
                 .rooted("a{}")
                 .starts_with(":root { --tabard-font-interface: Probe;")
+        );
+    }
+    #[test]
+    fn timeline_rows_use_height_and_stretched_spans_remain_pickable() {
+        let input = SceneInput::parse(include_str!(
+            "../../../../../support/design-studies/backdrops/templates/progression.json"
+        ))
+        .unwrap();
+        let surface = BackdropSurface::new(&input).unwrap();
+        let fit = surface.fit(580, 300).unwrap();
+        let supplied = surface
+            .scene()
+            .marks
+            .iter()
+            .find(|m| m.key == "bar-2")
+            .unwrap();
+        let expected = surface
+            .scene()
+            .marks
+            .iter()
+            .find(|m| m.key == "role-2")
+            .unwrap();
+        let at = |m: &scenomise::backdrops::Mark| {
+            surface.scene().scene.items[m.instance.0 as usize]
+                .transform
+                .translate
+        };
+        let (_, supplied_y) = fit.to_viewport((at(supplied).x, at(supplied).y));
+        let (_, expected_y) = fit.to_viewport((at(expected).x, at(expected).y));
+        assert!(
+            expected_y - supplied_y >= 48.0,
+            "rows must leave room for labels and arcs"
+        );
+        let item = &surface.scene().scene.items[supplied.instance.0 as usize];
+        let Footprint::Rect { size } = item.footprint else {
+            panic!("span")
+        };
+        let (x, y) = fit.to_viewport((at(supplied).x, at(supplied).y + size.h * 0.45));
+        assert_eq!(surface.pick(x, y, 580, 300), Some("bar-2"));
+        let fretboard = BackdropSurface::new(&super::tests::input()).unwrap();
+        let fit = fretboard.fit(580, 300).unwrap();
+        assert_eq!(
+            fit.scale_x, fit.scale_y,
+            "instrument geometry retains its aspect ratio"
         );
     }
     #[test]
