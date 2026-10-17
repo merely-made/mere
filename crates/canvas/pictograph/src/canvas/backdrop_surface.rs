@@ -79,6 +79,11 @@ impl BackdropSurface {
         self.font_ready |= !bytes.is_empty();
         self.text.register_font(bytes);
     }
+    /// Root custom-property declarations for the label document; see
+    /// [`BoardText::set_font_roles`].
+    pub fn set_font_roles(&mut self, declarations: &str) {
+        self.text.set_font_roles(declarations);
+    }
     fn contains(&self, key: &str) -> bool {
         self.compiled
             .marks
@@ -378,7 +383,7 @@ impl BackdropSurface {
         if !self.font_ready {
             return Err("embedding host must lend a font before scene painting".into());
         }
-        // The title font falls back as `board_scene.rs`'s TITLE_SHEET explains.
+        // The family names Tabard's interface role; `set_font_roles` supplies it.
         let sheet = format!(
             ".board-title{{position:absolute;margin:0;padding:0;font-family:var(--tabard-font-interface, IBM Plex Sans), sans-serif;font-size:13px;line-height:16px;color:rgba({},{},{},{});text-align:center;white-space:nowrap;overflow:hidden;}}",
             r * 255.0,
@@ -573,6 +578,18 @@ mod tests {
         assert!(surface.replace(&invalid).is_err());
         assert_eq!(surface.selected(), Some("bar-2"));
         assert_eq!(surface.scene(), &before);
+    }
+    #[test]
+    fn font_roles_reach_the_label_sheet_only_when_set() {
+        let mut surface = BackdropSurface::new(&input()).unwrap();
+        assert_eq!(surface.text.rooted("a{}"), "a{}");
+        surface.set_font_roles("--tabard-font-interface: Probe;");
+        assert!(
+            surface
+                .text
+                .rooted("a{}")
+                .starts_with(":root { --tabard-font-interface: Probe;")
+        );
     }
     #[test]
     fn painting_requires_host_fonts_and_valid_viewport() {
