@@ -15,9 +15,10 @@ OpenLlama 3B model whose f32 weights exceed the target GPU's memory, plus a
 with measured drift, memory and streaming costs. I8 adds leased layer stages,
 exact-session token parity and checkpointed streaming recovery. Its three
 software devices have independent roots and model libraries on one computer
-and GPU. Explicit embedding APIs supply the leased plan; automatic peer/rung
-selection and staged JSON settings remain integration work. Physical second-
-computer and installed-binary receipts remain separate. I9 is next.
+and GPU. Ordinary app asks now discover attested keyed peers and select
+owner-budgeted residence, leased stages or local streaming through `automatic`
+JSON settings. Worker departure resumes the same checkpoint locally. Physical
+second-computer and installed-binary receipts remain separate. I9 is next.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -650,6 +651,15 @@ session on the same backend class; one stage leaving mid-answer causes a
 checkpoint and a completed answer by reassignment or streaming fallback; the
 row records per-token time and bytes moved between stages; stage work runs
 under mesh leases.
+
+Resident integration gate: ordinary app-route asks select local residence,
+keyed peer stages or local streaming from owner settings, without a supplied
+stage plan. Independently rooted graph devices discover each other and obtain
+real leases; departure recovers from a committed checkpoint. Outputs match a
+local run of the same session/backend, and switching execution mode preserves
+existing journals and device IDs. Physical inter-computer capacity and latency
+remain separate receipts.
+
 
 ### I9. Architecture coverage
 
@@ -1385,8 +1395,71 @@ Stop and record the reason if any of these happen:
     records source/binary hashes, model and session identities, exact token
     outputs, placement, tensor traffic, host profile and gate logs. The
     embedding APIs compose explicit leased stage plans and the ordinary
-    durable inference actor. Automatic peer discovery/rung selection and a
-    staged JSON settings variant remain integration work. Larger staged
+    durable inference actor. At that source cut, automatic peer/rung selection
+    and staged JSON settings remained integration work; the entry below records
+    their qualification. Larger staged
     models, other formats/backend classes, physical second-computer execution,
     a new headed Turnstone row and an installed Djinn run need separate
     receipts. I8's native gate is complete; I9 architecture coverage is next.
+
+- **2026-10-16: I8 ordinary resident integration qualified.**
+  `automatic` model settings now compose local residence within an explicit
+  weight/context-KV payload budget, discovered leased ranges, and local streamed
+  recovery. The ordinary `inference.ask` route supplies no stage plan.
+  - *Topology finding.* Profile-derived mesh names differ across distinct
+    personal graph roots. Automatic compute therefore names a common graph
+    space. A bounded protocol over the existing personal connection exchanges
+    compute endpoint hints only after mutual attested current-reader proof.
+    Stage traffic uses the existing Distillery endpoint. Host admission gates
+    all work in this graph mesh and reclaims it on reader withdrawal.
+  - *Durability finding.* Compute mesh location must not rename ask authority.
+    Local and sealed graph journals and stable device IDs retain their existing
+    profile paths when the model setting changes from `library` to `automatic`.
+    Existing local history remains available for the established keyed import.
+  - *Ownership.* The actor gets a read-only board and a bounded posting queue;
+    the supervisor authors posts on its existing single-writer path. Canonical
+    inputs have short-lived poster-bound reservations. Late or abandoned plans
+    cannot newly claim work after reservation expiry. The library owner checks
+    exact row/session/backend availability before offering capacity. Prompts
+    enter neither discovery nor mesh input/receipts. The existing model-library
+    owner, GPU/trainer guard and current graph key owner remain authoritative.
+  - *Rungs and shutdown.* Indexed residence retains query-chunk arithmetic and
+    the exact session. Stage failure commits the last token/draw boundary and
+    placement before retiring the plan and loading streamed replacement tensors.
+    Plan cleanup has one overall deadline. Catalog callbacks remain counted
+    through timeout or cancellation so vault/shutdown drain cannot release the
+    library while detached work still borrows it. Existing lending allowlists
+    and checkpoint classes must permit a worker's device-addressed stage resource.
+  - *Qualification.* Frozen source `64c85620`, built through normal Cargo release
+    profiles, passes ordinary app-route asks across three independent vaults,
+    libraries and transport endpoints. The fixture supplies personal pairing and
+    key agreement, with no compute endpoint, stage range, mesh job or credential
+    supplied to the ask. Its 64-token CPU run and pinned seven-token SmolLM2 f16
+    GPU run match the resident reference in every placement. Separate ordinary
+    worker asks select whole-model residence. Removing a worker resumes at token
+    5 on CPU and token 3 on GPU; the following ask streams locally when the
+    remaining worker cannot cover the model. Existing history and device IDs
+    survive the `library` to `automatic` transition, and shutdown drains owners.
+  - *Regression checks.* ESP, Distillery and mesh pass **188, 54 and 125 unit
+    cases**; ESP and Distillery each pass **15 integration cases**. The actor/wire
+    build passes **38 tests** and its normal feature tree remains decoder-free.
+    Djinn passes **seven settings/discovery tests**, its current-key reader test,
+    the **four-case route suite**, **three explicit GPU reclaim cases** and the
+    explicit real-model recall case with exact retained versions. Default and
+    inference-without-stages gates are recorded in the receipt. Touched Rust
+    formatting and the documentation audit add no findings beyond the baseline.
+  - *Fixture findings and evidence limits.* Three supervisors on one local
+    executor stalled later asks; independent runtime threads model the separate
+    residents and let departure and observation proceed independently. The
+    fixture releases its host watchers before resident blob custody closes and
+    allows bounded cold GPU startup. Two earlier existing continuation-suite
+    attempts failed on a missing checkpoint parent and on a pause wait that
+    observed an already finished run; the isolated continuation and final
+    four-case suite pass. Those failed attempts remain in
+    the receipt; this is not a new 20-run flakiness qualification.
+    [The automatic-placement receipt](../../../support/receipts/resident_inference_automatic.json)
+    records exact source/binary hashes, commands, model/session identities,
+    token IDs and placement checkpoints. All three software devices use one
+    physical O-PC and RTX 4060 Laptop GPU. Physical fleet capacity and latency,
+    other model/backend rows, a new headed run and an installed Djinn invocation
+    need their own receipts. I9 architecture coverage is next.
