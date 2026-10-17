@@ -1,0 +1,994 @@
+{
+  "schema": "mere.resident-inference/architecture-primitives/v1",
+  "recorded_utc": "2026-10-17T07:18:27.436098+00:00",
+  "host": "O-PC",
+  "phase": "I9 in progress",
+  "architecture_checkpoint_complete": true,
+  "scale_gate_complete": false,
+  "source": {
+    "schema": "mere.resident-inference/architecture-source/v1",
+    "recorded_date": "2026-10-17",
+    "host": "O-PC",
+    "source_commit": "aa581385daec716a429ab2c814b9f7bcd3fce063",
+    "base_commit": "8498608cbdde726c46fc477c3cc582d6c359ed22",
+    "hash_definition": "SHA-256 of Git blob bytes; design-document updates excluded from executable source binding",
+    "source_git_blob_sha256": {
+      ".gitattributes": "2a369dabaa7da3213d26a3684d4af859ef7533443381a292ef10788ad6e4d600",
+      "Cargo.lock": "b7ac62843b7db5c2e5d2398624ea3f9f3fe4b8886684d54f3ca4feb150995916",
+      "Cargo.toml": "c3715e10921e7a58ff01c8ed8b2650eaad283bab673e5491945947dac2b16d77",
+      "crates/intel/esp/Cargo.toml": "26369d59daa61cb46b5a31c92f04ecd57a7bbad1229f63e2f3f6baa435c340ff",
+      "crates/intel/esp/README.md": "933318031e9f016d43e13779df354a1612fa6125d048603db4cdb96a64474f1d",
+      "crates/intel/esp/src/infer/decoder/architecture_tests.rs": "550c8d2867af4ac5ae23b72c51d466f665684cef648b2c81e4ae7378d4053caf",
+      "crates/intel/esp/src/infer/decoder/attention.rs": "6c6101ad1db5823e0a35005f41229b380a2e13511d5e5195e728a0986425102a",
+      "crates/intel/esp/src/infer/decoder/checkpoint.rs": "fe392b9a1a21944362a7d1f9fbcfa67ee40c137f78978667176d82e12e138469",
+      "crates/intel/esp/src/infer/decoder/config.rs": "e31ac64f57a154c63985e47ddeca9514107f5fc0b7392bbbd0c8bc6c57d01eab",
+      "crates/intel/esp/src/infer/decoder/layer.rs": "d8820a17be074a85423ae988b2c5f4da302ec704f9580ac5fe3b985909c612e2",
+      "crates/intel/esp/src/infer/decoder/loader.rs": "9664efa90f1800b3cabfec2788c950a26b98c7e334aa8d06754f7b25781c5881",
+      "crates/intel/esp/src/infer/decoder/lora.rs": "7a19831400983af976eaf866ee351b917112927a873b5b54a0bbe5766d6dd490",
+      "crates/intel/esp/src/infer/decoder/mod.rs": "c4c4d8235fb0159565bddd848e77322c1c449b8ef67530d1043873dcbb58f1dc",
+      "crates/intel/esp/src/infer/decoder/model.rs": "114709f5edc67d6e2112af665381846d86f9c903130f8fd4773ad51b52ee3450",
+      "crates/intel/esp/src/infer/decoder/moe.rs": "350eea70a9e52bb51b826b6f8c422a35b5bb292b551ee7960038dde97423d767",
+      "crates/intel/esp/src/infer/decoder/provider.rs": "f07c0fac5edb59f6a5192d13d6e21eee6b84395f1386072fde26ca8f8d9bc0a4",
+      "crates/intel/esp/src/infer/decoder/stage.rs": "75032e252e964c77dcd091498b964bf7d9b3963660dc6ad90fb8fc87ae3183a7",
+      "crates/intel/esp/src/infer/decoder/streaming.rs": "dc0705992efdc290fd273131bf8b66cb55941c6f4e87a525412e495149fa3fe0",
+      "crates/intel/esp/src/infer/decoder/train.rs": "2011591939a8da14971d0b28c508970df1e009e3ae3cb06619a2150d6c30526b",
+      "crates/intel/esp/src/infer/decoder/train_autodiff.rs": "0d6d3bae7211f901820ff832d0bbd91897900b8dc666323d7a2400c1c00cd64c",
+      "crates/intel/esp/src/infer/layer_library.rs": "2b65ff94982d022aa9fc99c6689dc59d4e40c3abeaf908d8b3e449f6524d1251",
+      "crates/intel/esp/src/infer/library.rs": "5284ddb3991ae1ec6f3f002b99ad9bfdff20ac4c487dc72073945bceb510c431",
+      "crates/intel/esp/templates/qwen2-instruct-v1.json": "77c4ff126008e98eecb8d24e22fd0446c6abf936d303cb276b5865d70ea2e331",
+      "crates/intel/esp/templates/qwen3-nonthinking-v1.json": "a3bc6f25c1387cc3c2e35ffc7df376c098080cee122583effec54bdd15db04d4",
+      "crates/intel/esp/tests/architecture_moe_real.rs": "3a919c7caf77a1aac2a245fee85b513bd933742a0f5c98b7504295f2c819839c",
+      "crates/intel/esp/tests/architecture_rows.rs": "a2e19592783af6378b51a6344af9047ce60ee85b40fffa49313887a7a5faf0ad",
+      "crates/intel/esp/tests/measure_architecture_gate.py": "442eb324695b56ff12694081f7ce883f3c822252c65db05362954bed5fd503ef",
+      "crates/intel/esp/tests/qwen2_05b_reference.json": "d0afad46a23aea65c231f7739849d0396a8c7b23c5ca96335a83e355122fc32d",
+      "crates/intel/esp/tests/qwen2_57b_moe_reference.json": "0b0a624206c624de9c60425a8e45e009f671431577b54b620ce0db28848a0d4f",
+      "crates/intel/esp/tests/qwen3_06b_reference.json": "6f575c0407d6c4985dd110501a987450ad970ce71b694943481b381dac8ac882",
+      "crates/intel/esp/tests/reference_architectures.py": "6fa1906c58499d71422085501c423dda4e3b1d32c7f379e0edcf10d74b4edc6e",
+      "crates/intel/esp/tests/support/architectures/linear/config.json": "6e2b8d6a7ae92ee6dc7deb5c04107d515e17fcba011bcb3a53366b7f72a4a02f",
+      "crates/intel/esp/tests/support/architectures/linear/model.safetensors": "781be691bbaaf315258a668df04b360b6440fd321b9dc29f6b78c49caec49b7a",
+      "crates/intel/esp/tests/support/architectures/llama/config.json": "4fc1a292bce7186fb870777114d79f20054d9657ce6a9cc03537af2af64a16d7",
+      "crates/intel/esp/tests/support/architectures/llama/model.safetensors": "781be691bbaaf315258a668df04b360b6440fd321b9dc29f6b78c49caec49b7a",
+      "crates/intel/esp/tests/support/architectures/llama3/config.json": "fe8900ac17047b30c6f926f5b7627f9f1867281df79c6d982d20b3b2b50d717c",
+      "crates/intel/esp/tests/support/architectures/llama3/model.safetensors": "781be691bbaaf315258a668df04b360b6440fd321b9dc29f6b78c49caec49b7a",
+      "crates/intel/esp/tests/support/architectures/mistral/config.json": "36b7ab4469e7c8baf5134df99c55714c9101dfe98db69cf1e3eaef247818dc97",
+      "crates/intel/esp/tests/support/architectures/mistral/model.safetensors": "23aed95c764faf55266cf2f2106e6ab5452d7082fa028433fc28ac2a96b072d9",
+      "crates/intel/esp/tests/support/architectures/qwen2/config.json": "f4d6501db07722a6812a993f0e16c87b8ae48e8f35f27dc7f641177c21767056",
+      "crates/intel/esp/tests/support/architectures/qwen2/model.safetensors": "98910169d1ac9a02401550e78e4a83df94b68db4e034942d10ebaf8c4894b867",
+      "crates/intel/esp/tests/support/architectures/qwen2_moe/config.json": "0ac81c11223507ea2d8da48617669c1eccd1798c6c4df234f0609f053963d2b9",
+      "crates/intel/esp/tests/support/architectures/qwen2_moe/model.safetensors": "767b9e38e6ede3f0d05c7343f9a370c52654786e7579ee70462d771b626528e4",
+      "crates/intel/esp/tests/support/architectures/qwen2_moe_normalized/config.json": "aa94c6b78697bca345a49fb688aed66e05eab1d524d0d63f8291341aa8e85af7",
+      "crates/intel/esp/tests/support/architectures/qwen2_moe_normalized/model.safetensors": "b833fb26a290a52b45a8f45e3bef2f42921368513d4b058afec848f01e16a158",
+      "crates/intel/esp/tests/support/architectures/qwen3/config.json": "39e9a8344fb6c59271356f750c8c9e3889716830e8e9dc5dbcedc5d668c12298",
+      "crates/intel/esp/tests/support/architectures/qwen3/model.safetensors": "814dd2bd1e6437598fc3baadbb80dbd1f29354bb3a0e399cf062e18eba2fa35a",
+      "crates/intel/esp/tests/support/architectures/reference.json": "8483d0579216f808fa1dc5822ed6f7c26195541865a0775640e371cff97e76e5",
+      "ports/distillery/Cargo.toml": "9c70783f72c0519f09276089065941975ba03b01fe25aefd7ac6c595ecaf6c00",
+      "ports/distillery/src/inference.rs": "f7fcd6a1d3d44d12e158d63b2fd4957ae9d05ab3f821bf5b96e05d7a385393df",
+      "ports/distillery/src/inference_stage.rs": "1070459fed5fafbe7a3ad7e89b73c93d9f9e297466b89ce37ec96db0fa394205",
+      "ports/distillery/tests/inference_layered.rs": "4e5fe70665407759b692b68406f358c4ea02fdd05027a87a2217bd20a0404b8c",
+      "ports/djinn/Cargo.toml": "1562525119021ed8bddae13723da9fe640b818ad52cfdea4f759e0effefc2d3d"
+    },
+    "cargo_target": "C:/t/cargo-targets/mere",
+    "cargo_build_dir": "C:/t/cargo-targets/mere/build",
+    "qualification": "runtime checks ongoing; this file records source identity"
+  },
+  "source_boundary": "The ESP unit/GPU executable was built at 397b8838; only the architecture_rows integration fixture changed through aa581385. Production source is identical. The final architecture_rows binary includes the exact-session complete-stage fixture fixes.",
+  "build_features": [
+    "actor",
+    "decoder-flex",
+    "decoder-wgpu",
+    "decoder-autodiff",
+    "model-session"
+  ],
+  "reproduce_build": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "esp",
+    "--release",
+    "--features",
+    "actor,decoder-flex,decoder-wgpu,decoder-autodiff,model-session",
+    "--lib",
+    "--test",
+    "architecture_rows",
+    "--test",
+    "architecture_moe_real",
+    "--no-run"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build",
+    "ESP_ARCHITECTURE_WORK_DIR": "C:\\t\\cargo-targets\\mere\\inference-i9",
+    "ESP_SMOLLM2_DIR": "C:/Users/mark_/.cache/huggingface/hub/models--HuggingFaceTB--SmolLM2-360M-Instruct/snapshots/a10cc1512eabd3dde888204e902eca88bddb4951"
+  },
+  "checks": [
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\esp-aa850293b753c7e7.exe",
+      "executable_sha256": "e2b5c06e7c822cb6bce694bc63cef17c641208dcc68845c1337c7907e1d15b38",
+      "reproduce_arguments": [
+        "--test-threads=1"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\esp-unit-final.log",
+        "bytes": 16055,
+        "sha256": "1e0f54ac41e9badfff3dbfe08ae542045d9281ffe7ed3c3ef588a9d7b3141c40"
+      },
+      "summaries": [
+        "test result: ok. 198 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 4.26s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\esp-aa850293b753c7e7.exe",
+      "executable_sha256": "e2b5c06e7c822cb6bce694bc63cef17c641208dcc68845c1337c7907e1d15b38",
+      "reproduce_arguments": [
+        "--ignored",
+        "--exact",
+        "infer::decoder::architecture_tests::gpu_architecture_streaming_and_stages_match_reference",
+        "--test-threads=1"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\gpu-architectures-final.log",
+        "bytes": 223,
+        "sha256": "3b66ef2c020665aefadf0236583b0b0ec54ba3f0675d8d95a3d7a055dbe6c284"
+      },
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 51.14s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\distillery-277cb55b725f095d.exe",
+      "executable_sha256": "04d24c17244235f025605d4ffa3b9bc07e123d31c87149afc8119e86d59d8e50",
+      "reproduce_arguments": [
+        "--test-threads=2"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\distillery-unit-final.log",
+        "bytes": 5054,
+        "sha256": "1f28945f30d063e5d9126d84cd3515ddee2bd569537ba3f5092a1590f9c8f2e8"
+      },
+      "summaries": [
+        "test result: ok. 54 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\architecture_rows-127a1744bbeccc00.exe",
+      "executable_sha256": "c246e639083e91006c55bef41514bec35c46c446d01d427cbdf9fec1b6077268",
+      "reproduce_arguments": [
+        "--exact",
+        "expert_library_identity_and_read_failures_are_enforced"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\expert-library-complete-final.log",
+        "bytes": 630,
+        "sha256": "737cf93a3dc18b0f6e8885adefafa815a9c7b7171e72bfb7644c8b18fe9c9eb5"
+      },
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.07s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\inference_layered-66f5bd1a136b1257.exe",
+      "executable_sha256": "ecf8e4999c3fd93826031f998266fb768e9f6c374848250a73cd6b0064b6f0f2",
+      "reproduce_arguments": [
+        "--test-threads=1"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\expert-owner-runtime.log",
+        "bytes": 348,
+        "sha256": "450ac19bb3ad07ff16297c4be2a399bf726a15f228f4dfd2b390aebadee42397"
+      },
+      "summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\smollm2_library-22aa3e65424a261c.exe",
+      "executable_sha256": "1eb2463375ab5399c71e953383aed1be844fd0c65ed8e39831a9d95f25c46b0d",
+      "reproduce_arguments": [
+        "--ignored",
+        "--exact",
+        "library_cpu_matches_independent_greedy_reference"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\smollm2-cpu.log",
+        "bytes": 1596,
+        "sha256": "667095531bea2021a2eafb6961a46274861f8591d2407539bc8de1e4735ad98d"
+      },
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 319.54s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\smollm2_library-22aa3e65424a261c.exe",
+      "executable_sha256": "1eb2463375ab5399c71e953383aed1be844fd0c65ed8e39831a9d95f25c46b0d",
+      "reproduce_arguments": [
+        "--ignored",
+        "--exact",
+        "library_gpu_matches_independent_greedy_reference"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\smollm2-gpu.log",
+        "bytes": 1706,
+        "sha256": "ca13d774de9a5f2850c859222b39a5c0bcb75e64626d9fa56e70ab5aa0cae88e"
+      },
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 39.09s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\architecture_rows-127a1744bbeccc00.exe",
+      "executable_sha256": "c246e639083e91006c55bef41514bec35c46c446d01d427cbdf9fec1b6077268",
+      "reproduce_arguments": [
+        "--ignored",
+        "--exact",
+        "qwen2_cpu_model_row",
+        "--test-threads=1"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\qwen2-cpu-final.log",
+        "bytes": 270,
+        "sha256": "ad2be3fcd6fd361cd8e5c65e7349c4fd5db089d2c90d93c1dca560e01dee351e"
+      },
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 149.27s"
+      ]
+    },
+    {
+      "status": "passed",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\djinn-d0d7d06df9ff7e0c.exe",
+      "executable_sha256": "c0df5a056cb21bf803367fc62637f3cb5729ead9d21dca674093be56e1e407b8",
+      "reproduce_arguments": [
+        "resident_inference::",
+        "--test-threads=1"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\djinn-inference-unit-final.log",
+        "bytes": 776,
+        "sha256": "874c4a8df85305ac0c7335839aae17512572c3fd7e36e59f4f55989efa80f20e"
+      },
+      "summaries": [
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 213 filtered out; finished in 0.06s"
+      ]
+    },
+    {
+      "status": "failed: two unchanged upstream expectation tests",
+      "executable": "C:\\t\\cargo-targets\\mere\\build\\release\\deps\\djinn-d0d7d06df9ff7e0c.exe",
+      "executable_sha256": "c0df5a056cb21bf803367fc62637f3cb5729ead9d21dca674093be56e1e407b8",
+      "reproduce_arguments": [
+        "--test-threads=2"
+      ],
+      "log": {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\djinn-unit-final.log",
+        "bytes": 21700,
+        "sha256": "cdbe3790bfba97979e61c0fdd8f437319742a86580258bc8a92f51e11db8e090"
+      },
+      "summaries": [
+        "test result: FAILED. 218 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 69.54s"
+      ]
+    }
+  ],
+  "independent_primitive_reference": {
+    "path": "crates/intel/esp/tests/support/architectures/reference.json",
+    "sha256": "ebb90aead83ab0e433731f5a88e97f188b8f19a195b29432230c80a5e84445d4",
+    "cases": 8,
+    "modes_per_case": [
+      "resident",
+      "streamed",
+      "complete stage",
+      "shared-row shards"
+    ],
+    "gpu_logit_max_absolute_error": 2e-05,
+    "exact_generated_tokens_per_case": 4,
+    "precision": "f32",
+    "implementation": "Transformers 4.57.6 eager; Torch 2.14.1+cpu; seed 8301; full recomputation"
+  },
+  "existing_smollm2_results": [
+    {
+      "adapter": null,
+      "backend": "burn-ndarray",
+      "load_seconds": 1.3490168,
+      "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+      "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+      "row": "blake3:cc753a9cfd8b2657c66b962e508b97845b6c2bda7c42940d5ea4ae5386952a01",
+      "rows": [
+        {
+          "draws": 0,
+          "first_differing_token": null,
+          "question": "What is the capital of France?",
+          "resume_at": 3,
+          "resumed_token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ],
+          "seconds": 13.402361,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "draws": 0,
+          "first_differing_token": null,
+          "question": "Count from one to five.",
+          "resume_at": 3,
+          "resumed_token_ids": [
+            33,
+            30,
+            1963,
+            198,
+            34,
+            30,
+            5713,
+            198,
+            35,
+            30,
+            8696,
+            198,
+            36,
+            30,
+            8920,
+            198
+          ],
+          "seconds": 25.8259045,
+          "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+          "token_ids": [
+            33,
+            30,
+            1963,
+            198,
+            34,
+            30,
+            5713,
+            198,
+            35,
+            30,
+            8696,
+            198,
+            36,
+            30,
+            8920,
+            198
+          ]
+        },
+        {
+          "draws": 0,
+          "first_differing_token": null,
+          "question": "What color is a clear daytime sky?",
+          "resume_at": 3,
+          "resumed_token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ],
+          "seconds": 23.5453984,
+          "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ]
+        }
+      ],
+      "session": {
+        "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+        "session_id": "blake3:27b717ec871178569bd15e8819af1c83ac26bac211547c09d67385e5d3b489f1"
+      }
+    },
+    {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "backend": "burn-wgpu",
+      "load_seconds": 4.3249179,
+      "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+      "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+      "row": "blake3:cc753a9cfd8b2657c66b962e508b97845b6c2bda7c42940d5ea4ae5386952a01",
+      "rows": [
+        {
+          "draws": 0,
+          "first_differing_token": null,
+          "question": "What is the capital of France?",
+          "resume_at": 3,
+          "resumed_token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ],
+          "seconds": 9.8044491,
+          "text": "The capital of France is Paris.",
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        {
+          "draws": 0,
+          "first_differing_token": null,
+          "question": "Count from one to five.",
+          "resume_at": 3,
+          "resumed_token_ids": [
+            33,
+            30,
+            1963,
+            198,
+            34,
+            30,
+            5713,
+            198,
+            35,
+            30,
+            8696,
+            198,
+            36,
+            30,
+            8920,
+            198
+          ],
+          "seconds": 2.8534069,
+          "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+          "token_ids": [
+            33,
+            30,
+            1963,
+            198,
+            34,
+            30,
+            5713,
+            198,
+            35,
+            30,
+            8696,
+            198,
+            36,
+            30,
+            8920,
+            198
+          ]
+        },
+        {
+          "draws": 0,
+          "first_differing_token": null,
+          "question": "What color is a clear daytime sky?",
+          "resume_at": 3,
+          "resumed_token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ],
+          "seconds": 2.5107098,
+          "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+          "token_ids": [
+            49,
+            2437,
+            23703,
+            6376,
+            314,
+            3431,
+            253,
+            2276,
+            11615,
+            282,
+            4461,
+            28,
+            1129,
+            351,
+            253,
+            11682
+          ]
+        }
+      ],
+      "session": {
+        "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+        "session_id": "blake3:e98a2d6d857bbeea8f431367885d4a5ddee51d3751f69e9ade6943c19314f925"
+      }
+    }
+  ],
+  "forcing_reference": {
+    "model_id": "Qwen/Qwen2-57B-A14B-Instruct",
+    "revision": "50896d66b39f1425d63720541a66c7df13e053c0",
+    "torch": "2.14.1+cpu",
+    "transformers": "4.57.6",
+    "dtype": "torch.float32",
+    "attention": "eager",
+    "max_tokens": 16,
+    "reference": "cached Transformers greedy tokens",
+    "official_template_match": true,
+    "template_sha256": "b7cd55e46fcbe3db8fe1c240bcc2022f7b6c29e19a630df83ae0a8ba09de5efe",
+    "artifacts": {
+      "config.json": "422bec9f6b52c33bbd23f2b5707ddb4b52cca480485cefc54e8e65831a212d4c",
+      "generation_config.json": "758d6aed2f4947bba541c57491ad53d8ba67067cbdfb9a0ce2821c834350501f",
+      "tokenizer.json": "f7c9b2dba4a296b1aa76c16a34b8225c0c118978400d4bb66bff0902d702f5b8",
+      "tokenizer_config.json": "b34ff231d7132e0d7f43e04544937d63f2edfcd91c6ca6a2c581b1078e42f166",
+      "model.safetensors.index.json": "9ced996b50d177c81b10af8d554f3ad3844aa3fcc1c2e374b9fee8a3b6c63e02",
+      "model-00001-of-00029.safetensors": "ca57fe6af12e0eebbc6b11ac31c9b5fde6ef8a9aec1fca0de2ebd02e39f19ca7",
+      "model-00002-of-00029.safetensors": "8cad09ebbea5214022fa0f73fe91852a6feb3e6a1c68de2505cc5466cc2807c4",
+      "model-00003-of-00029.safetensors": "bdf68771367ee467e7967258f2156e605430dd81bdc36823baca1020efa57435",
+      "model-00004-of-00029.safetensors": "be00366cf4fcb199761096f14eba5ea3ce8caada6d6f1b7cfedf43eadc4034d8",
+      "model-00005-of-00029.safetensors": "27013e94dbcd23d8bcdd490f819fc2f9de05ee69550417a1c256ef58b78be842",
+      "model-00006-of-00029.safetensors": "eed03d2ec20aeae9b4b2007e263aed073149178690c2d074bb96f0ee10542f55",
+      "model-00007-of-00029.safetensors": "0055a3131247962127bc8271bc3e4f46cb2c876747409fb7f2722bc3a54148cb",
+      "model-00008-of-00029.safetensors": "4ac20942deef743a792cf532220e02abec93ee1895fec96434471ebad77d2f46",
+      "model-00009-of-00029.safetensors": "f7381a2b1c884a2f27a09b25b82bc188daa0ec2abcf91ba3635f95ae293d9aa5",
+      "model-00010-of-00029.safetensors": "c18cdf3ce711a84cb7e0d8f497124325151f3b6fdca01c069706d35e134333b7",
+      "model-00011-of-00029.safetensors": "551629128f3114371279d7829e562a94ca13ad2a32214625a18b346c7fab7360",
+      "model-00012-of-00029.safetensors": "d68dbd946665e5fa8070fe14b03adb068cd5164fed3426254533ccef2ff1463a",
+      "model-00013-of-00029.safetensors": "da784966842a5ae8b7dd4e98abac253cde5519e65ff07bfc78e289d784bc1b75",
+      "model-00014-of-00029.safetensors": "478cdfec9f23b7f01e1cf8672f0413cb6dc3d406d47b758835155f349f7268e9",
+      "model-00015-of-00029.safetensors": "c9dc320656f785de6adbe3dab74baa4642405c097820ed15ca11879e632f64e3",
+      "model-00016-of-00029.safetensors": "f95c0b003ed37940c82ea7d4d9cb663abb2bcf51df2cd75827d151419b6ddbb5",
+      "model-00017-of-00029.safetensors": "ed01b9e8d28ac0d316865370809cc216f4c54cf30653ef22d9ff0ea91904af9f",
+      "model-00018-of-00029.safetensors": "4f5d53a73eaffa278345c74a0536442d10823b05d7963a83877050bb48bd4172",
+      "model-00019-of-00029.safetensors": "d5d5932ca2510dd2d2a9fbd2f164f861e47ce5deb41ad4ce86dece35c45afccf",
+      "model-00020-of-00029.safetensors": "7b0c35e57b2128bf21026a87a3b238fbe56759ae134ce3c8451e1a5f3c030ceb",
+      "model-00021-of-00029.safetensors": "dca80cc7a23e3ce928f254cff6b6160f866a7f1685c1863aef81d23fac4e1dcd",
+      "model-00022-of-00029.safetensors": "57ca4608bd3f00e4122d78ec96b7a27ff63b02b69fcc696a4398d8e45ca370b3",
+      "model-00023-of-00029.safetensors": "00e5fcacaacb0034c8cb6acd195d5c3e5723be6dd1ee0d28b35952b2aa1155c9",
+      "model-00024-of-00029.safetensors": "487c571d36af5f13956dfd6d30a0f9009281d54beb6502881147504fb03db48c",
+      "model-00025-of-00029.safetensors": "5851c675ffa0ce6c7d77d657b0a110132e805446c25c03044be8f4c2148bb945",
+      "model-00026-of-00029.safetensors": "0c54cddfa6132e13d207d66a0da788cd12426000ef634599606fa13ac89df490",
+      "model-00027-of-00029.safetensors": "99b04c7b37ea8b5f957f52392a8306abddb02c3df7e1d09e3bf81aead3c6710a",
+      "model-00028-of-00029.safetensors": "80df1ae3934022c0eee8fbc68a78db2886137519e93d58e4a777a67fe264edb7",
+      "model-00029-of-00029.safetensors": "e4d0e8bd5d23f13821e30a37dae9340decb05af405ea44c4f293384984f706a8"
+    },
+    "rows": [
+      {
+        "question": "What is the capital of France?",
+        "prompt": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n",
+        "prompt_ids": [
+          151644,
+          8948,
+          198,
+          2610,
+          525,
+          1207,
+          16948,
+          11,
+          3465,
+          553,
+          54364,
+          14817,
+          13,
+          1446,
+          525,
+          264,
+          10950,
+          17847,
+          13,
+          151645,
+          198,
+          151644,
+          872,
+          198,
+          3838,
+          374,
+          279,
+          6722,
+          315,
+          9625,
+          30,
+          151645,
+          198,
+          151644,
+          77091,
+          198
+        ],
+        "token_ids": [
+          785,
+          6722,
+          315,
+          9625,
+          374,
+          12095,
+          13,
+          1084,
+          374,
+          825,
+          315,
+          279,
+          1429,
+          26277,
+          323,
+          34801
+        ],
+        "text": "The capital of France is Paris. It is one of the most iconic and historically",
+        "seconds": 793.25
+      },
+      {
+        "question": "What is two plus two?",
+        "prompt": "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\nWhat is two plus two?<|im_end|>\n<|im_start|>assistant\n",
+        "prompt_ids": [
+          151644,
+          8948,
+          198,
+          2610,
+          525,
+          1207,
+          16948,
+          11,
+          3465,
+          553,
+          54364,
+          14817,
+          13,
+          1446,
+          525,
+          264,
+          10950,
+          17847,
+          13,
+          151645,
+          198,
+          151644,
+          872,
+          198,
+          3838,
+          374,
+          1378,
+          5519,
+          1378,
+          30,
+          151645,
+          198,
+          151644,
+          77091,
+          198
+        ],
+        "token_ids": [
+          11613,
+          5519,
+          1378,
+          374,
+          3040,
+          13
+        ],
+        "text": "Two plus two is four.",
+        "seconds": 486.875
+      }
+    ]
+  },
+  "forcing_reference_memory": {
+    "schema": "mere.architecture-reference/memory-observation/v1",
+    "scope": "Sampled OS process high-water mark during the f32 reference run, including its earlier measured peak",
+    "physical_ram_bytes": 33515835392,
+    "samples": 402,
+    "peak_os_working_set_bytes": 6621368320,
+    "pid": 41488,
+    "observed_from": "2026-10-17T01:05:17.2641569-04:00"
+  },
+  "forcing_payload": {
+    "schema": "mere.resident-inference/forcing-row-payload/v1",
+    "source": "pinned safetensors headers; complete source hashes are in qwen2_57b_moe_reference.json",
+    "f32_tensor_payload_bytes": 229634635776,
+    "tensor_dtypes": {
+      "BF16": 5771
+    },
+    "core_layers": 28,
+    "routed_expert_artifacts": 1792,
+    "largest_core_raw_bytes": 499611648,
+    "largest_expert_raw_bytes": 55050240,
+    "shared_raw_bytes": 2178161664,
+    "redb_version": "2.6.3",
+    "redb_max_value_bytes": 3221225472,
+    "estimated_power_of_two_value_allocation_bytes": 139586437120,
+    "estimate_scope": "Conservative per-value rounding with 4096 bytes per artifact. Table/manifest/allocator metadata and free region capacity are additional; actual final database size will be measured.",
+    "redb_growth_scope": "page_manager::grow adds regions after its first full region; it does not keep doubling the whole database."
+  },
+  "machine_memory": {
+    "schema": "mere.resident-inference/reachable-machine-memory/v1",
+    "observed_at": "2026-10-17 05:30:39 UTC",
+    "scope": "Read-only SSH observations of these known aliases; not an inventory of graph-key membership or a cross-machine inference receipt. Linux free reports usable OS memory.",
+    "ram_bytes": {
+      "O-PC": 33515835392,
+      "imac-intel": 34359738368,
+      "imac-m4": 17179869184,
+      "thinkpad-l14-f": 16083865600,
+      "s-pc": 6178201600
+    },
+    "largest_observed_ram_bytes": 34359738368,
+    "local_gpu": {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "reported_mib": 8188
+    },
+    "remote_gpu_scope": "Not measured; nvidia-smi was unavailable on s-pc.",
+    "queries": [
+      {
+        "host": "imac-intel",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "08bb46",
+            "wall_time_seconds": 1.3735648999999999,
+            "exit_code": 0,
+            "original_token_count": 3,
+            "output": "34359738368\n"
+          }
+        }
+      },
+      {
+        "host": "imac-m4",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "26c942",
+            "wall_time_seconds": 1.3081676,
+            "exit_code": 0,
+            "original_token_count": 3,
+            "output": "17179869184\n"
+          }
+        }
+      },
+      {
+        "host": "thinkpad-l14-f",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "d04b77",
+            "wall_time_seconds": 4.0509011,
+            "exit_code": 0,
+            "original_token_count": 52,
+            "output": "               total        used        free      shared  buff/cache   available\nMem:     16083865600  5617057792   755286016    12947456 10117292032 10466807808\nSwap:     8589930496  2895880192  5694050304\n"
+          }
+        }
+      },
+      {
+        "host": "s-pc",
+        "result": {
+          "status": "fulfilled",
+          "value": {
+            "chunk_id": "555723",
+            "wall_time_seconds": 2.4455464,
+            "exit_code": 1,
+            "original_token_count": 42,
+            "output": "bash: -c: line 1: syntax error near unexpected token `('\nbash: -c: line 1: `powershell -NoProfile -Command (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory'\n"
+          }
+        }
+      }
+    ],
+    "s_pc_corrected_queries": [
+      {
+        "status": "fulfilled",
+        "value": {
+          "chunk_id": "61caca",
+          "wall_time_seconds": 1.1792758,
+          "exit_code": 0,
+          "original_token_count": 52,
+          "output": "               total        used        free      shared  buff/cache   available\nMem:      6178201600  5076168704   238780416   715427840  1881886720  1102032896\nSwap:      536866816   536666112      200704\n"
+        }
+      },
+      {
+        "status": "fulfilled",
+        "value": {
+          "chunk_id": "649c07",
+          "wall_time_seconds": 1.2274899,
+          "exit_code": 1,
+          "original_token_count": 11,
+          "output": "bash: line 1: nvidia-smi: command not found\n"
+        }
+      }
+    ],
+    "s_pc_kernel": {
+      "status": "fulfilled",
+      "value": {
+        "chunk_id": "f3fd0c",
+        "wall_time_seconds": 1.0007253,
+        "exit_code": 0,
+        "original_token_count": 6,
+        "output": "Linux 7.0.0-38-generic\n"
+      }
+    }
+  },
+  "independent_reference_failures": [
+    {
+      "fault_time": "2026-10-17T00:56:34-04:00",
+      "root_cause": "undetermined; Windows Application Error event 1000 identifies the faulting Torch CPU module",
+      "log": "moe-reference.log",
+      "exception": "0xc0000005",
+      "dtype": "bf16",
+      "exit_code": -1073741819,
+      "module": "torch_cpu.dll",
+      "result_produced": false
+    }
+  ],
+  "failed_djinn_checks": {
+    "identity": "door::identity_endpoint::tests::graphshells_identity_cards_fixture_is_this_endpoints_projection",
+    "projection": "resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route",
+    "isolated_logs": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\identity-baseline-isolated.log",
+        "bytes": 886,
+        "sha256": "2e2f6d22617404e2e42348bacbfeee2b6903236f17991811fda86fc1df60fdee"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\projection-baseline-isolated.log",
+        "bytes": 774,
+        "sha256": "16ddce7a015606c0da8812617921b71c637cb03c56ea87914fb3162deb13d5f4"
+      }
+    ],
+    "source_binding": [
+      {
+        "path": "ports/djinn/src/door/identity_endpoint.rs",
+        "git_blob_sha256": "0ce7497aec1aa7b2bf359f8a83243fda0095eb8df9e51f77a61d43ad914719c0",
+        "unchanged_from": "8498608cbdde726c46fc477c3cc582d6c359ed22"
+      },
+      {
+        "path": "ports/djinn/src/resident_mere.rs",
+        "git_blob_sha256": "eb9f6cdbca2f0fc2f4a6f0cd95d352ac0acb11d14eed0fb50627e1ec79478021",
+        "unchanged_from": "8498608cbdde726c46fc477c3cc582d6c359ed22"
+      },
+      {
+        "path": "ports/graphshell/tests/fixtures/identity_cards.json",
+        "git_blob_sha256": "ec614d208fcefd51c2039db047f8707abc3daf70108a032bf847681d25dbc046",
+        "unchanged_from": "8498608cbdde726c46fc477c3cc582d6c359ed22"
+      }
+    ],
+    "scope": "Both fail in isolation. Relevant source and fixture bytes equal upstream base; no separate baseline rebuild was performed. Concurrent primary-checkout fixture edits were preserved."
+  },
+  "feature_graphs": {
+    "scope": "Normal/build production edges with default features disabled; Burn, tokenizers and safetensors absent. Pure ESP contracts may remain transitive.",
+    "logs": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\distillery-production-no-inference.log",
+        "bytes": 101732,
+        "sha256": "ce579fffaaea1ff722e4dc4a097af6412461c88b5896be2dae911aa5d0044ce7"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\djinn-production-no-inference.log",
+        "bytes": 216433,
+        "sha256": "7e0e06da6048e11dc45638d36bc020aada3b2da85eca9abfb4ade3a38054fe14"
+      }
+    ]
+  },
+  "documentation_audit": {
+    "before_errors": 16,
+    "current_errors": 16,
+    "added_errors": [],
+    "removed_errors": [],
+    "logs": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\doc-audit-before.json",
+        "bytes": 12037,
+        "sha256": "336a38ceed55f1f2402ba31f8a3a8828a7b17f7a871ac8e8c662a808214badb5"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\doc-audit-checkpoint.json",
+        "bytes": 12037,
+        "sha256": "336a38ceed55f1f2402ba31f8a3a8828a7b17f7a871ac8e8c662a808214badb5"
+      }
+    ]
+  },
+  "failed_or_interrupted_attempts": {
+    "retained_logs": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\final-esp-build.log",
+        "bytes": 16060,
+        "sha256": "9f2700187e31e1a43d1a732e599b010fa47c53848bf9ea383fc725a52053c46d"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\expert-library-final.log",
+        "bytes": 1142,
+        "sha256": "1496aaa600281881547fc7f87de2cac698bbebb9f0369dc42dffe9715c7c5d7d"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\expert-library-bound-final.log",
+        "bytes": 1137,
+        "sha256": "051cc18000410ffad7f9ae6c1ffeb704072bb2d0c5b2f4303c8cfa8ad8613023"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\consumer-build.log",
+        "bytes": 68077,
+        "sha256": "57f464c0c10b1eae3e7ed7b99418d9bd4e97f5ec4007b01231dea467403e8ddb"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\owner-test-build.log",
+        "bytes": 55,
+        "sha256": "2f1252c7b268aa812310695ac32e7b3e27abe94d9806f8611b975001e22a875e"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\inference-i9\\moe-reference.log",
+        "bytes": 140,
+        "sha256": "63e539fd91e3eb9110ca2ee6fde9549f11e1542e177b8e6d8b90ab5e12ce1633"
+      }
+    ],
+    "explanation": "Initial ESP test scope and complete-stage test-fixture binding/returns_logits mistakes were repaired without weakening production admission. Original broad consumer build and queued duplicate owner build were stopped to prioritize native gates, then replaced/resumed. Initial feature-tree probes incorrectly included dev edges and treated pure ESP contracts as execution dependencies; corrected production probes are above."
+  },
+  "budget": {
+    "schema": "mere.resident-inference/architecture-retained-bytes/v1",
+    "stage": "before native large-model import",
+    "input_cache_logical_bytes": {
+      "models--Qwen--Qwen2.5-0.5B-Instruct": 995153935,
+      "models--Qwen--Qwen3-0.6B": 1514758987,
+      "models--Qwen--Qwen2-57B-A14B-Instruct": 114825597637
+    },
+    "library_logical_bytes": {
+      "qwen2": 2150125568,
+      "qwen3": 4295503872,
+      "qwen2-moe": 0
+    },
+    "input_and_library_total_bytes": 123781139999,
+    "model_data_budget_bytes": 375000000000,
+    "compact_receipt_root_file_bytes": 1389203,
+    "compact_receipt_budget_bytes": 100000000,
+    "reference_working_cache_bytes": 110,
+    "free_disk_bytes": 329249050624,
+    "scope": "Logical file lengths; normal Cargo build outputs and preserved I1-I8 evidence excluded. Final totals required after native gates."
+  },
+  "open_gates": [
+    "57B native completed asks with exact reference tokens and serialized checkpoint/provider-reload recovery",
+    "Final Qwen3 CPU and Qwen2/Qwen3 GPU regressions",
+    "Resumed consumer build and route/automatic/reclaim/recall runtime checks",
+    "Largest reachable license-permitted model of each newly admitted family",
+    "Additional declared R12 primitives and families; physical fleet and installed resident need separate receipts"
+  ],
+  "scope": "One physical computer. Primitive parity, library ownership and the listed completed rows only. This receipt does not qualify the running native large-model gate or close I9."
+}
