@@ -414,9 +414,6 @@ responses only: an inspected value range locates the generator-name edit;
 revision-checked text edits insert a replacement preset and remove the old one.
 Real typed validation confirms ownership under the intended generator and no
 preset leakage. Comments and the complete foreign-extension tail survive.
-The raw transcripts contain five ready/exit pairs per run; the local report
-and receipt incorrectly label that count as six. The 45-command count and
-recorded pass/refusal outcomes agree in both runs.
 
 An incomplete string is saved explicitly; the existing loader rejects that
 draft. A fresh authoring process reopens the exact bytes, repairs the quote,
