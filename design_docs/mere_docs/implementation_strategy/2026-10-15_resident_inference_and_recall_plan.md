@@ -695,7 +695,11 @@ budget is 375,000,000,000 bytes**, within the measured 528,980,234,240 free
 bytes before acquisition. This is an explicit exception to the default
 100 MB retained-byte budget; the compact receipts themselves keep their
 100,000,000-byte cap. Acquire only indexed HF shards and tokenizer/config
-inputs, not duplicate consolidated formats. No such scale receipt exists yet.
+inputs, not duplicate consolidated formats. The first native streamed-expert
+ask now matches sixteen independent reference tokens; its
+[receipt](../../../support/receipts/resident_inference_architecture_first_ask.json)
+covers one physical computer. The remaining reference question and recovery
+checks are running; fleet and largest-per-family qualification remain open.
 
 Done when: each added family has a reference-matched row and a template
 artifact; the largest model of each family whose licence permits the use,
@@ -1554,15 +1558,26 @@ Stop and record the reason if any of these happen:
     completed both questions. The earlier bf16 reference crashed in
     `torch_cpu.dll`; its cause is undetermined and its failed receipt is kept.
     Native import completed into a **140,509,982,720-byte** model library.
-    Native generation is running; completed native asks, exact reference parity
-    and serialized checkpoint/provider-reload recovery are still open.
-  - The final Qwen2 CPU model-library row passes. Djinn's seven inference unit
-    tests pass; its full unit run has 218 passes and two failures in unchanged
-    identity-card and route-projection expectations. Both failures reproduce in
-    isolation. The relevant source/fixture bytes equal the upstream base;
-    concurrent primary-checkout fixture edits remain untouched. No separate
-    baseline rebuild was performed. The documentation judgment audit has the
-    same 16 findings as before this work.
+    The first native ask completes with **sixteen exact reference tokens** in
+    **3,088.095 seconds** after loading, including **1,352.851 seconds** to the
+    first token. It makes 7,990 verified expert reads overall and exactly 224
+    per single-token decode step. The observed process working-set peak is
+    10,769,522,688 bytes, including import; final monitoring is still running.
+    The [first-ask receipt](../../../support/receipts/resident_inference_architecture_first_ask.json)
+    freezes the completed-question log prefix. The naturally terminating second
+    reference question and serialized checkpoint/provider-reload recovery are
+    still open. This is a local GPU/library fixture, not an installed resident
+    or a complete graph-key fleet inventory.
+  - Both final small-Qwen CPU model-library rows pass. Djinn's seven inference
+    unit tests pass. Its initial full unit run has 218 passes and two failures.
+    The identity-card failure is CRLF checkout drift: restoring the fixture's
+    canonical Git LF bytes in this focused worktree makes it pass. No Git blob
+    changes, and the primary checkout's concurrent checkout-rule fix remains
+    untouched. The full rerun has **219 passes and one failure** in the unchanged
+    route-projection expectation. Its source equals the upstream base; no
+    separate baseline rebuild was performed. The documentation judgment audit
+    has the same 16 findings as before this work. All 22 changed Rust files
+    pass formatting.
   - The remaining consumer build and final small-Qwen model-library regressions
     are running. The [primitive checkpoint receipt](../../../support/receipts/resident_inference_architecture_primitives.json)
     binds completed checks, source and binary hashes, independent references,
