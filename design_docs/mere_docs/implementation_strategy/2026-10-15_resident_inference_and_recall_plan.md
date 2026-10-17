@@ -1463,3 +1463,22 @@ Stop and record the reason if any of these happen:
     physical O-PC and RTX 4060 Laptop GPU. Physical fleet capacity and latency,
     other model/backend rows, a new headed run and an installed Djinn invocation
     need their own receipts. I9 architecture coverage is next.
+
+- **2026-10-16: I1 to I8 main integration qualified.** The inference branch
+  incorporates public main through `d1e1d7aa` without conflicts. Normal Cargo
+  release builds against the updated graph, identity, storage and transport
+  dependencies pass at `26416283`. Fresh runtime checks pass **ten cases**:
+  four app-route cases, CPU and pinned SmolLM2 GPU automatic placement, three
+  GPU trainer-reclaim cases, and real-model recall with exact retained versions
+  and reopened history. Automatic placement preserves exact tokens through
+  residence, leased stages, worker departure and offline-worker streaming.
+  The final merge `98d80535` additionally takes two unrelated Pictograph
+  backdrop commits and their six-case owner receipt; inference, mesh, resident
+  and Cargo inputs are unchanged from the tested source. Those visual changes
+  were not rebuilt into these runtime executables. The
+  [integration receipt](../../../support/receipts/resident_inference_integration.json)
+  binds source, executable and log hashes and retains this qualification
+  boundary. The shared primary checkout's concurrent edits and local commits
+  remain untouched. Qualification still uses one physical computer and GPU;
+  installed-binary, further headed and physical-fleet gates remain separate.
+  This is not another 20-run flakiness check. I9 remains next.
