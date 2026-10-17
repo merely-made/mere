@@ -1770,7 +1770,7 @@ component-in-wrapper check, open
 
 ### Template scene vertical framing (2026-10-16)
 
-**Status:** shared fitting implemented and five focused surface tests passed; native Woodshed adoption follows.
+**Status:** shared fitting and native Woodshed adoption qualified.
 
 Long template timelines currently shrink both axes through BoardFit, leaving
 labels and role alignments in a narrow band even when the host lends height.
@@ -1786,3 +1786,10 @@ expected rows by about 49 pixels. The same two-axis transform drives inverse
 picking, including the lower edge of a stretched Card span. Fretboard fitting
 remains uniform. Five surface tests pass against the current source; see
 `validation/template-scene-height_20261016/tests.log`.
+
+Native adoption (2026-10-16): Woodshed `f683bbe` adopts shared source
+`52fb4900e`. Its 300px primary canvas passes 214 view cases, two native editor
+cases and the locked build. Three reviewed native captures show the separated
+rows and compact scrolling; the actual sealed Set and complete portable
+document equal the earlier fixture. Consumer evidence lives in
+`woodshed/validation/native-arrangement-spacing_20261016/receipt.json`.

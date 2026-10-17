@@ -1,4 +1,4 @@
-Template scene framing follow-up (2026-10-16): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#template-scene-vertical-framing-2026-10-16) tracks shared vertical framing and inverse picking for long template timelines, prompted by native Woodshed feedback.
+Template scene framing follow-up (2026-10-16): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#template-scene-vertical-framing-2026-10-16) records qualified shared vertical framing and inverse picking for long template timelines, with five surface checks and three reviewed native Woodshed captures.
 
 # Mere Documentation Index
 
