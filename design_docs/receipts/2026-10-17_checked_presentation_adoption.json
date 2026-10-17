@@ -1,0 +1,27 @@
+{
+  "genet_commit": "7f13b85f53c48fa90f433a6cd2ad45cd744e8b02",
+  "source_sha256": {
+    "crates/cambium/cambium-rootstock/src/lib.rs": "5ee8ca73a889f52d76040c4be0cc944aad9503c90350999dbc434265e41aa2a6",
+    "crates/cambium/cambium-rootstock/src/presentation/wgpu.rs": "871f15f95b0a939267884dbac3f769ab7e9158a5f3615f7817ec738c279aae7b",
+    "ports/pelt/desktop/smoke_macos.rs": "ca7a26c994d1bce4d28af0d5548f3844d4e109011310445cad93d6d94f4f6ab0",
+    "ports/pelt/desktop/smoke_wayland.rs": "f66c4dc390c1761427b4b0361db1715e358d81741e27630ce8620ab34cbe34fa",
+    "ports/pelt/desktop/smoke_windows.rs": "58041f76b83d8680008e7682bb0c885c8518d9e7ca9dccc1737210eaec8d1c25"
+  },
+  "validation": {
+    "graphshell_default_wasm_check": "passed",
+    "wayland_pre_cut": "60 fresh display handoffs; two-slot reuse",
+    "wayland_post_cut": "60 fresh display handoffs, AMD Radeon Graphics RADV RENOIR, Vulkan IntegratedGpu",
+    "git_only_metadata": "locked offline; normalized package versions, features and dependency edge sets match tested local graphs"
+  },
+  "lock_sha256": {
+    "Cargo.lock": "06fda81a149d8e4c7c4a7cd0b53b21666b416cd5dfe14fcd08ab1c9c8a345405",
+    "ports/graphshell/web/Cargo.lock": "185212994057835d6e8525986dd41ae01329c343708c8e7f51c107a6ea1b3796"
+  },
+  "limits": [
+    "No Windows or Apple hardware run. Pre-existing CALayer modules absent, so no Apple compile claim.",
+    "Wayland handoff is not scanout or child/bake pixel proof.",
+    "Builds serialized with 5 GiB RAM, zero swap, 150% CPU cap.",
+    "Graph comparison deduplicates identical metadata dependency-kind rows and normalizes local Genet source identity to the published commit."
+  ],
+  "evidence_directory": "/home/markik/Code/testing/audits/genet-architecture-20261017/remaining-slices"
+}
