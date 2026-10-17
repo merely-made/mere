@@ -1,0 +1,8 @@
+{
+  "name": "cleromancy-core-acceptance",
+  "version": "0.1.0",
+  "id": "git+https://github.com/merely-made/cleromancy.git?branch=main#cleromancy-core-acceptance@0.1.0",
+  "source": "git+https://github.com/merely-made/cleromancy.git?branch=main#3fa5a6db87cfa34df9fc1de0a0877181c9b4526f",
+  "manifest_path": "/Users/markik/.cargo/git/checkouts/cleromancy-1cf25b25af3bf29c/3fa5a6d/core/Cargo.toml",
+  "resolved_packages": 1372
+}

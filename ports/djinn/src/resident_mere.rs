@@ -2375,6 +2375,145 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread")]
+    async fn natal_aspects_authority_admits_cross_app_and_refuses_resealed_results_and_rules() {
+        use cleromancy_domain::natal_aspects::{AspectOutcome, AspectRules};
+
+        let fixture = fixture(0x4e4156, "divination").await;
+        let mut product = fixture.attach("turnstone").await;
+        let mut other = fixture.attach("knot-editor").await;
+        let initial = graph(&mut product);
+        let mut candidate = disclosed_graph(&mut product, &initial)
+            .into_graph()
+            .unwrap();
+        let captured = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let held = captured.clone();
+        candidate.set_recorder(Some(Arc::new(move |delta| {
+            held.lock().unwrap().push(delta.clone())
+        })));
+        let facts: dramatis::birth::BirthFacts = serde_json::from_value(serde_json::json!({
+            "schema": "dramatis.birth-facts/v1",
+            "subject": {"Profile": {"id": "public-natal-subject"}},
+            "date": {"year": 2000, "month": 1, "day": 1},
+            "time": {"Known": {"hour": 12, "minute": 0, "second": 0}},
+            "place": null,
+            "timezone": "UTC",
+            "source": {"label": "Public product-authority fixture", "reference": null}
+        }))
+        .unwrap();
+        let record = cleromancy_domain::natal::NatalReading::new(
+            "public-source-persona".into(),
+            "Public natal subject".into(),
+            personal_facts::birth_resource(&facts).unwrap(),
+            "A synthetic natal aspects question".into(),
+            cleromancy_domain::natal::FoldChoice::Refuse,
+            1792149302000,
+            "00000000000000000000000000000008".into(),
+        )
+        .unwrap()
+        .with_aspects(AspectRules::default())
+        .unwrap();
+        let AspectOutcome::Calculated { hits, .. } = &record.aspects.as_ref().unwrap().outcome
+        else {
+            panic!("expected actual aspects");
+        };
+        assert!(!hits.is_empty(), "fixture must exercise calculated results");
+        assert!(hits.iter().any(|hit| hit.orb_millidegrees > 0));
+        let mut host = cleromancy_domain::CleromancyHost::candidate(candidate).unwrap();
+        host.insert_natal_reading(&record).unwrap();
+        assert_eq!(
+            product
+                .invoke(apply(&initial, captured.lock().unwrap().clone()))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let shared = graph(&mut other);
+        let current = disclosed_graph(&mut other, &shared);
+        let host =
+            cleromancy_domain::CleromancyHost::candidate(current.clone().into_graph().unwrap())
+                .unwrap();
+        assert_eq!(host.natal_readings().unwrap(), vec![record.clone()]);
+        let mere = fixture.reservoir.meres().await.remove(0);
+        let sessions = mere_dir(fixture._root.path(), persona(0x4e4156), mere.id).join("sessions");
+        let product_snapshot = graph(&mut product);
+        let product_current = disclosed_graph(&mut product, &product_snapshot);
+        let durable = session_tree_bytes(&sessions);
+        assert!(durable.keys().any(|path| path.ends_with("changes.jsonl")));
+
+        for fault in ["output", "rules"] {
+            let mut value = serde_json::to_value(&record).unwrap();
+            match fault {
+                "output" => {
+                    value["aspects"]["outcome"]["hits"][0]["orb_millidegrees"] =
+                        serde_json::json!(99999)
+                },
+                _ => {
+                    value["aspects"]["rules"] = serde_json::to_value(AspectRules {
+                        conjunction_millidegrees: 0,
+                        opposition_millidegrees: 0,
+                        trine_millidegrees: 0,
+                        square_millidegrees: 0,
+                        sextile_millidegrees: 0,
+                    })
+                    .unwrap()
+                },
+            }
+            // Forge a valid content seal and matching canonical node identity.
+            // Refusal must come from replay, rather than an old id or URL.
+            value.as_object_mut().unwrap().remove("id");
+            let id = blake3::hash(&serde_json::to_vec(&value).unwrap())
+                .to_hex()
+                .to_string();
+            value["id"] = serde_json::json!(id);
+            let bad: cleromancy_domain::natal::NatalReading =
+                serde_json::from_value(value).unwrap();
+            assert_eq!(
+                bad.validate().unwrap_err(),
+                "Natal aspects differ from their retained rules and chart",
+                "{fault}"
+            );
+            let url = format!("cleromancy://natal/{}", bad.id);
+            let node_id = kernel::graph::Graph::node_namespace_id(&url).to_string();
+            let before = graph(&mut other);
+            let result = other
+                .invoke(apply(
+                    &before,
+                    vec![
+                        pandect::CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                            id: node_id.clone(),
+                            url,
+                            position: [0.0, 0.0],
+                        },
+                        pandect::CapturedDelta::ReplaySetNodeFacetById {
+                            node_id,
+                            facet: cleromancy_domain::natal::NATAL_FACET.into(),
+                            value_json: serde_json::to_string(&bad).unwrap(),
+                        },
+                    ],
+                ))
+                .unwrap();
+            assert!(
+                matches!(&result, IntentResult::Rejected { reason }
+                    if reason.contains("Natal aspects differ from their retained rules and chart")),
+                "{fault}: {result:?}"
+            );
+            for (app, expected) in [(&mut product, &product_current), (&mut other, &current)] {
+                let after = graph(app);
+                assert_eq!(after.scene.revision, before.scene.revision, "{fault}");
+                assert_eq!(
+                    serde_json::to_value(disclosed_graph(app, &after)).unwrap(),
+                    serde_json::to_value(expected).unwrap(),
+                    "{fault}"
+                );
+            }
+            assert_eq!(
+                session_tree_bytes(&sessions),
+                durable,
+                "{fault}: durable session changed"
+            );
+        }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
     async fn two_applications_edit_one_session_and_hear_each_other() {
         let fixture = fixture(21, "divination").await;
         for app in ["turnstone", "knot-editor"] {

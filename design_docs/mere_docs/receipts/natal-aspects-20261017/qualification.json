@@ -1,0 +1,215 @@
+{
+  "schema": "mere.natal-aspects-intake/v1",
+  "baseline": "8c299283f2145d38069f100fbedb25a54b00b746",
+  "cleromancy_core": "3fa5a6db87cfa34df9fc1de0a0877181c9b4526f",
+  "checks": {
+    "natal-owner-02": {
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--lib",
+        "natal_",
+        "--",
+        "--nocapture"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp",
+        "CARGO_BUILD_JOBS": "2",
+        "RUSTC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+        "RUSTDOC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc"
+      },
+      "source": "8c299283f2145d38069f100fbedb25a54b00b746",
+      "started": "2026-10-17T12:46:01.901868+00:00",
+      "inputs": {
+        "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c",
+        "ports/djinn/src/resident_mere.rs": "76f98cb3fd2245e08f20b4b1d4869151a9c33714e7cfb9194852717b0d6f3a7d"
+      },
+      "exit_code": 0,
+      "finished": "2026-10-17T12:46:32.223254+00:00",
+      "log_sha256": "f2f12b8062ea5ed34747e9f21cc65f5c4d0060d38dc014a64ca6246c424eec4a",
+      "test_summaries": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "owner-gates": {
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--lib",
+        "--test",
+        "embedded_reservoir_two_process",
+        "--test",
+        "embedded_reservoir_validation",
+        "--test",
+        "personal_facts",
+        "--",
+        "--nocapture"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp",
+        "CARGO_BUILD_JOBS": "2",
+        "RUSTC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+        "RUSTDOC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc"
+      },
+      "source": "8c299283f2145d38069f100fbedb25a54b00b746",
+      "started": "2026-10-17T12:46:35.132411+00:00",
+      "inputs": {
+        "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c",
+        "ports/djinn/src/resident_mere.rs": "76f98cb3fd2245e08f20b4b1d4869151a9c33714e7cfb9194852717b0d6f3a7d"
+      },
+      "exit_code": 0,
+      "finished": "2026-10-17T12:48:51.639006+00:00",
+      "log_sha256": "b351a2e005401460ec1781f65c2b3f1b7fe73419d170199f84e9d0c09c68ac22",
+      "test_summaries": [
+        {
+          "passed": 217,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 1
+        }
+      ]
+    },
+    "metadata-final": {
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp",
+        "CARGO_BUILD_JOBS": "2",
+        "RUSTC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+        "RUSTDOC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc"
+      },
+      "source": "8c299283f2145d38069f100fbedb25a54b00b746",
+      "started": "2026-10-17T12:46:10.546598+00:00",
+      "inputs": {
+        "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c",
+        "ports/djinn/src/resident_mere.rs": "76f98cb3fd2245e08f20b4b1d4869151a9c33714e7cfb9194852717b0d6f3a7d"
+      },
+      "exit_code": 0,
+      "finished": "2026-10-17T12:46:13.663825+00:00",
+      "log_sha256": "afc320369cf30e23bef62f4b4738a58a504a28d4edb19a45e2d4f07b83d7d547"
+    },
+    "natal-committed": {
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--lib",
+        "natal_",
+        "--",
+        "--nocapture"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp",
+        "CARGO_BUILD_JOBS": "2",
+        "RUSTC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+        "RUSTDOC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc"
+      },
+      "source": "8c8e048ea520053d32ff788d64cb7d0816dbff08",
+      "started": "2026-10-17T12:49:23.702192+00:00",
+      "inputs": {
+        "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c",
+        "ports/djinn/src/resident_mere.rs": "76f98cb3fd2245e08f20b4b1d4869151a9c33714e7cfb9194852717b0d6f3a7d"
+      },
+      "exit_code": 0,
+      "finished": "2026-10-17T12:49:30.486908+00:00",
+      "log_sha256": "e6c75964e5799b2d57b528fc8554eca99b73e35610129ec937379e4d54f1cd24",
+      "test_summaries": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    }
+  },
+  "scope": {
+    "baseline": "8c299283f2145d38069f100fbedb25a54b00b746",
+    "lock_only_cleromancy_revision_changed": true,
+    "canonical_branch_main": true,
+    "preserved_manifests_configs_and_prior_receipt_files": 173,
+    "locked_git_sources": [
+      "https://github.com/hecrj/cosmic-text.git?rev=6adc2364289fd241daed751948a03d0aea5a31ca#6adc2364289fd241daed751948a03d0aea5a31ca",
+      "https://github.com/iced-rs/cryoglyph.git?rev=cf38ed5ea0cfe95270b31ced2910560a7fcc5003#cf38ed5ea0cfe95270b31ced2910560a7fcc5003",
+      "https://github.com/iced-rs/iced?rev=ab336f6d6403d7206d82c7c2caa46143efde8284#ab336f6d6403d7206d82c7c2caa46143efde8284",
+      "https://github.com/mark-ik/kiss3d.git?rev=c362cd5855c01a525d1091589a0e38135007692f#c362cd5855c01a525d1091589a0e38135007692f",
+      "https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+      "https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b46648c08f3d2062e70559afa999842e1873c",
+      "https://github.com/merely-made/bole.git?rev=494ae680a10704722df3c98335073245b7088a24#494ae680a10704722df3c98335073245b7088a24",
+      "https://github.com/merely-made/cleromancy.git?branch=main#3fa5a6db87cfa34df9fc1de0a0877181c9b4526f",
+      "https://github.com/merely-made/dramatis.git?branch=main#cf562f47f33ab0b6ad0db1c5ac3123775769979e",
+      "https://github.com/merely-made/genet.git?branch=main#7f13b85f53c48fa90f433a6cd2ad45cd744e8b02",
+      "https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5",
+      "https://github.com/merely-made/murm.git?branch=main#bd8fe1e5db9690dbb15b618d0103ce6d97d701a4",
+      "https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06efc11c11595f2fa1bb30bce7e72979537",
+      "https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b#30875f30e83909f3030bc01237a5046e14cde29b",
+      "https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802#8e3755bbd0d40343eb4750b072801c941ff32802",
+      "https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306#e2f65c021a6bf744ab5fe77121e0441a46b47306",
+      "https://github.com/merely-made/vano.git?rev=7235209271ccea598b8ded14a7a6a856f92f82a7#7235209271ccea598b8ded14a7a6a856f92f82a7",
+      "https://github.com/merely-made/wgpu-weld.git?branch=main#b673f36f9b27329ad54ca356d60248279682cdfd"
+    ],
+    "source_hashes": {
+      "Cargo.toml": "1ae92b96b62c975fa38e2ca60bd4c97fc692fa4fd7014d589fe1320073c02fa4",
+      "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c",
+      "ports/djinn/Cargo.toml": "1562525119021ed8bddae13723da9fe640b818ad52cfdea4f759e0effefc2d3d",
+      "ports/djinn/src/resident_mere.rs": "76f98cb3fd2245e08f20b4b1d4869151a9c33714e7cfb9194852717b0d6f3a7d"
+    }
+  },
+  "publication": "Source locally committed; receipt recorded in a separate local commit; no push",
+  "limits": [
+    "Software resident owner intake only; no app foreground or native UI qualification",
+    "The old 225-test receipt remains historical evidence with its original revision",
+    "No full Graphshell browser renewal"
+  ],
+  "totals": {
+    "focused_natal": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0
+    },
+    "broader_gates": {
+      "passed": 230,
+      "failed": 0,
+      "ignored": 3
+    },
+    "focused_overlaps_library": true
+  },
+  "source_commit": "8c8e048ea520053d32ff788d64cb7d0816dbff08",
+  "broader_gate_committed_inputs_identical": true
+}
