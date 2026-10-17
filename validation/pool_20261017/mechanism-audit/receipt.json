@@ -1,0 +1,65 @@
+{
+  "schema": "mere.pool-mechanism-audit/v1",
+  "date": "2026-10-17",
+  "status": "source review and focused CPU checks complete; Pool integration remains future work",
+  "source": "source.json",
+  "toolchain": {
+    "actual_rustc": "rustc 1.99.0 (b940084d7 2026-09-28) (Homebrew)",
+    "actual_cargo": "cargo 1.99.0 (5f94df478 2026-08-27) (Homebrew)",
+    "declared": "1.99.1",
+    "qualification": "existing Homebrew 1.99.0 test runtime; not a declared-toolchain release qualification"
+  },
+  "checks": [
+    {
+      "name": "nested",
+      "filter": "nested::tests",
+      "passed": 5,
+      "failed": 0,
+      "log": "checks/nested.log"
+    },
+    {
+      "name": "swatch",
+      "filter": "swatch::tests",
+      "passed": 4,
+      "failed": 0,
+      "log": "checks/swatch.log"
+    },
+    {
+      "name": "folds-corrected",
+      "filter": "host_dataset::folds::tests",
+      "passed": 10,
+      "failed": 0,
+      "log": "checks/folds-corrected.log"
+    },
+    {
+      "name": "durable-undo",
+      "filter": "graph_session::tests::undo_and_redo_order_survives_a_reopen",
+      "passed": 1,
+      "failed": 0,
+      "log": "checks/durable-undo.log"
+    }
+  ],
+  "total_passed": 20,
+  "excluded": "Initial scenomise filter host_dataset::fold_tests matched zero tests; retained separately and corrected to host_dataset::folds::tests.",
+  "findings": [
+    "Mutable nested GraphLog storage/lifecycle exists independently of immutable frozen selections.",
+    "Swatch NestedGraph scope is declared; generic Pool scope resolution and edit intent routing are not complete.",
+    "Bounded native Swatch has focus/drag/relation/expand callbacks with host-owned action policy.",
+    "HostDatasetFolds expands and enters nested membership while preserving source instances/coordinates; pushing neighbors is additional presentation work.",
+    "Pandect persists attributed undo/redo history and supports staged acknowledged edits; generic GraphLog and GraphSession have different data and slot formats.",
+    "Pool content editing needs a separate document/editor owner from membership/arrangement history.",
+    "Existing mere-overmap route carries owner-directed session edit/history/view intents; Pool-specific binding remains to be built."
+  ],
+  "pending_product_questions": [
+    33,
+    34,
+    35
+  ],
+  "limits": [
+    "No Pool runtime migration or shared backing store implemented.",
+    "No end-to-end nested Pool removal/restoration, cross-Pool transfer or multi-host editing acceptance.",
+    "The one durable-history test restores an ordinary session edit across reopen, not the full nested archive/restore lifecycle.",
+    "No new native/browser/GPU/accessibility or canonical consumer supplier qualification.",
+    "Existing nested graph archival does not by itself supply Pool undo restoration."
+  ]
+}

@@ -1,0 +1,11 @@
+   Compiling scenograph v0.0.4 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenograph)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.60s
+     Running unittests src/lib.rs (target/build/debug/deps/scenograph-728335d3471d3051)
+
+running 4 tests
+test swatch::tests::misplaced_repeated_and_dangling_cells_are_refused ... ok
+test swatch::tests::a_scale_left_out_is_shared ... ok
+test swatch::tests::link_scope_round_trips_without_minting_another_identity ... ok
+test swatch::tests::a_facet_mixing_a_reflection_and_a_projection_validates_and_round_trips ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 43 filtered out; finished in 0.00s

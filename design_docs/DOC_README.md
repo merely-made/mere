@@ -710,7 +710,7 @@ engine adapters.
   source pair; CEF-enabled consumer, native and foreign accessibility gates
   stay distinct.)
 
-- **Pool workspace utility (2026-10-17):** provisional persistent holding utility in Graphshell and native Knot; shared independent text/Djot material in Inker, host-owned storage and insertion, no new crate. Prompts 23–32 set the next direction: distinct scoped Pools with personal as default, an embedded-minimere pocket, usual-editor editing with a canvas fallback, removal undo across reopen, separate Pool/editor histories, Move between Pools, saved alternatives within a composition and in-place group expansion with scoped entry also available. Prompt 32 explores Pool as a manipulable Swatch over a subgraph nested in a Mere container node, available as a sidecar and populated deliberately; these refinements are not yet implemented. See the [active projection plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) and [qualification receipt](../validation/pool_20261017/receipt.json).
+- **Pool workspace utility (2026-10-17):** Graphshell/Knot material-list prototype and the subsequent prompted design audit. The [active plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) records the editable nested-graph Swatch direction. A [mechanism audit](../validation/pool_20261017/mechanism-audit/receipt.json) checks existing nesting, Swatches, hierarchy and durable history (20 focused CPU tests); shared owner/session integration and questions 33–35 remain open. The [original host receipt](../validation/pool_20261017/receipt.json) remains scoped to the prototype.
 
 ## nematic_docs/ — the smolweb engine and knot composition
 

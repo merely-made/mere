@@ -2431,3 +2431,94 @@ Swatch, transfer/undo coordination across scoped Pools, and the concrete content
 and membership mapping. Verify reuse against Graphshell plus a real composition
 consumer before defining shared APIs. No browser-extension implementation or
 new automatic capture behavior is authorized by the analogy alone.
+
+
+#### Pool mechanism audit: reuse and integration boundaries (2026-10-17)
+
+**Status:** source audit complete on the local prototype branch; 20 focused CPU
+checks pass. Pool has not been migrated to the nested-graph model. The preceding
+native/browser Pool receipt still qualifies the original material-list prototype.
+Evidence: `validation/pool_20261017/mechanism-audit/receipt.json`, with source
+hashes, exact filters and logs. Checks used installed Homebrew Rust 1.99.0; the
+repository declares 1.99.1, so this is not a release/toolchain qualification.
+
+| Mechanism found | Reuse for Pool | Boundary still requiring work |
+| --- | --- | --- |
+| Chartulary `GraphBearing`, `Container::nested`, `GraphLog`, `nested.rs` | Stable container-to-child-log identity, lazy child loading, journal/snapshot storage, archive-before-parent-removal and interrupted-removal recovery. Five lifecycle tests pass. | A Pool owner/resolver must bind the graph to the correct Mere/store. Archive restoration and multi-graph undo are not supplied by the existing removal helper. |
+| Scenograph `Swatch`, `Scope::NestedGraph`, projection/reflection modes | The existing representation vocabulary for showing a graph nested within a node. Four declaration/roundtrip tests pass. | The audit found no production `NestedGraph` scope resolver. Hosts resolve and compile particular scopes today; naming the scope does not load the child graph. Reflection declarations also need host follow behavior. |
+| Cambium `GraphCanvasSwatch` interaction variants | Bounded graph painting with native node focus, click, drag, relation actions and full-Canvas expansion callbacks. | The host owns editing policy. Pool needs intent mapping and current-owner validation; a callback alone is not a durable edit. No headed interaction was rerun in this audit. |
+| Scenomise `HostDatasetFolds` and Canvas/Swatch fold projection | Explicit membership, expansion, entered scope, breadcrumbs, boundary context and stable source instances. Ten portable hierarchy tests pass. | Existing expansion preserves coordinates; pushing neighbors requires a presentation reflow step. The hierarchy adapter validates a single-parent forest, not arbitrary overlapping groups. |
+| Pandect `GraphSession`, its change journal and `transact_*` methods | Durable attributed undo/redo, view records, candidate validation and installation after storage acknowledgement. One saved-history reopen test passes. | This is a different graph/session format from generic `GraphLog`; no automatic nested-child/session-history bridge exists. The passing case is an ordinary session edit, not full nested Pool recovery. |
+| `mere-overmap` route/session and wire requests | A host can read an admitted Mere owner and issue existing session edit/history/view requests without owning its store. | Pool scope binding, commands, child lifetime and cross-Pool Move must be connected and qualified. Separate browser/native Pool files do not provide a shared cross-app Pool. |
+
+The earlier Swatch decision SE65 explicitly stages editing as interaction intents
+through host authority. Pool is a concrete consumer for that extension. A
+representation can expose editing actions while the Mere/Pool owner validates
+and commits them. This audit does not turn all Swatches into editors or change
+existing view-only consumers.
+
+Candidate flow, with the ownership/session adapter still to be implemented:
+
+```mermaid
+flowchart LR
+    P["Mere container node"] -->|nested identity| O["Pool child graph and durable owner"]
+    O --> R["Scope resolver and projection adapter"]
+    R --> S["Pocket Swatch or expanded Canvas"]
+    S -->|edit intents| O
+    O -->|stable held-item reference| D["Held document"]
+    E["Usual editor or canvas editor"] -->|content edits and own history| D
+```
+
+Concrete integration requirements:
+
+1. **Separate membership from content editing.** Pool's graph/history records
+   adding/removing and arranging held items. Each item's editable content needs
+   its own stable document owner and normal editor history. Storing every content
+   edit as an ordinary Pool graph change would violate prompt 29. The initial
+   capture can preserve independent text/Djot bytes and provenance; a content
+   ownership/Save adapter must then keep later editing out of Pool membership undo.
+2. **Resolve one Pool owner from every host.** Bind the container and child graph
+   to their actual Mere/store, then feed a projection into the existing bounded
+   Swatch/Canvas path. Keep passive browsing collection outside this utility.
+   Scope and projection declarations alone do not establish the connection.
+3. **Bridge durable child state and history explicitly.** Chartulary nested logs
+   use `nested/<LogId>/log` and `/snap`; Pandect sessions have a separate
+   `sessions/<SessionId>/` graph/change/view schema. A Pool adapter must reconcile
+   these contracts without pretending their identifiers or serialized logs are
+   interchangeable. Preserve existing data and typed corruption/missing-owner
+   errors. `SessionSubgraphs::load` currently falls back to defaults on corruption;
+   it is unsuitable unchanged for Pool's protected authored contents.
+4. **Coordinate structural operations.** An item Move between Pools must retain
+   the content owner and act as one logical transfer. Calling a container-removal
+   helper that archives its child is not a transfer protocol. Same-store writes
+   can use transactional backend primitives; cross-store moves and coordinated
+   undo need an explicit staged/recoverable design. Whole-session merge does not
+   by itself define the requested item Move.
+5. **Preserve authorship through view changes.** Reuse fold/entered-scope state
+   for presentation and navigation. Add bounded reflow only according to the
+   chosen policy, leaving authored line/bar order and timing intact. Keep the
+   view's selection, camera and reflection/follow behavior explicit.
+
+Next implementation proof should connect one container and mutable child graph
+to the Swatch in Graphshell, then exercise held metre and real Woodshed progression
+material before extracting common APIs. Done conditions include fresh-process
+membership/undo reopening, normal item-editor save/history isolation, scoped
+identity and source-provenance preservation, failure-before-install behavior,
+and both expansion and entered scope over the same material. Container removal,
+concurrent views and reflow tests depend on the answers below.
+
+Further product decisions opened by this audit, still pending:
+
+- **Prompt 33:** removing the Pool container: archive the whole Pool with undo,
+  detach its embedding while preserving a separately accessible Pool, or require
+  moving it before removal. The question concerns the whole utility, not an item.
+- **Prompt 34:** multiple views of the same Pool: independent navigation with
+  optional following, always following, or independent-only views. Material and
+  authored arrangement continue to use the same backing Pool.
+- **Prompt 35:** expansion space: temporary presentation reflow restored on
+  collapse, or adjusted free-canvas coordinates saved as an undoable arrangement
+  change. Authored document order and musical timing remain unchanged.
+
+These questions are proposals, not recorded answers. The already agreed personal
+scope/default, distinct Pools, deliberate capture, independent insertion, default
+Move between Pools, history separation and editor fallback are not reopened.

@@ -1,0 +1,25 @@
+{
+  "base": "05f27853a2b41d03a32ba6d6f4875d60b7665782",
+  "files": {
+    "crates/eidetic/chartulary/src/nested.rs": "15cd196799f4994713d628a806a0fb2e2f1d5131dd64c05988a67753ae5290cc",
+    "crates/eidetic/chartulary/src/spine.rs": "a36aafceae9f807eab0488017af69131a45e6663e5aeba709908d42278face5c",
+    "crates/eidetic/chartulary/src/container.rs": "793f097c852db3d0ef0a831567d0e8c1fb9f455a0dcb873934dc6cf8ffe8d159",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "97c0a2ec13f26fe5d01331ca4a4f50bfe77352b80241a2e56ef4c1edf48a0c5e",
+    "crates/graph/graph-kernel/src/graph/resource.rs": "0f8932a1dbf32f4ec36ae92040ab7921fb530410746b6137102c4b9bf35840a8",
+    "crates/graph/graph-kernel/src/graph/frozen_selection.rs": "4ce1bcf0b7b7e02531491b33aba589f6cde5247cd68185bdafa8d1e27dd3947d",
+    "crates/mere/src/subgraph.rs": "4865c0c49669bcc374096ddcb5027350dabb91aa0d7101b6f2c6ca6555275a04",
+    "crates/cambium/scenes/scenograph/src/swatch.rs": "9c0517a76ea8dcae2c15cb9b933894fccbe730744d49b4a01445c4d5aff7b8ae",
+    "crates/cambium/scenes/scenomise/src/facet.rs": "6d9fd4317e828965cc28847b4605507fecb828bb513e87d05e39387ad83b485d",
+    "crates/cambium/scenes/scenomise/src/host_dataset/folds.rs": "1fc6815fe5619f675a6146c1c1efaf7277b80d5f7ac616dcfe16254b30d7711a",
+    "crates/cambium/scenes/scenomise/src/host_dataset/fold_tests.rs": "6d033f4c9b04206ffa66914cc9e84b52a83b88f92fb96d061108877ad645600d",
+    "crates/cambium/cambium/src/graph_canvas.rs": "5943445b75f954d0b2823924f34919ac858c3e14abfd27bcf081f37e709dd675",
+    "crates/cambium/backstep/src/lib.rs": "be552a519506a54cf2136642429ccc57b662348f9b5b934675d6e1dbf300f518",
+    "crates/system/pandect/src/graph_session.rs": "aa9477a62f6620af7150882bb975e5fe53ea50f88de7cf28ed5b726eb05bb1e3",
+    "crates/system/pandect/src/graph_session_transaction.rs": "d333080db45ca8ba2940bb37b541d5b1641af66308d05e8d77f543a587246060",
+    "crates/cambium/mere-overmap/src/lib.rs": "412f7226368447565c6594a129145510b6c3098d42dfce73c7e655f6cececb45",
+    "crates/cambium/mere-overmap/src/wire.rs": "e4625e474edc0ae53721a50d34c9e395ca67addcfd0e17614448f28d3daeb626",
+    "crates/inker/inker/src/pool.rs": "8f01c77a1c1d58d8e23d2e9e1ddcf446a1ef4328c3bd5b3727695adf439e9ea8",
+    "Cargo.lock": "924ad5da5a77dd16f8e110a1b4b0d30eea7a5378c2f1e13ee50aba0126e5526a",
+    "rust-toolchain.toml": "70b1451554546366dd35c01225416776cfb8c0e3a73da440def1bed6de93808e"
+  }
+}
