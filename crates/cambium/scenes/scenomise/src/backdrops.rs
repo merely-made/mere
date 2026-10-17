@@ -51,6 +51,27 @@ pub struct MetreGrid {
     pub positions_per_foot: u16,
     pub lines: Vec<VerseLine>,
 }
+impl MetreGrid {
+    pub fn extent(&self) -> u32 {
+        self.lines
+            .iter()
+            .map(|l| l.syllables.len() as u32)
+            .max()
+            .unwrap_or(1)
+            .max(u32::from(self.feet) * u32::from(self.positions_per_foot))
+    }
+    pub fn placement(&self, line: usize, syllable: usize) -> Option<Span> {
+        let row = self.lines.get(line)?;
+        row.syllables.get(syllable)?;
+        match &row.alignment {
+            Some(spans) => spans.get(syllable).copied().flatten(),
+            None => Some(Span {
+                start: syllable as u32,
+                length: 1,
+            }),
+        }
+    }
+}
 fn binary_foot() -> u16 {
     2
 }
@@ -64,6 +85,10 @@ pub struct VerseLine {
     pub source: SourceRef,
     pub text: String,
     pub syllables: Vec<Syllable>,
+    /// Omitted: legacy ordinal alignment. Present: one explicit placement (or
+    /// unplaced value) per source syllable, independent of candidate stress.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alignment: Option<Vec<Option<Span>>>,
     /// The template's expected group, independently of the observed tail.
     pub rhyme_group: Option<String>,
     /// Supplied by the source's pronunciation/scansion adapter, never inferred
@@ -331,6 +356,16 @@ impl SceneInput {
                     "metre extent exceeds limits",
                 )?;
                 unique(grid.lines.iter().map(|l| l.key.as_str()), "metre.lines")?;
+                let keys: Vec<String> = grid
+                    .lines
+                    .iter()
+                    .flat_map(|line| {
+                        std::iter::once(line.key.clone()).chain(
+                            (0..line.syllables.len()).map(|i| format!("{}/syllable/{i}", line.key)),
+                        )
+                    })
+                    .collect();
+                unique(keys.iter().map(String::as_str), "metre.occurrences")?;
                 let mut count = grid.lines.len();
                 for line in &grid.lines {
                     source(&line.source, "metre.line.source")?;
@@ -339,6 +374,17 @@ impl SceneInput {
                         "metre.line.syllables",
                         "too many syllables",
                     )?;
+                    if let Some(alignment) = &line.alignment {
+                        check(
+                            alignment.len() == line.syllables.len()
+                                && alignment.iter().flatten().all(|span| {
+                                    span.length > 0
+                                        && span.end().is_some_and(|end| end <= grid.extent())
+                                }),
+                            "metre.line.alignment",
+                            "one bounded positive span or unplaced value is required per syllable",
+                        )?;
+                    }
                     count += line.syllables.len();
                     check(
                         line.rhyme_tail
@@ -526,7 +572,10 @@ impl SceneInput {
 
 // Core Sceno records keep their existing permissive stored-format serde.
 // This disclosed-input boundary is strict, including those nested records.
-pub(crate) fn strict_core_records(value: &serde_json::Value, path: &str) -> Result<(), SceneInputError> {
+pub(crate) fn strict_core_records(
+    value: &serde_json::Value,
+    path: &str,
+) -> Result<(), SceneInputError> {
     match value {
         serde_json::Value::Object(map) => {
             let allowed: Option<&[&str]> = if map.contains_key("adapter") {
@@ -800,13 +849,7 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
     let slot = 47.0;
     let row = 154.0;
     let n = grid.feet as usize * grid.positions_per_foot as usize;
-    let max_syllables = grid
-        .lines
-        .iter()
-        .map(|l| l.syllables.len())
-        .max()
-        .unwrap_or(n)
-        .max(n);
+    let max_syllables = grid.extent() as usize;
     let template = SequenceTemplate {
         lanes: vec![String::new(); grid.lines.len().max(1)],
         extent: max_syllables.max(1) as u32,
@@ -862,15 +905,16 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
         });
         rows.push(id);
         for (j, syllable) in line.syllables.iter().enumerate() {
-            let sx = template
-                .centre(
-                    i as u16,
-                    Span {
-                        start: j as u32,
-                        length: 1,
-                    },
-                )
-                .x;
+            let Some(span) = grid.placement(i, j) else {
+                out.unplaced.push(Unplaced {
+                    key: format!("{}/syllable/{j}", line.key),
+                    source: line.source.clone(),
+                    label: syllable.text.clone(),
+                    reason: "Authored unplaced syllable; lexical stress is retained".into(),
+                });
+                continue;
+            };
+            let sx = template.centre(i as u16, span).x;
             let h = if syllable.stressed { 24.0 } else { 7.0 };
             mark(
                 out,
@@ -878,9 +922,11 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
                 &line.source,
                 syllable.text.clone(),
                 format!(
-                    "{} syllable {}",
+                    "{} candidate stress · syllable {} · start {} / span {} metrical positions",
                     if syllable.stressed { "strong" } else { "weak" },
-                    j + 1
+                    j + 1,
+                    span.start,
+                    span.length
                 ),
                 if syllable.stressed {
                     MarkRole::StrongStress
@@ -889,9 +935,9 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
                 },
                 Vec2::new(sx, y - h / 2.0),
                 Footprint::Rect {
-                    size: Size2::new(slot * 0.70, h),
+                    size: Size2::new((slot * span.length as f32 - 8.0).max(3.0), h),
                 },
-                false,
+                true,
                 Some(Vec2::new(sx, y + 17.0)),
             );
         }
