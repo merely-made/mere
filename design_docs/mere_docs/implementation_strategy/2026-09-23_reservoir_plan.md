@@ -1761,3 +1761,22 @@ Release/startup database changes and the first cold original epoch8→10 byte
 failure remain recorded separately; the warm passes do not erase them.
 The documentation audits retain exactly the pre-edit F mechanical findings
 and D2 errors, with no new findings; inherited debt remains unresolved.
+
+## Shared personal facts intake (2026-10-16; in progress)
+
+Mark authorized reusable biographical facts and subject/resource associations for
+Cleromancy natal readings. The `personal-facts` domain consumes Dramatis plain
+birth/association contracts and scoped Gaz contact resources. Djinn installs its
+complete-candidate validator in daemon and embedded compositions. Its client
+uses the existing admitted mere session route, checked journal transactions and
+resource hashes, never an application-local store or custody fallback. Source:
+`dramatis/design_docs/2026-10-16_subject_reference_plan.md`; consumer:
+`cleromancy/design_docs/2026-09-23_divination_mere_plan.md`.
+
+Done when valid revisions and exact associations persist across owner reopening;
+tampering, wrong persona, stale candidate and access revocation refuse without
+installing durable edits; a second application reads the same admitted values;
+and the consumer retains an immutable authorized snapshot without moving
+Chatelaine autofill or credential custody. Numerical and native consumer
+qualification stay with Cleromancy. Implementation is in progress; no completion
+is inferred from the plain supplier types or the existing V1-V5 receipts.

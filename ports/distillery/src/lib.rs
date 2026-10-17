@@ -47,9 +47,18 @@
 mod authority;
 mod chronicle;
 pub mod chronicle_recipe;
+pub mod gpu;
 
 #[cfg(feature = "flora")]
 pub mod flora;
+/// The resident inference lane and its `inference.ask` route.
+#[cfg(feature = "inference")]
+pub mod inference;
+/// Decoder-free resident inference wire contract.
+pub mod inference_protocol;
+/// Lease-bound layer-stage protocol and coordinator composition.
+#[cfg(feature = "inference-stages")]
+pub mod inference_stage;
 mod installed;
 /// Shutdown ordering shared by long-lived residents; Djinn uses it too.
 pub mod lifecycle;

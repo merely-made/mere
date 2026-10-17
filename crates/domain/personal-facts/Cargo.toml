@@ -1,0 +1,20 @@
+[package]
+name = "mere-personal-facts"
+version = "0.1.0"
+edition.workspace = true
+rust-version = "1.97.1"
+license.workspace = true
+repository.workspace = true
+description = "Resident-admitted, revision-addressed biographical facts and subject/resource associations."
+
+[dependencies]
+blake3.workspace = true
+chartulary.workspace = true
+gaz.workspace = true
+dramatis.workspace = true
+kernel.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+personae.workspace = true

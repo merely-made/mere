@@ -116,6 +116,8 @@ pub fn resolve_data_root(
 
 /// What started personal sync hands the resident's doors.
 pub struct PersonalSyncStarted {
+    /// Endpoint and group owner borrowed by private sibling lanes.
+    pub host: Arc<PersonalSyncHost>,
     /// The cards both doors serve.
     pub surface: DeviceSurfaceHandle,
     /// The paired-device directory, read live from this host.
@@ -339,8 +341,9 @@ pub async fn start<P: IdentityProvider + ?Sized>(
         Arc::clone(&host),
         graphshell::receipts::inbox_dir(&data_root),
     );
-    spawn_accept_watch(host, Arc::clone(&surface));
+    spawn_accept_watch(host.clone(), Arc::clone(&surface));
     Ok(Some(PersonalSyncStarted {
+        host,
         surface,
         directory,
         node_id,

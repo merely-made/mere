@@ -11,6 +11,11 @@ keywords = ["inference", "embedding", "mesh", "harness", "compute"]
 categories = ["concurrency"]
 
 [dependencies]
+stickleback = { workspace = true, optional = true }
+p2panda-store = { version = "0.7.0", default-features = false, optional = true }
+chacha20poly1305 = { version = "0.11", optional = true }
+rand_core = { version = "0.6", features = ["getrandom"], optional = true }
+zeroize = { version = "1", optional = true }
 insigne.workspace = true
 mesh = { workspace = true, features = ["admitted-ingress"] }
 incipit.workspace = true
@@ -25,9 +30,14 @@ scenograph.workspace = true
 scenomise.workspace = true
 scenotime.workspace = true
 eidetic = { workspace = true, optional = true }
-esp = { workspace = true, features = ["decoder-lora"], optional = true }
+eidetic-search = { workspace = true, optional = true }
+# The decoder half is named by the features that need it (`trainer`,
+# `flora`), so `inference` can carry the actor without the Burn stack.
+esp = { workspace = true, optional = true }
+armillary = { workspace = true, optional = true }
 safetensors = { version = "0.4", optional = true }
 pollster = { version = "0.4", optional = true }
+notochord = { workspace = true, features = ["tokio"], optional = true }
 mere-surface-api = { workspace = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -43,7 +53,7 @@ iroh = { version = "1.0.3", optional = true }
 [features]
 default = []
 remote = ["dep:burn-backend", "dep:burn-ir", "dep:burn-remote", "dep:iroh"]
-trainer = ["dep:esp", "dep:eidetic", "dep:pollster", "dep:safetensors", "tokio/rt"]
+trainer = ["dep:esp", "esp/decoder-lora", "dep:eidetic", "dep:pollster", "dep:safetensors", "tokio/rt"]
 # The trainer on the local discrete GPU. Additive over `trainer`: it turns on
 # esp's wgpu decoder backend and the adapter probe that comes with it, so a
 # host can ask which adapter the runtime would bind *before* composing a
@@ -55,9 +65,18 @@ trainer-gpu = ["trainer", "esp/decoder-wgpu"]
 # runs either arm on either device. Without it the autodiff request arm still
 # deserializes, and the job refuses it by name.
 trainer-autodiff = ["trainer", "esp/decoder-autodiff"]
-flora = ["dep:eidetic", "dep:esp", "dep:safetensors"]
+flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
+# The resident inference lane (resident inference and recall plan, I1): esp's
+# actor and provider seam, the run table and the `inference.ask` endpoint. No
+# model runtime: the host supplies the provider.
+inference = ["dep:esp", "esp/actor", "dep:armillary"]
+inference-gpu = ["inference-model", "esp/decoder-wgpu"]
+inference-stages = ["inference-model", "dep:notochord", "tokio/io-util"]
+inference-wire = ["dep:eidetic"]
+inference-model = ["inference-wire","dep:eidetic-search", "inference", "esp/decoder-flex", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]
 
 [dev-dependencies]
+safetensors = "0.4"
 notochord = { workspace = true, features = ["tokio"] }
 stickleback.workspace = true
 # Tests and examples bind throwaway identities (vault lock plan, ruling 96).

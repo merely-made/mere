@@ -999,7 +999,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     let owner =
         owner_settings::OwnerSettings::load(&owner_settings::settings_path(&app_dir, &profile_id))?;
     #[cfg(feature = "personal-sync")]
-    let mut resident = DjinnResident::open(
+    let mut resident = DjinnResident::open_deferred_inference(
         personae.as_ref(),
         &data_root,
         &profile_id,
@@ -1069,7 +1069,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // the app catalog. Clone that narrow handle before lifting the mutable
     // works into their run loop, preserving the deliberate borrow split.
     let distillery_chronicle = resident.distillery_chronicle_observer();
-    let mut works = resident.take_distillery();
+    let mut works = None;
 
     // Keep every broker future inside this async block.  Its captures, most
     // notably the blob-store clones held by personal sync, are dropped before
@@ -1113,7 +1113,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             .with_additional(&std::env::var(EXTRA_EXTENSIONS_ENV).unwrap_or_default());
         let agent = listen(agent_listener, personae.agent_session());
         #[cfg(feature = "personal-sync")]
-        let (supplemental_cards, device_directory) = match device_sync::start(
+        let (supplemental_cards, device_directory, personal_sync_host) = match device_sync::start(
             personae.as_ref(),
             &app_dir,
             &args.vault_dir,
@@ -1134,10 +1134,24 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                         ticket: started.ticket.clone(),
                     })
                 });
-                (Some(started.surface), started.directory)
+                (Some(started.surface), started.directory, Some(started.host))
             },
-            None => (None, DeviceDirectorySource::sync_off()),
+            None => (None, DeviceDirectorySource::sync_off(), None),
         };
+        #[cfg(feature = "inference")]
+        {
+            resident.start_inference(personae.as_ref(), personal_sync_host.clone()).await?;
+            if let Some(holder) = resident.inference_lock_holder() {
+                personae.register_lock_holder(holder);
+            }
+            #[cfg(feature="inference-stages")]
+            if let Some(holder)=resident.inference_stage_lock_holder() {
+                personae.register_lock_holder(holder);
+            }
+        }
+        #[cfg(not(feature = "inference"))]
+        drop(personal_sync_host);
+        works = resident.take_distillery();
         {
             let now = status.read();
             events.emit(
@@ -1236,6 +1250,14 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                         ResidentDistillery::register_chronicle_route(observer, catalog)
                     })
                     .await?;
+                grants.grant(AppId::new("turnstone"), route);
+            }
+            // The inference lane, to Turnstone (resident inference plan,
+            // ruling 8).
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_inference_route(catalog))
+                .await?
+            {
                 grants.grant(AppId::new("turnstone"), route);
             }
             (grants, catalog)

@@ -27,6 +27,7 @@ members = [
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/apparatus",
+    "crates/domain/personal-facts",
     "crates/platen/platen",
     "crates/eidetic/eidetic-core",
     "crates/fleece",
@@ -481,6 +482,7 @@ forme = { package = "mere-forme", version = "0.2.0", path = "crates/forme/forme"
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
+personal-facts = { package = "mere-personal-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus" }
 eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-features = false }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
@@ -783,6 +785,10 @@ vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "276b46648c08f
 # cache in Mere's defaults-disabled GPU graph. Remove when upstream makes
 # persistence opt-in or fixes the defaults-on edge in cubecl-wgpu.
 cubecl-runtime = { path = "support/patches/cubecl-runtime" }
+# cubek-matmul 0.3.0: retain packed Q4 execution on 48-KiB workgroup devices
+# by reducing unit stage partitions after register partitions reach one.
+# Remove when upstream selection admits the same bounded packed-weight rows.
+cubek-matmul = { path = "support/patches/cubek-matmul" }
 # burn-cubecl 0.22.0-pre.4: the selector was retired under ruling 410 after
 # the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
 # cases, plus nine unfused native launcher controls. Vendored patch source

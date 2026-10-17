@@ -1,0 +1,152 @@
+{
+  "schema": "mere.resident-inference/answer-card/v1",
+  "status": "passed",
+  "recorded_at_utc": "2026-10-16T11:41:38.821006+00:00",
+  "mere_source_commit": "67a514e8099299666cb96d0505dfa1ef704f7d86",
+  "turnstone_source_commit": "ec9881ea1ac1b336604b0096e0971e1c8085193b",
+  "wire_supplier_commit": "65b97b0bfdf1eef5ba3b4ecdccba73f47a049d03",
+  "source_sha256": {
+    "Cargo.toml": "0902e497dd6f78a7c3ed7b76a308411fa3ee8caea52203ac98fb803e0d053d37",
+    "Cargo.lock": "3a3d7cd5f3c31170b2fb7b68fd8821f7cb821b8575e9df179937b6142ea87be5",
+    "crates/eidetic/eidetic-core/src/models/recall.rs": "e995aa985bfff06ba52dd204c15990ab6d31d3a2dbe77d1d05ab047b3b6d051f",
+    "ports/distillery/Cargo.toml": "277b7d4211aebbe13fd5e681e340702d03563d017c2d1dee3c0987f8266c1d24",
+    "ports/distillery/src/inference.rs": "b0141b7c16851504a91310e06f752e375a2808867389f66d8f06cb6df7dae308",
+    "ports/distillery/src/inference/recall.rs": "337eb750fdfcded679f1895af2fe95655e4518b7b1f6315e4f8ae9995bbf6ea7",
+    "ports/distillery/src/inference/durable.rs": "339685ae8bb6c8f624c4ef923c9e71a691d813d4cafb97c2e7c4642f89399d0c",
+    "ports/distillery/src/inference_protocol.rs": "01b5c36973cfb317b3c010e06c35abf2a0e476f4afe01a1268874858642a6932",
+    "ports/distillery/src/inference_protocol/recall.rs": "e1ceb9a38caac1e4620364ee0ba5a962a7abb0be148f31a4a8a50d3327097de7",
+    "ports/djinn/Cargo.toml": "a5f6b92ff8e27e874a034d82a8f093413dc55cb274ee0b8a703b547645e1d08b",
+    "ports/djinn/src/settings.rs": "1dfc6c157d9a255600d4dfc4e9a821360f507b4f991ec4a6962bab7674bddb52",
+    "ports/djinn/src/resident_inference.rs": "e0a43522bfc393e988714802705066a4fcc9780e5441b3f96e7a7024f7482b0e",
+    "ports/djinn/tests/inference_route.rs": "f428fb8530526109abe2b9b18d8504f57456f15505acfde57d99bc0c2bd106ee"
+  },
+  "turnstone_source_sha256": {
+    "Cargo.toml": "a2e68c1edde0eb1106abc72a4d12eacf2cbc0d9bf84eb94c1a5d3258179be8e6",
+    "Cargo.lock": "cc0af75bd07bb6a71280c110a9cd854b54612da4287004acd214c0ead29dddfc",
+    "src/inference_service.rs": "83123c1f4c736b2255cb8cb35a984fba6dfec588b7c4e20561bb3859572bf198",
+    "src/inference_surface.rs": "6a0096bb51c29c9ad391db191914628ee5546eeb881f5420e95886fa7609b120",
+    "src/trail_memory.rs": "6a0b8b587e5bedcc0c099106d96c9f92065beb1fb4a8b6f607c60085e4c82853",
+    "src/action.rs": "a6b8ec9f101fc6964ad0d8f4ee9f83a3542854412617dd00e6c28e93fb185a1c",
+    "src/app/mod.rs": "478062510b0ba5f6527b4aa297fdff0c28e303cb142fd3ae9d48d9eee9057665",
+    "src/shell/mod.rs": "c7b5eca840a7565f0fbd9cfae166f8b9b9173d2ccdb5444ded1fb3e1d2e1430b",
+    "src/shell/drive.rs": "6778cfc4fd81e1e5ed7e5f8c07e6fe153f11d00978d003a1c661ee55f13f2cbc"
+  },
+  "checks": {
+    "inference-i5-core-regression.log": {
+      "command": "cargo test --locked --offline -p distillery --features inference-gpu --lib --test inference_durable",
+      "passed_groups": [
+        53,
+        8
+      ],
+      "log_sha256": "816b4b795f954b7efe919791adab963771bea0a9a05ff49d4bda755e65e9204a"
+    },
+    "inference-i5-actor-wire.log": {
+      "command": "cargo test --locked --offline -p distillery --features inference,inference-wire --lib",
+      "passed_groups": [
+        38
+      ],
+      "log_sha256": "ea726943bdddd1cf14e9fb510d4aa4429fc7a6b46f197a38fb2b55a223e11fba"
+    },
+    "inference-i5-native-tests.log": {
+      "command": "inference_route-c15a1b2137e029ba.exe --test-threads=1",
+      "passed_groups": [
+        4
+      ],
+      "log_sha256": "0fa502bfa40839de201c6f33c3da2670027439edacb48f9d0052737d3e8dc4cf"
+    },
+    "inference-i5-tests.log": {
+      "command": "cargo test --locked --offline --lib inference_",
+      "passed_groups": [
+        4
+      ],
+      "log_sha256": "1087cf56ffd794d3340f2181dc41364fa18acaf86c984088c2b18006a0486422"
+    },
+    "inference-i5-trail-regression.log": {
+      "command": "turnstone-7bafdd410bc9bd3c.exe trail_memory::",
+      "passed_groups": [
+        11
+      ],
+      "log_sha256": "990d4813385b12e1d31863c14b9d5e9342baba7c19ef49e75a0cf14bc5929594"
+    },
+    "inference-i5-wait-tests.log": {
+      "command": "cargo test --locked --offline --lib file_wait_tests",
+      "passed_groups": [
+        2
+      ],
+      "log_sha256": "5e469c7bc534a69b7f0c3ce96cb1f849cde0af81149966796863bc8d39d3c203"
+    }
+  },
+  "headed_proof": {
+    "home": "turnstone/docs/receipts/resident_inference_i5_windows_20261016/native/",
+    "files_sha256": {
+      "answer/01_streaming.png": "619285beb6f529d221370089810adcda6584792a0a6e9dbb12b7d4a7393ede47",
+      "answer/02_paused.png": "61e4db81441d50016bdd67261f0126eb4258fdca657dda542097fb0bf9dbbe81",
+      "answer/03_answer.png": "2fa5b45eab2705af6a3b31edd8d05e94150a9d2eb7e1c2736e36dc00c0d35762",
+      "answer/04_exact_source.png": "5e120b1786c7fa00a15a298b24cc5ff7c236f39d2f66217cfaa09c87bc082440",
+      "answer/05_cancelled.png": "a4a5e87efa742f5a3936bd3cfc915ba3d3a4d7ba8bf596cbcdd810f55e21cb7f",
+      "answer/diagnostics.json": "564a4185b94d8f12ee29c9021c526ccaeba7f887658096852e71791aa2611c93",
+      "answer/scenario.done": "eed587d60edcbe851c8bfce58987bb5258547a602e0d3f6089c0b3b12066a74d",
+      "answer.log": "abb74990970104f5bafdd206810713df0c7b64574732e7a2af0382b778e3a9c8",
+      "cancelled.json": "95395f42ede1cbbefa5b0bb314eaf15f6821bd0ec47c5620d87e70ed0c14e5bc",
+      "execution.json": "6f1ac138db3736b1e4f594fd56ee24e9d3055237dc50ce21388b9fcdef043146",
+      "finished.json": "970c7359e7fd36a6d9bac9cc74aa3763530edeb83c46a81c42ae41acb2ce3acf",
+      "paused.json": "1bf4e6a1cfec7b923a0319a8c2b29985bccbad17bc874a3fd2155e402a93fb0c",
+      "reopen/06_reopened_exact_source.png": "8a2bb4cd5819903303836a48dafc1c4081e08182a10d75dd5f8e2e0783ba46f8",
+      "reopen/diagnostics.json": "6c2187dcc8e3310bc0cccae7260f1c27e5a06558448c95d0b43e3598264ff633",
+      "reopen/scenario.done": "937c2c0706b3af94ed72e77c05aae1d685a9583f4ae6c4d3147ed48b8d321581",
+      "reopen.log": "a791854eb7f0ef3b82a6c74df4d7aad9167ccb5bb98e5351fff92affc53b8eb5",
+      "reopened.json": "970c7359e7fd36a6d9bac9cc74aa3763530edeb83c46a81c42ae41acb2ce3acf",
+      "resident-receipt.json": "3556e5dde5df67c62f11a7f2b552fd4381bdd854e23f37945bdb235b165e7597",
+      "resident.log": "d5e2338e90aa41316aaa0a387c15ed5b0e5ea33bf38ee7b9b028ddc807ac2f86"
+    },
+    "execution": {
+      "turnstone_head": "ec9881ea1ac1b336604b0096e0971e1c8085193b",
+      "turnstone_binary_sha256": "14ba71af853acdeb97747cf6675f21b72f1577566f682fb606067562d8746c23",
+      "resident_test_sha256": "160bf83db15d457687b32cc2c3137804f18ca162c0cc660a2f9239e40df3f38b",
+      "cargo_lock_sha256": "cc0af75bd07bb6a71280c110a9cd854b54612da4287004acd214c0ead29dddfc",
+      "scenarios": {
+        "answer": "bc37452ceb848b9cafc23e0bb797f86cfd4f3a4fab217679cb6f1c22802b1fe4",
+        "reopen": "186f471c0d59e0c25156536b027cf6e0a6cf22c86e46025014eb497b1d120d1c"
+      },
+      "harness_sha256": "890335dbd5f14d403ccc1482282bf3e135bf577e11409d2459b0716dba3db6a9",
+      "fixture_notes": {
+        "/pelican": "The Pelican observatory's access word is amberstone. It has no other access word.",
+        "/sandpiper": "The Sandpiper observatory's access word is indigo. It has no other access word."
+      },
+      "origin_stopped_before_reopen": true,
+      "boundary": "Separate headed Turnstone and in-process native Djinn resident; pinned trained GPU model; actual app connection; public fictional retained text"
+    },
+    "paused_tokens": 1,
+    "finished_tokens": 18,
+    "cancelled_tokens": 0,
+    "citation_basis": "verbatim_passage",
+    "source_version": "blake3:61c24822e5cd81e7e27beb6f5058cbe7af6ad44c63f48327230609d95d65b9fc",
+    "source_selector": {
+      "start": 0,
+      "end": 81
+    },
+    "model_row": "blake3:cc753a9cfd8b2657c66b962e508b97845b6c2bda7c42940d5ea4ae5386952a01",
+    "prefix_preserved": true,
+    "sealed_evidence_unchanged_after_restart": true
+  },
+  "limits": [
+    "Pinned SmolLM2-360M-Instruct on one Windows computer with NVIDIA RTX 4060 Laptop GPU; test-owned native Djinn resident and separate headed Turnstone process.",
+    "Installed Djinn binary, physical second-device and whole-workspace gates are separate.",
+    "Inline source publication JSON is capped at 128 KiB and refuses oversize; larger-corpus handoff is open.",
+    "Citation is a host complete-verbatim-passage annotation, not a model-authored numeric marker or semantic-entailment judgment.",
+    "Four pre-existing trail tests remain ignored; the native route baseline excludes its two opt-in model/fixture tests, with the headed fixture explicitly run separately."
+  ],
+  "workspace": {
+    "inference_worktree": "C:/Users/mark_/Code/worktrees/mere-resident-inference",
+    "retained_generated_fixture": "C:/t/cargo-targets/turnstone/i5-headed",
+    "cleanup_denial": "Automatic approval review rejected removal of worktree target/build with blocked by policy; retained without retry."
+  },
+  "documentation": {
+    "audit_sha256": "cc1f440c91152c691b2f58c5907ceb97544e08263b5d4e96d31269f188b0f505",
+    "added_findings": [],
+    "existing_broken_relative_links": 41,
+    "existing_missing_known_root_paths": 178,
+    "existing_unheaded_owned_sources": 70,
+    "removed_stale_source_path": true
+  }
+}
