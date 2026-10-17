@@ -21,8 +21,10 @@ pub const UNRELATED_COLUMN: &str = "unrelated";
 pub fn tag_sets(graph: &Graph) -> HashMap<NodeKey, AxisValue> {
     graph
         .nodes()
-        .filter_map(|(key, node)| {
-            let tags: BTreeSet<&str> = node.tags.iter().map(String::as_str).collect();
+        .filter_map(|(key, _)| {
+            // A visible occurrence reads the tags of its shown Resource.
+            // The kernel retains raw Surface tags only as a legacy fallback.
+            let tags: BTreeSet<String> = graph.node_content_tags(key)?.into_iter().collect();
             (!tags.is_empty()).then(|| {
                 let joined = tags.into_iter().collect::<Vec<_>>().join("|");
                 (key, AxisValue::Categorical(joined))
@@ -111,6 +113,34 @@ mod tests {
 
     fn node(graph: &mut Graph, name: &str) -> NodeKey {
         graph.add_node(format!("https://{name}.example"), PortablePoint::zero())
+    }
+
+    #[test]
+    fn tag_sets_read_public_resource_tag_assertions_instead_of_surface_fallbacks() {
+        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+        let mut graph = Graph::new();
+        let tagged = node(&mut graph, "tagged");
+        let untagged = node(&mut graph, "untagged");
+        for tag in ["song", "practice"] {
+            apply_graph_delta(
+                &mut graph,
+                GraphDelta::InsertNodeTag {
+                    key: tagged,
+                    tag: tag.into(),
+                },
+            );
+        }
+        assert!(
+            graph.get_node(tagged).unwrap().tags.is_empty(),
+            "public tagging stores Resource assertions, not Surface fallback tags"
+        );
+        assert!(graph.node_content_tags(tagged).unwrap().contains("song"));
+        let axis = tag_sets(&graph);
+        assert_eq!(
+            axis.get(&tagged),
+            Some(&AxisValue::Categorical("practice|song".into()))
+        );
+        assert!(!axis.contains_key(&untagged));
     }
 
     #[test]
