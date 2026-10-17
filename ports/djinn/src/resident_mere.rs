@@ -129,7 +129,13 @@ impl MereRoutes {
                 cleromancy_domain::host::validate_divination_graph(graph)
                     .map_err(|error| error.to_string())
             }),
-        )
+        ).with_personal_facts_authority()
+    }
+
+    /// Install the same biographical-fact rules in daemon and embedded owners.
+    pub fn with_personal_facts_authority(self) -> Self {
+        let persona = self.inner.persona.as_uuid().to_string();
+        self.with_domain_validator(personal_facts::DOMAIN, Arc::new(move |graph| personal_facts::validate_for_persona(graph, &persona)))
     }
     /// Routes for `persona`'s meres, registered in `catalog` and granted to
     /// `apps` as each is served.
@@ -279,8 +285,8 @@ impl MereRoutes {
         let domain = mere.domain.to_string();
         // Product records must never be writable under generic graph authority.
         // Both daemon and embedded composition install the same product callback.
-        if domain == "divination" && !self.inner.validators.contains_key(&domain) {
-            return Err("divination domain authority is not composed into this resident".into());
+        if matches!(domain.as_str(), "divination" | "personal-facts") && !self.inner.validators.contains_key(&domain) {
+            return Err(format!("{domain} domain authority is not composed into this resident"));
         }
         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
@@ -450,7 +456,7 @@ impl ProjectionSource for AccessEndpoint {
             return Err("ambient routes expose graph material only".into());
         }
         let mut snapshot = self.endpoint.snapshot(request)?;
-        if self.endpoint.shared.domain == "divination" && snapshot.session.0 == MERE_GRAPH {
+        if matches!(self.endpoint.shared.domain.as_str(), "divination" | "personal-facts") && snapshot.session.0 == MERE_GRAPH {
             for binding in &snapshot.presentation.bindings {
                 if binding.instance != InstanceId(0) {
                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {
@@ -1547,9 +1553,9 @@ impl MereEndpoint {
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
-        if self.shared.domain == "divination" && intent.target != InstanceId(0) {
+        if matches!(self.shared.domain.as_str(), "divination" | "personal-facts") && intent.target != InstanceId(0) {
             return Ok(IntentResult::Rejected {
-                reason: "divination writes require a complete journaled session candidate".into(),
+                reason: "domain writes require a complete journaled session candidate".into(),
             });
         }
         // Stage the first edit and its fork together. A refused candidate leaves
@@ -3794,6 +3800,40 @@ mod tests {
         drive_common_panel(&mut panel, &mut endpoint, false);
         assert_eq!(panel.status(), "open");
         assert_eq!(panel.model().sessions.len(), 1);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn personal_facts_two_apps_share_exact_revisions_and_refuse_tampering() {
+        let fixture = fixture(0x5046, "personal-facts").await;
+        let mut first = fixture.attach("turnstone").await;
+        let mut second = fixture.attach("knot-editor").await;
+        let start = graph(&mut first);
+        let mut candidate = disclosed_graph(&mut first, &start).into_graph().unwrap();
+        let edits = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let held = edits.clone();
+        candidate.set_recorder(Some(Arc::new(move |d| held.lock().unwrap().push(d.clone()))));
+        let scope = fixture.reservoir.meres().await[0].persona.as_uuid().to_string();
+        let subject = personal_facts::create_contact(&mut candidate, &scope, gaz::LocalId::from_random([3;16]), "Synthetic subject").unwrap();
+        let facts: dramatis::birth::BirthFacts = serde_json::from_value(serde_json::json!({
+            "schema":"dramatis.birth-facts/v1", "subject":subject,
+            "date":{"year":2000,"month":1,"day":1}, "time":"Unknown",
+            "place":null,"timezone":null,"source":{"label":"Public test","reference":null}
+        })).unwrap();
+        let expected = personal_facts::save_birth(&mut candidate, &facts).unwrap();
+        let steps = edits.lock().unwrap().clone();
+        assert_eq!(first.invoke(apply(&start, steps)).unwrap(), IntentResult::Accepted);
+        let shared = graph(&mut second);
+        let data = disclosed_graph(&mut second, &shared).into_graph().unwrap();
+        assert_eq!(personal_facts::births(&data).unwrap(), vec![expected.clone()]);
+        let before = serde_json::to_value(disclosed_graph(&mut second, &shared)).unwrap();
+        let id = kernel::graph::Graph::node_namespace_id(&expected.resource.id);
+        let mut changed = facts;
+        changed.date.day = 2;
+        assert!(matches!(second.invoke(apply(&shared, vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
+            node_id:id.to_string(), facet:personal_facts::BIRTH_FACET.into(), value_json:serde_json::to_string(&changed).unwrap()
+        }])).unwrap(), IntentResult::Rejected{..}));
+        let after = graph(&mut second);
+        assert_eq!(serde_json::to_value(disclosed_graph(&mut second, &after)).unwrap(), before);
     }
 
     #[tokio::test(flavor = "multi_thread")]

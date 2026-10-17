@@ -84,6 +84,8 @@ chirograph.workspace = true
 cleromancy-domain = { package = "cleromancy-core-acceptance", git = "https://github.com/merely-made/cleromancy.git", branch = "main" }
 # The identity tier's plain types: views, intents, the roster (DR-A, DR-C).
 dramatis.workspace = true
+personal-facts.workspace = true
+gaz.workspace = true
 incipit.workspace = true
 # The operational works composed as this resident's fourth lane
 # (`src/resident_distillery.rs`). Default features only unless djinn's own
