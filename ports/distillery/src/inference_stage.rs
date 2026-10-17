@@ -6,11 +6,18 @@
 
 //! Layer-stage work on the resident's shared iroh endpoint. Every call is
 //! admitted against an active supervised mesh lease and its signed input.
+//! Prompt-free discovery and reservation precede that lease.
 
 mod fallback;
 pub use fallback::{StageFallbackProvider, StreamingLoader};
 mod lane;
-pub use lane::{StageChainFactory, StagedLaneDevice, open_staged_library_lane_with_journal};
+pub use lane::{
+    StageChainFactory, StagedLaneDevice, open_automatic_library_lane_with_journal,
+    open_staged_library_lane_with_journal,
+};
+mod discovery;
+pub use discovery::{StageCatalog, StageOffer, library_stage_catalog};
+pub mod automatic;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -267,8 +274,11 @@ pub struct StageService {
     stopped: AtomicBool,
     task: Mutex<Option<tokio::task::JoinHandle<()>>>,
     busy: Arc<AtomicBool>,
+    catalog_busy: Arc<AtomicBool>,
     last_refusal: Mutex<Option<String>>,
     private_locked: AtomicBool,
+    catalog: RwLock<Option<Arc<StageCatalog>>>,
+    reservation: Mutex<Option<discovery::StageReservation>>,
 }
 
 impl StageService {
@@ -312,8 +322,11 @@ impl StageService {
             stopped: AtomicBool::new(false),
             task: Mutex::new(None),
             busy: Arc::new(AtomicBool::new(false)),
+            catalog_busy: Arc::new(AtomicBool::new(false)),
             last_refusal: Mutex::new(None),
             private_locked: AtomicBool::new(false),
+            catalog: RwLock::new(None),
+            reservation: Mutex::new(None),
         });
         let weak = Arc::downgrade(&service);
         let network = service.transport.clone();
@@ -347,6 +360,11 @@ impl StageService {
     pub fn resource(self: &Arc<Self>) -> Arc<dyn MeshResource> {
         Arc::new(StageResource(self.clone()))
     }
+    /// Install the library owner's exact-session discovery callback. Older
+    /// explicit stage services remain undiscoverable until this is installed.
+    pub fn set_catalog(&self, catalog: Arc<StageCatalog>) {
+        *self.catalog.write().unwrap() = Some(catalog);
+    }
     /// Authenticated transport/mesh-author identity of this worker.
     pub fn server_peer(&self) -> [u8; 32] {
         self.author
@@ -376,7 +394,7 @@ impl StageService {
     /// A synchronous vault holder calls this on its blocking lock path. Async
     /// hosts can await `drain_private` without blocking their executor.
     pub fn private_drained(&self) -> bool {
-        !self.busy.load(Ordering::SeqCst)
+        !self.busy.load(Ordering::SeqCst) && !self.catalog_busy.load(Ordering::SeqCst)
     }
     /// Lock private stage work and await actual tensor/guard destruction.
     pub async fn drain_private(&self) {
@@ -482,6 +500,12 @@ impl StageService {
             .await
             .map_err(|e| e.to_string())?;
         let call: StageCall = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+        if matches!(
+            call.operation,
+            StageOperation::Discover | StageOperation::Reserve | StageOperation::ReleaseReservation
+        ) {
+            return self.serve_discovery(peer, call, &mut stream).await;
+        }
         let claim = RemoteSessionClaim::decode(&call.credential).map_err(|e| e.to_string())?;
         if call.operation == StageOperation::Probe {
             let ready = {
@@ -531,6 +555,7 @@ impl StageService {
         }
         if call.operation == StageOperation::Finish {
             run.finished.store(true, Ordering::SeqCst);
+            self.reservation.lock().unwrap().take();
             notochord::write_frame(&mut stream, b"finished", CONTROL_BYTES as u32)
                 .await
                 .map_err(|e| e.to_string())?;
@@ -608,7 +633,7 @@ impl StageService {
         }
         // An aborted resource may already have removed admission while its
         // blocking computation still owns the runtime and busy permit.
-        while self.busy.load(Ordering::SeqCst) {
+        while !self.private_drained() {
             tokio::time::sleep(Duration::from_millis(5)).await;
         }
         Ok(())
@@ -666,6 +691,9 @@ impl MeshResource for StageResource {
             || self.0.private_locked.load(Ordering::SeqCst)
             || self.0.busy.load(Ordering::SeqCst)
         {
+            return false;
+        }
+        if !self.0.reservation_permits(job) {
             return false;
         }
         let state = self.0.state.read().unwrap();
@@ -820,6 +848,9 @@ impl MeshResource for StageResource {
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 enum StageOperation {
+    Discover,
+    Reserve,
+    ReleaseReservation,
     Probe,
     Forward,
     Finish,
@@ -887,6 +918,8 @@ pub struct StageChain {
     max_seq: usize,
     traffic: Arc<Mutex<StageTraffic>>,
     peers_permitted: Arc<dyn Fn(PeerID) -> bool + Send + Sync>,
+    cleanup_timeout: Duration,
+    finished: AtomicBool,
 }
 impl std::fmt::Debug for StageChain {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -940,18 +973,29 @@ impl StageChain {
             transport,
             runtime,
             peers,
+            cleanup_timeout: settings.call_timeout,
             settings,
             format,
             width,
             vocab,
             max_seq,
             traffic: Arc::new(Mutex::new(StageTraffic::default())),
+            finished: AtomicBool::new(false),
             peers_permitted,
         })
     }
     /// Shared counters survive the scoped decoder provider.
     pub fn traffic(&self) -> Arc<Mutex<StageTraffic>> {
         self.traffic.clone()
+    }
+
+    /// Bound the entire best-effort close, independently of a compute call.
+    pub fn with_cleanup_timeout(mut self, timeout: Duration) -> Result<Self, String> {
+        if timeout.is_zero() {
+            return Err("stage cleanup timeout must be positive".into());
+        }
+        self.cleanup_timeout = timeout;
+        Ok(self)
     }
     /// Compact compute provenance for the coordinator's sealed checkpoint.
     /// Device ids are transport authors; their roots remain in the mesh directory.
@@ -1054,11 +1098,25 @@ impl StageChain {
     /// Best-effort lease-session completion on the actor thread. Unreachable
     /// workers remain subject to their host's cancellation/lease expiry.
     pub fn finish(&self) {
-        for peer in &self.peers {
-            let _ = self
-                .runtime
-                .block_on(self.call(peer, 0, &[], StageOperation::Finish));
+        if self.finished.swap(true, Ordering::SeqCst) {
+            return;
         }
+        self.runtime.block_on(async {
+            let _ = tokio::time::timeout(self.cleanup_timeout, async {
+                for peer in &self.peers {
+                    let _ = self.call(peer, 0, &[], StageOperation::Finish).await;
+                    let _ = discovery::query(
+                        &self.transport,
+                        peer.peer,
+                        peer.request.clone(),
+                        StageOperation::ReleaseReservation,
+                        self.cleanup_timeout,
+                    )
+                    .await;
+                }
+            })
+            .await;
+        });
     }
 }
 impl StageExecutor for StageChain {
@@ -1069,6 +1127,11 @@ impl StageExecutor for StageChain {
         Some(&self.peers[0].request.session)
     }
     fn forward(&self, hidden: StageHidden, start: usize) -> Result<StageHidden, InferError> {
+        if self.finished.load(Ordering::SeqCst) {
+            return Err(InferError::StageUnavailable(
+                "stage placement retired".into(),
+            ));
+        }
         let [batch, seq, width] = hidden.dims();
         if batch != 1
             || width != self.width

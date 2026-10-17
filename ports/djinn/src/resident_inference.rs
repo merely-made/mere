@@ -16,6 +16,17 @@
 
 use crate::settings::OwnerSettings;
 
+/// The graph's compute space is a name, independent of any device root.
+pub fn compute_space(graph: [u8; 32]) -> [u8; 32] {
+    let mut hash = blake3::Hasher::new();
+    hash.update(b"mere.djinn/personal-inference-mesh/v1");
+    hash.update(&graph);
+    *hash.finalize().as_bytes()
+}
+
+#[cfg(feature = "inference-stages")]
+pub(crate) mod mesh_discovery;
+
 #[cfg(feature = "inference")]
 pub const INFERENCE_DATA_SALT: &[u8] = b"mere.djinn/inference/data/v1";
 
@@ -42,24 +53,26 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
                 .into(),
         );
     }
-    if let Some(crate::settings::InferenceLaneSettings {
-        recall: _,
-        model:
-            crate::settings::InferenceModelSettings::Library {
-                row,
-                device,
-                max_tokens,
-            },
-    }) = &owner.inference
+    if let crate::settings::InferenceModelSettings::Automatic { stages, .. } =
+        &owner.inference.as_ref().unwrap().model
     {
-        if *max_tokens == 0 {
+        if !cfg!(feature = "inference-stages") {
+            return Err("automatic inference requires the `inference-stages` feature".into());
+        }
+        stages.validate()?;
+        if owner.sync.is_none() {
+            return Err("automatic inference requires personal sync settings".into());
+        }
+    }
+    if let Some((row, device, max_tokens)) = owner.inference.as_ref().unwrap().model.library() {
+        if max_tokens == 0 {
             return Err("inference.max_tokens must be greater than zero".into());
         }
         #[cfg(feature = "inference")]
         distillery::inference::parse_model_row(row)?;
         #[cfg(not(feature = "inference"))]
         let _ = row;
-        if *device == crate::settings::InferenceDeviceSettings::Gpu
+        if device == crate::settings::InferenceDeviceSettings::Gpu
             && !cfg!(feature = "inference-gpu")
         {
             return Err("inference.model.library.device gpu requires the `inference-gpu` feature; rebuild with it or select cpu".into());
@@ -132,10 +145,55 @@ mod lane {
                     distillery::inference::durable::PersonaRunJournal<muniment::RedbBackend>,
                 >,
             >,
+            #[cfg(feature = "inference-stages")] stages: Option<
+                std::sync::Arc<distillery::inference_stage::StageChainFactory>,
+            >,
         ) -> Result<Self, String> {
             #[cfg(not(feature = "inference-gpu"))]
             let _ = gpu_access;
             let lane = match &settings.model {
+                #[cfg(feature = "inference-stages")]
+                InferenceModelSettings::Automatic {
+                    row,
+                    device,
+                    max_tokens,
+                    stages: limits,
+                } => {
+                    let device = match device {
+                        crate::settings::InferenceDeviceSettings::Cpu => {
+                            distillery::inference_stage::StagedLaneDevice::Cpu
+                        },
+                        #[cfg(feature = "inference-gpu")]
+                        crate::settings::InferenceDeviceSettings::Gpu => {
+                            distillery::inference_stage::StagedLaneDevice::Gpu(gpu_access)
+                        },
+                        #[cfg(not(feature = "inference-gpu"))]
+                        _ => return Err("automatic GPU inference requires inference-gpu".into()),
+                    };
+                    let label = distillery::inference::RunJournal::device(
+                        journal
+                            .as_ref()
+                            .ok_or("automatic inference requires its journal")?
+                            .as_ref(),
+                    )
+                    .to_string();
+                    distillery::inference_stage::open_automatic_library_lane_with_journal(
+                        library.ok_or("automatic inference requires its library")?,
+                        distillery::inference::parse_model_row(row)?,
+                        *max_tokens,
+                        device,
+                        stages.ok_or("automatic stage planner was not composed")?,
+                        limits.local_resident_bytes,
+                        label,
+                        journal.as_ref().map(|j| {
+                            j.clone() as std::sync::Arc<dyn distillery::inference::RunJournal>
+                        }),
+                    )?
+                },
+                #[cfg(not(feature = "inference-stages"))]
+                InferenceModelSettings::Automatic { .. } => {
+                    return Err("automatic inference requires inference-stages".into());
+                },
                 InferenceModelSettings::Stub => {
                     InferenceLane::open(|| Box::new(StubInferenceProvider::new()))
                 },
@@ -431,7 +489,37 @@ mod tests {
         } else {
             assert!(validate(&owner).unwrap_err().contains("inference-gpu"));
         }
-        owner.inference = set_model(row, InferenceDeviceSettings::Cpu, 32);
+        owner.inference = set_model(row.clone(), InferenceDeviceSettings::Cpu, 32);
         assert!(validate(&owner).is_ok());
+        let model: InferenceModelSettings = serde_json::from_value(serde_json::json!({
+            "automatic": { "row": row, "device": "cpu", "max_tokens": 32, "stages": {
+                "local_resident_bytes": 0, "worker_layer_bytes": 1048576, "max_peers": 8,
+                "max_hidden_bytes": 1048576, "discovery_timeout_ms": 1000, "discovery_every_ms": 1000,
+                "lease_wait_ms": 10000, "call_timeout_ms": 60000, "poll_every_ms": 25,
+                "lease_duration_ms": 600000, "heartbeat_ms": 10000
+            } }
+        })).unwrap();
+        owner.inference.as_mut().unwrap().model = model;
+        if cfg!(feature = "inference-stages") {
+            assert!(validate(&owner).unwrap_err().contains("personal sync"));
+            owner.sync = Some(crate::settings::SyncSettings {
+                graph: "personal".into(),
+                store_path: None,
+                roster_roots: vec![],
+                paired_devices: vec![],
+                lanes: Default::default(),
+                encrypted: false,
+                relay_urls: vec![],
+            });
+            assert!(validate(&owner).is_ok());
+            if let InferenceModelSettings::Automatic { stages, .. } =
+                &mut owner.inference.as_mut().unwrap().model
+            {
+                stages.max_peers = 0;
+            }
+            assert!(validate(&owner).unwrap_err().contains("bounds"));
+        } else {
+            assert!(validate(&owner).unwrap_err().contains("inference-stages"));
+        }
     }
 }

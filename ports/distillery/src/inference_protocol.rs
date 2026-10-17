@@ -144,3 +144,63 @@ pub struct Continuation {
     #[serde(default)]
     pub compared_token_ids_hash: Option<String>,
 }
+
+/// Explicit owner limits. Memory values count tensor payloads after reserving
+/// backend/activation/allocator space; zero skips that resident rung/offer.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AutomaticStageSettings {
+    /// Local weight/context-KV payload budget; zero skips whole-model residence.
+    pub local_resident_bytes: u64,
+    /// Offered layer/context-KV bytes after reserving shared/head and runtime
+    /// memory; zero keeps this resident a coordinator only.
+    pub worker_layer_bytes: u64,
+    /// Maximum candidates queried concurrently, from two through 64.
+    pub max_peers: usize,
+    /// Maximum tensor frame, including its geometry header.
+    pub max_hidden_bytes: usize,
+    /// Deadline for one prompt-free endpoint/capacity discovery call.
+    pub discovery_timeout_ms: u64,
+    /// Cadence of personal-peer endpoint refreshes.
+    pub discovery_every_ms: u64,
+    /// Total bound for choosing, reserving, posting and obtaining stage leases.
+    pub lease_wait_ms: u64,
+    /// Stage call/readiness deadline and idle-session expiry.
+    pub call_timeout_ms: u64,
+    /// Observation cadence while waiting for readiness, leases or cancellation.
+    pub poll_every_ms: u64,
+    /// Longest signed stage lease window, at most the mesh's 24-hour ceiling.
+    pub lease_duration_ms: u64,
+    /// Signed heartbeat cadence, subject to the mesh lease bounds.
+    pub heartbeat_ms: u64,
+}
+
+impl AutomaticStageSettings {
+    /// Refuse missing/invalid memory, transport, cadence or lease bounds.
+    pub fn validate(&self) -> Result<(), String> {
+        if !(2..=64).contains(&self.max_peers)
+            || self.discovery_timeout_ms == 0
+            || self.discovery_every_ms == 0
+            || self.lease_wait_ms == 0
+            || self.poll_every_ms == 0
+            || self.call_timeout_ms < self.lease_wait_ms
+            || self.call_timeout_ms > mesh::lease::MAX_LEASE_DURATION_MS
+            || [
+                self.discovery_timeout_ms,
+                self.discovery_every_ms,
+                self.lease_wait_ms,
+                self.poll_every_ms,
+            ]
+            .iter()
+            .any(|ms| *ms > mesh::lease::MAX_LEASE_DURATION_MS)
+            || !(20..=256 * 1024 * 1024).contains(&self.max_hidden_bytes)
+        {
+            return Err("automatic stage bounds or cadences are invalid".into());
+        }
+        self.terms().validate().map_err(|e| e.to_string())
+    }
+    /// Lease terms signed by the posting resident for every selected range.
+    pub fn terms(&self) -> mesh::LeaseTerms {
+        mesh::LeaseTerms::new(self.lease_duration_ms, self.heartbeat_ms)
+    }
+}

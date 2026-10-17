@@ -139,8 +139,18 @@ service lifetime. A bounded authenticated readiness probe precedes private
 tensor transfer. Locked or unkeyed workers withdraw their offers; idle sessions
 close with a lease-bound receipt after the configured timeout. Availability is
 sampled by the host before the mesh's pure decision function runs.
-Peer discovery, automatic rung selection and a new CLI
-settings variant are not supplied by this embedding API.
+`StagePlanner` supplies automatic placement through a read-only live board,
+a bounded actor-to-supervisor posting queue and prompt-free authenticated
+capacity queries. A short-lived reservation binds the canonical stage input
+to its poster before a job can be claimed; failed plans release reservations,
+and late posts cannot start work after reservation expiry. The supervisor's
+single authoring path posts each job and signs its real granted lease.
+`open_automatic_library_lane_with_journal` first admits whole-model residence
+within an explicit payload budget, otherwise uses that plan and streamed
+recovery. Indexed resident/streamed/staged placements keep the same exact
+session and prefill arithmetic. The embedding product supplies the existing
+personal graph's live reader authority and endpoint reachability; Djinn's
+`automatic` settings compose these pieces. Existing explicit APIs are unchanged.
 
 `distillery.inference/ask-recall-v1` takes an `ask` and optional source `scope`.
 It renders selected passage handles through the declared context template and

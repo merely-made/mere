@@ -153,6 +153,7 @@ pub struct MeshHost<B: Backend + Clone + Send + Sync + 'static> {
     config: HostConfig,
     inflight: BTreeMap<JobId, InFlight>,
     gpu: Option<crate::gpu::GpuAccess>,
+    admission: Option<Arc<dyn Fn(&mesh::Job, &mesh::JobBoard) -> bool + Send + Sync>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
@@ -177,11 +178,55 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             config,
             inflight: BTreeMap::new(),
             gpu: None,
+            admission: None,
         }
     }
 
     pub fn me(&self) -> [u8; 32] {
         self.me
+    }
+
+    /// Owner stage posts are drained on the supervisor's single authoring
+    /// path. Actor threads never race the mesh author's log sequence.
+    #[cfg(feature = "inference-stages")]
+    pub(crate) async fn post_inference_stage(
+        &self,
+        peer: [u8; 32],
+        request: &crate::inference_stage::StageRequest,
+        requires: mesh::ResourceRequirements,
+        terms: mesh::LeaseTerms,
+        nonce: u64,
+    ) -> Result<JobId, String> {
+        let bytes = serde_json::to_vec(request).map_err(|e| e.to_string())?;
+        let input = self
+            .config
+            .blobs
+            .as_sink()
+            .commit(&bytes)
+            .await
+            .map_err(|e| e.to_string())?;
+        let mut spec = mesh::JobSpec::simple(
+            crate::inference_stage::stage_resource(peer),
+            "stage",
+            input.clone(),
+            "receipt",
+            256,
+            mesh::DeterminismClass::Observed,
+        )
+        .leased(terms);
+        spec.inputs.push(mesh::spec::JobInput {
+            name: "reservation".into(),
+            blob: input,
+        });
+        spec.requirements = requires;
+        self.author(&MeshEvent::JobPostedV2 {
+            spec: Box::new(spec),
+            nonce,
+            at_ms: self.config.clock.now_ms(),
+        })
+        .await
+        .map(JobId)
+        .map_err(|e| e.to_string())
     }
 
     pub fn synced(&self) -> &SyncedMesh<B> {
@@ -226,6 +271,19 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
     /// lane. CPU resources retain their normal admission and reclaim policy.
     pub fn set_gpu_access(&mut self, gpu: crate::gpu::GpuAccess) {
         self.gpu = Some(gpu);
+    }
+    /// Attach delivery for owner-composed multi-device resources.
+    pub fn set_courier(&mut self, courier: Arc<dyn BlobCourier>) {
+        self.config.courier = courier;
+    }
+
+    /// A product's live author boundary. Decisions are sampled outside the pure
+    /// worker; withdrawing admission reclaims existing work at the next tick.
+    pub fn set_admission(
+        &mut self,
+        admission: Arc<dyn Fn(&mesh::Job, &mesh::JobBoard) -> bool + Send + Sync>,
+    ) {
+        self.admission = Some(admission);
     }
 
     /// Replace the owner's settings. The new policy governs the very next tick:
@@ -326,6 +384,21 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
     pub async fn tick(&mut self) -> Result<Vec<Step>, HostError> {
         let now_ms = self.config.clock.now_ms();
         let mut steps = Vec::new();
+        if let Some(admit) = self.admission.clone() {
+            let board = self.synced.board().await?;
+            let rejected: Vec<_> = self
+                .inflight
+                .keys()
+                .filter_map(|id| {
+                    let job = board.job(*id)?;
+                    (!admit(job, &board)).then_some((*id, job.spec.as_ref()?.checkpoint))
+                })
+                .collect();
+            for (job, class) in rejected {
+                self.begin_reclaim(job, ReclaimReason::PolicyChange, class, now_ms);
+                steps.push(Step::AwaitingStop { job });
+            }
+        }
         if self
             .gpu
             .as_ref()
@@ -366,6 +439,13 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             let unavailable: Vec<JobId> = board
                 .jobs()
                 .filter(|job| {
+                    if self
+                        .admission
+                        .as_ref()
+                        .is_some_and(|admit| !admit(job, &board))
+                    {
+                        return true;
+                    }
                     job.spec
                         .as_ref()
                         .and_then(|spec| self.config.registry.get(&spec.resource))

@@ -145,9 +145,34 @@ impl DjinnResident {
             },
             None => None,
         };
+        let automatic_mesh = if matches!(
+            owner.inference.as_ref().map(|s| &s.model),
+            Some(crate::settings::InferenceModelSettings::Automatic { .. })
+        ) {
+            Some(resident_inference::compute_space(
+                crate::personal_sync::personal_graph_id(
+                    &owner
+                        .sync
+                        .as_ref()
+                        .ok_or("automatic inference requires personal sync settings")?
+                        .graph,
+                ),
+            ))
+        } else {
+            None
+        };
         let distillery = match owner.distillery {
             Some(lane) => {
-                match ResidentDistillery::open(data_root, profile, vault_dir, unlock, lane).await {
+                match ResidentDistillery::open_mesh(
+                    data_root,
+                    profile,
+                    vault_dir,
+                    unlock,
+                    lane,
+                    automatic_mesh,
+                )
+                .await
+                {
                     Ok(distillery) => Some(distillery),
                     Err(open_error) => {
                         // Unwind in reverse construction order: the Knot lane
@@ -209,10 +234,7 @@ impl DjinnResident {
             .distillery
             .as_mut()
             .ok_or("inference needs Distillery during composition")?;
-        let library = if matches!(
-            settings.model,
-            crate::settings::InferenceModelSettings::Library { .. }
-        ) {
+        let library = if settings.model.library().is_some() {
             Some(works.inference_model_library(&self.data_root)?)
         } else {
             None
@@ -226,7 +248,7 @@ impl DjinnResident {
             Some(match personal.as_ref() {
                 Some(host) => resident_inference::personal::open(
                     identity,
-                    works.mesh_root(),
+                    works.inference_root(),
                     host,
                     local,
                     key,
@@ -236,8 +258,41 @@ impl DjinnResident {
         } else {
             None
         };
-        let mut inference =
-            ResidentInference::open(settings, library, works.gpu_access(), journal.clone())?;
+        #[cfg(feature = "inference-stages")]
+        let stages = if let crate::settings::InferenceModelSettings::Automatic {
+            row,
+            device,
+            stages,
+            ..
+        } = &settings.model
+        {
+            Some(
+                works
+                    .prepare_automatic_inference(
+                        &self.data_root,
+                        personal
+                            .as_ref()
+                            .ok_or("automatic inference requires the live keyed personal graph")?,
+                        row,
+                        *device,
+                        stages.clone(),
+                        identity
+                            .attest_derived_key(mesh::MESH_AUTHOR_SALT)
+                            .map_err(|e| e.to_string())?,
+                    )
+                    .await?,
+            )
+        } else {
+            None
+        };
+        let mut inference = ResidentInference::open(
+            settings,
+            library,
+            works.gpu_access(),
+            journal.clone(),
+            #[cfg(feature = "inference-stages")]
+            stages,
+        )?;
         if let (Some(host), Some(journal)) = (&personal, &journal) {
             if let Err(error) = resident_inference::personal::join(host, journal).await {
                 let closed = inference.close().await.err();

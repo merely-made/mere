@@ -43,6 +43,52 @@ pub fn open_staged_library_lane_with_journal<B: eidetic::Store + Send + 'static>
     device_label: String,
     journal: Option<Arc<dyn RunJournal>>,
 ) -> Result<InferenceLane, String> {
+    open_library_lane(
+        library,
+        row,
+        max_tokens,
+        device,
+        stages,
+        device_label,
+        journal,
+        None,
+    )
+}
+
+/// Select whole-model residence within the owner's payload budget, otherwise
+/// use discovered leased stages, then the existing same-session streaming rung.
+pub fn open_automatic_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    row: eidetic::ManifestId,
+    max_tokens: usize,
+    device: StagedLaneDevice,
+    stages: Arc<StageChainFactory>,
+    local_resident_bytes: u64,
+    device_label: String,
+    journal: Option<Arc<dyn RunJournal>>,
+) -> Result<InferenceLane, String> {
+    open_library_lane(
+        library,
+        row,
+        max_tokens,
+        device,
+        stages,
+        device_label,
+        journal,
+        Some(local_resident_bytes),
+    )
+}
+
+fn open_library_lane<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    row: eidetic::ManifestId,
+    max_tokens: usize,
+    device: StagedLaneDevice,
+    stages: Arc<StageChainFactory>,
+    device_label: String,
+    journal: Option<Arc<dyn RunJournal>>,
+    local_resident_bytes: Option<u64>,
+) -> Result<InferenceLane, String> {
     InferenceLane::try_open_with_journal(
         max_tokens,
         move || {
@@ -88,6 +134,7 @@ pub fn open_staged_library_lane_with_journal<B: eidetic::Store + Send + 'static>
                 capability,
                 identity,
                 device_label,
+                local_resident_bytes,
             }))
         },
         journal,
@@ -105,6 +152,7 @@ struct LibraryStages {
     capability: ModelCapability,
     identity: SessionIdentity,
     device_label: String,
+    local_resident_bytes: Option<u64>,
 }
 
 #[derive(Debug)]
@@ -152,8 +200,49 @@ impl InferenceProvider for LibraryStages {
             None => None,
         };
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            if self.local_resident_bytes.is_some_and(|budget| {
+                budget > 0
+                    && self
+                        .resolved
+                        .resident_payload_bytes()
+                        .is_ok_and(|bytes| bytes <= budget)
+            }) {
+                let provider = self.resolved.load_resident_with_layer_source(
+                    &self.device,
+                    self.loader,
+                    self.max_tokens,
+                    borrow_layer_source(&self.source).ok_or_else(|| {
+                        InferError::Backend("resident layers lack a library source".into())
+                    })?,
+                )?;
+                let placement = esp::infer::provider::ExecutionPlacement {
+                    at_token: resume.map_or(0, |cp| cp.token_ids.len()),
+                    device: self.device_label.clone(),
+                    reason: "whole model resident within owner payload budget".into(),
+                };
+                let stamp = |cp: &mut GenerationCheckpoint| {
+                    if !cp.placements.contains(&placement) {
+                        cp.placements.push(placement.clone());
+                    }
+                };
+                let mut result = provider.generate_checkpointed(
+                    request,
+                    resume,
+                    &mut |cp| {
+                        let mut cp = cp.clone();
+                        stamp(&mut cp);
+                        commit(&cp)
+                    },
+                    stop,
+                )?;
+                stamp(&mut result);
+                return Ok(result);
+            }
             let chain = match (self.stages)(&self.resolved).and_then(|chain| {
-                chain.wait_ready()?;
+                if let Err(error) = chain.wait_ready() {
+                    chain.finish();
+                    return Err(error);
+                }
                 Ok(chain)
             }) {
                 Ok(chain) => chain,
@@ -194,6 +283,7 @@ impl InferenceProvider for LibraryStages {
                 reason: chain.placement_description(),
             };
             let _finish = FinishStages(chain.clone());
+            let retired = chain.clone();
             let staged = self.resolved.load_with_stages(
                 &self.device,
                 self.loader,
@@ -208,6 +298,7 @@ impl InferenceProvider for LibraryStages {
             let fallback = StageFallbackProvider::new(
                 Box::new(staged),
                 Arc::new(move || {
+                    retired.finish();
                     Ok(Box::new(resolved.load_with_layer_source(
                         &device,
                         loader,
