@@ -1142,3 +1142,22 @@ Stop and record the reason if any of these happen:
   of its consumer update. Earlier inference receipts retain their exact
   original suppliers; this merge does not requalify those gates or mark the
   candidate as Mere main.
+
+
+- **2026-10-16, Turnstone canonical-tag scene correction.** The receiving
+  consumer's public `Canvas::tag_node` fixture exposed a Sets adapter read
+  through legacy Surface tags, while the admitted write stores canonical
+  Resource tag assertions. `scene_axes::tag_sets` now reads the kernel's
+  `node_content_tags` contract, retaining its kernel-owned legacy fallback.
+  A regression inserts tags through `GraphDelta::InsertNodeTag`, verifies
+  that raw Surface tags remain empty, and checks the canonical membership
+  axis. The bounded-scene fixture likewise uses the public tag mutation
+  rather than filling the legacy Surface column. Provenance source writes
+  and axes are unchanged: its receiving assertion needed to consume the
+  buffered placement through a normal Canvas frame before reading positions.
+  Three `scene_axes` unit tests pass under the candidate workspace lock,
+  followed by all five bounded-scene tests in the same compiled test binary.
+  The focused build uses an existing dependency cache with explicit source
+  paths; it does not borrow an unbuilt consumer result. This remains the
+  isolated supplier candidate; Turnstone's exact-source receiving tests and
+  headed acceptance own its publication gate.

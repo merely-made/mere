@@ -29,11 +29,15 @@ fn scene_graph() -> (Graph, Vec<NodeKey>) {
         (keys[0], ["song", "practice"]),
         (keys[2], ["song", "publishing"]),
     ] {
-        graph
-            .get_node_mut(key)
-            .unwrap()
-            .tags
-            .extend(tags.map(String::from));
+        for tag in tags {
+            kernel::graph::apply::apply_graph_delta(
+                &mut graph,
+                kernel::graph::apply::GraphDelta::InsertNodeTag {
+                    key,
+                    tag: tag.into(),
+                },
+            );
+        }
     }
     graph.assert_relation(
         keys[0],
