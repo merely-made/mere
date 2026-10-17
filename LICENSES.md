@@ -90,7 +90,12 @@ Mark's own.
 
 Ruled 2026-08-27, on the brief's substantial-derivative precedent: tucket keeps
 MeshCore's MIT notice, and cambium and meristem go MPL-2.0 with the Apache
-notice retained. Both MIT and Apache-2.0 permit relicensing a derivative so
+notice retained. The Apache-2.0 sources are Linebender's `xilem_core` (all of
+meristem) and `xilem_web` (six cambium files: `splice.rs`, `optional_action.rs`,
+`text.rs`, `pod.rs`, `element.rs`, `event.rs`), each keeping `Copyright <year>
+the Xilem Authors`; the
+[Xilem ledger](design_docs/cambium_docs/technical_architecture/upstream-xilem.md)
+lists the files and the audit base. Both MIT and Apache-2.0 permit relicensing a derivative so
 long as the notice travels with it. luggage is published (0.1.0, MIT OR
 Apache-2.0); that version keeps its grant permanently and MPL-2.0 ships at its
 next functional bump, per the sweep plan's invariant 8.

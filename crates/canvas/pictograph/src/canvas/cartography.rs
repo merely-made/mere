@@ -62,6 +62,8 @@ impl Canvas {
         .with_seed(self.saved_seed())
         .with_regions(self.saved_regions())
         .with_mosaic(self.saved_mosaic())
+        // Derived members (suggested links) are session-only.
+        .retaining_members(|member| !self.is_derived_member(*member))
     }
 
     /// One node's current world position (the live seiche position), so the host can

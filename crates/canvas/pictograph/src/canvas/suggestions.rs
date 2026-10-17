@@ -23,7 +23,7 @@ impl Canvas {
     /// Replace the host's suggestion settings and re-admit the last offer.
     pub fn set_suggestion_settings(&mut self, settings: SuggestionSettings) {
         self.grammar.suggestions = settings;
-        self.admit_suggestions();
+        self.refresh_link_suggestions();
     }
 
     /// Offer `candidates` (member, source) in the scene's order, replacing
@@ -55,18 +55,20 @@ impl Canvas {
         (faces / viewport).clamp(0.0, 1.0)
     }
 
-    fn admit_suggestions(&mut self) {
-        let offered: Vec<NodeKey> = self.grammar.offered.iter().map(|(key, _)| *key).collect();
+    pub(crate) fn admit_suggestions(&mut self) {
+        let mut candidates = self.grammar.offered.clone();
+        candidates.extend(self.link_suggestion_members());
+        let offered: Vec<NodeKey> = candidates.iter().map(|(key, _)| *key).collect();
         // What the person keeps: everything held that is not on offer.
         let kept = self
             .graph
             .nodes()
-            .filter(|(key, _)| !offered.contains(key))
+            .filter(|(key, node)| !offered.contains(key) && !self.is_derived_member(node.id))
             .count();
-        let admitted =
-            self.grammar
-                .suggestions
-                .admit(self.grammar.offered.clone(), kept, self.plate_fill());
+        let admitted = self
+            .grammar
+            .suggestions
+            .admit(candidates, kept, self.plate_fill());
         self.grammar.attention_book_mut().set_suggested(admitted);
     }
 }

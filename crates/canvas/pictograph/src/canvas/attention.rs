@@ -36,6 +36,8 @@ pub(crate) struct GrammarState {
     pub(crate) suggestions: scenograph::suggestion::SuggestionSettings,
     /// The last offer, kept so a settings change re-admits from it.
     pub(crate) offered: Vec<(NodeKey, String)>,
+    /// Unvisited links offered by the pages they appear on (`link_suggestions.rs`).
+    pub(crate) links: super::link_suggestions::LinkSuggestions,
 }
 
 impl GrammarState {
