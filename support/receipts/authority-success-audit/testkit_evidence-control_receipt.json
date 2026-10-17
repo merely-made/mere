@@ -1,0 +1,104 @@
+{
+  "schema": "mere.djinn.receipt/v1",
+  "plan": "evidence-control",
+  "test": "evidence-control",
+  "run": "20261016T211432Z-f3e98302",
+  "commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "dirty": true,
+  "binary": {
+    "path": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-probe.exe",
+    "sha256": "4ba8d14b9f1753e8322d0de19935ad479aec4dbae045ec1dfce116b1e7f348a1"
+  },
+  "machine": {
+    "name": "O-PC",
+    "os": "windows",
+    "arch": "x86_64"
+  },
+  "host": {
+    "kind": "local",
+    "remote": null
+  },
+  "quiet": {
+    "requested": false,
+    "waited_ms": 0,
+    "achieved": null
+  },
+  "lock_wait_ms": 0,
+  "load": {
+    "before": {
+      "at_ms": 1792185272197,
+      "rustc": 1,
+      "cargo": 2,
+      "cpu_queue": 0.0,
+      "cpu_busy": 0.26171875
+    },
+    "after": {
+      "at_ms": 1792185273112,
+      "rustc": 1,
+      "cargo": 2,
+      "cpu_queue": 0.0,
+      "cpu_busy": 0.34980988593155893
+    }
+  },
+  "walls": {
+    "before": {
+      "installed_candidates": [],
+      "installed": [],
+      "standard_endpoints": {},
+      "canaries": [],
+      "session_bus": null
+    },
+    "after": {
+      "installed_candidates": [],
+      "installed": [],
+      "standard_endpoints": {},
+      "canaries": [],
+      "session_bus": null
+    },
+    "differences": []
+  },
+  "started_ms": 1792185272904,
+  "finished_ms": 1792185273422,
+  "steps": [
+    {
+      "t_ms": 153,
+      "at_ms": 1792185273057,
+      "label": "run begun",
+      "detail": {
+        "dir": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-fixtures\\receipts\\evidence-control\\20261016T211432Z-f3e98302",
+        "lock_wait_ms": 0
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "t_ms": 153,
+      "name": "every spawned process has exited",
+      "bound": "state",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "t_ms": 155,
+      "name": "no endpoint of this run remains",
+      "bound": "state",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    }
+  ],
+  "controls": [],
+  "attended": [],
+  "evidence": [
+    {
+      "path": "required.txt",
+      "sha256": "e7064feaf63bbf2d435379bd455b16b730359b11d7e54ca649a59f12f3bcb932",
+      "bytes": 16
+    }
+  ],
+  "outcome": {
+    "passed": true,
+    "failures": []
+  }
+}

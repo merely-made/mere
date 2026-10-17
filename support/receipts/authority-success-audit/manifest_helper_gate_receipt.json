@@ -1,0 +1,54 @@
+{
+  "export_tests": {
+    "command": [
+      "C:\\Users\\mark_\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_export_grouped_cargo.py",
+      "-v"
+    ],
+    "exit": 0,
+    "passed": 4,
+    "log_sha256": "db17ea666e190e0ddd36f066331747d3b55d2e4ba0019e20f7e0d5e9d07959ef"
+  },
+  "source_sha256": {
+    "Cargo.toml": "cdf20fbcb5136af9a7bced5bed2e065841cde697d247dd64aa849907b4257eda",
+    ".cargo/config.toml": "520d074f2ae865a3a2146e4f31cb1229f97c58b4e2a2e17a0e2eea5c634ec3f3",
+    ".cargo/config.toml.example": "faed0eb1628503fc617f2138ddacb68d2c8bac5685a4c2dc7c41d226ccac28a6",
+    "scripts/cargo_mode.py": "66110e97d7cd83b517caeb12dac4796dcf4613e0faa14ceac6e724134a34138e",
+    "scripts/test_cargo_mode.py": "a0e05c0be47d0a9a4f2da57232d113675b52fec55c382c421ed828f4f2121910",
+    "scripts/export_grouped_cargo.py": "35c98be9f551eda0411a3a6141f6264e228ea40192359144b59cb8b0d4c5745d",
+    "scripts/test_export_grouped_cargo.py": "eec506da1fa432c1660e641a47ef4a6f2e9d35018e3b68b26ce6732cd01e2a29",
+    ".github/workflows/portable.yml": "623756670167baa47701fdfca8a5d3b4c34327007edb1d4ddc0bae795901bfe7",
+    ".github/workflows/rust-policy.yml": "31c45e92e17cf973f5008036d7c70bcf7018420b35a78a6c4299a4cb1b70c2ea",
+    "rust-toolchain.toml": "b52889c61c1a7358f967f6e6865b32aace84e51c7a589c8c8b74a089f8620408",
+    "rustfmt.toml": "948ddbb2504264fd8339ce7ce06152cb516a76b6ab8b9fa079cc7b5266c2754c",
+    "deny.toml": "0885c813364242890229e3adcb94584acbc32b3b0270d1ece4b42caf2fa56e1e",
+    "Cargo.lock": "6872db7d031f5d6ff5e19b52caa95b3fe04b900e8902b9b01c1649b993904155",
+    "crates/canvas/pictograph/Cargo.toml": "7220ac66aa3982df23c8afa3ff8872c19589fb36c4d2c0681dee8865a0ceaf57"
+  },
+  "stale_alias": {
+    "scope": "example only; not active root config",
+    "alias": [
+      "test",
+      "--config",
+      "profile.dev.package.mere-canvas.incremental=false",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web"
+    ],
+    "missing_package": "mere-canvas",
+    "current_package": "pictograph",
+    "missing_from_lock": true,
+    "alias_executed": false
+  },
+  "cargo_mode_tests": "read only; tests create temporary repositories, Cargo homes and targets outside approved workspace locations",
+  "scope": "Root declarations/config and pure exporter test gate. Not resolved feature closure, full portability gate, MSRV build or CI execution."
+}

@@ -1,0 +1,10 @@
+   Compiling slotmap v1.1.1
+   Compiling syn v2.0.119
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling uxtree v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\forme\uxtree)
+   Compiling platen v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\platen\platen)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 17.52s

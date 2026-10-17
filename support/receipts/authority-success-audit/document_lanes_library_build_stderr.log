@@ -1,0 +1,93 @@
+   Compiling indexmap v2.14.2
+   Compiling tokio v1.53.2
+   Compiling ring v0.17.14
+   Compiling tracing v0.1.44
+   Compiling icu_properties v2.3.0
+   Compiling naga-types v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling naga v30.0.1
+   Compiling gpu-allocator v0.28.0
+   Compiling windows-sys v0.59.0
+   Compiling web_atoms v0.2.6
+   Compiling portable-atomic v1.15.0
+   Compiling petgraph v0.8.3
+   Compiling chacha20 v0.10.2
+   Compiling ppv-lite86 v0.2.21
+   Compiling rustls-webpki v0.103.15
+   Compiling bytecheck v0.8.3
+   Compiling webpki-roots v1.0.9
+   Compiling idna_adapter v1.2.2
+   Compiling rand v0.10.3
+   Compiling idna v1.1.0
+   Compiling rustls v0.23.45
+   Compiling url v2.5.8
+   Compiling markup5ever v0.39.0
+   Compiling rand_chacha v0.9.0
+   Compiling fastbloom v0.17.0
+   Compiling rand v0.9.5
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling rend v0.5.4
+   Compiling sha1 v0.10.7
+   Compiling futures-intrusive v0.5.0
+   Compiling av-scenechange v0.14.1
+   Compiling av1-grain v0.2.5
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling rcgen v0.13.2
+   Compiling webpki-roots v0.26.11
+   Compiling accesskit v0.24.1
+   Compiling xml5ever v0.39.0
+   Compiling tokio-util v0.7.19
+   Compiling h3 v0.0.8
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling quinn-udp v0.5.15
+   Compiling finger-protocol v0.1.1
+   Compiling guppy-protocol v0.1.1
+   Compiling rav1e v0.8.1
+   Compiling gopher-protocol v0.2.0
+   Compiling nex-protocol v0.1.1
+   Compiling spartan-protocol v0.1.1
+   Compiling h2 v0.4.19
+   Compiling html5ever v0.39.0
+   Compiling tokio-rustls v0.26.6
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling tungstenite v0.29.0
+   Compiling parley_data v0.10.0
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling quinn-proto v0.11.18
+   Compiling gemini-protocol v0.1.7
+   Compiling misfin v0.0.4
+   Compiling tokio-tungstenite v0.29.0
+   Compiling scroll-protocol v0.1.0
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling rkyv v0.8.18
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling async-compression v0.4.48
+   Compiling tabard v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling tempfile v3.27.0
+   Compiling nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+   Compiling quinn v0.11.12
+   Compiling hyper v1.11.1
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling h3-quinn v0.0.10
+   Compiling ravif v0.13.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling hyper-util v0.1.20
+   Compiling wgpu-hal v30.0.1
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling hyper-rustls v0.27.9
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling image v0.25.10
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+   Compiling wgpu v30.0.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling mere-document-lanes v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\document-lanes)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 12s

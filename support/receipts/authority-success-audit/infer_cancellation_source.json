@@ -1,0 +1,7 @@
+{
+  "source_sha256": {
+    "crates/intel/esp/src/infer/provider.rs": "7ea288277fd0c08e82fbcf2b7c5053675c94c654f2a8ce2f1a8fc9d1d6b7ff5b",
+    "crates/intel/esp/src/infer/stub.rs": "ba11a0fffdb88bd501a6064f0623e6828666dcb73daac97f1a605f83ec32845c"
+  },
+  "qualification": "Two unchanged complete current portable inference provider and stub modules. Public generate_streaming_controlled API only. No actor, session wrapper, model, decoder or GPU execution."
+}

@@ -1,0 +1,42 @@
+{
+  "date_utc": "2026-10-17T05:52:11.599Z",
+  "source": "ports/distillery/probe/web/probe.js",
+  "source_sha256": "23ad36e18a0e4411122b9a76b4fab6175eeba2f9a4a4a50eb2ebe7a14e5f0be8",
+  "probe_sha256": "aefb69a714b67020e7b7e30da6d6e1ed99d124c6c70dbd1a98d8d634635d3474",
+  "runtime": "v24.11.0",
+  "checks": 6,
+  "exit": 0,
+  "rows": [
+    {
+      "name": "manual_termination_leaves_ui_run_unsettled",
+      "observation": "terminateActive returned true and terminated the fake worker; UI submission remains pending and run controls remain disabled after the observation window",
+      "window_ms": 30
+    },
+    {
+      "name": "worker_error_settles_and_reenables_control",
+      "control": true
+    },
+    {
+      "name": "embedding_row_passes_reported_repeatability_failures",
+      "row_passed": true,
+      "cold_repeats": false,
+      "warm_repeats": false,
+      "output_repeated_across_workers": false
+    },
+    {
+      "name": "integrity_failure_refuses_row",
+      "control": true
+    },
+    {
+      "name": "matrix_reports_expected_weight_size_despite_observed_mismatch",
+      "observed_weights_bytes": 1,
+      "claimed_largest_successful_weight_bytes": 90000000,
+      "all_configured_rows_passed": true
+    },
+    {
+      "name": "ordinary_consistent_row_passes",
+      "control": true
+    }
+  ],
+  "scope": "Complete actual production page JavaScript evaluated in native Node VM. Controlled DOM, fetch and Worker messages isolate orchestration and receipt predicates. No browser, real worker, WebGPU, model execution, network request or user storage. The manual-cancel observation is bounded to30ms plus source proof that no resolver/timeout is called. Wrong-size and unstable outputs are synthetic worker-contract messages, not claims of an actual GPU model failure. Synthetic workers are terminated by the evaluated page; the unresolved Promise owns no real worker or timer."
+}

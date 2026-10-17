@@ -1,0 +1,30 @@
+
+running 25 tests
+test voxel_integration::accepted_chunk_patch_updates_the_voxel_collider ... ok
+test world_contacts::a_point_beyond_the_prediction_is_dropped ... ok
+test world_contacts::contacts_filter_and_refuse_like_overlaps ... ok
+test world_contacts::queries_see_only_what_refresh_published ... ok
+test world_contacts::records_do_not_depend_on_how_the_grid_was_built ... ok
+test world_contacts::records_follow_a_moved_and_turned_collider ... ok
+test world_contacts::the_prediction_means_what_it_says_for_every_pair ... ok
+test world_contacts::the_probe_case_reports_one_point_on_the_voxel_top ... ok
+test world_reads::a_point_inside_a_voxel_follows_a_carve ... ok
+test world_reads::a_point_query_names_the_containing_colliders ... ok
+test world_reads::a_point_query_refuses_like_raycast ... ok
+test world_reads::an_empty_grid_iterates_nothing ... ok
+test world_reads::boxed_iteration_reads_only_the_box ... ok
+test world_reads::canonical_order_holds_for_uneven_cell_sizes ... ok
+test world_reads::reversed_and_edit_built_grids_iterate_identically ... ok
+test world_reads::the_probe_cross_check_runs_through_conatus ... ok
+test world_reads::voxel_cells_iterate_in_canonical_order ... ok
+test world_reads::voxel_filled_reads_the_collider_grid ... ok
+test world_reads::voxel_reads_refuse_like_edit_voxels ... ok
+test world_refresh::a_body_refreshed_straight_after_insert_still_simulates ... ok
+test world_refresh::a_despawned_body_needs_no_refresh ... ok
+test world_refresh::a_teleport_is_visible_after_refresh ... ok
+test world_refresh::a_teleported_dynamic_body_simulates_as_its_control ... ok
+test world_refresh::a_voxel_added_outside_the_grid_bounds_is_visible_after_refresh ... ok
+test world_refresh::refresh_neither_ticks_nor_emits_events ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+

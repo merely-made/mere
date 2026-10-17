@@ -1,0 +1,98 @@
+{
+  "schema": "mere.djinn.receipt/v1",
+  "plan": "missing-evidence",
+  "test": "missing-evidence",
+  "run": "20261016T211433Z-3e9fcb55",
+  "commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "dirty": true,
+  "binary": {
+    "path": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-probe.exe",
+    "sha256": "4ba8d14b9f1753e8322d0de19935ad479aec4dbae045ec1dfce116b1e7f348a1"
+  },
+  "machine": {
+    "name": "O-PC",
+    "os": "windows",
+    "arch": "x86_64"
+  },
+  "host": {
+    "kind": "local",
+    "remote": null
+  },
+  "quiet": {
+    "requested": false,
+    "waited_ms": 0,
+    "achieved": null
+  },
+  "lock_wait_ms": 0,
+  "load": {
+    "before": {
+      "at_ms": 1792185273511,
+      "rustc": 1,
+      "cargo": 2,
+      "cpu_queue": 0.0,
+      "cpu_busy": 0.30078125
+    },
+    "after": {
+      "at_ms": 1792185274012,
+      "rustc": 1,
+      "cargo": 2,
+      "cpu_queue": 0.0,
+      "cpu_busy": 0.26819923371647514
+    }
+  },
+  "walls": {
+    "before": {
+      "installed_candidates": [],
+      "installed": [],
+      "standard_endpoints": {},
+      "canaries": [],
+      "session_bus": null
+    },
+    "after": {
+      "installed_candidates": [],
+      "installed": [],
+      "standard_endpoints": {},
+      "canaries": [],
+      "session_bus": null
+    },
+    "differences": []
+  },
+  "started_ms": 1792185273807,
+  "finished_ms": 1792185274321,
+  "steps": [
+    {
+      "t_ms": 148,
+      "at_ms": 1792185273956,
+      "label": "run begun",
+      "detail": {
+        "dir": "C:\\t\\cargo-targets\\mere\\authority-success-testkit-fixtures\\receipts\\missing-evidence\\20261016T211433Z-3e9fcb55",
+        "lock_wait_ms": 0
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "t_ms": 148,
+      "name": "every spawned process has exited",
+      "bound": "state",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    },
+    {
+      "t_ms": 150,
+      "name": "no endpoint of this run remains",
+      "bound": "state",
+      "expected": [],
+      "observed": [],
+      "passed": true
+    }
+  ],
+  "controls": [],
+  "attended": [],
+  "evidence": [],
+  "outcome": {
+    "passed": true,
+    "failures": []
+  }
+}

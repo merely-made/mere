@@ -1,0 +1,17 @@
+warning: calls to `std::mem::drop` with a value that implements `Copy` does nothing
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\pelt_receipt_recovery_probe.rs:188:1
+    |
+188 | drop(swap);
+    | ^^^^^----^
+    |      |
+    |      argument has type `()`
+    |
+    = note: `#[warn(dropping_copy_types)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+188 - drop(swap);
+188 + let _ = swap;
+    |
+
+warning: 1 warning emitted
+

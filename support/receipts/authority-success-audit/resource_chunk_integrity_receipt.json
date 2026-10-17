@@ -1,0 +1,27 @@
+{
+  "date_utc": "2026-10-17T06:32:04.274Z",
+  "node": "v24.11.0",
+  "exit": 0,
+  "checks": 4,
+  "results": [
+    {
+      "frame": "valid",
+      "accepted": true,
+      "result_utf8": "original"
+    },
+    {
+      "frame": "bad_chunk",
+      "accepted": true,
+      "result_utf8": "altered!"
+    },
+    {
+      "frame": "bad_resource",
+      "accepted": true,
+      "result_utf8": "altered!"
+    }
+  ],
+  "source": "ports/graphshell/web/extension/resource-chunk.js",
+  "source_sha256": "77d8d5f1096751a78253c8568f0c9d8a23cd9901279c2c1a616f2b7121c69d23",
+  "fixture_sha256": "9921ec55b9fbd429337d306e1c532d04d715f45f78a96f58cccc6e4b1fb3fe94",
+  "scope": "Complete actual JavaScript ResourceAssembly executed in native Node VM with exact synthetic BLAKE3 fixture frames. A chunk with changed bytes and unchanged chunk address is accepted; a validly chunk-addressed changed payload under the wrong whole-resource address is also accepted. Valid frame and wrong-session rejection controls. No real native host, browser, remote peer, user resource, renderer or network was exercised. Shared Rust assembler is qualified separately."
+}

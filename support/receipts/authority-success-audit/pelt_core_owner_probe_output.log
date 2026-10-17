@@ -1,0 +1,257 @@
+
+running 4 tests
+test surface_policy::tests::cadence_and_per_frame_cap_are_independent ... ok
+test surface_policy::tests::cadence_does_not_advance_rotation_on_skipped_frames ... ok
+test surface_policy::tests::rotating_window_eventually_visits_three_surfaces_with_cap_one ... ok
+test surface_policy::tests::zero_cadence_is_safe_and_does_not_disable_refresh ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+test review_capture_geometry_failed_offset_final_up_cancels_original_receiver ... ok
+test review_capture_geometry_failed_offset_visibility_cancels_original_receiver ... ok
+test review_capture_geometry_failed_partial_up_preserves_foreign_appearance ... ok
+test review_capture_geometry_failed_resize_final_up_cancels_original_receiver ... ok
+test review_capture_geometry_failed_resize_visibility_cancels_original_receiver ... ok
+test review_capture_geometry_successful_prepare_keeps_remaining_chord ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test review_capture_terminal_document_failed_down_and_hover_never_admit ... ok
+test review_capture_terminal_document_global_cancel_clears_nonzero_receivers ... ok
+test review_capture_terminal_document_pointer_cancel_keeps_other_id_retirement ... ok
+test review_capture_terminal_surface_failed_cancel_not_repeated_on_replace ... ok
+test review_capture_terminal_surface_failed_down_and_hover_never_admit ... ok
+test review_capture_terminal_surface_failed_final_up_not_cancelled_on_replace ... ok
+test review_capture_terminal_surface_failed_partial_up_keeps_remaining_admitted_mask ... ok
+test review_capture_terminal_surface_failed_secondary_down_never_extends_admission ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test a_failed_lane_swap_keeps_the_document ... ok
+test a_load_that_routes_to_a_surface_swaps_lanes_and_a_document_address_swaps_back ... ok
+test adopting_an_owned_appearance_does_not_respawn_or_fetch ... ok
+test an_engine_pin_holds_across_navigations ... ok
+test each_navigation_routes_its_engine_and_history_reopens_the_recorded_one ... ok
+test host_history_content_hands_links_up_and_opens_entries_in_either_lane ... ok
+test host_loading_routes_a_held_body_by_its_media_type ... ok
+test keyboard_envelope_completes_the_same_surface_link_route_as_session_enter ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test caller_owned_target_drives_the_same_retained_controller_as_desktop ... ok
+test the_session_seam_reaches_the_live_session_and_follows_replacement ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+test a_linear_controller_still_refuses_a_post ... ok
+test a_post_submission_is_handed_to_the_host ... ok
+test back_and_forward_belong_to_the_host_and_open_replaces_in_place ... ok
+test linear_history_is_unchanged ... ok
+test links_and_forms_become_requests_for_the_host ... ok
+test open_with_a_held_body_skips_the_transport_and_supersedes_a_fetch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 9 tests
+test a_streamed_prefix_opens_and_later_fragments_replace_in_place ... ok
+test a_superseded_load_cannot_surface ... ok
+test back_refetches_the_entry_and_commits_on_its_answer ... ok
+test conversations_downloads_and_failures_leave_the_page_intact ... ok
+test reload_is_a_new_request_for_the_same_entry ... ok
+test stop_cancels_the_exact_request_and_keeps_the_current_page ... ok
+test stopping_a_presented_prefix_keeps_it_ready_and_shown ... ok
+test the_engine_only_ever_receives_held_bodies ... ok
+test without_a_replacer_the_settled_body_reopens_once ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 14 tests
+test a_host_spawned_surface_takes_every_navigation_command_on_its_web_plane ... ok
+test a_spawned_extent_is_kept_until_the_host_lays_the_surface_out_anew ... ok
+test failed_other_placement_frame_cannot_leave_old_input_geometry_admitted ... ok
+test full_keyboard_payload_reaches_the_focused_surface_through_the_pool ... ok
+test mailbox_polling_follows_admitted_native_window_custody ... ok
+test neutral_drag_and_modified_wheel_preserve_payload_and_scale_once ... ok
+test neutral_surface_press_preserves_button_and_modifiers_in_pointer_contract ... ok
+test placement_removal_cancels_the_original_pen_pointer_without_losing_sensors ... ok
+test pool_pointer_capture_qualifies_identity_button_and_focus_loss ... ok
+test positive_subunit_scale_uses_the_same_geometry_for_layout_and_pointer ... ok
+test preparing_surface_input_resizes_only_the_target_without_resource_polling ... ok
+test surface_ime_commit_is_delivered_and_unsupported_preedit_is_explicit ... ok
+test the_host_keeps_the_producer_and_its_event_plane ... ok
+test window_focus_loss_cancels_each_pointer_capture_in_that_window ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test adopted_session_frames_but_capability_inspection_panics_without_factory ... AUDIT adopted no-factory session frames normally, then capability inspection panics; registered control returns Partial
+ok
+test back_restores_engine_but_retains_later_route_metadata ... AUDIT Back and Reload present first engine while selected/active route reports second; Forward agrees again
+ok
+test pool_drops_session_cancel_for_nonzero_pointer_captures ... AUDIT placement Session Cancel discarded without pointer0 admission; nonzero captures survive. Window focus-loss helper and direct controller Cancel deliver
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 25 tests
+test async_pump_invalidates_same_size_input_layout_without_hidden_paint ... ok
+test final_placement_close_retains_content_until_explicit_removal ... ok
+test handled_accessibility_action_invalidates_input_layout ... ok
+test hidden_and_invalid_placements_never_frame ... ok
+test hidden_pending_work_advances_without_requesting_a_visible_frame ... ok
+test invalid_geometry_is_hidden_and_mutable_iteration_admits_new_same_epoch_work ... ok
+test keyboard_scroll_prepares_its_addressed_appearance_and_retires_old_hit_layout ... ok
+test moving_focus_between_appearances_prepares_each_addressed_viewport ... ok
+test mutable_iteration_invalidates_same_epoch_completion_observation ... ok
+test mutable_session_access_invalidates_same_size_input_layout ... ok
+test neutral_keyboard_lowers_document_keys_and_composed_text_explicitly ... ok
+test pending_observation_is_read_only_and_redraw_is_scoped_to_visible_windows ... ok
+test placement_focus_is_independent_of_visibility_and_replacement_keeps_arrangement ... ok
+test placement_generation_invalidates_resized_and_reused_action_geometry ... ok
+test raw_session_mutation_invalidates_input_layout ... ok
+test repeated_content_placements_keep_their_own_geometry ... ok
+test repeated_placement_input_prepares_the_addressed_layout ... ok
+test replacing_content_preserves_current_placements_with_new_admission ... ok
+test review_overlap_pool_capture_outside_and_unrelated_release ... ok
+test review_overlap_pool_last_placement_receives_pointer_and_navigation ... ok
+test review_overlap_pool_wheel_follows_current_stacking_and_skips_hidden_top ... ok
+test routed_scroll_invalidates_same_size_input_layout ... ok
+test same_epoch_deduplicates_unchanged_windows_but_not_changed_placements ... ok
+test scheduled_document_work_preserves_prepared_routes_and_current_receiver_custody ... ok
+test workspace_reopens_closed_content_with_scroll_history_and_identity ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 6 tests
+test addressed_restore_keeps_both_viewports_actionable_without_relaxing_captured_revision ... ok
+test full_snapshot_equality_refuses_frame_side_effects ... ok
+test neutral_click_restores_target_geometry_and_emits_one_host_navigation ... ok
+test old_request_revision_hidden_moved_replaced_and_reopened_placements_refuse_delivery ... ok
+test unexpected_focus_and_field_value_changes_are_not_layout_restoration ... ok
+test unexpected_source_revision_even_with_restored_value_retires_every_snapshot ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 4 tests
+test failed_document_navigation_keeps_the_prior_session_and_records_a_recoverable_error ... ok
+test shared_registries_route_documents_surfaces_overrides_and_visible_fallbacks ... ok
+test source_artifact_is_held_across_a_live_route_switch ... ok
+test surface_budget_rotates_live_producers_without_cached_frames_advancing_schedule ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 12 tests
+test hidden_sessions_are_pumped_to_complete_async_work ... ok
+test outside_tearout_waits_for_host_acceptance_and_retains_pelt_custody ... ok
+test recursive_workspace_retains_each_tile_across_activation_drag_and_resize ... ok
+test review_workspace_capture_address_cancels_old_generation ... ok
+test review_workspace_capture_failed_provider_preserves_receiver ... ok
+test review_workspace_capture_failed_reload_preserves_receiver ... ok
+test review_workspace_capture_history_cancels_old_generation ... ok
+test review_workspace_capture_nonzero_pointer_chord_keeps_focus_receiver_and_masks ... ok
+test review_workspace_capture_noop_provider_preserves_receiver ... ok
+test review_workspace_capture_overlap_focus_matches_topmost_receiver ... ok
+test review_workspace_capture_provider_replacement_cancels_before_drop ... ok
+test review_workspace_capture_reload_cancels_old_generation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 7 tests
+test review_workspace_retirement_failed_host_install_preserves_capture ... ok
+test review_workspace_retirement_failed_input_navigation_preserves_capture ... ok
+test review_workspace_retirement_host_history_request_preserves_capture ... ok
+test review_workspace_retirement_pending_then_accepted_outcome ... ok
+test review_workspace_retirement_pending_then_first_prefix_only ... ok
+test review_workspace_retirement_same_down_form_get_cancels_before_drop ... ok
+test review_workspace_retirement_same_down_navigate_cancels_before_drop ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling smallvec v1.16.1
+   Compiling icu_normalizer v2.3.0
+   Compiling syn v2.0.119
+   Compiling foldhash v0.1.5
+   Compiling equivalent v1.0.2
+   Compiling indexmap v2.14.2
+   Compiling hashbrown v0.15.5
+   Compiling idna_adapter v1.2.2
+   Compiling uuid v1.27.0
+   Compiling fixedbitset v0.5.7
+   Compiling petgraph v0.8.3
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling accesskit v0.24.1
+   Compiling idna v1.1.0
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#7f13b85f)
+   Compiling url v2.5.8
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling mere-page-load v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\page-load)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7f13b85f)
+   Compiling workbench v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\workbench)
+   Compiling authority-success-pelt-core v0.0.0 (C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\cpu-pelt-core-runtime)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ..\..\..\..\ports\pelt\core\src\pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ..\..\..\..\ports\pelt\core\src\lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: `authority-success-pelt-core` (lib) generated 2 warnings (run `cargo fix --lib -p authority-success-pelt-core` to apply 2 suggestions)
+warning: `authority-success-pelt-core` (lib test) generated 2 warnings (2 duplicates)
+    Finished `test` profile [unoptimized] target(s) in 24.52s
+     Running unittests ..\..\..\..\ports\pelt\core\src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\pelt_core-59f37ace0c3f586c.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\capture_geometry.rs (C:/t/cargo-targets/mere/build\debug\deps\capture_geometry-db52e9af68de6dcc.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\capture_terminals.rs (C:/t/cargo-targets/mere/build\debug\deps\capture_terminals-7571f8d8f308379e.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\content.rs (C:/t/cargo-targets/mere/build\debug\deps\content-999f2ae6a3f966a2.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\embedder.rs (C:/t/cargo-targets/mere/build\debug\deps\embedder-a56a6f19aa720dc6.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\host_history.rs (C:/t/cargo-targets/mere/build\debug\deps\host_history-663d87154b517737.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\host_loading.rs (C:/t/cargo-targets/mere/build\debug\deps\host_loading-c001a6b31870bce4.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\host_surface.rs (C:/t/cargo-targets/mere/build\debug\deps\host_surface-a5b379aac65911e8.exe)
+     Running ..\pelt_core_owner_probe.rs (C:/t/cargo-targets/mere/build\debug\deps\pelt_core_audit_contracts-6eef034d1f6ebfd7.exe)
+
+thread 'adopted_session_frames_but_capability_inspection_panics_without_factory' (34528) panicked at ..\..\..\..\ports\pelt\core\src\lib.rs:613:14:
+a live Pelt controller keeps its registered session engine
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+     Running ..\..\..\..\ports\pelt\core\tests\pool.rs (C:/t/cargo-targets/mere/build\debug\deps\pool-5ad3eb70ada93f15.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\pool_a11y.rs (C:/t/cargo-targets/mere/build\debug\deps\pool_a11y-75fc78e2a180be5d.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\routing.rs (C:/t/cargo-targets/mere/build\debug\deps\routing-2784141e304b06e2.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\workspace.rs (C:/t/cargo-targets/mere/build\debug\deps\workspace-c58e3117fe9ea5c7.exe)
+     Running ..\..\..\..\ports\pelt\core\tests\workspace_retirement.rs (C:/t/cargo-targets/mere/build\debug\deps\workspace_retirement-e50437bef5a4b0ef.exe)

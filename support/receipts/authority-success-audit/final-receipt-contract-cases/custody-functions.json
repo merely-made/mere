@@ -1,0 +1,14 @@
+[
+  {
+    "returned_result": "failed",
+    "child_exit": 0,
+    "returned_without_error": true,
+    "script": "run_sennet_custody.ps1"
+  },
+  {
+    "returned_result": "failed",
+    "child_exit": 0,
+    "returned_without_error": true,
+    "script": "run_tucket_custody.ps1"
+  }
+]

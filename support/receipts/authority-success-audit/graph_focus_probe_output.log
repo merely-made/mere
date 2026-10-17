@@ -1,0 +1,9 @@
+PASS callback initial logical node focus control
+PASS callback reorder keeps old DOM focus on node 2 while node 1 retains focused class; Enter activates 2
+PASS callback explicit focus repair control activates logical node 1
+PASS component initial logical node focus control
+PASS component reorder keeps old DOM focus on node 2 while node 1 retains focused class; Enter activates 2
+PASS component explicit focus repair control activates logical node 1
+PASS relation and Expand buttons are absent from Tab seats while node buttons cycle normally
+PASS relation pointer activation control invokes its callback
+PASS Expand pointer activation control invokes its callback

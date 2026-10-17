@@ -1,0 +1,17 @@
+{
+  "observed_utc": "2026-10-17T06:38:47.224431+00:00",
+  "session_id": 87735,
+  "processes": [
+    {
+      "ProcessId": 17732,
+      "ParentProcessId": 61276,
+      "CreationDate": "2026-10-17T02:25:10.320468-04:00"
+    },
+    {
+      "ProcessId": 44920,
+      "ParentProcessId": 17732,
+      "CreationDate": "2026-10-17T02:25:10.537074-04:00"
+    }
+  ],
+  "scope": "Specific current Graphshell library build, polled through its original live exec session; process command filter matches the exact authorized build. Not a terminal result."
+}

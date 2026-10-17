@@ -1,0 +1,9 @@
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling gemini-protocol v0.1.7
+   Compiling gopher-protocol v0.2.0
+   Compiling finger-protocol v0.1.1
+   Compiling misfin v0.0.4
+   Compiling scroll-protocol v0.1.0
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 34.75s

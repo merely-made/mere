@@ -1,0 +1,56 @@
+{
+  "date_utc": "2026-10-17T00:16:47.009571+00:00",
+  "tests": 9,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/inker/inker/Cargo.toml": "d3b9bb6f31aac336ed47d8b895a55273a8201b680d46ab82c6cd96d36c30e2f4",
+    "crates/inker/inker/src/document.rs": "4272e9ce9e904df785fdb2a71cd0b99ad484fc16e75f2e5d658d146abbad0d35",
+    "crates/inker/inker/src/document/block_provenance.rs": "1349911bc4e83cb72222014fa99fea0fbe5124a4603a259cfebac1af31c86f32",
+    "crates/inker/inker/src/document/evaluate.rs": "0adeda85f2a5d47b7613763cd482791f0b85dc557864f7ce25746e599efa56ab",
+    "crates/inker/inker/src/document/navigation.rs": "6ad8786c19ca01b530587e807df120bcfc079d8802495da71aa1b8e2a36c3441",
+    "crates/inker/inker/src/document/render.rs": "b6ca474ae2497367fe8849610e08f9ee2367775532b2b43d863674d7b9483ba6",
+    "crates/inker/inker/src/document/render/export.rs": "2f1bb141f77c41ddc71fab99bdc9e5af860bf6c1a832a3abb9194daf3c150850",
+    "crates/inker/inker/src/document/render/html.rs": "602fc3154d7165b25aabb1d1a145abddc527f58ac13c3ebabce962a4a576badd",
+    "crates/inker/inker/src/document/render/tests.rs": "23e2b998ec7f5512c6f1cf6c388c571abbed985bf51b9a6f6a04b7e0a15c68fc",
+    "crates/inker/inker/src/document/transclude.rs": "5f06dc0e391d3fe92334f6bd1d1424706fbb83c6b2807be9935b4845ec91dcdf",
+    "crates/inker/inker/src/engine.rs": "b68535e1fb331481d699c9812265660eea1d0758184ad3065fe58ac9cf8d90a5",
+    "crates/inker/inker/src/flip/api.rs": "f76e9e4bcc6ed1c74b6b374c3ae37f3f9fe3737f96ba11c89926f8184159d58f",
+    "crates/inker/inker/src/flip/genet.rs": "c2af7bc7cf51863dec75789542cfd066ee60b949e729f1d70ba9ac47cc574473",
+    "crates/inker/inker/src/flip/mod.rs": "5b58484d01f1a6c13a5b860a69deaf56de6361958b5d7a2173a04f57873f85ac",
+    "crates/inker/inker/src/flip/orchestrator.rs": "3fd52efdd3df1856fed95794a79f80dfeaf1bb37af429c9e5d4b57b35dfb25eb",
+    "crates/inker/inker/src/flip/scry.rs": "c85c5e17e169975f311c8cb843b889d2672838dd441c996aae6c82ab404d88c2",
+    "crates/inker/inker/src/lib.rs": "90aed413e21fd24e1912e43214db33542e54566c1560421849ae7b6e2bbfe6bb",
+    "crates/inker/inker/src/routing.rs": "2aa0edf897720f2378cfa851c54b660cb6fec7842e0a0576ecbdd79bff1d7d76",
+    "crates/inker/inker/src/routing/ids.rs": "7879ecfdca50c71591af84177ce25663c368542cdf864a36fc3eb6e08ac3bb2d",
+    "crates/inker/inker/src/routing/tests.rs": "7c9512670bff27ffaf68d818a0bd8c451674fd5087e603a2270463d0bf93adad",
+    "crates/inker/inker/src/sniff.rs": "71f66871cb0915fa5eb2d9ce9235cb06c4eea56006651d6384709237a0227a27",
+    "crates/inker/inker/src/statements.rs": "39d9cefab15e0e5ea665a7d9ca4174eeca794e33fee1939a44735cb9bbf98d44",
+    "crates/inker/inker/src/surface_engine.rs": "f70fd5eae7f4de601abb06fae6f0513415c99e4ecb537ae38fa3ed2aec5e8c8a"
+  },
+  "libraries": {
+    "inker": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libinker.rlib",
+      "sha256": "0cbdf194677ccab532a3ae6e59a128e61dae43b08450740a322d98449ff389cc",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/inker#0.1.1"
+    }
+  },
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\inker_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--extern",
+    "inker=C:\\t\\cargo-targets\\mere\\debug\\libinker.rlib",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-inker-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "ef9058b8f9ac190f1c02f2144366a3d9a8b82350c2463f78bd8048a6ba0c005a",
+  "generated_output_removed": true,
+  "scope": "Nine current default Cargo-built native library observations with controls. Serialization collisions demonstrate non-injectivity without a parser reparse. Mock flip and Scry surfaces only. No network, browser, host, GPU, OS accessibility or optional genet-donor execution; release warning suppression is source-qualified, not release-built."
+}

@@ -1,0 +1,16 @@
+
+running 5 tests
+test an_error_consumes_granted_clock_steps_that_never_reach_physics ... After injected after-physics error: clock3, actual tick1, retry at elapsed0 has no backlog. No-error control executes3.
+ok
+test an_error_discards_applied_command_results_changes_and_prior_removals ... Error path loses applied spawn result, changed body and preexisting despawn notification; subsequent successful zero-step frame publishes none. No-error control publishes all three.
+ok
+test extreme_finite_ray_direction_reports_clear_space_through_a_present_body ... Same finite ray direction: normal and10x hit at3 units, f32::MAX magnitude is accepted as Ok(None) after norm overflow.
+ok
+test extreme_finite_rotation_admission_observation ... Finite extreme quaternion accepted as[0.0, 0.0, 0.0, 0.0], norm squared0; moderate nonunit control normalizes to[1.0, 0.0, 0.0, 0.0].
+ok
+test impulse_changes_velocity_but_zero_step_publication_omits_it ... torque=false: impulse changes speed to0.47746482; changed[] remains empty until identical set_velocity marks it dirty.
+torque=true: impulse changes speed to1.193662; changed[] remains empty until identical set_velocity marks it dirty.
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

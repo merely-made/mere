@@ -1,0 +1,67 @@
+{
+  "test_exit": 0,
+  "tests": 3,
+  "harness_sha256": "bbb87987f08cf8832ec18240394ff1fac1dcc2ff8009d2d896003952a70f065c",
+  "source_sha256": {
+    "crates/canvas/pictograph/src/canvas/frame.rs": "3e495da0a03617f02f8ccb4429c68b5c5301c8d9f5cd4ab5103bd6baa9c5cf18",
+    "crates/canvas/pictograph/src/canvas/view.rs": "35e7a00168062dc030c2b9be83f461d420304eb67e4d0351024d4f00df503be0",
+    "crates/canvas/pictograph/src/canvas/input.rs": "41d6457b0e82e6381e82e6176383384340d1f7da6bb9d358ec06e379a0978a5f",
+    "crates/canvas/pictograph/src/canvas/cartography.rs": "902e0f3d00eb090827d09d0dc2377a38e6f5a42fe6a0964b156e7e614f5e362d",
+    "crates/canvas/pictograph/src/canvas/grammar_view.rs": "f8aacbb2ebe1287cda07a98d78fc09cd4aee6e20e593083eb902062a12939c66",
+    "crates/canvas/pictograph/src/canvas/tests/face_on_body.rs": "d3c2c7398d62355197d5230abeedae12471106be81b493fa87d1d63274925a12",
+    "crates/canvas/pictograph/src/canvas/tests/grammar_view.rs": "ed2349db15a6298370a7e08c03de7b39a76dc31ec1a147b6f5ec83395bef6f9d"
+  },
+  "library_sha256": {
+    "pictograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libpictograph.rlib",
+      "sha256": "33c81c4a89453722179b13e2e9a8f92acb40d04077d8b52da76d973e14c3497d"
+    },
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-2e99ce8c1f69fd78.rlib",
+      "sha256": "64aed8db2000cc1499a77e116225d3f9a1e6cc9bd6a7e880ceb729177d5adf28"
+    },
+    "scenograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenograph-19959848835e9a56.rlib",
+      "sha256": "c9ec3b10308a4acc745bd1fce0be57e1944a42c86ad0b0fa3f77b6583efb2f67"
+    }
+  },
+  "library_build_log_sha256": "9db1c5d2d45d37cc8bd1aaa8e156eb7021b78e36e0616073ff9b2ff79cf30f73",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pictograph_height_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-pictograph-height-probe.exe",
+    "--extern",
+    "pictograph=C:\\t\\cargo-targets\\mere\\debug\\libpictograph.rlib",
+    "--extern",
+    "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-2e99ce8c1f69fd78.rlib",
+    "--extern",
+    "scenograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenograph-19959848835e9a56.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "build_exit": 0,
+  "native_binary_sha256": "f69fee8ce0b3be78da27391a30f9f9e4762ad351cfcc90f04c69d206689cfa8b",
+  "generated_output_removed": true,
+  "scope": "Three generated native CPU layout/hit-test observations covering height and suggestion-size defects, with height-off, grammar-off and zoom controls, using unchanged verified Cargo libraries. Actual raster pixels, GPU, headed UI, host DOM mode and favicon decode not executed. No production changes."
+}

@@ -1,0 +1,59 @@
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling script-rhai v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\script\rhai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.30s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\script_rhai-20c236e725d014b1.exe)
+
+running 26 tests
+test value::tests::a_script_returns_a_map_in_key_order ... ok
+test value::tests::each_eval_gets_a_fresh_scope_over_the_globals ... ok
+test value::tests::a_method_style_call_leaves_the_callers_variable_alone ... ok
+test value::tests::a_host_function_sees_neutral_values_and_may_refuse ... ok
+test tests::a_gemtext_string_is_detected ... ok
+test tests::a_runaway_is_caught_by_the_operation_budget ... ok
+test tests::language_tag_is_rhai ... ok
+test tests::a_compile_error_is_reported_not_panicked ... ok
+test tests::a_rhai_fence_evaluates_through_the_inker_pass ... ok
+test tests::evaluates_arithmetic_to_plain_text ... ok
+test tests::the_sandbox_has_no_file_access ... ok
+test tests::an_explicit_format_map_is_honored ... ok
+test value::tests::a_name_registered_twice_is_refused ... ok
+test value::tests::it_is_usable_behind_a_trait_object ... ok
+test value::tests::names_must_be_identifiers ... ok
+test value::tests::libm_maths_matches_libm_bit_for_bit ... ok
+test value::tests::a_runaway_is_a_budget_error_and_the_engine_survives ... ok
+test value::tests::non_finite_floats_cross_unchanged ... ok
+test value::tests::strings_compare_and_join ... ok
+test value::tests::scalars_and_containers_cross_both_ways ... ok
+test value::tests::nesting_past_the_cap_is_refused_in_both_directions ... ok
+test value::tests::failures_are_told_apart ... ok
+test tests::the_sandbox_cannot_import_a_module_from_disk ... ok
+test value::tests::the_sandbox_matches_the_block_evaluators ... ok
+test value::tests::engine_built_in_maths_is_not_loaded ... ok
+test value::tests::an_empty_budget_runs_nothing_and_unbounded_runs_to_the_end ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests\maths_bits.rs (C:/t/cargo-targets/mere/build\debug\deps\maths_bits-f1debb390684f7ca.exe)
+
+running 3 tests
+test the_rule_hashes_to_the_recorded_bits ... ok
+test the_rule_ran_over_every_position ... ok
+test the_hash_sees_a_single_ulp ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running tests\scenograph_rules.rs (C:/t/cargo-targets/mere/build\debug\deps\scenograph_rules-a668ac44d0610e6f.exe)
+
+running 9 tests
+test a_narrower_binding_set_has_no_maths_and_the_other_rules_still_resolve ... ok
+test a_script_cannot_carry_state_from_one_occurrence_to_the_next ... ok
+test the_same_occurrence_resolves_the_same_way_twice ... ok
+test rule_maths_goes_through_the_host_functions ... ok
+test a_missing_fact_is_a_traced_non_match_not_a_crash ... ok
+test a_runaway_rule_is_stopped_by_the_budget ... ok
+test a_script_runs_the_hysteresis_the_declarative_condition_has ... ok
+test a_rule_reads_facts_and_states ... ok
+test composed_script_failures_leave_the_whole_rule_unmatched ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

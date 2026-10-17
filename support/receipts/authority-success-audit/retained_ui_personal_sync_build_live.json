@@ -1,0 +1,18 @@
+{
+  "observed_utc": "2026-10-17T07:15:34.776705+00:00",
+  "session_id": 60676,
+  "processes": [
+    {
+      "ProcessId": 22716,
+      "ParentProcessId": 48224,
+      "CreationDate": "2026-10-17T02:56:56.690854-04:00"
+    },
+    {
+      "ProcessId": 6872,
+      "ParentProcessId": 22716,
+      "CreationDate": "2026-10-17T03:15:00.274767-04:00"
+    }
+  ],
+  "stdout_bytes": 671744,
+  "scope": "Original build is live. No terminal outcome and no personal-sync diagnostic execution."
+}

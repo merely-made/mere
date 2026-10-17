@@ -1,0 +1,11 @@
+
+running 3 tests
+test an_empty_density_flow_spends_ticks_forever_without_starting ... Empty Density continues180 ticks with zero budget and zero bodies; populated Density finishes, empty no-force control stops after one tick, and explicit Halt stops the empty Density loop.
+ok
+test tidal_force_also_parks_on_the_real_actor ... Actual actor tide parks at two ticks; live-demand control continues past the budget. Both actors are halted and dropped.
+ok
+test tidal_force_parks_when_the_inline_budget_ends ... Inline tide stops at its two-tick budget and stays frozen; the same force with wants_tick=true reaches20 ticks and keeps running.
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

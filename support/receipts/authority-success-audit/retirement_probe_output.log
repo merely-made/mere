@@ -1,0 +1,3 @@
+OBSERVATION: retirement selected one expired node id and removed both its expired and unexpired tombstones
+CONTROL: an unexpired tombstone with another node id survives retirement
+2 checks passed

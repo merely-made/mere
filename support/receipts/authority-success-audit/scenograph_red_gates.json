@@ -1,0 +1,71 @@
+{
+  "mode": "red",
+  "basis_commit": "4523cb6f4b3998a27dc474ba30a7f1df537c5ec3",
+  "source_sha256": {
+    "crates/cambium/scenes/scenograph/src/link.rs": "fbfd84550616e1f2d61d51dc26d08476237b5c6f4e95c1e823f50265071b561a",
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "d8166ec248d36f30cae1b5b2d0e92d8b0d4eae0e885830d058514d9be0ac2b08",
+    "crates/cambium/scenes/scenograph/src/presentation/scripts.rs": "9fa4b25f2376cc38817ae6ef74d3656a0012aad4de4c0370a687092990ce7db0",
+    "crates/script/rhai/tests/scenograph_rules.rs": "a9a6c6dc4edc5bead06c63edb7de910e0d2afe3828e43e625119e6a390437246"
+  },
+  "gates": [
+    {
+      "name": "layout",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "scenograph",
+        "--lib",
+        "compatibility_summaries_do_not_change_the_default_layout",
+        "--locked",
+        "--offline",
+        "-j",
+        "1",
+        "--target-dir",
+        "C:/t/cargo-targets/mere",
+        "--config",
+        "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+      ],
+      "exit": 101,
+      "test_results": [
+        [
+          "FAILED",
+          "0",
+          "1"
+        ]
+      ],
+      "log": "scenograph_red_layout.log",
+      "sha256": "5c8350a27891c6b31755359bad053f39cd091a695a3be2da79022845868fc192"
+    },
+    {
+      "name": "scripts",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "script-rhai",
+        "--test",
+        "scenograph_rules",
+        "composed_script_failures_leave_the_whole_rule_unmatched",
+        "--locked",
+        "--offline",
+        "-j",
+        "1",
+        "--target-dir",
+        "C:/t/cargo-targets/mere",
+        "--config",
+        "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+      ],
+      "exit": 101,
+      "test_results": [
+        [
+          "FAILED",
+          "0",
+          "1"
+        ]
+      ],
+      "log": "scenograph_red_scripts.log",
+      "sha256": "bd4e90d04073bca194176b6caf198c1639e23d73013cf2dae4b34ed8810825b9"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "test_exit": 0,
+  "tests": 8,
+  "harness_sha256": "87da1ae891cace17e34c0a122e4ca47de73599e91a0cf53081fd1e3efc1fea66",
+  "source_sha256": {
+    "crates/cambium/scenes/scenomise/src/catalog.rs": "102552077099b789296fa8f3b75d836f86f90d22727653d6a9d6f97873738f0f",
+    "crates/cambium/scenes/scenomise/src/solve.rs": "84d17aacf0f0b1325b46fdb9699990e9985ca0ca76fe025d4d230bed37493488",
+    "crates/cambium/scenes/scenomise/src/families/mod.rs": "90c73a37975c315b5cd043c48f7aaff8018dbec7bc3c7d612da14082763b1acb",
+    "crates/cambium/scenes/scenomise/src/families/axial.rs": "bf078db3588e41da10a6d0914370621498f5d3cd157e712250d7947f46605ccd",
+    "crates/cambium/scenes/scenomise/src/families/lsystem.rs": "0292f9864786d57fefb0f0e02e97ad7ddc3d6c19fa558dea4138a495c7745c55",
+    "crates/cambium/scenes/scenomise/src/families/penrose.rs": "41f3787ed4163e77e331333049c445d0e06dda24003d371610a253296cbb8592",
+    "crates/cambium/scenes/scenomise/src/families/radial.rs": "f19eae854aa65bd1341f255e1ccfc59eae7f52cad957927c986393e6ef1fd229",
+    "crates/cambium/scenes/scenomise/src/families/setscape.rs": "c75dcb69f334f8c67c8cd7892c46b70008d2ab59c182e110c5eac56888ab508a"
+  },
+  "library_sha256": {
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+      "sha256": "5217cd48a147df645cd924eada44f053696f2fa82d1b49f4383fd0c73a24f1dc"
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+      "sha256": "398b81ba7e1443daa91a756fe7ea33fa73140a0e1adceaf4d91610f0da931f51"
+    },
+    "scenomise": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libscenomise.rlib",
+      "sha256": "fa72705f081bdbe2f7bb07aa0281dc0cf6f8ec270f5d10fb7f4d7407e6236885"
+    },
+    "scenotime": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libscenotime.rlib",
+      "sha256": "4e168eba97a82909f84ff5ae16c9ff04bc1903a52e7cc6c9123e5e222ca34e1f"
+    }
+  },
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\scenomise_solver_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-scenomise-solver-probe.exe",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+    "--extern",
+    "scenomise=C:\\t\\cargo-targets\\mere\\debug\\libscenomise.rlib",
+    "--extern",
+    "scenotime=C:\\t\\cargo-targets\\mere\\debug\\libscenotime.rlib"
+  ],
+  "build_exit": 0,
+  "native_binary_sha256": "f618bcd7de4d6bd5de22fb575831774ffb1109522af1c6a26c3e6b1fd65cf20c",
+  "generated_output_removed": true,
+  "scope": "Native public API diagnostics only. Depth-255 admission is tested, hazardous expansion is not executed. No renderer/network/live editor or product persistence gate."
+}

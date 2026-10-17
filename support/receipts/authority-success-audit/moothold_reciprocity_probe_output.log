@@ -1,0 +1,13 @@
+
+running 8 tests
+test max_tolerance_refuses_even_zero_debt ... ok
+test max_unsigned_debt_is_treated_as_credit ... ok
+test moot::id::tests::preserves_opaque_identity_bytes ... ok
+test ordinary_debt_control ... ok
+test reciprocity::tests::a_freeloader_is_cut_off_until_it_reciprocates ... ok
+test reciprocity::tests::a_reciprocating_peer_may_keep_requesting ... ok
+test reciprocity::tests::provided_work_sets_the_balance ... ok
+test reciprocity::tests::reciprocation_nets_out ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,79 @@
+   Compiling mere-proofs v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\proofs)
+   Compiling state-witness v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\state-witness)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.27s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\proofs-7fc5461b0883f767.exe)
+
+running 2 tests
+test tests::p2panda_identity_is_typed_separately ... ok
+test tests::content_reference_and_application_commitment_keep_distinct_meanings ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\state_witness-00b6921936cd6dbc.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\formats.rs (C:/t/cargo-targets/mere/build\debug\deps\formats-1c5f35452b3d13f8.exe)
+
+running 5 tests
+test framed_records_round_trip_in_wing_formats_layout ... ok
+test wrong_magic_and_newer_versions_are_refused ... ok
+test the_json_shape_is_pinned ... ok
+test loading_refuses_bad_lists ... ok
+test payloads_cannot_spell_their_magic ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\hash.rs (C:/t/cargo-targets/mere/build\debug\deps\hash-a75b7133da62ccd1.exe)
+
+running 6 tests
+test floats_hash_by_bit_pattern ... ok
+test an_unencodable_value_is_refused ... ok
+test a_tuple_hashes_as_its_fields_concatenated ... ok
+test hash_value_streams_the_postcard_bytes ... ok
+test the_published_fnv1a_64_vectors_hold ... ok
+test hash_bytes_equals_isometers_and_the_control_does_not ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\trace.rs (C:/t/cargo-targets/mere/build\debug\deps\trace-05ed935b705c7a2b.exe)
+
+running 5 tests
+test a_tick_on_one_side_is_a_tick_divergence ... ok
+test an_earlier_entry_divergence_beats_a_later_missing_tick ... ok
+test ticks_must_increase ... ok
+test equal_runs_do_not_diverge ... ok
+test a_planted_change_names_its_tick_and_label_and_not_before ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\witness.rs (C:/t/cargo-targets/mere/build\debug\deps\witness-9056a3f4e5d22fdd.exe)
+
+running 10 tests
+test entries_sit_in_natural_order ... ok
+test the_digest_is_balaurs_fold ... ok
+test insert_refuses_duplicates_nuls_and_unencodable_values ... ok
+test a_label_on_one_side_diverges_at_its_place_in_either_direction ... ok
+test raw_bytes_and_serde_values_do_not_agree ... ok
+test the_label_helper_fixes_the_grammar ... ok
+test the_report_prints_both_sides ... ok
+test insertion_order_never_changes_a_result ... ok
+test a_planted_change_is_named_by_label ... ok
+test equal_witnesses_do_not_diverge ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests proofs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests state_witness
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

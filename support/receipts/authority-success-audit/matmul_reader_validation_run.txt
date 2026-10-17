@@ -1,0 +1,15 @@
+
+running 10 tests
+test async_full_rejects_same_imbalanced_workload ... ok
+test async_partial_balanced_control ... ok
+test async_partial_further_overrun_control_is_rejected ... ok
+test async_partial_strict_admits_start_exactly_at_stage_end ... ok
+test ordered_loader_validator_alone_also_accepts_load_only ... ok
+test ordered_main_flow_control ... ok
+test sync_full_rejects_same_imbalanced_workload ... ok
+test sync_partial_balanced_control ... ok
+test sync_partial_further_overrun_control_is_rejected ... ok
+test sync_partial_strict_admits_start_exactly_at_stage_end ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,73 @@
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 31.93s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\errand-2239ca93f677b7a0.exe)
+
+running 65 tests
+test nex::tests::live_nex_smoke ... ignored, hits the live network; run with `cargo test -- --ignored`
+test misfin::tests::receipts_map_by_status_category ... ok
+test misfin::tests::rejects_a_missing_mailbox ... ok
+test parse::feed::tests::rss_parses_channel_and_items ... ok
+test parse::feed::tests::strip_html_tags_collapses_whitespace ... ok
+test guppy::tests::guppy_scheme_routes_to_port_6775 ... ok
+test guppy::tests::specials_map_to_input_redirect_failure ... ok
+test parse::feed::tests::atom_enclosure_and_id_use_the_same_entry_facts ... ok
+test parse::feed::tests::atom_uses_link_href_attributes ... ok
+test guppy::tests::success_maps_mime_and_body ... ok
+test misfin::tests::an_empty_chain_is_rejected_before_any_network ... ok
+test parse::feed::tests::dates_and_bodies_stay_apart ... ok
+test parse::feed::tests::podcast_extensions_retain_raw_resources_and_diagnose_unknown_namespaces ... ok
+test gemini::tests::the_other_classes_map_one_to_one ... ok
+test gemini::tests::both_failure_classes_flatten_but_the_code_survives ... ok
+test misfin::tests::rejects_a_non_misfin_scheme ... ok
+test nex::tests::nex_scheme_routes_to_port_1900 ... ok
+test parse::nex::tests::directory_listing_classifies_dirs_and_files ... ok
+test parse::nex::tests::base_url_drops_page_to_parent ... ok
+test parse::nex::tests::base_url_keeps_trailing_slash ... ok
+test parse::feed::tests::truncated_feed_errors ... ok
+test parse::nex::tests::base_url_appends_when_only_authority ... ok
+test parse::nex::tests::whitespace_line_disqualifies_directory ... ok
+test parse::spartan::tests::prompt_is_typed ... ok
+test parse::nex::tests::empty_body_is_not_a_directory ... ok
+test parse::spartan::tests::prompt_marker_inside_preformatted_text_stays_text ... ok
+test scroll::tests::a_success_keeps_its_udc_code_and_mimetype ... ok
+test serve::dir::tests::a_traversing_request_never_reaches_the_filesystem ... ok
+test serve::dir::tests::the_root_itself_resolves ... ok
+test serve::dir::tests::traversal_is_refused_however_it_is_spelled ... ok
+test serve::adapt::tests::a_note_carries_its_text_as_info_lines ... ok
+test serve::adapt::tests::gophers_refusal_is_an_error_item_inside_a_valid_menu ... ok
+test serve::dir::tests::entry_kinds_follow_the_mime_family ... ok
+test serve::dir::tests::mime_types_cover_what_the_small_web_carries ... ok
+test scroll::tests::the_other_classes_map_like_geminis ... ok
+test serve::adapt::tests::a_gopher_selector_becomes_a_rooted_path ... ok
+test serve::dir::tests::child_paths_keep_exactly_one_separator ... ok
+test serve::dir::tests::current_directory_segments_are_ignored ... ok
+test serve::dir::tests::an_interior_parent_segment_is_allowed_because_it_stays_inside ... ok
+test serve::dir::tests::an_ordinary_path_resolves_under_the_root ... ok
+test serve::project::tests::a_gophermap_ends_with_the_rfc_terminator ... ok
+test serve::project::tests::a_gophermap_stamps_host_and_port_on_every_item ... ok
+test serve::dir::tests::a_missing_file_is_none_rather_than_an_error ... ok
+test serve::project::tests::an_absolute_target_becomes_a_url_item ... ok
+test serve::project::tests::gemtext_uses_link_lines_and_a_heading ... ok
+test serve::project::tests::gopher_item_types_follow_the_entry_kind ... ok
+test serve::project::tests::an_empty_listing_still_produces_valid_output ... ok
+test serve::project::tests::gemtext_invents_no_type_markers ... ok
+test spartan::tests::redirects_and_errors_map_with_their_digit ... ok
+test spartan::tests::spartan_scheme_routes_to_port_300 ... ok
+test tests::scheme_round_trips_and_ports ... ok
+test tests::timeout_error_displays ... ok
+test serve::project::tests::the_gophermap_round_trips_through_the_gopher_parser ... ok
+test serve::tests::a_closure_is_a_source ... ok
+test tests::http_is_not_routed ... ok
+test tests::identity_fetch_refuses_non_gemini_before_transport ... ok
+test serve::project::tests::plain_text_is_readable_without_any_format_at_all ... ok
+test serve::project::tests::the_gemtext_round_trips_through_the_gemtext_parser ... ok
+test spartan::tests::success_carries_mime_and_body ... ok
+test tests::every_smolweb_scheme_is_recognized ... ok
+test serve::tests::an_absolute_target_is_recognised ... ok
+test tests::mime_strips_params_and_gates_on_success ... ok
+test tests::new_schemes_round_trip ... ok
+test tests::trace_url_omits_query_and_fragment ... ok
+test serve::tests::a_directory_is_served_and_fetched_over_gopher ... ok
+
+test result: ok. 64 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.78s
+

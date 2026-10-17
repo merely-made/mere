@@ -1,0 +1,11 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "1 diagnostic test passes: narrower and empty successful saves retain old members; reload content reference differs from returned reference",
+  "reproduction_sha256": "ecd7297d724a6c87f8d81be5f975e7cdc50976c5bc75a07284896f3bbc281045",
+  "output_file": "pandect_grant_storage_output.txt",
+  "affected_sources": {
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "ddf770538ed8dd84f7ffa1f2ee056932e97a75ee2cc128a9ca95feb79899181a"
+  },
+  "scope": "Public save/load API, real signed certificates. Initial fresh-directory roundtrip control passes. This proves persistence/reference disagreement, not cryptographic revocation bypass. Custody refresh/adoption callers remain to be reviewed."
+}

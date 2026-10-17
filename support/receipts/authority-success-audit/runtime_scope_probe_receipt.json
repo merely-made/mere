@@ -1,0 +1,54 @@
+{
+  "date_utc": "2026-10-17T20:50:43.667914+00:00",
+  "exit": 0,
+  "passed": 11,
+  "original_dry_run_tests": 4,
+  "thread_affinity_cases": 2,
+  "allocation_window_cases": 3,
+  "observation_cases": 2,
+  "source_sha256": {
+    "support/patches/cubecl-runtime/src/client.rs": "92e16aec65cd0bc718c50ae9a503665b4befe1ab780ed198d6bcdb07e6b3f195",
+    "support/patches/cubecl-runtime/src/dry_run.rs": "a6db8ec8c31595b42a0f2ffd85b368d794cce819f0a97daba15f975d167cf39c",
+    "support/patches/cubecl-runtime/src/logging/observer.rs": "6c5709739788fec73390142931991f4b6d40f100003fe2d004be4213f73fba79",
+    "support/patches/cubecl-runtime/src/memory_management/policy.rs": "52d962fd96b4f09f37a0bb0bf538fcd9fc1c5313df14c2d19cd0f8f5c9351a93"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "--cfg",
+    "feature=\"std\"",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\runtime_scope_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-runtime-scope.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-scope.exe",
+      "bytes": 839168,
+      "sha256": "d92329b8a81bbef20fa8a35b2a064b84d197933b0bb004d55e9c9140fe3670c8"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-scope.pdb",
+      "bytes": 3100672,
+      "sha256": "08cc2494d1750f61565a98b3ca348f5e5bd4343a18de65e40dea38ad32bc73f9"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "allocation_window": "2f8cc6b03d14fbdcbb0ffbb10aa2e1bc4f8990db4d5dcf077f359a2cee4c324f",
+    "LaunchObservation": "623c55e6dd8af9a4a82a0096bca9ef4cc365057bf095bd9f46d3f383758a1a2e",
+    "observation_functions": "8ac43bc4b862ebbc574ec5abdd8e641d3cbd223ee3999388f21b9989b2848faa",
+    "MemoryAllocationMode": "f5db94011ea9974fa30f090a0b06579509ebb71ba938f9eccbcb4b566215d837",
+    "dry_run_without_serial_test_attributes": "af216319a4c533b1ecea6b79c26ed66a0849760abf9c86300863d974b7e03944"
+  },
+  "evidence_sha256": {
+    "run_runtime_scope_probe.py": "5898bbcb96052f1b1d65f423e1f23a6446ad6e06dfe0885b62af4e32ae23c47f",
+    "runtime_scope_probe.rs": "71afdf7171c358f3dd66257371688e542b08df02ab8ccb9925abf62a176a9375",
+    "runtime_scope_compile.txt": "2305c06669b673f249079aea2b93538801971abd5ff5716c8b657a8b59ad2f7d",
+    "runtime_scope_run.txt": "73bca39c3d2524b85bb72d21792b19a274133569e75b9b8ff680b3b0751adc45"
+  },
+  "qualification": "Selected runtime source: full dry_run.rs with original4 tests (only serial_test attributes removed; runner serializes),2 additional actual std-thread guard tests. Exact allocation_window function with explicit immediate-device/server/stream doubles; no allocation/GPU claim. Exact observer guard/new/drop/notify methods with minimal observer trait and std RwLock adapter; sequential documented-order/stack-order cases, no fabricated concurrency proof.11 CPU cases pass. Owned exe/PDB removed; no full backend/runtime build or device execution."
+}

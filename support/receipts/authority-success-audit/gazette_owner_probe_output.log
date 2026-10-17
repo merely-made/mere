@@ -1,0 +1,168 @@
+
+running 20 tests
+test intake::tests::aliases_cannot_select_an_existing_other_contact ... ok
+test intake::tests::bracketed_ipv6_account_hosts_use_the_same_core_normalization ... ok
+test intake::tests::changing_the_subject_or_user_case_is_explicitly_refused ... ok
+test intake::tests::invalid_query_or_subject_never_falls_back_to_an_alias ... ok
+test intake::tests::malformed_or_unmapped_aliases_and_links_stay_in_the_source ... ok
+test intake::tests::protocol_groups_and_catch_all_metadata_are_projected_without_keys ... ok
+test intake::tests::repeated_resolution_deduplicates_claims_and_preserves_existing_trust ... ok
+test intake::tests::returned_subject_and_account_aliases_require_explicit_uris ... ok
+test intake::tests::selected_account_uses_gaz_normalization_and_retains_source ... ok
+test intake::tests::valid_did_aliases_are_opaque_names_without_method_authentication ... ok
+test ledger::tests::ledger_and_recipient_picker_crossfilter_without_private_coordination ... ok
+test ledger::tests::ledger_replays_matrix_and_repeated_instance_receipts ... ok
+test ledger::tests::ledger_shelfmark_checks_both_authorities_and_instance_delta ... ok
+test tests::endpoint_url_builds_https_well_known_query_for_acct_resource ... ok
+test tests::fetch_document_from_endpoint_reads_jrd_response ... ok
+test tests::import_categorizes_aliases_and_links ... ok
+test tests::normalize_resource_accepts_bare_acct_handle ... ok
+test tests::supplied_html_article_extraction_is_readable_only ... ok
+test tests::supplied_non_html_never_enters_the_reader_extractor ... ok
+test tests::supplied_xhtml_uses_the_declared_xml_syntax ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 3 tests
+test classified_protocol_case_differs_and_generic_jsonld_is_actor ... AUDIT uppercase protocol uses catch-all; generic JSON-LD link classified as ActivityPub actor without ActivityStreams profile
+ok
+test ledger_counts_unknown_instances_and_ignores_malformed_selection ... AUDIT unknown instance counted honored=1 and malformed selection accepted; moved generation and malformed instance JSON refuse
+ok
+test resolver_and_intake_disagree_on_uppercase_account_scheme ... AUDIT uppercase scheme resolver query=acct:ACCT:Alice@EXAMPLE.org; actual Gaz-backed intake account=acct:Alice@example.org
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Locking 1 package to highest Rust 1.99.0 compatible version
+    Updating serde_json v1.0.151 -> v1.0.154
+   Compiling unicode-ident v1.0.26
+   Compiling smallvec v1.16.1
+   Compiling proc-macro2 v1.0.107
+   Compiling siphasher v1.0.3
+   Compiling phf_shared v0.13.1
+   Compiling quote v1.0.47
+   Compiling cc v1.6.0
+   Compiling syn v3.0.6
+   Compiling typenum v1.20.1
+   Compiling synstructure v0.14.0
+   Compiling zerovec-derive v0.11.6
+   Compiling zerofrom-derive v0.1.8
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling fastrand v2.5.0
+   Compiling phf_generator v0.13.1
+   Compiling displaydoc v0.2.7
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.8
+   Compiling parking_lot_core v0.9.12
+   Compiling pin-project-lite v0.2.17
+   Compiling bytes v1.12.1
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling string_cache_codegen v0.6.1
+   Compiling phf_codegen v0.13.1
+   Compiling windows-sys v0.61.2
+   Compiling futures-core v0.3.34
+   Compiling memchr v2.8.3
+   Compiling new_debug_unreachable v1.0.6
+   Compiling web_atoms v0.2.6
+   Compiling parking_lot v0.12.5
+   Compiling tinystr v0.8.4
+   Compiling serde_derive v1.0.229
+   Compiling precomputed-hash v0.1.1
+   Compiling version_check v0.9.5
+   Compiling generic-array v0.14.7
+   Compiling icu_locale_core v2.3.0
+   Compiling string_cache v0.9.0
+   Compiling mio v1.2.3
+   Compiling serde v1.0.229
+   Compiling socket2 v0.6.5
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling ring v0.17.14
+   Compiling phf v0.13.1
+   Compiling futures-sink v0.3.34
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling tokio v1.53.2
+   Compiling tendril v0.5.1
+   Compiling http v1.5.0
+   Compiling percent-encoding v2.3.2
+   Compiling once_cell v1.21.4
+   Compiling rustls-pki-types v1.15.1
+   Compiling http-body v1.1.0
+   Compiling markup5ever v0.39.0
+   Compiling getrandom v0.2.17
+   Compiling httparse v1.10.1
+   Compiling untrusted v0.9.0
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling futures-io v0.3.34
+   Compiling futures-util v0.3.34
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling hybrid-array v0.4.15
+   Compiling libc v0.2.190
+   Compiling rustls v0.23.45
+   Compiling tower-service v0.3.3
+   Compiling try-lock v0.2.5
+   Compiling want v0.3.1
+   Compiling idna_adapter v1.2.2
+   Compiling rustls-webpki v0.103.15
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling tracing-core v0.1.36
+   Compiling form_urlencoded v1.2.2
+   Compiling futures-channel v0.3.34
+   Compiling subtle v2.6.1
+   Compiling base64 v0.22.1
+   Compiling atomic-waker v1.1.2
+   Compiling hyper v1.11.1
+   Compiling tracing v0.1.44
+   Compiling digest v0.10.7
+   Compiling serde_json v1.0.154
+   Compiling idna v1.1.0
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#7f13b85f)
+   Compiling sync_wrapper v1.0.2
+   Compiling blake3 v1.8.7
+   Compiling ipnet v2.12.2
+   Compiling cpufeatures v0.2.17
+   Compiling const-oid v0.10.2
+   Compiling tower-layer v0.3.3
+   Compiling tower v0.5.3
+   Compiling digest v0.11.3
+   Compiling sha2 v0.10.9
+   Compiling hyper-util v0.1.20
+   Compiling uuid v1.27.0
+   Compiling url v2.5.8
+   Compiling tokio-rustls v0.26.6
+   Compiling sceno v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling webpki-roots v1.0.9
+   Compiling unicode-bidi v0.3.18
+   Compiling ryu v1.0.23
+   Compiling bitflags v2.13.2
+   Compiling unicode-segmentation v1.13.3
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#7f13b85f)
+   Compiling tower-http v0.6.11
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper-rustls v0.27.9
+   Compiling sha2 v0.11.0
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling http-body-util v0.1.5
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#7f13b85f)
+   Compiling reqwest v0.12.28
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+   Compiling incipit v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\incipit)
+   Compiling iri-string v0.7.14
+   Compiling authority-success-gazette v0.0.0 (C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\cpu-gazette-runtime)
+    Finished `test` profile [unoptimized] target(s) in 47.39s
+     Running unittests ..\..\..\..\ports\gazette\src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\gazette-6523d79a2f8bc5f8.exe)
+     Running ..\gazette_owner_probe.rs (C:/t/cargo-targets/mere/build\debug\deps\gazette_audit_contracts-4407daf0767364ee.exe)

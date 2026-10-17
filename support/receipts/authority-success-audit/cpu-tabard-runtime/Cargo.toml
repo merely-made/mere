@@ -1,0 +1,41 @@
+[workspace]
+
+[package]
+name = "authority-success-tabard"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+name = "tabard"
+path = "../../../../crates/system/tabard/src/lib.rs"
+
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+tinct = { path = "../../../../crates/cambium/tinct" }
+
+[[test]]
+name = "audit_contracts"
+path = "../tabard_owner_probe.rs"
+
+[[test]]
+name = "categories"
+path = "../../../../crates/system/tabard/tests/categories.rs"
+[[test]]
+name = "choice_resolution"
+path = "../../../../crates/system/tabard/tests/choice_resolution.rs"
+[[test]]
+name = "library"
+path = "../../../../crates/system/tabard/tests/library.rs"
+[[test]]
+name = "mode_artifacts"
+path = "../../../../crates/system/tabard/tests/mode_artifacts.rs"
+[[test]]
+name = "portable"
+path = "../../../../crates/system/tabard/tests/portable.rs"
+[[test]]
+name = "typography"
+path = "../../../../crates/system/tabard/tests/typography.rs"
+[[test]]
+name = "workshop"
+path = "../../../../crates/system/tabard/tests/workshop.rs"

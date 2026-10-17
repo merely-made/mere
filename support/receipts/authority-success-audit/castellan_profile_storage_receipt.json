@@ -1,0 +1,12 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "2 diagnostic observations pass: encrypted profile transplant accepted by PassphraseEncryptedStorage and refused by SealedProfileStorage; malformed nonce panics during fallible open",
+  "reproduction_sha256": "cda869ab60ec24e3d666e9ff9c61543b7299827ada42151be2319159ae4062f1",
+  "output_file": "castellan_profile_storage_output.txt",
+  "affected_sources": {
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "e2d90174302d67fc38545223b7b8c91300baed115dfd9fc4db4b15550ada5b63",
+    "ports/djinn/castellan/src/custody/sealed_profile_storage.rs": "20cef24cc9480887ff39759918248cb72e5a07558ba8d317b2fbf791cd3acca6"
+  },
+  "scope": "Public backend APIs with isolated temporary fixture profiles. Swaps existing authenticated records without decrypting or forging ciphertext. Old backend permits mapping change; sealed-record backend positive control refuses transplant. Active host adoption and installation scope pending."
+}

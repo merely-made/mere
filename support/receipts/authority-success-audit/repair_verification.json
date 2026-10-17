@@ -1,0 +1,52 @@
+{
+  "base_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "scope": "Uncommitted repair batch Q022-Q029 on merged main",
+  "checks": [
+    {
+      "log": "repair_castellan_tests.log",
+      "exit_code": 0,
+      "passed": 217,
+      "ignored": 0,
+      "residue_harnesses_passed": 1
+    },
+    {
+      "log": "repair_castellan_keeper_tests.log",
+      "exit_code": 0,
+      "passed": 309,
+      "ignored": 0,
+      "residue_harnesses_passed": 2
+    },
+    {
+      "log": "repair_pandect_tests.log",
+      "exit_code": 0,
+      "passed": 345,
+      "ignored": 1,
+      "residue_harnesses_passed": 0
+    },
+    {
+      "log": "repair_image_retry_tests.log",
+      "exit_code": 0,
+      "passed": 1,
+      "ignored": 0,
+      "residue_harnesses_passed": 0
+    }
+  ],
+  "full_source_review_complete": false,
+  "full_workspace_tested": false,
+  "isolated_resources": [],
+  "working_tree_files": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "design_docs/dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md": "38bf4fd8f0497909bb137c16ccf8a59746f8960b783768b41576a4b2a3925226",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "e648583aac0270cc6a4132880936dcc74f98b4dbc27607c586ae27f6aff24727",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "6652baca63bc4fd380727396ebef217515f30969c1bc8e6b8b4a8dd4a3612e2c",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d"
+  },
+  "diff_check": "passed"
+}

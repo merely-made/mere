@@ -1,0 +1,38 @@
+crates\canvas\pictograph\src\lib.rs:162:    let mut hash = 0xcbf2_9ce4_8422_2325_u64;
+crates\canvas\pictograph\src\lib.rs:165:        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+crates\canvas\pictograph\src\lib.rs:500:        let mut hash = 0xcbf2_9ce4_8422_2325_u64;
+crates\canvas\pictograph\src\lib.rs:503:            hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+crates\conatus\seiche\src\coupling_effect_tests.rs:38:    let mut hash = 0xcbf29ce484222325_u64;
+crates\conatus\seiche\src\coupling_effect_tests.rs:50:                    hash = (hash ^ u64::from(byte)).wrapping_mul(0x100000001b3);
+crates\canvas\pictograph\src\canvas\tests\arrangement_goldens.rs:33:        *hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+crates\canvas\pictograph\src\canvas\tests\arrangement_goldens.rs:40:    let mut hash = 0xcbf2_9ce4_8422_2325;
+crates\canvas\pictograph\src\canvas\tests\arrangement_goldens.rs:50:    let mut hash = 0xcbf2_9ce4_8422_2325;
+crates\system\state-witness\tests\hash.rs:16:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\system\state-witness\tests\hash.rs:19:        hash = hash.wrapping_mul(0x0000_0100_0000_01B3);
+crates\system\state-witness\tests\hash.rs:26:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\system\state-witness\tests\hash.rs:73:    assert_eq!(hash_bytes(b""), 0xcbf2_9ce4_8422_2325);
+crates\system\state-witness\src\lib.rs:28:const OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+crates\system\state-witness\src\lib.rs:29:const PRIME: u64 = 0x0000_0100_0000_01B3;
+crates\intel\esp\src\embed\stub.rs:71:    const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+crates\intel\esp\src\embed\stub.rs:72:    const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
+crates\intel\esp\src\embed\lexical.rs:264:const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+crates\intel\esp\src\embed\lexical.rs:265:const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
+crates\cambium\scenes\scenomise\src\projection.rs:1457:    let mut value = 0xcbf2_9ce4_8422_2325u64;
+crates\cambium\scenes\scenomise\src\projection.rs:1460:        value = value.wrapping_mul(0x0000_0100_0000_01b3);
+crates\cambium\scenes\scenomise\src\projection.rs:1471:            value = value.wrapping_mul(0x0000_0100_0000_01b3);
+crates\graph\linked-data\src\ingest.rs:156:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\graph\linked-data\src\ingest.rs:159:        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+crates\cambium\scenes\scenomise\src\families\mod.rs:143:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\cambium\scenes\scenomise\src\families\mod.rs:153:        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+crates\cambium\scenes\scenomise\src\facet.rs:161:    let mut generation: u64 = 0xcbf2_9ce4_8422_2325;
+crates\cambium\scenes\scenomise\src\facet.rs:163:        generation = (generation ^ scene.generation).wrapping_mul(0x0000_0100_0000_01b3);
+crates\cambium\scenes\scenomise\src\backdrops.rs:520:        out.scene.generation = bytes.into_iter().fold(0xcbf2_9ce4_8422_2325_u64, |h, b| {
+crates\cambium\scenes\scenograph\src\seed.rs:41:    bytes.iter().fold(0xcbf2_9ce4_8422_2325, |hash, byte| {
+crates\cambium\scenes\scenograph\src\seed.rs:42:        (hash ^ u64::from(*byte)).wrapping_mul(0x0000_0100_0000_01b3)
+crates\script\rhai\tests\support\rule_bits.rs:51:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\script\document-host\src\lib.rs:60:    let mut h: u64 = 0xcbf2_9ce4_8422_2325;
+crates\script\document-host\src\lib.rs:63:        h = h.wrapping_mul(0x0000_0100_0000_01b3);
+crates\cambium\cambium-winit-a11y\src\lib.rs:442:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\cambium\cambium-genet-web-host\src\mirror.rs:300:    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\cambium\mere-view\src\tests.rs:664:        let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+crates\cambium\mere-view\src\tests.rs:672:                hash = hash.wrapping_mul(0x0000_0100_0000_01b3);

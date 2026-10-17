@@ -1,0 +1,9 @@
+
+running 2 tests
+test exact_parallel_threshold_is_clipped_as_moving_but_never_crosses_a_voxel ... At exact1e-6 direction trace is Clear; the next representable value above it and unit-direction control hit voxel[4,4,4]. Clip uses < threshold; crossing uses > threshold.
+ok
+test public_material_lookup_wraps_distant_voxels_to_an_occupied_key ... Public lookup at +/-524288 aliases key0 to material7; nearby outside x8 is air, and actual public trace at the aliased coordinates is Clear.
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

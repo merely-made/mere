@@ -1,0 +1,66 @@
+{
+  "path": "Cargo.toml",
+  "git_basis": "70a153769ec5ef22b0af6a911a818518e073d946",
+  "git_blob_sha256": "c3715e10921e7a58ff01c8ed8b2650eaad283bab673e5491945947dac2b16d77",
+  "prior_coverage": {
+    "sha256": "07b53aecab2810e3dff9c344bf3c9e02045f1535711727b6e9811ee8aa3d23bd",
+    "through": 54309
+  },
+  "current_sha256": "ba29083d33fdf96126c1feba1c9eee34994c47b2d83334c6671ab87bb7147063",
+  "current_chars": 54374,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        41640
+      ],
+      "new_chars": [
+        0,
+        41640
+      ],
+      "text_sha256": "b73fe0056c627619cbba3266dcec8a398473c7f3b527dc3f359ce006bf5ce285"
+    },
+    {
+      "old_chars": [
+        41640,
+        54309
+      ],
+      "new_chars": [
+        41705,
+        54374
+      ],
+      "text_sha256": "d768bac58e497585177f95a31d400296d325aa994212b6e9377a6d4191b26d1e"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "insert",
+      "old_lines": [
+        663,
+        662
+      ],
+      "new_lines": [
+        663,
+        663
+      ],
+      "old_chars": [
+        41640,
+        41640
+      ],
+      "new_chars": [
+        41640,
+        41705
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 659,
+      "new_start_line": 659,
+      "text": " # dramatis revision this workspace pins, not to a path; a Knot revision that\r\n # names them through dramatis.git needs no entry, only the same revision\r\n # (Cargo refuses a patch from dramatis.git to dramatis.git).\r\n [patch.\"https://github.com/merely-made/mere.git\"]\r\n+mere-personal-facts = { path = \"crates/domain/personal-facts\" }\r\n murm = { git = \"https://github.com/merely-made/murm.git\", branch = \"main\" }\r\n cambium = { path = \"crates/cambium/cambium\" }\r\n cambium-genet-winit-host = { path = \"crates/cambium/cambium-genet-winit-host\" }\r\n chartulary = { path = \"crates/eidetic/chartulary\" }\r\n"
+    }
+  ],
+  "certificate": "transition_2e9d962a0832_ba29083d33fd.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T05:42:17.007573+00:00"
+}

@@ -1,0 +1,20 @@
+
+running 13 tests
+test layout_cases::channel_gap_control_is_refused ... ok
+test layout_cases::sliced_batch_gap_is_wrongly_declared_flattenable ... retained reshape_input accepts batch gap: source=[0, 1, 4, 5], flattened=[0, 1, 2, 3]
+ok
+test layout_cases::spatial_gap_control_is_refused ... ok
+test layout_cases::stride_wider_than_unit_kernel_misses_valid_origin ... retained direct transpose unit kernel stride3 excludes valid origin: rows=(0, 0) columns=(0, 0)
+ok
+test layout_cases::truly_contiguous_batch_control_agrees ... ok
+test layout_cases::unit_stride_three_kernel_origin_control ... ok
+test layout_cases::unit_stride_unit_kernel_origin_control ... ok
+test tests::a_started_registry_is_sealed ... ok
+test tests::defaults_are_removable_and_reserve_their_name ... ok
+test tests::defaults_seed_the_registry ... ok
+test tests::duplicate_names_are_rejected ... ok
+test tests::provider_lookup_by_name ... ok
+test tests::register_then_remove_round_trips ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

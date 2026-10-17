@@ -1,0 +1,103 @@
+warning: variants `NodesLocal`, `NodesAll`, `TabsLocal`, `TabsAll`, `EdgesLocal`, and `EdgesAll` are never constructed
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:48:5
+   |
+46 | pub enum OmnibarSearchMode {
+   |          ----------------- variants in this enum
+47 |     Mixed,
+48 |     NodesLocal,
+   |     ^^^^^^^^^^
+49 |     NodesAll,
+   |     ^^^^^^^^
+50 |     TabsLocal,
+   |     ^^^^^^^^^
+51 |     TabsAll,
+   |     ^^^^^^^
+52 |     EdgesLocal,
+   |     ^^^^^^^^^^
+53 |     EdgesAll,
+   |     ^^^^^^^^
+   |
+   = note: `OmnibarSearchMode` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `display_label` is never read
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:59:9
+   |
+57 | pub struct HistoricalNodeMatch {
+   |            ------------------- field in this struct
+58 |     pub url: String,
+59 |     pub display_label: Option<String>,
+   |         ^^^^^^^^^^^^^
+   |
+   = note: `HistoricalNodeMatch` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: variant `Edge` is never constructed
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:97:5
+   |
+90 | pub enum OmnibarMatch {
+   |          ------------ variant in this enum
+...
+97 |     Edge {
+   |     ^^^^
+   |
+   = note: `OmnibarMatch` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Ready` and `Failed` are never constructed
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:111:5
+    |
+108 | pub enum ProviderSuggestionStatus {
+    |          ------------------------ variants in this enum
+...
+111 |     Ready,
+    |     ^^^^^
+112 |     Failed(ProviderSuggestionError),
+    |     ^^^^^^
+    |
+    = note: `ProviderSuggestionStatus` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Network`, `HttpStatus`, and `Parse` are never constructed
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:117:5
+    |
+116 | pub enum ProviderSuggestionError {
+    |          ----------------------- variants in this enum
+117 |     Network,
+    |     ^^^^^^^
+118 |     HttpStatus(u16),
+    |     ^^^^^^^^^^
+119 |     Parse,
+    |     ^^^^^
+    |
+    = note: `ProviderSuggestionError` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: fields `matches` and `status` are never read
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:129:9
+    |
+128 | pub struct ProviderSuggestionFetchOutcome {
+    |            ------------------------------ fields in this struct
+129 |     pub matches: Vec<OmnibarMatch>,
+    |         ^^^^^^^
+130 |     pub status: ProviderSuggestionStatus,
+    |         ^^^^^^
+    |
+    = note: `ProviderSuggestionFetchOutcome` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: associated function `ready` is never used
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:183:12
+    |
+162 | impl ProviderSuggestionMailbox {
+    | ------------------------------ associated function in this implementation
+...
+183 |     pub fn ready() -> Self {
+    |            ^^^^^
+
+warning: field `matches` is never read
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\crates\shell\chrome\src\omnibar.rs:221:9
+    |
+218 | pub struct OmnibarSearchSession {
+    |            -------------------- field in this struct
+...
+221 |     pub matches: Vec<OmnibarMatch>,
+    |         ^^^^^^^
+
+warning: 8 warnings emitted
+

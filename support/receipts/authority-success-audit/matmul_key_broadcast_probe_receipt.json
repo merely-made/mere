@@ -1,0 +1,43 @@
+{
+  "date_utc": "2026-10-17T21:41:46.579078+00:00",
+  "exit": 0,
+  "passed": 8,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/tune_key.rs": "35826c6864ff19da1e3dc047de1319f40bc73ff58d71be2392efe5fab4a7afc1",
+    "support/patches/cubek-matmul/tests/harness/broadcast.rs": "73b1cf6c82f79bbbc36ca1e19434649cf2ce61ea834b33c5bf979777a2f1d842"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_key_broadcast_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-key-broadcast.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-key-broadcast.exe",
+      "bytes": 757248,
+      "sha256": "a71c0e800b6baf8c08cd4e2848a5e9ae0f3816e190b8af2f6f79b18f2482f234"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-key-broadcast.pdb",
+      "bytes": 3026944,
+      "sha256": "fb864b0fad3594b8e953d4d46c88e6ce5aae3368aff1710364a23e02ae81d70b"
+    }
+  ],
+  "extracted_body_sha256": {
+    "key_extent": "6fe8984a4c87f7c0485f3eb1e7cfafeb77d8a69e5fc34ab3549bdb108a31d49d",
+    "passed": "8786627333a827aa5456ee73344a2de933407992b1757b1e30d10a8ebe4b3544",
+    "assert_batch_broadcast": "ae90911bb88c406531c3aebcd69cbb8a517602a1f8ae4b489e93ebee49f244f5"
+  },
+  "evidence_sha256": {
+    "run_matmul_key_broadcast_probe.py": "9a597f5aee062fb980c00ebaf597578de89715e7d4e9c5191f0e419da8d94027",
+    "matmul_key_broadcast_probe.rs": "80bd9242700b76f20ec4f491aec9caf550e8d78e38f5f1827203e3cdbc39d83e",
+    "matmul_key_broadcast_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matmul_key_broadcast_run.txt": "3fffec21b73a2845f7695e3ad0ed6b8a774c8f2b0d5d157c3677e3af4745317e"
+  },
+  "qualification": "Four exact key extent-fragment cases over already logical shape slices; no actual Metadata folding, generated key/anchor/serde/tuner or frontend normalization executed. Four full exact broadcast assertion helper cases with explicit Client/problem/strategy/outcome doubles: wrong numeric baseline and compile error skip all broadcasts; passing controls run both, passing baseline + wrong broadcast panics. No full crate, real backend/device or production invocation proof. Owned exe/PDB removed."
+}

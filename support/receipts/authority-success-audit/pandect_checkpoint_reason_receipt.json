@@ -1,0 +1,30 @@
+{
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "classification": "Bug-observation diagnostics, not correctness gates",
+  "command": "cargo test -p pandect --test audit_checkpoint_reason --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+  "exit_code": 0,
+  "diagnostic_tests_passed": 2,
+  "files": {
+    "pandect_checkpoint_reason_diagnostics.rs": "39cb87d554ae5f570356ca1dfa5f45f9ea08164e6d743a76f10f84a16decf178",
+    "pandect_checkpoint_reason_output.txt": "7e13087aedea344108b2557d9b9d1f6e8d698402444ba008d4cd1684d8205eba",
+    "pandect_checkpoint_reason_initial.rs": "d5637feb6cb9047cccb319a9910c5b3ab3287e19665a0be60d8baa27347aacae",
+    "pandect_checkpoint_reason_initial_output.txt": "9274085796c8e046a7daa76e0f9f2d4a3f304d0dd775ab2d931f87750ce78174"
+  },
+  "source_files": {
+    "crates/system/pandect/src/graph_session.rs": "fcf7410c3ca8e7590f9edf61cc3caf38af219ce86592e992954daca593a5bcf1",
+    "crates/system/pandect/src/graph_placement.rs": "cb023914b5b266679b4c3af16f9cf12bd6886a408a28a8684b520d0de8214ac3",
+    "crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs": "f29f6d42b4a5f88a4027bd4e6773f7e4c99d34904094dfb5f81ea033e9cf296f"
+  },
+  "findings": {
+    "Q002": "Actual MereSessions/GraphSession consumer: a correct checkpoint opens as a control; replacing graph.json and facets.json while retaining its in-range cursor makes open report the original session/journal but return a foreign graph. graph_at at the same cursor reconstructs the real baseline+journal. Ahead checkpoint falls back to real replay.",
+    "Q032": "Actual stored legacy session via MemoryBackend: applied initial and changed method/evidence on the same handle, loaded a new session instance, successfully qualify_legacy, and opened again. Changed reason survives stored translation. Checked exact-ID writer refuses each changed reason as a control."
+  },
+  "limits": [
+    "The checkpoint test substitutes valid stored checkpoint documents; it does not demonstrate spontaneous corruption or bypass of operating-system permissions.",
+    "Translated legacy checkpoints have a replay comparison; the substituted-checkpoint diagnostic targets ordinary recorded sessions.",
+    "No product UI or external receiving host acceptance claim.",
+    "The first attempt failed to compile because Seq was imported from Pandect instead of Muniment; initial source/output are retained.",
+    "Both diagnostics use MemoryBackend and in-process new session instances. These prove public session/store admission behavior, not disk durability or a fresh-process recovery gate."
+  ],
+  "cleanup": "Temporary crates/system/pandect/tests/audit_checkpoint_reason.rs removed after source hash comparison on both attempts. Reused shared Mere target; no isolated resource."
+}

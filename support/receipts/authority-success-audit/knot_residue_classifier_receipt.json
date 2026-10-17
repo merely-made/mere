@@ -1,0 +1,28 @@
+{
+  "date_utc": "2026-10-16T21:08:30.633705+00:00",
+  "kind": "Exact source classifier executed natively against synthetic allocation observations; not Knot/transport execution or actual seed exposure",
+  "source": "ports/djinn/tests/knot_residue.rs",
+  "source_sha256": "d6a420f0800ac17e91b9ffa5bb9ed0374aecd2964df5585bb89824db6756b06e",
+  "classifier_sha256": "d7ff0da8518463dabfa1e8436f6f46d6c6a43673c05dae99558f9ee5998415bf",
+  "harness_sha256": "f66881a2ae1047c85a91856dee2f324a0962606d7347d978baca30fde5482bb3",
+  "native_binary_sha256": "f149fa7bb7d875165d53ad1ebe26d6af487d56ca0c1ced3274c7136131a8c821",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\knot_residue_classifier_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-residue-classifier.exe"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "observations": [
+    "positive persistent unique size detected",
+    "intermittent unique copy discarded",
+    "persistent copy matching one baseline size discarded",
+    "extra same-size copy multiplicity discarded"
+  ],
+  "generated_native_output_removed": true
+}

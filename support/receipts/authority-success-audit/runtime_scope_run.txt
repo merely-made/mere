@@ -1,0 +1,20 @@
+
+running 11 tests
+test allocation::cases::ordinary_stream_window_control_routes_and_resets ... ok
+test allocation::cases::pinned_client_window_changes_other_stream_not_its_allocation_stream ... ok
+test allocation::cases::unwinding_callback_skips_reset_command ... ok
+test dry::audit::foreign_real_run_drop_disables_another_threads_live_guard ... ok
+test dry::audit::moving_real_run_then_dropping_it_leaves_origin_enabled ... ok
+test dry::tests::a_dry_run_spares_the_measurements ... ok
+test dry::tests::dry_runs_nest ... ok
+test dry::tests::launches_execute_by_default ... ok
+test dry::tests::real_run_nests ... ok
+test observation::cases::documented_taken_order_loses_active_then_resurrects_ended_observer ... ok
+test observation::cases::reverse_order_control_restores_and_ends_observers ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'allocation::cases::unwinding_callback_skips_reset_command' (3148) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\runtime_scope_probe.rs:328:133:
+synthetic caller unwind
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

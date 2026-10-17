@@ -1,0 +1,14 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "1 public-flow observation passes: shared evaluator rejects revoked persona certificate, another device revocation refreshes its new private epoch, and public enrollment bundle exports the new carriage",
+  "reproduction_sha256": "f8c02b947ca17e5424e60e1bdeced814fe51be02925a185ef9ffe8899a409eca",
+  "output_file": "castellan_revocation_output.txt",
+  "affected_sources": {
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "9060edea658cb1007233a37ec8d14dea13abd061fce04b5c62506b55caeab0f6",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "921ce0f697990a1850bc55b8a5cc9106523495c278ac6b57ab0fff5938ceba78",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "430632bec4fa972ac05ed57423a30bb2d3f4a632860226a0e7cc0e33f3b3625d",
+    "crates/system/pandect/src/wallet_grant/revocation.rs": "8b0bdb00bc77e3fd7b1578e72ab0b5e4575ccea0d4e98612b084f4a47af65ba6"
+  },
+  "scope": "Public APIs with isolated temporary wallets and fixture keys, Windows native --features wallet, locked offline dependencies. No real profiles or credentials used. Network delivery/adversarial peer execution is not claimed."
+}

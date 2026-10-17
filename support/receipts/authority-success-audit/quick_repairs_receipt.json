@@ -1,0 +1,69 @@
+{
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "scope": "Uncommitted contained audit repairs Q004, carriage-return portion of Q005, Q006, Q011, Q030 and measurement Q033. Source claims corrected for A028 and Q014; containment behavior is retained.",
+  "checks": [
+    {
+      "log": "quick_repairs_store_output.txt",
+      "log_sha256": "c665d062e7a70f3ed38676135a6c2c358313431c1c4171a56235336550071bc8",
+      "command": "cargo test -p chartulary -p mere-kernel --features mere-kernel/store --lib --tests --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+      "exit_code": 0,
+      "passed": 556,
+      "failed": 0,
+      "ignored": 2
+    },
+    {
+      "log": "quick_repairs_pandect_output.txt",
+      "log_sha256": "3e0e006d2a63cb6e66c5886453dcd222de6b2596cda1c5b7713a2ffb923fcdff",
+      "command": "cargo test -p pandect --lib --tests --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"'",
+      "exit_code": 0,
+      "passed": 345,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "log": "quick_repairs_size_output.txt",
+      "log_sha256": "96ae0c164ca7d7221acd9007772426cb2e238028b281a8cdd5bd62ad1d574ead",
+      "command": "cargo test -p mere-kernel --features store --lib graph::tests::snapshot_size::common_case_semantic_statement_stays_cheap_in_the_snapshot --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"' -- --nocapture",
+      "exit_code": 0,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "working_tree_files": {
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md": "d2fcaed3fe7ca654a92b1969ae2173303d6ee1d1a87d53547ed6ce032eeef42d"
+  },
+  "previous_repair_batch": "All hashes in repair_verification.json unchanged, including Q022-Q029 source/tests and its vault plan.",
+  "intermediate_logs": [
+    "quick_repairs_output.txt",
+    "quick_repairs_final_output.txt"
+  ],
+  "historical_evidence": "Original bug-observation reproductions are retained unchanged. snapshot_size_before_repair.rs records the no-op overhead comparison; new focused log measures 3185 bytes across 49 assertions.",
+  "limits": [
+    "Full-source audit is active and incomplete.",
+    "No whole-workspace, headed or foreign-product qualification.",
+    "Q005 IRI formatting remains unqualified; the escape repair is narrower.",
+    "Public trait repair retains the intentionally single-predicate capability.",
+    "Broad checkpoint, lineage, ownership, placement and migration repairs remain documented in review_notes.json.",
+    "query.rs comments were corrected during the graph package run; its executable behavior was unchanged. The subsequent focused kernel test rebuild includes these comments."
+  ],
+  "resources": {
+    "isolated_targets": [],
+    "isolated_homes": [],
+    "worktrees": [],
+    "shared_target": "C:/t/cargo-targets/mere",
+    "owner": "Mere shared repository builds; reused, not created for isolation"
+  },
+  "diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "log": "quick_repairs_diffcheck_output.txt"
+  }
+}

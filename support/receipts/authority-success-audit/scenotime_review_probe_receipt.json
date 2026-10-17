@@ -1,0 +1,58 @@
+{
+  "date_utc": "2026-10-16T21:56:31.339649+00:00",
+  "scope": "Current public snapshot, diff, trace and clock APIs with generated typed data only. Includes nonfinite geometry round-trip failures and two boundary qualifications; no source authority, host renderer, network or real clock callback executed.",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\scenotime_review_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-scenotime-review-probe.exe",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+    "--extern",
+    "scenotime=C:\\t\\cargo-targets\\mere\\debug\\libscenotime.rlib"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "tests": 6,
+  "source_sha256": {
+    "crates/cambium/scenes/scenotime/Cargo.toml": "d44ca07361656dc556308a11cb6a972248fb471ba8e1c2a8465f9303ff5f507f",
+    "crates/cambium/scenes/scenotime/src/clock.rs": "339c3ad8c6a138ce982625f05f865533d08c0396d5b6de81b48d5ea9bf9a94ac",
+    "crates/cambium/scenes/scenotime/src/diff.rs": "898933fc446e1b5751669d30419e08906e0a0615a01c361d62c9ca50ffdafc92",
+    "crates/cambium/scenes/scenotime/src/ids.rs": "7bf6bae4e6b8ba0426e00d8645e862487972f3a612cd4fd4aef58c4ec01429b8",
+    "crates/cambium/scenes/scenotime/src/lib.rs": "fabc8f86ea8d78ef27f78064b8cde2fbdf9281550a33ed2ad98363ae10ebb9f5",
+    "crates/cambium/scenes/scenotime/src/pick.rs": "6c7f10094a40fa29c22739e57d7a45b46b5909508fce1813a2127e7d6ac4c229",
+    "crates/cambium/scenes/scenotime/src/return_motion.rs": "0a14305977c9df105dfb636f19fc83f0e4d2f42f926ffb8ed71482d9cc47fb26",
+    "crates/cambium/scenes/scenotime/src/snapshot.rs": "4d08c8521bb06ea8ab3f3b5a65730063ac5ea24219199ff2778c8caca30bc607",
+    "crates/cambium/scenes/scenotime/src/trace.rs": "5f61765a46c1dda1e3deaa2b3fd2115a0f1a868c08c561bed37190a1d8532231",
+    "crates/cambium/scenes/scenotime/src/transition.rs": "a0f25194f9f56cc1fea28ebe4c847e13f180079930f1721974faf4b22921a988",
+    "crates/cambium/scenes/scenotime/tests/fold.rs": "bd68f73649220289c11bf867ac8c1ed953076fee7b26beb81a693c5a9d99c5d4",
+    "crates/cambium/scenes/scenotime/tests/history.rs": "3479b48ffec0fcc3f0260a305f2bf982459e662b33ae925e2def9707b84c9d07",
+    "crates/cambium/scenes/scenotime/tests/site_projection.rs": "87dc35e6e93d02e4614fca6653ed13300b555dd77673eb092abe4f0051b7eb57",
+    "crates/cambium/scenes/sceno/src/link.rs": "89f7e8262974a8fce2d2abf185fcd8855cf8b5082d5bf7e163fde42b62b0865b"
+  },
+  "library_sha256": {
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-31d752b8adef6783.rlib",
+      "sha256": "5217cd48a147df645cd924eada44f053696f2fa82d1b49f4383fd0c73a24f1dc"
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-2f77397b57d6cb2c.rlib",
+      "sha256": "398b81ba7e1443daa91a756fe7ea33fa73140a0e1adceaf4d91610f0da931f51"
+    },
+    "scenotime": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libscenotime.rlib",
+      "sha256": "4e168eba97a82909f84ff5ae16c9ff04bc1903a52e7cc6c9123e5e222ca34e1f"
+    }
+  },
+  "harness_sha256": "82bcba7fc96180ec5dad623d46f996d415df4e4ca8bc01e970b7abc60ee43a90",
+  "native_binary_sha256": "fe770fdd5c4729c7654afc770fb501ab6b07a8452d5a2a8a6876b9939e10f527",
+  "generated_native_output_removed": true
+}

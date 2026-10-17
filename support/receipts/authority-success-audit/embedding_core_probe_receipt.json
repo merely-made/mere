@@ -1,0 +1,74 @@
+{
+  "date_utc": "2026-10-17T10:11:11.769095+00:00",
+  "source_sha256": {
+    "crates/intel/esp/src/embed/index.rs": "0fa17d4442928db98bf5df1894bd41100c9009d352d0409c945de9dd9ab65fc3",
+    "crates/intel/esp/src/embed/provider.rs": "c0273227fb5a8e4d4663cf156d9196d50ebdece3e06f0ad9362ee140e171d80d",
+    "crates/intel/esp/src/embed/sparse.rs": "1cc8ea3b9cfe978f4800d905e653f013cda70f2da31e63994822ba5b1d09b22a",
+    "crates/intel/esp/src/embed/lexical.rs": "eaa9690a95398f1063c5762a24f3c062bdcf55ca8ea4a320f92877822fcb2764",
+    "crates/intel/esp/src/embed/stub.rs": "668927f03bef751e293fdc966f83df1b6bb732ccb300a72223ec8b437b8e627f",
+    "crates/intel/esp/src/embed/search.rs": "c5027219e2c02dc743d00960286fffc190a934ba19170b7e59281169560708b3",
+    "crates/intel/esp/src/embed/affinity.rs": "800ece6b64361ac5e5755e98c310e2fbeec42f156bd753095d417914fc8cc37d"
+  },
+  "qualification": "Seven unchanged current embedding source modules compiled together in their original embed namespace, including their original unit tests. No whole ESP infer/Burn/actor/model-session build.",
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    }
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\embedding_core_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-embedding-core.exe",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 77,
+  "audit_cases": 7,
+  "original_tests": 70,
+  "runner_sha256": "82954da119a3052cfeb76afbf0186878f5a6d32e8295486cde6697f82eec024e",
+  "probe_sha256": "a92089e889d2687e38262d3494e64127fd21ce20575acf726c41ef110339ff3f",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-embedding-core.exe",
+      "bytes": 1629184,
+      "sha256": "875f2e8794ee01908e89510ae939e561fbc96698d650ed26efc00ff2c9e3655a"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-embedding-core.pdb",
+      "bytes": 5910528,
+      "sha256": "40e65a3064c0e7ccaea38c510ecdcd977b1c4a0fe853f281d8e5e9ee5d8dfcf9"
+    }
+  ],
+  "generated_output_removed": true
+}

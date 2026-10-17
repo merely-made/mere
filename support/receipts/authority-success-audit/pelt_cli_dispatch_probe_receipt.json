@@ -1,0 +1,60 @@
+{
+  "date_utc": "2026-10-17T20:17:10.897500+00:00",
+  "compile_command": [
+    "rustc",
+    "--edition",
+    "2024",
+    "--cfg",
+    "feature=\"scripted\"",
+    "--cfg",
+    "feature=\"scripted-nova\"",
+    "--cfg",
+    "feature=\"reader\"",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pelt_cli_dispatch_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-pelt-cli-dispatch.exe"
+  ],
+  "compile_exit": 0,
+  "exit": 0,
+  "passed": 9,
+  "source_sha256": {
+    "ports/pelt/viewer.rs": "ebe4fced0c1ad422181a7690a1878d4ac2206600d787691ecb7bd5bed7cffe2c",
+    "ports/pelt/desktop/static_viewer.rs": "0cca83b9f3bd9e0652f4962d0cba9b3dd5d322dd88b1e96c3f73fa3b98347f45",
+    "ports/pelt/desktop/workspace_viewer.rs": "4cca3d1b2bcf23a81a98a2f8391fa9af0c72a30b59a762deb3f3283abba2a4f1"
+  },
+  "extracted_body_sha256": {
+    "selected_engine": "e9fd7a3d7814f5daa03650e01ca3dcb38bd971918458eff2064ab6a7343deb23",
+    "cli_parser_and_early_dispatch": "ebf71efd39240cb3cccaa73475382ce88fa91546f8736919d4d62b25d424aa4a",
+    "size_receipt_parser_helpers": "ca90d469a58e3865acc346e31362498a16242afff231045c98dcd24d2dbe010d",
+    "tile_engine_parser": "15300a582d6b59291ba00f1f3d923468a2b408e647e33f05e68308044ed42002",
+    "workspace_receipt_parser": "b49d0672ea19a631b1f514109923f6f8457ed808b743f9b1e9af310d3a802203",
+    "engine_parser": "3c541632d9afa738b436fe627a182ffda3aed746f067274fe0082995859756d7",
+    "workspace_profile_engine": "41fd6756b517240173aee8ee9a00d41e2ea3930b469e00f067eff8d8bbf82628",
+    "product_receipt_types": "d6ba1eb09275ce77ac80930c01bd68a60c63ce27a1ea97a48e748b82d968d58a",
+    "workspace_receipt_enum": "f5f9a0fc4b6f61b9bb275861633c89e0c5f8fd49a7e899a5e4bcc22d1deeaaaa",
+    "workspace_receipt_id": "a9651d54b46af211816c663d48c5e4bb7376cf8069d54ef87a10174236ee8ab7"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-pelt-cli-dispatch.exe",
+      "bytes": 237568,
+      "sha256": "9f148512b6f63a05c90d6bc4529e7a6868d661198e2f9ff0f7a7f959693f69d9"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-pelt-cli-dispatch.pdb",
+      "bytes": 1404928,
+      "sha256": "e148bb0565147b4f2ff466b37acc5d03803e43e1823355a86e76eb9175612599"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_pelt_cli_dispatch_probe.py": "64c1134b0abd4490b2cb38b0d432f23b6731519e65af8c374eec8ff0d096fd3c",
+    "pelt_cli_dispatch_probe.rs": "f747786d5e838277d6a88199ad1a1aca3934670e2200a8921cb3ba9ddac38912",
+    "pelt_cli_dispatch_compile_attempt0.txt": "0ba26a8af535f59224a14a786eeafbc716d8fd75b408ab2f02467d8f3c7fad42",
+    "pelt_cli_dispatch_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pelt_cli_dispatch_cases.json": "b9a9aad874cdb16e8e229f7d5e42d768ee4c9bfba9c9b440a4f28d9b8052c8af"
+  },
+  "qualification": "Nine real child-process invocations of exact source-extracted CLI parser/early-smoke dispatch prefix, parser helpers and workspace profile-engine selection. Main function renamed and source-prefix fixture stops only after the actual smoke early-return branches. Engine-capability/engine-ID and smoke host doubles; original receipt enum/id/metadata definitions extracted. Scripted/Nova/Reader cfg enabled only to inspect branch selection; neither JS backend compiled or executed. Owner-dispatch control is reachability only, not receipt execution. No actual Pelt desktop binary, GPU, browser, native window, physical input/AT or user storage mutation; expected PNG never created."
+}

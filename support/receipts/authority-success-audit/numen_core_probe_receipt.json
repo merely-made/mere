@@ -1,0 +1,75 @@
+{
+  "date_utc": "2026-10-16T23:23:08.605883+00:00",
+  "test_exit": 0,
+  "tests": 3,
+  "harness_sha256": "472c412584dca9f8155387e57602dbbf4cf07d60e5a06cb072bb924d70132140",
+  "source_sha256": {
+    "crates/conatus/numen/Cargo.toml": "4ddea55a059e410de2091ed421a8c7c74f4b0084d01f75ade28c30c923a00f99",
+    "crates/conatus/numen/examples/responsive_paths.rs": "959439fb186c2fcd52c39e61b0b64786def147463340757f38381bd2ea27015c",
+    "crates/conatus/numen/src/coupling.rs": "b7a1c5a071fcbbd47318b8a3961589bb4891e5430639cdac5348852ed2bd1a66",
+    "crates/conatus/numen/src/edge_path.rs": "05a0525cccf11474ccb4d52d731959ead791693e23bf035194d88ff5bb0dd360",
+    "crates/conatus/numen/src/eval.rs": "625c5f954ae5acb20de92e13d096b9ef87cd3e7cd33bd9631033ed9433e37818",
+    "crates/conatus/numen/src/field.rs": "c885c6b49cfcb39b0476d22aa6979806d41fc5753db5e56fa5b7dbaedaa97501",
+    "crates/conatus/numen/src/field_ast.rs": "959f8b47a3fee84eb20796ac36d5a9b169cb2ae4218d5c2dcc842a887303e54a",
+    "crates/conatus/numen/src/lib.rs": "565ad2e30f76b007ec071bfa927d55357f5c7b620b2851ed0b9d1540c57c3a92",
+    "crates/conatus/numen/src/lower_burn.rs": "27721a8c90c07a75c771b58b9b12c3696a1e84b1d9aae2fb48c6b55631420b51",
+    "crates/conatus/numen/src/lower_burn/tests.rs": "17f45a5b94bc70e0c1d6720a069aae03677d6409448783e7404de020978be62a",
+    "crates/conatus/numen/src/lower_burn/tests_wgpu.rs": "28c0b0bc20ca15afb986763447b2e7edc578bad235bcd7121102a6862bac17a5",
+    "crates/conatus/numen/src/projection.rs": "ca9de19988c5d0250b2564883d089bd573ad46f71d72c932c339af7b409438eb",
+    "crates/conatus/numen/src/registry.rs": "faebe9955bea04a0a7d0e3564b39beea7f7e10ba05fde5ebd72deb33d63fc520",
+    "crates/conatus/numen/src/responsive_path.rs": "9b132b65e02745f5b20d31acec0aacc355ebbeb5c6a7307b16a55f48ef93d78c",
+    "crates/conatus/numen/src/responsive_path/tests.rs": "106759c131d2af99ee23b5037e2774e14fd658f5d484ae5964df8f887124db45",
+    "crates/conatus/numen/src/rhai_bindings.rs": "d98f3c232fdea39ce2bea26ac2e0a5611b51a43c15ebe75ad9a1318551243b38"
+  },
+  "library_sha256": {
+    "numen": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libnumen.rlib",
+      "sha256": "1a7b007b81c15499c3aa95025c4cc29329ea64bcfb9a39d58c4c626699c3b3fc"
+    }
+  },
+  "library_build_command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "build",
+    "-p",
+    "numen",
+    "--lib",
+    "--target-dir",
+    "C:\\t\\cargo-targets\\mere",
+    "--message-format=json"
+  ],
+  "library_build_exit": 0,
+  "suite_command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "test",
+    "-p",
+    "numen",
+    "--lib",
+    "--target-dir",
+    "C:\\t\\cargo-targets\\mere",
+    "--",
+    "--test-threads=1"
+  ],
+  "suite_exit": 0,
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\numen_core_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "--extern",
+    "numen=C:\\t\\cargo-targets\\mere\\debug\\libnumen.rlib",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-numen-core-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "11926ad08edf035d9f97a11d4cc6bd543c83c7f926861c6c723be98f036e184a",
+  "generated_output_removed": true,
+  "scope": "Current default-feature library suite plus three native defect observations with constant-parameter and identity controls. No Burn, Rhai, GPU, renderer or hosted consumer execution."
+}

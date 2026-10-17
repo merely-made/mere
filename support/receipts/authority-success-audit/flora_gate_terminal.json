@@ -1,0 +1,13 @@
+{
+  "date_utc": "2026-10-17T06:10:07.907556+00:00",
+  "session_id": 32507,
+  "exit": 0,
+  "passed": 6,
+  "failed": 0,
+  "filtered_out": 29,
+  "command": "cargo --config build.build-dir=C:/t/cargo-targets/mere/build test -p distillery --lib --features trainer,flora --locked -j 1 --target-dir C:/t/cargo-targets/mere flora:: -- --test-threads=1",
+  "log": "trainer_flora_fetched_unit_tests.log",
+  "log_sha256": "1a619074d461d0d017d2e1327c765251a813d06e0fa18b64213608d3f22ec2ef",
+  "basis_commit": "a6e6b94140b0b227f2ac19356571e3decfa98975",
+  "scope": "Original filtered library tests on merged dependency graph; trainer+flora, CPU, not autodiff/GPU/browser. Terminal exit0 observed by polling original session32507."
+}

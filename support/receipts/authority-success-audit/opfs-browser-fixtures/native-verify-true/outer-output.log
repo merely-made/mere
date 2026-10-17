@@ -1,0 +1,10 @@
+[firefox] launching (headless=true)
+[firefox] harness ready
+[firefox] lane 5 …
+[firefox] lane 5: ok=true failed=false (0s)
+[firefox] browser→native verify: ok=true
+[firefox] receipt → output.json
+{
+ "receipt_gate_passed": true,
+ "lane5_native_to_browser_ok": true
+}

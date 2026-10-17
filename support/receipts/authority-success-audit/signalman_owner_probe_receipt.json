@@ -1,0 +1,52 @@
+{
+  "date_utc": "2026-10-17T20:22:58.939431+00:00",
+  "exit": 0,
+  "passed": 4,
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-signalman-runtime\\Cargo.toml",
+    "--target-dir",
+    "C:\\t\\cargo-targets\\mere",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "--lib",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "source_sha256": {
+    "ports/signalman/src/bin/mere-signalman-first-owner.rs": "524ee9c23da753bebd35ac19b83cd7a39581b648ef4da11b65c12d621027da9d",
+    "ports/signalman/src/lib.rs": "6640e9ef1dd71b1241a9cb1b7a1ce28f56a7c7d058eab0383f468d104cdf8fcc"
+  },
+  "extracted_body_sha256": {
+    "reservation": "9f7693d959791da59da266f13d71c60f771c2607a5c94785dc679c31175c3a6d",
+    "next_event": "d6fce345915acdfcde2adda74a89696c00895afd206ac74eae0652186a05f5ae",
+    "stop": "17b56a86b1f6cd6676f59941f8ab83ea36c7ac0cd0540cb0c27f9e069a725f91",
+    "revoke": "9de091769ab74fb64637ef49a734eb7e536154715a85f48e713cc53a60a6cfa6"
+  },
+  "evidence_sha256": {
+    "run_signalman_owner_probe.py": "7d0a20a10b29b0f95e633ec4b6c9e023ff443667a69371ca103b5ee8299e796a",
+    "cpu-signalman-runtime/Cargo.toml": "2442136e5d22caf28c4d827cfdde7f651977da6aecd31f05cc5da0e034e59b7f",
+    "cpu-signalman-runtime/Cargo.lock": "1b4cb4b1686323627ae8ac2f44ad0e8ac55fae436411fbf0ce9ceb05c285065a",
+    "signalman_owner_probe.rs": "ddde18dc8234cac100ce7bbbc72ae5a57c4cf3f63d169599da162e1ceeb1758f",
+    "signalman_owner_probe_run.txt": "c6926d8c673b0b4554e467397049b2b9f900c27eb54e205f11cd1707dca19322"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\authority_success_signalman-2132c11f289710d4.exe",
+      "bytes": 1401856,
+      "sha256": "f1a2118c6a6af6beac3203900fe9d720bedd91b7a6f14bbb662beebf69131831"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\authority_success_signalman-2132c11f289710d4.pdb",
+      "bytes": 3805184,
+      "sha256": "e6381f06fbcd37e3b308edff7493af8df2a8f0a0e0e8dffd412ce5f31c17b497"
+    }
+  ],
+  "retained_isolation": [],
+  "qualification": "Exact reservation, stop, revoke, next_event bodies extracted without edits. Counter uses real filesystem, serde, synced writes/renames with deterministic delays after actual read to schedule two callers; no radio or board replay verifier run. Station uses actual Tokio mutex/time/select with virtual time, fake pending radio, lease/revoke/clock and disabled watchdog doubles; tests prove mutex/cancellation behavior, not full hardware cessation or real Djinn revocation. Four cases include idle-stop control. Source unchanged.",
+  "cleanup_note": "Initial output lookup used legacy debug/deps; actual Cargo build.build-dir placed outputs in build/debug/deps. Corrected audit runner and removed both verified run-owned outputs after process exit."
+}

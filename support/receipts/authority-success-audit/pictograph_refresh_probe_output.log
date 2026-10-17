@@ -1,0 +1,15 @@
+
+running 5 tests
+test changing_offer_origin_leaves_old_edge_and_kept_provenance ... OBSERVATION: only page B still offers shared URL, but derived edge and kept-link origin still name page A
+ok
+test changing_other_offers_does_not_remove_derived_nodes_that_lose_admission ... OBSERVATION: two minted links remain real graph members after both lose suggestion admission to new offers
+ok
+test filtered_other_offers_consume_page_link_minting_budget ... OBSERVATION: two source-filtered offers reserve entire link mint budget; removing them admits both links
+ok
+test pending_kept_link_survives_wholesale_graph_switch ... OBSERVATION: old graph's pending keep intent is returned after a different graph replaces it; host writes not executed
+ok
+test tiny_plate_mints_a_link_that_immediately_is_not_admitted ... OBSERVATION: link minted under pre-mint plate budget is immediately not admitted by post-mint plate budget
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

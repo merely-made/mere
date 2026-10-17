@@ -1,0 +1,1 @@
+{"receipt": {"lanes": {"lane1": {"failed": true, "error": "AUDIT injected lane exception"}}, "conclusions": {"receipt_gate_passed": true}}, "laneThrows": true, "native": null}

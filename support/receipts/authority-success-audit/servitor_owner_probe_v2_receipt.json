@@ -1,0 +1,185 @@
+{
+  "date_utc": "2026-10-17T12:45:56.299756+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/servitor/Cargo.toml": "4a5fe924e2793d2a277e1841f2014b5fb8c1dcbd94dfccc1062cbd7403f2d544",
+    "crates/servitor/src/cap.rs": "ea6f60f7b547c0beb44cb5104d69b7230c4ab7a4824ea3862665211d95846731",
+    "crates/servitor/src/cascade.rs": "54dcfd89b136a25f480dfc6ac351dcf6692ff98650d3b95d564b17997747f02b",
+    "crates/servitor/src/deadband.rs": "73e616506b71b98c1c6e61f20ea91cd3c61d69a2bc15a7db222128d352f4b26b",
+    "crates/servitor/src/delegation.rs": "209e2e6eb1d82a5a53b4a28f3449f60d7590f5bd14e8143038eaa55c882d6314",
+    "crates/servitor/src/gate.rs": "9cd0e01301132859a3ac978e21e414f0ae294d97eaf013b19fa4553d8ec76b8a",
+    "crates/servitor/src/grant.rs": "edb4e7eb30efa73d836e28a1a806261379ddcde30d6bb8382ebbe0b2b4f3dd61",
+    "crates/servitor/src/lib.rs": "9b90b292a3167415409f04c253f324a8c221f638e9c06ec36b3e934698742934",
+    "crates/servitor/src/resident.rs": "21c0b929b97cea219b5d2ff1ba9304ea06ca24ad76ddefb28b51f02a3ea57ccd",
+    "crates/servitor/src/run.rs": "912622e7ca6149b95338217188e83f4500b50a25a5c2d5d291ce648f31cb63ad",
+    "crates/servitor/src/tick.rs": "980341c3065a678b691ba7bc64823f34bcb8a5039fe8f1037fa7cbc22f9a010c",
+    "crates/servitor/src/watch.rs": "30d889d012d353205fb419e6e2b87a75388f8cf87ab71b33adabe0cba7f8b0ea"
+  },
+  "libraries": {
+    "insigne": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-955b80afa4630e77.rlib",
+      "sha256": "3bfcdcbc1e04074663ce735da4ad1eb5487a26fb5d93749a9ab136e95462dc91",
+      "fingerprint_value": 3492335656838042627,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\insigne-955b80afa4630e77\\lib-insigne.json",
+      "metadata_sha256": "45449470c3073cb18e1e508e8e7355ec3833aee884791ce6ff429cfdfdead08b"
+    },
+    "identity": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+      "sha256": "c0f0c0d29580214e3285d567d3e726192d4b7187f68218de9fcb6f88c4eee3d5",
+      "fingerprint_value": 16393081860439893135,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-2b0f6cacb453c490\\lib-personae.json",
+      "metadata_sha256": "ec1f18c144ba1dc165b0e28a8a6cb003db84aa95984bfca700f8e45305d75b2d"
+    },
+    "chartulary": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchartulary-c3979848a301295d.rlib",
+      "sha256": "67ece151c63515db4bf79c5e09289dc6975f98e10938a795ac7e04c4c97c0536",
+      "fingerprint_value": 14405788720319156262,
+      "metadata_path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\chartulary-c3979848a301295d\\lib-chartulary.json",
+      "metadata_sha256": "f528a8dcc3badd025a80d81b157057b0fd5911b3e18d3fb0979958e968b31b57"
+    }
+  },
+  "supplier_metadata": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\servitor-75b7e6682b543f46\\lib-servitor.json",
+    "sha256": "657f9c170d5b386cc111a3641de8d1c335bc1bba865a8749fe64554fe817836c"
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "results": {
+    "owner_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--crate-name",
+        "servitor_audit",
+        "--crate-type",
+        "rlib",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\lib.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+        "-L",
+        "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+        "--extern",
+        "insigne=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-955b80afa4630e77.rlib",
+        "--extern",
+        "identity=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+        "--extern",
+        "chartulary=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchartulary-c3979848a301295d.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\libauthority_success_servitor_owner.rlib"
+      ],
+      "exit": 0
+    },
+    "consumer_compile": {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\servitor_owner_probe_v2.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+        "-L",
+        "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+        "-L",
+        "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+        "-L",
+        "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+        "--extern",
+        "insigne=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-955b80afa4630e77.rlib",
+        "--extern",
+        "identity=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-2b0f6cacb453c490.rlib",
+        "--extern",
+        "chartulary=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchartulary-c3979848a301295d.rlib",
+        "--extern",
+        "servitor_audit=C:\\t\\cargo-targets\\mere\\libauthority_success_servitor_owner.rlib",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-servitor-owner.exe"
+      ],
+      "exit": 0
+    },
+    "output": {
+      "command": [
+        "C:\\t\\cargo-targets\\mere\\authority-success-servitor-owner.exe"
+      ],
+      "exit": 0
+    }
+  },
+  "original_tests_this_attempt": 0,
+  "prior_original_tests": {
+    "path": "servitor_owner_probe_receipt.json",
+    "sha256": "5443d3939d214e5e16c78df3331be629ab4f0a329fe151b7f2449a7d9827828b",
+    "tests_passed": 98,
+    "qualification": "Same unchanged complete owner and exact suppliers. First attempt passed all98original tests, then its new consumer failed due to missing Issue trait import. Original tests were not rerun for this audit-only import fix."
+  },
+  "audit_cases": 4,
+  "runner_sha256": "b94469bcda9d15cf6d923ead5f0ba2571d7129b3b5f5d57805897b59534c23ca",
+  "probe_sha256": "5f63d9f0ce2b89cd191d9624324395709ce2f1957cd54dfff91b4ba7886266de",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-servitor-owner.exe",
+      "bytes": 1430016,
+      "sha256": "7f62f5be0398c8c05957968e32e3830535d0c03a0331b7859d212ce96f0cdcdf"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-servitor-owner.pdb",
+      "bytes": 19222528,
+      "sha256": "579b910056c2998e6c3e5c5f0a5d4f5ad6119318e3524dd4dc2f4152885ebb38"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_servitor_owner.rlib",
+      "bytes": 4876566,
+      "sha256": "af51c043442736bc323d89f589476b4e54a0ca8cb9e717166909a4165c258845"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Complete unchanged current Servitor freshly compiled directly, with all original source unit tests and a separate public consumer over three exact retained Cargo-fingerprint-matched suppliers. The signed namespace case uses actual identity signatures, shared certificate check and Gate/GraphLog commit. Subject collision case uses two distinct raw public Subject values with equal first four bytes, not generated colliding cryptographic keys or identity authentication. Watch cases are in-memory public APIs with explicit clock and labels. No fresh Cargo dependency graph, live consumer/host, network, product scheduling, physical trial or persisted migration. This retry reruns whole-owner and public consumer compilation only. All98original unit tests passed in the preserved first attempt; its consumer compile failure was not a production failure. V2 adds the required identity::delegation::Issue import."
+}

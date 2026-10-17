@@ -1,0 +1,107 @@
+{
+  "date_utc": "2026-10-16T23:31:59.547287+00:00",
+  "results": [
+    {
+      "kind": "library",
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--test",
+        "--cfg",
+        "feature=\"default\"",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\conatus\\conatus\\src\\lib.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-conatus-library-tests.exe",
+        "--crate-name",
+        "conatus",
+        "--extern",
+        "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-753847e7fa07e7ef.rlib",
+        "--extern",
+        "nisus=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnisus-e9922fbdaf157683.rlib",
+        "--extern",
+        "rapier3d=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\librapier3d-bc0f5240be50583c.rlib"
+      ],
+      "build_exit": 0,
+      "test_exit": 0,
+      "passed": 19,
+      "generated_output_removed": true
+    },
+    {
+      "kind": "integration",
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--test",
+        "--cfg",
+        "feature=\"default\"",
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\conatus_existing_cpu_tests.rs",
+        "-L",
+        "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+        "-C",
+        "debuginfo=0",
+        "-o",
+        "C:\\t\\cargo-targets\\mere\\authority-success-conatus-integration-tests.exe",
+        "--extern",
+        "conatus=C:\\t\\cargo-targets\\mere\\debug\\libconatus.rlib"
+      ],
+      "build_exit": 0,
+      "test_exit": 0,
+      "passed": 25,
+      "generated_output_removed": true
+    }
+  ],
+  "source_sha256": {
+    "crates/conatus/conatus/Cargo.toml": "951c1710b2e0dd25250c5bca527fe7e8fabf0bfb8da3efc832ff4033a6992664",
+    "crates/conatus/conatus/src/body.rs": "623279cc13f54594c92476aabdeae29eef062db8c4b0b9a36d1f072e72f75d89",
+    "crates/conatus/conatus/src/clock.rs": "0bd923639c178a05c294ed123ac1603f45b8763e496e19b7c85dbb21487d4764",
+    "crates/conatus/conatus/src/command.rs": "484fd674e33d8b01832f0022fda1164806ce90407724525361cc1408f12f2afd",
+    "crates/conatus/conatus/src/engine.rs": "d578c94b141362e9ce8c8606cf7aa0138727906cd0723b3662592bc3aa35698d",
+    "crates/conatus/conatus/src/lib.rs": "fba5bef139a56c6fc77bff27f02f1aa4e9a956520dbd18da12a5d6b7af08487c",
+    "crates/conatus/conatus/src/resident.rs": "9f6ef3fb03026c08a821eaea1bd50e932c62441bf4a31791a904e27d4bc84122",
+    "crates/conatus/conatus/src/resident/binning/mod.rs": "3b6fcbdb9e7bb4ba67e8a43870ba99285e3a0fbd2b548ea55d18c9958d6393f2",
+    "crates/conatus/conatus/src/resident/chunk.rs": "a292c5582a38f892de97ad33c493195305fc9b2335c9ab2675892d230ade82d7",
+    "crates/conatus/conatus/src/resident/exclusion.rs": "18f924a2d3e5b504df8e8a486785ac111ea43ce6956ba7af1dde65c5a525950a",
+    "crates/conatus/conatus/src/resident/kernels.rs": "cce8a65395611b865b4b617dc135fe9e7a07537a84b211406bb1a1fcddf67a18",
+    "crates/conatus/conatus/src/schedule.rs": "2737f3d0f5bdb86d8d9cbbee6439289a4f49b3ef44ddcbf77dd5740529284f86",
+    "crates/conatus/conatus/src/world.rs": "53fc4c71a0a7afda57e16a41aa94547c64ef33e6cd7c8d497980184adfa4b760",
+    "crates/conatus/conatus/src/world/queries.rs": "e84e87758580937cbf378022964d278c282dec4c711c5be621deb3230330b66f",
+    "crates/conatus/conatus/src/world/rapier.rs": "7a85d3b8d17382072d5a571d0d54e2b3e13e0a23746e7fa1e37a16ab27ba60ac",
+    "crates/conatus/conatus/src/world/rapier/queries.rs": "af58e344c5487433712afbc5327e4d87afc755290f5f21a6f179cc236ae10aae",
+    "crates/conatus/conatus/tests/exclusion.rs": "3394a56d57724995237cdf767ab9213c8001d335ab11e1c5e833b05f5062307d",
+    "crates/conatus/conatus/tests/resident.rs": "0192356ce4996886bead7c3f4b52113d98562516cf766fb2c0e8150c48c99220",
+    "crates/conatus/conatus/tests/resident_chunk.rs": "1d2e5099edc4ae6bb5514a1d73f99f93147437afdab5f4a7997764901668324b",
+    "crates/conatus/conatus/tests/voxel_integration.rs": "cb1ab4a3f6d4f355efd5f2c83307813c7db28b604e15d66edfb35e6cf21fbf5e",
+    "crates/conatus/conatus/tests/world_contacts.rs": "8523aefcd50679fc1574f3de6e0f27abba1e12e45e9817bbbd2f98122c515305",
+    "crates/conatus/conatus/tests/world_reads.rs": "a24435333ccaac4bc6b20f16eceb3e9e4f676cb299d88cbc1eb1182084bf77c2",
+    "crates/conatus/conatus/tests/world_refresh.rs": "91bda58e6c4602a40cff2aeb704407f97b24234d915dd29120878cc50a5521c3"
+  },
+  "library_sha256": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-753847e7fa07e7ef.rlib",
+      "sha256": "4fc16e0b6c94c56520180fc64d831c87b98ce70cec07b953cddee06ab2ee0b94"
+    },
+    "nisus": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnisus-e9922fbdaf157683.rlib",
+      "sha256": "18c5a88b34711aada4e1777e6203f45ea23b4df8ed2fd6ca0437d80f060de45e"
+    },
+    "rapier3d": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\librapier3d-bc0f5240be50583c.rlib",
+      "sha256": "0e2d95a92c68eb4441411a2396f35307d45173de4387b6d56685655cee5ef158"
+    },
+    "conatus": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libconatus.rlib",
+      "sha256": "5fdd026be03cff260c7126f9b0d7654f75ae7db31d5618b1d1958b73ad289847"
+    }
+  },
+  "scope": "Original default-feature library tests and four original CPU integration files compiled with rustc. Not a Cargo package/doctest or resident-GPU gate. Unchanged sources; generated executables/PDBs removed.",
+  "evidence_sha256": {
+    "conatus_existing_library_build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "conatus_existing_library_tests.log": "87f343ddd8f4685e7fd1993217be276f944dd57f6deaeaae22ed38ac68ab3ac7",
+    "conatus_existing_integration_build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "conatus_existing_integration_tests.log": "959f2d8161d5de61376cdbcb9f1ce82fb0111e09f9a5d07a2724956aaa33345b"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "zero_test_process_accepted": {
+    "name": "support_driver_zero_tests",
+    "command": [
+      "cargo",
+      "test",
+      "--ignored",
+      "--exact",
+      "real_signed_package_and_tamper_controls"
+    ],
+    "exit_code": 0
+  },
+  "nonzero_process_control": {
+    "name": "support_driver_nonzero_control",
+    "command": [
+      "audit-process-double"
+    ],
+    "exit_code": 9
+  },
+  "consent_control_cases": [
+    {
+      "concurrent_edit_injected": false,
+      "concurrent_bytes_preserved": false,
+      "saved_original_restored": true,
+      "write_count": 2,
+      "calls": [
+        "control-unflagged",
+        "negative-consent",
+        "restored",
+        "restored-build"
+      ]
+    },
+    {
+      "concurrent_edit_injected": true,
+      "concurrent_bytes_preserved": false,
+      "saved_original_restored": true,
+      "write_count": 2,
+      "calls": [
+        "control-unflagged",
+        "negative-consent",
+        "restored",
+        "restored-build"
+      ]
+    }
+  ]
+}

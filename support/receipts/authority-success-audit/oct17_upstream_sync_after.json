@@ -1,0 +1,48 @@
+{
+  "head": "70a153769ec5ef22b0af6a911a818518e073d946",
+  "upstream": "8498608cbdde726c46fc477c3cc582d6c359ed22",
+  "preserved_dirty_files": 38,
+  "changed_dirty_files": [],
+  "stale_coverage_paths": [
+    "ports/djinn/Cargo.toml",
+    "ports/djinn/src/bin/djinn.rs",
+    "ports/djinn/src/personal_sync.rs",
+    "ports/djinn/src/lib.rs",
+    "ports/djinn/src/pairing.rs",
+    "ports/djinn/src/resident.rs",
+    "ports/djinn/src/resident_distillery.rs",
+    "ports/djinn/src/settings.rs",
+    "ports/djinn/src/resident_mere.rs",
+    "ports/djinn/src/sync/mod.rs",
+    "ports/djinn/src/sync/personal_sync_host.rs",
+    "ports/djinn/tests/common/mod.rs",
+    "ports/djinn/tests/distillery_trainer_gpu.rs",
+    "crates/canvas/pictograph/src/canvas/backdrop_surface.rs",
+    "Cargo.toml",
+    "crates/mesh/mesh/src/lib.rs",
+    "crates/mesh/mesh/src/resource.rs",
+    "crates/mesh/mesh/src/worker.rs"
+  ],
+  "prior_inventory_files": 3355,
+  "pending_reads": [
+    {
+      "path": "crates/fleece/src/crawl/graph.rs",
+      "sha256": "afcb3ac25a6177f1aaf1fefeb16e4fcc678e027b1b30a9dd9fc6b2f327b17299",
+      "start": 0,
+      "end": 6561
+    },
+    {
+      "path": "crates/fleece/src/crawl/robots.rs",
+      "sha256": "5612b38a2561bcebab646b33bd2dbc20ea3e4daebe28268ec15b89613a787bff",
+      "start": 0,
+      "end": 9159
+    },
+    {
+      "path": "crates/fleece/src/crawl/sitemap.rs",
+      "sha256": "08d1e67dc94351f69c7c51313f549712010d634204d48448e78a940bf6c9c112",
+      "start": 0,
+      "end": 2243
+    }
+  ],
+  "scope": "authorized upstream merge; no audit production-code edit"
+}

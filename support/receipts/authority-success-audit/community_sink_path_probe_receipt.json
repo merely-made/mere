@@ -1,0 +1,69 @@
+{
+  "tests": 3,
+  "checks": [
+    {
+      "name": "ordinary",
+      "origin": "http://127.0.0.1:8731",
+      "statuses": [
+        204
+      ],
+      "attempted_writes": [
+        [
+          "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\synthetic-output-never-created\\ordinary.png",
+          1
+        ],
+        [
+          "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\synthetic-output-never-created\\result.json",
+          107
+        ],
+        [
+          "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\synthetic-output-never-created\\scenario.done",
+          10
+        ]
+      ],
+      "paths_outside_output": []
+    },
+    {
+      "name": "../escaped",
+      "origin": "http://127.0.0.1:8731",
+      "statuses": [
+        204
+      ],
+      "attempted_writes": [
+        [
+          "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\escaped.png",
+          1
+        ],
+        [
+          "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\synthetic-output-never-created\\result.json",
+          109
+        ],
+        [
+          "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\synthetic-output-never-created\\scenario.done",
+          10
+        ]
+      ],
+      "paths_outside_output": [
+        "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\escaped.png"
+      ]
+    },
+    {
+      "name": "../escaped",
+      "origin": "http://refused.invalid",
+      "statuses": [
+        403
+      ],
+      "attempted_writes": [],
+      "paths_outside_output": []
+    }
+  ],
+  "source_sha256": {
+    "ports/graphshell/web/tests/receipt_sink.py": "0191ecd8bd233f32e9701f1a989c7fb8454d7b9b88e9cd8eac7955481ae530bf"
+  },
+  "exact_class_lines": [
+    50,
+    132
+  ],
+  "diagnostic_sha256": "e3e54e7f8ed9d97bc8cbbfc2da543b7d4930c07c0861e446cf6e13b467dbfd8c",
+  "scope": "Exact unchanged current nested Handler AST, executed with its outer values supplied. Synthetic headers and payload; in-memory path/write intercepts only, no files written by the Handler and no server/network. Shows an allowed-origin capture name escapes --out; wrong-origin control still refuses."
+}

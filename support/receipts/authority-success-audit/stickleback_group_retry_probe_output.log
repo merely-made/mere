@@ -1,0 +1,3 @@
+PASS control mode 0 persists and reopens the updated epoch with successful decryption
+PASS failed save then same-session retry settles the update without invoking save; reopen cannot recover or decrypt the new epoch
+PASS control mode 2 persists and reopens the updated epoch with successful decryption

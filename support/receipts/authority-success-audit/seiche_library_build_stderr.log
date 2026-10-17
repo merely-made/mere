@@ -1,0 +1,28 @@
+   Compiling bytemuck v1.25.2
+   Compiling thiserror v2.0.21
+   Compiling typenum v1.20.1
+   Compiling hashbrown v0.17.1
+   Compiling ena v0.14.4
+   Compiling arrayvec v0.7.8
+   Compiling nalgebra-macros v0.3.0
+   Compiling spade v2.15.1
+   Compiling num-derive v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling strum_macros v0.28.0
+   Compiling serde v1.0.229
+   Compiling euclid v0.22.14
+   Compiling serde_path_to_error v0.1.20
+   Compiling armillary v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\armillary)
+   Compiling safe_arch v1.2.0
+   Compiling indexmap v2.14.2
+   Compiling wide v1.7.1
+   Compiling petgraph v0.8.3
+   Compiling strum v0.28.0
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+   Compiling simba v0.10.2
+   Compiling nalgebra v0.35.0
+   Compiling glamx v0.3.1
+   Compiling parry2d v0.31.1
+   Compiling rapier2d v0.36.0
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 44.14s

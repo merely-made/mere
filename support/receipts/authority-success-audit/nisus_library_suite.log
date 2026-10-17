@@ -1,0 +1,14 @@
+   Compiling nisus v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\nisus)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.54s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\nisus-02ec7cb1b89d5baf.exe)
+
+running 6 tests
+test tests::draining_dirt_does_not_change_record_equality ... ok
+test tests::effective_patch_advances_once_and_publishes_one_dirty_box ... ok
+test tests::material_patch_lowers_only_occupancy_changes ... ok
+test tests::negative_world_cells_split_with_euclidean_coordinates ... ok
+test tests::refused_and_noop_patches_leave_authoritative_state_unchanged ... ok
+test tests::serialization_keeps_facts_and_drops_projection_dirt ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

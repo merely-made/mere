@@ -1,0 +1,165 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling windows-sys v0.61.2
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.3
+   Compiling tokio v1.53.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling chacha20 v0.10.2
+   Compiling blake3 v1.8.7
+   Compiling windows v0.62.2
+   Compiling rand v0.10.3
+   Compiling tokio-util v0.7.19
+   Compiling der v0.7.10
+   Compiling rustls-webpki v0.103.15
+   Compiling sec1 v0.7.3
+   Compiling rustls v0.23.45
+   Compiling spki v0.7.3
+   Compiling elliptic-curve v0.13.8
+   Compiling h2 v0.4.19
+   Compiling hyper v1.11.1
+   Compiling gpu-allocator v0.28.0
+   Compiling ecdsa v0.16.9
+   Compiling n0-future v0.3.2
+   Compiling hyper-util v0.1.20
+   Compiling primeorder v0.13.6
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling wgpu-hal v30.0.1
+   Compiling tokio-rustls v0.26.6
+   Compiling sceno v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling data-encoding-macro-internal v0.1.19
+   Compiling noq-udp v1.3.0
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling tower v0.5.3
+   Compiling tower-http v0.6.11
+   Compiling wgpu-core v30.0.1
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling data-encoding-macro v0.1.21
+   Compiling hyper-rustls v0.27.9
+   Compiling p256 v0.13.2
+   Compiling p384 v0.13.1
+   Compiling pkcs8 v0.10.2
+   Compiling num-iter v0.1.46
+   Compiling tokio-stream v0.1.19
+   Compiling ipconfig v0.3.4
+   Compiling noq-proto v1.3.0
+   Compiling num-bigint-dig v0.8.6
+   Compiling pkcs1 v0.7.5
+   Compiling reqwest v0.13.5
+   Compiling iroh-base v1.3.0
+   Compiling wgpu v30.0.1
+   Compiling ed25519 v2.2.3
+   Compiling netdev v0.45.1
+   Compiling wmi v0.18.4
+   Compiling n0-dns-resolver v0.1.0
+   Compiling ed25519-dalek v2.2.0
+   Compiling rsa v0.9.10
+   Compiling noq v1.3.0
+   Compiling p521 v0.13.3
+   Compiling n0-watcher v1.0.0
+   Compiling attohttpc v0.30.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling igd-next v0.17.1
+   Compiling iroh-dns v1.3.0
+   Compiling netwatch v0.19.3
+   Compiling ssh-key v0.6.7
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling tokio-websockets v0.13.3
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling chacha20poly1305 v0.11.0
+   Compiling iroh-relay v1.3.0
+   Compiling portmapper v0.19.3
+   Compiling backon v1.6.0
+   Compiling p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling iroh v1.3.0
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling rcgen v0.14.10
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling wuff v0.2.9
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling acto v0.8.2
+   Compiling scenomise v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+   Compiling irpc v0.17.0
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling libcrux-traits v0.0.8
+   Compiling wuff-capi v0.2.0
+   Compiling stacker v0.1.25
+   Compiling p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling hickory-proto v0.26.3
+   Compiling hpke-rs-crypto v0.7.0
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling libcrux-sha3 v0.0.10
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling swarm-discovery v0.6.4
+   Compiling fontsan v0.7.0
+   Compiling tabard v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling k256 v0.13.4
+   Compiling futures-concurrency v7.7.1
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling parry2d v0.31.1
+   Compiling iroh-gossip v0.101.0
+   Compiling hpke-rs-rust-crypto v0.7.0
+   Compiling ractor v0.16.5
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling hpke-rs v0.7.0
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling mere-alembic v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\distillery\alembic)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling iroh-io v0.6.2
+   Compiling bao-tree v0.16.1
+   Compiling pandect v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\system\pandect)
+   Compiling p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling rapier2d v0.36.0
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling iroh-util v0.6.0
+   Compiling sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+   Compiling gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling iroh-tickets v1.0.0
+   Compiling mere-proofs v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\proofs)
+   Compiling reflink-copy v0.1.30
+   Compiling nu-ansi-term v0.50.3
+   Compiling tracing-subscriber v0.3.23
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+   Compiling iroh-blobs v0.103.1
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling uxtree v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\forme\uxtree)
+   Compiling mere-cartography v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\canvas\cartography)
+   Compiling windows-sys v0.59.0
+   Compiling luggage v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\luggage)
+   Compiling pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+   Compiling graphshell-endpoint v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-endpoint)
+   Compiling mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling graphshell-client v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-client)
+   Compiling ssh-agent-lib v0.6.0
+   Compiling graphshell-host v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-host)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+   Compiling mere v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\mere)
+   Compiling platen v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\platen\platen)
+   Compiling mere-overmap v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mere-overmap)
+   Compiling graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 29m 41s

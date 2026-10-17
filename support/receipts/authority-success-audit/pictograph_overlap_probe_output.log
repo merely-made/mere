@@ -1,0 +1,7 @@
+
+running 1 test
+test resized_bodies_disagree_with_both_overlap_diagnostics ... Both diagnostics count zero for 80px bodies 50px apart, and one for 16px bodies 30px apart. Default 36px controls agree with the CPU bounds.
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

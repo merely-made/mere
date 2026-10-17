@@ -1,0 +1,72 @@
+Merge made by the 'ort' strategy.
+ Cargo.lock                                         | 115 ++++++++++++---------
+ Cargo.toml                                         |   8 +-
+ crates/cambium/cambium-genet-winit-host/Cargo.toml |   1 +
+ .../cambium-genet-winit-host/src/harness.rs        |   7 +-
+ .../cambium-genet-winit-host/tests/host_fonts.rs   |   2 +-
+ .../cambium-genet-winit-host/tests/scenario.rs     |  17 ++-
+ .../tests/status_bar_collapse.rs                   |   4 +-
+ .../cambium-genet-winit-host/tests/ui_zoom.rs      |   2 +-
+ .../tests/workbench_collapse.rs                    |   4 +-
+ crates/cambium/cambium-rootstock/src/lib.rs        |   7 +-
+ .../cambium-rootstock/src/presentation/wgpu.rs     |   6 ++
+ crates/cambium/mesquite/Cargo.toml                 |   3 +
+ crates/cambium/mesquite/src/probe.rs               |   2 +-
+ crates/cambium/tabard-workshop/Cargo.toml          |   2 +-
+ crates/cambium/tabard-workshop/src/native_host.rs  |  20 +++-
+ crates/cambium/tabard-workshop/tests/instrument.rs |   2 +-
+ .../cambium/tabard-workshop/tests/key_release.rs   |   2 +-
+ .../tests/release_host_acceptance.rs               |   2 +-
+ .../tabard-workshop/tests/shared_components.rs     |   2 +-
+ crates/cambium/tabard-workshop/tests/surface.rs    |   4 +-
+ crates/cambium/tabard-workshop/tests/usability.rs  |  14 +--
+ crates/canvas/pictograph/src/canvas.rs             |   3 +-
+ crates/canvas/pictograph/src/canvas/frame.rs       |   8 +-
+ crates/canvas/pictograph/src/canvas/nodes.rs       |   2 +-
+ .../pictograph/src/canvas/resolved_image_cache.rs  |  15 ++-
+ crates/graphshell/graphshell-client/Cargo.toml     |   2 +-
+ crates/graphshell/graphshell-client/src/frozen.rs  |  20 ++--
+ crates/inker/document-canvas/Cargo.toml            |   2 +-
+ crates/inker/document-canvas/src/paint_list.rs     |   3 +-
+ crates/inker/document-canvas/src/types.rs          |   3 +-
+ crates/system/document-lanes/src/smolweb.rs        |   2 +-
+ .../2026-10-17_checked_presentation_adoption.json  |  27 +++++
+ .../2026-10-17_retained_geometry_adoption.json     |  62 +++++++++++
+ ports/dramatis/Cargo.toml                          |   2 +-
+ ports/dramatis/tests/interaction.rs                |   6 +-
+ ports/graphshell/src/web_tree.rs                   |  15 +++
+ ports/graphshell/src/web_tree/appearance.rs        |   8 +-
+ ports/graphshell/src/web_tree/commands.rs          |   7 +-
+ ports/graphshell/src/web_tree/coupling.rs          |   7 +-
+ ports/graphshell/src/web_tree/field_inspection.rs  |   2 +-
+ ports/graphshell/src/web_tree/gestures.rs          |   4 +-
+ ports/graphshell/src/web_tree/lane.rs              |  56 ++++++----
+ ports/graphshell/src/web_tree/presentation.rs      |   3 +-
+ ports/graphshell/src/web_tree/product/fields.rs    |   4 +-
+ ports/graphshell/src/web_tree/promoted_links.rs    |   6 +-
+ ports/graphshell/src/web_tree/query_view.rs        |   6 +-
+ ports/graphshell/web/Cargo.lock                    |  66 +++++++-----
+ ports/graphshell/web/Cargo.toml                    |   4 +-
+ ports/pelt/desktop/smoke_macos.rs                  |  15 +++
+ ports/pelt/desktop/smoke_wayland.rs                |  20 ++++
+ ports/pelt/desktop/smoke_windows.rs                |  10 ++
+ .../desktop/examples/native_shared_recovery.rs     |   4 +-
+ ports/tabard/desktop/tests/workshop_routing.rs     |   2 +-
+ 53 files changed, 415 insertions(+), 207 deletions(-)
+ create mode 100644 design_docs/receipts/2026-10-17_checked_presentation_adoption.json
+ create mode 100644 design_docs/receipts/2026-10-17_retained_geometry_adoption.json
+warning: in the working copy of 'crates/eidetic/chartulary/src/commit.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/graph.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/rdf.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/graph/graph-kernel/src/graph/chart.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/script/rhai/tests/scenograph_rules.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/system/pandect/src/wallet_grant/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/passphrase_storage.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/certs.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/mod.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/tests.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/refresh.rs', LF will be replaced by CRLF the next time Git touches it

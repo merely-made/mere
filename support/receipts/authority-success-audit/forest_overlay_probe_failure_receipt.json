@@ -1,0 +1,13 @@
+{
+  "build_exits": [
+    0,
+    1
+  ],
+  "run_exit": null,
+  "checks": 0,
+  "reason": "Audit fixture Action type not inferable; cleanup first rejected rustc generated long-type text. Root rlib was already marker-validated/removed. Remaining identified generated type text copied into audit evidence and removed from stable target after compiler exited.",
+  "long_type_sha256": "0044a855395e013cb0653145c739ed921cc132db4f2b358ce5c94f472ab68444",
+  "runner_sha256": "841d47c80413896bf5f777b32c629a9d44aea4a52ec7fc3d698d16d62c1e507e",
+  "probe_sha256": "827df8bb018683be1e76c39d8f1886b63b24dc6ea6cf216f5b50f45c876e6193",
+  "generated_output_removed": true
+}

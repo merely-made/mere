@@ -1,0 +1,11 @@
+
+running 3 tests
+test annotation_interchange_id_aliases_distinct_valid_rendered_targets ... distinct canonical targets and source scopes share annotation id urn:eidetic:annotation:160682f995a72daf419379af8d5232cf62cd18eb5c2c88579cc597c8c4890681:0-5; Eidetic records stay distinct
+ok
+test crop_reports_success_outside_image_and_overcaptures_partial_rect ... crop control=(true, Some((20, 20))); partial=(true, Some((100, 20))) (expected 50x20); outside=(true, Some((1, 20))) (expected empty)
+ok
+test sitemap_xml_entities_are_sent_as_url_characters ... XML entity spelling reached Page request; correct URL absent; equivalent CDATA loc omitted; stop=FrontierExhausted
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

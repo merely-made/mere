@@ -1,0 +1,79 @@
+{
+  "date_utc": "2026-10-16T20:21:04.784587+00:00",
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "working_tree_uncommitted": true,
+  "findings": [
+    "Q035",
+    "Q036",
+    "Q037",
+    "Q038",
+    "Q039"
+  ],
+  "source_sha256": {
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    "design_docs/dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md": "f4ae8c46068ea886cc3906529709dc956e8d994a9c2c4f106f2d13aac2eea776"
+  },
+  "gate": {
+    "command": "cargo test -p castellan --features keeper --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+    "exit_code": 0,
+    "log": "commands_storage_repair_output.txt",
+    "library_passed": 296,
+    "integration_passed": 18,
+    "doctests_passed": 1,
+    "separate_residue_harnesses_passed": 2,
+    "post_gate_comments_only": [
+      "Removed inaccurate unit-test scope comment in vault_commands/mod.rs",
+      "Corrected lib.rs CXF feature documentation"
+    ],
+    "tested_mod_sha256_before_comment_removal": "6f39278c000fa341275ea36067214ab5dfde3e507cb7c596055e3ac5c1d8006a",
+    "tested_lib_sha256_before_comment_change": "c78ed48b5362163976f64c1dfe7c387fc6a480878d5dbdaacd52e97e56f7d86f"
+  },
+  "before_evidence": {
+    "commands": "mint_before_output.txt: real restriction success, wrong lifetime report and overflow panic. InMemory locked fixture failure is invalid evidence, explicitly superseded by real locked sealed-store final regression.",
+    "fixture_compile_errors": [
+      "mint_initial_compile_output.txt",
+      "mint_profile_fixture_compile_output.txt"
+    ],
+    "storage_bug_observation": "passphrase_open_race_output.txt with preserved passphrase_open_race_diagnostic.rs; diagnostic passed by observing broken behavior before salt guard. It is historical, not a current correctness test."
+  },
+  "limits": [
+    "Existing stored restrictions must match flags exactly; CIDR subset overrides are not implemented.",
+    "Salt guard addresses deterministic stale opens; whole-file operation serialization across independent backend instances/processes remains open.",
+    "Keeper feature tested on Windows. CXF source was read; cxf and secret-service feature gates were not run in this follow-up. Linux adapter reading remains pending.",
+    "OS availability branches in existing tests do not establish physical-presence acceptance.",
+    "No full-source, workspace-wide, headed, remote-device, or fresh-process durability completion claim."
+  ],
+  "supplier_evidence": {
+    "dramatis_pin": "2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59",
+    "files": [
+      "crates/personae/src/ssh_ca.rs",
+      "crates/personae/src/ssh_face.rs"
+    ],
+    "note": "Read local pinned checkout; compared with the initially inspected 5c89001 files and found them identical. Supplier source is outside Mere coverage count and was not edited."
+  },
+  "resources": {
+    "cargo_target": "C:/t/cargo-targets/mere",
+    "cargo_build_dir": "C:/t/cargo-targets/mere/build",
+    "isolated_targets_homes_worktrees": [],
+    "temporary_test_copy_removed": true
+  },
+  "supersedes": "Passphrase/profile-storage source hashes in repair_verification.json are historical; this final gate includes all earlier custody regressions.",
+  "diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "log": "commands_storage_diffcheck_output.txt"
+  },
+  "coverage_checkpoint": {
+    "complete_files": 300,
+    "total_files": 3321,
+    "read_chars": 4485107,
+    "total_chars": 36764758,
+    "pending_chunks": 0,
+    "next_source": "ports/djinn/castellan/src/otp/item.rs"
+  }
+}

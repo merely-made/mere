@@ -1,0 +1,59 @@
+{
+  "date_utc": "2026-10-17T20:43:47.300211+00:00",
+  "exit": 0,
+  "passed": 12,
+  "original_pending_response_tests": 6,
+  "helper_cases": 3,
+  "rendezvous_cases": 3,
+  "source_sha256": {
+    "support/patches/burn-remote/src/lib.rs": "94bf762da29e57cea80f347eb3e4fe227e662ed226934a2533a48bd79d340ecf",
+    "support/patches/burn-remote/src/client/runner.rs": "309a01ce408b33a799a122d226ed778198e76e56f5964bafb7731275da2e2b91",
+    "support/patches/burn-remote/src/client/service/pending.rs": "233ef4af184c598115dbe9a5c2ae77a52eaec8ca262ef6cf281d77affd0a1dce",
+    "support/patches/burn-remote/src/server/local_comm.rs": "17cc46d33023f3b0da9fd7344c763e2418da23619484d270355279238cfc94bf",
+    "support/patches/burn-remote/src/shared/task.rs": "5bebfdb6b9f9fd74e7e4477300dec0697592adbf0c7fee211325b040bc569c7d"
+  },
+  "external_context_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-de8334592412b821.rlib": "4c16cc92c29471d8dd36dd96fb981cd7411749311cbb308e0b4d35e88298fe0b"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "--cfg",
+    "feature=\"client\"",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\remote_client_ownership_probe.rs",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-de8334592412b821.rlib",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-remote-client-ownership.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-remote-client-ownership.exe",
+      "bytes": 1235456,
+      "sha256": "f74f133ffbe64bba2acab301143c8ec43aa4c24c25658f051f1397fa415b58d3"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-remote-client-ownership.pdb",
+      "bytes": 3649536,
+      "sha256": "8ef21d21a055831e19ee68c61f8d9bfac45fe13f6a2334624feee59bb9075403"
+    }
+  ],
+  "retained_isolation": [],
+  "extraction_sha256": {
+    "finishes_within": "0979e9d2bdf8929ab30067314a19cd9c4db24bc5c9ae9081c23325eaba12e719",
+    "get_next_transfer_id": "e95131fbd05a7a0ac871bc7da9f73d8390980fb381f789de0a73d8bdf5938fbd",
+    "LocalTransferId_without_serde_derives": "0699f92200669ace387887f72a4dce28dfb37c02db59e9332b7e7658c925491a"
+  },
+  "evidence_sha256": {
+    "run_remote_client_ownership_probe.py": "10955424835ba2788765ec1dfe19f156d9162fdd1fb7d36a7e6341d0c0c2048a",
+    "remote_client_ownership_probe.rs": "b1e8e2bf5751a0182b916a3e1dc11b101d35addf77629aa517586a491f2c8732",
+    "remote_client_ownership_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "remote_client_ownership_run.txt": "aebe9c4539ef0756770a9bdb30855b144468d5c2a16140ea589d01fdf21f3265"
+  },
+  "qualification": "Exact finishes_within and counter functions; full unchanged PendingResponses and LocalCommService source compiled against actual existing Tokio. Backend/tensor payload is i32, SessionId u64 and response content a minimal enum; LocalTransferId only loses serde derives. Two module-local counter statics represent independent process-local state; no live separate processes, real tensor allocation, server, transport, credential or GPU. Demonstrates counter namespace/registry overwrite and panic admission, not an observed real deployment mixup.6 unchanged pending-response tests also run. Owned exe/PDB removed."
+}

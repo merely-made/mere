@@ -1,0 +1,105 @@
+{
+  "date_utc": "2026-10-17T07:28:10.903978+00:00",
+  "source_sha256": {
+    "ports/moot/src/coop.rs": "abe95d0aa0466beb5be90ab7de16c5aea6b053e9cc5627f47cc92ab6e05bb880",
+    "ports/moot/src/resource_coop.rs": "9974e9bc680d4a8ffa88fa24f4b8416117c80eecd57662de51811bea73f60a06",
+    "ports/moot/src/resource_coop/control.rs": "54ca2b53c65f9e1ab93964ca773dc01d742dabac6c3b7a01695e4dd4b4e47ff0",
+    "ports/moot/src/resource_coop/tests.rs": "f21b1b5282c05229b4564d6e0eac4171851f1f63f98c3a67f69a2afcf0e836dd",
+    "ports/graphshell/src/moot_resources.rs": "3b48fc2466703483ce02c6e2186ede1538835ddaf49774bc126d02dbe61b1b92"
+  },
+  "module_path_rebase": {
+    "generated": "community_portable_resource.rs",
+    "sha256": "65b35ebefe573ef8c8db7bf17cebf320d13245e07ecf2670d9f8c00a8cc7e9da",
+    "transformation": "Only rebase control and test module path attributes to their original absolute files; all core behavior and original tests unchanged."
+  },
+  "libraries": {
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151"
+    }
+  },
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "-A",
+    "dead_code",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\community_portable_probe.rs",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-community-portable-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "test_exit": 0,
+  "tests": 28,
+  "new_counterexample_and_controls": 3,
+  "original_portable_tests": 25,
+  "native_binary_sha256": "dddf4b16c20156bf4b7ce1b707df46fc02845610a7fb1e57d981b1901e604cd0",
+  "fixture": {
+    "source": "ports/graphshell/src/moot_resources.rs",
+    "start_char": 9700,
+    "end_char": 10466,
+    "verbatim_fixture_sha256": "37913f3ec7ec2494a3aba9fa844a5e7a4a6692c8f90dc39439f5821da509556d",
+    "generated_source_sha256": "335705208c26be7620ee0fd770acad6078c11faf137956739f3d962943fea4f7",
+    "compile_command": [
+      "rustc",
+      "--edition=2024",
+      "-A",
+      "dead_code",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "--extern",
+      "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "--emit=metadata",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\community_current_fixture_compile.rs",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-community-original-fixture.rmeta"
+    ],
+    "exit": 1,
+    "expected_diagnostic": "E0063 missing shared_by"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-community-portable-probe.exe",
+      "bytes": 1981440,
+      "sha256": "dddf4b16c20156bf4b7ce1b707df46fc02845610a7fb1e57d981b1901e604cd0"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-community-portable-probe.pdb",
+      "bytes": 6197248,
+      "sha256": "e25774d8f9247d9e66beeedab69ec96b003d06cc984f125cbe1388bc3d9c16de"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Actual current portable coop/resource_coop/control source and original embedded tests compiled with only module path attributes rebased with qualified serde libraries. Three public Pane counterexample/control tests. Original Graphshell fixture body compiled verbatim against actual current ResourceRead type and correctly fails E0063. No full Graphshell moot-resources feature build, browser, peer, signer, store, clock/revocation or hosting trial."
+}

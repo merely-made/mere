@@ -1,0 +1,41 @@
+{
+  "date_utc": "2026-10-17T20:39:36.833221+00:00",
+  "exit": 0,
+  "passed": 5,
+  "source_sha256": {
+    "support/patches/burn-cubecl/src/kernel/matmul/tune/base.rs": "4fc551307d2ec346625a333831465318f1850c13ac7fe13504d89cea0927075c",
+    "support/patches/burn-cubecl/src/kernel/matmul/utils.rs": "ded2e2156060939ecb5a1b1f9ce63d055d49c90b697eed246854ff51ad9883dc",
+    "support/patches/burn-cubecl/src/ops/numeric.rs": "1a9cdd17c12d6d34460afd3eb80e496d2596d7ea3c679babadea882a3760cbdc"
+  },
+  "extracted_prefix_sha256": "bf84ae73d5355b0787e6204eddf4f1d8e2479da5523d4aec3a7c0de5a902ea05",
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\retained_burn_zero_matmul_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-retained-burn-zero-matmul.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-burn-zero-matmul.exe",
+      "bytes": 759296,
+      "sha256": "a76f4ec10581089cc579c3e6265c43c8dc4ede630822ad1f3d8b8276cf6ba1c4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-burn-zero-matmul.pdb",
+      "bytes": 3026944,
+      "sha256": "6fd70f6be8c1a5c2f42f81e37f31d9872fca4289fb09791c92a1e0f17cb6d7fb"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_retained_burn_zero_matmul_probe.py": "847a8d5c14111067602fb83ec7835c03b139f9df8a29b4536227725268932226",
+    "retained_burn_zero_matmul_probe.rs": "1315728f66e57275538db7a1d09f11077ee5db1c2e9067c0823d1a83bc227092",
+    "retained_burn_zero_matmul_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained_burn_zero_matmul_run.txt": "0b16aa50fcf498beaf13c355a2a599647afff6bbb81a87e3ceba24873a7501d2"
+  },
+  "qualification": "Exact retained matmul_autotune initialization/early-return prefix, compiled with CPU metadata/tensor/output allocator doubles. Supplied-output case proves no zeroing or dispatch before return for nonempty MxN and K0. Allocator sentinel demonstrates absent initialization in this prefix, not actual uninitialized GPU bytes. M0/N0 and nonempty controls included. No CubeCL/backend/shader compilation or registry backend failure claimed; retained copy is root-unselected. Exact owned exe/PDB removed."
+}

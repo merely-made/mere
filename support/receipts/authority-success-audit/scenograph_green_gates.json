@@ -1,0 +1,158 @@
+{
+  "mode": "green",
+  "basis_commit": "4523cb6f4b3998a27dc474ba30a7f1df537c5ec3",
+  "source_sha256": {
+    "crates/cambium/scenes/scenograph/src/link.rs": "42f1c3328693d90aec125ed3b3d60ce2a45d4b4b93659ce7a43b2e2749c0694f",
+    "crates/cambium/scenes/scenograph/src/presentation.rs": "5d4d8cf451e22ee3481881c9f87fd1d4c6df74e124e70b6ae37a37deb4e1b2f6",
+    "crates/cambium/scenes/scenograph/src/presentation/scripts.rs": "0efdcf8901fe64ebc897cfca002d54c4fa946008f06d85cac148dc88c5c34643",
+    "crates/cambium/scenes/scenomise/src/opened_link.rs": "727fd157715bbd27aae7fe6d3ffb45ec2a6c3c9a5f0f9957d3d155551585ca21",
+    "crates/script/rhai/tests/scenograph_rules.rs": "c4bde16ef3c4f25b5a3e7f058cc09f69d44a552402dc9317ffe51877bb4d4686"
+  },
+  "gates": [
+    {
+      "name": "default",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "scenograph",
+        "--lib",
+        "--tests",
+        "--locked",
+        "--offline",
+        "-j",
+        "1",
+        "--target-dir",
+        "C:/t/cargo-targets/mere",
+        "--config",
+        "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+      ],
+      "exit": 0,
+      "test_results": [
+        [
+          "ok",
+          "48",
+          "0"
+        ]
+      ],
+      "log": "scenograph_green_default.log",
+      "sha256": "1ace5e12f9c03cf973440363ba4a30e05335df171603575221c67103763db422"
+    },
+    {
+      "name": "scripts",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "scenograph",
+        "--lib",
+        "--tests",
+        "--features",
+        "scripts",
+        "--locked",
+        "--offline",
+        "-j",
+        "1",
+        "--target-dir",
+        "C:/t/cargo-targets/mere",
+        "--config",
+        "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+      ],
+      "exit": 0,
+      "test_results": [
+        [
+          "ok",
+          "52",
+          "0"
+        ]
+      ],
+      "log": "scenograph_green_scripts.log",
+      "sha256": "09dc8ffb6e82f1bc5173e918b1e8c4945493638cf4e34ca2a8179f156a0046ea"
+    },
+    {
+      "name": "rhai",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "script-rhai",
+        "--lib",
+        "--tests",
+        "--locked",
+        "--offline",
+        "-j",
+        "1",
+        "--target-dir",
+        "C:/t/cargo-targets/mere",
+        "--config",
+        "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+      ],
+      "exit": 0,
+      "test_results": [
+        [
+          "ok",
+          "26",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0"
+        ],
+        [
+          "ok",
+          "9",
+          "0"
+        ]
+      ],
+      "log": "scenograph_green_rhai.log",
+      "sha256": "d1d4610052e0f6b83cc074d83ab750ddd690022fff9c5f87274b30c99d6fd7d5"
+    },
+    {
+      "name": "compiler",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "scenomise",
+        "--lib",
+        "--tests",
+        "--features",
+        "authoring",
+        "--locked",
+        "--offline",
+        "-j",
+        "1",
+        "--target-dir",
+        "C:/t/cargo-targets/mere",
+        "--config",
+        "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+      ],
+      "exit": 0,
+      "test_results": [
+        [
+          "ok",
+          "212",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0"
+        ]
+      ],
+      "log": "scenograph_green_compiler.log",
+      "sha256": "ee379bab966e403eca277e4202a5ebf612394c13e28c42f6b9fc30aef443f6fd"
+    }
+  ]
+}

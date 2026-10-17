@@ -1,0 +1,9 @@
+test_branch_parent_identity_and_original_microseconds (test_firefox_history_export.HistoryExportTests.test_branch_parent_identity_and_original_microseconds) ... ok
+test_full_paths_disambiguate_receipt_readmes (test_mere_doc_judgment_audit.ReceiptCoverage.test_full_paths_disambiguate_receipt_readmes) ... ok
+test_legacy_basename_remains_ambiguous (test_mere_doc_judgment_audit.ReceiptCoverage.test_legacy_basename_remains_ambiguous) ... ok
+test_one_record_cannot_cover_both_receipts (test_mere_doc_judgment_audit.ReceiptCoverage.test_one_record_cannot_cover_both_receipts) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.073s
+
+OK

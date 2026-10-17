@@ -1,0 +1,23 @@
+
+running 9 tests
+test active_url_filter_accepts_browser_normalized_control_spelling ... HTML URL admission: ordinary javascript blocked; embedded LF/TAB/CR spellings pass without diagnostic and url::Url normalizes scheme to javascript; no execution
+ok
+test actual_knot_reparse_confirms_literal_and_semantic_export_loss ... Q146/Q147 parser follow-up: escaped literal *x* becomes emphasis after Knot export; parsed FeedEntry stable-id becomes guid=None
+ok
+test block_sources_claimed_metadata_disappears_on_reparse ... block_sources: emitted wire contains override, both Knot parsers drop it entirely; document-source control remains
+ok
+test crlf_blank_lines_do_not_split_text_paragraphs ... Text blank lines: LF -> two paragraphs; CRLF -> one paragraph with empty line retained as soft breaks
+ok
+test default_djot_lane_silently_flattens_structural_blocks ... default Djot: quote/list containers absent and table blocks=[]; no degradation diagnostics; compatibility quote control preserves Quote
+ok
+test djot_serializer_loses_recognized_link_and_predicate ... Djot serializer: recognized link/rel input exports as "Topic\n"; reparse loses destination and statement
+ok
+test extension_and_mime_routes_parse_the_same_knot_differently ... same file/body: extension dispatch -> CommonMark compatibility, explicit native MIME -> Djot and real MetadataRow
+ok
+test html_whitespace_only_text_between_inline_nodes_is_lost ... HTML whitespace: separate em nodes with a source space lower to redfox; text-bearing whitespace controls retain red fox
+ok
+test tight_nested_markdown_list_places_child_before_parent_text ... Markdown nested tight item children are [inner List, outer Paragraph]; loose-list control retains [outer Paragraph, inner List]
+ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

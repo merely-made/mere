@@ -1,0 +1,13 @@
+{
+  "observed_utc": "2026-10-17T06:54:53.322403+00:00",
+  "head": "c1b5d47156f2c940ccd67799963ed203df96362a",
+  "fetched_origin_main": "161368bfd2f33c2ea4002ebd86565b2102c1a780",
+  "head_only_and_upstream_only_commits": "9\t4",
+  "merge": "Deferred while other active Cargo builds use this shared checkout. No branch, stash, worktree, merge, reset or source update in this pass.",
+  "new_upstream_commits": [
+    "161368bfd2f33c2ea4002ebd86565b2102c1a780 Record shared span editing and native consumer qualification",
+    "34f7f08dbd71a5f0b5d3f2ab8c880af039a56cdb Record integrated natal houses owner qualification",
+    "5147de0f39fa5855a7a904585e9278d6feceea80 Merge current shared span editing and documentation before natal intake qualification",
+    "46297ab1d4544ad61ad78eaed847d1cc6f190926 Import immutable natal houses validator and verify both systems across apps"
+  ]
+}

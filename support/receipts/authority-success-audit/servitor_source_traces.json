@@ -1,0 +1,187 @@
+{
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "production": [
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\delegation.rs",
+      "sha256": "209e2e6eb1d82a5a53b4a28f3449f60d7590f5bd14e8143038eaa55c882d6314",
+      "excerpts": [
+        {
+          "first_line": 7,
+          "last_line": 37,
+          "text": "//! Delegation: the one mechanism behind install, expiry, and revocation \u2014\n//! **personae's signed certificates, viewed through the typed capability**.\n//!\n//! The capability-model round's D3 ruling (2026-07-24): the user is not an\n//! implicit infinite authority that \"writes some grants\" \u2014 the user is a\n//! **root subject**, and everything else is delegation from it. Install is an\n//! attenuating delegation; expiry is a delegation with a bound; revocation is\n//! severing one, cascading to its subtree.\n//!\n//! **This module owns none of that machinery.** `personae::delegation` already\n//! provides the whole signed grammar \u2014 [`DelegationCertificate`] with\n//! `attenuates` / `covers`, chain parents, expiry bounds, delegation depth,\n//! content-addressed ids, `DelegationRevocation`, and the derived-key identity\n//! proof beneath it \u2014 and gemot's moot store already consumes it. Servitor\n//! contributes exactly one thing personae lacks: the **typed capability**\n//! ([`Cap`], with its closed-set powers and hierarchical scopes) as a view over\n//! personae's `(path_prefix, actions)` pair. One delegation system, two tiers.\n//!\n//! ## How a `Cap` becomes a personae scope\n//!\n//! personae's [`CapabilityScope`] is two-dimensional \u2014 *where*\n//! (`path_prefix`, matched with a slash boundary) and *what* (`actions`, a set\n//! attenuated by subset). A [`Cap`] encodes into the path, and [`Mode`] into\n//! the actions:\n//!\n//! | servitor | personae `path_prefix` | personae `actions` |\n//! | --- | --- | --- |\n//! | `Cap::Power(\"navigate\")` at `Write` | `power/navigate` | `{read, write}` |\n//! | `Cap::Scope(\"scenario/a\")` at `Read` | `scope/scenario/a` | `{read}` |\n//! | `Cap::Facet(\"web\")` at `Write` | `facet/web` | `{read, write}` |\n//!"
+        },
+        {
+          "first_line": 63,
+          "last_line": 70,
+          "text": "/// personae's `domain` dimension. Keeps participant certificates from ever being\n/// confused with a moot's or a mesh's.\n/// Compatibility spelling retained after the 2026-09-20 participant rename:\n/// changing this signed domain would invalidate existing delegation scopes.\npub const DENIZEN_DOMAIN: &str = \"mere.denizen\";\n\nconst POWER_PATH: &str = \"power\";\nconst SCOPE_PATH: &str = \"scope\";"
+        },
+        {
+          "first_line": 267,
+          "last_line": 331,
+          "text": "    /// is revoked, and that it terminates at this table's root.\n    pub fn verify_chain(&self, signed: &SignedDelegationCertificate) -> Result<(), ChainError> {\n        let mut seen = HashSet::new();\n        self.verify_inner(signed, &mut seen)\n    }\n\n    fn verify_inner(\n        &self,\n        signed: &SignedDelegationCertificate,\n        seen: &mut HashSet<DelegationId>,\n    ) -> Result<(), ChainError> {\n        let id = signed.certificate.id();\n        if !seen.insert(id) {\n            return Err(ChainError::Cycle(id));\n        }\n        if self.revoked.contains(&id) {\n            return Err(ChainError::Revoked(id));\n        }\n        // insigne owns the cryptography: signature, derived-key attestation,\n        // and issuer binding all check there, not in servitor.\n        signed\n            .check()\n            .map_err(|fault| ChainError::BadSignature(id, fault))?;\n        match signed.certificate.parent {\n            DelegationParent::Root(root) => {\n                // `check` binds the signer to `issuer`; this binds `issuer`\n                // to the root, so only the root can issue a root link.\n                if root == self.root && signed.certificate.issuer == root {\n                    Ok(())\n                } else {\n                    Err(ChainError::WrongRoot(id))\n                }\n            },\n            DelegationParent::Certificate(parent_id) => {\n                let parent = self\n                    .certificates\n                    .get(&parent_id)\n                    .ok_or(ChainError::MissingParent(parent_id))?;\n                // personae owns attenuation too: scope narrowing, action\n                // subset, expiry containment, and delegation depth.\n                if !signed.certificate.attenuates(&parent.certificate) {\n                    return Err(ChainError::NotAttenuating(id));\n                }\n                self.verify_inner(parent, seen)\n            },\n        }\n    }\n\n    /// Whether `subject` holds `needed` at `mode` right now, by a verified,\n    /// unrevoked chain to the root.\n    fn covers_inner(&self, subject: Subject, needed: &Cap, mode: Mode) -> bool {\n        let path = cap_path(needed);\n        let action = mode_action(mode);\n        self.certificates.values().any(|signed| {\n            signed.certificate.subject == subject.0\n                && signed.certificate.covers(&path, action, self.now_ms)\n                && self.verify_chain(signed).is_ok()\n        })\n    }\n}\n\nimpl AuthorityProvider for DelegationTable {\n    fn covers(&self, subject: Subject, needed: &Cap, mode: Mode) -> bool {\n        self.covers_inner(subject, needed, mode)\n    }"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\lib.rs",
+      "sha256": "9b90b292a3167415409f04c253f324a8c221f638e9c06ec36b3e934698742934",
+      "excerpts": [
+        {
+          "first_line": 101,
+          "last_line": 145,
+          "text": "/// A keyholder identity: the 32-byte public key of whoever acts. A device, a\n/// servitor, a persona, a peer, an agent are all subjects; what *kind* of\n/// holder it is, is metadata elsewhere, never a second identity axis. Matches\n/// the `subject: [u8; 32]` the moot authorization seam already speaks.\n#[derive(Clone, Copy, PartialEq, Eq, Hash)]\npub struct Subject(pub [u8; 32]);\n\nimpl Subject {\n    /// Wrap a raw public key.\n    pub fn new(key: [u8; 32]) -> Self {\n        Self(key)\n    }\n\n    /// Parse a 64-char lowercase-hex key. `None` on any malformed input, so a\n    /// corrupt record yields no subject rather than a wrong one.\n    pub fn from_hex(hex: &str) -> Option<Self> {\n        if hex.len() != 64 {\n            return None;\n        }\n        let mut key = [0u8; 32];\n        for (byte, pair) in key.iter_mut().zip(hex.as_bytes().chunks(2)) {\n            let text = std::str::from_utf8(pair).ok()?;\n            *byte = u8::from_str_radix(text, 16).ok()?;\n        }\n        Some(Self(key))\n    }\n\n    /// Lowercase hex of the key.\n    pub fn to_hex(&self) -> String {\n        let mut s = String::with_capacity(64);\n        for byte in self.0 {\n            s.push(char::from_digit((byte >> 4) as u32, 16).unwrap());\n            s.push(char::from_digit((byte & 0x0f) as u32, 16).unwrap());\n        }\n        s\n    }\n\n    /// The journal author label for changes this subject commits: `denizen:`\n    /// plus the first 8 hex chars of the key. Attribution, not authentication;\n    /// the gate has already checked authority before it commits.\n    pub fn to_author(&self) -> chartulary::Author {\n        let hex = self.to_hex();\n        chartulary::Author::new(format!(\"denizen:{}\", &hex[..8]))\n    }\n}"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\watch.rs",
+      "sha256": "30d889d012d353205fb419e6e2b87a75388f8cf87ab71b33adabe0cba7f8b0ea",
+      "excerpts": [
+        {
+          "first_line": 7,
+          "last_line": 29,
+          "text": "//! Standing subscriptions: **when** a participant runs.\n//!\n//! [`gate`](crate::gate) answers \"may it write\". This module answers the other\n//! half: a **watch** is a scope whose committed changes wake a participant's body,\n//! so a helper can react to the world instead of waiting to be invoked.\n//!\n//! Three properties, each enforced here rather than left to a host:\n//!\n//! 1. **The containment law.** A watch must sit inside what its subject may\n//!    already read: registration asks the [`AuthorityProvider`] and refuses\n//!    otherwise. You cannot be woken by what you cannot read, so a watch can\n//!    never become a side channel for observing a region a grant excludes.\n//! 2. **No self-waking.** An entry authored by the watcher never matches that\n//!    watcher's own watch. The trivial loop is unrepresentable rather than\n//!    merely budgeted, which matters because the budget is the *last* line of\n//!    defence and should only ever catch genuine mutual cascades.\n//! 3. **Cursors, not replays.** Each watch remembers the last journal position\n//!    it has seen. Waking is \"what happened since\", and a wake advances the\n//!    cursor past everything considered, matched or not, so an unmatched entry\n//!    is never rescanned.\n//!\n//! **The matcher is tier-agnostic on purpose.** It consumes [`WatchEvent`]s\n//! (a sequence number, an author label, the scopes an entry touched) rather"
+        },
+        {
+          "first_line": 149,
+          "last_line": 159,
+          "text": "    /// Read back [`to_wire`](Self::to_wire).\n    ///\n    /// Deliberately does **not** re-check authority: a persisted watch is\n    /// replayed as it was recorded, and a grant that has since narrowed is the\n    /// authority layer's business at wake time, not a reason to lose the\n    /// record silently on load.\n    pub fn parse(line: &str) -> Result<Self, WatchError> {\n        let malformed = || WatchError::Malformed {\n            line: line.to_string(),\n        };\n        let mut parts = line.splitn(4, ' ');"
+        },
+        {
+          "first_line": 195,
+          "last_line": 227,
+          "text": "    /// Register a watch, enforcing the containment law.\n    ///\n    /// `self_author` is the label this subject's own commits carry in the\n    /// journal this watch will read; entries bearing it never wake it. It is\n    /// an argument rather than derived because the two journals in this stack\n    /// label the same subject differently (see the module docs), so a derived\n    /// label would disable the self-wake refusal on one of them without\n    /// saying so.\n    pub fn register(\n        &mut self,\n        provider: &impl AuthorityProvider,\n        subject: Subject,\n        scope: ScopePath,\n        self_author: impl Into<String>,\n    ) -> Result<&Watch, WatchError> {\n        if !provider.covers(subject, &Cap::Scope(scope.clone()), Mode::Read) {\n            return Err(WatchError::Unauthorized {\n                scope: scope.to_string(),\n            });\n        }\n        self.watches.push(Watch {\n            subject,\n            scope,\n            self_author: self_author.into(),\n            cursor: 0,\n        });\n        Ok(self.watches.last().expect(\"just pushed\"))\n    }\n\n    /// Adopt a persisted watch as-is, without an authority check (see\n    /// [`Watch::parse`]).\n    pub fn adopt(&mut self, watch: Watch) {\n        self.watches.push(watch);"
+        },
+        {
+          "first_line": 247,
+          "last_line": 304,
+          "text": "    /// everything considered.\n    ///\n    /// Cursors advance whether or not an entry matched: an entry a watch has\n    /// already declined is not a candidate again, so a quiet watch costs one\n    /// comparison per entry per drain and never accumulates a backlog.\n    ///\n    /// Results come back in **stable subject order** (by key), which is what\n    /// makes a cascade's execution order reproducible across runs.\n    pub fn wake(&mut self, events: &[WatchEvent<'_>]) -> Vec<Wake> {\n        let highest = events.iter().map(|event| event.seq).max();\n        let mut wakes: Vec<Wake> = Vec::new();\n        for watch in &mut self.watches {\n            let matched: Vec<u64> = events\n                .iter()\n                .filter(|event| watch.matches(event))\n                .map(|event| event.seq)\n                .collect();\n            if let Some(highest) = highest {\n                watch.cursor = watch.cursor.max(highest);\n            }\n            if !matched.is_empty() {\n                wakes.push(Wake {\n                    subject: watch.subject,\n                    matched,\n                });\n            }\n        }\n        wakes.sort_by_key(|wake| wake.subject.0);\n        for wake in &mut wakes {\n            wake.matched.sort_unstable();\n        }\n        wakes\n    }\n\n    /// Who `events` *would* wake, without advancing any cursor.\n    ///\n    /// The read-only twin of [`wake`](Self::wake), for naming the subjects a\n    /// cascade ran out of budget before reaching. Peeking must not consume:\n    /// the work is deferred to a later drain, not dropped, so the cursors have\n    /// to stay where they are.\n    pub fn would_wake(&self, events: &[WatchEvent<'_>]) -> Vec<Subject> {\n        let mut subjects: Vec<Subject> = self\n            .watches\n            .iter()\n            .filter(|watch| events.iter().any(|event| watch.matches(event)))\n            .map(|watch| watch.subject)\n            .collect();\n        subjects.sort_by_key(|subject| subject.0);\n        subjects.dedup();\n        subjects\n    }\n\n    /// The whole table as persistable lines, one watch each.\n    pub fn to_wire_lines(&self) -> Vec<String> {\n        self.watches.iter().map(Watch::to_wire).collect()\n    }\n\n    /// Rebuild a table from [`to_wire_lines`](Self::to_wire_lines). Blank"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\grant.rs",
+      "sha256": "edb4e7eb30efa73d836e28a1a806261379ddcde30d6bb8382ebbe0b2b4f3dd61",
+      "excerpts": [
+        {
+          "first_line": 52,
+          "last_line": 77,
+          "text": "    pub fn expiring_at(mut self, expires_at_ms: u64) -> Self {\n        self.expires_at_ms = Some(expires_at_ms);\n        self\n    }\n\n    /// Whether this grant has expired at `now_ms`. An open-ended grant never\n    /// has; a bounded one expires AT its bound (the instant named is the\n    /// first at which it no longer covers).\n    pub fn expired_at(&self, now_ms: u64) -> bool {\n        self.expires_at_ms.is_some_and(|at| now_ms >= at)\n    }\n\n    /// Whether this grant covers `needed` at `mode` as of `now_ms`: same\n    /// subject, unexpired, the held capability covers the needed one, and the\n    /// mode is sufficient.\n    pub fn covers_at(&self, now_ms: u64, subject: Subject, needed: &Cap, mode: Mode) -> bool {\n        !self.expired_at(now_ms) && self.covers(subject, needed, mode)\n    }\n\n    /// Whether this grant covers `needed` at `mode`, ignoring expiry. Callers\n    /// that have a clock want [`covers_at`](Self::covers_at).\n    pub fn covers(&self, subject: Subject, needed: &Cap, mode: Mode) -> bool {\n        self.subject == subject && self.mode.covers(mode) && self.cap.covers(needed)\n    }\n}\n"
+        },
+        {
+          "first_line": 86,
+          "last_line": 107,
+          "text": "pub trait AuthorityProvider {\n    /// Whether `subject` may act under `needed` at `mode`.\n    fn covers(&self, subject: Subject, needed: &Cap, mode: Mode) -> bool;\n}\n\n/// The minimal provider: a flat table of grants, coverage answered by each\n/// grant's capability order. The stand-in until the structural-cap layer is\n/// built. (Was `PrefixAuthority` before capabilities became typed; the name\n/// described the matching rule, which is no longer this type's business.)\n#[derive(Clone, Debug, Default)]\npub struct GrantTable {\n    grants: Vec<Grant>,\n    /// The host-set clock expiry is judged against. Zero (the default) means\n    /// \"the epoch\", under which no bounded grant has expired yet; a host that\n    /// issues bounded grants must call [`set_now`](Self::set_now).\n    now_ms: u64,\n}\n\nimpl GrantTable {\n    /// An empty authority table.\n    pub fn new() -> Self {\n        Self::default()"
+        },
+        {
+          "first_line": 153,
+          "last_line": 163,
+          "text": "\n    fn subject(tag: u8) -> Subject {\n        Subject::new([tag; 32])\n    }\n\n    #[test]\n    fn write_covers_read_but_not_the_reverse() {\n        assert!(Mode::Write.covers(Mode::Read));\n        assert!(Mode::Delegate.covers(Mode::Write));\n        assert!(!Mode::Read.covers(Mode::Write));\n    }"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\cascade.rs",
+      "sha256": "54dcfd89b136a25f480dfc6ac351dcf6692ff98650d3b95d564b17997747f02b",
+      "excerpts": [
+        {
+          "first_line": 177,
+          "last_line": 224,
+          "text": "    table: &mut WatchTable,\n    budget: CascadeBudget,\n    entries: Vec<CommittedEntry>,\n    mut run: R,\n) -> Cascade\nwhere\n    R: FnMut(&[Wake]) -> Vec<CommittedEntry>,\n{\n    let mut rounds: Vec<Round> = Vec::new();\n    let mut pending = entries;\n\n    for _ in 0..budget.rounds() {\n        let events: Vec<WatchEvent<'_>> = pending.iter().map(CommittedEntry::as_event).collect();\n        let wakes = table.wake(&events);\n        if wakes.is_empty() {\n            return Cascade {\n                rounds,\n                outcome: CascadeOutcome::Settled,\n            };\n        }\n        let produced = run(&wakes);\n        rounds.push(Round { wakes });\n        pending = produced;\n    }\n\n    // The budget is spent. Anyone the next round would have woken is named,\n    // without advancing a cursor: the work is deferred, not consumed, so a\n    // later drain still sees it.\n    let events: Vec<WatchEvent<'_>> = pending.iter().map(CommittedEntry::as_event).collect();\n    let still_waking = table.would_wake(&events);\n    let outcome = if still_waking.is_empty() {\n        CascadeOutcome::Settled\n    } else {\n        CascadeOutcome::BudgetExhausted { still_waking }\n    };\n    Cascade { rounds, outcome }\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    use crate::cap::Cap;\n    use crate::grant::{Grant, GrantTable, Mode};\n\n    fn subject(seed: u8) -> Subject {\n        Subject::new([seed; 32])\n    }\n"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\deadband.rs",
+      "sha256": "73e616506b71b98c1c6e61f20ea91cd3c61d69a2bc15a7db222128d352f4b26b",
+      "excerpts": [
+        {
+          "first_line": 170,
+          "last_line": 205,
+          "text": "#[derive(Clone, Debug, Default, PartialEq, Eq)]\npub struct DeadbandTable {\n    entries: Vec<Entry>,\n}\n\nimpl DeadbandTable {\n    /// An empty table.\n    pub fn new() -> Self {\n        Self::default()\n    }\n\n    /// Register or replace a behavior's declaration. Re-registering the same\n    /// declaration preserves its accepted baseline; changing policy resets it.\n    pub fn register(&mut self, subject: Subject, deadband: Deadband) {\n        if let Some(entry) = self\n            .entries\n            .iter_mut()\n            .find(|entry| entry.subject == subject)\n        {\n            if entry.deadband != deadband {\n                entry.deadband = deadband;\n                entry.accepted = None;\n            }\n            return;\n        }\n        self.entries.push(Entry {\n            subject,\n            deadband,\n            accepted: None,\n        });\n    }\n\n    /// Drop a behavior's declaration and accepted baseline with its residency.\n    pub fn remove_subject(&mut self, subject: Subject) {\n        self.entries.retain(|entry| entry.subject != subject);\n    }"
+        },
+        {
+          "first_line": 263,
+          "last_line": 301,
+          "text": "            subject,\n            deadband: Some(entry.deadband),\n            actuation,\n        })\n    }\n\n    /// Move the accepted baseline after the host's actuation succeeds.\n    /// Admissions for undeclared subjects are deliberately a no-op.\n    pub fn record(&mut self, admission: DeadbandAdmission) {\n        let Some(deadband) = admission.deadband else {\n            return;\n        };\n        if let Some(entry) = self\n            .entries\n            .iter_mut()\n            .find(|entry| entry.subject == admission.subject && entry.deadband == deadband)\n        {\n            entry.accepted = Some(Accepted {\n                output: admission.actuation.output,\n                at_ms: admission.actuation.at_ms,\n            });\n        }\n    }\n\n    /// Check and immediately record an accepted actuation. Useful when the\n    /// caller's actuation cannot fail; fallible commit paths should use\n    /// [`check`](Self::check) and [`record`](Self::record) separately.\n    pub fn admit(&mut self, subject: Subject, actuation: Actuation) -> Result<(), DeadbandRefusal> {\n        let admission = self.check(subject, actuation)?;\n        self.record(admission);\n        Ok(())\n    }\n\n    /// The whole table as stable, persistable lines.\n    ///\n    /// Each line is\n    /// `<subject> <minimum-change> <minimum-interval-ms> <output|-> <at-ms|->`.\n    pub fn to_wire_lines(&self) -> Vec<String> {\n        let mut entries: Vec<&Entry> = self.entries.iter().collect();"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\gate.rs",
+      "sha256": "9cd0e01301132859a3ac978e21e414f0ae294d97eaf013b19fa4553d8ec76b8a",
+      "excerpts": [
+        {
+          "first_line": 165,
+          "last_line": 190,
+          "text": "fn touched_nodes<'a>(\n    nested: &'a GraphLog<Container, Relation>,\n    spec: &'a EditSpec<Container, Relation>,\n) -> Vec<&'a str> {\n    match spec {\n        EditSpec::InsertNode(node) => vec![node.id.as_str()],\n        EditSpec::RemoveNode(id) => vec![id.as_str()],\n        EditSpec::Connect { from, to, .. } | EditSpec::Assert { from, to, .. } => {\n            vec![from.as_str(), to.as_str()]\n        },\n        EditSpec::Disconnect(id)\n        | EditSpec::ConfirmAssertion { id, .. }\n        | EditSpec::WithdrawAssertion { id, .. } => nested\n            .assertion(*id)\n            .map(|record| vec![record.from.as_str(), record.to.as_str()])\n            .unwrap_or_default(),\n        EditSpec::Derive { node, .. } => vec![node.as_str()],\n        EditSpec::SetFacet { node, .. } | EditSpec::RemoveFacet { node, .. } => {\n            vec![node.as_str()]\n        },\n    }\n}\n\n/// The facet id a spec writes, if any. Facet authority is an independent axis\n/// from the node scope returned by [`touched_nodes`].\nfn touched_facet(spec: &EditSpec<Container, Relation>) -> Option<&str> {"
+        },
+        {
+          "first_line": 251,
+          "last_line": 273,
+          "text": "    /// A gate whose projections carry a specific author.\n    pub fn with_author(author: Author) -> Self {\n        Self { author }\n    }\n\n    /// The projection node id for a grant over `cap`, in the capability's wire\n    /// form so the record round-trips (`grant:power:navigate`).\n    pub fn projection_id(cap: &Cap) -> String {\n        format!(\"{GRANT_PREFIX}{}\", cap.to_wire())\n    }\n\n    fn commit_projection(\n        &self,\n        nested: &mut GraphLog<Container, Relation>,\n        mut node: Container,\n    ) -> Result<Committed, GateError> {\n        node.media_type = Some(PROJECTION_MEDIA_TYPE.to_string());\n        let expected = nested.revision();\n        nested\n            .commit_batch(\n                self.author.clone(),\n                expected,\n                vec![EditSpec::InsertNode(node)],"
+        },
+        {
+          "first_line": 306,
+          "last_line": 350,
+          "text": "    /// an attributed revision-checked commit. Returns the commit receipt or the\n    /// reason nothing applied.\n    pub fn petition(\n        &self,\n        provider: &impl AuthorityProvider,\n        nested: &mut GraphLog<Container, Relation>,\n        subject: Subject,\n        claimed: &ScopePath,\n        expected: u64,\n        specs: Vec<EditSpec<Container, Relation>>,\n    ) -> Result<Committed, GateError> {\n        self.validate_petition(provider, nested, subject, claimed, &specs)?;\n        nested\n            .commit_batch(subject.to_author(), expected, specs)\n            .map_err(GateError::Commit)\n    }\n\n    /// Run a behavior petition through the ordinary authority checks and its\n    /// declared actuation deadband, then commit. The accepted output and time\n    /// are recorded only after the revision-checked commit lands.\n    pub fn petition_behavior(\n        &self,\n        provider: &impl AuthorityProvider,\n        deadbands: &mut DeadbandTable,\n        nested: &mut GraphLog<Container, Relation>,\n        subject: Subject,\n        petition: BehaviorPetition<'_>,\n    ) -> Result<Committed, GateError> {\n        self.validate_petition(provider, nested, subject, petition.claimed, &petition.specs)?;\n        let admission = deadbands\n            .check(subject, petition.actuation)\n            .map_err(GateError::Deadband)?;\n        let committed = nested\n            .commit_batch(subject.to_author(), petition.expected, petition.specs)\n            .map_err(GateError::Commit)?;\n        deadbands.record(admission);\n        Ok(committed)\n    }\n\n    fn validate_petition(\n        &self,\n        provider: &impl AuthorityProvider,\n        nested: &GraphLog<Container, Relation>,\n        subject: Subject,\n        claimed: &ScopePath,"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\servitor\\src\\tick.rs",
+      "sha256": "980341c3065a678b691ba7bc64823f34bcb8a5039fe8f1037fa7cbc22f9a010c",
+      "excerpts": [
+        {
+          "first_line": 107,
+          "last_line": 122,
+          "text": "            self.period\n        )\n    }\n\n    /// Read back [`to_wire`](Self::to_wire).\n    pub fn parse(line: &str) -> Option<Self> {\n        let mut parts = line.split(' ');\n        let subject = Subject::from_hex(parts.next()?)?;\n        let last_fired_ms = parts.next()?.parse().ok()?;\n        let period = Period::parse(parts.next()?)?;\n        Some(Self {\n            subject,\n            period,\n            last_fired_ms,\n        })\n    }"
+        },
+        {
+          "first_line": 171,
+          "last_line": 211,
+          "text": "    /// period. A behavior that files or archives should act on what it finds\n    /// now, and firing six extra times to \"catch up\" would be six chances to\n    /// do the same work again.\n    ///\n    /// Results come back in stable subject order, like [`WatchTable::wake`], so\n    /// a recorded run replays.\n    ///\n    /// [`WatchTable::wake`]: crate::watch::WatchTable::wake\n    pub fn due(&mut self, now_ms: u64) -> Vec<Subject> {\n        let mut due: Vec<Subject> = Vec::new();\n        for watch in &mut self.watches {\n            // Saturating: a host clock that jumped backwards (a system time\n            // change) must not wrap into a huge elapsed span and fire\n            // everything at once.\n            let elapsed = now_ms.saturating_sub(watch.last_fired_ms);\n            if elapsed >= watch.period.millis() {\n                watch.last_fired_ms = now_ms;\n                due.push(watch.subject);\n            }\n        }\n        due.sort_by_key(|subject| subject.0);\n        due.dedup();\n        due\n    }\n\n    /// The whole table as persistable lines.\n    pub fn to_wire_lines(&self) -> Vec<String> {\n        self.watches.iter().map(TimeWatch::to_wire).collect()\n    }\n\n    /// Rebuild from [`to_wire_lines`](Self::to_wire_lines). A malformed line\n    /// fails the load rather than vanishing: a schedule that quietly stops\n    /// existing is a behavior that stops running for no stated reason.\n    pub fn from_wire_lines<'a>(lines: impl IntoIterator<Item = &'a str>) -> Option<Self> {\n        let mut table = Self::new();\n        for line in lines {\n            if line.trim().is_empty() {\n                continue;\n            }\n            table.watches.push(TimeWatch::parse(line)?);\n        }"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\moot\\gemot\\src\\moot\\delegation.rs",
+      "sha256": "d5ecfdb3aee9463e0eb8488a774e627f15e8dbf42950b688b43266d66cfbaac4",
+      "excerpts": [
+        {
+          "first_line": 271,
+          "last_line": 289,
+          "text": "    pub fn covers(\n        &self,\n        moot_id: [u8; 32],\n        rules: &ConstitutionRules,\n        subject: [u8; 32],\n        path: &str,\n        at_ms: u64,\n    ) -> bool {\n        self.certificates.iter().any(|(id, signed)| {\n            signed.certificate.subject == subject\n                && is_moot_scope(&signed.certificate.scope, moot_id)\n                && signed.certificate.covers(path, MOOT_ACT_ACTION, at_ms)\n                && self.chain_is_live(*id, rules, moot_id)\n        })\n    }\n\n    fn chain_is_live(\n        &self,\n        id: DelegationId,"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\moot\\gemot\\src\\moot\\typed_authorization.rs",
+      "sha256": "9891fcf07d4a831e03488222656fc3636ab72932feaeb06558d242f46617ad02",
+      "excerpts": [
+        {
+          "first_line": 7,
+          "last_line": 26,
+          "text": "//! The moot authorization seam over the TYPED capability vocabulary \u2014 the\n//! capability-model round's OQ3 unification (ruled 2026-07-24: unify, on the\n//! trait, when the caller exists; this is that caller).\n//!\n//! Both tiers already speak personae's signed delegation certificates: the\n//! participant tier through `servitor::DelegationTable`, the moot tier through\n//! [`MootDelegations`]. What they did NOT share until now is the capability\n//! vocabulary. [`MootGroup`]'s provider answers `capability_covers` from the\n//! member's access level and **ignores the request's path entirely**, so a\n//! Write member covers every capability \u2014 membership standing in for\n//! authority.\n//!\n//! [`TypedMootAuthorization`] closes that: the request's `capability_path`\n//! is parsed as a shared [`Cap`] **at the seam** (D2's rule \u2014 strings are\n//! parsed at boundaries, never compared inside a decision) and answered from\n//! the moot's delegation certificates through the same `power/...` /\n//! `scope/...` encoding servitor writes. A moot capability check and a\n//! participant capability check are now the SAME question in the SAME vocabulary\n//! against the SAME certificate grammar; the two tiers differ only in where\n//! chains root (a constitution grant here, the profile identity there)."
+        }
+      ]
+    }
+  ],
+  "external_contract": {
+    "path": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\dramatis-c1632f2f3bdc2597\\cf562f4\\crates\\insigne\\src\\delegation.rs",
+    "sha256": "b043780378814e1a56ebefe7609c9abf8a04b62db2b912891c70371daba80913",
+    "excerpts": [
+      {
+        "first_line": 49,
+        "last_line": 82,
+        "text": "/// A capability target shared across application-specific authority ledgers.\n///\n/// `domain` separates applications (`moot`, `murm.coop`, `mesh`); `resource`\n/// identifies one space within that application; `path_prefix` selects a\n/// structural subset; and `actions` remains an application-owned vocabulary.\n#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]\npub struct CapabilityScope {\n    /// Application or protocol family which owns the action vocabulary.\n    pub domain: String,\n    /// Opaque application-owned identity of the governed space.\n    pub resource: Vec<u8>,\n    /// Inclusive structural path prefix within the resource.\n    pub path_prefix: String,\n    /// Application-owned actions allowed under this scope.\n    pub actions: BTreeSet<String>,\n}\n\nimpl CapabilityScope {\n    /// Whether this scope is a valid narrowing of `parent`.\n    pub fn attenuates(&self, parent: &Self) -> bool {\n        self.is_well_formed()\n            && parent.is_well_formed()\n            && self.domain == parent.domain\n            && self.resource == parent.resource\n            && path_covers(&parent.path_prefix, &self.path_prefix)\n            && self.actions.is_subset(&parent.actions)\n    }\n\n    fn is_well_formed(&self) -> bool {\n        !self.domain.is_empty()\n            && !self.resource.is_empty()\n            && !self.path_prefix.is_empty()\n            && !self.actions.is_empty()\n            && self.actions.iter().all(|action| !action.is_empty())"
+      },
+      {
+        "first_line": 145,
+        "last_line": 181,
+        "text": "    /// Whether this certificate is structurally valid on its own.\n    pub fn is_well_formed(&self) -> bool {\n        self.version == CERTIFICATE_VERSION\n            && self.issuer != [0; 32]\n            && self.subject != [0; 32]\n            && self.scope.is_well_formed()\n            && self.issued_at_ms <= self.not_before_ms\n            && self\n                .expires_at_ms\n                .is_none_or(|expires| expires >= self.not_before_ms)\n    }\n\n    /// Whether this certificate narrows an already-valid parent certificate.\n    ///\n    /// Behind `digest`, since naming the parent means hashing it.\n    #[cfg(feature = \"digest\")]\n    pub fn attenuates(&self, parent: &Self) -> bool {\n        self.is_well_formed()\n            && parent.is_well_formed()\n            && self.parent == DelegationParent::Certificate(parent.id())\n            && self.issuer == parent.subject\n            && self.scope.attenuates(&parent.scope)\n            && self.not_before_ms >= parent.not_before_ms\n            && expiry_within(self.expires_at_ms, parent.expires_at_ms)\n            && parent.remaining_delegation_depth > 0\n            && self.remaining_delegation_depth < parent.remaining_delegation_depth\n    }\n\n    /// Whether the certificate covers one action at the evaluation time.\n    pub fn covers(&self, path: &str, action: &str, at_ms: u64) -> bool {\n        self.is_well_formed()\n            && at_ms >= self.not_before_ms\n            && self.expires_at_ms.is_none_or(|expires| at_ms <= expires)\n            && path_covers(&self.scope.path_prefix, path)\n            && self.scope.actions.contains(action)\n    }\n"
+      }
+    ]
+  },
+  "qualification": "Exact source excerpts and hashes. Cached Insigne explains the application-owned domain/resource check and inclusive expiry contract; this external source does not count toward Mere coverage. Public executions are separately recorded."
+}

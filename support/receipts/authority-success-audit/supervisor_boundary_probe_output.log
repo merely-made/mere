@@ -1,0 +1,13 @@
+
+running 4 tests
+test cached_input_admission_does_not_establish_this_meshs_retention ... OBSERVATION: successful local-input delivery installed no second-mesh custody claim; first mesh release lets GC remove that input
+ok
+test expired_completion_receipt_disagrees_with_the_authoritative_board ... OBSERVATION: host emits Completed for expired lease, while its authoritative board remains nonterminal: Claimed { winner: [154, 201, 82, 53, 20, 185, 188, 45, 246, 2, 159, 2, 255, 126, 197, 29, 120, 210, 38, 97, 91, 2, 92, 220, 247, 118, 113, 239, 39, 206, 4, 3] }; steps: [Completed { job: JobId([206, 56, 62, 100, 135, 249, 20, 152, 57, 86, 208, 92, 136, 245, 139, 143, 94, 190, 206, 49, 244, 4, 239, 58, 196, 157, 239, 140, 168, 113, 93, 252]), lease: Some(LeaseId([247, 95, 28, 198, 144, 41, 255, 157, 58, 89, 219, 191, 35, 103, 249, 251, 134, 80, 106, 42, 27, 9, 81, 186, 185, 82, 45, 131, 234, 154, 183, 153])) }, Claimed { job: JobId([206, 56, 62, 100, 135, 249, 20, 152, 57, 86, 208, 92, 136, 245, 139, 143, 94, 190, 206, 49, 244, 4, 239, 58, 196, 157, 239, 140, 168, 113, 93, 252]) }]
+ok
+test explicit_mesh_retention_is_the_positive_control ... CONTROL: explicit second-mesh pin retains cached input after first mesh releases its claim
+ok
+test live_lease_completion_is_the_positive_control ... CONTROL: completion within the live lease is terminal in both host receipt and authoritative board
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.36s
+

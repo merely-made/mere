@@ -1,0 +1,19 @@
+
+running 7 tests
+test attestation_is_omitted_by_catchup_even_though_privacy_and_priority_keep_it ... OBSERVATION: catch-up frontier overrides device-always-travels comment; snapshot has no device directory (Q202)
+ok
+test cancellation_during_final_real_adapter_pause_still_commits_output ... OBSERVATION: cancel is visible during last adapter await, yet run_job returns success and stores output
+ok
+test catchup_checkpoint_plus_tail_cannot_import_nonroot_tail_into_empty_store ... OBSERVATION: owner checkpoint imports; selected tail fails MissingPredecessor until policy-omitted original prefix supplied
+ok
+test delayed_adapter_units_are_unbound_by_exact_resource_and_implementation_identity ... OBSERVATION: same exact resource, implementation, input and spec yield different bytes solely by constructor unit count
+ok
+test exact_verdict_is_reported_using_local_producer_only_adapter ... OBSERVATION: local ProducerOnly is NotCheckable ordinarily, but yields Reproduced/Diverged against a producer ExactBytes declaration
+ok
+test legacy_job_ignores_resource_allowlist_while_v2_equivalent_is_blocked ... OBSERVATION: excluded legacy Blake3 is claimed/executed; equivalent V2 is idle
+ok
+test unstarted_held_job_executes_despite_owner_withholding_or_capacity_zero ... OBSERVATION: held-but-unstarted job Execute with owner withholding, and with zero configured capacity; running control reclaims
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+

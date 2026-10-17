@@ -1,0 +1,25 @@
+
+running 9 tests
+test filtered_route_returns_an_engine_rejected_by_filter ... route_filtered: all engines unavailable still yields external.protocol; available Genet control selects Genet
+ok
+test inline_and_frontmatter_exports_have_collisions ... exports: distinct literal/emphasis blocks collide in Markdown/Knot; HTML distinguishes; distinct title/source metadata also collides
+ok
+test ipv6_is_misparsed_by_both_local_authority_splitters ... IPv6: gopher exported host=[ port=70 instead of ::1/7070; host override also misses; DNS-host controls pass
+ok
+test knot_export_drops_feed_identity ... Knot: different FeedEntry guid values serialize identically; changed-block control differs
+ok
+test public_flip_traits_allow_secondary_chaining ... flip: a type implementing FlipBack + FlipDonor + FlipReceiver compiles and forwards twice; built-in ScryForward is not being claimed to implement FlipDonor
+ok
+test same_length_replacement_passes_navigation_currentness ... navigation: unrelated same-length replacement is_current=true; length-change control=false
+ok
+test scry_exposes_no_structured_cookie_or_restore_failure ... Scry: cookie refusal -> begin Ok; restore refusal -> terminal is_done; debug warnings are not a host result API
+ok
+test svg_sniff_reads_beyond_its_claimed_window ... sniff bound: identical 1024-byte heads differ on SVG marker at 65536; HTML path remains windowed
+ok
+test xml_feed_sniff_does_not_reach_default_feed_route ... sniff+route: Atom without XML declaration -> feed engine; same root with declaration -> Genet over HTTPS; no host fetch executed
+ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+[verso-scry] scry flip: set_cookie failed: audit cookie refusal
+[verso-scry] scry flip: restore script failed: audit script refusal

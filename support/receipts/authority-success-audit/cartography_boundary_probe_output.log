@@ -1,0 +1,23 @@
+
+running 7 tests
+An explicitly asymmetric affinity query returns the reverse pair when that pair is stored first; forward and reverse-only controls pass
+test affinity_lookup_prefers_storage_order_over_requested_direction ... ok
+Generic solve-to-projection conversion shrinks valid 10x10 content bounds to 0x0; portable lowering retains the footprint but copies the zero bounds
+Exported Grid strategy accepts an explicit one-node ViewIntent filter yet places all three without a fault; selecting the order separately works
+Partition reinterprets degree-plus-one weights1/2/2 as2/3/3, changing the isolated share from1/5 to2/8; unchanged-weight direct solve is the control
+Partition regions exist in the projection, but scene lowering drops all of them while retaining a halo overlay control
+Qualified edge boundary: raw projection fabricates an absent endpoint at origin, coverage reports omission, and portable lowering drops the edge
+test partition_adds_another_one_to_already_offset_degree_weights ... ok
+test explicit_view_filter_is_ignored_by_the_exported_strategy ... ok
+test generic_adapter_replaces_footprint_bounds_with_point_bounds ... Qualified signal admission boundary: a missing order key is skipped in generic score construction but panics in Spiral; current host registry pairing was not violated in a live caller
+ok
+test arrangement_regions_disappear_in_portable_scene_lowering ... ok
+test omitted_endpoint_is_fabricated_at_origin_in_positioned_edge ... ok
+test stale_order_is_skipped_by_generic_score_but_panics_in_spiral ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'stale_order_is_skipped_by_generic_score_but_panics_in_spiral' (33128) panicked at crates\canvas\cartography\src\spiral_score.rs:111:14:
+node keys came from this graph
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

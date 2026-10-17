@@ -1,0 +1,148 @@
+{
+  "date_utc": "2026-10-17T09:29:47.347909+00:00",
+  "source_sha256": {
+    "crates/cambium/meristem/Cargo.toml": "ef5cbe05d723ca80adcd38fad130b449fd60435f88632e03e485f1b111d67044",
+    "crates/cambium/meristem/LICENSE": "6d1d968fb225eca367cb7f0b8831ab012a35d92b547e945e17ef8e7b05c3e5cc",
+    "crates/cambium/meristem/README.md": "7010a73d0edcd845794b4c5c99f94d5b4ef62bac5190e816dbc023fb20574223",
+    "crates/cambium/meristem/src/element.rs": "d7fbdc48bfd1599b5bbaaebe49d4337599f06e404540d2c8ae88525a2bb84e6f",
+    "crates/cambium/meristem/src/element_splice.rs": "e69aab560956ea5695d5137850ddfe5ac3c01f126511ea82f9e99d701ef3e4de",
+    "crates/cambium/meristem/src/lib.rs": "b590109e4876e510a4f3126f96a78416d6a6973ec9f8171185cbb4168f11f487",
+    "crates/cambium/meristem/src/message.rs": "8986f6febc549e01b3935c7506f1fdbc6395b7f9572d417f30e951d703759591",
+    "crates/cambium/meristem/src/message_context.rs": "61a72c4c7df5b284c87a1c03179a709ad8bd26f37ced06dcc54f6b91282db4ee",
+    "crates/cambium/meristem/src/view.rs": "5ceb5945d5ff5cc36dd96078e2c1957f5822f8e03c832af8cfc3e4f4f8afb754",
+    "crates/cambium/meristem/src/view_ctx.rs": "99170f87ea8af1e1fe9d24d5ba680da2c1e3c6264e6b1360761a7fb451d9bdf3",
+    "crates/cambium/meristem/src/view_sequence.rs": "7945667fd300ec475bd26730e9122b9794380d28777b6d62d4ffcf11029f5aef",
+    "crates/cambium/meristem/src/views/any_view.rs": "026013789afe24cfe1f1f46dc0d0297b668ef58821564d3f923d708d1d456427",
+    "crates/cambium/meristem/src/views/impl_box.rs": "e5045476ddd9487ec7d18ee0441c148abe0bbe5cb0cc64326de1a28914314f38",
+    "crates/cambium/meristem/src/views/impl_rc.rs": "cdaafe06884032d5e9a8d94cd336c617b21ec117cdf59913a2ec38afe03ff39d",
+    "crates/cambium/meristem/src/views/lens.rs": "14ec63aedd43219ca8eebc0cb4ba7c2313cb3c6ef69efca150df60e81bb37eb8",
+    "crates/cambium/meristem/src/views/map_message.rs": "c2486538055365b2267277b79999a14ee6d568803d53f8ae380d9a9b0aebcfb4",
+    "crates/cambium/meristem/src/views/map_state.rs": "08f50e729a702046d314ebbfc91a4a2ecd8043f7695d86d05650c72d93375356",
+    "crates/cambium/meristem/src/views/mod.rs": "6bc4ebd914e8b92c3f219cc421df98ed8639dde44ac407e7549b96807bc8c2b4",
+    "crates/cambium/meristem/src/views/orphan.rs": "7892553aa79af089a3818c11ec15405664e416ecd6762a8aea2b5bc6713653a1",
+    "crates/cambium/meristem/src/view_sequences/impl_array.rs": "d25d8d3fd45122e7d4fe99620c311d7ed6d9d1ad0bcc239e535991759dd04f43",
+    "crates/cambium/meristem/src/view_sequences/impl_option.rs": "5825c1859e97b2f28b23689c9d2280aacb8e16593a0ac33cb3eed9ba84349ce2",
+    "crates/cambium/meristem/src/view_sequences/impl_tuples.rs": "c2d012e762dd57b45eb1dbd70f08834c5350956c73009bbea8b8a730cb53bc84",
+    "crates/cambium/meristem/src/view_sequences/impl_vec.rs": "750d4ff41f59de663511768fcb11befd8f1764af3545fdc0ea4f649c90045c5d",
+    "crates/cambium/meristem/src/view_sequences/mod.rs": "06040c790edc1419cb3bb67db8afbf3f6fb5498f278a5cc1d8c1934e1bb69a69",
+    "crates/cambium/meristem/tests/any_view.rs": "94307e8c13e55e246b37f00d52046471fdee7362f9f03c679a016aba3a3c24d3",
+    "crates/cambium/meristem/tests/arc.rs": "42d6bba5ac3ff6cb7bbd7e864233616244886d4e022bce82beb8818925d3b8df",
+    "crates/cambium/meristem/tests/array_sequence.rs": "c9da02ec02daf25a929c3a48e68233049115d5928ddb9b70a21df26b69c9154b",
+    "crates/cambium/meristem/tests/base_sequence.rs": "b5285f058f5bf1ddcd735545158fd1e44602e9dfccda199d2cd1922be29c4acf",
+    "crates/cambium/meristem/tests/nested_seq.rs": "d08c3c2f68e4b1fecac999f28646049520f7a0246f1a6ab5cd476fb1ae54c07d",
+    "crates/cambium/meristem/tests/orphan.rs": "479a92bcce18e073bee0f8b959622465f903232275694816f8fc2e239b74bae9",
+    "crates/cambium/meristem/tests/tuple_sequence.rs": "45058cd9d68986e822c16824d9b44056dfa55cedad019a3b294fb240c8375d14",
+    "crates/cambium/meristem/tests/vec_sequence.rs": "38e1ae847001d78d005c9c3cfc6267ffd1eb6bd47e11432e4de7844c7f7a6d3e",
+    "crates/cambium/meristem/tests/common/mod.rs": "5447768223eb218f98e5c0b56bbb45a530a8d556337fff30874ab1609b87628a"
+  },
+  "libraries": {
+    "anymore": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libanymore-36f553a3ae552d17.rlib",
+      "sha256": "78139c00d72c17a711dd4d4a8ec7274ec05a8ad4ee3e8a0827711fd8b7c57d80",
+      "features": [
+        "alloc",
+        "default",
+        "type_name"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#anymore@1.0.0"
+    },
+    "tracing": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib",
+      "sha256": "1ec97cae29ea0bd57aa60d548b055bc75a621befcd7fc702feb34ccff21e2e85",
+      "features": [
+        "attributes",
+        "default",
+        "std",
+        "tracing-attributes"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tracing@0.1.44"
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--crate-name",
+      "meristem",
+      "--crate-type",
+      "rlib",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\meristem\\src\\lib.rs",
+      "-C",
+      "metadata=authority_success_meristem_state",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\libauthority_success_meristem_state.rlib",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "anymore=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libanymore-36f553a3ae552d17.rlib",
+      "--extern",
+      "tracing=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\meristem_state_probe.rs",
+      "--extern",
+      "meristem=C:\\t\\cargo-targets\\mere\\libauthority_success_meristem_state.rlib",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-meristem-state-probe.exe",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "anymore=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libanymore-36f553a3ae552d17.rlib",
+      "--extern",
+      "tracing=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\meristem_count_const_probe.rs",
+      "--extern",
+      "meristem=C:\\t\\cargo-targets\\mere\\libauthority_success_meristem_state.rlib",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-meristem-count-const-probe.exe",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "anymore=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libanymore-36f553a3ae552d17.rlib",
+      "--extern",
+      "tracing=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtracing-3d21b8d22ec6ecc0.rlib"
+    ]
+  ],
+  "build_exits": [
+    0,
+    0,
+    1
+  ],
+  "run_exit": 0,
+  "checks": 3,
+  "runner_sha256": "2493903b721eedc2dddf846c1b85f1c757e29dbdbabe48ebc923600b50bed453",
+  "probe_sha256": "4584d28ab724dc17030c7c1d044974e12c1ebf24e4ec1a16d4783e56c69780ee",
+  "constant_probe_sha256": "89af65dff90e7687aeb4c61a506e2ba48a8969445c972e8a9648b96012975e9e",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_meristem_state.rlib",
+      "bytes": 1299900,
+      "sha256": "b371cefe05e9598ad5e0128322959e80d786226e605ca821ad766cd60c96f759"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-meristem-state-probe.exe",
+      "bytes": 862720,
+      "sha256": "e8b5b1a64df2089ebad457f97a697d25fa06147a8118676869c45c62553f1840"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-meristem-state-probe.pdb",
+      "bytes": 3952640,
+      "sha256": "ed7e3f41518ee024e922086d853b5499f477a09d47171bcc725703f26afe0d65"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Original current no-optional-feature Meristem, compiled fresh over exact retained tracing/anymore. Three public Count/core sequence counterexamples using the original current Meristem test element/splice fixture. Separate const consumer expects E0080. No native DOM/application routing or fresh whole supplier graph acceptance; compilation is not source-reading credit."
+}

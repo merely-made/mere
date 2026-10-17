@@ -1,0 +1,11 @@
+
+running 3 tests
+test gaussian_dynamic_center_produces_a_gradient_for_a_constant_function ... Gaussian center=p+(1,0): constant value0.99501246, direct gradient(0.009950125, -0.0), finite difference(0.0, 0.0); fixed-center control correct.
+ok
+test linear_dynamic_normal_omits_its_derivative_and_sample_changes_the_answer ... Dynamic Linear value25: direct gradient(3.0, 4.0), registry-sampled equivalent(5.9995646, 8.000374), expected(6,8); constant-normal control correct.
+ok
+test locally_minted_ids_overwrite_an_explicit_zero_identity ... Explicit zero ID value7 is silently replaced by unrelated new named field value9; ordinary fresh-name and same-name-update controls behave as documented.
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

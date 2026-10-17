@@ -1,0 +1,274 @@
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> crates\graph\graph-kernel\src\graph\legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> crates\graph\graph-kernel\src\graph\query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> crates\graph\graph-kernel\src\graph\assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: methods `append_node_property`, `add_node_classification`, `remove_node_classification`, `set_node_classification_status`, and `set_node_primary_classification` are never used
+   --> crates\graph\graph-kernel\src\graph\resource_content.rs:96:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `replay_assert_relation_by_ids`, `replay_set_edge_semantic_predicate_by_ids`, `dissolve_remove_node_collect_traversals`, `assert_surface_persisted_semantic_statement`, `replay_retract_relations`, and `set_edge_semantic_predicate` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_ops.rs:422:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 17 warnings (run `cargo fix --lib -p mere-kernel` to apply 8 suggestions)
+   Compiling scenomise v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+warning: unused variable: `time_range`
+   --> crates\cambium\scenes\scenomise\src\opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling mere-cartography v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\canvas\cartography)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 51.51s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\cartography-5360fec1221852c3.exe)
+
+running 57 tests
+test adapters::matrix::tests::the_two_reading_profile_sits_beside_the_one_authority_matrix ... ok
+test adapters::matrix::tests::a_two_reading_matrix_crosses_neighbors_with_the_graph ... ok
+test adapters::matrix::tests::axis_readings_are_actor_readings_with_their_inputs ... ok
+test adapters::parity::radial_without_a_focus_places_nothing ... ok
+test adapters::parity::divergence_timeline_zero_span_places_rather_than_producing_nan ... ok
+test adapters::parity::kanban_matches_the_pre_migration_placement ... ok
+test adapters::parity::grid_matches_the_pre_migration_placement ... ok
+test adapters::parity::an_adapter_reports_a_missing_or_mistyped_channel_and_places_nothing ... ok
+test adapters::parity::lsystem_matches_the_pre_migration_placement ... ok
+test adapters::parity::divergence_leave_in_place_resolves_to_the_disclosed_coordinate ... ok
+test adapters::parity::radial_matches_the_pre_migration_placement_from_the_rings_it_is_handed ... ok
+test adapters::parity::divergence_penrose_runs_centre_out_from_the_tiling_not_the_configured_centre ... ok
+test adapters::parity::phyllotaxis_matches_the_pre_migration_placement ... ok
+test adapters::parity::penrose_matches_the_pre_migration_placement ... ok
+test adapters::parity::spectral_places_the_coordinates_it_is_handed_and_rings_out_without_them ... ok
+test adapters::matrix::tests::the_site_matrix_reproduces_through_the_shared_derivation ... ok
+test overlay::tests::overlay_variants_are_debuggable ... ok
+test projection::coverage_tests::missing_channels_on_an_empty_graph_are_a_projection_limit ... ok
+test adapters::parity::the_embedded_merge_places_both_producers_identically ... ok
+test projection::tests::projection_empty_has_no_geometry ... ok
+test reading::tests::registry_separates_reading_scope_from_arrangement ... ok
+test adapters::parity::the_score_takes_its_ordinals_from_the_request_order ... ok
+test adapters::parity::timeline_matches_the_pre_migration_placement ... ok
+test reading::tests::reading_ids_are_unique_and_registry_is_serializable ... ok
+test representation::tests::class_set_resolution_follows_registry_order ... ok
+test projection::coverage_tests::output_omissions_and_scene_lowering_preserve_coverage ... ok
+test representation::tests::every_class_has_one_profile_and_unknown_classes_fall_back ... ok
+test representation::tests::profile_ladder_selects_from_data_and_retains_through_hysteresis ... ok
+test request::tests::target_size_default_logical_size_is_reference ... ok
+test request::tests::view_intent_canvas_pixels_builder_sets_pixel_target ... ok
+test request::tests::view_intent_minimap_builder_sets_minimap_form_factor ... ok
+test scene_out::tests::an_unemphasized_node_carries_no_channels ... ok
+test adapters::parity::the_graph_only_table_dispatches_each_strategy_it_lists_and_no_other ... ok
+test representation::tests::host_bindings_do_not_claim_endpoint_domain_actions ... ok
+test scene_out::tests::cluster_halo_lowers_to_region ... ok
+test scene_out::tests::edges_lower_to_relations_with_weight_and_path ... ok
+test scene_out::tests::heat_and_bridge_lower_to_channels ... ok
+test representation::tests::primitive_and_behavior_axes_are_serializable_and_distinct ... ok
+test scene_out::tests::importance_scale_folds_into_transform ... ok
+test scene_out::tests::nodes_lower_to_items_with_measured_footprints ... ok
+test scene_out::tests::unmeasured_radius_falls_back_to_circle ... ok
+test signals::tests::a_keyed_signal_reads_by_id_and_reports_a_missing_or_mistyped_channel ... ok
+test signals::tests::affinity_scores_lookup_returns_none_for_unrecorded_pair ... ok
+test signals::tests::affinity_scores_lookup_returns_reverse_pair_when_forward_missing ... ok
+test signals::tests::importance_weights_lookup_returns_recorded_weight ... ok
+test signals::tests::intelligence_signals_default_holds_no_channel ... ok
+test signals::tests::keyed_signals_round_trip_as_a_map_by_id ... ok
+test signals::tests::node_embeddings_lookup_returns_recorded_coord ... ok
+test spiral_score::tests::an_unmeasured_item_does_not_claim_a_card ... ok
+test strategy::tests::noop_strategy_returns_strategy_id_in_metadata ... ok
+test spiral_score::tests::one_graph_at_two_zooms_selects_different_rungs_without_moving_items ... ok
+test spiral_score::tests::prior_score_supplies_hysteresis_and_focus_stays_live ... ok
+test spiral_score::tests::the_spiral_reports_a_missing_or_mistyped_channel_and_places_nothing ... ok
+test spiral_score::tests::the_handed_order_is_the_portable_order_and_recency_selects_declared_lod_rungs ... ok
+test adapters::changes::tests::only_an_adjacent_revision_reading_reads_changes ... ok
+test adapters::changes::tests::the_changes_reading_reproduces_the_sites_checkpoint_classes ... ok
+test adapters::changes::tests::a_changes_axis_lists_removed_actors_after_current_ones ... ok
+
+test result: ok. 57 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

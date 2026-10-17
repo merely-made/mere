@@ -1,0 +1,25 @@
+{
+  "kind": "native Linux primitives and source branch checks; not Rust API execution",
+  "sources": {
+    "ports/djinn/src/bin/djinn.rs": {
+      "sha256": "f30d29a15c8fd8cccd25c6a6f3568a0e0fce10baf30f2f3d8fad0d5be2b38398",
+      "helper_sha256": "768de59b6886487bd8b98fcaedea32210d68887bca30b49223fe29ad5fe6b868",
+      "helper": "prepare_unix_agent_endpoint"
+    },
+    "crates/graphshell/graphshell-endpoint/src/door/local_endpoint.rs": {
+      "sha256": "26d9ecb52bc8168702ed6d7dad74244f9be79f6f8b03ffabf0d23e3949e66e16",
+      "helper_sha256": "36d95cb0c0518a44fc12f1a636b705c57bfcbd30bb742709985ffb564aa686fc",
+      "helper": "prepare_unix_endpoint"
+    }
+  },
+  "observations": {
+    "regular_file": {
+      "connect_errno": 111,
+      "removed_by_policy": true
+    },
+    "missing": "accepted without a file",
+    "stale_socket": "removed as intended",
+    "live_socket": "refused and preserved"
+  },
+  "fixture_removed": true
+}

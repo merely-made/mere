@@ -1,0 +1,274 @@
+   Compiling syn v3.0.6
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling synstructure v0.14.0
+   Compiling zerofrom-derive v0.1.8
+   Compiling num-traits v0.2.19
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling yoke v0.8.3
+   Compiling zerovec-derive v0.11.6
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling tinystr v0.8.4
+   Compiling phf_macros v0.13.1
+   Compiling icu_locale_core v2.3.0
+   Compiling phf v0.13.1
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling icu_provider v2.3.1
+   Compiling icu_collections v2.3.0
+   Compiling parking_lot v0.12.5
+   Compiling string_cache v0.9.0
+   Compiling equator-macro v0.4.2
+   Compiling bytemuck_derive v1.12.1
+   Compiling bytemuck v1.25.2
+   Compiling equator v0.4.2
+   Compiling web_atoms v0.2.6
+   Compiling hashbrown v0.17.1
+   Compiling num-integer v0.1.47
+   Compiling windows-result v0.4.1
+   Compiling windows-implement v0.60.2
+   Compiling windows-interface v0.59.3
+   Compiling windows-core v0.62.2
+   Compiling num-bigint v0.4.8
+   Compiling markup5ever v0.39.0
+   Compiling icu_properties v2.3.0
+   Compiling aligned-vec v0.6.4
+   Compiling object v0.39.1
+   Compiling icu_normalizer v2.3.0
+   Compiling ar_archive_writer v0.5.3
+   Compiling v_frame v0.3.9
+   Compiling num-rational v0.4.2
+   Compiling font-types v0.11.3
+   Compiling thiserror-impl v2.0.21
+   Compiling winnow v1.0.4
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling thiserror v2.0.21
+   Compiling read-fonts v0.39.2
+   Compiling serde_json v1.0.151
+   Compiling psm v0.1.32
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling euclid v0.22.14
+   Compiling no_std_io2 v0.9.4
+   Compiling nom v8.0.0
+   Compiling arg_enum_proc_macro v0.3.4
+   Compiling profiling-procmacros v1.0.18
+   Compiling av-scenechange v0.14.1
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling brotli-decompressor v5.0.3
+   Compiling profiling v1.0.18
+   Compiling av1-grain v0.2.5
+   Compiling bitstream-io v4.10.0
+   Compiling windows-future v0.3.2
+   Compiling uuid v1.27.0
+   Compiling sceno v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling windows-collections v0.3.2
+   Compiling windows-numerics v0.3.1
+   Compiling num-derive v0.4.2
+   Compiling cssparser-macros v0.7.1
+   Compiling simd_helpers v0.1.0
+   Compiling rav1e v0.8.1
+   Compiling cssparser v0.37.0
+   Compiling windows v0.62.2
+   Compiling icu_locale_fallback v2.3.0
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling windows-sys v0.60.2
+   Compiling wuff v0.2.9
+   Compiling idna_adapter v1.2.2
+   Compiling indexmap v2.14.2
+   Compiling app_units v0.7.8
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling linebender_resource_handle v0.1.1
+   Compiling ravif v0.13.0
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling moxcms v0.8.1
+   Compiling petgraph v0.8.3
+   Compiling tracing v0.1.44
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling idna v1.1.0
+   Compiling icu_segmenter v2.3.0
+   Compiling wuff-capi v0.2.0
+   Compiling stacker v0.1.25
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling accesskit v0.24.1
+   Compiling harfrust v0.8.4
+   Compiling skrifa v0.42.1
+   Compiling parley_data v0.10.0
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling simdutf8 v0.1.5
+   Compiling encoding_rs v0.8.42
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling fontsan v0.7.0
+   Compiling url v2.5.8
+   Compiling image v0.25.10
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling mere-curation v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\forme\curation)
+   Compiling tokio-macros v2.7.2
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling tokio v1.53.2
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling uxtree v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\forme\uxtree)
+   Compiling scenomise v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+warning: unused variable: `time_range`
+   --> crates\cambium\scenes\scenomise\src\opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling incipit v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\incipit)
+   Compiling graphshell-client v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-client)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 46s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\graphshell_client-0f2c35fa2e1ed751.exe)
+
+running 79 tests
+test core::tests::the_wrong_answer_shape_is_named ... ok
+test core::tests::an_unsolicited_answer_is_refused ... ok
+test core::tests::mounting_an_offer_that_does_not_exist_asks_nothing ... ok
+test core::tests::closing_asks_before_it_purges ... ok
+test core::tests::mounting_asks_for_a_snapshot_without_any_carrier ... ok
+test core::tests::a_notice_for_an_unknown_session_is_refused ... ok
+test driver::tests::a_blank_line_is_ignored ... ok
+test action_draft::tests::draft_requires_an_advertised_selection_before_it_composes ... ok
+test action_draft::tests::draft_keeps_only_exact_advertised_choice_values ... ok
+test action_draft::tests::semantics_and_invocation_share_the_same_selected_value ... ok
+test driver::tests::an_unreadable_line_is_named_as_such ... ok
+test driver::tests::disconnecting_clears_the_inflight_request ... ok
+test driver::tests::a_second_request_while_one_is_in_flight_is_refused ... ok
+test driver::tests::a_notice_queues_without_disturbing_the_inflight_request ... ok
+test driver::tests::a_refusal_clears_the_inflight_request ... ok
+test driver::tests::an_answer_to_a_request_never_sent_is_refused ... ok
+test driver::tests::an_answer_naming_the_wrong_request_is_refused ... ok
+test driver::tests::discovery_builds_the_core ... ok
+test driver::tests::discovering_again_on_a_live_core_is_answered_and_keeps_the_core ... ok
+test core::tests::media_requires_a_verified_card_and_keeps_owner_bytes_out_of_presentation_cache ... ok
+test core::tests::media_refuses_wrong_scope_wrong_hash_and_corrupted_bytes ... ok
+test frozen::tests::a_fold_freezes_as_a_group_not_an_absence ... ok
+test frozen::tests::a_frozen_scene_enumerates_every_visible_instance_by_name ... ok
+test frozen::tests::a_grid_refuses_ragged_rows_and_blank_cells ... ok
+test frozen::tests::a_fold_free_freeze_writes_no_fold_key ... ok
+test frozen::tests::a_screen_reader_reaches_a_fold_and_its_members ... ok
+test frozen::tests::a_summary_fold_without_a_rule_still_lists_its_members ... ok
+test frozen::tests::a_screen_reader_traversal_reaches_every_instance_and_relation_by_name ... ok
+test frozen::tests::an_invisible_item_is_not_something_a_reader_is_missing ... ok
+test frozen::tests::an_unmet_placement_is_announced_too ... ok
+test frozen::tests::an_unmet_placement_reaches_the_reader_too ... ok
+test frozen::tests::an_unpinned_scene_says_nothing_at_all ... ok
+test frozen::tests::every_instance_carries_a_role_and_a_label ... ok
+test frozen::tests::freezing_is_deterministic ... ok
+test frozen::tests::no_node_reaches_a_reader_unlabelled ... ok
+test frozen::tests::relations_are_resolved_to_names_not_indices ... ok
+test frozen::tests::repeated_source_instances_keep_distinct_accessibility_nodes ... ok
+test frozen::tests::satisfaction_reads_both_halves_off_the_wire ... ok
+test frozen::tests::snapshot_freeze_preserves_sparse_instances_and_full_source_mapping ... ok
+test frozen::tests::the_line_leads_with_the_failure ... ok
+test frozen::tests::a_v2_capture_freezes_without_the_compiler ... ok
+test frozen::tests::the_summary_counts_what_the_listing_shows ... ok
+test frozen::tests::the_document_names_and_describes_itself ... ok
+test frozen::tests::the_tree_is_deterministic_and_root_last ... ok
+test frozen::tests::a_hostile_name_cannot_reshape_the_tree ... ok
+test frozen::tests::a_matrix_grid_carries_instance_and_source_identity ... ok
+test frozen::tests::a_matrix_grid_reads_as_a_grid_to_a_screen_reader ... ok
+test pump::tests::a_stream_that_ends_early_is_reported ... ok
+test pump::tests::a_session_opens_and_runs_until_settled_over_one_stream ... ok
+test remote::tests::an_unreadable_line_fails_the_operation_in_flight ... ok
+test frozen::tests::a_fold_is_a_disclosure_in_the_markup ... ok
+test frozen::tests::a_labelled_fold_reads_its_label_in_place_of_the_rule ... ok
+test remote::tests::nothing_is_invoked_before_a_mount ... ok
+test remote::tests::a_nudge_reports_the_hosts_revision_or_its_failure ... ok
+test remote::tests::a_channel_the_host_closed_is_named_as_such ... ok
+test frozen::tests::the_frozen_form_is_a_real_tree_a_host_can_traverse ... ok
+test remote::tests::an_incomplete_draft_is_refused_locally_and_stays_open ... ok
+test remote::tests::joining_discovers_then_mounts ... ok
+test tests::memory_only_cache_refuses_persistence ... ok
+test tests::malformed_editable_payload_and_persistent_policy_fail_closed ... ok
+test tests::editable_capability_selects_source_while_card_only_keeps_the_fallback ... ok
+test tests::missing_base_requests_resync_without_changing_stale_display ... ok
+test remote::tests::a_rejected_intent_resnapshots_and_rings_no_bell ... ok
+test remote::tests::the_first_bounded_form_opens_from_any_client ... ok
+test tests::revocation_purges_editable_source_bytes ... ok
+test tests::resource_and_status_changes_commit_with_the_scene_revision ... ok
+test remote::tests::a_stale_position_is_answered_as_stale_and_the_bell_still_resumes ... ok
+test remote::tests::an_accepted_intent_polls_and_the_bell_resumes_with_a_snapshot ... ok
+test remote::tests::a_bounded_action_waits_for_its_values ... ok
+test tests::snapshot_and_resource_stay_scoped_to_their_session ... ok
+test tests::scene_and_presentation_diff_commit_once ... ok
+test remote::tests::actions_are_one_per_intent_not_one_per_card ... ok
+test tests::unsupported_image_becomes_a_labeled_placeholder_without_fetching ... ok
+test remote::tests::local_actions_are_listed_and_run_by_the_host_never_the_carrier ... ok
+test tests::permitted_encrypted_cache_restores_scene_and_resource_once ... ok
+test remote::tests::reconnect_keeps_the_mount_and_resumes_the_missed_change_with_a_snapshot ... ok
+test frozen::tests::a_probe_resolves_an_instance_by_its_announced_name ... ok
+test frozen::tests::two_instances_sharing_a_name_stay_distinguishable ... ok
+test frozen::tests::a_probe_can_reach_every_instance_by_carried_identity ... ok
+
+test result: ok. 79 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\facet_frozen.rs (C:/t/cargo-targets/mere/build\debug\deps\facet_frozen-01a33ec4c28707b8.exe)
+
+running 1 test
+test freezing_a_facet_lists_every_cell_and_heading ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\fold_remote.rs (C:/t/cargo-targets/mere/build\debug\deps\fold_remote-b710ca5a5c55bae0.exe)
+
+running 5 tests
+test an_invalid_fold_from_the_endpoint_changes_nothing ... ok
+test a_summary_stand_in_sits_at_its_members_centroid ... ok
+test a_host_label_is_read_in_place_of_the_rule ... ok
+test a_mounted_fold_hides_its_members_behind_a_counted_stand_in ... ok
+test unfolding_arrives_as_a_diff_and_round_trips ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\portable_projection.rs (C:/t/cargo-targets/mere/build\debug\deps\portable_projection-5535b6944e9f1489.exe)
+
+running 2 tests
+test the_site_artifact_decomposes_into_a_capture_and_a_sibling_trace ... ok
+test a_shelfmark_cites_the_capture_by_address_and_generation ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\site_fold_parity.rs (C:/t/cargo-targets/mere/build\debug\deps\site_fold_parity-0d7ab03e94b8a15e.exe)
+
+running 5 tests
+test the_rule_reaches_what_the_site_hides ... ok
+test every_position_shows_what_the_site_shows ... ok
+test freezing_the_fold_lists_the_group_instead_of_dropping_it ... ok
+test a_fold_free_trace_writes_back_byte_identical ... FAILED
+test the_committed_fact_trace_is_the_derived_one ... ok
+
+failures:
+
+---- a_fold_free_trace_writes_back_byte_identical stdout ----
+
+thread 'a_fold_free_trace_writes_back_byte_identical' (59200) panicked at crates\graphshell\graphshell-client\tests\site_fold_parity.rs:193:5:
+assertion `left == right` failed
+  left: "{\"version\":1,\"base\":{\"epoch\":2158167204149687473,\"revision\":1,\"tables\":{\"sources\":[{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"mere\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"genet\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"retinue\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"netrender\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"turnstone\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"knot-editor\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"woodshed\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"isocosm\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"cleromancy\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"emblem\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"mora\"}],\"spaces\":[{\"parent\":null,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"name\":\"world\"}],\"backdrops\":[],\"items\":[{\"source\":0,\"space\":0,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":2,\"space\":0,\"transform\":{\"translate\":{\"x\":11.07806,\"y\":-126.22835},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":3,\"space\":0,\"transform\":{\"translate\":{\"x\":94.42463,\"y\":123.160324},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":4,\"space\":0,\"transform\":{\"translate\":{\"x\":-176.46063,\"y\":-31.21351},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":5,\"space\":0,\"transform\":{\"translate\":{\"x\":169.04788,\"y\":-107.53424},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":6,\"space\":0,\"transform\":{\"translate\":{\"x\":-56.97666,\"y\":211.94957},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":7,\"space\":0,\"transform\":{\"translate\":{\"x\":-109.26208,\"y\":-210.37802},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":8,\"space\":0,\"transform\":{\"translate\":{\"x\":238.04933,\"y\":86.935555},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":9,\"space\":0,\"transform\":{\"translate\":{\"x\":-248.46422,\"y\":102.56203},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":10,\"space\":0,\"transform\":{\"translate\":{\"x\":120.09294,\"y\":-256.63065},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}],\"item_order\":[0,1,2,3,4,5,6,7,8,9,10],\"relations\":[{\"from\":7,\"to\":0,\"space\":0,\"points\":[{\"x\":-109.26208,\"y\":-210.37802},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":5,\"to\":0,\"space\":0,\"points\":[{\"x\":169.04788,\"y\":-107.53424},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":5,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":169.04788,\"y\":-107.53424}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":1,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":-66.06826,\"y\":60.523922}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":3,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":94.42463,\"y\":123.160324}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":2,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":11.07806,\"y\":-126.22835}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-176.46063,\"y\":-31.21351},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-176.46063,\"y\":-31.21351},{\"x\":0.0,\"y\":0.0}],\"kind\":\"host_for\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":6,\"to\":0,\"space\":0,\"points\":[{\"x\":-56.97666,\"y\":211.94957},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":1,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":-66.06826,\"y\":60.523922}],\"kind\":\"renders_with\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":8,\"to\":0,\"space\":0,\"points\":[{\"x\":238.04933,\"y\":86.935555},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":9,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":-248.46422,\"y\":102.56203}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null},{\"from\":0,\"to\":10,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":120.09294,\"y\":-256.63065}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null}],\"regions\":[],\"bounds\":{\"origin\":{\"x\":-276.46423,\"y\":-284.63065},\"size\":{\"w\":542.51355,\"h\":524.5802}},\"generation\":2158167204149687473,\"unmet_holds\":[],\"honored_holds\":[]}},\"steps\":[{\"label\":\"Select Turnstone\",\"annotation\":{\"id\":\"turnstone\",\"kind\":\"node\"}},{\"label\":\"Move Turnstone\",\"diff\":{\"epoch\":2158167204149687473,\"base\":1,\"revision\":2,\"operations\":[{\"UpdateItem\":{\"index\":4,\"value\":{\"source\":4,\"space\":0,\"transform\":{\"translate\":{\"x\":-128.46063,\"y\":-7.2135105},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateRelation\":{\"index\":6,\"value\":{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-128.46063,\"y\":-7.2135105},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null}}},{\"UpdateRelation\":{\"index\":7,\"value\":{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-128.46063,\"y\":-7.2135105},{\"x\":0.0,\"y\":0.0}],\"kind\":\"host_for\",\"weight\":1.0,\"link_key\":null,\"marks\":{\"forward\":false,\"reverse\":false,\"opposed\":false},\"strength\":null}}}]}},{\"label\":\"Select the Turnstone host relationship\",\"annotation\":{\"id\":\"turnstone-hosts-mere\",\"kind\":\"edge\"}},{\"label\":\"Remove the relationship from the scene\",\"diff\":{\"epoch\":2158167204149687473,\"base\":2,\"revision\":3,\"operations\":[{\"TombstoneRelation\":{\"index\":7}}]}},{\"label\":\"Select Mere\",\"annotation\":{\"id\":\"mere\",\"kind\":\"node\"}},{\"label\":\"Fold Mere dependencies\",\"diff\":{\"epoch\":2158167204149687473,\"base\":3,\"revision\":4,\"operations\":[{\"UpdateItem\":{\"index\":0,\"value\":{\"source\":0,\"space\":0,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[[\"fold\",1.0]]}}},{\"UpdateItem\":{\"index\":5,\"value\":{\"source\":5,\"space\":0,\"transform\":{\"translate\":{\"x\":169.04788,\"y\":-107.53424},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":3,\"value\":{\"source\":3,\"space\":0,\"transform\":{\"translate\":{\"x\":94.42463,\"y\":123.160324},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":2,\"value\":{\"source\":2,\"space\":0,\"transform\":{\"translate\":{\"x\":11.07806,\"y\":-126.22835},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":9,\"value\":{\"source\":9,\"space\":0,\"transform\":{\"translate\":{\"x\":-248.46422,\"y\":102.56203},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":10,\"value\":{\"source\":10,\"space\":0,\"transform\":{\"translate\":{\"x\":120.09294,\"y\":-256.63065},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}}]}},{\"label\":\"Expand Mere dependencies\",\"diff\":{\"epoch\":2158167204149687473,\"base\":4,\"revision\":5,\"operations\":[{\"UpdateItem\":{\"index\":0,\"value\":{\"source\":0,\"space\":0,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":5,\"value\":{\"source\":5,\"space\":0,\"transform\":{\"translate\":{\"x\":169.04788,\"y\":-107.53424},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":3,\"value\":{\"source\":3,\"space\":0,\"transform\":{\"translate\":{\"x\":94.42463,\"y\":123.160324},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":2,\"value\":{\"source\":2,\"space\":0,\"transform\":{\"translate\":{\"x\":11.07806,\"y\":-126.22835},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":9,\"value\":{\"source\":9,\"space\":0,\"transform\":{\"translate\":{\"x\":-248.46422,\"y\":102.56203},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":10,\"value\":{\"source\":10,\"space\":0,\"transform\":{\"translate\":{\"x\":120.09294,\"y\":-256.63065},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}}]}}]}"
+ right: "{\"version\":1,\"base\":{\"epoch\":2158167204149687473,\"revision\":1,\"tables\":{\"sources\":[{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"mere\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"genet\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"retinue\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"netrender\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"turnstone\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"knot-editor\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"woodshed\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"isocosm\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"cleromancy\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"emblem\"},{\"adapter\":\"mer3ly.repository-graph/v1\",\"id\":\"mora\"}],\"spaces\":[{\"parent\":null,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"name\":\"world\"}],\"backdrops\":[],\"items\":[{\"source\":0,\"space\":0,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":2,\"space\":0,\"transform\":{\"translate\":{\"x\":11.07806,\"y\":-126.22835},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":3,\"space\":0,\"transform\":{\"translate\":{\"x\":94.42463,\"y\":123.160324},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":4,\"space\":0,\"transform\":{\"translate\":{\"x\":-176.46063,\"y\":-31.21351},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":5,\"space\":0,\"transform\":{\"translate\":{\"x\":169.04788,\"y\":-107.53424},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":6,\"space\":0,\"transform\":{\"translate\":{\"x\":-56.97666,\"y\":211.94957},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":7,\"space\":0,\"transform\":{\"translate\":{\"x\":-109.26208,\"y\":-210.37802},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":8,\"space\":0,\"transform\":{\"translate\":{\"x\":238.04933,\"y\":86.935555},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":9,\"space\":0,\"transform\":{\"translate\":{\"x\":-248.46422,\"y\":102.56203},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]},{\"source\":10,\"space\":0,\"transform\":{\"translate\":{\"x\":120.09294,\"y\":-256.63065},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}],\"item_order\":[0,1,2,3,4,5,6,7,8,9,10],\"relations\":[{\"from\":7,\"to\":0,\"space\":0,\"points\":[{\"x\":-109.26208,\"y\":-210.37802},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":5,\"to\":0,\"space\":0,\"points\":[{\"x\":169.04788,\"y\":-107.53424},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":5,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":169.04788,\"y\":-107.53424}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":1,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":-66.06826,\"y\":60.523922}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":3,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":94.42463,\"y\":123.160324}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":2,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":11.07806,\"y\":-126.22835}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-176.46063,\"y\":-31.21351},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-176.46063,\"y\":-31.21351},{\"x\":0.0,\"y\":0.0}],\"kind\":\"host_for\",\"weight\":1.0},{\"from\":6,\"to\":0,\"space\":0,\"points\":[{\"x\":-56.97666,\"y\":211.94957},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":1,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":-66.06826,\"y\":60.523922}],\"kind\":\"renders_with\",\"weight\":1.0},{\"from\":8,\"to\":0,\"space\":0,\"points\":[{\"x\":238.04933,\"y\":86.935555},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":9,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":-248.46422,\"y\":102.56203}],\"kind\":\"depends_on\",\"weight\":1.0},{\"from\":0,\"to\":10,\"space\":0,\"points\":[{\"x\":0.0,\"y\":0.0},{\"x\":120.09294,\"y\":-256.63065}],\"kind\":\"depends_on\",\"weight\":1.0}],\"regions\":[],\"bounds\":{\"origin\":{\"x\":-276.46423,\"y\":-284.63065},\"size\":{\"w\":542.51355,\"h\":524.5802}},\"generation\":2158167204149687473,\"unmet_holds\":[],\"honored_holds\":[]}},\"steps\":[{\"label\":\"Select Turnstone\",\"annotation\":{\"id\":\"turnstone\",\"kind\":\"node\"}},{\"label\":\"Move Turnstone\",\"diff\":{\"epoch\":2158167204149687473,\"base\":1,\"revision\":2,\"operations\":[{\"UpdateItem\":{\"index\":4,\"value\":{\"source\":4,\"space\":0,\"transform\":{\"translate\":{\"x\":-128.46063,\"y\":-7.2135105},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateRelation\":{\"index\":6,\"value\":{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-128.46063,\"y\":-7.2135105},{\"x\":0.0,\"y\":0.0}],\"kind\":\"depends_on\",\"weight\":1.0}}},{\"UpdateRelation\":{\"index\":7,\"value\":{\"from\":4,\"to\":0,\"space\":0,\"points\":[{\"x\":-128.46063,\"y\":-7.2135105},{\"x\":0.0,\"y\":0.0}],\"kind\":\"host_for\",\"weight\":1.0}}}]}},{\"label\":\"Select the Turnstone host relationship\",\"annotation\":{\"id\":\"turnstone-hosts-mere\",\"kind\":\"edge\"}},{\"label\":\"Remove the relationship from the scene\",\"diff\":{\"epoch\":2158167204149687473,\"base\":2,\"revision\":3,\"operations\":[{\"TombstoneRelation\":{\"index\":7}}]}},{\"label\":\"Select Mere\",\"annotation\":{\"id\":\"mere\",\"kind\":\"node\"}},{\"label\":\"Fold Mere dependencies\",\"diff\":{\"epoch\":2158167204149687473,\"base\":3,\"revision\":4,\"operations\":[{\"UpdateItem\":{\"index\":0,\"value\":{\"source\":0,\"space\":0,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[[\"fold\",1.0]]}}},{\"UpdateItem\":{\"index\":5,\"value\":{\"source\":5,\"space\":0,\"transform\":{\"translate\":{\"x\":169.04788,\"y\":-107.53424},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":3,\"value\":{\"source\":3,\"space\":0,\"transform\":{\"translate\":{\"x\":94.42463,\"y\":123.160324},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":2,\"value\":{\"source\":2,\"space\":0,\"transform\":{\"translate\":{\"x\":11.07806,\"y\":-126.22835},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":9,\"value\":{\"source\":9,\"space\":0,\"transform\":{\"translate\":{\"x\":-248.46422,\"y\":102.56203},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":10,\"value\":{\"source\":10,\"space\":0,\"transform\":{\"translate\":{\"x\":120.09294,\"y\":-256.63065},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":false,\"hit\":null,\"channels\":[]}}}]}},{\"label\":\"Expand Mere dependencies\",\"diff\":{\"epoch\":2158167204149687473,\"base\":4,\"revision\":5,\"operations\":[{\"UpdateItem\":{\"index\":0,\"value\":{\"source\":0,\"space\":0,\"transform\":{\"translate\":{\"x\":0.0,\"y\":0.0},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":5,\"value\":{\"source\":5,\"space\":0,\"transform\":{\"translate\":{\"x\":169.04788,\"y\":-107.53424},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":3,\"value\":{\"source\":3,\"space\":0,\"transform\":{\"translate\":{\"x\":94.42463,\"y\":123.160324},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":2,\"value\":{\"source\":2,\"space\":0,\"transform\":{\"translate\":{\"x\":11.07806,\"y\":-126.22835},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":1,\"value\":{\"source\":1,\"space\":0,\"transform\":{\"translate\":{\"x\":-66.06826,\"y\":60.523922},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":9,\"value\":{\"source\":9,\"space\":0,\"transform\":{\"translate\":{\"x\":-248.46422,\"y\":102.56203},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}},{\"UpdateItem\":{\"index\":10,\"value\":{\"source\":10,\"space\":0,\"transform\":{\"translate\":{\"x\":120.09294,\"y\":-256.63065},\"scale\":1.0,\"rotate\":0.0},\"footprint\":{\"Circle\":{\"radius\":28.0}},\"representation\":\"Glyph\",\"layer\":0,\"visible\":true,\"hit\":null,\"channels\":[]}}}]}}]}"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    a_fold_free_trace_writes_back_byte_identical
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p graphshell-client --test site_fold_parity`

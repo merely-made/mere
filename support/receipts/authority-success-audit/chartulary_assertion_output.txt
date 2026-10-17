@@ -1,0 +1,11 @@
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.23s
+     Running tests\audit_assertion_diagnostics.rs (C:/t/cargo-targets/mere/build\debug\deps\audit_assertion_diagnostics-d45f1f64e56d71e9.exe)
+
+running 3 tests
+test disconnect_of_an_edge_reaped_earlier_in_the_batch_still_reports_success ... ok
+test accepted_lifecycle_operations_after_remove_reinsert_are_silently_ignored ... ok
+test equal_length_foreign_checkpoint_overrides_the_durable_journal ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

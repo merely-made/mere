@@ -1,0 +1,8 @@
+error: couldn't find file `C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\..\crates\intel\eidetic-search\src\bm25.rs`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\search_boundaries_probe.rs:5:1
+  |
+5 | mod original_bm25;
+  | ^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

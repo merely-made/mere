@@ -1,0 +1,48 @@
+{
+  "date_utc": "2026-10-17T20:55:59.595869+00:00",
+  "exit": 0,
+  "passed": 17,
+  "original_roofline_tests": 8,
+  "new_roofline_cases": 5,
+  "rank_cases": 4,
+  "source_sha256": {
+    "support/patches/cubecl-runtime/src/throughput/roofline.rs": "b57fa49c06f28b32a996f51d65c89a27990495eb1e7f30e358d99fbdc64bcec5",
+    "support/patches/cubecl-runtime/src/throughput/benchmarker.rs": "64d367ed980f42107512db39b518b11c9bfcf59fbcbef2812bdf52f449d991bf"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\runtime_throughput_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-runtime-throughput.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-throughput.exe",
+      "bytes": 782848,
+      "sha256": "49fb5f7e187cbdc5151e7d7e4eb530322f48fac2b05f8b4adc90828db9175efd"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-runtime-throughput.pdb",
+      "bytes": 3043328,
+      "sha256": "fa3e24a6b92d0713a8dfd26bc445d5fe2c1d238ed553720400fe4ae97e5c454e"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "rank": "4bbcfdb9cbde0e27b8fa7e29086d098425547b57da1661c70cb31813cb50d6df",
+    "retarget": "6f3bc1809fa5198bdb17fb0a1ddf7596cda6e239e740a1c9561c33df1371d1bf",
+    "TARGET_DURATION": "9006f2ff401006ba868e3a0346ede162cff11f53779df7aac7fc977283109bfa",
+    "full_roofline": "a5711ca1cbf68812a542293f1b18dd63a8d55f1419a6d6a6e9e246abb374d225"
+  },
+  "evidence_sha256": {
+    "run_runtime_throughput_probe.py": "4a526810a8bdbcdbd4b80940e20453ec50362f47ab30a8ab6308e28c395ec7a6",
+    "runtime_throughput_probe.rs": "7432fea746ab630d0c1a3d062c01469b13f948e5c8e6ea55093d81d24a80a60f",
+    "runtime_throughput_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime_throughput_run.txt": "1a617252c57f924e8d5e4bf24bcf910f9f34a6156041483ca16bb1a4db1e3f34"
+  },
+  "qualification": "Full unchanged roofline.rs compiled with8 original tests and5 new numeric policy cases. Exact rank/retarget bodies and target duration compiled with shape-equivalent config/result structs and deterministic CPU duration callbacks;2 ordinary controls and2 U64-count cases on64-bit host. No actual kernel iterations, hardware timing, GPU measurement, current probe-caller reachability, cache insertion or full backend/runtime build. Exact owned exe/PDB removed."
+}

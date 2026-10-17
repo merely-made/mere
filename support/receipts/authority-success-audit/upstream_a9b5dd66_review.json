@@ -1,0 +1,44 @@
+{
+  "from": "00e4442868ee1cb014364a81ccaed657b512b218",
+  "to": "a9b5dd6635e7528ff3d2aec1e389075d628fcb6c",
+  "commits": [
+    "a9b5dd6635e7528ff3d2aec1e389075d628fcb6c Record publication of qualified scroll supplier and consumer",
+    "1eba417ebdf0036fe64f3423f02fb10989a9d54f Record document scroll boundary supplier and Woodshed receiving qualification",
+    "2d95d95e9d843ed6ebb0d38f47f77444823834bb Drive clip relayout regression through drained DOM mutations",
+    "6be10362791ed4a3b06adf4ef75b49d412135141 Expose retained document scroll as an optional host observation",
+    "e105394296f08dbbda3b7ae57648d6acbe4644d4 Respect nested clip boundaries in document scroll extent",
+    "df30e97dddcf8f3dc5e9f0da93c76350687212e6 Remove resolved pack-authoring process-count discrepancy",
+    "1be0bc04f44eacf4cecce62afc84bda68625cf87 Preserve HTTP response provenance for explicit source capture",
+    "45e5d40dfe4f69caa0410f79c5e9ad5ec1e5be39 Record private pack-authoring workflow qualification"
+  ],
+  "source_diffs_read": [
+    "crates/cambium/cambium-rootstock/src/host.rs",
+    "crates/cambium/cambium-rootstock/src/owned_layout.rs",
+    "crates/cambium/cambium-rootstock/src/owned_layout/tests.rs",
+    "crates/system/fetch/src/handle_tests.rs",
+    "crates/system/fetch/src/lib.rs",
+    "crates/system/page-load/src/lib.rs"
+  ],
+  "documentation_diffs_read": [
+    "design_docs/2026-10-14_retained_document_resource_brief.md",
+    "design_docs/DOC_README.md",
+    "design_docs/mere_docs/implementation_strategy/2026-06-23_native_session_store_plan.md",
+    "design_docs/mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md"
+  ],
+  "diff_sha256": "3bcea87b3186c32de5579e0b2f169f5a1a1695547a2beac99553fc2fdeaa3a04",
+  "git_source_blob_sha256": {
+    "crates/cambium/cambium-rootstock/src/host.rs": "9804ac00e9be68d82a4ee5c2f0b7a35f6f8b254b2787d4fba68247f42811a080",
+    "crates/cambium/cambium-rootstock/src/owned_layout.rs": "06244e403e768f0d321e9a13b6207440f6bc6cbd9183259366c765e4e495c216",
+    "crates/cambium/cambium-rootstock/src/owned_layout/tests.rs": "08961eecf899b32c26bdc65101181207888723b091a5a66b5448926f78fd1470",
+    "crates/system/fetch/src/handle_tests.rs": "5e332a0d117ea55d022c83730056e87dc237d8a0c4a7921fbe6c36dc737cda8e",
+    "crates/system/fetch/src/lib.rs": "0d00fad0ac906350f0e5525b67c396022fa0a38757a86861d136ead72a9cabe7",
+    "crates/system/page-load/src/lib.rs": "bd532977cd34de3bfa03666875798d45156e43c7c77b03a52b67ab4e5790b605"
+  },
+  "receipt_context_read": [
+    "validation/http-source-provenance-20261017/receipt.json",
+    "support/receipts/scroll-boundary-20261017/qualification.json",
+    "support/receipts/scroll-boundary-20261017/publication.json",
+    "support/receipts/scroll-boundary-20261017/supplier-source.json"
+  ],
+  "qualification": "Fetched origin/main; read all six changed source diffs and four changed documentation diffs from Git objects. Receipt context was read; full supplier gate and test log were not re-executed or independently requalified. No merge over existing shared report WIP after earlier ff-only refusal. Working source stays at original3738-file inventory; upstream diff review is separate from working-source coverage."
+}

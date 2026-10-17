@@ -1,0 +1,29 @@
+
+running 6 tests
+test audit_tests::invalid_february_date_is_accepted ... ok
+test audit_tests::malformed_unicode_fraction_panics ... ok
+test audit_tests::original_utc_control ... ok
+test audit_tests::overflowing_year_panics_in_checked_native_build ... ok
+test audit_tests::positive_offset_is_silently_ignored ... positive-offset found=Some(1786372265123), required=Some(1786352465123)
+ok
+test audit_tests::valid_negative_offset_becomes_unknown ... FAILED
+
+failures:
+
+failures:
+    audit_tests::valid_negative_offset_becomes_unknown
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'audit_tests::malformed_unicode_fraction_panics' (44908) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt_timestamp_probe.rs:22:44:
+end byte index 3 is not a char boundary; it is inside 'é' (bytes 2..4 of string)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'audit_tests::overflowing_year_panics_in_checked_native_build' (40892) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt_timestamp_probe.rs:32:16:
+attempt to multiply with overflow
+
+thread 'audit_tests::valid_negative_offset_becomes_unknown' (64072) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\receipt_timestamp_probe.rs:55:9:
+assertion `left == right` failed
+  left: Some(1786372265123)
+ right: None

@@ -1,0 +1,152 @@
+{
+  "date_utc": "2026-10-17T09:38:00.034992+00:00",
+  "source_sha256": {
+    "crates/cambium/sprigging/Cargo.toml": "3d9bb1fb29798e2a9b71f3c25693142bfe04cf538d18d7801138497b1c431fb9",
+    "crates/cambium/sprigging/src/angle.rs": "21d1b7cc29060051f558cd718d497e948b995f20ef30c2a54e8856401cd5ece2",
+    "crates/cambium/sprigging/src/arrange.rs": "e7f0189b545b3a55bf3afbc528ee73e7ec9862a4ec39e4783a087a0273ec9b18",
+    "crates/cambium/sprigging/src/dimension.rs": "cb6762858cac515938aa111f81370ca6ab9384791d57a558f3b168da3d4175d8",
+    "crates/cambium/sprigging/src/glyphs.rs": "7d7d32804f62115c9df8722275b00c8ffab39c78248366b5d71ba0773f8178ea",
+    "crates/cambium/sprigging/src/grid.rs": "0b1865a67c0a174a2b764c2fdb04d19ac242b78fa566eee663e1b7267d7eca9b",
+    "crates/cambium/sprigging/src/lib.rs": "33c5b12f2c9356665bc51765648a5f7fd5b98a7f4a13c25e7ee1a2adc530af27",
+    "crates/cambium/sprigging/src/path.rs": "c9e59d8ac3d082187d57a67e290369e5322dc09561d71e876a1c914f9f8d99b4",
+    "crates/cambium/sprigging/src/slot.rs": "339449daba9192b3c3f40ade781672daff954b8c4392a1ce42c13734b59f6fe6"
+  },
+  "libraries": {
+    "paint_list_api": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_api-d350b5e172665605.rlib",
+      "sha256": "1691163be7efe15a39f9f61fc101994e1af80d28b61638734c7ae41405570e7b",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/netrender.git?branch=main#paint_list_api@0.1.2"
+    },
+    "accesskit": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "sha256": "113f80f588814d49bc0ed457eba5c1d257f1d439859b0bf32cdf5829ba5befd9",
+      "features": [
+        "enumn",
+        "serde"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#accesskit@0.24.1"
+    },
+    "vello": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libvello-7af8f81e6c6f2e25.rlib",
+      "sha256": "7dc5afb59af3229fbe736e2d16f1d51f347c8e85b32c2f3971d8faec2d32757a",
+      "features": [
+        "bump_estimate",
+        "wgpu"
+      ],
+      "package_id": "git+https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#netrender-vello@0.11.0"
+    }
+  },
+  "commands": [
+    [
+      "rustc",
+      "--edition=2024",
+      "--crate-name",
+      "sprigging",
+      "--crate-type",
+      "rlib",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\sprigging\\src\\lib.rs",
+      "-C",
+      "metadata=authority_success_sprigging_retention",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\libauthority_success_sprigging_retention.rlib",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "paint_list_api=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_api-d350b5e172665605.rlib",
+      "--extern",
+      "accesskit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "--extern",
+      "vello=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libvello-7af8f81e6c6f2e25.rlib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\sprigging_retention_probe.rs",
+      "--extern",
+      "sprigging=C:\\t\\cargo-targets\\mere\\libauthority_success_sprigging_retention.rlib",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-sprigging-retention.exe",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "paint_list_api=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_api-d350b5e172665605.rlib",
+      "--extern",
+      "accesskit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "--extern",
+      "vello=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libvello-7af8f81e6c6f2e25.rlib"
+    ],
+    [
+      "rustc",
+      "--edition=2024",
+      "--test",
+      "--crate-name",
+      "sprigging",
+      "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\sprigging\\src\\lib.rs",
+      "-o",
+      "C:\\t\\cargo-targets\\mere\\authority-success-sprigging-original-unit.exe",
+      "-L",
+      "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+      "-C",
+      "debuginfo=0",
+      "--extern",
+      "paint_list_api=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_api-d350b5e172665605.rlib",
+      "--extern",
+      "accesskit=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libaccesskit-8364a842f85866c1.rlib",
+      "--extern",
+      "vello=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libvello-7af8f81e6c6f2e25.rlib"
+    ]
+  ],
+  "build_exits": [
+    0,
+    0,
+    0
+  ],
+  "runs": [
+    {
+      "exit": 0,
+      "checks": 3
+    },
+    {
+      "exit": 0,
+      "checks": 29
+    }
+  ],
+  "checks": 32,
+  "runner_sha256": "6cec17d3dab25627e4964b93ec19acd5c6a2ee3051507b63fffcb3c037bd33a8",
+  "probe_sha256": "57c993c96f582ad81c5b5ceb7f74daf6661d26b19f2a9cb9d5056b08ea1ccfc5",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\libauthority_success_sprigging_retention.rlib",
+      "bytes": 937676,
+      "sha256": "1b5f82c51ff0e3fb1faf489022c47d155813a20c275b97ac86e120b24b6f478f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-sprigging-retention.exe",
+      "bytes": 964096,
+      "sha256": "152dd8e57b621cfdcb72e88a7d7d155d4eadbcc20b9eae9f9cbba58e069fde8f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-sprigging-retention.pdb",
+      "bytes": 69931008,
+      "sha256": "8f8276ad3581f4fc667a90a63638e1074aceffff71dcc3ee2e2f574d6db926e7"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-sprigging-original-unit.exe",
+      "bytes": 1188864,
+      "sha256": "556d1f9701da630aaf6d5bd640027740f9201dc34c81986a038113bd5acc76ce"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-sprigging-original-unit.pdb",
+      "bytes": 70660096,
+      "sha256": "96b570a673386473dc5e0c5912c33f653925de13993506c909d8ee50edf7a110"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Fresh original current Sprigging over three exact retained libraries; original core unit cases and three actual registry/cache counterexamples. No GPU rasterization, live product replacement/style-change consumer, native hit dispatch or whole fresh supplier graph acceptance."
+}

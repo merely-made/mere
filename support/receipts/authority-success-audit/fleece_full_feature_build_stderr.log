@@ -1,0 +1,58 @@
+   Compiling indexmap v2.14.2
+   Compiling tracing v0.1.44
+   Compiling uuid v1.27.0
+   Compiling tokio v1.53.2
+   Compiling rustls v0.23.45
+   Compiling rand_chacha v0.9.0
+   Compiling rand v0.9.5
+   Compiling serde_json v1.0.151
+   Compiling num-traits v0.2.19
+   Compiling url v2.5.8
+   Compiling munge_macro v0.4.7
+   Compiling petgraph v0.8.3
+   Compiling blake3 v1.8.7
+   Compiling quinn-udp v0.5.15
+   Compiling enumn v0.1.14
+   Compiling cfb v0.7.3
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling bytemuck v1.25.2
+   Compiling incipit v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\incipit)
+   Compiling oxrdf v0.3.4
+   Compiling armillary v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\armillary)
+   Compiling accesskit v0.24.1
+   Compiling munge v0.4.7
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling rkyv v0.8.18
+   Compiling infer v0.19.0
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling euclid v0.22.14
+   Compiling moxcms v0.8.1
+   Compiling oxttl v0.2.4
+   Compiling oxjsonld v0.2.6
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling tungstenite v0.29.0
+   Compiling quinn-proto v0.11.18
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling tokio-util v0.7.19
+   Compiling tokio-rustls v0.26.6
+   Compiling h3 v0.0.8
+   Compiling async-compression v0.4.48
+   Compiling tokio-tungstenite v0.29.0
+   Compiling image v0.25.10
+   Compiling h2 v0.4.19
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling quinn v0.11.12
+   Compiling h3-quinn v0.0.10
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.20
+   Compiling hyper-rustls v0.27.9
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling mere-fetch v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\fetch)
+   Compiling mere-linked-data v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\graph\linked-data)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 55.37s

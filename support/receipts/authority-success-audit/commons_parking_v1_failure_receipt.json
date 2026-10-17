@@ -1,0 +1,42 @@
+{
+  "build_exit": 1,
+  "run_exit": null,
+  "executed_checks": 0,
+  "reason": "Windows linker LNK1181 for windows.0.52.0.lib; harness omitted build-script native search paths. Cleanup marker rejected valid compiler COFF object suffix, stopping the runner before its normal receipt.",
+  "runner_sha256": "28bdd9179eab887767a5212023d47fcd512a9fa012b243be87df5cc258825b53",
+  "probe_sha256": "fc556213a44f96deca3e6e62dd4fd0c6b037132d900c1a8e57d58d934dc34b0e",
+  "compile_log_sha256": "b59f78c0f59d388bee48dbe0e0809e700e167555565e469ceaf08158d9395277",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.8dd7s8fs0yokf9c5x98mfwvio.rcgu.o",
+      "bytes": 1355,
+      "sha256": "9c4f421dc277389cf5b938879f89158a78fc95ff79bb5da13d7ed52270891e1d"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.commons_parking_probe.a19c63babdb41eb-cgu.0.rcgu.o",
+      "bytes": 255779,
+      "sha256": "5f0c6e400ac49cb9cd0670960dddff0f2dee35f89aaf3b44543c330d9c529f97"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.commons_parking_probe.a19c63babdb41eb-cgu.1.rcgu.o",
+      "bytes": 141998,
+      "sha256": "e13c584eae9dce980a046dba93a6baf003b74f9f5e2f7e3852a6687c4a7c8620"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.commons_parking_probe.a19c63babdb41eb-cgu.2.rcgu.o",
+      "bytes": 162861,
+      "sha256": "95acdff6d83b8e6c3f136b92f7ab331d9cc6c7e958d7706cf1ddddb52548fd67"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.commons_parking_probe.a19c63babdb41eb-cgu.3.rcgu.o",
+      "bytes": 134793,
+      "sha256": "b00c2de7955bdecdf9ffa19c1e56f460eb3a2bf98eb2c12d73eec3a77d34239c"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.pdb",
+      "bytes": 67584,
+      "sha256": "a335999a70d646f3b39315220b244f90340d6c0b53c26fb41073b8f86ed24bd8"
+    }
+  ],
+  "cleanup_basis": "Owned exec session41985 reached terminal exit1; all six outputs remain in the approved stable target, with distinct audit prefix and validated COFF/PDB markers. Hashes recorded before removing."
+}

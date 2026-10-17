@@ -1,0 +1,2 @@
+PASS single-operation prune reports two removed entries but payload erasure recreates a pruned header in the log without its operation pointer
+PASS native-drop batch control applies the identical signed corpus and policy with only the surviving checkpoint in the log

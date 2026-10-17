@@ -1,0 +1,9 @@
+test_alias_optional_and_target_are_disclosed_without_external_or_local_path_leaks (test_export_grouped_cargo.GroupedCargoExportTests.test_alias_optional_and_target_are_disclosed_without_external_or_local_path_leaks) ... ok
+test_git_component_links_preserve_declaration_scope_and_build_kind (test_export_grouped_cargo.GroupedCargoExportTests.test_git_component_links_preserve_declaration_scope_and_build_kind) ... ok
+test_order_independent_revision_and_relationship_identity (test_export_grouped_cargo.GroupedCargoExportTests.test_order_independent_revision_and_relationship_identity) ... ok
+test_selection_reports_absent_input_and_does_not_invent_missing_dependencies (test_export_grouped_cargo.GroupedCargoExportTests.test_selection_reports_absent_input_and_does_not_invent_missing_dependencies) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.010s
+
+OK

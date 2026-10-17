@@ -1,0 +1,140 @@
+{
+  "date_utc": "2026-10-17T08:06:26.835511+00:00",
+  "source_sha256": {
+    "ports/graphshell/src/distillery_w1.rs": "a0c328adf20ba663bf2f6d99472857173ce79b39c49bf1662e780961af73860a",
+    "crates/graphshell/graphshell-client/src/lib.rs": "388b3d86ee1094ceecc6dc4558ed965be3bf4c8da966fab1fdae908eea175d29",
+    "crates/graphshell/graphshell-host/src/live_endpoint.rs": "3cfc13ea68c77516656e422e6405ba73ff2cb2ed72f162929f720d42c0ebfd30"
+  },
+  "libraries": {
+    "chirograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-15b5484398dcd058.rlib",
+      "sha256": "6c5e89b1eb9bc99cf40e7a3b30e3ad24424146e1d9db4de2e8a4a54c8907f2e6",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/chirograph#0.0.2",
+      "features": []
+    },
+    "graphshell_client": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_client-6068e6fe5f0166cf.rlib",
+      "sha256": "92256c4e96a276f13705a4e46f18399e5c5dc18989d78917fa03058819e70e55",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/graphshell/graphshell-client#0.0.2",
+      "features": []
+    },
+    "graphshell_endpoint": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_endpoint-136da1b9e5190c05.rlib",
+      "sha256": "c6faa5b15fb3db1a07f517fb2e5c097c422c0c1261076a17734516bbcadf676c",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/graphshell/graphshell-endpoint#0.0.2",
+      "features": [
+        "default"
+      ]
+    },
+    "graphshell_host": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_host-badc2cf972cc91a3.rlib",
+      "sha256": "2d075948bb0e9d15b7844b1ccbe85af0a4080cef26a66385b660608074d745a4",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/graphshell/graphshell-host#0.0.2",
+      "features": []
+    },
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-c1cfe82624dead66.rlib",
+      "sha256": "eda547612d43980082db463f19d278a9fb29eae22c439f6552d7dd692075e3c0",
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/scenes/sceno#0.0.5",
+      "features": []
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ]
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+      "sha256": "fde1dabd11c98f318a60112e92e6b91389b818992c193ccde9f63e5752303c6e",
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "features": [
+        "default",
+        "float_roundtrip",
+        "std"
+      ]
+    }
+  },
+  "prior_build_log": {
+    "path": "capture_graphshell_build.jsonl",
+    "sha256": "4e62875cf8899eda0a0b5e84775138f5415c31cdb89dcd4366d56d110ab1c921"
+  },
+  "probe_sha256": "2ec893618e68d53d170fe969daf61ba6bd6b50b278be889e924b969a20ff95c1",
+  "runner_sha256": "85448489a498a03a66c688e42a45605df48eaaa3564c0098381d34f0f7e32446",
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\chronicle_mount_probe_v3.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-chronicle-mount-probe.exe",
+    "--extern",
+    "chirograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libchirograph-15b5484398dcd058.rlib",
+    "--extern",
+    "graphshell_client=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_client-6068e6fe5f0166cf.rlib",
+    "--extern",
+    "graphshell_endpoint=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_endpoint-136da1b9e5190c05.rlib",
+    "--extern",
+    "graphshell_host=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgraphshell_host-badc2cf972cc91a3.rlib",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-c1cfe82624dead66.rlib",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-2c6c1397e132c4b5.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 5,
+  "binary_sha256": "113ecd361d046f0a2b99b70b917506875a2eb78c774778a8dcf1556704f3bbc6",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-chronicle-mount-probe.exe",
+      "bytes": 1636864,
+      "sha256": "113ecd361d046f0a2b99b70b917506875a2eb78c774778a8dcf1556704f3bbc6"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-chronicle-mount-probe.pdb",
+      "bytes": 26996736,
+      "sha256": "98c02117c6197d676af1ea2795a45050ae8dd1f5de2cfb822393ad8bcc398d1d"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Current original distillery_w1.rs compiled fresh by path, not copied or edited, against exact recorded library bytes from an earlier successful Cargo build. Synthetic local endpoint injects wrong-session diff, missing-base diff, invalid snapshot and self-validating unrequested resource. No transitive full-current Cargo gate, actual Distillery process, carrier/network/browser/GPU or original module tests executed."
+}

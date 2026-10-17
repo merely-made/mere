@@ -1,0 +1,33 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "command": "cargo test -p muniment --features fjall --test audit_storage --locked --offline --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build -- --nocapture",
+  "exit_code": 0,
+  "diagnostic_assertions": "Tests assert observed faulty behavior, not desired correctness.",
+  "tests": {
+    "whole_journal_load_accepts_future_causes_that_entry_load_refuses": "passed",
+    "a_reader_observes_a_partial_fjall_apply_batch": "passed"
+  },
+  "result": "2 passed; 0 failed; finished in 0.78s",
+  "reproduction_sha256": "cc8e8b84db42e21f6756768eb587ad23a336e36f99e5d63eacc5b9ed8c3566c6",
+  "source_sha256": {
+    "crates\\eidetic\\muniment\\src\\backend.rs": "f39440cb96ebc922ba182300c7e9c65420f730c6b58fe7b611882fc569da806d",
+    "crates\\eidetic\\muniment\\src\\blob.rs": "4b16e4c4aff72c4d6396d2fff916dd655800d362108f523a19adcbeaf95e09c6",
+    "crates\\eidetic\\muniment\\src\\codec.rs": "bc76550275429d4905411116a8db082bbed92b6399c2579204d7046dc023d7a5",
+    "crates\\eidetic\\muniment\\src\\custody_transact_tests.rs": "828373a4ca8df1b9cede038be9b8c4ba4edff110c4d036ac19bfdcdccb654819",
+    "crates\\eidetic\\muniment\\src\\directory_backend.rs": "1e46c53ccc68baa32e14dffab8b3880bb86a5f38e2d066fc9a56a8bb445a62c2",
+    "crates\\eidetic\\muniment\\src\\error.rs": "321d0d1effa378f2ebcf9629258c8ac15acd909072703fce62c373c3e654d8b9",
+    "crates\\eidetic\\muniment\\src\\fjall_backend.rs": "24e8a907259973f255b757cfb17754ef69a1a21bb024c212bf20fbefd6444ae8",
+    "crates\\eidetic\\muniment\\src\\indexeddb_backend.rs": "428de2fb4ec0ba46b566e751d0cda368fabeff3d4eb526ae9bf562f8080d0918",
+    "crates\\eidetic\\muniment\\src\\lib.rs": "f2858a64d2cc351e43374a712545ed409c3ecce1c159e1021a61498a61794021",
+    "crates\\eidetic\\muniment\\src\\redb_backend.rs": "abd53da533d568adff21668c797b5918fc118a864b5685e67a6bd8b314a5d49d",
+    "crates\\eidetic\\muniment\\src\\slot.rs": "de93fce74acbb642ccc8b49c1d5ae9d60fde9996951257375ad8109196b57ece",
+    "crates\\eidetic\\muniment\\src\\zip_backend.rs": "f08a57ba84d06d44f9e4603c16a32598c70c815a8fbee5647a92583c7ea26c26",
+    "crates\\eidetic\\muniment\\src\\journal\\causal.rs": "8375f1cb4eb90dfe95a77521a6bde509355eb00016c1c70b56de6fe776930e35",
+    "crates\\eidetic\\muniment\\src\\journal\\entries.rs": "53fe0b62b97c50621fff71d139fc33b0f370c439787dd2e56b1bb2fa2e26ce6b",
+    "crates\\eidetic\\muniment\\src\\journal\\fork.rs": "5b9d49e571f5d2fc0a9ad25af6322d85f71f17de01b7a09e228d34a600e3b46c",
+    "crates\\eidetic\\muniment\\src\\journal\\log.rs": "6e55950f06f66f9ce93d86c27b7298b46319630bf84756ebb70222aadf871959",
+    "crates\\eidetic\\muniment\\src\\journal\\mod.rs": "f0cbe4a634ef990a7799263476d9fec6bb8a6709da84765237618e13ccf36e14",
+    "crates\\eidetic\\muniment\\src\\journal\\persist.rs": "508396efed748761a4f01fcd564399ffb77613f739aae2f82a6c022cea24b69c",
+    "crates\\eidetic\\muniment\\src\\journal\\seq.rs": "a316438074569859bb28d54b5a1c579815c1a11cde9718e9d1af70566a8d7808"
+  }
+}

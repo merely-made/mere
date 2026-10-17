@@ -1,0 +1,11 @@
+{
+  "source_sha256": {
+    "crates/graph/linked-data/src/ingest.rs": "602585bc01add516a68450b9209f55d668f1b7803932b84b7b8ba1b3adfe01e3",
+    "crates/distillery/alembic/src/memory_levels.rs": "4d15b3877ed1c3653a2a6f90a01e1aad22bc9f301fe91a764f2c51cc8f474bcb"
+  },
+  "extracted_code_sha256": [
+    "b0f0e57936aca0b2307586225fcf5de7da9f231de85f68c9ae7e8c0b94ea8502",
+    "9a11be148ef710446fd7d0cfa097ff093953cad5eeee19a9f2d8074772ad5164"
+  ],
+  "qualification": "Exact original scanner functions and cycled method; local enum fixture uses matching variants without serde derives. No whole linked-data/Alembic feature, kernel, JSON-LD expansion or network execution."
+}

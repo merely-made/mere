@@ -1,0 +1,31 @@
+
+running 24 tests
+test tests::a_competing_handle_cannot_write_and_drop_releases_lock_without_unlinking ... ok
+test tests::catalog_install_enable_disable_and_reopen_are_distinct_durable_states ... ok
+test tests::corrupted_installed_pack_cannot_be_reopened_or_silently_repaired ... ok
+test tests::digest_mismatch_missing_digest_and_pinned_mismatch_are_rejected ... ok
+test tests::dotted_versions_are_opaque_metadata_but_traversal_and_empty_segments_are_not ... ok
+test tests::duplicate_entry_sense_relation_features_and_dangling_targets_are_rejected ... ok
+test tests::every_entry_belongs_to_its_source_and_declared_language ... ok
+test tests::exact_lemma_language_and_explicit_source_selection_never_silently_fall_back ... ok
+test tests::failed_atomic_publication_does_not_enable_memory_state ... ok
+test tests::hostile_identifiers_never_become_paths_and_invalid_import_does_not_mutate ... ok
+test tests::invalid_existing_registry_is_reported_without_overwriting_it ... ok
+test tests::lookup_and_registry_metadata_are_bounded ... ok
+test tests::normalized_fixture_is_real_json_with_verifiable_payload_and_owned_entries ... ok
+test tests::pack_entry_sense_relation_string_and_installed_byte_limits_are_enforced ... ok
+test tests::preexisting_invalid_content_addressed_file_is_never_overwritten ... ok
+test tests::process_exit_without_drop_releases_advisory_writer_lock ... 
+running 1 test
+ok
+test tests::registry_path_traversal_and_enabled_uninstalled_records_are_rejected ... ok
+test tests::reimport_preserves_enabled_and_never_replaces_an_installed_version ... ok
+test tests::reopen_rechecks_total_pack_and_registry_limits_before_loading ... ok
+test tests::sense_relations_preserve_exact_meaning_and_reject_wrong_sense_identity ... ok
+test tests::subprocess_writer_exit ... ignored, subprocess helper, run only with dedicated temporary root
+test tests::unicode_exact_lemma_lookup_is_not_limited_to_english ... ok
+test tests::upstream_shaped_dotted_sense_ids_are_preserved_without_becoming_paths ... ok
+test tests::utf8_schema_unknown_fields_and_executable_mod_shapes_are_rejected ... ok
+
+test result: ok. 23 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.17s
+

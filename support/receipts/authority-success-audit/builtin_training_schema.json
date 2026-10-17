@@ -1,0 +1,1 @@
+{"format":"mere-native","schema_id":"eidetic.TrainingCorpus/v2","body":{"version":2,"description":"Immutable, canonically ordered, disjoint training and evaluation source codicils.","required":["training_source_codicils","evaluation_source_codicils"],"fields":{"training_source_codicils":{"type":"array"},"evaluation_source_codicils":{"type":"array"}}}}

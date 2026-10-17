@@ -1,0 +1,66 @@
+{
+  "date_utc": "2026-10-17T21:11:54.853181+00:00",
+  "exit": 0,
+  "passed": 13,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/definition/base.rs": "612589478f276b583e37ae3b92634dd22068978fb98ecd2fda325a8ce5a151d0",
+    "support/patches/cubek-matmul/src/eval/benchmarks/gemm/benchmark.rs": "2b858c317478bad62d1db37138d72458a4d82c4f089a7ca6467c64c17e9cf6b0",
+    "support/patches/cubek-matmul/src/eval/benchmarks/gemm/problem.rs": "022cbc7664ddf083fc460e20b8803136273e57bc8f371dad5df8dc10d5084755",
+    "support/patches/cubek-matmul/src/eval/cpu_reference.rs": "fde0283b168b5499d9118d11ff6d1e0d79df2d5a83c9156fb77ea9d005926f25"
+  },
+  "external_context_sha256": {
+    "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\cubek-test-utils-0.3.0\\src\\test_tensor\\host_data.rs": "5e8c3f321934b3930d366a0cfa6014dc072bbcf235fb79a4aedb28a30fafeae3",
+    "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\cubek-test-utils-0.3.0\\src\\test_tensor\\strides.rs": "2dae7fc1f1a1bcf21369a1eb3953128c153201069ee5b7576bb18a2e9fee6e91"
+  },
+  "numpy_control": {
+    "version": "2.4.3",
+    "zero_singleton": [
+      0
+    ],
+    "singleton_zero": [
+      0
+    ],
+    "empty_zero": [
+      0
+    ]
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_definition_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-definition.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-definition.exe",
+      "bytes": 810496,
+      "sha256": "32b59551f59649cca009c2223dbabb103a91be00c022703dd97606b0f1c485fe"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-definition.pdb",
+      "bytes": 3067904,
+      "sha256": "196b39e62d12fa713f4c92b721d7f535b9b632c9215994ba6190ba352aec21c2"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "broadcast_batches": "57dfad15ef576f4315ba4682f753d205d824b1d0113e04a80a238b627d6ad542",
+    "prepare": "c57366efff7ddfc32daf19c43336c9909a90bddf52c65cb3e12b547ea11c2394",
+    "matmul_cpu_reference": "5d2fb9ca0efa6b259c8fdf36e38b7e71a599ccf8cf8d71792faccfe7579a7f63",
+    "num_batches": "dcd694e6a311cbba310a6c14c87e296fc3730716d6f0c3d508c62a4c18cfd861",
+    "get_f64": "c206f8f39dd20244cc2c06e607129c4098550361581e88212a36d4cfb85e0487",
+    "strided_index": "5a06612856b0680f0945b67b273ab9cc0222e71d87e844c9f90589ea06167f3b",
+    "compute_strides": "bea6ed7931c7005f75485d3206a87c5c1220057654134d0dcc6228bde954104b"
+  },
+  "evidence_sha256": {
+    "run_matmul_definition_probe.py": "a81cc310c70b5c4c6d464a8735c130f42e09dab76fd1f6a9f554f506a4eac87a",
+    "matmul_definition_probe.rs": "acabd748e088ecabf4748f08b09f249744971b4472212cc2fa74c2140e2732c9",
+    "matmul_definition_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "matmul_definition_run.txt": "43e03d056bb5a5b00848588ce33f8223aadad8db87711081629dfe288a3259eb"
+  },
+  "qualification": "Exact broadcast_batches/GemmBench.prepare/matmul_cpu_reference/num_batches with exact cached HostData get_f64/strided_index and StridedLayout.compute_strides. Shape/Strides containers, tensor builder metadata/client/device/host-data payload/progress/problem fields doubled; generated row-major strides match actual shared layout helper. NumPy2.4.3 broadcast oracle. CPU layout/index behavior only, no actual TestInput/GPU launch, strategy/bounds selection, full crate build or deployed benchmark/reference receipt. Backend-reference helpers are feature-gated."
+}

@@ -1,0 +1,37 @@
+{
+  "date_utc": "2026-10-17T06:27:40.372Z",
+  "node": "v24.11.0",
+  "exit": 0,
+  "checks": 6,
+  "results": [
+    {
+      "name": "Exact queue duplicate is idempotent",
+      "passed": true
+    },
+    {
+      "name": "Changed URL conflict is rejected",
+      "passed": true
+    },
+    {
+      "name": "Changed exact source time and locality are silently discarded",
+      "passed": true
+    },
+    {
+      "name": "A stale configure snapshot overwrites a newly queued visit",
+      "passed": true
+    },
+    {
+      "name": "A pending queue write restores a URL excluded by completed configuration",
+      "passed": true
+    },
+    {
+      "name": "Sequential configuration preserves eligible visits and removes excluded visits",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "ports/graphshell/web/extension/capture-model.js": "fa2db2b2cb0724c79d289b1f69941bcb1e8344ae7635362668f3d44f11f66967",
+    "ports/graphshell/web/extension/background.js": "7fc344544c4cf8ad0e68fdd57f6a35e2273d15fd58249dcd380d13f0bc066557"
+  },
+  "scope": "Complete actual capture-model.js and background.js executed in native Node VM with controlled in-memory extension storage and explicit awaited-write interleavings. Reproduces queue/configuration lost update and stale exclusion write, plus queue source-fact comparison omissions. Idempotence, visible conflict refusal and sequential configuration controls pass. No actual browser, extension installation, permission prompt, profile, user data, network or native host was exercised. Exact source-time/locality rejection at the Rust ledger remains separately qualified."
+}

@@ -1,0 +1,28 @@
+
+running 23 tests
+test gated::tests::a_colour_that_already_holds_is_unchanged ... ok
+test gated::tests::border_is_quieter_than_border_strong ... ok
+test gated::tests::dark_grounds_gate_toward_white ... ok
+test gated::tests::every_gated_role_holds_its_floor_in_every_mode ... ok
+test gated::tests::matches_the_design_system_specimen ... ok
+test gated::tests::no_category_takes_a_status_hue ... ok
+test syntax::tests::accents_are_distinct ... ok
+test syntax::tests::adversarial_chroma_and_text_overrides_clear_each_profiles_floor ... ok
+test syntax::tests::all_covers_every_role ... ok
+test syntax::tests::explicit_profiles_gate_against_the_exact_rendered_surface ... ok
+test syntax::tests::fanned_accents_clear_contrast ... ok
+test syntax::tests::legacy_api_retains_normal_text_tiers_and_existing_accent_derivation ... ok
+test syntax::tests::light_mode_also_gates ... ok
+test syntax::tests::role_lookup_matches_fields ... ok
+test tests::best_on_picks_readable ... ok
+test tests::derived_dark_has_ordered_ladder_and_readable_text ... ok
+test tests::derived_light_inverts_and_stays_readable ... ok
+test tests::four_canonical_modes_derive_distinct_wider_hc_palettes ... ok
+test tests::hex_roundtrips ... ok
+test tests::hsl_roundtrips_within_a_step ... ok
+test tests::oklch_lightness_step_is_monotonic ... ok
+test tests::oklch_roundtrips_within_a_couple_steps ... ok
+test tests::text_body_override_cascades_to_dim_and_disabled ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -1,0 +1,42 @@
+   Compiling portable-atomic v1.15.0
+   Compiling serde v1.0.229
+   Compiling once_cell v1.21.4
+   Compiling syn v2.0.119
+   Compiling ahash v0.8.12
+   Compiling uuid v1.27.0
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing-core v0.1.36
+   Compiling libm v0.2.16
+   Compiling petgraph v0.8.3
+   Compiling tracing v0.1.44
+   Compiling accesskit v0.24.1
+   Compiling rhai_codegen v3.2.0
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling smallvec v1.16.1
+   Compiling rhai v1.26.1
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling sceno v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling mere-curation v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\forme\curation)
+   Compiling scenograph v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling script-rhai v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\script\rhai)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 50.13s
+     Running tests\scenograph_rules.rs (C:/t/cargo-targets/mere/build\debug\deps\scenograph_rules-a668ac44d0610e6f.exe)
+
+running 1 test
+test composed_script_failures_leave_the_whole_rule_unmatched ... FAILED
+
+failures:
+
+---- composed_script_failures_leave_the_whole_rule_unmatched stdout ----
+
+thread 'composed_script_failures_leave_the_whole_rule_unmatched' (59368) panicked at crates\script\rhai\tests\scenograph_rules.rs:252:13:
+Not { condition: Script { source: "missing_function()" } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    composed_script_failures_leave_the_whole_rule_unmatched
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p script-rhai --test scenograph_rules`

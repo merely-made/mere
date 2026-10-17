@@ -1,0 +1,12 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "Successful graph save/load loses Surface pin and arbitrary facet; node identity and URL survive as controls",
+  "command": "cargo test -p mere-kernel --features store --test audit_store --locked --offline --target-dir C:\\t\\cargo-targets\\mere --config build.build-dir=C:/t/cargo-targets/mere/build -- --nocapture",
+  "reproduction_sha256": "e675e604b1efe118d40e5de486b1126c572624f299903a4ef8e376f87662094b",
+  "output_file": "kernel_store_output.txt",
+  "source_sha256": {
+    "crates/graph/graph-kernel/src/store.rs": "8c4b4dacc0f63b33e758c5b76b26683c5d032b1dcef4cc78cb9c778b660cc6b7",
+    "crates/graph/graph-kernel/src/graph/snapshot/to.rs": "c1164846372e765c64003c5a09732ca326dcdffc3fa378938af361c7f655ce8d"
+  }
+}

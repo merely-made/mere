@@ -1,0 +1,8 @@
+{
+  "scope": "Initial direct path inclusion failed E0583 before test compilation/execution because rustc resolved the child control module beside the attributed file. No product changes and zero tests executed. New distinct runner rebases only module path plumbing.",
+  "files": {
+    "run_community_identity_probe.py": "382290f5c38b7271435947ff591b7a83549e3892da9cc96797f0dd295389df4d",
+    "community_identity_probe.rs": "6019d9d2cc33fada4368867eca853106e3973a8b1b2f70cb45c0a0ba43e03ebf",
+    "community_identity_probe_compile.log": "545d64dcd53ddf14632c3748738cb052a98e4d283fe4be23b710a061eaf549d4"
+  }
+}

@@ -1,0 +1,19 @@
+
+running 14 tests
+test audit::cancellation_after_first_delivery_returns_extra_fragment ... ok
+test audit::cancellation_before_first_delivery_returns_undelivered_text ... ok
+test infer::provider::tests::capability_rejects_small_window_wrong_loader_no_streaming ... ok
+test infer::provider::tests::capability_satisfies_matching_query ... ok
+test infer::provider::tests::capability_serde_roundtrip ... ok
+test infer::provider::tests::infer_error_display_is_stable ... ok
+test infer::stub::tests::callback_break_stops_after_current_fragment ... ok
+test infer::stub::tests::echoes_unknown_prompts_and_streams_in_order ... ok
+test infer::stub::tests::invalid_requests_rejected ... ok
+test infer::stub::tests::max_tokens_truncates ... ok
+test infer::stub::tests::prompt_too_long_reports_window ... ok
+test infer::stub::tests::provider_is_object_safe_and_shared ... ok
+test infer::stub::tests::stop_sequence_halts_before_emitting ... ok
+test infer::stub::tests::stub_response_wins_over_echo ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

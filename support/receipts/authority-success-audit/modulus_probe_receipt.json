@@ -1,0 +1,75 @@
+{
+  "date_utc": "2026-10-16T23:38:14.264524+00:00",
+  "test_exit": 0,
+  "tests": 2,
+  "harness_sha256": "3c3009be0ee9aa7c52430bf48839d09fc63417d48f07c678f5d0406b7d2ffad0",
+  "source_sha256": {
+    "crates/conatus/modulus/Cargo.toml": "66c465f29c0aa4ba8f956f68d7b56eeef4cf1527a04c09e178c7eb4e95b6c282",
+    "crates/conatus/modulus/src/brick_dda.wgsl": "be2c66faddb4d3eb95b66ab4aa53f9a1af92217708ecc500e52679de2a1621a7",
+    "crates/conatus/modulus/src/error.rs": "3970a558099c66ada40e6328404b24a6196c0907b3a00eca4939f4870bee3235",
+    "crates/conatus/modulus/src/lib.rs": "ebb04e42d26f0678e5b64ceb8885777b92ea440a6c00f285ab58e35e82050ddc",
+    "crates/conatus/modulus/src/limits.rs": "b39a236eebf509d378bf78bf2c450aa9dfe8637a1d4ee2f98b47b1e747ccd422",
+    "crates/conatus/modulus/src/tests.rs": "9e550b2b5118fec371ae36a7bc1ac9044c19f94fd5aebdc837d6ecfdc024f217",
+    "crates/conatus/modulus/src/trace.rs": "f19b511dad7136a5db4c5ceb94e6e97c4dc5a9b3fd8e21068da929d031d4bc1b",
+    "crates/conatus/modulus/src/traversal_tests.rs": "4cea73eb664934eb5150ad8a848bfb3683292f39ff16f66f509862ada1faad15",
+    "crates/conatus/modulus/src/traversal_tests/accumulated.rs": "537a8865f2f996eec8ad1578641e8bc6359c816596a0e8e059aa0e1fcea51431",
+    "crates/conatus/modulus/src/traversal_tests/exact.rs": "dae94bc055408d5dc913f4f9d7252b32e12e89ad30241190b20af1f1c909e96e",
+    "crates/conatus/modulus/src/traversal_tests/scenes.rs": "09f91ef437103372f763b46c9456a4c62e262490340d30be6e835aa5c074a771",
+    "crates/conatus/modulus/tests/trace.rs": "1503998cfe9e2b31a64465e7423adf39dca55697ffae46aaecf1b4b0442acf82"
+  },
+  "library_sha256": {
+    "modulus": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libmodulus.rlib",
+      "sha256": "7c6a31c99df1f91529bf4ebc93dd399de55d7aa8cdac096dc5a1fe1b191569e9"
+    }
+  },
+  "library_build_command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "build",
+    "-p",
+    "modulus",
+    "--lib",
+    "--target-dir",
+    "C:\\t\\cargo-targets\\mere",
+    "--message-format=json"
+  ],
+  "library_build_exit": 0,
+  "suite_command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "test",
+    "-p",
+    "modulus",
+    "--target-dir",
+    "C:\\t\\cargo-targets\\mere",
+    "--",
+    "--test-threads=1"
+  ],
+  "suite_exit": 0,
+  "suite_passed_counts": [
+    18,
+    8,
+    0
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\modulus_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "--extern",
+    "modulus=C:\\t\\cargo-targets\\mere\\debug\\libmodulus.rlib",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-modulus-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "262716a003b571ec11c97494631b5f7f77528b20ef01fef8859e034535c670c3",
+  "generated_output_removed": true,
+  "scope": "Default Modulus Cargo unit/integration/doc gate, excluding ignored receipt, and two CPU public-API observations with controls. WGSL source read; no shader compilation or GPU execution."
+}

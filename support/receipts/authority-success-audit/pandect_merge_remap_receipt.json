@@ -1,0 +1,11 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "Public component-pick merge rewrites ordinary title text matching a mapped UUID",
+  "reproduction_sha256": "bea7cbc2f7c54ab23ed277da0fbcc690bdeb9626c9b59af794913e97650c2190",
+  "output_file": "pandect_merge_remap_output.txt",
+  "affected_sources": {
+    "crates/system/pandect/src/graph_session.rs": "7fae5cfdba774e5c6b9527d131d11571fb804779b691928c5cf68f63feb7180a",
+    "crates/system/pandect/src/graph_session_merge.rs": "d4bf72eef97c40fda01303654e46c971a7b5cd0c60f357f46c43321696ba9b45"
+  }
+}

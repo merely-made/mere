@@ -1,0 +1,141 @@
+
+running 37 tests
+test smolweb::tests::app_passes_through_and_system_falls_back_to_light ... ok
+test smolweb::tests::default_is_site ... ok
+test smolweb::tests::site_hue_is_stable_and_host_scoped ... ok
+test theme::choice::font_store_tests::font_requests_round_trip_and_failed_write_retains_previous_choice ... ok
+test theme::choice::tests::an_existing_pelt_appearance_file_reads ... ok
+test theme::choice::tests::file_store_defaults_missing_or_invalid_and_round_trips ... ok
+test theme::choice::tests::file_store_surfaces_nonrecoverable_load_errors ... ok
+test theme::choice::tests::in_memory_store_updates_live_value ... ok
+test theme::choice::tests::legacy_lines_and_json_both_read ... ok
+test theme::choice::tests::strict_load_keeps_missing_and_legacy_choice_semantics ... ok
+test theme::choice::tests::strict_load_preserves_malformed_and_non_utf8_preferences ... ok
+test theme::data::tests::built_in_ids_resolve_to_their_token_sets ... ok
+test theme::data::tests::saved_lens_themes_read_by_id_and_by_value ... ok
+test theme::data::tests::theme_lookup_falls_back_for_unknown_id ... ok
+test theme::edge_style::tests::generic_family_signatures_do_not_depend_on_colors ... ok
+test theme::edge_style::tests::theme_tokens_satisfy_generic_family_contract ... ok
+test theme::mode_calc::tests::calculator_covers_every_role_and_transforms_apply ... ok
+test theme::mode_calc::tests::mode_file_json_roundtrips ... ok
+test theme::mode_calc::tests::on_picks_readable_text_over_the_computed_fill ... ok
+test theme::mode_calc::tests::partial_or_unknown_tables_are_rejected_by_name ... ok
+test theme::mode_calc::tests::template_is_complete_and_valid_for_all_flag_combos ... ok
+test theme::registry::tests::a_theme_file_saved_before_the_merge_still_reads ... ok
+test theme::registry::tests::all_seed_derived_builtins_pass_wcag_validation ... ok
+test theme::registry::tests::builtin_themes_include_edge_tokens ... ok
+test theme::registry::tests::default_mode_for_def_matches_legacy_builtins ... ok
+test theme::registry::tests::locked_harmony_rotates_accents_to_primary_plus_offset_and_validates ... ok
+test theme::registry::tests::mode_key_roundtrips ... ok
+test theme::registry::tests::mode_sheets_roundtrip_and_gate_on_non_empty ... ok
+test theme::registry::tests::mode_tokens_derive_four_distinct_palettes_from_one_theme ... ok
+test theme::registry::tests::registry_lists_built_ins_in_order ... ok
+test theme::registry::tests::theme_def_round_trips_through_serde ... ok
+test theme::registry::tests::theme_registry_resolves_builtin_themes_and_fallbacks ... ok
+test theme::registry::tests::user_theme_crud_fork_rename_remove_add ... ok
+test theme::registry::tests::user_theme_edit_helpers_only_mutate_user_defs ... ok
+test typography::tests::names_cannot_escape_a_css_string_and_invalid_json_is_refused ... ok
+test typography::tests::requested_order_and_missing_names_survive_resolution_and_serialization ... ok
+test typography::tests::unavailable_request_uses_host_default_without_rewriting_intent ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+
+running 2 tests
+test generic_font_case_rules_disagree_across_shared_preference_paths ... application SERIF resolves sans-serif fallback; application serif and authored SERIF retain generic serif; requested spelling preserved
+ok
+test public_registry_can_replace_a_builtin_that_workshop_refuses ... workshop rejects built-in collision; raw registry replaces, renames and removes it; fresh-ID fork preserves original
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test an_override_is_still_gated ... ok
+test an_override_replaces_the_derived_category ... ok
+test empty_overrides_are_not_serialized ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+test authored_sheets_are_authority_for_canonical_and_custom_modes_without_claimed_palette ... ok
+test canonical_choice_uses_exact_shared_mode_math_and_does_not_activate_registry ... ok
+test empty_sheets_derive_and_default_mode_respects_authored_contrast_flags ... ok
+test fallback_preserves_request_reports_both_missing_identity_and_mode_and_recovers ... ok
+test font_requests_survive_theme_fallback_without_entering_the_definition ... ok
+test invalid_definitions_do_not_gain_authority_via_css_and_inert_builtins_still_validate ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 7 tests
+test busy_lock_preserves_memory_and_disk_then_allows_retry ... ok
+test corrupt_and_unsupported_libraries_are_visible_and_left_untouched ... ok
+test failed_filesystem_save_preserves_snapshot_and_allows_retry ... ok
+test inadmissible_definitions_are_rejected_on_both_load_and_save ... ok
+test missing_library_loads_without_creating_files_and_saves_authored_shape ... ok
+test stale_writers_refuse_changes_deletions_and_newly_created_libraries ... ok
+test typography_library_is_versioned_round_trips_and_refuses_invalid_writes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+
+running 6 tests
+test authored_body_overrides_are_preserved_but_syntax_is_contrast_gated_for_selected_mode ... ok
+test canonical_artifacts_export_the_exact_harmonized_mode_and_all_roles ... ok
+test explicit_artifacts_reject_invalid_authored_definitions_before_exporting ... ok
+test no_argument_exports_keep_legacy_raw_seed_behavior_and_document_shape ... ok
+test selected_mode_provenance_roundtrips_the_authored_definition_and_effective_inputs ... ok
+test strict_exports_refuse_selected_overrides_and_custom_modes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 8 tests
+test authored_default_mode_updates_both_flags_in_one_history_action ... ok
+test blocked_and_failed_replacement_preserve_existing_artifact ... ok
+test builtin_artifacts_are_inert_until_explicitly_forked_to_user_identity ... ok
+test corrupt_or_inadmissible_payloads_return_visible_errors ... ok
+test exporting_a_draft_does_not_save_it_and_never_clobbers_by_default ... ok
+test imported_draft_checks_commit_collisions_and_copy_preserves_unregistered_source ... ok
+test invalid_new_draft_edit_cannot_change_registry_or_save_point ... ok
+test portable_roundtrip_preserves_authored_fields_and_normalizes_identity ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 7 tests
+test absent_preferences_preserve_old_json_and_css ... ok
+test explicitly_empty_role_data_round_trips_without_changing_css ... ok
+test invalid_metrics_are_refused_before_library_or_export ... ok
+test missing_family_notices_are_read_only_and_generic_families_need_no_catalogue_entry ... ok
+test portable_fonts_require_a_versioned_envelope_and_round_trip ... ok
+test requested_faces_are_escaped_and_retained_with_explicit_fallback ... ok
+test typography_is_history_and_css_keeps_final_authority ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 5 tests
+test commit_refuses_concurrent_edits_deletion_and_fork_collisions ... ok
+test draft_preview_and_commit_preserve_builtin_and_active_appearance ... ok
+test invalid_and_colliding_identities_never_change_registry ... ok
+test stylesheet_previews_never_pretend_to_be_derived_tokens ... ok
+test undo_redo_branching_and_discard_return_to_save_point ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Locking 12 packages to highest Rust 1.99.0 compatible versions
+   Compiling tinct v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\tinct)
+   Compiling authority-success-tabard v0.0.0 (C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\cpu-tabard-runtime)
+    Finished `test` profile [unoptimized] target(s) in 8.15s
+     Running unittests ..\..\..\..\crates\system\tabard\src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\tabard-496fc27d3eea06e0.exe)
+     Running ..\tabard_owner_probe.rs (C:/t/cargo-targets/mere/build\debug\deps\audit_contracts-a78e4be39ae11f42.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\categories.rs (C:/t/cargo-targets/mere/build\debug\deps\categories-0eeb410f17377075.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\choice_resolution.rs (C:/t/cargo-targets/mere/build\debug\deps\choice_resolution-d02f2b8aa41ba78e.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\library.rs (C:/t/cargo-targets/mere/build\debug\deps\library-137a6f5c13e16dc1.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\mode_artifacts.rs (C:/t/cargo-targets/mere/build\debug\deps\mode_artifacts-64872a614fa1b70f.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\portable.rs (C:/t/cargo-targets/mere/build\debug\deps\portable-830c8f6dbdf8ba64.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\typography.rs (C:/t/cargo-targets/mere/build\debug\deps\typography-f9d1ba1a29f47af2.exe)
+     Running ..\..\..\..\crates\system\tabard\tests\workshop.rs (C:/t/cargo-targets/mere/build\debug\deps\workshop-90f2d0cf6da73eb8.exe)

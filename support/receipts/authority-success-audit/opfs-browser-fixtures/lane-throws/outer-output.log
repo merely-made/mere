@@ -1,0 +1,8 @@
+[firefox] launching (headless=true)
+[firefox] harness ready
+[firefox] lane 1 …
+[firefox] lane 1 threw: Error: AUDIT injected lane exception
+[firefox] receipt → output.json
+{
+ "receipt_gate_passed": true
+}

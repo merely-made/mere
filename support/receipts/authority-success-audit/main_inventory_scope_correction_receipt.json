@@ -1,0 +1,56 @@
+{
+  "date_utc": "2026-10-17T15:11:34.824583+00:00",
+  "basis_commit": "7c71810550234ccbe11f7429cd44e369b279ec06",
+  "prior_refresh_receipt_sha256": "460e096bebf2f2b6cc22b1eeb88ba99dcbeb0f0c698a69da4eb4447979b59c66",
+  "base_predicate_inventory_snapshot_sha256": "c7d6d2572d1d421b25078ebf232f70403f8bb8fd7add1919697073e7d53770cb",
+  "restored_explicit_inclusions": {
+    "design_docs/mere_docs/receipts/natal-cap-20261017/mere-intake-narrow-final.diff": {
+      "sha256": "6d3cfe7d6c9c3a988673a477ab878e314a17708d67dee3dd02558b6fa1ed0d4b",
+      "chars": 1885,
+      "lines": 64
+    },
+    "ports/graphshell/web/extension/manifest.chromium.json": {
+      "sha256": "cd8d9ebcbc7dc9b45ccbf91a8f0cd3c8db2f1048d30c3d629650d8b45ebc79bb",
+      "chars": 929,
+      "lines": 25
+    },
+    "ports/graphshell/web/extension/manifest.firefox.json": {
+      "sha256": "b391d4b915133f277d818d153c5710e77c9094fcb1ad3613c922ef85343d6845",
+      "chars": 654,
+      "lines": 32
+    }
+  },
+  "actual_removed_files": [],
+  "source_inventory_sha256": "d32a0bb27ed672e074b48a580412b83865a4b2e7e09b7b0584336710ef3f7c00",
+  "coverage": {
+    "complete_files": 2612,
+    "total_files": 3738,
+    "read_chars": 30574532,
+    "total_chars": 39556704,
+    "changed_since_inventory": [
+      ".gitattributes",
+      "crates/intel/esp/src/infer/decoder/attention.rs",
+      "crates/intel/esp/src/infer/decoder/checkpoint.rs",
+      "crates/intel/esp/src/infer/decoder/config.rs",
+      "crates/intel/esp/src/infer/decoder/layer.rs",
+      "crates/intel/esp/src/infer/decoder/loader.rs",
+      "crates/intel/esp/src/infer/decoder/lora.rs",
+      "crates/intel/esp/src/infer/decoder/mod.rs",
+      "crates/intel/esp/src/infer/decoder/model.rs",
+      "crates/intel/esp/src/infer/decoder/provider.rs",
+      "crates/intel/esp/src/infer/decoder/stage.rs",
+      "crates/intel/esp/src/infer/decoder/streaming.rs",
+      "crates/intel/esp/src/infer/decoder/train.rs",
+      "crates/intel/esp/src/infer/decoder/train_autodiff.rs",
+      "crates/intel/esp/src/infer/layer_library.rs",
+      "crates/intel/esp/src/infer/library.rs",
+      "ports/distillery/src/inference.rs",
+      "ports/distillery/src/inference_stage.rs",
+      "ports/distillery/tests/inference_layered.rs",
+      "ports/djinn/src/resident_mere.rs"
+    ],
+    "pending_chunks": 0
+  },
+  "runner_sha256": "b243fd3db3fdefdd1096332acb6cfca5cae5dbe848ae655bd2479fa55e1ea852",
+  "qualification": "The base inventory predicate omitted three previously explicit source inclusions. All remain present and are restored; denominator never intentionally narrows. Earlier coverage hashes remain unchanged and only matching bytes earn credit. No source edits."
+}

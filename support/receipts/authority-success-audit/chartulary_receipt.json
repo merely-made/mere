@@ -1,0 +1,30 @@
+{
+  "source_commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "recorded_at": "2026-10-16T13:23:32.0120831-04:00",
+  "scope": "Six diagnostic native MemoryBackend/API reproductions. They assert observed defects, not desired behavior. No headed or physical receipt.",
+  "build_command": "cargo test -p chartulary --test audit_foundations --locked --offline --target-dir C:\\t\\cargo-targets\\mere --config build.build-dir=\"C:/t/cargo-targets/mere/build\" -- --nocapture",
+  "reproduction_source": "chartulary_foundations.rs",
+  "temporary_test_path": "crates/eidetic/chartulary/tests/audit_foundations.rs",
+  "exit_code": 0,
+  "output": "\nrunning 6 tests\ntest batch_preflight_accepts_a_disconnect_of_an_edge_removed_earlier_in_the_batch ... ok\ntest nquads_export_leaves_a_literal_carriage_return_unescaped ... ok\ntest removing_one_bearer_archives_the_other_bearers_live_graph ... ok\ntest deleting_a_creator_breaks_snapshotting_of_the_surviving_child ... ok\n\nthread 'deleting_a_creator_breaks_snapshotting_of_the_surviving_child' (25020) panicked at crates\\eidetic\\chartulary\\src\\stemma\\snapshot.rs:187:69:\nno entry found for key\ntest deserializing_duplicate_node_ids_preserves_two_nodes_but_indexes_only_one ... ok\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\ntest snapshot_can_override_the_authoritative_durable_journal ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n",
+  "sha256": {
+    "crates/eidetic/chartulary/src/graph.rs": "96291C07B8581AB93E28A40A62A1F6E34E4F78C3E4E1491CABD0147FDC0A6450",
+    "crates/eidetic/chartulary/src/stemma/snapshot.rs": "C374DB69E67054A049C5F37D55A27B7D3B826CD5EA829FEEF960537E11D5AE7A",
+    "crates/eidetic/chartulary/src/stemma/mutations.rs": "92764B020AAF57FB05059AB4A106CF7C38CEBAEFD6FB427937CB37214DC26772",
+    "crates/eidetic/chartulary/src/spine.rs": "7B4D001D5249FFA834AE38CCB8625A985E83854DD7C5E042C50AE94781E39E49",
+    "crates/eidetic/chartulary/src/stemma/queries.rs": "01DC725D885F8E819B9B7F6F7E411CC090217D5C65BE07FAD9308F7C371B5C90",
+    "crates/eidetic/chartulary/src/taxonomy.rs": "36D64BD09502AF83D6547736212D5FA4DFD6049AE07E44BE94E70EFB3AB6185F",
+    "crates/eidetic/chartulary/src/content_class.rs": "0A1D575234235538324639B4737BE2934B3E9A93836C0DBA7A85230A226676F1",
+    "crates/eidetic/chartulary/src/stemma/mod.rs": "3CB73C2AB5163531A2B2662DAF3D53A38EC97A8A4C5107C26A014E7319743151",
+    "crates/eidetic/chartulary/src/nested.rs": "A8FF1DA64F8586AAA6B85ECD864BD24199F2489972DCD665A452EEA36F00CDB7",
+    "crates/eidetic/chartulary/src/rdf.rs": "33EE86A4DEBDF3929A93AF90DFC160FF15359DED5BFA560569D2099272679F80",
+    "crates/eidetic/chartulary/src/canonical.rs": "0084AD41BF886882502C4300B424773AF6C4DCE9DBB286561B846A5DE09A439A",
+    "crates/eidetic/chartulary/src/stemma/tests.rs": "5140ACF04A9CAB14E876786D51F8F70171601596DFF39C4C02F091F5D0475DA2",
+    "crates/eidetic/chartulary/src/container.rs": "ADC27EDD4698926CD524A23C7375016B5FB37DDDF3EA7E798D5507F5E1BEAC44",
+    "crates/eidetic/chartulary/src/edit.rs": "DDEE457C67CD87D710325F2B75087CB2E40ED52E37611D3AC172E914E46A6D11",
+    "crates/eidetic/chartulary/src/caps.rs": "FEEAA2FC4C726C8D7210357E4B3E78055C4DDB7EDAA9F36F806C12DE02DF4728",
+    "crates/eidetic/chartulary/src/lib.rs": "5CCA1C06A6AB8AF81C65F92DF0337ADD20DA48F2E6FEFAC25D5D1216708910A8",
+    "crates/eidetic/chartulary/src/commit.rs": "D8C8DC0AFD31C5B3A2B06419471B9CA6A2C74BC42B51F0DCFFED62E9E86754F1",
+    "crates/eidetic/chartulary/src/facet.rs": "D69E657C0797EF073EA79705E9D882366A00D5C71C727BD150279E5278D65459"
+  }
+}

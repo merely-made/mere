@@ -1,0 +1,5 @@
+{
+  "child_exit": 0,
+  "stdout": "{\"packages\": [{\"name\": \"genet-audit-package\", \"version\": \"0.0.0\", \"source\": \"git+https://github.com/audit/genet.git?rev=2c7ef73bfa44c07744e0643e3c6f98be3cbd7947#2c7ef73bfa44c07744e0643e3c6f98be3cbd7947\"}, {\"name\": \"netrender-audit-package\", \"version\": \"0.0.0\", \"source\": \"git+https://github.com/audit/netrender.git?rev=c74b7cb28090c28b1c6d80b08dcdea18aff48d3e#c74b7cb28090c28b1c6d80b08dcdea18aff48d3e\"}, {\"name\": \"vello-audit-package\", \"version\": \"0.0.0\", \"source\": \"git+https://github.com/audit/vello.git?rev=2eae6243881d5b24c984d5ee35dde509ca5db782#2eae6243881d5b24c984d5ee35dde509ca5db782\"}, {\"name\": \"knot-editor-audit-package\", \"version\": \"0.0.0\", \"source\": \"git+https://github.com/audit/knot-editor.git?rev=3af93adda472af2913a5d298f14deb10e85daee2#3af93adda472af2913a5d298f14deb10e85daee2\"}]}",
+  "knot_revision": "3af93adda472af2913a5d298f14deb10e85daee2"
+}

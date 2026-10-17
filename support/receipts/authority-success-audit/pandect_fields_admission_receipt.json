@@ -1,0 +1,33 @@
+{
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "classification": "Bug-observation diagnostics, not correctness gates",
+  "command": "cargo test -p pandect --test audit_legacy_fields --test audit_admission_current --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config 'build.build-dir=\"C:/t/cargo-targets/mere/build\"' -- --nocapture",
+  "exit_code": 0,
+  "diagnostic_tests_passed": 2,
+  "files": {
+    "pandect_legacy_fields_diagnostic.rs": "57c42f9056dabd9473f18d5b9383960615ef2f732d1d6d66f5d451fd01d06c92",
+    "pandect_admission.rs": "6b0ccc5eb0e3a0080eeb633a029e3386b36ad190a4e022967d9b107577d1f444",
+    "pandect_fields_admission_output.txt": "265af274f4a2bc96c1cf7cea27e14c0331038f9933621c3af22a318a3c0c933a",
+    "pandect_legacy_fields_initial.rs": "97df00d005c97cc0249ed53f476a3012b0a47fe0566c75209f46d16a316477f4",
+    "pandect_fields_admission_initial_output.txt": "d530b845c3a8bc45b4b058f08dae615b1f83f7f38ddb1d15da5179e1b5303dce"
+  },
+  "source_files": {
+    "crates/system/pandect/src/graph_session.rs": "fcf7410c3ca8e7590f9edf61cc3caf38af219ce86592e992954daca593a5bcf1",
+    "crates/system/pandect/src/graph_placement.rs": "cb023914b5b266679b4c3af16f9cf12bd6886a408a28a8684b520d0de8214ac3",
+    "crates/graph/graph-kernel/src/graph/field_ops.rs": "766e374b7f20ad004310be9c143b440d66c24989789c0cb5f6a3439e533b64ea",
+    "crates/graph/graph-kernel/src/graph/snapshot/to.rs": "ca9df36928162961886528abf32d37b008829cda7a275f4d2ef55a1ac03db739"
+  },
+  "findings": {
+    "Q016": "Previous public GraphSession::apply handle-collision reproducer still passes on current source: stored success, live handle check fails, graph_at refuses and reopening is Corrupt. Valid baseline opens as control.",
+    "Q034": "All eight independently seeded valid eight-field baselines opened with identical normalized field records, then qualify_legacy(Seq(0)) refused because receipt replay did not equal frozen result. Zero/one-field controls qualified and reopened. Refused session retained exact fields and absent placement."
+  },
+  "limits": [
+    "Eight observed field-map layouts establish a real possible refusal, not that every multi-field graph must fail.",
+    "The field case has no graph relations or journal edits; no evaluator performance or physical/rendering claim.",
+    "Source cause: field_ops::fields yields unspecified HashMap order; snapshot/to.rs collects it directly; graph_placement FrozenGraph equality compares JSON arrays without normalizing field order.",
+    "Coupling stores have analogous source shape but were not separately reproduced.",
+    "Initial field fixture failed to compile because ScalarField::Const is f32, not f64; initial source/output are retained.",
+    "The diagnostics use MemoryBackend and in-process new session instances; no disk durability or fresh-process qualification is claimed."
+  ],
+  "cleanup": "Both temporary package test files were removed after exact hash checks. Shared Mere target reused; no isolated target/home/worktree."
+}

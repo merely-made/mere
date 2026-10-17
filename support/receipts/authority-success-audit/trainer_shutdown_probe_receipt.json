@@ -1,0 +1,176 @@
+{
+  "date_utc": "2026-10-17T05:31:41.186869+00:00",
+  "source_sha256": {
+    "ports/distillery/src/trainer.rs": "88be82c143d60bc0d807306ab20955ade6f4d9b1994c80b16c2b1ce0294f292f",
+    "ports/distillery/src/mesh_host/host.rs": "41b141401fe897b0ec148fbbf00cde9ca62c3352c6263f8ac6c3bfcaf805699f",
+    "ports/distillery/src/mesh_host/inflight.rs": "ddcb0acefa795446638e26156cd794973a608f745a8cc114ef95254fcd7e06e4",
+    "ports/distillery/src/gpu.rs": "2b0bbcf3ee42fb50d78411955e0ddbb51857deefccfa83e5bb08320263e64fbf",
+    "ports/distillery/Cargo.toml": "c19308b8120a4fb1a6da11fe8797c02d84f5d52a40467cc7999d76410f208733",
+    "Cargo.toml": "07b53aecab2810e3dff9c344bf3c9e02045f1535711727b6e9811ee8aa3d23bd",
+    "Cargo.lock": "924fc0b93222131937e18d80384d4579db1e4e013cffd6540f54a602921d553e"
+  },
+  "libraries": {
+    "distillery": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdistillery-101f92e022daf2a5.rlib",
+      "sha256": "286b09ba1e2c95e1c597c0ad2a105240cfb9f70b77d406dc2817856c0b4c99a5",
+      "features": [
+        "default",
+        "flora",
+        "trainer"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/ports/distillery#0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\src\\lib.rs"
+    },
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+      "sha256": "e743e7b736c462a1cd45d01cc6e33c3a834cf6fd2648cdd86b469d3f24cd88e1",
+      "features": [
+        "default",
+        "json-schema",
+        "pack-signing"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "mesh": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmesh-eae44ca3bb494d5e.rlib",
+      "sha256": "6cea4076229b689e3f510f318c7992506b6723ebd414b53d7979d2967822a9a9",
+      "features": [
+        "admitted-ingress"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/mesh/mesh#mere-mesh@0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mesh\\mesh\\src\\lib.rs"
+    },
+    "personae": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-be711869a2628b3f.rlib",
+      "sha256": "767d1f1bb58a101dc5dc85b9d28a43d7168af343c653b11dd4fb8c735968b057",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/dramatis.git?branch=main#personae@0.3.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\dramatis-c1632f2f3bdc2597\\cf562f4\\crates\\personae\\src\\lib.rs"
+    },
+    "transport": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtransport-2b6768e365816f88.rlib",
+      "sha256": "5179730df5a8dc222029c3bd9aa3a20205d6100b3ae856dc659f20639496868e",
+      "features": [
+        "notochord"
+      ],
+      "package_id": "git+https://github.com/merely-made/murm.git?branch=main#mere-transport@0.0.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\murm-ebfa134ea22785bd\\cba46d8\\native\\crates\\transport\\src\\lib.rs"
+    },
+    "tokio": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-f93b8eec18cffcea.rlib",
+      "sha256": "aa65082705a96bf125386fc879504983d5c724d22ce11769538a697bb2c978ff",
+      "features": [
+        "bytes",
+        "default",
+        "fs",
+        "io-std",
+        "io-util",
+        "libc",
+        "macros",
+        "mio",
+        "net",
+        "rt",
+        "rt-multi-thread",
+        "socket2",
+        "sync",
+        "test-util",
+        "time",
+        "tokio-macros",
+        "tracing",
+        "windows-sys"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\tokio-1.53.2\\src\\lib.rs"
+    },
+    "serde_json": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+      "sha256": "4ee2e2efcf90f61ce85a257fe3a6d707890eff440805fb2ede877eddee6ce791",
+      "features": [
+        "alloc",
+        "default",
+        "float_roundtrip",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_json-1.0.151\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\trainer_shutdown_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-trainer-shutdown-probe.exe",
+    "--extern",
+    "distillery=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdistillery-101f92e022daf2a5.rlib",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+    "--extern",
+    "mesh=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmesh-eae44ca3bb494d5e.rlib",
+    "--extern",
+    "personae=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-be711869a2628b3f.rlib",
+    "--extern",
+    "transport=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtransport-2b6768e365816f88.rlib",
+    "--extern",
+    "tokio=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libtokio-f93b8eec18cffcea.rlib",
+    "--extern",
+    "serde_json=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde_json-f141e4af6929013b.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "42bc6f3237c3a6341134a4d33e031819b2d6e32f9497625c401de8f6a5919263",
+  "test_exit": 0,
+  "tests": 2,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-trainer-shutdown-probe.exe",
+      "bytes": 58620928,
+      "sha256": "42bc6f3237c3a6341134a4d33e031819b2d6e32f9497625c401de8f6a5919263"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-trainer-shutdown-probe.exp",
+      "bytes": 25379,
+      "sha256": "337d453b2e82e2363f8921a4e5728a780b2707999ff552e11a8b7cbb8e3f37fd"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-trainer-shutdown-probe.lib",
+      "bytes": 47484,
+      "sha256": "4ff854386f9f054b498ba8d424f9c49ddcd3ba856149c6acbffbd76fff47cdf1"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-trainer-shutdown-probe.pdb",
+      "bytes": 585043968,
+      "sha256": "a03e5b3b2887bafb35dd4cedfd7e0411a381dc3397fc8fdf1b5071aca6f6e4c0"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Real public CPU TrainerResource run through one local MeshHost/P2panda endpoint, gated at its shared in-memory artifact-store mutex. A real blocking worker retains the third Arc after successful host shutdown; releasing the probe gate lets the absent synthetic model make it exit before tensor training. Positive control drains before shutdown. No actual training, GPU, vault, installed resident, remote peer or user store; all owned work drained before test completion."
+}

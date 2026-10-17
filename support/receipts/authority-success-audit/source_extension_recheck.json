@@ -1,0 +1,26 @@
+{
+  "candidate_code_extensions_outside_current_predicate": [
+    ".cmake",
+    ".cs",
+    ".graphql",
+    ".ipynb",
+    ".lua",
+    ".mk",
+    ".nix",
+    ".pl",
+    ".props",
+    ".proto",
+    ".psd1",
+    ".psm1",
+    ".r",
+    ".rb",
+    ".ron",
+    ".sql",
+    ".svelte",
+    ".targets",
+    ".vue",
+    ".xml"
+  ],
+  "paths": [],
+  "scope": "Read-only tracked and non-ignored path inventory. These are candidate source formats for inspection, not acknowledged source coverage or a claim that all formats are code."
+}

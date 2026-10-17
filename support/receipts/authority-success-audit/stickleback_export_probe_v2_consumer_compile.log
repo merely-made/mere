@@ -1,0 +1,53 @@
+error[E0603]: module `drop_io` is private
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\stickleback_export_probe.rs:8:24
+   |
+ 8 | use stickleback_audit::drop_io::{DropExportProfile, DropExportBudget, export_plain_topic_file, export_selected_plain_topic_file};
+   |                        ^^^^^^^   ----------------- struct `DropExportProfile` is not publicly re-exported
+   |                        |
+   |                        private module
+   |
+note: the module `drop_io` is defined here
+  --> C:\Users\mark_\Code\repos\mere\crates\stickleback\src\lib.rs:25:1
+   |
+25 | mod drop_io;
+   | ^^^^^^^^^^^
+
+error[E0603]: module `drop_io` is private
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\stickleback_export_probe.rs:8:24
+   |
+ 8 | use stickleback_audit::drop_io::{DropExportProfile, DropExportBudget, export_plain_topic_file, export_selected_plain_topic_file};
+   |                        ^^^^^^^ private module       ---------------- struct `DropExportBudget` is not publicly re-exported
+   |
+note: the module `drop_io` is defined here
+  --> C:\Users\mark_\Code\repos\mere\crates\stickleback\src\lib.rs:25:1
+   |
+25 | mod drop_io;
+   | ^^^^^^^^^^^
+
+error[E0603]: module `drop_io` is private
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\stickleback_export_probe.rs:8:24
+   |
+ 8 | use stickleback_audit::drop_io::{DropExportProfile, DropExportBudget, export_plain_topic_file, export_selected_plain_topic_file};
+   |                        ^^^^^^^ private module                         ----------------------- function `export_plain_topic_file` is not publicly re-exported
+   |
+note: the module `drop_io` is defined here
+  --> C:\Users\mark_\Code\repos\mere\crates\stickleback\src\lib.rs:25:1
+   |
+25 | mod drop_io;
+   | ^^^^^^^^^^^
+
+error[E0603]: module `drop_io` is private
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\stickleback_export_probe.rs:8:24
+   |
+ 8 | use stickleback_audit::drop_io::{DropExportProfile, DropExportBudget, export_plain_topic_file, export_selected_plain_topic_file};
+   |                        ^^^^^^^ private module                                                  -------------------------------- function `export_selected_plain_topic_file` is not publicly re-exported
+   |
+note: the module `drop_io` is defined here
+  --> C:\Users\mark_\Code\repos\mere\crates\stickleback\src\lib.rs:25:1
+   |
+25 | mod drop_io;
+   | ^^^^^^^^^^^
+
+error: aborting due to 4 previous errors
+
+For more information about this error, try `rustc --explain E0603`.

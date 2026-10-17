@@ -1,0 +1,8 @@
+warning: in the working copy of 'crates/eidetic/chartulary/src/commit.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/graph.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/rdf.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/graph/graph-kernel/src/graph/chart.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/system/pandect/src/wallet_grant/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/passphrase_storage.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/refresh.rs', LF will be replaced by CRLF the next time Git touches it

@@ -1,0 +1,16 @@
+
+running 7 tests
+test a_compute_task_flush_control_submits_pending_writes ... ok
+test a_write_only_flush_returns_ok_but_does_not_submit ... ok
+test default_type_enumeration_has_same_mixed_adapter_mismatch ... ok
+test enumerate_all_uses_global_index_then_selection_uses_per_type_index ... ok
+test existing_device_ids_truncate_before_u32_overflow_guard ... ok
+test filtered_type_enumeration_control_uses_the_matching_index_space ... ok
+test sixty_four_write_threshold_control_submits ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'enumerate_all_uses_global_index_then_selection_uses_per_type_index' (35728) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\retained_wgpu_completion_probe.rs:353:13:
+none, adapters [AdapterInfo { device_type: DiscreteGpu, name: "discrete0" }, AdapterInfo { device_type: DiscreteGpu, name: "discrete1" }], other adapters []
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

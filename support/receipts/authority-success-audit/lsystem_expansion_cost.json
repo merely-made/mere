@@ -1,0 +1,18 @@
+{
+  "method": "Symbol-count recurrence over the reviewed Hilbert production rules; no expansion string allocated or solver invoked",
+  "depths": {
+    "0": {
+      "symbols": 1,
+      "forward_steps": 0
+    },
+    "10": {
+      "symbols": 3495251,
+      "forward_steps": 1048575
+    },
+    "20": {
+      "symbols": 3665038759251,
+      "forward_steps": 1099511627775
+    }
+  },
+  "source_sha256": "0292f9864786d57fefb0f0e02e97ad7ddc3d6c19fa558dea4138a495c7745c55"
+}

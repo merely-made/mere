@@ -1,0 +1,12 @@
+{
+  "date_utc": "2026-10-17T09:38:50.851Z",
+  "source_sha256": {
+    "crates/cambium/examples/genet_web_smoke/index.html": "a9b1e2c983b0dde74f9bacb3fd2ba244b7b93bcef783ee6d75834ec6216bd7bf"
+  },
+  "runner_sha256": "2273333b2bfd899bd69ea7a7fc6679f44ace585b8b23c14170ed5ebacf315432",
+  "extracted_hooks_sha256": "40a1b00c77bc3e97a0dacf260bfadef0f592ca093a4d32f14e83c878b8b13ed5",
+  "checks": 3,
+  "run_exit": 0,
+  "generated_output_removed": true,
+  "scope": "Three assertions around unchanged smoke console/window error hooks in Node VM fixture storage: before PASS title fails, after PASS both console.error and window error leave PASS. This is JavaScript hook logic, not a browser/WebGPU/rendered-pixel run. Console logging itself is retained."
+}

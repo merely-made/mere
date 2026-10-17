@@ -1,0 +1,52 @@
+{
+  "date_utc": "2026-10-17T19:00:16.176003+00:00",
+  "basis_commit": "7c71810550234ccbe11f7429cd44e369b279ec06",
+  "source_sha256": {
+    "crates/intel/esp/src/infer/provider.rs": "7ea288277fd0c08e82fbcf2b7c5053675c94c654f2a8ce2f1a8fc9d1d6b7ff5b",
+    "crates/intel/esp/src/infer/decoder/config.rs": "ddd102ca5e118526cc402df6b9975494519950ba64c98b7df4bf3f818201384c",
+    "crates/intel/esp/src/infer/decoder/architecture_tests.rs": "82fa80d26877d33c06c3a9cdf1d3a5ec3fe3ba7d3fdf30422ae61c67ceddd3fd",
+    "crates/system/luggage/src/error.rs": "2ba50b8c7b597f92f331bd354f913c57e8b3dc958196aeb9351d208f658e3d52",
+    "crates/system/luggage/src/release.rs": "5731bdb117fcc1deeb4d8b1e7d448d6612b83d359b2b3634a4e505ed4ccdb3a7",
+    "crates/system/luggage/src/staging.rs": "baff77efb779a375c8dec0ad2c125a0097cd25815048d1a48c8ecfab6c5a5841"
+  },
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-staging-runtime\\Cargo.toml",
+    "--lib",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "passed_tests": 27,
+  "audit_tests": 3,
+  "original_tests": 24,
+  "runner_sha256": "3de60fe935f3075e7d7dabb2528f8972d9d704a97edf963ec9750d8e866e19c6",
+  "probe_sha256": "7ffbdf2ffcd7b700208dfe53de77d3fe6ff6b8f206833832dfe9a19cde6eb157",
+  "manifest_sha256": "1c19f1832df3bdd4bcb507571ae50b11fd8b8e37da4b3a5dc7b7f092f33b4ae5",
+  "lock_sha256": "efa4bd2c596053746c1065f2a8177528ac2b18863784983f07dca3e0a9b2c8a4",
+  "projections": {
+    "main_refresh_staging_production.rs": "a9a464c0e3c96f03a70208e6651bedff260c784e589fa8251235edcd2b8452cb",
+    "main_refresh_comparison_projection.rs": "15d1e246f4754b03086cd87e36889d7385773e6f32d1a67e2c97ced1120d79af"
+  },
+  "prior_setup_failure": {
+    "path": "main_refresh_staging_initial_setup_failure.json",
+    "sha256": "56739204b0464d29294d443a1c715e7515cea2bbaa4cf8ac707d73d214806e81"
+  },
+  "removed_outputs": [],
+  "fixture_files": {
+    "staging-trust-reload\\staged-artifact": {
+      "bytes": 33,
+      "sha256": "d8b3c16cdc4940ff2613dbb48929a3a9e4e6db4c0edbfb6af2f98ce342e72adc"
+    },
+    "staging-trust-reload\\staged.json": {
+      "bytes": 159,
+      "sha256": "23e2dccecee299742063df1a74a5918cdf8a5c0fafa9e477b695e7d496eaac76"
+    }
+  },
+  "qualification": "Fresh offline small CPU dependency graph under audit-owned standalone manifest in existing shared approved Cargo target. Exact current config/portable provider and Luggage core error/release tests. Unchanged production staging methods before cfg(test) over an audit Update facade that panics on install, never invoked. Three audit tests: metadata+payload substitution after reload, ignored discard failures, projected exact NaN comparator. Includes intact, one-file tamper and finite-mismatch controls. No full native Luggage/ESP owner, artifact/manifest signature test, OS installer, real model/GPU or network. Old retained supplier setup failure preserved. Small fixture files retained, test executable/PDB removed; reusable dependency cache remains in stable shared target, not an isolated target."
+}

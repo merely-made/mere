@@ -1,0 +1,131 @@
+{
+  "date_utc": "2026-10-17T11:50:02.611339+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/moot/commons/src/parking.rs": "1cd74a0a115bb0408f4549b5699b65c8eae71fa358c48f85836aea67badc383d"
+  },
+  "libraries": {
+    "muniment": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-2dbefd19bbbeb99d.rlib",
+      "sha256": "371be5d246daa9d97d5d551b0cab2852c98276e5e8e3ccc10cec760a472dfad4",
+      "features": [
+        "default",
+        "directory",
+        "json",
+        "redb"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/muniment#0.1.2"
+    },
+    "stickleback": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libstickleback-90dddad71b38a8c2.rlib",
+      "sha256": "0009f997ead54cc458a3f1aa34b4fc17c6330f10a92ada7fec9df07b3fa9916a",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/stickleback#0.1.1"
+    },
+    "p2panda_core": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-c55b3fd2b296103a.rlib",
+      "sha256": "49b09e598cce7f5d45d96b10f97651d77436a16389ec62054de49172dc7959f4",
+      "features": [
+        "default"
+      ],
+      "package_id": "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#p2panda-core@0.7.1"
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+      "sha256": "77d8da8f2b6c72188ba2b9c390a9582a05bacff8f5e56c305b3783698d5fd74a",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229"
+    },
+    "async_trait": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll",
+      "sha256": "06aa9294ef54ae79b3c1339e7aaf5c547633182869bd5e63d69dae98ee675cd9",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#async-trait@0.1.92"
+    }
+  },
+  "native_link_searches": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\commons_parking_probe_v3.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.exe",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+    "--extern",
+    "muniment=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmuniment-2dbefd19bbbeb99d.rlib",
+    "--extern",
+    "stickleback=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libstickleback-90dddad71b38a8c2.rlib",
+    "--extern",
+    "p2panda_core=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libp2panda_core-c55b3fd2b296103a.rlib",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-9d07a9c8fb7c68aa.rlib",
+    "--extern",
+    "async_trait=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\async_trait-5f56d5ca77e79a01.dll"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 3,
+  "original_tests": 0,
+  "audit_cases": 3,
+  "runner_sha256": "177571b51d6aeb36b0e38cb998231fcfca3afadac5cbffada9d6867793228ea0",
+  "probe_sha256": "8508fe19b7fb78d10b81df696b25df35a0a2b5f5bb5b79dd7bf113b4749ef82d",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.exe",
+      "bytes": 2586624,
+      "sha256": "db49c0fb859693ac84b950fad614ae52d844c6b68ece48160473f5197d360bfe"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-commons-parking.pdb",
+      "bytes": 164745216,
+      "sha256": "3360e88b81c5fb68b6cf54d6b7dfb5e8a80234d514a8fc42a5d7da8c55a3add7"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Unchanged complete current private Parking module compiled over five exact retained suppliers. Three audit cases use real MemoryBackend storage; wrapper only schedules two valid list snapshots before writes and delegates every write batch unchanged. Sequential control and deterministic two-writer count/byte-bound counterexamples. No whole Commons/Chat/EncryptedReplica, fresh Cargo graph, live LogSync, physical carrier or disk execution."
+}

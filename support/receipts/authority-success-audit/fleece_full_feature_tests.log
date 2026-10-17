@@ -1,0 +1,381 @@
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling n0-future v0.3.2
+   Compiling chrono v0.4.45
+   Compiling tempfile v3.27.0
+   Compiling noq-proto v1.3.0
+   Compiling reqwest v0.13.5
+   Compiling n0-watcher v1.0.0
+   Compiling value-log v1.9.0
+   Compiling quinn-udp v0.5.15
+   Compiling quinn-proto v0.11.18
+   Compiling oxrdf v0.3.4
+   Compiling tokio-tungstenite v0.29.0
+   Compiling swarm-discovery v0.6.4
+   Compiling async-compression v0.4.48
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling euclid v0.22.14
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+   Compiling wmi v0.18.4
+   Compiling lsm-tree v2.10.4
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates\nematic\nematic\src\knot\expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates\nematic\nematic\src\knot\expand\build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+   Compiling oxjsonld v0.2.6
+   Compiling oxttl v0.2.4
+   Compiling n0-dns-resolver v0.1.0
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling iroh-dns v1.3.0
+   Compiling fjall v2.11.2
+   Compiling quinn v0.11.12
+   Compiling netwatch v0.19.3
+   Compiling h3-quinn v0.0.10
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling portmapper v0.19.3
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+   Compiling mere-fetch v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\fetch)
+   Compiling noq v1.3.0
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> crates\graph\graph-kernel\src\graph\legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> crates\graph\graph-kernel\src\graph\query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+   Compiling iroh-relay v1.3.0
+   Compiling irpc v0.17.0
+warning: unused import: `EdgeRef`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+   Compiling iroh v1.3.0
+warning: unused variable: `key`
+    --> crates\graph\graph-kernel\src\graph\assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates\graph\graph-kernel\src\graph\mod.rs:722:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+722 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+748 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+758 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates\graph\graph-kernel\src\graph\edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates\graph\graph-kernel\src\graph\edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates\graph\graph-kernel\src\graph\query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+   Compiling mere-linked-data v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\graph\linked-data)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+warning: `mere-kernel` (lib) generated 19 warnings (run `cargo fix --lib -p mere-kernel` to apply 8 suggestions)
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling iroh-gossip v0.101.0
+   Compiling iroh-util v0.6.0
+   Compiling iroh-blobs v0.103.1
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 45s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\fleece-e2d3952ee7595fc7.exe)
+
+running 56 tests
+test clip::tests::submission_target_is_not_imported_as_a_navigation_link ... ok
+test crawl::graph::tests::contributions_bind_to_supplied_destination_and_old_run_is_ignored ... ok
+test clip::tests::web_clip_script_uses_cursor_coordinates ... ok
+test crawl::robots::tests::comments_and_casing_are_tolerated ... ok
+test clip::tests::parses_webview2_quoted_json_result ... ok
+test crawl::robots::tests::disallow_root_blocks_all ... ok
+test crawl::robots::tests::explicit_empty_bot_group_does_not_inherit_star_restrictions ... ok
+test crawl::robots::tests::disallow_blocks_its_prefix ... ok
+test clip::tests::markdown_fallback_preserves_blocks_and_links ... ok
+test crawl::robots::tests::empty_disallow_is_allow_all ... ok
+test crawl::robots::tests::empty_or_comment_only_allows_everything ... ok
+test clip::tests::micron_clip_preserves_text_and_links_inside_source_presentation ... ok
+test clip::tests::micron_in_page_link_clips_as_label_text_not_a_link ... ok
+test crawl::robots::tests::allow_overrides_disallow_on_a_longer_match ... ok
+test crawl::robots::tests::our_ua_group_overrides_the_star_group ... ok
+test clip::tests::html_fallback_extracts_main_text_through_fleece ... ok
+test crawl::robots::tests::wildcard_end_anchor_and_encoded_paths_are_honored ... ok
+test crawl::sitemap::tests::handles_a_sitemapindex_the_same_way ... ok
+test clip::tests::cropped_visual_uses_element_rect ... ok
+test crawl::sitemap::tests::skips_non_http_and_empty ... ok
+test crawl::tests::frontier_bounds_links_and_sitemap_by_depth_fanout_and_scope ... ok
+test crawl::tests::cancelled_before_start_sends_no_requests_and_invalid_seed_has_typed_receipt ... ok
+test crawl::tests::response_and_total_bytes_bound_adapter_and_reject_oversized_results ... ok
+test crawl::tests::frontier_never_queues_more_than_the_page_budget_and_rejects_non_http_seed ... ok
+test crawl::tests::robots_are_cached_per_origin_including_port ... ok
+test crawl::tests::failed_page_response_bytes_reduce_subsequent_request_allowance ... ok
+test crawl::tests::generic_content_is_gathered_with_depth_and_cycle_limits ... ok
+test crawl::sitemap::tests::extracts_loc_urls_from_a_urlset ... ok
+test crawl::tests::creating_a_gathering_actor_does_not_start_network_acquisition ... ok
+test crawl::tests::ready_failed_fetch_preserves_complete_bytes_and_terminal_cancellation ... ok
+test crawl::tests::robots_blocks_pages_sitemap_and_percent_escape_bypasses ... ok
+test crawl::tests::single_hop_adapter_preserves_absence_failure_status_and_partial_byte_evidence ... ok
+test crawl::tests::sitemap_and_robots_count_against_request_budget ... ok
+test crawl::tests::zero_request_byte_and_page_budgets_do_not_invoke_fetcher ... ok
+test crawl::tests::unreachable_robots_fails_closed_and_accounts_partial_bytes ... ok
+test crawl::tests::supplied_html_and_xhtml_use_extraction_without_fetching ... ok
+test page_links::tests::links_resolve_dedupe_and_skip_the_page_itself ... ok
+test eidetic_bridge::tests::capture_identity_rejects_relative_or_malformed_sources ... ok
+test eidetic_bridge::tests::capture_evidence_binds_every_retained_fact ... ok
+test structured_data::tests::resolves_only_contexts_supplied_by_the_offline_cache ... ok
+test structured_data::tests::projects_raw_json_ld_text_in_dom_order_and_skips_invalid_and_js_scripts ... ok
+test traversal::tests::cycle_is_observed_once_and_node_budget_is_typed ... ok
+test traversal::tests::generated_graph_selection_reaches_goal_before_irrelevant_branch ... ok
+test traversal::tests::cancellation_during_final_failed_observation_preserves_failure_and_stop_reason ... ok
+test eidetic_bridge::tests::record_serialized_before_capture_evidence_remains_readable ... ok
+test traversal::tests::depth_fanout_and_pending_bounds_report_omissions ... ok
+test structured_data::tests::resolves_relative_ids_against_the_caller_owned_document_base ... ok
+test traversal::tests::inference_selection_cannot_invent_an_index_or_override_budget ... ok
+test traversal::tests::goal_ranking_retains_shorter_path_reobservations_within_node_budget ... ok
+test traversal::tests::versions_are_separate_from_observations_and_cancellation_stops_expansion ... ok
+test eidetic_bridge::tests::annotation_json_ld_expands_to_expected_rdf_dataset_offline ... ok
+test eidetic_bridge::tests::changed_text_or_selector_is_rejected_before_reopen_accepts_it ... ok
+test structured_data::tests::imports_explicit_assertions_and_complete_tag_definitions_from_dom_text ... ok
+test crawl::tests::polite_delay_applies_to_robots_sitemap_and_page_requests ... ok
+test crawl::tests::in_flight_request_is_dropped_on_cancellation_and_timeout ... ok
+test eidetic_bridge::tests::fleece_annotation_round_trips_after_fjall_reopen ... ok
+
+test result: ok. 56 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests\eidetic_peer_transfer.rs (C:/t/cargo-targets/mere/build\debug\deps\eidetic_peer_transfer-c460e8d9defaddf0.exe)
+
+running 1 test
+test selected_page_survives_authenticated_peer_transfer_and_receiver_reopen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.07s
+
+     Running tests\portable_clip.rs (C:/t/cargo-targets/mere/build\debug\deps\portable_clip-ed1f94521c650a6f.exe)
+
+running 6 tests
+test invalid_packages_are_refused_before_receiver_writes ... ok
+test retained_and_portable_schemas_are_available_and_validate_offline ... ok
+test selected_dependency_closure_is_bounded_and_does_not_traverse_backing ... ok
+test sealed_selected_transfer_preserves_existing_receiver_custody ... ok
+test tag_attribution_and_native_anchor_refusals_survive_adapters ... ok
+test native_owner_exports_survive_receiver_only_disk_reopen ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+

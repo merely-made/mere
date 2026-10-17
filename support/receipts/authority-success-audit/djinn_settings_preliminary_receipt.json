@@ -1,0 +1,14 @@
+{
+  "classification": "audit fixture failure, not product evidence",
+  "failures": [
+    "Windows CRLF marker compared with LF",
+    "local replica author correctly refused unselected carrier; fixture must observe refusal before comparing projections"
+  ],
+  "evidence_sha256": {
+    "djinn_settings_preliminary_djinn_settings_probe.rs": "4671878901ee2f525d3461480fced5861e35f4c81d5428342cca31d8091d38db",
+    "djinn_settings_preliminary_run_djinn_settings_probe.py": "23ab0f2f41a07f08c327b3a4b918b66536e43b7aa3717a6f1f1aa82616f88e3e",
+    "djinn_settings_preliminary_djinn_settings_probe_build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "djinn_settings_preliminary_djinn_settings_probe_output.log": "52a7a0a203b3ebeb4073ee775eed201864cdb227a00b955f092e89b08966f2dd"
+  },
+  "generated_marker_only_fixture_removed": true
+}

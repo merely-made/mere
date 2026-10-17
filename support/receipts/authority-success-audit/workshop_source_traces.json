@@ -1,0 +1,22 @@
+{
+  "qualification": "Source branch traces only; no full Workshop/Pelt/GPU execution. Tinct unit execution is separate.",
+  "export_policy_reset": {
+    "sources": {
+      "crates/cambium/tabard-workshop/src/state.rs": "f6b5dcc4992f54b22d31ff58118f1e8daf9a09527a0eb38fd2b9ec892bd919d4",
+      "ports/pelt/desktop/appearance_editor.rs": "da3cf5a5e3cca44607839eb2a031ef7f7ec3276f07da6eb003bc659b633ef72e"
+    },
+    "precondition": "A successfully loaded/saved clean library and host-supplied protected paths/directories. Pelt supplies its appearance path once when EditorWindow opens.",
+    "transition": "WorkshopState::reopen loads a fresh Self whose constructor has empty protection vectors, then replaces the entire current state. Native sync_and_export does not reinstall those vectors.",
+    "consequence": "Subsequent complete_export no longer refuses the external host path. Existing targets still require the ordinary explicit replace confirmation; automatic overwrite was not observed. Workshop-owned library/preferences checks still exist."
+  },
+  "graph_repaint": {
+    "sources": {
+      "crates/cambium/tabard-workshop/src/preview_bindings.rs": "9830b9f0c6d9799f9e3cfbe6efe9fce15db6f1deb9b1fa1c7e9f812fd469f41d",
+      "crates/cambium/sprigging/src/lib.rs": "33c5b12f2c9356665bc51765648a5f7fd5b98a7f4a13c25e7ee1a2adc530af27",
+      "crates/cambium/sprigging/src/glyphs.rs": "7d7d32804f62115c9df8722275b00c8ffab39c78248366b5d71ba0773f8178ea"
+    },
+    "precondition": "An ordinary frame with the graph leaf laid out at a stable size and unchanged state.",
+    "transition": "Native frame calls PreviewBindings::register, which inserts a new state.graph_leaf. GraphCanvas::new sets dirty true and registry insert replaces the old leaf.",
+    "consequence": "The next render_into cannot take its clean-cached skip; graph paint/epoch changes on every eligible pass. Does not establish a continuous redraw loop, GPU duration or measured latency."
+  }
+}

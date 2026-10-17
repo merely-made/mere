@@ -1,0 +1,71 @@
+warning: variant `ModelNotLoaded` is never constructed
+  --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\provider.rs:41:5
+   |
+37 | pub enum EmbedError {
+   |          ---------- variant in this enum
+...
+41 |     ModelNotLoaded,
+   |     ^^^^^^^^^^^^^^
+   |
+   = note: `EmbedError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `dimensions` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\sparse.rs:92:12
+   |
+44 | impl SparseVector {
+   | ----------------- method in this implementation
+...
+92 |     pub fn dimensions(&self) -> usize {
+   |            ^^^^^^^^^^
+
+warning: constant `RECOMMENDED_DIMENSIONS_SHORT_TEXT` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\lexical.rs:47:11
+   |
+47 | pub const RECOMMENDED_DIMENSIONS_SHORT_TEXT: std::ops::RangeInclusive<usize> = 256..=512;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `HashingStats` is never constructed
+  --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\lexical.rs:55:12
+   |
+55 | pub struct HashingStats {
+   |            ^^^^^^^^^^^^
+
+warning: method `hashing_stats` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\lexical.rs:197:12
+    |
+ 84 | impl LexicalEmbeddingProvider {
+    | ----------------------------- method in this implementation
+...
+197 |     pub fn hashing_stats<'a, I: IntoIterator<Item = &'a str>>(&self, texts: I) -> HashingStats {
+    |            ^^^^^^^^^^^^^
+
+warning: methods `provider`, `index_mut`, and `sparse_index_mut` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\search.rs:245:12
+    |
+ 71 | impl<K: Hash + Eq + Clone, P: EmbeddingProvider> SemanticSearch<K, P> {
+    | --------------------------------------------------------------------- methods in this implementation
+...
+245 |     pub fn provider(&self) -> &P {
+    |            ^^^^^^^^
+...
+257 |     pub fn index_mut(&mut self) -> &mut VectorIndex<K> {
+    |            ^^^^^^^^^
+...
+267 |     pub fn sparse_index_mut(&mut self) -> Option<&mut SparseIndex<K>> {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: method `progress` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\intel\esp\src\embed\affinity.rs:114:12
+    |
+ 67 | / impl<K, V> AffinityScan<K, V>
+ 68 | | where
+ 69 | |     K: Hash + Eq + Clone + Ord,
+ 70 | |     V: IndexVector + Clone + Borrow<V::Query>,
+    | |______________________________________________- method in this implementation
+...
+114 |       pub fn progress(&self) -> (usize, usize) {
+    |              ^^^^^^^^
+
+warning: 7 warnings emitted
+

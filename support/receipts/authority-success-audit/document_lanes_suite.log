@@ -1,0 +1,138 @@
+   Compiling tokio v1.53.2
+   Compiling windows v0.62.2
+   Compiling gl_generator v0.14.0
+   Compiling naga v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling url v2.5.8
+   Compiling regex-automata v0.4.18
+   Compiling windows-sys v0.48.0
+   Compiling serde_urlencoded v0.7.1
+   Compiling assert-json-diff v2.0.2
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling glutin_wgl_sys v0.6.1
+   Compiling colored v3.1.1
+   Compiling regex v1.13.1
+   Compiling tokio-rustls v0.26.6
+   Compiling tokio-util v0.7.19
+   Compiling quinn v0.11.12
+   Compiling h3 v0.0.8
+   Compiling guppy-protocol v0.1.1
+   Compiling nex-protocol v0.1.1
+   Compiling spartan-protocol v0.1.1
+   Compiling gopher-protocol v0.2.0
+   Compiling finger-protocol v0.1.1
+   Compiling async-compression v0.4.48
+   Compiling gemini-protocol v0.1.7
+   Compiling tokio-tungstenite v0.29.0
+   Compiling misfin v0.0.4
+   Compiling h2 v0.4.19
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+   Compiling scroll-protocol v0.1.0
+   Compiling h3-quinn v0.0.10
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+   Compiling nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates\nematic\nematic\src\knot\expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates\nematic\nematic\src\knot\expand\build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+   Compiling hyper v1.11.1
+   Compiling wgpu-naga-bridge v30.0.1
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+   Compiling hyper-util v0.1.20
+   Compiling hyper-rustls v0.27.9
+   Compiling mockito v1.7.2
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling gpu-allocator v0.28.0
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling wgpu-hal v30.0.1
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling wgpu v30.0.1
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling mere-document-lanes v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\document-lanes)
+warning: unused import: `DocumentSession`
+   --> crates\system\document-lanes\src\session.rs:293:33
+    |
+293 |     use inker::session_engine::{DocumentSession, SessionEngine, SessionSpawnRequest};
+    |                                 ^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-document-lanes` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 21s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\mere_document_lanes-dc254f3ecb396be3.exe)
+
+running 54 tests
+test reader::tests::presented_headings_remain_in_reader_outline_order ... ok
+test remote::smolweb_tests::unknown_scheme_is_not_routed_to_errand ... ok
+test reader::tests::reader_requires_held_bytes_and_declines_non_articles ... ok
+test retained_clip::tests::export_without_a_custody_adapter_refuses_a_sealed_clip ... ok
+test reader::tests::article_lowering_preserves_table_header_and_figure_caption ... ok
+test retained_clip::tests::selected_export_roundtrips_exact_body_and_source_without_private_backing ... ok
+test remote::tests::local_fetcher_gets_http_bytes_via_netfetcher ... ok
+test remote::tests::http_not_found_is_none ... ok
+test remote::tests::configured_fetcher_enforces_redirect_and_body_limits ... ok
+test remote::tests::configured_fetcher_revalidates_a_shared_cached_response ... ok
+test reader::tests::reader_route_lowers_renders_links_and_reports_lineage ... ok
+test retained_clip::tests::shared_text_clip_has_original_evidence_and_a_real_pelt_session ... ok
+test reader::tests::reader_projection_is_partial_with_virtual_focus_only ... ok
+test retained_clip::tests::shared_voice_clip_keeps_exact_decoder_bytes_and_typed_controls ... ok
+test reader::tests::reader_appearances_share_content_but_keep_viewport_and_scroll_independent ... ok
+test session::navigation_tests::probe_06b_replace_document_drops_an_edited_heading_and_a_new_address ... ok
+test reader::tests::reader_snapshot_waits_for_frame_and_groups_wrapped_links_across_reflow ... ok
+test session::navigation_tests::probe_09_in_page_activation_issues_no_transport_at_the_session_boundary ... ok
+test remote::smolweb_tests::smolweb_scheme_routes_and_unresolvable_host_is_none ... ok
+test session::tests::session_exposes_the_reader_source_presentation_override ... ok
+test session::navigation_tests::probe_08_enter_and_space_toggle_the_focused_heading ... ok
+test smolweb::a11y::tests::a_gopher_menu_reads_row_by_row ... ok
+test reader::tests::reader_pointer_target_rechecks_current_scroll_and_content_hole ... ok
+test session::tests::smolweb_session_body_route_requests_and_accepts_inline_images ... ok
+test smolweb::a11y::tests::nothing_is_published_before_a_frame ... ok
+test smolweb::tests::a_fixed_width_menu_sets_its_body_font_to_the_monospace_one ... ok
+test smolweb::a11y::tests::an_inline_link_is_read_once_between_its_text ... ok
+test smolweb::a11y::tests::a_gemini_page_reads_in_order_with_roles_and_boxes ... ok
+test smolweb::tests::an_entry_address_loads_the_feed_and_renders_the_entry ... ok
+test smolweb::tests::app_rgb_palette_maps_into_document_style ... ok
+test smolweb::tests::a_gopher_menu_reaches_the_host_as_one_typed_menu ... ok
+test smolweb::a11y::tests::scroll_into_view_reaches_the_bottom_and_stale_actions_are_refused ... ok
+test smolweb::a11y::tests::click_and_focus_act_on_the_page ... ok
+test smolweb::tests::replacing_a_streamed_body_rebuilds_structure_and_invalidates_layout ... ok
+test smolweb::tests::gemtext_uses_engine_document_and_paints_text ... ok
+test smolweb::tests::schemes_select_their_nematic_engines ... ok
+test smolweb::a11y::tests::nomadnet_pages_read_with_headings_and_links ... ok
+test smolweb::tests::opted_in_gemtext_image_link_fetches_decodes_paints_and_stays_clickable ... ok
+test session::navigation_tests::probes_03_04_missing_targets_are_inert_but_handled ... ok
+test session::navigation_tests::probes_08_07c_pointer_toggles_a_collapsible_heading ... ok
+test smolweb::tests::spartan_prompt_click_remains_a_submission ... ok
+test typography::tests::reading_override_preserves_heading_code_and_label_defaults ... ok
+test smolweb::tests::links_and_clicks_share_viewport_coordinates ... ok
+test smolweb::tests::streamed_replacement_scene_retains_prefix_runs_and_adds_tail_runs ... ok
+test typography::tests::code_can_explicitly_choose_a_generic_ui_face_without_being_forced_to_monospace ... ok
+test typography::tests::heading_override_preserves_relative_hierarchy_and_code_style ... ok
+test smolweb::tests::long_document_scrolls_and_windows ... ok
+test smolweb::tests::wide_table_links_clip_scroll_hit_test_and_resize_in_viewport_coordinates ... ok
+test smolweb::typography_tests::restyling_reflows_without_replacing_source_or_session_state ... ok
+test session::navigation_tests::probes_05_17_links_into_closed_sections_open_ancestors_and_scroll ... ok
+test reader::tests::reader_owned_virtual_focus_is_current_visible_and_appearance_local ... ok
+test session::navigation_tests::decision_12_focus_reaches_every_region_with_a_configurable_indicator ... ok
+test session::navigation_tests::guide_structure_07c_fold_state_and_scroll_survive_replace_document ... ok
+test session::navigation_tests::probes_17_05_08_14c_reveal_after_toggle_and_resize ... ok
+
+test result: ok. 54 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+

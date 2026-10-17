@@ -1,0 +1,24 @@
+
+running 8 tests
+-1 takes the outer-ring fallback; -0.1 rounds into the focus instead
+L-system and Penrose arrangement construction accept depth 255 for one item; expansions not executed
+Named missing-host-grammar returns an identical scene to Hilbert without an unavailable-grammar result
+u32::MAX plus an undisclosed ring panics in the native overflow-checked library
+test a_negative_fractional_ring_goes_to_the_focus ... ok
+test depth_255_is_admitted_without_running_the_expansion ... ok
+test named_grammar_is_silently_hilbert ... ok
+test a_maximum_ring_and_an_undisclosed_item_overflow_the_outer_ring ... ok
+Distinct finite [0, 1e-100] axis values both map to origin
+test finite_tiny_axis_collapses_distinct_endpoints ... ok
+Six declared memberships remain in region data, but the item is geometrically inside only 1; no degraded-placement report
+test impossible_set_intersections_silently_get_a_partial_membership_position ... ok
+test normal_finite_timeline_control ... ok
+Finite [0, 1e100] score reopens, solve emits NaN, admitted snapshot JSON cannot reopen
+test finite_large_axis_generates_nan_then_a_non_reopenable_snapshot ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'a_maximum_ring_and_an_undisclosed_item_overflow_the_outer_ring' (48908) panicked at crates\cambium\scenes\scenomise\src\families\radial.rs:37:74:
+attempt to add with overflow
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

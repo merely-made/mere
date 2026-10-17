@@ -1,0 +1,32 @@
+
+running 17 tests
+test ranking::audit::a_usize_iteration_floor_multiple_of_u32_range_divides_by_zero ... ok
+test ranking::audit::ordinary_ranking_control_preserves_duration_per_iteration ... ok
+test ranking::audit::retargeting_can_leave_warmup_ceiling_and_normalize_by_wrapped_count ... ok
+test ranking::audit::zero_minimum_control_is_clamped_to_one ... ok
+test roof::audit::a_negative_normal_peak_panics_instead_of_being_ignored ... ok
+test roof::audit::a_positive_finite_peak_can_overflow_duration ... ok
+test roof::audit::scoring_a_negative_peak_keeps_a_binding_the_docs_say_is_skipped ... ok
+test roof::audit::scoring_a_zero_peak_control_is_unusable ... ok
+test roof::audit::scoring_an_infinite_peak_keeps_a_binding_the_docs_say_is_skipped ... ok
+test roof::tests::a_zero_duration_reports_nan_instead_of_dividing_by_zero ... ok
+test roof::tests::binding_achieved_skips_non_finite_entries_and_is_none_if_all_are ... ok
+test roof::tests::binding_resource_is_the_one_needing_the_most_time_at_peak ... ok
+test roof::tests::binding_resource_skips_non_normal_peaks_and_is_none_if_all_are ... ok
+test roof::tests::resources_with_different_peaks_score_independently_and_pick_the_slower_one ... ok
+test roof::tests::score_resources_reports_achieved_rate_and_fraction_of_peak ... ok
+test roof::tests::time_at_peak_is_amount_over_peak ... ok
+test roof::tests::time_at_peak_is_none_for_a_non_normal_peak ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'ranking::audit::a_usize_iteration_floor_multiple_of_u32_range_divides_by_zero' (34208) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\runtime_throughput_probe.rs:268:24:
+divide by zero error when dividing duration by scalar
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'roof::audit::a_negative_normal_peak_panics_instead_of_being_ignored' (30900) panicked at C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib/rustlib/src/rust\library\core\src\time.rs:962:23:
+cannot convert float seconds to Duration: value is negative
+
+thread 'roof::audit::a_positive_finite_peak_can_overflow_duration' (5920) panicked at C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib/rustlib/src/rust\library\core\src\time.rs:962:23:
+cannot convert float seconds to Duration: value is either too big or NaN

@@ -1,0 +1,10 @@
+warning: unused import: `alloc::vec`
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\runtime_scope_probe.rs:185:9
+    |
+185 |     use alloc::vec;
+    |         ^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

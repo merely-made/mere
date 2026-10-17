@@ -1,0 +1,65 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling url v2.5.8
+   Compiling heapless v0.7.17
+   Compiling tower-http v0.6.11
+   Compiling iroh-base v1.3.0
+   Compiling attohttpc v0.30.1
+   Compiling netwatch v0.19.3
+   Compiling reqwest v0.13.5
+   Compiling p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling postcard v1.1.3
+   Compiling igd-next v0.17.1
+   Compiling p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling hickory-proto v0.26.3
+   Compiling hpke-rs-rust-crypto v0.7.0
+   Compiling tungstenite v0.29.0
+   Compiling irpc v0.17.0
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling iroh-tickets v1.0.0
+   Compiling assert-json-diff v2.0.2
+   Compiling portmapper v0.19.3
+   Compiling mockito v1.7.2
+   Compiling p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling tokio-tungstenite v0.29.0
+   Compiling n0-dns-resolver v0.1.0
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling swarm-discovery v0.6.3 (https://github.com/mark-ik/swarm-discovery.git?branch=mere#99dd24c5)
+   Compiling iroh-dns v1.3.0
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling iroh-relay v1.3.0
+   Compiling iroh v1.3.0
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling iroh-gossip v0.101.0
+   Compiling iroh-util v0.6.0
+   Compiling iroh-blobs v0.103.1
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling mere-fetch v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\fetch)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 04s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\fetch-46389fdbed11d7f3.exe)
+
+running 16 tests
+test crawler::tests::chunked_response_stops_at_cap_and_accounts_for_received_chunk ... ok
+test crawler::tests::exhausted_byte_budget_issues_no_request ... ok
+test crawler::tests::failed_stream_keeps_partial_bytes_for_budget_accounting ... ok
+test crawler::tests::local_redirect_is_observed_without_following ... ok
+test crawler::tests::local_response_length_is_refused_before_reading ... ok
+test crawler::tests::local_server_sees_one_bot_request_without_cookies ... ok
+test crawler::tests::missing_robots_and_denied_robots_remain_distinct_without_body_reads ... ok
+test handle::tests::a_blocking_thread_reads_exact_ranges_with_identity_encoding ... ok
+test handle::tests::a_cached_whole_object_never_answers_a_ranged_read ... ok
+test handle::tests::a_changed_representation_and_an_ignored_range_are_told_apart ... ok
+test handle::tests::a_download_streams_into_its_sink_before_the_server_finishes ... ok
+test handle::tests::a_feed_is_read_whole_and_an_oversize_body_is_refused ... ok
+test handle::tests::a_ranged_read_carries_its_own_scopes_cookie_and_no_other ... ok
+test handle::tests::a_redirect_keeps_the_range_and_reports_the_final_url ... ok
+test handle::tests::a_supplied_transport_is_the_wire_the_handle_sends_through ... ok
+test handle::tests::the_handle_serves_a_documents_resources_and_hands_other_schemes_on ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.47s
+

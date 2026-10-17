@@ -1,0 +1,24 @@
+
+running 10 tests
+Qualified identity boundary: distinct adapter-backed value cells share one derived SourceRef and interned source
+test matrix_derived_sources_alias_distinct_adapters ... ok
+Unmoved 10x10 item retains its footprint while scene bounds become 0x0
+One bounded relax step moves endpoint items; the original routed polyline stays behind
+Finite source coordinate and finite accepted scale return Ok with infinite geometry
+test relaxation_discards_footprint_bounds_even_when_no_item_moves ... ok
+Qualified cache boundary: a different registration for the same custom ID reuses the previous compiler's geometry
+test coordinate_validation_uses_spacing_instead_of_the_overridden_scale ... ok
+test relaxation_moves_items_but_not_their_existing_routes ... ok
+Strictly parsed history contains changed label/explanation, yet reports the relationship and both endpoints stable
+Qualified focus boundary: entered visible set omits unrelated, while the complete Scene fold effect still shows it
+test refresh_reuses_geometry_from_a_different_solver_registration ... ok
+test parsed_relationship_text_can_hide_a_change_at_signature_separators ... ok
+test entered_focus_uses_a_visibility_set_beyond_portable_fold_hiding ... ok
+History parsing admits duplicate occurrence IDs that compile rejects; comparison keeps the last predecessor and reports all current items stable
+test history_admits_duplicate_occurrences_that_the_compiler_rejects ... ok
+Foreign owner-b relationships route onto an owner-a projection; different-revision control refuses
+test routing_accepts_another_source_with_the_same_revision_and_occurrence_ids ... ok
+test ordinary_history_change_control ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

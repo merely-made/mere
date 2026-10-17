@@ -1,0 +1,66 @@
+{
+  "date_utc": "2026-10-16T23:48:03.863847+00:00",
+  "test_exit": 0,
+  "tests": 3,
+  "harness_sha256": "0dead8a1e2be187b72a9a60e495ab7253ebe378ac949e4977eda6493e9723bfc",
+  "source_sha256": {
+    "crates/mere/Cargo.toml": "b737bc4d3314ddbb142c4a8b712a2956927a281fdab35c3f13af364a5e721a49",
+    "crates/mere/src/clip.rs": "da0508f70d5413ccb7043a41f2a518a331b9a9f640c059490c6bad6b0486a707",
+    "crates/mere/src/coupling_edit.rs": "fc36087ac0ee8d178bf4e7a91cb79d96d2386da98550eb22528ace2b0bb6d711",
+    "crates/mere/src/gloss.rs": "ddda9d0cb582d2dd820a9ac1e9bda03af6b06c7224118e7605bed47359b54630",
+    "crates/mere/src/glossary.rs": "f3cd7e880fe39df362a8a381c451c4387a3c358f3d8cfccac3f00dcaa7b5ab1b",
+    "crates/mere/src/lib.rs": "e0dce1211b351d2aff313e11a356f85b04f01741a87cab18be2b75882a200201",
+    "crates/mere/src/query_view.rs": "54da421cb0ae921aff5bc4e29c11a44814761ab149b4afff0691b8a6bdf33a09",
+    "crates/mere/src/query_view/projection.rs": "3d23df66bd178bf0c2907dd359e5a6d120b283411ca62dfcdd01d3cf0b294e52",
+    "crates/mere/src/query_view/stroke.rs": "07f76ba16fb72808921b61b6af6c14fa366ef4a30b27ee3c072cc61483673b93",
+    "crates/mere/src/query_view/tests.rs": "2a6209fb85e4d360cad970b4abda9fc187bd6fc1ea11aaf6aab05e0d1cf05ef1",
+    "crates/mere/src/roster.rs": "c8a167f0e8343e88550293bba8977cb5503f25aed8d9ba3931a8fe277c57ecaf",
+    "crates/mere/src/routing.rs": "c2560fdbe9d7d84b0a8a4abc83fea9a3d4af39d34df57a2a0a8b926671bf0540",
+    "crates/mere/src/subgraph.rs": "b1f79b12d8a840777ada8514e5012ea7a04ac19a35b841443661a6b4aebfd3db",
+    "crates/mere/src/subgraph/classifier.rs": "5b02db0358827b9ef16a009edf90aadc59043aac723e8afb6d8424d51e440223",
+    "crates/mere/src/subgraph/query_tests.rs": "fe0288eb82c895d5de5d8ab8d4b66f79f71f7c588eeb17a8b58f3632d9271027",
+    "crates/mere/src/subgraph/saved.rs": "3497cba6e1abb1783f5ed274589d8d5926e85ef1b207a915467911d6a2e310d7",
+    "crates/mere/src/subgraph/tests.rs": "ac64321d293a8977581b0a0c2f487c0a1fbb0ae95bfed434d5853384324d29d2",
+    "crates/mere/src/trail.rs": "232d63814b659a95226e173a409f8ae8a57bdbcb2c2fa2379ec399c80cc3fd54"
+  },
+  "library_sha256": {
+    "mere": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libmere.rlib",
+      "sha256": "9fd68100035207e65ba4d92c1455d6b9c68e5fdb6a294e630d4bcb652d3fefac"
+    }
+  },
+  "library_build_command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "build",
+    "-p",
+    "mere",
+    "--no-default-features",
+    "--features",
+    "graph",
+    "--lib",
+    "--target-dir",
+    "C:\\t\\cargo-targets\\mere",
+    "--message-format=json"
+  ],
+  "library_build_exit": 0,
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\mere_facade_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "--extern",
+    "mere=C:\\t\\cargo-targets\\mere\\debug\\libmere.rlib",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-mere-facade-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "0c3bdb82b1cd0d56e59528c13853b439862b93378f0b418e362d55df4c9b7557",
+  "generated_output_removed": true,
+  "scope": "Three native public graph-only facade observations with controls: outline address collisions, equal-title relation bundle order, and corrupt subgraph sidecar replacement. No canvas, SPARQL/query, clip, workbench, renderer or product UI execution."
+}

@@ -1,0 +1,24 @@
+
+running 12 tests
+test cases::blocked_body_control_is_not_finished_and_is_released ... ok
+test cases::completed_body_control_is_finished ... ok
+test cases::distinct_transfer_ids_control_preserves_both_payloads ... ok
+test cases::independent_client_counters_collide_in_shared_server_registry ... separate client counter id collision returned second session payload for first id
+ok
+test cases::panic_in_server_survival_body_is_reported_finished ... ok
+test cases::source_session_purge_control_preserves_other_source ... ok
+test pending::tests::complete_consumes_the_callback ... ok
+test pending::tests::complete_unknown_id_returns_false ... ok
+test pending::tests::disconnect_fails_every_pending_caller ... ok
+test pending::tests::next_id_is_monotonic ... ok
+test pending::tests::register_after_disconnect_returns_a_closed_receiver ... ok
+test pending::tests::register_then_complete_delivers_to_receiver ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+thread '<unnamed>' (35524) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\remote_client_ownership_probe.rs:381:64:
+assertion `left == right` failed: synthetic wrong server result
+  left: 1
+ right: 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

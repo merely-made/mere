@@ -1,0 +1,176 @@
+{
+  "date_utc": "2026-10-17T12:06:56.376170+00:00",
+  "runner_sha256": "83ed991f1820c50e8294b1764d3dfbc718d64792763c139107832ef8f42316e9",
+  "selected_family": {
+    "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\gemot-d1280ffacb26c7cf\\lib-gemot.json",
+    "sha256": "2b203c2fbe1ec53d99f45d927fe2e7bb53ff249932648cea0756e935e748b00c"
+  },
+  "expected_identity_fingerprint": 14023560314955649026,
+  "observed": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-023a5abda454504a\\lib-personae",
+      "sha256": "d7d4bb1f7ba307e762c68c35008b918e802eb322b02bd29ed1f6f69cf163870f",
+      "value": 11020729179148811730,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-0aaecd56c8af526d\\lib-personae",
+      "sha256": "481fc12a935054140db96e431b24ca8215bc4b8eae6122800e4b88a3e3d0c7c5",
+      "value": 18230200697667347514,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-20c0fd32d092b120\\lib-personae",
+      "sha256": "3018713a9bd391ecf7e3f93ec2110c64a3042f98e11f441362d18ccb80d20548",
+      "value": 11260156198338094504,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-2b0f6cacb453c490\\lib-personae",
+      "sha256": "4d12c96195536ab5ad0e6b642c72c7a36611b3fd7fdf9dc878ca61d1bcc47a90",
+      "value": 16393081860439893135,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-2d75047e13a23e24\\lib-personae",
+      "sha256": "5a8ae22aece1d90b9a5ff6f54a2e113d9128cb4c6cdc87dc0058ba1900c5a577",
+      "value": 2120017546588784319,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-38f6c4984c4d601d\\lib-personae",
+      "sha256": "5234186d7c543c6555f4a3f05df3602f3fe54b3d75a9a98fd96293ef6895107c",
+      "value": 10783209973858505886,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-49e34565b120cf6a\\lib-personae",
+      "sha256": "494a4fe54ae39af9a967257902a283949a25d8354a214aff39787954d35dbe3d",
+      "value": 14593258832170604930,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-4d32012a2f546c85\\lib-personae",
+      "sha256": "ac3c65453c7e3ebb21d95a72acbbaf3028f3c3b625361043e42ae232bb29fc6e",
+      "value": 2157671439365550152,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-5bad7c5d448c0a41\\lib-personae",
+      "sha256": "7c42b145ea376a34e34291ee1e98355b99d3b56cf2a5c2039b4806fc109fa3f5",
+      "value": 4146786033310452647,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-6585db5ce29cfbf6\\lib-personae",
+      "sha256": "cc0041945b4d53b18a84d925240ff68b57a9ecc56c8dbb86c807f78866b85704",
+      "value": 1226915586154852750,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-6c0d6ad986e5c676\\lib-personae",
+      "sha256": "dd0beb045bfccd73bdcdfdf524d3d82caf9e9d17c4899fd56cf17403de1eaaf4",
+      "value": 17625556992446773609,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-6cb1ffc238dd1384\\lib-personae",
+      "sha256": "6f4d4bb4b232785cf76c9e7969f6d124aa1cc310bd9bd532eb4d8d3aaca7a80f",
+      "value": 10000112308285463466,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-762ed3706437a3c9\\lib-personae",
+      "sha256": "564799a7be092eb04438cf8a1511c9bd7ff83475b83b3702c15980b939bf0abe",
+      "value": 17782036341175585965,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-8166aa3a83fe75a7\\lib-personae",
+      "sha256": "7adfa5b0dcd51b6c047baa8e2518c6f49766480a5f0d33c5140adbd3f59c50cf",
+      "value": 10180798696243154202,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-86849faa47ba06bf\\lib-personae",
+      "sha256": "7f3bc007ac9fab6dd09124717d89d8b7f11db03c88d1f0d3f087c644290a9643",
+      "value": 9039931951393250448,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-8ad823f41a51becb\\lib-personae",
+      "sha256": "d095aca48cf21262cc28b9dd7e43001832d5a9de6e931e754af858f51b0df3ab",
+      "value": 11173022938347399631,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-a06677621946faa6\\lib-personae",
+      "sha256": "d0ce94955d63137e0e9ef322b5e6b41ef82f99e85c2e3ee53c8e636547d18eed",
+      "value": 16062832940907740441,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-a90af31a9153f6bd\\lib-personae",
+      "sha256": "fafaad7ee6a92d2a0f53c3310394909c5c293360b13b6b3b879180932b0b8a9a",
+      "value": 12251525151639258228,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-be711869a2628b3f\\lib-personae",
+      "sha256": "1c7760554507042107423d24e33b51d4ac7ce97ff49e9128fb95570b28bce57f",
+      "value": 14163955059199364009,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-c80b6058f0557f50\\lib-personae",
+      "sha256": "ad7e6b7262e9ba6caa64ad9b7251e866040dafd4c45b15e74309145d0a37043a",
+      "value": 16216540750113277539,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-d17685badd0c8d2c\\lib-personae",
+      "sha256": "81ce7d01ddc4929ce8f249e943d398b517009211a91f19db8cdc1fa5edf44312",
+      "value": 13640299985628707818,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-d975a5ecfdec856f\\lib-personae",
+      "sha256": "7a8a09fd9d393ed9b2ee3c84b1b1d3b9e50c1251f2f62a6e86880e5e7ef3fd8a",
+      "value": 1676380994674481560,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-e0980d62bc86f692\\lib-personae",
+      "sha256": "b59183b68175aecc7a9e959b4f830c5fdb6b6dabb4f69e736a6e1e59e4dbbe0e",
+      "value": 3459611627727990854,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-f1799d9544d403b6\\lib-personae",
+      "sha256": "584110d2a3013896aa8aa3f859d1b7845d196aa0a95318c6c011612a9beddeb7",
+      "value": 8073483734741714606,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-f54a568a7a9e69bc\\lib-personae",
+      "sha256": "17bd0613ebaf3f62110566f0fd5652c6e642b73535f8683ac27e9171143f7aea",
+      "value": 14637349739336303244,
+      "artifact_exists": true
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-fe6900d3571fd14c\\lib-personae",
+      "sha256": "246707a02257005969df2f505ed3857dce910b8b8330c13535cdd3bbf0ceb5e1",
+      "value": 16797742887955128663,
+      "artifact_exists": false
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\.fingerprint\\personae-fec63da0bf1b9663\\lib-personae",
+      "sha256": "9b3fde4c5aa1a503d99d92cc64df250e002c79822444338e71ac65af364ae151",
+      "value": 970621717497844319,
+      "artifact_exists": false
+    }
+  ],
+  "executed_compilation": false,
+  "executed_checks": 0,
+  "qualification": "Initial bounded supplier selection stopped before rustc: the named d128 family had no matching current identity marker/artifact pair. A targeted inventory found two other complete ten-supplier families, so this is neither a Cargo build failure nor an unavailable diagnostic."
+}

@@ -1,0 +1,101 @@
+{
+  "date_utc": "2026-10-17T05:33:45.322960+00:00",
+  "source_sha256": {
+    "crates/eidetic/eidetic-core/src/typed.rs": "fc2989bdce0284ef3ade5632405de772c7dd682fc41e830c28541a3b2b47b243",
+    "crates/eidetic/eidetic-core/src/manifest.rs": "45a8efbbfd338c7f24fd0c1f0c358ef292610897508ca22c1009cb9ff8f65a35",
+    "crates/eidetic/eidetic-core/src/schema.rs": "9c1fa9307d8847cd11c3569092e4381ad06295977df8326a65d9c58c08844f41"
+  },
+  "libraries": {
+    "eidetic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+      "sha256": "e743e7b736c462a1cd45d01cc6e33c3a834cf6fd2648cdd86b469d3f24cd88e1",
+      "features": [
+        "default",
+        "json-schema",
+        "pack-signing"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/eidetic/eidetic-core#eidetic@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\eidetic\\eidetic-core\\src\\lib.rs"
+    },
+    "pollster": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+      "sha256": "58d7c143682aaad275af4e6de898b1f7d7a2449bd6044bc309d19247b011a6a1",
+      "features": [],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#pollster@0.4.0",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pollster-0.4.0\\src\\lib.rs"
+    },
+    "serde": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+      "sha256": "c23f7d7dd7ff77ed4a3d498dee89b3cbe2761bf4451a9267fef43b80102b7d7f",
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229",
+      "target_source": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.229\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\typed_identity_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-typed-identity-probe.exe",
+    "--extern",
+    "eidetic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libeidetic-0f8556c7cc5322ce.rlib",
+    "--extern",
+    "pollster=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpollster-5fd711b1c29af1c6.rlib",
+    "--extern",
+    "serde=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libserde-319fad388f9668c8.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\onig_sys-cea06882f8697f24\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "8d794494beac9ae258ac2c713f894dcc5e568c9fa9726ced029d920362bb3a86",
+  "test_exit": 0,
+  "tests": 3,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-typed-identity-probe.exe",
+      "bytes": 1846272,
+      "sha256": "8d794494beac9ae258ac2c713f894dcc5e568c9fa9726ced029d920362bb3a86"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-typed-identity-probe.pdb",
+      "bytes": 46985216,
+      "sha256": "741e591bf8cd8cc14641fa0f475276dd0fde2fa6cf2ecec74bb35e4fda2c56bc"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Actual public Eidetic save/load APIs with synthetic in-memory typed payloads. Two schema types deliberately serialize identical valid JSON; replacement privacy/provenance is an explicitly requested second save, not an unauthorized disclosure. Different-byte control retains both schemas. Reuses exact premerge compiled library artifacts; reviewed Eidetic sources unchanged through merge. No installed store, cryptography, networking or real private data."
+}

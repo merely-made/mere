@@ -1,0 +1,10 @@
+{
+  "command": "python -X utf8 support/receipts/authority-success-audit/record_stickleback_completion_review.py",
+  "exit": 1,
+  "error": "AssertionError: head == old[basis_commit] failed before any report or notes mutation",
+  "runner_path": "record_stickleback_completion_review_initial.py",
+  "runner_sha256": "03dcafe1b1bc535bd77b58c19aff692feac4596ae02ad5714b2fc5f88f067748",
+  "observed_head": "7c71810550234ccbe11f7429cd44e369b279ec06",
+  "old_basis": "609b0a60373bdb54cd899254397bb061096a3221",
+  "report_matches_old_hash": true
+}

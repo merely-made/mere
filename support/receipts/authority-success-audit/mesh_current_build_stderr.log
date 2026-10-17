@@ -1,0 +1,37 @@
+   Compiling socket2 v0.6.5
+   Compiling windows-sys v0.52.0
+   Compiling tokio v1.53.2
+   Compiling noq-udp v1.3.0
+   Compiling ipconfig v0.3.4
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling tokio-util v0.7.19
+   Compiling tokio-rustls v0.26.6
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling backon v1.6.0
+   Compiling acto v0.8.2
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling ractor v0.16.5
+   Compiling swarm-discovery v0.6.4
+   Compiling tower-http v0.6.11
+   Compiling n0-future v0.3.2
+   Compiling tokio-stream v0.1.19
+   Compiling tokio-websockets v0.13.3
+   Compiling n0-watcher v1.0.0
+   Compiling hyper-util v0.1.20
+   Compiling netwatch v0.19.3
+   Compiling noq v1.3.0
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling irpc v0.17.0
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.13.5
+   Compiling n0-dns-resolver v0.1.0
+   Compiling iroh-dns v1.3.0
+   Compiling iroh-relay v1.3.0
+   Compiling iroh v1.3.0
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling iroh-gossip v0.101.0
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling mere-mesh v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\mesh\mesh)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 50.09s

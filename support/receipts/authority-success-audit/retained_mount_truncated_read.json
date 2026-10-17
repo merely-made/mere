@@ -1,0 +1,11 @@
+{
+  "unacknowledged_read": [
+    {
+      "path": "crates/cambium/cambium/src/retained_mount.rs",
+      "sha256": "f17db3957b7b33d7f55ce3c648eff20137a185a4b87176ecd5e0a6bc1a403c48",
+      "start": 0,
+      "end": 25998
+    }
+  ],
+  "reason": "Tool output budget truncated the emission; no source coverage credited. Discarded pending marker to re-emit smaller chunks."
+}

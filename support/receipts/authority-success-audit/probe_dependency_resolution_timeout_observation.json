@@ -1,0 +1,39 @@
+{
+  "date_utc": "2026-10-17T12:35:06.448357+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "kind": "qualification of preserved shallow result and terminal metadata timeout; no retry",
+  "prior_path_observation": {
+    "path": "probe_dependency_paths_receipt.json",
+    "sha256": "9d115eb3af276a61465ccbc0223609e84b37ef51ba899c36656c441bc7655aee"
+  },
+  "shallow_result": "cargo metadata --offline --locked --no-deps exited0. The original runner then failed its incorrect assertion expecting nonzero. This does not resolve dependencies or prove buildability.",
+  "full_resolution_attempt": {
+    "runner": "resolve_probe_dependency_paths.py",
+    "runner_sha256": "bdc3ae0129ed8e592e47a4cfba33696ef21e4e5ccf2cfb540f6a3fa831844af7",
+    "command": [
+      "cargo",
+      "metadata",
+      "--offline",
+      "--locked",
+      "--format-version",
+      "1",
+      "--manifest-path",
+      "crates/probes/wing-three-paths/Cargo.toml"
+    ],
+    "observed_terminal_result": "Python subprocess.TimeoutExpired after30seconds; unified execution session58060 terminal exit1. No Cargo resolver exit result, full-resolution receipt or output log was obtained.",
+    "qualification": "This records the terminal tool observation, not captured Cargo stderr or a reproduced compile failure. No cause of the timeout is established."
+  },
+  "current_parent_config": {
+    "path": "C:\\Users\\mark_\\Code\\.cargo\\config.toml",
+    "sha256": "02ae1382ba5aa713200b1e4bf5636f9a03c7c586cc8514a7bf9e2469e4070b84",
+    "observation": "comments only, no active parent paths override"
+  },
+  "source_sha256": {
+    "crates/probes/pack-distribution/Cargo.toml": "c353265de088d082a9002629e30b79562e2037d4eccb64bf6ebc5f4a83deadf7",
+    "crates/probes/wing-three-paths/Cargo.toml": "7fcb7b8c1e9234089e699bcc4c3f1f7c23050362184b85ca545498f0fee93f88",
+    ".cargo/config.toml": "520d074f2ae865a3a2146e4f31cb1229f97c58b4e2a2e17a0e2eea5c634ec3f3"
+  },
+  "probe_lock_sha256": "1bd04a46f491174c1f8c05ca4999c33f9dde68d3866e1ae9c757aa3d845a2747",
+  "process_observation": "Win32 process inventory after terminal timeout found no cargo/rustup/rustc command matching metadata or wing-three-paths. No owned resolver remains live.",
+  "conclusion": "Three literal nested Mesocosm manifests are absent. Full Cargo dependency resolution remains unverified. The first receipt buildability wording is overstrong and superseded by this qualification. Do not count an established build failure or rendering defect."
+}

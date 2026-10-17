@@ -1,0 +1,14 @@
+
+running 9 tests
+test fold::tests::a_member_stand_in_counts_the_others ... ok
+test fold::tests::a_saved_version_one_record_migrates_on_load ... ok
+test fold::tests::a_selection_canonicalizes_its_members ... ok
+test fold::tests::invalid_records_are_refused ... ok
+test fold::tests::invalid_saved_members_are_refused_before_and_after_migration ... ok
+test fold::tests::unknown_or_mixed_versions_are_refused ... ok
+test fold::tests::version_two_round_trips_with_its_wire_pinned ... ok
+test saved_query_tests::sparql_spec_has_portable_query_and_explicit_member_column ... ok
+test tests::a_spec_reads_and_writes_the_shape_forme_wrote ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

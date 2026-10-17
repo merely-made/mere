@@ -1,0 +1,54 @@
+{
+  "date_utc": "2026-10-17T20:35:30.520684+00:00",
+  "exit": 0,
+  "passed": 13,
+  "original_registry_tests": 6,
+  "new_layout_cases": 4,
+  "new_range_cases": 3,
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\retained_burn_layout_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-retained-burn-layout.exe"
+  ],
+  "source_sha256": {
+    "support/patches/burn-cubecl/src/kernel/conv/im2col.rs": "951d1a4e4075279da120a98488b48230cd46b2b95854383f15e63fafbc65f89e",
+    "support/patches/burn-cubecl/src/kernel/conv/conv_transpose2d/transpose_direct.rs": "f41c2932804a2b98cb1bd5a0677b38c056f2cf18576a1964429c23e819fae237",
+    "support/patches/burn-cubecl/src/fusion/registry.rs": "e7d0a2d3a5e28e4c4504f6489165b45e09aa21267e6d81d4d9935e4e26eafbf8"
+  },
+  "root_selection_input_sha256": {
+    "Cargo.toml": "c4a3383706668b00b339ee0e639025a32e8a6189249ec9f80459b015852ba115",
+    "Cargo.lock": "38507a9d09afbe7601b569190302aa3aacb7d4f0b41cbfe77c9c3c4ac86c0793"
+  },
+  "extracted_body_sha256": {
+    "is_spatial_contiguous": "70bedbdb2ed27e55d60f3ee0372246d923f028563071759db8dc63829cab348d",
+    "registry_error": "e71418bba8c4e5a913f4d565d97441906bb8d801444a688ed989b954359de82c",
+    "registry_core_and_original_tests": "8ac57fc00f4c4c0e7248546567bd1ba75c4b9e9edf56554bddbc86ffd05e2a12",
+    "direct_transpose_range_arithmetic": "ffa97099a4adf5185af440b3fe45c50d8ab56279c38f914c78f7cb2b9f5b4873"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-burn-layout.exe",
+      "bytes": 789504,
+      "sha256": "28dcb9734f4fe27b3e010c7687b101679b47ab9155d6b95de9214472982e5eb0"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-burn-layout.pdb",
+      "bytes": 3051520,
+      "sha256": "272a4c583aabf4a020ab18252ef3b9e8c0d17396278a820598e10abe18797a5f"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_retained_burn_layout_probe.py": "9acdd4783fb350ed36c9e17145f9454ab14effc1d7827dbed08adcbea2ad18f3",
+    "retained_burn_layout_probe.rs": "8629f43f4d8982863de1fbf821112ae67d24463326f1aa2f3a13f0755d24570f",
+    "retained_burn_layout_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained_burn_layout_run.txt": "79f20ff396fd1589d6e24f59979a959382c275a241e171c8196fa5874c97ed4d",
+    "retained_burn_root_selection.json": "c907133ecd08e33af48b6d8d392b393e52a264899e23bfcfa22afb2e804a5a3e"
+  },
+  "qualification": "Retained burn-cubecl copy is not root-selected; root uses registry0.22.0, retained manifest0.22.0-pre.4.13 CPU tests:6 unchanged original type-erased registry core tests;4 actual layout predicate cases with independently enumerated source/flattened addresses;3 exact extracted direct-transpose integer-range blocks using scalar arg/input/clamp doubles. No CubeCL macro expansion, shader/backend build, actual GPU/tensor convolution or current registry backend failure claimed. Two exact owned exe/PDB removed."
+}

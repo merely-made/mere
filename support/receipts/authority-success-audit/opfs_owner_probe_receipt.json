@@ -1,0 +1,98 @@
+{
+  "date_utc": "2026-10-17T19:43:45.609162+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-opfs-runtime\\Cargo.toml",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "--lib",
+    "--tests",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "source_sha256": {
+    "ports/muniment-opfs-probe/src/churn.rs": "6ce44973b18db6c0bc7b42e8d17ffc6fcdf243fb8ef56f192d35a6f04730cc9e",
+    "ports/muniment-opfs-probe/src/fault.rs": "c6f894040b1455d5c55be1b6ff29c93576c6a8f475f5dc17a828e13634f1d51c",
+    "ports/muniment-opfs-probe/src/idb_keys.rs": "b954fba7badc7225b95621438846922995ba8c5377a80e783990afee9b97a090",
+    "ports/muniment-opfs-probe/src/indexeddb_range.rs": "acc1e9868c45a266c6d4b1769c3137c25f3c56b23c15f92c04a6c1b70e0b99ee",
+    "ports/muniment-opfs-probe/src/lib.rs": "932c1368f4bd022f630b4ddd21724a240f251afe383b44fe8e67223cc770e1a4",
+    "ports/muniment-opfs-probe/src/opfs_backend.rs": "70094f4ef7292883e9225d26a48c26a842801feeb5e181a178cef314e204d7e0",
+    "ports/muniment-opfs-probe/src/redb_backend.rs": "87cd81b87e7a2e6394e4360db6774d5ff95709bfe91f6e2c754f241dd5a5b26f",
+    "ports/muniment-opfs-probe/src/worker.rs": "95b8290294ea3ec43916d7d72804af321cdacd7a2c2625f724fbaa7ac1942448",
+    "ports/muniment-opfs-probe/src/workload.rs": "44164ae51380858def57252e40476fcbb0bba651d092df4b4c13ceaf3ff5c399",
+    "ports/muniment-opfs-probe/src/bin/fixture.rs": "eee5ff92b07c31f91d65bd4798ab90a2b668d1e28d13bff34704f1db9917759b",
+    "crates/eidetic/muniment/src/backend.rs": "f39440cb96ebc922ba182300c7e9c65420f730c6b58fe7b611882fc569da806d",
+    "crates/eidetic/muniment/src/blob.rs": "4b16e4c4aff72c4d6396d2fff916dd655800d362108f523a19adcbeaf95e09c6",
+    "crates/eidetic/muniment/src/codec.rs": "bc76550275429d4905411116a8db082bbed92b6399c2579204d7046dc023d7a5",
+    "crates/eidetic/muniment/src/custody_transact_tests.rs": "828373a4ca8df1b9cede038be9b8c4ba4edff110c4d036ac19bfdcdccb654819",
+    "crates/eidetic/muniment/src/directory_backend.rs": "1e46c53ccc68baa32e14dffab8b3880bb86a5f38e2d066fc9a56a8bb445a62c2",
+    "crates/eidetic/muniment/src/error.rs": "321d0d1effa378f2ebcf9629258c8ac15acd909072703fce62c373c3e654d8b9",
+    "crates/eidetic/muniment/src/fjall_backend.rs": "24e8a907259973f255b757cfb17754ef69a1a21bb024c212bf20fbefd6444ae8",
+    "crates/eidetic/muniment/src/indexeddb_backend.rs": "428de2fb4ec0ba46b566e751d0cda368fabeff3d4eb526ae9bf562f8080d0918",
+    "crates/eidetic/muniment/src/lib.rs": "f2858a64d2cc351e43374a712545ed409c3ecce1c159e1021a61498a61794021",
+    "crates/eidetic/muniment/src/redb_backend.rs": "abd53da533d568adff21668c797b5918fc118a864b5685e67a6bd8b314a5d49d",
+    "crates/eidetic/muniment/src/slot.rs": "de93fce74acbb642ccc8b49c1d5ae9d60fde9996951257375ad8109196b57ece",
+    "crates/eidetic/muniment/src/zip_backend.rs": "f08a57ba84d06d44f9e4603c16a32598c70c815a8fbee5647a92583c7ea26c26",
+    "crates/eidetic/muniment/src/journal/causal.rs": "8375f1cb4eb90dfe95a77521a6bde509355eb00016c1c70b56de6fe776930e35",
+    "crates/eidetic/muniment/src/journal/entries.rs": "53fe0b62b97c50621fff71d139fc33b0f370c439787dd2e56b1bb2fa2e26ce6b",
+    "crates/eidetic/muniment/src/journal/fork.rs": "5b9d49e571f5d2fc0a9ad25af6322d85f71f17de01b7a09e228d34a600e3b46c",
+    "crates/eidetic/muniment/src/journal/log.rs": "6e55950f06f66f9ce93d86c27b7298b46319630bf84756ebb70222aadf871959",
+    "crates/eidetic/muniment/src/journal/mod.rs": "f0cbe4a634ef990a7799263476d9fec6bb8a6709da84765237618e13ccf36e14",
+    "crates/eidetic/muniment/src/journal/persist.rs": "508396efed748761a4f01fcd564399ffb77613f739aae2f82a6c022cea24b69c",
+    "crates/eidetic/muniment/src/journal/seq.rs": "a316438074569859bb28d54b5a1c579815c1a11cde9718e9d1af70566a8d7808",
+    "ports/muniment-opfs-probe/Cargo.toml": "f30e8f096c0586263442550cecf58f8f27c9a4605101f77085c78ad201ec3116"
+  },
+  "results": [
+    {
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "passed": 19,
+  "original_tests": 17,
+  "audit_tests": 2,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\muniment_opfs_probe-a9de082df269d784.exe",
+      "bytes": 4024320,
+      "sha256": "9862c210bc0d6817fbf4d811be65ecff862375485d53be8124ccf56ad8381405"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\muniment_opfs_probe-a9de082df269d784.pdb",
+      "bytes": 5541888,
+      "sha256": "5445c7c6c91bb9ebbfa95ba3a4598cd6d3176cb3a8b0632c9c25cde438a4deca"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\opfs_audit_contracts-dfb12c5bdca02976.exe",
+      "bytes": 1041408,
+      "sha256": "d1b44a5ddc70e2edf9c180bf81eb8839d2cd220312ab175562b633b5492afd75"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\opfs_audit_contracts-dfb12c5bdca02976.pdb",
+      "bytes": 3313664,
+      "sha256": "0d35718d77135a2113fc92b058e9345476e970bac2e956c24665aa0bfee6f339"
+    }
+  ],
+  "retained_isolation": [],
+  "evidence_sha256": {
+    "run_opfs_owner_probe.py": "7597d04e27fae2ec84450b273132380deade66ce1589b35a6abebae3ac70a4b5",
+    "opfs_owner_probe.rs": "f549a5c091f2680092d7eadb813dc6c8260783ed9b3b025f182a940c3929aee4",
+    "opfs_owner_probe_output.log": "39f1c9807b2bc2d75be04f16ca617c4c4a22b832cffea519bc1c00b24c9aa38f",
+    "cpu-opfs-runtime/Cargo.toml": "c2ffa4b30cc89f2a19171ae85ccf38fdffb1f508aa3c970caf4fb481b068c1a3",
+    "cpu-opfs-runtime/Cargo.lock": "803eb18f5a054fd6de7448bfa902a1c56da2b8ef3bf043899cdaa7613d29ac92"
+  },
+  "qualification": "Actual unchanged OPFS probe lib.rs native root, actual local Muniment and exact redb4.2. Full original native unit suite and two audit CPU cases. Fault backend SharedMemory receives actual bytes; digest anomaly uses an explicitly defective supplied Backend with real MemoryBackend control. No browser, OPFS sync handle, IndexedDB, real worker kill, power loss, promotion, network, native portability fixture or production storage execution. Stable shared target/build-dir; exact completed run exe/PDB outputs removed."
+}

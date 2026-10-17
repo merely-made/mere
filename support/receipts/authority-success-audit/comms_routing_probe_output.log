@@ -1,0 +1,2 @@
+PASS inbox lists second same-protocol adapter but read/send return NotFound; reversing registration makes it reachable
+PASS selecting second owner's colliding conversation ID reads and fake-sends through the first owner

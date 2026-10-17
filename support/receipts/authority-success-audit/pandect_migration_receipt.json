@@ -1,0 +1,12 @@
+{
+  "commit": "cd277dedd7e782336bff2ec68bdd05c968130a3e",
+  "exit_code": 0,
+  "result": "2 migration defects reproduced with controlled storage/file-operation refusal",
+  "reproduction_sha256": "8750dce6234ea09e4626c11debc56e9847cbf0abfc68ec614a194c14bd238686",
+  "output_file": "pandect_migration_output.txt",
+  "scope": "Identity interruption test uses a Windows file handle denying replacement of a fixture obstacle. The initial unlocked obstacle was replaced by rename and did not inject a failure; initial exploratory output retained. Image test uses a refusing Backend and then a healthy retry.",
+  "affected_sources": {
+    "crates/system/pandect/src/shared_root.rs": "46cf8242cbf1c34dd880967ce33d4b65df28d7ddea037a6f4b0ab318a3ea0942",
+    "crates/system/pandect/src/image_store.rs": "1e99f2fa3fa6e8f7fe42e6d112d5b11fd58180282b1641ffa4ed9cb9d5bdeacb"
+  }
+}

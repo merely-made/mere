@@ -1,0 +1,49 @@
+{
+  "date_utc": "2026-10-17T21:53:56.683813+00:00",
+  "passed": 17,
+  "exit": 0,
+  "source_sha256": {
+    "support/patches/cubek-reduce/src/lib.rs": "84064c8f93a98507381b5396a8da1d11f94265d50498a87d0f4031b5a4709ebf",
+    "support/patches/cubek-reduce/src/components/instructions/base.rs": "b98875b5ba9ffb7dce03f220224b290a792ab4498a3192c23cb2d9a599067332",
+    "support/patches/cubek-reduce/src/components/instructions/topk.rs": "729ad381db2cd8919037957fb6a3d0cf9f6796b9da251dad934d9a083f4bc94f",
+    "support/patches/cubek-reduce/src/routines/unit.rs": "74f6367044091f437a4820ae5726f1ca2f912baf68db45157f8cda40e9e88e75",
+    "support/patches/cubek-reduce/src/routines/cube.rs": "6cca24ea46040802772dde01a79451f1e28a6fdaee4ef0118ee1265e11f57d9e"
+  },
+  "extracted_fragment_sha256": {
+    "validate_axis": "6eeac43ada3b247edb4cbb1c395d7f28bb6053af5c13ec4004f52d58651f798c",
+    "validate_shapes": "5eeeb0a1ce23dd567f04982d7e1d40e8a92c9180d7967e3d9542fe06c456f1aa",
+    "reaches": "bf886520cbabc5a2a1ff15c9c80b3bce938568c927a609d74f47cb8852f59a31",
+    "topk_insert": "8eab819c7002e56551b3b8ba5c644535f42925b6f4dd12412bddc4590cbae05c",
+    "unit_guard": "896c66296b8e9f9c3699aea538abb056fa3c9aed6570c004d2221e83d452248f",
+    "cube_guard": "361383e66d8cf5453e0a050181ffbcc47355260d591e6140848a0d41bca9bab0"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\reduce_contract_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-reduce-contract.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-reduce-contract.exe",
+      "bytes": 795648,
+      "sha256": "f5d59d51e7c821d6c39df82daed57218d8ec0f3a107a6bc4ec1b29f9e4f90d09"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-reduce-contract.pdb",
+      "bytes": 3051520,
+      "sha256": "6c0bde88bc730bfd2ffcdd542169bce7575bec2cce76239b5dae943cb205a850"
+    }
+  ],
+  "evidence_sha256": {
+    "run_reduce_contract_probe.py": "784e9e8d2c8d49c381a5892c6f961f904fc8fd48683549c132e82bd649ef50d9",
+    "reduce_contract_probe.rs": "268d46445e4aa55b6013473ae58da7e0aecaf4dd2c0cf1e83c73af9cf1071a91",
+    "reduce_contract_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reduce_contract_run.txt": "ec161ff9f0af9c2043e97830620a202b7af9a02986e04073a536d9b2ab5f0e0c"
+  },
+  "qualification": "Exact two host validation functions, exact forced-unit and forced-cube branch predicates with explicit launch/blueprint doubles. Top-k exact reaches + whole topk_insert with Cube attributes removed and one-component vector/Value/Array doubles; initialization explicitly copies finite f32::MIN seed. Tests pin CPU control flow only. No Cube DSL expansion, real hardware selection, generated kernel, public Client call, synchronization, actual GPU result or crate suite executed. NaN case exposes ordering difference, not a settled TopK NaN contract. Owned EXE/PDB removed."
+}

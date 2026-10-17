@@ -1,0 +1,10 @@
+
+running 5 tests
+test cases::nonzero_dimensions_reach_dispatch_marker ... ok
+test cases::zero_columns_control_has_empty_output ... ok
+test cases::zero_inner_dimension_leaves_supplied_nonempty_output_unchanged ... ok
+test cases::zero_inner_dimension_returns_allocator_double_without_initializing ... ok
+test cases::zero_rows_control_has_empty_output ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

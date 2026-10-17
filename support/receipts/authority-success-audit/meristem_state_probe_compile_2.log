@@ -1,0 +1,21 @@
+error[E0080]: index out of bounds: the length is 1 but the index is 1
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\meristem_count_const_probe.rs:2:22
+   |
+ 2 | const COUNT: Count = Count::combine([Count::One]);
+   |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `COUNT` failed inside this call
+   |
+note: inside `Count::combine::<1>`
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\meristem\src\view_sequence.rs:40:19
+   |
+40 |             match vals[idx] {
+   |                   ^^^^^^^^^ the failure occurred here
+
+note: erroneous constant encountered
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\meristem_count_const_probe.rs:3:21
+  |
+3 | fn main() { let _ = COUNT; }
+  |                     ^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0080`.

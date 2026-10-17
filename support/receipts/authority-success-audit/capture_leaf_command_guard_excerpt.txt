@@ -1,0 +1,13 @@
+C:\Users\mark_\Code\repos\mere\ports\graphshell\src\web_tree\commands.rs
+sha256 e2b20f8d15cb01be1419f60f617bc6542d7ccbc97c4cfc44fa43abf8b9652fef
+
+fn run(page: &mut TreePage, id: &str) {
+    // Re-read current capabilities instead of trusting a row from a prior frame.
+    let set = catalog(page);
+    let Some(command) = set.get(id) else {
+        return;
+    };
+    if let Some(reason) = &command.disabled_reason {
+        page.commands.last = reason.clone();
+        return;
+    }

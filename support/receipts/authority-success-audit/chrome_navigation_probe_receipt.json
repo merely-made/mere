@@ -1,0 +1,84 @@
+{
+  "date_utc": "2026-10-17T12:54:15.722945+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/shell/chrome/src/nav.rs": "dfbd5706a08c353fa8a80790d0e1a35b2793436829b007aac739ee9573978728",
+    "crates/shell/chrome/src/omnibar.rs": "13928cd0b75a1effe37f6f877737c8b967860dac27b5b62d23214f0b539b5a53",
+    "crates/shell/chrome/src/suggest.rs": "895a8279f4021193555c9d1a699638ebe8858d5f278e60ee48b81b17303e0c8e"
+  },
+  "libraries": {
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-698082ec7ae12c18.rlib",
+      "sha256": "c85bb662ae7384f7e816278c925802681eabb3bce380fcefebb5355e9c5cc8c1",
+      "scope": "cached fixtures dependency imported by original unit sources; no fresh kernel build claim"
+    },
+    "url": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\liburl-56ed62d386b7887c.rlib",
+      "sha256": "fc1a2726a794ad3e6063afe1e633086e597f29942030fd4a73da575332c6ea68",
+      "features": [
+        "default",
+        "std"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#url@2.5.8"
+    }
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\chrome_navigation_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-e67583dbaa874146\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-614b68a2d23fb37e\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\zstd-sys-efbddcad13311a5c\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib",
+    "--extern",
+    "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-698082ec7ae12c18.rlib",
+    "--extern",
+    "url=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\liburl-56ed62d386b7887c.rlib",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-chrome-navigation.exe"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 34,
+  "original_tests": 32,
+  "audit_cases": 2,
+  "runner_sha256": "69a2254de15fd7bef6c1805fdc9755a9972ae57e3dffc706aab3be9e5a496458",
+  "probe_sha256": "5fbf724dfe82c511b1ff56ccacad2e198bab843705a6e7631d3b22fc915205f6",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-chrome-navigation.exe",
+      "bytes": 1690112,
+      "sha256": "8be197825e027a14cb1c0b8e8c1bd0c53d7ef58c05d7f6e3fc85e49c78c60497"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-chrome-navigation.pdb",
+      "bytes": 54284288,
+      "sha256": "8fa983093b6c68795cbe970b3f4962d7e7eda468b7ba67f54ea0064da01f8ad2"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Three complete unchanged modules nav/omnibar/suggest compiled together over two exact retained kernel/url suppliers. Their original module tests plus two audit cases exercise pure CPU classification and resolution. This is not the complete Chrome crate/unit suite, a fresh Cargo graph, a browser or live host/provider request. The suggestion helper explicitly produces DuckDuckGo/default-sigil rows today; the cases establish that its public shared match input ignores other provider tags and that custom classification settings cannot reach this suggestion API."
+}

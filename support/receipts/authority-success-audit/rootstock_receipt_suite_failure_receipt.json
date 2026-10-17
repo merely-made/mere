@@ -1,0 +1,19 @@
+{
+  "date_utc": "2026-10-17T09:06:10.108768+00:00",
+  "build_exits": [
+    0,
+    0,
+    1
+  ],
+  "run_exit": null,
+  "tests_run": 0,
+  "reason": "Audit harness filename mismatch: runner requested rootstock_receipt_suite_probe.rs but author created rootstock_receipt_suite.rs. Source suites were not compiled or run. Finally cleanup removed both fresh rlibs. No test result or missing-source probe hash is retroactively claimed.",
+  "evidence_sha256": {
+    "run_rootstock_receipt_suite.py": "3f5c569d90836dde94fbd88915171f45bc66099acde3a471956f702bf1c37976",
+    "rootstock_receipt_suite.rs": "7dbbca79c7ed1ba20e5160c2f1982c8d03abb8645140c44160310b759f0caea0",
+    "rootstock_receipt_suite_probe_compile_0.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rootstock_receipt_suite_probe_compile_1.log": "1269f16612a2665337ebae735f28b7946dd4c86271ef461fdafdb30a20fcb1d2",
+    "rootstock_receipt_suite_probe_compile_2.log": "46acf04be520fbc8c9fc095cafeb1f717c5624878545c22a5e2a0be4eb52081b"
+  },
+  "generated_output_removed": true
+}

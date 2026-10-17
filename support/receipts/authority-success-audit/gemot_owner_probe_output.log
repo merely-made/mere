@@ -1,0 +1,4 @@
+PASS distinct_version_control
+PASS same_version_conflict: effective citation names new artifact; projected artifact is old
+PASS self_elected_aggregate: stranger chooses electorate and self-endorses; adopted snapshot despite zero members
+PASS pending_quorum_observation: aggregate amend returns Ok with unchanged accepted law

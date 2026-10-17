@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling mere-mesh v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\mesh\mesh)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.48s
+     Running tests\lease_receipts.rs (C:/t/cargo-targets/mere/build\debug\deps\lease_receipts-93d0f939ae8aba97.exe)
+
+running 3 tests
+test owner_revoke_and_heartbeat_silence_are_distinguishable_histories ... ok
+test lease_facts_fold_identically_in_every_order ... ok
+test owner_reclaim_hands_the_job_to_a_second_worker ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

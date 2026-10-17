@@ -1,0 +1,9 @@
+
+running 2 tests
+test edgeless_spectral_disclosure_is_the_uniterated_start_not_missing_structure ... Three edgeless nodes disclose finite nonzero coordinates identical at0 and200 iterations; registry caches them once. Empty/single-node controls return the promised empty map. Resource degree control succeeds.
+ok
+test empty_affinity_restarts_a_paused_backend_on_every_unchanged_frame ... Empty authoritative affinity kept budget=180 after400 unchanged CPU frames; clock advanced to6.666667014360428 while paused. Disabled control stayed idle; turning affinity off allowed the remaining budget to drain.
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+

@@ -1,0 +1,13 @@
+warning: method `limit_bytes` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\resolved_image_cache.rs:118:19
+    |
+ 43 | impl ResolvedImageCache {
+    | ----------------------- method in this implementation
+...
+118 |     pub(crate) fn limit_bytes(&self) -> usize {
+    |                   ^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

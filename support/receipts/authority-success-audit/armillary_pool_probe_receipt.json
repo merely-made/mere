@@ -1,0 +1,22 @@
+{
+  "test_exit": 0,
+  "tests": 2,
+  "harness_sha256": "ab2e0d609fe0e685c3896f61d0e7b34f867f2da807a09ff3b096e8e1bc7e1974",
+  "source_sha256": {
+    "crates/armillary/src/pool.rs": "37f631b2760ebe01f123075da1e2ef5e1ebc95516e64b36897a1bf93290ceedb"
+  },
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\armillary_pool_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-armillary-pool-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "772c0e335aa0a961a97937d3d61614673b2ae8399e51d46bd3f56bb9b17dfcf0",
+  "generated_output_removed": true,
+  "scope": "Public Pool.submit with long-lived jobs; bounded attempts to observe idle-worker starvation and a busy-worker control. Both jobs released and finished each attempt. Original package tests are filtered out. No product host, shutdown or panic execution."
+}

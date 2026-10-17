@@ -1,0 +1,129 @@
+{
+  "date_utc": "2026-10-17T01:12:41.041746+00:00",
+  "tests": 5,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/system/content-contract/Cargo.toml": "0fa34a79051c1b5edc26a8faa1eea0dd7d6387efd8baccb92129c0d6ceadf40c",
+    "crates/system/content-contract/src/lib.rs": "1d4877e03d2cbd777d32324e318e1caf16f2050f4bad1c22c7f5a936dae3da6d",
+    "crates/system/framing/Cargo.toml": "1771940ea45db38331a414a9ee38648fa62c8d276e6afd2ee07964c12997eab5",
+    "crates/system/framing/src/lib.rs": "20575a051109866ed0a2e3a6bf2319fc59bc7a44074a89130c9044e5375808d5",
+    "crates/system/framing/src/tests.rs": "f58edf8e5c063e4b7b9307fd12aa9b3235d0ec7c233824761ebd0d13a503fe4c",
+    "crates/system/page-load/Cargo.toml": "551abe899723463c471b29df2dc3c3f67914216e91aa575ead15f29481b3af8d",
+    "crates/system/page-load/src/lib.rs": "bbb80ef9a26fb86fa9c76c96e99f603fbe329f26471277447380108c17aacbb6",
+    "crates/system/page-load/src/tests.rs": "263ef7dddca33f764885114ce44b00693885c722433f5ad385924b389bd5d6b7"
+  },
+  "libraries": {
+    "page_load": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpage_load-30d5277b20aed28a.rlib",
+      "sha256": "3ba7bb3dd82a7c0f2092be59404d36c6cb90135a24316838e4c3fdb41e62501a",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/page-load#mere-page-load@0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\page-load\\src\\lib.rs"
+    },
+    "framing": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libframing-b5cae62e26d75a30.rlib",
+      "sha256": "b698b33ea6ad04757272f1e8bf49ee618860f7c9a60966eee016a6754e6954bc",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/framing#mere-framing@0.0.2",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\framing\\src\\lib.rs"
+    },
+    "content_contract": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcontent_contract-cf349845da1ce805.rlib",
+      "sha256": "ff70cc50035a4d3d2fd39e983b8e0ad8c61ab753e673990f32970d6d19929f4b",
+      "features": [
+        "scripted"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/system/content-contract#0.0.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\content-contract\\src\\lib.rs"
+    },
+    "inker": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-576a07713d13229c.rlib",
+      "sha256": "8c299704ea8cae419b4d566002a92601e678c67ff0518313392d8be6ea890a7f",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/inker#0.1.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\inker\\inker\\src\\lib.rs"
+    },
+    "nematic": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnematic-00416a7e5baa09ad.rlib",
+      "sha256": "b9a121b5b657e22518155038e39617e4ef0973b1c5200b01b190aa66f4d07f08",
+      "features": [
+        "default",
+        "html-fragment"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/nematic/nematic#0.1.1",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\nematic\\nematic\\src\\lib.rs"
+    },
+    "netrender": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnetrender-f9e3b69be4572c3b.rlib",
+      "sha256": "4aa0cfc05873467cf21022d1f9640cb085731dbbc272e582180884476cd74bfe",
+      "features": [
+        "default",
+        "serde"
+      ],
+      "package_id": "git+https://github.com/merely-made/netrender.git?branch=main#netrender@0.1.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\netrender-a79f0762881dec01\\f4f9c0d\\netrender\\src\\lib.rs"
+    },
+    "document_canvas": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdocument_canvas-e1b9d14d3731937a.rlib",
+      "sha256": "824371113d9937d286976b2427bc0e23892dfc975dae29e82f1c3a714a484376",
+      "features": [
+        "default"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/inker/document-canvas#0.1.0",
+      "target_source": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\inker\\document-canvas\\src\\lib.rs"
+    },
+    "paint_list_render": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_render-0ba0c1f2957a8ebb.rlib",
+      "sha256": "b4f93294ed7ee2c5b445b2037d19551188476e3d20d06f5c12a8ae6b0ec0cd16",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/netrender.git?branch=main#paint_list_render@0.1.2",
+      "target_source": "C:\\Users\\mark_\\.cargo\\git\\checkouts\\netrender-a79f0762881dec01\\f4f9c0d\\paint_list_render\\src\\lib.rs"
+    }
+  },
+  "native_search_paths": [
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\load_contract_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-load-contract-probe.exe",
+    "--extern",
+    "page_load=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpage_load-30d5277b20aed28a.rlib",
+    "--extern",
+    "framing=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libframing-b5cae62e26d75a30.rlib",
+    "--extern",
+    "content_contract=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcontent_contract-cf349845da1ce805.rlib",
+    "--extern",
+    "inker=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinker-576a07713d13229c.rlib",
+    "--extern",
+    "nematic=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnematic-00416a7e5baa09ad.rlib",
+    "--extern",
+    "netrender=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnetrender-f9e3b69be4572c3b.rlib",
+    "--extern",
+    "document_canvas=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libdocument_canvas-e1b9d14d3731937a.rlib",
+    "--extern",
+    "paint_list_render=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpaint_list_render-0ba0c1f2957a8ebb.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\ring-0bcbe051a96c550a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "e4e075d71c6ddb48da466fb5d2ad1fca318ee6536f3ffa1778d8add57fe6c802",
+  "generated_output_removed": true,
+  "scope": "Five current Cargo-built CPU/API observations: three reproduced defects and two qualified contract limits. Actual engine policy/registry, document packet/paint-list/Scene transfer pipeline, public command/update decode and framing APIs. No network, browser worker, script, file/user persistence, UI frame or GPU; image comparison is source/replayed resource bytes, not rendered pixels."
+}

@@ -1,0 +1,133 @@
+{
+  "basis_commit": "7c71810550234ccbe11f7429cd44e369b279ec06",
+  "upstream_commit": "00e4442868ee1cb014364a81ccaed657b512b218",
+  "ahead": 0,
+  "behind": 8,
+  "integration_exit": 1,
+  "integration_error": "git merge --ff-only origin/main refused: local changes to design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md would be overwritten",
+  "changed_files": [
+    ".github/workflows/portable.yml",
+    ".github/workflows/rust-policy.yml",
+    "Cargo.lock",
+    "Cargo.toml",
+    "crates/cambium/cambium-rootstock/src/embedding.rs",
+    "crates/cambium/cambium-rootstock/src/embedding/egui_input.rs",
+    "crates/cambium/cambium-rootstock/src/embedding/iced_input.rs",
+    "crates/cambium/cambium-rootstock/src/embedding/tests.rs",
+    "crates/canvas/pictograph/src/canvas/scene_axes.rs",
+    "crates/canvas/pictograph/src/canvas/tests/bounded_scenes.rs",
+    "crates/script/app-host/guest/rust-toolchain.toml",
+    "crates/script/document-host/guest-bomb/rust-toolchain.toml",
+    "crates/script/document-host/guest/rust-toolchain.toml",
+    "crates/system/document-lanes/src/remote.rs",
+    "crates/system/document-lanes/src/session.rs",
+    "crates/system/document-lanes/src/smolweb.rs",
+    "crates/system/fetch/src/handle.rs",
+    "crates/system/fetch/src/handle_tests.rs",
+    "design_docs/2026-10-14_retained_document_resource_brief.md",
+    "design_docs/DOC_README.md",
+    "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
+    "design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
+    "design_docs/receipts/2026-10-17_remaining_three_adoption.json",
+    "ports/dramatis/package.py",
+    "ports/graphshell/src/local_intake.rs",
+    "ports/graphshell/src/local_intake/tests.rs",
+    "ports/graphshell/src/product.rs",
+    "ports/graphshell/src/retained_content/view.rs",
+    "ports/graphshell/src/web_tree/product.rs",
+    "ports/graphshell/web/Cargo.lock",
+    "ports/pelt/core/src/content.rs",
+    "ports/pelt/core/src/native.rs",
+    "ports/pelt/core/tests/host_surface.rs",
+    "ports/pelt/desktop/smolweb_glue.rs",
+    "ports/pelt/desktop/static_viewer.rs",
+    "ports/pelt/desktop/workspace_viewer.rs",
+    "ports/pelt/desktop/workspace_viewer/tests.rs",
+    "rust-toolchain.toml"
+  ],
+  "reviewed_diffs": {
+    ".github/workflows/portable.yml": {
+      "diff_sha256": "35eadba0699490d372ac3798cc17175f79a205321ebad0774788a276fb181c49",
+      "upstream_git_bytes_sha256": "1187ca22afe8ff1307de53212abf595f26048edd5375908385a31bf3828e0e04"
+    },
+    ".github/workflows/rust-policy.yml": {
+      "diff_sha256": "6d1484e6b87ab03a60c9393c021835d74f1580b616217d039b30c64cb562f540",
+      "upstream_git_bytes_sha256": "e5326369f10073f75c22b7fcd860a2fdb46e7fa652c94cb3a0b0882deab8c4f4"
+    },
+    "Cargo.toml": {
+      "diff_sha256": "b7c6d533db7e0a4957231cab3aa2e8d45726f51fa74b97f02055b6cb64fc3143",
+      "upstream_git_bytes_sha256": "0ca0f8bb947d9b98ab95fe399521d275e185b1ddf8f8334667ab310db9959ce4"
+    },
+    "rust-toolchain.toml": {
+      "diff_sha256": "f0079f72e4fc0d4d2da66ebe966659831570f56175540a0b775ee77559de0af2",
+      "upstream_git_bytes_sha256": "70b1451554546366dd35c01225416776cfb8c0e3a73da440def1bed6de93808e"
+    },
+    "crates/cambium/cambium-rootstock/src/embedding.rs": {
+      "diff_sha256": "35369da3dbab7819776f3659748254735453b230c0787d7b2f4db814432a9b91",
+      "upstream_git_bytes_sha256": "c3321bb6f39165bb02dbde8bedd11a7f3815efbabd75e377399d58d1ae12d2e7"
+    },
+    "crates/cambium/cambium-rootstock/src/embedding/egui_input.rs": {
+      "diff_sha256": "06f1a614892d534f39fb927aac7dc1d94827586c4dc11dc5115acaa449f8f734",
+      "upstream_git_bytes_sha256": "068d64b4d295a3e863c6916c1b1f4d0e3e31be7352c74faeebc35da4a39f1bfa"
+    },
+    "crates/cambium/cambium-rootstock/src/embedding/iced_input.rs": {
+      "diff_sha256": "7f2881f9e23240d820eaae8b0661b94ad3330a1d6ce75f20118770946764228e",
+      "upstream_git_bytes_sha256": "33b4b221cddf03a3e0f9403ee9ea746c7e9de1ba62a72f892867dd3ff8fe7356"
+    },
+    "crates/cambium/cambium-rootstock/src/embedding/tests.rs": {
+      "diff_sha256": "7f987f0da445fcd14d4eb5285780051f946b3c949d8fb612b79ff6e0c765bc66",
+      "upstream_git_bytes_sha256": "bdb68324497c498cada935dc2606aaad63765b013491488e5ad8ee26029a9cb7"
+    },
+    "crates/canvas/pictograph/src/canvas/scene_axes.rs": {
+      "diff_sha256": "1e6fba5585e654ff015f546076716665de4b7b9540640bfd4e759032cd7cad12",
+      "upstream_git_bytes_sha256": "1404c4983a0dea80f63d012e8a19a38d7d6ade7a23352e9e4859cd238995b4b8"
+    },
+    "crates/canvas/pictograph/src/canvas/tests/bounded_scenes.rs": {
+      "diff_sha256": "f4929e21da8277ec19ed93350d634d4884c9f64407924b52bb3bde2bdae53aef",
+      "upstream_git_bytes_sha256": "8970385f73d007508aa36bea6b35a0882867db51027809360946cdef3ea6f396"
+    },
+    "crates/script/app-host/guest/rust-toolchain.toml": {
+      "diff_sha256": "263f4cebef181b51610ae75180d2ab6eb404c232d612a605565505b4a3e14864",
+      "upstream_git_bytes_sha256": "5033a91aad922ad6262732768418b11870f3b20da43f12185e9405da249c497e"
+    },
+    "crates/script/document-host/guest-bomb/rust-toolchain.toml": {
+      "diff_sha256": "15568647a2d5d6cd8473879bca34bc7a964eb3c09fbba80c2525725e7f1b3260",
+      "upstream_git_bytes_sha256": "5033a91aad922ad6262732768418b11870f3b20da43f12185e9405da249c497e"
+    },
+    "crates/script/document-host/guest/rust-toolchain.toml": {
+      "diff_sha256": "8da8c79da22fdd3a1da976c21dccebf5df38812f2d4e5af2bf823b44378b36d4",
+      "upstream_git_bytes_sha256": "5033a91aad922ad6262732768418b11870f3b20da43f12185e9405da249c497e"
+    },
+    "ports/dramatis/package.py": {
+      "diff_sha256": "b999fc34c6593d335fe96ced2f9af0093e348f15fc51b087696b2918e8318335",
+      "upstream_git_bytes_sha256": "43c1e31117e96e9d882b026b7390b51ce441c6f37db3ebd54f6d08e935959260"
+    }
+  },
+  "remaining_diffs": [
+    "Cargo.lock",
+    "crates/system/document-lanes/src/remote.rs",
+    "crates/system/document-lanes/src/session.rs",
+    "crates/system/document-lanes/src/smolweb.rs",
+    "crates/system/fetch/src/handle.rs",
+    "crates/system/fetch/src/handle_tests.rs",
+    "design_docs/2026-10-14_retained_document_resource_brief.md",
+    "design_docs/DOC_README.md",
+    "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md",
+    "design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
+    "design_docs/receipts/2026-10-17_remaining_three_adoption.json",
+    "ports/graphshell/src/local_intake.rs",
+    "ports/graphshell/src/local_intake/tests.rs",
+    "ports/graphshell/src/product.rs",
+    "ports/graphshell/src/retained_content/view.rs",
+    "ports/graphshell/src/web_tree/product.rs",
+    "ports/graphshell/web/Cargo.lock",
+    "ports/pelt/core/src/content.rs",
+    "ports/pelt/core/src/native.rs",
+    "ports/pelt/core/tests/host_surface.rs",
+    "ports/pelt/desktop/smolweb_glue.rs",
+    "ports/pelt/desktop/static_viewer.rs",
+    "ports/pelt/desktop/workspace_viewer.rs",
+    "ports/pelt/desktop/workspace_viewer/tests.rs"
+  ],
+  "qualification": "Fourteen exact upstream diffs were emitted/read; not all38files, not a completed upstream source snapshot, not local read credit. No stash/revert/commit/merge of shared WIP. Continue remote diff review read-only while preserving the current checkout/report."
+}

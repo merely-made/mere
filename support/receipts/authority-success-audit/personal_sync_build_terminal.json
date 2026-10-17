@@ -1,0 +1,21 @@
+{
+  "observed_utc": "2026-10-17T07:28:32.616160+00:00",
+  "session_id": 60676,
+  "exit_code": 0,
+  "basis_commit": "c1b5d47156f2c940ccd67799963ed203df96362a",
+  "build_finished": {
+    "reason": "build-finished",
+    "success": true
+  },
+  "logs": {
+    "personal_sync_build.jsonl": {
+      "bytes": 781897,
+      "sha256": "1371ab9fe76492198b56a3de6bab606dbeeea33aaef7c68b93cb49d93c56869a"
+    },
+    "personal_sync_build_stderr.log": {
+      "bytes": 9546,
+      "sha256": "ff0bf8301890705ff3706a39619bc74b7fbe5e01f758aa133cf83b52a8191ce3"
+    }
+  },
+  "evidence": "Original exec session60676 returned authoritative terminal exit_code0, followed by final build-finished success verification. No restart."
+}

@@ -1,0 +1,28 @@
+warning: type `sync_partial_cyclic` should have an upper camel case name
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_reader_validation_probe.rs:31:8
+   |
+31 | struct sync_partial_cyclic<TO>(PhantomData<TO>);impl<TO:TilingOrder>LoadingValidation for sync_partial_cyclic<TO>{
+   |        ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `SyncPartialCyclic`
+   |
+   = note: `#[warn(non_camel_case_types)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+warning: type `async_partial_cyclic` should have an upper camel case name
+  --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_reader_validation_probe.rs:65:8
+   |
+65 | struct async_partial_cyclic<TO>(PhantomData<TO>);impl<TO:TilingOrder>LoadingValidation for async_partial_cyclic<TO>{
+   |        ^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `AsyncPartialCyclic`
+
+warning: type `sync_full_cyclic` should have an upper camel case name
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_reader_validation_probe.rs:114:8
+    |
+114 | struct sync_full_cyclic<TO>(PhantomData<TO>);impl<TO:TilingOrder>LoadingValidation for sync_full_cyclic<TO>{
+    |        ^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `SyncFullCyclic`
+
+warning: type `async_full_cyclic` should have an upper camel case name
+   --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\matmul_reader_validation_probe.rs:139:8
+    |
+139 | struct async_full_cyclic<TO>(PhantomData<TO>);impl<TO:TilingOrder>LoadingValidation for async_full_cyclic<TO>{
+    |        ^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `AsyncFullCyclic`
+
+warning: 4 warnings emitted
+

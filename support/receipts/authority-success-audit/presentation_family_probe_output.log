@@ -1,0 +1,7 @@
+
+running 2 tests
+test containment_assertion_is_disclosed_to_rules_as_semantic ... ok
+test semantic_assertion_remains_correctly_disclosed_as_semantic ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

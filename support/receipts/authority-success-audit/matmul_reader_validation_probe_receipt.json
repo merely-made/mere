@@ -1,0 +1,49 @@
+{
+  "date_utc": "2026-10-17T21:23:11.605106+00:00",
+  "exit": 0,
+  "passed": 10,
+  "source_sha256": {
+    "support/patches/cubek-matmul/src/multi_level/components/global/read/strategy/sync_partial_cyclic.rs": "503598901bbe852873c16857a34f6c1f46843aeb2aedec448c90ab1fe3ebd0c2",
+    "support/patches/cubek-matmul/src/multi_level/components/global/read/strategy/async_partial_cyclic.rs": "f37abfc32bbd5de603775ae9e9991ed2c69c0d1494bfc0f4ac85e44870cc75c6",
+    "support/patches/cubek-matmul/src/multi_level/components/global/read/strategy/sync_full_cyclic.rs": "aa60d278fbfcc7ee67e334fb90e485a34277530ee6bcf6cf2f23dec222d360ef",
+    "support/patches/cubek-matmul/src/multi_level/components/global/read/strategy/async_full_cyclic.rs": "b884828b00bd07b5d8f0b2e76f90d3e1f60d359126ec9da70ad3f94fa0993b3b",
+    "support/patches/cubek-matmul/src/multi_level/components/global/read/strategy/sync_full_ordered.rs": "5e827dda740ba980bca727afd330ce9b2a90c04eae1a7b908813f29b29975788"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\matmul_reader_validation_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-matmul-reader-validation.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-reader-validation.exe",
+      "bytes": 762368,
+      "sha256": "dc5f19a29004fe8b410a80aa294125eb1f9bd64e16908b4a15323cbd2c00a6b8"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-matmul-reader-validation.pdb",
+      "bytes": 3026944,
+      "sha256": "cd25fe7dc7af7720004e79741a0aa0dbc8dd76181d8e32fabeb6c854cb902410"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "sync_partial_cyclic": "92a7f822b12637c83768ed3d03099ad410c6f4f025bfe74849735b484d5788e3",
+    "async_partial_cyclic": "5483fba0500216271a0d817baabaf86a83d2abd05dfc705b25d8009b2dc57dd4",
+    "sync_full_cyclic": "56737c863aace8e57d4054bf67ffde447c3ae81dc58043c9ad03c6486d18c4b4",
+    "async_full_cyclic": "9a6194c995647643a2fc989c24d00326769ba75852b6c3d93b57adf5bdff2cc6",
+    "sync_full_ordered": "9bce895868dd6c594710fea0f9ed78c9f8a38be0c91ace650dce5765eed7ba32"
+  },
+  "evidence_sha256": {
+    "run_matmul_reader_validation_probe.py": "0708b89594001f3d71db3292ad8a2360c968e72d9de418128082bfd1b0bd5a6a",
+    "matmul_reader_validation_probe.rs": "9e499ab99067e916ffef050a16ed0b65c99b3d92779a649d70d10cdd81c136e4",
+    "matmul_reader_validation_compile.txt": "9b0e232b299ca4bba0c44f814213eb59269145d8387a6b6300944c0faede0afd",
+    "matmul_reader_validation_run.txt": "0772af870f278a126c95d61f7cc77121675ec69d9265c92d3cfa20a63e2fb5c1"
+  },
+  "qualification": "Exact host validator bodies for sync/async partial/full cyclic and ordered readers. Config shape/count/type methods are explicit scalar doubles; tiling/swizzle/async capability validators are deliberately stubbed Ok. Proves these predicates admit the end-start boundary and ordered validator alone ignores load flow; does not prove complete validator/blueprint/routine admission of any actual tile config, concrete caller reachability, CubeDSL lowering, GPU access or deployed fault. Full/balanced/further-overrun/ordered-main controls included. Owned exe/PDB removed."
+}

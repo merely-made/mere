@@ -1,0 +1,6 @@
+error: couldn't find file `C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\rootstock_receipt_suite_probe.rs`
+  |
+  = help: you might have meant to open `C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\rootstock_receipt_suite.rs`
+
+error: aborting due to 1 previous error
+

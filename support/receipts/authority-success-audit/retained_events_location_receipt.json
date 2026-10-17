@@ -1,0 +1,16 @@
+{
+  "prior_checkpoint": "retained_events_review_receipt.json",
+  "changes": [
+    {
+      "finding": "Q296",
+      "previous": "crates/cambium/cambium/src/propagation.rs:108; crates/cambium/cambium/src/runner.rs:344,519,711",
+      "current": "crates/cambium/cambium/src/propagation.rs:104; crates/cambium/cambium/src/runner.rs:344,519,711"
+    },
+    {
+      "finding": "Q298",
+      "previous": "crates/cambium/cambium/src/disclosure.rs:119; crates/cambium/cambium/src/runner.rs:1536",
+      "current": "crates/cambium/cambium/src/disclosure.rs:119; crates/cambium/cambium/src/runner.rs:1506"
+    }
+  ],
+  "scope": "Corrected exact declaration locations in mutable finding index after line-number verification; immutable checkpoint/evidence and production source unchanged."
+}

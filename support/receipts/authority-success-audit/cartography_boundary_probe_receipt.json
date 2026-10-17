@@ -1,0 +1,59 @@
+{
+  "test_exit": 0,
+  "tests": 7,
+  "harness_sha256": "b7db09a5c0cc9fc0357968b87999fe73536296f3129d4de52fdd63ead30a37ca",
+  "source_sha256": {
+    "crates/canvas/cartography/src/adapters/bounded.rs": "eda0bf3d3dc73d63164be6211f2c01e5234588f2c44d19a322f8b1dac8d31ff9",
+    "crates/canvas/cartography/src/adapters/score.rs": "db467ca57bc663184a07fe80273064195f13767950c1137a553414d970b31170",
+    "crates/canvas/cartography/src/scene_out.rs": "de039073ff74b8e9ade59f58876051629b70f1bfd2a61057068c496bcd182266",
+    "crates/canvas/cartography/src/signals.rs": "11e2d6aa3bd189d2931bd38dd9d606d0a16b34b49a7e5be7f87d3d9d0e24d114",
+    "crates/canvas/cartography/src/request.rs": "fb1ac1d642e3d1fb95ba6d081c2caefd688edcec4d2d1e3f91bd5464b6a46f15",
+    "crates/canvas/cartography/src/spiral_score.rs": "3439d42cef8da0c24f425537c8c569ab2775dcc9dd2e38ab2d40144dcbc17e29"
+  },
+  "library_sha256": {
+    "sceno": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-27fc9c42afca0beb.rlib",
+      "sha256": "46f3f51731ab12704a56818613989891d5c7c813d7ffffa93df1f392a33073a4"
+    },
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-9ec771bd039c02d7.rlib",
+      "sha256": "bd75102166fa3099311e7e5abc7bd2a34358a1e2c371a982994f11173e2694ce"
+    },
+    "scenomise": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenomise-e8c660f97608d3f8.rlib",
+      "sha256": "9af4b7c41744e2874bf5bf1ce51e95951ee9c678c91df4a37ca2958ff082e183"
+    },
+    "cartography": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libcartography.rlib",
+      "sha256": "59a47f6de3627b6d246545a5687335af26a0e1f3e6eeefc528a94694737e2d20"
+    }
+  },
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cartography_boundary_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-cartography-boundary-probe.exe",
+    "--extern",
+    "sceno=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libsceno-27fc9c42afca0beb.rlib",
+    "--extern",
+    "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-9ec771bd039c02d7.rlib",
+    "--extern",
+    "scenomise=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenomise-e8c660f97608d3f8.rlib",
+    "--extern",
+    "cartography=C:\\t\\cargo-targets\\mere\\debug\\libcartography.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64"
+  ],
+  "build_exit": 0,
+  "native_binary_sha256": "33e41c4e2771986e4ab0b9f3b9b1e71b802e4229b8996e0872acc44cad1a95eb",
+  "generated_output_removed": true,
+  "scope": "Bounded native conversion and lookup APIs with generated graph/signal data. Five reproduced contract defects and two qualified edge/signal boundaries. Pictograph degree producer inspected as source; live host renderer/network/store not executed."
+}

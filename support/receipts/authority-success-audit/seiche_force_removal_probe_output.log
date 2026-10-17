@@ -1,0 +1,11 @@
+
+running 3 tests
+test removing_the_last_anchor_has_the_same_persistent_force_problem ... Anchor removed: first vx=-18.768496, next vx=-36.78625; zero-stiffness coasting control vx=-18.017756
+ok
+test removing_the_last_builtin_keeps_its_old_force_alive ... Boundary removed: first vx=-15.719008, next vx=-30.809254; zero-force coasting control vx=-15.090249
+ok
+test zero_theta_still_merges_distinct_nearby_bodies_at_the_minimum_cell ... theta=0, distance=0.2, epsilon=0.01: min-cell 1 gives -20, min-cell 0.01 gives -5 (pairwise value -5)
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,8 @@
+
+running 3 tests
+test changing_public_graph_radius_moves_current_hit_position_but_keeps_old_paint ... ok
+test replacing_scene_leaf_with_path_a_leaf_keeps_the_old_scene_instead ... ok
+test replacing_scene_slot_with_fresh_empty_slot_reuses_retired_content_without_paint ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

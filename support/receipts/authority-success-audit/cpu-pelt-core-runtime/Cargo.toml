@@ -1,0 +1,62 @@
+[workspace]
+
+[package]
+name = "authority-success-pelt-core"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+name = "pelt_core"
+path = "../../../../ports/pelt/core/src/lib.rs"
+
+# The audit builds the actual engine-free default root only. This label lets
+# rustc recognize the source cfg; this manifest does not qualify feature genet.
+[features]
+genet = []
+
+[dependencies]
+genet-host-api = { git = "https://github.com/merely-made/genet.git", branch = "main" }
+workbench = { path = "../../../../crates/cambium/workbench" }
+inker = { path = "../../../../crates/inker/inker" }
+page-load = { package = "mere-page-load", path = "../../../../crates/system/page-load" }
+url = "=2.5.8"
+
+[[test]]
+name = "pelt_core_audit_contracts"
+path = "../pelt_core_owner_probe.rs"
+[[test]]
+name = "capture_geometry"
+path = "../../../../ports/pelt/core/tests/capture_geometry.rs"
+[[test]]
+name = "capture_terminals"
+path = "../../../../ports/pelt/core/tests/capture_terminals.rs"
+[[test]]
+name = "content"
+path = "../../../../ports/pelt/core/tests/content.rs"
+[[test]]
+name = "embedder"
+path = "../../../../ports/pelt/core/tests/embedder.rs"
+[[test]]
+name = "host_history"
+path = "../../../../ports/pelt/core/tests/host_history.rs"
+[[test]]
+name = "host_loading"
+path = "../../../../ports/pelt/core/tests/host_loading.rs"
+[[test]]
+name = "host_surface"
+path = "../../../../ports/pelt/core/tests/host_surface.rs"
+[[test]]
+name = "pool"
+path = "../../../../ports/pelt/core/tests/pool.rs"
+[[test]]
+name = "pool_a11y"
+path = "../../../../ports/pelt/core/tests/pool_a11y.rs"
+[[test]]
+name = "routing"
+path = "../../../../ports/pelt/core/tests/routing.rs"
+[[test]]
+name = "workspace"
+path = "../../../../ports/pelt/core/tests/workspace.rs"
+[[test]]
+name = "workspace_retirement"
+path = "../../../../ports/pelt/core/tests/workspace_retirement.rs"

@@ -1,0 +1,162 @@
+{
+  "date_utc": "2026-10-16T21:39:31.791365+00:00",
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "kind": "source audit and bounded native defect diagnostics; no repairs",
+  "previous_turn_classification": "progress",
+  "findings": [
+    "Q056",
+    "Q057",
+    "Q058",
+    "Q059",
+    "Q060",
+    "Q061"
+  ],
+  "authority_entries": [
+    "A052",
+    "A053",
+    "A054",
+    "A055",
+    "A056",
+    "A057"
+  ],
+  "complete_areas": [
+    "crates/graphshell/graphshell-host/"
+  ],
+  "host_files": 24,
+  "host_chars": 490958,
+  "coverage": {
+    "complete_files": 479,
+    "total_files": 3345,
+    "read_chars": 7423791,
+    "total_chars": 36772639,
+    "changed_since_inventory": [],
+    "pending_chunks": 0
+  },
+  "next_read": {
+    "path": "crates/graphshell/graphshell-client/src/fold.rs",
+    "start": 0
+  },
+  "production_edits_this_pass": false,
+  "preserved_production_and_test_hashes": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3",
+    ".gitattributes": "addcb11f0417b3f755a5395db099eb318d2639d58b1c7499810438ded576ebdf",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "ab40f1887af4ad301a033b409eb2d5413238b33db3771db5693f06691a2866ab",
+    "ports/graphshell/tests/fixtures/identity_cards.json": "ec614d208fcefd51c2039db047f8707abc3daf70108a032bf847681d25dbc046"
+  },
+  "host_source_sha256": {
+    "crates/graphshell/graphshell-host/Cargo.toml": "2accc3327f878a0ba3fa53a54dca4256bcfa0965474ce926a9e7c77a61c779f1",
+    "crates/graphshell/graphshell-host/src/admission.rs": "fc006a38cfedfaa58ffabd1884ba2b4f57926c7a2b6cd7a2d3ec042e6b535ac2",
+    "crates/graphshell/graphshell-host/src/canary.rs": "3ea7a041634e2e408332a6f1e0d4b3b706dedffbc6f9b6fc9a2a17d097d8b08b",
+    "crates/graphshell/graphshell-host/src/carrier.rs": "b0e72d86585594ca663d6250c5bbe2dda83bfffcc1d385fef30f41498e1c39df",
+    "crates/graphshell/graphshell-host/src/endpoint_catalog.rs": "b0efb233195c386b7fa9b01e4bfbde1fa0d6f347a7a3638e2da1cbccca0ea3e6",
+    "crates/graphshell/graphshell-host/src/lib.rs": "fde0bd684eee4a5a6f593b0af949d94da28fff5ee0b1a9e7981da062643643d5",
+    "crates/graphshell/graphshell-host/src/lifecycle.rs": "abebb9a9de920d476da56b492def3259caaaf79386f15387102f2a7ff43b78fe",
+    "crates/graphshell/graphshell-host/src/line.rs": "a14ac53fbbf87d7eb2914bdb7663e6f624098b4810e5106dcc353eb7a0ebf6a7",
+    "crates/graphshell/graphshell-host/src/live_endpoint.rs": "3cfc13ea68c77516656e422e6405ba73ff2cb2ed72f162929f720d42c0ebfd30",
+    "crates/graphshell/graphshell-host/src/network_carrier.rs": "4f4a9a1b9d5a55cae95da2f7658ce905e04c95113f0bd5aaec0ab1535d153d70",
+    "crates/graphshell/graphshell-host/src/policy_projection.rs": "4cbd2a5f88d00c95d6b357c5a1e22e61e9008232a2140b63620491c4b385555d",
+    "crates/graphshell/graphshell-host/src/projection_host.rs": "b44dab80905192ab134bb02530ca92f85dfeb1f7d31fdd42660dedd67cf675dc",
+    "crates/graphshell/graphshell-host/src/resume.rs": "215a156b4d1be60bcb64174ef000321c8e6e381254388e409f790e9caf2c5a15",
+    "crates/graphshell/graphshell-host/src/session_loop.rs": "f1d350e69eaf1747e95ed8ebbafdf5baacd07cad6264fd1bdb5f7e1228d0f0ed",
+    "crates/graphshell/graphshell-host/src/session_notices.rs": "dbf8907667959858cb9501c0a67d7425a3584b5704275a1b4f5eab41f90d305a",
+    "crates/graphshell/graphshell-host/src/sessions.rs": "44ff82ff461a8d334a2f51f60bc942626afc835a1a0a234bbaa03a98329654a7",
+    "crates/graphshell/graphshell-host/src/view.rs": "ccb3e612f86202b682bd7c90798ab54bf596d2d8c414122fbd30f8ea30ae6f67",
+    "crates/graphshell/graphshell-host/src/webrtc_door.rs": "957d2a25a10708da23bbb138e05c39f38a1e6c5496641690813c12888bf172e4",
+    "crates/graphshell/graphshell-host/src/webrtc_join.rs": "43289eabdefefc056f7d92f116bb6eadd31e9405bde62378aa785c9a2d406447",
+    "crates/graphshell/graphshell-host/src/webrtc_session.rs": "e28b10345544ba7d93215b7f29129da77630c02142f51128569dfef5abeea295",
+    "crates/graphshell/graphshell-host/tests/projection_round_trip.rs": "3df7a4b6377443d99065177a6a65a42b1935dc5dc3e7605046fe97e08a6c9067",
+    "crates/graphshell/graphshell-host/tests/remote_session_live.rs": "65e7eb018e581ddb346936a5c07febf9dcd9c48f10adff108afd0e324f50cb2d",
+    "crates/graphshell/graphshell-host/tests/webrtc_door_loopback.rs": "cf992cee506e6893c4db3e41c4cb3f0fe5308e3b1b4215117d372ddc14129923",
+    "crates/graphshell/graphshell-host/tests/webrtc_join_loopback.rs": "f110b21c89eb594775de371fc0a54c8ed19eca9172574bab8fae3c8a3e24f0fe"
+  },
+  "coverage_limits": [
+    "No whole-source or workspace completion claim.",
+    "No headed browser, real remote peer, installed resident or Linux interoperability gate.",
+    "Source-read existing integration tests were not run in this pass."
+  ],
+  "default_unit_build": {
+    "command": "cargo test -p graphshell-host --lib --no-run --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+    "exit": 101,
+    "errors": 36,
+    "tests_executed": false
+  },
+  "retained_isolation": [],
+  "generated_output": "All standalone native probe executable/PDB sets removed after execution.",
+  "diff_check": {
+    "exit": 0,
+    "log": "host_review_diff_check.txt"
+  },
+  "evidence_sha256": {
+    "host_admission_probe.rs": "a0c49022b1060a65ac4bf96ffc90fbcf8078572968dad62c4a9107b7dabf9b0f",
+    "run_host_admission_probe.py": "19d89739f9ad9314720aa7557070b60dd77184d6a3c74ac77d9e39f665e386d2",
+    "n4_policy_rule_extracted.rs": "8e15ac01aba7d9906803f337cdda26af50ec90108d64a1768e6850755029d792",
+    "graphshell_host_admission_build_output.jsonl": "ae03d39b663507ac0a18cba939d294896e4b854e33e1ee16845c06c87a7faf6a",
+    "host_admission_probe_build_output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "host_admission_probe_output.txt": "b0dc9aa4e7b6527e483e60dd7dc6302a0562bc3779d5beb29dc6df7eebe642f4",
+    "host_admission_probe_receipt.json": "3332e6b67b1b7ee3e1eaac0faee569e0fda982d4da9de6b7218af00fdc8af5b0",
+    "graphshell_host_default_test_build_output.txt": "05f5ff01d4ecd9a61ac93c1e090d7f9bcc5dd8cafb22f6d248368be99f877ab2",
+    "host_notice_authority_probe.rs": "9b19a83e384b8ad3644b9889ead11fb54b2f93e6d261dd826ea4b4a2d6e308b7",
+    "run_host_notice_authority_probe.py": "f8e313c4a95e2b68f308c0712a849b1a91708ce854c723eb35eadd1ff3468807",
+    "graphshell_host_native_build_output.jsonl": "63d38847c2cef2f0d5b46776cfefc7695f07d1ff2bc2fb36ee2e2f0e9d15ec78",
+    "host_notice_probe_build_output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "host_notice_probe_output.txt": "61d8ab961ae68fb8f18f04e297e59b984b156ce893acd2d1bb1b5a73fc5d4993",
+    "host_notice_authority_receipt.json": "29c0e3b763e7289f7d9cebfb82dea5497efcc0d60131e86a3e400ebae3d783ee",
+    "client_pending_probe.rs": "675738a4001a2f6d06d0d2e09142eedf2c004fce349b48911b17f244d9730183",
+    "run_client_pending_probe.py": "76b1a35a807488438f4307ede76675ed671f25a79ba500b813766be134ff1a4d",
+    "client_pending_build_output.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client_pending_output.txt": "66072146b09b8abad0b0afa4d68b80474d35c26fc447b1a6f82e734c1dd6a0d3",
+    "client_pending_receipt.json": "2811a32a874579f58fde8350e5f5ccd5fc06975c8bdaeb2860804d9cc2dd7902"
+  },
+  "governing_document_sha256": {
+    "design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md": "9945beea72b0988ee99f1e88cc684c58ea4fe307c9da52d52c0b42d10afd86e4"
+  },
+  "diagnostic_test_counts": {
+    "admission": 5,
+    "notices": 3,
+    "client_pending": 2
+  },
+  "native_host_build": {
+    "exit": 0,
+    "features": "native; no default features",
+    "log": "graphshell_host_native_build_output.jsonl"
+  },
+  "partial_client_reading": {
+    "crates/graphshell/graphshell-client/Cargo.toml": {
+      "sha256": "b38185b8370154d1fe85453c2060dd0b0501496c69fef9cb84a6826b0c79e74b",
+      "through": 2065
+    },
+    "crates/graphshell/graphshell-client/src/action_draft.rs": {
+      "sha256": "fc4748418b0bdee8d297d430cbad43f260d90e56bce65ab2150e87257a924048",
+      "through": 10819
+    },
+    "crates/graphshell/graphshell-client/src/core.rs": {
+      "sha256": "3bfbc36731969a504fafe61e22d2b74f9e00d1e6aa0df832b487669a154181b2",
+      "through": 36194
+    },
+    "crates/graphshell/graphshell-client/src/driver.rs": {
+      "sha256": "57e5d47a94b175de00951c6798e69922140701ee12a3ebf29ee7679335f23dc7",
+      "through": 18660
+    }
+  }
+}

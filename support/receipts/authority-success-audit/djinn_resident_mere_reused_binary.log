@@ -1,0 +1,42 @@
+
+running 23 tests
+test resident_mere::tests::a_branch_merges_back_through_the_route_with_a_choice_per_conflict ... ok
+test resident_mere::tests::a_device_reads_a_mere_through_the_dialable_host_as_its_granted_application ... ok
+test resident_mere::tests::a_failed_apply_plans_again_and_carries_the_choices_that_still_apply ... ok
+test resident_mere::tests::a_product_client_cannot_clear_denial_or_opt_in_ambient_through_the_reservoir ... ok
+test resident_mere::tests::access_is_default_for_admitted_apps_and_ambient_is_independent ... ok
+test resident_mere::tests::archive_intents_save_browse_fork_and_compose_through_the_resident ... ok
+test resident_mere::tests::checked_candidate_refuses_cross_application_race_without_installing_any_delta ... ok
+test resident_mere::tests::common_archive_adapter_preserves_resident_authority_on_divination ... ok
+test resident_mere::tests::common_panel_controller_runs_lifecycle_then_purges_on_denial_and_rejoins ... ok
+test resident_mere::tests::common_panel_refuses_a_hash_valid_resource_in_the_wrong_presentation_role ... ok
+test resident_mere::tests::common_panel_refuses_media_with_wrong_namespace_application_session_or_hash ... ok
+test resident_mere::tests::common_panel_saves_own_view_and_reopens_archive_without_implicit_writes ... ok
+test resident_mere::tests::divination_requires_product_authority_and_refuses_unknown_domain_facets ... ok
+test resident_mere::tests::domain_authority_checks_route_batches_archive_compose_and_first_edit_forks ... ok
+test resident_mere::tests::knot_overlay_merges_a_branch_through_the_door ... ok
+test resident_mere::tests::knot_overlay_saves_and_opens_an_archive_through_the_door ... ok
+test resident_mere::tests::personal_facts_two_apps_share_exact_revisions_and_refuse_tampering ... ok
+test resident_mere::tests::resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants ... ok
+test resident_mere::tests::the_dialable_host_serves_only_what_the_grant_and_the_owner_name ... ok
+test resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route ... FAILED
+test resident_mere::tests::the_sessions_projection_runs_the_lifecycle ... ok
+test resident_mere::tests::two_applications_edit_one_session_and_hear_each_other ... ok
+test resident_mere::tests::view_media_and_writes_are_scoped_to_the_admitted_application ... ok
+
+failures:
+
+---- resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route stdout ----
+
+thread 'resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route' (57644) panicked at ports\djinn\src\resident_mere.rs:4661:9:
+assertion `left == right` failed
+  left: ["link.surface"]
+ right: ["containment", "semantic", "semantic"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route
+
+test result: FAILED. 22 passed; 1 failed; 0 ignored; 0 measured; 194 filtered out; finished in 8.21s
+

@@ -1,0 +1,3 @@
+PASS ordinary allowed and denied host controls
+PASS gate/parser disagreement: raw admitted host=allowed.test parsed host=outside.test normalized request refused
+OBSERVATION host allowlist also admits a different scheme and port; this is its stated host policy, not an additional parser-bypass case

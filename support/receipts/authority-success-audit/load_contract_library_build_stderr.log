@@ -1,0 +1,82 @@
+   Compiling num-traits v0.2.19
+   Compiling indexmap v2.14.2
+   Compiling smallvec v1.16.1
+   Compiling serde_bytes v0.11.19
+   Compiling parking_lot_core v0.9.12
+   Compiling tokio v1.53.2
+   Compiling parking_lot v0.12.5
+   Compiling icu_normalizer v2.3.0
+   Compiling linebender_resource_handle v0.1.1
+   Compiling tracing v0.1.44
+   Compiling naga-types v30.0.1
+   Compiling polycool v0.4.0
+   Compiling petgraph v0.8.3
+   Compiling naga v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling string_cache v0.9.0
+   Compiling idna_adapter v1.2.2
+   Compiling kurbo v0.13.1
+   Compiling heapless v0.7.17
+   Compiling oxiri v0.2.11
+   Compiling oxilangtag v0.1.6
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling futures-intrusive v0.5.0
+   Compiling idna v1.1.0
+   Compiling web_atoms v0.2.6
+   Compiling euclid v0.22.14
+   Compiling half v2.7.1
+   Compiling ordered-float v5.5.0
+   Compiling oxrdf v0.3.4
+   Compiling postcard v1.1.3
+   Compiling yasna v0.5.2
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling url v2.5.8
+   Compiling peniko v0.6.1
+   Compiling guillotiere v0.7.0
+   Compiling markup5ever v0.39.0
+   Compiling rcgen v0.13.2
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling futures-util v0.3.34
+   Compiling icu_segmenter v2.3.0
+   Compiling harfrust v0.8.4
+   Compiling tokio-rustls v0.26.6
+   Compiling json-event-parser v0.2.3
+   Compiling ryu-js v1.0.3
+   Compiling gemini-protocol v0.1.7
+   Compiling oxjsonld v0.2.6
+   Compiling misfin v0.0.4
+   Compiling gopher-protocol v0.2.0
+   Compiling finger-protocol v0.1.1
+   Compiling spartan-protocol v0.1.1
+   Compiling scroll-protocol v0.1.0
+   Compiling guppy-protocol v0.1.1
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling nex-protocol v0.1.1
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling oxttl v0.2.4
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+   Compiling mere-framing v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\framing)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+   Compiling mere-linked-data v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\graph\linked-data)
+   Compiling wgpu v30.0.1
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling content-contract v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\system\content-contract)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 52.86s

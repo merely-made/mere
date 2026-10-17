@@ -1,0 +1,10 @@
+{
+  "binary": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\djinn-ca7838fe34564bd4.exe",
+  "binary_sha256": "22f79bed009b528d5edb708586dcc461ac07d77c7f840d0e9c751c3d736e184d",
+  "build_evidence": "djinn_inference_default_tests.log",
+  "source_guard_receipt": "djinn_current_owner_review_receipt.json",
+  "source_guard_count": 756,
+  "exit_code": 101,
+  "seconds": 8.907362461090088,
+  "scope": "Direct execution of earlier default-feature Cargo test binary at unchanged guarded source hashes. This is not a new build or current whole Cargo graph freshness assertion."
+}

@@ -1,0 +1,38 @@
+{
+  "date_utc": "2026-10-17T11:29:10.688513+00:00",
+  "basis_commit": "609b0a60373bdb54cd899254397bb061096a3221",
+  "source_sha256": {
+    "crates/canvas/pictograph/src/canvas/resolved_image_cache.rs": "aa1ff4df16809bc8563b12dbe584b3b00266ae78cb423a841de2cdbd6e63b453"
+  },
+  "probe_sha256": "10950ec249246f8860427bf7a8f9ccdd2ee82f9a4fe794a3f776e274a1918009",
+  "runner_sha256": "6b721a604c4e8ede0c28bf562db4cdaf68c86c290185026845740edfe2258402",
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\shared_image_cache_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-shared-image-cache.exe"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 4,
+  "original_tests": 2,
+  "audit_cases": 2,
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-shared-image-cache.exe",
+      "bytes": 797696,
+      "sha256": "274faa3d9af88fb317fc0857fc5af5b2a7a6532db6cccec4a14e6567c6f71030"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-shared-image-cache.pdb",
+      "bytes": 3067904,
+      "sha256": "63d4aae240fd97938e5c0bde8767a4643a8544d386a80ffbc269de9c97e46241"
+    }
+  ],
+  "generated_output_removed": true,
+  "qualification": "Fresh unchanged std-only private cache source, two original tests plus two ownership observations. No whole Canvas, paint/compositor dependency build, image store, renderer, GPU or retained-scene lifetime proof."
+}

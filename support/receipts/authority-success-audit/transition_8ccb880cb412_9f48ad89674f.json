@@ -1,0 +1,66 @@
+{
+  "path": "ports/djinn/src/embedded_reservoir.rs",
+  "git_basis": "70a153769ec5ef22b0af6a911a818518e073d946",
+  "git_blob_sha256": "99e20d439565b478a98842ca8addc3b88e12eb6f8371ed5edbbaa9f3698520b7",
+  "prior_coverage": {
+    "sha256": "322b4ee44969828610344276ae388c3bddd39c92f15ff49f8a9b1cf93a8ea73d",
+    "through": 23805
+  },
+  "current_sha256": "9f48ad89674fb2439275a724f19e61ad5d71da63bb4410461937249e7abd763a",
+  "current_chars": 23860,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        20014
+      ],
+      "new_chars": [
+        0,
+        20014
+      ],
+      "text_sha256": "1f1ded896efd51a613f10f9d8d71f73039d74a7f2db8c72f089310d9e91ba783"
+    },
+    {
+      "old_chars": [
+        20026,
+        23805
+      ],
+      "new_chars": [
+        20081,
+        23860
+      ],
+      "text_sha256": "8fbb609d376e55cf2de10659100a7956ef509495a7e6642306a843a1ba50d94d"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "replace",
+      "old_lines": [
+        477,
+        477
+      ],
+      "new_lines": [
+        477,
+        478
+      ],
+      "old_chars": [
+        20014,
+        20026
+      ],
+      "new_chars": [
+        20014,
+        20081
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 473,
+      "new_start_line": 473,
+      "text": "             options.persona,\r\n             catalog.clone(),\r\n             grants.clone(),\r\n             options.applications.clone(),\r\n-        );\r\n+        )\r\n+        .with_profile_subject_authority(host.clone());\r\n         let routes = configure(routes)\r\n             .await\r\n             .map_err(ReservoirAttachmentError::Embedded)?;\r\n         routes\r\n"
+    }
+  ],
+  "certificate": "transition_8ccb880cb412_9f48ad89674f.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T05:42:05.244156+00:00"
+}

@@ -1,0 +1,17 @@
+
+running 12 tests
+test compiler::wgsl::audit::direct_helper_registration_control ... ok
+test compiler::wgsl::audit::if_loop_and_range_registration_control ... ok
+test compiler::wgsl::audit::switch_case_calls_helper_without_registering_definition ... ok
+test compiler::wgsl::audit::switch_default_calls_helper_without_registering_definition ... ok
+test compiler::wgsl::audit::vec3_index_assignment_terminator_control ... ok
+test compiler::wgsl::audit::vec4_index_assignment_omits_statement_terminator ... ok
+test compiler::wgsl::extension::audit_masks::f32_classification_control ... ok
+test compiler::wgsl::extension::audit_masks::f64_nan_and_infinity_are_lost_by_swapped_constants ... ok
+test storage_predicate::both_absent_control ... ok
+test storage_predicate::both_present_control ... ok
+test storage_predicate::eight_only_is_falsely_excluded ... ok
+test storage_predicate::sixteen_only_falsely_admits_eight ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

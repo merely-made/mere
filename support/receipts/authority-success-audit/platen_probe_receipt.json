@@ -1,0 +1,79 @@
+{
+  "date_utc": "2026-10-17T00:00:04.397194+00:00",
+  "tests": 9,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/cambium/workbench/Cargo.toml": "c725c8705714ce6400d12c1a82ab2ebc185a5f3fd04b0e1803122d9fb0633842",
+    "crates/cambium/workbench/float.rs": "be8ae54379c1a5772baebcbabf77dc85711fda672e43b9436e131e42dc39cc12",
+    "crates/cambium/workbench/lib.rs": "6cef9d71ab26b1f16d20866bdb6f48412fd498eb022fbfcbe859296cc7c1b74b",
+    "crates/cambium/workbench/presentation.rs": "f23ad4e6b49ebc1f0bcb5e71130c9cc6db9a9283711084cf9da2ca91bd0ce828",
+    "crates/platen/platen/Cargo.toml": "bd66b41f1ad188ed98fedb8a1e24920374bce787212b2d6fd39cf97cac6cd602",
+    "crates/platen/platen/src/accessibility.rs": "34e6baa80b1968c2487566ca1123ff279784f9b10f851e8a40170c68262dd45e",
+    "crates/platen/platen/src/document_scene.rs": "739285fd4e5387d3a1cb6e7b8a1952bd2f8331dc80e845d794f6b04ff2ae423e",
+    "crates/platen/platen/src/lib.rs": "d6a4adde64fb41e96a095d768bf2f3306d12aba4ad1126a553c9f94224ecf7ec",
+    "crates/platen/platen/src/projection_geometry.rs": "57eb81b0813f53001496451b218003c520b892efdd6b7f8693b54cd5414ee229",
+    "crates/platen/platen/src/tree_projection.rs": "5695fb3f2fddaf053b2822a1fc7b7c75147a64408a84fd0c022d26e58f1be733",
+    "crates/platen/platen/src/workbench.rs": "ba8b5579facc4fd8aa179acce8e9205a230dffac6f0ccc56d296cf155f3b1232",
+    "crates/platen/platen/src/workbench/bridge.rs": "f90f7eb77d734bceef72dae3eef8c5f30a4668a136956008235c6b52b44e8a05",
+    "crates/platen/platen/src/workbench/tests.rs": "8488e7f65b6806ca6344a0ac0cba6f8adb2fe11cdeb599e79823196f0e887ad1",
+    "crates/platen/platen/src/workbench/tree.rs": "b0352424afa6e0b19ccbe20055c260875b360e59b2bb6cae909fbdc39795cb24"
+  },
+  "libraries": {
+    "platen": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libplaten.rlib",
+      "sha256": "e2f7042755baf7ad8278b02a7df94101f255e6e02e8afc13ad0d247826ad7e9e",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/platen/platen#0.0.1"
+    },
+    "forme": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libforme-d82fc071321887c5.rlib",
+      "sha256": "90af67183438d5676ee5ccc04ce52720d43b8472f7e81b7f9549cf8d6a511c57",
+      "features": [
+        "default"
+      ],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/forme/forme#mere-forme@0.2.0"
+    },
+    "uuid": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-442bd6074a01c413.rlib",
+      "sha256": "d400705e041d4f15d20a8e78b9b337fc572775bb5684b55d49794a5d0dbbb0d8",
+      "features": [
+        "default",
+        "rng",
+        "serde",
+        "std",
+        "v4"
+      ],
+      "package_id": "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0"
+    },
+    "workbench": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libworkbench-7ef1c0e05e707819.rlib",
+      "sha256": "e1efa3099042fd5e2cb53bec332228f2118c4ca85bc8768a8b631bdc83216743",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/workbench#0.1.0"
+    }
+  },
+  "probe_build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\platen_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "--extern",
+    "platen=C:\\t\\cargo-targets\\mere\\debug\\libplaten.rlib",
+    "--extern",
+    "forme=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libforme-d82fc071321887c5.rlib",
+    "--extern",
+    "uuid=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libuuid-442bd6074a01c413.rlib",
+    "--extern",
+    "workbench=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libworkbench-7ef1c0e05e707819.rlib",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-platen-probe.exe"
+  ],
+  "probe_build_exit": 0,
+  "native_binary_sha256": "8f849c6bafa43abf245bcd39ede13938a074a2cac1e8b6a121a40cb3966bfcf6",
+  "generated_output_removed": true,
+  "scope": "Nine public Platen/Workbench CPU/data probes against current no-default-features Platen and default Workbench Cargo libraries. Native debug persistence and float-resolution panics caught explicitly. No document-layout default feature, rendered host, AccessKit consumer, GPU or UI execution."
+}

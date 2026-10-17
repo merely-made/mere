@@ -1,0 +1,16 @@
+warning: unused import: `FetchError`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\fetch_probe.rs:2:20
+  |
+2 | use fetch::{Fetch, FetchError, NetFetch, Range, Stores};
+  |                    ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `TcpStream`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\fetch_probe.rs:5:29
+  |
+5 | use std::net::{TcpListener, TcpStream};
+  |                             ^^^^^^^^^
+
+warning: 2 warnings emitted
+

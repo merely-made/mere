@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "metadata",
+    "--offline",
+    "--locked",
+    "--format-version",
+    "1",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\muniment-opfs-probe\\Cargo.toml",
+    "--config",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\muniment-opfs-probe\\.cargo\\config.toml",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\""
+  ],
+  "cwd": "C:/t",
+  "exit": 101,
+  "stderr": "error: cannot update the lock file C:\\Users\\mark_\\Code\\repos\\mere\\ports\\muniment-opfs-probe\\Cargo.lock because --locked was passed to prevent this\nhelp: to generate the lock file without accessing the network, remove the --locked flag and use --offline instead.\n",
+  "stdout_bytes": 0,
+  "lock_sha256_before_after": "4145ff22cd0df93ae27f78caa795fd888155b733d36db0c8813728e9cbe77c33",
+  "manifest_sha256": "f30e8f096c0586263442550cecf58f8f27c9a4605101f77085c78ad201ec3116",
+  "local_muniment_manifest_sha256": "add2680a32b13135ad7ec72dd56062e4685e19b893df54e25cf677cb98e213d9",
+  "qualification": "Read-only Cargo metadata with original --locked standalone graph and committed config, offline neutral cwd. No build, compiler or browser execution; no source or lock change. Stable shared target/build-dir."
+}

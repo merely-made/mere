@@ -1,0 +1,8 @@
+{
+  "runner_sha256": "74d23a56255ba1b0e5ae3ed35a614e4ced537b6f9ad58af2f76a5a9f50b40781",
+  "build_exits": [],
+  "run_exit": null,
+  "checks": 0,
+  "generated_output_removed": true,
+  "failure": "Supplier preflight asserted one serde artifact; capture contains two feature variants. No compiler or tests started. A later attempted shell inline preparation had a quoting SyntaxError and created nothing; this saved preparation is the first completed v2 setup."
+}

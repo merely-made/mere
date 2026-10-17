@@ -1,0 +1,8 @@
+
+running 3 tests
+test count_multiple_inherits_the_same_nonempty_indexing_failure ... ok
+test every_singleton_count_panics_while_empty_count_succeeds ... ok
+test partial_regrowth_discards_a_removed_slots_generation_and_revives_its_old_route ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

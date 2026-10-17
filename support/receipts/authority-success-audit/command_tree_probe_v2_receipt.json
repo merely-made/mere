@@ -1,0 +1,97 @@
+{
+  "date_utc": "2026-10-17T08:26:25.183061+00:00",
+  "source_sha256": {
+    "crates/cambium/cambium/src/command_surface.rs": "f06e01da9c1f575304119b173d734d3616cf2d9c0dae29e488811df0d625a08b",
+    "crates/cambium/cambium/src/command_menu_bar.rs": "6d3b95187bc818e3475e6b6356ebd66cfc43f8dd71f5988f762411dd6c8b2747"
+  },
+  "libraries": {
+    "cambium": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+      "sha256": "7dfb7f3d6cae98e1cb46982f082fc274612941e40b8d50f39be23cc0772f0102",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/cambium#0.3.3"
+    },
+    "meristem": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmeristem-ce7a45e131513ccd.rlib",
+      "sha256": "1ea660b8251911978b9d13e538f7955382aa8901488688044d957a0b2cadb76b",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/meristem#0.2.0"
+    },
+    "command_menu": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcommand_menu-954f0e4d0f8bad23.rlib",
+      "sha256": "f455638662d7254dea45fd893551a4f2b43eeeb81821c586afc863ad367b7474",
+      "features": [],
+      "package_id": "path+file:///C:/Users/mark_/Code/repos/mere/crates/cambium/command-menu#0.1.0"
+    },
+    "genet_scripted_dom": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_scripted_dom-81bb1441b60629e2.rlib",
+      "sha256": "f5afa1b59af5c57bbe05a1c995d36c3603528829c6a5dc9fbd1daed7acce954b",
+      "features": [],
+      "package_id": "git+https://github.com/merely-made/genet.git?branch=main#genet-scripted-dom@0.1.2"
+    },
+    "layout_dom_api": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\liblayout_dom_api-306cb975bbc0aef0.rlib",
+      "sha256": "f9b6b13179f2c3b3de38a88cdf64e6f9ba8aef5e1d0ab028897563abfd2c95ec",
+      "features": [
+        "capture"
+      ],
+      "package_id": "git+https://github.com/merely-made/genet.git?branch=main#layout-dom-api@0.1.1"
+    }
+  },
+  "command": [
+    "rustc",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\command_tree_probe_v2.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-command-tree-probe-v2.exe",
+    "--extern",
+    "cambium=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcambium-3e4da3fa34243ed1.rlib",
+    "--extern",
+    "meristem=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libmeristem-ce7a45e131513ccd.rlib",
+    "--extern",
+    "command_menu=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcommand_menu-954f0e4d0f8bad23.rlib",
+    "--extern",
+    "genet_scripted_dom=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libgenet_scripted_dom-81bb1441b60629e2.rlib",
+    "--extern",
+    "layout_dom_api=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\liblayout_dom_api-306cb975bbc0aef0.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.48.5\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib"
+  ],
+  "build_exit": 0,
+  "run_exit": 0,
+  "checks": 6,
+  "probe_sha256": "ca50a4a1a13acd98cb9f1c2f54c85d2a389aec6938ecbc89dde1b3ddeab02163",
+  "runner_sha256": "2278c406d682f3cb505f37880448eaa2f05ff4455f0c0694844060ad81c47644",
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-command-tree-probe-v2.exe",
+      "bytes": 1641984,
+      "sha256": "2c33dc2e5a9f247e4a1c61dc4f2b0351177ce949a3c868731ae5976ffa2c16f6"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\authority-success-command-tree-probe-v2.pdb",
+      "bytes": 107376640,
+      "sha256": "197c3e9d441a559b67c6ea95f64db880a98d93548899f527ec5250c413b7521b"
+    }
+  ],
+  "generated_output_removed": true,
+  "scope": "Original current command_surface and command_menu_bar modules included by path, current local model types, retained real Cambium runner and ScriptedDom. Synthetic keyboard/pointer input; no native host, OS input, GPU, backend command execution or fresh full-current Cargo gate."
+}

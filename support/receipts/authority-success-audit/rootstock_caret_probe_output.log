@@ -1,0 +1,8 @@
+PASS multiline Home no-layout control keeps toolkit caret byte 3
+PASS multiline Home current retained-layout correction overwrites caret byte to 0
+PASS multiline End no-layout control keeps toolkit caret byte 2
+PASS multiline End current retained-layout correction overwrites caret byte to 5
+PASS selection Left no-layout control keeps toolkit caret byte 1
+PASS selection Left current retained-layout correction overwrites caret byte to 2
+PASS grapheme Right no-layout control keeps toolkit caret byte 3
+PASS grapheme Right current retained-layout correction overwrites caret byte to 0

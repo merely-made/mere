@@ -1,0 +1,121 @@
+
+running 90 tests
+test audit::descriptor_sampling_is_not_the_effective_default ... descriptor declares 25 percent; generic config admits 8/8; explicit 25 percent admits 2/8
+ok
+test audit::failed_dependency_does_not_block_dependent_activation ... provider Failed; dependent callback called, Active and capability published; all-success/missing controls pass
+ok
+test audit::no_native_runtime_still_publishes_active_capabilities ... absent native runtime: Active + webview; injected refusal: none; independent global query: true
+ok
+test audit::remap_codec_loses_legal_delimiter_characters ... plain remap and ordinary chord round-trip; pipe remap and greater-than chord fail
+ok
+test audit::repeated_load_bypasses_quarantine_and_forgets_unremoved_record ... quarantine -> repeated load Active -> unload Unloaded while old callback-owned effect remains
+ok
+test diagnostics::descriptor::invariant::tests::channel_config_preserves_zero_retention ... ok
+test diagnostics::descriptor::invariant::tests::deadline_overflow_is_counted_without_retaining_a_token ... ok
+test diagnostics::descriptor::invariant::tests::duplicate_and_unmatched_do_not_extend_or_complete_another_operation ... ok
+test diagnostics::descriptor::invariant::tests::late_terminal_cannot_erase_timeout_at_deadline_equality ... ok
+test diagnostics::descriptor::invariant::tests::legacy_late_terminal_preserves_the_timeout_and_uses_a_separate_clock ... ok
+test diagnostics::descriptor::invariant::tests::matching_never_crosses_run_source_or_uncorrelated_mode ... ok
+test diagnostics::descriptor::invariant::tests::pending_count_bytes_zero_and_opaque_key_are_bounded ... ok
+test diagnostics::descriptor::invariant::tests::retention_expiry_is_lost_tracking_not_a_false_operation_failure ... ok
+test diagnostics::descriptor::invariant::tests::reverse_terminal_only_clears_its_exact_operation ... ok
+test diagnostics::descriptor::invariant::tests::sweep_checks_every_deadline_even_behind_a_later_one ... ok
+test diagnostics::descriptor::invariant::tests::time_reversal_is_visible_and_does_not_change_pending_deadlines ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_attaches_structured_schema_to_high_value_contract_channels ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_config_roundtrip ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_declares_gl_state_violation_as_warn_severity ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_invariant_watchdog_times_out_when_terminal_missing ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_mod_namespace_enforcement_blocks_invalid_channel ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_phase5_received_watchdog_clears_on_terminal_channel ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_phase5_sent_watchdog_times_out_without_terminal ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_registers_phase5_sync_watchdog_invariants ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_rejects_conflicting_schema_on_reject_policy ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_rejects_empty_structured_payload_schema ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_seeds_phase_contract_channels ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_supports_dynamic_runtime_channel_registration ... ok
+test diagnostics::descriptor::tests::diagnostics_registry_tracks_auto_registered_orphan_channels ... ok
+test diagnostics::emit::queue::tests::accounting_measures_payload_and_envelope_not_message_byte_len ... ok
+test diagnostics::emit::queue::tests::any_zero_disables_and_runtime_limits_release_records ... ok
+test diagnostics::emit::queue::tests::disconnected_and_contended_producers_do_not_wait_or_allocate_identity ... ok
+test diagnostics::emit::queue::tests::disconnected_queue_cleanup_can_follow_a_contended_drop ... ok
+test diagnostics::emit::queue::tests::exhausted_sequence_never_wraps_or_reuses_an_identity ... ok
+test diagnostics::emit::queue::tests::expiry_at_equality_precedes_admission ... ok
+test diagnostics::emit::queue::tests::full_queue_rejects_newest_and_drains_are_bounded ... ok
+test diagnostics::emit::queue::tests::poisoned_queue_returns_loss_without_panicking ... ok
+test diagnostics::emit::queue::tests::scoped_sender_restores_previous_sink_and_no_sink_is_observable ... ok
+test diagnostics::emit::tests::emit_routes_to_thread_local_sender ... ok
+test diagnostics::emit::tests::emit_span_duration_helper_produces_exit_span ... ok
+test diagnostics::emit::tests::emit_with_no_sender_is_silent ... ok
+test input::tests::every_default_binding_names_a_catalogue_command ... ok
+test input::tests::input_binding_display_label_uses_human_shortcut_format ... ok
+test input::tests::input_binding_remap_round_trips_through_string_encoding ... ok
+test input::tests::input_registry_describes_bindable_actions_with_current_and_default_bindings ... ok
+test input::tests::input_registry_detects_same_binding_conflict_within_context ... ok
+test input::tests::input_registry_legacy_binding_ids_resolve_through_typed_map ... ok
+test input::tests::input_registry_remap_binding_detects_target_conflicts ... ok
+test input::tests::input_registry_remap_binding_replaces_existing_binding ... ok
+test input::tests::input_registry_reports_missing_binding ... ok
+test input::tests::input_registry_resolves_enter_differently_by_context ... ok
+test input::tests::input_registry_resolves_toolbar_nav_bindings ... ok
+test input::tests::input_registry_resolves_toolbar_submit_binding ... ok
+test input::tests::input_registry_uses_ctrl_modified_default_zoom_bindings ... ok
+test input::tests::input_registry_with_remaps_replays_on_top_of_defaults ... ok
+test layout::canvas::tests::canvas_registry_custom_profile_with_culling_enabled ... ok
+test layout::canvas::tests::canvas_registry_default_profile_has_performance_policy ... ok
+test layout::canvas::tests::canvas_registry_falls_back_for_unknown_profile ... ok
+test layout::canvas::tests::canvas_registry_resolves_default_profile ... ok
+test layout::canvas::tests::canvas_surface_profile_allows_background_pan_when_conditions_met ... ok
+test layout::canvas::tests::canvas_surface_profile_allows_background_pan_when_radial_menu_open ... ok
+test layout::canvas::tests::canvas_surface_profile_blocks_background_pan_for_active_lasso_drag ... ok
+test layout::canvas::tests::canvas_surface_profile_wheel_zoom_capture_with_ctrl_requirement ... ok
+test layout::canvas::tests::canvas_surface_profile_wheel_zoom_capture_without_ctrl_requirement ... ok
+test layout::canvas::tests::canvas_surface_profile_zones_enabled_reflects_style_flag ... ok
+test layout::workbench_surface::tests::workbench_surface_registry_resolves_default ... ok
+test layout::workbench_surface::tests::workbench_surface_registry_resolves_focus_and_compare_profiles ... ok
+test layout::workbench_surface::tests::workbench_surface_resolution_round_trips_via_json ... ok
+test mod_loader::loader::tests::discover_mod_manifests_appends_additional_entries ... ok
+test mod_loader::loader::tests::discover_wasm_mods_in_dir_empty_for_absent_dir ... ok
+test mod_loader::loader::tests::discover_wasm_mods_in_dir_surfaces_document_script_origins ... ok
+test mod_loader::loader::tests::discovers_native_mods_including_verso_and_nostrcore ... ignored, Slice 68c: this assertion depends on inventory::submit! calls in the binary root's mods/native/* files. Those calls don't link when register-mod-loader builds alone, so the inventory is empty here. The test still runs as a host-side integration test (manually) at the binary root build.
+test mod_loader::loader::tests::fails_on_dependency_cycle ... ok
+test mod_loader::loader::tests::fails_on_missing_requirement ... ok
+test mod_loader::loader::tests::load_all_quarantines_when_rollback_fails ... ok
+test mod_loader::loader::tests::load_all_rolls_back_applied_records_on_activation_failure ... ok
+test mod_loader::loader::tests::load_mod_admits_path_backed_wasm_manifests ... ok
+test mod_loader::loader::tests::load_mod_rejects_unknown_capabilities ... ok
+test mod_loader::loader::tests::mixed_native_and_wasm_manifests_resolve_dependency_order ... ok
+test mod_loader::loader::tests::mod_registry_can_load_mixed_manifest_sets_with_extension_callback ... ok
+test mod_loader::loader::tests::mod_registry_checks_capability_availability ... ok
+test mod_loader::loader::tests::mod_registry_discovers_native_mods ... ok
+test mod_loader::loader::tests::mod_registry_loads_mods_in_order ... ok
+test mod_loader::loader::tests::mod_registry_resolves_dependencies ... ok
+test mod_loader::loader::tests::mod_registry_without_verso_disables_webview_capability ... ok
+test mod_loader::loader::tests::resolves_dependency_order ... ok
+test mod_loader::loader::tests::test_safe_capability_path_disabling_verso_removes_webview_capabilities ... ok
+test mod_loader::loader::tests::test_safe_capability_path_matches_runtime_default_when_unmodified ... ok
+test mod_loader::loader::tests::unload_mod_quarantines_and_preserves_records_on_removal_failure ... ok
+test mod_loader::loader::tests::unload_mod_refuses_while_any_dependent_is_active ... ok
+
+test result: ok. 89 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+   Compiling authority-success-registry v0.0.0 (C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\cpu-registry-source-runtime)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ..\registry-source-composition\diagnostics\emit\queue.rs:88:31
+   |
+88 |         let _ = self.0[index].fetch_update(Ordering::Relaxed, Ordering::Relaxed, |old| {
+   |                               ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+88 -         let _ = self.0[index].fetch_update(Ordering::Relaxed, Ordering::Relaxed, |old| {
+88 +         let _ = self.0[index].try_update(Ordering::Relaxed, Ordering::Relaxed, |old| {
+   |
+
+warning: `authority-success-registry` (lib test) generated 1 warning (run `cargo fix --lib -p authority-success-registry --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized] target(s) in 7.42s
+     Running unittests ..\registry-source-composition\lib_probe.rs (C:/t/cargo-targets/mere/build\debug\deps\authority_success_registry-276585f228e55b4f.exe)
+
+thread 'diagnostics::emit::queue::tests::poisoned_queue_returns_loss_without_panicking' (36108) panicked at ..\registry-source-composition\diagnostics\emit\queue\tests.rs:152:9:
+deliberately poison queue fixture
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

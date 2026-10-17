@@ -1,0 +1,2 @@
+PASS both public plaintext export variants truncate an existing destination before returning the configured-limit refusal
+PASS successful export control round-trips a real signed stored operation without changing the source store

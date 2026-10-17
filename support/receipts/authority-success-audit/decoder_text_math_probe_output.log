@@ -1,0 +1,34 @@
+
+running 15 tests
+test audit::accepted_subnormal_temperature_selects_the_wrong_token ... FAILED
+test audit::ascii_control_and_split_stop_work ... ok
+test audit::nan_expected_logit_is_ranked_first ... ok
+test audit::real_byte_fallback_revises_partial_unicode ... ok
+test audit::split_utf8_stream_returns_replacement_and_latches ... ok
+test audit::unicode_stop_is_bypassed_after_partial_decode ... ok
+test portable::tests::capability_rejects_small_window_wrong_loader_no_streaming ... ok
+test portable::tests::capability_satisfies_matching_query ... ok
+test portable::tests::capability_serde_roundtrip ... ok
+test portable::tests::infer_error_display_is_stable ... ok
+test sample::tests::entropy_seeds_vary_across_draws ... ok
+test sample::tests::frequencies_track_the_distribution ... ok
+test sample::tests::low_temperature_is_effectively_greedy ... ok
+test sample::tests::same_seed_same_stream ... ok
+test sample::tests::tiny_top_p_collapses_to_greedy ... ok
+
+failures:
+
+---- audit::accepted_subnormal_temperature_selects_the_wrong_token stdout ----
+
+thread 'audit::accepted_subnormal_temperature_selects_the_wrong_token' (30268) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\decoder_text_math_probe.rs:198:13:
+assertion `left == right` failed
+  left: 1
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    audit::accepted_subnormal_temperature_selects_the_wrong_token
+
+test result: FAILED. 14 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

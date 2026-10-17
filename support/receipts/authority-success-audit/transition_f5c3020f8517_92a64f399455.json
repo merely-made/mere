@@ -1,0 +1,391 @@
+{
+  "path": "crates/cambium/scenes/scenomise/src/backdrops.rs",
+  "git_basis": "a6e6b94140b0b227f2ac19356571e3decfa98975",
+  "git_blob_sha256": "a32f6b22a6078df73d51ed94d099905a3d1f31a90e4f1747e4d55e16d1ebd427",
+  "prior_coverage": {
+    "sha256": "a32f6b22a6078df73d51ed94d099905a3d1f31a90e4f1747e4d55e16d1ebd427",
+    "through": 39061
+  },
+  "current_sha256": "92a64f3994555483fa0ae55ab222efe4c972d6df2cc587a5ab684dd3de7f5493",
+  "current_chars": 41351,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        1721
+      ],
+      "new_chars": [
+        0,
+        1721
+      ],
+      "text_sha256": "c3ccf75d1c3a2f909eb6be25ae6f26310f39b7021303d7bc0787b38cb2e1d71a"
+    },
+    {
+      "old_chars": [
+        1721,
+        2030
+      ],
+      "new_chars": [
+        2371,
+        2680
+      ],
+      "text_sha256": "85e9066abb7345f48dd90882b45a897398ebb09f2d9014534eafd28a0313e4cd"
+    },
+    {
+      "old_chars": [
+        2030,
+        10294
+      ],
+      "new_chars": [
+        2946,
+        11210
+      ],
+      "text_sha256": "ae17dfcb431ba09eaf0cd2c8b36669c98bbb51102703b4bb897bad9185c76113"
+    },
+    {
+      "old_chars": [
+        10294,
+        10648
+      ],
+      "new_chars": [
+        11675,
+        12029
+      ],
+      "text_sha256": "76e080681af8b64cdfc8068abc6f6752bbb9b37fef0395b5390763930cda93dd"
+    },
+    {
+      "old_chars": [
+        10648,
+        18982
+      ],
+      "new_chars": [
+        12650,
+        20984
+      ],
+      "text_sha256": "8e2e90416f16a601a98822151b3276e5c03b344a01c2e7dae9bf26ee7d22f0cd"
+    },
+    {
+      "old_chars": [
+        19088,
+        27885
+      ],
+      "new_chars": [
+        21101,
+        29898
+      ],
+      "text_sha256": "b90c3c4800bf1cde78e5e8054c32006a871828b3f7a8e24328e3775ba126b54e"
+    },
+    {
+      "old_chars": [
+        28035,
+        29963
+      ],
+      "new_chars": [
+        29946,
+        31874
+      ],
+      "text_sha256": "3028ad1fdbbfd714ed67bebaa93abcda11f08146cb1ed6fc8515d6c9738cc3bf"
+    },
+    {
+      "old_chars": [
+        30212,
+        30463
+      ],
+      "new_chars": [
+        32348,
+        32599
+      ],
+      "text_sha256": "18b59ebb0a9db32891abc5f499765fde31bb40f4fcf637b804329abaf8763c5e"
+    },
+    {
+      "old_chars": [
+        30501,
+        30572
+      ],
+      "new_chars": [
+        32696,
+        32767
+      ],
+      "text_sha256": "2e0cc6c39b59a2afcd78d0b0cd7d10b7dd8259255e557d434a40603e20c7f96d"
+    },
+    {
+      "old_chars": [
+        30598,
+        30862
+      ],
+      "new_chars": [
+        32858,
+        33122
+      ],
+      "text_sha256": "daa18fb336389137bb9c597bc7e9b995d5a27d9bdb272b170a3a42da4eaeed18"
+    },
+    {
+      "old_chars": [
+        30916,
+        30935
+      ],
+      "new_chars": [
+        33207,
+        33226
+      ],
+      "text_sha256": "91ca7abb78737656584174e6720b0b950e76e4d9d62e27a82bacdcb84eb56da4"
+    },
+    {
+      "old_chars": [
+        30958,
+        39061
+      ],
+      "new_chars": [
+        33248,
+        41351
+      ],
+      "text_sha256": "29074e8b47fd384e3fe8502a1a9373baea98966e90ea923e434f5c97e55e9b3f"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "insert",
+      "old_lines": [
+        54,
+        53
+      ],
+      "new_lines": [
+        54,
+        74
+      ],
+      "old_chars": [
+        1721,
+        1721
+      ],
+      "new_chars": [
+        1721,
+        2371
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        67,
+        66
+      ],
+      "new_lines": [
+        88,
+        91
+      ],
+      "old_chars": [
+        2030,
+        2030
+      ],
+      "new_chars": [
+        2680,
+        2946
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        334,
+        333
+      ],
+      "new_lines": [
+        359,
+        368
+      ],
+      "old_chars": [
+        10294,
+        10294
+      ],
+      "new_chars": [
+        11210,
+        11675
+      ]
+    },
+    {
+      "kind": "insert",
+      "old_lines": [
+        342,
+        341
+      ],
+      "new_lines": [
+        377,
+        387
+      ],
+      "old_chars": [
+        10648,
+        10648
+      ],
+      "new_chars": [
+        12029,
+        12650
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        529,
+        529
+      ],
+      "new_lines": [
+        575,
+        578
+      ],
+      "old_chars": [
+        18982,
+        19088
+      ],
+      "new_chars": [
+        20984,
+        21101
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        803,
+        809
+      ],
+      "new_lines": [
+        852,
+        852
+      ],
+      "old_chars": [
+        27885,
+        28035
+      ],
+      "new_chars": [
+        29898,
+        29946
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        865,
+        873
+      ],
+      "new_lines": [
+        908,
+        917
+      ],
+      "old_chars": [
+        29963,
+        30212
+      ],
+      "new_chars": [
+        31874,
+        32348
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        881,
+        881
+      ],
+      "new_lines": [
+        925,
+        925
+      ],
+      "old_chars": [
+        30463,
+        30501
+      ],
+      "new_chars": [
+        32599,
+        32696
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        883,
+        883
+      ],
+      "new_lines": [
+        927,
+        929
+      ],
+      "old_chars": [
+        30572,
+        30598
+      ],
+      "new_chars": [
+        32767,
+        32858
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        892,
+        892
+      ],
+      "new_lines": [
+        938,
+        938
+      ],
+      "old_chars": [
+        30862,
+        30916
+      ],
+      "new_chars": [
+        33122,
+        33207
+      ]
+    },
+    {
+      "kind": "replace",
+      "old_lines": [
+        894,
+        894
+      ],
+      "new_lines": [
+        940,
+        940
+      ],
+      "old_chars": [
+        30935,
+        30958
+      ],
+      "new_chars": [
+        33226,
+        33248
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 50,
+      "new_start_line": 50,
+      "text": "     #[serde(default = \"binary_foot\", skip_serializing_if = \"is_binary_foot\")]\n     pub positions_per_foot: u16,\n     pub lines: Vec<VerseLine>,\n }\n+impl MetreGrid {\n+    pub fn extent(&self) -> u32 {\n+        self.lines\n+            .iter()\n+            .map(|l| l.syllables.len() as u32)\n+            .max()\n+            .unwrap_or(1)\n+            .max(u32::from(self.feet) * u32::from(self.positions_per_foot))\n+    }\n+    pub fn placement(&self, line: usize, syllable: usize) -> Option<Span> {\n+        let row = self.lines.get(line)?;\n+        row.syllables.get(syllable)?;\n+        match &row.alignment {\n+            Some(spans) => spans.get(syllable).copied().flatten(),\n+            None => Some(Span {\n+                start: syllable as u32,\n+                length: 1,\n+            }),\n+        }\n+    }\n+}\n fn binary_foot() -> u16 {\n     2\n }\n fn is_binary_foot(value: &u16) -> bool {\n"
+    },
+    {
+      "old_start_line": 63,
+      "new_start_line": 84,
+      "text": "     pub key: String,\n     pub source: SourceRef,\n     pub text: String,\n     pub syllables: Vec<Syllable>,\n+    /// Omitted: legacy ordinal alignment. Present: one explicit placement (or\n+    /// unplaced value) per source syllable, independent of candidate stress.\n+    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n+    pub alignment: Option<Vec<Option<Span>>>,\n     /// The template's expected group, independently of the observed tail.\n     pub rhyme_group: Option<String>,\n     /// Supplied by the source's pronunciation/scansion adapter, never inferred\n     /// from spelling here. Unknown tails do not establish a rhyme.\n"
+    },
+    {
+      "old_start_line": 330,
+      "new_start_line": 355,
+      "text": "                     \"metre\",\n                     \"metre extent exceeds limits\",\n                 )?;\n                 unique(grid.lines.iter().map(|l| l.key.as_str()), \"metre.lines\")?;\n+                let keys: Vec<String> = grid\n+                    .lines\n+                    .iter()\n+                    .flat_map(|line| {\n+                        std::iter::once(line.key.clone()).chain(\n+                            (0..line.syllables.len()).map(|i| format!(\"{}/syllable/{i}\", line.key)),\n+                        )\n+                    })\n+                    .collect();\n+                unique(keys.iter().map(String::as_str), \"metre.occurrences\")?;\n                 let mut count = grid.lines.len();\n                 for line in &grid.lines {\n                     source(&line.source, \"metre.line.source\")?;\n                     check(\n                         line.syllables.len() <= 512,\n                         \"metre.line.syllables\",\n                         \"too many syllables\",\n                     )?;\n+                    if let Some(alignment) = &line.alignment {\n+                        check(\n+                            alignment.len() == line.syllables.len()\n+                                && alignment.iter().flatten().all(|span| {\n+                                    span.length > 0\n+                                        && span.end().is_some_and(|end| end <= grid.extent())\n+                                }),\n+                            \"metre.line.alignment\",\n+                            \"one bounded positive span or unplaced value is required per syllable\",\n+                        )?;\n+                    }\n                     count += line.syllables.len();\n                     check(\n                         line.rhyme_tail\n                             .as_ref()\n"
+    },
+    {
+      "old_start_line": 525,
+      "new_start_line": 571,
+      "text": " }\n \n // Core Sceno records keep their existing permissive stored-format serde.\n // This disclosed-input boundary is strict, including those nested records.\n-pub(crate) fn strict_core_records(value: &serde_json::Value, path: &str) -> Result<(), SceneInputError> {\n+pub(crate) fn strict_core_records(\n+    value: &serde_json::Value,\n+    path: &str,\n+) -> Result<(), SceneInputError> {\n     match value {\n         serde_json::Value::Object(map) => {\n             let allowed: Option<&[&str]> = if map.contains_key(\"adapter\") {\n                 Some(&[\"adapter\", \"id\"])\n"
+    },
+    {
+      "old_start_line": 799,
+      "new_start_line": 848,
+      "text": " fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid) {\n     let slot = 47.0;\n     let row = 154.0;\n     let n = grid.feet as usize * grid.positions_per_foot as usize;\n-    let max_syllables = grid\n-        .lines\n-        .iter()\n-        .map(|l| l.syllables.len())\n-        .max()\n-        .unwrap_or(n)\n-        .max(n);\n+    let max_syllables = grid.extent() as usize;\n     let template = SequenceTemplate {\n         lanes: vec![String::new(); grid.lines.len().max(1)],\n         extent: max_syllables.max(1) as u32,\n         ticks_per_unit: 1,\n"
+    },
+    {
+      "old_start_line": 861,
+      "new_start_line": 904,
+      "text": "             size: Size2::new(36.0, 44.0),\n         });\n         rows.push(id);\n         for (j, syllable) in line.syllables.iter().enumerate() {\n-            let sx = template\n-                .centre(\n-                    i as u16,\n-                    Span {\n-                        start: j as u32,\n-                        length: 1,\n-                    },\n-                )\n-                .x;\n+            let Some(span) = grid.placement(i, j) else {\n+                out.unplaced.push(Unplaced {\n+                    key: format!(\"{}/syllable/{j}\", line.key),\n+                    source: line.source.clone(),\n+                    label: syllable.text.clone(),\n+                    reason: \"Authored unplaced syllable; lexical stress is retained\".into(),\n+                });\n+                continue;\n+            };\n+            let sx = template.centre(i as u16, span).x;\n             let h = if syllable.stressed { 24.0 } else { 7.0 };\n             mark(\n                 out,\n                 format!(\"{}/syllable/{j}\", line.key),\n                 &line.source,\n                 syllable.text.clone(),\n                 format!(\n-                    \"{} syllable {}\",\n+                    \"{} candidate stress \u00b7 syllable {} \u00b7 start {} / span {} metrical positions\",\n                     if syllable.stressed { \"strong\" } else { \"weak\" },\n-                    j + 1\n+                    j + 1,\n+                    span.start,\n+                    span.length\n                 ),\n                 if syllable.stressed {\n                     MarkRole::StrongStress\n                 } else {\n                     MarkRole::WeakStress\n                 },\n                 Vec2::new(sx, y - h / 2.0),\n                 Footprint::Rect {\n-                    size: Size2::new(slot * 0.70, h),\n+                    size: Size2::new((slot * span.length as f32 - 8.0).max(3.0), h),\n                 },\n-                false,\n+                true,\n                 Some(Vec2::new(sx, y + 17.0)),\n             );\n         }\n         if let Some(group) = &line.rhyme_group {\n"
+    }
+  ],
+  "certificate": "transition_f5c3020f8517_92a64f399455.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T06:12:10.167791+00:00"
+}

@@ -1,0 +1,8 @@
+error: couldn't find file `C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\..\..\..\..\\ports\graphshell\src\distillery_w1.rs`
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\chronicle_mount_probe.rs:3:1
+  |
+3 | mod current;
+  | ^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+

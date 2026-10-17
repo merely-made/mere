@@ -1,0 +1,85 @@
+{
+  "test_exit": 101,
+  "tests": 12,
+  "harness_sha256": "5ebd0fa732afbdc2ec361341cbad037481f284ba26da93108ca953193e5f29b4",
+  "source_sha256": {
+    "crates/canvas/pictograph/src/canvas/cartography.rs": "902e0f3d00eb090827d09d0dc2377a38e6f5a42fe6a0964b156e7e614f5e362d",
+    "crates/canvas/pictograph/src/canvas/camera_host.rs": "26a0f8214c1a14415d149e7eb9937f472f15d3a5661a8e59f35fb294a53692be",
+    "crates/canvas/pictograph/src/canvas/controls.rs": "744e84335a3943f0031b87bbc8b5ca23ba26abebddd199d26fccb1aaf8714ab3",
+    "crates/canvas/pictograph/src/canvas/input.rs": "41d6457b0e82e6381e82e6176383384340d1f7da6bb9d358ec06e379a0978a5f",
+    "crates/canvas/pictograph/src/canvas/coupling_paint.rs": "50826e3f5c4e3bb34f0cf00ea0b72fa025c66a20c467bd4c7cc8de00cf5f4c47",
+    "crates/canvas/pictograph/src/canvas/fold_paint.rs": "1f274301716caa99633e93748e69eb19ad6d8af87c7e2138415b511b2e38dbb5",
+    "crates/canvas/pictograph/src/canvas/fields.rs": "1730e2667e7020223822b70eee33fce5ebe8c9bf1e584de92633c8d050ff8ce5",
+    "crates/canvas/pictograph/src/canvas/selection.rs": "85becd25fc50184b30c081cd4d08b7cb91bacca1b25283a44c2af6e5e3c76e4a",
+    "crates/canvas/pictograph/src/canvas/dynamics_spec.rs": "250cd9e02714e6326ae14c5f191b4f799b6201d7624f528c808f06910b7324a5",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection.rs": "ba1b45489d1f5d7f4b072f52870a2174d61c36110de07b8b8ed03736c434f027",
+    "crates/canvas/pictograph/src/canvas/relationship_topology.rs": "0a58241dcdabadfb3c2b5b36a9d6738fbf5566fa5134d75856a4e423962d891d",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "992dd387a5ab9741a1a33dafb406199156a6c9a8c7e2df0ca5901f6df837cb0d",
+    "crates/canvas/pictograph/src/canvas/palette.rs": "70e2d99291ec700ca55aa1a4b81a743a2e75776afe9dd29b73862dcd005a3529",
+    "crates/canvas/pictograph/src/canvas/build.rs": "d1888a9e8d455887e92505edae5ca0a5175f135c6f584c4c9cf882a1f28428e6"
+  },
+  "library_sha256": {
+    "curation": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-84215a77c902be1e.rlib",
+      "sha256": "6843c8a8f72d0edfa2c6070d058b0251c0b2423424ba28c722d1ff9483bb4fff"
+    },
+    "scenograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenograph-19959848835e9a56.rlib",
+      "sha256": "c9ec3b10308a4acc745bd1fce0be57e1944a42c86ad0b0fa3f77b6583efb2f67"
+    },
+    "kernel": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-2e99ce8c1f69fd78.rlib",
+      "sha256": "64aed8db2000cc1499a77e116225d3f9a1e6cc9bd6a7e880ceb729177d5adf28"
+    },
+    "cartography": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcartography-0f25c12053fefee2.rlib",
+      "sha256": "4040396ff35962a388a34766a2056f5bdc44dedd1a3483fcc1aaa5119a267834"
+    },
+    "pictograph": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libpictograph.rlib",
+      "sha256": "33c81c4a89453722179b13e2e9a8f92acb40d04077d8b52da76d973e14c3497d"
+    }
+  },
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\pictograph_boundary_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-pictograph-boundary-probe.exe",
+    "--extern",
+    "curation=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcuration-84215a77c902be1e.rlib",
+    "--extern",
+    "scenograph=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libscenograph-19959848835e9a56.rlib",
+    "--extern",
+    "kernel=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libkernel-2e99ce8c1f69fd78.rlib",
+    "--extern",
+    "cartography=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libcartography-0f25c12053fefee2.rlib",
+    "--extern",
+    "pictograph=C:\\t\\cargo-targets\\mere\\debug\\libpictograph.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-60cd86991815b163\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\fontsan-054e91f39c3a15ff\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\libz-sys-ab1ddcea88a4497f\\out\\lib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\psm-d4fbcc15a6e96c07\\out",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\stacker-92e0bcfd606e5c9a\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.52.6\\lib",
+    "-L",
+    "native=C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\windows_x86_64_msvc-0.53.1\\lib"
+  ],
+  "build_exit": 0,
+  "native_binary_sha256": "f7bd37785f934e7ec6ad5964e01a90cc155b3d7f4cf3737c8f04dadb1a7cdbb1",
+  "generated_output_removed": true,
+  "scope": "Generated native graphs and public Canvas/paint/command APIs. Eleven diagnostics characterize ten defects (two hide paths share one fold-routing defect); unsupported weighted-root control qualifies shared refusal. One CPU Canvas frame, no headed UI, network, storage, GPU rasterization or source writes."
+}

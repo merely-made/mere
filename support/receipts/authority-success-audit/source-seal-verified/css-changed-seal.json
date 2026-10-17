@@ -1,0 +1,44 @@
+{
+  "schema": "graphshell-renderer-browser-identity-v1",
+  "sealed": true,
+  "features": [
+    "product"
+  ],
+  "target": "wasm32-unknown-unknown",
+  "sources": [
+    {
+      "root": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\source-seal-verified\\repo",
+      "head": "AUDIT_INERT_SOURCE_FIXTURE_NO_REAL_GIT_COMMIT",
+      "source_sha256": {
+        "Cargo.toml": "4ce872b5fbd0fa2a92ad61bdddc65f22c2664ae6eb341a3d969c7c0ea017ff4e",
+        "crates\\cambium\\cambium\\src\\workspace_chrome.rs": "bda64b94139b01aa6be6128d28d818c9522ee0203e39e4200c79c1a19d143515"
+      },
+      "fingerprint": "dfa404a4aa4fbd47f0bb8d3333505454548f7a161fa7fed63603d989cb41bef2"
+    }
+  ],
+  "build_sources": [
+    {
+      "root": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\source-seal-verified\\repo",
+      "head": "AUDIT_INERT_SOURCE_FIXTURE_NO_REAL_GIT_COMMIT",
+      "source_sha256": {
+        "Cargo.toml": "4ce872b5fbd0fa2a92ad61bdddc65f22c2664ae6eb341a3d969c7c0ea017ff4e",
+        "crates\\cambium\\cambium\\src\\workspace_chrome.rs": "bda64b94139b01aa6be6128d28d818c9522ee0203e39e4200c79c1a19d143515"
+      },
+      "fingerprint": "dfa404a4aa4fbd47f0bb8d3333505454548f7a161fa7fed63603d989cb41bef2"
+    }
+  ],
+  "package": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\source-seal-verified\\pkg",
+  "artifacts": {
+    "graphshell_web.js": {
+      "bytes": 46,
+      "sha256": "9bd0634cb700044a397841138e74e5deca0e35cdffd653ab648375363803a6b6"
+    },
+    "graphshell_web_bg.wasm": {
+      "bytes": 26,
+      "sha256": "fe148a9fd50afefd020582f25c11c164f1f4204ae940d17ae92c3464826511a1"
+    }
+  },
+  "metadata_sha256": "a5e7b5d48fb375cb0c33a7726b6bb025e4d9bb7cde87f60017083b18923acf1f",
+  "build_log_sha256": "be35fe7e40dbecf2501368131b01cafd1517f863e0e9d673bd7b4d73c5a7f47c",
+  "dependencies": []
+}

@@ -1,0 +1,49 @@
+0uuid v1.27.0
+1accesskit v0.24.1
+2accesskit feature "default"
+3mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+4mere-kernel feature "default" (command-line)
+2accesskit feature "enumn"
+3accesskit feature "serde"
+4mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+2accesskit feature "serde" (*)
+1uuid feature "default"
+2cfb v0.7.3
+3cfb feature "default"
+4infer v0.19.0
+5infer feature "alloc"
+6infer feature "std"
+7infer feature "default"
+8mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+5infer feature "cfb"
+6infer feature "std" (*)
+5infer feature "default" (*)
+5infer feature "std" (*)
+2chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+3chartulary feature "default"
+4mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+2mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+3mere-forme feature "default"
+4mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+2mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+2numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+3numen feature "default"
+4mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+1uuid feature "js"
+2numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen) (*)
+1uuid feature "rng"
+2uuid feature "v4"
+3mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme) (*)
+1uuid feature "serde"
+2mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme) (*)
+2mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+2numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen) (*)
+2accesskit feature "serde" (*)
+1uuid feature "sha1"
+2uuid feature "v5"
+3chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary) (*)
+3mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel) (*)
+1uuid feature "std"
+2uuid feature "default" (*)
+1uuid feature "v4" (*)
+1uuid feature "v5" (*)

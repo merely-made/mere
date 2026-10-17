@@ -1,0 +1,5 @@
+{
+  "child_exit": 0,
+  "stdout": "{\"packages\": [{\"name\": \"netrender\", \"version\": \"0.1.2\", \"source\": \"registry+https://github.com/rust-lang/crates.io-index\"}]}",
+  "knot_revision": "3af93adda472af2913a5d298f14deb10e85daee2"
+}

@@ -1,0 +1,42 @@
+
+running 37 tests
+test any_view::message_after_rebuild ... ok
+test any_view::messages_to_inner_view ... ok
+test any_view::no_message_after_stale ... ok
+test any_view::no_message_after_stale_then_same_type ... ok
+test arc::arc_no_path ... ok
+test arc::arc_passthrough_message ... ok
+test arc::arc_passthrough_teardown ... ok
+test arc::box_no_path ... ok
+test arc::box_passthrough_message ... ok
+test arc::box_passthrough_rebuild ... ok
+test arc::box_passthrough_rebuild_same_value ... ok
+test arc::box_passthrough_teardown ... ok
+test arc::new_arc_rebuild ... ok
+test arc::new_arc_rebuild_same_value ... ok
+test arc::same_arc_skip_rebuild ... ok
+test array_sequence::two_element_message ... ok
+test array_sequence::two_element_passthrough ... ok
+test base_sequence::one_element_sequence_passthrough ... ok
+test base_sequence::option_message_some ... ok
+test base_sequence::option_message_some_none_some_stale ... ok
+test base_sequence::option_message_some_none_stale ... ok
+test base_sequence::option_message_some_some ... ok
+test base_sequence::option_none_none ... ok
+test base_sequence::option_none_some ... ok
+test base_sequence::option_some_none ... ok
+test base_sequence::option_some_some ... ok
+test nested_seq::vec_in_tuple ... ok
+test orphan::str_as_orphan_view ... ok
+test tuple_sequence::one_element_passthrough ... ok
+test tuple_sequence::two_element_message ... ok
+test tuple_sequence::two_element_passthrough ... ok
+test tuple_sequence::unit_no_elements ... ok
+test vec_sequence::normal_messages ... ok
+test vec_sequence::one_two ... ok
+test vec_sequence::one_zero ... ok
+test vec_sequence::stale_messages ... ok
+test vec_sequence::zero_zero ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+

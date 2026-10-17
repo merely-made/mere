@@ -1,0 +1,27 @@
+
+running 22 tests
+test inspection::tests::disabled_retention_is_not_reported_as_nothing_happened ... ok
+test inspection::tests::display_budget_never_changes_observation_loss ... ok
+test inspection::tests::inspection_reports_loss_and_unavailable_correlation_without_draining_receipt ... ok
+test inspection::tests::structural_projection_keeps_all_readings_and_declares_no_actions ... ok
+test inspection::tests::supplied_cause_retains_its_scope_and_record_identity_survives_label_changes ... ok
+test observation::tests::accounting_overflow_is_a_visible_rejection ... ok
+test observation::tests::age_expires_at_equality_even_without_new_records ... ok
+test observation::tests::backward_receipt_time_rejects_without_changing_sequence_or_cursor ... ok
+test observation::tests::bounded_batches_keep_gaps_and_never_skip_retained_successors ... ok
+test observation::tests::byte_limit_accounts_envelope_and_payload_and_evicts_before_admission ... ok
+test observation::tests::correlation_and_source_time_preserved_without_inferring_order ... ok
+test observation::tests::count_eviction_and_slow_readers_are_independent ... ok
+test observation::tests::envelope_metadata_is_included_in_admission_accounting ... ok
+test observation::tests::oversize_rejection_preserves_retained_records_and_consumes_sequence ... ok
+test observation::tests::reducing_limits_enforces_bounds_immediately ... ok
+test observation::tests::reset_reports_old_run_and_old_readers_receive_a_boundary ... ok
+test observation::tests::sequence_exhaustion_is_transactional ... ok
+test observation::tests::zero_of_any_limit_disables_retention_and_reports_loss ... ok
+test observation::tests::zero_read_is_nondestructive_and_tail_is_explicit ... ok
+test tests::ids_are_deterministic_across_runs ... ok
+test tests::root_is_apparatus_group ... ok
+test tests::skeleton_includes_each_section ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

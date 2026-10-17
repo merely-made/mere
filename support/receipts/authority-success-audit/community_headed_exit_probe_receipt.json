@@ -1,0 +1,82 @@
+{
+  "tests": 2,
+  "checks": [
+    {
+      "scenario_result": "fail",
+      "main_returned_normally": true,
+      "stdout": "RESULT fail\n\n",
+      "metadata_result": "fail",
+      "synthetic_process_count": 3
+    },
+    {
+      "scenario_result": "ok",
+      "main_returned_normally": true,
+      "stdout": "RESULT ok\n\n",
+      "metadata_result": "ok",
+      "synthetic_process_count": 3
+    }
+  ],
+  "source_sha256": {
+    "ports/graphshell/web/tests/run-headed-receipt.py": "d2de8bfa9980d5576b4aa37f2ce5c0dc0a6e0906174f21f1e275d6124e7cc5d9"
+  },
+  "diagnostic_sha256": "44523b12dec684ae6f0780fed2d3391b0d96c580a535b811dbe072375ae33936",
+  "fixture_files": {
+    "community_headed_exit_fixture/scenario-fail/chrome.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "community_headed_exit_fixture/scenario-fail/environment.json": {
+      "sha256": "f4624562971f3014e5374e346b947fd5960a2071669d11fe52368f59419b570f",
+      "bytes": 1969
+    },
+    "community_headed_exit_fixture/scenario-fail/result.json": {
+      "sha256": "578e63479154ceb4295766866a9c1fdd440f8f193bc52b4da5f8ed866c542209",
+      "bytes": 79
+    },
+    "community_headed_exit_fixture/scenario-fail/scenario.done": {
+      "sha256": "baa141006b12619772ad64d0677f5cb365d068cfc838f0e7d6c867db1f49ed9b",
+      "bytes": 13
+    },
+    "community_headed_exit_fixture/scenario-fail/sink.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "community_headed_exit_fixture/scenario-fail/chrome-profile/.graphshell-receipt-profile": {
+      "sha256": "2d7d5959ef4e854778ce13b885d8fa3e8d8077e7d963d2c83ab1b42f3b6a4258",
+      "bytes": 43
+    },
+    "community_headed_exit_fixture/scenario-ok/chrome.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "community_headed_exit_fixture/scenario-ok/environment.json": {
+      "sha256": "0f419dcf40c21ee5f6e6a50dd57ead2fce5122695f3b5f981b73c3cfbbdf66bb",
+      "bytes": 1959
+    },
+    "community_headed_exit_fixture/scenario-ok/result.json": {
+      "sha256": "6190136ec58a12345b13a413d334d1565a87fa6a9d0f5281af76aa501d0e5a22",
+      "bytes": 77
+    },
+    "community_headed_exit_fixture/scenario-ok/scenario.done": {
+      "sha256": "5a96e4ad6d16c64c48d0375a62923cd1e7b278b82f507c7d7312c650745dfe96",
+      "bytes": 11
+    },
+    "community_headed_exit_fixture/scenario-ok/sink.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "community_headed_exit_fixture/scenario-ok/chrome-profile/.graphshell-receipt-profile": {
+      "sha256": "2d7d5959ef4e854778ce13b885d8fa3e8d8077e7d963d2c83ab1b42f3b6a4258",
+      "bytes": 43
+    },
+    "community_headed_exit_fixture/web/pkg/graphshell_web_bg.wasm": {
+      "sha256": "2f1f434fda1128169966af6c233c831cb7a6a76fcb44a117cbc5fce95ccdb66c",
+      "bytes": 18
+    },
+    "community_headed_exit_fixture/web/scenarios/fixture.scn": {
+      "sha256": "f9d8785589c46b224558a50a71cdfd552da9ea1fc8640c8ee9d8eec182dd0388",
+      "bytes": 24
+    }
+  },
+  "scope": "Unchanged actual current driver main, synthetic file receipts and substituted process/socket/HTTP/clock/OS dependencies. No browser, process launch, signal, capture, GPU, network or actual headed qualification. Proves failed-scenario status is recorded but does not make this main fail."
+}

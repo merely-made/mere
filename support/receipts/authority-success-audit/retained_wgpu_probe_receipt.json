@@ -1,0 +1,51 @@
+{
+  "date_utc": "2026-10-17T21:04:47.183377+00:00",
+  "exit": 0,
+  "passed": 12,
+  "source_sha256": {
+    "support/patches/cubecl-wgpu/src/backend/vulkan.rs": "a92bb33377d33fc1b92ea040f6cceb59adfcb1ba73199a34d84a6f5cbefb6322",
+    "support/patches/cubecl-wgpu/src/backend/vulkan/features.rs": "81edb23d9e29009748d8550d57ae4102faa619a9d321b7eb1aaf1aa1c8688f86",
+    "support/patches/cubecl-wgpu/src/compiler/wgsl/base.rs": "10035b0192c0a44f3a69973ff88507b4328728b02640557b93114bb82beb55a9",
+    "support/patches/cubecl-wgpu/src/compiler/wgsl/extension.rs": "174517ae6ca44b9e939794a546a47d480e024288273f779fc06aa35708b9d41d",
+    "support/patches/cubecl-wgpu/src/compiler/wgsl/instructions.rs": "75ad82ab210881aa769452ca248a5a6261345199cd58f257e06a006207accb6f",
+    "support/patches/cubecl-wgpu/src/compiler/wgsl/compiler.rs": "d8598da84b0bf0c95c3e1a47be848ca2fa5acea41f11a90abb239c2603b98739",
+    "support/patches/cubecl-wgpu/src/compiler/wgsl/shader.rs": "c4cc0bcd8fa9fc9d52bf53ed0c99c1ce69c9a9a8538c0bbbabb7a9ab906c776b"
+  },
+  "compile_command": [
+    "rustc",
+    "--test",
+    "--edition=2024",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\retained_wgpu_probe.rs",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\audit-retained-wgpu.exe"
+  ],
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-wgpu.exe",
+      "bytes": 959488,
+      "sha256": "22a435a64f75f9d403d07da52799bc3e9c8e260963afd15e38a5b9c84c5672b4"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\audit-retained-wgpu.pdb",
+      "bytes": 3158016,
+      "sha256": "1faee643b45bd2653d4503453b1089560cdfc8aa0d9cc1e28fd0cbae24aee5a6"
+    }
+  ],
+  "retained_isolation": [],
+  "extracted_body_sha256": {
+    "register_extensions": "fb0815532eb40c4eb30c197ed7e5435a311e3939038bd038047d676b1e072a79",
+    "storage_predicates": "d63b5535cd1bebf4df3c151a3c6ecdd5e221f0c891b8c7d18bcf884ffd5ab6e1",
+    "full_values": "10035b0192c0a44f3a69973ff88507b4328728b02640557b93114bb82beb55a9",
+    "full_extension": "174517ae6ca44b9e939794a546a47d480e024288273f779fc06aa35708b9d41d",
+    "full_instructions": "75ad82ab210881aa769452ca248a5a6261345199cd58f257e06a006207accb6f"
+  },
+  "evidence_sha256": {
+    "run_retained_wgpu_probe.py": "45679e13db27fd197a5e0e888e6a384841afd3408b4aceb32ec2e6f13523ecce",
+    "retained_wgpu_probe.rs": "7e584e8b30565ae3335ee45c9a7247cf71530ed4c6e570e99f7e21d3438b6e38",
+    "retained_wgpu_compile.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained_wgpu_run.txt": "728f28b3abfed0b4c727c27da833824b979b3e99e7ddc47a2279eb3fd2349e02"
+  },
+  "qualification": "Retained 0.10 backend, root lock selects registry0.11. Exact full WGSL base/extension/instructions source and extracted register_extensions; only core Id/constant Display/f16 storage/Subgroup types doubled, no Subgroup execution. Exact Vulkan storage predicate with feature structs. CPU emitted text/helper-list/IEEE-bit classification witnesses only. No parser/Naga validation, GPU/backend/actual Vulkan feature query, concrete caller or shipped failure. Owned exe/PDB removed."
+}

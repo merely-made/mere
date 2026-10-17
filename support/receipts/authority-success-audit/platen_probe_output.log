@@ -1,0 +1,30 @@
+
+running 9 tests
+test closing_an_inactive_earlier_tab_changes_the_active_member ... Closing inactive1 from[1,2,3] with active2 switches active to3; last-active clamp control retains3.
+ok
+test duplicate_geometry_members_survive_admission_close_and_canonical_check ... Loaded duplicate members pass canonical check, create duplicate AccessKit IDs, and one remains after close; normal open_stack deduplicates.
+ok
+test failed_open_into_missing_target_removes_existing_member ... open_in_slot_of returns false and removes held member2 for unknown target99; guarded move control preserves it.
+ok
+test float_resolve_does_not_sanitize_nonfinite_host_area ... Nonfinite host x panics and host width yields NaN despite nonfinite-input promise; nonfinite rect control is sanitized.
+ok
+test geometry_overrides_arrangement_members_and_stacking_without_a_refusal ... Same arrangement1 StackedWith2: stale geometry drops2; split geometry yields two cells while no geometry yields one. Self-roundtrip still true.
+ok
+test late_bridge_does_not_merge_previously_placed_stacks ... Edges1-3 and2-3 project to two slots, violating2-3 grouping; insertion-aligned chain projects to one.
+ok
+test sanitizer_and_live_normalizer_leave_invalid_shares_and_persist_can_panic ... sanitize leaves[-1,2]; finite MAX shares become[0,0] in both paths; debug fallible persist panics, ordinary weights serialize.
+ok
+test shared_reducer_repeats_platens_active_index_loss ... Shared Workbench reducer also switches active2 to3 when inactive1 closes.
+ok
+test shared_reducer_reports_applied_after_self_edge_drop_deletes_the_tile ... Shared reducer returns Applied after dropping1 onto its own edge deletes1; unknown target is Unchanged; other-tile edge preserves both.
+ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+thread 'float_resolve_does_not_sanitize_nonfinite_host_area' (27800) panicked at C:\Users\mark_\.rustup\toolchains\1.99.0-x86_64-pc-windows-msvc\lib/rustlib/src/rust\library\core\src\num\f32.rs:1605:9:
+min > max, or either was NaN. min = NaN, max = NaN
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'sanitizer_and_live_normalizer_leave_invalid_shares_and_persist_can_panic' (56864) panicked at crates\platen\platen\src\workbench\bridge.rs:114:9:
+TileLayout Pane tree is not canonical-derivable from its (Arrangement, geometry) pair

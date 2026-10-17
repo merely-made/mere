@@ -1,0 +1,13 @@
+warning: variant `Opacity` is never constructed
+ --> C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\native_authority_v2_probe.rs:9:44
+  |
+9 | #[derive(Clone,Copy)] enum LayerKind {Clip,Opacity}
+  |                            ---------       ^^^^^^^
+  |                            |
+  |                            variant in this enum
+  |
+  = note: `LayerKind` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

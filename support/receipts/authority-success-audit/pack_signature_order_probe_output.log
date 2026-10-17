@@ -1,0 +1,11 @@
+
+running 3 tests
+test permuting_one_valid_and_one_malformed_binding_changes_the_verdict ... OBSERVATION: the same signature multiset is Trusted with the valid binding first and Broken with the malformed binding first
+ok
+test signature_still_refuses_a_changed_manifest ... CONTROL: a signature over the original manifest does not authorize a changed version
+ok
+test valid_invalid_and_unsigned_single_binding_controls_hold ... CONTROL: valid, malformed and unsigned single-binding classifications remain distinct
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

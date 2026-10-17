@@ -1,0 +1,60 @@
+{
+  "date_utc": "2026-10-16T21:24:20.338261+00:00",
+  "scope": "Current public sans-I/O Graphshell admission under admission-only features, synthetic signed identities and supplied authenticated memory-carrier facts; exact extracted N4 rule helper. No native transport, installed resident, WebRTC join or persistence scenario executed.",
+  "build_command": [
+    "rustc",
+    "--edition=2024",
+    "--test",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\host_admission_probe.rs",
+    "-L",
+    "dependency=C:\\t\\cargo-targets\\mere\\build\\debug\\deps",
+    "-C",
+    "debuginfo=0",
+    "-o",
+    "C:\\t\\cargo-targets\\mere\\authority-success-host-admission-probe.exe",
+    "--extern",
+    "insigne=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-39b85aecfba09fc5.rlib",
+    "--extern",
+    "personae=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-d17685badd0c8d2c.rlib",
+    "--extern",
+    "notochord=C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnotochord-8de5208b42926502.rlib",
+    "--extern",
+    "graphshell_host=C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_host.rlib",
+    "-L",
+    "native=C:/t/cargo-targets/mere/build\\debug\\build\\blake3-510019d0f936cdfc\\out",
+    "-L",
+    "native=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.51.36231\\atlmfc\\lib\\x64"
+  ],
+  "build_exit": 0,
+  "test_exit": 0,
+  "source_sha256": {
+    "crates/graphshell/graphshell-host/src/admission.rs": "fc006a38cfedfaa58ffabd1884ba2b4f57926c7a2b6cd7a2d3ec042e6b535ac2",
+    "crates/graphshell/graphshell-host/src/carrier.rs": "b0e72d86585594ca663d6250c5bbe2dda83bfffcc1d385fef30f41498e1c39df",
+    "crates/graphshell/graphshell-host/src/lifecycle.rs": "abebb9a9de920d476da56b492def3259caaaf79386f15387102f2a7ff43b78fe",
+    "crates/graphshell/graphshell-host/src/policy_projection.rs": "4cbd2a5f88d00c95d6b357c5a1e22e61e9008232a2140b63620491c4b385555d",
+    "crates/graphshell/graphshell-host/src/webrtc_door.rs": "957d2a25a10708da23bbb138e05c39f38a1e6c5496641690813c12888bf172e4",
+    "crates/graphshell/graphshell-host/src/webrtc_join.rs": "43289eabdefefc056f7d92f116bb6eadd31e9405bde62378aa785c9a2d406447"
+  },
+  "library_sha256": {
+    "insigne": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libinsigne-39b85aecfba09fc5.rlib",
+      "sha256": "9404ba8177786c9b4d2d15a922850c4818a38f2dedda7051415ebca8f07486be"
+    },
+    "personae": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libpersonae-d17685badd0c8d2c.rlib",
+      "sha256": "6c193548b0a81643befdeed04a20b03f2c8ce445c361b75ed89feee889e01d84"
+    },
+    "notochord": {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\libnotochord-8de5208b42926502.rlib",
+      "sha256": "779ed45db8bf287322c80377911a5a8580b683e13aa1ec365bce2ff658fe714c"
+    },
+    "graphshell_host": {
+      "path": "C:\\t\\cargo-targets\\mere\\debug\\libgraphshell_host.rlib",
+      "sha256": "fc442cc166d902fb925844d5aca666d707971718c76f3e9bff290e3d9558b35e"
+    }
+  },
+  "harness_sha256": "a0c49022b1060a65ac4bf96ffc90fbcf8078572968dad62c4a9107b7dabf9b0f",
+  "n4_extracted_helper_sha256": "8e15ac01aba7d9906803f337cdda26af50ec90108d64a1768e6850755029d792",
+  "native_binary_sha256": "5182a5b2a505f9190ff4e48e809c9828ab81378881d9160008a12df35f3e921a",
+  "generated_native_output_removed": true
+}

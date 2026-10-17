@@ -1,0 +1,9 @@
+{
+  "source_sha256": {
+    "crates/intel/esp/src/infer/decoder/provider.rs": "fb637714d91bcbce722bb4c91aa5e6f71b1349a2b411484e69aeeabd3e0a1a16",
+    "crates/intel/esp/src/infer/decoder/train.rs": "467db4d7866c8f963753d8981d65615531cb360e4f516231771ab1232e2f0507",
+    "crates/intel/esp/src/infer/provider.rs": "7ea288277fd0c08e82fbcf2b7c5053675c94c654f2a8ce2f1a8fc9d1d6b7ff5b",
+    "crates/intel/esp/src/infer/decoder/sample.rs": "fbd9bd10c546ed6b28caf2dd49686780d0fcad85db9a9e8e954fef51f8c2d918"
+  },
+  "qualification": "Exact unchanged StreamObserver, DecoderGeneration, decode method, and expected_token_rank extracted with hash binding; two unchanged full source modules include original tests. Fixture DecoderProvider holds only a real tokenizers 0.20.4 tokenizer. No model, full provider, Burn, inference/session or GPU execution."
+}

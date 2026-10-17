@@ -1,0 +1,273 @@
+{
+  "date_utc": "2026-10-17T19:20:57.185452+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\support\\receipts\\authority-success-audit\\cpu-registry-source-runtime\\Cargo.toml",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "--lib",
+    "-j",
+    "2",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "passed": 89,
+  "ignored": 1,
+  "audit_tests": 5,
+  "original_tests": 84,
+  "copied_source": {
+    "diagnostics.rs": {
+      "source": "crates/system/registry/src/diagnostics.rs",
+      "sha256": "10d3b87ab578439086a89cc9e73ac0606c010ea999f60d6be58b607d4deb0649"
+    },
+    "input.rs": {
+      "source": "crates/system/registry/src/input.rs",
+      "sha256": "498591d147d5cdccac745a317d9a5d6d4b0aa51f8824386d0f987aa7076274e4"
+    },
+    "knowledge.rs": {
+      "source": "crates/system/registry/src/knowledge.rs",
+      "sha256": "7ca216703261ae232510f317de0a93547007365cfca94f7ee6ac9599b432d8c6"
+    },
+    "layout.rs": {
+      "source": "crates/system/registry/src/layout.rs",
+      "sha256": "7221d7c9fa1c8d664a90b4bb7b3f36de095827987d1e9a3471ef772882618296"
+    },
+    "lens.rs": {
+      "source": "crates/system/registry/src/lens.rs",
+      "sha256": "0f5a80171637cbdfc694a8a769729f01d33b00d8f09f668ec2d05ff05801b416"
+    },
+    "lib.rs": {
+      "source": "crates/system/registry/src/lib.rs",
+      "sha256": "c1b86aa68f27d729db2acfa607febf3da43fa3bd391e93b91509fd65125b6c60"
+    },
+    "mod_loader.rs": {
+      "source": "crates/system/registry/src/mod_loader.rs",
+      "sha256": "13408f0d8051910b39579622597837f0d55fa0fbd75fe064ce0c339f05092bcd"
+    },
+    "protocol.rs": {
+      "source": "crates/system/registry/src/protocol.rs",
+      "sha256": "1df26242680faea2c05daaf2f2e57a7dd52fd5cf0130a4d3fe588a1ab9e0381c"
+    },
+    "viewer.rs": {
+      "source": "crates/system/registry/src/viewer.rs",
+      "sha256": "409b5b5fec2ad8b782711634e13c32cb176c2c53512cbe1c6a941af51505f80f"
+    },
+    "diagnostics/channels.rs": {
+      "source": "crates/system/registry/src/diagnostics/channels.rs",
+      "sha256": "e8e57b15860dfbc029a1ea91eaf0e518bd391e13d1862bbb64df37aa72f4a5ca"
+    },
+    "diagnostics/correlation.rs": {
+      "source": "crates/system/registry/src/diagnostics/correlation.rs",
+      "sha256": "02d12e4c636ddec8aba6236a29e35afe2bf15c13fd03ce9d9bb20b1260c7922c"
+    },
+    "diagnostics/descriptor.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor.rs",
+      "sha256": "5e9239e1d9c136a4b440f3f3dec4f9f90d78d494748080bf95ed902b102d3636"
+    },
+    "diagnostics/emit.rs": {
+      "source": "crates/system/registry/src/diagnostics/emit.rs",
+      "sha256": "3453d7b46ecd8fe9e0d12cdc3c2c94edafb130733245bcc36d27f5294f708b9c"
+    },
+    "diagnostics/descriptor/catalog.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/catalog.rs",
+      "sha256": "986af4f96b69a81255988d8c4be62a595f55a47407351373eb6063ee5cbbfc8f"
+    },
+    "diagnostics/descriptor/invariant.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/invariant.rs",
+      "sha256": "50e566984976b8935e4e756ce933cb4e1f580f16aa7b3861d45e6e4f1e61ee1f"
+    },
+    "diagnostics/descriptor/registry.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/registry.rs",
+      "sha256": "d77e5c7de22f017ceb1909ef0b9b2c5001139c79b00f2992a63d168feccbf066"
+    },
+    "diagnostics/descriptor/tests.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/tests.rs",
+      "sha256": "62e5cbf581e012162dfb708b9677bab7fdf8ca82d9576a8f9852f61871c430a5"
+    },
+    "diagnostics/descriptor/types.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/types.rs",
+      "sha256": "4915e51d49777afcce8885a91bb2dd9c53591d595070dc1a4ca608ae6e015d7b"
+    },
+    "diagnostics/descriptor/catalog/phase3a.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/catalog/phase3a.rs",
+      "sha256": "b8ad01058f83544b920d4da3ec2e771c55e95b956835e74aade62e0860e111d6"
+    },
+    "diagnostics/descriptor/catalog/phase3b.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/catalog/phase3b.rs",
+      "sha256": "97a2bc69f8c074c4c552df69a4de6dde3a83563c0a7a9cad46e06a2ada79db6b"
+    },
+    "diagnostics/descriptor/invariant/tests.rs": {
+      "source": "crates/system/registry/src/diagnostics/descriptor/invariant/tests.rs",
+      "sha256": "42c1e23a3264aab62694dc2be01b352fdc62a1f3f9965dff5ad2d900eb7f0499"
+    },
+    "diagnostics/emit/queue.rs": {
+      "source": "crates/system/registry/src/diagnostics/emit/queue.rs",
+      "sha256": "aff60b76a7987fb23a615b1d3c7bdfbc783344907bdb4e5fd05e7a995d3617a8"
+    },
+    "diagnostics/emit/queue/tests.rs": {
+      "source": "crates/system/registry/src/diagnostics/emit/queue/tests.rs",
+      "sha256": "7506675da016509ed56a254e26bfece455087628ce929a25c01008a68b95f4b8"
+    },
+    "input/defaults.rs": {
+      "source": "crates/system/registry/src/input/defaults.rs",
+      "sha256": "ef1fedfa0f186fd6ebbf8b3a99410f0938940a3cd3967c3864125f8208ce72d9"
+    },
+    "input/registry.rs": {
+      "source": "crates/system/registry/src/input/registry.rs",
+      "sha256": "613bb7f9243048f000434c4253dcc0f0c994f8a4b53f1f47ef01db13276c9466"
+    },
+    "input/tests.rs": {
+      "source": "crates/system/registry/src/input/tests.rs",
+      "sha256": "0054d618e363e88501ec89e911c8cf7118fdd0806ce15cc84375fb304cc59358"
+    },
+    "layout/canvas.rs": {
+      "source": "crates/system/registry/src/layout/canvas.rs",
+      "sha256": "6037cbd4778112f5bdf5da7a5ce47abadcb319e109d2b6fede416ecc0793f599"
+    },
+    "layout/profile_registry.rs": {
+      "source": "crates/system/registry/src/layout/profile_registry.rs",
+      "sha256": "a86e4e20b973d14a51791031f1e65f4561c91b7afd87b9e3a5c6fcb66c57a35b"
+    },
+    "layout/workbench_surface.rs": {
+      "source": "crates/system/registry/src/layout/workbench_surface.rs",
+      "sha256": "83b73be610e02725f103dffb47c72d67350215ffb30ab79a3c479984eee50386"
+    },
+    "lens/layout.rs": {
+      "source": "crates/system/registry/src/lens/layout.rs",
+      "sha256": "f5b4535ca7d2640e56dcedef9dc01b708ccc9d9c9b034a904b15f1d97fbf5eb4"
+    },
+    "lens/physics.rs": {
+      "source": "crates/system/registry/src/lens/physics.rs",
+      "sha256": "720efd9be6f03f4f75643383d1f520bbb1f9224c882615819e947a0694afe8ce"
+    },
+    "lens/physics_config.rs": {
+      "source": "crates/system/registry/src/lens/physics_config.rs",
+      "sha256": "5c486f3aca39ca909a4d6e842e115152aae2a8e115289b03f5ae571d068a302e"
+    },
+    "lens/registry.rs": {
+      "source": "crates/system/registry/src/lens/registry.rs",
+      "sha256": "53e722fae1597a7d3481a592a9f722c681ed0b90053a0fb829934f64e908f864"
+    },
+    "lens/physics/tests.rs": {
+      "source": "crates/system/registry/src/lens/physics/tests.rs",
+      "sha256": "aa9d991f1b6af7240693093de91097ce9456468cfd0057a2275e2ceb6228dd3a"
+    },
+    "mod_loader/loader.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader.rs",
+      "sha256": "ec389b5d67b186108927cbf649a2b8698f9cf6510e5593c41277afd378444462"
+    },
+    "mod_loader/loader/free_fns.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader/free_fns.rs",
+      "sha256": "8f30c952919ac611b2ad509658776a655aefbda5116d715d757d046c1022b328"
+    },
+    "mod_loader/loader/registry.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader/registry.rs",
+      "sha256": "5d7379479740700eb7c58957e60a399351be40bbafed773c47bc857062b6edd9"
+    },
+    "mod_loader/loader/tests.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader/tests.rs",
+      "sha256": "c014f3cd62345bf5e8f083233848fd7d0e8855358283d3447165a8d655a6174a"
+    },
+    "mod_loader/loader/types.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader/types.rs",
+      "sha256": "46d417d38ecefba78ec8c2213b1c68dc69e909c38a0db7f505ceb401bd1f2f2d"
+    },
+    "mod_loader/loader/registry/registry_default.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader/registry/registry_default.rs",
+      "sha256": "169975653534ae4b2b0b2e30db7bc383f5b466bf61904044fe38d27911b94326"
+    },
+    "mod_loader/loader/registry/registry_impl.rs": {
+      "source": "crates/system/registry/src/mod_loader/loader/registry/registry_impl.rs",
+      "sha256": "9be04ed95b0d8e803cbaf7ea58542bce4888fbb69172bf8a834626d0b14a3432"
+    },
+    "protocol/contract.rs": {
+      "source": "crates/system/registry/src/protocol/contract.rs",
+      "sha256": "31a0be371d6a8034588927e68f6a93af27897d32480b53aba3244d0336ffc585"
+    },
+    "protocol/provider.rs": {
+      "source": "crates/system/registry/src/protocol/provider.rs",
+      "sha256": "77b4ad88b98ffbc24624fcd998b7bac09c953f0a64e9429e3282d0457cfc1bc1"
+    },
+    "viewer/tests.rs": {
+      "source": "crates/system/registry/src/viewer/tests.rs",
+      "sha256": "998d8c7f25854da666abb2a2d609253dc3265b7e0dde1b9615b5fbf0886d35d0"
+    }
+  },
+  "copied_tree_sha256": {
+    "registry-source-composition/diagnostics.rs": "10d3b87ab578439086a89cc9e73ac0606c010ea999f60d6be58b607d4deb0649",
+    "registry-source-composition/input.rs": "498591d147d5cdccac745a317d9a5d6d4b0aa51f8824386d0f987aa7076274e4",
+    "registry-source-composition/knowledge.rs": "7ca216703261ae232510f317de0a93547007365cfca94f7ee6ac9599b432d8c6",
+    "registry-source-composition/layout.rs": "7221d7c9fa1c8d664a90b4bb7b3f36de095827987d1e9a3471ef772882618296",
+    "registry-source-composition/lens.rs": "0f5a80171637cbdfc694a8a769729f01d33b00d8f09f668ec2d05ff05801b416",
+    "registry-source-composition/lib.rs": "c1b86aa68f27d729db2acfa607febf3da43fa3bd391e93b91509fd65125b6c60",
+    "registry-source-composition/lib_probe.rs": "29aec67f1aa1607a03870db74fb588b4c1b96657748394de9c21bddf8e160abe",
+    "registry-source-composition/mod_loader.rs": "13408f0d8051910b39579622597837f0d55fa0fbd75fe064ce0c339f05092bcd",
+    "registry-source-composition/protocol.rs": "1df26242680faea2c05daaf2f2e57a7dd52fd5cf0130a4d3fe588a1ab9e0381c",
+    "registry-source-composition/registry_viewer_capabilities_projection.rs": "cf1d3b5be3e2bceb8ed6f44eeabc86d6bd76007974347cf3b070b8174ae4982c",
+    "registry-source-composition/viewer.rs": "409b5b5fec2ad8b782711634e13c32cb176c2c53512cbe1c6a941af51505f80f",
+    "registry-source-composition/diagnostics/channels.rs": "e8e57b15860dfbc029a1ea91eaf0e518bd391e13d1862bbb64df37aa72f4a5ca",
+    "registry-source-composition/diagnostics/correlation.rs": "02d12e4c636ddec8aba6236a29e35afe2bf15c13fd03ce9d9bb20b1260c7922c",
+    "registry-source-composition/diagnostics/descriptor.rs": "5e9239e1d9c136a4b440f3f3dec4f9f90d78d494748080bf95ed902b102d3636",
+    "registry-source-composition/diagnostics/emit.rs": "3453d7b46ecd8fe9e0d12cdc3c2c94edafb130733245bcc36d27f5294f708b9c",
+    "registry-source-composition/diagnostics/descriptor/catalog.rs": "986af4f96b69a81255988d8c4be62a595f55a47407351373eb6063ee5cbbfc8f",
+    "registry-source-composition/diagnostics/descriptor/invariant.rs": "50e566984976b8935e4e756ce933cb4e1f580f16aa7b3861d45e6e4f1e61ee1f",
+    "registry-source-composition/diagnostics/descriptor/registry.rs": "d77e5c7de22f017ceb1909ef0b9b2c5001139c79b00f2992a63d168feccbf066",
+    "registry-source-composition/diagnostics/descriptor/tests.rs": "62e5cbf581e012162dfb708b9677bab7fdf8ca82d9576a8f9852f61871c430a5",
+    "registry-source-composition/diagnostics/descriptor/types.rs": "4915e51d49777afcce8885a91bb2dd9c53591d595070dc1a4ca608ae6e015d7b",
+    "registry-source-composition/diagnostics/descriptor/catalog/phase3a.rs": "b8ad01058f83544b920d4da3ec2e771c55e95b956835e74aade62e0860e111d6",
+    "registry-source-composition/diagnostics/descriptor/catalog/phase3b.rs": "97a2bc69f8c074c4c552df69a4de6dde3a83563c0a7a9cad46e06a2ada79db6b",
+    "registry-source-composition/diagnostics/descriptor/invariant/tests.rs": "42c1e23a3264aab62694dc2be01b352fdc62a1f3f9965dff5ad2d900eb7f0499",
+    "registry-source-composition/diagnostics/emit/queue.rs": "aff60b76a7987fb23a615b1d3c7bdfbc783344907bdb4e5fd05e7a995d3617a8",
+    "registry-source-composition/diagnostics/emit/queue/tests.rs": "7506675da016509ed56a254e26bfece455087628ce929a25c01008a68b95f4b8",
+    "registry-source-composition/input/defaults.rs": "ef1fedfa0f186fd6ebbf8b3a99410f0938940a3cd3967c3864125f8208ce72d9",
+    "registry-source-composition/input/registry.rs": "613bb7f9243048f000434c4253dcc0f0c994f8a4b53f1f47ef01db13276c9466",
+    "registry-source-composition/input/tests.rs": "0054d618e363e88501ec89e911c8cf7118fdd0806ce15cc84375fb304cc59358",
+    "registry-source-composition/layout/canvas.rs": "6037cbd4778112f5bdf5da7a5ce47abadcb319e109d2b6fede416ecc0793f599",
+    "registry-source-composition/layout/profile_registry.rs": "a86e4e20b973d14a51791031f1e65f4561c91b7afd87b9e3a5c6fcb66c57a35b",
+    "registry-source-composition/layout/workbench_surface.rs": "83b73be610e02725f103dffb47c72d67350215ffb30ab79a3c479984eee50386",
+    "registry-source-composition/lens/layout.rs": "f5b4535ca7d2640e56dcedef9dc01b708ccc9d9c9b034a904b15f1d97fbf5eb4",
+    "registry-source-composition/lens/physics.rs": "720efd9be6f03f4f75643383d1f520bbb1f9224c882615819e947a0694afe8ce",
+    "registry-source-composition/lens/physics_config.rs": "5c486f3aca39ca909a4d6e842e115152aae2a8e115289b03f5ae571d068a302e",
+    "registry-source-composition/lens/registry.rs": "53e722fae1597a7d3481a592a9f722c681ed0b90053a0fb829934f64e908f864",
+    "registry-source-composition/lens/physics/tests.rs": "aa9d991f1b6af7240693093de91097ce9456468cfd0057a2275e2ceb6228dd3a",
+    "registry-source-composition/mod_loader/loader.rs": "ec389b5d67b186108927cbf649a2b8698f9cf6510e5593c41277afd378444462",
+    "registry-source-composition/mod_loader/loader/free_fns.rs": "8f30c952919ac611b2ad509658776a655aefbda5116d715d757d046c1022b328",
+    "registry-source-composition/mod_loader/loader/registry.rs": "5d7379479740700eb7c58957e60a399351be40bbafed773c47bc857062b6edd9",
+    "registry-source-composition/mod_loader/loader/tests.rs": "c014f3cd62345bf5e8f083233848fd7d0e8855358283d3447165a8d655a6174a",
+    "registry-source-composition/mod_loader/loader/types.rs": "46d417d38ecefba78ec8c2213b1c68dc69e909c38a0db7f505ceb401bd1f2f2d",
+    "registry-source-composition/mod_loader/loader/registry/registry_default.rs": "169975653534ae4b2b0b2e30db7bc383f5b466bf61904044fe38d27911b94326",
+    "registry-source-composition/mod_loader/loader/registry/registry_impl.rs": "9be04ed95b0d8e803cbaf7ea58542bce4888fbb69172bf8a834626d0b14a3432",
+    "registry-source-composition/protocol/contract.rs": "31a0be371d6a8034588927e68f6a93af27897d32480b53aba3244d0336ffc585",
+    "registry-source-composition/protocol/provider.rs": "77b4ad88b98ffbc24624fcd998b7bac09c953f0a64e9429e3282d0457cfc1bc1",
+    "registry-source-composition/viewer/tests.rs": "998d8c7f25854da666abb2a2d609253dc3265b7e0dde1b9615b5fbf0886d35d0"
+  },
+  "failed_initial_receipt": {
+    "path": "registry_owner_probe_receipt.json",
+    "sha256": "5b0096cf1a769e13ddc61c86ef6de86b5154797428d7cdc75b34afe9a6f06217"
+  },
+  "evidence_sha256": {
+    "run_registry_owner_probe_v2.py": "bded8a717c6fc163c31b5e53d38e3dd21a9c86cd4efc82506caf360e40c73278",
+    "registry_owner_probe_v2_output.log": "33c5e0dc2e8434d051cfc5d95a97f7d72ab2641203e6fdf0b581f4399f8d7d84",
+    "cpu-registry-source-runtime/Cargo.toml": "1cfb2278540a899d80fb7e39f70e63f1445bc5c0ce88e6ed82ce7d6bb13f80df",
+    "cpu-registry-source-runtime/Cargo.lock": "df9c32fa3c8eb563bf1dbf58fc8e772419019ae43dfee692ae0cb169ca130875"
+  },
+  "removed_outputs": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\authority_success_registry-276585f228e55b4f.exe",
+      "bytes": 3036672,
+      "sha256": "463f3093fd341c75a6aecb5724ec4704e7f43c9a7cdbd67d8bc51360593ffa1f"
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\authority_success_registry-276585f228e55b4f.pdb",
+      "bytes": 5697536,
+      "sha256": "952b0686694a433950bb58c2d9be5dfd00bf6176a832d296466883b9302e3491"
+    }
+  ],
+  "retained_isolation": [],
+  "qualification": "Whole byte-identical Registry source tree preserved; only diagnostics/input/layout/mod_loader modules linked via an audit root. Original unit tests for those modules execute, actual command-menu path dependency. Exact data-only ViewerSubsystemCapabilities projection supplies the extension-record field, without viewer selection/graph-kernel execution. Five audit cases exercise actual public owners with synthetic documented activation/removal callbacks. No native mod/WASM instance, product host, network, browser or GPU. First external-path harness compiler failure preserved, not counted as tests. Stable shared target/build-dir explicitly configured; audit executable/PDB removed."
+}

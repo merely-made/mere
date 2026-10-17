@@ -1,0 +1,108 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling uuid v1.27.0
+   Compiling windows-core v0.62.2
+   Compiling windows-future v0.3.2
+   Compiling windows-collections v0.3.2
+   Compiling windows-numerics v0.3.1
+   Compiling windows v0.62.2
+   Compiling linebender_resource_handle v0.1.1
+   Compiling tracing v0.1.44
+   Compiling naga v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling gpu-allocator v0.28.0
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling glutin_wgl_sys v0.6.1
+   Compiling wgpu-hal v30.0.1
+   Compiling accesskit v0.24.1
+   Compiling idna_adapter v1.2.2
+   Compiling kurbo v0.13.1
+   Compiling idna v1.1.0
+   Compiling web_atoms v0.2.6
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling peniko v0.6.1
+   Compiling zeroize v1.9.1
+   Compiling markup5ever v0.39.0
+   Compiling wgpu-core v30.0.1
+   Compiling url v2.5.8
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling wgpu v30.0.1
+   Compiling cobs v0.3.0
+   Compiling postcard v1.1.3
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling rkyv v0.8.18
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling cfb v0.7.3
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling html5ever v0.39.0
+   Compiling xml5ever v0.39.0
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling cssparser v0.37.0
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling infer v0.19.0
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling scenomise v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+   Compiling curve25519-dalek v5.0.0
+   Compiling nalgebra v0.35.0
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling spade v2.15.1
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chacha20 v0.10.2
+   Compiling glamx v0.3.1
+   Compiling ed25519-dalek v3.0.0
+   Compiling parry2d v0.31.1
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chacha20poly1305 v0.11.0
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling meristem v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\meristem)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling rapier2d v0.36.0
+   Compiling tabard v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling sprigging v0.2.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+   Compiling armillary v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\armillary)
+   Compiling winit v0.30.13
+   Compiling tracing-subscriber v0.3.23
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+   Compiling cambium v0.3.3 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling uxtree v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\forme\uxtree)
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling mere-cartography v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\canvas\cartography)
+   Compiling mere-alembic v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\distillery\alembic)
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling esp v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\intel\esp)
+   Compiling incipit v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\incipit)
+   Compiling pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+   Compiling pandect v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\system\pandect)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling graphshell-endpoint v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-endpoint)
+   Compiling graphshell-client v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-client)
+   Compiling graphshell-host v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-host)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+   Compiling mere-overmap v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mere-overmap)
+   Compiling mere v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\mere)
+   Compiling platen v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\platen\platen)
+   Compiling graphshell v0.0.2 (C:\Users\mark_\Code\repos\mere\ports\graphshell)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 19m 30s

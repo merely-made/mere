@@ -1,0 +1,19 @@
+
+running 14 tests
+test a_stemmed_persistent_index_reopens_as_current_with_different_answers ... ok
+test field_256_silently_uses_field_zero_and_loses_its_weight ... ok
+test original_bm25::tests::an_empty_index_answers_nothing ... ok
+test original_bm25::tests::term_frequency_saturates_and_missing_terms_score_nothing ... ok
+test original_bm25::tests::the_knobs_change_the_score_and_nothing_is_hardcoded ... ok
+test original_bm25::tests::the_weighted_field_wins_over_the_light_one ... ok
+test original_fusion::tests::a_page_ranked_by_both_engines_beats_single_engine_pages ... ok
+test original_fusion::tests::a_third_ranking_contributes_and_is_visible ... ok
+test original_fusion::tests::empty_inputs_fuse_to_the_other_side ... ok
+test original_fusion::tests::two_rankings_agree_however_they_are_spelled ... ok
+test original_fusion::tests::weights_are_a_setting_that_actually_steers ... ok
+test persistent_rebuild_deletes_unrelated_marker_in_the_supplied_directory ... ok
+test transient_rebuild_preserves_the_same_kind_of_directory_marker ... ok
+test zero_limit_panics_only_for_a_matching_public_bm25_query ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

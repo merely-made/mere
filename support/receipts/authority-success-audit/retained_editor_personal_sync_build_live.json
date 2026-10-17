@@ -1,0 +1,18 @@
+{
+  "observed_utc": "2026-10-17T07:23:06.597340+00:00",
+  "session_id": 60676,
+  "processes": [
+    {
+      "ProcessId": 22716,
+      "ParentProcessId": 48224,
+      "CreationDate": "2026-10-17T02:56:56.690854-04:00"
+    },
+    {
+      "ProcessId": 14024,
+      "ParentProcessId": 22716,
+      "CreationDate": "2026-10-17T03:23:01.457112-04:00"
+    }
+  ],
+  "stdout_bytes": 741376,
+  "scope": "Original build confirmed live; no terminal result and no personal-sync tests executed."
+}

@@ -1,0 +1,11 @@
+
+running 3 tests
+test an_explicit_replacement_content_type_replaces_the_previous_one ... CONTROL: an explicit replacement type updates both body and metadata
+ok
+test an_initial_untyped_response_has_no_content_type ... CONTROL: None on the first write round-trips without metadata
+ok
+test replacing_a_typed_response_with_none_retains_the_old_content_type ... OBSERVATION: successful replacement body with content_type=None keeps the previous response's text/html metadata
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

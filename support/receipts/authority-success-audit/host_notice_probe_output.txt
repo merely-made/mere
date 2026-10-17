@@ -1,0 +1,11 @@
+
+running 3 tests
+OBSERVED mode=expired idle-notice-received=true request-refused=true end=Lapsed(Expired { at_ms: 100 })
+OBSERVED mode=live idle-notice-received=true request-refused=false end=Closed
+test expired_idle_peer_receives_notice_before_request_refusal ... ok
+test live_notice_and_request_control ... ok
+OBSERVED mode=revoked idle-notice-received=true request-refused=true end=Lapsed(Revoked)
+test revoked_idle_peer_receives_notice_before_request_refusal ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

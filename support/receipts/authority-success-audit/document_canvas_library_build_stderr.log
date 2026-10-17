@@ -1,0 +1,44 @@
+   Compiling syn v3.0.6
+   Compiling windows-interface v0.59.3
+   Compiling windows-implement v0.60.2
+   Compiling windows-core v0.62.2
+   Compiling windows-collections v0.3.2
+   Compiling windows-numerics v0.3.1
+   Compiling windows-future v0.3.2
+   Compiling synstructure v0.14.0
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling bytemuck_derive v1.12.1
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling bytemuck v1.25.2
+   Compiling windows v0.62.2
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling font-types v0.11.3
+   Compiling serde v1.0.229
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling read-fonts v0.39.2
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling petgraph v0.8.3
+   Compiling euclid v0.22.14
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling icu_provider v2.3.1
+   Compiling icu_locale_fallback v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_segmenter v2.3.0
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling parley_data v0.10.0
+   Compiling skrifa v0.42.1
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling harfrust v0.8.4
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 27.30s

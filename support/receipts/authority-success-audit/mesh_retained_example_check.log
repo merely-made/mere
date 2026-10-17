@@ -1,0 +1,27 @@
+    Checking mere-mesh v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\mesh\mesh)
+    Checking mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+error: couldn't read `crates\mesh\mesh\examples\retained_receive\../../../../murm/transport/src/transport.rs`: The system cannot find the path specified. (os error 3)
+  --> crates\mesh\mesh\examples\retained_receive\identity.rs:24:9
+   |
+24 |         include_bytes!("../../../../murm/transport/src/transport.rs"),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `crates\mesh\mesh\examples\retained_receive\../../../../murm/transport/src/p2panda_transport.rs`: The system cannot find the path specified. (os error 3)
+  --> crates\mesh\mesh\examples\retained_receive\identity.rs:36:9
+   |
+36 |         include_bytes!("../../../../murm/transport/src/p2panda_transport.rs"),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `crates\mesh\mesh\examples\retained_receive\../../../../murm/transport/src/accepted.rs`: The system cannot find the path specified. (os error 3)
+  --> crates\mesh\mesh\examples\retained_receive\identity.rs:40:9
+   |
+40 |         include_bytes!("../../../../murm/transport/src/accepted.rs"),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `crates\mesh\mesh\examples\retained_receive\../../../../murm/transport/src/peer_route.rs`: The system cannot find the path specified. (os error 3)
+  --> crates\mesh\mesh\examples\retained_receive\identity.rs:44:9
+   |
+44 |         include_bytes!("../../../../murm/transport/src/peer_route.rs"),
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `mere-mesh` (example "retained_receive") due to 4 previous errors

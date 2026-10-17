@@ -1,0 +1,66 @@
+[
+  {
+    "name": "dense_valid_fifth_match_dropped",
+    "visit_stamps_ms": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "metadata_stamps_ms": [
+      1002,
+      1002,
+      1002,
+      1002,
+      1002
+    ],
+    "tolerance_ms": 10,
+    "matched": {
+      "3": 1,
+      "2": 2,
+      "4": 3,
+      "1": 4
+    },
+    "unclaimed": [
+      {
+        "visit_id": 5,
+        "timestamp": 1004
+      }
+    ]
+  },
+  {
+    "name": "ordinary_two_match_control",
+    "visit_stamps_ms": [
+      1000,
+      1001
+    ],
+    "metadata_stamps_ms": [
+      1000,
+      1001
+    ],
+    "tolerance_ms": 10,
+    "matched": {
+      "1": 1,
+      "2": 2
+    },
+    "unclaimed": []
+  },
+  {
+    "name": "out_of_tolerance_control",
+    "visit_stamps_ms": [
+      1000
+    ],
+    "metadata_stamps_ms": [
+      2000
+    ],
+    "tolerance_ms": 10,
+    "matched": {},
+    "unclaimed": [
+      {
+        "visit_id": 1,
+        "timestamp": 1000
+      }
+    ]
+  }
+]

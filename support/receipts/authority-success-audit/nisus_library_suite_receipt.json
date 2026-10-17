@@ -1,0 +1,24 @@
+{
+  "date_utc": "2026-10-16T23:26:12.303760+00:00",
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"C:/t/cargo-targets/mere/build\"",
+    "test",
+    "-p",
+    "nisus",
+    "--lib",
+    "--target-dir",
+    "C:/t/cargo-targets/mere",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "source_sha256": {
+    "crates/conatus/nisus/Cargo.toml": "bf8ce0c359bd59f457b4cfd192d82f79d5f67b4e5d97739a2617a839d85fd88f",
+    "crates/conatus/nisus/src/lib.rs": "2d2194e00063f63a4650521094d3e685163908ab78aa029c087e7becfbc2ad0a"
+  },
+  "log_sha256": "a21c4d30f4b87dece89ec7ba8d78722fdc7d24e582cf3e6646412f2ffc195122",
+  "scope": "Current Nisus library tests only. No product, collider, GPU or durable storage consumer execution.",
+  "retained_isolation": []
+}

@@ -1,0 +1,9 @@
+
+running 2 tests
+test an_actually_drained_cpu_worker_is_the_positive_control ... CONTROL: letting the real CPU worker drain first leaves only the probe/trainer store owners after host shutdown
+ok
+test successful_host_shutdown_does_not_wait_for_a_cpu_trainer_store_owner ... OBSERVATION: host shutdown returned success while a real CPU trainer blocking closure retained the shared model-store owner
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+

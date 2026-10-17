@@ -1,0 +1,25 @@
+
+running 20 tests
+test pane::tests::attention_changes_preserve_each_draft_and_identity_clear_forgets_them ... ok
+test pane::tests::delayed_send_acknowledgment_preserves_other_and_newer_edits ... ok
+test pane::tests::delayed_thread_loads_cannot_attach_after_switch_reload_or_to_another_pane ... ok
+test pane::tests::draft_send_readiness_and_clear ... ok
+test pane::tests::inbox_failures_are_surfaced ... ok
+test pane::tests::select_aims_the_draft_and_clears_the_prior_thread ... ok
+test pane::tests::set_inbox_drops_a_selection_that_vanished ... ok
+test pane::tests::set_inbox_keeps_a_selection_that_remains ... ok
+test pane::tests::toggle_opens_and_closes_with_focus ... ok
+test tests::delivery_status_default_is_unknown_not_a_read_receipt ... ok
+test tests::delivery_status_labels_cover_each_delivery_fact ... ok
+test tests::delivery_statuses_serialize_and_preserve_failure_detail ... ok
+test tests::identities_lists_one_per_backend ... ok
+test tests::inbox_merges_and_recency_sorts_across_backends ... ok
+test tests::inbox_surfaces_a_failing_backend_without_dropping_others ... ok
+test tests::messages_for_unknown_conversation_is_not_found ... ok
+test tests::messages_route_to_the_owning_backend ... ok
+test tests::operations_on_an_unregistered_protocol_are_unsupported ... ok
+test tests::send_routes_by_protocol_and_respects_capability ... ok
+test tests::untracked_delivery_is_unknown_only_for_an_existing_message ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

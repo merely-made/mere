@@ -1,0 +1,54 @@
+{
+  "date_utc": "2026-10-17T19:34:54.974193+00:00",
+  "source_sha256": {
+    "design_docs/mere_docs/testing/receipts/2026-10-11_classic_browser_gates/identity.py": "1d81850816d924447321559861c25544cc76726511f4cc439250a2b50a2a5311",
+    "crates/cambium/cambium/src/workspace_chrome.rs": "bda64b94139b01aa6be6128d28d818c9522ee0203e39e4200c79c1a19d143515",
+    "crates/cambium/cambium/src/instrument.css": "84778d7fd0b289f57bf6e011d21c7fc41b7865d3cfc9ce6eb627ca64f8d5024b"
+  },
+  "initial_harness_failure": {
+    "reason": "Harness expected forward-slash keys; actual Windows snapshot keys use backslashes. No production failure credited.",
+    "runner_sha256": "dbfac8abe15715c281aeced93bad99ce609f98672bb385781eadc2151fac7d24",
+    "fixture_sha256": {
+      "source-seal-fixture/bootstrap.py": "041a088064ae2c0f7a64f2a92795129769f92da760b73b8d7a3403efc01fc262",
+      "source-seal-fixture/build.log": "be35fe7e40dbecf2501368131b01cafd1517f863e0e9d673bd7b4d73c5a7f47c",
+      "source-seal-fixture/identity.py": "1d81850816d924447321559861c25544cc76726511f4cc439250a2b50a2a5311",
+      "source-seal-fixture/listing.json": "cc1471ddb923601dbcf4959c7e399db5fa52f753587665bc2a7f7cb300cfa959",
+      "source-seal-fixture/metadata.json": "64b65d27e8b3d4cad1b7e648b9f2618d82c7a064d7b5395f3bea7e3be314d5eb",
+      "source-seal-fixture/preflight.json": "c22c8df716c4dcba0fdeb5b3fd3a4d63ee87896ea762c6359e5e6b22c8e33f10",
+      "source-seal-fixture/preflight.log": "61ff23d8f4d8e071fd0a115fd712eb63ec1ee42a1c63bb04f2dc1bcae089b007",
+      "source-seal-fixture/pkg/graphshell_web.js": "9bd0634cb700044a397841138e74e5deca0e35cdffd653ab648375363803a6b6",
+      "source-seal-fixture/pkg/graphshell_web_bg.wasm": "fe148a9fd50afefd020582f25c11c164f1f4204ae940d17ae92c3464826511a1",
+      "source-seal-fixture/repo/Cargo.toml": "4ce872b5fbd0fa2a92ad61bdddc65f22c2664ae6eb341a3d969c7c0ea017ff4e",
+      "source-seal-fixture/repo/crates/cambium/cambium/src/instrument.css": "84778d7fd0b289f57bf6e011d21c7fc41b7865d3cfc9ce6eb627ca64f8d5024b",
+      "source-seal-fixture/repo/crates/cambium/cambium/src/workspace_chrome.rs": "bda64b94139b01aa6be6128d28d818c9522ee0203e39e4200c79c1a19d143515"
+    }
+  },
+  "cases": {
+    "css_input": "crates/cambium/cambium/src/instrument.css",
+    "css_before_sha256": "84778d7fd0b289f57bf6e011d21c7fc41b7865d3cfc9ce6eb627ca64f8d5024b",
+    "css_after_sha256": "c250532af7b0c1eac2fd69dc43ff868eb4444e2e85a7e09f9de96acc580b3adc",
+    "css_changed_outer_exit": 0,
+    "css_changed_sealed": true,
+    "fingerprint_unchanged": true,
+    "rust_change_refused_exit": 1
+  },
+  "runner_sha256": "f54e4a54817e9e67bb2dd23934d194165e20bb3b94ee4f00af055bf46594dd77",
+  "fixture_sha256": {
+    "source-seal-verified/bootstrap.py": "041a088064ae2c0f7a64f2a92795129769f92da760b73b8d7a3403efc01fc262",
+    "source-seal-verified/build.log": "be35fe7e40dbecf2501368131b01cafd1517f863e0e9d673bd7b4d73c5a7f47c",
+    "source-seal-verified/css-changed-seal.json": "30af147d5bc66a661bc3ce5c2e5c3ed5141461318a0471e29e3f30430916f9ca",
+    "source-seal-verified/css-changed-seal.log": "974f93ac3e978232c4e11194f4d5b4c72173068d55472fa2d2c834bbeacd8076",
+    "source-seal-verified/identity.py": "1d81850816d924447321559861c25544cc76726511f4cc439250a2b50a2a5311",
+    "source-seal-verified/listing.json": "cc1471ddb923601dbcf4959c7e399db5fa52f753587665bc2a7f7cb300cfa959",
+    "source-seal-verified/metadata.json": "a5e7b5d48fb375cb0c33a7726b6bb025e4d9bb7cde87f60017083b18923acf1f",
+    "source-seal-verified/preflight.json": "ad893d9287806b22e992eff7733282e0a60d7cf80117a462b9d8d448c051db53",
+    "source-seal-verified/preflight.log": "0aa584182f6aee8010ad5bb583944e1bbdce4f757547d67651ad6df48ea24f6d",
+    "source-seal-verified/rust-changed-control.log": "a7f2fd73a8574585450a69d9006c8bb5ed05c5875f601396bf50db5db0af6121",
+    "source-seal-verified/pkg/graphshell_web.js": "9bd0634cb700044a397841138e74e5deca0e35cdffd653ab648375363803a6b6",
+    "source-seal-verified/pkg/graphshell_web_bg.wasm": "fe148a9fd50afefd020582f25c11c164f1f4204ae940d17ae92c3464826511a1",
+    "source-seal-verified/repo/Cargo.toml": "4ce872b5fbd0fa2a92ad61bdddc65f22c2664ae6eb341a3d969c7c0ea017ff4e",
+    "source-seal-verified/repo/crates/cambium/cambium/src/instrument.css": "c250532af7b0c1eac2fd69dc43ff868eb4444e2e85a7e09f9de96acc580b3adc",
+    "source-seal-verified/repo/crates/cambium/cambium/src/workspace_chrome.rs": "ed74435661c3d30e2bb97e5dc7e4015768c9c108968654e01ceeca99e2a26baa"
+  },
+  "qualification": "Whole unchanged identity.py CLI copy executes in real Python processes. Git listing/head are explicitly mocked for an audit-owned inert minimal source fixture. Current real Cambium workspace_chrome.rs and instrument.css copied byte-identically before audit-only edits. CSS bytes actually change between preflight/seal; hash list excludes them and seal accepts. Changed Rust control refuses. Package/log/metadata inputs explicitly synthetic and no genuine build/compiler/Genet/browser/Wasm/runtime/GPU executed. This proves source snapshot omission, not a freshly observed stale real browser package or invalidation of historical success."
+}

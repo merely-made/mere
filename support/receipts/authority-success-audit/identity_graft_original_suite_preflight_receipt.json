@@ -1,0 +1,8 @@
+{
+  "runner": "run_identity_graft_original_suite.py",
+  "runner_sha256": "00e15b075429eb4180b5a3bce5521d5827b7760462683838d0417477a9e2e64c",
+  "exit": 1,
+  "reason": "serde has two captured feature rows; selector refused ambiguity before any compilation or output creation",
+  "builds": 0,
+  "tests": 0
+}

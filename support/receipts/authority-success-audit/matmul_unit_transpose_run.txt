@@ -1,0 +1,9 @@
+
+running 4 tests
+test valid_transposed_input_contiguous_axis_is_rejected_by_wrong_axis_assert ... ok
+test vector1_control_is_correct ... ok
+test vector2_single_input_vector_control ... ok
+test vector2_transpose_overwrites_and_leaves_holes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

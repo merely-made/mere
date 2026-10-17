@@ -1,0 +1,39 @@
+{
+  "source_sha256": {
+    "crates/moot/gemot/examples/capsule-library/browser.mjs": "0ba06287abac451328bee5f3e18ac4cfd2986e061e4c2b402aa130539bd482b8",
+    "ports/graphshell/web/applets/runtime.mjs": "8cdb458ff2fec764d9d81b6c696c6b33e8a810e9e1b3562fed92cf577c6c12d1"
+  },
+  "runner_sha256": "ba545486f68195de49f5f6ad7252c14394664190913c1e1f71e676110b717d0d",
+  "checks": 3,
+  "cases": [
+    {
+      "case": "control",
+      "verified_part_calls": 1,
+      "body_published_after_boundary": false,
+      "last_opened": "revision-a",
+      "notice_before_return": "Applet running. Capsules remain independently signed.",
+      "notice_after_return": "Verified this revision. Reading it has not saved a capsule file.",
+      "closed_workers": 0
+    },
+    {
+      "case": "revoke",
+      "verified_part_calls": 1,
+      "body_published_after_boundary": true,
+      "last_opened": "revision-a",
+      "notice_before_return": "Revoked for this running applet. A new grant requires Run applet.",
+      "notice_after_return": "Verified this revision. Reading it has not saved a capsule file.",
+      "closed_workers": 0
+    },
+    {
+      "case": "stop",
+      "verified_part_calls": 1,
+      "body_published_after_boundary": true,
+      "last_opened": "revision-a",
+      "notice_before_return": "Applet stopped. Your kept revisions remain on this device.",
+      "notice_after_return": "Verified this revision. Reading it has not saved a capsule file.",
+      "closed_workers": 1
+    }
+  ],
+  "node_version": "v24.11.0",
+  "qualification": "Fresh Node VM execution of unchanged complete standalone browser.mjs and shared runtime.mjs. DOM, honest Worker replies, absent-only IndexedDB, network and cryptographic verification are explicit doubles. This tests host continuation and publication after grant revocation or completed Stop, not actual Chromium/Wasm, signature authenticity, real IDB, live transport or the separately implemented Graphshell host."
+}

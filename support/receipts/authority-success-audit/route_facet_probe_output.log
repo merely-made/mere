@@ -1,0 +1,3 @@
+PASS no-facet control keeps owner address first
+PASS facet Address shadows the still-present owner address for first-label consumers
+PASS lowercase address control does not collide with the exact Address label

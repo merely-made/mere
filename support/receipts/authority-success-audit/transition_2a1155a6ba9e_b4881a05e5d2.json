@@ -1,0 +1,66 @@
+{
+  "path": "ports/djinn/src/bin/djinn.rs",
+  "git_basis": "70a153769ec5ef22b0af6a911a818518e073d946",
+  "git_blob_sha256": "f48d30f0db4f0e4ac009f091279a1d594bf53a3e92b75c2a938348a365c5e761",
+  "prior_coverage": {
+    "sha256": "ad8930dcc3a1203c81613f6bf241ac7b3cc992c9ba69053cbeda6eec4a490ccf",
+    "through": 67293
+  },
+  "current_sha256": "b4881a05e5d237c6c894c642b9aae8bdf7ad1170bbd39de72e4b4667a019af18",
+  "current_chars": 67360,
+  "unchanged_previously_read_spans": [
+    {
+      "old_chars": [
+        0,
+        52243
+      ],
+      "new_chars": [
+        0,
+        52243
+      ],
+      "text_sha256": "9e4fa84fe87c88ad6de93128c5a1dc8115cba29b21946e9f6253006a26d80ab1"
+    },
+    {
+      "old_chars": [
+        52243,
+        67293
+      ],
+      "new_chars": [
+        52310,
+        67360
+      ],
+      "text_sha256": "35f736a2e4a841ad60ea0438dd80545cb8a37f432796e2088e8891e1eecda7d3"
+    }
+  ],
+  "changed_spans": [
+    {
+      "kind": "insert",
+      "old_lines": [
+        1226,
+        1225
+      ],
+      "new_lines": [
+        1226,
+        1226
+      ],
+      "old_chars": [
+        52243,
+        52243
+      ],
+      "new_chars": [
+        52243,
+        52310
+      ]
+    }
+  ],
+  "emitted_hunks": [
+    {
+      "old_start_line": 1222,
+      "new_start_line": 1222,
+      "text": "                     catalog.clone(),\r\n                     grants.clone(),\r\n                     first_party.clone(),\r\n                 )\r\n+                .with_profile_subject_authority(personae.clone())\r\n                 .with_divination_authority()\r\n             });\r\n             if let Some(route) = catalog\r\n                 .update(|catalog| resident.register_reservoir_route(catalog, routes.clone()))\r\n"
+    }
+  ],
+  "certificate": "transition_2a1155a6ba9e_b4881a05e5d2.json",
+  "rule": "Full old source previously read at the verified hash. Equal spans proven text-identical; every insertion/replacement/deletion emitted with context and requires a separate acknowledgment. This is retained coverage, not a claim that the whole new file was emitted again.",
+  "acknowledged_utc": "2026-10-17T05:42:11.267076+00:00"
+}

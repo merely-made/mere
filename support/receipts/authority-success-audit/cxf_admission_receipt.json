@@ -1,0 +1,104 @@
+{
+  "date_utc": "2026-10-16T20:30:07.057545+00:00",
+  "basis_commit": "b567660d67c4d900f1d638345c89715e1f36c575",
+  "kind": "public API bug-observation diagnostics; passing asserts broken behavior",
+  "findings": [
+    "Q040",
+    "Q041",
+    "Q042"
+  ],
+  "checks": [
+    {
+      "command": "cargo test -p castellan --features cxf --test audit_cxf_admission --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "observations_passed": 2,
+      "source": "cxf_admission_initial.rs",
+      "log": "cxf_admission_output.txt"
+    },
+    {
+      "command": "cargo test -p castellan --features cxf,secret-service --test audit_cxf_admission --locked --offline -j 1 --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "observations_passed": 3,
+      "source": "cxf_admission_diagnostics.rs",
+      "log": "cxf_collection_output.txt"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": "cxf_continuation_diffcheck_output.txt"
+    }
+  ],
+  "source_sha256": {
+    "ports/djinn/castellan/src/cxf/commit.rs": "888b993d562f1a69e026221294bfc4cf4728f277518847fb7b5bf76bf637b0b1",
+    "ports/djinn/castellan/src/cxf/parse.rs": "5d7a52443125bfedb11b9263da985cdfdc390c8a73eb9c3524f404f0ef1dd7c2",
+    "ports/djinn/castellan/src/authority.rs": "8ac5cb47fe07f620879d6ae5205d5fe469ce3961528d4c828fadf5c07371e3cb",
+    "ports/djinn/castellan/src/resident.rs": "8c66943fc316cf7c3dbb8ae87ff079ac7a5afa5011a376fb1d3cd943f60c5472",
+    "ports/djinn/castellan/src/items/transaction.rs": "23e31ebc00ed45429ccd8155f98540117f5a891331d360953bd2e7a70f986799",
+    "ports/djinn/castellan/src/otp/mod.rs": "75e6d2a49f4273f4c4336402da0530b0add42e5c8069c5325faeb4f74dc268bf",
+    "ports/djinn/castellan/src/otp/item.rs": "d9fb0af726507be8574f848a7cbaa083924defbf7376c377ce29f0dfc4ae87a8",
+    "ports/djinn/castellan/src/otp/release.rs": "ef260b05fb7be544f2c5a753a14f6e296fcc8250a5f86887704785442215ac88",
+    "ports/djinn/castellan/src/review.rs": "4b53e67954c61ac70a045678706326f883f3b2f8adc5e48e80c2aa0a47a9be64",
+    "ports/djinn/castellan/src/secret_service/store.rs": "3d19a8d9b4ca9b149afd54ec6693185ae26dfa8c6bbd44526b31c032e0004a53",
+    "ports/djinn/castellan/src/secret_service/store/collections.rs": "237970dc2cd3374227f8393a3aade21bf0d2d8f0cf4a0bc4f9ee22bcfdfbef12",
+    "ports/djinn/Cargo.toml": "1e515a663aabd2169656de92ca8a7d5e12ce6610054a24a5aff1368672a43f3a",
+    "design_docs/dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md": "5ad7cefdc514d7459b1c980d45faea2705510e0a3bfc8fb938c576736b65f93a"
+  },
+  "diagnostic_sha256": {
+    "cxf_admission_initial.rs": "ab0de792e4b35197d256525bd1900f37ecad86bbfb35109cec135a79fdb8cc8b",
+    "cxf_admission_diagnostics.rs": "d97dc89a2e6a5480048e141320db2470b2b196ec67c142f085130057a4dd7171",
+    "cxf_admission_output.txt": "403ca42cdb05f2faa50cd2100b16a7df2b464627f0c346cad5d6adefa44e469e",
+    "cxf_collection_output.txt": "e7ff5840dddc3d01829a210ea1a8b5d0e928136e4c6a497e0f1f8bdb9460b28e"
+  },
+  "preserved_production_and_test_hashes": {
+    "crates/system/pandect/src/image_store.rs": "7c847f01fff9bd9988537c395dbee3840c2d17f38296ab2bd84428304df27df8",
+    "crates/system/pandect/src/wallet_grant/certificate.rs": "98ede601faf5d92c219ce10d00d94e53075509a2468e452baf525a549f737a43",
+    "crates/system/pandect/src/wallet_grant/enroll.rs": "e25a9f31195279270a2d822da4b3c376874365601f84e20cbf9ce5b833a743f2",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "79ecb862d912ae019fcbd17da1b59831b64631ab4a6a2266925b9518493b40c8",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "05241d640d5961798bdbd33c91cfc0a94363c11b857f13d17339e2ee0b6fef5b",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "f011f6ba7a5ea690a680351c5ffeecdcb6473745297deec8f096ac2a72e14dd9",
+    "crates/system/pandect/tests/image_migration_failure.rs": "0f77eafb7718d84db0500273f212db0427c297b7baa052bd296704d2a1dbf283",
+    "ports/djinn/castellan/tests/profile_storage.rs": "c9cba2af13c1ca9f14faebc69455a4505865cb6c17b55ccf3aa8b3bbc6f136ee",
+    "ports/djinn/castellan/tests/wallet_authority.rs": "2ea2eaa132be0c2d899354acabd51d79b03fed40d18bf4adf038fdbc06eaeb8d",
+    "crates/eidetic/chartulary/src/commit.rs": "59dc9321f3b52332440689c751c8284c30f7fbb504a63db1ff3b4b78a1718b3a",
+    "crates/eidetic/chartulary/src/graph.rs": "a226a6e7d3232d7fa4129b7a072b1a81e5ce2723ed432a8affdb725b41fa5abe",
+    "crates/eidetic/chartulary/src/rdf.rs": "6ed905a8d6c143d2969c8f3473c105f5ddeb745c5bafe97d602d60dbb3afbf06",
+    "crates/graph/graph-kernel/src/graph/chart.rs": "6522e25dc8d853844c04aa42d722dbb8ca75964c28866aa19a3e413252793cf5",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "9eba4b88d50b5e689d2689138c3f06cb0a02e550d4ed9b830ac506fc89fe2a69",
+    "crates/graph/graph-kernel/src/graph/query.rs": "0eef17fa50ae1536835335a57155dc7344ff955579201c5f52e55ef135249ccf",
+    "crates/graph/graph-kernel/src/graph/tests/snapshot_size.rs": "bcf00713b52ba18398ff1ee8bae2fe6bea20fb9081b13314f620711467baecaa",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/lib.rs": "98b9d81b355501ef72782b41db850c0e62b53f64678ad6c0feb4fcd663a464a3"
+  },
+  "changes_this_pass": [
+    "Audit evidence and source-reading receipts",
+    "Existing vault plan updated with unrepaired Q040-Q042 and explicit repair boundaries"
+  ],
+  "production_edits_this_pass": false,
+  "limits": [
+    "Real claimed resident, PersonaeHost and temporary filesystem records; in-process API evidence, no fresh-process test.",
+    "No Linux D-Bus execution, native prompt or product UI acceptance claim.",
+    "Q042 requires opt-in secret-service. Current Djinn manifest does not enable castellan/secret-service and targeted search found no product serving call.",
+    "Review short-seed activation, dead-bus-owner cleanup, prompt ownership and alias publication are source candidates beyond the three executed observations.",
+    "All-source reading remains open. Existing earlier repair gates are preserved, not rerun or reclassified as fixes for these new defects."
+  ],
+  "coverage_checkpoint": {
+    "complete_files": 339,
+    "total_files": 3321,
+    "read_chars": 4854709,
+    "total_chars": 36764758,
+    "castellan_files_complete": 100,
+    "castellan_chars": 1108630,
+    "pending_chunks": 0,
+    "next_source": "ports/djinn/install-linux.sh"
+  },
+  "resources": {
+    "target": "C:/t/cargo-targets/mere",
+    "build_dir": "C:/t/cargo-targets/mere/build",
+    "isolated_resources": [],
+    "temporary_source_copy_removed": true
+  }
+}

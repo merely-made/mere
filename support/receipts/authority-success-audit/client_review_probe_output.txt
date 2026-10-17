@@ -1,0 +1,21 @@
+
+running 8 tests
+OBSERVED invisible-item remote-includes=true frozen-excludes=true
+CONTROL requested-resource resolves=true
+OBSERVED reordered-snapshot remote=[1,0] frozen=[0,1]
+OBSERVED resource-mismatch accepted-replies=6 selected-resource-still-missing=true other-resource-cached=true
+CONTROL dense-order readers-agree=true
+test remote_accessibility_ignores_item_visibility ... ok
+test requested_resource_control_completes ... ok
+test frozen_reader_ignores_explicit_item_order ... ok
+test dense_order_control_agrees ... ok
+test another_advertised_resource_is_accepted_repeatedly_without_completing ... ok
+CONTROL intentional-disconnect mount-disconnected=true rediscovery-sent=true
+OBSERVED unexpected-close mount-still-live=true lost-request-still-awaited=true rejoin-rediscovery-refused=true
+test intentional_disconnect_control_clears_mount_status_and_restarts_discovery ... ok
+test unexpected_close_leaves_mount_live_and_a_lost_request_blocks_rejoin ... ok
+OBSERVED resume-reply=Snapshot receipt-label=diff revision-updated=true
+test a_snapshot_resume_is_reported_as_a_diff ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

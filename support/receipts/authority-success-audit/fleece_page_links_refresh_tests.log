@@ -1,0 +1,96 @@
+   Compiling derive_more-impl v2.1.1
+   Compiling h2 v0.4.19
+   Compiling fastbloom v0.17.0
+   Compiling tower-http v0.6.11
+   Compiling path-dedot v3.1.1
+   Compiling backon v1.6.0
+   Compiling once_cell v1.21.4
+   Compiling string_cache v0.9.0
+   Compiling path-absolutize v3.1.1
+   Compiling acto v0.8.2
+   Compiling yasna v0.5.2
+   Compiling ractor v0.16.5
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling gemini-protocol v0.1.7
+   Compiling iroh-io v0.6.2
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+   Compiling gopher-protocol v0.2.0
+   Compiling enum_dispatch v0.3.13
+   Compiling value-log v1.9.0
+   Compiling web_atoms v0.2.6
+   Compiling nex-protocol v0.1.1
+   Compiling swarm-discovery v0.6.4
+   Compiling rcgen v0.13.2
+   Compiling scroll-protocol v0.1.0
+   Compiling bao-tree v0.16.1
+   Compiling markup5ever v0.39.0
+   Compiling guppy-protocol v0.1.1
+   Compiling misfin v0.0.4
+   Compiling finger-protocol v0.1.1
+   Compiling spartan-protocol v0.1.1
+   Compiling oxrdf v0.3.4
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling html5ever v0.39.0
+   Compiling xml5ever v0.39.0
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling errand v0.4.0 (C:\Users\mark_\Code\repos\mere\crates\system\errand)
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling oxjsonld v0.2.6
+   Compiling hyper v1.11.1
+   Compiling lsm-tree v2.10.4
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling derive_more v2.1.1
+   Compiling fjall v2.11.2
+   Compiling n0-future v0.3.2
+   Compiling noq-proto v1.3.0
+   Compiling iroh-base v1.3.0
+   Compiling hyper-util v0.1.20
+   Compiling n0-watcher v1.0.0
+   Compiling muniment v0.1.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\muniment)
+   Compiling nematic v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\nematic\nematic)
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates\nematic\nematic\src\knot\expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates\nematic\nematic\src\knot\expand\build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+   Compiling chartulary v0.2.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\chartulary)
+   Compiling hyper-rustls v0.27.9
+   Compiling igd-next v0.17.1
+   Compiling reqwest v0.13.5
+   Compiling netwatch v0.19.3
+   Compiling iroh-tickets v1.0.0
+   Compiling portmapper v0.19.3
+   Compiling eidetic v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\eidetic\eidetic-core)
+   Compiling n0-dns-resolver v0.1.0
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+   Compiling iroh-dns v1.3.0
+   Compiling noq v1.3.0
+   Compiling iroh-relay v1.3.0
+   Compiling irpc v0.17.0
+   Compiling iroh v1.3.0
+   Compiling iroh-mdns-address-lookup v0.6.0
+   Compiling iroh-gossip v0.101.0
+   Compiling iroh-util v0.6.0
+   Compiling iroh-blobs v0.103.1
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling stickleback v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\stickleback)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 12s
+     Running unittests src\lib.rs (C:/t/cargo-targets/mere/build\debug\deps\fleece-8b6ff2c7ca4e0341.exe)
+
+running 1 test
+test page_links::tests::links_resolve_dedupe_and_skip_the_page_itself ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+

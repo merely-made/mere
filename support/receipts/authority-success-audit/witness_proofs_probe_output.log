@@ -1,0 +1,13 @@
+
+running 4 tests
+test ambient_mesh_lookup_accepts_invalid_reference_but_resource_view_refuses_it ... Mesh reference boundary: ambient has/get report present/return bytes for wrong-algorithm or wrong-length references, and spec validation admits them. JobNamespaceView correctly refuses both before adapter read; no permission bypass or durable files
+ok
+test label_helper_is_a_plain_formatter_not_an_injective_structured_identity ... Label boundary: Display parts containing '/' collide with path separators; plain String/helper was explicitly ruled, so producers own grammar/escaping. No current colliding consumer or new identity-bypass finding
+ok
+test typed_proof_checks_preserve_tags_but_as_32_checks_only_width ... Proof boundary: complete BlobRef/Commitment verification checks the tags; as_32 returns the same raw array for differently tagged32-byte digests and is not an algorithm guard. No signature, inclusion-tree or canonicalization proof is implied
+ok
+test unique_out_of_order_entries_are_reported_as_duplicate_labels ... Witness refusal: unique out-of-order entries return DuplicateLabel for a label that occurs once; normal insertion sorts and framed reload succeeds
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

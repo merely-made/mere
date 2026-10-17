@@ -1,0 +1,7 @@
+PASS context keyboard activates non-leaf Export while HTML remains absent
+PASS context pointer disclosure reopens root submenu without exposing HTML
+PASS menubar control reaches same tree HTML leaf with full original path
+
+thread 'main' (62496) panicked at C:\Users\mark_\Code\repos\mere\support\receipts\authority-success-audit\command_tree_probe.rs:42:12:
+RefCell already borrowed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -1,0 +1,15 @@
+warning: in the working copy of 'crates/eidetic/chartulary/src/commit.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/graph.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/eidetic/chartulary/src/rdf.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/graph/graph-kernel/src/graph/chart.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/script/rhai/tests/scenograph_rules.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/system/pandect/src/wallet_grant/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/mere_docs/technical_architecture/2026-10-15_transport_agnosticism_note.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design_docs/scenograph_docs/technical_architecture/2026-07-22_scenotime_epoch_diff_note.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/passphrase_storage.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/certs.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/mod.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/vault_commands/tests.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/enroll.rs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ports/djinn/castellan/src/custody/wallet/refresh.rs', LF will be replaced by CRLF the next time Git touches it
