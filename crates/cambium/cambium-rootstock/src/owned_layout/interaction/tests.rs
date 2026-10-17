@@ -85,7 +85,7 @@ fn focus_changes_and_later_dom_rebuilds_keep_the_current_interaction() {
         QualName::new(None, Namespace::from(""), LocalName::from("style")),
         "height: 60px",
     );
-    layout.rebuild(&dom, 400.0, 100.0);
+    layout.rebuild_drained(&mut dom, 400.0, 100.0);
     assert_eq!(layout.painted_rect(&dom, a).unwrap().3, 60.0);
     assert_eq!(layout.painted_rect(&dom, b).unwrap().3, 90.0);
     let generation = layout.generation;
