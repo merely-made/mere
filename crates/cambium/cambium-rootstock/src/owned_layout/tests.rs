@@ -193,6 +193,181 @@ fn a_plane_carried_onto_a_fresh_session_is_clamped_as_it_is_set() {
     assert_eq!(fresh.element_scroll().len(), 1);
 }
 
+/// A bounded workspace containing the recorder's three rows and transport.
+/// Both horizontal content and the transport extend beyond the recorder, but
+/// neither may enlarge the document after a wheel reaches the recorder end.
+#[test]
+fn document_extent_nested_recorder_repeated_wheel_stays_in_child() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    let workspace = div(&mut dom, root, "width:280px;height:320px;overflow:auto;");
+    let recorder = div(&mut dom, workspace, "width:260px;height:200px;overflow:auto;");
+    let content = div(&mut dom, recorder, "width:900px;height:400px;");
+    div(&mut dom, content, "width:900px;height:120px;");
+    div(&mut dom, content, "width:900px;height:120px;");
+    let third_card = div(&mut dom, content, "width:900px;height:120px;");
+    let transport = div(&mut dom, content, "width:900px;height:40px;");
+    let mut layout = OwnedLayout::new(
+        &dom,
+        &[""],
+        VIEWPORT.0,
+        VIEWPORT.1,
+        &[],
+        &Default::default(),
+    );
+    assert_eq!(
+        layout.scroll_at_target(&dom, 20.0, 20.0, 10_000.0, 10_000.0),
+        Some(ScrollTarget::Element(recorder)),
+    );
+    assert_eq!(layout.element_scroll()[&recorder], (640.0, 200.0));
+    assert_eq!(layout.viewport_scroll(), (0.0, 0.0));
+    assert!(layout.visible_rect(&dom, third_card).is_some());
+    assert!(layout.visible_rect(&dom, transport).is_some());
+    for _ in 0..3 {
+        assert_eq!(
+            layout.scroll_at_target(&dom, 20.0, 180.0, 10_000.0, 10_000.0),
+            None,
+        );
+        assert_eq!(layout.viewport_scroll(), (0.0, 0.0));
+        assert_eq!(layout.element_scroll()[&recorder], (640.0, 200.0));
+        assert!(!layout.element_scroll().contains_key(&workspace));
+    }
+    assert_eq!(
+        layout.scroll_at_target(&dom, 20.0, 180.0, -10_000.0, -10_000.0),
+        Some(ScrollTarget::Element(recorder)),
+    );
+    assert_eq!(layout.element_scroll()[&recorder], (0.0, 0.0));
+    assert_eq!(layout.viewport_scroll(), (0.0, 0.0));
+}
+
+#[test]
+fn document_extent_excludes_hidden_clip_auto_and_scroll_descendants() {
+    for overflow in ["hidden", "clip", "auto", "scroll"] {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        let boundary = div(
+            &mut dom,
+            root,
+            &format!("width:100px;height:100px;overflow:{overflow};"),
+        );
+        div(&mut dom, boundary, "width:900px;height:1000px;");
+        let mut layout = OwnedLayout::new(
+            &dom,
+            &[""],
+            VIEWPORT.0,
+            VIEWPORT.1,
+            &[],
+            &Default::default(),
+        );
+        layout.set_viewport_scroll((10_000.0, 10_000.0));
+        assert_eq!(layout.viewport_scroll(), (0.0, 0.0), "overflow:{overflow}");
+    }
+}
+
+#[test]
+fn document_extent_clips_only_the_bounded_axis() {
+    for (overflow, expected) in [
+        ("overflow-x:clip;overflow-y:visible;", (0.0, 600.0)),
+        ("overflow-x:visible;overflow-y:clip;", (600.0, 0.0)),
+    ] {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        let boundary = div(
+            &mut dom,
+            root,
+            &format!("width:100px;height:100px;{overflow}"),
+        );
+        div(&mut dom, boundary, "width:900px;height:1000px;");
+        let mut layout = OwnedLayout::new(
+            &dom,
+            &[""],
+            VIEWPORT.0,
+            VIEWPORT.1,
+            &[],
+            &Default::default(),
+        );
+        assert_eq!(
+            layout.scroll_at_target(&dom, 200.0, 200.0, 10_000.0, 10_000.0),
+            Some(ScrollTarget::Document),
+        );
+        assert_eq!(layout.viewport_scroll(), expected, "{overflow}");
+    }
+}
+
+#[test]
+fn document_extent_preserves_visible_outer_overflow_and_boundary_border_box() {
+    for bounded in [false, true] {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        let outer_style = if bounded {
+            "margin-left:100px;margin-top:100px;width:500px;height:600px;overflow:auto;"
+        } else {
+            "margin-left:100px;margin-top:100px;width:100px;height:100px;overflow:visible;"
+        };
+        let outer = div(&mut dom, root, outer_style);
+        let inner_style = if bounded {
+            "width:900px;height:1000px;"
+        } else {
+            "width:500px;height:600px;"
+        };
+        div(&mut dom, outer, inner_style);
+        let mut layout = OwnedLayout::new(
+            &dom,
+            &[""],
+            VIEWPORT.0,
+            VIEWPORT.1,
+            &[],
+            &Default::default(),
+        );
+        // Outside the element: real document overflow must still accept wheel.
+        assert_eq!(
+            layout.scroll_at_target(&dom, 20.0, 20.0, 10_000.0, 10_000.0),
+            Some(ScrollTarget::Document),
+        );
+        assert_eq!(layout.viewport_scroll(), (300.0, 300.0), "bounded:{bounded}");
+        assert_eq!(
+            layout.scroll_at_target(&dom, 20.0, 20.0, -10_000.0, -10_000.0),
+            Some(ScrollTarget::Document),
+        );
+        assert_eq!(layout.viewport_scroll(), (0.0, 0.0));
+    }
+}
+
+#[test]
+fn document_extent_preserves_inline_bounds_and_rebuild_reclamps_after_clipping() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    let owner = div(
+        &mut dom,
+        root,
+        "width:220px;height:40px;line-height:600px;overflow:visible;",
+    );
+    let text = dom.create_text("Hg");
+    dom.append_child(owner, text);
+    let mut layout = OwnedLayout::new(
+        &dom,
+        &[""],
+        VIEWPORT.0,
+        VIEWPORT.1,
+        &[],
+        &Default::default(),
+    );
+    let lines = layout.fragments.inline_scroll_bounds(owner).unwrap();
+    assert_eq!(lines.height, 600.0);
+    layout.set_viewport_scroll((0.0, 10_000.0));
+    assert!(
+        layout.viewport_scroll().1 >= 200.0,
+        "visible line boxes must contribute",
+    );
+    style(
+        &mut dom,
+        owner,
+        "width:220px;height:40px;line-height:600px;overflow:hidden;",
+    );
+    layout.rebuild(&dom, VIEWPORT.0, VIEWPORT.1);
+    assert_eq!(layout.viewport_scroll(), (0.0, 0.0));
+}
+
 #[test]
 fn a_caret_paints_in_its_fields_text_colour() {
     let mut dom = ScriptedDom::new();

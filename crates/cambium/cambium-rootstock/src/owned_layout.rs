@@ -123,7 +123,7 @@ impl OwnedLayout {
         .expect("Cambium's authored Livery layout must resolve");
         let layout_with_text_us = elapsed_us(phase.elapsed());
         let phase = crate::Instant::now();
-        let content_extent = content_extent(dom, &fragments);
+        let content_extent = content_extent(dom, &styles, &fragments);
         let content_extent_us = elapsed_us(phase.elapsed());
         Self {
             style_set,
@@ -199,7 +199,7 @@ impl OwnedLayout {
         self.styles = styles;
         self.fragments = fragments;
         let phase = crate::Instant::now();
-        self.content_extent = content_extent(dom, &self.fragments);
+        self.content_extent = content_extent(dom, &self.styles, &self.fragments);
         self.content_extent_us = elapsed_us(phase.elapsed());
         self.clamp_viewport_scroll();
         self.clamp_element_scroll(dom);
@@ -1112,7 +1112,7 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
         extent.1 = extent.1.max(lines.y + lines.height + end.1);
     }
     for child in dom.dom_children(node) {
-        extend_element_scroll_extent(dom, styles, fragments, child, end, &mut extent);
+        extend_scroll_extent(dom, styles, fragments, child, end, (true, true), &mut extent);
     }
     (
         (extent.0 - container.x - container.width).max(0.0),
@@ -1121,29 +1121,47 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
 }
 
 /// Descendant border boxes contribute before their clipping boundary. Lines
-/// and deeper fragments contribute only while that content remains visible.
-/// All bounds stay in layout coordinates, unlike `content_clip`'s painted box.
-fn extend_element_scroll_extent<D: LayoutDom<NodeId = NodeId>>(
+/// and deeper fragments contribute only on axes still visible to the caller.
+/// Shared by element and document extents, in layout coordinates.
+fn extend_scroll_extent<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     styles: &StylePlane<NodeId>,
     fragments: &LiveryLayout<NodeId>,
     node: NodeId,
     end: (f32, f32),
+    axes: (bool, bool),
     extent: &mut (f32, f32),
 ) {
     for fragment in fragments.fragments_for_node(node) {
-        extent.0 = extent.0.max(fragment.x + fragment.width + end.0);
-        extent.1 = extent.1.max(fragment.y + fragment.height + end.1);
+        if axes.0 {
+            extent.0 = extent.0.max(fragment.x + fragment.width + end.0);
+        }
+        if axes.1 {
+            extent.1 = extent.1.max(fragment.y + fragment.height + end.1);
+        }
     }
-    if clips_content(styles, node) {
+    let visible = |property| {
+        styles
+            .computed_style(node, property)
+            .is_none_or(|value| value == "visible")
+    };
+    let axes = (
+        axes.0 && visible("overflow-x"),
+        axes.1 && visible("overflow-y"),
+    );
+    if !axes.0 && !axes.1 {
         return;
     }
     if let Some(lines) = fragments.inline_scroll_bounds(node) {
-        extent.0 = extent.0.max(lines.x + lines.width + end.0);
-        extent.1 = extent.1.max(lines.y + lines.height + end.1);
+        if axes.0 {
+            extent.0 = extent.0.max(lines.x + lines.width + end.0);
+        }
+        if axes.1 {
+            extent.1 = extent.1.max(lines.y + lines.height + end.1);
+        }
     }
     for child in dom.dom_children(node) {
-        extend_element_scroll_extent(dom, styles, fragments, child, end, extent);
+        extend_scroll_extent(dom, styles, fragments, child, end, axes, extent);
     }
 }
 
@@ -1230,17 +1248,24 @@ fn text_rect_command(rect: genet_livery::TextRect, color: ColorF) -> PaintCmd {
     })
 }
 
+/// Only overflow visible outside nested clip/scroll boundaries can enlarge
+/// the document. A boundary's own border box still contributes, so an outer
+/// scrollport positioned beyond the viewport remains document-scrollable.
 fn content_extent<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
+    styles: &StylePlane<NodeId>,
     fragments: &LiveryLayout<NodeId>,
 ) -> (f32, f32) {
-    let mut extent: (f32, f32) = (0.0, 0.0);
-    walk(dom, dom.document(), &mut |node| {
-        if let Some(fragment) = fragments.get(node) {
-            extent.0 = extent.0.max(fragment.x + fragment.width);
-            extent.1 = extent.1.max(fragment.y + fragment.height);
-        }
-    });
+    let mut extent = (0.0, 0.0);
+    extend_scroll_extent(
+        dom,
+        styles,
+        fragments,
+        dom.document(),
+        (0.0, 0.0),
+        (true, true),
+        &mut extent,
+    );
     extent
 }
 
