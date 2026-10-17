@@ -1,0 +1,452 @@
+{
+  "schema": "mere.resident-inference-durable-receipt/v1",
+  "recorded_at_utc": "2026-10-16T01:20:49.612856+00:00",
+  "branch": "codex/mere-presentation-rules",
+  "proof_basis": {
+    "parent": "384fd3937d7ffe1749a5f3f89a293a3552d081fb",
+    "source_sha256": {
+      "Cargo.lock": "46f36c76353f08ae6d7f3dcd7e39dd690a6c19c759235629381c624aa316dd1c",
+      "crates/eidetic/eidetic-core/src/models/inference.rs": "d32dfa415825334ae98e8544e5c72d053375273085f1b6114becd9983ac92dee",
+      "crates/eidetic/eidetic-core/src/models/mod.rs": "2fc3b428daf75b146c1937763f2abef31aff9452a79cfaa332982b7e495c4a25",
+      "crates/intel/esp/Cargo.toml": "2915c46f03ef5674fe81f1f9dde9b812cb29012e6abacee1496b25b97d2323c6",
+      "crates/intel/esp/README.md": "029c1d1d31ff9114f0900ccd2e085b248a85b1011904ddb927e28afda007789d",
+      "crates/intel/esp/src/infer/actor.rs": "1bd7e5e210f339081c3d8bce671aa641cfbf7aa297187079e2018b344998015f",
+      "crates/intel/esp/src/infer/decoder/generate.rs": "1b3970add25aae44804ea39961ab9aee45abebca1b837f899ebd42567a3f2bca",
+      "crates/intel/esp/src/infer/decoder/provider.rs": "e7284340398524b170feb3c1f3dadac562a590aa942547f2b1569672dca9c7cc",
+      "crates/intel/esp/src/infer/decoder/sample.rs": "91c512214a36cf3a590d887a7f8184d86178a23f57a9dd21fdf12dfcf786b1d2",
+      "crates/intel/esp/src/infer/prompt.rs": "91f7e2d2545b5e7f4c74adf4f423cfe550969cd5734f7d4d690e5450d184068e",
+      "crates/intel/esp/src/infer/provider.rs": "1559b487b11bf6c9feecca6179cf03b8c3ad292e9906c1a881d1d14b60cbe709",
+      "crates/intel/esp/tests/durable_generation.rs": "ed7ef6723bbe30d6e7fef7a5c6a93b1fe7025f7e9d6aca774ecd6063844eaceb",
+      "crates/intel/esp/tests/smollm2_library.rs": "818b317c51e0f024ec73ec54de0fa7ec0eea29b21465e82d99450b04e2acb68e",
+      "design_docs/DOC_README.md": "8cf08241f4b4e25db131d48868c894b135b9d7069a68cfc404f8a7cc461d2ff3",
+      "design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md": "317b94edfdcc00c61d4d8500a8e2e80c3c20ac8fd22e45af8b3b830220c332bf",
+      "design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md": "326c7b95e5dbbee6992b516d9b7e672b964084f4d4ed5559c02db86296facd6e",
+      "ports/distillery/Cargo.toml": "3d0460c665683287934dbbfb09688b9e846f22e9b67d0f26e78ea2d6c6315689",
+      "ports/distillery/README.md": "fedfa03435208b716b440c86dba975dd9b37dd133e5b2e937630f5643ee17ddd",
+      "ports/distillery/src/inference.rs": "6150e837c91fa27a17105cb3b053b4917a93a302d85ded78f772dc7b92ed02df",
+      "ports/distillery/src/inference/durable.rs": "48420a63984cb2b08ea03aaaff4b590ce1cf0e029dbd99bfc9469ee123a7d874",
+      "ports/distillery/src/inference/gpu.rs": "21e5223cd01521f41662236ea23dd3e72dfa36a96c25a71153b696f53c243017",
+      "ports/distillery/tests/inference_durable.rs": "e223f403d0e90f75faac37ecf46d7d265deda3fe4c5a5bdf6e3492b8cff870c1",
+      "ports/djinn/README.md": "263fc64c10be9a6359d02bf574c0e2d4f7405c0d89ca4eb3ca5834a26f9c5971",
+      "ports/djinn/src/bin/djinn.rs": "b215669d902d3dba957c90d62d4e2832b49317fcf29376f070f7a38e5183409f",
+      "ports/djinn/src/resident.rs": "968d5713035230ee5249d9915fa3bca9b5d3ed9868977599344e0acfbc8af98e",
+      "ports/djinn/src/resident_distillery.rs": "0e2356423dc4f67ccc3cc11b1c2d1dc74a18067589736eb2d0f0cf06a42d08ba",
+      "ports/djinn/src/resident_inference.rs": "55f54d029889ea48a15c0b19a65cf32b7aae9591e718f1befbf755288824be14",
+      "ports/djinn/tests/inference_route.rs": "836e2ce40fae8ae2c8d06c6f9e345fe2b5272e43dd3d995c4744b0a927374282"
+    },
+    "note": "Exact Windows worktree bytes; Git may normalize line endings. The receipt itself is excluded from source hashes."
+  },
+  "host": "O-PC",
+  "scope": {
+    "implemented": [
+      "durable rendered prompt, exact session, token IDs and draw position",
+      "synchronous checkpoint commit before publication",
+      "native sealed Eidetic run evidence and blob references",
+      "restart and token-boundary lock pause/resume",
+      "cancelled partial state and failure provenance",
+      "same-persona signed/encrypted log replication on an existing endpoint",
+      "explicit device continuation, reference comparison and fork refusal"
+    ],
+    "open": "Production binding to separately rooted keyed personal-graph devices awaits the requested private-ask admission decision."
+  },
+  "checks": {
+    "inference-durable-generation.log": {
+      "passed_groups": [
+        160,
+        2
+      ],
+      "log_sha256": "3184821784cc0eb29d5853699b48d217fa4c9a2ea909a29e641bf37c4c9bdc68"
+    },
+    "inference-durable-bare.log": {
+      "passed_groups": [
+        82
+      ],
+      "log_sha256": "e4d61d726cac4489b912f0b36450d19d0eb68e1d2ed6bbbb1db32461e8b8206c"
+    },
+    "inference-durable-recovery.log": {
+      "passed_groups": [
+        36,
+        8
+      ],
+      "log_sha256": "35e85060e0038568edd1a1a86e223972803ccca5189379bbf3ffb59275e9d9f3"
+    },
+    "inference-durable-resident-final.log": {
+      "passed_groups": [
+        3,
+        3
+      ],
+      "log_sha256": "95492c03a88c3a35dcbb56e46b914f5f8c93eecc92d08fb23a0473d0f7b714cb"
+    },
+    "inference-durable-default.log": {
+      "passed_groups": [
+        4
+      ],
+      "log_sha256": "b7134b0015f9a8c3610ec55c9b569d51bed844824e79992fa1623210e0914226"
+    },
+    "inference-durable-smollm2-gpu.log": {
+      "passed_groups": [
+        1
+      ],
+      "log_sha256": "55c6faa4faa7fd15ff26502567a5250f2bffb4caecb89002f2dc9b17f337b5b6"
+    },
+    "local_repetition": {
+      "iterations": 20,
+      "test_entries_per_iteration": 7,
+      "excluded": "checkpoint_log_syncs_on_existing_transport_and_continues_on_device_b",
+      "last_iteration_log_sha256": "4309d80e00aa05b24333049b551fd1cdea1835fd40610b82280c039346e26166",
+      "controller": "20 invocations of the exact durable integration executable with --skip checkpoint_log_syncs_on_existing_transport_and_continues_on_device_b; stop on any nonzero exit"
+    }
+  },
+  "binary_sha256": {
+    "esp-1ce848d885afe147.exe": {
+      "sha256": "461b0cd550ca74a6738c884a33af3d2dc34ef0381cae60b9327258f27cace85b",
+      "bytes": 10466304
+    },
+    "durable_generation-8774b1e33d366b52.exe": {
+      "sha256": "e96f8426408e8b40aeb32aae66a9697c900c137c498bd7562db167fa04f40934",
+      "bytes": 9261568
+    },
+    "esp-7199c16a49b055af.exe": {
+      "sha256": "0260999d7370a473bf1f54c8427f9d1ecc4ecd53a4482ef383c992defdd455f4",
+      "bytes": 1082880
+    },
+    "distillery-e2029bb6c76645c3.exe": {
+      "sha256": "5c2d4b83c173d4b7cb68258d15e56b37a339ab89ae0daec6936ead8cbaac542f",
+      "bytes": 57904128
+    },
+    "inference_durable-b721e4ba7ecc5c37.exe": {
+      "sha256": "b9ee6876f327e30eef44109acaf54da98c4702aec9681a26716bb52fa4d1a248",
+      "bytes": 65285120
+    },
+    "inference_gpu_reclaim-cd93fac4f8095286.exe": {
+      "sha256": "a35e76e0bb2c37c65ae27fd07313865a99eaa78b59d9c2acb38de6e27c374538",
+      "bytes": 194147328
+    },
+    "inference_route-1f2a7a676a9b7318.exe": {
+      "sha256": "77fb4197e7199add7fed7b3869fbce034c6799b235f6b0755a4ee8cae0e49c92",
+      "bytes": 208476672
+    },
+    "djinn-782add0115b261a8.exe": {
+      "sha256": "eff44067aa2644a6211c85ba9e931d0d1ecb47e35158a4a1f67f75bd273792b2",
+      "bytes": 99120128
+    },
+    "smollm2_library-78ec7b0fc2b661d7.exe": {
+      "sha256": "0164876df9f8d71a0352426b17b50573dbd5e70ca437b13c49599ca9b2293a54",
+      "bytes": 51300352
+    }
+  },
+  "smollm2_gpu": {
+    "adapter": {
+      "backend": "vulkan",
+      "device_type": "Discrete",
+      "matched_requested_class": true,
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+    },
+    "backend": "burn-wgpu",
+    "load_seconds": 2.6379911,
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+    "row": "blake3:cc753a9cfd8b2657c66b962e508b97845b6c2bda7c42940d5ea4ae5386952a01",
+    "rows": [
+      {
+        "draws": 0,
+        "first_differing_token": null,
+        "question": "What is the capital of France?",
+        "resume_at": 3,
+        "resumed_token_ids": [
+          504,
+          3575,
+          282,
+          4649,
+          314,
+          7042,
+          30
+        ],
+        "seconds": 1.5544850000000001,
+        "text": "The capital of France is Paris.",
+        "token_ids": [
+          504,
+          3575,
+          282,
+          4649,
+          314,
+          7042,
+          30
+        ]
+      },
+      {
+        "draws": 0,
+        "first_differing_token": null,
+        "question": "Count from one to five.",
+        "resume_at": 3,
+        "resumed_token_ids": [
+          33,
+          30,
+          1963,
+          198,
+          34,
+          30,
+          5713,
+          198,
+          35,
+          30,
+          8696,
+          198,
+          36,
+          30,
+          8920,
+          198
+        ],
+        "seconds": 1.324421,
+        "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+        "token_ids": [
+          33,
+          30,
+          1963,
+          198,
+          34,
+          30,
+          5713,
+          198,
+          35,
+          30,
+          8696,
+          198,
+          36,
+          30,
+          8920,
+          198
+        ]
+      },
+      {
+        "draws": 0,
+        "first_differing_token": null,
+        "question": "What color is a clear daytime sky?",
+        "resume_at": 3,
+        "resumed_token_ids": [
+          49,
+          2437,
+          23703,
+          6376,
+          314,
+          3431,
+          253,
+          2276,
+          11615,
+          282,
+          4461,
+          28,
+          1129,
+          351,
+          253,
+          11682
+        ],
+        "seconds": 1.2718512,
+        "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+        "token_ids": [
+          49,
+          2437,
+          23703,
+          6376,
+          314,
+          3431,
+          253,
+          2276,
+          11615,
+          282,
+          4461,
+          28,
+          1129,
+          351,
+          253,
+          11682
+        ]
+      }
+    ],
+    "session": {
+      "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+      "session_id": "blake3:e98a2d6d857bbeea8f431367885d4a5ddee51d3751f69e9ade6943c19314f925"
+    }
+  },
+  "native_gpu_reclaim": {
+    "autodiff": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Restart",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "continuations": [
+              {
+                "at_token": 0,
+                "compared_token_ids_hash": null,
+                "device": "O-PC:6507b24310ffbd417a44fb43c833bc29",
+                "first_differing_token": null,
+                "reason": "ask"
+              }
+            ],
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5",
+            "tokens": 4
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792113377502,
+      "steps": "[Claimed { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Granted { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]), epoch: 0, lease: LeaseId([205, 146, 66, 149, 83, 135, 116, 177, 82, 147, 196, 172, 242, 14, 41, 214, 103, 175, 22, 166, 244, 113, 50, 177, 228, 132, 241, 47, 113, 143, 200, 11]) }, Started { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]), lease: Some(LeaseId([205, 146, 66, 149, 83, 135, 116, 177, 82, 147, 196, 172, 242, 14, 41, 214, 103, 175, 22, 166, 244, 113, 50, 177, 228, 132, 241, 47, 113, 143, 200, 11])) }, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Idle, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Idle, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Idle, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Idle, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Idle, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Idle, AwaitingStop { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }, Reclaimed { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]), lease: LeaseId([205, 146, 66, 149, 83, 135, 116, 177, 82, 147, 196, 172, 242, 14, 41, 214, 103, 175, 22, 166, 244, 113, 50, 177, 228, 132, 241, 47, 113, 143, 200, 11]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Claimed { job: JobId([108, 182, 72, 193, 184, 34, 141, 61, 211, 37, 2, 182, 129, 84, 134, 12, 11, 77, 6, 87, 225, 25, 72, 219, 43, 54, 229, 254, 172, 93, 91, 84]) }]"
+    },
+    "checkpoint_request": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Resumable",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "continuations": [
+              {
+                "at_token": 0,
+                "compared_token_ids_hash": null,
+                "device": "O-PC:d6924e017651a395eb4e777d3436dcc6",
+                "first_differing_token": null,
+                "reason": "ask"
+              }
+            ],
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5",
+            "tokens": 4
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792113377816,
+      "steps": "[Claimed { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Granted { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), epoch: 0, lease: LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63]) }, Started { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), lease: Some(LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63])) }, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Heartbeat { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), lease: LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Heartbeat { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), lease: LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Heartbeat { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), lease: LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Heartbeat { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), lease: LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Idle, AwaitingStop { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }, Reclaimed { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]), lease: LeaseId([114, 140, 110, 76, 161, 200, 110, 39, 132, 177, 211, 220, 183, 89, 235, 95, 231, 202, 75, 33, 97, 44, 21, 63, 249, 76, 163, 49, 156, 87, 65, 63]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle, Idle, Claimed { job: JobId([175, 45, 150, 36, 227, 196, 88, 117, 91, 209, 254, 152, 204, 193, 171, 176, 255, 247, 86, 6, 240, 206, 52, 212, 128, 17, 136, 163, 213, 246, 202, 25]) }]"
+    },
+    "finite_difference": {
+      "adapter": {
+        "backend": "vulkan",
+        "device_type": "Discrete",
+        "matched_requested_class": true,
+        "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "checkpoint_class": "Restart",
+      "inference": {
+        "load_error": null,
+        "model": "fixture/trainer-resource",
+        "runs": [
+          {
+            "continuations": [
+              {
+                "at_token": 0,
+                "compared_token_ids_hash": null,
+                "device": "O-PC:8ae2c2a94996afc5be752e078ef47414",
+                "first_differing_token": null,
+                "reason": "ask"
+              }
+            ],
+            "error": null,
+            "question": "t3 t11 t5 t29",
+            "run": "foreground",
+            "session": {
+              "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+              "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+            },
+            "state": "finished",
+            "text": "t31 t5 t12 t5",
+            "tokens": 4
+          }
+        ],
+        "schema": "distillery.inference-runs/v1",
+        "session": {
+          "prompt_template_hash": "blake3:da71be973cfcd8025b5c7b565c3ed644685b4aa3d0e7e9eeb91d5f14e75c9e05",
+          "session_id": "blake3:e917c4fc62d529c73f6ef925504b7ac0183ccfc59cf5171c676e5cfd40ea5864"
+        }
+      },
+      "native_in_process": true,
+      "offer_restored_after_inference": true,
+      "offer_withdrawn_while_waiting": true,
+      "recorded_at_ms": 1792113377549,
+      "steps": "[Claimed { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Granted { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), epoch: 0, lease: LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85]) }, Started { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), lease: Some(LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85])) }, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Heartbeat { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), lease: LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Heartbeat { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), lease: LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Heartbeat { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), lease: LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Heartbeat { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), lease: LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85]), progress: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Idle, AwaitingStop { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]) }, Reclaimed { job: JobId([68, 111, 227, 52, 46, 156, 233, 217, 47, 76, 123, 65, 122, 19, 96, 212, 126, 13, 107, 190, 244, 244, 67, 104, 191, 101, 16, 26, 66, 220, 255, 30]), lease: LeaseId([219, 126, 238, 239, 231, 234, 114, 133, 155, 174, 45, 36, 124, 255, 177, 173, 101, 204, 6, 165, 132, 133, 198, 187, 61, 23, 209, 170, 248, 116, 186, 85]), reason: ForegroundActivity, stopped_at: LeaseProgress { done: 0, total: 0, checkpoint_held: false, activity: Preparing } }, Idle, Idle, Idle, Idle, Idle, Idle, Idle]"
+    }
+  },
+  "docs": {
+    "audit_sha256": "aad1e15b24af83e9a244aaa2008a5c7035664ce55149c559eb0ca1efc667e180",
+    "no_new_findings_against": "inference-doc-audit.json",
+    "counts": {
+      "active_docs": 270,
+      "indexed_active_docs": 268,
+      "index_orphans": 1,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 28,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 105,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 24,
+      "missing_known_root_paths": 124,
+      "historical_missing_known_root_paths": 235,
+      "planned_missing_known_root_paths": 6,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 32,
+      "exhibit_b_sources": 0
+    }
+  },
+  "reproduction": [
+    "cargo test --locked -p esp --release --no-default-features --features decoder,model-session,actor --lib --test durable_generation",
+    "ESP_SMOLLM2_DIR=<pinned local snapshot>; cargo test --locked -p esp --release --no-default-features --features decoder-wgpu,model-session,actor --test smollm2_library library_gpu_matches_independent_greedy_reference -- --ignored --nocapture",
+    "cargo test --locked -p distillery --features inference-model --lib --test inference_durable",
+    "cargo test --locked -p djinn --features inference-gpu,trainer-gpu,trainer-autodiff --test inference_route --test inference_gpu_reclaim -- --include-ignored",
+    "cargo test --locked -p djinn --lib resident_inference",
+    "cargo test --locked -p esp --release --no-default-features --lib"
+  ],
+  "limits": [
+    "The two-host transfer uses two independent endpoints on one physical computer with the same journal persona signer/data key.",
+    "Real SmolLM2 reference/resume, tiny-model resident/app-broker, seeded sampling and trainer reclaim are separate harnesses.",
+    "No second physical computer or independently rooted personal-graph key group was qualified.",
+    "No installed Djinn binary was run and no heap-residue audit was performed.",
+    "No divergent real-model token was observed, so no prefill-versus-step divergence trace is claimed.",
+    "Shared stable Cargo target reused; existing worktree retained pending branch integration; no isolated Cargo home created."
+  ]
+}

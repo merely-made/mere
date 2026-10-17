@@ -78,6 +78,44 @@ pub const RESIDENT_DISTILLERY_CHRONICLE_ROUTE: &str = "distillery.chronicle";
 /// Notice cadence for live Chronicle revisions on the first-party route.
 pub const RESIDENT_DISTILLERY_CHRONICLE_NOTICE_POLL: Duration = Duration::from_millis(250);
 
+#[cfg(feature = "inference-stages")]
+struct StageVaultLock {
+    services: Vec<Arc<distillery::inference_stage::StageService>>,
+    profile: ProfileId,
+}
+#[cfg(feature = "inference-stages")]
+impl castellan::lock::VaultLockHolder for StageVaultLock {
+    fn name(&self) -> &str {
+        "resident inference stages"
+    }
+    fn key_profile(&self) -> Option<&ProfileId> {
+        Some(&self.profile)
+    }
+    fn lock(&self) {
+        for service in &self.services {
+            service.set_private_locked(true);
+        }
+        // Djinn runs lock holders on its blocking lock path while the Tokio
+        // resident workers continue draining their leased computation.
+        while self
+            .services
+            .iter()
+            .any(|service| !service.private_drained())
+        {
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+    fn unlock(
+        &self,
+        _vault: &dyn personae::IdentityProvider,
+    ) -> Result<(), personae::IdentityError> {
+        for service in &self.services {
+            service.set_private_locked(false);
+        }
+        Ok(())
+    }
+}
+
 /// One resident Distillery works, bound to this profile's personal mesh.
 pub struct ResidentDistillery {
     resident: ResidentAuthority<RedbBackend>,
@@ -102,13 +140,18 @@ pub struct ResidentDistillery {
     mesh_id: [u8; 32],
     profile: String,
     mesh_root: PathBuf,
+    #[cfg(feature = "inference")]
+    inference_root: PathBuf,
+    #[cfg(feature = "inference")]
+    inference_space: [u8; 32],
     /// The persona-scoped model library the trainer writes artifacts into,
     /// held for the lane's life so the resource and any reader see one handle
-    /// on one redb file. `None` when the owner stated no trainer — and, in a
-    /// build without the `trainer` feature, always `None`, because such a
-    /// build refuses a lane that asks for one rather than opening a store
-    /// nothing would ever write to.
+    /// on one redb file. Opened for a trainer or a library-backed inference
+    /// lane; `None` when neither consumer needs it.
     model_library: Option<Arc<Mutex<RedbBackend>>>,
+    gpu_access: distillery::gpu::GpuAccess,
+    #[cfg(feature = "inference-stages")]
+    stage_network: Option<super::resident_inference::mesh_discovery::StageNetwork>,
     /// The adapter the composed trainer actually runs on, when this lane
     /// composed a GPU trainer.
     ///
@@ -122,6 +165,198 @@ pub struct ResidentDistillery {
 }
 
 impl ResidentDistillery {
+    /// Compose discovery, the worker offer and the actor's bounded planner on
+    /// this existing mesh. Current graph keys remain the admission boundary.
+    #[cfg(feature = "inference-stages")]
+    pub async fn prepare_automatic_inference(
+        &mut self,
+        data_root: &Path,
+        personal: &Arc<crate::sync::personal_sync_host::PersonalSyncHost>,
+        row: &str,
+        device: crate::settings::InferenceDeviceSettings,
+        limits: distillery::inference_protocol::AutomaticStageSettings,
+        proof: insigne::DerivedKeyAttestation,
+    ) -> Result<Arc<distillery::inference_stage::StageChainFactory>, String> {
+        use distillery::inference_stage::{automatic::StagePlanner, library_stage_catalog};
+        limits.validate()?;
+        if self.mesh_id != super::resident_inference::compute_space(personal.graph()) {
+            return Err("automatic inference graph differs from the configured graph".into());
+        }
+        self.resident
+            .authority()
+            .host()
+            .announce(proof.clone())
+            .await
+            .map_err(|e| e.to_string())?;
+        let seals = personal.seals();
+        let local = self.author.public_key().to_bytes();
+        self.resident
+            .authority_mut()
+            .host_mut()
+            .set_admission(Arc::new(move |job, board| {
+                [local, job.posted_by].iter().all(|author| {
+                    board
+                        .devices()
+                        .master_of(author)
+                        .is_some_and(|root| seals.current_reader(&root))
+                })
+            }));
+        let row = distillery::inference::parse_model_row(row)?;
+        let library = self.inference_model_library(data_root)?;
+        let resolved = {
+            let mut store = library.lock().await;
+            distillery::inference::resolve_library_session(&mut *store, row)
+                .await
+                .map_err(|e| e.to_string())?
+        };
+        if resolved.layer_artifacts().is_none() {
+            return Err("automatic inference requires a layer-indexed library row".into());
+        }
+        let half = resolved.weight_format().is_some();
+        let loader = match device {
+            crate::settings::InferenceDeviceSettings::Cpu if half => "burn-flex",
+            crate::settings::InferenceDeviceSettings::Cpu => "burn-ndarray",
+            crate::settings::InferenceDeviceSettings::Gpu => "burn-wgpu",
+        };
+        resolved.capability(loader).map_err(|e| e.to_string())?;
+        let memory_mib = u32::try_from(limits.worker_layer_bytes.div_ceil(1 << 20))
+            .map_err(|_| "stage layer budget exceeds host memory range")?;
+        let requires = mesh::ResourceRequirements {
+            memory_mib,
+            compute: if device == crate::settings::InferenceDeviceSettings::Gpu {
+                mesh::ComputeClass::Gpu
+            } else {
+                mesh::ComputeClass::Cpu
+            },
+        };
+        if limits.worker_layer_bytes > 0 {
+            let service = self
+                .enable_inference_stages(
+                    data_root,
+                    personal,
+                    loader,
+                    limits.worker_layer_bytes,
+                    limits.transport(requires),
+                )
+                .await?;
+            service.set_catalog(library_stage_catalog(
+                library,
+                loader.into(),
+                (device == crate::settings::InferenceDeviceSettings::Gpu)
+                    .then(|| self.gpu_access.clone()),
+                limits.worker_layer_bytes,
+            ));
+        }
+        let transport = self.resident.transport().clone();
+        let blobs = self.resident.storage().blobs();
+        self.resident
+            .authority_mut()
+            .host_mut()
+            .set_courier(Arc::new(distillery::mesh_host::TransportCourier::for_mesh(
+                transport.clone(),
+                blobs,
+                self.mesh_id,
+            )));
+        let planner = StagePlanner::new(
+            transport,
+            self.mesh_id,
+            self.author.clone(),
+            Arc::new(distillery::mesh_host::SystemClock),
+            mesh::LeasePolicy::default(),
+            crate::resident_inference::personal::stage_readers(personal),
+            limits.clone(),
+        )?;
+        self.resident
+            .authority_mut()
+            .attach_stage_planner(planner.clone())?;
+        self.stage_network = Some(
+            super::resident_inference::mesh_discovery::StageNetwork::open(
+                personal.clone(),
+                self.resident.transport().clone(),
+                proof,
+                self.author.clone(),
+                &limits,
+            )
+            .await?,
+        );
+        Ok(planner.factory(row, loader.into()))
+    }
+    /// Explicit embedding composition for a stage worker. Uses this profile's
+    /// existing library, mesh leases, trainer gate and shared endpoint. The
+    /// caller reserves shared/activation/backend memory before giving a stage
+    /// its layer/KV budget and installs the vault holder before opening a door.
+    #[cfg(feature = "inference-stages")]
+    pub async fn enable_inference_stages(
+        &mut self,
+        data_root: &Path,
+        personal: &crate::sync::personal_sync_host::PersonalSyncHost,
+        loader: &str,
+        resident_layer_budget: u64,
+        settings: distillery::inference_stage::StageSettings,
+    ) -> Result<Arc<distillery::inference_stage::StageService>, String> {
+        let (device, gpu) = match loader {
+            "burn-ndarray" => (distillery::inference::InferenceDevice::ndarray(), None),
+            "burn-flex" => (distillery::inference::InferenceDevice::flex(), None),
+            #[cfg(feature = "inference-gpu")]
+            "burn-wgpu" => (
+                distillery::inference::discrete_gpu_inference_device()?.0,
+                Some(self.gpu_access.clone()),
+            ),
+            _ => return Err("stage loader is unavailable in this resident build".into()),
+        };
+        if (settings.requires.compute == mesh::ComputeClass::Gpu) != gpu.is_some() {
+            return Err("stage requirements disagree with the composed backend".into());
+        }
+        let library = self.inference_model_library(data_root)?;
+        let factory = distillery::inference_stage::library_stage_factory(
+            library,
+            device,
+            loader.into(),
+            gpu,
+            resident_layer_budget,
+        );
+        let policy = self.resident.authority().host().policy();
+        let resource =
+            distillery::inference_stage::stage_resource(self.author.public_key().to_bytes());
+        if (!policy.allowed_resources.is_empty() && !policy.allowed_resources.contains(&resource))
+            || (!policy.accepted_checkpoints.is_empty()
+                && !policy
+                    .accepted_checkpoints
+                    .contains(&mesh::CheckpointClass::Restart))
+        {
+            return Err("mesh lending settings do not permit this device's stage resource and restart class".into());
+        }
+        self.resident
+            .enable_inference_stages(
+                Arc::new(distillery::mesh_host::SystemClock),
+                mesh::LeasePolicy::default(),
+                settings,
+                factory,
+                crate::resident_inference::personal::stage_readers(personal),
+            )
+            .await
+    }
+
+    /// Register alongside the ask lane's holder. An idle resident with only
+    /// stage workers still participates in private-data lock handling.
+    #[cfg(feature = "inference-stages")]
+    pub fn inference_stage_lock_holder(&self) -> Option<Arc<dyn castellan::lock::VaultLockHolder>> {
+        let services = self.resident.inference_stage_services();
+        if services.is_empty() {
+            None
+        } else {
+            Some(Arc::new(StageVaultLock {
+                services,
+                profile: ProfileId(self.profile.clone()),
+            }))
+        }
+    }
+
+    /// Owner handles for live worker diagnostics and lifecycle verification.
+    #[cfg(feature = "inference-stages")]
+    pub fn inference_stage_services(&self) -> Vec<Arc<distillery::inference_stage::StageService>> {
+        self.resident.inference_stage_services()
+    }
     /// Open the works for one already-resolved Personae profile.
     pub async fn open(
         data_root: &Path,
@@ -129,6 +364,19 @@ impl ResidentDistillery {
         vault_dir: &Path,
         unlock: Unlock,
         lane: DistilleryLaneSettings,
+    ) -> Result<Self, String> {
+        Self::open_mesh(data_root, profile, vault_dir, unlock, lane, None).await
+    }
+
+    /// Automatic inference names a common graph compute space even when the
+    /// devices have distinct profile roots. Existing profile meshes stay local.
+    pub async fn open_mesh(
+        data_root: &Path,
+        profile: &ProfileId,
+        vault_dir: &Path,
+        unlock: Unlock,
+        lane: DistilleryLaneSettings,
+        mesh: Option<[u8; 32]>,
     ) -> Result<Self, String> {
         lane.validate()?;
 
@@ -201,9 +449,17 @@ impl ResidentDistillery {
             .map_err(|error| format!("open the Distillery works' profile: {error}"))?;
         let authority = InstalledAuthority::open(data_root, Arc::new(vault), opened.description)
             .map_err(|error| format!("open the Distillery works: {error}"))?;
-        let mesh_id = authority
+        let personal_mesh = authority
             .personal_mesh_id()
             .map_err(|error| format!("derive the personal mesh id: {error}"))?;
+        #[cfg(feature = "inference")]
+        let inference_paths = authority.paths(personal_mesh);
+        #[cfg(feature = "inference")]
+        inference_paths.prepare().map_err(|e| e.to_string())?;
+        let mesh_id = match mesh {
+            Some(mesh) => mesh,
+            None => personal_mesh,
+        };
         let paths = authority.paths(mesh_id);
         paths
             .prepare()
@@ -260,6 +516,8 @@ impl ResidentDistillery {
         #[cfg(feature = "trainer-gpu")]
         let mut trainer_adapter: Option<distillery::GpuAdapterFacts> = None;
 
+        let gpu_access = distillery::gpu::GpuAccess::default();
+
         // Registering is fallible, and the closure below cannot be, so the
         // registry is assembled here and only *installed* there.
         #[cfg(feature = "trainer")]
@@ -294,12 +552,17 @@ impl ResidentDistillery {
                     },
                     _ => distillery::TrainerDevice::ndarray(),
                 };
+                let mut resource = distillery::TrainerResource::new(Arc::clone(store), device);
+                if lane
+                    .trainer
+                    .as_ref()
+                    .is_some_and(|trainer| trainer.device.trim() == "gpu")
+                {
+                    resource = resource.with_gpu_access(gpu_access.clone());
+                }
                 let mut registry = mesh::ResourceRegistry::builtin();
                 registry
-                    .register(Arc::new(distillery::TrainerResource::new(
-                        Arc::clone(store),
-                        device,
-                    )))
+                    .register(Arc::new(resource))
                     .map_err(|error| format!("register the trainer resource: {error}"))?;
                 Some(registry)
             },
@@ -314,7 +577,7 @@ impl ResidentDistillery {
         let composed_gpu = false;
         let facts = host_facts(composed_gpu)?;
 
-        let resident = authority
+        let mut resident = authority
             .bind_resident(mesh_id, store, resident_settings(&lane), move |space| {
                 let mut config = distillery::mesh_host::HostConfig::supervised(space);
                 config.policy = policy;
@@ -347,6 +610,11 @@ impl ResidentDistillery {
             .await
             .map_err(|error| format!("bind the Distillery resident: {error}"))?;
 
+        resident
+            .authority_mut()
+            .host_mut()
+            .set_gpu_access(gpu_access.clone());
+
         // Chronicle needs a board snapshot but owns neither the board nor its
         // lifecycle. Take that snapshot only after the resident authority is
         // completely assembled, then retain the observer beside the works so
@@ -369,10 +637,22 @@ impl ResidentDistillery {
             mesh_id,
             profile: profile_name,
             mesh_root,
+            #[cfg(feature = "inference")]
+            inference_root: inference_paths.root().to_path_buf(),
+            #[cfg(feature = "inference")]
+            inference_space: personal_mesh,
             model_library,
+            gpu_access,
+            #[cfg(feature = "inference-stages")]
+            stage_network: None,
             #[cfg(feature = "trainer-gpu")]
             trainer_adapter,
         })
+    }
+
+    /// The single local device gate, shared with the registered trainer.
+    pub fn gpu_access(&self) -> distillery::gpu::GpuAccess {
+        self.gpu_access.clone()
     }
 
     /// The mesh this works joined, derived rather than configured.
@@ -390,13 +670,20 @@ impl ResidentDistillery {
         &self.mesh_root
     }
 
+    /// Durable ask authority remains profile-scoped when execution moves to a
+    /// graph mesh. Changing rungs must not hide old local or sealed graph runs.
+    #[cfg(feature = "inference")]
+    pub fn inference_root(&self) -> &Path {
+        &self.inference_root
+    }
+
     /// This device's mesh author key, as the ring sees it.
     pub fn author(&self) -> [u8; 32] {
         self.author.public_key().to_bytes()
     }
 
-    /// The persona-scoped model library the composed trainer publishes into,
-    /// or `None` when this lane composes no trainer.
+    /// The persona-scoped library shared by the trainer and inference,
+    /// or `None` when neither consumer opened it.
     ///
     /// Handing the same handle out rather than a path is deliberate: redb is
     /// single-writer, so a reader that opened the file itself would either
@@ -405,6 +692,58 @@ impl ResidentDistillery {
     /// one open store the trainer is writing.
     pub fn model_library(&self) -> Option<Arc<Mutex<RedbBackend>>> {
         self.model_library.as_ref().map(Arc::clone)
+    }
+
+    /// Borrow the trainer's handle, or open the same persona library when
+    /// inference is its first consumer. Distillery retains the sole owner.
+    #[cfg(feature = "inference")]
+    pub fn inference_model_library(
+        &mut self,
+        data_root: &Path,
+    ) -> Result<Arc<Mutex<RedbBackend>>, String> {
+        if self.model_library.is_none() {
+            self.model_library = Some(open_model_library(data_root, &self.profile, None)?);
+        }
+        Ok(Arc::clone(
+            self.model_library.as_ref().expect("just opened"),
+        ))
+    }
+
+    /// Open the persona's ask log before starting replication into it.
+    #[cfg(feature = "inference")]
+    pub fn inference_journal(
+        &self,
+        key: [u8; 32],
+    ) -> Result<Arc<distillery::inference::durable::PersonaRunJournal<RedbBackend>>, String> {
+        use rand_core::RngCore;
+        let device_path = self.inference_root.join("inference-device");
+        let device = match std::fs::read_to_string(&device_path) {
+            Ok(device) => device,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                let mut bytes = [0u8; 16];
+                rand_core::OsRng.fill_bytes(&mut bytes);
+                let id: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
+                let device = format!(
+                    "{}:{id}",
+                    std::env::var("COMPUTERNAME")
+                        .or_else(|_| std::env::var("HOSTNAME"))
+                        .unwrap_or_else(|_| "device".into())
+                );
+                std::fs::write(&device_path, &device).map_err(|error| error.to_string())?;
+                device
+            },
+            Err(error) => return Err(error.to_string()),
+        };
+        let backend = RedbBackend::open(self.inference_root.join("inference.redb"))
+            .map_err(|error| error.to_string())?;
+        let journal = Arc::new(distillery::inference::durable::PersonaRunJournal::new(
+            backend,
+            self.inference_space,
+            &self.author,
+            device,
+            key,
+        ));
+        Ok(journal)
     }
 
     /// The GPU adapter this lane's trainer was composed on, or `None` when it
@@ -533,7 +872,11 @@ impl ResidentDistillery {
     }
 
     /// Stop mesh networking, release the joined mesh, then flush blob storage.
-    pub async fn close(self) -> Result<(), String> {
+    pub async fn close(mut self) -> Result<(), String> {
+        #[cfg(feature = "inference-stages")]
+        if let Some(network) = self.stage_network.take() {
+            network.close().await?;
+        }
         self.resident
             .shutdown()
             .await
@@ -615,7 +958,7 @@ pub fn model_library_path(
 }
 
 /// Open (creating if absent) the persona's model library.
-#[cfg(feature = "trainer")]
+#[cfg(any(feature = "trainer", feature = "inference"))]
 fn open_model_library(
     data_root: &Path,
     profile: &str,

@@ -785,6 +785,10 @@ vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "276b46648c08f
 # cache in Mere's defaults-disabled GPU graph. Remove when upstream makes
 # persistence opt-in or fixes the defaults-on edge in cubecl-wgpu.
 cubecl-runtime = { path = "support/patches/cubecl-runtime" }
+# cubek-matmul 0.3.0: retain packed Q4 execution on 48-KiB workgroup devices
+# by reducing unit stage partitions after register partitions reach one.
+# Remove when upstream selection admits the same bounded packed-weight rows.
+cubek-matmul = { path = "support/patches/cubek-matmul" }
 # burn-cubecl 0.22.0-pre.4: the selector was retired under ruling 410 after
 # the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
 # cases, plus nine unfused native launcher controls. Vendored patch source

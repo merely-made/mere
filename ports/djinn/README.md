@@ -134,6 +134,122 @@ djinn-devices --json
 The directory is read-only and lists paired devices only. The broker endpoint
 follows `GRAPHSHELL_APP_ENDPOINT`, as `djinn-site` does.
 
+## Resident inference
+
+Build with `--features inference` for a CPU model-library lane, or
+`--features inference-gpu` for the first discrete GPU. GPU selection is
+probed and refused when that adapter class is unavailable. Owner settings
+name the exact imported row and output limit:
+
+```json
+{"inference":{"model":{"library":{"row":"blake3:<row hash>","device":"gpu","max_tokens":256}}}}
+```
+
+The lane requires a `distillery` block and shares its persona's model library.
+`esp`'s `import_inference_model` example imports a local checkpoint and declared
+template into that library. Its printed settings select CPU; change `device`
+to `gpu` for the GPU build. The `inference.ask` route is granted to Turnstone.
+
+Passing a streaming-options JSON file as the import example's sixth argument
+stores weights as immutable per-layer artifacts. The same library setting
+selects that row on CPU or GPU. The resident reads and verifies one layer at a
+time through its existing library owner, releases the library lock before
+tensor work, and uses bounded query blocks during prefill. Its execution loader
+has a `/layer-stream-v1` suffix, so checkpoints cannot silently resume through
+another loader. The native I6 decoder rows qualify a model exceeding GPU
+memory and bounded long prefill; the plan records those measurements and the
+resident composition regressions separately.
+
+A GPU ask preempts the GPU trainer through owner reclaim. The offer is
+withdrawn while inference waits or runs; inference loads device tensors for
+each ask and releases them before returning the GPU. CPU inference retains
+its loaded model, with only shared weights resident for layered rows. Library
+asks now retain exact token checkpoints in an
+append-only encrypted log. Shutdown pauses unfinished asks and joins the actor;
+local interrupted asks resume after reopen. Lock refuses the route, pauses at a
+token boundary, clears materialized runs and their device-local data key, and
+unlock rehydrates and resumes lock-paused work while the device retains a
+current execution seat. Unlock also reconciles operations refused while locked.
+Explicit pauses remain paused. A GPU pause drops
+its KV cache and device tensors before releasing the foreground guard.
+
+A qualified `esp.layer-weights/v2` row selects its declared f16, bf16, Q8 or
+Q4 format through the same library setting. CPU rows use Flex for half precision;
+GPU rows retain the trainer reclaim path. Imported format candidates must be
+measured against bf16 before publication. The measured loader must match the
+selected device's loader, and a format change refuses old checkpoints.
+
+The optional `inference-stages` feature also composes automatic execution from
+settings. It requires the live keyed personal graph and a layer-indexed library
+row. For example, the `model` field can be:
+
+```json
+{"automatic":{"row":"blake3:<qualified-row-hash>","device":"gpu","max_tokens":128,"stages":{
+  "local_resident_bytes":2147483648,"worker_layer_bytes":536870912,
+  "max_peers":8,"max_hidden_bytes":16777216,
+  "discovery_timeout_ms":2000,"discovery_every_ms":1000,
+  "lease_wait_ms":10000,"call_timeout_ms":60000,"poll_every_ms":25,
+  "lease_duration_ms":600000,"heartbeat_ms":10000
+}}}
+```
+
+These numbers illustrate explicit owner limits. `local_resident_bytes` admits
+weights and full-context KV for whole-model residence; zero skips that rung.
+`worker_layer_bytes` is the offered layer/KV budget after reserving embedding/head,
+RoPE, activations, allocator and backend space. Zero offers no worker. Neither
+budget is a process RSS or VRAM limit. The device's existing mesh lending rules
+still apply; an explicit resource allowlist must permit its device-addressed
+`esp.inference.stage.<mesh-author-hex>/v1` resource and the restart class.
+
+An ordinary ask first tries local residence within that budget, then discovers
+current keyed readers offering the exact row, format and backend, posts real
+stage leases, and falls back to local layer streaming if placement is unavailable
+or leaves mid-answer. Discovery exchanges attested compute endpoints over the
+existing personal connection, then uses Distillery's existing endpoint for
+stage work. Compute joins a graph-scoped mesh across distinct profile roots.
+Ask journals, device IDs and existing history retain their profile-scoped paths.
+No prompt enters discovery, reservation, the mesh post or its fixed receipt.
+
+`ResidentDistillery::enable_inference_stages` and the explicit staged actor API
+remain available to embedding hosts. Both paths use the existing library and GPU
+owner, exact-session guards and current graph seats through `PersonalGraphSeals`.
+The vault holder refuses new work and waits for catalog, KV and tensors to drain
+on lock. Historical readability does not authorize new stage work. Install the
+holder before admitting application sessions. Native I8 rows use independently
+rooted software devices/libraries on one physical computer; physical fleet
+capacity and inter-computer latency require separate receipts.
+
+The route also takes `distillery.inference/pause-v1` and
+`distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.
+`distillery.inference/ask-sampled-v1` accepts `ask`, `max_tokens`, `temperature`,
+`top_p` and `seed`; the owner cap still applies. Every keyed personal-graph
+device can read received asks and resume one with the exact model session.
+Inference borrows personal sync's existing key group and endpoint; devices
+keep separate identity roots. Shared asks refuse until the device is keyed,
+then become available through live key agreement. With personal sync off,
+asks stay locally durable. Existing local history is imported when keyed.
+Revocation excludes future epochs while preserving already received history.
+The native/embedded composition can call `configure_inference_recall` with an
+already-owned retained corpus and recall limits. Turnstone then uses
+`distillery.inference/ask-recall-v1` with `{"ask":{"run":"name","question":"..."},"scope":[]}`.
+An empty scope means the composed corpus. The route returns supplied passages,
+source-version staleness, validated citations and their answer spans alongside
+the run. Citation bases distinguish model markers from exact-quote annotations.
+The journal retains exact source versions and selectors through restart and
+personal-graph continuation. The desktop binary does not discover or reopen
+Turnstone's app-owned browsing database. Turnstone publishes retained text over
+the admitted route, with an owner namespace per browsing session, then asks
+against that publication. Only supplied passages enter the sealed run journal.
+The optional `inference.recall` object sets `chunk_chars`, `max_passages`,
+`min_quote_chars`, `max_context_chars` and `max_corpus_chars`. When this object is
+omitted, RecallConfig defaults apply. Inline publications above 128 KiB are
+refused. The Turnstone native client is qualified through I5, including streaming,
+pause/resume, cancellation and exact source reopening after both processes
+restart with the origin offline. That gate uses a test-owned native resident;
+the installed Djinn binary retains its separate gate.
+See the
+[resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+
 ## Publishing
 
 `0.0.2` is the source version of this workspace resident, not a crates.io

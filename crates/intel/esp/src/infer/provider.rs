@@ -57,6 +57,9 @@ impl ModelCapability {
 pub struct GenerationRequest {
     /// The full prompt (any chat templating happens above this seam).
     pub prompt: String,
+    /// Retained context rendered only by a declared session template.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub context: String,
     /// Hard cap on generated fragments/tokens.
     pub max_tokens: usize,
     /// Sampling temperature; `0.0` = deterministic/greedy. Stub providers
@@ -75,10 +78,31 @@ pub struct GenerationRequest {
     pub stop: Vec<String>,
 }
 
+impl GenerationRequest {
+    /// Clear persona text retained by a stopped actor or checkpoint.
+    pub fn clear_private(&mut self) {
+        use zeroize::Zeroize;
+        self.prompt.zeroize();
+        self.context.zeroize();
+        for stop in &mut self.stop {
+            stop.zeroize();
+        }
+        self.stop.clear();
+        self.seed.zeroize();
+    }
+}
+
+impl zeroize::Zeroize for GenerationRequest {
+    fn zeroize(&mut self) {
+        self.clear_private();
+    }
+}
+
 impl Default for GenerationRequest {
     fn default() -> Self {
         Self {
             prompt: String::new(),
+            context: String::new(),
             max_tokens: 256,
             temperature: 0.0,
             top_p: None,
@@ -95,14 +119,24 @@ pub enum InferError {
     PromptTooLong { length: usize, limit: usize },
     /// The provider type can hold a model but no weights are loaded yet.
     ModelNotLoaded,
+    /// A cooperative host stop before the first checkpoint could be prepared.
+    Interrupted,
     /// The underlying runtime (Burn / CPU / wgpu / native engine) failed.
     Backend(String),
+    /// A leased stage could not complete a hidden-state call. A host may
+    /// checkpoint and retry the same session on another execution placement.
+    StageUnavailable(String),
     /// The request itself is invalid (empty prompt, zero max_tokens, ...).
     InvalidRequest(String),
     /// A model config could not be parsed or is internally inconsistent.
     InvalidConfig(String),
     /// Model weights were missing, malformed, or shape-mismatched.
     InvalidWeights(String),
+    /// The model uses an architecture or feature this provider does not
+    /// implement. `feature` names the config field or tensor. Loading is
+    /// refused rather than running a computation other than the one the
+    /// checkpoint was trained for.
+    Unsupported { feature: String, detail: String },
 }
 
 impl std::fmt::Display for InferError {
@@ -111,16 +145,67 @@ impl std::fmt::Display for InferError {
             InferError::PromptTooLong { length, limit } => {
                 write!(f, "prompt too long: {length} > {limit}")
             },
+            InferError::Interrupted => write!(f, "generation interrupted at a token boundary"),
             InferError::ModelNotLoaded => write!(f, "model not loaded"),
             InferError::Backend(msg) => write!(f, "backend: {msg}"),
+            InferError::StageUnavailable(msg) => write!(f, "stage unavailable: {msg}"),
             InferError::InvalidRequest(msg) => write!(f, "invalid request: {msg}"),
             InferError::InvalidConfig(msg) => write!(f, "invalid config: {msg}"),
             InferError::InvalidWeights(msg) => write!(f, "invalid weights: {msg}"),
+            InferError::Unsupported { feature, detail } => {
+                write!(f, "unsupported {feature}: {detail}")
+            },
         }
     }
 }
 
 impl std::error::Error for InferError {}
+
+/// Exact session provenance carried by a bound inference provider.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SessionIdentity {
+    pub session_id: String,
+    pub prompt_template_hash: String,
+}
+
+/// Portable generation state. KV tensors are deliberately absent. `request`
+/// contains the rendered prompt, and `draws` counts committed sampling draws,
+/// including a terminating EOS draw. A host commits this before publishing it.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GenerationCheckpoint {
+    /// Placement changes already committed before retrying a token. This does
+    /// not weaken the exact session guard or include remote KV state.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub placements: Vec<ExecutionPlacement>,
+    pub session: Option<SessionIdentity>,
+    pub request: GenerationRequest,
+    pub prompt_ids: Vec<u32>,
+    pub token_ids: Vec<u32>,
+    pub draws: u64,
+    pub text: String,
+    pub complete: bool,
+}
+
+/// Durable provenance for a change in where the same session executes.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExecutionPlacement {
+    pub at_token: usize,
+    pub device: String,
+    pub reason: String,
+}
+
+impl Drop for GenerationCheckpoint {
+    fn drop(&mut self) {
+        use zeroize::Zeroize;
+        self.request.clear_private();
+        self.prompt_ids.zeroize();
+        self.token_ids.zeroize();
+        self.text.zeroize();
+        self.draws.zeroize();
+    }
+}
 
 /// Provider that generates text from a prompt.
 ///
@@ -133,6 +218,48 @@ impl std::error::Error for InferError {}
 /// surfaces it is the caller's choice). Callers that only want the final text
 /// use [`generate`](Self::generate).
 pub trait InferenceProvider: Send + Sync {
+    /// Resume by prefilling the recorded prompt and generated IDs. The commit
+    /// callback is synchronous: failure stops generation before another token.
+    /// A true stop flag pauses at a token boundary, without committing a draw
+    /// that did not produce a durable token. Unsupported providers refuse.
+    fn generate_checkpointed(
+        &self,
+        _request: &GenerationRequest,
+        _resume: Option<&GenerationCheckpoint>,
+        _commit: &mut dyn FnMut(&GenerationCheckpoint) -> Result<(), InferError>,
+        _stop: &mut dyn FnMut() -> bool,
+    ) -> Result<GenerationCheckpoint, InferError> {
+        Err(InferError::Unsupported {
+            feature: "durable-generation".into(),
+            detail: "this provider cannot checkpoint model tokens".into(),
+        })
+    }
+
+    /// Cooperative entry point for providers that may wait for device access.
+    /// The default preserves existing providers' fragment cancellation.
+    fn generate_streaming_controlled(
+        &self,
+        request: &GenerationRequest,
+        on_token: &mut dyn FnMut(&str) -> std::ops::ControlFlow<()>,
+        cancelled: &mut dyn FnMut() -> bool,
+    ) -> Result<String, InferError> {
+        if cancelled() {
+            return Ok(String::new());
+        }
+        self.generate_streaming(request, &mut |fragment| {
+            if cancelled() {
+                std::ops::ControlFlow::Break(())
+            } else {
+                on_token(fragment)
+            }
+        })
+    }
+
+    /// Exact session provenance, absent for unbound providers such as the stub.
+    fn session_identity(&self) -> Option<SessionIdentity> {
+        None
+    }
+
     /// What this provider's loaded model/runtime pair can do.
     fn capability(&self) -> &ModelCapability;
 

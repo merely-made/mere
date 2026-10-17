@@ -1,0 +1,519 @@
+{
+  "schema": "mere.resident-inference/layer-streaming/v1",
+  "status": "passed",
+  "recorded_at_utc": "2026-10-16T13:39:54.050979+00:00",
+  "native_measurement_source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+  "native_build_parent_head": "5b945e027b5800adfefcfdff71a542bcd14cbdd8",
+  "supplemental_shared_limit_guard_commit": "7f460ae89138e58a85d92d1a552e5304fa8c736a",
+  "source_hash_definition": "SHA-256 of Git blob bytes at the named cut. Model artifacts and binaries are hashed as stored.",
+  "native_source_git_blob_sha256": {
+    "crates/intel/esp/examples/import_inference_model.rs": "42c5fb32724f7bfb7c5cebf64b0403c2db578ad0bde8b333068eee443e543c64",
+    "crates/intel/esp/src/infer/decoder/attention.rs": "43df63bcf5d7aa38676a1cb180cfedbebb44910efe197b12ef8ce6aa6bd160d0",
+    "crates/intel/esp/src/infer/decoder/checkpoint.rs": "775e7982967e47959eb2b82b87cbbfa1478d1a7068a71691adf9e26c39af69a3",
+    "crates/intel/esp/src/infer/decoder/generate.rs": "4f7b4ba13c8a1f996d22ce464443d3db097695f2f581248bb0e593656436ae4e",
+    "crates/intel/esp/src/infer/decoder/layer.rs": "4e389662e0994ae6ae2182a158c18f859383df6a51fea6050ab8f676397c6aea",
+    "crates/intel/esp/src/infer/decoder/loader.rs": "262a81bfb193d343335355ab87a461d94aeabf966bc7daf9497a0ad5e9d10f1f",
+    "crates/intel/esp/src/infer/decoder/mod.rs": "8aea64a5885a7d9318602e4e2ffe1aabefbb2d6a6f22c1bc310ff32e46764da1",
+    "crates/intel/esp/src/infer/decoder/model.rs": "31f6f7d5a3738cf2ee60fec6becacea0fea2941fc4973cfe3c838d52fa9ba4a9",
+    "crates/intel/esp/src/infer/decoder/provider.rs": "d4e4176cf361d0ab50d314aa2a106c017e5373db77edabaaa3453af49c59feb1",
+    "crates/intel/esp/src/infer/decoder/streaming.rs": "ee7a038133487ca732f259acf32e6103d32257afb98b6f61b837f3819af106c3",
+    "crates/intel/esp/src/infer/layer_library.rs": "38bd05f3e025092e460c7b12111689870134d8dea6c008d6cc17f521043c2d75",
+    "crates/intel/esp/src/infer/library.rs": "f8f026cdd424827be3804656485f6326f20b67577ae86739d14a1246ff9ba696",
+    "crates/intel/esp/src/infer/mod.rs": "64db7a2f2cb5edc5d7b2d4b96cc6eb25c4b8103b7791d37ee11a2cb0017a0e8f",
+    "crates/intel/esp/templates/openllama-qa-v1.json": "55267a40f2712b8db72366a418a67f0d54b311e546ed5a337a68106673e7badd",
+    "crates/intel/esp/tests/layer_streaming_real.rs": "bb5b5af2fe15169ef127e4680d370ea64b1ca9a1a1d926cf573c51a20e3cb4ff",
+    "crates/intel/esp/tests/openllama_3b_v2_reference.json": "14871fccddf343d618a2ed0e61c4f2558ea953d2beaac6163ad2e45f0cfcb240",
+    "crates/intel/esp/tests/reference_layer_streaming.py": "0aff1456abca92fff68acbb2aee4b847157c1adb49d2360131fd9e7fa5e5b43f",
+    "ports/distillery/src/inference.rs": "6f6a794ec3bccaaace0b5053bd4189f33bc21d738acde07a17a28ae19b947df4",
+    "ports/distillery/src/inference/gpu.rs": "1bbe887d262ffcb746068998787fe2bb2fc655162bc34d11ea724d5a0368539d",
+    "ports/distillery/tests/inference_layered.rs": "5d27ae6759c86d4b9dde1fa692b8499608872cac6a102d299b6badfb196033f6",
+    "support/run_resident_layer_streaming.ps1": "b90951f2a31e798e00273f622ccf4e74ba622f553a25e46ee7d53ee62f1ce34e",
+    "Cargo.toml": "a2cd0f46929c3d2261abfc7f1b84abdd2b177faed7fa8a13c5db1588f7f08fbf",
+    "Cargo.lock": "11cfa65a0df7876f55304ba33283ada371617336f7a6e2115a69660ce4df1a01",
+    "crates/intel/esp/Cargo.toml": "6b8b58bca25b53ea788909277c65f3aecc66260bc0b39edd2f69b0c19eb69643",
+    "ports/distillery/Cargo.toml": "b0c2b1bb689192c158402484b60f07e73e889b1afa0b0999a671b675fd3edd82",
+    "ports/djinn/Cargo.toml": "38d49a07b5bf12b5e25a1810f5e9c99eb474a6232df83cd69fba60768f6e880b",
+    "crates/intel/esp/tests/smollm2_360m_reference.json": "10eb7c94f68d06cea07779f16d7e90fc9a1fec583cf2a90f41b07b04688ce346",
+    "crates/intel/esp/templates/smollm2-instruct-v1.json": "e74608112d6fa9812f416799ac7a6d8d63a50f4b98a20b470b05f018c0ee4daf"
+  },
+  "guard_source_git_blob_sha256": {
+    "crates/intel/esp/src/infer/decoder/provider.rs": "6dfe765c9e52d9051bb09fb54ee9b8f61c098308163782f5fc9e470ad072c623",
+    "crates/intel/esp/src/infer/layer_library.rs": "1d4ed8bab0e1caba65ca5186953009e161ab3e0ddc6d27496cf04de18c2bdbcc"
+  },
+  "toolchain": {
+    "rustc": "1.99.0 (b940084d7 2026-09-28)",
+    "cargo": "1.99.0 (5f94df478 2026-08-27)",
+    "nvidia_driver": "610.88",
+    "reference_python_packages": {
+      "torch": "2.14.1+cpu",
+      "transformers": "4.57.6",
+      "safetensors": "0.8.0",
+      "tokenizers": "0.22.2",
+      "sentencepiece": "0.2.2",
+      "accelerate": "1.15.0",
+      "protobuf": "7.36.2",
+      "psutil": "7.2.2",
+      "huggingface-hub": "0.36.2"
+    }
+  },
+  "cargo_environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build",
+    "CARGO_BUILD_JOBS": "4"
+  },
+  "checks": {
+    "esp_base": {
+      "command": "cargo test --locked --offline -p esp --release --features decoder-wgpu,decoder-autodiff --lib --test durable_generation --test library_session --test prompt_template --test trainer_autodiff --test layer_streaming_real --no-fail-fast",
+      "source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+      "passed_groups": [
+        171,
+        2,
+        0,
+        2,
+        5,
+        6
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/esp-regression.log",
+      "log_sha256": "aa03e88d62936098258c24a1f7c94d1c5da24fe2450865f91315370047554872"
+    },
+    "shared_artifact_budget_guard": {
+      "command": "cargo test --locked --offline -p esp --release --features decoder-wgpu,decoder-autodiff --lib",
+      "source_commit": "7f460ae89138e58a85d92d1a552e5304fa8c736a",
+      "passed_groups": [
+        172
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/esp-shared-limit-regression.log",
+      "log_sha256": "b96cd7eb88ea24ef7a1a2e82a6cbb36002c36cfac971406c4c76367fe0d1bf49"
+    },
+    "distillery": {
+      "command": "cargo test --locked --offline -p distillery --release --features inference-gpu --lib --test inference_layered --test inference_durable",
+      "source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+      "passed_groups": [
+        53,
+        8,
+        1
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/distillery-regression.log",
+      "log_sha256": "ac569ba27894ee6b8a552f75f29c2cbc729ff7551c10b38a74c3ce968775f18b"
+    },
+    "actor_wire": {
+      "command": "cargo test --locked --offline -p distillery --features inference,inference-wire --lib",
+      "source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+      "passed_groups": [
+        38
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/actor-wire-regression.log",
+      "log_sha256": "f3e6fd20559f86256a9cef697306dbc721902f99d9847d6ba1b271fb96bae9b2"
+    },
+    "djinn_route": {
+      "command": "inference_route-cf1e511757aa2fdb.exe --test-threads=1",
+      "source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+      "passed_groups": [
+        4
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/djinn-route.log",
+      "log_sha256": "33d580b6896c648ca1650ef03524fef1f60b2fcd7b21cd1796496f29246fc6bc"
+    },
+    "djinn_real_recall": {
+      "command": "ESP_SMOLLM2_DIR=<pinned snapshot> inference_route-cf1e511757aa2fdb.exe --ignored --exact a_real_model_cites_exact_retained_versions_and_reopens_its_run --test-threads=1 --nocapture",
+      "source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+      "passed_groups": [
+        1
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/djinn-real-recall.log",
+      "log_sha256": "ab8b6cc7600ed1ccadae46f3fd6ba85fec5ce0912eb41e3f1da37423a38f0abc"
+    },
+    "djinn_gpu_reclaim": {
+      "command": "inference_gpu_reclaim-397e4990105c76c1.exe --ignored --test-threads=1 --nocapture",
+      "source_commit": "fa0cdaffc071ddc92ad6abe25c93dc64ca01a7e6",
+      "passed_groups": [
+        3
+      ],
+      "log": "C:/t/cargo-targets/mere/inference-i6/djinn-gpu-reclaim-explicit.log",
+      "log_sha256": "54813c159b5af4e9ea451b30ef792416c2755e2c59cca2f61e8876fbadbc66ba"
+    }
+  },
+  "cases": {
+    "openllama-3b": {
+      "provider": {
+        "artifacts": {
+          "config.json": "c92b16f305e2a41c27bcc8ff882499f3c9fe7253ca1eeda2573850d7998ee2af",
+          "model-00001-of-00007.safetensors": "20a110f427e02cf7e46dbaba57af9d39685a965fb7f8aae1cc892a9ce86e02d3",
+          "model-00002-of-00007.safetensors": "7163612bc528bf18a0aa74416dc821130743142346040e802cab6847cf0c5243",
+          "model-00003-of-00007.safetensors": "23ba30a7b60f35b86689a46506073d872971b143df0128c234beccb48bdf2454",
+          "model-00004-of-00007.safetensors": "db0c1f3eed8edfb35fdf8861a95d575583fe55e5040955607b08c65ba850ec0a",
+          "model-00005-of-00007.safetensors": "954ce343edadb79f30b22ae1925bab1d5d683460e47e67be357a010bf30b92d5",
+          "model-00006-of-00007.safetensors": "cc1fc9bc85b7730e92b4fbf042232d6bc0fd418612faccbc52981cae09a7b3cf",
+          "model-00007-of-00007.safetensors": "05bee4fee694c922727c32d86dba697ee4dfae51e7311a21a6273285c851611a",
+          "model.safetensors.index.json": "23786754882feecd80222ad117b511b55b1271ed50a1ca0b3c434793ede61ad4",
+          "tokenizer.json": "ffb5089ba63a221d2ad044e760fcd7673fb89cc3cbd80e45bf147d08afd52eda",
+          "tokenizer_config.json": "5e7461292ef8b6b5f9d5ec40f61e5c783b0e26ac960f85cf70b552a4802af84d"
+        },
+        "bytes_per_layer_pass": 6443367136,
+        "device_capacity_measured_by_this_test": false,
+        "limits": [
+          "logical artifact reads do not measure physical disk traffic",
+          "device capacity and peak process memory require the separate host measurement"
+        ],
+        "loader": "burn-wgpu/layer-stream-v1",
+        "long_prefill": null,
+        "model": "openlm-research/open_llama_3b_v2",
+        "options": {
+          "max_layer_bytes": 268435456,
+          "max_shared_bytes": 1073741824,
+          "query_chunk": 32
+        },
+        "pause_resume": {
+          "boundary": 3,
+          "matched_reference": true,
+          "token_ids": [
+            7002,
+            13,
+            28629,
+            29537,
+            1200,
+            325,
+            268,
+            4739
+          ]
+        },
+        "revision": "bce5d60d3b0c68318862270ec4e794d83308d80a",
+        "row": "blake3:cd0a43eb937da92cd7fbabc2e29a9c4e2279fcbcf71307dbe4f4fb07bdd787ec",
+        "rows": [
+          {
+            "largest_encoded_layer": 247821816,
+            "layer_reads": 208,
+            "logical_encoded_bytes_read": 51546937088,
+            "question": "What is the capital of France?",
+            "seconds": 131.7206574,
+            "seconds_per_token": 16.465082175,
+            "text": "Paris\nQuestion: What is the capital",
+            "token_ids": [
+              7002,
+              13,
+              28629,
+              29537,
+              1200,
+              325,
+              268,
+              4739
+            ],
+            "logical_encoded_bytes_per_output_token": 6443367136.0
+          },
+          {
+            "largest_encoded_layer": 247821816,
+            "layer_reads": 208,
+            "logical_encoded_bytes_read": 51546937088,
+            "question": "What is two plus two?",
+            "seconds": 148.7565471,
+            "seconds_per_token": 18.5945683875,
+            "text": "Four.\nQuestion: What is two",
+            "token_ids": [
+              7531,
+              29520,
+              13,
+              28629,
+              29537,
+              1200,
+              325,
+              846
+            ],
+            "logical_encoded_bytes_per_output_token": 6443367136.0
+          }
+        ],
+        "schema": "mere.resident-inference/layer-streaming-software/v1",
+        "session": {
+          "prompt_template_hash": "blake3:651284c2ad1d99b62fbee6358648ab2669e34c7b938bebe05ad7a5112e057770",
+          "session_id": "blake3:ccd888b3382fc87d0b9038281933668255f6285ae5049d0832f3670722e87ee7"
+        },
+        "statistics": {
+          "encoded_bytes_read": 154640811264,
+          "largest_encoded_layer": 247821816,
+          "layer_reads": 624
+        }
+      },
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T13:06:46.3461814Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/layer_streaming_real-45833a70e27040bf.exe",
+          "--ignored",
+          "--exact",
+          "real_gpu_layer_streaming_matches_reference",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "07c71d1ba27c13b0f86abaeba0bb80b0586d0a824abb9d1ee095a291add04b3b",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 555.4638138,
+        "process_peak_working_set_bytes": 3224231936,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 20863074304,
+        "gpu_before": {
+          "free_bytes": 7156531200,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "total_bytes": 8585740288
+        },
+        "gpu_global_peak_used_bytes": 3652190208,
+        "samples": 1925,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "independent_reference": "crates/intel/esp/tests/openllama_3b_v2_reference.json",
+      "independent_reference_git_blob_sha256": "14871fccddf343d618a2ed0e61c4f2558ea953d2beaac6163ad2e45f0cfcb240",
+      "compared_token_count": 16,
+      "files_sha256": {
+        "burn-wgpu-software.json": "8843b3ec013fda25d16059f62a6e8526b75ccae87f47a714bdd64b7c7cb52a0d",
+        "host-measurement.json": "d4ddb71c4e407b5db407d6c3641aec93492af8e6a37d5c1a7673979ad036d72c",
+        "gpu.stdout.log": "e52a1d7372072ebea4d2c3905bf79f5aecb2b7d3e5fd8d31b861fcc44268649e",
+        "gpu.stderr.log": "1ced775f2719507ff6b735a115d6c3681dd0338036feeafef7b15aa0a0edf4a0"
+      },
+      "resident_f32_weight_bytes": 13705894400,
+      "reference_process_peak_working_set_bytes": 14609170432,
+      "weights_exceed_gpu_total_memory": true,
+      "weights_exceed_gpu_free_memory_before": true
+    },
+    "smollm2-360m": {
+      "provider": {
+        "artifacts": {
+          "config.json": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+          "model.safetensors": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+          "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+          "tokenizer_config.json": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df"
+        },
+        "bytes_per_layer_pass": 629300144,
+        "device_capacity_measured_by_this_test": false,
+        "limits": [
+          "logical artifact reads do not measure physical disk traffic",
+          "device capacity and peak process memory require the separate host measurement"
+        ],
+        "loader": "burn-wgpu/layer-stream-v1",
+        "long_prefill": {
+          "largest_attention_score_block_bytes": 7921920,
+          "prompt_tokens": 4126,
+          "reference_compared": false,
+          "seconds": 14.7738314,
+          "token_ids": [
+            198
+          ]
+        },
+        "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+        "options": {
+          "max_layer_bytes": 268435456,
+          "max_shared_bytes": 1073741824,
+          "query_chunk": 32
+        },
+        "pause_resume": {
+          "boundary": 3,
+          "matched_reference": true,
+          "token_ids": [
+            504,
+            3575,
+            282,
+            4649,
+            314,
+            7042,
+            30
+          ]
+        },
+        "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+        "row": "blake3:69a85e6b285c3e554b47b1da06166df385a4830e866a147d41b9e716ab4567e3",
+        "rows": [
+          {
+            "largest_encoded_layer": 19665632,
+            "layer_reads": 256,
+            "logical_encoded_bytes_read": 5034401152,
+            "question": "What is the capital of France?",
+            "seconds": 16.2497133,
+            "seconds_per_token": 2.3213876142857144,
+            "text": "The capital of France is Paris.",
+            "token_ids": [
+              504,
+              3575,
+              282,
+              4649,
+              314,
+              7042,
+              30
+            ],
+            "logical_encoded_bytes_per_output_token": 719200164.5714285
+          },
+          {
+            "largest_encoded_layer": 19665632,
+            "layer_reads": 512,
+            "logical_encoded_bytes_read": 10068802304,
+            "question": "Count from one to five.",
+            "seconds": 33.8602501,
+            "seconds_per_token": 2.11626563125,
+            "text": "1. One\n2. Two\n3. Three\n4. Four\n",
+            "token_ids": [
+              33,
+              30,
+              1963,
+              198,
+              34,
+              30,
+              5713,
+              198,
+              35,
+              30,
+              8696,
+              198,
+              36,
+              30,
+              8920,
+              198
+            ],
+            "logical_encoded_bytes_per_output_token": 629300144.0
+          },
+          {
+            "largest_encoded_layer": 19665632,
+            "layer_reads": 512,
+            "logical_encoded_bytes_read": 10068802304,
+            "question": "What color is a clear daytime sky?",
+            "seconds": 33.4647455,
+            "seconds_per_token": 2.09154659375,
+            "text": "A clear daytime sky is typically a deep shade of blue, often with a slight",
+            "token_ids": [
+              49,
+              2437,
+              23703,
+              6376,
+              314,
+              3431,
+              253,
+              2276,
+              11615,
+              282,
+              4461,
+              28,
+              1129,
+              351,
+              253,
+              11682
+            ],
+            "logical_encoded_bytes_per_output_token": 629300144.0
+          }
+        ],
+        "schema": "mere.resident-inference/layer-streaming-software/v1",
+        "session": {
+          "prompt_template_hash": "blake3:4f8d6369eededd7a3e772e383a5dec5adcc081f337d98839eae61aee4273059f",
+          "session_id": "blake3:32d7c502e60dcc732dc5526cbfad0b027472fdc10fcb526a110e24aa27b89c4d"
+        },
+        "statistics": {
+          "encoded_bytes_read": 30835707056,
+          "largest_encoded_layer": 19665632,
+          "layer_reads": 1568
+        }
+      },
+      "host_measurement": {
+        "recorded_at_utc": "2026-10-16T13:18:05.4402389Z",
+        "command": [
+          "C:/t/cargo-targets/mere/build/release/deps/layer_streaming_real-45833a70e27040bf.exe",
+          "--ignored",
+          "--exact",
+          "real_gpu_layer_streaming_matches_reference",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "binary_sha256": "07c71d1ba27c13b0f86abaeba0bb80b0586d0a824abb9d1ee095a291add04b3b",
+        "exit_code": 0,
+        "fresh_software_receipt": true,
+        "elapsed_seconds": 121.3833901,
+        "process_peak_working_set_bytes": 1424113664,
+        "host_memory_bytes": 33515835392,
+        "host_available_bytes_before": 25664499712,
+        "gpu_before": {
+          "free_bytes": 7156531200,
+          "total_bytes": 8585740288,
+          "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+        },
+        "gpu_global_peak_used_bytes": 2304770048,
+        "samples": 433,
+        "gpu_measurement_scope": "Entire GPU including other processes; not an isolated per-process VRAM measurement."
+      },
+      "independent_reference": "crates/intel/esp/tests/smollm2_360m_reference.json",
+      "independent_reference_git_blob_sha256": "10eb7c94f68d06cea07779f16d7e90fc9a1fec583cf2a90f41b07b04688ce346",
+      "compared_token_count": 39,
+      "files_sha256": {
+        "burn-wgpu-software.json": "4757faba61d3425c26cab4e6eda9a834787c82c291db0cf8255512249f5b807b",
+        "host-measurement.json": "302abc80e3bee910b3a9b6ae6673a70819ce78e4738d4396cac12e85f315c1f9",
+        "gpu.stdout.log": "6f8f6b8c8225d29c0d0815cd764682b535c5c210d4b2b0d09ae4b157b177e078",
+        "gpu.stderr.log": "1ced775f2719507ff6b735a115d6c3681dd0338036feeafef7b15aa0a0edf4a0"
+      }
+    }
+  },
+  "decoder_free_feature_graph": {
+    "command": "cargo tree --locked --offline -p distillery --features inference,inference-wire -e features,no-dev -i esp",
+    "log_sha256": "2d990d12a90b19b216f1bf7837f87d8e1941216e30966c45edbb37b10eae57a6",
+    "decoder": false,
+    "model_session": false
+  },
+  "additional_checks": {
+    "import_example": "cargo check -p esp --release --features decoder,model-session --example import_inference_model: passed",
+    "touched_rustfmt": "passed",
+    "python_ast": "passed",
+    "json_parse": "passed"
+  },
+  "binary_sha256": {
+    "C:/t/cargo-targets/mere/build/release/deps/layer_streaming_real-45833a70e27040bf.exe": "07c71d1ba27c13b0f86abaeba0bb80b0586d0a824abb9d1ee095a291add04b3b",
+    "C:/t/cargo-targets/mere/build/debug/deps/inference_route-cf1e511757aa2fdb.exe": "3728ff18ce9d95557acaec668452792e56c887e41e41b46d3781fc3bcd5d0fd1",
+    "C:/t/cargo-targets/mere/build/debug/deps/inference_gpu_reclaim-397e4990105c76c1.exe": "aae200b2b68d8a491e9d7fa018b1c2221c3ef1fad9c72589b41228c0f5681710"
+  },
+  "measurement_scope": [
+    "Native provider GPU rows use local content-addressed library artifacts and NoFetcher.",
+    "OpenLlama source tensors retain their original precision in the seven offline-converted shards; the current runtime widens weights to f32.",
+    "Logical artifact payload reads include OS-cache hits. Physical disk traffic and cold-disk throughput are not attributed.",
+    "GPU high-water values are sampled whole-device use, including other processes, rather than isolated per-process VRAM peaks.",
+    "The long-prefill score size is a logical tensor count; allocator padding and other temporaries are covered only by the separate observed memory measurements.",
+    "A concurrent Djinn no-run build overlaps the OpenLlama scale fixture, so its timing is not an isolated throughput comparison.",
+    "Long-prefill output is recorded without a separate independent numerical comparison.",
+    "Whole-model and streamed imports remain distinct exact sessions; cross-rung continuation remains I8.",
+    "Installed-binary scale-model execution, a new headed scale-model run, and a physical second computer are outside this receipt."
+  ],
+  "retained_outputs": {
+    "worktree": {
+      "path": "C:/Users/mark_/Code/worktrees/mere-resident-inference",
+      "owner": "resident inference I6",
+      "reason": "existing inference branch awaiting integration with the concurrent primary Mere checkout"
+    },
+    "cargo_target": "C:/t/cargo-targets/mere",
+    "gate_data": "C:/t/cargo-targets/mere/inference-i6",
+    "gate_data_owner": "I6 measurements and reusable I7 format-comparison inputs",
+    "reference_python": "C:/t/cargo-targets/mere/reference-python",
+    "isolated_cargo_homes_created": false,
+    "upstream_model_cache": "C:/Users/mark_/.cache/huggingface/hub/models--openlm-research--open_llama_3b_v2",
+    "previous_worktree_build_cache": {
+      "path": "C:/Users/mark_/Code/worktrees/mere-resident-inference/target/build",
+      "retained_after_earlier_tool_policy_block": true
+    }
+  },
+  "initial_fixture_repair": {
+    "log_sha256": "372300553f93ffae5c94c1e67670462fac4500c830156bf878cb46dc8379fdf2",
+    "detail": "The non-journaled lane fixture initially expected a durable token counter; it now checks emitted text. The final combined Distillery regression passes all groups."
+  },
+  "documentation_audit": {
+    "counts": {
+      "active_docs": 286,
+      "indexed_active_docs": 285,
+      "index_orphans": 0,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 0,
+      "broken_relative_links": 41,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 175,
+      "ignored_known_root_patterns": 24,
+      "reserved_identifier_paths": 31,
+      "missing_known_root_paths": 178,
+      "historical_missing_known_root_paths": 243,
+      "planned_missing_known_root_paths": 9,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 70,
+      "exhibit_b_sources": 0
+    },
+    "unchanged_from_baseline": true,
+    "log_sha256": "cc1f440c91152c691b2f58c5907ceb97544e08263b5d4e96d31269f188b0f505"
+  }
+}

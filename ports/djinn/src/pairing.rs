@@ -222,6 +222,7 @@ mod tests {
             }),
             knot: None,
             distillery: None,
+            inference: None,
             reservoir: Default::default(),
             content: Default::default(),
         }
@@ -294,6 +295,7 @@ mod tests {
             }),
             knot: None,
             distillery: None,
+            inference: None,
             reservoir: Default::default(),
             content: Default::default(),
         }

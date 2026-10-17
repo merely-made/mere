@@ -68,6 +68,120 @@ of durable operations. The [local composition and receipt](../../crates/mesh/mes
 cover actual RaptorQ recovery, QUIC handoff, preserved signed bytes, action
 separation, shared-budget refusal and fresh-process durable reopening.
 
+With `inference-model`, `InferenceLane::try_open_with_journal` adds a
+synchronous checkpoint barrier to the actor. The decoder records exact session,
+rendered prompt, model-token IDs and random-draw position. Text becomes visible
+after the commit; resumed generation rebuilds KV state by prefill. The retained
+record uses Eidetic's `InferenceRunRecord` schema, keeping paused, failed,
+cancelled partial and finished states distinct. I4 adds retained passage inputs.
+
+Layered library rows use the same CPU/GPU lane entry points. The lane retains
+its existing library owner and borrows it briefly for each content-verified
+layer artifact. It releases that lock before tensor work. GPU layer reads and
+execution stay inside the foreground guard, preserving trainer reclaim and
+release on pause. The streamed loader and weight index form part of the exact
+session identity. The native I6 receipt qualifies a model exceeding GPU memory
+and bounded long prefill; the plan records its exact measurement scope.
+
+`PersonaRunJournal` stores signed, encrypted per-device logs through muniment
+and joins the caller's existing p2panda endpoint. Token entries contain only new
+IDs and text. A fork is reported rather than silently choosing a continuation.
+A host can bind a journal to its existing encryption group through
+`RunGroupProtection`. Djinn uses the personal graph's live keyring and membership,
+with separately rooted, domain-attested writers on its existing endpoint.
+Current epochs require a current group member before insertion. Retained
+epochs admit historical writers named by the retained key agreement, and
+local historical reads survive removal of a writer. Unlock and key revisions
+reopen reconciliation against the retained frontier; a child whose parent has
+not arrived is retried without persisting a dangling checkpoint. The
+persona-only constructor remains the local journal and test seam.
+
+`InferenceLane::configure_recall` borrows a `RecallCorpus` and explicit
+`RecallConfig`. `PageTextCorpus` reads already-owned Eidetic page-text storage,
+verifying immutable blob bytes; other source owners supply the same snapshot
+and current-version contract with capture, clip or Fleece identities. The
+BM25 `DocumentIndex` is keyed by passage content references. Its deterministic
+Unicode chunks retain the source version, canonical text hash and half-open
+Unicode scalar selector. Reconfigure recall to rebuild a changed corpus.
+
+Explicit `esp.layer-weights/v2` rows preserve their declared dtype and require
+a bf16 comparison receipt for the selected loader. CPU composition uses Flex
+for these rows and retains NdArray for legacy rows. GPU composition keeps the
+same foreground reclaim guard for f16, Q8 and Q4. Format and qualification are
+immutable library data, and the exact session refuses a format change on resume.
+
+`inference-stages` adds the explicit embedding APIs in `inference_stage`.
+`StageService` mounts `mere/inference-stage/v1` on the resident's shared iroh
+endpoint and exposes a device-addressed mesh resource. The supervisor grants
+and reclaims its lease. Every call checks the poster's signed claim, live
+lease, transport identity, exact signed stage input and current personal graph
+read authority. A worker retains only its assigned contiguous layers and KV.
+Available layer budgets include the declared context's KV; shared tensors,
+activations and backend overhead require a separate host reservation.
+
+`StageChain` relays bounded hidden states through disjoint workers, leaving
+embedding at the coordinator and the final norm/head at the last worker. The
+last worker returns f32 logits; sampling and checkpointing stay at the coordinator. Its first wire version
+uses lossless f32 values, including exact widening of half activations. Traffic
+counts cover completed hidden-state and logits transfers; framing, QUIC overhead and
+partial failed transfers are outside those counts. `StageFallbackProvider`
+commits the last token/draw boundary and a placement record before retiring
+stages and loading the same session through local layer streaming. Format,
+template and backend-class guards remain exact.
+
+`open_staged_library_lane_with_journal` composes this path with the ordinary
+actor, journal and foreground GPU reclaim. Its host supplies newly leased
+stages through `StageChainFactory`. Pause/completion closes these stage sessions;
+resume rebuilds their KV from the retained token checkpoint. Worker vault lock,
+reader retirement, lease loss and shutdown drain private stage state before
+releasing hardware. `ResidentAuthority::enable_inference_stages` owns that
+service lifetime. A bounded authenticated readiness probe precedes private
+tensor transfer. Locked or unkeyed workers withdraw their offers; idle sessions
+close with a lease-bound receipt after the configured timeout. Availability is
+sampled by the host before the mesh's pure decision function runs.
+`StagePlanner` supplies automatic placement through a read-only live board,
+a bounded actor-to-supervisor posting queue and prompt-free authenticated
+capacity queries. A short-lived reservation binds the canonical stage input
+to its poster before a job can be claimed; failed plans release reservations,
+and late posts cannot start work after reservation expiry. The supervisor's
+single authoring path posts each job and signs its real granted lease.
+`open_automatic_library_lane_with_journal` first admits whole-model residence
+within an explicit payload budget, otherwise uses that plan and streamed
+recovery. Indexed resident/streamed/staged placements keep the same exact
+session and prefill arithmetic. The embedding product supplies the existing
+personal graph's live reader authority and endpoint reachability; Djinn's
+`automatic` settings compose these pieces. Existing explicit APIs are unchanged.
+
+`distillery.inference/ask-recall-v1` takes an `ask` and optional source `scope`.
+It renders selected passage handles through the declared context template and
+retains the exact supplied passages as sealed native Eidetic artifacts. Stale
+or unavailable sources are excluded. An ask without usable passages is retained
+as failed before generation, with structured stale-source details. A stub
+cannot answer retained material. Current answer views distinguish validated
+model markers from host annotations of complete verbatim passage matches;
+partial matches and invented handles do not become citations. `min_quote_chars`
+defaults to 32 non-padding characters; zero disables host quote annotations. Both citation
+bases carry exact answer spans and require the source owner's current version.
+Historical input evidence remains readable when a source changes.
+
+Context-bearing checkpoint entries carry an authenticated `required_semantics`
+marker: older checkpoint readers reject them instead of silently losing context.
+Ordinary ask serialization remains compatible. Lock clears the derived recall
+index with the run materialization; the composing source owner keeps its own
+storage and disclosure authority.
+
+`inference-wire` exposes the run table, controls and recall DTOs without ESP or
+a decoder. An admitted source owner can publish its retained text through
+`distillery.inference/publish-corpus-v1`, then ask with
+`distillery.inference/ask-published-v1`. Each publication names an application
+session namespace and exact text hashes. Only its live publisher can replace
+it; disconnect or vault lock withdraws the publication. The host controls recall
+limits. Inline JSON is capped at 128 KiB and oversized publications are refused.
+Published material stays in memory; supplied passages and run records use the
+existing sealed journal. Published checkpoints require `recall/published-v1`.
+
+See the [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM
 row localized and recovered two Burn/CubeCL browser defects. The configured
 D2c embedding matrix now passes BGE Micro, MiniLM, E5-small, and E5-base in

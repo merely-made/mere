@@ -33,6 +33,7 @@ pub mod resident_blobs;
 pub mod resident_devices;
 pub mod resident_distillery;
 pub mod resident_events;
+pub mod resident_inference;
 pub mod resident_knot;
 pub mod resident_mere;
 pub mod resident_projection;
