@@ -22,8 +22,9 @@ second-computer and installed-binary receipts remain separate. I9 is in progress
 the dense variants and Qwen2 routed/shared experts have independent small
 references. The 57B streamed GPU row matches both reference answers and
 serialized checkpoint/provider-reload recovery; the trained Mistral CPU
-library row also passes. Remaining GPU checks are running; largest-per-family
-and broader-family gates remain open.
+library row also passes on CPU and GPU. The bounded native architecture and
+consumer regression batch passes; largest-per-family and broader-family gates
+remain open. Djinn's full unit run retains one unchanged projection failure.
 Rulings 1 to 15 recorded (§1). Rulings 9 to 14 widened the plan from a first answering host to
 reliable answers from models as large as the available hardware can hold,
 across devices; ruling 11 supersedes ruling 2.
@@ -713,10 +714,10 @@ eight-token requests. Its indexed
 checkpoint/tokenizer/config inputs total 14,485,321,143 bytes. Acquisition is
 bounded to 15 GB of inputs, 45 GB of library data and 30 GB of regenerable
 reference working cache, within the existing 375 GB aggregate model-data cap.
-Require streamed CPU/GPU model-library and checkpoint parity; whole-model
-residence is not required on this GPU. This is a trained-family row, not a
-largest-per-family receipt. CPU reference work can proceed during the long MoE
-GPU gate; native GPU checks remain serialized.
+Streamed CPU/GPU model-library and checkpoint parity now pass; whole-model
+residence was not attempted on this GPU. This is a trained-family row, not a
+largest-per-family receipt. CPU reference work overlapped the long MoE GPU
+gate; native GPU checks were serialized.
 
 Done when: each added family has a reference-matched row and a template
 artifact; the largest model of each family whose licence permits the use,
@@ -1558,8 +1559,8 @@ Stop and record the reason if any of these happen:
   installed-binary, further headed and physical-fleet gates remain separate.
   This is not another 20-run flakiness check. I9 remains next.
 
-- **2026-10-17: I9 architecture implementation checkpoint; qualification in
-  progress.** The dense decoder now implements declared linear/Llama3 RoPE,
+- **2026-10-17: I9 architecture checkpoint; bounded native gates qualified.**
+  The dense decoder now implements declared linear/Llama3 RoPE,
   independent head dimensions, projection biases, per-layer sliding attention
   and Qwen3 head norms. Qwen2 MoE adds routed and shared experts, separately
   verified expert artifacts, bounded query chunks and exact shared-matrix row
@@ -1612,14 +1613,23 @@ Stop and record the reason if any of these happen:
     isolated throughput measurement. Its data template matches the pinned
     tokenizer's official rendering. The [Mistral CPU receipt](../../../support/receipts/resident_inference_architecture_mistral_cpu.json)
     records exact inputs, sessions, tokens and measurement scope. The trained
-    GPU row is queued behind the other GPU checks.
+    GPU row also passes both answers, checkpoint continuation and store reopen
+    in **1,066.39 seconds**, with a **3,826,397,184-byte** process working-set
+    peak. Its sampled whole-GPU peak is 3,727 MiB, including other applications.
   - The resumed consumer build completes successfully. CPU automatic placement
     and all four app-route cases pass, including keyed-device continuation.
-    GPU automatic placement, trainer reclaim, retained-version recall and the
-    final small-Qwen GPU regressions are queued. The
+    GPU automatic placement, all three trainer-reclaim cases, real retained-
+    version recall and both final small-Qwen GPU regressions pass. The nine
+    recorded runtime invocations cover **twelve passing tests**. The
     [primitive checkpoint receipt](../../../support/receipts/resident_inference_architecture_primitives.json)
     binds completed checks, source and binary hashes, independent references,
     failed attempts and the exact evidence boundaries. It does not qualify the
-    native large-model run. Largest-per-family qualification, further families,
+    native large-model run. The [final bounded qualification receipt](../../../support/receipts/resident_inference_architecture_qualification.json)
+    consolidates the completed model rows, consumer checks, canonical Git byte
+    bindings and retained-output accounting. Model inputs, libraries and
+    reference working caches total **296,361,639,070 bytes** against the
+    375 GB cap. Compact evidence is measured at 2,427,368 bytes before final
+    publication, with a further 1 MB reserved, within its 100 MB cap.
+    Largest-per-family qualification, further families,
     physical-fleet execution and installed-resident invocation are not covered
     by this checkpoint. I9 remains in progress.
