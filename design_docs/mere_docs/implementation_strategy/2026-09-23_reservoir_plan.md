@@ -1835,3 +1835,21 @@ real-process parents, with two intentional direct child ignores. The exact
 immutable core and both numerical revisions remain bound by
 `receipts/natal-houses-20261017/integrated.json`. Product native evidence is
 owned by Cleromancy; no shared browser-wall renewal is inferred.
+
+### Natal cap portable-validator intake (2026-10-17)
+
+Cleromancy core `da495cfc75b2ee6bbb9476c8c03386e9057c36d3` retains its
+original planetary and Whole Sign/Equal editions while admitting optional signed
+motion, observed IERS inputs and Placidus receipts through the same complete
+candidate validator. Two admitted applications witness accepted new receipts and
+refusal of altered motion without a candidate write. Product native evidence
+remains in Cleromancy and is not inferred from this owner fixture.
+
+Preintegration `3b70984e8` passes 225 tests (216 library, eight owner-process
+parents, one shared-facts process parent; two intentional child-entry ignores).
+Integrated source `a4b77014634807b7a82790d233bbaedb28312bd2` preserves incoming
+main `e3de60496` and its coordinated renderer cohort, then passes the same 225
+checks. New Turquet edition is immutable `8e3755bb`; no prior receipt changes.
+The narrow Cargo-generated intake and the separate integrated result are under
+`receipts/natal-cap-20261017/`. This is bounded domain/owner qualification;
+browser, native platform and whole-family acceptance retain their own receipts.
