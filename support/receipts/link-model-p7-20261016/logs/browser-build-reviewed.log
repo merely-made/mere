@@ -1,0 +1,725 @@
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+warning: unused variable: `time_range`
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:719:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+719 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+745 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+755 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 20 warnings (run `cargo fix --lib -p mere-kernel` to apply 9 suggestions)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock/src/producer/registry.rs:36:10
+   |
+36 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+36 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+36 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock/src/scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock/src/host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: `cambium-rootstock` (lib) generated 3 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+warning: function `build_affinity_spring` is never used
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas.rs:67:4
+   |
+67 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `visible_link_appearances` is never used
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas/edge_cells.rs:25:15
+   |
+25 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas/edge_cells.rs:337:15
+    |
+337 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas/edge_cells.rs:385:15
+    |
+385 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas/edge_cells.rs:467:15
+    |
+467 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas/edge_cells.rs:525:15
+    |
+525 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+warning: `pictograph` (lib) generated 6 warnings
+warning: unused import: `std::io`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `into_graph` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/graph_codicil.rs:185:19
+    |
+184 | impl GraphCodicil {
+    | ----------------- method in this implementation
+185 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+warning: methods `is_plain_property` and `is_plain_edge` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/linked-data/src/ingest/envelope.rs:163:12
+    |
+ 53 | impl ImportEvidence {
+    | ------------------- methods in this implementation
+...
+163 |     pub fn is_plain_property(&self, subject: &str, property: &NodeProperty) -> bool {
+    |            ^^^^^^^^^^^^^^^^^
+...
+168 |     pub fn is_plain_edge(&self, index: usize) -> bool {
+    |            ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-linked-data` (lib) generated 1 warning
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/pelt/core/src/pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/pelt/core/src/lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: `pelt-core` (lib) generated 2 warnings (run `cargo fix --lib -p pelt-core` to apply 2 suggestions)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/retained_content/producer.rs:32:14
+   |
+32 |         NEXT.fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+32 -         NEXT.fetch_update(
+32 +         NEXT.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/retained_content/producer.rs:136:30
+    |
+136 |                         NEXT.fetch_update(
+    |                              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+136 -                         NEXT.fetch_update(
+136 +                         NEXT.try_update(
+    |
+
+warning: method `begin_session` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/mere_host.rs:433:19
+    |
+269 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+433 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `relation_kind_label` is never used
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/mere_host.rs:1470:4
+     |
+1470 | fn relation_kind_label(kind: RelationKind) -> &'static str {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `codicil_graph` is never used
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/product.rs:1063:4
+     |
+1063 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/product.rs:1451:15
+     |
+1451 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `graphshell` (lib) generated 6 warnings (run `cargo fix --lib -p graphshell` to apply 2 suggestions)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-genet-web-host/src/recovery.rs:33:18
+   |
+33 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+33 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+33 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: function `next_frame` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-genet-web-host/src/presentation/boot.rs:146:21
+    |
+146 | pub(crate) async fn next_frame() -> Result<(), String> {
+    |                     ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cambium-genet-web-host` (lib) generated 2 warnings (run `cargo fix --lib -p cambium-genet-web-host` to apply 1 suggestion)
+   Compiling graphshell-web v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web)
+warning: unused import: `std::rc::Rc`
+  --> ../src/web_timing.rs:24:5
+   |
+24 | use std::rc::Rc;
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2165:7
+     |
+2165 | #[cfg(feature = "main-page")]
+     |       ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+     = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2167:11
+     |
+2167 | #[cfg(not(feature = "main-page"))]
+     |           ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unused import: `PresentedLink`
+ --> ../src/web_tree/query_view.rs:9:31
+  |
+9 | use graphshell::query_views::{PresentedLink, presented_links};
+  |                               ^^^^^^^^^^^^^
+
+warning: unused variable: `inspection`
+  --> ../src/web_tree/promoted_links.rs:84:13
+   |
+84 |         (Ok(inspection), None) => {
+   |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_inspection`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `mount` is never used
+  --> ../src/web_appearance.rs:70:15
+   |
+70 | pub(crate) fn mount(root: Element, owned: bool) -> Result<Handle, String> {
+   |               ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `supplied` is never used
+  --> ../src/web_dataset.rs:40:15
+   |
+40 | pub(crate) fn supplied(root: &Element) -> Option<Result<HostDatasetV1, String>> {
+   |               ^^^^^^^^
+
+warning: field `active` is never read
+  --> ../src/web_capture.rs:61:16
+   |
+60 | pub(crate) struct HistoryControlSummary {
+   |                   --------------------- field in this struct
+61 |     pub(crate) active: bool,
+   |                ^^^^^^
+   |
+   = note: `HistoryControlSummary` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: constant `STORAGE` is never used
+  --> ../src/web_practice.rs:32:7
+   |
+32 | const STORAGE: &str = "graphshellPracticeWorkspaceV1";
+   |       ^^^^^^^
+
+warning: constant `HISTORY_LIMIT` is never used
+  --> ../src/web_practice.rs:33:7
+   |
+33 | const HISTORY_LIMIT: usize = 64;
+   |       ^^^^^^^^^^^^^
+
+warning: struct `Face` is never constructed
+  --> ../src/web_practice.rs:36:19
+   |
+36 | pub(crate) struct Face {
+   |                   ^^^^
+
+warning: struct `Control` is never constructed
+  --> ../src/web_practice.rs:45:19
+   |
+45 | pub(crate) struct Control {
+   |                   ^^^^^^^
+
+warning: struct `Metrics` is never constructed
+  --> ../src/web_practice.rs:54:8
+   |
+54 | struct Metrics {
+   |        ^^^^^^^
+
+warning: struct `SavedPractice` is never constructed
+  --> ../src/web_practice.rs:69:8
+   |
+69 | struct SavedPractice {
+   |        ^^^^^^^^^^^^^
+
+warning: struct `PracticeHost` is never constructed
+  --> ../src/web_practice.rs:74:19
+   |
+74 | pub(super) struct PracticeHost {
+   |                   ^^^^^^^^^^^^
+
+warning: function `encoded_axes` is never used
+  --> ../src/web_practice.rs:99:4
+   |
+99 | fn encoded_axes(definition: &ProjectionDefinition) -> Axes {
+   |    ^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ../src/web_practice.rs:110:19
+    |
+107 | impl PracticeHost {
+    | ----------------- associated items in this implementation
+...
+110 |     pub(super) fn new(supplied: Option<Result<HostDatasetV1, String>>) -> Result<Self, String> {
+    |                   ^^^
+...
+172 |     pub(super) fn needs_frame(&self) -> bool {
+    |                   ^^^^^^^^^^^
+...
+179 |     fn sync_slots(&mut self, width: u32, height: u32) {
+    |        ^^^^^^^^^^
+...
+230 |     fn sync_permitted(&mut self) {
+    |        ^^^^^^^^^^^^^^
+...
+239 |     pub(super) fn command(&mut self, command: &str) -> Result<(), String> {
+    |                   ^^^^^^^
+...
+392 |     fn relations_spoken(&self) -> String {
+    |        ^^^^^^^^^^^^^^^^
+...
+417 |     pub(crate) fn controls(&self, width: u32, height: u32) -> Vec<Control> {
+    |                   ^^^^^^^^
+...
+829 |     pub(crate) fn advance(&mut self, width: u32, height: u32, host_ms: f64) -> bool {
+    |                   ^^^^^^^
+...
+861 |     pub(crate) fn board_pointer(
+    |                   ^^^^^^^^^^^^^
+...
+904 |     pub(crate) fn relation_lines(&self) -> Vec<([f32; 4], bool)> {
+    |                   ^^^^^^^^^^^^^^
+...
+940 |     pub(crate) fn set_error(&mut self, error: String) {
+    |                   ^^^^^^^^^
+...
+944 |     pub(crate) fn fields(&self) -> Result<Vec<(&'static str, String)>, String> {
+    |                   ^^^^^^
+
+warning: function `label` is never used
+   --> ../src/web_speed.rs:313:15
+    |
+313 | pub(crate) fn label(speed: Speed) -> String {
+    |               ^^^^^
+
+warning: function `board_line` is never used
+   --> ../src/web_speed.rs:331:15
+    |
+331 | pub(crate) fn board_line(speed: Speed) -> String {
+    |               ^^^^^^^^^^
+
+warning: field `practice` is never read
+   --> ../src/web_tree.rs:477:5
+    |
+424 | pub(crate) struct TreePage {
+    |                   -------- field in this struct
+...
+477 |     practice: Option<practice::Practice>,
+    |     ^^^^^^^^
+
+warning: field `gestures` is never read
+    --> ../src/web_tree.rs:1061:5
+     |
+1056 | struct Tree {
+     |        ---- field in this struct
+...
+1061 |     gestures: gestures::GestureOwner,
+     |     ^^^^^^^^
+
+warning: method `rebind_host_presenter` is never used
+   --> ../src/web_tree/presenter.rs:134:19
+    |
+109 | impl TreePage {
+    | ------------- method in this implementation
+...
+134 |     pub(super) fn rebind_host_presenter(&mut self, envelope: HostDatasetV1) -> Result<(), String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `pump` and `form_mut` are never used
+  --> ../src/web_tree/remote_off.rs:88:19
+   |
+73 | impl TreeRemote {
+   | --------------- methods in this implementation
+...
+88 |     pub(super) fn pump(&mut self) {
+   |                   ^^^^
+...
+96 |     pub(super) fn form_mut(&mut self) -> &mut ActionForm {
+   |                   ^^^^^^^^
+
+warning: field `fields` is never read
+   --> ../src/web_tree/remote_off.rs:139:16
+    |
+138 | pub(super) struct DraftControls {
+    |                   ------------- field in this struct
+139 |     pub(super) fields: Vec<SelectState>,
+    |                ^^^^^^
+
+warning: `graphshell-web` (lib) generated 24 warnings (run `cargo fix --lib -p graphshell-web` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.23s

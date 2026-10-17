@@ -399,6 +399,168 @@ pub enum RelationKind {
 const OPEN_PREDICATE_TAG_SUB: u32 = 0x00ff_ffff;
 
 impl RelationKind {
+    /// The canonical predicate IRI for a recognized relation kind.
+    ///
+    /// Semantic predicates retain their established byte-for-byte IRIs.
+    /// The other sub-kind families use an explicit family-qualified local
+    /// name so their predicate identity is stable across refactors. Traversal
+    /// and open predicates do not name one fixed predicate here.
+    pub fn predicate_iri(self) -> Option<&'static str> {
+        use super::edge_data::predicate_iri as semantic_predicate_iri;
+
+        match self {
+            RelationKind::Semantic(sub_kind) => Some(semantic_predicate_iri(sub_kind)),
+            RelationKind::OpenPredicate | RelationKind::Traversal => None,
+            RelationKind::Containment(sub_kind) => Some(match sub_kind {
+                ContainmentSubKind::UrlPath => "https://mere.computer/ns/rel#containment.url-path",
+                ContainmentSubKind::Domain => "https://mere.computer/ns/rel#containment.domain",
+                ContainmentSubKind::FileSystem => {
+                    "https://mere.computer/ns/rel#containment.filesystem"
+                },
+                ContainmentSubKind::UserFolder => {
+                    "https://mere.computer/ns/rel#containment.user-folder"
+                },
+                ContainmentSubKind::ClipSource => {
+                    "https://mere.computer/ns/rel#containment.clip-source"
+                },
+                ContainmentSubKind::NotebookSection => {
+                    "https://mere.computer/ns/rel#containment.notebook-section"
+                },
+                ContainmentSubKind::CollectionMember => {
+                    "https://mere.computer/ns/rel#containment.collection-member"
+                },
+            }),
+            RelationKind::Arrangement(sub_kind) => Some(match sub_kind {
+                ArrangementSubKind::FrameMember => {
+                    "https://mere.computer/ns/rel#arrangement.frame-member"
+                },
+                ArrangementSubKind::TileGroup => {
+                    "https://mere.computer/ns/rel#arrangement.tile-group"
+                },
+                ArrangementSubKind::SplitPair => {
+                    "https://mere.computer/ns/rel#arrangement.split-pair"
+                },
+            }),
+            RelationKind::Imported(sub_kind) => Some(match sub_kind {
+                ImportedSubKind::BookmarkFolder => {
+                    "https://mere.computer/ns/rel#imported.bookmark-folder"
+                },
+                ImportedSubKind::HistoryImport => {
+                    "https://mere.computer/ns/rel#imported.history-import"
+                },
+                ImportedSubKind::SessionImport => {
+                    "https://mere.computer/ns/rel#imported.session-import"
+                },
+                ImportedSubKind::RssMembership => {
+                    "https://mere.computer/ns/rel#imported.rss-membership"
+                },
+                ImportedSubKind::FileSystemImport => {
+                    "https://mere.computer/ns/rel#imported.filesystem-import"
+                },
+                ImportedSubKind::ArchiveMembership => {
+                    "https://mere.computer/ns/rel#imported.archive-membership"
+                },
+                ImportedSubKind::SharedCollection => {
+                    "https://mere.computer/ns/rel#imported.shared-collection"
+                },
+            }),
+            RelationKind::Provenance(sub_kind) => Some(match sub_kind {
+                ProvenanceSubKind::ClippedFrom => {
+                    "https://mere.computer/ns/rel#provenance.clipped-from"
+                },
+                ProvenanceSubKind::ExcerptedFrom => {
+                    "https://mere.computer/ns/rel#provenance.excerpted-from"
+                },
+                ProvenanceSubKind::SummarizedFrom => {
+                    "https://mere.computer/ns/rel#provenance.summarized-from"
+                },
+                ProvenanceSubKind::TranslatedFrom => {
+                    "https://mere.computer/ns/rel#provenance.translated-from"
+                },
+                ProvenanceSubKind::RewrittenFrom => {
+                    "https://mere.computer/ns/rel#provenance.rewritten-from"
+                },
+                ProvenanceSubKind::GeneratedFrom => {
+                    "https://mere.computer/ns/rel#provenance.generated-from"
+                },
+                ProvenanceSubKind::ExtractedFrom => {
+                    "https://mere.computer/ns/rel#provenance.extracted-from"
+                },
+                ProvenanceSubKind::ImportedFromSource => {
+                    "https://mere.computer/ns/rel#provenance.imported-from-source"
+                },
+                ProvenanceSubKind::CopiedFrom => {
+                    "https://mere.computer/ns/rel#provenance.copied-from"
+                },
+                ProvenanceSubKind::MergedFrom => {
+                    "https://mere.computer/ns/rel#provenance.merged-from"
+                },
+            }),
+        }
+    }
+
+    /// Decode a canonical predicate IRI produced by [`Self::predicate_iri`].
+    /// Unknown and open predicates remain outside the closed relation-kind
+    /// vocabulary.
+    pub fn from_predicate_iri(iri: &str) -> Option<Self> {
+        use super::edge_data::sub_kind_from_iri as semantic_sub_kind_from_iri;
+
+        if let Some(sub_kind) = semantic_sub_kind_from_iri(iri) {
+            return Some(RelationKind::Semantic(sub_kind));
+        }
+
+        [
+            ContainmentSubKind::UrlPath,
+            ContainmentSubKind::Domain,
+            ContainmentSubKind::FileSystem,
+            ContainmentSubKind::UserFolder,
+            ContainmentSubKind::ClipSource,
+            ContainmentSubKind::NotebookSection,
+            ContainmentSubKind::CollectionMember,
+        ]
+        .into_iter()
+        .map(RelationKind::Containment)
+        .chain(
+            [
+                ArrangementSubKind::FrameMember,
+                ArrangementSubKind::TileGroup,
+                ArrangementSubKind::SplitPair,
+            ]
+            .into_iter()
+            .map(RelationKind::Arrangement),
+        )
+        .chain(
+            [
+                ImportedSubKind::BookmarkFolder,
+                ImportedSubKind::HistoryImport,
+                ImportedSubKind::SessionImport,
+                ImportedSubKind::RssMembership,
+                ImportedSubKind::FileSystemImport,
+                ImportedSubKind::ArchiveMembership,
+                ImportedSubKind::SharedCollection,
+            ]
+            .into_iter()
+            .map(RelationKind::Imported),
+        )
+        .chain(
+            [
+                ProvenanceSubKind::ClippedFrom,
+                ProvenanceSubKind::ExcerptedFrom,
+                ProvenanceSubKind::SummarizedFrom,
+                ProvenanceSubKind::TranslatedFrom,
+                ProvenanceSubKind::RewrittenFrom,
+                ProvenanceSubKind::GeneratedFrom,
+                ProvenanceSubKind::ExtractedFrom,
+                ProvenanceSubKind::ImportedFromSource,
+                ProvenanceSubKind::CopiedFrom,
+                ProvenanceSubKind::MergedFrom,
+            ]
+            .into_iter()
+            .map(RelationKind::Provenance),
+        )
+        .find(|kind| kind.predicate_iri() == Some(iri))
+    }
+
     /// Project to the relation's family. Pure function — no payload
     /// access required.
     pub fn family(self) -> EdgeFamily {

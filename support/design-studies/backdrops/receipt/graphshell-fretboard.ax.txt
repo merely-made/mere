@@ -1,0 +1,195 @@
+Browser tab: 10, Title: "Graphshell, one tree", URL: "http://127.0.0.1:8786/tree.html?app=local&receipt=recipe-files".
+0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8786/tree.html?app=local&receipt=recipe-files
+	1 container Graphshell, one tree
+		2 container
+			3 text mereGraphshellLocal mere / retained material
+			4 container
+				5 text mere mere
+			6 container
+				7 text GraphshellLocal mere / retained material GraphshellLocal mere / retained material
+				8 heading Graphshell, Value: 1
+					9 text Graphshell
+				10 text Local mere / retained material
+			11 text saved graph · 11 nodes · selected: 0 · primary: none
+			12 container Graph controls
+				13 button Pan left
+				14 button Pan right
+				15 button Pan up
+				16 button Pan down
+				17 button Zoom in
+				18 button Zoom out
+				19 button Fit graph
+				20 button (disabled) Fit selection
+				21 button Restore arrangement
+				22 button Play physics
+				23 pop up button (collapsed) Graph commands, Secondary Actions: Expand
+			24 text Open selected in workbenchShow workbench
+			25 button Open selected in workbench
+			26 button Show workbench
+			27 text Saved graph
+			28 button Undo session
+			29 button Redo session
+			30 container
+				31 text Add an object
+				32 button (collapsed) Add an object, Secondary Actions: Expand
+			33 button (disabled) Inspect selected access
+			34 button Inspect fields
+			35 button Open details
+			36 text Dataspace11 items / Graph presentationPortable scene workspaceGraph tools
+			37 container
+				38 text Dataspace11 items / Graph presentationPortable scene workspace Dataspace11 items / Graph presentation
+				39 container
+					40 text Dataspace11 items / Graph presentation
+					41 heading Dataspace, Value: 2
+						42 text Dataspace
+					43 text 11 items / Graph presentation
+				195 text Portable scene workspace
+				196 container
+					197 text Graphshell / portable sceneMetre gridFretboardTerrain and coverageLinksImport scene recipeExport scene recipe Graphshell / portable scene
+					198 checkbox Metre grid, Value: 0
+					199 checkbox Fretboard, Value: 1
+					200 checkbox Terrain and coverage, Value: 0
+					201 checkbox Links, Value: 1
+					202 button Import scene recipe
+					203 button Export scene recipe
+				204 heading Open C major, Value: 2
+					205 text Open C major
+				206 container
+					207 text Portable scene stageScene selection and occurrences Portable scene stage Scene selection and occurrences
+					208 heading Selection, Value: 3
+						209 text Selection
+					231 text C
+					211 text string 5, fret 3, pitch class 0
+					232 text Source: fixture.pitch-class / 0 · illustrative-v1
+					233 button Related occurrence string-2-fret-1
+					234 text One source resource realized at different instrument positions; octaves may differ
+					235 text forward 1 · retained 1
+					236 button Clear selection
+					237 button Dismiss retained
+					238 heading Occurrences, Value: 3
+						239 text Occurrences
+					230 checkbox Scene occurrence string-1-fret-0: E, Value: 0
+					240 checkbox Scene occurrence string-2-fret-1: C, Value: 0
+					241 checkbox Scene occurrence string-3-fret-0: G, Value: 0
+					242 checkbox Scene occurrence string-4-fret-2: E, Value: 0
+					243 checkbox Scene occurrence string-5-fret-3: C, Value: 1
+				220 text Source revision: illustrative-v1 · supplied facts; selection does not edit the source
+			78 container
+				79 text Graph tools Application appearance
+				80 button (collapsed) Appearance, Secondary Actions: Expand
+				81 text Appearance status
+				82 text InspectorSelection, scene and presentation
+				83 container
+					84 text InspectorSelection, scene and presentation
+					85 heading Inspector, Value: 2
+						86 text Inspector
+					87 text Selection, scene and presentation
+				88 text Storage: IndexedDB reopened · not persistent, may be evicted Arrangement and physics
+				89 container
+					90 text Arrangement and physicsArrangement and physics
+					91 button (expanded) Arrangement and physics, Secondary Actions: Collapse
+					92 text Arrangement and physics
+					93 container
+						94 text ArrangementArrangement Arrangement
+						95 combo box (collapsed) Description: Arrangement, Value: Spiral, Secondary Actions: Expand
+							96 text Spiral
+					97 button Apply arrangement
+					98 container
+						99 text RoleRole Role
+						100 combo box (collapsed) Description: Role, Value: Seeded, Secondary Actions: Expand
+							101 text Seeded
+					102 button Apply role
+					103 container
+						104 text Physics lawPhysics law Physics law
+						105 combo box (collapsed) Description: Physics law, Value: Springs, Secondary Actions: Expand
+							106 text Springs
+					107 container Overlays
+						108 container
+							109 text Hub roomHub room
+							110 checkbox Hub room, Value: 0
+							111 text Hub room
+						112 container
+							113 text Group pullGroup pull
+							114 checkbox Group pull, Value: 0
+							115 text Group pull
+						116 container
+							117 text Hub pullHub pull
+							118 checkbox Hub pull, Value: 0
+							119 text Hub pull
+						120 container
+							121 text DepthDepth
+							122 checkbox Depth, Value: 0
+							123 text Depth
+						124 container
+							125 text GridGrid
+							126 checkbox Grid, Value: 0
+							127 text Grid
+						128 container
+							129 text CentreCentre
+							130 checkbox Centre, Value: 0
+							131 text Centre
+						132 container
+							133 text TideTide
+							134 checkbox Tide, Value: 0
+							135 text Tide
+						136 container
+							137 text SkeletonSkeleton
+							138 checkbox Skeleton, Value: 0
+							139 text Skeleton
+					140 container
+						141 text KindsKinds Kinds
+						142 combo box (collapsed) Description: Kinds, Value: By site, Secondary Actions: Expand
+							143 text By site
+					144 container
+						145 text GroupsGroups Groups
+						146 combo box (collapsed) Description: Groups, Value: By site, Secondary Actions: Expand
+							147 text By site
+					148 container
+						149 text MassMass Mass
+						150 combo box (collapsed) Description: Mass, Value: By degree, Secondary Actions: Expand
+							151 text By degree
+					152 container
+						153 text DepthDepth Depth
+						154 combo box (collapsed) Description: Depth, Value: From roots, Secondary Actions: Expand
+							155 text From roots
+					156 button Apply physics
+					157 container
+						158 text SpeedSpeed Speed
+						159 combo box (collapsed) Description: Speed, Value: 1x, Secondary Actions: Expand
+							160 text 1x
+					161 container
+						162 text ProfileProfile Profile
+						163 combo box (collapsed) Description: Profile, Value: Springs, Secondary Actions: Expand
+							164 text Springs
+					165 button Apply profile
+					166 text Physics status
+				167 text Find and filter
+				168 button (collapsed) Find and filter, Secondary Actions: Expand
+				169 text Scenes and transfers
+				170 button (collapsed) Scenes and transfers, Secondary Actions: Expand
+				171 text Projection editor
+				172 button (collapsed) Projection editor, Secondary Actions: Expand
+				173 button (expanded) Close portable scene, Secondary Actions: Collapse
+				174 text History
+				175 button (collapsed) History, Secondary Actions: Expand
+				176 text Dynamics inspector
+				177 button (disabled) Explain selected dynamics
+				178 text Presentation rules
+				179 button (collapsed) Presentation rules, Secondary Actions: Expand
+				180 text Saved query views
+				181 heading Saved query views, Value: 3
+					182 text Saved query views
+				183 button New query view
+				184 text Fields
+				185 heading Fields, Value: 2
+					186 text Fields
+				187 container
+					188 text Forme controls Workbench · 0 accesses · 0 regions
+					189 button Unlock forme
+					190 button (disabled) Undo saved forme change
+					191 button (disabled) Redo saved forme change
+					192 button Hide forme boundary
+					193 button Select forme members
+					194 button Retry workbench save
+
+The focused UI element is 0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8786/tree.html?app=local&receipt=recipe-files

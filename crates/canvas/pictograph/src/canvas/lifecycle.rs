@@ -76,8 +76,11 @@ impl Canvas {
         self.forme_guides = None;
         self.forme_held.clear();
         self.selected.clear();
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         self.hidden_edges.clear();
+        self.hidden_links.clear();
+        self.hidden_assertions.clear();
         self.active_field = None;
         self.hidden_fields.clear();
         self.node_states.clear();
@@ -100,6 +103,15 @@ impl Canvas {
         self.channels = crate::signals::ChannelRegistry::new();
         self.drag = None;
         self.pinned_nodes.clear();
+        // Attention and seeds are keyed by node; the host's suggestion settings
+        // and the pages' link offers (keyed by member) outlive the swap.
+        let suggestions = std::mem::take(&mut self.grammar.suggestions);
+        let links = std::mem::take(&mut self.grammar.links);
+        self.grammar = Default::default();
+        self.grammar.suggestions = suggestions;
+        self.grammar.links = links;
+        self.strategy_regions.clear();
+        self.mosaic = Default::default();
         self.field_drag = None;
         self.marquee = None;
         self.middle_drag = None;
@@ -161,13 +173,22 @@ impl Canvas {
             orbit_drag: None,
             drag: None,
             pinned_nodes: HashSet::new(),
+            grammar: Default::default(),
+            strategy_regions: Vec::new(),
+            mosaic: Default::default(),
+            territory_field: false,
+            graph_grammar: false,
+            category_colors: Vec::new(),
             field_drag: None,
             forme_region: None,
             forme_guides: None,
             forme_held: HashSet::new(),
             selected: HashSet::new(),
-            selected_edges: HashSet::new(),
+            selected_links: HashSet::new(),
+            selected_link_appearances: HashMap::new(),
             hidden_edges: HashSet::new(),
+            hidden_links: HashSet::new(),
+            hidden_assertions: HashSet::new(),
             occurrence_edges: None,
             physics_view_revision: 0,
             active_field: None,
@@ -218,6 +239,7 @@ impl Canvas {
             height_by_degree: false,
             marquee: None,
             empty_press: None,
+            self_link_press: None,
             context_request: None,
             ctrl: false,
             shift: false,
@@ -403,6 +425,10 @@ impl Canvas {
         self.physics.sync_nodes(nodes);
         self.physics.sync_edges(self.controller_edges());
         self.pinned_nodes
+            .retain(|key| self.graph.get_node(*key).is_some());
+        self.grammar
+            .retain(|key| self.graph.get_node(*key).is_some());
+        self.mosaic
             .retain(|key| self.graph.get_node(*key).is_some());
         for positions in [&mut self.strategy_positions, &mut self.paused_positions]
             .into_iter()

@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The built-in arrangement catalog: sceno's eleven named families, by id.
+//! The built-in arrangement catalog: sceno's fourteen named families, by id.
 //!
 //! An authored recipe names its arrangement by id. An id found here resolves to
 //! the family's typed [`sceno::Arrangement`] variant; any other id falls through
@@ -23,8 +23,8 @@ use std::collections::BTreeMap;
 
 use sceno::{
     Arrangement, Embedded, EmbeddingFallback, Geographic, Grid, Hulls, IterationDepth, Kanban,
-    LSystem, LSystemGrammar, Penrose, PenroseVariant, Radial, RadialAngularPolicy,
-    RadialUnreachablePolicy, Rect, Size2, Spiral, SpiralCurve, Stack, SubdivisionCount, Timeline,
+    LSystem, LSystemGrammar, Mosaic, Partition, PartitionForm, Penrose, PenroseVariant, Radial, RadialAngularPolicy,
+    RadialUnreachablePolicy, Rect, Setscape, Size2, Spiral, SpiralCurve, Stack, SubdivisionCount, Timeline,
     TimelineFallback, UnusedVertexPolicy, Vec2,
 };
 use scenograph::dataset::ProjectionFieldType;
@@ -47,10 +47,13 @@ pub enum Family {
     Kanban,
     Embedded,
     Radial,
+    Partition,
+    Sets,
+    Mosaic,
 }
 
 /// Every family in the catalog, in a stable order.
-pub const FAMILIES: [Family; 11] = [
+pub const FAMILIES: [Family; 14] = [
     Family::Spiral,
     Family::Grid,
     Family::Geographic,
@@ -62,6 +65,9 @@ pub const FAMILIES: [Family; 11] = [
     Family::Kanban,
     Family::Embedded,
     Family::Radial,
+    Family::Partition,
+    Family::Sets,
+    Family::Mosaic,
 ];
 
 /// How a family reads a recipe's x and y encoding.
@@ -157,6 +163,9 @@ impl Family {
             Self::Kanban => "kanban",
             Self::Embedded => "embedded",
             Self::Radial => "radial",
+            Self::Partition => "partition",
+            Self::Sets => "sets",
+            Self::Mosaic => "mosaic",
         }
     }
 
@@ -183,7 +192,9 @@ impl Family {
             Self::Embedded => ChannelUse::Embedding,
             Self::Timeline | Self::Radial => ChannelUse::NumericAxis,
             Self::Stack => ChannelUse::IntegerAxis,
-            Self::Kanban => ChannelUse::CategoricalAxis,
+            Self::Kanban | Self::Partition | Self::Sets | Self::Mosaic => {
+                ChannelUse::CategoricalAxis
+            },
             Self::Spiral | Self::Penrose | Self::LSystem => ChannelUse::Order,
         }
     }
@@ -369,6 +380,40 @@ impl Family {
                     RADIAL_UNREACHABLE_POLICIES,
                 ),
             ],
+            Self::Partition => vec![
+                measured("width", "Width", OptionKind::Positive, AREA),
+                measured("height", "Height", OptionKind::Positive, AREA),
+                finite("whole", "Measured whole (0: the items' total)", 0.0),
+                choice("form", "Form", PARTITION_FORMS),
+                finite("gap", "Gap", Partition::default().gap),
+            ],
+            Self::Sets => vec![
+                measured("width", "Width", OptionKind::Positive, AREA),
+                measured("height", "Height", OptionKind::Positive, AREA),
+                OptionSpec::new("sets", "Sets", OptionKind::List, OptionDefault::Empty),
+            ],
+            Self::Mosaic => vec![
+                measured(
+                    "unit_area",
+                    "Area per unit of weight",
+                    OptionKind::Positive,
+                    "the largest item's pitch, squared",
+                ),
+                OptionSpec::new(
+                    "aspect",
+                    "Aspect",
+                    OptionKind::Positive,
+                    OptionDefault::Value(Mosaic::default().aspect.to_string()),
+                ),
+                finite("gap", "Gap", Mosaic::default().gap),
+                finite("header", "Group label band", Mosaic::default().header),
+                OptionSpec::new(
+                    "group_order",
+                    "Group order",
+                    OptionKind::List,
+                    OptionDefault::Empty,
+                ),
+            ],
         }
     }
 
@@ -418,6 +463,21 @@ impl Family {
                 "Radial",
                 "Items ring outward by a numeric index.",
                 &["hierarchical"],
+            ),
+            Self::Partition => (
+                "Partition",
+                "Items share a measured whole, by area or by angle.",
+                &["hierarchical"],
+            ),
+            Self::Sets => (
+                "Sets",
+                "Items sit in the overlap of the sets they belong to.",
+                &["spatial-memory"],
+            ),
+            Self::Mosaic => (
+                "Mosaic",
+                "Items tile by weight in groups, and never reflow.",
+                &["spatial-memory", "hierarchical"],
             ),
         };
         let mut capability = SolverCapability::new(self.id(), name);
@@ -569,6 +629,27 @@ impl Family {
                     RADIAL_UNREACHABLE_POLICIES,
                 ),
             }),
+            Self::Partition => Arrangement::Partition(Partition {
+                bounds: area(read, measure),
+                whole: Some(read.finite("whole", 0.0)).filter(|whole| *whole > 0.0),
+                form: read.choice("form", PartitionForm::default(), PARTITION_FORMS),
+                gap: read.finite("gap", Partition::default().gap).max(0.0),
+            }),
+            Self::Sets => Arrangement::Setscape(Setscape {
+                bounds: area(read, measure),
+                sets: read.list("sets"),
+            }),
+            Self::Mosaic => {
+                let default = Mosaic::default();
+                Arrangement::Mosaic(Mosaic {
+                    origin: Vec2::ZERO,
+                    unit_area: read.positive("unit_area", measure.pitch() * measure.pitch()),
+                    aspect: read.positive("aspect", default.aspect),
+                    gap: read.finite("gap", default.gap).max(0.0),
+                    header: read.finite("header", default.header).max(0.0),
+                    group_order: read.list("group_order"),
+                })
+            },
         }
     }
 }
@@ -614,6 +695,23 @@ const RADIAL_ANGULAR_POLICIES: &[(&str, RadialAngularPolicy)] = &[
     ("weighted", RadialAngularPolicy::Weighted),
     ("hash_sorted", RadialAngularPolicy::HashSorted),
 ];
+
+const PARTITION_FORMS: &[(&str, PartitionForm)] = &[
+    ("tiles", PartitionForm::Tiles),
+    ("rings", PartitionForm::Rings),
+];
+
+/// What a bounded family's area defaults to when the host gives no viewport.
+const AREA: &str = "room for every item at its pitch, twice over";
+
+/// A bounded family's area, centred on the origin. A host passes its
+/// viewport as `width` and `height`; Partition subdivides exactly that.
+fn area(read: &mut Options, measure: &Measure) -> Rect {
+    let side = measure.side() * 2.0;
+    let w = read.positive("width", side * measure.pitch_w());
+    let h = read.positive("height", side * measure.pitch_h());
+    Rect::new(Vec2::new(-w / 2.0, -h / 2.0), Size2::new(w, h))
+}
 
 const RADIAL_UNREACHABLE_POLICIES: &[(&str, RadialUnreachablePolicy)] = &[
     ("outer_ring", RadialUnreachablePolicy::OuterRing),

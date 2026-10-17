@@ -193,6 +193,7 @@ pub fn project_spiral_score_for_view(
             faults: Vec::new(),
             coverage: Default::default(),
         },
+        regions: Vec::new(),
     };
     MereSpiralProjection {
         score,

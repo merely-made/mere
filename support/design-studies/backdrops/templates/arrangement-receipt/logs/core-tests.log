@@ -1,0 +1,43 @@
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling scenomise v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.56s
+     Running tests/backdrop_scenes.rs (target/build/debug/deps/backdrop_scenes-9fdee61696497156)
+
+running 7 tests
+test metre_uses_supplied_stress_and_keeps_mismatches_visible ... ok
+test fretboard_shares_pitch_identity_but_keeps_occurrences_distinct ... ok
+test ternary_template_keeps_actual_syllables_and_discloses_expected_extent ... ok
+test ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts ... ok
+test unknown_radio_positions_never_become_origin_nodes_or_fields ... ok
+test each_recipe_exports_a_valid_scene_without_product_authorities ... ok
+test invalid_coordinates_and_unknown_input_are_refused ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/scene_documents.rs (target/build/debug/deps/scene_documents-01a3a5d175f6c848)
+
+running 3 tests
+test invalid_linked_geometry_or_unknown_bindings_refuse_the_whole_document ... ok
+test linked_reading_is_selected_by_occurrence_and_round_trips ... ok
+test nested_unknown_fields_and_over_budget_documents_are_refused ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/sequence_templates.rs (target/build/debug/deps/sequence_templates-a0cde65598d68f5d)
+
+running 4 tests
+test invalid_spans_hierarchy_references_and_budgets_are_refused ... ok
+test open_expectations_and_unplaced_readings_are_preserved ... ok
+test nested_unknown_fields_are_rejected ... ok
+test anticipated_and_sustained_occurrences_do_not_become_errors ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -13,7 +13,8 @@ use std::sync::LazyLock;
 use serde::Deserialize;
 
 use crate::theme::registry::{
-    THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_HIGH_CONTRAST, THEME_ID_LIGHT,
+    THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_GRAPHSHELL_NIGHT, THEME_ID_HIGH_CONTRAST,
+    THEME_ID_LIGHT, THEME_ID_MERELY,
 };
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -72,10 +73,16 @@ pub fn resolve_theme_data(theme_id: &str) -> ThemeResolution {
 }
 
 pub fn theme_data_id(theme: &ThemeData) -> &'static str {
-    [THEME_ID_DARK, THEME_ID_LIGHT, THEME_ID_HIGH_CONTRAST]
-        .into_iter()
-        .find(|id| builtin(id).as_ref() == Some(theme))
-        .unwrap_or(THEME_ID_DEFAULT)
+    [
+        THEME_ID_DARK,
+        THEME_ID_LIGHT,
+        THEME_ID_HIGH_CONTRAST,
+        THEME_ID_MERELY,
+        THEME_ID_GRAPHSHELL_NIGHT,
+    ]
+    .into_iter()
+    .find(|id| builtin(id).as_ref() == Some(theme))
+    .unwrap_or(THEME_ID_DEFAULT)
 }
 
 #[derive(Deserialize)]
@@ -128,6 +135,8 @@ mod tests {
             THEME_ID_DARK,
             THEME_ID_LIGHT,
             THEME_ID_HIGH_CONTRAST,
+            THEME_ID_MERELY,
+            THEME_ID_GRAPHSHELL_NIGHT,
         ] {
             let resolution = resolve_theme_data(id);
             assert!(resolution.matched, "{id}");

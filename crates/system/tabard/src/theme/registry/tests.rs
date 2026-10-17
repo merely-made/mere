@@ -42,7 +42,7 @@ fn builtin_themes_include_edge_tokens() {
     let dark = builtin(THEME_ID_DARK);
 
     assert!(default.edge_tokens.family_tokens.len() >= 5);
-    assert!(dark.edge_tokens.kind_tokens.len() >= 5);
+    assert!(dark.edge_tokens.family_tokens.len() >= 5);
 }
 
 #[test]
@@ -55,7 +55,9 @@ fn registry_lists_built_ins_in_order() {
             THEME_ID_DEFAULT,
             THEME_ID_DARK,
             THEME_ID_LIGHT,
-            THEME_ID_HIGH_CONTRAST
+            THEME_ID_HIGH_CONTRAST,
+            THEME_ID_MERELY,
+            THEME_ID_GRAPHSHELL_NIGHT
         ]
     );
 }
@@ -108,6 +110,7 @@ fn user_theme_crud_fork_rename_remove_add() {
         harmony: Default::default(),
         mode_sheets: Default::default(),
         typography: Default::default(),
+        categories: Default::default(),
     };
     reg.add_user_theme(def)
         .expect("user theme passes validation");
@@ -141,6 +144,7 @@ fn locked_harmony_rotates_accents_to_primary_plus_offset_and_validates() {
         },
         mode_sheets: Default::default(),
         typography: Default::default(),
+        categories: Default::default(),
     };
 
     // The accents' hue is the primary's hue plus the locked offset; each accent

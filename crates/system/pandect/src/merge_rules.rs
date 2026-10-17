@@ -199,11 +199,7 @@ pub fn check_assertion_handles(snapshot: &GraphSnapshot) -> Result<(), RuleError
         .map(|edge| (false, edge))
         .chain(snapshot.resource_edges.iter().map(|edge| (true, edge)))
     {
-        for statement in edge
-            .semantic
-            .iter()
-            .flat_map(|semantic| &semantic.statements)
-        {
+        for statement in edge.retained_assertions() {
             let identity = (
                 resource,
                 uuid::Uuid::parse_str(&edge.from_node_id).map_err(|_| edge.from_node_id.as_str()),
@@ -226,6 +222,11 @@ pub fn check_assertion_handles(snapshot: &GraphSnapshot) -> Result<(), RuleError
 #[cfg(test)]
 mod tests {
     use super::*;
+    use euclid::default::Point2D;
+    use kernel::graph::Graph;
+    use kernel::graph::fixtures::GraphFixtures;
+    use kernel::persistence::{PersistedEdgeFamily, PersistedSemanticStatement};
+    use kernel::types::{AssertionBasis, GraphScope};
 
     #[test]
     fn a_facet_without_a_rule_merges_only_when_both_sides_agree() {
@@ -242,5 +243,51 @@ mod tests {
         );
         assert!(!resource_facet_has_rule("test.review"));
         assert!(resource_facet_has_rule(RESOURCE_PROPERTIES));
+    }
+
+    #[test]
+    fn canonical_assertion_handle_collisions_are_checked_across_pairs() {
+        let mut graph = Graph::new();
+        graph.add_node("https://one.test/".into(), Point2D::new(0.0, 0.0));
+        graph.add_node("https://two.test/".into(), Point2D::new(1.0, 0.0));
+        graph.add_node("https://three.test/".into(), Point2D::new(2.0, 0.0));
+        let mut snapshot = graph.to_snapshot();
+        let statement = PersistedSemanticStatement {
+            statement_id: "canonical-collision".into(),
+            predicate: "urn:test:claim".into(),
+            recognized_sub_kind: None,
+            label: Some("same reason".into()),
+            graph_scope: GraphScope::User,
+            provenance_iri: Some("urn:test:author".into()),
+            asserted_at_ms: Some(10),
+            first_asserted_ms: Some(10),
+            withdrawn: None,
+            basis: AssertionBasis {
+                note: Some("same reason".into()),
+                ..Default::default()
+            },
+        };
+        let edge = |from: &str, to: &str| PersistedEdge {
+            from_node_id: from.into(),
+            to_node_id: to.into(),
+            families: vec![PersistedEdgeFamily::Semantic],
+            semantic: None,
+            traversal: None,
+            containment: None,
+            arrangement: None,
+            imported: None,
+            provenance: None,
+            assertions: Some(vec![statement.clone()]),
+        };
+        let from = snapshot.nodes[0].node_id.clone();
+        let to = snapshot.nodes[1].node_id.clone();
+        let other_to = snapshot.nodes[2].node_id.clone();
+        let first = edge(&from, &to);
+        let identical_copy = first.clone();
+        snapshot.edges = vec![first, identical_copy];
+        assert!(check_assertion_handles(&snapshot).is_ok());
+
+        snapshot.edges.push(edge(&from, &other_to));
+        assert!(check_assertion_handles(&snapshot).is_err());
     }
 }

@@ -373,7 +373,8 @@ mod tests {
 
     #[test]
     fn sparse_provider_selects_the_sparse_store_and_index_stays_empty() {
-        let mut s = CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
+        let mut s =
+            CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
         s.ingest(1, "rust async runtime", (0.0, 0.0)).unwrap();
         s.ingest(2, "italian dinner recipes", (100.0, 0.0)).unwrap();
         assert!(s.is_sparse());
@@ -383,7 +384,8 @@ mod tests {
 
     #[test]
     fn search_focus_works_with_a_sparse_provider() {
-        let mut s = CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
+        let mut s =
+            CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
         s.ingest(1, "rust async runtime", (0.0, 0.0)).unwrap();
         s.ingest(2, "italian dinner recipes", (100.0, 0.0)).unwrap();
         s.set_focus_query("rust async").unwrap();
@@ -393,9 +395,11 @@ mod tests {
 
     #[test]
     fn register_focus_field_works_with_a_sparse_provider() {
-        let mut s = CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
+        let mut s =
+            CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
         s.ingest(1, "rust async runtime", (100.0, 100.0)).unwrap();
-        s.ingest(2, "italian dinner recipes", (500.0, 500.0)).unwrap();
+        s.ingest(2, "italian dinner recipes", (500.0, 500.0))
+            .unwrap();
         s.set_focus_query("rust async runtime").unwrap();
 
         let mut projection = FieldProjection::new();

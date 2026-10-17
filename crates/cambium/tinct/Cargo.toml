@@ -1,7 +1,7 @@
 [package]
 rust-version = "1.97.1"
 name = "tinct"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 description = "Perceptual (OKLCH) seed-to-palette derivation, plus a contrast-gated syntax-highlight palette, for the Merely family (Woodshed, Hocket, Mere). A theme is a few seed colours; the full palette is derived."
 license = "MPL-2.0"
