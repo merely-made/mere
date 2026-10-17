@@ -165,6 +165,32 @@ pub enum InferenceModelSettings {
         /// Maximum generated tokens per ask, stated by the owner.
         max_tokens: usize,
     },
+    /// Whole-model residence, discovered keyed stages, then local streaming.
+    Automatic {
+        row: String,
+        device: InferenceDeviceSettings,
+        max_tokens: usize,
+        stages: distillery::inference_protocol::AutomaticStageSettings,
+    },
+}
+
+impl InferenceModelSettings {
+    pub fn library(&self) -> Option<(&str, InferenceDeviceSettings, usize)> {
+        match self {
+            Self::Stub => None,
+            Self::Library {
+                row,
+                device,
+                max_tokens,
+            }
+            | Self::Automatic {
+                row,
+                device,
+                max_tokens,
+                ..
+            } => Some((row, *device, *max_tokens)),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]

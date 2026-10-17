@@ -179,16 +179,45 @@ GPU rows retain the trainer reclaim path. Imported format candidates must be
 measured against bf16 before publication. The measured loader must match the
 selected device's loader, and a format change refuses old checkpoints.
 
-The optional `inference-stages` feature exposes an embedding composition through
-`ResidentDistillery::enable_inference_stages` and Distillery's staged actor API.
-It borrows the existing library and GPU owner and checks current personal graph
-seats through `PersonalGraphSeals`. The stage vault holder refuses new work and
-waits for active KV/tensors to drain on lock; historical graph readability does
-not authorize a stage. Install it before admitting application sessions.
-This API takes an explicit leased stage plan. The JSON library setting above
-continues to select local execution; automatic peer/rung selection and a staged
-settings variant remain integration work. The native I8 fixture measures real
-iroh stage execution with separate roots/libraries on one physical computer.
+The optional `inference-stages` feature also composes automatic execution from
+settings. It requires the live keyed personal graph and a layer-indexed library
+row. For example, the `model` field can be:
+
+```json
+{"automatic":{"row":"blake3:<qualified-row-hash>","device":"gpu","max_tokens":128,"stages":{
+  "local_resident_bytes":2147483648,"worker_layer_bytes":536870912,
+  "max_peers":8,"max_hidden_bytes":16777216,
+  "discovery_timeout_ms":2000,"discovery_every_ms":1000,
+  "lease_wait_ms":10000,"call_timeout_ms":60000,"poll_every_ms":25,
+  "lease_duration_ms":600000,"heartbeat_ms":10000
+}}}
+```
+
+These numbers illustrate explicit owner limits. `local_resident_bytes` admits
+weights and full-context KV for whole-model residence; zero skips that rung.
+`worker_layer_bytes` is the offered layer/KV budget after reserving embedding/head,
+RoPE, activations, allocator and backend space. Zero offers no worker. Neither
+budget is a process RSS or VRAM limit. The device's existing mesh lending rules
+still apply; an explicit resource allowlist must permit its device-addressed
+`esp.inference.stage.<mesh-author-hex>/v1` resource and the restart class.
+
+An ordinary ask first tries local residence within that budget, then discovers
+current keyed readers offering the exact row, format and backend, posts real
+stage leases, and falls back to local layer streaming if placement is unavailable
+or leaves mid-answer. Discovery exchanges attested compute endpoints over the
+existing personal connection, then uses Distillery's existing endpoint for
+stage work. Compute joins a graph-scoped mesh across distinct profile roots.
+Ask journals, device IDs and existing history retain their profile-scoped paths.
+No prompt enters discovery, reservation, the mesh post or its fixed receipt.
+
+`ResidentDistillery::enable_inference_stages` and the explicit staged actor API
+remain available to embedding hosts. Both paths use the existing library and GPU
+owner, exact-session guards and current graph seats through `PersonalGraphSeals`.
+The vault holder refuses new work and waits for catalog, KV and tensors to drain
+on lock. Historical readability does not authorize new stage work. Install the
+holder before admitting application sessions. Native I8 rows use independently
+rooted software devices/libraries on one physical computer; physical fleet
+capacity and inter-computer latency require separate receipts.
 
 The route also takes `distillery.inference/pause-v1` and
 `distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.

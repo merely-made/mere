@@ -34,7 +34,7 @@ use chirograph::{
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
 use esp::infer::actor::spawn_inference_actor_with_checkpoints;
-use esp::infer::provider::GenerationCheckpoint;
+pub use esp::infer::provider::GenerationCheckpoint;
 use esp::infer::{GenerationRequest, InferCommand, InferUpdate};
 #[cfg(feature = "inference-model")]
 pub mod durable;
@@ -61,10 +61,11 @@ pub use gpu::{
 pub use esp::infer::decoder::DecoderDevice as InferenceDevice;
 /// The provider seam a host builds a lane from, re-exported so a host
 /// composes the lane without naming esp.
-pub use esp::infer::{InferenceProvider, StubInferenceProvider};
+pub use esp::infer::{InferError, InferenceProvider, StubInferenceProvider};
 #[cfg(feature = "inference-model")]
 pub use esp::infer::{
-    library::{InferenceModelRow, load_library_session},
+    layer_library::import_layered_model,
+    library::{InferenceModelRow, load_library_session, resolve_library_session},
     prompt::PromptTemplate,
 };
 

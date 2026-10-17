@@ -435,6 +435,13 @@ impl PersonalSyncHost {
         self.graph
     }
 
+    /// Borrow the existing graph carrier for the resident's attested compute
+    /// discovery protocol. Discovery still checks current graph readers.
+    #[cfg(feature = "inference-stages")]
+    pub(crate) fn stage_transport(&self) -> &P2pandaTransport {
+        self.network.transport()
+    }
+
     /// The endpoint and gossip handles a sibling lane joins with, as owned
     /// clones. What lets carriage ride this same bound endpoint instead of
     /// opening a second one per device.

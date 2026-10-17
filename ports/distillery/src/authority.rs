@@ -89,6 +89,8 @@ pub struct Distillery<B: Backend + Clone + Send + Sync + 'static> {
     retention: RetentionSettings,
     #[cfg(any(feature = "remote", feature = "inference-stages"))]
     remote: Vec<Arc<dyn RemoteSessionProjection>>,
+    #[cfg(feature = "inference-stages")]
+    stage_planner: Option<Arc<crate::inference_stage::automatic::StagePlanner>>,
 }
 
 impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
@@ -105,6 +107,8 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
             retention,
             #[cfg(any(feature = "remote", feature = "inference-stages"))]
             remote: Vec::new(),
+            #[cfg(feature = "inference-stages")]
+            stage_planner: None,
         }
     }
 
@@ -115,10 +119,35 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
         self.remote.push(remote);
     }
 
+    /// Owner composition for automatic asks. Posting stays on this host's
+    /// serialized authoring path; the actor receives only a bounded handle.
+    #[cfg(feature = "inference-stages")]
+    pub fn attach_stage_planner(
+        &mut self,
+        planner: Arc<crate::inference_stage::automatic::StagePlanner>,
+    ) -> Result<(), String> {
+        if self.stage_planner.is_some() {
+            return Err("stage planner already attached".into());
+        }
+        self.remote.push(planner.clone());
+        self.stage_planner = Some(planner);
+        Ok(())
+    }
+
+    /// Read the owner-composed planner and its public-metadata diagnostics.
+    #[cfg(feature = "inference-stages")]
+    pub fn stage_planner(&self) -> Option<&Arc<crate::inference_stage::automatic::StagePlanner>> {
+        self.stage_planner.as_ref()
+    }
+
     /// Drive one non-blocking supervisor tick.
     pub async fn tick(&mut self) -> Result<Vec<Step>, DistilleryError> {
         #[cfg(any(feature = "remote", feature = "inference-stages"))]
         self.refresh_remote().await?;
+        #[cfg(feature = "inference-stages")]
+        if let Some(planner) = &self.stage_planner {
+            planner.drive_posts(&self.host).await;
+        }
         let steps = self.host.tick().await?;
         #[cfg(any(feature = "remote", feature = "inference-stages"))]
         self.refresh_remote().await?;

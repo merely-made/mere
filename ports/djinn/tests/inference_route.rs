@@ -19,33 +19,21 @@ mod decoder_fixture;
 use std::sync::Arc;
 use std::time::Duration;
 
-use castellan::authority::PersonaeHost;
-use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
-use chirograph::{
-    CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, PortableCardV1,
-    ProjectionRequest,
-};
+use chirograph::IntentResult;
 use common::{
     lane, lending, open_vault, owner, profile, refusal_from, unlock, write_device_settings,
 };
 use distillery::inference::{
     ASK_INTENT, AskRequestV1, CANCEL_INTENT, CancelRequestV1, INFERENCE_ASK_ROUTE,
-    INFERENCE_RUNS_SCHEMA, InferenceProvider, InferenceRunsV1, RunStateV1,
+    INFERENCE_RUNS_SCHEMA, InferenceProvider, RunStateV1,
 };
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::resident::DjinnResident;
 use djinn::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
-use graphshell_endpoint::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
-use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use graphshell_endpoint::door::app_client::AppClientError;
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
-use personae::{Ed25519Keypair, ProfileId};
-use sceno::InstanceId;
-use scenotime::{Revision, SceneEpoch};
-use uuid::Uuid;
 
 fn stub_lane() -> Option<InferenceLaneSettings> {
     Some(InferenceLaneSettings {
@@ -54,90 +42,7 @@ fn stub_lane() -> Option<InferenceLaneSettings> {
     })
 }
 
-fn endpoint_name() -> String {
-    #[cfg(windows)]
-    return format!(r"\\.\pipe\djinn-inference-route-test-{}", Uuid::new_v4());
-    #[cfg(not(windows))]
-    return std::env::temp_dir()
-        .join(format!(
-            "djinn-inference-route-test-{}.sock",
-            Uuid::new_v4()
-        ))
-        .display()
-        .to_string();
-}
-
-fn keeper_host() -> Arc<PersonaeHost<InMemoryStorage>> {
-    let profile = Profile::new(
-        ProfileId("default".into()),
-        "Default",
-        Ed25519Keypair::from_seed([0x5e; 32]),
-    );
-    Arc::new(PersonaeHost::new(
-        IdentityVault::with_profile(InMemoryStorage::new(), profile),
-        None,
-        VaultProtectionView::Ephemeral,
-    ))
-}
-
-async fn open(endpoint: &str, app: &str) -> Result<AppBrokerClient, AppClientError> {
-    AppBrokerClient::open_route_at(
-        endpoint,
-        AppId::new(app),
-        AppRouteId::new(INFERENCE_ASK_ROUTE).unwrap(),
-    )
-    .await
-}
-
-/// Read the run table the route serves.
-async fn read_runs(client: &mut AppBrokerClient, request: &ProjectionRequest) -> InferenceRunsV1 {
-    let snapshot = client.snapshot(request.clone()).await.unwrap();
-    let offer = snapshot
-        .presentation
-        .offers
-        .values()
-        .flatten()
-        .next()
-        .expect("the snapshot has a card")
-        .clone();
-    let card: PortableCardV1 = serde_json::from_slice(
-        &client
-            .resource(snapshot.session.clone(), offer.resource)
-            .await
-            .unwrap(),
-    )
-    .unwrap();
-    serde_json::from_slice(
-        &client
-            .resource(snapshot.session, card.media[0])
-            .await
-            .unwrap(),
-    )
-    .unwrap()
-}
-
-async fn intent(
-    client: &mut AppBrokerClient,
-    request: &ProjectionRequest,
-    intent: &str,
-    payload: Vec<u8>,
-) -> IntentResult {
-    let body = client
-        .request_body(CarrierRequestBody::Intent(IntentInvocation {
-            session: request.session.clone(),
-            target: InstanceId(0),
-            observed_epoch: SceneEpoch(1),
-            observed_revision: Revision(0),
-            intent: intent.into(),
-            payload,
-        }))
-        .await
-        .unwrap();
-    match body {
-        CarrierResponseBody::Intent(result) => result,
-        other => panic!("an intent was answered with {other:?}"),
-    }
-}
+use common::inference_door::{endpoint_name, intent, keeper_host, open, read_runs};
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_resident_answers_an_ask_on_its_route_and_closes_the_lane() {
