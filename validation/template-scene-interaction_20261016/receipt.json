@@ -12,5 +12,10 @@
     "consumer_tests": 14,
     "native_frames": 323,
     "reviewed_captures": 5
+  },
+  "integration": {
+    "source": "affb9bbcec7aa22ff54a4b1b99ff13347fccbbad",
+    "tests_passed": 6,
+    "backdrop_surface_unchanged_from_native_qualified_source": true
   }
 }
