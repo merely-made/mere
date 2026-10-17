@@ -68,6 +68,8 @@ pub struct BackdropSurface {
     fill_template_height: bool,
     pub show_coverage: bool,
     pub show_links: bool,
+    /// Embedding owner opts into span affordances when it supplies editing.
+    pub show_span_handles: bool,
 }
 
 impl BackdropSurface {
@@ -81,6 +83,7 @@ impl BackdropSurface {
             fill_template_height: matches!(&input.facts, SceneFacts::TemplatedSequence(_)),
             show_coverage: true,
             show_links: true,
+            show_span_handles: false,
         })
     }
     pub fn scene(&self) -> &BackdropScene {
@@ -177,15 +180,49 @@ impl BackdropSurface {
             origin: (base.origin.0, 24.0 - b.origin.y * scale_y),
         })
     }
-    pub fn pick(&self, x: f32, y: f32, width: u32, height: u32) -> Option<&str> {
+    /// Project scene geometry through the same fit used by paint and picking.
+    /// Hosts can place interaction affordances without owning a second camera.
+    pub fn viewport_point(&self, point: Vec2, width: u32, height: u32) -> Option<Vec2> {
+        if !point.x.is_finite() || !point.y.is_finite() {
+            return None;
+        }
+        let (x, y) = self
+            .fit(width, height)
+            .ok()?
+            .to_viewport((point.x, point.y));
+        Some(Vec2::new(x, y))
+    }
+    /// Inverse presentation transform, including a template's independent Y fit.
+    pub fn scene_point(&self, x: f32, y: f32, width: u32, height: u32) -> Option<Vec2> {
         if !x.is_finite() || !y.is_finite() {
             return None;
         }
         let fit = self.fit(width, height).ok()?;
-        let world = Vec2::new(
+        Some(Vec2::new(
             (x - fit.origin.0) / fit.scale_x,
             (y - fit.origin.1) / fit.scale_y,
-        );
+        ))
+    }
+    /// Visible rectangular occurrence bounds in logical viewport pixels.
+    /// This is geometry only; the source owner decides whether a span is editable.
+    pub fn occurrence_rect(&self, key: &str, width: u32, height: u32) -> Option<BoardRect> {
+        let mark = self
+            .compiled
+            .marks
+            .iter()
+            .find(|m| m.selectable && m.key == key)?;
+        let item = &self.compiled.scene.items[mark.instance.0 as usize];
+        let Footprint::Rect { size } = item.footprint else {
+            return None;
+        };
+        let fit = self.fit(width, height).ok()?;
+        let (x, y) = fit.to_viewport((item.transform.translate.x, item.transform.translate.y));
+        let w = size.w * fit.scale_x;
+        let h = size.h * fit.scale_y;
+        Some(BoardRect::new(x - w / 2.0, y - h / 2.0, w, h))
+    }
+    pub fn pick(&self, x: f32, y: f32, width: u32, height: u32) -> Option<&str> {
+        let world = self.scene_point(x, y, width, height)?;
         self.compiled
             .marks
             .iter()
@@ -345,6 +382,20 @@ impl BackdropSurface {
                         Some(alpha(color, if forward { 0.32 } else { 0.16 })),
                         Some(stroke(alpha(color, 0.45), 1.0, None)),
                     ));
+                }
+                if forward && self.show_span_handles {
+                    if let Footprint::Rect { size } = item.footprint {
+                        let half = size.w * fit.scale_x / 2.0;
+                        let inset = 2.0_f32.min(half / 3.0);
+                        for x in [at.x - half + inset, at.x + half - inset] {
+                            commands.push(path(
+                                &rect(LayoutPoint::new(x, at.y), 2.0, size.h * fit.scale_y * 0.8),
+                                true,
+                                Some(color),
+                                None,
+                            ));
+                        }
+                    }
                 }
                 if forward {
                     let disc = circle(at, 15.0);
@@ -665,6 +716,40 @@ mod tests {
             fit.scale_x, fit.scale_y,
             "instrument geometry retains its aspect ratio"
         );
+    }
+    #[test]
+    fn interaction_geometry_round_trips_across_template_consumers_and_viewports() {
+        for json in [
+            include_str!(
+                "../../../../../support/design-studies/backdrops/templates/progression.json"
+            ),
+            include_str!("../../../../../support/design-studies/backdrops/templates/metre.json"),
+        ] {
+            let input = SceneInput::parse(json).unwrap();
+            let surface = BackdropSurface::new(&input).unwrap();
+            for (w, h) in [(580, 300), (1050, 300), (420, 500)] {
+                for mark in surface.scene().marks.iter().filter(|m| m.selectable) {
+                    let item = &surface.scene().scene.items[mark.instance.0 as usize];
+                    let at = item.transform.translate;
+                    let point = surface.viewport_point(at, w, h).unwrap();
+                    let restored = surface.scene_point(point.x, point.y, w, h).unwrap();
+                    assert!((at.x - restored.x).abs() < 0.001);
+                    assert!((at.y - restored.y).abs() < 0.001);
+                    if let Some(rect) = surface.occurrence_rect(&mark.key, w, h) {
+                        assert!((rect.x + rect.width / 2.0 - point.x).abs() < 0.001);
+                        assert!((rect.y + rect.height / 2.0 - point.y).abs() < 0.001);
+                        // The visible edge is also a valid hit, with the same stretched Y fit.
+                        assert_eq!(
+                            surface.pick(rect.x + 0.1, point.y, w, h),
+                            Some(mark.key.as_str())
+                        );
+                    }
+                }
+            }
+            assert!(surface.scene_point(f32::NAN, 0.0, 580, 300).is_none());
+            assert!(surface.occurrence_rect("missing", 580, 300).is_none());
+            assert!(surface.scene_point(0.0, 0.0, 40, 40).is_none());
+        }
     }
     #[test]
     fn painting_requires_host_fonts_and_valid_viewport() {

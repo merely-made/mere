@@ -1,0 +1,7 @@
+{
+  "status": "shared geometry tests passed; native consumer pending",
+  "tests": 6,
+  "command": "cargo test -p pictograph --features canvas backdrop_surface --locked",
+  "source_file_sha256": "0a27e7a5103c3651ce3fe27dc67680e1e2ae834b10a23a1bda97a13007689c9e",
+  "scope": "Forward/inverse geometry, rectangular span bounds and optional affordances. Metre/progression specimens; no source-edit authority."
+}
