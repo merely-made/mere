@@ -1034,13 +1034,9 @@ fn surface_input(
                 meta: modifiers.meta,
             },
             pressed: state == SessionButtonState::Pressed,
-            text: match (state, key) {
-                (SessionButtonState::Pressed, SessionKey::Character(text)) => Some(text),
-                (SessionButtonState::Pressed, SessionKey::Space) => Some(" ".to_owned()),
-                _ => None,
-            },
+            text: None,
         }),
-        SessionInput::Text(text) => surface.keyboard(KeyboardEvent {
+        SessionInput::KeyboardText(text) | SessionInput::Text(text) => surface.keyboard(KeyboardEvent {
             key_code: 0,
             scan_code: 0,
             modifiers: KeyboardModifiers::default(),

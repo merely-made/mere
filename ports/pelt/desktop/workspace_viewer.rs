@@ -4681,6 +4681,12 @@ impl TearoutWindow {
                 let handled = effect.handled;
                 let editable = effect.editable;
                 let mut redraw = self.apply_effect(effect);
+                if !surface
+                    && let Some(text) = native_keyboard_text(&event.logical_key, event.text.as_deref(), event.state, self.modifiers)
+                {
+                    let effect = self.workspace.input(SessionInput::KeyboardText(text));
+                    redraw |= self.apply_effect(effect);
+                }
                 if event.state == ElementState::Pressed
                     && !handled
                     && !editable
@@ -5544,6 +5550,12 @@ impl ApplicationHandler for WorkspaceApp {
                 let handled = effect.handled;
                 let editable = effect.editable;
                 self.apply_effect(effect);
+                if !surface
+                    && let Some(text) = native_keyboard_text(&event.logical_key, event.text.as_deref(), event.state, self.modifiers)
+                {
+                    let effect = self.workspace.input(SessionInput::KeyboardText(text));
+                    self.apply_effect(effect);
+                }
                 if event.state == ElementState::Pressed
                     && !handled
                     && !editable
@@ -5680,6 +5692,22 @@ fn native_keyboard_input(
         pressed: state == ElementState::Pressed,
         text: text.map(str::to_owned),
     })
+}
+
+fn native_keyboard_text(
+    logical: &Key,
+    text: Option<&str>,
+    state: ElementState,
+    modifiers: SessionModifiers,
+) -> Option<String> {
+    if state != ElementState::Pressed || modifiers.meta || (modifiers.control && !modifiers.alt)
+        || !matches!(logical, Key::Character(_) | Key::Named(NamedKey::Space))
+    {
+        return None;
+    }
+    text.or_else(|| matches!(logical, Key::Named(NamedKey::Space)).then_some(" "))
+        .filter(|text| !text.is_empty() && text.chars().all(|c| !c.is_control()))
+        .map(str::to_owned)
 }
 
 fn native_virtual_key(key: &Key) -> u32 {

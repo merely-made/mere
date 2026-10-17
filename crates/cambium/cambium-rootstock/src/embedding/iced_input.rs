@@ -66,18 +66,20 @@ impl Input {
                 ..
             }) => {
                 self.modifiers = modifiers(*m);
+                let session_key = key(k);
+                let printable = matches!(&session_key, SessionKey::Character(_) | SessionKey::Space);
                 let mut events = vec![OwnerInput::Session(SessionInput::Key {
-                    key: key(k),
+                    key: session_key,
                     state: SessionButtonState::Pressed,
                     modifiers: self.modifiers,
                     repeat: *repeat,
                 })];
                 if let Some(text) = text {
-                    if !text.is_empty()
+                    if printable && !text.is_empty() && text.chars().all(|c| !c.is_control())
                         && (!self.modifiers.control || self.modifiers.alt)
                         && !self.modifiers.meta
                     {
-                        events.push(OwnerInput::Session(SessionInput::Text(text.to_string())));
+                        events.push(OwnerInput::Session(SessionInput::KeyboardText(text.to_string())));
                     }
                 }
                 return Ok(events);
