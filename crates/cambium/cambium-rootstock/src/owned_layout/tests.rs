@@ -16,6 +16,15 @@ use layout_dom_api::{LayoutDomMut, QualName};
 
 const VIEWPORT: (f32, f32) = (300.0, 400.0);
 
+impl OwnedLayout {
+    /// `rebuild` over whatever `dom` has logged, as the host's relayout drains it.
+    pub(super) fn rebuild_drained(&mut self, dom: &mut ScriptedDom, width: f32, height: f32) {
+        let mut mutations = Vec::new();
+        dom.drain_mutations(&mut mutations);
+        self.rebuild(dom, width, height, &mutations);
+    }
+}
+
 fn style(dom: &mut ScriptedDom, node: NodeId, declarations: &str) {
     dom.set_attribute(
         node,
@@ -123,7 +132,7 @@ fn a_shrinking_container_pulls_its_offset_back_to_the_new_end() {
     assert_eq!(layout.element_scroll()[&scroller], (0.0, 150.0));
 
     style(&mut dom, content, "width:100px;height:60px;");
-    layout.rebuild(&dom, VIEWPORT.0, VIEWPORT.1);
+    layout.rebuild_drained(&mut dom, VIEWPORT.0, VIEWPORT.1);
     assert_eq!(
         layout.element_scroll()[&scroller],
         (0.0, 10.0),
@@ -140,7 +149,7 @@ fn a_box_that_stops_scrolling_or_leaves_the_dom_loses_its_offset() {
 
     style(&mut dom, scroller, "width:100px;height:50px;");
     dom.remove(other);
-    layout.rebuild(&dom, VIEWPORT.0, VIEWPORT.1);
+    layout.rebuild_drained(&mut dom, VIEWPORT.0, VIEWPORT.1);
     assert!(
         layout.element_scroll().is_empty(),
         "neither a non-scrolling box nor a departed one keeps an entry: {:?}",
@@ -155,7 +164,7 @@ fn an_unrelated_container_keeps_the_offset_it_had() {
     assert_eq!(layout.element_scroll()[&other], (0.0, 150.0));
 
     style(&mut dom, content, "width:100px;height:60px;");
-    layout.rebuild(&dom, VIEWPORT.0, VIEWPORT.1);
+    layout.rebuild_drained(&mut dom, VIEWPORT.0, VIEWPORT.1);
     assert_eq!(layout.element_scroll()[&other], (0.0, 150.0));
 }
 
@@ -317,7 +326,7 @@ fn host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes() {
     use paint_list_api::PaintList;
     let bytes =
         include_bytes!("../../../examples/genet_web_smoke/assets/Roboto-Regular.ttf").to_vec();
-    let dom = ScriptedDom::from_serialized_document(
+    let mut dom = ScriptedDom::from_serialized_document(
         "<html><body><p style='font-family:sans-serif'>Sans</p><p style='font-family:serif'>Serif</p><p style='font-family:monospace'>Mono</p><p style='font-family:system-ui'>System</p><p style=\"font-family:'sans-serif'\">Quoted alias</p></body></html>",
     );
     let fonts: Vec<_> = ["sans-serif", "serif", "monospace", "system-ui"]
@@ -356,7 +365,7 @@ fn host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes() {
             .iter()
             .all(|face| face.data.as_slice() == bytes)
     );
-    layout.rebuild(&dom, 280.0, 240.0);
+    layout.rebuild_drained(&mut dom, 280.0, 240.0);
     let list = layout.emit_paint_list_with_leaves(
         &dom,
         DeviceIntSize::new(280, 240),

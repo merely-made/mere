@@ -1,0 +1,1594 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling constant_time_eq v0.4.2
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling data-encoding-macro-internal v0.1.19
+   Compiling blake3 v1.8.7
+   Compiling muniment v0.1.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/eidetic/muniment)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chartulary v0.2.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/eidetic/chartulary)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling data-encoding-macro v0.1.21
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/graph/graph-kernel)
+   Compiling iroh-base v1.3.0
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling iroh-dns v1.3.0
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8960024f)
+   Compiling inker v0.1.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/inker/inker)
+   Compiling iroh-relay v1.3.0
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates/graph/graph-kernel/src/graph/mod.rs:719:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+719 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+733 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+745 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+755 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates/graph/graph-kernel/src/graph/query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling iroh v1.3.0
+   Compiling eidetic v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/eidetic/eidetic-core)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chirograph v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/chirograph)
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling mere-alembic v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/distillery/alembic)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/cambium)
+   Compiling gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling pandect v0.1.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/system/pandect)
+warning: unused import: `std::io`
+  --> crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+   Compiling p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+warning: `mere-kernel` (lib) generated 19 warnings (run `cargo fix --lib -p mere-kernel` to apply 8 suggestions)
+   Compiling p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+   Compiling iroh-gossip v0.101.0
+   Compiling iroh-mdns-address-lookup v0.6.0
+warning: variable does not need to be mutable
+   --> crates/system/pandect/src/graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling bao-tree v0.16.1
+   Compiling iroh-util v0.6.0
+   Compiling p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+warning: method `into_graph` is never used
+   --> crates/system/pandect/src/graph_codicil.rs:185:19
+    |
+184 | impl GraphCodicil {
+    | ----------------- method in this implementation
+185 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling mere-cartography v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/canvas/cartography)
+   Compiling iroh-tickets v1.0.0
+   Compiling mere-proofs v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/system/proofs)
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling pictograph v0.2.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/canvas/pictograph)
+   Compiling iroh-blobs v0.103.1
+   Compiling mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+warning: function `build_affinity_spring` is never used
+  --> crates/canvas/pictograph/src/canvas.rs:67:4
+   |
+67 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `visible_link_appearances` is never used
+  --> crates/canvas/pictograph/src/canvas/edge_cells.rs:25:15
+   |
+25 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:337:15
+    |
+337 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:385:15
+    |
+385 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:467:15
+    |
+467 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:525:15
+    |
+525 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+   Compiling stickleback v0.1.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/stickleback)
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5)
+   Compiling graphshell-client v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/graphshell/graphshell-client)
+   Compiling graphshell-endpoint v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/graphshell/graphshell-endpoint)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling uxtree v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/forme/uxtree)
+   Compiling document-canvas v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/inker/document-canvas)
+   Compiling nematic v0.1.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/nematic/nematic)
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates/nematic/nematic/src/knot/expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates/nematic/nematic/src/knot/expand/build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+warning: `nematic` (lib) generated 2 warnings (run `cargo fix --lib -p nematic` to apply 2 suggestions)
+   Compiling murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5)
+   Compiling knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e)
+   Compiling mere-view v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/mere-view)
+   Compiling mere-fleece v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/fleece)
+   Compiling phf_shared v0.12.1
+   Compiling browsing-context-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling chrono-tz v0.10.4
+   Compiling genet-documents v0.1.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling phf v0.12.1
+   Compiling mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5)
+   Compiling mere-overmap v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/mere-overmap)
+   Compiling mere-document-lanes v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/system/document-lanes)
+   Compiling knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e)
+   Compiling netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling knot-editor-host v0.1.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/inker/knot-editor-host)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/cambium-winit)
+   Compiling mere v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/mere)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling servitor v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/servitor)
+   Compiling reference-data v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/intel/reference-data)
+warning: `pictograph` (lib) generated 6 warnings
+   Compiling script-engine-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#fa27ea54)
+   Compiling script-rhai v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/script/rhai)
+   Compiling retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5)
+   Compiling knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/cambium/cambium-rootstock)
+   Compiling knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e)
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates/cambium/cambium-rootstock/src/producer/registry.rs:678:13
+    |
+678 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+678 -             drop(renderer);
+678 +             let _ = renderer;
+    |
+
+   Compiling mere-fetch v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/system/fetch)
+   Compiling pelt-core v0.2.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/pelt/core)
+warning: `cambium-rootstock` (lib) generated 1 warning
+   Compiling graphshell-host v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/graphshell/graphshell-host)
+   Compiling platen v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/platen/platen)
+   Compiling mere-mesh v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/mesh/mesh)
+   Compiling mere-personal-facts v0.1.0 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/crates/domain/personal-facts)
+   Compiling knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e)
+   Compiling cleromancy-core-acceptance v0.1.0 (https://github.com/merely-made/cleromancy.git?branch=main#a684361b)
+   Compiling knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e)
+   Compiling distillery v0.0.1 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/distillery)
+warning: variable does not need to be mutable
+   --> ports/distillery/src/resident.rs:500:13
+    |
+500 |         let mut authority_error = report.failure("authority").map(str::to_owned);
+    |             ----^^^^^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:17:5
+   |
+17 |     pub session_id: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+   |
+note: the lint level is defined here
+  --> ports/distillery/src/lib.rs:45:9
+   |
+45 | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:18:5
+   |
+18 |     pub prompt_template_hash: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:47:5
+   |
+47 |     pub ask: AskRequestV1,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:48:5
+   |
+48 |     pub max_tokens: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:49:5
+   |
+49 |     pub temperature: f32,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:50:5
+   |
+50 |     pub top_p: Option<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol.rs:51:5
+   |
+51 |     pub seed: Option<u64>,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:114:5
+    |
+114 |     pub tokens: usize,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:116:5
+    |
+116 |     pub continuations: Vec<Continuation>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:119:5
+    |
+119 |     pub recall: Option<recall::RecallEvidence>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:140:5
+    |
+140 |     pub device: String,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:141:5
+    |
+141 |     pub at_token: usize,
+    |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:142:5
+    |
+142 |     pub reason: String,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:143:5
+    |
+143 |     pub first_differing_token: Option<usize>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol.rs:145:5
+    |
+145 |     pub compared_token_ids_hash: Option<String>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports/distillery/src/inference_protocol/recall.rs:12:1
+   |
+12 | pub const RECALL_ASK_INTENT: &str = "distillery.inference/ask-recall-v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports/distillery/src/inference_protocol/recall.rs:13:1
+   |
+13 | pub const ASK_PUBLISHED_INTENT: &str = "distillery.inference/ask-published-v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports/distillery/src/inference_protocol/recall.rs:14:1
+   |
+14 | pub const PUBLISH_CORPUS_INTENT: &str = "distillery.inference/publish-corpus-v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+  --> ports/distillery/src/inference_protocol/recall.rs:15:1
+   |
+15 | pub const CHUNKER_VERSION: &str = "mere.unicode-chunks/v1";
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:21:1
+   |
+21 | pub struct PublishCorpusRequestV1 {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:24:5
+   |
+24 |     pub sources: Vec<RetainedSourceText>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:29:1
+   |
+29 | pub struct RecallConfig {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:30:5
+   |
+30 |     pub chunk_chars: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:31:5
+   |
+31 |     pub max_passages: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:36:5
+   |
+36 |     pub max_context_chars: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:37:5
+   |
+37 |     pub max_corpus_chars: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:55:1
+   |
+55 | pub struct RecallAskRequestV1 {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:56:5
+   |
+56 |     pub ask: super::AskRequestV1,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:58:5
+   |
+58 |     pub scope: Vec<RecallSourceId>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:61:1
+   |
+61 | pub struct SuppliedPassage {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:64:5
+   |
+64 |     pub passage: InferencePassage,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:67:1
+   |
+67 | pub struct StalePassage {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:68:5
+   |
+68 |     pub source: RecallSourceId,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:69:5
+   |
+69 |     pub indexed_version: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:70:5
+   |
+70 |     pub current_version: Option<String>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:71:5
+   |
+71 |     pub error: Option<String>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:74:1
+   |
+74 | pub struct Citation {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:75:5
+   |
+75 |     pub handle: u32,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:76:5
+   |
+76 |     pub passage: eidetic::ManifestId,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:77:5
+   |
+77 |     pub basis: CitationBasis,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an enum
+  --> ports/distillery/src/inference_protocol/recall.rs:83:1
+   |
+83 | pub enum CitationBasis {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/inference_protocol/recall.rs:84:5
+   |
+84 |     ModelMarker,
+   |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/inference_protocol/recall.rs:85:5
+   |
+85 |     VerbatimPassage,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> ports/distillery/src/inference_protocol/recall.rs:88:1
+   |
+88 | pub struct RecallEvidence {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:90:5
+   |
+90 |     pub owner: Option<String>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:92:5
+   |
+92 |     pub scope: Vec<RecallSourceId>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:93:5
+   |
+93 |     pub config: RecallConfig,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:94:5
+   |
+94 |     pub passages: Vec<SuppliedPassage>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:95:5
+   |
+95 |     pub stale: Vec<StalePassage>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:97:5
+   |
+97 |     pub citations: Vec<Citation>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/inference_protocol/recall.rs:99:5
+   |
+99 |     pub unknown_citations: Vec<u32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol/recall.rs:106:5
+    |
+106 |     pub owner: String,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol/recall.rs:107:5
+    |
+107 |     pub ask: super::AskRequestV1,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/inference_protocol/recall.rs:109:5
+    |
+109 |     pub scope: Vec<RecallSourceId>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports/distillery/src/inference_protocol/recall.rs:112:5
+    |
+112 |     pub fn validate(&self) -> Result<(), String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/mesh_host/courier.rs:42:5
+   |
+42 |     MalformedDigest,
+   |     ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/mesh_host/courier.rs:44:5
+   |
+44 |     Store(String),
+   |     ^^^^^
+
+warning: missing documentation for a method
+   --> ports/distillery/src/mesh_host/courier.rs:131:5
+    |
+131 |     pub async fn has(&self, blob: &BlobRef) -> bool {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> ports/distillery/src/mesh_host/courier.rs:219:5
+    |
+219 |     pub fn new(transport: Arc<P2pandaTransport>, blobs: Arc<BlobStore>) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports/distillery/src/mesh_host/host.rs:33:5
+   |
+33 |     fn as_source(&self) -> &dyn BlobSource;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports/distillery/src/mesh_host/host.rs:34:5
+   |
+34 |     fn as_sink(&self) -> &dyn BlobSink;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:48:5
+   |
+48 |     pub registry: ResourceRegistry,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:49:5
+   |
+49 |     pub blobs: Arc<dyn BlobSpace>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:52:5
+   |
+52 |     pub clock: Arc<dyn Clock>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:53:5
+   |
+53 |     pub conditions: Arc<dyn ConditionSource>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:54:5
+   |
+54 |     pub facts: HostFacts,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:55:5
+   |
+55 |     pub policy: DevicePolicy,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:56:5
+   |
+56 |     pub lease: LeasePolicy,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/mesh_host/host.rs:84:5
+   |
+84 |     Claimed {
+   |     ^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:85:9
+   |
+85 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/mesh_host/host.rs:87:5
+   |
+87 |     Granted {
+   |     ^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:88:9
+   |
+88 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:89:9
+   |
+89 |         epoch: u32,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:90:9
+   |
+90 |         lease: LeaseId,
+   |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/distillery/src/mesh_host/host.rs:92:5
+   |
+92 |     Heartbeat {
+   |     ^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:93:9
+   |
+93 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:94:9
+   |
+94 |         lease: LeaseId,
+   |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:95:9
+   |
+95 |         progress: LeaseProgress,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/host.rs:99:9
+   |
+99 |         job: JobId,
+   |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:100:9
+    |
+100 |         lease: Option<LeaseId>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/distillery/src/mesh_host/host.rs:102:5
+    |
+102 |     Completed {
+    |     ^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:103:9
+    |
+103 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:104:9
+    |
+104 |         lease: Option<LeaseId>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/distillery/src/mesh_host/host.rs:106:5
+    |
+106 |     Released {
+    |     ^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:107:9
+    |
+107 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:108:9
+    |
+108 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:109:9
+    |
+109 |         reason: ReleaseReason,
+    |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:114:9
+    |
+114 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:119:9
+    |
+119 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:120:9
+    |
+120 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:121:9
+    |
+121 |         reason: ReclaimReason,
+    |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:122:9
+    |
+122 |         stopped_at: LeaseProgress,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:128:9
+    |
+128 |         job: JobId,
+    |         ^^^^^^^^^^
+
+warning: missing documentation for a struct field
+   --> ports/distillery/src/mesh_host/host.rs:129:9
+    |
+129 |         lease: LeaseId,
+    |         ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/distillery/src/mesh_host/host.rs:131:5
+    |
+131 |     Idle,
+    |     ^^^^
+
+warning: missing documentation for a variant
+   --> ports/distillery/src/mesh_host/host.rs:138:5
+    |
+138 |     Sync(#[from] MeshSyncError),
+    |     ^^^^
+
+warning: missing documentation for a variant
+   --> ports/distillery/src/mesh_host/host.rs:140:5
+    |
+140 |     Store(#[from] MeshStoreError),
+    |     ^^^^^
+
+warning: missing documentation for an associated function
+   --> ports/distillery/src/mesh_host/host.rs:172:5
+    |
+172 |     pub fn new(synced: SyncedMesh<B>, keypair: Ed25519Keypair, config: HostConfig) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports/distillery/src/mesh_host/host.rs:185:5
+    |
+185 |     pub fn me(&self) -> [u8; 32] {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports/distillery/src/mesh_host/host.rs:232:5
+    |
+232 |     pub fn synced(&self) -> &SyncedMesh<B> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports/distillery/src/mesh_host/host.rs:246:5
+    |
+246 |     pub fn policy(&self) -> &DevicePolicy {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/inflight.rs:30:5
+   |
+30 |     pub reason: ReclaimReason,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/inflight.rs:41:5
+   |
+41 |     pub handle: JobControlHandle,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/inflight.rs:42:5
+   |
+42 |     pub task: JoinHandle<Result<RunOutcome, RunError>>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> ports/distillery/src/mesh_host/inflight.rs:45:5
+   |
+45 |     pub reclaim: Option<Reclaiming>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports/distillery/src/mesh_host/sense.rs:27:5
+   |
+27 |     fn now_ms(&self) -> u64;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> ports/distillery/src/mesh_host/sense.rs:52:5
+   |
+52 |     pub fn at(now_ms: u64) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports/distillery/src/mesh_host/sense.rs:58:5
+   |
+58 |     pub fn set(&self, now_ms: u64) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports/distillery/src/mesh_host/sense.rs:62:5
+   |
+62 |     pub fn advance(&self, by_ms: u64) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> ports/distillery/src/mesh_host/sense.rs:80:5
+   |
+80 |     fn conditions(&self) -> DeviceConditions;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> ports/distillery/src/mesh_host/sense.rs:91:5
+   |
+91 |     pub fn new(conditions: DeviceConditions) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> ports/distillery/src/mesh_host/sense.rs:102:5
+    |
+102 |     pub fn set(&self, conditions: DeviceConditions) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling castellan v0.0.3 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/djinn/castellan)
+warning: unused imports: `Deserialize` and `Serialize`
+  --> ports/djinn/castellan/src/custody/startup_unlock.rs:22:13
+   |
+22 | use serde::{Deserialize, Serialize};
+   |             ^^^^^^^^^^^  ^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `provider`
+  --> ports/djinn/castellan/src/custody/wallet/refresh.rs:51:5
+   |
+51 |     provider: &InMemoryProvider,
+   |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_provider`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a variant
+  --> ports/djinn/castellan/src/authority.rs:97:5
+   |
+97 |     UnknownIntent,
+   |     ^^^^^^^^^^^^^
+   |
+note: the lint level is defined here
+  --> ports/djinn/castellan/src/lib.rs:82:9
+   |
+82 | #![warn(missing_docs)]
+   |         ^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> ports/djinn/castellan/src/authority.rs:99:5
+   |
+99 |     InvalidPayload(#[from] serde_json::Error),
+   |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:101:5
+    |
+101 |     Decision(#[from] DecisionError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:103:5
+    |
+103 |     Identity(IdentityError),
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:111:5
+    |
+111 |     KeyGeneration,
+    |     ^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:113:5
+    |
+113 |     PublicEncoding,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:115:5
+    |
+115 |     InvalidComment,
+    |     ^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:120:5
+    |
+120 |     InvalidProfileId,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:122:5
+    |
+122 |     InvalidProfileName,
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:124:5
+    |
+124 |     InvalidIdleWindow,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:126:5
+    |
+126 |     ConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:128:5
+    |
+128 |     KeyNotFound,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:130:5
+    |
+130 |     NativeHandoffRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:132:5
+    |
+132 |     DeviceRevocationConfirmationRequired,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:134:5
+    |
+134 |     CarryUnavailable,
+    |     ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> ports/djinn/castellan/src/authority.rs:136:5
+    |
+136 |     DeviceRevocation(std::io::ErrorKind),
+    |     ^^^^^^^^^^^^^^^^
+
+warning: `distillery` (lib) generated 113 warnings (run `cargo fix --lib -p distillery` to apply 1 suggestion)
+   Compiling graphshell v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/graphshell)
+warning: unused import: `happens_before`
+  --> ports/graphshell/src/personal_sync.rs:35:5
+   |
+35 |     happens_before, observed_frontier, stable_writer_subject, validate_causal_metadata,
+   |     ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `castellan` (lib) generated 18 warnings (run `cargo fix --lib -p castellan` to apply 2 suggestions)
+warning: method `begin_session` is never used
+   --> ports/graphshell/src/mere_host.rs:433:19
+    |
+269 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+433 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `relation_kind_label` is never used
+    --> ports/graphshell/src/mere_host.rs:1479:4
+     |
+1479 | fn relation_kind_label(kind: RelationKind) -> &'static str {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `codicil_graph` is never used
+    --> ports/graphshell/src/product.rs:1063:4
+     |
+1063 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> ports/graphshell/src/product.rs:1413:15
+     |
+1413 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+   Compiling djinn v0.0.2 (/Users/markik/Code/testing/cleromancy/c7-20261016/mere-receiving/ports/djinn)
+warning: unused import: `Graph`
+  --> ports/djinn/src/knot_relation_intake.rs:19:20
+   |
+19 |     CapturedDelta, Graph, SemanticStatement, apply::GraphDelta, sub_kind_from_iri,
+   |                    ^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Hash`
+  --> ports/djinn/src/sync/carriage_host.rs:30:26
+   |
+30 | use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
+   |                          ^^^^
+
+warning: unused import: `HeldLease`
+  --> ports/djinn/src/sync/carriage_host_commissioning.rs:42:64
+   |
+42 | use super::{CarriageCeilings, CarriageHost, CarriageHostError, HeldLease, now_ms};
+   |                                                                ^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> ports/djinn/src/resident_distillery.rs:875:24
+    |
+875 |     pub async fn close(mut self) -> Result<(), String> {
+    |                        ----^^^^
+    |                        |
+    |                        help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `ceilings` is never read
+  --> ports/djinn/src/sync/carriage_host.rs:72:5
+   |
+62 | pub struct CarriageHost {
+   |            ------------ field in this struct
+...
+72 |     ceilings: CarriageCeilings,
+   |     ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `graphshell` (lib) generated 5 warnings (run `cargo fix --lib -p graphshell` to apply 1 suggestion)
+warning: `djinn` (lib) generated 5 warnings (run `cargo fix --lib -p djinn` to apply 4 suggestions)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `djinn` (lib test) generated 6 warnings (5 duplicates)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 24s
+     Running unittests src/lib.rs (target/build/debug/deps/djinn-51f275b1c4f2ea8f)
+
+running 214 tests
+test conditions::tests::a_sensed_link_never_upgrades_a_stated_one ... ok
+test conditions::tests::a_bandwidth_rate_is_octets_times_eight_over_milliseconds ... ok
+test conditions::tests::a_stated_metered_link_downgrades_a_sensed_one ... ok
+test conditions::tests::the_absent_bandwidth_value_withholds_rather_than_lends ... ok
+test conditions::tests::an_owner_stated_signal_satisfies_an_enabled_rule ... ok
+test conditions::tests::quiet_hours_alone_never_refuses_a_policy ... ok
+test conditions::tests::on_mains_alone_decides_the_battery_rule_without_a_percentage ... ok
+test conditions::tests::a_bandwidth_rule_on_an_absent_bandwidth_signal_is_refused_by_name ... ok
+test conditions::tests::every_enabled_rule_is_named_when_several_are_missing ... ok
+test conditions::tests::a_permissive_policy_needs_no_signals_at_all ... ok
+test conditions::tests::the_same_absent_signal_passes_once_its_rule_is_disabled ... ok
+test conditions::tests::an_enabled_rule_on_an_absent_signal_is_refused_by_name ... ok
+test conditions::tests::stated_values_are_the_whole_reading_off_windows ... ok
+test conditions::tests::a_stated_metered_link_survives_a_real_sensing_pass ... ok
+test conditions::tests::with_nothing_sensed_and_nothing_stated_every_signal_is_absent ... ok
+test conditions::tests::unsensed_signals_hold_their_fail_closed_values ... ok
+test door::app_broker::tests::the_app_connect_schema_is_its_own ... ok
+test door::app_broker::tests::an_unadmitted_application_is_refused_at_the_hello ... ok
+test door::app_broker_tests::an_ungranted_route_never_opens_its_product_endpoint ... ok
+test door::app_broker_tests::an_unadmitted_application_never_sees_a_challenge ... ok
+test custody::tests::the_default_policy_releases_named_namespaces_and_never_the_master ... ok
+test door::app_broker_tests::denials_and_ambient_refusals_precede_product_construction ... ok
+test custody::tests::radio_station_release_is_exact_wallet_scope_for_signalman_only ... ok
+test door::browser_carrier::tests::challenge_replay_changes_the_transcript_link ... ok
+test door::app_broker::tests::the_application_wire_cannot_carry_an_identity_action ... ok
+test door::browser_carrier::tests::launcher_allowlist_is_exact ... ok
+test door::app_broker_tests::the_browser_connect_frame_does_not_open_an_application_session ... ok
+test door::browser_carrier::tests::a_captured_brokered_hello_cannot_cross_browser_challenges ... ok
+test door::browser_carrier::tests::native_messaging_frames_json_with_native_endian_length ... ok
+test door::browser_carrier::tests::asynchronous_native_framing_matches_the_browser_wire ... ok
+test door::browser_carrier::tests::admitted_client_queues_a_notice_that_precedes_its_response ... ok
+test door::browser_carrier::tests::native_ssh_import_message_has_no_secret_bearing_fields ... ok
+test door::device_broker::tests::the_app_endpoint_is_distinct_from_the_browser_one ... ok
+test door::identity_endpoint::tests::a_resource_absent_from_memory_is_read_through ... ok
+test door::browser_carrier::tests::browser_application_stream_exists_only_after_sessionhello_accepts ... ok
+test door::identity_endpoint::tests::accepting_a_transfer_records_one_decision_and_never_reaches_the_vault ... ok
+test door::identity_endpoint::tests::accepting_without_a_place_to_record_it_is_refused ... ok
+test door::identity_endpoint::tests::no_reader_means_no_invention ... ok
+test door::identity_endpoint::tests::only_an_advertised_target_can_generate_a_key ... ok
+test door::browser_carrier::tests::idle_notice_poll_reads_without_a_request_and_retains_cancelled_partial_frames ... ok
+test door::identity_endpoint::tests::portable_client_mounts_only_public_identity_resources ... ok
+test door::identity_endpoint::tests::supplemental_public_cards_share_the_device_projection ... ok
+test door::identity_projection::tests::a_locked_surface_offers_only_the_native_unlock ... ok
+test door::identity_projection::tests::active_device_advertises_confirmed_revocation_and_revoked_grant_is_inert ... ok
+test door::identity_projection::tests::creating_a_persona_belongs_to_the_vault_not_to_a_persona ... ok
+test door::identity_projection::tests::every_persona_but_the_selected_one_offers_the_switch ... ok
+test door::identity_projection::tests::headed_surface_contains_only_the_payload_digest ... ok
+test door::identity_projection::tests::key_controls_are_native_only_and_bind_no_private_payload ... ok
+test door::identity_projection::tests::per_use_card_exposes_once_and_deny_but_cannot_widen_approval ... ok
+test door::identity_projection::tests::short_ttl_card_exposes_the_configured_idle_decision ... ok
+test door::browser_host::tests::browser_route_opens_a_catalog_endpoint_only_after_admission ... ok
+test door::local_session::tests::two_labels_on_one_challenge_do_not_share_a_link ... ok
+test door::browser_host::tests::admitted_browser_receives_resident_personal_sync_cards ... ok
+test door::app_broker_tests::turnstone_opens_a_session_and_reads_a_capture ... ok
+test door::identity_endpoint::tests::graphshells_identity_cards_fixture_is_this_endpoints_projection ... ok
+test door::identity_session_tests::browser_carrier_delivers_public_identity_cards_and_an_approval ... ok
+test enrollment::tests::enrolment_then_a_passphrase_unlock_works_on_a_temp_root ... ok
+test enrollment::tests::a_directory_without_a_root_is_refused_and_left_empty ... ok
+test identity_ui::tests::unavailable_ui_cannot_downgrade_to_browser_secret_input ... ok
+test lock_triggers::host::tests::a_session_lock_and_a_suspend_lock_before_signal_returns ... ok
+test lock_triggers::host::tests::a_trigger_turned_off_does_nothing ... ok
+test lock_triggers::tests::each_trigger_follows_its_setting ... ok
+test lock_triggers::tests::idle_fires_once_after_the_window_and_activity_resets_it ... ok
+test lock_triggers::tests::an_unknown_reading_counts_as_idle ... ok
+test lock_triggers::tests::rearming_counts_from_the_unlock ... ok
+test pairing::tests::a_device_can_be_paired_again_after_being_unpaired ... ok
+test pairing::tests::a_device_paired_without_a_root_is_receive_only_and_says_so ... ok
+test pairing::tests::pairing_refuses_when_no_graph_is_configured ... ok
+test door::identity_endpoint::tests::only_released_blobs_are_servable_and_they_arrive_in_verified_chunks ... ok
+test door::app_broker_tests::a_route_granted_while_serving_opens_for_the_next_connection ... ok
+test personal_sync::tests::a_graph_name_maps_to_one_id_and_different_names_do_not_collide ... ok
+test personal_sync::tests::initial_pairing_watch_state_retains_each_device_root ... ok
+test personal_sync::tests::silence_names_unfound_apart_from_unanswered ... ok
+test door::app_broker_tests::the_client_reads_cards_over_the_served_endpoint ... ok
+test lock_triggers::tests::settings_absent_malformed_or_zero_mean_the_defaults ... ok
+test pairing::tests::pairing_writes_once_and_is_idempotent ... ok
+test resident::tests::credential_roots_stay_profile_scoped_and_below_the_data_root ... ok
+test resident::tests::published_sites_keep_profile_paths_and_custody_scopes_distinct ... ok
+test resident::tests::credential_derivation_is_distinct_from_the_personal_sync_identity ... ok
+test pairing::tests::unpairing_revokes_write_authority_along_with_reachability ... ok
+test personal_sync::tests::the_data_root_override_is_taken_as_given_and_skips_the_migration ... ok
+test profile::tests::the_selected_profile_is_the_family_choice ... ok
+test pairing::tests::unpairing_twice_and_unpairing_an_unconfigured_profile_are_not_errors ... ok
+test resident_devices::tests::a_device_entry_without_on_overlay_still_reads ... ok
+test resident_devices::tests::a_snapshot_keeps_its_resources_while_the_directory_moves ... ok
+test resident_devices::tests::an_entry_reports_the_live_path_and_decodes_the_saved_hint ... ok
+test resident_devices::tests::the_card_says_when_gossip_and_the_path_disagree ... ok
+test resident_devices::tests::an_unlisted_device_is_not_connected_and_a_bad_hint_says_why ... ok
+test resident_distillery::tests::a_link_class_outside_the_closed_set_is_refused_by_name ... ok
+test resident_distillery::tests::a_profile_that_could_escape_the_data_root_is_sanitised_into_one_segment ... ok
+test resident_distillery::tests::a_stated_library_root_is_taken_as_the_owners_word ... ok
+test resident_distillery::tests::a_thermal_limit_without_a_thermal_reading_cannot_compose ... ok
+test resident_distillery::tests::an_unknown_checkpoint_string_is_refused_by_name ... ok
+test resident_distillery::tests::an_unparseable_resource_id_is_refused_by_the_parsers_own_message ... ok
+test resident_distillery::tests::allowed_resources_and_accepted_checkpoints_convert_into_mesh_types ... ok
+test resident_distillery::tests::the_cadences_are_exactly_the_ones_the_owner_stated ... ok
+test resident_distillery::tests::the_model_library_is_persona_scoped_and_lives_outside_every_mesh ... ok
+test resident_distillery::tests::the_retention_policy_carries_the_owners_revision_and_self_authority ... ok
+test resident_distillery::tests::the_stated_posture_becomes_the_policy_with_nothing_added ... ok
+test resident_distillery::tests::this_machine_reports_a_real_memory_size_and_a_gpu_fact_that_follows_composition ... ok
+test resident_inference::tests::absent_settings_pass ... ok
+test resident_inference::tests::library_settings_are_explicit_and_refuse_unknown_fields ... ok
+test resident_inference::tests::settings_name_the_stub_in_kebab_case ... ok
+test resident_inference::tests::the_lane_in_a_build_without_it_is_refused ... ok
+test resident_events::tests::events_are_json_lines_and_stopping_keeps_its_first_reason ... ok
+test resident_blobs::tests::absent_source_does_not_claim_completion ... ok
+test resident_blobs::tests::migration_is_verified_restart_safe_and_idempotent ... ok
+test resident_mere::tests::a_device_reads_a_mere_through_the_dialable_host_as_its_granted_application ... ok
+test resident_mere::tests::a_product_client_cannot_clear_denial_or_opt_in_ambient_through_the_reservoir ... ok
+test resident_knot::tests::route_reopens_over_joined_sync_and_live_pairing_updates_all_authority ... ok
+test identity_ui::tests::wrong_passphrase_imports_nothing_and_returns_a_bounded_reason ... ok
+test resident_mere::tests::access_is_default_for_admitted_apps_and_ambient_is_independent ... ok
+test identity_ui::tests::encrypted_key_is_unlocked_and_imported_without_a_serialized_secret ... ok
+test resident::tests::startup_discovers_original_store_after_selected_persona_changes ... ok
+test door::identity_endpoint::tests::a_transfer_over_the_ceiling_is_refused_whole ... ok
+test resident_mere::tests::a_branch_merges_back_through_the_route_with_a_choice_per_conflict ... ok
+test resident_mere::tests::a_failed_apply_plans_again_and_carries_the_choices_that_still_apply ... ok
+test resident_mere::tests::checked_candidate_refuses_cross_application_race_without_installing_any_delta ... ok
+test door::identity_endpoint::tests::the_read_cache_evicts_oldest_first ... ok
+test resident_mere::tests::common_panel_refuses_a_hash_valid_resource_in_the_wrong_presentation_role ... ok
+test resident_mere::tests::common_panel_refuses_media_with_wrong_namespace_application_session_or_hash ... ok
+test resident_mere::tests::divination_requires_product_authority_and_refuses_unknown_domain_facets ... ok
+test resident_mere::tests::archive_intents_save_browse_fork_and_compose_through_the_resident ... ok
+test resident_mere::tests::common_archive_adapter_preserves_resident_authority_on_divination ... ok
+test resident_mere::tests::common_panel_controller_runs_lifecycle_then_purges_on_denial_and_rejoins ... ok
+test resident_mere::tests::natal_product_authority_admits_replay_and_refuses_tampering_across_apps ... ok
+test resident_mere::tests::knot_overlay_saves_and_opens_an_archive_through_the_door ... ok
+test resident_mere::tests::personal_facts_two_apps_share_exact_revisions_and_refuse_tampering ... ok
+test resident_mere::tests::profile_subject_admission_uses_owner_vault_and_refuses_fabricated_ids ... ok
+test resident_projection::the_wire_spells_graphshells_actions ... ok
+test resident_mere::tests::knot_overlay_merges_a_branch_through_the_door ... ok
+test resident_mere::tests::common_panel_saves_own_view_and_reopens_archive_without_implicit_writes ... ok
+test resident_mere::tests::domain_authority_checks_route_batches_archive_compose_and_first_edit_forks ... ok
+test resident_reservoir::tests::a_bad_domain_or_a_stale_revision_changes_nothing ... ok
+test resident_reservoir::tests::an_admitted_session_ensures_and_lists_meres_through_the_route ... ok
+test resident_mere::tests::the_dialable_host_serves_only_what_the_grant_and_the_owner_name ... ok
+test resident_mere::tests::resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants ... ok
+test resident_reservoir::tests::the_lane_reports_why_it_is_unavailable_and_refuses_a_second_owner ... ok
+test resident_site::tests::durable_saved_snapshot_reopens_with_the_same_certificate_identity ... ok
+test resident_site::tests::incomplete_or_wrong_format_bytes_never_install_a_descriptor ... ok
+test resident_mere::tests::view_media_and_writes_are_scoped_to_the_admitted_application ... ok
+test resident_site::tests::failed_replacement_keeps_a_reopened_nonresuming_site_stopped ... ok
+test resident_status::tests::the_native_unlock_refuses_any_payload ... ok
+test resident_site::tests::missing_identity_refuses_restore_instead_of_rotating_the_certificate ... ok
+test settings::tests::a_cadence_that_would_spin_or_never_run_is_refused ... ok
+test settings::tests::a_dial_hint_is_recorded_once_per_value_and_only_for_paired_devices ... ok
+test resident_mere::tests::two_applications_edit_one_session_and_hear_each_other ... ok
+test settings::tests::a_profile_id_cannot_escape_the_settings_directory ... ok
+test resident_site::tests::open_cancels_an_interrupted_removal_marker_for_the_active_descriptor ... ok
+test settings::tests::a_record_written_before_the_new_fields_still_loads ... ok
+test settings::tests::a_revision_that_is_not_a_key_is_refused ... ok
+test settings::tests::a_trainer_device_outside_the_closed_vocabulary_is_refused_by_name ... ok
+test settings::tests::a_missing_file_is_empty_settings_but_a_malformed_one_is_an_error ... ok
+test settings::tests::a_lane_that_never_mentions_a_nullable_field_is_refused_rather_than_assumed_off ... ok
+test resident_site::tests::status_projection_advertises_a_decodable_card_and_typed_status_media ... ok
+test settings::tests::an_argument_wins_over_the_file_but_a_lane_flag_only_turns_a_lane_on ... ok
+test settings::tests::a_typo_in_a_distillery_field_is_refused_rather_than_ignored ... ok
+test settings::tests::hex_round_trips_and_rejects_the_wrong_length ... ok
+test settings::tests::a_trainer_lane_round_trips_and_is_absent_only_by_saying_so ... ok
+test settings::tests::pairing_is_idempotent_and_keyed_on_the_node_id ... ok
+test settings::tests::a_typo_in_a_lane_name_is_refused_rather_than_ignored ... ok
+test settings::tests::pairing_mints_an_identity_and_repairing_mints_a_fresh_one ... ok
+test settings::tests::retention_bounds_come_from_a_closed_vocabulary ... ok
+test settings::tests::sync_stays_off_without_a_graph_from_either_source ... ok
+test settings::tests::the_reservoir_lane_is_on_unless_the_owner_turns_it_off ... ok
+test resident_site::tests::publication_does_not_resume_without_the_explicit_policy ... ok
+test settings::tests::the_distillery_lane_round_trips_and_stays_absent_when_unconfigured ... ok
+test settings::tests::settings_round_trip_and_the_write_replaces_the_previous_file ... ok
+test startup_vault::tests::backoff_doubles_to_thirty_seconds ... ok
+test settings::tests::the_data_root_moves_once_and_refuses_to_guess_when_both_exist ... ok
+test startup_vault::tests::the_choice_follows_the_platform_the_flag_and_the_file ... ok
+test resident_mere::tests::the_sessions_projection_runs_the_lifecycle ... ok
+test resident_mere::tests::the_route_adapter_takes_the_lifecycle_and_shows_the_route ... ok
+test resident_site::tests::stalled_connections_consume_the_public_connection_limit ... ok
+test sync::carriage_host::tests::lane::a_ceiling_violation_is_refused_at_the_issuer ... ok
+test sync::carriage_host::tests::lane::an_expired_lease_is_refused_on_read_and_purged_on_schedule ... ok
+test sync::graph_keys::retention_probe::epoch_growth_is_small_and_pruning_is_blocked_for_a_reason ... ok
+test sync::graph_keys::tests::a_failed_lane_change_can_restore_its_durable_checkpoint ... ok
+test sync::graph_keys::tests::a_frame_that_will_not_decode_is_counted_rather_than_fatal ... ok
+test sync::carriage_host::tests::lane::a_peer_recovers_a_live_slot_and_supersession_replaces_it ... ok
+test sync::graph_keys::tests::a_root_resolves_to_the_recipient_that_published_for_it ... ok
+test sync::graph_keys::tests::a_relayed_bundle_still_authenticates_its_own_subject ... ok
+test startup_vault::tests::a_handed_over_passphrase_creates_a_missing_vault ... ok
+test sync::graph_keys::tests::an_unkeyed_device_cannot_change_membership ... ok
+test startup_vault::tests::first_run_asks_twice_and_a_mismatch_asks_again ... ok
+test startup_vault::tests::with_nothing_to_ask_with_the_start_fails ... ok
+test sync::graph_keys::tests::session_state_reopens_and_is_not_stored_in_the_clear ... ok
+test sync::personal_seals::tests::stage_reads_require_a_current_seat_and_current_local_key ... ok
+test sync::graph_keys::tests::the_disclosed_bundle_survives_a_restart ... ok
+test sync::graph_keys::tests::only_live_roster_roots_are_registered_for_a_future_add ... ok
+test sync::graph_keys::tests::a_second_device_becomes_readable_through_lane_events_alone ... ok
+test sync::graph_keys::tests::removing_a_device_also_turns_the_epoch ... ok
+test resident_status::tests::a_stop_is_raised_when_the_asking_session_ends ... ok
+test startup_vault::tests::an_empty_passphrase_is_refused_without_opening ... ok
+test sync::carriage_host::tests::attached::both_lanes_converge_over_one_endpoint_per_device ... ok
+test startup_vault::tests::a_handed_over_passphrase_gets_one_try ... ok
+test startup_vault::tests::a_wrong_passphrase_and_a_cancel_ask_again_and_the_right_one_opens ... ok
+test sync::personal_sync_host::tests::a_garbled_stored_dial_hint_does_not_stop_the_host_opening ... ok
+test sync::personal_sync_host::tests::a_paired_node_id_is_tagged_onto_the_overlay_without_an_address ... ok
+test sync::personal_sync_host::tests::a_waiting_transfer_advertises_an_accept_form_naming_that_transfer ... ok
+test sync::personal_sync_host::tests::closing_a_lane_preserves_the_process_owned_blob_store ... ok
+test sync::personal_sync_host::tests::failed_group_creation_can_be_retried ... ok
+test sync::personal_sync_host::tests::failed_private_open_releases_its_store_for_retry ... ok
+test sync::personal_sync_host::tests::fetching_from_an_unpaired_device_is_refused ... ok
+test sync::personal_sync_host::tests::private_sibling_topics_follow_live_pairing_and_unpairing ... ok
+test sync::personal_sync_host::tests::resident_host_reopens_and_projects_public_cards ... ok
+test sync::transfer_staging::tests::offering_without_the_blob_lane_is_refused_before_any_byte_is_staged ... ok
+test sync::personal_sync_host::tests::a_paired_device_is_keyed_over_live_sync_and_reads_what_was_sealed ... ok
+test sync::personal_sync_host::tests::a_device_that_sees_a_key_group_does_not_start_another ... ok
+test sync::personal_sync_host::tests::a_device_keyed_after_sealed_writes_still_receives_them ... ok
+test sync::personal_sync_host::tests::a_staged_blob_is_fetched_by_a_paired_device_from_the_graph_alone ... ok
+test sync::transfer_staging::tests::a_transfer_applies_after_its_source_is_gone ... ok
+test sync::personal_sync_host::tests::an_offer_over_live_sync_reaches_its_addressee_and_not_a_third_device ... ok
+test sync::personal_sync_host::tests::a_revocation_on_one_device_reaches_the_others ... ok
+
+test result: ok. 214 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.16s
+

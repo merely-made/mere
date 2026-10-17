@@ -43,7 +43,7 @@ image = { version = "0.25", default-features = false, features = ["png"] }
 
 [dev-dependencies]
 chatelaine.workspace = true
-taproot.workspace = true
+taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
 luggage = { workspace = true, features = ["native"] }
 tempfile = "3"
 

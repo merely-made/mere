@@ -7,6 +7,7 @@
 //! Byte-bounded LRU for decoded, content-addressed node imagery.
 
 use std::collections::HashMap;
+use std::sync::Arc;
 
 /// Default decoded-image working set: 64 MiB.
 ///
@@ -16,7 +17,7 @@ pub const DEFAULT_RESOLVED_IMAGE_CACHE_BYTES: usize = 64 * 1024 * 1024;
 
 #[derive(Debug)]
 struct Entry {
-    rgba: Vec<u8>,
+    rgba: Arc<Vec<u8>>,
     width: u32,
     height: u32,
     touched: u64,
@@ -56,10 +57,8 @@ impl ResolvedImageCache {
     /// Bump the LRU clock for one entry and report whether it was resident.
     ///
     /// Reading is split from touching so callers can decide (dimensions, empty
-    /// pixels) *before* paying for a copy: a combined `get` needs `&mut self`
-    /// for the clock, which forces it to hand back owned pixels — a full
-    /// buffer clone per image per frame, even for entries about to be
-    /// discarded. Pair this with [`peek`](Self::peek).
+    /// pixels) before cloning the shared pixel handle. Pair this with
+    /// [`peek`](Self::peek).
     pub(crate) fn touch(&mut self, digest: &[u8; 32]) -> bool {
         self.clock = self.clock.wrapping_add(1);
         match self.entries.get_mut(digest) {
@@ -72,9 +71,9 @@ impl ResolvedImageCache {
     }
 
     /// Borrow one entry's pixels without disturbing the LRU order.
-    pub(crate) fn peek(&self, digest: &[u8; 32]) -> Option<(&[u8], u32, u32)> {
+    pub(crate) fn peek(&self, digest: &[u8; 32]) -> Option<(&Arc<Vec<u8>>, u32, u32)> {
         let entry = self.entries.get(digest)?;
-        Some((entry.rgba.as_slice(), entry.width, entry.height))
+        Some((&entry.rgba, entry.width, entry.height))
     }
 
     /// Insert decoded pixels and return every digest evicted to honor the
@@ -99,7 +98,7 @@ impl ResolvedImageCache {
         self.entries.insert(
             digest,
             Entry {
-                rgba,
+                rgba: rgba.into(),
                 width,
                 height,
                 touched: self.clock,

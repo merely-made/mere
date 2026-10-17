@@ -1,0 +1,23 @@
+{
+  "baseline": "ac10d648023c72571bd10e3e1803589791959dd2",
+  "cleromancy_core": "ca562db9cb15af5d6f80a153dd9a1e8c78275c22",
+  "turquet_houses": "e2f65c021a6bf744ab5fe77121e0441a46b47306",
+  "checks": {
+    "mere-full.log": {
+      "passed": 215,
+      "ignored": 0,
+      "sha256": "be5dcde44635262cf07e543747d32d9b3b809d25c6b11d377d78fb8b813bed11"
+    },
+    "mere-owner-processes.log": {
+      "passed": 9,
+      "ignored": 2,
+      "sha256": "104fbd5906a3bc12fa1538a9851629f424377a8342146a00d8fd29fdfe3f5e3c"
+    }
+  },
+  "source_files": {
+    "Cargo.lock": "8965af08bbcdf929e489ba7ec0a114ab519b17afc985879f5d1f119852b30d13",
+    "ports/djinn/src/resident_mere.rs": "6f3af28cf6c00fc02eb0b615de5304daa265d4eb0968879b27e86281f971fe5d"
+  },
+  "scope": "Pre-incoming-main software and real-process checkpoint. Admits Whole Sign/Equal through two real app routes and refuses altered cusp without envelope change. Incoming span-edit/docs work is integrated and qualified separately. Native product proof belongs to Cleromancy.",
+  "supplier_control": "Cargo generated the lock; Genet fa27ea54 and Murm bd8fe1e5 remain the compiled supplier cohort. Old unused patch annotations and registry dependency edges were normalized, without adopting their newer main revisions."
+}

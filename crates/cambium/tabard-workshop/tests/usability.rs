@@ -64,7 +64,7 @@ fn editor_colors(host: &Host) -> Vec<(Option<String>, Option<String>)> {
         [Selector::class("theme-editor"), action("save")]
             .into_iter()
             .map(|selector| {
-                let nodes = taproot::matching(surface.dom, &selector);
+                let nodes = taproot::matching_estimated_fixture(surface.dom, &selector);
                 assert_eq!(nodes.len(), 1);
                 (
                     plane.computed_style(nodes[0], "background-color"),
@@ -94,7 +94,7 @@ fn every_text_field_lays_out_at_its_authored_height() {
     ] {
         let selector = Selector::role("textbox").with_attr("data-field", field);
         let node = host.with_dom(|dom| {
-            let nodes = taproot::matching(dom, &selector);
+            let nodes = taproot::matching_estimated_fixture(dom, &selector);
             assert_eq!(nodes.len(), 1, "{field} must be one textbox");
             nodes[0]
         });
@@ -138,7 +138,7 @@ fn incomplete_hex_blocks_save_and_navigation_and_undo_keeps_authored_alpha() {
         assert!(host.state().status().contains("Fix the seed color"));
     }
     assert!(host.with_dom(|dom| {
-        !taproot::matching(
+        !taproot::matching_estimated_fixture(
             dom,
             &Selector::role("textbox")
                 .with_attr("data-field", "seed-hex")
@@ -264,7 +264,7 @@ fn font_controls_are_retained_guard_invalid_input_and_save_reopen() {
         assert!(!path.exists());
     }
     assert!(host.with_dom(|dom| {
-        !taproot::matching(
+        !taproot::matching_estimated_fixture(
             dom,
             &Selector::role("textbox")
                 .with_attr("data-field", "font-size")
@@ -390,7 +390,7 @@ fn visible_chrome_and_syntax_font_roles_change_without_styling_the_editor() {
             ("code-filename", "monospace", "13px"),
             ("syntax-code", "sans-serif", "19px"),
         ] {
-            let nodes = taproot::matching(surface.dom, &Selector::class(class));
+            let nodes = taproot::matching_estimated_fixture(surface.dom, &Selector::class(class));
             assert_eq!(nodes.len(), 1, "{class}");
             let actual = plane.computed_style(nodes[0], "font-family").unwrap();
             assert_eq!(actual.split(',').next().unwrap().trim(), family, "{class}");
@@ -400,13 +400,13 @@ fn visible_chrome_and_syntax_font_roles_change_without_styling_the_editor() {
                 "{class}"
             );
         }
-        let syntax = taproot::matching(surface.dom, &Selector::class("syntax-code"))[0];
+        let syntax = taproot::matching_estimated_fixture(surface.dom, &Selector::class("syntax-code"))[0];
         assert_eq!(
             plane.computed_style(syntax, "background-color").as_deref(),
             Some(syntax_color.as_str()),
             "font styles must preserve Illume's local palette"
         );
-        let save = taproot::matching(surface.dom, &action("save"))[0];
+        let save = taproot::matching_estimated_fixture(surface.dom, &action("save"))[0];
         let family = plane.computed_style(save, "font-family").unwrap();
         assert!(
             family.split(',').all(|face| face.trim() == "sans-serif"),

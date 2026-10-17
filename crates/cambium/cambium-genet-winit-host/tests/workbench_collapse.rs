@@ -140,7 +140,7 @@ fn a_narrow_rail_keeps_its_full_vertical_label_within_painted_bounds() {
         "label outside rail: label=({x}, {y}, {width}, {height}); rail=({rx}, {ry}, {rw}, {rh})"
     );
     assert_eq!(
-        host.with_dom(|dom| taproot::matching(
+        host.with_dom(|dom| taproot::matching_estimated_fixture(
             dom,
             &Selector::role("button").containing("Open Reading")
         )
@@ -207,7 +207,7 @@ fn drawer_fits_reflow_width_and_pointer_close_restores_the_rail() {
         host.with_dom(|dom| dom.all_with_class(dom.document(), "frisket-presented-stack"));
     assert_eq!(host.focus(), sources.first().copied());
     assert!(host.with_dom(|dom| {
-        taproot::matching(dom, &Selector::role("button").containing("Content 3")).is_empty()
+        taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Content 3")).is_empty()
     }));
 }
 

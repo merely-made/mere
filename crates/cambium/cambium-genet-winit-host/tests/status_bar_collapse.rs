@@ -88,7 +88,7 @@ fn refusal_and_overflow_fit_at_320_and_hidden_chips_are_not_mounted() {
         );
     }
     assert!(
-        host.with_dom(|dom| taproot::matching(
+        host.with_dom(|dom| taproot::matching_estimated_fixture(
             dom,
             &Selector::role("button").containing("Save refused")
         )
@@ -96,7 +96,7 @@ fn refusal_and_overflow_fit_at_320_and_hidden_chips_are_not_mounted() {
             == 1
     );
     assert!(host.with_dom(|dom| {
-        taproot::matching(dom, &Selector::role("button").containing("Not retained")).is_empty()
+        taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Not retained")).is_empty()
     }));
 }
 

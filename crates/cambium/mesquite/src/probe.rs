@@ -374,7 +374,7 @@ mod text_tests {
             view as Logic,
             TextInput::new("previous"),
         );
-        let node = taproot::matching(&*runner.dom().borrow(), &Selector::role("textbox"))[0];
+        let node = taproot::matching_estimated_fixture(&*runner.dom().borrow(), &Selector::role("textbox"))[0];
         runner.set_focus(Some(node));
         state.runner = Some(runner);
         let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
