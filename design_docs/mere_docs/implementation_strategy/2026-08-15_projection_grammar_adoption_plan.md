@@ -1793,3 +1793,18 @@ cases and the locked build. Three reviewed native captures show the separated
 rows and compact scrolling; the actual sealed Set and complete portable
 document equal the earlier fixture. Consumer evidence lives in
 `woodshed/validation/native-arrangement-spacing_20261016/receipt.json`.
+
+
+### Native arrangement interaction geometry (2026-10-16)
+
+**Status:** shared geometry qualified; Woodshed interaction adoption in progress.
+
+BackdropSurface now exposes forward/inverse viewport transforms and rectangular
+occurrence bounds through its existing fit. A host can opt into selected-span
+edge affordances. These queries carry no mutation authority or domain edit
+semantics. Woodshed owns beat snapping, draft preview, validation and Save.
+The shared regression exercises both progression and metre template specimens
+across three viewports, verifies round trips and visible-edge picking, and rejects
+invalid queries. Six surface tests pass (`validation/template-scene-interaction_20261016/tests.log`).
+A shared editing-intent API still requires a second concrete editing consumer;
+metre geometry evidence alone does not qualify source editing in Knot/Graphshell.
