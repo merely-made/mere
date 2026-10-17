@@ -2276,8 +2276,7 @@ or editing held material has been implemented.
 The referenced choices were (1) same Pool for the same workspace, (2) one
 personal Pool across all workspaces and apps, and (3) separate per-app Pools with
 explicit transfer. Personal scope is the primary direction; workspace and app
-scope options have merit. Whether those scopes are distinct Pools, membership/
-filtered views or a combination is still open. Cross-device synchronization,
+scope options have merit. Prompt 26 below resolves these as distinct scoped Pools. Cross-device synchronization,
 workspace identity and transfer behavior are not settled by this answer.
 
 **Prompt 24 — presentation while composing:**
@@ -2296,8 +2295,52 @@ paths should reuse existing domain editing and shared scene surfaces rather
 than introducing a separate authoring grammar. That reuse is an implementation
 direction; editor dispatch and save/session ownership still need definition.
 
-Next prompted topics: scoped-Pool ownership versus views, removal/recovery and
-the default way to inspect a nested group. Moving group contents together is
-already agreed; these questions must not reopen that decision. Other remaining
-topics include alternate arrangements, selected structural aspects and template
-updates, cross-app workspace identity and the held-item editing lifecycle.
+Prompts 26–28 below resolve scoped-Pool ownership versus views, removal/recovery
+and the default way to inspect a nested group. Moving group contents together
+was already agreed. Other remaining topics include alternate arrangements,
+selected structural aspects and template updates, cross-app workspace identity
+and the held-item editing lifecycle.
+
+
+#### Pool review: scoped collections, undo and nesting (prompts 26–28)
+
+**Prompt 26 — distinct Pools versus filtered views:**
+
+> 1; it's basically an embedded minimere, no?
+
+Option 1 was "Distinct scoped Pools, with personal as the default (Recommended)".
+Personal, workspace and app scopes therefore select distinct Pools. The personal
+Pool is the default. Mark's embedded-minimere framing points toward reusing Mere
+collection, presentation and session mechanisms for a compact embedded utility.
+This is product direction, not a claim that the current `inker::pool` vector is
+already a Mere or that a specific Mere API satisfies the new requirements.
+Inspect existing Mere/Swatch/Canvas and history seams before extending the
+prototype; do not extract an independent Pool crate merely to bypass that review.
+Cross-Pool copy/move/reference behavior, workspace identity and cross-device
+availability remain open.
+
+**Prompt 27 — removal and recovery:**
+
+> Remove it with Pool undo available across reopen
+
+Removal must be undoable after reopening Pool. This replaces the prototype's
+immediate permanent removal. A separate Trash is not the selected recovery UI.
+Inserted independent copies remain unaffected. The extent of Pool history and
+its relationship to held-item content editing still need definition; this answer
+does not impose a history limit, expiry period or automatic purge.
+
+**Prompt 28 — inspecting nested groups:**
+
+> Expand in place, with entering its own scope also available (Recommended)
+
+In-place expansion is the usual interaction; entering the group's own scope is
+also available. Expanding may rearrange the surrounding presentation while
+preserving authored text order and musical timing. Group members remain members
+when their presentation changes; moving a group together was already agreed.
+Focus/selection on collapse, reflow details and nested-scope navigation remain
+interaction refinements, not authority to change authored arrangement silently.
+
+These decisions have not yet changed implementation or expanded the historical
+qualification claims. Validation for a future slice must include distinct scope
+selection, removal/undo across a fresh process, shared held-item editing ownership
+and both nested views preserving the same authored facts in metre and Woodshed.
