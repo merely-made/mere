@@ -1,0 +1,23 @@
+{
+  "worktree": "/Users/markik/Code/repos/mere-link-model-p2-20261015",
+  "head": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929",
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "scripts/mere_doc_audit.py",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/mere_doc_judgment_audit.py",
+        "--json"
+      ],
+      "exit_code": 1
+    }
+  ],
+  "note": "P4 completion docs are uncommitted audit inputs; earlier missing D2 sections corrected before final comparison."
+}

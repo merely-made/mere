@@ -40,7 +40,13 @@ on the same maths the base `derive_palette` uses.
 
 ## Status
 
-Seed → base `Palette` derivation + the OKLCH primitives. Consumers (Woodshed's
+Seed → base `Palette` derivation + the OKLCH primitives, plus
+`derive_gated_roles` (2026-10-16): accent, focus, success, danger, border,
+border-strong and five category colours (the fourth is `open_hue`, the widest
+hue gap away from the triad and the status seeds), each mixed toward white or
+black only where it misses its
+contrast floor (4.5:1 for text, 3:1 for marks) on both `bg` and `surface`. It
+mirrors `tokens/tinct.js` in the Merely design system. Consumers (Woodshed's
 `audio_widgets`, Mere's `register-theme`) layer their own richer token sets on
 top.
 

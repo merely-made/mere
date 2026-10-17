@@ -42,6 +42,11 @@ use crate::resident_reservoir::{
 };
 
 const ATTACH_TIMEOUT: Duration = Duration::from_secs(5);
+// Opening a domain route also replays and validates its saved graph. That
+// bounded local work can outlast a transport handshake, particularly for a
+// cold numerical validator. Keep endpoint discovery and shutdown at five
+// seconds, but allow thirty seconds for the checked mere to finish opening.
+const OPEN_MERE_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Explicit identity, endpoint and storage selection for one application.
 ///
@@ -131,7 +136,7 @@ impl ReservoirAttachment {
         .map_err(|_| ReservoirAttachmentError::Timeout)?;
         match initial {
             Ok(mut reservoir) => {
-                let attach = tokio::time::timeout(ATTACH_TIMEOUT, async {
+                let attach = tokio::time::timeout(OPEN_MERE_TIMEOUT, async {
                     let persona = disclosed_persona(&mut reservoir).await?;
                     if let Some(expected) = options.persona {
                         if persona != expected {
@@ -268,7 +273,7 @@ impl ReservoirAttachment {
         CFut: Future<Output = Result<MereRoutes, String>>,
     {
         let reservoir_route = AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).expect("valid route");
-        let initial = connect(&options, reservoir_route.clone()).await;
+        let initial = connect(&options, reservoir_route.clone(), ATTACH_TIMEOUT).await;
         let (mut reservoir, embedded) = match initial {
             Ok(client) => (client, None),
             Err(ReservoirAttachmentError::Client(AppClientError::Io(error)))
@@ -294,7 +299,7 @@ impl ReservoirAttachment {
                     ));
                 }
                 let owner = EmbeddedOwner::start(&options, host, configure).await?;
-                let client = match connect(&options, reservoir_route).await {
+                let client = match connect(&options, reservoir_route, ATTACH_TIMEOUT).await {
                     Ok(client) => client,
                     Err(error) => {
                         owner.close().await?;
@@ -305,12 +310,12 @@ impl ReservoirAttachment {
             },
             Err(error) => return Err(error),
         };
-        let attach = tokio::time::timeout(ATTACH_TIMEOUT, async {
+        let attach = tokio::time::timeout(OPEN_MERE_TIMEOUT, async {
             check_persona(&mut reservoir, options.persona).await?;
             ensure(&mut reservoir, &options.domain).await?;
             let route = AppRouteId::new(mere_route_id(options.domain.as_str()))
                 .map_err(|error| ReservoirAttachmentError::Embedded(error.to_string()))?;
-            connect(&options, route).await
+            connect(&options, route, OPEN_MERE_TIMEOUT).await
         })
         .await
         .unwrap_or(Err(ReservoirAttachmentError::Timeout));
@@ -357,9 +362,10 @@ impl ReservoirAttachment {
 async fn connect(
     options: &ReservoirAttachmentOptions,
     route: AppRouteId,
+    patience: Duration,
 ) -> Result<AppBrokerClient, ReservoirAttachmentError> {
     tokio::time::timeout(
-        ATTACH_TIMEOUT,
+        patience,
         AppBrokerClient::open_route_at(&options.endpoint, options.application.clone(), route),
     )
     .await

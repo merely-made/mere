@@ -3,7 +3,7 @@
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23). CollapsedGraphlet is now ArrangementKind::Supernode.*
 
 **Date:** 2026-08-03  
-**Status (2026-10-15):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance now passes for the production Canvas renderer and a bounded Cambium Swatch fixture, including fresh-process restore. The Isocosm: VTT campaign Overmap fold controls and its separate consumer acceptance remain pending.
+**Status (2026-10-16):** C3's root-Canvas fold and native multi-fold continuation are integrated. Headed macOS acceptance passes for the production Canvas renderer, the bounded Cambium Swatch fixture, and Knot’s production catalog Swatch, including fresh-process restore. Knot closes the next consumer gate; Isocosm: VTT remains independent.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
 adapters, plus a real second source in Isometry's pre-log `GameSnapshot` and
 authority `GameEvent` Codicil. Its Overmap Swatch has a Cambium slider that
@@ -659,12 +659,45 @@ output directory, and a 55-second timeout. The first run explicitly sets
 `FOLD_ACCEPTANCE_STATE` to an isolated file; the second explicitly sets
 `FOLD_ACCEPTANCE_RESTORE` to that file. Neither uses a real application profile.
 
-This closes the bounded native-host fixture proof. It does not close the
-plan's named Isocosm: VTT campaign consumer: its Overmap currently has no fold
-controls. Keyboard gestures, live screen-reader interaction, recovery, and
+This closes the bounded native-host fixture proof. At that checkpoint the
+plan's named Isocosm: VTT campaign consumer remained unqualified; its Overmap
+had no fold controls. The subsequent Knot continuation below supplies the
+next production consumer proof without depending on VTT's changing workspace. Keyboard gestures, live screen-reader interaction, recovery, and
 Windows/Linux headed acceptance are also outside this receipt.
 
 Validation on the tested source: `pictograph` and `mere-view` library suites
 passed 494 tests, with 18 existing Canvas timing/release tests ignored. The
 port/web dependency boundary check, changed-file rustfmt, and diff check
 passed. The existing document audit has no new findings from these changes.
+
+
+### Knot catalog consumer continuation (2026-10-16)
+
+Knot is the qualified next production consumer; Isocosm: VTT's changing
+workspace is not a prerequisite. `mere-view` now accepts host-owned native `FoldRecord`s in its
+view state. It lays out the full source graph, then projects summaries and
+directed endpoint/provenance boundary bundles into the same Swatch used by
+paint and hit targets, before adding the resident session/archive tier.
+Stale or overlapping records cannot hide partial members. Aggregated routes
+carry fresh aggregate identities rather than one source relation's evidence.
+The shared library's 38 tests pass, including two new opaque-id projection
+checks. Knot owns selection, reversible history and catalog-root preferences;
+its headed and fresh-process consumer qualification is recorded downstream.
+
+Knot commit [`69d15f1`](https://github.com/merely-made/knot-editor/commit/69d15f1)
+records the production integration and
+[acceptance receipt](https://github.com/merely-made/knot-editor/blob/69d15f1/docs/receipts/2026-10-16_catalog_folds/README.md).
+Its locked source uses Mere `42c158bae`; the supplier integration preserves
+the concurrent Mosaic and territory commits. The root workspace passes 698
+tests (four existing ignores). Two finite LaunchServices runs present 37 and
+25 frames and produce eight inspected captures: selection, two folds, undo/redo,
+fresh-process restoration, summary expansion and Expand all. Source-reading
+facts, all source-member positions and source-file bytes remain unchanged.
+The five boundary cells remain represented in three directed endpoint/provenance
+bundles. Fold records persist in Knot's catalog-root preferences, with bounded
+session undo/redo, independently of source truth and the resident archive.
+This closes the bounded selection-fold catalog consumer gate on macOS. It does
+not infer document parenthood for descendant folding or qualify keyboard, live
+screen-reader, recovery or Windows/Linux behavior. The earlier fixture example
+also now uses inferred default link marks rather than an undeclared direct
+`sceno` dependency; this changes no mark values or qualified Knot runtime source.

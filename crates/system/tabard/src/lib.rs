@@ -41,8 +41,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::theme::registry::{Harmony, Mode, ThemeSource};
 use tinct::{
-    Palette, Seeds, Srgb, SyntaxPalette, SyntaxRole, color_to_hex, derive_palette,
-    derive_syntax_palette,
+    GatedRoles, Palette, Seeds, Srgb, SyntaxPalette, SyntaxRole, color_to_hex, derive_gated_roles,
+    derive_palette, derive_syntax_palette,
 };
 
 /// DTCG's stable Design Tokens Format Module schema for this output.
@@ -109,6 +109,36 @@ pub struct Theme {
     /// Portable role preferences; absent fields preserve host defaults.
     #[serde(default, skip_serializing_if = "Typography::is_empty")]
     pub typography: Typography,
+    /// The person's own category colours, replacing Tinct's derived ones;
+    /// each is still gated to 3:1 on bg and surface. Empty = fully derived.
+    #[serde(default, skip_serializing_if = "CategoryOverrides::is_empty")]
+    pub categories: CategoryOverrides,
+}
+
+/// Per-theme overrides for the five category colours (index 0 is
+/// `category-1`). A `None` keeps Tinct's derived colour. An override is gated
+/// like the colour it replaces (3:1 on `bg` and `surface`), so a theme can
+/// choose a hue but not an illegible mark.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CategoryOverrides(pub [Option<Srgb>; 5]);
+
+impl CategoryOverrides {
+    pub fn is_empty(&self) -> bool {
+        self.0.iter().all(Option::is_none)
+    }
+}
+
+/// Tinct's gated roles for `palette`, with the theme's category overrides
+/// applied and gated.
+pub fn gated_roles(palette: &Palette, overrides: &CategoryOverrides) -> GatedRoles {
+    let mut roles = derive_gated_roles(palette);
+    let grounds = [palette.bg, palette.surface];
+    for (slot, chosen) in roles.category.iter_mut().zip(overrides.0) {
+        if let Some(color) = chosen {
+            *slot = tinct::gated::gate(color, &grounds, tinct::gated::MARK_FLOOR);
+        }
+    }
+    roles
 }
 
 impl Theme {
@@ -124,6 +154,7 @@ impl Theme {
             harmony: Harmony::default(),
             mode_sheets: BTreeMap::new(),
             typography: Typography::default(),
+            categories: CategoryOverrides::default(),
         }
     }
 
@@ -167,13 +198,16 @@ impl Theme {
     /// Emit a Livery author stylesheet with the derived palette at :root.
     ///
     /// The property names intentionally mirror the owned Tinct base roles:
-    /// --tabard-color-bg, --tabard-color-surface-2, and so on, then the syntax
-    /// roles as --tabard-syntax-keyword and the like. A host may append
+    /// --tabard-color-bg, --tabard-color-surface-2, and so on, with success
+    /// and danger gated to 4.5:1; then Tinct's
+    /// contrast-gated roles (--tabard-color-accent, -focus, -border,
+    /// -border-strong, -category-1 … -category-5); then the syntax roles as
+    /// --tabard-syntax-keyword and the like. A host may append
     /// ordinary author rules which use them through var().
     pub fn css_custom_properties(&self) -> String {
         format!(
             "{}{}",
-            custom_properties(self.palette(), self.syntax_palette()),
+            custom_properties(self.palette(), self.syntax_palette(), &self.categories),
             self.typography.css_custom_properties()
         )
     }
@@ -190,13 +224,37 @@ impl Theme {
     }
 }
 
-fn custom_properties(palette: Palette, syntax: SyntaxPalette) -> String {
+/// The palette as published: the base roles, with `success` and `danger`
+/// replaced by their contrast-gated values (4.5:1 on `bg` and `surface`), so
+/// status text holds its floor in every mode. The raw seeds stay in the
+/// theme's provenance and in the Lagrange export.
+fn published(palette: Palette) -> Palette {
+    let gated = derive_gated_roles(&palette);
+    Palette {
+        success: gated.success,
+        danger: gated.danger,
+        ..palette
+    }
+}
+
+fn custom_properties(
+    palette: Palette,
+    syntax: SyntaxPalette,
+    categories: &CategoryOverrides,
+) -> String {
     let mut stylesheet = String::from(":root {\n");
-    for role in color_roles(palette) {
+    for role in color_roles(published(palette)) {
         stylesheet.push_str("  --tabard-color-");
         stylesheet.push_str(role.name);
         stylesheet.push_str(": ");
         stylesheet.push_str(&css_color(role.value));
+        stylesheet.push_str(";\n");
+    }
+    for (name, value) in gated_roles(&palette, categories).named() {
+        stylesheet.push_str("  --tabard-color-");
+        stylesheet.push_str(name);
+        stylesheet.push_str(": ");
+        stylesheet.push_str(&css_color(value));
         stylesheet.push_str(";\n");
     }
     for role in SyntaxRole::ALL {
@@ -646,7 +704,35 @@ pub struct DtcgColorGroup {
     pub on_tertiary: DtcgColorToken,
     pub success: DtcgColorToken,
     pub danger: DtcgColorToken,
+    /// Tinct's contrast-gated roles (accent, focus, border, border-strong,
+    /// category-1 … category-5). Absent in documents written before
+    /// 2026-10-16.
+    #[serde(default)]
+    pub gated: DtcgGatedGroup,
     pub syntax: DtcgSyntaxGroup,
+}
+
+/// Tinct's contrast-gated roles as a DTCG group, keyed by the CSS suffix
+/// (`accent`, `border-strong`, `category-1`, …).
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct DtcgGatedGroup {
+    #[serde(rename = "$description", default)]
+    pub description: String,
+    #[serde(flatten)]
+    pub roles: BTreeMap<String, DtcgColorToken>,
+}
+
+impl DtcgGatedGroup {
+    fn new(palette: Palette, categories: &CategoryOverrides) -> Self {
+        Self {
+            description: "Tinct-derived roles gated against bg and surface (derive_gated_roles): 4.5:1 for accent, 3:1 for focus, border-strong and category marks; border is decorative.".to_owned(),
+            roles: gated_roles(&palette, categories)
+                .named()
+                .into_iter()
+                .map(|(name, value)| (name.to_owned(), value.into()))
+                .collect(),
+        }
+    }
 }
 
 /// Tinct's syntax-highlight palette as a DTCG group: one color token per
@@ -721,8 +807,9 @@ impl DtcgColorGroup {
             on_secondary: palette.on_secondary.into(),
             tertiary: palette.tertiary.into(),
             on_tertiary: palette.on_tertiary.into(),
-            success: palette.success.into(),
-            danger: palette.danger.into(),
+            success: published(palette).success.into(),
+            danger: published(palette).danger.into(),
+            gated: DtcgGatedGroup::new(palette, &theme.categories),
             syntax: syntax.into(),
         }
     }

@@ -191,6 +191,9 @@ pub enum MereViewEvent {
 /// area it has until it lays out again.)
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct MereViewState {
+    /// Host-owned catalog curation. Layout still uses every source member;
+    /// only the final catalog Swatch is folded, before the resident tier.
+    pub folds: Vec<curation::FoldRecord>,
     pub hovered: Option<String>,
     pub focused: Option<String>,
     /// Presentation-only selection for an explicit Compose request.
@@ -633,6 +636,9 @@ impl MereView<'_> {
                 let from = labels.get(relation.from.as_str())?;
                 let to = labels.get(relation.to.as_str())?;
                 Some(GraphCanvasRelation {
+                    link_key: None,
+                    marks: Default::default(),
+                    strength: 1.0,
                     id: relation.key.clone(),
                     from: relation.from.clone(),
                     to: relation.to.clone(),
@@ -672,6 +678,7 @@ impl MereView<'_> {
             .map(|(kind, line)| (kind.token().to_string(), line))
             .collect(),
         );
+        swatch = super::folds::project(swatch, &self.state.folds);
         // Targets as wide as the layout keeps nodes apart, so none holds
         // another's centre.
         swatch.hit_size = SEPARATION;

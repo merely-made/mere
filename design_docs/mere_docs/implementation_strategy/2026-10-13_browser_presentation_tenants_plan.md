@@ -4,6 +4,8 @@
 
 **Status:** coordinated adoption qualified, 2026-10-15, including merged upstream version/supplier updates. All four temporary Netrender bridge tables are retired. Earlier gate tuples remain explicit below.
 
+**Continuation status (2026-10-16):** native shadow-mask/producer namespace correction and bounded Woodshed P4f receiving native/fresh-process qualification complete. Portable composition shadow-mask support retains its separate admission scope.
+
 **Goal:** Run Graphshell's viewer through the shared Cambium host on direct WebGL2 when WebGPU is unavailable, including content updates, resize, recovery, capture, input and accessibility.
 
 **Architecture:** Separate shared frame preparation from graphics presentation. Keep native/WebGPU device services in their adapter; add a direct Vello GPU WebGL2 adapter using Netrender's existing sparse lowering and portable producer content. Context generations govern graphics resources independently of content revisions.
@@ -398,3 +400,75 @@ Viewer size levers remain options. Forms C and three-lanes are outside scope.
   `C:/t/cargo-targets/mere/netrender-adoption` is retained for this gate:
   automatic approval review blocked cleanup after its Cargo marker and lack
   of live owners were verified. No isolated Cargo home or worktree was made.
+
+## Native shadow-mask admission continuation (2026-10-16)
+
+### Findings
+
+- 2026-10-16: Woodshed's Rehearsal scene reaches Rootstock frame preparation
+  but presents zero frames. In `crates/cambium/cambium-rootstock/src/producer/registry.rs`,
+  GPU remapping rejects every translator-owned blurred-shadow mask because
+  its generated key occupies the high external-image namespace. Removing
+  only the mask-list refusal would still misclassify its image operation as
+  a producer reference.
+- 2026-10-16: Netrender generates shadow-mask keys from
+  `0xFFFF_0000_0000_0000`; its renderer retains image overrides across frames.
+  Preserve those generated keys and reserve their range from Rootstock's
+  physical producer allocation. Moving masks into ordinary inline-image keys
+  could let an old override capture a later inline image. Authored producer
+  keys still admit all lower 62 bits, independently of physical allocation.
+- 2026-10-16: External-texture metadata identifies each producer image's exact
+  scene-operation boundary. That attribution distinguishes a producer whose
+  local key numerically equals a generated mask key. Pattern references remain
+  producer references. Validate the complete scene before rewriting anything;
+  malformed mask ownership, stale producer stamps and opaque fragments still
+  refuse the frame. Portable composition's shadow-mask admission stays separate.
+
+### Phases and done-conditions
+
+1. Reproduce refusal using the real paint translator's blurred-shadow command.
+   Done when the focused regression fails at the producer remapping boundary.
+2. Partition physical producer allocation below the mask range and use mask
+   ownership plus producer draw boundaries during remapping. Done when shadow,
+   mixed producer/clip/opacity, high-local-key collision, transactional refusal
+   and malformed-mask controls pass, along with Rootstock/native-host suites.
+3. Publish the supplier revision for Woodshed intake. Done when its exact
+   locked graph builds, the explicit Related/Set/Card/Rehearsal flow presents,
+   captures are reviewed and the same Set reopens in a fresh process. Receiving
+   runtime results remain the Woodshed owner's responsibility and receipt.
+
+### Progress
+
+- 2026-10-16: Worktree reconciled to Mere `e43fcee761dc`; six focused regression
+  controls added against the real translator. Mere owns the supplier correction
+  and serialized Cargo checks; Woodshed holds its intake/native gates until
+  the published revision arrives. No supplier selector or lock changes planned.
+- 2026-10-16: The shadow-only control first reproduced the exact
+  `ForeignInlineImage` refusal at generated key `0xFFFF_0000_0000_0000`.
+  Physical producer allocation now ends below that band; mask ownership and
+  exact producer draw boundaries preserve both generated images and the full
+  authored local-key domain. All six focused controls pass. Rootstock and
+  native-host suites pass 307 tests, zero failures, six existing ignores on
+  the unchanged locked graph (Genet `e37762d752e`, Netrender `f4f9c0d87e`).
+  Independent read-only review found no correctness blocker. The opt-in frame
+  trace now attributes producer-resource refusals before presentation.
+  [Qualification receipt](../../../support/receipts/producer-shadow-20261016/qualification.json)
+  records commands, source/lock hashes and the separate receiving gate.
+  The documentation audit adds no finding in this continuation; existing
+  unrelated whole-tree findings remain. Woodshed native/reopen is pending.
+- 2026-10-16: Woodshed receiving qualification passes on Mere `6575075057e`,
+  consumer Rust source `d2adb09ac3b` and scenario-only successor `7500d1b`.
+  Its preserved Netrender `8960024f7b` supplier independently exercises the fix
+  beyond Mere's supplier-test graph. The guarded seed presents 342 frames,
+  a fresh-process reopen 110 and the default/narrow layout phase 112.
+  Fourteen captures were independently reviewed, including the final-binary
+  save-refusal close panel. Both Stage and Rehearsal show the retained four-note
+  realization; exact owner/Card IDs, instructions, realization float bits,
+  cursor, projection, workspace and personal journal survive reopening.
+  Directed and selected-Card auditions each reach the same output runtime
+  without changing those durable facts. Receiving checks pass 789 tests plus
+  five separate fresh-process child checks, with seven existing host ignores.
+  [Receiving closure](../../../support/receipts/producer-shadow-20261016/woodshed-receiving.json)
+  binds the source, binary, supplier graph and owning consumer receipt.
+  Failed/mixed earlier trials are excluded. Physical audio, other platforms
+  and portable shadow-mask composition retain their separate qualification.

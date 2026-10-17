@@ -1,0 +1,134 @@
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, `Resolver`, and `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^             ^^^^^^^^^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `uuid::Uuid`
+   --> crates/graph/graph-kernel/src/graph/display.rs:200:9
+    |
+200 |     use uuid::Uuid;
+    |         ^^^^^^^^^^
+
+error[E0631]: type mismatch in function arguments
+   --> crates/graph/graph-kernel/src/graph/frozen_link.rs:171:46
+    |
+171 |             || endpoint.resource.is_some_and(Uuid::is_nil)
+    |                                  ----------- ^^^^^^^^^^^^
+    |                                  |           |
+    |                                  |           expected due to this
+    |                                  |           found signature defined here
+    |                                  required by a bound introduced by this call
+    |
+    = note: expected function signature `fn(Uuid) -> _`
+               found function signature `fn(&Uuid) -> _`
+note: required by a bound in `std::option::Option::<T>::is_some_and`
+   --> /Users/markik/.rustup/toolchains/1.99.0-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/option.rs:659:44
+    |
+659 |     pub const fn is_some_and(self, f: impl [const] FnOnce(T) -> bool + [const] Destruct) -> bool {
+    |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `Option::<T>::is_some_and`
+help: consider wrapping the function in a closure
+    |
+171 |             || endpoint.resource.is_some_and(|arg0: accesskit::Uuid| Uuid::is_nil(&arg0))
+    |                                              +++++++++++++++++++++++             +++++++
+
+error[E0599]: no method named `edge_references` found for reference `&StableGraph<SurfaceNode, edge_payload::EdgePayload>` in the current scope
+   --> crates/graph/graph-kernel/src/graph/frozen_link.rs:335:22
+    |
+332 |                   let rows = self
+    |  ____________________________-
+333 | |                     .inner
+334 | |                     .inner()
+335 | |                     .edge_references()
+    | |_____________________-^^^^^^^^^^^^^^^
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `IntoEdgeReferences` which provides `edge_references` is implemented but not in scope; perhaps you want to import it
+    |
+  9 + use petgraph::visit::IntoEdgeReferences;
+    |
+help: there is a method `node_references` with a similar name
+    |
+335 -                     .edge_references()
+335 +                     .node_references()
+    |
+
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused variable: `copy`
+   --> crates/graph/graph-kernel/src/graph/cross_graph.rs:420:13
+    |
+420 |         let copy = b.get_node(copy_key).unwrap();
+    |             ^^^^ help: if this is intentional, prefix it with an underscore: `_copy`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/graph/graph-kernel/src/graph/legacy_family_attribution.rs:494:13
+    |
+494 |         let mut attribution = LegacyFamilyAttribution::from_baseline(&graph);
+    |             ----^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+
+warning: variable does not need to be mutable
+    --> crates/graph/graph-kernel/src/graph/query.rs:1311:13
+     |
+1311 |         let mut node = |g: &mut Graph, i: usize| {
+     |             ----^^^^
+     |             |
+     |             help: remove this `mut`
+
+Some errors have detailed explanations: E0599, E0631.
+For more information about an error, try `rustc --explain E0599`.
+warning: `mere-kernel` (lib test) generated 11 warnings
+error: could not compile `mere-kernel` (lib test) due to 2 previous errors; 11 warnings emitted

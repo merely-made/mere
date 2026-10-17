@@ -1679,7 +1679,7 @@ mod resource_revert_tests {
             } else {
                 let surviving = live.persisted_resource_edges_between(resource_a, resource_c);
                 assert_eq!(
-                    surviving[0].semantic.as_ref().unwrap().statements[0].statement_id,
+                    surviving[0].retained_assertions()[0].statement_id,
                     "later-handle"
                 );
                 assert_eq!(shown_resource(&live, surface_b), Some(resource_b));

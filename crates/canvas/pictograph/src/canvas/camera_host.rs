@@ -75,6 +75,15 @@ pub trait FitHost: CameraHost {
         false
     }
     fn set_physics_paused(&mut self, _paused: bool) {}
+    /// The graph grammar's seed and attention verbs (`attention.rs`).
+    fn reset_to_seed(&mut self) {}
+    fn set_seed(&mut self) {}
+    fn restore_recipe_seed(&mut self) {}
+    fn dismiss_all_retained(&mut self) {}
+    fn toggle_selection_foreground_pin(&mut self) {}
+    fn resize_selected_tiles(&mut self, _factor: f32) {}
+    fn toggle_territory_field(&mut self) {}
+    fn toggle_suggestions(&mut self) {}
 }
 
 /// What [`super::face_alignment::FaceAlignment`] measures: each node's face
@@ -142,6 +151,41 @@ impl FitHost for Canvas {
 
     fn set_physics_paused(&mut self, paused: bool) {
         Canvas::set_physics_paused(self, paused);
+    }
+
+    fn reset_to_seed(&mut self) {
+        Canvas::reset_to_seed(self);
+    }
+
+    fn set_seed(&mut self) {
+        Canvas::set_seed(self);
+    }
+
+    fn restore_recipe_seed(&mut self) {
+        Canvas::restore_recipe_seed(self);
+    }
+
+    fn dismiss_all_retained(&mut self) {
+        Canvas::dismiss_all_retained(self);
+    }
+
+    fn toggle_selection_foreground_pin(&mut self) {
+        Canvas::toggle_selection_foreground_pin(self);
+    }
+
+    fn resize_selected_tiles(&mut self, factor: f32) {
+        Canvas::resize_selected_tiles(self, factor);
+    }
+
+    fn toggle_territory_field(&mut self) {
+        let on = Canvas::territory_field(self);
+        Canvas::set_territory_field(self, !on);
+    }
+
+    fn toggle_suggestions(&mut self) {
+        let mut settings = Canvas::suggestion_settings(self).clone();
+        settings.on = !settings.on;
+        Canvas::set_suggestion_settings(self, settings);
     }
 }
 

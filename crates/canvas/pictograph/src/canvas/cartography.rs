@@ -57,6 +57,13 @@ impl Canvas {
                 .get_node(key)
                 .map(|node| (node.id, face.as_code().to_string()))
         }))
+        // The graph grammar's saved seed and the arrangement's regions
+        // (`scene_state.rs`).
+        .with_seed(self.saved_seed())
+        .with_regions(self.saved_regions())
+        .with_mosaic(self.saved_mosaic())
+        // Derived members (suggested links) are session-only.
+        .retaining_members(|member| !self.is_derived_member(*member))
     }
 
     /// One node's current world position (the live seiche position), so the host can

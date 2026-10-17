@@ -42,7 +42,12 @@ The first implementation is deliberately portable and library-only:
   seeds, and derivation choice live under org.merely.tabard in $extensions.
 - Theme::css_custom_properties emits a deterministic :root stylesheet with the
   same palette as --tabard-color-* custom properties. Livery can consume it
-  as an ordinary author sheet.
+  as an ordinary author sheet. Success and danger are published gated to
+  4.5:1 on bg and surface (the raw seeds stay in provenance and in the
+  Lagrange export). After the sixteen base roles it emits Tinct's
+  contrast-gated roles (accent, focus, border, border-strong, category-1 to
+  category-5, from tinct::derive_gated_roles); the DTCG document carries them
+  under color.gated.
 - Theme::lagrange_palette_txt emits a deterministic `palette.txt` for
   Lagrange's application UI. It writes the documented `# Dark` and `# Light`
   sections in Lagrange's neutral, accent, and status-label order using

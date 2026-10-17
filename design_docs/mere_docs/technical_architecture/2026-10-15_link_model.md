@@ -8,7 +8,14 @@ lifecycle and Knot supplier/intake gate are qualified by the continuation on
 Graphshell opened-link slice are qualified on `732c1537a`; Knot receiving
 qualification is published at `921b4e0`, and Woodshed receiving qualification is
 published at `943c762` on native source `474d10a`, including authoring, ordered
-audition and fresh-process sealed reopen. P4, P6 and P7 (§8) remain later work.
+audition and fresh-process sealed reopen. Bounded P4 rest-stroke and fan
+retirement is qualified on Mere source `91467c0bb` and Woodshed receiving source `fe54425`, published with receipt
+`4716b71`: canonical resting links, exact member opening, acknowledged whole-link
+hides and reviewed browser/native reopening. Bounded P6 (§8) is qualified on
+published Mere `a45a0b697`, with Woodshed source `d896e39` and published receiving
+receipt `c32b60a`. Bounded P7 promotion is qualified in Graphshell on
+`6d53d4439`, from refreshed main `a4c1814c8`, including immutable Resource
+copies, receiver coverage, review assertions and browser reopening.
 Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
@@ -106,16 +113,16 @@ states only what is new.
 
   | Field | Meaning | Today |
   |---|---|---|
-  | `id` | opaque, device-safe, stable across snapshot, replay and sync | `statement_id` (semantic only) |
+  | `id` | opaque, device-safe, stable across snapshot, replay and sync | canonical assertion ID for every recognized relation predicate |
   | `subject`, `object` | direction is kept; the link reading is unordered | pair bucket direction |
-  | `predicate` | meaning, as an IRI; recognized predicates carry behavior | `predicate` plus sub-kind sets |
+  | `predicate` | meaning, as an IRI; recognized predicates carry behavior | one of 44 canonical recognized predicate IRIs, or an open predicate |
   | `scope` | named graph | `graph_scope` |
   | `source` | the store that owns the record, with revision availability. Edits and withdrawals route to it, and an opened member keeps its source's explanation and actions | MereHost session/root identity in shared readings, immutable revision unavailable; scenomise `source`, `source_revision` |
   | `asserter` | attributed source, else the journal `Author` (ruling 5) | `provenance_iri` |
-  | `first_asserted_ms` | set when the assertion is minted, never overwritten | semantic `first_asserted_ms`; unknown remains explicit |
+  | `first_asserted_ms` | set when the assertion is minted, never overwritten | canonical `first_asserted_ms`; unknown remains explicit |
   | `last_asserted_ms` | updated on reassertion by the same asserter | `asserted_at_ms` (often `None`) |
-  | `withdrawn` | `{ at_ms, by }` once withdrawn; the record remains until compaction | semantic retained withdrawal; other families wait for P6 |
-  | `basis` | why: `note`, `method`, `evidence`, `occurrences` (§6.2) | semantic note/method/evidence; label alias; occurrences remain sidecars |
+  | `withdrawn` | `{ at_ms, by }` once withdrawn; the record remains until compaction | retained lifecycle for every recognized relation predicate |
+  | `basis` | why: `note`, `method`, `evidence`, `occurrences` (§6.2) | canonical note/method/evidence; occurrences remain future work |
 
   Mark's "linking factor" is an assertion. `statement` remains the code
   synonym under the `edge` rule. **Held** means not withdrawn.
@@ -152,13 +159,12 @@ states only what is new.
   wants to be settings"). Field response and compatibility between links are
   declared view/dynamics rules; one strength number does not define them.
 
-Traversal joins this set rather than standing beside it. The pair's
-navigation history is one assertion per direction: predicate
-`mere:traversed`, the persona as asserter, and a span from the first to the
-last navigation. Its dated events are that assertion's **occurrences**, which
-are today's `TraversalData` events and `EdgeMetrics` rollup moved under the
-assertion. Woodshed's practice evidence has the same shape: an evidence
-assertion whose occurrences are dated visits. This answers the §7
+Traversal remains a separate `TraversalData` event collection with an
+`EdgeMetrics` rollup; it has not yet been converted into assertion
+occurrences. The longer-term model in this design treats navigation history
+as one `mere:traversed` assertion per direction, with dated events as its
+**occurrences**. Woodshed practice evidence has the same target shape: an
+evidence assertion whose occurrences are dated visits. This answers the §7
 "Occurrences or events" candidate for pair relations without a new stratum.
 An occurrence is dated support inside an assertion, not an entity.
 
@@ -242,14 +248,14 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | Concept (where) | Verdict | Becomes |
 |---|---|---|
 | `EdgeFamily` (6; `edge_taxonomy.rs`) | Subsume | A declared predicate property (the policy group). No longer a storage shape. The stance doc's curated lens survives as registry vocabulary. |
-| Sub-kinds (`SemanticSubKind` and the four others; 43 recognized kinds) | Subsume | Recognized predicates. Each enum is the recognized-predicate table for its family. |
-| `EdgePayload` six sidecars (`edge_payload.rs`:46-53) | Retire (P6) | One assertion list per pair bucket. The type name stays as the bucket, under the `edge` rule. |
-| `SemanticData` compatibility aggregates (`sub_kinds`, `label`, `predicate`) | Retire | Nothing; readers iterate assertions. |
-| `ArrangementData` / `ContainmentData` / `ImportedData` / `ProvenanceData` sub-kind sets | Retire (P6) | Assertions with id, asserter, span and basis. |
-| `TraversalData` + `EdgeMetrics` | Subsume | The occurrences and rollup of a `mere:traversed` assertion. |
+| Sub-kinds (`SemanticSubKind` and the four others; 44 recognized kinds) | Subsume | Recognized predicates. Each enum is the recognized-predicate table for its family. |
+| `EdgePayload` family sidecars (`edge_payload.rs`) | Retired (P6 implementation) | One authoritative retained assertion collection plus the separate Traversal summary. The type remains the pair-bucket payload. |
+| `SemanticData` compatibility aggregates (`sub_kinds`, `label`, `predicate`) | Derived projection | Reads are computed from canonical assertions; they are not a second store. |
+| `ArrangementData` / `ContainmentData` / `ImportedData` / `ProvenanceData` sub-kind sets | Derived projection | Compatibility accessors compute their sets from canonical assertions. |
+| `TraversalData` + `EdgeMetrics` | Keep for now | Separate traversal events and rollup remain pending the future occurrence model; do not infer assertion timestamps from them. |
 | `EdgeKind`: graphshell 4-variant tag set, kernel index | Already retired 2026-05-13 | Delete the surviving doc comments when touched (`mod.rs`:154, `edge_payload.rs`:14). |
 | VGCP `EdgeKind` | Already "not current direction" | No action. |
-| tabard `EdgeStyleRegistry`, `EdgeStyleKey`, `ThemeEdgeKindToken` (`theme/edge_style.rs`) | Retire | Stratum stroke cue (ruled 2026-10-13) plus a per-predicate-family style token in the same theme. It is a fifth, test-only style taxonomy with no Provenance family. |
+| tabard `EdgeStyleRegistry`, `EdgeStyleKey`, `ThemeEdgeKindToken` | Retired (P6 implementation) | The unused relation-specific registry is gone; the generic theme edge-family styling contract remains. |
 | `RelationKind` (read classifier) | Subsume | The recognized predicate. |
 | `RelationSelector` (filter and retract discriminant) | Subsume | A predicate filter: one predicate, a family group or a set. Exact retract uses the assertion id. |
 | `EdgeAssertion` (write contract) | Keep, simplified | `assert(spec)` and `withdraw(id)`, the only two writes. |
@@ -390,16 +396,16 @@ item below:
 
 `link(stratum, a, b)` reads every directed bucket in both pair orientations
 through `projected_relations_between`, including lifted Resource appearances.
-Explicit retained history uses `retained_relations_between`. It yields assertions grouped by
-nothing else. Direction, predicate, asserter and family are attributes of
-members, not levels. P1 gives Graphshell and pictograph one shared implementation;
-roster, cambium and Woodshed adopt it in their later phases. Hosts outside the kernel
-(Woodshed and Knot via scenomise) disclose assertions in the same shape,
-which lives in `scenograph` (L6). Until P6, members from the four sidecar
-families have no id: the shape admits an id-less `(family, sub-kind)`
-member, read-only and labelled as such, so the reading never falls back to
-cells. A reading over a partly resident graph reports its coverage (ruling 4),
-so "no more assertions" and "not loaded" stay distinct.
+Explicit retained history uses `retained_relations_between`. Its canonical
+members preserve exact IDs across all recognized relation families; direction,
+predicate, asserter and family are attributes of members, not levels. The
+grouped rest-stroke projection counts held records by exact ID and omits pairs
+whose only records are withdrawn. Traversal remains a separate event summary.
+P1 gives Graphshell and Pictograph one shared implementation; roster, Cambium
+and Woodshed adopt it in their later phases. Hosts outside the kernel (Woodshed
+and Knot via Scenomise) disclose assertions in the same shape, which lives in
+Scenograph (L6). A reading over a partly resident graph reports its coverage
+(ruling 4), so "no more assertions" and "not loaded" stay distinct.
 
 ### 7.2 The opened link, which is the "nested link"
 
@@ -568,15 +574,18 @@ current storage, so a consumer benefits before any persistence change.
   response, observed path motion and any allocated spring share. Record the
   evaluator, bounds and response rules used; endpoint feedback and resonance
   are further choices, not completion requirements.
-- **P6. All families as assertions.** The four sidecar families become
-  assertion records, `EdgePayload` collapses to one list, `RelationKind` and
-  `RelationSelector` become predicate filters, and the tabard style registry
-  retires. Persistence migration loads old snapshots, with asserters from
-  journal replay as in ruling 9. Proof: roster and pandect hide one
-  containment assertion of two on a pair. Done also requires that every
-  family's behavior (visibility, deletion, durability, layout) is unchanged,
-  and that reads stay within budget on a graph with substantial withdrawal
-  history.
+- **P6. All families as assertions.** The four former sidecar families now
+  use canonical assertion records, with compatibility set accessors derived
+  from them; `TraversalData` remains a separate summary. The unused Tabard
+  relation-specific style registry is retired while generic family styling
+  remains. Persistence migration loads old snapshots, with asserters from
+  journal replay as in ruling 9. Bounded P6 is qualified: exact-ID withdrawal
+  retains the independent same-pair reason; shared reads, acknowledged
+  presentation hiding and persistence preserve source records; old snapshots,
+  journals, codicils, sync and transfer retain their checked behavior. The
+  source, reviewed browser/receiving and substantial-history budget receipts
+  are recorded in the implementation plan. Traversal's future occurrence model
+  and P7 promotion keep their own scope.
 
 ### 8.1 Execution recommendation: a core sequence and an independent probe
 
@@ -732,3 +741,31 @@ withdrawal tombstone. Seven reviewed List/Timeline captures close the bounded P3
 receiving proof, published with receipt `943c762`. The implementation plan records
 exact revisions, receiving receipts and the separate Knot checkpoint
 confidentiality finding. L1–L13 and the later phase gates are unchanged.
+
+
+**2026-10-16, bounded P6 qualified.** All 44 recognized predicates now use
+retained assertion records; the four former set families have derived
+compatibility reads. Exact withdrawal and exact view hiding preserve independent
+reasons and their source metadata. Versioned legacy conversion preserves unknown
+clocks and only repairs attribution from proven journal history. The
+[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md#p6-qualification-and-receiving-proof)
+records source, compatibility, 50,000-withdrawal budgets, reviewed WebGPU
+hide/reopen proof and the published Woodshed receiving receipt. Traversal remains
+event-shaped; fields and sympathetic influences retain the dynamics framing in
+§7.3, and P7 promotion remains later work.
+
+
+### P7 promoted-link qualification (2026-10-16)
+
+The [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md#p7-qualification-2026-10-16)
+and [receipt](../../../support/receipts/link-model-p7-20261016/receipt.json)
+record bounded Graphshell P7 on `6d53d4439`. Each freeze creates an independent
+Resource with the original stratum, endpoint references, exact directed assertion
+copies and explicit source revision availability. The immutable facet survives
+later source withdrawal, while live drift and Resource-owned review comments
+remain separate readings/assertions. A receiving process reopens the carried
+Resource without inventing endpoint payloads and reports missing Surface and
+Resource references through coverage. Six reviewed final-source browser captures
+cover ordinary freeze, withdrawal, review and fresh-page reopening. This proof
+has one owning graph source per freeze; broader receiving products and automatic
+resident synchronization keep their separate gates.

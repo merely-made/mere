@@ -1,0 +1,405 @@
+    Checking windows_x86_64_msvc v0.53.1
+    Checking muniment v0.1.2 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\eidetic\muniment)
+    Checking insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+    Checking mere-curation v0.1.1 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\forme\curation)
+    Checking numen v0.2.0 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\conatus\numen)
+    Checking command-menu v0.1.0 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\cambium\command-menu)
+    Checking sceno v0.0.5 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\cambium\scenes\sceno)
+    Checking tinct v0.1.2 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\cambium\tinct)
+    Checking windows-sys v0.59.0
+    Checking incipit v0.2.0 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\incipit)
+    Checking chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+    Checking windows-targets v0.53.5
+    Checking windows-sys v0.60.2
+    Checking mere-forme v0.2.0 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\forme\forme)
+    Checking personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#2f27f1a9)
+    Checking tabard v0.0.1 (C:\Users\mark_\Code\worktrees\mere-sennet-direct-custody\crates\system\tabard)
+error: you should consider adding a `Default` implementation for `FieldId`
+  --> crates\conatus\numen\src\field.rs:38:5
+   |
+38 | /     pub fn new() -> Self {
+39 | |         Self(Uuid::new_v4())
+40 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#new_without_default
+   = note: `-D clippy::new-without-default` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::new_without_default)]`
+help: try adding this
+   |
+49 ~ }
+50 + 
+51 + #[cfg(not(target_arch = "wasm32"))]
+52 + impl Default for FieldId {
+53 +     fn default() -> Self {
+54 +         Self::new()
+55 +     }
+56 + }
+   |
+
+error: you should consider adding a `Default` implementation for `CouplingId`
+  --> crates\conatus\numen\src\field.rs:57:5
+   |
+57 | /     pub fn new() -> Self {
+58 | |         Self(Uuid::new_v4())
+59 | |     }
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#new_without_default
+help: try adding this
+   |
+68 ~ }
+69 + 
+70 + #[cfg(not(target_arch = "wasm32"))]
+71 + impl Default for CouplingId {
+72 +     fn default() -> Self {
+73 +         Self::new()
+74 +     }
+75 + }
+   |
+
+error: could not compile `numen` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: this `impl` can be derived
+  --> crates\forme\forme\src\layout.rs:28:1
+   |
+28 | / impl Default for LayoutMode {
+29 | |     fn default() -> Self {
+30 | |         Self::TreeStyleTabs
+31 | |     }
+32 | | }
+   | |_^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#derivable_impls
+   = note: `-D clippy::derivable-impls` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::derivable_impls)]`
+help: replace the manual implementation with a derive attribute and mark the default variant
+   |
+17 + #[derive(Default)]
+18 | pub enum LayoutMode {
+19 |     /// Tree-style tabs + single focused content pane. **Default.**
+20 |     /// The tree IS the navigation; one member is active at a time.
+21 ~     #[default]
+22 ~     TreeStyleTabs,
+   |
+
+error: this `impl` can be derived
+  --> crates\forme\forme\src\lens.rs:41:1
+   |
+41 | / impl Default for ProjectionLens {
+42 | |     fn default() -> Self {
+43 | |         Self::Traversal
+44 | |     }
+45 | | }
+   | |_^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#derivable_impls
+help: replace the manual implementation with a derive attribute and mark the default variant
+   |
+16 + #[derive(Default)]
+17 | pub enum ProjectionLens {
+18 |     /// Traversal-first: parent-child from navigation history.
+19 |     /// "I opened B from A" -> B is child of A.
+20 |     /// Natural tree-style-tabs view. **Default.**
+21 ~     #[default]
+22 ~     Traversal,
+   |
+
+error: consider using `sort_by_key`
+   --> crates\forme\forme\src\pressure.rs:135:5
+    |
+135 |     summaries.sort_by(|a, b| b.warm_pressure().cmp(&a.warm_pressure()));
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_sort_by
+    = note: `-D clippy::unnecessary-sort-by` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unnecessary_sort_by)]`
+help: try
+    |
+135 -     summaries.sort_by(|a, b| b.warm_pressure().cmp(&a.warm_pressure()));
+135 +     summaries.sort_by_key(|a| std::cmp::Reverse(a.warm_pressure()));
+    |
+
+error: the following explicit lifetimes could be elided: 'a
+  --> crates\forme\forme\src\query.rs:18:29
+   |
+18 | pub fn members_by_lifecycle<'a, N: MemberId>(
+   |                             ^^
+19 |     tree: &'a GraphTree<N>,
+   |            ^^
+20 |     lifecycle: Lifecycle,
+21 | ) -> Vec<&'a N> {
+   |           ^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_lifetimes
+   = note: `-D clippy::needless-lifetimes` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_lifetimes)]`
+help: elide the lifetimes
+   |
+18 ~ pub fn members_by_lifecycle<N: MemberId>(
+19 ~     tree: &GraphTree<N>,
+20 |     lifecycle: Lifecycle,
+21 ~ ) -> Vec<&N> {
+   |
+
+error: this `if` statement can be collapsed
+  --> crates\forme\forme\src\query.rs:60:9
+   |
+60 | /         if let Some(entry) = tree.get(&ancestor) {
+61 | |             if entry.lifecycle == Lifecycle::Active {
+62 | |                 // Return the ancestor from the tree's own storage
+63 | |                 return tree
+...  |
+68 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+   = note: `-D clippy::collapsible-if` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+   |
+60 ~         if let Some(entry) = tree.get(&ancestor)
+61 ~             && entry.lifecycle == Lifecycle::Active {
+62 |                 // Return the ancestor from the tree's own storage
+...
+66 |                     .map(|(id, _)| id);
+67 ~             }
+   |
+
+error: this `if` statement can be collapsed
+  --> crates\forme\forme\src\query.rs:77:9
+   |
+77 | /         if let Some(entry) = tree.get(sibling) {
+78 | |             if entry.lifecycle == Lifecycle::Active {
+79 | |                 return tree
+80 | |                     .members()
+...  |
+84 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+77 ~         if let Some(entry) = tree.get(sibling)
+78 ~             && entry.lifecycle == Lifecycle::Active {
+79 |                 return tree
+...
+82 |                     .map(|(id, _)| id);
+83 ~             }
+   |
+
+error: this `if` statement can be collapsed
+   --> crates\forme\forme\src\query.rs:111:9
+    |
+111 | /         if let Some(entry) = tree.get(node) {
+112 | |             if entry.lifecycle == lifecycle {
+113 | |                 result.push(node.clone());
+114 | |             }
+115 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+111 ~         if let Some(entry) = tree.get(node)
+112 ~             && entry.lifecycle == lifecycle {
+113 |                 result.push(node.clone());
+114 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates\forme\forme\src\query.rs:123:9
+    |
+123 | /         if let Some(entry) = tree.get(node) {
+124 | |             if entry.is_visible_in_pane() {
+125 | |                 result.push(node.clone());
+126 | |             }
+127 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+123 ~         if let Some(entry) = tree.get(node)
+124 ~             && entry.is_visible_in_pane() {
+125 |                 result.push(node.clone());
+126 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates\forme\forme\src\reconciliation.rs:110:17
+    |
+110 | /                 if let Some(entry) = tree.get_mut(member) {
+111 | |                     if !entry.subgraph_membership.contains(&gid) {
+112 | |                         entry.subgraph_membership.push(gid);
+113 | |                     }
+114 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+110 ~                 if let Some(entry) = tree.get_mut(member)
+111 ~                     && !entry.subgraph_membership.contains(&gid) {
+112 |                         entry.subgraph_membership.push(gid);
+113 ~                     }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates\forme\forme\src\topology.rs:178:9
+    |
+178 | /         if let Some(parent) = self.parent.remove(member) {
+179 | |             if let Some(siblings) = self.children.get_mut(&parent) {
+180 | |                 siblings.retain(|n| n != member);
+181 | |             }
+182 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+178 ~         if let Some(parent) = self.parent.remove(member)
+179 ~             && let Some(siblings) = self.children.get_mut(&parent) {
+180 |                 siblings.retain(|n| n != member);
+181 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> crates\forme\forme\src\tree\actions.rs:194:9
+    |
+194 | /         if let Some(ref active) = self.active {
+195 | |             if !self.contains(active) {
+196 | |                 self.active = None;
+197 | |             }
+198 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+194 ~         if let Some(ref active) = self.active
+195 ~             && !self.contains(active) {
+196 |                 self.active = None;
+197 ~             }
+    |
+
+error: this `if` statement can be collapsed
+  --> crates\forme\forme\src\tree\layout.rs:68:13
+   |
+68 | /             if let Some(entry) = self.members.get(id) {
+69 | |                 if entry.is_visible_in_pane() {
+70 | |                     tabs.push(TabEntry {
+71 | |                         member: id.clone(),
+...  |
+78 | |             }
+   | |_____________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+68 ~             if let Some(entry) = self.members.get(id)
+69 ~                 && entry.is_visible_in_pane() {
+70 |                     tabs.push(TabEntry {
+...
+76 |                     });
+77 ~                 }
+   |
+
+error: this `if` statement can be collapsed
+  --> crates\forme\forme\src\tree\layout.rs:86:9
+   |
+86 | /         if let Some(active) = &self.active {
+87 | |             if self
+88 | |                 .members
+89 | |                 .get(active)
+...  |
+94 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+86 ~         if let Some(active) = &self.active
+87 ~             && self
+88 |                 .members
+...
+92 |                 rects.insert(active.clone(), *available);
+93 ~             }
+   |
+
+error: this function has too many arguments (9/7)
+   --> crates\forme\forme\src\tree\layout.rs:286:5
+    |
+286 | /     fn extract_layout_results(
+287 | |         &self,
+288 | |         taffy: &taffy::TaffyTree<()>,
+289 | |         node: taffy::NodeId,
+...   |
+295 | |         boundaries: &mut Vec<SplitBoundary<N>>,
+296 | |     ) {
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: could not compile `mere-forme` (lib) due to 14 previous errors
+error: doc list item without indentation
+   --> crates\system\tabard\src\theme\registry.rs:118:9
+    |
+118 |     /// maintains contrast on any theme.
+    |         ^
+    |
+    = help: if this is supposed to be its own paragraph, add a blank line
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#doc_lazy_continuation
+    = note: `-D clippy::doc-lazy-continuation` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::doc_lazy_continuation)]`
+help: indent this line
+    |
+118 |     ///   maintains contrast on any theme.
+    |         ++
+
+error: large size difference between variants
+  --> crates\system\tabard\src\workshop.rs:38:1
+   |
+38 | / pub enum Preview {
+39 | |     Tokens(ThemeTokenSet),
+   | |     --------------------- the largest variant contains at least 392 bytes
+40 | |     Stylesheet(Vec<String>),
+   | |     ----------------------- the second-largest variant contains at least 24 bytes
+41 | | }
+   | |_^ the entire enum is at least 392 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_enum_variant
+   = note: `-D clippy::large-enum-variant` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::large_enum_variant)]`
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+39 -     Tokens(ThemeTokenSet),
+39 +     Tokens(Box<ThemeTokenSet>),
+   |
+
+error: usage of `bool::then` in `filter_map`
+   --> crates\system\tabard\src\lib.rs:369:14
+    |
+369 |               .filter_map(|(role, labels)| {
+    |  ______________^
+370 | |                 (labels.len() > 1).then(|| LagrangePaletteDiagnostic::CollapsedRole {
+371 | |                     source_role: role,
+372 | |                     labels: labels.clone(),
+373 | |                 })
+374 | |             })
+    | |______________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#filter_map_bool_then
+    = note: `-D clippy::filter-map-bool-then` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::filter_map_bool_then)]`
+help: use `filter` then `map` instead
+    |
+369 ~             .filter(|&(role, labels)| (labels.len() > 1)).map(|(role, labels)| LagrangePaletteDiagnostic::CollapsedRole {
+370 +                     source_role: role,
+371 +                     labels: labels.clone(),
+372 +                 })
+    |
+
+error: could not compile `tabard` (lib) due to 3 previous errors

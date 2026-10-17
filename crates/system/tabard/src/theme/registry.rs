@@ -73,6 +73,10 @@ pub const THEME_ID_DEFAULT: &str = "theme:default";
 pub const THEME_ID_LIGHT: &str = "theme:light";
 pub const THEME_ID_DARK: &str = "theme:dark";
 pub const THEME_ID_HIGH_CONTRAST: &str = "theme:high_contrast";
+/// The Merely brand seed set (oxblood, lake, ember over parchment), light.
+pub const THEME_ID_MERELY: &str = "theme:merely";
+/// Graphshell's own night palette, re-expressed as seeds (2026-10-16).
+pub const THEME_ID_GRAPHSHELL_NIGHT: &str = "theme:graphshell_night";
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeTokenSet {
@@ -356,6 +360,7 @@ impl ThemeRegistry {
             // part of the theme's look; remove them by editing the fork).
             mode_sheets: src.mode_sheets,
             typography: src.typography,
+            categories: src.categories,
         };
         self.add_user_theme(def.clone()).ok()?;
         Some(def)

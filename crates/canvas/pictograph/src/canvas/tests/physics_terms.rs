@@ -306,11 +306,7 @@ fn expected_classes(row: &str) -> Option<&'static [Class]> {
 /// `NodeExclusion`, not a term, so it has no row.
 #[test]
 fn every_catalog_term_declares_itself() {
-    assert_eq!(
-        PhysicsLaw::ALL.len(),
-        12,
-        "every law declares its terms"
-    );
+    assert_eq!(PhysicsLaw::ALL.len(), 12, "every law declares its terms");
     let fixture = Fixture::p2();
     let probe = fixture.probe();
     let positions = probe.scatter(1, fixture.radius);

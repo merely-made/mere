@@ -1,0 +1,65 @@
+{
+  "schema": "mere.cleromancy-c5-intake/v1",
+  "date": "2026-10-16",
+  "status": "C5 portable validator qualifies on integrated receiving source; publication recorded separately",
+  "source": "f21ba258e9478a0051e6671183d03d5f4c8748fc",
+  "core": "7b0c5ef604355c7140a6dbc64b53f14d0983c157",
+  "native_product": "052e54ffb809390e5a0dacaf78e0811cd974c9b6",
+  "product_supplier": "72f9c5c73ab9ddd8ba761524388c2406a6d6ffcf",
+  "integrated_origin_main": "594c5b3832b34509a11a6c39ece2ebed22ff3142",
+  "compiler": "Cargo1.99 rustc/rustdoc1.97.1",
+  "command": "cargo test --locked --offline -p djinn --test embedded_reservoir_validation",
+  "passed": 6,
+  "failed": 0,
+  "ignored": 1,
+  "ignore_reason": "The process-child entry is intentionally ignored by the outer runner and launched explicitly by parent tests.",
+  "owners": [
+    "embedded",
+    "daemon",
+    "embedded"
+  ],
+  "checks": [
+    "Two complete typed decks, legacy reading, three-card shuffled prefix and orientations survive exact graph replay across every owner",
+    "Seed fixture is installed through bounded replay-valid candidate transactions; final expected facets remain exact",
+    "Orientation and same-schema tamper are refused atomically with snapshots and every durable byte unchanged",
+    "C1/C3/C4 original ownership tests remain active on the same current validator"
+  ],
+  "packet_disposition": "Original combined two-deck fixture packet exceeds 1MiB; logs owner-initial and owner-final retain failure. The identical-field guard alone did not fix it. Only fixture setup uses bounded complete-candidate prefixes under900k encoded-payload allowance; carrier1MiB cap and atomic rejection guards are unchanged.",
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "afdeb9c318c9d3d1ca1c9d1ee4cf9f90b557d91020acda55720df7f2747847a5"
+    },
+    {
+      "path": "ports/djinn/tests/embedded_reservoir_validation.rs",
+      "sha256": "fa5f3efd103176fdc1411951bfe31889c129676a5e614c2fb5bf65b722d33de1"
+    }
+  ],
+  "logs": [
+    {
+      "path": "owner-bounded-second.log",
+      "sha256": "b5e3ba6b7ca46a4389f47c48f45d94e855e1eeca54f0996d8a9f127c64b2997b"
+    },
+    {
+      "path": "owner-committed.log",
+      "sha256": "66b3909114cdb6e5027d36bdc6365d6d5054a2e0999a8836f52fc2ad1690c9b9"
+    },
+    {
+      "path": "owner-final.log",
+      "sha256": "00d5cff0eb08b356654f0af8ed1bb1a4480eaf75a17e31267031a0f5f48f1bdd"
+    },
+    {
+      "path": "owner-initial.log",
+      "sha256": "5b85b04da0d6fc473812e643228391d2cb2c8f59a45f695d114d1f0760b2d090"
+    },
+    {
+      "path": "owner-integrated.log",
+      "sha256": "49aae22b1559dc18dc636f2176eaf7cc4d06e08e26e10941924d678e02ac3938"
+    }
+  ],
+  "limits": [
+    "Native product receipts keep frozen052e54f; receiving source is not substituted for the native supplier",
+    "Current Isocosm removed its Cleromancy dependency; no Isocosm runtime integration pass claimed",
+    "Shared wall, graphical unlock and release/performance remain separate gates"
+  ]
+}

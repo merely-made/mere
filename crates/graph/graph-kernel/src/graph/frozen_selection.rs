@@ -40,7 +40,7 @@ pub struct OpenedFrozenSelection<'a> {
 }
 // Legacy edge DTOs deliberately remain permissive. This v1 carrier checks
 // every nested key against what their typed serialization retains instead.
-fn validate_retained_keys(
+pub(super) fn validate_retained_keys(
     input: &serde_json::Value,
     known: &serde_json::Value,
 ) -> Result<(), String> {
@@ -66,6 +66,26 @@ fn validate_retained_keys(
     Ok(())
 }
 
+pub(super) fn normalize_statement_defaults(statements: &mut [serde_json::Value]) {
+    for statement in statements {
+        let object = statement
+            .as_object_mut()
+            .expect("serialized statement object");
+        for field in [
+            "recognized_sub_kind",
+            "label",
+            "graph_scope",
+            "provenance_iri",
+            "asserted_at_ms",
+            "first_asserted_ms",
+            "withdrawn",
+            "basis",
+        ] {
+            object.entry(field).or_insert(serde_json::Value::Null);
+        }
+    }
+}
+
 /// Decode and check nested references without requiring member residency.
 pub(crate) fn selection_from_record(
     record: &crate::persistence::PersistedResourceRecord,
@@ -89,24 +109,17 @@ pub(crate) fn selection_from_record(
         .expect("serialized edge array")
     {
         if let Some(statements) = edge
-            .get_mut("semantic")
-            .and_then(|s| s.get_mut("statements"))
-            .and_then(|s| s.as_array_mut())
+            .get_mut("assertions")
+            .and_then(serde_json::Value::as_array_mut)
         {
-            for statement in statements {
-                let object = statement
-                    .as_object_mut()
-                    .expect("serialized statement object");
-                for field in [
-                    "recognized_sub_kind",
-                    "label",
-                    "graph_scope",
-                    "provenance_iri",
-                    "asserted_at_ms",
-                ] {
-                    object.entry(field).or_insert(serde_json::Value::Null);
-                }
-            }
+            normalize_statement_defaults(statements);
+        }
+        if let Some(statements) = edge
+            .get_mut("semantic")
+            .and_then(|semantic| semantic.get_mut("statements"))
+            .and_then(serde_json::Value::as_array_mut)
+        {
+            normalize_statement_defaults(statements);
         }
     }
     validate_retained_keys(&raw, &known)?;
@@ -134,19 +147,21 @@ pub(crate) fn selection_from_record(
         {
             return Err("frozen statement endpoints must be member references".into());
         }
-        if let Some(semantic) = &edge.semantic {
-            if semantic.statements.is_empty()
+        if edge.assertions.is_some() && edge.has_legacy_assertion_data() {
+            return Err("frozen relation mixes canonical and legacy assertion data".into());
+        }
+        if edge.assertions.is_none() {
+            if let Some(semantic) = &edge.semantic
+                && semantic.statements.is_empty()
                 && (!semantic.sub_kinds.is_empty() || semantic.predicate.is_some())
             {
                 return Err("frozen semantic statements require exact handles".into());
             }
-            for statement in &semantic.statements {
-                if let Some(previous) =
-                    handles.insert(&statement.statement_id, (from, to, statement))
-                {
-                    if previous != (from, to, statement) {
-                        return Err("conflicting frozen statement handle".into());
-                    }
+        }
+        for statement in edge.retained_assertions() {
+            if let Some(previous) = handles.insert(&statement.statement_id, (from, to, statement)) {
+                if previous != (from, to, statement) {
+                    return Err("conflicting frozen statement handle".into());
                 }
             }
         }
@@ -236,5 +251,72 @@ impl Graph {
             selection,
             coverage: self.coverage_for_resource_refs(selection.members()),
         })
+    }
+}
+
+#[cfg(test)]
+mod canonical_record_tests {
+    use super::*;
+    use crate::persistence::{
+        PersistedEdge, PersistedResourceFacet, PersistedResourceRecord, PersistedSemanticStatement,
+    };
+    use crate::types::{AssertionBasis, GraphScope};
+
+    fn assertion_edge(from: Uuid, to: Uuid, id: &str) -> PersistedEdge {
+        PersistedEdge {
+            from_node_id: from.to_string(),
+            to_node_id: to.to_string(),
+            families: vec![crate::persistence::PersistedEdgeFamily::Semantic],
+            semantic: None,
+            traversal: None,
+            containment: None,
+            arrangement: None,
+            imported: None,
+            provenance: None,
+            assertions: Some(vec![PersistedSemanticStatement {
+                statement_id: id.into(),
+                predicate: "urn:test:claim".into(),
+                recognized_sub_kind: None,
+                label: Some("claim".into()),
+                graph_scope: GraphScope::User,
+                provenance_iri: Some("urn:test:author".into()),
+                asserted_at_ms: Some(12),
+                first_asserted_ms: Some(10),
+                withdrawn: None,
+                basis: AssertionBasis {
+                    note: Some("basis note".into()),
+                    ..Default::default()
+                },
+            }]),
+        }
+    }
+
+    #[test]
+    fn frozen_selection_rejects_conflicting_canonical_ids_across_pairs() {
+        let first = Uuid::from_u128(1);
+        let second = Uuid::from_u128(2);
+        let third = Uuid::from_u128(3);
+        let selection = FrozenSelection {
+            version: 1,
+            spec: serde_json::json!({}),
+            revision: 1,
+            members: vec![first, second, third],
+            statements: vec![
+                assertion_edge(first, second, "same-id"),
+                assertion_edge(first, third, "same-id"),
+            ],
+        };
+        let record = PersistedResourceRecord {
+            canonical_iri: "urn:uuid:selection".into(),
+            facets: vec![PersistedResourceFacet {
+                facet: FROZEN_SELECTION.into(),
+                value_json: serde_json::to_string(&selection).unwrap(),
+            }],
+        };
+        assert!(
+            selection_from_record(&record)
+                .unwrap_err()
+                .contains("conflicting frozen statement handle")
+        );
     }
 }

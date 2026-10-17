@@ -215,15 +215,13 @@ fn exact_reconfirm_withdraw_and_stale_import_preserve_lifecycle_history() {
     assert!(
         persisted
             .iter()
-            .flat_map(|edge| edge.semantic.as_ref().into_iter())
-            .flat_map(|semantic| semantic.statements.iter())
+            .flat_map(|edge| edge.retained_assertions())
             .any(|s| { s.statement_id == first.statement_id && s.withdrawn.is_some() })
     );
     assert!(
         persisted
             .iter()
-            .flat_map(|edge| edge.semantic.as_ref().into_iter())
-            .flat_map(|semantic| semantic.statements.iter())
+            .flat_map(|edge| edge.retained_assertions())
             .any(|s| { s.statement_id == other.statement_id && s.withdrawn.is_none() })
     );
 
@@ -363,13 +361,14 @@ fn plain_claim_is_an_empty_reason_key_and_tombstone_only_buckets_leave_topology(
             .iter()
             .any(|statement| statement.statement_id == dead.statement_id)
     }));
-    assert!(graph.to_snapshot().resource_edges.iter().any(|edge| {
-        edge.semantic.as_ref().is_some_and(|data| {
-            data.statements
-                .iter()
-                .any(|s| s.statement_id == dead.statement_id && s.withdrawn.is_some())
-        })
-    }));
+    assert!(
+        graph
+            .to_snapshot()
+            .resource_edges
+            .iter()
+            .flat_map(|edge| edge.retained_assertions())
+            .any(|s| s.statement_id == dead.statement_id && s.withdrawn.is_some())
+    );
 
     assert!(graph.append_traversal(c, d, NavigationTrigger::LinkClick, Some(5)));
     assert!(

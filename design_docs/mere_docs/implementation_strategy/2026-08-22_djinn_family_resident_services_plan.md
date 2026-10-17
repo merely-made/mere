@@ -706,3 +706,13 @@ evidence is in `testing/receipts/sennet-custody/`; private synthetic wallets
 stay in Murm's ignored validation results with helpers stopped. The existing
 shared `C:/t/cargo-homes/mere-upstreams` cache remains co-owned by the earlier
 family qualifiers and this gate. No isolated Cargo home/target was created.
+
+Murm R8 (2026-10-16) adds `SennetStationMaterial` from Dramatis `2f27f1a`
+to the same exact release, preserving the public node and sticky lease.
+Transient copies and retained material zeroize; Debug is redacted. Broker
+namespace/policy remain unchanged. Six real-Keeper cases pass again, now
+including stable material on reopen as well as wrong-app and custody controls.
+The updated probe builds and selected port/example strict Clippy passes with
+`--no-deps`; a broader invocation separately records unrelated Tabard warnings.
+Public evidence is in `testing/receipts/sennet-directed-custody/`. Murm owns
+protocol construction, peer pinning, nonce allocation and directed/ACK RF proof.

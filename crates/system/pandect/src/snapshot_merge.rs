@@ -37,6 +37,69 @@ fn check_assertion_handles(snapshot: &GraphSnapshot) -> Result<()> {
     crate::merge_rules::check_assertion_handles(snapshot).map_err(|error| Error::new(error.0))
 }
 
+/// Validate the source as stored, then lift only its edge columns through the
+/// kernel's recorded-snapshot reader. That reader assigns deterministic IDs to
+/// legacy sidecars without deriving new relations from the surfaces' current
+/// URLs. Keeping the original snapshot as the base preserves every non-edge
+/// column while making the assertion schema uniform for composition.
+fn canonical_assertion_columns(snapshot: &GraphSnapshot) -> Result<GraphSnapshot> {
+    check_assertion_handles(snapshot)?;
+    let graph = Graph::try_from_recorded_snapshot(snapshot)
+        .map_err(|error| Error::new(format!("invalid composition source: {error}")))?;
+    let canonical = graph.to_snapshot();
+    let surfaces: HashSet<_> = snapshot
+        .nodes
+        .iter()
+        .filter_map(|node| uuid::Uuid::parse_str(&node.node_id).ok())
+        .collect();
+    // The graph reader intentionally skips orphaned Surface DTOs and empty
+    // buckets. Compose historically retains those raw rows; they do not own
+    // active handles when orphaned, but dropping them here would silently
+    // rewrite the source's compatibility data.
+    let retained_raw_surface_rows: Vec<_> = snapshot
+        .edges
+        .iter()
+        .filter(|edge| {
+            let valid_surface_pair = [&edge.from_node_id, &edge.to_node_id]
+                .into_iter()
+                .all(|id| {
+                    uuid::Uuid::parse_str(id)
+                        .ok()
+                        .is_some_and(|id| surfaces.contains(&id))
+                });
+            let legacy_orphan = snapshot.assertion_schema == 0 && !valid_surface_pair;
+            let empty_bucket = edge.retained_assertions().is_empty()
+                && !edge.has_legacy_assertion_data()
+                && edge.traversal.is_none();
+            legacy_orphan || empty_bucket
+        })
+        .cloned()
+        .collect();
+    let keeps_legacy_orphans = snapshot.assertion_schema == 0
+        && retained_raw_surface_rows.iter().any(|edge| {
+            [&edge.from_node_id, &edge.to_node_id]
+                .into_iter()
+                .any(|id| {
+                    !uuid::Uuid::parse_str(id)
+                        .ok()
+                        .is_some_and(|id| surfaces.contains(&id))
+                })
+        });
+    let mut normalized = snapshot.clone();
+    normalized.edges = canonical.edges;
+    normalized.edges.extend(retained_raw_surface_rows);
+    normalized.resource_edges = canonical.resource_edges;
+    normalized.assertion_schema = if keeps_legacy_orphans {
+        0
+    } else {
+        canonical.assertion_schema
+    };
+    check_assertion_handles(&normalized)?;
+    Graph::try_from_recorded_snapshot(&normalized)
+        .map_err(|error| Error::new(format!("invalid normalized composition source: {error}")))?;
+    Ok(normalized)
+}
+
 /// What [`merge_snapshots`] did, for the Athanor proposal / diagnostics. Never a
 /// placebo: every count reflects a real change to the merged snapshot.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -83,13 +146,14 @@ pub(crate) fn merge_snapshots_with_remap(
     a: &GraphSnapshot,
     b: &GraphSnapshot,
 ) -> Result<(GraphSnapshot, MergeReport, HashMap<String, String>)> {
-    for snapshot in [a, b] {
-        check_assertion_handles(snapshot)?;
-        Graph::try_from_snapshot(snapshot)
-            .map_err(|error| Error::new(format!("invalid composition source: {error}")))?;
-    }
+    let a = canonical_assertion_columns(a)?;
+    let b = canonical_assertion_columns(b)?;
     let mut report = MergeReport::default();
     let mut merged = a.clone();
+    // A retained schema-0 orphan is opaque compatibility data. Keep the
+    // merged envelope permissive so those exact rows survive the final load;
+    // all active canonical handles are still checked independently below.
+    merged.assertion_schema = a.assertion_schema.min(b.assertion_schema);
 
     // A URL identifies content, while each surface keeps its own stable id.
     let mut id_to_index: HashMap<String, usize> = merged
@@ -225,6 +289,7 @@ mod tests {
     /// A minimal kind-less edge between two node ids.
     fn edge(from: &str, to: &str) -> PersistedEdge {
         PersistedEdge {
+            assertions: None,
             from_node_id: from.to_string(),
             to_node_id: to.to_string(),
             families: Vec::new(),
@@ -347,25 +412,163 @@ mod tests {
     fn assertion(from: &str, to: &str, handle: &str) -> PersistedEdge {
         let mut edge = edge(from, to);
         edge.families = vec![kernel::persistence::PersistedEdgeFamily::Semantic];
-        edge.semantic = Some(kernel::persistence::PersistedSemanticEdgeData {
-            statements: vec![kernel::persistence::PersistedSemanticStatement {
-                statement_id: handle.into(),
-                predicate: "https://schema.org/citation".into(),
-                recognized_sub_kind: None,
-                label: Some("citation".into()),
-                basis: kernel::types::AssertionBasis {
-                    note: Some("citation".into()),
-                    ..Default::default()
-                },
-                graph_scope: kernel::types::GraphScope::Default,
-                provenance_iri: Some("https://author.test/".into()),
-                asserted_at_ms: Some(17),
-                first_asserted_ms: Some(17),
-                withdrawn: None,
-            }],
-            ..Default::default()
-        });
+        edge.assertions = Some(vec![kernel::persistence::PersistedSemanticStatement {
+            statement_id: handle.into(),
+            predicate: "https://schema.org/citation".into(),
+            recognized_sub_kind: None,
+            label: Some("citation".into()),
+            basis: kernel::types::AssertionBasis {
+                note: Some("citation".into()),
+                ..Default::default()
+            },
+            graph_scope: kernel::types::GraphScope::Default,
+            provenance_iri: Some("https://author.test/".into()),
+            asserted_at_ms: Some(17),
+            first_asserted_ms: Some(17),
+            withdrawn: None,
+        }]);
         edge
+    }
+
+    /// Re-encode assertion records as schema-0 sidecars for legacy loader
+    /// controls that intentionally admit malformed or unbound endpoint rows.
+    fn use_legacy_schema_zero(snapshot: &mut GraphSnapshot) {
+        snapshot.assertion_schema = 0;
+        for edge in snapshot
+            .edges
+            .iter_mut()
+            .chain(snapshot.resource_edges.iter_mut())
+        {
+            if let Some(assertions) = edge.assertions.take() {
+                edge.semantic = (!assertions.is_empty()).then(|| {
+                    kernel::persistence::PersistedSemanticEdgeData {
+                        statements: assertions,
+                        ..Default::default()
+                    }
+                });
+            }
+        }
+    }
+
+    fn canonical_claim(id: &str, predicate: &str, evidence: &str) -> PersistedEdge {
+        use kernel::persistence::{PersistedEdgeFamily, PersistedSemanticStatement};
+        use kernel::types::{AssertionBasis, GraphScope};
+
+        let mut edge = edge("", "");
+        edge.families = vec![PersistedEdgeFamily::Containment];
+        edge.assertions = Some(vec![PersistedSemanticStatement {
+            statement_id: id.into(),
+            predicate: predicate.into(),
+            recognized_sub_kind: None,
+            label: Some(evidence.into()),
+            graph_scope: GraphScope::User,
+            provenance_iri: Some("urn:test:author".into()),
+            asserted_at_ms: Some(40),
+            first_asserted_ms: Some(40),
+            withdrawn: None,
+            basis: AssertionBasis {
+                evidence: vec![evidence.into()],
+                ..Default::default()
+            },
+        }]);
+        edge
+    }
+
+    #[test]
+    fn mixed_legacy_and_canonical_snapshots_merge_without_losing_claims_or_placement() {
+        use kernel::graph::{ContainmentSubKind, RelationKind};
+        use kernel::persistence::{PersistedContainmentEdgeData, PersistedEdgeFamily};
+
+        let mut legacy = snap(&["https://sub.example.test/a", "https://target.test/"]);
+        let mut canonical = legacy.clone();
+        let (from, to) = (
+            legacy.nodes[0].node_id.clone(),
+            legacy.nodes[1].node_id.clone(),
+        );
+        let old = PersistedEdge {
+            from_node_id: from.clone(),
+            to_node_id: to.clone(),
+            families: vec![PersistedEdgeFamily::Containment],
+            semantic: None,
+            traversal: None,
+            containment: Some(PersistedContainmentEdgeData {
+                sub_kinds: vec![kernel::persistence::PersistedContainmentSubKind::CollectionMember],
+            }),
+            arrangement: None,
+            imported: None,
+            provenance: None,
+            assertions: None,
+        };
+        legacy.assertion_schema = 0;
+        legacy.edges.push(old);
+
+        let predicate = RelationKind::Containment(ContainmentSubKind::CollectionMember)
+            .predicate_iri()
+            .expect("stable predicate for collection membership");
+        let mut first = canonical_claim("canonical-reason-a", predicate, "reason-a");
+        first.from_node_id = from.clone();
+        first.to_node_id = to.clone();
+        let mut second = canonical_claim("canonical-reason-b", predicate, "reason-b");
+        second.from_node_id = from.clone();
+        second.to_node_id = to.clone();
+        canonical.assertion_schema = 1;
+        canonical.edges = vec![first.clone(), second.clone()];
+
+        // The recorded-snapshot conversion must preserve the original pair and
+        // avoid deriving new URL-path/domain claims from the current URLs.
+        let normalized = canonical_assertion_columns(&legacy).unwrap();
+        assert_eq!(normalized.edges.len(), 1);
+        assert_eq!(normalized.edges[0].from_node_id, from);
+        assert_eq!(normalized.edges[0].to_node_id, to);
+        assert_eq!(normalized.edges[0].retained_assertions().len(), 1);
+
+        let (merged, _) = try_merge_snapshots(&legacy, &canonical).unwrap();
+        let (reverse, _) = try_merge_snapshots(&canonical, &legacy).unwrap();
+        let records = |snapshot: &GraphSnapshot| {
+            let mut rows: Vec<_> = snapshot
+                .edges
+                .iter()
+                .flat_map(|edge| {
+                    edge.retained_assertions()
+                        .iter()
+                        .cloned()
+                        .map(move |record| {
+                            (edge.from_node_id.clone(), edge.to_node_id.clone(), record)
+                        })
+                })
+                .collect();
+            rows.sort_by(|a, b| a.2.statement_id.cmp(&b.2.statement_id));
+            rows
+        };
+        assert_eq!(merged.assertion_schema, 1);
+        assert_eq!(records(&merged).len(), 3);
+        assert_eq!(records(&merged), records(&reverse));
+        assert_eq!(
+            records(&merged)
+                .iter()
+                .map(|(_, _, statement)| statement.statement_id.clone())
+                .collect::<std::collections::BTreeSet<_>>(),
+            [
+                "canonical-reason-a".to_string(),
+                "canonical-reason-b".to_string(),
+                normalized.edges[0].retained_assertions()[0]
+                    .statement_id
+                    .clone(),
+            ]
+            .into_iter()
+            .collect::<std::collections::BTreeSet<_>>()
+        );
+        let legacy_id = normalized.edges[0].retained_assertions()[0]
+            .statement_id
+            .clone();
+        let mut conflicting = canonical.clone();
+        conflicting.edges[0].assertions.as_mut().unwrap()[0].statement_id = legacy_id;
+        assert!(try_merge_snapshots(&legacy, &conflicting).is_err());
+        let reopened = Graph::try_from_recorded_snapshot(&merged)
+            .unwrap()
+            .to_snapshot();
+        assert_eq!(records(&merged), records(&reopened));
+        assert_eq!(reopened.assertion_schema, 1);
     }
 
     fn declaration(
@@ -445,9 +648,9 @@ mod tests {
             Some("declaration-b"),
         )];
         let mut resource_claim = assertion(&from, &to, "held-resource");
-        resource_claim.semantic.as_mut().unwrap().statements[0].predicate = predicate.to_string();
+        resource_claim.retained_assertions_mut()[0].predicate = predicate.to_string();
         let mut surface_claim = assertion(&b.nodes[0].node_id, &b.nodes[1].node_id, "held-surface");
-        surface_claim.semantic.as_mut().unwrap().statements[0].predicate = predicate.to_string();
+        surface_claim.retained_assertions_mut()[0].predicate = predicate.to_string();
         a.resource_edges.push(resource_claim.clone());
         b.edges.push(surface_claim.clone());
         let before = (
@@ -497,20 +700,12 @@ mod tests {
         assert_eq!(chosen.edges, held.edges);
         assert_eq!(chosen.resource_edges, held.resource_edges);
         assert_eq!(
-            chosen.edges[0].semantic.as_ref().unwrap().statements,
-            merged.edges[0].semantic.as_ref().unwrap().statements
+            chosen.edges[0].retained_assertions(),
+            merged.edges[0].retained_assertions()
         );
         assert_eq!(
-            chosen.resource_edges[0]
-                .semantic
-                .as_ref()
-                .unwrap()
-                .statements,
-            merged.resource_edges[0]
-                .semantic
-                .as_ref()
-                .unwrap()
-                .statements
+            chosen.resource_edges[0].retained_assertions(),
+            merged.resource_edges[0].retained_assertions()
         );
         assert_eq!(
             stored_declarations(&chosen, predicate).variants,
@@ -666,7 +861,7 @@ mod tests {
         let statements: Vec<_> = merged
             .resource_edges
             .iter()
-            .flat_map(|edge| &edge.semantic.as_ref().unwrap().statements)
+            .flat_map(|edge| edge.retained_assertions())
             .collect();
         assert_eq!(
             statements.len(),
@@ -751,16 +946,15 @@ mod tests {
         ];
         a.resource_edges = vec![assertion(&from, &to, "stable-handle")];
         let mut b = a.clone();
-        b.resource_edges[0].semantic.as_mut().unwrap().statements[0].label =
-            Some("conflict".into());
+        b.resource_edges[0].retained_assertions_mut()[0].label = Some("conflict".into());
+        b.resource_edges[0].retained_assertions_mut()[0].basis.note = Some("conflict".into());
         assert!(try_merge_snapshots(&a, &b).is_err());
         b.resource_edges = a.resource_edges.clone();
         assert_eq!(
             try_merge_snapshots(&a, &b).unwrap().0.resource_edges.len(),
             1
         );
-        b.resource_edges[0].semantic.as_mut().unwrap().statements[0].statement_id =
-            "other-handle".into();
+        b.resource_edges[0].retained_assertions_mut()[0].statement_id = "other-handle".into();
         assert_eq!(
             try_merge_snapshots(&a, &b).unwrap().0.resource_edges.len(),
             2
@@ -773,6 +967,7 @@ mod tests {
         let from = a.nodes[0].node_id.clone();
         let to = a.nodes[1].node_id.clone();
         a.edges = vec![assertion(&from, &to, "legacy-handle")];
+        use_legacy_schema_zero(&mut a);
         let mut b = a.clone();
         b.edges[0].to_node_id = a.nodes[2].node_id.clone();
         assert!(
@@ -780,12 +975,13 @@ mod tests {
             "same id on a different pair stops"
         );
         b.edges = a.edges.clone();
-        b.edges[0].semantic.as_mut().unwrap().statements[0].label = Some("changed".into());
+        b.edges[0].retained_assertions_mut()[0].label = Some("changed".into());
+        b.edges[0].retained_assertions_mut()[0].basis.note = Some("changed".into());
         assert!(
             try_merge_snapshots(&a, &b).is_err(),
             "same id with a different payload stops"
         );
-        b.edges[0].semantic.as_mut().unwrap().statements[0].statement_id = "distinct-handle".into();
+        b.edges[0].retained_assertions_mut()[0].statement_id = "distinct-handle".into();
         assert_eq!(try_merge_snapshots(&a, &b).unwrap().0.edges.len(), 2);
         b.edges = a.edges.clone();
         assert_eq!(try_merge_snapshots(&a, &b).unwrap().0.edges.len(), 1);
@@ -794,6 +990,14 @@ mod tests {
         assert!(
             try_merge_snapshots(&a, &b).is_ok(),
             "UUID spelling does not change the pair named by an assertion"
+        );
+        let canonical = Graph::try_from_recorded_snapshot(&a).unwrap().to_snapshot();
+        let mut malformed_canonical = canonical.clone();
+        malformed_canonical.edges[0].from_node_id = from.to_uppercase();
+        malformed_canonical.edges[0].to_node_id = to.to_uppercase();
+        assert!(
+            try_merge_snapshots(&canonical, &malformed_canonical).is_err(),
+            "schema-1 exact endpoints remain strict"
         );
         let mut cross_domain = a.clone();
         cross_domain.resource_edges = a.edges.clone();
@@ -820,6 +1024,7 @@ mod tests {
             &uuid::Uuid::from_u128(999).to_string(),
             "resource-handle",
         )];
+        use_legacy_schema_zero(&mut source);
         assert!(Graph::try_from_snapshot(&source).is_ok());
         let before = serde_json::to_value(&source).unwrap();
         let empty = snap(&[]);
@@ -830,27 +1035,31 @@ mod tests {
             "composition leaves source truth untouched"
         );
         assert_eq!(merged.edges, source.edges, "orphan rows stay retained");
-        assert_eq!(merged.resource_edges, source.resource_edges);
+        let canonical_resource_edges = Graph::try_from_recorded_snapshot(&source)
+            .unwrap()
+            .to_snapshot()
+            .resource_edges;
+        assert_eq!(merged.resource_edges, canonical_resource_edges);
         assert!(Graph::try_from_snapshot(&merged).is_ok());
         assert_eq!(
             try_merge_snapshots(&empty, &source)
                 .unwrap()
                 .0
                 .resource_edges,
-            source.resource_edges,
+            canonical_resource_edges,
         );
 
         let mut invalid_endpoint = source.clone();
         invalid_endpoint.edges[0].to_node_id = "not-a-uuid".into();
         let merged = try_merge_snapshots(&invalid_endpoint, &empty).unwrap().0;
         assert_eq!(merged.edges, invalid_endpoint.edges);
-        assert_eq!(merged.resource_edges, source.resource_edges);
+        assert_eq!(merged.resource_edges, canonical_resource_edges);
 
         let mut active = source.clone();
         active.edges[0].to_node_id = active.nodes[1].node_id.to_uppercase();
         assert!(check_assertion_handles(&active).is_err());
         assert!(try_merge_snapshots(&active, &empty).is_err());
-        active.edges[0].semantic.as_mut().unwrap().statements[0].statement_id =
+        active.edges[0].retained_assertions_mut()[0].statement_id =
             "distinct-surface-handle".into();
         assert!(check_assertion_handles(&active).is_ok());
         assert!(try_merge_snapshots(&active, &empty).is_ok());

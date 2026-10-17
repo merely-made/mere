@@ -155,12 +155,15 @@ pub use application_settings_store::{
     save_application_settings,
 };
 pub use arrangement_facets::{
-    ARRANGEMENT_FACE, ARRANGEMENT_MATERIAL, ARRANGEMENT_POSITION, ARRANGEMENT_SIZE,
-    ARRANGEMENT_SPRITE, ARRANGEMENT_SPRITE_HULL, arrangement_position_facet,
-    read_arrangement_faces, read_arrangement_materials, read_arrangement_positions,
+    ARRANGEMENT_FACE, ARRANGEMENT_MATERIAL, ARRANGEMENT_MOSAIC, ARRANGEMENT_POSITION,
+    ARRANGEMENT_REGIONS, ARRANGEMENT_SEED, ARRANGEMENT_SIZE, ARRANGEMENT_SPRITE,
+    ARRANGEMENT_SPRITE_HULL, ArrangementMosaic, ArrangementRegion, arrangement_position_facet,
+    read_arrangement_faces, read_arrangement_materials, read_arrangement_mosaic,
+    read_arrangement_positions, read_arrangement_regions, read_arrangement_seed,
     read_arrangement_sizes, read_arrangement_sprite_hulls, read_arrangement_sprites,
     retain_present_nodes, write_arrangement_faces, write_arrangement_materials,
-    write_arrangement_positions, write_arrangement_sizes, write_arrangement_sprite_hulls,
+    write_arrangement_mosaic, write_arrangement_positions, write_arrangement_regions,
+    write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
     write_arrangement_sprites,
 };
 pub use atomic_file::write_bytes_with_backup;

@@ -14,15 +14,11 @@ use petgraph::visit::EdgeRef;
 
 use super::super::*;
 use crate::persistence::{
-    GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
-    PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedCoupling,
-    PersistedCouplingResponse, PersistedEdge, PersistedEdgeFamily, PersistedField,
-    PersistedFieldExtent, PersistedFieldLifecycle, PersistedImportedEdgeData,
-    PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode, PersistedNodeSelector,
-    PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
-    PersistedSemanticEdgeData, PersistedSemanticStatement, PersistedSemanticSubKind,
-    PersistedShownResource, PersistedTraversalEdgeData, PersistedTraversalMetrics,
-    PersistedTraversalRecord,
+    GraphSnapshot, PersistedAddress, PersistedCoupling, PersistedCouplingResponse, PersistedEdge,
+    PersistedEdgeFamily, PersistedField, PersistedFieldExtent, PersistedFieldLifecycle,
+    PersistedNavigationTrigger, PersistedNode, PersistedNodeSelector, PersistedNodeSessionState,
+    PersistedSemanticStatement, PersistedSemanticSubKind, PersistedShownResource,
+    PersistedTraversalEdgeData, PersistedTraversalMetrics, PersistedTraversalRecord,
 };
 fn persisted_semantic_sub_kind(sub_kind: SemanticSubKind) -> PersistedSemanticSubKind {
     match sub_kind {
@@ -211,6 +207,7 @@ impl Graph {
             .collect();
 
         GraphSnapshot {
+            assertion_schema: 1,
             nodes,
             edges,
             import_records: self.import_records.clone(),
@@ -253,27 +250,14 @@ impl Graph {
             .edges_connecting(from, to)
             .map(|edge| {
                 let mut persisted = self.persisted_edge(from, to, edge.weight());
-                // Exact captures and undo retain session arrangements too.
-                persisted.arrangement =
+                // Pair captures/undo retain session arrangements too.
+                persisted.assertions = Some(
                     edge.weight()
-                        .arrangement_data()
-                        .map(|data| PersistedArrangementEdgeData {
-                            sub_kinds: data
-                                .sub_kinds
-                                .iter()
-                                .map(|kind| match kind {
-                                    ArrangementSubKind::FrameMember => {
-                                        PersistedArrangementSubKind::FrameMember
-                                    },
-                                    ArrangementSubKind::TileGroup => {
-                                        PersistedArrangementSubKind::TileGroup
-                                    },
-                                    ArrangementSubKind::SplitPair => {
-                                        PersistedArrangementSubKind::SplitPair
-                                    },
-                                })
-                                .collect(),
-                        });
+                        .assertions()
+                        .iter()
+                        .map(persisted_assertion)
+                        .collect(),
+                );
                 persisted
             })
             .collect()
@@ -285,17 +269,43 @@ pub(crate) fn persisted_edge_for_ids(from: Uuid, to: Uuid, payload: &EdgePayload
     persisted_edge_with_ids(from.to_string(), to.to_string(), payload)
 }
 
+pub(crate) fn persisted_assertion(statement: &SemanticStatement) -> PersistedSemanticStatement {
+    PersistedSemanticStatement {
+        statement_id: statement.statement_id.clone(),
+        predicate: statement.predicate.clone(),
+        recognized_sub_kind: statement
+            .recognized_sub_kind
+            .map(persisted_semantic_sub_kind),
+        label: statement.label.clone(),
+        basis: statement.basis.clone(),
+        graph_scope: statement.graph_scope.clone(),
+        provenance_iri: statement.provenance_iri.clone(),
+        asserted_at_ms: statement.asserted_at_ms,
+        first_asserted_ms: statement.first_asserted_ms,
+        withdrawn: statement.withdrawn.clone(),
+    }
+}
+
 fn persisted_edge_with_ids(
     from_node_id: String,
     to_node_id: String,
     payload: &EdgePayload,
 ) -> PersistedEdge {
+    let assertions: Vec<_> = payload
+        .assertions()
+        .iter()
+        .filter(|statement| {
+            !matches!(statement.relation_kind(), RelationKind::Arrangement(kind)
+            if kind.durability() != RelationDurability::Durable)
+        })
+        .map(persisted_assertion)
+        .collect();
     PersistedEdge {
         from_node_id,
         to_node_id,
         families: payload
             .families()
-            .iter()
+            .into_iter()
             .map(|family| match family {
                 EdgeFamily::Semantic => PersistedEdgeFamily::Semantic,
                 EdgeFamily::Traversal => PersistedEdgeFamily::Traversal,
@@ -305,49 +315,12 @@ fn persisted_edge_with_ids(
                 EdgeFamily::Provenance => PersistedEdgeFamily::Provenance,
             })
             .collect(),
-        semantic: Some(PersistedSemanticEdgeData {
-            sub_kinds: payload
-                .semantic_data()
-                .map(|data| {
-                    data.sub_kinds
-                        .iter()
-                        .copied()
-                        .map(persisted_semantic_sub_kind)
-                        .collect()
-                })
-                .unwrap_or_default(),
-            label: payload.semantic_data().and_then(|data| data.label.clone()),
-            agent_decay_progress: payload
-                .has_relation(RelationSelector::Semantic(SemanticSubKind::AgentDerived))
-                .then_some(0.0),
-            predicate: payload
-                .semantic_data()
-                .and_then(|data| data.predicate.clone()),
-            statements: payload
-                .semantic_statements()
-                .iter()
-                .map(|statement| PersistedSemanticStatement {
-                    statement_id: statement.statement_id.clone(),
-                    predicate: statement.predicate.clone(),
-                    recognized_sub_kind: statement
-                        .recognized_sub_kind
-                        .map(persisted_semantic_sub_kind),
-                    label: statement.label.clone(),
-                    basis: statement.basis.clone(),
-                    graph_scope: statement.graph_scope.clone(),
-                    provenance_iri: statement.provenance_iri.clone(),
-                    asserted_at_ms: statement.asserted_at_ms,
-                    first_asserted_ms: statement.first_asserted_ms,
-                    withdrawn: statement.withdrawn.clone(),
-                })
-                .collect(),
-        })
-        .filter(|data| {
-            !data.sub_kinds.is_empty()
-                || data.label.is_some()
-                || data.predicate.is_some()
-                || !data.statements.is_empty()
-        }),
+        semantic: None,
+        containment: None,
+        arrangement: None,
+        imported: None,
+        provenance: None,
+        assertions: Some(assertions),
         traversal: payload
             .traversal_data()
             .map(|data| PersistedTraversalEdgeData {
@@ -390,99 +363,6 @@ fn persisted_edge_with_ids(
                     backward_navigations: data.metrics.backward_navigations,
                     last_navigated_at: data.metrics.last_navigated_at,
                 },
-            }),
-        containment: payload
-            .containment_data()
-            .map(|data| PersistedContainmentEdgeData {
-                sub_kinds: data
-                    .sub_kinds
-                    .iter()
-                    .map(|sub_kind| match sub_kind {
-                        ContainmentSubKind::UrlPath => PersistedContainmentSubKind::UrlPath,
-                        ContainmentSubKind::Domain => PersistedContainmentSubKind::Domain,
-                        ContainmentSubKind::FileSystem => PersistedContainmentSubKind::FileSystem,
-                        ContainmentSubKind::UserFolder => PersistedContainmentSubKind::UserFolder,
-                        ContainmentSubKind::ClipSource => PersistedContainmentSubKind::ClipSource,
-                        ContainmentSubKind::NotebookSection => {
-                            PersistedContainmentSubKind::NotebookSection
-                        },
-                        ContainmentSubKind::CollectionMember => {
-                            PersistedContainmentSubKind::CollectionMember
-                        },
-                    })
-                    .collect(),
-            }),
-        arrangement: payload
-            .arrangement_data()
-            .map(|data| PersistedArrangementEdgeData {
-                sub_kinds: data
-                    .sub_kinds
-                    .iter()
-                    .copied()
-                    .filter(|sub_kind| sub_kind.durability() == RelationDurability::Durable)
-                    .map(|sub_kind| match sub_kind {
-                        ArrangementSubKind::FrameMember => PersistedArrangementSubKind::FrameMember,
-                        ArrangementSubKind::TileGroup => PersistedArrangementSubKind::TileGroup,
-                        ArrangementSubKind::SplitPair => PersistedArrangementSubKind::SplitPair,
-                    })
-                    .collect(),
-            }),
-        imported: payload
-            .imported_data()
-            .map(|data| PersistedImportedEdgeData {
-                sub_kinds: data
-                    .sub_kinds
-                    .iter()
-                    .map(|sub_kind| match sub_kind {
-                        ImportedSubKind::BookmarkFolder => PersistedImportedSubKind::BookmarkFolder,
-                        ImportedSubKind::HistoryImport => PersistedImportedSubKind::HistoryImport,
-                        ImportedSubKind::SessionImport => PersistedImportedSubKind::SessionImport,
-                        ImportedSubKind::RssMembership => PersistedImportedSubKind::RssMembership,
-                        ImportedSubKind::FileSystemImport => {
-                            PersistedImportedSubKind::FileSystemImport
-                        },
-                        ImportedSubKind::ArchiveMembership => {
-                            PersistedImportedSubKind::ArchiveMembership
-                        },
-                        ImportedSubKind::SharedCollection => {
-                            PersistedImportedSubKind::SharedCollection
-                        },
-                    })
-                    .collect(),
-            }),
-        provenance: payload
-            .provenance_data()
-            .map(|data| PersistedProvenanceEdgeData {
-                sub_kinds: data
-                    .sub_kinds
-                    .iter()
-                    .map(|sub_kind| match sub_kind {
-                        ProvenanceSubKind::ClippedFrom => PersistedProvenanceSubKind::ClippedFrom,
-                        ProvenanceSubKind::ExcerptedFrom => {
-                            PersistedProvenanceSubKind::ExcerptedFrom
-                        },
-                        ProvenanceSubKind::SummarizedFrom => {
-                            PersistedProvenanceSubKind::SummarizedFrom
-                        },
-                        ProvenanceSubKind::TranslatedFrom => {
-                            PersistedProvenanceSubKind::TranslatedFrom
-                        },
-                        ProvenanceSubKind::RewrittenFrom => {
-                            PersistedProvenanceSubKind::RewrittenFrom
-                        },
-                        ProvenanceSubKind::GeneratedFrom => {
-                            PersistedProvenanceSubKind::GeneratedFrom
-                        },
-                        ProvenanceSubKind::ExtractedFrom => {
-                            PersistedProvenanceSubKind::ExtractedFrom
-                        },
-                        ProvenanceSubKind::ImportedFromSource => {
-                            PersistedProvenanceSubKind::ImportedFromSource
-                        },
-                        ProvenanceSubKind::CopiedFrom => PersistedProvenanceSubKind::CopiedFrom,
-                        ProvenanceSubKind::MergedFrom => PersistedProvenanceSubKind::MergedFrom,
-                    })
-                    .collect(),
             }),
     }
 }

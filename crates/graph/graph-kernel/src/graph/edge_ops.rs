@@ -81,11 +81,38 @@ impl Graph {
             EdgeAssertion::Provenance { sub_kind } => RelationKind::Provenance(*sub_kind),
             EdgeAssertion::Semantic { .. } => unreachable!(),
         };
-        let key = self
-            .relation_bucket(from, to, super::built_in_relation_stratum(kind))
-            .ok()?;
-        if !self.get_relation_mut(key)?.assert_relation(assertion) {
+        let derived = is_derived_containment(kind);
+        let stratum = super::built_in_relation_stratum(kind);
+        if derived
+            && self.derived_output_id_is_retained_for_pair(
+                match stratum {
+                    super::GraphStratum::Surface => "surface",
+                    super::GraphStratum::Resource => "resource",
+                },
+                from,
+                to,
+                kind,
+            )
+        {
             return None;
+        }
+        let key = self.relation_bucket(from, to, stratum).ok()?;
+        if derived && self.derived_output_id_is_retained(key, kind) {
+            return None;
+        }
+        if !self.get_relation_mut(key)?.assert_relation_with_context(
+            assertion,
+            Some(asserter_iri),
+            if derived {
+                None
+            } else {
+                Some(asserted_at_ms.unwrap_or_else(unix_epoch_millis))
+            },
+        ) {
+            return None;
+        }
+        if derived {
+            self.normalize_derived_membership(key, kind);
         }
         self.bump_revision();
         self.capture_statement_bucket(key);
@@ -122,29 +149,172 @@ impl Graph {
                 )
                 .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
         }
+        let derived_kind = match &assertion {
+            EdgeAssertion::Containment { sub_kind }
+                if matches!(
+                    sub_kind,
+                    super::ContainmentSubKind::UrlPath | super::ContainmentSubKind::Domain
+                ) =>
+            {
+                Some(RelationKind::Containment(*sub_kind))
+            },
+            _ => None,
+        };
         if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
             return None;
         }
         if let Some(edge_key) = self.find_edge_key(from, to) {
+            if let Some(kind) = derived_kind {
+                if self.derived_output_id_is_retained(RelationKey::Surface(edge_key), kind) {
+                    return None;
+                }
+            }
             // Existing edge: assert onto its payload. A real change (a new relation on the pair —
             // a multiplicity bump a weighted signal reads) advances the revision.
             let changed = {
                 let payload = self.inner.edge_mut(edge_key)?;
-                payload.assert_relation(assertion)
+                payload.assert_relation_with_context(
+                    assertion,
+                    Some(asserter_iri.clone()),
+                    asserted_at_ms,
+                )
             };
             if changed {
+                if let Some(kind) = derived_kind {
+                    self.normalize_derived_membership(RelationKey::Surface(edge_key), kind);
+                }
                 self.bump_revision();
                 return Some(RelationKey::Surface(edge_key));
             }
             return None;
         }
+        if let Some(kind) = derived_kind {
+            if self.derived_output_id_is_retained_for_pair("surface", from, to, kind) {
+                return None;
+            }
+        }
         let mut payload = EdgePayload::new();
-        if !payload.assert_relation(assertion) {
+        if !payload.assert_relation_with_context(
+            assertion,
+            Some(asserter_iri.clone()),
+            asserted_at_ms,
+        ) {
             return None;
         }
         let edge_key = self.inner.connect(from, to, payload);
+        if let Some(kind) = derived_kind {
+            self.normalize_derived_membership(RelationKey::Surface(edge_key), kind);
+        }
         self.bump_revision();
         Some(RelationKey::Surface(edge_key))
+    }
+
+    /// Derived containment is a rule output, not authored history. Its ID is
+    /// stable for this directed source bucket and its time remains undated.
+    fn normalize_derived_membership(&mut self, key: RelationKey, kind: RelationKind) {
+        let endpoints = match key {
+            RelationKey::Surface(key) => self.inner.inner().edge_endpoints(key).map(|(a, b)| {
+                (
+                    "surface",
+                    self.inner.node(a).unwrap().id,
+                    self.inner.node(b).unwrap().id,
+                )
+            }),
+            RelationKey::Resource(key) => {
+                self.resources
+                    .inner()
+                    .edge_endpoints(key.raw())
+                    .map(|(a, b)| {
+                        (
+                            "resource",
+                            self.resources.node(a).unwrap().id(),
+                            self.resources.node(b).unwrap().id(),
+                        )
+                    })
+            },
+        };
+        let Some((stratum, from, to)) = endpoints else {
+            return;
+        };
+        let id = derived_containment_statement_id(stratum, from, to, kind);
+        if self.find_semantic_statement(&id).is_some() {
+            return;
+        }
+        for statement in &mut self.get_relation_mut(key).unwrap().assertions.statements {
+            if !statement.is_held() || statement.relation_kind() != kind {
+                continue;
+            }
+            statement.statement_id = id.clone();
+            statement.provenance_iri = Some("urn:mere:rule:derived-containment:v1".into());
+            statement.first_asserted_ms = None;
+            statement.asserted_at_ms = None;
+            statement.basis = crate::types::AssertionBasis {
+                method: Some(crate::types::AssertionMethod {
+                    iri: "urn:mere:method:derived-containment".into(),
+                    version: Some("1".into()),
+                }),
+                ..Default::default()
+            };
+        }
+    }
+
+    fn derived_output_id_is_retained(&self, key: RelationKey, kind: RelationKind) -> bool {
+        let endpoints = match key {
+            RelationKey::Surface(key) => {
+                self.inner.inner().edge_endpoints(key).and_then(|(a, b)| {
+                    Some(("surface", self.inner.node(a)?.id, self.inner.node(b)?.id))
+                })
+            },
+            RelationKey::Resource(key) => self
+                .resources
+                .inner()
+                .edge_endpoints(key.raw())
+                .and_then(|(a, b)| {
+                    Some((
+                        "resource",
+                        self.resources.node(a)?.id(),
+                        self.resources.node(b)?.id(),
+                    ))
+                }),
+        };
+        endpoints.is_some_and(|(stratum, from, to)| {
+            self.derived_output_id_is_retained_for_identity(stratum, from, to, kind)
+        })
+    }
+
+    fn derived_output_id_is_retained_for_pair(
+        &self,
+        stratum: &str,
+        from_key: NodeKey,
+        to_key: NodeKey,
+        kind: RelationKind,
+    ) -> bool {
+        let (Some(from), Some(to)) = (self.get_node(from_key), self.get_node(to_key)) else {
+            return false;
+        };
+        let (from, to) = if stratum == "resource" {
+            let from_id = self
+                .shown_resource_id(from_key)
+                .unwrap_or_else(|| super::resource::ResourceNode::new(from.url()).id());
+            let to_id = self
+                .shown_resource_id(to_key)
+                .unwrap_or_else(|| super::resource::ResourceNode::new(to.url()).id());
+            (from_id, to_id)
+        } else {
+            (from.id, to.id)
+        };
+        self.derived_output_id_is_retained_for_identity(stratum, from, to, kind)
+    }
+
+    fn derived_output_id_is_retained_for_identity(
+        &self,
+        stratum: &str,
+        from: Uuid,
+        to: Uuid,
+        kind: RelationKind,
+    ) -> bool {
+        let id = derived_containment_statement_id(stratum, from, to, kind);
+        self.find_semantic_statement(&id).is_some()
     }
 
     pub(crate) fn assert_semantic_relation_in_scope(
@@ -243,7 +413,7 @@ impl Graph {
         let Some(to_key) = self.get_node_key_by_id(to_id) else {
             return 0;
         };
-        if is_semantic_selector(selector) {
+        if selector != RelationSelector::Family(super::EdgeFamily::Traversal) {
             return self.withdraw_selected_semantic_assertions(from_key, to_key, selector, false);
         }
         self.retract_surface_relations(from_key, to_key, selector)
@@ -422,7 +592,7 @@ impl Graph {
             .and_then(|key| self.inner.edge(key).map(|payload| (key, payload)))
             .and_then(|(key, payload)| {
                 payload
-                    .semantic_statements()
+                    .assertions()
                     .iter()
                     .find(|statement| {
                         statement.withdrawn.is_none()
@@ -503,7 +673,43 @@ impl Graph {
             }
             return Some(RelationKey::Surface(edge_key));
         }
-        self.assert_surface_relation_as(from, to, assertion, asserter_iri, None)
+        let before: std::collections::BTreeSet<_> = self
+            .edges_between_undirected(from, to)
+            .flat_map(|(_, payload)| payload.assertions())
+            .map(|s| s.statement_id.clone())
+            .collect();
+        let result = self.assert_surface_relation_as(from, to, assertion, asserter_iri, None);
+        if let Some(RelationKey::Surface(key)) = result {
+            let from_id = self.get_node(from)?.id;
+            let to_id = self.get_node(to)?.id;
+            let payload = self.inner.edge_mut(key)?;
+            let mut generations = std::collections::BTreeMap::<String, usize>::new();
+            for statement in &payload.assertions.statements {
+                if before.contains(&statement.statement_id) {
+                    *generations.entry(statement.predicate.clone()).or_default() += 1;
+                }
+            }
+            for statement in &mut payload.assertions.statements {
+                if !before.contains(&statement.statement_id)
+                    && !is_derived_containment(statement.relation_kind())
+                {
+                    let generation = *generations.get(&statement.predicate).unwrap_or(&0);
+                    let bytes = serde_json::to_vec(&(
+                        "mere.legacy-replay-assertion",
+                        1u8,
+                        "surface",
+                        from_id,
+                        to_id,
+                        &statement.predicate,
+                        generation,
+                    ))
+                    .expect("string tuple JSON");
+                    statement.statement_id =
+                        Uuid::new_v5(&Uuid::NAMESPACE_URL, &bytes).urn().to_string();
+                }
+            }
+        }
+        result
     }
 
     /// Assert a semantic statement whose id is ALREADY minted — the re-ingest /
@@ -576,7 +782,7 @@ impl Graph {
         to: NodeKey,
         selector: RelationSelector,
     ) -> usize {
-        if is_semantic_selector(selector) {
+        if selector != RelationSelector::Family(super::EdgeFamily::Traversal) {
             return self.withdraw_selected_semantic_assertions(from, to, selector, true);
         }
         let mut removed = self.retract_surface_relations(from, to, selector);
@@ -624,7 +830,7 @@ impl Graph {
         to: NodeKey,
         selector: RelationSelector,
     ) -> usize {
-        if is_semantic_selector(selector) {
+        if selector != RelationSelector::Family(super::EdgeFamily::Traversal) {
             return self.withdraw_selected_semantic_assertions(from, to, selector, false);
         }
         self.retract_relations(from, to, selector)
@@ -637,16 +843,14 @@ impl Graph {
         selector: RelationSelector,
         authored: bool,
     ) -> usize {
-        let matches_selector = |statement: &SemanticStatement| match selector {
-            RelationSelector::Semantic(kind) => statement.recognized_sub_kind == Some(kind),
-            RelationSelector::Family(super::edge_taxonomy::EdgeFamily::Semantic) => true,
-            _ => false,
+        let matches_selector = |statement: &SemanticStatement| {
+            super::edge_payload::selector_matches_kind(selector, statement.relation_kind())
         };
         let mut ids = self
             .inner
             .inner()
             .edges_connecting(from, to)
-            .flat_map(|edge| edge.weight().held_semantic_statements())
+            .flat_map(|edge| edge.weight().held_assertions())
             .filter(|statement| matches_selector(statement))
             .map(|statement| statement.statement_id.clone())
             .collect::<Vec<_>>();
@@ -657,7 +861,7 @@ impl Graph {
             ids.extend(
                 self.resource_relations()
                     .filter(|(_, a, b, _)| (*a, *b) == (source, target))
-                    .flat_map(|(_, _, _, payload)| payload.held_semantic_statements())
+                    .flat_map(|(_, _, _, payload)| payload.held_assertions())
                     .filter(|statement| matches_selector(statement))
                     .map(|statement| statement.statement_id.clone()),
             );
@@ -733,9 +937,14 @@ impl Graph {
         }
         // Pair iteration visits the newest edge first, so insert in reverse
         // order to preserve the exact capture's row order.
-        for edge in edges.iter().rev() {
-            let mut payload = super::snapshot::payload_from_persisted(edge);
-            if let Some(semantic) = &mut payload.semantic {
+        for (ordinal, edge) in edges.iter().enumerate().rev() {
+            let mut payload = super::snapshot::payload_from_persisted_at(
+                edge,
+                super::GraphStratum::Surface,
+                ordinal,
+            );
+            {
+                let semantic = &mut payload.assertions;
                 for statement in &mut semantic.statements {
                     statement.normalize_legacy_asserter();
                 }
@@ -774,7 +983,8 @@ impl Graph {
         };
         let before = payload.clone();
         payload.set_semantic_predicate(predicate);
-        if let Some(semantic) = payload.semantic.as_mut() {
+        {
+            let semantic = &mut payload.assertions;
             for statement in &mut semantic.statements {
                 if statement.provenance_iri.is_none() {
                     statement.provenance_iri = Some(asserter.clone());
@@ -868,12 +1078,25 @@ impl Graph {
     }
 }
 
-fn is_semantic_selector(selector: RelationSelector) -> bool {
-    matches!(
-        selector,
-        RelationSelector::Semantic(_)
-            | RelationSelector::Family(super::edge_taxonomy::EdgeFamily::Semantic)
-    )
+fn derived_containment_statement_id(
+    stratum: &str,
+    from: Uuid,
+    to: Uuid,
+    kind: RelationKind,
+) -> String {
+    let predicate = kind
+        .predicate_iri()
+        .expect("derived containment has a canonical predicate");
+    let bytes = serde_json::to_vec(&(
+        "mere.derived-containment",
+        1u8,
+        stratum,
+        from,
+        to,
+        predicate,
+    ))
+    .expect("derived containment identity is serializable");
+    Uuid::new_v5(&Uuid::NAMESPACE_URL, &bytes).urn().to_string()
 }
 
 #[cfg(test)]
@@ -943,7 +1166,7 @@ mod legacy_predicate_revision_tests {
 
         assert!(graph.set_edge_semantic_predicate_as(edge, None, "unused".into()));
         let payload = graph.get_edge(edge).unwrap();
-        assert!(payload.held_semantic_statements().next().is_none());
+        assert!(payload.held_assertions().next().is_none());
         assert_eq!(payload.semantic_statements().len(), 1);
         assert!(payload.semantic_statements()[0].withdrawn.is_some());
         assert_eq!(graph.revision(), edited_revision + 1);
@@ -985,4 +1208,13 @@ mod legacy_predicate_revision_tests {
             "existing attribution stays exact"
         );
     }
+}
+
+fn is_derived_containment(kind: RelationKind) -> bool {
+    matches!(
+        kind,
+        RelationKind::Containment(
+            super::ContainmentSubKind::UrlPath | super::ContainmentSubKind::Domain
+        )
+    )
 }

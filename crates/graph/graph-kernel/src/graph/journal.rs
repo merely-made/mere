@@ -497,9 +497,15 @@ impl GraphJournal {
     /// `baseline` is the graph before entry zero, not the checkpoint at `since`.
     pub fn replay_from_with_baseline(&self, since: Seq, graph: &mut Graph, baseline: &Graph) {
         let mut attribution = ReplayAttribution::from_baseline(baseline);
-        for entry in self.log.entries().iter().take(since.index()) {
-            let _ = attribution.replay_delta(&entry.delta, &entry.author);
-        }
+        // Reconstruct prefix evidence on one shadow graph. Pair/kind legacy
+        // attribution needs ordered membership transitions, while cloning the
+        // graph once per journal entry would make checkpoint replay quadratic.
+        let mut shadow = baseline.clone();
+        replay_attributed_deltas_onto(
+            &mut shadow,
+            &mut attribution,
+            self.log.entries().iter().take(since.index()),
+        );
         attribution.repair_checkpoint(graph);
         replay_attributed_deltas_onto(graph, &mut attribution, self.log.from(since));
     }
@@ -846,7 +852,7 @@ mod tests {
                 )
                 .unwrap();
             let mut old_edges = template.persisted_edges_between(from, to);
-            let old_statement = &mut old_edges[0].semantic.as_mut().unwrap().statements[0];
+            let old_statement = &mut old_edges[0].retained_assertions_mut()[0];
             old_statement.statement_id = "legacy-exact-handle".into();
             old_statement.provenance_iri = source.map(str::to_owned);
             if source.is_none() {
@@ -861,11 +867,7 @@ mod tests {
                 baseline_journal.record_as(recorder.clone(), exact);
                 baseline_journal.replay_from(Seq(0), &mut baseline);
                 assert_eq!(
-                    baseline.persisted_edges_between(from, to)[0]
-                        .semantic
-                        .as_ref()
-                        .unwrap()
-                        .statements[0]
+                    baseline.persisted_edges_between(from, to)[0].retained_assertions()[0]
                         .provenance_iri
                         .as_deref(),
                     Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI),
@@ -890,7 +892,7 @@ mod tests {
             let prefix = journal.snapshot_at(Seq(3)).unwrap();
             let prefix_edges = prefix.persisted_edges_between(from, to);
             assert_eq!(
-                prefix_edges[0].semantic.as_ref().unwrap().statements[0].provenance_iri,
+                prefix_edges[0].retained_assertions()[0].provenance_iri,
                 Some(recorder.asserter_iri()),
                 "the raw historical assertion first recovers its recorder"
             );
@@ -905,7 +907,7 @@ mod tests {
 
             let full = journal.replay();
             let expected = full.persisted_edges_between(from, to);
-            let statements = &expected[0].semantic.as_ref().unwrap().statements;
+            let statements = &expected[0].retained_assertions();
             assert_eq!(statements.len(), 1);
             assert_eq!(statements[0].statement_id, "legacy-exact-handle");
             assert_eq!(statements[0].asserted_at_ms, Some(100));
@@ -948,14 +950,14 @@ mod tests {
             },
         );
         let mut edges = template.persisted_edges_between(from, to);
-        let mut unknown = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        let mut unknown = edges[0].retained_assertions()[0].clone();
         unknown.statement_id = "baseline-unknown".into();
         unknown.provenance_iri = None;
         let mut known = unknown.clone();
         known.statement_id = "baseline-source".into();
         known.provenance_iri = Some("https://source.test/page".into());
         known.asserted_at_ms = Some(101);
-        edges[0].semantic.as_mut().unwrap().statements = vec![unknown.clone(), known];
+        *edges[0].assertions.as_mut().unwrap() = vec![unknown.clone(), known];
         let capture = |edges| CapturedDelta::ReplaySetEdgesByIds {
             from_id: Uuid::from_u128(1).to_string(),
             to_id: Uuid::from_u128(2).to_string(),
@@ -966,7 +968,7 @@ mod tests {
         let mut minted = unknown;
         minted.statement_id = "minted-handle".into();
         minted.asserted_at_ms = Some(200);
-        edges[0].semantic.as_mut().unwrap().statements.push(minted);
+        edges[0].assertions.as_mut().unwrap().push(minted);
         let minter = Author::engine("first-extractor", "1");
         let mut journal = GraphJournal::new();
         journal.record_as(minter.clone(), capture(edges));
@@ -976,7 +978,7 @@ mod tests {
             journal.entries().iter().map(|entry| entry.delta.clone()),
         );
         let old = checkpoint.persisted_edges_between(from, to);
-        let old_statements = &old[0].semantic.as_ref().unwrap().statements;
+        let old_statements = &old[0].retained_assertions();
         assert_eq!(old_statements.len(), 3);
         assert_eq!(
             old_statements[0].provenance_iri.as_deref(),
@@ -999,7 +1001,7 @@ mod tests {
         })));
         journal.replay_from_with_baseline(Seq(1), &mut checkpoint, &baseline);
         let repaired = checkpoint.persisted_edges_between(from, to);
-        let statements = &repaired[0].semantic.as_ref().unwrap().statements;
+        let statements = &repaired[0].retained_assertions();
         assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
         assert_eq!(statements[2].statement_id, "minted-handle");
         assert_eq!(statements[2].asserted_at_ms, Some(200));
@@ -1031,13 +1033,13 @@ mod tests {
             },
         );
         let mut edges = template.persisted_edges_between(from, to);
-        let mut unknown = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        let mut unknown = edges[0].retained_assertions()[0].clone();
         unknown.statement_id = "baseline-unknown".into();
         unknown.provenance_iri = None;
         let mut known = unknown.clone();
         known.statement_id = "baseline-source".into();
         known.provenance_iri = Some("https://source.test/page".into());
-        edges[0].semantic.as_mut().unwrap().statements = vec![unknown.clone(), known.clone()];
+        *edges[0].assertions.as_mut().unwrap() = vec![unknown.clone(), known.clone()];
         let capture = |edges| CapturedDelta::ReplaySetEdgesByIds {
             from_id: Uuid::from_u128(1).to_string(),
             to_id: Uuid::from_u128(2).to_string(),
@@ -1052,21 +1054,21 @@ mod tests {
         let mut minted = unknown.clone();
         minted.statement_id = "minted-handle".into();
         minted.asserted_at_ms = Some(200);
-        edges[0].semantic.as_mut().unwrap().statements.push(minted);
+        edges[0].assertions.as_mut().unwrap().push(minted);
         let mut journal = GraphJournal::new();
         journal.record_as(minter.clone(), capture(edges.clone()));
-        edges[0].semantic.as_mut().unwrap().statements[2].asserted_at_ms = Some(201);
+        edges[0].retained_assertions_mut()[2].asserted_at_ms = Some(201);
         journal.record_as(updater.clone(), capture(edges.clone()));
         let mut withdrawn = edges.clone();
-        withdrawn[0].semantic.as_mut().unwrap().statements = vec![known];
+        *withdrawn[0].assertions.as_mut().unwrap() = vec![known];
         journal.record_as(updater, capture(withdrawn));
-        edges[0].semantic.as_mut().unwrap().statements[2].asserted_at_ms = Some(202);
-        edges[0].semantic.as_mut().unwrap().statements[1].provenance_iri = None;
+        edges[0].retained_assertions_mut()[2].asserted_at_ms = Some(202);
+        edges[0].retained_assertions_mut()[1].provenance_iri = None;
         journal.record_as(undoer, capture(edges));
 
         let full = journal.snapshot_at_from(&baseline, Seq(4)).unwrap();
         let expected = full.persisted_edges_between(from, to);
-        let statements = &expected[0].semantic.as_ref().unwrap().statements;
+        let statements = &expected[0].retained_assertions();
         assert_eq!(statements.len(), 3);
         assert_eq!(statements[0].statement_id, "baseline-unknown");
         assert_eq!(statements[0].asserted_at_ms, Some(100));
@@ -1092,10 +1094,7 @@ mod tests {
         let withdrawn = journal.snapshot_at_from(&baseline, Seq(3)).unwrap();
         assert_eq!(
             withdrawn.persisted_edges_between(from, to)[0]
-                .semantic
-                .as_ref()
-                .unwrap()
-                .statements
+                .retained_assertions()
                 .len(),
             1
         );
@@ -1103,7 +1102,7 @@ mod tests {
         journal.replay_from(Seq(3), &mut without_baseline);
         let conservative = without_baseline.persisted_edges_between(from, to);
         assert_eq!(
-            conservative[0].semantic.as_ref().unwrap().statements[2]
+            conservative[0].retained_assertions()[2]
                 .provenance_iri
                 .as_deref(),
             Some(UNKNOWN_LEGACY_ASSERTER_IRI)

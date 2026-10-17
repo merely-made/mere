@@ -80,7 +80,9 @@ pub mod strategy;
 pub use adapters::{changes, matrix};
 pub use minimap::{MinimapDescriptor, MinimapOverlayKind};
 pub use overlay::Overlay;
-pub use projection::{PositionedEdge, PositionedNode, Projection, ProjectionMetadata};
+pub use projection::{
+    PositionedEdge, PositionedNode, ProjectedRegion, Projection, ProjectionMetadata,
+};
 pub use reading::{
     ActorScope, GRAPH_READING_REGISTRY_SCHEMA, GraphReadingProfile, GraphReadingRegistry,
     ReadingEmphasis, ReadingSurface, default_graph_reading_registry,

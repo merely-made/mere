@@ -331,6 +331,9 @@ pub fn route_relationships(
             points: vec![at(from), at(to)],
             kind: Some(relationship.kind.clone()),
             weight: None,
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         });
         compiled.push(CompiledRelationship {
             disclosure: relationship.clone(),

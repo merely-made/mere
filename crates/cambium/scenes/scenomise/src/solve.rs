@@ -66,7 +66,13 @@ pub fn solve_with(
     // be grown large enough — plan every position up front. The per-item
     // families keep their original closed form below.
     let ordered: Vec<&ScoreItem> = order.iter().map(|(_, item)| *item).collect();
-    let planned = match families::arrange(&score.arrangement, &ordered) {
+    // Bounded families (Partition, Sets) also size items and draw regions.
+    let shaped = families::shape(&score.arrangement, &ordered);
+    let arranged = match &shaped {
+        Some(shape) => Some(shape.positions.clone()),
+        None => families::arrange(&score.arrangement, &ordered),
+    };
+    let planned = match arranged {
         Some(planned) => Some(planned),
         // The four closed-form per-item families keep their original path below.
         None if families::is_per_item(&score.arrangement) => None,
@@ -110,7 +116,10 @@ pub fn solve_with(
             source,
             space: Scene::WORLD,
             transform: Transform2::translation(position.x, position.y),
-            footprint: item.footprint.clone(),
+            footprint: shaped
+                .as_ref()
+                .and_then(|shape| shape.footprints[rank].clone())
+                .unwrap_or_else(|| item.footprint.clone()),
             representation: item.representation.clone(),
             layer: item.layer,
             visible: item.visible,
@@ -135,6 +144,29 @@ pub fn solve_with(
             Some(old) => old.union(hulls.bounds),
             None => hulls.bounds,
         });
+    }
+
+    // Items were pushed in rank order, so a rank is its instance.
+    if let Some(shape) = shaped {
+        for region in shape.regions {
+            scene.regions.push(Region {
+                members: region.members.into_iter().map(|rank| InstanceId(rank as u32)).collect(),
+                space: Scene::WORLD,
+                contour: Some(Footprint::Polygon {
+                    points: region.contour,
+                }),
+                label: region.label,
+                confidence: 1.0,
+            });
+        }
+        let area = match &score.arrangement {
+            Arrangement::Partition(config) => Some(config.bounds),
+            Arrangement::Setscape(config) => Some(config.bounds),
+            _ => None,
+        };
+        if let Some(area) = area {
+            bounds = Some(bounds.map_or(area, |old| old.union(area)));
+        }
     }
 
     let mut scene = report_holds(score, scene);

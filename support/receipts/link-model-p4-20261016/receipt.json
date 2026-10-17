@@ -1,0 +1,116 @@
+{
+  "schema": "mere.link-model-rest-qualification/v1",
+  "date": "2026-10-16",
+  "source_revision": "91467c0bbf6f92cc26262579dec634155ee33f2d",
+  "starting_main": "b31363d2d2de081a76fbbac5272e5f02df851d58",
+  "upstream_merged": [
+    "9b6da81db661ebbb36377f5123010e18c9199820",
+    "594c5b383"
+  ],
+  "phase_status": {
+    "P4": "bounded shared/browser and Woodshed receiving qualification complete",
+    "P5": "prior bounded experiment remains qualified independently",
+    "P6": "later",
+    "P7": "later"
+  },
+  "browser": {
+    "result": "passed",
+    "backend": "BrowserWebGpu",
+    "source_manifest": "build-source-v2.json",
+    "initial": "browser/p4_tree_link_rest/result.json",
+    "fresh_tab_reopen": "browser/p4_tree_link_rest_reopen/result.json",
+    "captures_reviewed": [
+      "p4_link_rest_canvas_initial",
+      "p4_link_rest_opened_resource_reading",
+      "p4_link_rest_surface_pick",
+      "p4_link_rest_resource_hidden",
+      "p4_link_rest_reopened_hidden",
+      "p4_link_rest_reopened_shown"
+    ],
+    "verified": [
+      "six resting appearances: four Resource aliases and two Surface keys",
+      "direction, opposition and held strength summaries",
+      "normal Canvas pointer selection of both strata",
+      "opened reading retains all six assertions on selected pair",
+      "exact assertion handle action",
+      "whole-key hide acknowledged before visibility changes",
+      "source facts and graph revision unchanged by selection, hide and show",
+      "fresh-tab IndexedDB reopen retains hide; ordinary Show hidden links restores all six appearances"
+    ],
+    "initial_failure": "iterations/browser-initial/p4_tree_link_rest/result.json"
+  },
+  "receiving_host": {
+    "woodshed": "qualified on integrated source fe54425786779753bf6af1d4f6ea243271f13203, published with receipt 4716b71591d74a1fc2b7fde44074dd0183e0cbe1; see receiving-hosts.json",
+    "knot": "This P4 lane did not perform a Knot native intake. Independent C5 constructor compatibility and receiving qualification keep their own scope."
+  },
+  "scope_limits": [
+    "No new endpoint force law",
+    "No physical audio qualification",
+    "P4f exploration, P6 and P7 remain separate"
+  ],
+  "checks": [
+    {
+      "name": "shared-packages",
+      "log": "logs/link-model-p4-shared-qualified-20261016.log",
+      "result": "passed",
+      "summaries": [
+        "test result: ok. 71 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s",
+        "test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 312 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s",
+        "test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 184 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+        "test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "sha256": "e3001db9047615f5bd63d2b78f4e9814ed3d917f70a36eca45811666b896eb6e"
+    },
+    {
+      "name": "graphshell-web",
+      "log": "logs/link-model-p4-graphshell-accepted-20261016.log",
+      "result": "passed",
+      "summaries": [
+        "test result: ok. 302 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 9.17s"
+      ],
+      "sha256": "9628d3eb1b590661b0159f905aeb0f4d41d286cbf57a598b0784b0ce55791a66"
+    },
+    {
+      "name": "canvas-packages",
+      "log": "logs/canvas-qualified.log",
+      "result": "passed",
+      "summaries": [
+        "test result: ok. 276 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s",
+        "test result: ok. 471 passed; 0 failed; 18 ignored; 0 measured; 0 filtered out; finished in 46.98s",
+        "test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "sha256": "7be7fa1e6af6ce4ced4ba342d7dd18e675527760292e8c175294f4b0873cadd3"
+    },
+    {
+      "name": "wasm",
+      "log": "logs/wasm-fixture.log",
+      "result": "passed",
+      "summaries": [],
+      "sha256": "5deedfbf040cd1dd4abcbac15dde74c74854f307c9444c455b6ead70d4b1101c"
+    },
+    {
+      "name": "port-boundaries",
+      "log": "logs/port-boundaries.log",
+      "result": "passed",
+      "summaries": [],
+      "sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186"
+    }
+  ],
+  "test_evidence_scope": "Final canvas packages and browser run use source 91467c0bb. Shared package and Graphshell package logs cover the integrated code before the final fixture-only browser corrections; those corrections compile and execute in the recorded browser bundle.",
+  "doc_audit": {
+    "new_audit_findings": {},
+    "judgment_errors_unchanged": true,
+    "judgment_errors": 15,
+    "covered_active_docs": 271,
+    "active_docs": 285,
+    "baseline_revision": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929",
+    "removed_audit_findings": {},
+    "normalization": "worktree roots and Markdown line positions; object line fields excluded; list findings compared as Counters",
+    "result": "No new findings or judgment errors; existing global debt retained",
+    "final_evidence": "doc-audit/final/comparison.json"
+  },
+  "upstream_doc_baseline": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929"
+}

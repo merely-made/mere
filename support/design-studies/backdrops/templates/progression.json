@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "source": {
+    "adapter": "woodshed.progression-arrangement",
+    "id": "exported-song"
+  },
+  "revision": "f22333438f815d7b016cfdf31d7c59d8c818eeebad130508b1bcc49384a9f965",
+  "title": "ii-V-I (Jazz) in C · role template and song arrangement",
+  "facts": {
+    "kind": "templated_sequence",
+    "data": {
+      "template": {
+        "lanes": [
+          "ii-V-I (Jazz) in C · expected roles below / arranged chords above"
+        ],
+        "extent": 64,
+        "ticks_per_unit": 4,
+        "unit_label": "quarter-note beat (4 ticks); no playback clock",
+        "groups": [
+          {
+            "key": "phrase",
+            "lane": 0,
+            "span": {
+              "start": 0,
+              "length": 64
+            },
+            "parent": null,
+            "label": "ii-V-I (Jazz)"
+          },
+          {
+            "key": "block-0",
+            "lane": 0,
+            "span": {
+              "start": 0,
+              "length": 16
+            },
+            "parent": "phrase",
+            "label": "1 × 4/4"
+          },
+          {
+            "key": "block-1",
+            "lane": 0,
+            "span": {
+              "start": 16,
+              "length": 16
+            },
+            "parent": "phrase",
+            "label": "1 × 4/4"
+          },
+          {
+            "key": "block-2",
+            "lane": 0,
+            "span": {
+              "start": 32,
+              "length": 32
+            },
+            "parent": "phrase",
+            "label": "2 × 4/4"
+          }
+        ]
+      },
+      "slots": [
+        {
+          "key": "role-0",
+          "lane": 0,
+          "span": {
+            "start": 0,
+            "length": 16
+          },
+          "label": "iim7",
+          "expectation": "iim7 in C major; supplied ordinal role 1"
+        },
+        {
+          "key": "role-1",
+          "lane": 0,
+          "span": {
+            "start": 16,
+            "length": 16
+          },
+          "label": "V7",
+          "expectation": "V7 in C major; supplied ordinal role 2"
+        },
+        {
+          "key": "role-2",
+          "lane": 0,
+          "span": {
+            "start": 32,
+            "length": 32
+          },
+          "label": "IM7",
+          "expectation": "IM7 in C major; supplied ordinal role 3"
+        }
+      ],
+      "occurrences": [
+        {
+          "key": "bar-0",
+          "source": {
+            "adapter": "woodshed.chord",
+            "id": "2:Minor 7"
+          },
+          "label": "Dm7",
+          "detail": "exported-song#bar=0 · iim7 · 4 beats × 1 bars · 100 BPM · ordinal alignment supplied by Woodshed",
+          "placement": {
+            "lane": 0,
+            "span": {
+              "start": 0,
+              "length": 16
+            }
+          },
+          "slot": "role-0"
+        },
+        {
+          "key": "bar-1",
+          "source": {
+            "adapter": "woodshed.chord",
+            "id": "7:Dominant 7"
+          },
+          "label": "G7",
+          "detail": "exported-song#bar=1 · V7 · 4 beats × 1 bars · 100 BPM · ordinal alignment supplied by Woodshed",
+          "placement": {
+            "lane": 0,
+            "span": {
+              "start": 16,
+              "length": 16
+            }
+          },
+          "slot": "role-1"
+        },
+        {
+          "key": "bar-2",
+          "source": {
+            "adapter": "woodshed.chord",
+            "id": "0:Major 7"
+          },
+          "label": "Cmaj7",
+          "detail": "exported-song#bar=2 · IM7 · 4 beats × 2 bars · 100 BPM · ordinal alignment supplied by Woodshed",
+          "placement": {
+            "lane": 0,
+            "span": {
+              "start": 32,
+              "length": 32
+            }
+          },
+          "slot": "role-2"
+        }
+      ],
+      "relations": [
+        {
+          "from": "bar-0",
+          "to": "bar-1",
+          "kind": "woodshed.sequence",
+          "label": "Next chord block",
+          "why": "Adjacent authored blocks in ii-V-I (Jazz) in C; no harmonic function or tension inferred"
+        },
+        {
+          "from": "bar-1",
+          "to": "bar-2",
+          "kind": "woodshed.sequence",
+          "label": "Next chord block",
+          "why": "Adjacent authored blocks in ii-V-I (Jazz) in C; no harmonic function or tension inferred"
+        }
+      ]
+    }
+  }
+}

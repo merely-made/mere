@@ -563,6 +563,7 @@ impl WorkshopState {
         {
             let mut appearance = appearance.clone();
             appearance.typography = self.draft_theme().typography.clone();
+            appearance.categories = self.draft_theme().categories;
             return appearance;
         }
         let mut theme = source.clone();

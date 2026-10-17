@@ -33,8 +33,8 @@ use crate::theme::edge_style::{
     EdgeAccessibilityMode, ThemeAccessibilitySupport, ThemeContract, ThemeEdgeTokens,
 };
 use crate::theme::registry::{
-    GraphNodeChromeTheme, Harmony, THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_HIGH_CONTRAST,
-    THEME_ID_LIGHT, ThemeSource, ThemeTokenSet,
+    GraphNodeChromeTheme, Harmony, THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_GRAPHSHELL_NIGHT,
+    THEME_ID_HIGH_CONTRAST, THEME_ID_LIGHT, THEME_ID_MERELY, ThemeSource, ThemeTokenSet,
 };
 
 // =============================================================================
@@ -403,10 +403,12 @@ pub fn builtin_token_sets() -> Vec<ThemeTokenSet> {
     builtin_defs().iter().map(derive_from_def).collect()
 }
 
-/// The four built-in theme definitions, re-expressed as seeds. Default + Dark
+/// The built-in theme definitions, re-expressed as seeds. Default + Dark
 /// share the Slate triad (Dark pulled toward black); Light is the triad shifted
 /// for light surfaces; High Contrast is a yellow accent over forced-black
-/// surfaces (high-contrast derivation mode).
+/// surfaces (high-contrast derivation mode). Merely is the brand seed set and
+/// Graphshell night the palette Graphshell's stylesheet hard-coded, so one host
+/// can prove two seed sets (Merely design system, 2026-10-16).
 pub fn builtin_defs() -> Vec<Theme> {
     let (pr, se, te, ok, no) = slate_triad();
     vec![
@@ -429,6 +431,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
             typography: Default::default(),
+            categories: Default::default(),
         },
         Theme {
             id: THEME_ID_DARK.to_string(),
@@ -449,6 +452,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
             typography: Default::default(),
+            categories: Default::default(),
         },
         Theme {
             id: THEME_ID_LIGHT.to_string(),
@@ -469,6 +473,7 @@ pub fn builtin_defs() -> Vec<Theme> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
             typography: Default::default(),
+            categories: Default::default(),
         },
         Theme {
             id: THEME_ID_HIGH_CONTRAST.to_string(),
@@ -489,6 +494,49 @@ pub fn builtin_defs() -> Vec<Theme> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
             typography: Default::default(),
+            categories: Default::default(),
+        },
+        Theme {
+            id: THEME_ID_MERELY.to_string(),
+            name: "Merely".to_string(),
+            source: ThemeSource::BuiltIn,
+            seeds: Seeds {
+                primary: Srgb::rgb(0x6E, 0x17, 0x12),
+                secondary: Srgb::rgb(0x29, 0x48, 0x6B),
+                tertiary: Srgb::rgb(0xC7, 0x80, 0x2F),
+                neutral: Srgb::rgb(0xF0, 0xEB, 0xDD),
+                text_header: None,
+                text_body: None,
+                success: Srgb::rgb(0x4F, 0xB3, 0x6E),
+                danger: Srgb::rgb(0xD5, 0x4E, 0x4E),
+                dark: false,
+            },
+            high_contrast: false,
+            harmony: Harmony::Custom,
+            mode_sheets: Default::default(),
+            typography: Default::default(),
+            categories: Default::default(),
+        },
+        Theme {
+            id: THEME_ID_GRAPHSHELL_NIGHT.to_string(),
+            name: "Graphshell night".to_string(),
+            source: ThemeSource::BuiltIn,
+            seeds: Seeds {
+                primary: Srgb::rgb(0xD3, 0x9B, 0x4A),
+                secondary: Srgb::rgb(0x8D, 0xB8, 0xA4),
+                tertiary: Srgb::rgb(0xF0, 0xC6, 0x74),
+                neutral: Srgb::rgb(0x17, 0x24, 0x2C),
+                text_header: None,
+                text_body: None,
+                success: Srgb::rgb(0x4F, 0xB3, 0x6E),
+                danger: Srgb::rgb(0xE9, 0x93, 0x87),
+                dark: true,
+            },
+            high_contrast: false,
+            harmony: Harmony::Custom,
+            mode_sheets: Default::default(),
+            typography: Default::default(),
+            categories: Default::default(),
         },
     ]
 }

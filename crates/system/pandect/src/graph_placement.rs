@@ -78,20 +78,37 @@ pub(crate) struct FrozenGraph {
 
 impl PartialEq for FrozenGraph {
     fn eq(&self, other: &Self) -> bool {
-        let semantic = |graph: &GraphSnapshot| {
-            let mut value = serde_json::to_value(graph)?;
-            // The envelope clock is not graph truth; its stored bytes remain
-            // covered by the translation checksum.
-            if let Some(fields) = value.as_object_mut() {
-                fields.remove("timestamp_secs");
-            }
-            Ok::<_, serde_json::Error>(value)
-        };
         self.facets == other.facets
             && matches!(
-            (semantic(&self.graph), semantic(&other.graph)),
-            (Ok(left), Ok(right)) if left == right)
+                (comparison_graph_value(&self.graph), comparison_graph_value(&other.graph)),
+                (Some(left), Some(right)) if left == right
+            )
     }
+}
+
+fn comparison_graph_value(snapshot: &GraphSnapshot) -> Option<serde_json::Value> {
+    // Historical translation receipts keep their original legacy-sidecar JSON
+    // and checksum. Only legacy-schema receipts are restored into the current
+    // assertion shape for truth comparison; canonical snapshots retain their
+    // exact persisted columns in the comparison.
+    let mut value = match snapshot.assertion_schema {
+        0 => {
+            let graph = Graph::try_from_recorded_snapshot(snapshot).ok()?;
+            let mut normalized = graph.to_snapshot();
+            normalized.edges.sort_by_cached_key(|edge| {
+                serde_json::to_vec(edge).expect("persisted surface edge encodes")
+            });
+            serde_json::to_value(normalized).ok()?
+        },
+        1 => serde_json::to_value(snapshot).ok()?,
+        _ => return None,
+    };
+    // The envelope clock is not graph truth; its stored bytes remain covered
+    // by the translation checksum.
+    if let Some(fields) = value.as_object_mut() {
+        fields.remove("timestamp_secs");
+    }
+    Some(value)
 }
 
 impl FrozenGraph {
@@ -344,13 +361,10 @@ pub(crate) fn placement_test_graph() -> Graph {
         }],
     );
     let mut snapshot = graph.to_snapshot();
-    let semantic = snapshot.edges[0].semantic.as_mut().unwrap();
-    semantic.sub_kinds.clear();
-    semantic.predicate = Some("urn:mere:profile:held-custom".into());
-    let claim = &mut semantic.statements[0];
+    let claim = &mut snapshot.edges[0].assertions.as_mut().unwrap()[0];
     claim.statement_id = "held-profile-handle".into();
     claim.recognized_sub_kind = None;
-    claim.predicate = semantic.predicate.clone().unwrap();
+    claim.predicate = "urn:mere:profile:held-custom".into();
     claim.provenance_iri = Some("urn:mere:profile:source".into());
     claim.asserted_at_ms = Some(42);
     let mut recorded = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
@@ -423,8 +437,7 @@ mod tests {
             unqualified
                 .edges
                 .iter()
-                .flat_map(|edge| edge.semantic.iter())
-                .flat_map(|bucket| &bucket.statements)
+                .flat_map(|edge| edge.retained_assertions())
                 .any(|claim| claim.statement_id == "held-profile-handle")
         );
         assert_eq!(snapshot.edges, recorded.to_snapshot().edges);
@@ -447,10 +460,23 @@ mod tests {
         ]);
         let source = Graph::try_from_snapshot(&original.to_snapshot()).unwrap();
         let has = |edges: &[kernel::persistence::PersistedEdge], kind| {
+            use kernel::graph::{ContainmentSubKind, RelationKind};
+            let kind = match kind {
+                PersistedContainmentSubKind::UrlPath => ContainmentSubKind::UrlPath,
+                PersistedContainmentSubKind::Domain => ContainmentSubKind::Domain,
+                PersistedContainmentSubKind::FileSystem => ContainmentSubKind::FileSystem,
+                PersistedContainmentSubKind::UserFolder => ContainmentSubKind::UserFolder,
+                PersistedContainmentSubKind::ClipSource => ContainmentSubKind::ClipSource,
+                PersistedContainmentSubKind::NotebookSection => ContainmentSubKind::NotebookSection,
+                PersistedContainmentSubKind::CollectionMember => {
+                    ContainmentSubKind::CollectionMember
+                },
+            };
+            let predicate = RelationKind::Containment(kind).predicate_iri().unwrap();
             edges.iter().any(|edge| {
-                edge.containment
-                    .as_ref()
-                    .is_some_and(|bucket| bucket.sub_kinds.contains(&kind))
+                edge.retained_assertions()
+                    .iter()
+                    .any(|assertion| assertion.predicate == predicate)
             })
         };
         assert!(has(
@@ -508,10 +534,10 @@ mod tests {
             .unwrap()
             .to_snapshot();
         assert!(
-            has(&legacy.edges, PersistedContainmentSubKind::Domain),
-            "legacy loader retains its existing derivation behavior"
+            !has(&legacy.edges, PersistedContainmentSubKind::Domain),
+            "the carried Resource record already owns the stable rule ID"
         );
-        assert!(has(&legacy.edges, PersistedContainmentSubKind::UrlPath));
+        assert!(!has(&legacy.edges, PersistedContainmentSubKind::UrlPath));
         assert_eq!(legacy.resource_edges, final_state.graph.resource_edges);
     }
 
@@ -543,16 +569,15 @@ mod tests {
         for field in ["id", "source", "time", "endpoints", "dropped", "duplicate"] {
             let mut changed = original.clone();
             match field {
-                "id" => changed.graph.edges[0].semantic.as_mut().unwrap().statements[0]
+                "id" => changed.graph.edges[0].retained_assertions_mut()[0]
                     .statement_id
                     .push_str("-changed"),
                 "source" => {
-                    changed.graph.edges[0].semantic.as_mut().unwrap().statements[0].provenance_iri =
+                    changed.graph.edges[0].retained_assertions_mut()[0].provenance_iri =
                         Some("urn:mere:other-source".into())
                 },
                 "time" => {
-                    changed.graph.edges[0].semantic.as_mut().unwrap().statements[0].asserted_at_ms =
-                        Some(42)
+                    changed.graph.edges[0].retained_assertions_mut()[0].asserted_at_ms = Some(42)
                 },
                 "endpoints" => changed.graph.edges[0].to_node_id = Uuid::from_u128(3).to_string(),
                 "dropped" => {
@@ -569,21 +594,14 @@ mod tests {
         }
 
         let mut two_assertions = original.clone();
-        let statements = &mut two_assertions.graph.edges[0]
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements;
+        let statements = two_assertions.graph.edges[0].assertions.as_mut().unwrap();
         let mut second = statements[0].clone();
         second.statement_id.push_str("-second");
         second.provenance_iri = Some("urn:mere:second-source".into());
         statements.push(second);
         let ordered = FrozenGraph::of(&two_assertions.materialize().unwrap());
         two_assertions.graph.edges[0]
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements
+            .retained_assertions_mut()
             .reverse();
         assert_ne!(
             FrozenGraph::of(&two_assertions.materialize().unwrap()),
@@ -750,3 +768,7 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+#[path = "graph_placement_legacy_receipt_compat.rs"]
+mod legacy_receipt_compat_tests;

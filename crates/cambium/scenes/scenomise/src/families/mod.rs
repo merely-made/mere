@@ -13,13 +13,16 @@
 //! exists), which is why these take the whole ordered slice rather than one
 //! item at a time.
 
-use sceno::{Arrangement, AxisValue, Placement, ScoreItem, Vec2};
+use sceno::{Arrangement, AxisValue, Footprint, Placement, ScoreItem, Vec2};
 
 mod axial;
 mod embedded;
 mod lsystem;
+pub(crate) mod mosaic;
+pub(crate) mod partition;
 mod penrose;
 mod radial;
+pub(crate) mod setscape;
 mod stack;
 
 /// Place every item, in the order given.
@@ -44,8 +47,48 @@ pub(crate) fn arrange(arrangement: &Arrangement, items: &[&ScoreItem]) -> Option
         Arrangement::Kanban(config) => axial::kanban(config, items),
         Arrangement::Embedded(config) => embedded::place(config, items),
         Arrangement::Radial(config) => radial::place(config, items),
+        Arrangement::Partition(_) | Arrangement::Setscape(_) | Arrangement::Mosaic(_) => {
+            shape(arrangement, items)?.positions
+        },
         Arrangement::Custom { .. } => return None,
     })
+}
+
+/// What a bounded family decides beyond positions: footprints it sizes and
+/// the regions it draws. Indices are ranks in the ordered items.
+pub(crate) struct Shape {
+    pub positions: Vec<Vec2>,
+    /// `Some` where the family sizes the item (a tile, a sector).
+    pub footprints: Vec<Option<Footprint>>,
+    pub regions: Vec<ShapedRegion>,
+}
+
+impl Shape {
+    fn unplaced(count: usize) -> Self {
+        Self {
+            positions: vec![Vec2::ZERO; count],
+            footprints: vec![None; count],
+            regions: Vec::new(),
+        }
+    }
+}
+
+/// A region in world coordinates, its members by rank.
+pub(crate) struct ShapedRegion {
+    pub contour: Vec<Vec2>,
+    pub label: Option<String>,
+    pub members: Vec<usize>,
+}
+
+/// The shape of a family that sizes items and draws regions (Partition,
+/// Sets, Mosaic); `None` for the rest.
+pub(crate) fn shape(arrangement: &Arrangement, items: &[&ScoreItem]) -> Option<Shape> {
+    match arrangement {
+        Arrangement::Partition(config) => Some(partition::shape(config, items)),
+        Arrangement::Setscape(config) => Some(setscape::shape(config, items)),
+        Arrangement::Mosaic(config) => Some(mosaic::shape(config, items)),
+        _ => None,
+    }
 }
 
 /// True when this arrangement is one the per-item path in `solve` still owns.

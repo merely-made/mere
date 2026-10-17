@@ -1,0 +1,835 @@
+{
+  "scenario": {
+    "state": "fail",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        980,
+        316
+      ],
+      "canvas_physical_size": [
+        1960,
+        632
+      ],
+      "log": [
+        "captured p7_source_before_promotion",
+        "captured p7_link_promoted",
+        "FAIL: assert snap link-inspector-statements Eq '1': got '2'",
+        "captured p7_live_link_drifted",
+        "FAIL: reveal role:button Open promoted link 1: nothing matches",
+        "captured p7_promoted_link_review_comment",
+        "Graphshell promotion retained the frozen copy across source withdrawal and attached review to the unique Resource",
+        "FAIL: no current DOM target for Selector { surface: None, matcher: Role(\"button\"), text: Some(\"Open promoted link 1\"), attr: None }",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "fail",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "owner_observation": {
+          "actual_app_present": true,
+          "actual_graph_session": "09b006ff-cd2b-4454-9d77-0b0a919e240b",
+          "actual_session_changes": 0,
+          "forme_model_session": "09b006ff-cd2b-4454-9d77-0b0a919e240b",
+          "forme_region_id": null,
+          "forme_session_matches": true,
+          "schema": "graphshell.actual-owner-observation/v1"
+        },
+        "reopened": false,
+        "save_state": "saved",
+        "selected": null,
+        "session": "09b006ff-cd2b-4454-9d77-0b0a919e240b",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "p7_source_before_promotion",
+        "width": 2560,
+        "height": 1440,
+        "bytes": 402890
+      },
+      {
+        "name": "p7_link_promoted",
+        "width": 2560,
+        "height": 1440,
+        "bytes": 439198
+      },
+      {
+        "name": "p7_live_link_drifted",
+        "width": 2560,
+        "height": 1440,
+        "bytes": 495530
+      },
+      {
+        "name": "p7_promoted_link_review_comment",
+        "width": 2560,
+        "height": 1440,
+        "bytes": 566906
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Graphshell",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "status",
+              "label": "saved graph \u00b7 4 nodes \u00b7 selected: 0 \u00b7 primary: none",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Reset",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Set seed",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Foreground pin",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Dismiss retained",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Hide selected link",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Show hidden links",
+                  "children": []
+                },
+                {
+                  "role": "status",
+                  "label": "No saved whole-link hides",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Open selected in workbench",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Show workbench",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "status",
+                  "label": "Graph status",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Undo session",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Redo session",
+                  "children": []
+                },
+                {
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Add an object",
+                      "expanded": false,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect selected access",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect fields",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Open details",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Dataspace",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "group",
+                      "label": "4 of 4 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "A first",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "A alias",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "B first",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "B alias",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Appearance",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Appearance status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Inspector",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "status",
+                      "label": "Storage: IndexedDB seeded \u00b7 not persistent, may be evicted",
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Physics status",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Find and filter",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Scenes and transfers",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Projection editor",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "History",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Explain selected dynamics",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Presentation rules",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Saved query views",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "New query view",
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Promoted links for review",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Viewing promoted link 1",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "textbox",
+                              "label": "Review comment",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "button",
+                          "label": "Add review comment",
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Review comment on 08c389c5-3fcd-5674-a687-8bcec7e583e6 is saved and readable",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Fields",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Unlock forme",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Undo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Redo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Hide forme boundary",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Select forme members",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Retry workbench save",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "collected_at_utc": "2026-10-16T16:56:05.950553+00:00"
+}

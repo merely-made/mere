@@ -1,0 +1,136 @@
+{
+  "schema": "mere.sequence-template-qualification/1",
+  "date_utc": "2026-10-16T17:53:32.894960+00:00",
+  "mere_parent": "f12bee327630bd644edae901f084c078ae224f11",
+  "woodshed_commit": "f002577082bed5efe8741358737ff532d7622238",
+  "scope": "Shared sequence structure used by metre and Woodshed progressions, with Graphshell as first host",
+  "source_manifest": "source-manifest.json",
+  "checks": [
+    {
+      "command": "cargo test -p scenomise --test backdrop_scenes --test sequence_templates --offline",
+      "tests": 11,
+      "log": "logs/core-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p pictograph --no-default-features --features canvas --lib backdrop_surface --offline",
+      "tests": 3,
+      "log": "logs/surface-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo test -p cambium --lib backdrop_scene --offline",
+      "tests": 1,
+      "log": "logs/semantic-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "python3 MERE/support/design-studies/backdrops/with_local_scene_source.py MERE test -p woodshed-core --features portable-scenes --lib progression_ --offline",
+      "tests": 7,
+      "log": "logs/woodshed-tests.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo check -p woodshed-core --lib --locked --offline",
+      "cohort": "canonical committed lock; portable-scenes disabled",
+      "log": "logs/woodshed-default.log",
+      "result": "pass"
+    },
+    {
+      "command": "python3 scripts/check_port_boundaries.py",
+      "log": "logs/boundaries.log",
+      "result": "pass"
+    },
+    {
+      "command": "cargo run -p pictograph --no-default-features --features backdrop-cpu --example backdrop_receipt --offline -- support/design-studies/backdrops/templates/receipt support/design-studies/backdrops/templates",
+      "frames": 5,
+      "backend": "Vello CPU",
+      "log": "logs/cpu.log",
+      "result": "pass"
+    },
+    {
+      "command": "RUSTC=RUSTUP_1_99_RUSTC rustup run 1.99.0 cargo rustc --manifest-path ports/graphshell/web/Cargo.toml --lib --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu --offline -- -C link-arg=-zstack-size=16777216",
+      "log": "logs/wasm-build.log",
+      "result": "pass"
+    },
+    {
+      "command": "wasm-bindgen ports/graphshell/web/target/wasm32-unknown-unknown/debug/graphshell_web.wasm --target web --out-dir SERVED/pkg",
+      "log": "logs/wasm-bindgen.log",
+      "result": "pass"
+    }
+  ],
+  "exports": [
+    {
+      "root": "C",
+      "command": "woodshed-progression-scene C 'ii-V-I (Jazz)' 100 1,1,2 OUTPUT",
+      "recipe": "progression.json",
+      "log": "logs/export-c.log",
+      "result": "pass"
+    },
+    {
+      "root": "G",
+      "command": "woodshed-progression-scene G 'ii-V-I (Jazz)' 100 1,1,2 OUTPUT",
+      "recipe": "progression-g.json",
+      "log": "logs/export-g.log",
+      "result": "pass"
+    }
+  ],
+  "browser": {
+    "result": "pass for listed smoke cases",
+    "browser": "Codex in-app Chromium",
+    "backend": "Graphshell presentation-webgpu shared producer; GPU adapter identity not independently recorded",
+    "runtime_manifest": "runtime-manifest.json",
+    "desktop_viewport": [
+      1280,
+      1000
+    ],
+    "narrow_viewport": [
+      435,
+      1220
+    ],
+    "captures": {
+      "graphshell-metre.jpg": [
+        1280,
+        1000
+      ],
+      "graphshell-narrow-after.jpg": [
+        435,
+        1220
+      ],
+      "graphshell-narrow-before.jpg": [
+        435,
+        1220
+      ],
+      "graphshell-progression-c.jpg": [
+        1280,
+        1000
+      ],
+      "graphshell-progression-g.jpg": [
+        1280,
+        1000
+      ]
+    },
+    "console_errors_and_warnings": 0,
+    "evidence": "receipt/browser-state.json",
+    "cases": [
+      "Final metre visibly retains stress heights, foot brackets and disclosed rhyme arcs with a readable aspect-preserving stage",
+      "Actual Woodshed C export shows Dm7, G7, Cmaj7 with the tonic occupying two bars",
+      "G export preserves relative roles and shows Am7, D7, Gmaj7",
+      "Concrete tonic and expected IM7 role inspect independently, with separate source identities and retained attention",
+      "Exported new generic recipe equals the Woodshed G recipe as parsed JSON",
+      "At narrow width the scene scrolls horizontally without compressing group labels; before and after captures show the tonic becoming visible"
+    ],
+    "export": "receipt/browser-export.json",
+    "file_reimport": "not exercised in this run",
+    "viewport_override": "reset to original pane size after desktop testing"
+  },
+  "limits": [
+    "Woodshed adapter currently aligns one song block per progression role by explicit ordinal; arbitrary song-role mapping is not implemented",
+    "No harmonic tension, conformity, scansion or playback clock inferred by shared structure",
+    "Existing metre JSON remains valid; compiled geometry changes with the shared layout",
+    "No new native Woodshed/Knot panels or native host acceptance; no release/performance/hardware parity qualification",
+    "Optional app exporter tested against a temporary local four-scene-crate cohort; integration and canonical app repin remain outstanding",
+    "Browser uses debug product/WebGPU with an explicit 16 MiB top-level stack, following the earlier host admission; no default-stack or release acceptance claimed"
+  ],
+  "resolved_build_issue": "Initial Homebrew rustc could not find wasm std; final build uses the installed rustup 1.99.0 compiler explicitly"
+}

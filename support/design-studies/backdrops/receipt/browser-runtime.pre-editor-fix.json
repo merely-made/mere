@@ -1,0 +1,33 @@
+{
+  "origin": "http://127.0.0.1:8786",
+  "entry": "tree.html?app=local",
+  "profile": "debug; product,presentation-webgpu; wasm-bindgen 0.2.129; top-level link-arg=-zstack-size=16777216",
+  "sha256": {
+    "GraphshellSans.ttf": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481",
+    "co_op.css": "a0402ff506c7a8b8170389a9d165d5882508d642e0bcbc7446b42e8db1a9d925",
+    "co_op.html": "bda4bef733274f5851d658e126e8fde601305096bcce4868bedf0afbaa8ddb3a",
+    "co_op.js": "b077b6e593f06b726f79fe5d12f2226f75c6ad06028547e06da2766f1ee8c146",
+    "dataset.html": "c685d2e55f7df4eb64e7b0cf61ed00235419e806909a6557fb304a844d6b1349",
+    "embed.html": "bb3497def8a16b4794e91917d1e34e298d76d005491dee30f6baee961a643e6e",
+    "extension-profile.js": "12bd6540d0f3933a133fc6e3203e8e55a54d65f87fa2f538b23977e87cf1ffc8",
+    "grouped-dataset.html": "c96910e2383bd6c8d1dd83f8414102c269d94939b6ac12ff2bc444e61f8edb81",
+    "index.html": "d7f16f46fab34ff9ea0130a43f88fad7bc542f4e3ba9cbb56c731f71afdf49df",
+    "loader.js": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728",
+    "moot_resource_host.js": "62ca808b9a2eb774aa4e14d3a57950469d9fcbb23047e2e0b962cb9746d10c93",
+    "mount.js": "46e06335f795fbae21fdbd3deb35d6420dc9b5c5bb9174a1b3f28d065a3d1bbf",
+    "pkg/graphshell_web.d.ts": "9c2346f6f4765890244575cda7632283cdcbb406f080260a86ca9f4ccabcccff",
+    "pkg/graphshell_web.js": "4bb09212cbaebd2843bf9d85c85f17c3cdad2f5611bd4ff3f76173fae6aec5ee",
+    "pkg/graphshell_web_bg.wasm": "c2e67f0ff51d5feed654c99b8f506ecc4d77475e852b694b2f7f11a44f1a56c4",
+    "pkg/graphshell_web_bg.wasm.d.ts": "b34be773016e78a908be79ec424838de538ca3b79b29eb2dd86a8c16b1594370",
+    "pkg/snippets/genet-render-host-3997a73541d04484/inline0.js": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee",
+    "practice-embed.html": "ff037e9d2ebf5b6ea728737edae8c33b6625bedd6b036367bdb7ff91befc0b2f",
+    "practice-tree-test.html": "642809ebd8fa3469560faa34d9c8c40522b68d39460554fdc983b15b7e46eb81",
+    "practice.html": "610bde8141504725da9dad492700d62bd6bf8290e1db45d8263c44b1e25c681a",
+    "responsive-links.html": "ed7212f191bebbbefd882c98f77b8cc71fdf19327b1b966d53010642fa8be9b5",
+    "styles.css": "a0944b06a83a7249fc69239ecffc8cab543f7556ffc95f2446b33ce3b5cd0bfd",
+    "tree.html": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b",
+    "viewer.html": "a1c4d9dae8ef6a97b585e772d9710845707c269db24af2b73d54405d795b3526",
+    "viewer.js": "dd0451f52f0444cc44e8cbc2495db8b912338f38f8be47361732778ce3cd51db",
+    "workspace.html": "dc1278880cf7d2833ec7780e38390ad7e2494bd59811dd5fb85a6489a07ae98f"
+  }
+}

@@ -20,8 +20,9 @@ remain for source compatibility during consumer migration.
 - [`tabard-workshop`](tabard-workshop): shared theme-authoring state, Cambium
   controls and preview scenes for embedding applications
 
-Every crate is MPL-2.0 (see the repository `LICENSE`); Meristem, a Xilem
-derivative, keeps the Xilem Authors' Apache-2.0 notice in each derived file.
+Every crate is MPL-2.0 (see the repository `LICENSE`). Meristem (from
+`xilem_core`) and the Cambium files ported or adapted from `xilem_web` keep the
+Xilem Authors' Apache-2.0 notice in each derived file.
 
 See [the architecture doc](../../design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md)
 for the ownership rule and
@@ -76,6 +77,8 @@ for the coverage rule.
 
 ## License
 
-MPL-2.0 (see the repository `LICENSE`). `meristem` retains the Xilem Authors'
-Apache-2.0 notice as a derivative; see the repository
+MPL-2.0 (see the repository `LICENSE`). `meristem` and the `xilem_web`-derived
+files of `cambium` (listed in the
+[Xilem ledger](../../design_docs/cambium_docs/technical_architecture/upstream-xilem.md))
+retain the Xilem Authors' Apache-2.0 notice as derivatives; see the repository
 [`LICENSES.md`](../../LICENSES.md).

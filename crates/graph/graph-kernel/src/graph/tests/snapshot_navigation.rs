@@ -16,6 +16,7 @@ fn snapshot_with(
     nav: SharedNavigationMemory,
 ) -> crate::persistence::GraphSnapshot {
     crate::persistence::GraphSnapshot {
+            assertion_schema: 0,
         nodes: vec![node],
         edges: vec![],
         import_records: vec![],

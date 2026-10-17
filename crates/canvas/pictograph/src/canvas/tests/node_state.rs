@@ -57,9 +57,11 @@ fn hide_selected_edges_then_show_all_round_trips() {
         .get_node_by_url("https://b.example")
         .unwrap()
         .0;
-    canvas
-        .selected_edges
-        .insert(first_edge_cell_between(&canvas, a, b)); // the host edge-picks this normally
+    canvas.selected_links.insert(scenograph::link::LinkKey::new(
+        scenograph::link::LinkStratum::Surface,
+        canvas.graph().get_node(a).unwrap().id.to_string(),
+        canvas.graph().get_node(b).unwrap().id.to_string(),
+    ));
 
     assert_eq!(
         canvas.hide_selected_edges(),
@@ -67,10 +69,10 @@ fn hide_selected_edges_then_show_all_round_trips() {
         "the selected edge is hidden"
     );
     assert!(
-        canvas.selected_edges.is_empty(),
+        canvas.selected_links.is_empty(),
         "hiding clears the selection"
     );
-    assert_eq!(canvas.hidden_edges.len(), 1);
+    assert_eq!(canvas.hidden_link_keys().len(), 1);
     // The relation itself survives (hiding is display-only).
     assert!(
         canvas.graph().projected_relations().count() >= 1,
@@ -82,7 +84,7 @@ fn hide_selected_edges_then_show_all_round_trips() {
         1,
         "show-all reveals the hidden edge"
     );
-    assert!(canvas.hidden_edges.is_empty());
+    assert!(canvas.hidden_link_keys().is_empty());
 }
 
 #[test]

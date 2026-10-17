@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-16",
+  "check": "cargo test -p pictograph --features canvas backdrop_surface --locked --offline",
+  "passed": 5,
+  "presentation": "Template-only independent vertical fit; unchanged source coordinates and horizontal span scale; common paint/inverse-pick transform.",
+  "native_acceptance": "Woodshed f683bbe: 214 view cases, 2 native editor cases, locked build, 3 reviewed captures; woodshed/validation/native-arrangement-spacing_20261016/receipt.json"
+}

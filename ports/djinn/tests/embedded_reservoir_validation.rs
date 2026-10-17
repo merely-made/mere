@@ -596,6 +596,9 @@ mod published_replay_regression {
     fn product_fixture(
         typed_decks: bool,
         ambient: bool,
+        shuffled: bool,
+        situation: bool,
+        inference: bool,
     ) -> (Vec<CapturedDelta>, Value, cleromancy_domain::Reading) {
         let captured = Arc::new(Mutex::new(Vec::new()));
         let observed = captured.clone();
@@ -665,7 +668,80 @@ mod published_replay_regression {
                 view.reduced_motion = true;
                 host.insert_ambient_view(&view).unwrap();
             }
-            (host.graph().clone(), detail.readings[0].clone())
+            let reading = if shuffled {
+                let context = host.context_for_digest(&context).unwrap();
+                let field = host.field_for_digest(&field).unwrap();
+                let drawn = host
+                    .record_three_card_spread_derived_at_with_entropy(
+                        &context,
+                        &field,
+                        "C5 owner public seed",
+                        "cleromancy.owner/shuffle",
+                        if situation { 1_792_149_302_000 } else { 6000 },
+                        None,
+                        &mut PublicEntropy(0xc5),
+                    )
+                    .unwrap();
+                if situation {
+                    use cleromancy_domain::situation::*;
+                    let place = ReadingPlace::new(51_476_900, 0).unwrap();
+                    // Public synthetic response; live network provenance has
+                    // a separate product-native receipt.
+                    let body = r#"{"latitude":51.472404,"longitude":0.011566162,"utc_offset_seconds":0,"current_units":{"time":"unixtime","interval":"seconds","temperature_2m":"°C","relative_humidity_2m":"%","precipitation":"mm","weather_code":"wmo code","wind_speed_10m":"m/s"},"current":{"time":1792149300,"interval":900,"temperature_2m":12.8,"relative_humidity_2m":70,"precipitation":0,"weather_code":3,"wind_speed_10m":4.1}}"#;
+                    let weather = WeatherObservation::from_response(
+                        &place,
+                        1_792_149_301_000,
+                        weather_url(&place).unwrap(),
+                        body.into(),
+                    )
+                    .unwrap();
+                    let snapshot = ReadingSituation::capture(
+                        &drawn.0,
+                        &SituationPreferences {
+                            place: Some(place),
+                            weather: true,
+                        },
+                        Some(weather),
+                    )
+                    .unwrap();
+                    host.insert_reading_situation(&snapshot).unwrap();
+                }
+                drawn.2[0].clone()
+            } else {
+                detail.readings[0].clone()
+            };
+            if inference {
+                use cleromancy_domain::inference::*;
+                let session = host
+                    .sessions()
+                    .unwrap()
+                    .into_iter()
+                    .max_by_key(|s| s.created_at_ms)
+                    .unwrap();
+                let inputs = host.inference_inputs(&session.id).unwrap();
+                host.insert_generated_inference(&GeneratedInference::formula(inputs.clone()))
+                    .unwrap();
+                // Deliberately synthetic: this fixture qualifies stored model
+                // records and receiving authority, not model execution.
+                let model = ModelIdentity {
+                    model_id: "fixture-only/receiving-record".into(),
+                    revision: "contract-v1".into(),
+                    loader: "esp-burn-ndarray".into(),
+                    artifacts: ["config.json", "tokenizer.json", "model.safetensors"]
+                        .map(|name| (name.into(), "a".repeat(64)))
+                        .into_iter()
+                        .collect(),
+                };
+                let record = GeneratedInference::model(
+                    inputs,
+                    model,
+                    "Synthetic receiving fixture output; no model was executed by this fixture."
+                        .into(),
+                );
+                host.insert_generated_inference(&record).unwrap();
+                host.keep_generated_inference(&record.digest()).unwrap();
+            }
+            (host.graph().clone(), reading)
         });
         drop(clear);
         let edits = std::mem::take(&mut *captured.lock().unwrap());
@@ -718,6 +794,49 @@ mod published_replay_regression {
         envelope
     }
 
+    // Fixture seeding may contain several complete decks. Each bounded
+    // transaction remains a fully valid candidate; no frame cap or refusal
+    // guard is widened to fit a combined acceptance setup packet.
+    async fn apply_bounded_fixture(client: &mut AppBrokerClient, edits: &[CapturedDelta]) {
+        let mut accepted: Vec<CapturedDelta> = Vec::new();
+        let mut offset = 0;
+        while offset < edits.len() {
+            let current = snapshots(client).await;
+            let mut choice = None;
+            for end in (offset + 1..=edits.len()).rev() {
+                let batch = edits[offset..end].to_vec();
+                let payload =
+                    serde_json::to_vec(&ApplyEditsV1::checked(current[1].scene.revision, batch))
+                        .unwrap();
+                if serde_json::to_vec(&payload).unwrap().len() > 900_000 {
+                    continue;
+                }
+                let candidate = kernel::graph::replay_captured_deltas(
+                    accepted
+                        .iter()
+                        .cloned()
+                        .chain(edits[offset..end].iter().cloned()),
+                );
+                if cleromancy_domain::host::validate_divination_graph(&candidate).is_ok() {
+                    choice = Some(end);
+                    break;
+                }
+            }
+            let end =
+                choice.expect("fixture must have a replay-valid prefix below the carrier limit");
+            assert_eq!(
+                apply_checked(client, &current[1], edits[offset..end].to_vec()).await,
+                IntentResult::Accepted
+            );
+            println!(
+                "BOUNDED PRODUCT FIXTURE deltas={} replay-valid-candidate=true",
+                end - offset
+            );
+            accepted.extend_from_slice(&edits[offset..end]);
+            offset = end;
+        }
+    }
+
     async fn apply_checked(
         client: &mut AppBrokerClient,
         snapshot: &ProjectionSnapshot,
@@ -766,20 +885,39 @@ mod published_replay_regression {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn published_reading_replay_and_same_schema_tamper_survive_three_real_owners() {
-        owner_replay(false, false).await;
+        owner_replay(false, false, false, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn typed_decks_and_reading_survive_three_owners_and_refuse_metadata_tamper() {
-        owner_replay(true, false).await;
+        owner_replay(true, false, false, false, false).await;
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn ambient_view_and_kept_memory_survive_three_owners_and_refuse_source_tamper() {
-        owner_replay(true, true).await;
+        owner_replay(true, true, false, false, false).await;
     }
 
-    async fn owner_replay(typed_decks: bool, ambient: bool) {
+    #[tokio::test(flavor = "multi_thread")]
+    async fn shuffled_deck_survives_three_owners_and_refuses_orientation_tamper() {
+        owner_replay(true, false, true, false, false).await;
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn recorded_situation_and_weather_survive_three_owners_and_refuse_tamper() {
+        owner_replay(true, false, true, true, false).await;
+    }
+    #[tokio::test(flavor = "multi_thread")]
+    async fn generated_inferences_survive_three_owners_and_refuse_input_and_output_tamper() {
+        owner_replay(true, false, true, false, true).await;
+    }
+    async fn owner_replay(
+        typed_decks: bool,
+        ambient: bool,
+        shuffled: bool,
+        situation: bool,
+        inference: bool,
+    ) {
         let root = tempfile::tempdir().unwrap();
         let unusable = root.path().join("no-attached-client-store");
         std::fs::write(
@@ -787,7 +925,8 @@ mod published_replay_regression {
             b"the live client cannot open local custody or storage",
         )
         .unwrap();
-        let (edits, expected_facets, reading) = product_fixture(typed_decks, ambient);
+        let (edits, expected_facets, reading) =
+            product_fixture(typed_decks, ambient, shuffled, situation, inference);
         let reading_url = format!("cleromancy://reading/{}", reading.id);
         let reading_id = kernel::graph::Graph::node_namespace_id(&reading_url);
         let mut retained_session = None;
@@ -829,11 +968,15 @@ mod published_replay_regression {
                     0,
                     "the owner has no fixture-seeded graph"
                 );
-                assert_eq!(
-                    apply_checked(attached.client_mut(), &initial[1], edits.clone()).await,
-                    IntentResult::Accepted,
-                    "real published replay authority accepts the complete product batch"
-                );
+                if shuffled || typed_decks {
+                    apply_bounded_fixture(attached.client_mut(), &edits).await;
+                } else {
+                    assert_eq!(
+                        apply_checked(attached.client_mut(), &initial[1], edits.clone()).await,
+                        IntentResult::Accepted,
+                        "real published replay authority accepts the complete product batch"
+                    );
+                }
             }
             let before = snapshots(attached.client_mut()).await;
             let envelope = disclosed(attached.client_mut(), &before[1]).await;
@@ -973,6 +1116,168 @@ mod published_replay_regression {
                     "AMBIENT REPLAY mode={mode} phase={phase} focus-roles-foreground-and-spec-retained=true saved-memory=true source-tamper-refused=true durable-bytes-unchanged=true"
                 );
             }
+            if shuffled {
+                let draw = reading.receipt.shuffle.as_ref().unwrap();
+                assert_eq!(draw.count, 3);
+                let plan = draw
+                    .shuffle
+                    .replay(
+                        &cleromancy_domain::CleromancyHost::candidate(graph.clone())
+                            .unwrap()
+                            .context_for_digest(&reading.receipt.context_digest)
+                            .unwrap(),
+                        &cleromancy_domain::CleromancyHost::candidate(graph.clone())
+                            .unwrap()
+                            .field_for_digest(&reading.receipt.field_digest)
+                            .unwrap(),
+                    )
+                    .unwrap();
+                assert_eq!(plan.len(), 78);
+                let mut forged = stored.clone();
+                forged["receipt"]["shuffle"]["orientation"] = serde_json::json!(if reading
+                    .orientation()
+                    == cleromancy_domain::Orientation::Reversed
+                {
+                    "upright"
+                } else {
+                    "reversed"
+                });
+                let result = apply_checked(
+                    attached.client_mut(),
+                    &before[1],
+                    vec![
+                        node(0xc500 + phase as u128),
+                        CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: reading_id.to_string(),
+                            facet: cleromancy_domain::host::READING_FACET.into(),
+                            value_json: forged.to_string(),
+                        },
+                    ],
+                )
+                .await;
+                assert!(matches!(result, IntentResult::Rejected { .. }));
+                assert_eq!(
+                    serde_json::to_value(snapshots(attached.client_mut()).await).unwrap(),
+                    serde_json::to_value(&before).unwrap()
+                );
+                assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                println!(
+                    "SHUFFLED DECK REPLAY mode={mode} phase={phase} full-deck=78 prefix=3 orientation-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
+            if situation {
+                use cleromancy_domain::situation::*;
+                let host = cleromancy_domain::CleromancyHost::candidate(graph.clone()).unwrap();
+                let records = host.reading_situations().unwrap();
+                assert_eq!(records.len(), 1);
+                assert_eq!(
+                    records[0]
+                        .weather
+                        .as_ref()
+                        .unwrap()
+                        .values
+                        .temperature_millicelsius,
+                    12_800
+                );
+                let facet = SITUATION_FACET;
+                let (node_id, mut forged) = graph
+                    .facets()
+                    .iter()
+                    .find_map(|(id, facets)| {
+                        facets
+                            .iter()
+                            .find(|(name, _)| name.as_str() == facet)
+                            .map(|(_, v)| (*id, v.clone()))
+                    })
+                    .unwrap();
+                forged["weather"]["values"]["temperature_millicelsius"] = serde_json::json!(99_999);
+                let result = apply_checked(
+                    attached.client_mut(),
+                    &before[1],
+                    vec![
+                        node(0xc600 + phase as u128),
+                        CapturedDelta::ReplaySetNodeFacetById {
+                            node_id: node_id.to_string(),
+                            facet: facet.into(),
+                            value_json: forged.to_string(),
+                        },
+                    ],
+                )
+                .await;
+                assert!(matches!(result, IntentResult::Rejected { .. }));
+                assert_eq!(
+                    serde_json::to_value(snapshots(attached.client_mut()).await).unwrap(),
+                    serde_json::to_value(&before).unwrap()
+                );
+                assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                println!(
+                    "SITUATION REPLAY mode={mode} phase={phase} saved-response-exact=true network-free-replay=true weather-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
+            if inference {
+                use cleromancy_domain::inference::*;
+                let host = cleromancy_domain::CleromancyHost::candidate(graph.clone()).unwrap();
+                let records = host.generated_inferences().unwrap();
+                assert_eq!(records.len(), 2);
+                for record in records {
+                    let key = graph
+                        .get_node_by_url(&format!("cleromancy://inference/{}", record.digest()))
+                        .unwrap()
+                        .0;
+                    let id = graph.get_node(key).unwrap().id;
+                    match record.generation {
+                        Generation::Formula { .. } => {
+                            assert_eq!(record.output, record.inputs.formula_output())
+                        },
+                        Generation::Model { .. } => {
+                            assert_eq!(record.label, LABEL_MODEL);
+                            assert!(
+                                record
+                                    .output
+                                    .starts_with("Synthetic receiving fixture output")
+                            );
+                            assert!(
+                                graph
+                                    .node_content_tags(key)
+                                    .is_some_and(|tags| tags.contains("kept"))
+                            );
+                        },
+                    }
+                    for case in 0..3 {
+                        let mut forged = serde_json::to_value(&record).unwrap();
+                        if case == 0 {
+                            forged["inputs"]["context_text"] =
+                                serde_json::json!("fabricated source input");
+                        } else if case == 1 {
+                            forged["output"] = serde_json::json!("fabricated output");
+                        } else {
+                            forged["label"] = serde_json::json!("Unlabelled invented output");
+                        }
+                        let result = apply_checked(
+                            attached.client_mut(),
+                            &before[1],
+                            vec![
+                                node(0xc700 + phase as u128 * 6 + case),
+                                CapturedDelta::ReplaySetNodeFacetById {
+                                    node_id: id.to_string(),
+                                    facet: INFERENCE_FACET.into(),
+                                    value_json: forged.to_string(),
+                                },
+                            ],
+                        )
+                        .await;
+                        assert!(matches!(result, IntentResult::Rejected { .. }));
+                        assert_eq!(
+                            serde_json::to_value(snapshots(attached.client_mut()).await).unwrap(),
+                            serde_json::to_value(&before).unwrap()
+                        );
+                        assert_eq!(durable_files_for(root.path(), "divination"), durable);
+                    }
+                }
+                println!(
+                    "INFERENCE REPLAY mode={mode} phase={phase} formula-exact=true stored-model-label-retained=true explicit-keep-retained=true input-and-disclosure-tamper-refused=true durable-bytes-unchanged=true"
+                );
+            }
             if let Some(id) = retained_session {
                 assert_eq!(session, id, "the same owner-held session reopens");
                 assert_eq!(retained_graph.as_ref().unwrap(), &graph_state);
@@ -998,8 +1303,13 @@ mod published_replay_regression {
                 assert_eq!(typed.schema, reading.schema);
                 assert_eq!(typed.receipt.schema, reading.receipt.schema);
                 assert_eq!(typed.id, reading.id);
-                assert!(typed.schema.ends_with("/v1"));
-                assert!(typed.receipt.schema.ends_with("/v1"));
+                assert!(typed.schema.ends_with(if shuffled { "/v3" } else { "/v1" }));
+                assert!(
+                    typed
+                        .receipt
+                        .schema
+                        .ends_with(if shuffled { "/v5" } else { "/v1" })
+                );
                 let result = apply_checked(
                     attached.client_mut(),
                     &before[1],

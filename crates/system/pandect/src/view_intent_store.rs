@@ -34,6 +34,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use curation::FoldRecord;
+use sceno::LinkKey;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -118,6 +119,16 @@ impl Default for CameraSnapshot {
 pub struct ViewIntent {
     #[serde(default)]
     pub hidden_relations: BTreeSet<HiddenRelationRecord>,
+    /// Hidden logical links keyed by their stable unordered endpoint pair
+    /// and source stratum. This is distinct from `hidden_relations`, which
+    /// retains the older directed per-kind/cell visibility semantics.
+    #[serde(default)]
+    pub hidden_links: BTreeSet<LinkKey>,
+    /// Hidden exact relation assertions by their stable source assertion ID.
+    /// This composes with whole-link hides and legacy selector hides without
+    /// widening either to a broader target.
+    #[serde(default)]
+    pub hidden_assertions: BTreeSet<String>,
     /// The view's folds (mer3ly site plan, Rulings 163 to 165): several,
     /// never sharing a member. Their members remain source graph members; a
     /// record only tells a projection to draw them as one stand-in. A saved
@@ -165,6 +176,8 @@ impl ViewIntent {
     /// path returns `Ok(None)` and the host falls back to default.
     pub fn is_empty(&self) -> bool {
         self.hidden_relations.is_empty()
+            && self.hidden_links.is_empty()
+            && self.hidden_assertions.is_empty()
             && self.folds.is_empty()
             && self.camera.is_none()
             && self.focus.is_none()
@@ -304,6 +317,74 @@ mod tests {
         save_view_intent(&dir, &frame, 1, &intent).unwrap();
         let restored = load_view_intent(&dir, &frame, 1).unwrap().unwrap();
         assert_eq!(restored.focus.as_deref(), Some("https://example.com/page"));
+        fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn link_hide_round_trips_and_counts_as_nonempty() {
+        let dir = temp_session_dir("link-hide-round-trip");
+        let frame = fixture_frame();
+        let mut intent = ViewIntent::new();
+        let key = LinkKey::new(sceno::LinkStratum::Surface, "surface:two", "surface:one");
+        intent.hidden_links.insert(key.clone());
+        intent.hidden_links.insert(LinkKey::new(
+            sceno::LinkStratum::Resource,
+            "surface:one",
+            "surface:two",
+        ));
+        assert!(!intent.is_empty(), "a link hide alone is worth persisting");
+        save_view_intent(&dir, &frame, 1, &intent).unwrap();
+        let restored = load_view_intent(&dir, &frame, 1).unwrap().unwrap();
+        assert_eq!(restored.hidden_links.len(), 2);
+        assert!(restored.hidden_links.contains(&key));
+        assert!(restored.hidden_relations.is_empty());
+        fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn exact_assertion_hides_round_trip_independently_and_compose_with_other_hides() {
+        let dir = temp_session_dir("assertion-hide-round-trip");
+        let frame = fixture_frame();
+        let mut intent = ViewIntent::new();
+        intent.hidden_relations.insert(HiddenRelationRecord::new(
+            Uuid::from_u128(1),
+            Uuid::from_u128(2),
+            3,
+        ));
+        intent.hidden_links.insert(LinkKey::new(
+            sceno::LinkStratum::Surface,
+            "surface:a",
+            "surface:b",
+        ));
+        intent.hidden_assertions.insert("urn:assertion:one".into());
+        assert!(!intent.is_empty());
+        save_view_intent(&dir, &frame, 1, &intent).unwrap();
+        let restored = load_view_intent(&dir, &frame, 1).unwrap().unwrap();
+        assert_eq!(restored, intent);
+        assert_eq!(
+            restored.hidden_assertions,
+            BTreeSet::from(["urn:assertion:one".into()])
+        );
+        assert_eq!(restored.hidden_links.len(), 1);
+        assert_eq!(restored.hidden_relations.len(), 1);
+        fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn legacy_view_without_link_hides_loads_empty_link_set() {
+        let dir = temp_session_dir("legacy-without-link-hides");
+        let frame = fixture_frame();
+        let path = view_intent_path(&dir, &frame, 1);
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(
+            &path,
+            r#"{"hidden_relations":[{"from_id":"00000000-0000-0000-0000-000000000001","to_id":"00000000-0000-0000-0000-000000000002","relation_tag":3}]}"#,
+        )
+        .unwrap();
+        let restored = load_view_intent(&dir, &frame, 1).unwrap().unwrap();
+        assert!(restored.hidden_links.is_empty());
+        assert!(restored.hidden_assertions.is_empty());
+        assert_eq!(restored.hidden_relations.len(), 1);
         fs::remove_dir_all(&dir).ok();
     }
 

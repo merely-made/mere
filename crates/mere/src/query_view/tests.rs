@@ -5,7 +5,11 @@
 // SPDX-License-Identifier: MPL-2.0
 use super::*;
 use kernel::graph::apply::add_node;
-use kernel::graph::{CoverageLayer, CoverageLimit, EdgeAssertion, GraphStratum, SemanticSubKind};
+use kernel::graph::{
+    ContainmentSubKind, CoverageLayer, CoverageLimit, EdgeAssertion, GraphStratum, RelationKind,
+    SemanticStatementSpec, SemanticSubKind,
+};
+use kernel::types::{AssertionBasis, GraphScope};
 
 fn fixture() -> (Graph, Uuid, Uuid, Uuid) {
     let mut graph = Graph::new();
@@ -115,10 +119,8 @@ fn surface_buckets_preserve_parallel_assertions_without_resource_lifting() {
         .find(|edge| edge.from_node_id == from.to_string() && edge.to_node_id == to.to_string())
         .unwrap();
     let mut parallel = original.clone();
-    parallel.semantic.as_mut().unwrap().statements[0].statement_id =
-        "urn:statement:surface-parallel".into();
-    parallel.semantic.as_mut().unwrap().statements[0].provenance_iri =
-        Some("urn:author:surface-other".into());
+    parallel.retained_assertions_mut()[0].statement_id = "urn:statement:surface-parallel".into();
+    parallel.retained_assertions_mut()[0].provenance_iri = Some("urn:author:surface-other".into());
     apply_graph_delta(
         &mut graph,
         GraphDelta::ReplaySetEdgesByIds {
@@ -149,6 +151,74 @@ fn surface_buckets_preserve_parallel_assertions_without_resource_lifting() {
             .all(|relation| relation.from == QueryNodeId::surface(from)
                 && relation.source_from == relation.from
                 && relation.source_to == relation.to)
+    );
+}
+
+#[test]
+fn projection_exposes_all_family_assertions_and_retains_withdrawals() {
+    let (mut graph, _, from_id, _) = fixture();
+    let to_id = Uuid::from_u128(3);
+    let from = graph.get_node_key_by_id(from_id).unwrap();
+    let to = graph.get_node_key_by_id(to_id).unwrap();
+    let predicate = RelationKind::Containment(ContainmentSubKind::CollectionMember)
+        .predicate_iri()
+        .unwrap()
+        .to_owned();
+
+    let mut ids = Vec::new();
+    for evidence in ["urn:evidence:container-a", "urn:evidence:container-b"] {
+        let (_, asserted) = graph
+            .try_assert_relation_statement(
+                from,
+                to,
+                SemanticStatementSpec {
+                    predicate: predicate.clone(),
+                    recognized_sub_kind: None,
+                    label: None,
+                    basis: AssertionBasis {
+                        note: None,
+                        method: None,
+                        evidence: vec![evidence.into()],
+                    },
+                    graph_scope: GraphScope::User,
+                    provenance_iri: Some("https://author.test/container".into()),
+                    asserted_at_ms: Some(20),
+                },
+            )
+            .unwrap();
+        ids.push(asserted.statement_id);
+    }
+    assert!(graph.retract_assertion(&ids[0]));
+
+    let owner = save_spec(&mut graph, None, None, Uuid::from_u128(911), &spec()).unwrap();
+    let projection = project_view(&graph, owner).unwrap();
+    let relation = projection
+        .relations
+        .iter()
+        .find(|relation| {
+            relation.kind == VisualRelationKind::SurfaceLink
+                && relation.source_from == QueryNodeId::surface(from_id)
+                && relation.source_to == QueryNodeId::surface(to_id)
+        })
+        .expect("surface source relation is projected");
+    let family_records: Vec<_> = relation
+        .assertions
+        .as_deref()
+        .unwrap()
+        .iter()
+        .filter(|record| record.predicate == predicate)
+        .collect();
+
+    assert_eq!(family_records.len(), 2);
+    assert_eq!(family_records[0].statement_id, ids[0]);
+    assert!(family_records[0].withdrawn.is_some());
+    assert_eq!(family_records[1].statement_id, ids[1]);
+    assert!(family_records[1].is_held());
+    assert!(
+        relation
+            .statements
+            .iter()
+            .all(|record| record.predicate != predicate)
     );
 }
 #[test]
@@ -286,18 +356,14 @@ fn source_identity_parallel_assertions_tags_navigation_and_reopen_survive_projec
         .resource_edges
         .into_iter()
         .find(|edge| {
-            edge.semantic.as_ref().is_some_and(|s| {
-                s.statements
-                    .iter()
-                    .any(|s| s.predicate != kernel::graph::resource::TAGGED_WITH_IRI)
-            })
+            edge.retained_assertions()
+                .iter()
+                .any(|assertion| assertion.predicate != kernel::graph::resource::TAGGED_WITH_IRI)
         })
         .unwrap();
     let mut parallel = original.clone();
-    parallel.semantic.as_mut().unwrap().statements[0].statement_id =
-        "urn:statement:parallel-query".into();
-    parallel.semantic.as_mut().unwrap().statements[0].provenance_iri =
-        Some("urn:author:other".into());
+    parallel.retained_assertions_mut()[0].statement_id = "urn:statement:parallel-query".into();
+    parallel.retained_assertions_mut()[0].provenance_iri = Some("urn:author:other".into());
     let target = original.to_node_id.parse().unwrap();
     apply_graph_delta(
         &mut graph,
@@ -368,9 +434,15 @@ fn source_identity_parallel_assertions_tags_navigation_and_reopen_survive_projec
     );
     assert!(reopened_projection.relations.iter().any(|relation| {
         relation.kind == VisualRelationKind::SurfaceLink
-            && relation.families["containment"]["sub_kinds"]
-                .as_array()
-                .is_some_and(|kinds| kinds.contains(&serde_json::json!("Domain")))
+            && relation.assertions.as_ref().is_some_and(|records| {
+                records.iter().any(|record| {
+                    record.is_held()
+                        && record.predicate
+                            == RelationKind::Containment(ContainmentSubKind::Domain)
+                                .predicate_iri()
+                                .unwrap()
+                })
+            })
     }));
     apply_graph_delta(
         &mut graph,

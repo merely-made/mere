@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 //! Read current view configuration and topology without advancing its controller.
-use super::relationship_topology::{PairInputs, inspect_pair};
+use super::relationship_topology::{PairInputs, inspect_pair_with_link_hides};
 use super::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -110,10 +110,11 @@ impl Canvas {
                     .filter(|(from, to)| (*from == a && *to == b) || (*from == b && *to == a))
                     .count();
                 let inputs = if self.occurrence_edges.is_none() {
-                    Some(inspect_pair(
+                    Some(inspect_pair_with_link_hides(
                         &self.graph,
                         first,
                         second,
+                        &self.hidden_links.iter().cloned().collect(),
                         |from, to, selector| {
                             self.hidden_edges.contains(&EdgeCell { from, to, selector })
                         },

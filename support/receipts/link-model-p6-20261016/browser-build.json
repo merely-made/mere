@@ -1,0 +1,61 @@
+{
+  "source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+  "source_clean": true,
+  "package_path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/pkg-v2",
+  "origin": "http://127.0.0.1:8857",
+  "wasm_bindgen": "0.2.129",
+  "command": "cargo build --locked --offline -j1 --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu",
+  "cwd": "/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web",
+  "package_files": [
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/pkg-v2/graphshell_web_bg.wasm.d.ts",
+      "bytes": 5724,
+      "sha256": "28aa7894eb88fd6b3905c861427653ffaebd5e840ebce67d73e16eacdcad2ca5"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/pkg-v2/graphshell_web_bg.wasm",
+      "bytes": 263747817,
+      "sha256": "f72eed50a7643ada06be291ae6b5c4adbd675d8aefdd35131a79f312abf911da"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/pkg-v2/graphshell_web.js",
+      "bytes": 149342,
+      "sha256": "3b257b5125b445b843b6a11ad2eeefdb959b5f9ee94484260daf1ff601342328"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/pkg-v2/graphshell_web.d.ts",
+      "bytes": 8123,
+      "sha256": "0bb920aa469bc6b1de7b6482daed7350cd8c018d7e4f13e1580a987e756a3ccd"
+    },
+    {
+      "path": "/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web/scenarios/p6_tree_family_assertion_hide.scn",
+      "bytes": 2196,
+      "sha256": "f3c47cbe42c4f9d461eb6e2dcdc3264aeeec1b03a6a58e49bf4e5e30772aa22f"
+    },
+    {
+      "path": "/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web/scenarios/p6_tree_family_assertion_hide_reopen.scn",
+      "bytes": 1324,
+      "sha256": "d4fe3c9e71a9b205e93a6e4bda866af5964cd0e3ead32bb394317ea067fb0077"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/site/tree.html",
+      "bytes": 1051,
+      "sha256": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/site/loader.js",
+      "bytes": 25105,
+      "sha256": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/site/mount.js",
+      "bytes": 6189,
+      "sha256": "46e06335f795fbae21fdbd3deb35d6420dc9b5c5bb9174a1b3f28d065a3d1bbf"
+    },
+    {
+      "path": "/Users/markik/Code/testing/mere/link-model-p6-20261016/site/styles.css",
+      "bytes": 14965,
+      "sha256": "a0944b06a83a7249fc69239ecffc8cab543f7556ffc95f2446b33ce3b5cd0bfd"
+    }
+  ]
+}

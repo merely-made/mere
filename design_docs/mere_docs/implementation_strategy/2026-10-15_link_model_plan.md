@@ -1,7 +1,8 @@
 # Link model: shared readings, assertion lifecycle and responsive paths
 
 **Date:** 2026-10-15
-**Status:** in progress overall. The bounded P1 shared reading, P2 semantic
+**Status:** qualified within the bounded P1–P7 scope; independent product and
+storage gates remain named below. The bounded P1 shared reading, P2 semantic
 lifecycle/Knot intake and P5 fixed-endpoint experiment are qualified on their
 recorded sources. The P2 continuation is source `b69510949`, based on runtime
 `82e7fd718` with later upstream documentation merged. P3 began on 2026-10-16
@@ -10,7 +11,13 @@ Graphshell opened-link slice are qualified on `732c1537a`. Knot receiving
 qualification is published at `921b4e0`; Woodshed is qualified on native source
 `474d10a`, published with receipt `943c762`. This completes bounded P3, including
 source-owned personal authoring/withdrawal, ordered audition and fresh-process
-sealed reopening. P4, P6 and P7 remain later work.
+sealed reopening. P4 began on 2026-10-16 from refreshed main `b31363d2d` and is
+qualified within its recorded scope on Mere source `91467c0bb` and Woodshed receiving source `fe54425`,
+published with receipt `4716b71`. P6 began from refreshed main `0f8c1bf59`;
+its bounded migration and receiving gates are qualified on Mere `a45a0b697`
+and Woodshed source `d896e39` (published receipt `c32b60a`). P7 began from refreshed
+main `a4c1814c8` and is qualified in Graphshell on final browser source
+`6d53d4439`; its source gates, receiving and reopen evidence are recorded below.
 Work began at `d4d2f88c4`; the first source
 commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
@@ -44,7 +51,8 @@ before P3's Woodshed proof (L8); strength defaults to 1 per held assertion
 until the dynamics grammar plan sets it (L9); selection opens a link and
 lanes are rows in Timeline (L10); local compaction follows predicate nature
 (L12); valid time waits (L7). Promotion is planned as P7, after P3 and
-independent of P4 and P6 (L11). It is not part of this delivery.
+independent of P4 and P6 (L11). It was outside the first P1 delivery; the
+authorized P7 continuation is recorded below.
 
 ## P1: shared link reading over current storage
 
@@ -627,3 +635,273 @@ keep their own gates. The next integration phase is P4's responsive rest stroke
 and fan; the independently qualified P5 experiment remains evidence for that
 later dynamics adapter, with fields and sympathetic influences treated as
 forces acting on links rather than additional relationship assertions.
+
+
+## P4 continuation: rest stroke and fan retirement
+
+**Status (2026-10-16): bounded P4 qualified.** Mark authorized proceeding after
+bounded P3. Mere began from refreshed `b31363d2d`; Woodshed began from `284fa340`
+including the independent capture-accumulator work. Root owns the shared
+contract, rendering integration, receiving locks, qualification and publication.
+Independent source work covers Pictograph, Woodshed's relationship editor and
+Pandect/scene lowering; all Cargo and consumer intake remain serialized.
+
+The resting target is a canonical `LinkKey` with a separate displayed
+appearance, at most one per stratum on a displayed pair. Picking it opens the
+existing shared member reader. Original assertion IDs, direction and source
+provenance remain untouched. Direction heads and an opposition mark carry the
+closed link's meaning without per-assertion lanes. Default visual strength
+counts eligible held contributions, while the existing endpoint force law
+retains its exact source-row behavior; this phase does not introduce a force law.
+
+Only canonical key/stratum/paint-mark values move down into Sceno so routed
+scenes can carry them without a dependency cycle. Scenograph keeps the public
+`scenograph::link` path and owns readings/source authority. `RoutedRelation`
+adds optional source identity and view-local marks/strength; anonymous geometry
+stays explicitly unbound. Source-linked rendering must use the typed identity.
+
+New whole-link hides persist by canonical key. Existing directed member hides
+remain precise eligibility filters; migration never widens a user's partial
+hide to a whole link or to the other stratum. Closed selection and picking no
+longer use a selector or arbitrary first assertion as the link identity.
+
+The completed done conditions are architecture §8 P4: Woodshed's relationship editor,
+Pictograph, Cambium and routed scenes use the shared key; all three fan drawing
+paths retire; direction/opposition and both strata remain legible and selectable;
+member actions resolve exact current source handles; and saved link hides
+round-trip without changing graph truth. Qualification requires focused CPU and
+compatibility checks, reviewed receiving native and browser captures, and a
+fresh-process reopen for retained presentation state. P4f, P6/P7, physical audio
+quality and endpoint feedback retain their independent gates.
+
+### P4 qualification and receiving proof
+
+The [shared receipt](../../../support/receipts/link-model-p4-20261016/receipt.json)
+records the source gates and six reviewed browser captures on immutable supplier
+`91467c0bb`. Shared packages pass 714 cases; the final canvas gate passes 776
+cases with 18 existing ignores; Graphshell web passes 302 cases with six existing
+ignores. The shared and Graphshell logs precede the final fixture-only corrections;
+the exact recorded browser bundle compiles and executes those corrections.
+The port-boundary check and locked offline Wasm build pass. The real WebGPU
+fixture selects both strata, opens all six assertions on the selected pair,
+resolves an exact member action, and acknowledges a canonical-key hide before
+changing visibility. A new tab reopens the same IndexedDB profile with that
+hide retained; ordinary Show hidden links restores all six displayed appearances.
+Source facts and graph revision remain unchanged.
+
+Woodshed advances only its root Mere family to that immutable supplier. Its
+[P4 receiving receipt](../../../support/receipts/link-model-p4-20261016/receiving-hosts.json)
+links the published consumer proof at `4716b71`. The 619-case source gate on
+`a8c2cd2` retains seven existing ignores and five separate child invocations.
+After capture framing and an existing CSS wrapper correction, source `865e0e9`
+passes its desktop build and native seed/reopen, with four reviewed captures.
+Merged source `fe54425` incorporates concurrent take-navigation main and repeats
+193 view plus 168 native-host cases, five child invocations and the build.
+Two different native processes then present 141 and 135 frames on a fresh
+sealed test profile; all four new captures are reviewed. The exact source
+resource/revision, assertion handle, direction, method and evidence survive
+reopening. The four-file isolated Keeper manifest is unchanged. A later merge
+of standalone Hocket source changes no Woodshed runtime or lock input.
+
+Receiving checks caught an eligible-member summary defect; the rest stroke
+now counts only displayed source contributions while its opened reading keeps
+the complete independent evidence. Native review caught and repaired missing
+reader spacing. Pictograph self-link arches now meet their node boundaries and
+use the same geometry for paint and picking. All three old fan paths retire.
+The endpoint force law and per-source contribution policy remain unchanged.
+
+The later Mere `81e6805cf` intake changes C5 validation/receipts and the root
+Knot lock, with no P4 production source change. This lane does not claim a Knot
+P4 native intake; the independent C5 compatibility receipt keeps its own scope.
+P5 remains independently qualified. P6 family migration is next in the core
+sequence; P7 promotion is separately eligible. Full Stage P4f and physical audio
+qualification remain separate.
+
+
+## P6 continuation: all relation families as assertions
+
+**Status (2026-10-16): bounded P6 qualified.**
+Mark authorized the next phase after P4. Work begins from refreshed main
+`0f8c1bf59`; the containment proof leads the migration without conflating
+rule-derived URL/domain membership with authored reasons. The integration
+owner controls the storage contract, serialized Cargo gates and publication.
+Cheaper agents own bounded source inventories, canonical predicate mapping,
+read adapters, exact view hiding and independent compatibility controls.
+
+The four set-based families are Containment, Arrangement, Imported and
+Provenance. Traversal remains event-shaped with its existing rollup. A single
+assertion list replaces the four authoritative membership sets; old typed
+accessors become derived read projections. Every recognized relation has a
+stable canonical predicate. Existing taxonomy tags remain compatibility
+filters and keep their ordinals; Tabard's unused per-kind registry retires,
+while its active generic styling contract stays intact.
+
+Existing membership writers retain ensure semantics. Independent reasons use
+the statement-aware writer with exact IDs, source attribution, scope, basis,
+first/last times and terminal withdrawal. Default reads count held records;
+explicit history retains tombstones. New exact-ID view hides are distinct from
+whole-link and old selector hides. Paint, picking, spring contributions and
+saved intent must agree, and source facts must not change with a view hide.
+
+Canonical snapshots carry `assertion_schema: 1` and one assertion array per
+bucket. Schema 0 decodes the legacy sidecars; migration creates one deterministic
+compatibility record per original member and keeps unknown times/attribution
+unknown. Identity uses declared UTF-8 canonical bytes and UUIDv5, never a
+platform hash or wall clock. Known retained journal authors may repair legacy
+attribution only where original membership history proves it. Versioned v4
+JSON codicils keep explicit v1-v3 readers. Checked loading rejects ambiguous
+mixed formats and conflicting assertion handles before materialization.
+Normal durable snapshots still omit session arrangements; exact pair captures
+retain them. Ordinary URL/domain regeneration keeps its rule source and stable
+identity, while recorded snapshots retain their supplied truth.
+
+Done conditions include the authored CollectionMember proof (two independent
+same-actor reasons, exact withdrawal/hide, retained sibling), all-family metadata
+and placement controls, old snapshot/journal/codicil compatibility, stale-ID and
+foreign-owner refusal, ordinary and exact persistence, and measured reads with
+substantial withdrawal history. The integrated Graphshell browser must exercise
+ordinary exact-member hide/show and saved-intent reopen. Receiving products
+advance only after their own affected source/build/native gates. These are
+requirements, not acceptance inferred from the source edits.
+
+
+### P6 qualification and receiving proof
+
+The [P6 receipt](../../../support/receipts/link-model-p6-20261016/receipt.json)
+records published supplier `a45a0b697`, based on refreshed main `fb32346fe`, and
+the exact revisions used for each source gate. A canonical assertion collection
+owns all 44 recognized predicate kinds; semantic-only compatibility APIs retain
+their scope. Query projections separately expose canonical records, including
+withdrawals, and their resting strokes count exact held IDs. A withdrawn-only
+pair has no resting stroke. Traversal retains its event collection and rollup.
+
+The final shared checkpoint passes kernel 466, linked-data with query 104,
+Mere-view 36, Cambium 276, Scenograph 43, Scenomise 184 and Tabard 37 cases.
+After the query and historical-receipt controls, full Mere and Pandect gates
+pass 70 and 318 library cases plus 26 Pandect integration cases. Kernel's store
+reopen passes in separate write/read processes. Signed Knot intake passes five
+cases plus its separate reopen child against the actual locked supplier
+`b6a6222ed`; this does not claim another Knot native qualification. Graphshell
+passes 389 cases with six existing ignores, including all-family signed sync,
+exact withdrawal, v4 codicil/legacy readers and transfer. The separately gated
+sync and transfer peers compile. The port boundary check passes.
+
+The broader Pictograph run passes 484 cases with 18 existing ignores and one
+wall-clock physics-budget failure; that same test passes in isolation with its
+original threshold. Both outcomes remain in the receipt. No timing assertion
+was relaxed. Historical receipt checks use an independent serializer derived
+from the pre-P6 field schema, rather than treating the current constructor as
+its own checksum oracle. This is source-derived compatibility evidence, not an
+old-executable or pre-P2 binary-archive migration claim.
+
+The declared debug budgets use 50,000 retained withdrawals and two held reasons.
+Kernel's 64 held reads have p95 3.684 ms; its snapshot is 16,941,071 bytes and
+peak resident memory is 111,853,568 bytes, below the 64 MiB wire and 256 MiB
+process budgets. The portable reader's 16 held reads round to p95 1 ms; explicit
+50,002-record history materializes in 88 ms, serializes to 26,218,350 bytes and
+peaks at 245,448,704 resident bytes, below its 2 s, 64 MiB and 512 MiB budgets.
+These are bounded CPU read/materialization probes, not a UI frame-rate claim.
+
+The locked offline Wasm product build passes. Four reviewed WebGPU captures at
+the default 1280 × 720 logical viewport show the two strata, acknowledged exact
+assertion hiding and ordinary restoration. The fixture's two same-actor
+CollectionMember reasons keep separate IDs and basis/evidence. Hiding one
+changes strength from two to one without changing graph facts or revision.
+A new tab reopens the same IndexedDB graph session and retained hide; Show
+hidden assertions restores strength two. The initial exact-action scenario
+selector incorrectly replaced its ID filter with its action filter. The
+corrected selector combines exact ID with accessible action text; its fresh
+origin rerun passes, and the failed iteration is retained.
+
+The [receiving record](../../../support/receipts/link-model-p6-20261016/receiving-hosts.json)
+points to Woodshed's published `c32b60a` receipt. Only its 45 root Mere package
+rows advance, from `91467c0bb` to `a45a0b697`; other suppliers and nested locks
+are preserved. Source `d896e39` passes 629 cases, seven existing ignores and
+five additional child-process checks, followed by the locked desktop build.
+Its new portable custom-predicate regression preserves exact IDs, source scope,
+actor, clocks, basis and evidence through the real personal reading adapter and
+shared compiler; exact withdrawal retains the independent held reason.
+Woodshed has no Mere Graph ingestion owner, so the four-family graph-storage
+proof remains with Mere.
+
+Two native app processes present 141 and 134 frames on the same isolated sealed
+profile, producing four reviewed captures. The generated Surface recipe's source
+identity/revision, exact assertion handle, direction, method, evidence and
+unknown clocks survive reopening. The four-file Keeper manifest is unchanged;
+the Keeper remains the same separate fixture process during this app-process
+reopen. Sealed profile byte manifests are recorded separately from source truth.
+This closes the bounded P6 receiving gate. Full Stage P4f, physical audio,
+automatic resident synchronization, pre-P2 binary archives and P7 promotion
+retain their separate gates.
+
+## P7 continuation: promoted links (2026-10-16)
+
+P7 starts from published main `a4c1814c8`, including the integrated Cleromancy
+receiving checks. The kernel owner implements a new typed immutable
+`graph.frozen-link/v1` Resource facet, separate from frozen selections so the
+original Surface or Resource stratum survives. The integration owner owns
+Graphshell's journaled freeze, source-owned withdrawal, review assertions and
+drift reading. The presentation owner owns ordinary browser controls and the
+seed/reopen scenarios. Cargo and shared-seam integration are serialized.
+
+Each freeze mints a distinct Resource and retains the canonical pair, endpoint
+references, exact directed assertion copies (including retained withdrawals),
+separate Traversal context, freeze-time coverage, source identity and revision
+availability. The captured local graph revision is explicitly a local capture
+coordinate, never a public source revision. This Graphshell proof has one
+owning graph source per promoted link; it does not aggregate foreign stores.
+Comments are ordinary literal assertions about the promoted Resource.
+
+Done conditions: later source withdrawal leaves the copied facet unchanged;
+independent freezes have distinct identities; malformed or changed immutable
+facets refuse atomically; receivers admit the Resource without inventing its
+referenced endpoints and report missing Surface/Resource material through
+coverage. Live drift distinguishes added, withdrawn, changed and missing exact
+IDs and stays unavailable under relevant coverage or a different source.
+Graphshell must exercise freeze, acknowledged save, withdrawal, comment and
+fresh browser reopening with reviewed captures. Tests, browser observation and
+publication remain separate evidence gates until recorded here.
+
+
+### P7 qualification (2026-10-16)
+
+The [P7 receipt](../../../support/receipts/link-model-p7-20261016/receipt.json)
+records core source `611e484d4` and final Graphshell browser source `6d53d4439`.
+The tested kernel, journaled host operations, fixture and Pandect objects are
+identical across the browser-only refinements; their Git object receipts are
+retained. Each freeze creates a fresh Resource bearing a validated immutable
+`graph.frozen-link/v1` facet. It holds one source-qualified pair reading in its
+original stratum, exact directed assertion copies, source revision availability,
+local capture revision and coverage. Comments are separately attributed literal
+assertions on that Resource. Changing or clearing its retained facet refuses;
+normal whole-Resource deletion remains distinct, as for frozen selections.
+
+Kernel passes 474 library cases with the store feature. Graphshell passes 393
+library cases with six existing ignores. Pandect passes 318 library and 26
+integration cases, with one existing integration ignore. A separate writer,
+author reader and receiving reader process verify exact frozen JSON after a
+live withdrawal, the Resource-owned comment, and a reference-only receiving
+Resource with explicit missing Surface and Resource coverage. The receiver
+creates no endpoint payloads. Exact-ID drift reports additions, withdrawals,
+metadata changes and missing records; duplicate handles, source changes and
+relevant incomplete coverage refuse an absence conclusion. A simultaneous
+metadata update and withdrawal retains both drift signals.
+
+The locked offline WebGPU build and dependency boundary check pass. Six reviewed
+captures at the default 1280 × 720 logical viewport (device scale 2) accompany a
+fresh-origin seed and fresh-page IndexedDB reopen on the final committed source.
+Ordinary controls freeze the Surface link, acknowledge its save, withdraw only
+one personal assertion, and add a review comment. Reopening retains both original
+frozen assertions, reports the exact withdrawn source ID and restores the comment.
+The source pair's facts do not change when freezing or commenting. Early scenario
+iterations incorrectly counted one stratum in a pair-wide inspector and used an
+old selected-button label; those failures are retained. Visual review found an
+unsupported text-arrow glyph, replaced by plain endpoint words before the final
+run. The final captures use ordinary scrolling to the review outcome.
+
+This closes bounded P7 and the recorded bounded P1–P7 implementation sequence.
+The proof has one owning Mere graph source per freeze and explicitly unavailable
+public revision for the live MereHost graph. It does not qualify foreign-store
+aggregate promotion, another product's review UI, automatic resident
+synchronization, browser anti-eviction guarantees or physical audio. The broader
+product and storage qualifications retain their named owners and receipts.

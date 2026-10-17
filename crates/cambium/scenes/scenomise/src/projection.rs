@@ -128,7 +128,10 @@ fn relationship_snapshot(
         }
     }
     let definition = &snapshot.recipe.definition;
-    if !matches!(Family::resolve(&definition.arrangement.kind), Some(Family::Grid | Family::Spiral)) {
+    if !matches!(
+        Family::resolve(&definition.arrangement.kind),
+        Some(Family::Grid | Family::Spiral)
+    ) {
         issues.push(CompileIssue::new("arrangement.kind", "authored occurrence order requires a grid or spiral arrangement; it is not a physical scatter coordinate"));
     }
     if definition.reading.kind != "nodes"
@@ -303,6 +306,9 @@ fn relationship_snapshot(
             ],
             kind: Some(relationship.kind.clone()),
             weight: None,
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         });
         compiled.push(CompiledRelationship {
             disclosure: relationship.clone(),
@@ -725,7 +731,10 @@ impl Target {
     }
 }
 
-fn resolve_target(compiler: &ProjectionCompiler, definition: &ProjectionDefinition) -> Option<Target> {
+fn resolve_target(
+    compiler: &ProjectionCompiler,
+    definition: &ProjectionDefinition,
+) -> Option<Target> {
     let kind = definition.arrangement.kind.as_str();
     Family::resolve(kind).map(Target::Builtin).or_else(|| {
         compiler
@@ -823,7 +832,14 @@ fn compile_inner(
             embedding: None,
             weight: None,
         };
-        disclose(&mut item, channels, occurrence, x_field, y_field, grid_ranks.as_ref());
+        disclose(
+            &mut item,
+            channels,
+            occurrence,
+            x_field,
+            y_field,
+            grid_ranks.as_ref(),
+        );
         score.items.push(item);
     }
     // Compare exact solver inputs, not revision hashes: source revisions can
@@ -887,10 +903,16 @@ fn disclose(
     grid_ranks: Option<&(BTreeMap<u64, i32>, BTreeMap<u64, i32>)>,
 ) {
     let x_number = number(occurrence, x_field);
-    let x_text = occurrence.values.get(x_field).and_then(ProjectionValue::text);
+    let x_text = occurrence
+        .values
+        .get(x_field)
+        .and_then(ProjectionValue::text);
     let y_number = y_field.and_then(|field| number(occurrence, field));
     let xy = || {
-        let (x, y) = (x_number.expect("validated x value"), y_number.expect("validated y value"));
+        let (x, y) = (
+            x_number.expect("validated x value"),
+            y_number.expect("validated y value"),
+        );
         (x, y)
     };
     match channels {
@@ -1097,7 +1119,13 @@ fn validation_issues(
             // arrangement is reported below.
             None => (ANY_FIELD_TYPE, false),
         };
-    required_channel_field(&mut issues, dataset, "encoding.x", &definition.encoding.x, x_types);
+    required_channel_field(
+        &mut issues,
+        dataset,
+        "encoding.x",
+        &definition.encoding.x,
+        x_types,
+    );
     if reads_y {
         required_channel_field(
             &mut issues,
@@ -1246,7 +1274,10 @@ fn validate_arrangement(
             for (key, value) in &definition.arrangement.options {
                 let field = format!("arrangement.options.{key}");
                 match declared.iter().find(|spec| &spec.key == key) {
-                    None => issues.push(CompileIssue::new(field, format!("{id} does not read this option"))),
+                    None => issues.push(CompileIssue::new(
+                        field,
+                        format!("{id} does not read this option"),
+                    )),
                     Some(spec) => {
                         if let Some(refusal) = spec.kind.refusal(value) {
                             issues.push(CompileIssue::new(field, refusal));
@@ -1359,7 +1390,10 @@ fn validate_occurrences(
                 ));
             }
         }
-        if matches!(channels, Some(ChannelUse::Coordinate | ChannelUse::Embedding)) {
+        if matches!(
+            channels,
+            Some(ChannelUse::Coordinate | ChannelUse::Embedding)
+        ) {
             for field in [x, y].into_iter().flatten() {
                 if let Some(value) = occurrence
                     .values

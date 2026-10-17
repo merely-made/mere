@@ -1,0 +1,18 @@
+{
+  "source": "1e003b3b44257f96be4e58901c21aa1b7b7a4c6c",
+  "integrated_main": "b6f5c4ac960b9151d86d2c7a0ed4821fb764e8ab",
+  "portable_core": "d5c383c189f9e866a38939dd372ddf6a7556b60b",
+  "gate": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 1
+  },
+  "command": "cargo test --locked --offline -p djinn --test embedded_reservoir_validation -- --nocapture --test-threads=1",
+  "compiler": "Cargo 1.99; rustc/rustdoc 1.97.1",
+  "repair": "All typed-deck fixture seeds use the existing bounded replay-valid prefix helper. Carrier cap and complete final facets, same-disk owner and tamper guards are unchanged.",
+  "diagnostic": "First integrated probe: C4 seed frame 1048599 exceeds unchanged 1048576 carrier limit. Seven other parents passed, including C7. Original failure is retained.",
+  "logs": {
+    "receiving-main-integration-01.log": "de8e9aa84553577aaa72322a1bdbf3fa9861674d942fdeca561495d91ead63d1",
+    "receiving-main-integration-02.log": "d71dfe5eef2271bbf46803dbc36d8d4831c26b188c212f715db72a828aafe94e"
+  }
+}

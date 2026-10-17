@@ -253,8 +253,8 @@ mod tests {
                     from_node_id: from.id().to_string(),
                     to_node_id: to.id().to_string(),
                     families: vec![PersistedEdgeFamily::Semantic],
-                    semantic: Some(PersistedSemanticEdgeData {
-                        statements: statements
+                    assertions: Some(
+                        statements
                             .iter()
                             .map(|statement| PersistedSemanticStatement {
                                 statement_id: statement.statement_id.clone(),
@@ -269,8 +269,8 @@ mod tests {
                                 withdrawn: statement.withdrawn.clone(),
                             })
                             .collect(),
-                        ..Default::default()
-                    }),
+                    ),
+                    semantic: None,
                     traversal: None,
                     containment: None,
                     arrangement: None,

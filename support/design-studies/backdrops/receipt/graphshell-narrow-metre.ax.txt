@@ -1,0 +1,18 @@
+Browser tab: 9, Title: "Graphshell, one tree", URL: "http://127.0.0.1:8786/tree.html?app=local".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 220, 222-229
++					231 text the light returns along the river bend
+~					221 text 10 syllables / 10 expected; rhyme A
++					232 text Source: fixture.verse / line-1 · illustrative-v1
++					233 button Related occurrence line-3
++					234 text Source-disclosed rhyme tails match: end
++					235 text forward 1 · retained 0
++					236 button Clear selection
++					237 button Dismiss retained
++					238 heading Occurrences, Value: 3
++						239 text Occurrences
++					240 checkbox Scene occurrence line-1: the light returns along the river bend, Value: 1
++					241 checkbox Scene occurrence line-2: we leave our names beneath the falling rain, Value: 0
++					242 checkbox Scene occurrence line-3: the willows lean where all our footpaths end, Value: 0
++					243 checkbox Scene occurrence line-4: and every road will lead us home again, Value: 0
+The focused UI element is 0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8786/tree.html?app=local

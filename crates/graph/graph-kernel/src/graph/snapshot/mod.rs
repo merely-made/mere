@@ -31,7 +31,7 @@ pub mod to;
 
 pub use checked::ResourceSnapshotError;
 
-pub(crate) use from::payload_from_persisted;
+pub(crate) use from::{payload_from_persisted, payload_from_persisted_at};
 pub(crate) use to::persisted_edge_for_ids;
 
 #[cfg(test)]

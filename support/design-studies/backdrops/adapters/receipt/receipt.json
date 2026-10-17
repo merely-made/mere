@@ -1,0 +1,39 @@
+{
+  "backend": "Vello CPU",
+  "frames": [
+    {
+      "backdrops": 4,
+      "generation": 7803842391526923351,
+      "height": 540,
+      "items": 12,
+      "scene": "metre",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    },
+    {
+      "backdrops": 12,
+      "generation": 7193468540914970591,
+      "height": 540,
+      "items": 11,
+      "scene": "fretboard",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 4,
+      "width": 900
+    },
+    {
+      "backdrops": 2,
+      "generation": 14802991310454475619,
+      "height": 540,
+      "items": 4,
+      "scene": "terrain",
+      "selection_changes_pixels": true,
+      "source_unchanged_by_attention": true,
+      "sources": 5,
+      "width": 900
+    }
+  ],
+  "presentation": "not exercised"
+}

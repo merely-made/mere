@@ -255,6 +255,12 @@ pub enum Arrangement {
     Kanban(Kanban),
     Embedded(Embedded),
     Radial(Radial),
+    /// Shares of a measured whole, bounded by the viewport.
+    Partition(crate::Partition),
+    /// Fixed set regions; membership picks the region.
+    Setscape(crate::Setscape),
+    /// Tiles by weight on the infinite canvas, grouped, never reflowing.
+    Mosaic(crate::Mosaic),
     /// A solver registered at runtime, named by id, configured opaquely.
     ///
     /// The id is matched against the `scenograph` solver registry. An

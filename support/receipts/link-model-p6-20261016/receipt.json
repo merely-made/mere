@@ -1,0 +1,75 @@
+{
+  "schema": "mere.link-model-p6-qualification/v1",
+  "status": "bounded-qualified",
+  "supplier_source": "a45a0b6976fa8984ade032d5514d6403d5a216c3",
+  "published_supplier": true,
+  "receiving_hosts": "receiving-hosts.json",
+  "source_gates": "run-ledger.json",
+  "implementation": {
+    "recognized_predicates": 44,
+    "canonical_families": [
+      "semantic",
+      "containment",
+      "arrangement",
+      "imported",
+      "provenance"
+    ],
+    "traversal": "existing event and rollup model",
+    "snapshot_schema": 1,
+    "codicil_schema": 4,
+    "legacy_synthesized_identity": "UUIDv5 over declared UTF-8 bytes; unknown actor and clocks remain unknown absent proven journal attribution",
+    "view_hiding": "exact assertion IDs; acknowledged saved intent; graph truth unchanged"
+  },
+  "browser": {
+    "build": "browser-build.json",
+    "review": "browser-review.json",
+    "backend": "BrowserWebGpu",
+    "reviewed_captures": 4,
+    "fresh_tab_reopen": true,
+    "same_graph_session": true,
+    "exact_assertion_id": "fixture:p6:family:collection-primary",
+    "independent_reason_id": "fixture:p6:family:collection-independent",
+    "strength_before_hide": 2,
+    "strength_after_hide": 1,
+    "strength_after_restore": 2,
+    "source_facts_unchanged": true
+  },
+  "history_budgets": "history-budget-results.json",
+  "documentation": {
+    "status": "no-new-findings",
+    "comparison": "doc-audit/final-audit-comparison.json",
+    "known_preexisting_judgment_errors": 15,
+    "covered_active_docs": 271,
+    "active_docs": 285,
+    "global_judgment_green": false
+  },
+  "observations": [
+    {
+      "area": "Pictograph timing",
+      "detail": "Broad checkpoint suite has 484 passes, 18 existing ignores and one real-clock physics-budget failure. The unchanged same test passes in a focused process. Both logs retained; no threshold relaxed."
+    },
+    {
+      "area": "legacy receipt",
+      "detail": "Historical checksum comparison uses an independent serializer derived from the old schema, not an old executable."
+    },
+    {
+      "area": "browser scenario",
+      "detail": "The initial exact-action selector overwrote its ID predicate. Corrected exact-ID plus accessible action text passes on a fresh origin. Failed receipt retained."
+    }
+  ],
+  "separate_gates": [
+    "P7 promoted links",
+    "Traversal occurrence-model migration",
+    "automatic resident synchronization",
+    "pre-P2 binary archive migration",
+    "full Woodshed Stage P4f",
+    "physical audio qualification"
+  ],
+  "cleanup": {
+    "browser_tabs_closed": true,
+    "browser_servers_stopped": true,
+    "native_apps_exited": true,
+    "isolated_keeper_stopped": true
+  },
+  "component_continuity": "component-continuity.json"
+}

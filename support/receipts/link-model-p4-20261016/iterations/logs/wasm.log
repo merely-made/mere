@@ -1,0 +1,39 @@
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling font-types v0.12.5
+   Compiling color v0.3.3
+   Compiling svg_fmt v0.4.5
+   Compiling static_assertions v1.1.0
+   Compiling adler2 v2.0.1
+   Compiling precomputed-hash v0.1.1
+   Compiling string_cache v0.9.0
+   Compiling crc32fast v1.5.2
+   Compiling guillotiere v0.7.0
+   Compiling peniko v0.6.1
+   Compiling read-fonts v0.41.0
+   Compiling web_atoms v0.2.6
+   Compiling idna_adapter v1.2.2
+   Compiling web-time v1.1.0
+   Compiling raw-window-handle v0.6.2
+   Compiling percent-encoding v2.3.2
+   Compiling form_urlencoded v1.2.2
+   Compiling accesskit v0.24.1
+   Compiling blake3 v1.8.7
+   Compiling idna v1.1.0
+   Compiling skrifa v0.44.0
+   Compiling miniz_oxide v0.9.1
+   Compiling tendril v0.5.1
+   Compiling wasm-bindgen-futures v0.4.79
+   Compiling constant_time_eq v0.4.2
+   Compiling crossbeam-utils v0.8.23
+   Compiling wgpu v30.0.1
+   Compiling markup5ever v0.39.0
+   Compiling flate2 v1.1.10
+   Compiling url v2.5.8
+   Compiling wgpu-types v30.0.1
+   Compiling miniz_oxide v0.8.9
+   Compiling fdeflate v0.3.7
+   Compiling half v2.7.1

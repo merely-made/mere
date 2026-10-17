@@ -1,0 +1,48 @@
+{
+  "source_revision": "32f95bc07bbacab0da51ad952af532d9e8123b01",
+  "policy": {
+    "declared_before_focused_measurement": true,
+    "build": "debug",
+    "scope": "single focused test process, not UI frame rate",
+    "kernel": {
+      "retained_records": 50002,
+      "held_records": 2,
+      "reads": 64,
+      "read_p95_ms_max": 100,
+      "snapshot_wire_bytes_max": 67108864,
+      "peak_resident_bytes_max": 268435456
+    },
+    "portable": {
+      "retained_records": 50002,
+      "held_records": 2,
+      "reads": 16,
+      "held_read_p95_ms_max": 100,
+      "history_materialization_ms_max": 2000,
+      "history_wire_bytes_max": 67108864,
+      "peak_resident_bytes_max": 536870912
+    }
+  },
+  "results": {
+    "kernel": {
+      "maximum_resident_set_bytes": 111853568,
+      "peak_budget_passed": true,
+      "test_passed": true,
+      "log": "history-budget-kernel.log",
+      "sha256": "398557996916399a68e567948b6b11163f5d3a7ed9ad7ce4ffce8bfb887e5bbf",
+      "snapshot_bytes": 16941071,
+      "held_read_p95_ms": 3.683917,
+      "load_ms": 587.386125
+    },
+    "portable": {
+      "maximum_resident_set_bytes": 245448704,
+      "peak_budget_passed": true,
+      "test_passed": true,
+      "log": "history-budget-portable.log",
+      "sha256": "f504926647a1cd9909c6b53a2428abc5749c79ab4521cc97b241e98d3b67bd3a",
+      "history_bytes": 26218350,
+      "held_read_p95_ms_rounded": 1,
+      "history_materialization_ms": 88
+    }
+  },
+  "scope": "Debug single-process synthetic-history CPU read and materialization probes. No UI frame-rate or device claim."
+}

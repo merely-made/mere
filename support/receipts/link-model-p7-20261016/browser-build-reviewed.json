@@ -1,0 +1,66 @@
+{
+  "source": "6d53d4439fce520c1da9f3ddf87c3dac343934b3",
+  "clean": true,
+  "command": "cargo build --locked --offline -j1 --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu",
+  "exit_code": 0,
+  "build_log": "logs/browser-build-reviewed.log",
+  "bindgen": "wasm-bindgen 0.2.129 --target web",
+  "bindgen_log": "logs/browser-bindgen-reviewed.log",
+  "source_files": [
+    {
+      "path": "ports/graphshell/src/web_tree/promoted_links.rs",
+      "sha256": "f1c478d8c6468f01a29293725d1c4d3cd27aaecc5d7b60400f2304d2f370be66"
+    },
+    {
+      "path": "ports/graphshell/web/tree.html",
+      "sha256": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b"
+    },
+    {
+      "path": "ports/graphshell/web/loader.js",
+      "sha256": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p7_tree_promoted_link.scn",
+      "sha256": "83c9d179281cae311d5fd3f5e7dd21de9a24e5d6dab78ed245278bb17a6e6984"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p7_tree_promoted_link_reopen.scn",
+      "sha256": "728915667d018d2d11b825303de276eaa8dc6b56a55f66ad00bd38c76d07de68"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "7cbbade5759169a37eb7c6967f2d892edc42b3838684aa4c4eb06cf627583210"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "35f42b75c8584b979e1efd957bbb76bde5ad22a02011487d85fd23b656a89423"
+    }
+  ],
+  "package_files": [
+    {
+      "path": "graphshell_web.d.ts",
+      "bytes": 8123,
+      "sha256": "0bb920aa469bc6b1de7b6482daed7350cd8c018d7e4f13e1580a987e756a3ccd"
+    },
+    {
+      "path": "graphshell_web.js",
+      "bytes": 149348,
+      "sha256": "ffeaf863cbd3cf62ceaf0fd0f465983ef633c7afe5ad8302b17db9eadc34cb06"
+    },
+    {
+      "path": "graphshell_web_bg.wasm",
+      "bytes": 264746075,
+      "sha256": "14f0254f8601ed5189f54da888c19c2970fb89ecac99873bc9d0b6e05bfc3109"
+    },
+    {
+      "path": "graphshell_web_bg.wasm.d.ts",
+      "bytes": 5724,
+      "sha256": "28aa7894eb88fd6b3905c861427653ffaebd5e840ebce67d73e16eacdcad2ca5"
+    },
+    {
+      "path": "snippets/genet-render-host-3997a73541d04484/inline0.js",
+      "bytes": 1369,
+      "sha256": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee"
+    }
+  ]
+}

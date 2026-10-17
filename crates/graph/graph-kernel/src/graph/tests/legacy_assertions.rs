@@ -6,6 +6,7 @@
 
 use super::super::*;
 use crate::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+use crate::persistence::{PersistedSemanticEdgeData, PersistedSemanticSubKind};
 
 #[test]
 fn legacy_statement_load_preserves_ids_times_and_known_attribution() {
@@ -33,6 +34,12 @@ fn legacy_statement_load_preserves_ids_times_and_known_attribution() {
             .unwrap();
     }
     let mut snapshot = graph.to_snapshot();
+    snapshot.assertion_schema = 0;
+    let statements = snapshot.edges[0].assertions.take().unwrap();
+    snapshot.edges[0].semantic = Some(PersistedSemanticEdgeData {
+        statements,
+        ..Default::default()
+    });
     let statements = &mut snapshot.edges[0].semantic.as_mut().unwrap().statements;
     assert_eq!(statements.len(), 2);
     statements[0].provenance_iri = None;
@@ -47,10 +54,7 @@ fn legacy_statement_load_preserves_ids_times_and_known_attribution() {
         }
     }
     let restored = Graph::from_snapshot(&snapshot).to_snapshot();
-    assert_eq!(
-        restored.edges[0].semantic.as_ref().unwrap().statements,
-        expected
-    );
+    assert_eq!(restored.edges[0].retained_assertions(), expected);
     assert_eq!(
         Graph::from_snapshot(&restored).to_snapshot().edges,
         restored.edges
@@ -79,14 +83,20 @@ fn aggregate_only_snapshots_receive_unknown_attribution_for_both_predicate_forms
             },
         );
         snapshot.edges = graph.to_snapshot().edges;
-        snapshot.edges[0]
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements
-            .clear();
+        snapshot.assertion_schema = 0;
+        snapshot.edges[0].assertions = None;
+        snapshot.edges[0].semantic = Some(PersistedSemanticEdgeData {
+            sub_kinds: if recognized {
+                vec![PersistedSemanticSubKind::Cites]
+            } else {
+                vec![]
+            },
+            label: Some("old citation".into()),
+            predicate: (!recognized).then(|| "https://example.test/relates".into()),
+            ..Default::default()
+        });
         let restored = Graph::from_snapshot(&snapshot).to_snapshot();
-        let statements = &restored.edges[0].semantic.as_ref().unwrap().statements;
+        let statements = restored.edges[0].retained_assertions();
         assert!(!statements.is_empty());
         assert!(
             statements

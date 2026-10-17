@@ -1,0 +1,525 @@
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling sceno v0.0.5 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/sceno)
+   Compiling scenograph v0.0.4 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenograph)
+   Compiling scenomise v0.0.5 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenomise)
+warning: unused variable: `time_range`
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/assertion_write.rs:1021:19
+     |
+1021 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/mod.rs:710:19
+    |
+407 | impl Graph {
+    | ---------- methods in this implementation
+...
+710 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+724 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+746 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `upsert_persisted_statement` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_data.rs:468:19
+    |
+323 | impl SemanticData {
+    | ----------------- method in this implementation
+...
+468 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_payload.rs:285:19
+    |
+ 57 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+285 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+298 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+320 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+344 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/resource_content.rs:86:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+ 86 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 89 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/edge_ops.rs:181:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+181 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+252 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+268 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+337 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+524 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+621 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+757 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/graph-kernel/src/graph/query.rs:231:19
+    |
+224 | impl Graph {
+    | ---------- method in this implementation
+...
+231 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 16 warnings (run `cargo fix --lib -p mere-kernel` to apply 7 suggestions)
+   Compiling scenotime v0.0.4 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/scenes/scenotime)
+   Compiling chirograph v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/chirograph)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/sprigging)
+   Compiling cambium v0.3.3 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-winit)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock/src/producer/registry.rs:36:10
+   |
+36 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+36 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+36 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock/src/scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-rootstock/src/host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: `cambium-rootstock` (lib) generated 3 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+   Compiling mere-cartography v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/cartography)
+   Compiling pictograph v0.2.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph)
+warning: function `build_affinity_spring` is never used
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/canvas/pictograph/src/canvas.rs:67:4
+   |
+67 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pictograph` (lib) generated 1 warning
+   Compiling pandect v0.1.1 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect)
+warning: unused import: `std::io`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `into_graph` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/system/pandect/src/graph_codicil.rs:149:19
+    |
+148 | impl GraphCodicil {
+    | ----------------- method in this implementation
+149 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+warning: methods `is_plain_property` and `is_plain_edge` are never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graph/linked-data/src/ingest/envelope.rs:163:12
+    |
+ 53 | impl ImportEvidence {
+    | ------------------- methods in this implementation
+...
+163 |     pub fn is_plain_property(&self, subject: &str, property: &NodeProperty) -> bool {
+    |            ^^^^^^^^^^^^^^^^^
+...
+168 |     pub fn is_plain_edge(&self, index: usize) -> bool {
+    |            ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `mere-linked-data` (lib) generated 1 warning
+   Compiling graphshell-endpoint v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graphshell/graphshell-endpoint)
+   Compiling graphshell-client v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graphshell/graphshell-client)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/pelt/core/src/pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/pelt/core/src/lib.rs:206:10
+    |
+206 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+206 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+206 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: `pelt-core` (lib) generated 2 warnings (run `cargo fix --lib -p pelt-core` to apply 2 suggestions)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/mesquite)
+   Compiling graphshell-host v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/graphshell/graphshell-host)
+   Compiling mere v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/mere)
+   Compiling mere-overmap v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/mere-overmap)
+   Compiling graphshell v0.0.2 (/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/retained_content/producer.rs:32:14
+   |
+32 |         NEXT.fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+32 -         NEXT.fetch_update(
+32 +         NEXT.try_update(
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/retained_content/producer.rs:136:30
+    |
+136 |                         NEXT.fetch_update(
+    |                              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+136 -                         NEXT.fetch_update(
+136 +                         NEXT.try_update(
+    |
+
+warning: method `begin_session` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/mere_host.rs:429:19
+    |
+265 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+429 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `relation_kind_label` is never used
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/mere_host.rs:1469:4
+     |
+1469 | fn relation_kind_label(kind: RelationKind) -> &'static str {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `codicil_graph` is never used
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/product.rs:1063:4
+     |
+1063 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> /Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/src/product.rs:1465:15
+     |
+1465 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `graphshell` (lib) generated 6 warnings (run `cargo fix --lib -p graphshell` to apply 2 suggestions)
+   Compiling cambium-genet-web-host v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-genet-web-host)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-genet-web-host/src/recovery.rs:33:18
+   |
+33 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+33 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+33 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: function `next_frame` is never used
+   --> /Users/markik/Code/repos/mere-link-model-p2-20261015/crates/cambium/cambium-genet-web-host/src/presentation/boot.rs:146:21
+    |
+146 | pub(crate) async fn next_frame() -> Result<(), String> {
+    |                     ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cambium-genet-web-host` (lib) generated 2 warnings (run `cargo fix --lib -p cambium-genet-web-host` to apply 1 suggestion)
+   Compiling graphshell-web v0.1.0 (/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web)
+error[E0432]: unresolved import `crate::mere_host_fixture`
+   --> ../src/web_tree/lane.rs:189:16
+    |
+189 |     use crate::mere_host_fixture::{
+    |                ^^^^^^^^^^^^^^^^^ could not find `mere_host_fixture` in the crate root
+
+error[E0432]: unresolved import `crate::mere_host_fixture`
+    --> ../src/web_tree/lane.rs:1708:28
+     |
+1708 |                 use crate::mere_host_fixture::{
+     |                            ^^^^^^^^^^^^^^^^^ could not find `mere_host_fixture` in the crate root
+
+warning: unused import: `std::rc::Rc`
+  --> ../src/web_timing.rs:24:5
+   |
+24 | use std::rc::Rc;
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2150:7
+     |
+2150 | #[cfg(feature = "main-page")]
+     |       ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+     = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2152:11
+     |
+2152 | #[cfg(not(feature = "main-page"))]
+     |           ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+error[E0382]: borrow of moved value: `from`
+   --> ../src/web_tree/query_view.rs:128:23
+    |
+ 88 |         let (Some(from), Some(to)) = (
+    |                   ---- move occurs because `from` has type `std::string::String`, which does not implement the `Copy` trait
+...
+ 94 |         let key = LinkKey::new(stratum, from, to);
+    |                                         ---- value moved here
+...
+128 |         let forward = from == key.first && to == key.second;
+    |                       ^^^^ value borrowed here after move
+    |
+help: consider borrowing `from`
+    |
+ 94 |         let key = LinkKey::new(stratum, &from, to);
+    |                                         +
+
+error[E0382]: borrow of moved value: `to`
+   --> ../src/web_tree/query_view.rs:128:44
+    |
+ 88 |         let (Some(from), Some(to)) = (
+    |                               -- move occurs because `to` has type `std::string::String`, which does not implement the `Copy` trait
+...
+ 94 |         let key = LinkKey::new(stratum, from, to);
+    |                                               -- value moved here
+...
+128 |         let forward = from == key.first && to == key.second;
+    |                                            ^^ value borrowed here after move
+    |
+help: consider borrowing `to`
+    |
+ 94 |         let key = LinkKey::new(stratum, from, &to);
+    |                                               +
+
+Some errors have detailed explanations: E0382, E0432.
+For more information about an error, try `rustc --explain E0382`.
+warning: `graphshell-web` (lib) generated 3 warnings
+error: could not compile `graphshell-web` (lib) due to 4 previous errors; 3 warnings emitted

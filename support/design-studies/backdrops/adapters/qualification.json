@@ -1,0 +1,128 @@
+{
+  "schema": "mere.portable-backdrop-adapters-qualification/1",
+  "date_utc": "2026-10-16T10:37:25.720359+00:00",
+  "scope": "App-owned source adapters and file exports, shared compilation and independent CPU paint",
+  "mere_parent_commit": "4463314c06c88b00779498082c789135f2962444",
+  "mere_includes_original_graphshell_slice": "b7932f87e",
+  "apps": {
+    "knot": {
+      "commit": "5bdbba38dd03df5821f866534baaf3c56ab4d54e",
+      "branch": "codex/portable-metre-scene",
+      "base": "921b4e06e7eb4fa034cfaefddd9735f3b80ebec6"
+    },
+    "woodshed": {
+      "commit": "97d33f3fc0765d9267919a6a7cf7a06897d08cfb",
+      "branch": "codex/portable-fretboard-scene",
+      "base": "284fa34061b0b90dcf121578ee3fe11f9daa5652"
+    },
+    "signalman": {
+      "commit": "1f85aca6a291bcce6ade79622a36e4c8a667712d",
+      "branch": "codex/portable-coverage-scene",
+      "base": "a694aa71b70adb8a99e12dc275847c1fe30c07fa"
+    }
+  },
+  "source_manifest": "source-manifest.json",
+  "checks": [
+    {
+      "owner": "knot",
+      "command": "python3 MERE/support/design-studies/backdrops/with_local_scene_source.py MERE test -p knot-readings --features portable-scenes --lib  --offline",
+      "result": "pass",
+      "tests": 15,
+      "log": "logs/knot-tests.log"
+    },
+    {
+      "owner": "knot",
+      "command": "cargo check -p knot-readings --lib --locked --offline",
+      "result": "pass",
+      "cohort": "committed canonical lockfile; optional adapter feature disabled",
+      "log": "logs/knot-default-check.log"
+    },
+    {
+      "owner": "woodshed",
+      "command": "python3 MERE/support/design-studies/backdrops/with_local_scene_source.py MERE test -p woodshed-core --features portable-scenes --lib fretboard_scene --offline",
+      "result": "pass",
+      "tests": 3,
+      "log": "logs/woodshed-tests.log"
+    },
+    {
+      "owner": "woodshed",
+      "command": "cargo check -p woodshed-core --lib --locked --offline",
+      "result": "pass",
+      "cohort": "committed canonical lockfile; optional adapter feature disabled",
+      "log": "logs/woodshed-default-check.log"
+    },
+    {
+      "owner": "signalman",
+      "command": "python3 MERE/support/design-studies/backdrops/with_local_scene_source.py MERE test -p signalman --features portable-scenes --lib survey:: --offline",
+      "result": "pass",
+      "tests": 13,
+      "log": "logs/signalman-tests.log"
+    },
+    {
+      "owner": "signalman",
+      "command": "cargo check -p signalman --lib --locked --offline",
+      "result": "pass",
+      "cohort": "committed canonical lockfile; optional adapter feature disabled",
+      "log": "logs/signalman-default-check.log"
+    },
+    {
+      "owner": "mere",
+      "command": "cargo test -p scenomise --test backdrop_scenes --offline",
+      "result": "pass",
+      "tests": 7,
+      "log": "logs/core-tests.log"
+    },
+    {
+      "owner": "mere",
+      "command": "python3 scripts/check_port_boundaries.py",
+      "result": "pass",
+      "log": "logs/boundaries.log"
+    },
+    {
+      "owner": "mere",
+      "command": "cargo run -p pictograph --no-default-features --features backdrop-cpu --example backdrop_receipt -- support/design-studies/backdrops/adapters/receipt support/design-studies/backdrops/adapters",
+      "result": "pass",
+      "frames": 3,
+      "backend": "Vello CPU",
+      "log": "logs/cpu-render.log",
+      "result_file": "receipt/receipt.json"
+    }
+  ],
+  "exports": [
+    {
+      "owner": "knot",
+      "recipe": "metre.json",
+      "log": "logs/knot-export.log",
+      "result": "pass",
+      "rendered_recipe_equals_export": true
+    },
+    {
+      "owner": "woodshed",
+      "recipe": "fretboard.json",
+      "log": "logs/woodshed-export.log",
+      "result": "pass",
+      "rendered_recipe_equals_export": true
+    },
+    {
+      "owner": "signalman",
+      "recipe": "terrain.json",
+      "log": "logs/signalman-export.log",
+      "result": "pass",
+      "rendered_recipe_equals_export": true
+    }
+  ],
+  "cohort": {
+    "adapter_tests": "Temporary local patch of sceno, scenomise, scenograph and scenotime from this Mere source",
+    "canonical_defaults": "Default app checks pass with committed canonical remote-source lockfiles",
+    "integration": "Local branches; shared APIs must be integrated and app scene cohorts repinned before enabling portable-scenes against canonical remote dependencies"
+  },
+  "limits": [
+    "No new native scene panel added to Knot, Woodshed or Signalman",
+    "No new native/GPU/browser presentation qualification of these app exports; earlier Graphshell browser receipt remains separate",
+    "Knot stress is a resolved lexical candidate and expected metre/rhyme groups are supplied by caller",
+    "Signalman fixture has no admitted radio-position association or propagation estimate; capture identities remain unplaced, coverage is empty and whole plane unmeasured",
+    "GPX local display plane is approximate equirectangular; track segment gaps preserved",
+    "No physical radio, credential, deployment, release-performance or platform-parity qualification",
+    "Commands tested with optional local scene cohort can repin a test checkout lockfile; committed app locks qualify default builds only"
+  ]
+}

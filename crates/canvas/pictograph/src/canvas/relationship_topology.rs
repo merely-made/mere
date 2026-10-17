@@ -6,7 +6,7 @@
 //! The exact relation-cell input seam shared by the controller and inspector.
 //! Cell multiplicity is not assertion multiplicity or a measured force value.
 use kernel::graph::{EdgeFamily, Graph, GraphStratum, NodeKey, RelationKind, RelationSelector};
-use scenograph::link::{LinkLegacyMember, LinkSource};
+use scenograph::link::{LinkKey, LinkLegacyMember, LinkSource};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use uuid::Uuid;
@@ -66,6 +66,16 @@ pub fn inspect_pair(
     second: Uuid,
     hidden: impl Fn(NodeKey, NodeKey, RelationSelector) -> bool,
 ) -> Result<PairInputs, String> {
+    inspect_pair_with_link_hides(graph, first, second, &BTreeSet::new(), hidden)
+}
+
+pub fn inspect_pair_with_link_hides(
+    graph: &Graph,
+    first: Uuid,
+    second: Uuid,
+    hidden_links: &BTreeSet<LinkKey>,
+    hidden: impl Fn(NodeKey, NodeKey, RelationSelector) -> bool,
+) -> Result<PairInputs, String> {
     graph
         .get_node_key_by_id(first)
         .ok_or_else(|| format!("Access {first} is absent from this view"))?;
@@ -79,6 +89,7 @@ pub fn inspect_pair(
     let pair_reading = super::link_reading::read_link(graph, first, second, source)?;
     let source = pair_reading.source.clone();
     for reading in pair_reading.links {
+        let link_hidden = hidden_links.contains(&reading.key);
         let stratum = match reading.key.stratum {
             scenograph::link::LinkStratum::Surface => GraphStratum::Surface,
             scenograph::link::LinkStratum::Resource => GraphStratum::Resource,
@@ -110,10 +121,7 @@ pub fn inspect_pair(
                 .map_err(|_| "Invalid target endpoint identity")?;
             let mut rows = Vec::<(RelationKind, Option<String>)>::new();
             rows.extend(bucket.assertions.into_iter().map(|assertion| {
-                let kind = assertion
-                    .recognized_kind
-                    .and_then(|kind| serde_json::from_value(serde_json::Value::String(kind)).ok())
-                    .map(RelationKind::Semantic)
+                let kind = RelationKind::from_predicate_iri(&assertion.predicate)
                     .unwrap_or(RelationKind::OpenPredicate);
                 (kind, Some(assertion.id))
             }));
@@ -139,7 +147,7 @@ pub fn inspect_pair(
                     .or_insert_with(|| CellInput {
                         owner,
                         rows: 0,
-                        hidden: hidden(from_key, to_key, selector),
+                        hidden: link_hidden || hidden(from_key, to_key, selector),
                         assertions: BTreeSet::new(),
                     });
                 group.rows += 1;

@@ -1,0 +1,32 @@
+{
+  "source": "611e484d49d8894085ee7d66e5582764f46642df",
+  "test_counts": {
+    "kernel_library": {
+      "passed": 474,
+      "failed": 0,
+      "ignored": 0
+    },
+    "graphshell_library": {
+      "passed": 393,
+      "failed": 0,
+      "ignored": 6
+    },
+    "pandect_library": {
+      "passed": 318,
+      "failed": 0,
+      "ignored": 0
+    },
+    "pandect_integration": {
+      "passed": 26,
+      "failed": 0,
+      "ignored": 1
+    },
+    "kernel_new_disk_boundary": {
+      "parents_passed": 1,
+      "child_process_checks_passed": 3,
+      "ignored_helpers": 1
+    }
+  },
+  "commands_and_logs": "source-gates.json",
+  "scope": "The browser-only follow-ups leave all tested kernel, host-domain, fixture and Pandect components unchanged."
+}

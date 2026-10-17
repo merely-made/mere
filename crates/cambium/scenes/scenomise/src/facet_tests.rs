@@ -36,6 +36,9 @@ fn cell_scene(adapter: &str, extent: f32, generation: u64) -> Scene {
         points: Vec::new(),
         kind: Some("cites".into()),
         weight: None,
+        link_key: None,
+        marks: sceno::LinkMarks::default(),
+        strength: None,
     });
     scene.folds.push(Fold {
         members: vec![InstanceId(0), InstanceId(1)],

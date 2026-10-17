@@ -1,0 +1,17 @@
+{
+  "worktree": "/Users/markik/Code/repos/mere-link-audit-p3-20261016",
+  "head": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929",
+  "origin_main": "81e6805cf55a3d2de90a41ba95a5a21c6f3be929",
+  "commands": [
+    {
+      "command": "python3 scripts/mere_doc_audit.py --json",
+      "exit_code": 0,
+      "output": "mere_doc_audit.json"
+    },
+    {
+      "command": "python3 scripts/mere_doc_judgment_audit.py --json",
+      "exit_code": 1,
+      "output": "mere_doc_judgment_audit.json"
+    }
+  ]
+}

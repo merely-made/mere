@@ -10,7 +10,7 @@
 use super::resource::TAGGED_WITH_IRI;
 use super::{
     ArrangementSubKind, ContainmentSubKind, ImportedSubKind, ProvenanceSubKind, RelationKind,
-    SemanticSubKind, sub_kind_from_iri,
+    SemanticSubKind,
 };
 
 /// The owning graph stratum of a relation.
@@ -89,7 +89,7 @@ pub fn built_in_predicate_stratum(iri: &str) -> Option<GraphStratum> {
     if iri == TAGGED_WITH_IRI {
         return Some(GraphStratum::Resource);
     }
-    sub_kind_from_iri(iri).map(|kind| built_in_relation_stratum(RelationKind::Semantic(kind)))
+    RelationKind::from_predicate_iri(iri).map(built_in_relation_stratum)
 }
 
 /// Predicate placement before per-mere declarations are applied. This fallback
@@ -197,5 +197,53 @@ mod tests {
                 GraphStratum::Resource
             );
         }
+    }
+
+    #[test]
+    fn relation_predicate_mapping_is_unique_bidirectional_and_placement_preserving() {
+        let kinds: Vec<_> = SemanticSubKind::iter()
+            .map(RelationKind::Semantic)
+            .chain(ContainmentSubKind::iter().map(RelationKind::Containment))
+            .chain(ArrangementSubKind::iter().map(RelationKind::Arrangement))
+            .chain(ImportedSubKind::iter().map(RelationKind::Imported))
+            .chain(ProvenanceSubKind::iter().map(RelationKind::Provenance))
+            .collect();
+        assert_eq!(kinds.len(), 44);
+
+        let mut predicates = std::collections::BTreeSet::new();
+        for kind in kinds {
+            let iri = kind
+                .predicate_iri()
+                .expect("every sub-kind relation has a predicate IRI");
+            assert!(predicates.insert(iri), "duplicate predicate IRI {iri}");
+            assert_eq!(RelationKind::from_predicate_iri(iri), Some(kind), "{iri}");
+            assert_eq!(
+                built_in_predicate_stratum(iri),
+                Some(built_in_relation_stratum(kind)),
+                "placement for {iri}"
+            );
+        }
+
+        for sub_kind in SemanticSubKind::iter() {
+            assert_eq!(
+                RelationKind::Semantic(sub_kind).predicate_iri(),
+                Some(predicate_iri(sub_kind)),
+                "semantic predicate bytes remain unchanged for {sub_kind:?}"
+            );
+        }
+        assert_eq!(RelationKind::Traversal.predicate_iri(), None);
+        assert_eq!(RelationKind::OpenPredicate.predicate_iri(), None);
+        assert_eq!(
+            RelationKind::from_predicate_iri("https://foreign.test/rel"),
+            None
+        );
+        assert_eq!(
+            RelationKind::from_predicate_iri("https://mere.computer/ns/rel#containment.UserFolder"),
+            None
+        );
+        assert_eq!(
+            built_in_predicate_stratum("https://mere.computer/ns/rel#containment.UserFolder"),
+            None
+        );
     }
 }

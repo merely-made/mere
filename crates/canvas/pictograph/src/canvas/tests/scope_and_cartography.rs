@@ -200,8 +200,14 @@ fn park_physics_halts_an_in_progress_settle() {
 
 fn two_node_graph() -> (Graph, uuid::Uuid, uuid::Uuid) {
     let mut g = Graph::new();
-    let a = g.add_node("https://a.example".to_string(), PortablePoint::new(0.0, 0.0));
-    let b = g.add_node("https://b.example".to_string(), PortablePoint::new(0.0, 0.0));
+    let a = g.add_node(
+        "https://a.example".to_string(),
+        PortablePoint::new(0.0, 0.0),
+    );
+    let b = g.add_node(
+        "https://b.example".to_string(),
+        PortablePoint::new(0.0, 0.0),
+    );
     let ids = (g.get_node(a).unwrap().id, g.get_node(b).unwrap().id);
     (g, ids.0, ids.1)
 }
@@ -224,7 +230,10 @@ fn an_empty_exact_scope_shows_nothing_and_only_clear_scope_shows_all() {
     assert_eq!(canvas.scope_members(), Some(vec![]));
     // The helper that clears on empty must not be the way in.
     canvas.scope_to_members([]);
-    assert!(!canvas.is_scoped(), "scope_to_members keeps its clearing meaning");
+    assert!(
+        !canvas.is_scoped(),
+        "scope_to_members keeps its clearing meaning"
+    );
     canvas.scope_to_exact_members([]);
     canvas.clear_scope();
     assert_eq!(visible(&canvas), 2);
@@ -237,7 +246,11 @@ fn an_exact_roster_survives_a_graph_swap_and_appears_when_demanded() {
     let mut canvas = Canvas::with_graph(g);
     let missing = uuid::Uuid::from_u128(77);
     canvas.scope_to_exact_members([a, missing]);
-    assert_eq!(visible(&canvas), 1, "the unresolved member is skipped, not lost");
+    assert_eq!(
+        visible(&canvas),
+        1,
+        "the unresolved member is skipped, not lost"
+    );
     assert_eq!(canvas.scope_members().unwrap().len(), 2);
     // The source is replaced by one holding neither node: the scope stays and is empty.
     canvas.set_graph(Graph::new());
@@ -245,8 +258,14 @@ fn an_exact_roster_survives_a_graph_swap_and_appears_when_demanded() {
     assert_eq!(visible(&canvas), 0);
     // The missing member becomes resident under a new graph and is shown.
     let mut next = Graph::new();
-    let key = next.add_node("https://m.example".to_string(), PortablePoint::new(0.0, 0.0));
-    next.add_node("https://other.example".to_string(), PortablePoint::new(0.0, 0.0));
+    let key = next.add_node(
+        "https://m.example".to_string(),
+        PortablePoint::new(0.0, 0.0),
+    );
+    next.add_node(
+        "https://other.example".to_string(),
+        PortablePoint::new(0.0, 0.0),
+    );
     let id = next.get_node(key).unwrap().id;
     canvas.scope_to_exact_members([id, a]);
     canvas.set_graph(next);
@@ -262,7 +281,9 @@ fn explicit_scope_changes_drop_the_exact_roster() {
     canvas.scope_to_members([b]);
     assert_eq!(canvas.scope_members(), Some(vec![b]));
     canvas.scope_to_exact_members([a]);
-    canvas.selected.insert(canvas.graph.get_node_by_id(a).unwrap().0);
+    canvas
+        .selected
+        .insert(canvas.graph.get_node_by_id(a).unwrap().0);
     canvas.isolate_selection();
     let before = canvas.scope_members().unwrap();
     canvas.set_graph(canvas.graph.clone());

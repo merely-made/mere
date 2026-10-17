@@ -1,0 +1,25 @@
+{
+  "source": "6d53d4439fce520c1da9f3ddf87c3dac343934b3",
+  "origin": "http://127.0.0.1:8871",
+  "viewport_logical": [
+    1280,
+    720
+  ],
+  "device_scale": 2,
+  "renderer": "BrowserWebGpu",
+  "fresh_origin_databases": [],
+  "graph_session": "2ee9426c-09d1-4796-8c42-b25dfe543229",
+  "seed_result": "ok",
+  "fresh_page_reopen_result": "ok",
+  "same_graph_session": true,
+  "reviewed_images": [
+    "browser/p7_tree_promoted_link/p7_link_promoted.png",
+    "browser/p7_tree_promoted_link/p7_live_link_drifted.png",
+    "browser/p7_tree_promoted_link/p7_promoted_link_review_comment.png",
+    "browser/p7_tree_promoted_link/p7_source_before_promotion.png",
+    "browser/p7_tree_promoted_link_reopen/p7_promoted_link_reopened_after_source_drift.png",
+    "browser/p7_tree_promoted_link_reopen/p7_promoted_link_reopened_resource_list.png"
+  ],
+  "visual_review": "Root inspected all six original 2560x1440 captures with view_image. Text wraps in the ordinary tool pane and the final reopened view shows the Resource, exact withdrawal and retained comment. Endpoint wording replaces the unsupported arrow glyph found in an earlier iteration.",
+  "scope": "Fresh browser page/IndexedDB reopen; independent OS processes are separately proved by the native JSON-store test."
+}

@@ -79,7 +79,7 @@ impl GraphBearing for Node {
 /// Arrangement, Imported). Precedence matches linked-data: an explicit statement or
 /// open predicate wins, else the first recognized sub-kind's canonical IRI.
 fn edge_predicate(payload: &EdgePayload) -> Option<&str> {
-    let semantic = payload.semantic.as_ref()?;
+    let semantic = payload.semantic_data()?;
     if let Some(statement) = semantic.statements.first() {
         Some(statement.predicate.as_str())
     } else if let Some(predicate) = &semantic.predicate {

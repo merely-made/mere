@@ -2352,9 +2352,38 @@ mod tests {
         };
         replay_captured_deltas_onto(&mut baseline, [grouped(1, 2)]);
         let mut raw = baseline.to_snapshot();
+        // This retained baseline intentionally models the schema-0 sidecar
+        // wire shape; it must not accidentally keep schema-1 assertion rows.
+        raw.assertion_schema = 0;
         for edge in &mut raw.edges {
-            if let Some(semantic) = &mut edge.semantic {
-                semantic.statements.clear();
+            let records = edge.assertions.take().unwrap_or_default();
+            let sub_kinds: Vec<_> = records
+                .iter()
+                .filter_map(|record| record.recognized_sub_kind.clone())
+                .collect();
+            if !sub_kinds.is_empty() {
+                edge.semantic = Some(kernel::persistence::PersistedSemanticEdgeData {
+                    sub_kinds,
+                    label: records.iter().find_map(|record| record.label.clone()),
+                    ..Default::default()
+                });
+            }
+            let containment: Vec<_> = records
+                .iter()
+                .filter_map(|record| match record.predicate.as_str() {
+                    "https://mere.computer/ns/rel#containment.url-path" => {
+                        Some(kernel::persistence::PersistedContainmentSubKind::UrlPath)
+                    },
+                    "https://mere.computer/ns/rel#containment.domain" => {
+                        Some(kernel::persistence::PersistedContainmentSubKind::Domain)
+                    },
+                    _ => None,
+                })
+                .collect();
+            if !containment.is_empty() {
+                edge.containment = Some(kernel::persistence::PersistedContainmentEdgeData {
+                    sub_kinds: containment,
+                });
             }
         }
         let mere = MereSessions::new(store.clone());
@@ -2474,17 +2503,13 @@ mod tests {
             let original_entries = session.journal().entries()[..cutoff.index()].to_vec();
             let first = FrozenGraph::of(session.graph());
             assert!(first.graph.resource_edges.iter().any(|edge| {
-                edge.containment.as_ref().is_some_and(|bucket| {
-                    bucket
-                        .sub_kinds
-                        .contains(&kernel::persistence::PersistedContainmentSubKind::Domain)
+                edge.retained_assertions().iter().any(|assertion| {
+                    assertion.predicate == "https://mere.computer/ns/rel#containment.domain"
                 })
             }));
             assert!(first.graph.resource_edges.iter().any(|edge| {
-                edge.containment.as_ref().is_some_and(|bucket| {
-                    bucket
-                        .sub_kinds
-                        .contains(&kernel::persistence::PersistedContainmentSubKind::UrlPath)
+                edge.retained_assertions().iter().any(|assertion| {
+                    assertion.predicate == "https://mere.computer/ns/rel#containment.url-path"
                 })
             }));
             assert!(
@@ -2492,12 +2517,11 @@ mod tests {
                     .graph
                     .edges
                     .iter()
-                    .all(|edge| edge.containment.as_ref().is_none_or(|bucket| !bucket
-                        .sub_kinds
-                        .contains(&kernel::persistence::PersistedContainmentSubKind::Domain)
-                        && !bucket
-                            .sub_kinds
-                            .contains(&kernel::persistence::PersistedContainmentSubKind::UrlPath)))
+                    .all(|edge| edge.retained_assertions().iter().all(|assertion| {
+                        assertion.predicate != "https://mere.computer/ns/rel#containment.domain"
+                            && assertion.predicate
+                                != "https://mere.computer/ns/rel#containment.url-path"
+                    }))
             );
             let histories: Vec<_> = (0..=cutoff.0)
                 .map(|cursor| FrozenGraph::of(&session.graph_at(Seq(cursor)).unwrap()))
@@ -2508,9 +2532,8 @@ mod tests {
                     .graph
                     .edges
                     .iter()
-                    .filter_map(|edge| edge.semantic.as_ref())
-                    .map(|bucket| bucket.statements.len())
-                    .sum::<usize>(),
+                    .flat_map(|edge| edge.retained_assertions())
+                    .count(),
                 1,
                 "aggregate-only held baseline gains one frozen handle"
             );
@@ -2518,8 +2541,11 @@ mod tests {
                 .graph
                 .resource_edges
                 .iter()
-                .filter_map(|edge| edge.semantic.as_ref())
-                .flat_map(|bucket| bucket.statements.iter())
+                .flat_map(|edge| edge.retained_assertions())
+                .filter(|assertion| {
+                    assertion.predicate
+                        == kernel::graph::predicate_iri(kernel::graph::SemanticSubKind::Cites)
+                })
                 .collect();
             assert_eq!(resource_claims.len(), 1);
             assert_eq!(
@@ -2533,8 +2559,7 @@ mod tests {
                     .graph
                     .edges
                     .iter()
-                    .filter_map(|edge| edge.semantic.as_ref())
-                    .flat_map(|bucket| bucket.statements.iter())
+                    .flat_map(|edge| edge.retained_assertions())
                     .any(|claim| claim.provenance_iri.as_deref()
                         == Some(group_author.asserter_iri().as_str()))
             );
@@ -2571,10 +2596,10 @@ mod tests {
                     .to_snapshot()
                     .resource_edges
                     .iter()
-                    .all(|edge| edge.semantic.as_ref().is_none_or(|bucket| bucket
-                        .statements
+                    .all(|edge| edge
+                        .retained_assertions()
                         .iter()
-                        .all(|claim| claim.statement_id != resource_handle)))
+                        .all(|claim| { claim.statement_id != resource_handle }))
             );
             assert_eq!(
                 session.graph().to_snapshot().edges,
@@ -2619,8 +2644,7 @@ mod tests {
                     .graph
                     .edges
                     .iter()
-                    .filter_map(|edge| edge.semantic.as_ref())
-                    .flat_map(|bucket| bucket.statements.iter())
+                    .flat_map(|edge| edge.retained_assertions())
                     .any(|claim| claim.predicate == predicate
                         && claim.provenance_iri.as_deref() == Some(modern.asserter_iri().as_str()))
             );
@@ -2629,8 +2653,7 @@ mod tests {
                     .graph
                     .resource_edges
                     .iter()
-                    .filter_map(|edge| edge.semantic.as_ref())
-                    .flat_map(|bucket| bucket.statements.iter())
+                    .flat_map(|edge| edge.retained_assertions())
                     .all(|claim| claim.predicate != predicate),
                 "later Resource declaration does not migrate modern held claims"
             );
@@ -2836,8 +2859,7 @@ mod tests {
             let claim = changed_checkpoint
                 .resource_edges
                 .iter_mut()
-                .filter_map(|edge| edge.semantic.as_mut())
-                .flat_map(|semantic| &mut semantic.statements)
+                .flat_map(|edge| edge.retained_assertions_mut())
                 .next()
                 .expect("fixture has a migrated resource claim");
             let original_claim = claim.clone();
@@ -2857,8 +2879,7 @@ mod tests {
             *changed_checkpoint
                 .resource_edges
                 .iter_mut()
-                .filter_map(|edge| edge.semantic.as_mut())
-                .flat_map(|semantic| &mut semantic.statements)
+                .flat_map(|edge| edge.retained_assertions_mut())
                 .next()
                 .unwrap() = changed_claim;
 
@@ -3381,8 +3402,7 @@ mod tests {
             let graph = crate::graph_placement::placement_test_graph();
             let mut snapshot = graph.to_snapshot();
             let mut second = snapshot.edges[0].clone();
-            second.semantic.as_mut().unwrap().statements[0].statement_id =
-                "held-profile-second".into();
+            second.retained_assertions_mut()[0].statement_id = "held-profile-second".into();
             snapshot.edges.push(second);
             let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
             graph.overlay_facets(
@@ -4057,7 +4077,7 @@ mod tests {
             assert!(template.to_snapshot().resource_edges.is_empty());
             let mut baseline_edges = template.to_snapshot().edges;
             assert_eq!(baseline_edges.len(), 1);
-            let statements = &mut baseline_edges[0].semantic.as_mut().unwrap().statements;
+            let statements = baseline_edges[0].assertions.as_mut().unwrap();
             statements[0].statement_id = "baseline-source".into();
             statements[0].provenance_iri = Some("https://source.test/page".into());
             statements[0].asserted_at_ms = Some(100);
@@ -4077,12 +4097,7 @@ mod tests {
             let restorer = Author::person("persona-b").via("knot-editor");
             let mut minted_edges = baseline_edges.clone();
             unknown.statement_id = "journal-minted".into();
-            minted_edges[0]
-                .semantic
-                .as_mut()
-                .unwrap()
-                .statements
-                .push(unknown);
+            minted_edges[0].assertions.as_mut().unwrap().push(unknown);
             session
                 .journal
                 .record_as(person(), exact(minted_edges.clone()));
@@ -4094,11 +4109,7 @@ mod tests {
                 .unwrap();
             let old_checkpoint = GraphSession::open(store.clone(), id).await.unwrap();
             let old_checkpoint_snapshot = old_checkpoint.graph().to_snapshot();
-            let old_statements = &old_checkpoint_snapshot.edges[0]
-                .semantic
-                .as_ref()
-                .unwrap()
-                .statements;
+            let old_statements = old_checkpoint_snapshot.edges[0].retained_assertions();
             let old_source_of = |id: &str| {
                 old_statements
                     .iter()
@@ -4157,7 +4168,7 @@ mod tests {
                 "checkpoint plus tail equals full replay"
             );
             let edges = full.to_snapshot().edges;
-            let statements = &edges[0].semantic.as_ref().unwrap().statements;
+            let statements = edges[0].retained_assertions();
             let source_of = |id: &str| {
                 statements
                     .iter()

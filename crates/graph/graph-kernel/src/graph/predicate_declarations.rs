@@ -448,22 +448,20 @@ mod tests {
         );
         let mut replayed = Graph::try_from_snapshot(&before).unwrap();
         let restored_before = replayed.to_snapshot();
+        assert!(restored_before.edges.iter().any(|edge| {
+            edge.retained_assertions()
+                .iter()
+                .any(|statement| statement.statement_id == "surface-claim")
+        }));
         assert!(
             restored_before
                 .edges
                 .iter()
-                .any(
-                    |edge| edge.semantic.as_ref().is_some_and(|semantic| semantic
-                        .statements
-                        .iter()
-                        .any(|statement| statement.statement_id == "surface-claim"))
-                )
-        );
-        assert!(
-            restored_before
-                .edges
-                .iter()
-                .any(|edge| edge.containment.is_some()),
+                .any(|edge| edge.retained_assertions().iter().any(|record| {
+                    super::super::RelationKind::from_predicate_iri(&record.predicate).is_some_and(
+                        |kind| matches!(kind, super::super::RelationKind::Containment(_)),
+                    )
+                })),
             "restored aggregate control is present"
         );
         replay_captured_deltas_onto(&mut replayed, deltas.lock().unwrap().iter().cloned());

@@ -613,6 +613,9 @@ mod tests {
             points: Vec::new(),
             kind: None,
             weight: None,
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         }));
         let before = state.clone();
         assert!(matches!(

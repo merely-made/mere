@@ -275,15 +275,16 @@ fn every_hide_and_show_that_changes_the_view_bumps_its_revision() {
         .projected_relations()
         .next()
         .expect("a relation");
-    let cell = crate::canvas::edge_cells::edge_cell_for_relation(
-        relation.from,
-        relation.to,
-        relation.kind,
-    );
-    canvas.selected_edges.insert(cell);
+    let from = canvas.graph().get_node(relation.from).unwrap().id;
+    let to = canvas.graph().get_node(relation.to).unwrap().id;
+    canvas.selected_links.insert(scenograph::link::LinkKey::new(
+        scenograph::link::LinkStratum::Surface,
+        from.to_string(),
+        to.to_string(),
+    ));
     let did = canvas.hide_selected_edges() == 1;
     changed(&canvas, &mut at, did, "hide_selected_edges");
-    let did = canvas.show_all_edges() > 0;
+    let did = canvas.show_all_links() > 0;
     changed(&canvas, &mut at, did, "show_all_edges");
 
     assert_eq!(

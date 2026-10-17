@@ -1,0 +1,93 @@
+{
+  "schema": "mere.sequence-template-source-manifest/1",
+  "repositories": {
+    "mere": {
+      "parent": "f12bee327630bd644edae901f084c078ae224f11",
+      "files": {
+        "Cargo.lock": "27c90d6f7088607019747caf6750c353e3034e7f0137fc40b50b4e1f395f53da",
+        "Cargo.toml": "a2cd0f46929c3d2261abfc7f1b84abdd2b177faed7fa8a13c5db1588f7f08fbf",
+        "crates/cambium/cambium/src/backdrop_scene.rs": "64a75d11208905e7986d1b1e8265933c975bbdd3ec1ef1eb50d0361907e00b6e",
+        "crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf": "319cff6e7a31f0f2a41c475dca42890aa5d19fe16017e2290f8c1d4e14f76481",
+        "crates/cambium/scenes/README.md": "57598bd8e7f2563ca18fc8bce269c786539caa5170e38ac1fcbbd8b7ee8ff849",
+        "crates/cambium/scenes/scenomise/src/backdrops.rs": "e50d323298f6b3d47d60a5d367a1585d1d29e5ce99dd77c7928932770b1bc601",
+        "crates/cambium/scenes/scenomise/src/lib.rs": "6f9bd362fec6b70877986cd31c5ac103892d92c999a44585a88def99d89917d3",
+        "crates/cambium/scenes/scenomise/src/template.rs": "f7bd9a70c26a6db1509967ca068d57dd192431e4be25309d5bfbe4c4677ebc1e",
+        "crates/cambium/scenes/scenomise/tests/sequence_templates.rs": "30cda68bad8f296fb0aaff79acb6568eb33af1e55651fcea0e92811f0ba5dd05",
+        "crates/canvas/pictograph/examples/backdrop_receipt.rs": "3b005e9c52aac5bb90f87dd9008e1aaed9d0a7fcd330ed76c5e1a2e3a0d8eaa9",
+        "crates/canvas/pictograph/src/canvas/backdrop_surface.rs": "4f195e040b2cae713beaf53767e45e841406d7c675f2bc97e8d15c75cbff6bde",
+        "design_docs/2026-08-23_projection_scenes_and_graph_native_platform.md": "ff1e837798c939c66cf5681799f87b3e94cf4439d787d4a5c716dd9a6e9e0682",
+        "ports/graphshell/src/web_tree/backdrop.rs": "a02f09eff6985d0ffa13d0304516a1935c9b8d8f39ecea88327d9e9c25281373",
+        "ports/graphshell/web/Cargo.lock": "afe85d57b66e079646f60e6d9dcff7838acbc79aec9cb2cf4972c8ab86741a7c",
+        "rust-toolchain.toml": "7fe2fd673f4a1953c4d3d837e8f070d107461b909223ecf4a38137bf5e53b3a7",
+        "support/design-studies/backdrops/with_local_scene_source.py": "8af4f081ffec211bb1fa572c7091672577d862d09c3539c6fb5d86ebcd98f56a"
+      }
+    },
+    "woodshed": {
+      "commit": "f002577082bed5efe8741358737ff532d7622238",
+      "files": {
+        "Cargo.lock": "36ee9c18f4905bb3c3419725dc49202cbccf2468b8da44a74eea299a75fd6575",
+        "Cargo.toml": "f0c8a84a41a58a0b2c4c8e9fae56a8ab1e684362b45d561e273e4fa0ca8df598",
+        "README.md": "2c6b25effffe30b77e47114105e100ae5f345a9d6a3a44c78e4398a6e99ea461",
+        "crates/woodshed-core/Cargo.toml": "df0898159382a6cac77faa0363c5fe2f47ff4b9a55c6d9b7067a6ffcfdd45075",
+        "crates/woodshed-core/src/bin/woodshed-progression-scene.rs": "747b1a1f97d0124965e34f0c5d9a87a6a80f0446932dc2312698e91050450f03",
+        "crates/woodshed-core/src/lib.rs": "890fcca114c7f1c01a6ccf0ec439ebba9eeec837dfbc7cf39c7c7ce8e6bdfac8",
+        "crates/woodshed-core/src/progression_scene.rs": "4f4c12b27fa69af7b753d161d7ce28cabb680a3fd106a1515a52b6fd7818b721",
+        "crates/woodshed-core/src/song.rs": "c0df0263e9b81ad366d61f521803e6dd9b7d29b57d71ad9d72cdbbddcf324882",
+        "crates/woodshedding/src/progression.rs": "6e36b0b3199bcf0bed121ed6914c72d1d1f0d3d4e69b6c0a12d9fe46ddde8135"
+      }
+    }
+  },
+  "tested_app_cohort": {
+    "lock_sha256": "4836d028d6c1e54040e0ae8e4eccb6e6d06c41c68ae9606da060549980ea1f66",
+    "git_sources": [
+      "git+https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc",
+      "git+https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b46648c08f3d2062e70559afa999842e1873c",
+      "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2",
+      "git+https://github.com/merely-made/genet.git?branch=main#e37762d752e423dc43f920bd728c83f70c47f2cc",
+      "git+https://github.com/merely-made/mere.git?branch=main#ee324e517d501653aee8df7d5a430760a74749c0",
+      "git+https://github.com/merely-made/netrender.git?branch=main#f4f9c0d87e6a6030b61075a45118055dfe6a12df",
+      "git+https://github.com/merely-made/wavicle.git?rev=2c5a49fd48db7a54aeab9e712804fd065411aef9#2c5a49fd48db7a54aeab9e712804fd065411aef9"
+    ],
+    "local_scene_crates": [
+      "sceno",
+      "scenomise",
+      "scenograph",
+      "scenotime"
+    ],
+    "note": "Canonical default-check lock is the committed app Cargo.lock; local test lock differs by temporary scene-source patch"
+  },
+  "artifacts": {
+    "README.md": "9748b1ebba8d029d3f308edcddbfd5714bdf4793e7f279668c2366ecd84a857b",
+    "fretboard.json": "f39d0aaffd27e0211943c531417661f801b324812e5a097cf5508a07a9e46a8a",
+    "logs/boundaries.log": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+    "logs/core-tests.log": "88812bbfcc4b2524d838013fff42e8266fe417a7b6d7a33dfb6c175f0a092fae",
+    "logs/cpu.log": "2e935ca6a4beb93707abfcb760f6ca7cd64b3bb96867fdf4b2f57e73ced93481",
+    "logs/export-c.log": "9b6498953f6b74f6a514fbdc5435247b5812357d099faed40c1e3ddb6961baa7",
+    "logs/export-g.log": "ebe57ce6f2251355f4878b062f8a4949f7012be5b2e30907bb4ace328e2f308b",
+    "logs/semantic-tests.log": "b16e235864d21a0dd97d4c52d2db964116c1d29a8e31eb885aedcf4986f415a2",
+    "logs/surface-tests.log": "0606d56fa718490a13b4fde5b0d9791b381e2c42ce63482a853ef0847871e804",
+    "logs/wasm-bindgen.log": "6d102bd8980e3ae94e33efbd8270ae84ee0cae74702d044a3b6b1efabc244a07",
+    "logs/wasm-build.log": "bb747639909b5aa722882711b4cc3f120333bd7dfe18b05d80841a44ee69d8fc",
+    "logs/woodshed-default.log": "711d4fcb6f216ec5752be61b7082ba8fbfa974d4d01a1f31093763d1bce25277",
+    "logs/woodshed-tests.log": "f93446d6fb2d2c8dfb0f6a544b93446e9fca5717aeee4d9932090cf70573a5b5",
+    "metre.json": "a2ae127e10d6f16e155bb4bbb5fbcdf7105d7f3ebd17c579d81373ad51d629ee",
+    "progression-g.json": "71b2284939316fcdbef3733f9dea8be2641dfc6f9ffff3198caaa8f1ce7d0bfa",
+    "progression.json": "c6a99efc94817ce4a964237967740d772c74f33780a7618724a3f55f31c7a680",
+    "qualification.json": "c0f621c262dc37af325354e38245a2fa1ad466e40c3a9d53012bcc74931e7787",
+    "receipt/browser-export.json": "71b2284939316fcdbef3733f9dea8be2641dfc6f9ffff3198caaa8f1ce7d0bfa",
+    "receipt/browser-state.json": "10e03860036545f4d5145cdf02661401af964cdf9eb20efc7bb4d6616c7d1e48",
+    "receipt/fretboard.png": "6713caa03dfa53ba482070aaccfa0f637096e02d0b17be20bf656b7c508d4c91",
+    "receipt/graphshell-metre.jpg": "ff29a37f59c7cb86f86b4ea6a05d9c47d93fe558f68797dc4f96e5ee70548a60",
+    "receipt/graphshell-narrow-after.jpg": "5933bb9619ac78fc5e30453febd89460eeecb996caa6602ee141cbd0a991baf8",
+    "receipt/graphshell-narrow-before.jpg": "a23332836d10101d5ce859777a29860dffa067d2eac56e5ef856d1d393a0e3ab",
+    "receipt/graphshell-progression-c.jpg": "377a552ea308f70269063df1f397a0110d348dfea3120d8d1c1b9532f8eff804",
+    "receipt/graphshell-progression-g.jpg": "2b43fa9329f6d571a9950314e4e8e31b5eac08206e3f94c0287e9552c092de2e",
+    "receipt/metre.png": "2ec6ac0f3a40d9223d11056f9a3b7b2084f93c3c540f11a6d5ad7fddfaffa694",
+    "receipt/progression-g.png": "5277c2d4b1712f0c0e834d2ca627bd10da123db1c691d1a69ea069713a60f43f",
+    "receipt/progression.png": "7934356894b931f6072866c1b25f7e3fd13b3d76c0f3affb17f0a028e4f328bd",
+    "receipt/receipt.json": "c5f771464ca7a6cfc931afd063fe581ac635b111f9d9dac4271218ac0e9916e2",
+    "receipt/terrain.png": "abaad6ff8329247be57ca8d2cd26cfd4b041480ec0541a47d4a3a9f1a3f01e24",
+    "runtime-manifest.json": "3075686d8c8e8868a665ba82eb80e9a6b3b3ef4ec3b1d9dc2366bc54b618f859",
+    "terrain.json": "7697c1431fbe73c752b41b9c85438e75ed032da82610ce807c283c83e42d19a5"
+  }
+}

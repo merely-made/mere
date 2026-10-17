@@ -4,36 +4,31 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! `EdgePayload` — the structural + temporal payload carried on every
-//! graph edge. Composes the taxonomy types from
-//! [`super::edge_taxonomy`] into a single payload struct whose
-//! **typed sidecars are authoritative**: `EdgeFamily` is derived from
-//! which sidecars are populated, not from a parallel index set.
+//! One assertion list per directed bucket, plus the traversal event rollup.
 //!
-//! Per the 2026-05-11 relation-taxonomy plan stage 4: the legacy
-//! `kinds: BTreeSet<EdgeKind>` cache and `families: BTreeSet<EdgeFamily>`
-//! field are gone. [`Self::families`] returns a freshly-computed set
-//! over the sidecars on each call; reads go through [`Self::has_relation`]
-//! with a [`RelationSelector`] discriminant.
-
-use std::collections::BTreeSet;
-
-use rkyv::{Archive, Deserialize, Serialize};
-
-use crate::types::GraphScope;
-
-use crate::types::AssertionWithdrawal;
+//! The four former structural sidecars are compatibility projections. Their
+//! predicates now carry the same exact identity and lifecycle as semantic facts.
 
 use super::edge_data::{
-    ArrangementData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData, SemanticData,
-    SemanticStatement, SemanticStatementSpec, StatementAssert, Traversal, TraversalData,
-    predicate_iri,
+    ArrangementData, AssertionData, ContainmentData, EdgeMetrics, ImportedData, ProvenanceData,
+    SemanticData, SemanticStatement, SemanticStatementSpec, StatementAssert, Traversal,
+    TraversalData, UNKNOWN_LEGACY_ASSERTER_IRI, predicate_iri,
 };
 use super::edge_taxonomy::{
-    ArrangementSubKind, EdgeAssertion, EdgeFamily, RelationSelector, SemanticSubKind,
+    ArrangementSubKind, EdgeAssertion, EdgeFamily, RelationKind, RelationSelector, SemanticSubKind,
 };
+use crate::types::{AssertionWithdrawal, GraphScope};
+use rkyv::{Archive, Deserialize, Serialize};
+use std::collections::BTreeSet;
 
-/// Edge semantics payload: structural assertions + temporal traversal events.
+/// Borrowed semantic compatibility projection, never another assertion store.
+pub struct SemanticDataView<'a> {
+    pub sub_kinds: &'a BTreeSet<SemanticSubKind>,
+    pub label: &'a Option<String>,
+    pub predicate: &'a Option<String>,
+    pub statements: &'a [SemanticStatement],
+}
+
 #[derive(
     Debug,
     Clone,
@@ -46,431 +41,286 @@ use super::edge_taxonomy::{
     serde::Deserialize,
 )]
 pub struct EdgePayload {
-    pub semantic: Option<SemanticData>,
+    /// All retained assertions, including withdrawal tombstones. The legacy
+    /// `SemanticData` name is a source compatibility alias for the record store.
+    pub assertions: AssertionData,
     pub traversal: Option<TraversalData>,
-    pub arrangement: Option<ArrangementData>,
-    pub containment: Option<ContainmentData>,
-    pub imported: Option<ImportedData>,
-    pub provenance: Option<ProvenanceData>,
+}
+
+pub fn selector_matches_kind(selector: RelationSelector, kind: RelationKind) -> bool {
+    match selector {
+        RelationSelector::Family(family) => family == kind.family(),
+        RelationSelector::Semantic(value) => kind == RelationKind::Semantic(value),
+        RelationSelector::Containment(value) => kind == RelationKind::Containment(value),
+        RelationSelector::Arrangement(value) => kind == RelationKind::Arrangement(value),
+        RelationSelector::Imported(value) => kind == RelationKind::Imported(value),
+        RelationSelector::Provenance(value) => kind == RelationKind::Provenance(value),
+    }
+}
+
+impl<'a> SemanticDataView<'a> {
+    pub fn statements(&self) -> &'a [SemanticStatement] {
+        self.statements
+    }
 }
 
 impl EdgePayload {
     pub fn new() -> Self {
         Self {
-            semantic: None,
+            assertions: SemanticData::default(),
             traversal: None,
-            arrangement: None,
-            containment: None,
-            imported: None,
-            provenance: None,
         }
     }
 
-    fn insert_semantic_relation(
-        &mut self,
-        sub_kind: SemanticSubKind,
-        label: Option<String>,
-    ) -> bool {
-        self.insert_semantic_relation_in_scope(sub_kind, label, GraphScope::Default)
+    pub fn assertions(&self) -> &[SemanticStatement] {
+        &self.assertions.statements
     }
 
-    fn insert_semantic_relation_in_scope(
-        &mut self,
-        sub_kind: SemanticSubKind,
-        label: Option<String>,
-        graph_scope: GraphScope,
-    ) -> bool {
-        let data = self.semantic.get_or_insert_with(SemanticData::default);
-        data.insert_statement(
-            Some(sub_kind),
-            predicate_iri(sub_kind).to_string(),
-            label,
-            graph_scope,
-            None,
-            None,
-        )
-    }
-
-    fn remove_semantic_relation(&mut self, sub_kind: SemanticSubKind) -> bool {
-        let Some(data) = self.semantic.as_mut() else {
-            return false;
-        };
-        if !data.remove_statements_with_sub_kind(sub_kind) {
-            return false;
-        }
-        if data.statements().is_empty() {
-            self.semantic = None;
-        }
-        true
-    }
-
-    /// Write-side relation assertion. Returns `true` when the payload
-    /// changed (new sub-kind inserted, or label refreshed).
-    pub fn assert_relation(&mut self, assertion: EdgeAssertion) -> bool {
-        match assertion {
-            EdgeAssertion::Semantic {
-                sub_kind, label, ..
-            } => self.insert_semantic_relation(sub_kind, label),
-            EdgeAssertion::Containment { sub_kind } => self
-                .containment
-                .get_or_insert_with(ContainmentData::default)
-                .insert(sub_kind),
-            EdgeAssertion::Arrangement { sub_kind } => self
-                .arrangement
-                .get_or_insert_with(ArrangementData::default)
-                .insert(sub_kind),
-            EdgeAssertion::Imported { sub_kind } => self
-                .imported
-                .get_or_insert_with(ImportedData::default)
-                .sub_kinds
-                .insert(sub_kind),
-            EdgeAssertion::Provenance { sub_kind } => self
-                .provenance
-                .get_or_insert_with(ProvenanceData::default)
-                .sub_kinds
-                .insert(sub_kind),
-        }
-    }
-
-    pub fn has_relation(&self, selector: RelationSelector) -> bool {
-        match selector {
-            RelationSelector::Family(family) => self.has_family(family),
-            RelationSelector::Semantic(sub_kind) => self.semantic.as_ref().is_some_and(|data| {
-                data.held_statements()
-                    .any(|statement| statement.recognized_sub_kind == Some(sub_kind))
-            }),
-            RelationSelector::Containment(sub_kind) => self
-                .containment
-                .as_ref()
-                .is_some_and(|data| data.contains(sub_kind)),
-            RelationSelector::Arrangement(sub_kind) => self
-                .arrangement
-                .as_ref()
-                .is_some_and(|data| data.contains(sub_kind)),
-            RelationSelector::Imported(sub_kind) => self
-                .imported
-                .as_ref()
-                .is_some_and(|data| data.sub_kinds.contains(&sub_kind)),
-            RelationSelector::Provenance(sub_kind) => self
-                .provenance
-                .as_ref()
-                .is_some_and(|data| data.sub_kinds.contains(&sub_kind)),
-        }
-    }
-
-    /// Physical removal for legacy migration/retention compaction only.
-    /// Authored semantic withdrawal must go through `Graph` so it carries a
-    /// timestamp, actor, journal capture, and exact assertion identity.
-    pub(crate) fn retract_relation(&mut self, selector: RelationSelector) -> bool {
-        match selector {
-            RelationSelector::Family(EdgeFamily::Traversal) => self.traversal.take().is_some(),
-            RelationSelector::Family(_) => false,
-            RelationSelector::Semantic(sub_kind) => self.remove_semantic_relation(sub_kind),
-            RelationSelector::Containment(sub_kind) => {
-                let Some(data) = self.containment.as_mut() else {
-                    return false;
-                };
-                if !data.remove(sub_kind) {
-                    return false;
-                }
-                if data.is_empty() {
-                    self.containment = None;
-                }
-                true
-            },
-            RelationSelector::Arrangement(sub_kind) => {
-                let Some(data) = self.arrangement.as_mut() else {
-                    return false;
-                };
-                if !data.remove(sub_kind) {
-                    return false;
-                }
-                if data.is_empty() {
-                    self.arrangement = None;
-                }
-                true
-            },
-            RelationSelector::Imported(sub_kind) => {
-                let Some(data) = self.imported.as_mut() else {
-                    return false;
-                };
-                if !data.sub_kinds.remove(&sub_kind) {
-                    return false;
-                }
-                if data.sub_kinds.is_empty() {
-                    self.imported = None;
-                }
-                true
-            },
-            RelationSelector::Provenance(sub_kind) => {
-                let Some(data) = self.provenance.as_mut() else {
-                    return false;
-                };
-                if !data.sub_kinds.remove(&sub_kind) {
-                    return false;
-                }
-                if data.sub_kinds.is_empty() {
-                    self.provenance = None;
-                }
-                true
-            },
-        }
-    }
-
-    fn has_family(&self, family: EdgeFamily) -> bool {
-        match family {
-            EdgeFamily::Semantic => self.semantic.as_ref().is_some_and(|data| {
-                data.held_statements().next().is_some()
-                    || !data.sub_kinds.is_empty()
-                    || data.predicate.is_some()
-            }),
-            EdgeFamily::Traversal => self.traversal.is_some(),
-            EdgeFamily::Containment => self
-                .containment
-                .as_ref()
-                .is_some_and(|data| !data.is_empty()),
-            EdgeFamily::Arrangement => self
-                .arrangement
-                .as_ref()
-                .is_some_and(|data| !data.is_empty()),
-            EdgeFamily::Imported => self
-                .imported
-                .as_ref()
-                .is_some_and(|data| !data.sub_kinds.is_empty()),
-            EdgeFamily::Provenance => self
-                .provenance
-                .as_ref()
-                .is_some_and(|data| !data.sub_kinds.is_empty()),
-        }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        !self
-            .semantic
-            .as_ref()
-            .is_some_and(|data| !data.statements().is_empty())
-            && !self.has_family(EdgeFamily::Semantic)
-            && self.traversal.is_none()
-            && !self.has_family(EdgeFamily::Containment)
-            && !self.has_family(EdgeFamily::Arrangement)
-            && !self.has_family(EdgeFamily::Imported)
-            && !self.has_family(EdgeFamily::Provenance)
-    }
-
-    pub fn label(&self) -> Option<&str> {
-        self.semantic
-            .as_ref()
-            .and_then(|data| data.label.as_deref())
-    }
-
-    pub fn semantic_data(&self) -> Option<&SemanticData> {
-        self.semantic.as_ref()
+    pub fn held_assertions(&self) -> impl Iterator<Item = &SemanticStatement> {
+        self.assertions()
+            .iter()
+            .filter(|statement| statement.is_held())
     }
 
     pub fn semantic_statements(&self) -> &[SemanticStatement] {
-        self.semantic
-            .as_ref()
-            .map(SemanticData::statements)
-            .unwrap_or(&[])
+        let count = self
+            .assertions()
+            .partition_point(SemanticStatement::is_semantic);
+        &self.assertions()[..count]
     }
 
-    /// Held assertions for default query projections. The raw accessor above
-    /// remains the persistence/history view and includes tombstones.
     pub fn held_semantic_statements(&self) -> impl Iterator<Item = &SemanticStatement> {
         self.semantic_statements()
             .iter()
             .filter(|statement| statement.is_held())
     }
 
+    pub fn semantic_data(&self) -> Option<SemanticDataView<'_>> {
+        (!self.semantic_statements().is_empty()).then(|| SemanticDataView {
+            sub_kinds: &self.assertions.sub_kinds,
+            label: &self.assertions.label,
+            predicate: &self.assertions.predicate,
+            statements: self.semantic_statements(),
+        })
+    }
+
+    pub fn has_relation(&self, selector: RelationSelector) -> bool {
+        if selector == RelationSelector::Family(EdgeFamily::Traversal) {
+            return self.traversal.is_some();
+        }
+        self.held_assertions()
+            .any(|statement| selector_matches_kind(selector, statement.relation_kind()))
+    }
+
+    /// Legacy membership ensure. A caller who has an independent reason uses
+    /// the statement-aware Graph writer and its exact returned assertion ID.
+    pub fn assert_relation(&mut self, assertion: EdgeAssertion) -> bool {
+        self.assert_relation_with_context(assertion, None, None)
+    }
+
+    pub(crate) fn assert_relation_with_context(
+        &mut self,
+        assertion: EdgeAssertion,
+        asserter: Option<String>,
+        at_ms: Option<u64>,
+    ) -> bool {
+        let (kind, label) = match assertion {
+            EdgeAssertion::Semantic {
+                sub_kind, label, ..
+            } => (RelationKind::Semantic(sub_kind), label),
+            EdgeAssertion::Containment { sub_kind } => (RelationKind::Containment(sub_kind), None),
+            EdgeAssertion::Arrangement { sub_kind } => (RelationKind::Arrangement(sub_kind), None),
+            EdgeAssertion::Imported { sub_kind } => (RelationKind::Imported(sub_kind), None),
+            EdgeAssertion::Provenance { sub_kind } => (RelationKind::Provenance(sub_kind), None),
+        };
+        if kind.family() != EdgeFamily::Semantic
+            && self.held_assertions().any(|s| s.relation_kind() == kind)
+        {
+            return false;
+        }
+        self.assertions
+            .assert_statement(SemanticStatementSpec {
+                predicate: kind
+                    .predicate_iri()
+                    .expect("asserted kind has a predicate")
+                    .into(),
+                recognized_sub_kind: match kind {
+                    RelationKind::Semantic(k) => Some(k),
+                    _ => None,
+                },
+                label,
+                provenance_iri: asserter.or_else(|| Some(UNKNOWN_LEGACY_ASSERTER_IRI.into())),
+                asserted_at_ms: at_ms,
+                ..Default::default()
+            })
+            .changed
+    }
+
+    /// Physical removal remains reserved for regeneration, migration and
+    /// compaction. Authored withdrawals use Graph's exact-ID lifecycle writer.
+    pub(crate) fn retract_relation(&mut self, selector: RelationSelector) -> bool {
+        if selector == RelationSelector::Family(EdgeFamily::Traversal) {
+            return self.traversal.take().is_some();
+        }
+        let before = self.assertions().len();
+        self.assertions
+            .statements
+            .retain(|s| !s.is_held() || !selector_matches_kind(selector, s.relation_kind()));
+        if self.assertions().len() == before {
+            return false;
+        }
+        self.assertions.rebuild_compat();
+        true
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.assertions().is_empty() && self.traversal.is_none()
+    }
+    pub fn label(&self) -> Option<&str> {
+        self.assertions.label.as_deref()
+    }
+
     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
         self.assert_semantic_predicate_in_scope(predicate, GraphScope::Default)
     }
-
     pub(crate) fn assert_semantic_relation_in_scope(
         &mut self,
         sub_kind: SemanticSubKind,
         label: Option<String>,
-        graph_scope: GraphScope,
+        scope: GraphScope,
     ) -> bool {
-        self.insert_semantic_relation_in_scope(sub_kind, label, graph_scope)
+        self.assertions.insert_statement(
+            Some(sub_kind),
+            predicate_iri(sub_kind).into(),
+            label,
+            scope,
+            None,
+            None,
+        )
     }
-
     pub(crate) fn assert_semantic_predicate_in_scope(
         &mut self,
         predicate: String,
-        graph_scope: GraphScope,
+        scope: GraphScope,
     ) -> bool {
-        self.semantic
-            .get_or_insert_with(SemanticData::default)
-            .insert_statement(None, predicate, None, graph_scope, None, None)
+        self.assertions
+            .insert_statement(None, predicate, None, scope, None, None)
     }
-
-    /// Statement-aware assert on this pair bucket (creates the semantic
-    /// sidecar if absent). Returns the fact handle + whether anything changed.
     pub(crate) fn assert_semantic_statement(
         &mut self,
         spec: SemanticStatementSpec,
     ) -> StatementAssert {
-        self.semantic
-            .get_or_insert_with(SemanticData::default)
-            .assert_statement(spec)
+        self.assertions.assert_statement(spec)
     }
-
-    /// Retain a precise withdrawal tombstone on the exact fact handle.
     pub(crate) fn withdraw_semantic_statement(
         &mut self,
-        statement_id: &str,
+        id: &str,
         withdrawal: AssertionWithdrawal,
     ) -> bool {
-        let Some(data) = self.semantic.as_mut() else {
-            return false;
-        };
-        data.withdraw_statement(statement_id, withdrawal)
+        self.assertions.withdraw_statement(id, withdrawal)
     }
-
-    pub(crate) fn compact_semantic_statement(&mut self, statement_id: &str) -> bool {
-        let Some(data) = self.semantic.as_mut() else {
-            return false;
-        };
-        if !data.compact_statement(statement_id) {
-            return false;
-        }
-        if data.statements().is_empty() {
-            self.semantic = None;
-        }
-        true
+    pub(crate) fn compact_semantic_statement(&mut self, id: &str) -> bool {
+        self.assertions.compact_statement(id)
     }
-
     pub(crate) fn upsert_persisted_semantic_statement(
         &mut self,
         statement: SemanticStatement,
     ) -> bool {
-        self.semantic
-            .get_or_insert_with(SemanticData::default)
-            .upsert_persisted_statement(statement)
+        self.assertions.upsert_persisted_statement(statement)
     }
-
     pub(crate) fn push_persisted_semantic_statement(
         &mut self,
         statement: SemanticStatement,
     ) -> bool {
-        self.semantic
-            .get_or_insert_with(SemanticData::default)
-            .push_persisted_statement(statement)
+        self.assertions.push_persisted_statement(statement)
     }
-
-    /// Set (or clear) the open predicate IRI on the semantic sidecar, creating
-    /// the sidecar if needed. Clearing preserves open assertions as undated
-    /// tombstones; authored withdrawals should use the Graph write API. The
-    /// predicate is independent of `sub_kinds`: a recognized edge carries
-    /// both; a raw web predicate may carry only this.
     pub fn set_semantic_predicate(&mut self, predicate: Option<String>) {
-        if predicate.is_none() && self.semantic.is_none() {
-            return;
-        }
-        if let Some(data) = self.semantic.as_mut() {
-            data.set_statement_predicate(predicate);
-            if data.statements().is_empty() {
-                self.semantic = None;
-            }
-            return;
-        }
-        let mut data = SemanticData::default();
-        data.set_statement_predicate(predicate);
-        if !data.statements().is_empty() {
-            self.semantic = Some(data);
-        }
+        self.assertions.set_statement_predicate(predicate);
     }
 
     pub fn traversal_data(&self) -> Option<&TraversalData> {
         self.traversal.as_ref()
     }
-
-    pub fn arrangement_data(&self) -> Option<&ArrangementData> {
-        self.arrangement.as_ref()
+    pub fn arrangement_data(&self) -> Option<ArrangementData> {
+        let sub_kinds = self
+            .held_assertions()
+            .filter_map(|s| match s.relation_kind() {
+                RelationKind::Arrangement(k) => Some(k),
+                _ => None,
+            })
+            .collect::<BTreeSet<_>>();
+        (!sub_kinds.is_empty()).then_some(ArrangementData { sub_kinds })
     }
-
-    pub fn containment_data(&self) -> Option<&ContainmentData> {
-        self.containment.as_ref()
+    pub fn containment_data(&self) -> Option<ContainmentData> {
+        let sub_kinds = self
+            .held_assertions()
+            .filter_map(|s| match s.relation_kind() {
+                RelationKind::Containment(k) => Some(k),
+                _ => None,
+            })
+            .collect::<BTreeSet<_>>();
+        (!sub_kinds.is_empty()).then_some(ContainmentData { sub_kinds })
     }
-
-    pub fn imported_data(&self) -> Option<&ImportedData> {
-        self.imported.as_ref()
+    pub fn imported_data(&self) -> Option<ImportedData> {
+        let sub_kinds = self
+            .held_assertions()
+            .filter_map(|s| match s.relation_kind() {
+                RelationKind::Imported(k) => Some(k),
+                _ => None,
+            })
+            .collect::<BTreeSet<_>>();
+        (!sub_kinds.is_empty()).then_some(ImportedData { sub_kinds })
     }
-
-    pub fn provenance_data(&self) -> Option<&ProvenanceData> {
-        self.provenance.as_ref()
+    pub fn provenance_data(&self) -> Option<ProvenanceData> {
+        let sub_kinds = self
+            .held_assertions()
+            .filter_map(|s| match s.relation_kind() {
+                RelationKind::Provenance(k) => Some(k),
+                _ => None,
+            })
+            .collect::<BTreeSet<_>>();
+        (!sub_kinds.is_empty()).then_some(ProvenanceData { sub_kinds })
     }
-
-    pub fn has_arrangement_sub_kind(&self, sub_kind: ArrangementSubKind) -> bool {
-        self.arrangement
-            .as_ref()
-            .is_some_and(|data| data.contains(sub_kind))
+    pub fn has_arrangement_sub_kind(&self, kind: ArrangementSubKind) -> bool {
+        self.has_relation(RelationSelector::Arrangement(kind))
     }
-
     pub fn has_durable_arrangement_relation(&self) -> bool {
-        self.arrangement
-            .as_ref()
-            .is_some_and(ArrangementData::has_durable_relation)
+        self.arrangement_data()
+            .is_some_and(|data| data.has_durable_relation())
     }
-
     pub fn has_session_arrangement_relation(&self) -> bool {
-        self.arrangement
-            .as_ref()
-            .is_some_and(ArrangementData::has_session_relation)
+        self.arrangement_data()
+            .is_some_and(|data| data.has_session_relation())
     }
-
     pub fn traversals(&self) -> &[Traversal] {
         self.traversal
             .as_ref()
             .map(|data| data.traversals.as_slice())
             .unwrap_or(&[])
     }
-
     pub fn metrics(&self) -> EdgeMetrics {
         self.traversal
             .as_ref()
             .map(|data| data.metrics)
             .unwrap_or_default()
     }
-
     pub fn push_traversal(&mut self, traversal: Traversal) {
         self.traversal
             .get_or_insert_with(TraversalData::default)
             .push(traversal);
     }
-
-    /// Compute the set of [`EdgeFamily`] tags carried by this payload
-    /// from the populated sidecars. Materialized fresh on each call —
-    /// there is no parallel cache.
     pub fn families(&self) -> BTreeSet<EdgeFamily> {
-        let mut out = BTreeSet::new();
-        if self.has_family(EdgeFamily::Semantic) {
-            out.insert(EdgeFamily::Semantic);
+        let mut families = self
+            .held_assertions()
+            .map(|s| s.relation_kind().family())
+            .collect::<BTreeSet<_>>();
+        if self.traversal.is_some() {
+            families.insert(EdgeFamily::Traversal);
         }
-        if self.has_family(EdgeFamily::Traversal) {
-            out.insert(EdgeFamily::Traversal);
-        }
-        if self.has_family(EdgeFamily::Containment) {
-            out.insert(EdgeFamily::Containment);
-        }
-        if self.has_family(EdgeFamily::Arrangement) {
-            out.insert(EdgeFamily::Arrangement);
-        }
-        if self.has_family(EdgeFamily::Imported) {
-            out.insert(EdgeFamily::Imported);
-        }
-        if self.has_family(EdgeFamily::Provenance) {
-            out.insert(EdgeFamily::Provenance);
-        }
-        out
+        families
     }
-
-    /// Whether this retained bucket participates in ordinary graph topology.
-    /// A tombstone-only semantic bucket remains persisted but is not held
-    /// graph content; other held sidecars on the same bucket still participate.
     pub fn has_held_topology(&self) -> bool {
-        !self.families().is_empty()
+        self.traversal.is_some() || self.held_assertions().next().is_some()
     }
 }
 

@@ -1,0 +1,81 @@
+{
+  "schema": "mere.cleromancy-c6-intake/v1",
+  "date": "2026-10-16",
+  "status": "Bounded C6 receiving validator qualification passes; publication is separate",
+  "source": "ea7bc55630167aeafe6dffbba914bba8747450da",
+  "integrated_source": "5252473c776c94ec5f9fc32b610f574788caf6ac",
+  "same_integrated_tree": true,
+  "core": "adc434dba77a6287d0132b0e6030f32ea36615f3",
+  "product_supplier": "25cbe8106df3fd6431d83acd756ab6bcabbaba40",
+  "supplier_parent": "72f9c5c73ab9ddd8ba761524388c2406a6d6ffcf",
+  "supplier_changed_paths": [
+    "ports/djinn/src/embedded_reservoir.rs"
+  ],
+  "compiler": "Cargo1.99 rustc/rustdoc1.97.1",
+  "command": "cargo test --locked --offline -p djinn --test embedded_reservoir_validation -- --nocapture --test-threads=1",
+  "passed": 7,
+  "failed": 0,
+  "ignored": 1,
+  "ignore_reason": "Process-child entry is launched explicitly by parent tests",
+  "owners": [
+    "embedded",
+    "daemon",
+    "embedded"
+  ],
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "fe6a078f60dfa640ddbf35208219908b459aa25266267cc3208afea747b7f3f8"
+    },
+    {
+      "path": "ports/djinn/src/embedded_reservoir.rs",
+      "sha256": "99e20d439565b478a98842ca8addc3b88e12eb6f8371ed5edbbaa9f3698520b7"
+    },
+    {
+      "path": "ports/djinn/tests/embedded_reservoir_validation.rs",
+      "sha256": "a44266721e7c87d11621ee82d33f47080b6de0fa5507493125f275ab98b3afe2"
+    }
+  ],
+  "logs": [
+    {
+      "path": "owner-current.log",
+      "sha256": "16c7b63f8c265ee1fd75c9789fca93542233246bd25afba8f1d88fc0d18e8eb3"
+    },
+    {
+      "path": "owner-situation-isolated.log",
+      "sha256": "9e272781ff164198d9a76c80a570405b5c3c30987d741329a5cb6946f89e483b"
+    },
+    {
+      "path": "owner-cold-sampled.log",
+      "sha256": "91e2dd79926b3c2804584b25e03419ada6ff1f88c0d43fd05d54a9acf8d93c1d"
+    },
+    {
+      "path": "owner-cold-sample.txt",
+      "sha256": "dd7244ea572908a997ea5f128edb993f7bbc29fc7f175e5203fe230fc95ff77c"
+    },
+    {
+      "path": "owner-patience.log",
+      "sha256": "750a1b20d221370e48696b48fc1370e657147f4f4bea19a31a1ab486317af7ca"
+    },
+    {
+      "path": "owner-qualified.log",
+      "sha256": "7088a70f502e19de2df5f939f69811784ec41592a6a1e515daedfb1333a86e60"
+    },
+    {
+      "path": "sample-owner.py",
+      "sha256": "1b0e13c74612215d6bf5b7951297f875abf01b7b72692e17928f1c01b9e4ee98"
+    }
+  ],
+  "checks": [
+    "Actual saved raw weather response, normalized values and local sky replay exactly on every fresh owner",
+    "Same-schema weather tamper is refused atomically; all durable bytes and projections remain exact",
+    "Original six typed-deck, shuffle, ambient and owner/refusal fixtures remain active",
+    "Endpoint discovery and shutdown remain bounded at five seconds; checked mere route opening allows thirty seconds",
+    "Published incoming Graphshell attention, seeds and reset work is preserved through integration"
+  ],
+  "limits": [
+    "Original five-second cold replay timeout and isolated/sampled retries are retained as failures",
+    "Thirty-second opening is a bounded loading allowance, not a performance or consistently successful startup claim",
+    "The public receiving weather body is a labelled synthetic fixture; the separate native product run captures an actual network response"
+  ]
+}

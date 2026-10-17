@@ -36,6 +36,21 @@ pub enum CanvasCommand {
     RestoreArrangement,
     SetPhysicsPaused(bool),
     TogglePhysics,
+    /// Every unheld node eases back to its seed (graph grammar).
+    ResetToSeed,
+    /// The current arrangement becomes the seed.
+    SetSeed,
+    RestoreRecipeSeed,
+    DismissRetained,
+    /// Pin the selection forward, or release it if all of it is pinned.
+    ToggleForegroundPin,
+    /// Grow or shrink the selected Mosaic tiles by a quarter.
+    GrowTiles,
+    ShrinkTiles,
+    /// Draw the territory field beneath the graph, or stop.
+    ToggleTerritory,
+    /// Turn suggestions on or off (off by default).
+    ToggleSuggestions,
 }
 
 impl CanvasCommand {
@@ -79,6 +94,15 @@ impl CanvasCommand {
                 let paused = host.physics_paused();
                 host.set_physics_paused(!paused);
             },
+            Self::ResetToSeed => host.reset_to_seed(),
+            Self::SetSeed => host.set_seed(),
+            Self::RestoreRecipeSeed => host.restore_recipe_seed(),
+            Self::DismissRetained => host.dismiss_all_retained(),
+            Self::ToggleForegroundPin => host.toggle_selection_foreground_pin(),
+            Self::GrowTiles => host.resize_selected_tiles(1.25),
+            Self::ShrinkTiles => host.resize_selected_tiles(0.8),
+            Self::ToggleTerritory => host.toggle_territory_field(),
+            Self::ToggleSuggestions => host.toggle_suggestions(),
         }
     }
 }

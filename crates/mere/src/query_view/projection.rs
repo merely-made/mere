@@ -69,6 +69,11 @@ pub struct QueryRelation {
     /// The source identity survives lifting onto Surface endpoints.
     pub source_from: QueryNodeId,
     pub source_to: QueryNodeId,
+    /// All retained assertion records from the source edge, across every
+    /// relation family. `statements` remains the semantic-only compatibility
+    /// API; this field carries canonical non-semantic records and tombstones.
+    #[serde(default)]
+    pub assertions: Option<Vec<SemanticStatement>>,
     pub statements: Vec<SemanticStatement>,
     pub families: serde_json::Value,
     /// Shown bindings keep the existing zero-hop cost and no assertion handle.
@@ -121,6 +126,7 @@ fn source_relation(
         kind,
         source_from: from,
         source_to: to,
+        assertions: Some(payload.assertions().to_vec()),
         statements: payload.semantic_statements().to_vec(),
         families: serde_json::to_value(payload).expect("held edge payload serializes"),
         hop_cost: 1,
@@ -204,6 +210,7 @@ pub fn project_view(graph: &Graph, owner: Uuid) -> Result<QueryProjection, Strin
                 kind: VisualRelationKind::ShownBinding,
                 source_from: QueryNodeId::surface(access),
                 source_to: QueryNodeId::resource(*id),
+                assertions: Some(vec![]),
                 statements: vec![],
                 families: serde_json::Value::Null,
                 hop_cost: 0,

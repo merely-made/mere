@@ -131,7 +131,7 @@ fn statement_bucket_survives_snapshot_roundtrip() {
     );
     let edge_key = graph.projected_relations_between(a, b).next().unwrap().0;
     let payload = graph.get_relation_mut(edge_key).expect("payload");
-    let statements = &mut payload.semantic.as_mut().expect("semantic").statements;
+    let statements = &mut payload.assertions.statements;
     statements[0].statement_id = "stmt-edge-1".to_string();
     statements[0].provenance_iri = Some("https://people.test/alice".to_string());
     statements[0].asserted_at_ms = Some(1_720_000_000_123);
@@ -485,6 +485,7 @@ fn test_snapshot_edge_with_missing_url_is_dropped() {
     use crate::persistence::{GraphSnapshot, PersistedAddress, PersistedEdge, PersistedNode};
 
     let snapshot = GraphSnapshot {
+            assertion_schema: 0,
         nodes: vec![PersistedNode {
             node_id: Uuid::new_v4().to_string(),
             url: "https://a.com".to_string(),
@@ -515,6 +516,7 @@ fn test_snapshot_edge_with_missing_url_is_dropped() {
             content_hash: None,
         }],
         edges: vec![PersistedEdge {
+            assertions: None,
             from_node_id: Uuid::new_v4().to_string(),
             to_node_id: Uuid::new_v4().to_string(),
             families: vec![PersistedEdgeFamily::Semantic],
@@ -553,6 +555,7 @@ fn test_snapshot_duplicate_urls_last_wins() {
     use crate::persistence::{GraphSnapshot, PersistedAddress, PersistedNode};
 
     let snapshot = GraphSnapshot {
+            assertion_schema: 0,
         nodes: vec![
             PersistedNode {
                 node_id: Uuid::new_v4().to_string(),

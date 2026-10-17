@@ -97,8 +97,9 @@ fn token_and_css_output_are_deterministic_and_map_every_base_role() {
         ("on-secondary", palette.on_secondary),
         ("tertiary", palette.tertiary),
         ("on-tertiary", palette.on_tertiary),
-        ("success", palette.success),
-        ("danger", palette.danger),
+        // Published gated to 4.5:1 (tinct::derive_gated_roles).
+        ("success", tinct::derive_gated_roles(&palette).success),
+        ("danger", tinct::derive_gated_roles(&palette).danger),
     ];
     for (name, color) in expected {
         assert_eq!(

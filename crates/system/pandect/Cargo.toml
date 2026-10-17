@@ -14,6 +14,7 @@ categories = ["data-structures"]
 description = "Pandect: session manifests, graph and view sidecars, worker declarations, graph-reference adapters, settings and the persona wallet carry lane."
 
 [dependencies]
+sceno.workspace = true
 async-trait = "0.1"
 insigne = { workspace = true, features = ["verify"] }
 # Certificate filenames are hex-encoded ids, so this is production code,

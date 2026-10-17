@@ -607,6 +607,9 @@ mod tests {
             points: Vec::new(),
             kind: None,
             weight: Some(1.0),
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: None,
         });
         let before = separation(&scene, 0, 1);
         relax(&mut scene, &Relaxation::default().untethered());

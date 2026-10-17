@@ -13,7 +13,7 @@ use super::{ResourceSnapshotError, payload_from_persisted, persisted_edge_for_id
 use crate::graph::*;
 use crate::persistence::{
     GraphSnapshot, PersistedEdge, PersistedResourceFacet, PersistedResourceRecord,
-    PersistedShownResource,
+    PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedShownResource,
 };
 use crate::types::GraphScope;
 
@@ -99,12 +99,10 @@ fn shared_payload_conversion_preserves_every_sidecar_and_separate_assertions() {
         ArrangementSubKind::FrameMember
     )));
     let mut durable = payload.clone();
-    durable
-        .arrangement
-        .as_mut()
-        .unwrap()
-        .sub_kinds
-        .retain(|sub_kind| sub_kind.durability() == RelationDurability::Durable);
+    durable.assertions.statements.retain(|statement| !matches!(
+        statement.relation_kind(), RelationKind::Arrangement(kind) if kind.durability() != RelationDurability::Durable
+    ));
+    durable.assertions.rebuild_compat();
     assert_eq!(decoded, durable);
     assert_eq!(persisted_edge_for_ids(from, to, &decoded), encoded);
     let cites = decoded
@@ -185,7 +183,7 @@ fn resource_snapshot_fixture() -> (GraphSnapshot, Uuid, Uuid, Uuid) {
     assert!(graph.set_resource_record(from, Some(first)));
     assert!(graph.set_resource_record(to, Some(second)));
     let mut payload = complete_payload();
-    for claim in &mut payload.semantic.as_mut().unwrap().statements {
+    for claim in &mut payload.assertions.statements {
         claim.normalize_legacy_asserter();
     }
     let first_edge = persisted_edge_for_ids(from, to, &payload);
@@ -299,6 +297,51 @@ fn legacy_json_keeps_surfaces_and_has_no_resource_auto_population() {
 #[test]
 fn resource_snapshot_normalizes_only_missing_legacy_attribution() {
     let (mut snapshot, _, from, to) = resource_snapshot_fixture();
+    // Exercise the schema-0 semantic sidecar decoder explicitly. Canonical
+    // snapshots carry all-family assertion records and do not use this field.
+    snapshot.assertion_schema = 0;
+    for edge in &mut snapshot.resource_edges {
+        let statements: Vec<_> = edge
+            .assertions
+            .take()
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|statement| {
+                statement.recognized_sub_kind.is_some()
+                    || statement.predicate == "https://vocabulary.test/ns#refutes"
+            })
+            .collect();
+        if statements.is_empty() {
+            continue;
+        }
+        edge.semantic = Some(PersistedSemanticEdgeData {
+            sub_kinds: all_semantic_sub_kinds()
+                .map(|kind| match kind {
+                    SemanticSubKind::Hyperlink => PersistedSemanticSubKind::Hyperlink,
+                    SemanticSubKind::UserGrouped => PersistedSemanticSubKind::UserGrouped,
+                    SemanticSubKind::AgentDerived => PersistedSemanticSubKind::AgentDerived,
+                    SemanticSubKind::Cites => PersistedSemanticSubKind::Cites,
+                    SemanticSubKind::Quotes => PersistedSemanticSubKind::Quotes,
+                    SemanticSubKind::Summarizes => PersistedSemanticSubKind::Summarizes,
+                    SemanticSubKind::Elaborates => PersistedSemanticSubKind::Elaborates,
+                    SemanticSubKind::ExampleOf => PersistedSemanticSubKind::ExampleOf,
+                    SemanticSubKind::Supports => PersistedSemanticSubKind::Supports,
+                    SemanticSubKind::Contradicts => PersistedSemanticSubKind::Contradicts,
+                    SemanticSubKind::Questions => PersistedSemanticSubKind::Questions,
+                    SemanticSubKind::SameEntityAs => PersistedSemanticSubKind::SameEntityAs,
+                    SemanticSubKind::DuplicateOf => PersistedSemanticSubKind::DuplicateOf,
+                    SemanticSubKind::CanonicalMirrorOf => {
+                        PersistedSemanticSubKind::CanonicalMirrorOf
+                    },
+                    SemanticSubKind::DependsOn => PersistedSemanticSubKind::DependsOn,
+                    SemanticSubKind::Blocks => PersistedSemanticSubKind::Blocks,
+                    SemanticSubKind::NextStep => PersistedSemanticSubKind::NextStep,
+                })
+                .collect(),
+            statements,
+            ..Default::default()
+        });
+    }
     let raw = snapshot
         .resource_edges
         .iter_mut()
@@ -311,8 +354,7 @@ fn resource_snapshot_normalizes_only_missing_legacy_attribution() {
     let claims = graph
         .persisted_resource_edges_between(from, to)
         .into_iter()
-        .filter_map(|edge| edge.semantic)
-        .flat_map(|semantic| semantic.statements)
+        .flat_map(|edge| edge.retained_assertions().to_vec())
         .collect::<Vec<_>>();
     assert!(claims.iter().any(|claim| claim.statement_id == "raw-claim"
         && claim.provenance_iri.as_deref() == Some(edge_data::UNKNOWN_LEGACY_ASSERTER_IRI)));
@@ -552,42 +594,29 @@ fn checked_resource_load_rejects_invalid_endpoints_and_unhandled_semantic_data()
         ResourceSnapshotError::MissingResource { .. }
     ));
     let mut aggregate = base.clone();
-    aggregate.resource_edges[0]
-        .semantic
-        .as_mut()
-        .unwrap()
-        .statements
-        .clear();
+    aggregate.assertion_schema = 0;
+    let edge = &mut aggregate.resource_edges[0];
+    edge.assertions = None;
+    edge.semantic = Some(PersistedSemanticEdgeData {
+        sub_kinds: vec![PersistedSemanticSubKind::Cites],
+        ..Default::default()
+    });
     assert!(matches!(
         checked_rejection(&aggregate),
         ResourceSnapshotError::LegacySemanticAggregate { .. }
     ));
     for handle in ["", "  ", "opaque\nhandle"] {
         let mut opaque = base.clone();
-        opaque.resource_edges[0]
-            .semantic
-            .as_mut()
-            .unwrap()
-            .statements[0]
-            .statement_id = handle.into();
-        let expected = opaque.resource_edges[0]
-            .semantic
-            .as_ref()
-            .unwrap()
-            .statements[0]
-            .clone();
+        opaque.resource_edges[0].retained_assertions_mut()[0].statement_id = handle.into();
+        let expected = opaque.resource_edges[0].retained_assertions()[0].clone();
         let graph = Graph::try_from_snapshot(&opaque).unwrap();
         assert_eq!(
-            graph.persisted_resource_edges_between(from, to)[0]
-                .semantic
-                .as_ref()
-                .unwrap()
-                .statements[0],
+            graph.persisted_resource_edges_between(from, to)[0].retained_assertions()[0],
             expected
         );
     }
     let mut empty_sidecar = base.clone();
-    empty_sidecar.resource_edges[1].semantic = Some(Default::default());
+    empty_sidecar.resource_edges[1].assertions = Some(vec![]);
     let graph = Graph::try_from_snapshot(&empty_sidecar).unwrap();
     assert_eq!(graph.resources.edge_count(), 2);
     assert_eq!(
@@ -601,18 +630,12 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
     let (base, surface, from, to) = resource_snapshot_fixture();
     assert!(Graph::try_from_snapshot(&base).is_ok());
     let mut changed_metadata = base.clone();
-    let mut statement = changed_metadata.resource_edges[0]
-        .semantic
-        .as_ref()
-        .unwrap()
-        .statements[0]
-        .clone();
+    let mut statement = changed_metadata.resource_edges[0].retained_assertions()[0].clone();
     statement.asserted_at_ms = Some(999);
     changed_metadata.resource_edges[0]
-        .semantic
+        .assertions
         .as_mut()
         .unwrap()
-        .statements
         .push(statement);
     assert!(matches!(
         checked_rejection(&changed_metadata),
@@ -638,6 +661,12 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
     ));
     let mut orphan_surface = active_surface.clone();
     orphan_surface.edges[0].to_node_id = Uuid::from_u128(123).to_string();
+    assert!(matches!(
+        checked_rejection(&orphan_surface),
+        ResourceSnapshotError::MissingSurface { .. }
+    ));
+    // Schema 0 retains the historical permissive orphan handling.
+    orphan_surface.assertion_schema = 0;
     let restored = Graph::try_from_snapshot(&orphan_surface).unwrap();
     assert_eq!(
         restored.persisted_resource_edges_between(from, to),
@@ -645,14 +674,14 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
     );
     assert_eq!(restored.edge_count(), 0);
     assert_eq!(
-        orphan_surface.edges[0].semantic,
-        active_surface.edges[0].semantic
+        orphan_surface.edges[0].assertions,
+        active_surface.edges[0].assertions
     );
     let mut uppercase_surface = active_surface.clone();
     uppercase_surface.edges[0].from_node_id = surface.to_string().to_uppercase();
     assert!(matches!(
         checked_rejection(&uppercase_surface),
-        ResourceSnapshotError::ActiveSurfaceAssertion { .. }
+        ResourceSnapshotError::NonCanonicalUuid { .. }
     ));
     let mut shown_conflict = base.clone();
     shown_conflict.shown_resources.push(PersistedShownResource {

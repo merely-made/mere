@@ -17,8 +17,8 @@ use kernel::graph::{
 use layout_dom_api::{LayoutDom, LayoutDomMut};
 
 use crate::canvas::build::*;
-use crate::canvas::palette;
 use crate::canvas::seiche_bridge::{build_simulation, visible_relation_edges};
+use crate::canvas::{Canvas, palette};
 
 fn computed_value(
     dom: &genet_scripted_dom::ScriptedDom,
@@ -135,6 +135,129 @@ fn visible_relation_edges_keeps_one_tuple_per_cell_and_drops_hidden_ones() {
         vec![(a, b)],
         "hiding one cell drops exactly its own spring, leaving the other live"
     );
+}
+
+#[test]
+fn closed_link_hides_preserve_controller_rows_in_the_other_stratum() {
+    use crate::canvas::seiche_bridge::visible_relation_edges_with_link_hides;
+    use scenograph::link::{LinkKey, LinkStratum};
+    let (graph, [a, alias_a, b, alias_b, _]) = shown_content_graph();
+    let surface_key = LinkKey::new(
+        LinkStratum::Surface,
+        graph.get_node(a).unwrap().id.to_string(),
+        graph.get_node(b).unwrap().id.to_string(),
+    );
+    let all = visible_relation_edges_with_link_hides(&graph, &HashSet::new(), &HashSet::new());
+    assert_eq!(all.len(), 13);
+
+    let hidden_surface = HashSet::from([surface_key]);
+    assert_eq!(
+        visible_relation_edges_with_link_hides(&graph, &HashSet::new(), &hidden_surface).len(),
+        12,
+        "hiding the Surface link removes its single surface source row"
+    );
+
+    let resource_a = graph.resource(graph.shown_resource_id(a).unwrap()).unwrap();
+    let resource_b = graph.resource(graph.shown_resource_id(b).unwrap()).unwrap();
+    let resource_key = LinkKey::new(
+        LinkStratum::Resource,
+        resource_a.canonical_iri(),
+        resource_b.canonical_iri(),
+    );
+    let hidden_resource = HashSet::from([resource_key]);
+    assert_eq!(
+        visible_relation_edges_with_link_hides(&graph, &HashSet::new(), &hidden_resource).len(),
+        1,
+        "hiding the Resource link removes all aliases' resource rows but keeps Surface truth"
+    );
+    assert_ne!(a, alias_a);
+    assert_ne!(b, alias_b);
+}
+
+#[test]
+fn link_appearances_keep_resource_identity_across_aliases_and_separate_two_strata() {
+    use crate::canvas::edge_cells::visible_link_appearances;
+    use scenograph::link::{LinkKey, LinkStratum};
+    let (graph, [a, alias_a, b, alias_b, unbound]) = shown_content_graph();
+    let view = seiche::LayoutView::from_parts(
+        [
+            (a, Point2D::new(0.0, 0.0)),
+            (alias_a, Point2D::new(0.0, 300.0)),
+            (b, Point2D::new(1000.0, 0.0)),
+            (alias_b, Point2D::new(1000.0, 300.0)),
+            (unbound, Point2D::new(500.0, 900.0)),
+        ],
+        dedup_edges(&graph),
+        1.0,
+    );
+    let appearances =
+        visible_link_appearances(&graph, &view, &HashSet::new(), &HashSet::new(), |_| 36.0);
+    assert_eq!(
+        appearances.len(),
+        5,
+        "one Surface plus four Resource appearances"
+    );
+    let resource_a = graph.resource(graph.shown_resource_id(a).unwrap()).unwrap();
+    let resource_b = graph.resource(graph.shown_resource_id(b).unwrap()).unwrap();
+    let resource_key = LinkKey::new(
+        LinkStratum::Resource,
+        resource_a.canonical_iri(),
+        resource_b.canonical_iri(),
+    );
+    assert_eq!(
+        appearances
+            .iter()
+            .filter(|segment| segment.appearance.key == resource_key)
+            .count(),
+        4,
+        "aliases are appearances of one canonical Resource link"
+    );
+    let mut selected = Canvas::with_graph(graph.clone());
+    let chosen = if alias_a <= alias_b {
+        (alias_a, alias_b)
+    } else {
+        (alias_b, alias_a)
+    };
+    selected.selected_links.insert(resource_key.clone());
+    selected
+        .selected_link_appearances
+        .insert(resource_key.clone(), chosen);
+    assert_eq!(
+        selected.link_appearance_pair(&resource_key),
+        Some((
+            graph.get_node(chosen.0).unwrap().id,
+            graph.get_node(chosen.1).unwrap().id,
+        )),
+        "opening a selected Resource key resolves its clicked surface appearance"
+    );
+    let pair = if a <= b { (a, b) } else { (b, a) };
+    let same_display_pair: Vec<_> = appearances
+        .iter()
+        .filter(|segment| {
+            let displayed = if segment.appearance.display_from <= segment.appearance.display_to {
+                (
+                    segment.appearance.display_from,
+                    segment.appearance.display_to,
+                )
+            } else {
+                (
+                    segment.appearance.display_to,
+                    segment.appearance.display_from,
+                )
+            };
+            displayed == pair
+        })
+        .collect();
+    assert_eq!(same_display_pair.len(), 2, "one stroke per stratum");
+    let surface = same_display_pair
+        .iter()
+        .find(|segment| segment.appearance.key.stratum == LinkStratum::Surface)
+        .unwrap();
+    let resource = same_display_pair
+        .iter()
+        .find(|segment| segment.appearance.key.stratum == LinkStratum::Resource)
+        .unwrap();
+    assert!((surface.from.y - resource.from.y).abs() > 0.0);
 }
 
 /// The load-bearing check for the palette-as-custom-properties move: the sheet
@@ -350,10 +473,8 @@ pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
         from_node_id: from.to_string(),
         to_node_id: to.to_string(),
         families: vec![PersistedEdgeFamily::Semantic],
-        semantic: Some(PersistedSemanticEdgeData {
-            statements,
-            ..Default::default()
-        }),
+        semantic: None,
+        assertions: Some(statements),
         traversal: None,
         containment: None,
         arrangement: None,
@@ -390,8 +511,8 @@ pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
 
 #[test]
 fn content_projection_drives_all_shown_pairs_through_topology_draw_and_hit() {
-    use crate::canvas::edge_cells::{edge_cell_hit_test, visible_edge_cell_segments};
-    use kernel::graph::{RelationKey, RelationKind};
+    use crate::canvas::edge_cells::visible_link_appearances;
+    use kernel::graph::RelationKey;
     let (graph, [a, alias_a, b, alias_b, unbound]) = shown_content_graph();
     assert_eq!(
         graph.relations().count(),
@@ -454,43 +575,20 @@ fn content_projection_drives_all_shown_pairs_through_topology_draw_and_hit() {
         pairs,
         1.0,
     );
-    let segments = visible_edge_cell_segments(&graph, &view, &HashSet::new());
-    assert_eq!(
-        segments.len(),
-        13,
-        "every assertion contributes its fanned lane"
-    );
-    for segment in segments
-        .iter()
-        .filter(|segment| segment.kind == RelationKind::Semantic(SemanticSubKind::Quotes))
-    {
-        let point = Point2D::new(
-            segment.from.x * 0.75 + segment.to.x * 0.25,
-            segment.from.y * 0.75 + segment.to.y * 0.25,
-        );
-        assert_eq!(
-            edge_cell_hit_test(&graph, &view, &HashSet::new(), point, 1.0),
-            Some(segment.cell)
-        );
-    }
+    let segments =
+        visible_link_appearances(&graph, &view, &HashSet::new(), &HashSet::new(), |_| 36.0);
+    assert_eq!(segments.len(), 5, "one appearance per stratum/pair");
     let hidden = HashSet::from([crate::canvas::EdgeCell {
         from: a,
         to: b,
         selector: RelationSelector::Semantic(SemanticSubKind::Cites),
     }]);
     assert_eq!(visible_relation_edges(&graph, &hidden).len(), 11);
-    let visible = visible_edge_cell_segments(&graph, &view, &hidden);
-    assert_eq!(visible.len(), 11);
-    assert!(
-        visible
-            .iter()
-            .all(|segment| !hidden.contains(&segment.cell))
-    );
-    assert!(
-        visible.iter().any(|segment| segment.cell.from == a
-            && segment.cell.to == b
-            && segment.kind == RelationKind::Semantic(SemanticSubKind::Quotes)),
-        "same-pair quote is the hiding control"
+    let visible = visible_link_appearances(&graph, &view, &HashSet::new(), &hidden, |_| 36.0);
+    assert_eq!(
+        visible.len(),
+        5,
+        "the remaining member still keeps its link visible"
     );
     assert_eq!(graph.resource_relations().count(), 2);
 }

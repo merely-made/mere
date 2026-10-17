@@ -30,14 +30,17 @@ use seiche::{Role, RoleTable};
 /// the canvas supplies its positions.
 pub const SETTLED_ARRANGEMENT: &str = "settled";
 
-/// A stop's return of anchored items: where they were and where they go.
-/// A host that adopts transitions animates between the two
-/// ([`Canvas::preview_paused_positions`], [`Canvas::land_paused_positions`]);
-/// the canvas has already placed `to`, so a host that does not still lands.
+/// A stop's return of anchored items, or a reset's return to the seed: where
+/// they were and where they go. A host that adopts transitions animates
+/// between the two ([`Canvas::preview_paused_positions`],
+/// [`Canvas::land_paused_positions`]); the canvas has already placed `to`, so a
+/// host that does not still lands.
 #[derive(Clone, Debug, PartialEq)]
 pub struct StopReturn {
     pub from: Vec<(NodeKey, PortablePoint)>,
     pub to: Vec<(NodeKey, PortablePoint)>,
+    /// The ease's length; `None` is the arrangement transition's default.
+    pub duration_ms: Option<u32>,
 }
 
 /// The canvas's role state, kept in one field so it moves as one piece.
@@ -185,6 +188,12 @@ impl Canvas {
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
         )
+        .with_link_hides(
+            &self.graph,
+            &self.hidden_edges,
+            &self.hidden_links,
+            &self.hidden_assertions,
+        )
         .with_meaning(self.meaning.snapshot())
         .with_registry(&self.channels, self.physics_view_key());
         // A group is named by its smallest member's stable id (F134), which
@@ -286,7 +295,11 @@ impl Canvas {
     }
 
     pub(crate) fn arrangement_axis_locks(&self) -> seiche::Axes {
-        if self.roles.encoded == seiche::Axes::BOTH { seiche::Axes::NONE } else { self.roles.encoded }
+        if self.roles.encoded == seiche::Axes::BOTH {
+            seiche::Axes::NONE
+        } else {
+            self.roles.encoded
+        }
     }
 
     /// Realize the roles over the active arrangement: pinned items kinematic
@@ -329,7 +342,8 @@ impl Canvas {
         }
         self.roles.pinned = pinned;
         let held = self.arrangement_axis_locks();
-        self.physics.set_axis_locks(self.view.positions().map(|(key, _)| (key, held)).collect());
+        self.physics
+            .set_axis_locks(self.view.positions().map(|(key, _)| (key, held)).collect());
         let force = (playing && !anchors.is_empty())
             .then(|| seiche::AnchorSpring::new(anchors).with_stiffness(self.roles.stiffness));
         self.physics.set_anchor_force(force);
@@ -393,8 +407,14 @@ impl Canvas {
         self.roles.stop_return = moved.then(|| StopReturn {
             from: from.to_vec(),
             to: to.clone(),
+            duration_ms: None,
         });
         to
+    }
+
+    /// Queue a return for the host to animate, replacing any pending one.
+    pub(crate) fn queue_return(&mut self, ret: StopReturn) {
+        self.roles.stop_return = Some(ret);
     }
 
     /// Whether a stop's return waits for a host to animate it.

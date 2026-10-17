@@ -150,8 +150,7 @@ mod tests {
             .0;
         let statement = graph
             .get_relation_mut(edge)
-            .and_then(|p| p.semantic.as_mut())
-            .and_then(|s| s.statements.iter_mut().next())
+            .and_then(|p| p.assertions.statements.iter_mut().next())
             .expect("statement");
         statement.provenance_iri = Some("https://persona.test/mark".to_string());
         statement.asserted_at_ms = Some(1_720_000_000_000);

@@ -16,8 +16,9 @@
 use std::collections::HashSet;
 
 use euclid::default::Point2D;
-use kernel::graph::{Graph, NodeKey};
+use kernel::graph::{Graph, NodeKey, RelationKey};
 use numen::FieldRegistry;
+use scenograph::link::{LinkKey, LinkStratum};
 use seiche::{Boundary, CouplingForce, EdgeSpring, NodeExclusion, Simulation};
 
 /// The relation-cell edges that feed the layout **springs**, respecting this instance's
@@ -33,9 +34,70 @@ pub(crate) fn visible_relation_edges(
     graph: &Graph,
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
 ) -> Vec<(NodeKey, NodeKey)> {
-    super::relationship_topology::visible_edges(graph, |from, to, selector| {
-        hidden_edges.contains(&crate::canvas::EdgeCell { from, to, selector })
-    })
+    visible_relation_edges_with_link_hides(graph, hidden_edges, &HashSet::new())
+}
+
+/// Keep the historical one-spring-per-visible-source-row law. A canonical
+/// link hide removes only rows in its owning stratum; another stratum over the
+/// same displayed pair keeps its own rows and spring multiplicity.
+pub(crate) fn visible_relation_edges_with_link_hides(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+    hidden_links: &HashSet<LinkKey>,
+) -> Vec<(NodeKey, NodeKey)> {
+    visible_relation_edges_with_assertion_hides(graph, hidden_edges, hidden_links, &HashSet::new())
+}
+
+pub(crate) fn visible_relation_edges_with_assertion_hides(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_assertions: &HashSet<String>,
+) -> Vec<(NodeKey, NodeKey)> {
+    let assertions = graph
+        .projected_assertions()
+        .filter(|(_, _, _, statement)| !hidden_assertions.contains(&statement.statement_id))
+        .map(|(owner, from, to, statement)| {
+            (
+                owner,
+                kernel::graph::RelationView {
+                    from,
+                    to,
+                    kind: statement.relation_kind(),
+                },
+            )
+        });
+    let traversals = graph
+        .projected_relations()
+        .filter(|(_, relation)| relation.kind == kernel::graph::RelationKind::Traversal);
+    assertions
+        .chain(traversals)
+        .filter_map(|(relation_key, relation)| {
+            let selector = super::relationship_topology::selector_for_relation_kind(relation.kind);
+            if hidden_edges.contains(&crate::canvas::EdgeCell {
+                from: relation.from,
+                to: relation.to,
+                selector,
+            }) {
+                return None;
+            }
+            let key = match relation_key {
+                RelationKey::Surface(_) => {
+                    let from = graph.get_node(relation.from)?.id.to_string();
+                    let to = graph.get_node(relation.to)?.id.to_string();
+                    LinkKey::new(LinkStratum::Surface, from, to)
+                },
+                RelationKey::Resource(_) => {
+                    let from_id = graph.shown_resource_id(relation.from)?;
+                    let to_id = graph.shown_resource_id(relation.to)?;
+                    let from = graph.resource(from_id)?.canonical_iri().to_owned();
+                    let to = graph.resource(to_id)?.canonical_iri().to_owned();
+                    LinkKey::new(LinkStratum::Resource, from, to)
+                },
+            };
+            (!hidden_links.contains(&key)).then_some((relation.from, relation.to))
+        })
+        .collect()
 }
 
 /// Build the force-directed simulation from `graph`: a body per node, one spring
@@ -242,6 +304,70 @@ mod tests {
             sim.coupling_force_count(),
             1,
             "the placed coupling resolves into the built simulation"
+        );
+    }
+}
+
+#[cfg(test)]
+mod assertion_hide_controls {
+    use super::*;
+    use kernel::graph::{ContainmentSubKind, RelationKind, SemanticStatementSpec};
+    use kernel::types::AssertionBasis;
+
+    #[test]
+    fn exact_hide_removes_one_reason_spring_without_hiding_its_same_kind_sibling() {
+        let mut graph = Graph::new();
+        use kernel::graph::fixtures::GraphFixtures;
+        let from = graph.add_node("urn:assertion-hide:a".into(), Default::default());
+        let to = graph.add_node("urn:assertion-hide:b".into(), Default::default());
+        let mut ids = Vec::new();
+        for evidence in ["urn:reason:one", "urn:reason:two"] {
+            let (_, result) = graph
+                .try_assert_relation_statement(
+                    from,
+                    to,
+                    SemanticStatementSpec {
+                        predicate: RelationKind::Containment(ContainmentSubKind::CollectionMember)
+                            .predicate_iri()
+                            .unwrap()
+                            .into(),
+                        basis: AssertionBasis {
+                            evidence: vec![evidence.into()],
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+            ids.push(result.statement_id);
+        }
+        let before = graph.to_snapshot_at(0);
+        assert_eq!(
+            visible_relation_edges(&graph, &HashSet::new()),
+            vec![(from, to), (from, to)]
+        );
+        let hidden = HashSet::from([ids[0].clone()]);
+        assert_eq!(
+            visible_relation_edges_with_assertion_hides(
+                &graph,
+                &HashSet::new(),
+                &HashSet::new(),
+                &hidden
+            ),
+            vec![(from, to)]
+        );
+        assert_eq!(
+            visible_relation_edges_with_assertion_hides(
+                &graph,
+                &HashSet::new(),
+                &HashSet::new(),
+                &HashSet::from(["urn:missing".into()])
+            ),
+            vec![(from, to), (from, to)]
+        );
+        assert_eq!(
+            serde_json::to_value(graph.to_snapshot_at(0)).unwrap(),
+            serde_json::to_value(before).unwrap()
         );
     }
 }

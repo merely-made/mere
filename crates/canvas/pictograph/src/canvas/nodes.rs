@@ -379,6 +379,7 @@ impl Canvas {
         if new == self.selected {
             return;
         }
+        self.sync_attention();
         self.selected = new;
         self.reconcile_derived();
     }

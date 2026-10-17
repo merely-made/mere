@@ -166,8 +166,7 @@ impl Graph {
         let mut payloads = self.persisted_resource_edges_between(resource_id, target.id());
         if payloads
             .iter()
-            .filter_map(|edge| edge.semantic.as_ref())
-            .flat_map(|semantic| &semantic.statements)
+            .flat_map(|edge| edge.retained_assertions())
             .any(|held| {
                 held.withdrawn.is_none()
                     && held.predicate == TAGGED_WITH_IRI
@@ -277,5 +276,55 @@ impl Graph {
             }
         }
         changed
+    }
+}
+
+#[cfg(test)]
+mod canonical_snapshot_tests {
+    use super::*;
+    use euclid::default::Point2D;
+
+    #[test]
+    fn repeated_tag_ensure_reads_canonical_assertions_without_adding_a_reason() {
+        let mut graph = Graph::new();
+        let node = graph.add_node("https://tagged.test/".into(), Point2D::new(0.0, 0.0));
+        let resource = graph.ensure_surface_resource(node).unwrap();
+        let owner = "https://author.test/";
+        let label = "Reviewed";
+        let iri = tag_concept_iri(owner, label);
+        let concept = TagConcept {
+            owner_iri: owner.into(),
+            label: label.into(),
+        };
+
+        assert!(
+            graph
+                .tag_resource_with_concept(resource, &iri, concept.clone())
+                .unwrap()
+        );
+        let before = graph.persisted_resource_edges_between(
+            resource,
+            super::super::ResourceNode::for_term(&iri).id(),
+        );
+        assert!(before.iter().any(|edge| {
+            edge.assertions.as_ref().is_some_and(|records| {
+                records
+                    .iter()
+                    .any(|record| record.predicate == TAGGED_WITH_IRI)
+            })
+        }));
+
+        assert!(
+            !graph
+                .tag_resource_with_concept(resource, &iri, concept)
+                .unwrap()
+        );
+        assert_eq!(
+            graph.persisted_resource_edges_between(
+                resource,
+                super::super::ResourceNode::for_term(&iri).id(),
+            ),
+            before
+        );
     }
 }

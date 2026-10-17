@@ -66,6 +66,7 @@ pub enum RosterSubject {
     RelationCell {
         from: GraphMemberId,
         to: GraphMemberId,
+        assertion_id: String,
         selector: RelationSelector,
     },
     Subgraph(SubgraphId),
@@ -150,6 +151,9 @@ pub struct RosterRow {
 pub struct LinkRow {
     pub from: GraphMemberId,
     pub to: GraphMemberId,
+    /// Exact source assertion identity. `selector` remains only a family/kind
+    /// filter and must not be used as a mutation target.
+    pub assertion_id: String,
     pub source_title: String,
     pub source_url: String,
     pub target_title: String,
@@ -160,6 +164,8 @@ pub struct LinkRow {
     pub kind_label: String,
     pub source_label: Option<String>,
     pub selector: RelationSelector,
+    /// Supplied by the owning source; semantic shape alone does not grant edit authority.
+    pub editable: bool,
     pub selected: bool,
     pub starts_bundle: bool,
 }
@@ -202,6 +208,7 @@ pub struct NodeDetail {
 pub struct LinkRelationRow {
     pub from: GraphMemberId,
     pub to: GraphMemberId,
+    pub assertion_id: String,
     pub family: EdgeFamily,
     pub family_label: String,
     pub kind_label: String,
@@ -344,12 +351,15 @@ pub struct NodeRowInput {
 pub struct LinkRowInput {
     pub from: GraphMemberId,
     pub to: GraphMemberId,
+    pub assertion_id: String,
     pub source_title: String,
     pub source_url: String,
     pub target_title: String,
     pub target_url: String,
     pub kind: RelationKind,
     pub source_label: Option<String>,
+    /// Source-owned edit capability; generated/read-only assertions pass false.
+    pub editable: bool,
     pub selected: bool,
 }
 
@@ -380,8 +390,11 @@ pub struct NodeDetailInput {
 pub struct LinkRelationInput {
     pub from: GraphMemberId,
     pub to: GraphMemberId,
+    pub assertion_id: String,
     pub kind: RelationKind,
     pub label: Option<String>,
+    /// Source-owned edit capability; never inferred from the predicate family.
+    pub editable: bool,
     pub selected: bool,
     pub hidden: bool,
 }
@@ -455,6 +468,7 @@ pub fn build_link_rows(inputs: Vec<LinkRowInput>) -> Vec<LinkRow> {
             LinkRow {
                 from: input.from,
                 to: input.to,
+                assertion_id: input.assertion_id,
                 source_title: input.source_title,
                 source_url: input.source_url,
                 target_title: input.target_title,
@@ -465,6 +479,7 @@ pub fn build_link_rows(inputs: Vec<LinkRowInput>) -> Vec<LinkRow> {
                 kind_label: relation_kind_label(input.kind).to_string(),
                 source_label: input.source_label,
                 selector,
+                editable: input.editable,
                 selected: input.selected,
                 starts_bundle: false,
             }
@@ -481,6 +496,7 @@ pub fn build_link_rows(inputs: Vec<LinkRowInput>) -> Vec<LinkRow> {
             })
             .then_with(|| a.family.cmp(&b.family))
             .then_with(|| a.kind_label.cmp(&b.kind_label))
+            .then_with(|| a.assertion_id.cmp(&b.assertion_id))
     });
     let mut last: Option<(GraphMemberId, GraphMemberId)> = None;
     for row in &mut rows {
@@ -562,16 +578,16 @@ pub fn build_link_card(input: LinkCardInput) -> LinkCard {
         .map(|input| {
             let family = input.kind.family();
             let selector = relation_selector(input.kind);
-            let editable = matches!(selector, RelationSelector::Semantic(_));
             LinkRelationRow {
                 from: input.from,
                 to: input.to,
+                assertion_id: input.assertion_id,
                 family,
                 family_label: edge_family_label(family).to_string(),
                 kind_label: relation_kind_label(input.kind).to_string(),
                 label: input.label,
                 selector,
-                editable,
+                editable: input.editable,
                 selected: input.selected,
                 hidden: input.hidden,
             }
@@ -581,6 +597,7 @@ pub fn build_link_card(input: LinkCardInput) -> LinkCard {
         a.family
             .cmp(&b.family)
             .then_with(|| a.kind_label.cmp(&b.kind_label))
+            .then_with(|| a.assertion_id.cmp(&b.assertion_id))
     });
     let facets = link_facets(input.from, input.to, &relations);
     LinkCard {
@@ -1180,6 +1197,7 @@ mod tests {
                 LinkRelationRow {
                     from,
                     to,
+                    assertion_id: "cite-a".to_string(),
                     family: EdgeFamily::Semantic,
                     family_label: "Semantic".to_string(),
                     kind_label: "Cites".to_string(),
@@ -1192,6 +1210,7 @@ mod tests {
                 LinkRelationRow {
                     from,
                     to,
+                    assertion_id: "quote-a".to_string(),
                     family: EdgeFamily::Semantic,
                     family_label: "Semantic".to_string(),
                     kind_label: "Quotes".to_string(),
@@ -1245,6 +1264,47 @@ mod tests {
     }
 
     #[test]
+    fn roster_keeps_same_kind_assertions_distinct_and_uses_source_editability() {
+        let from = GraphMemberId::from_u128(11);
+        let to = GraphMemberId::from_u128(22);
+        let rows = build_link_rows(vec![
+            LinkRowInput {
+                from,
+                to,
+                assertion_id: "generated-reason-02".to_string(),
+                source_title: "From".to_string(),
+                source_url: "https://from.test".to_string(),
+                target_title: "To".to_string(),
+                target_url: "https://to.test".to_string(),
+                kind: RelationKind::Containment(ContainmentSubKind::CollectionMember),
+                source_label: Some("second reason".to_string()),
+                editable: false,
+                selected: false,
+            },
+            LinkRowInput {
+                from,
+                to,
+                assertion_id: "personal-reason-01".to_string(),
+                source_title: "From".to_string(),
+                source_url: "https://from.test".to_string(),
+                target_title: "To".to_string(),
+                target_url: "https://to.test".to_string(),
+                kind: RelationKind::Containment(ContainmentSubKind::CollectionMember),
+                source_label: Some("first reason".to_string()),
+                editable: true,
+                selected: false,
+            },
+        ]);
+
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].assertion_id, "generated-reason-02");
+        assert!(!rows[0].editable);
+        assert_eq!(rows[1].assertion_id, "personal-reason-01");
+        assert!(rows[1].editable);
+        assert_eq!(rows[0].selector, rows[1].selector);
+    }
+
+    #[test]
     fn build_link_card_sorts_relations_and_uses_selector_intents() {
         let from = GraphMemberId::from_u128(1);
         let to = GraphMemberId::from_u128(2);
@@ -1260,16 +1320,20 @@ mod tests {
                 LinkRelationInput {
                     from,
                     to,
+                    assertion_id: "quote-a".to_string(),
                     kind: RelationKind::Semantic(SemanticSubKind::Quotes),
                     label: None,
+                    editable: false,
                     selected: false,
                     hidden: false,
                 },
                 LinkRelationInput {
                     from,
                     to,
+                    assertion_id: "cite-a".to_string(),
                     kind: RelationKind::Semantic(SemanticSubKind::Cites),
                     label: None,
+                    editable: true,
                     selected: true,
                     hidden: false,
                 },
@@ -1277,6 +1341,9 @@ mod tests {
         });
         assert_eq!(card.relations.len(), 2);
         assert_eq!(card.relations[0].kind_label, "Cites");
+        assert_eq!(card.relations[0].assertion_id, "cite-a");
+        assert!(card.relations[0].editable);
+        assert!(!card.relations[1].editable);
         assert_eq!(
             card.relations[0].selector,
             RelationSelector::Semantic(SemanticSubKind::Cites)

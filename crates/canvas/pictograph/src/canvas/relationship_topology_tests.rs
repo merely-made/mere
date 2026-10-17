@@ -5,7 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 use super::*;
 use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
-use kernel::graph::{SemanticStatementSpec, SemanticSubKind, predicate_iri};
+use kernel::graph::{
+    ContainmentSubKind, RelationKind, SemanticStatement, SemanticStatementSpec, SemanticSubKind,
+    predicate_iri,
+};
 use kernel::types::GraphScope;
 fn fixture() -> (Graph, [Uuid; 4]) {
     let mut graph = Graph::new();
@@ -58,6 +61,47 @@ fn assertions_preserve_current_projected_row_multiplicity() {
     assert_eq!((pair.held_rows, pair.visible_rows), (2, 2));
     assert_eq!(pair.cells[0].assertions, BTreeSet::from([first, second]));
     assert_eq!(serde_json::to_value(graph.to_snapshot()).unwrap(), before);
+}
+
+#[test]
+fn closed_surface_link_hide_filters_all_rows_without_merging_their_controller_weight() {
+    let (mut graph, [a, b, _, _]) = fixture();
+    assertion(
+        &mut graph,
+        a,
+        b,
+        Some(SemanticSubKind::UserGrouped),
+        "urn:alice",
+    );
+    assertion(
+        &mut graph,
+        a,
+        b,
+        Some(SemanticSubKind::UserGrouped),
+        "urn:bob",
+    );
+    let key = LinkKey::new(
+        scenograph::link::LinkStratum::Surface,
+        a.to_string(),
+        b.to_string(),
+    );
+    let hidden = BTreeSet::from([key]);
+    let pair = inspect_pair_with_link_hides(&graph, a, b, &hidden, |_, _, _| false).unwrap();
+    assert_eq!((pair.held_rows, pair.visible_rows), (2, 0));
+    let ak = graph.get_node_key_by_id(a).unwrap();
+    let bk = graph.get_node_key_by_id(b).unwrap();
+    assert_eq!(
+        crate::canvas::seiche_bridge::visible_relation_edges_with_link_hides(
+            &graph,
+            &std::collections::HashSet::new(),
+            &hidden.iter().cloned().collect(),
+        )
+        .into_iter()
+        .filter(|(from, to)| (*from == ak && *to == bk) || (*from == bk && *to == ak))
+        .count(),
+        0,
+        "a closed link hide removes every spring row in its own source stratum"
+    );
 }
 #[test]
 fn visibility_and_controller_share_exact_cell_filter() {
@@ -121,7 +165,7 @@ fn parallel_buckets_preserve_input_multiplicity_and_assertion_handles() {
     let owner = &pair.cells[0].owner;
     let edge = graph.to_snapshot().resource_edges.remove(0);
     let mut second = edge.clone();
-    second.semantic.as_mut().unwrap().statements[0].statement_id = "urn:parallel".into();
+    second.assertions.as_mut().unwrap()[0].statement_id = "urn:parallel".into();
     apply_graph_delta(
         &mut graph,
         GraphDelta::ReplaySetResourceEdgesByIds {
@@ -154,6 +198,65 @@ fn open_predicates_keep_handles_without_recognized_kind_invention() {
         RelationSelector::Family(EdgeFamily::Semantic)
     );
     assert_eq!(pair.cells[0].assertions, BTreeSet::from([id]));
+}
+
+#[test]
+fn exact_same_kind_containment_keeps_independent_hide_handles() {
+    let (mut graph, [a, b, _, _]) = fixture();
+    let predicate = RelationKind::Containment(ContainmentSubKind::CollectionMember)
+        .predicate_iri()
+        .expect("canonical containment predicate")
+        .to_owned();
+    for (id, author) in [
+        ("member-claim-one", "urn:author:one"),
+        ("member-claim-two", "urn:author:two"),
+    ] {
+        graph
+            .try_assert_persisted_relation_statement(
+                graph.get_node_key_by_id(a).unwrap(),
+                graph.get_node_key_by_id(b).unwrap(),
+                SemanticStatement {
+                    statement_id: id.into(),
+                    predicate: predicate.clone(),
+                    recognized_sub_kind: None,
+                    label: None,
+                    basis: Default::default(),
+                    graph_scope: GraphScope::Default,
+                    provenance_iri: Some(author.into()),
+                    first_asserted_ms: Some(1),
+                    asserted_at_ms: Some(2),
+                    withdrawn: None,
+                },
+            )
+            .unwrap();
+    }
+    let pair = inspect_pair(&graph, a, b, |_, _, _| false).unwrap();
+    assert!(pair.held_rows >= 2);
+    assert!(pair.cells.iter().all(|cell| cell.owner.selector
+        == RelationSelector::Containment(ContainmentSubKind::CollectionMember)));
+    let ids = pair
+        .cells
+        .iter()
+        .flat_map(|cell| cell.assertions.iter().cloned())
+        .collect::<BTreeSet<_>>();
+    assert_eq!(
+        ids,
+        BTreeSet::from(["member-claim-one".into(), "member-claim-two".into()])
+    );
+    let exact_id_hide_candidate = BTreeSet::from(["member-claim-one".to_owned()]);
+    assert_eq!(exact_id_hide_candidate.len(), 1);
+    assert!(ids.is_superset(&exact_id_hide_candidate));
+
+    graph.retract_assertion("member-claim-one");
+    let held = inspect_pair(&graph, a, b, |_, _, _| false).unwrap();
+    assert!(held.held_rows >= 1);
+    assert_eq!(
+        held.cells
+            .iter()
+            .flat_map(|cell| cell.assertions.iter().cloned())
+            .collect::<BTreeSet<_>>(),
+        BTreeSet::from(["member-claim-two".into()])
+    );
 }
 #[test]
 fn directions_strata_and_self_links_do_not_collapse() {

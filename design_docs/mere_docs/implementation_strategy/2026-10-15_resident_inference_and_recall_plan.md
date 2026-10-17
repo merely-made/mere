@@ -1120,3 +1120,25 @@ Stop and record the reason if any of these happen:
   checks pass 50 Distillery unit tests and eight durability tests; Djinn's GPU
   library, binary and native route test compile. These are producer-protocol
   checks. The Turnstone consumer and headed acceptance are still pending.
+
+
+- **2026-10-16, Turnstone graph-scene supplier integration candidate.**
+  Turnstone's published fold consumer locks Mere
+  `65b97b0bfdf1eef5ba3b4ecdccba73f47a049d03`, whose decoder-free
+  `distillery/inference-wire` feature is on the published inference line and
+  absent from the separate current `main` line. The isolated
+  `codex/turnstone-scene-supplier` branch merges published main
+  `d1e1d7aaed1b2b3f99fceca6fa7301ab09f5aa46` into that exact prior consumer
+  basis. This brings Partition, Sets, Provenance, Mosaic, attention and seed
+  presentation, and Pandect's scene-state facets together with Turnstone's
+  existing admitted inference protocol. Git merged source and the workspace
+  lock without conflicts. The newer inference continuation through
+  `1f4809918154b4c4232ed00d8b837b196f10fe99` is outside this candidate, and its
+  active branch and working copies are untouched.
+  `cargo metadata --locked --offline --no-deps --format-version 1` passes;
+  this is manifest validation, not compilation or behavior acceptance.
+  Turnstone owns the graph-scene integration, focused tests, native primary
+  and lens presentation, and fresh-process reopening gate before publication
+  of its consumer update. Earlier inference receipts retain their exact
+  original suppliers; this merge does not requalify those gates or mark the
+  candidate as Mere main.

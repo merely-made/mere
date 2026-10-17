@@ -1,0 +1,205 @@
+Browser tab: 9, Title: "Graphshell, one tree", URL: "http://127.0.0.1:8786/tree.html?app=local".
+0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8786/tree.html?app=local
+	1 container Graphshell, one tree
+		2 container
+			3 text mereGraphshellLocal mere / retained material
+			4 container
+				5 text mere mere
+			6 container
+				7 text GraphshellLocal mere / retained material GraphshellLocal mere / retained material
+				8 heading Graphshell, Value: 1
+					9 text Graphshell
+				10 text Local mere / retained material
+			11 text saved graph · 11 nodes · selected: 0 · primary: none
+			12 container Graph controls
+				13 button Pan left
+				14 button Pan right
+				15 button Pan up
+				16 button Pan down
+				17 button Zoom in
+				18 button Zoom out
+				19 button Fit graph
+				20 button (disabled) Fit selection
+				21 button Restore arrangement
+				22 button Play physics
+				23 pop up button (collapsed) Graph commands, Secondary Actions: Expand
+				24 button (expanded) Graph tools, Secondary Actions: Collapse
+			25 text Open selected in workbenchShow workbench
+			26 button Open selected in workbench
+			27 button Show workbench
+			28 text Saved graph
+			29 button Undo session
+			30 button Redo session
+			31 container
+				32 text Add an object
+				33 button (collapsed) Add an object, Secondary Actions: Expand
+			34 button (disabled) Inspect selected access
+			35 button Inspect fields
+			36 button Open details
+			37 text Dataspace11 items / Graph presentationPortable scene workspaceGraph tools
+			38 container
+				39 text Dataspace11 items / Graph presentationPortable scene workspace Dataspace11 items / Graph presentation
+				40 container
+					41 text Dataspace11 items / Graph presentation
+					42 heading Dataspace, Value: 2
+						43 text Dataspace
+					44 text 11 items / Graph presentation
+				205 text Portable scene workspace
+				206 container
+					207 text Graphshell / portable sceneMetre gridFretboardTerrain and coverageLinksScene dataExport scene recipe Graphshell / portable scene
+					208 checkbox Metre grid, Value: 0
+					209 checkbox Fretboard, Value: 1
+					210 checkbox Terrain and coverage, Value: 0
+					211 checkbox Links, Value: 1
+					212 button (collapsed) Scene data, Secondary Actions: Expand
+					213 button Export scene recipe
+				214 heading Open C major, Value: 2
+					215 text Open C major
+				216 container
+					217 text Portable scene stageScene selection and occurrences Portable scene stage Scene selection and occurrences
+					218 heading Selection, Value: 3
+						219 text Selection
+					241 text C
+					221 text string 5, fret 3, pitch class 0
+					242 text Source: fixture.pitch-class / 0 · illustrative-v1
+					243 button Related occurrence string-2-fret-1
+					244 text One source resource realized at different instrument positions; octaves may differ
+					245 text forward 1 · retained 1
+					246 button Clear selection
+					247 button Dismiss retained
+					248 heading Occurrences, Value: 3
+						249 text Occurrences
+					240 checkbox Scene occurrence string-1-fret-0: E, Value: 0
+					250 checkbox Scene occurrence string-2-fret-1: C, Value: 0
+					251 checkbox Scene occurrence string-3-fret-0: G, Value: 0
+					252 checkbox Scene occurrence string-4-fret-2: E, Value: 0
+					253 checkbox Scene occurrence string-5-fret-3: C, Value: 1
+				230 text Source revision: illustrative-v1 · supplied facts; selection does not edit the source
+			79 container
+				80 text Graph tools Graph tools
+				81 container
+					82 text Application appearance
+					83 button (collapsed) Appearance, Secondary Actions: Expand
+					84 text Appearance status
+				85 container
+					86 text InspectorSelection, scene and presentation InspectorSelection, scene and presentation
+					87 heading Inspector, Value: 2
+						88 text Inspector
+					89 text Selection, scene and presentation
+				90 text Storage: IndexedDB reopened · not persistent, may be evicted
+				91 container
+					92 text Arrangement and physics Arrangement and physicsArrangement and physics
+					93 button (expanded) Arrangement and physics, Secondary Actions: Collapse
+					94 container
+						95 text Arrangement and physics ArrangementArrangement
+						96 text Arrangement
+						97 combo box (collapsed) Description: Arrangement, Value: Spiral, Secondary Actions: Expand
+							98 text Spiral
+						99 button Apply arrangement
+						100 text RoleRole
+						101 text Role
+						102 combo box (collapsed) Description: Role, Value: Seeded, Secondary Actions: Expand
+							103 text Seeded
+						104 button Apply role
+						105 text Physics lawPhysics law
+						106 text Physics law
+						107 combo box (collapsed) Description: Physics law, Value: Springs, Secondary Actions: Expand
+							108 text Springs
+						109 container Overlays
+							110 container
+								111 text Hub roomHub room
+								112 checkbox Hub room, Value: 0
+								113 text Hub room
+							114 container
+								115 text Group pullGroup pull
+								116 checkbox Group pull, Value: 0
+								117 text Group pull
+							118 container
+								119 text Hub pullHub pull
+								120 checkbox Hub pull, Value: 0
+								121 text Hub pull
+							122 container
+								123 text DepthDepth
+								124 checkbox Depth, Value: 0
+								125 text Depth
+							126 container
+								127 text GridGrid
+								128 checkbox Grid, Value: 0
+								129 text Grid
+							130 container
+								131 text CentreCentre
+								132 checkbox Centre, Value: 0
+								133 text Centre
+							134 container
+								135 text TideTide
+								136 checkbox Tide, Value: 0
+								137 text Tide
+							138 container
+								139 text SkeletonSkeleton
+								140 checkbox Skeleton, Value: 0
+								141 text Skeleton
+						142 text KindsKinds
+						143 text Kinds
+						144 combo box (collapsed) Description: Kinds, Value: By site, Secondary Actions: Expand
+							145 text By site
+						146 text GroupsGroups
+						147 text Groups
+						148 combo box (collapsed) Description: Groups, Value: By site, Secondary Actions: Expand
+							149 text By site
+						150 text MassMass
+						151 text Mass
+						152 combo box (collapsed) Description: Mass, Value: By degree, Secondary Actions: Expand
+							153 text By degree
+						154 text DepthDepth
+						155 text Depth
+						156 combo box (collapsed) Description: Depth, Value: From roots, Secondary Actions: Expand
+							157 text From roots
+						158 button Apply physics
+						159 text SpeedSpeed
+						160 text Speed
+						161 combo box (collapsed) Description: Speed, Value: 1x, Secondary Actions: Expand
+							162 text 1x
+						163 text ProfileProfile
+						164 text Profile
+						165 combo box (collapsed) Description: Profile, Value: Springs, Secondary Actions: Expand
+							166 text Springs
+						167 button Apply profile
+						168 text Physics status
+				169 container
+					170 text Find and filter
+					171 button (collapsed) Find and filter, Secondary Actions: Expand
+				172 container
+					173 text Scenes and transfers
+					174 button (collapsed) Scenes and transfers, Secondary Actions: Expand
+				175 container
+					176 text Projection editor
+					177 button (collapsed) Projection editor, Secondary Actions: Expand
+				178 button (expanded) Close portable scene, Secondary Actions: Collapse
+				179 container
+					180 text History
+					181 button (collapsed) History, Secondary Actions: Expand
+				182 container
+					183 text Dynamics inspector
+					184 button (disabled) Explain selected dynamics
+				185 container
+					186 text Presentation rules
+					187 button (collapsed) Presentation rules, Secondary Actions: Expand
+				188 container
+					189 text Saved query views
+					190 heading Saved query views, Value: 3
+						191 text Saved query views
+					192 button New query view
+				193 container
+					194 text Fields
+					195 heading Fields, Value: 2
+						196 text Fields
+					197 text Forme controls
+					198 text Workbench · 0 accesses · 0 regions
+					199 button Unlock forme
+					200 button (disabled) Undo saved forme change
+					201 button (disabled) Redo saved forme change
+					202 button Hide forme boundary
+					203 button Select forme members
+					204 button Retry workbench save
+
+The focused UI element is 0 AXWebArea Graphshell, one tree, URL: 127.0.0.1:8786/tree.html?app=local

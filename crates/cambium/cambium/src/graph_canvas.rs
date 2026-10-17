@@ -172,22 +172,26 @@ pub struct GraphCanvasEdge<Id> {
     pub to: Id,
 }
 
-/// One independently curatable relation cell in a graph-canvas Swatch.
+/// One routed connection in a graph-canvas Swatch. A source link carries its
+/// canonical key; choosing that stroke opens the link before a member is picked.
 ///
-/// `id` is owned by the consumer and must remain stable for the lifetime of
-/// the source relation. Unlike [`GraphCanvasEdge`], it deliberately does not
-/// collapse two relations that share endpoints. Visibility and emphasis are
-/// projection state: they do not change graph truth.
+/// A disclosed `link_key` groups parallel reasons into one stroke for that
+/// stratum and appearance. Anonymous non-link geometry retains its caller ID.
+/// Visibility, marks and emphasis are projection state and never change truth.
 #[derive(Clone, Debug, PartialEq)]
 pub struct GraphCanvasRelation<Id> {
     pub id: String,
+    /// Present for source links; absent for geometry without a disclosed link.
+    pub link_key: Option<sceno::LinkKey>,
+    pub marks: sceno::LinkMarks,
+    /// View-local additive contribution; paint bounds its visual width.
+    pub strength: f32,
     pub from: Id,
     pub to: Id,
     pub kind: String,
     pub label: String,
-    /// Authored normalized route. Two points name a straight route and may be
-    /// fanned when sibling relation cells share its endpoints; three or more
-    /// points are preserved as an explicit polyline.
+    /// Authored normalized route. Three or more points preserve an explicit
+    /// polyline; member multiplicity never creates additional lanes.
     pub route: Vec<(f32, f32)>,
     pub visible: bool,
     pub emphasized: bool,
@@ -362,8 +366,35 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
     /// Supply identity-bearing relation cells. When present, these replace the
     /// legacy endpoint-only edges in the retained paint projection.
     #[must_use]
-    pub fn with_relations(mut self, relations: Vec<GraphCanvasRelation<Id>>) -> Self {
-        self.relations = relations;
+    pub fn with_relations(mut self, relations: Vec<GraphCanvasRelation<Id>>) -> Self
+    where
+        Id: PartialEq,
+    {
+        self.relations.clear();
+        for mut relation in relations {
+            if let Some(key) = &relation.link_key {
+                relation.id = key.stable_id();
+                if relation.visible {
+                    if let Some(peer) = self.relations.iter_mut().find(|peer| {
+                        peer.visible
+                            && peer.link_key.as_ref() == Some(key)
+                            && ((peer.from == relation.from && peer.to == relation.to)
+                                || (peer.from == relation.to && peer.to == relation.from))
+                    }) {
+                        let marks = if peer.from == relation.from {
+                            relation.marks
+                        } else {
+                            relation.marks.reversed()
+                        };
+                        peer.marks.merge(marks);
+                        peer.strength += relation.strength.max(0.0);
+                        peer.emphasized |= relation.emphasized;
+                        continue;
+                    }
+                }
+            }
+            self.relations.push(relation);
+        }
         self
     }
 
@@ -521,6 +552,10 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
                         points,
                         emphasized: relation.emphasized,
                         line: self.relation_line(&relation.kind),
+                        start_arrow: relation.marks.reverse,
+                        end_arrow: relation.marks.forward,
+                        opposed: relation.marks.opposed,
+                        strength: relation.strength,
                     })
                     .collect(),
             );
@@ -837,72 +872,51 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         ))
     }
 
-    /// Resolve authored routes and endpoint-only relation cells into distinct
-    /// normalized polylines. Parallel cells fan around their shared chord;
-    /// authored routes with a real interior are left alone.
+    /// Resolve one path per disclosed link appearance. The only fixed offset
+    /// separates the two strata when both are present; it never depends on
+    /// assertion count. Explicit authored paths retain their interiors.
     fn relation_routes(&self) -> Vec<(&GraphCanvasRelation<Id>, Vec<(f32, f32)>)> {
-        const FAN_GAP_PX: f32 = 12.0;
         let visible = self
             .relations
             .iter()
-            .filter(|relation| relation.visible)
-            .filter_map(|relation| {
-                let from = self
-                    .graph
-                    .nodes
-                    .iter()
-                    .position(|node| node.id == relation.from)?;
-                let to = self
-                    .graph
-                    .nodes
-                    .iter()
-                    .position(|node| node.id == relation.to)?;
-                Some((relation, from, to))
-            })
+            .filter(|r| r.visible)
             .collect::<Vec<_>>();
-
         visible
             .iter()
-            .enumerate()
-            .map(|(visible_index, (relation, from, to))| {
+            .filter_map(|&relation| {
+                let a = self
+                    .graph
+                    .nodes
+                    .iter()
+                    .find(|n| n.id == relation.from)?
+                    .position;
+                let b = self
+                    .graph
+                    .nodes
+                    .iter()
+                    .find(|n| n.id == relation.to)?
+                    .position;
                 if relation.route.len() > 2 {
-                    return (*relation, relation.route.clone());
+                    return Some((relation, relation.route.clone()));
                 }
-
-                let a = self.graph.nodes[*from].position;
-                let b = self.graph.nodes[*to].position;
-                if from == to {
-                    let rank = visible[..visible_index]
-                        .iter()
-                        .filter(|(_, peer_from, peer_to)| peer_from == from && peer_to == to)
-                        .count() as f32;
-                    let radius = 0.08 + rank * 0.035;
-                    return (
-                        *relation,
-                        vec![
-                            a,
-                            (a.0 + radius, a.1 - radius),
-                            (a.0 + radius * 1.35, a.1 + radius),
-                            a,
-                        ],
-                    );
+                if relation.from == relation.to {
+                    return Some((
+                        relation,
+                        vec![a, (a.0 + 0.08, a.1 - 0.08), (a.0 + 0.108, a.1 + 0.08), a],
+                    ));
                 }
-
-                let same_pair = |peer_from: usize, peer_to: usize| {
-                    (peer_from == *from && peer_to == *to) || (peer_from == *to && peer_to == *from)
+                let two_strata = relation.link_key.as_ref().filter(|key| {
+                    visible.iter().any(|peer| {
+                        peer.link_key
+                            .as_ref()
+                            .is_some_and(|other| key.stratum != other.stratum)
+                            && ((peer.from == relation.from && peer.to == relation.to)
+                                || (peer.from == relation.to && peer.to == relation.from))
+                    })
+                });
+                let Some(key) = two_strata else {
+                    return Some((relation, vec![a, b]));
                 };
-                let peers = visible
-                    .iter()
-                    .filter(|(_, peer_from, peer_to)| same_pair(*peer_from, *peer_to))
-                    .collect::<Vec<_>>();
-                if peers.len() == 1 {
-                    return (*relation, vec![a, b]);
-                }
-                let rank = peers
-                    .iter()
-                    .position(|(peer, _, _)| std::ptr::eq(*peer, *relation))
-                    .unwrap_or_default() as f32;
-                let offset = (rank - (peers.len() as f32 - 1.0) * 0.5) * FAN_GAP_PX;
                 let size = Size {
                     width: self.width as f32,
                     height: self.height as f32,
@@ -912,19 +926,36 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
                 let b_px = self.viewport.project(b, size, inset);
                 let dx = b_px.0 - a_px.0;
                 let dy = b_px.1 - a_px.1;
-                let length = (dx * dx + dy * dy).sqrt().max(0.0001);
+                let length = dx.hypot(dy).max(0.0001);
+                // Normalize by endpoint order so reversing a route keeps its lane.
+                let orientation = if a.0 < b.0 || (a.0 == b.0 && a.1 <= b.1) {
+                    1.0
+                } else {
+                    -1.0
+                };
+                let offset = orientation
+                    * match key.stratum {
+                        sceno::LinkStratum::Surface => -3.0,
+                        sceno::LinkStratum::Resource => 3.0,
+                    };
                 let normal = (-dy / length * offset, dx / length * offset);
-                let first = (a_px.0 + dx * 0.28 + normal.0, a_px.1 + dy * 0.28 + normal.1);
-                let second = (a_px.0 + dx * 0.72 + normal.0, a_px.1 + dy * 0.72 + normal.1);
-                (
-                    *relation,
-                    vec![
-                        a,
-                        graph_position_at_unclamped(self.viewport, size, inset, first),
-                        graph_position_at_unclamped(self.viewport, size, inset, second),
-                        b,
-                    ],
-                )
+                let route = vec![
+                    a,
+                    graph_position_at_unclamped(
+                        self.viewport,
+                        size,
+                        inset,
+                        (a_px.0 + dx * 0.28 + normal.0, a_px.1 + dy * 0.28 + normal.1),
+                    ),
+                    graph_position_at_unclamped(
+                        self.viewport,
+                        size,
+                        inset,
+                        (a_px.0 + dx * 0.72 + normal.0, a_px.1 + dy * 0.72 + normal.1),
+                    ),
+                    b,
+                ];
+                Some((relation, route))
             })
             .collect()
     }
@@ -1159,8 +1190,7 @@ fn graph_position_at_unclamped(
 }
 
 /// The segment crossing a polyline's half-length point. Relation hit targets
-/// sit on this segment, which keeps parallel fanned cells independently
-/// reachable instead of stacking every target on the shared endpoint chord.
+/// sit on this segment, sharing the same path as the painted link.
 fn route_midpoint_segment(points: &[(f32, f32)]) -> Option<((f32, f32), (f32, f32))> {
     let segments = points
         .windows(2)
@@ -1557,11 +1587,26 @@ where
             if relation.emphasized {
                 class.push_str(" emphasized");
             }
+            let label = format!("{}: {}", relation.kind, relation.label);
+            let label = if relation.link_key.is_some() {
+                format!("{label}; {}{}",
+                    match (relation.marks.forward, relation.marks.reverse) {
+                        (true, true) => "both directions",
+                        (true, false) => "forward",
+                        (false, true) => "reverse",
+                        _ => "direction unavailable",
+                    },
+                    if relation.marks.opposed { "; opposing assertions" } else { "" })
+            } else {
+                label
+            };
             let mut target = el::<_, State, AppAction>("button", ())
                 .attr("class", class)
                 .attr("type", "button")
-                .attr("aria-label", format!("{}: {}", relation.kind, relation.label))
+                .attr("aria-label", label)
                 .attr("data-relation-id", relation.id.clone())
+                .attr("data-link-direction", match (relation.marks.forward,relation.marks.reverse) {(true,true)=>"both",(true,false)=>"forward",(false,true)=>"reverse",_=>"none"})
+                .attr("data-link-opposed", if relation.marks.opposed {"true"} else {"false"})
                 // For the host's sheet: a line style per kind, so kinds differ
                 // by more than colour.
                 .attr("data-kind", relation.kind.clone())
@@ -2740,6 +2785,9 @@ mod tests {
     fn node_footprints_clip_incident_relation_routes_to_the_card_perimeter() {
         let relations = vec![
             GraphCanvasRelation {
+                link_key: None,
+                marks: sceno::LinkMarks::default(),
+                strength: 1.0,
                 id: "outgoing".into(),
                 from: 1,
                 to: 2,
@@ -2750,6 +2798,9 @@ mod tests {
                 emphasized: false,
             },
             GraphCanvasRelation {
+                link_key: None,
+                marks: sceno::LinkMarks::default(),
+                strength: 1.0,
                 id: "incoming".into(),
                 from: 2,
                 to: 1,
@@ -2786,10 +2837,6 @@ mod tests {
             on_perimeter(*routes[1].1.last().expect("incoming endpoint")),
             "incoming target is clipped"
         );
-        assert_eq!(routes[0].1[1], compact_routes[0].1[1]);
-        assert_eq!(routes[0].1[2], compact_routes[0].1[2]);
-        assert_eq!(routes[1].1[1], compact_routes[1].1[1]);
-        assert_eq!(routes[1].1[2], compact_routes[1].1[2]);
         assert_eq!(
             *routes[0].1.last().expect("unoccupied target"),
             *compact_routes[0].1.last().expect("compact target")
@@ -2831,6 +2878,9 @@ mod tests {
     fn relation_view(state: &State) -> TestView {
         let swatch = model(state.hovered, state.focused).with_relations(vec![
             GraphCanvasRelation {
+                link_key: None,
+                marks: sceno::LinkMarks::default(),
+                strength: 1.0,
                 id: "cites".into(),
                 from: 1,
                 to: 2,
@@ -2841,6 +2891,9 @@ mod tests {
                 emphasized: true,
             },
             GraphCanvasRelation {
+                link_key: None,
+                marks: sceno::LinkMarks::default(),
+                strength: 1.0,
                 id: "quotes".into(),
                 from: 1,
                 to: 2,
@@ -2851,6 +2904,9 @@ mod tests {
                 emphasized: false,
             },
             GraphCanvasRelation {
+                link_key: None,
+                marks: sceno::LinkMarks::default(),
+                strength: 1.0,
                 id: "hidden".into(),
                 from: 1,
                 to: 2,
@@ -2873,7 +2929,7 @@ mod tests {
     }
 
     #[test]
-    fn relation_cells_keep_parallel_endpoints_independent_and_hideable() {
+    fn unbound_routes_keep_independent_targets_and_visibility() {
         let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
         let mut runner =
             GenetAppRunner::<_, _, _, ()>::new(dom.clone(), relation_view, State::default());
@@ -2900,6 +2956,9 @@ mod tests {
         assert_eq!(runner.state().relation_clicked, ["cites"]);
 
         let swatch = model(None, None).with_relations(vec![GraphCanvasRelation {
+            link_key: None,
+            marks: sceno::LinkMarks::default(),
+            strength: 1.0,
             id: "hidden".into(),
             from: 1,
             to: 2,
@@ -2913,41 +2972,95 @@ mod tests {
     }
 
     #[test]
-    fn parallel_relation_cells_fan_into_distinct_painted_routes() {
+    fn one_link_target_keeps_both_directions_opposition_and_strength_without_fanning() {
+        let key = sceno::LinkKey::new(sceno::LinkStratum::Surface, "1", "2");
+        let relation = |id: &str, from, to, marks| GraphCanvasRelation {
+            id: id.into(),
+            link_key: Some(key.clone()),
+            marks,
+            strength: 1.0,
+            from,
+            to,
+            kind: "reason".into(),
+            label: id.into(),
+            route: Vec::new(),
+            visible: true,
+            emphasized: false,
+        };
         let swatch = model(None, None).with_relations(vec![
-            GraphCanvasRelation {
-                id: "one".into(),
-                from: 1,
-                to: 2,
-                kind: "First".into(),
-                label: "First relation".into(),
-                route: Vec::new(),
-                visible: true,
-                emphasized: false,
+            relation(
+                "one",
+                1,
+                2,
+                sceno::LinkMarks {
+                    forward: true,
+                    reverse: false,
+                    opposed: true,
+                },
+            ),
+            relation(
+                "two",
+                2,
+                1,
+                sceno::LinkMarks {
+                    forward: true,
+                    reverse: false,
+                    opposed: false,
+                },
+            ),
+        ]);
+        assert_eq!(swatch.relations.len(), 1);
+        let (link, route) = &swatch.projected_relations()[0];
+        assert_eq!(link.id, key.stable_id());
+        assert_eq!(
+            link.marks,
+            sceno::LinkMarks {
+                forward: true,
+                reverse: true,
+                opposed: true
+            }
+        );
+        assert_eq!(link.strength, 2.0);
+        assert_eq!(
+            route.len(),
+            2,
+            "assertion count does not bend the resting path"
+        );
+    }
+
+    #[test]
+    fn stratum_strokes_remain_separate_without_assertion_lanes() {
+        let relation = |stratum| GraphCanvasRelation {
+            id: "ignored".into(),
+            link_key: Some(sceno::LinkKey::new(stratum, "1", "2")),
+            marks: sceno::LinkMarks {
+                forward: true,
+                ..Default::default()
             },
-            GraphCanvasRelation {
-                id: "two".into(),
-                from: 1,
-                to: 2,
-                kind: "Second".into(),
-                label: "Second relation".into(),
-                route: Vec::new(),
-                visible: true,
-                emphasized: false,
-            },
+            strength: 1.0,
+            from: 1,
+            to: 2,
+            kind: "link".into(),
+            label: "source pair".into(),
+            route: Vec::new(),
+            visible: true,
+            emphasized: false,
+        };
+        let swatch = model(None, None).with_relations(vec![
+            relation(sceno::LinkStratum::Surface),
+            relation(sceno::LinkStratum::Resource),
         ]);
         let routes = swatch.projected_relations();
         assert_eq!(routes.len(), 2);
-        assert_eq!(routes[0].1.len(), 4);
-        assert_eq!(routes[1].1.len(), 4);
-        assert_eq!(routes[0].1[0], routes[1].1[0]);
-        assert_eq!(routes[0].1[3], routes[1].1[3]);
-        let gap = (routes[0].1[1].1 - routes[1].1[1].1).abs();
-        assert!((gap - 12.0).abs() < 0.01, "pixel-stable lane gap: {gap}");
-        assert_eq!(
-            routes[0].1[1].1, routes[0].1[2].1,
-            "each relation holds its own lane through the graph interior"
+        assert_ne!(routes[0].0.id, routes[1].0.id);
+        assert!(
+            (routes[0].1[1].1 - routes[1].1[1].1).abs() > 5.9,
+            "both stratum strokes have distinct paint and pick paths"
         );
+        let mut hidden = swatch.clone();
+        hidden.relations[1].visible = false;
+        assert_eq!(hidden.projected_relations().len(), 1);
+        assert_eq!(hidden.projected_relations()[0].1.len(), 2);
     }
 
     #[test]

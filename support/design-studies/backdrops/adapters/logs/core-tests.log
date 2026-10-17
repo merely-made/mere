@@ -1,0 +1,28 @@
+    Blocking waiting for file lock on package cache
+    Updating git repository `https://github.com/merely-made/dramatis.git`
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling scenomise v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.72s
+     Running tests/backdrop_scenes.rs (target/build/debug/deps/backdrop_scenes-71f56c98c3d85961)
+
+running 7 tests
+test metre_uses_supplied_stress_and_keeps_mismatches_visible ... ok
+test ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts ... ok
+test ternary_template_keeps_actual_syllables_and_discloses_expected_extent ... ok
+test fretboard_shares_pitch_identity_but_keeps_occurrences_distinct ... ok
+test unknown_radio_positions_never_become_origin_nodes_or_fields ... ok
+test each_recipe_exports_a_valid_scene_without_product_authorities ... ok
+test invalid_coordinates_and_unknown_input_are_refused ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s

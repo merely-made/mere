@@ -1767,3 +1767,44 @@ To reproduce, build the current Graphshell web package, serve
 origin with `practice.html?scenario=scenarios/practice_reopen.scn`. For the
 component-in-wrapper check, open
 `practice-embed.html?scenario=scenarios/practice_embedded.scn` on that origin.
+
+### Template scene vertical framing (2026-10-16)
+
+**Status:** shared fitting and native Woodshed adoption qualified.
+
+Long template timelines currently shrink both axes through BoardFit, leaving
+labels and role alignments in a narrow band even when the host lends height.
+Pictograph's shared BackdropSurface will fit template Y coordinates to the
+available height independently, using the same transform for paint and inverse
+picking. Other scene kinds retain uniform instrument/map geometry. Source
+facts, musical spans, selection identities and document serialization stay
+authoritative. Done when the shared regression verifies row clearance and span
+edge picking, and Woodshed presents the revised scene in its native panel.
+
+Findings (2026-10-16): the 580 × 300 timeline now separates supplied and
+expected rows by about 49 pixels. The same two-axis transform drives inverse
+picking, including the lower edge of a stretched Card span. Fretboard fitting
+remains uniform. Five surface tests pass against the current source; see
+`validation/template-scene-height_20261016/tests.log`.
+
+Native adoption (2026-10-16): Woodshed `f683bbe` adopts shared source
+`52fb4900e`. Its 300px primary canvas passes 214 view cases, two native editor
+cases and the locked build. Three reviewed native captures show the separated
+rows and compact scrolling; the actual sealed Set and complete portable
+document equal the earlier fixture. Consumer evidence lives in
+`woodshed/validation/native-arrangement-spacing_20261016/receipt.json`.
+
+
+### Native arrangement interaction geometry (2026-10-16)
+
+**Status:** shared geometry qualified; Woodshed interaction adoption in progress.
+
+BackdropSurface now exposes forward/inverse viewport transforms and rectangular
+occurrence bounds through its existing fit. A host can opt into selected-span
+edge affordances. These queries carry no mutation authority or domain edit
+semantics. Woodshed owns beat snapping, draft preview, validation and Save.
+The shared regression exercises both progression and metre template specimens
+across three viewports, verifies round trips and visible-edge picking, and rejects
+invalid queries. Six surface tests pass (`validation/template-scene-interaction_20261016/tests.log`).
+A shared editing-intent API still requires a second concrete editing consumer;
+metre geometry evidence alone does not qualify source editing in Knot/Graphshell.

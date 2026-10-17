@@ -39,6 +39,7 @@ impl Canvas {
             self.set_physics_paused_quietly(true);
         } else if reverting {
             self.strategy_positions = None;
+            self.strategy_regions.clear();
             self.set_physics_paused_quietly(false);
         }
     }
@@ -57,18 +58,18 @@ impl Canvas {
         }
     }
 
-    /// Whether a strategy's layout depends on the **focus** (the single selection). Only radial
-    /// centers on it; for every other strategy a selection change must not invalidate the cached
-    /// layout. (Arrangements — the layout cache.)
+    /// Whether a strategy's layout depends on the **focus** (the single selection): radial
+    /// centers on it and Sets puts it in the core; for every other strategy a selection change
+    /// must not invalidate the cached layout. (Arrangements — the layout cache.)
     pub(crate) fn strategy_uses_focus(id: &str) -> bool {
-        id == "radial.default"
+        matches!(id, "radial.default" | "sets.default")
     }
 
-    /// Whether a strategy's inputs include the URL authority partition. Only
-    /// by-site kanban reads it; unrelated URL edits must not invalidate the
-    /// other analytic layouts.
+    /// Whether a strategy's inputs include the URL authority partition: by-site
+    /// kanban, Partition and Mosaic read it; unrelated URL edits must not invalidate
+    /// the other analytic layouts.
     fn strategy_uses_url_grouping(id: &str) -> bool {
-        id == "kanban.default"
+        matches!(id, "kanban.default" | "partition.default" | "mosaic.default")
     }
 
     /// Whether the active analytic layout must be recomputed: `true` when its inputs — the strategy,

@@ -1,0 +1,30 @@
+{
+  "source": "91467c0bbf6f92cc26262579dec634155ee33f2d",
+  "git_status": "",
+  "build_cwd": "/Users/markik/Code/repos/mere-link-model-p2-20261015/ports/graphshell/web",
+  "features": [
+    "product",
+    "presentation-webgpu"
+  ],
+  "locked": true,
+  "offline": true,
+  "bindgen": "0.2.129",
+  "files": {
+    "pkg-v2/graphshell_web.js": {
+      "bytes": 149342,
+      "sha256": "1a2749d733d3ec93e28855ff163b0214724b7ed83f386d35187cee56d454e950"
+    },
+    "pkg-v2/graphshell_web_bg.wasm": {
+      "bytes": 263042146,
+      "sha256": "6848b0103aa55abab0a75b941bf0e9edbc24d6c705a52143dbbd2ed805faa675"
+    },
+    "site/scenarios/p4_tree_link_rest.scn": {
+      "bytes": 3380,
+      "sha256": "2be18053c853ac0bbee60d8a1f542d7878ebabe4ba094976658e6d7308dbd3ca"
+    },
+    "site/scenarios/p4_tree_link_rest_reopen.scn": {
+      "bytes": 1233,
+      "sha256": "c13ee8a1cab413502734d4420df47e389e8f16aff8560200dbadd33766599551"
+    }
+  }
+}

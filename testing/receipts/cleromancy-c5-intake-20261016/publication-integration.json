@@ -1,0 +1,53 @@
+{
+  "schema": "mere.cleromancy-c5-publication-integration/v1",
+  "date": "2026-10-16",
+  "source": "fbac5567cc47f61e4794016d3cbb82461afee38a",
+  "integrated_origin_main": "5031ea5fa0cd6264cd701e8734bb6d86d750f494",
+  "core": "7b0c5ef604355c7140a6dbc64b53f14d0983c157",
+  "knot": "b6a6222ede48bacebbc5a533c5930bcab779cee5",
+  "native_product": "052e54ffb809390e5a0dacaf78e0811cd974c9b6",
+  "native_supplier": "72f9c5c73ab9ddd8ba761524388c2406a6d6ffcf",
+  "command": "cargo test --locked --offline -p djinn --test embedded_reservoir_validation",
+  "exit": 0,
+  "passed": 6,
+  "failed": 0,
+  "ignored": 1,
+  "ignore_reason": "The process-child entry is intentionally ignored by the outer runner and launched by its parent tests.",
+  "source_identity": "The gate started with the prepared lock later committed verbatim as fbac5567c; all other source inputs were already committed in8959684dc. No source changed during execution.",
+  "compatibility": {
+    "failed_source": "8959684dcb68b0ec5d5dc2288a77fc5b60ba4012",
+    "failed_exit": 101,
+    "error": "Pinned Knot0020a50 lacks RoutedRelation link_key, marks and strength added by upstream resting-link model.",
+    "fix": "Isolated published-Knot921b4e0-based checkpoint sets synthetic geometry link_key=None, marks=Default, strength=None; receiving lock changes only six Knot source identities. Its standalone lock qualifies separately against Mere5031ea5f."
+  },
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "46d09e76bad0718f9d8e188bdb491e66cae347e324f52cf6e4101b295aa6b977"
+    },
+    {
+      "path": "ports/djinn/tests/embedded_reservoir_validation.rs",
+      "sha256": "fa5f3efd103176fdc1411951bfe31889c129676a5e614c2fb5bf65b722d33de1"
+    }
+  ],
+  "logs": [
+    {
+      "path": "owner-publication-integrated.log",
+      "sha256": "a0bba588a8fb7a7707054458c7720b0dfea58305dc6b7234445ce92671a6006f"
+    },
+    {
+      "path": "owner-knot-compat.log",
+      "sha256": "ae91e260d0c2aba4aa34c0c248b3aba872726f7159b39d3c8f312a1ef6c0ea8e"
+    },
+    {
+      "path": "mere-knot-compat-lock.log",
+      "sha256": "d675d3c718d6d2abe34ff08dd982260b0cc5486c491809955f9e726cb2284b4d"
+    }
+  ],
+  "limits": [
+    "No replacement of frozen native or earlier owner receipts",
+    "No renewed Knot native qualification",
+    "Shared wall, release and startup performance retain separate gates"
+  ],
+  "lock_resolution_diagnostic": "mere-knot-compat-lock.log preserves the initial Cargo proposal, which advanced unrelated Genet/netrender families. That proposal was not adopted. The final receiving lock starts at8959684dc and changes only six Knot source identities; published supplier cohorts are preserved."
+}

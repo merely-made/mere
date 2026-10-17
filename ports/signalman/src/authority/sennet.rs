@@ -1,12 +1,17 @@
-//! Scoped public Sennet station identity, using the same sticky lock/loss
+//! Scoped Sennet station identity/material, using the same sticky lock/loss
 //! watch as Tucket. This route does not provision channel-encryption keys.
 use super::*;
-use personae::{IdentityError, IdentityProvider, sennet::SennetStationIdentity};
+use personae::{
+    IdentityError, IdentityProvider,
+    sennet::{SennetStationIdentity, SennetStationMaterial},
+};
 
 /// One public node number and its connection-lifetime custody guard.
 pub struct ReleasedSennetStation {
     /// Scoped public number; it does not authenticate RF senders.
     pub identity: SennetStationIdentity,
+    /// Transient device/realm child for immediate protocol construction only.
+    pub material: SennetStationMaterial,
     /// Retain until serial/protocol work has stopped.
     pub lease: StationCustodyLease,
 }
@@ -44,7 +49,13 @@ impl DjinnStationAuthority {
         }
         let identity = SennetStationIdentity::derive(&released, device.as_uuid().as_bytes(), realm)
             .map_err(CustodyClientError::Release)?;
+        let material = SennetStationMaterial::derive(&released, device.as_uuid().as_bytes(), realm)
+            .map_err(CustodyClientError::Release)?;
         lease.check()?;
-        Ok(ReleasedSennetStation { identity, lease })
+        Ok(ReleasedSennetStation {
+            identity,
+            material,
+            lease,
+        })
     }
 }

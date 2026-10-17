@@ -92,7 +92,7 @@ fn frozen_query_stays_exact_after_retraction_while_live_roster_changes() {
     assert!(frozen.members().contains(&a));
     assert!(frozen.members().contains(&b));
     assert_eq!(
-        frozen.statements()[0].semantic.as_ref().unwrap().statements[0].statement_id,
+        frozen.statements()[0].retained_assertions()[0].statement_id,
         claim
     );
     assert!(graph.retract_assertion(&claim));

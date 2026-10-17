@@ -1,0 +1,486 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling cfg-if v1.0.5
+   Compiling autocfg v1.5.1
+   Compiling smallvec v1.16.1
+   Compiling libm v0.2.16
+   Compiling serde v1.0.229
+   Compiling arrayvec v0.7.8
+   Compiling foldhash v0.2.0
+   Compiling equivalent v1.0.2
+   Compiling log v0.4.34
+   Compiling bitflags v2.13.2
+   Compiling cfg_aliases v0.2.2
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.14
+   Compiling parking_lot_core v0.9.12
+   Compiling once_cell v1.21.4
+   Compiling scopeguard v1.2.0
+   Compiling hashbrown v0.17.1
+   Compiling siphasher v1.0.3
+   Compiling objc2 v0.6.4
+   Compiling stable_deref_trait v1.2.1
+   Compiling thiserror v2.0.21
+   Compiling lock_api v0.4.14
+   Compiling num-traits v0.2.19
+   Compiling objc2-encode v4.1.0
+   Compiling fastrand v2.5.0
+   Compiling zerocopy v0.8.57
+   Compiling phf_shared v0.13.1
+   Compiling writeable v0.6.4
+   Compiling rustc-hash v1.1.0
+   Compiling litemap v0.8.3
+   Compiling phf_generator v0.13.1
+   Compiling bit-vec v0.9.1
+   Compiling unicode-width v0.2.2
+   Compiling utf8_iter v1.0.4
+   Compiling serde_json v1.0.151
+   Compiling icu_properties_data v2.3.0
+   Compiling linebender_resource_handle v0.1.1
+   Compiling bit-set v0.10.0
+   Compiling getrandom v0.4.3
+   Compiling static_assertions v1.1.0
+   Compiling codespan-reporting v0.13.1
+   Compiling phf_codegen v0.13.1
+   Compiling naga v30.0.1
+   Compiling typenum v1.20.1
+   Compiling new_debug_unreachable v1.0.6
+   Compiling icu_normalizer_data v2.3.0
+   Compiling polycool v0.4.0
+   Compiling raw-window-handle v0.6.2
+   Compiling sha1_smol v1.0.1
+   Compiling precomputed-hash v0.1.1
+   Compiling kurbo v0.13.1
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling jobserver v0.1.35
+   Compiling string_cache_codegen v0.6.1
+   Compiling indexmap v2.14.2
+   Compiling cc v1.6.0
+   Compiling parking_lot v0.12.5
+   Compiling web_atoms v0.2.6
+   Compiling objc2-core-foundation v0.3.2
+   Compiling block2 v0.6.2
+   Compiling string_cache v0.9.0
+   Compiling wgpu-hal v30.0.1
+   Compiling uuid v1.27.0
+   Compiling pin-project-lite v0.2.17
+   Compiling svg_fmt v0.4.5
+   Compiling object v0.39.1
+   Compiling tendril v0.5.1
+   Compiling libloading v0.8.9
+   Compiling simd-adler32 v0.3.10
+   Compiling simdutf8 v0.1.5
+   Compiling version_check v0.9.5
+   Compiling approx v0.5.1
+   Compiling tracing-core v0.1.36
+   Compiling matrixmultiply v0.3.11
+   Compiling wgpu-core v30.0.1
+   Compiling slotmap v1.1.1
+   Compiling crc32fast v1.5.2
+   Compiling futures-core v0.3.34
+   Compiling litrs v1.0.0
+   Compiling cpufeatures v0.3.1
+   Compiling blake3 v1.8.7
+   Compiling allocator-api2 v0.2.21
+   Compiling adler2 v2.0.1
+   Compiling objc2-foundation v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling num-integer v0.1.47
+   Compiling num-complex v0.4.6
+   Compiling hashbrown v0.16.1
+   Compiling document-features v0.2.12
+   Compiling wgpu v30.0.1
+   Compiling slab v0.4.12
+   Compiling icu_locale_fallback_data v2.3.0
+   Compiling rawpointer v0.2.1
+   Compiling constant_time_eq v0.4.2
+   Compiling rustversion v1.0.23
+   Compiling winnow v1.0.4
+   Compiling heck v0.5.0
+   Compiling vcpkg v0.2.15
+   Compiling foldhash v0.1.5
+   Compiling pkg-config v0.3.34
+   Compiling hashbrown v0.15.5
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling num-rational v0.4.2
+   Compiling miniz_oxide v0.9.1
+   Compiling libz-sys v1.1.29
+   Compiling glam v0.33.8
+   Compiling hybrid-array v0.4.15
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling wuff-capi v0.2.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling dtoa v1.0.11
+   Compiling fixedbitset v0.5.7
+   Compiling percent-encoding v2.3.2
+   Compiling fearless_simd v0.7.0
+   Compiling unicase v2.9.0
+   Compiling crossbeam-utils v0.8.23
+   Compiling icu_segmenter_data v2.3.0
+   Compiling dtoa-short v0.3.5
+   Compiling brotli-decompressor v5.0.3
+   Compiling form_urlencoded v1.2.2
+   Compiling mime_guess v2.0.5
+   Compiling flate2 v1.1.10
+   Compiling synstructure v0.14.0
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling miniz_oxide v0.8.9
+   Compiling stacker v0.1.25
+   Compiling fdeflate v0.3.7
+   Compiling byteorder v1.5.0
+   Compiling grid v1.0.1
+   Compiling bytes v1.12.1
+   Compiling robust v1.2.0
+   Compiling fnv v1.0.7
+   Compiling zerocopy-derive v0.8.57
+   Compiling phf_macros v0.13.1
+   Compiling profiling-procmacros v1.0.18
+   Compiling tracing-attributes v0.1.31
+   Compiling objc2-metal v0.3.2
+   Compiling munge_macro v0.4.7
+   Compiling strum_macros v0.28.0
+   Compiling nalgebra-macros v0.3.0
+   Compiling profiling v1.0.18
+   Compiling glob v0.3.4
+   Compiling munge v0.4.7
+   Compiling wuff v0.2.9
+   Compiling phf v0.13.1
+   Compiling png v0.18.1
+   Compiling spade v2.15.1
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.1
+   Compiling thiserror-impl v2.0.21
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling ptr_meta_derive v0.3.2
+   Compiling ar_archive_writer v0.5.3
+   Compiling bytemuck v1.25.2
+   Compiling ptr_meta v0.3.2
+   Compiling zerofrom v0.1.8
+   Compiling bytecheck_derive v0.8.3
+   Compiling tracing v0.1.44
+   Compiling strum v0.28.0
+   Compiling cssparser-macros v0.7.1
+   Compiling color v0.3.3
+   Compiling naga-types v30.0.1
+   Compiling font-types v0.12.5
+   Compiling markup5ever v0.39.0
+   Compiling safe_arch v1.2.0
+   Compiling wgpu-types v30.0.1
+   Compiling font-types v0.11.3
+   Compiling psm v0.1.32
+   Compiling async-trait v0.1.92
+   Compiling rancor v0.1.3
+   Compiling rkyv_derive v0.8.18
+   Compiling bytecheck v0.8.3
+   Compiling yoke v0.8.3
+   Compiling peniko v0.6.1
+   Compiling read-fonts v0.41.0
+   Compiling read-fonts v0.39.2
+   Compiling wide v1.7.1
+   Compiling fontsan v0.7.0
+   Compiling num-derive v0.5.1
+   Compiling futures-macro v0.3.34
+   Compiling cfb v0.7.3
+   Compiling enumn v0.1.14
+   Compiling rend v0.5.4
+   Compiling encoding_rs v0.8.42
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling crypto-common v0.2.2
+   Compiling objc2-quartz-core v0.3.2
+   Compiling euclid v0.22.14
+   Compiling mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/forme/curation)
+   Compiling sceno v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/sceno)
+   Compiling raw-window-metal v1.1.0
+   Compiling petgraph v0.8.3
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling numen v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/conatus/numen)
+   Compiling icu_locale_core v2.3.0
+   Compiling app_units v0.7.8
+   Compiling icu_collections v2.3.0
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling muniment v0.1.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/eidetic/muniment)
+   Compiling cssparser v0.37.0
+   Compiling guillotiere v0.7.0
+   Compiling block-buffer v0.12.1
+   Compiling half v2.7.1
+   Compiling vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling objc2-core-text v0.3.2
+   Compiling futures-intrusive v0.5.0
+   Compiling ordered-float v5.5.0
+   Compiling memmap2 v0.9.11
+   Compiling icu_provider v2.3.1
+   Compiling ena v0.14.4
+   Compiling parlance v0.1.0
+   Compiling const-oid v0.10.2
+   Compiling mime v0.3.17
+   Compiling num-conv v0.2.2
+   Compiling powerfmt v0.2.0
+   Compiling either v1.18.0
+   Compiling time-core v0.1.9
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_locale_fallback v2.3.0
+   Compiling deranged v0.5.8
+   Compiling downcast-rs v2.0.2
+   Compiling regex-syntax v0.8.11
+   Compiling futures-task v0.3.34
+   Compiling pollster v1.0.1
+   Compiling mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/forme/forme)
+   Compiling icu_segmenter v2.3.0
+   Compiling futures-util v0.3.34
+   Compiling rkyv v0.8.18
+   Compiling digest v0.11.3
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling scenograph v0.0.4 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenograph)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling time v0.3.55
+   Compiling command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/command-menu)
+   Compiling idna_adapter v1.2.2
+   Compiling regex-automata v0.4.18
+   Compiling idna v1.1.0
+   Compiling parley_data v0.10.0
+   Compiling accesskit v0.24.1
+   Compiling crossbeam-channel v0.5.17
+   Compiling url v2.5.8
+   Compiling infer v0.19.0
+   Compiling skrifa v0.44.0
+   Compiling harfrust v0.8.4
+   Compiling skrifa v0.42.1
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling simba v0.10.2
+   Compiling chartulary v0.2.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/eidetic/chartulary)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling lazy_static v1.5.0
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling web-time v1.1.0
+   Compiling core_detect v1.0.0
+   Compiling multiversion_no_op v1.0.0
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling sharded-slab v0.1.7
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling scenomise v0.0.5 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise)
+   Compiling matchers v0.2.0
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling glifo v0.4.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling vello_cpu v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/graph/graph-kernel)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling sha2 v0.11.0
+   Compiling scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenotime)
+   Compiling armillary v0.1.1 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/armillary)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling tracing-log v0.2.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling thread_local v1.1.10
+   Compiling base64 v0.22.1
+   Compiling data-url v0.3.2
+   Compiling nu-ansi-term v0.50.3
+   Compiling tinct v0.1.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/tinct)
+   Compiling esp v0.1.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/intel/esp)
+   Compiling emblem v0.2.0
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling tracing-subscriber v0.3.23
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/chirograph)
+   Compiling nalgebra v0.35.0
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+   Compiling wgpu-core-deps-apple v30.0.1
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1021:19
+     |
+1021 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#e37762d7)
+warning: method `upsert_persisted_statement` is never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:468:19
+    |
+323 | impl SemanticData {
+    | ----------------- method in this implementation
+...
+468 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:285:19
+    |
+ 57 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+285 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+298 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+320 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+344 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: methods `append_node_property`, `add_node_classification`, `remove_node_classification`, `set_node_classification_status`, and `set_node_primary_classification` are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:92:19
+    |
+ 85 | impl Graph {
+    | ---------- methods in this implementation
+...
+ 92 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 95 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+116 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `replay_assert_relation_by_ids`, `replay_set_edge_semantic_predicate_by_ids`, `dissolve_remove_node_collect_traversals`, `assert_surface_persisted_semantic_statement`, `replay_retract_relations`, and `set_edge_semantic_predicate` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:252:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+252 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+268 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+337 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+524 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+621 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+757 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling glamx v0.3.1
+   Compiling parry2d v0.31.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/cartography)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)
+   Compiling rapier2d v0.36.0
+warning: `mere-kernel` (lib) generated 13 warnings (run `cargo fix --lib -p mere-kernel` to apply 6 suggestions)
+   Compiling seiche v0.0.6 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/conatus/seiche)
+   Compiling pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/canvas/pictograph)
+warning: function `build_affinity_spring` is never used
+  --> crates/canvas/pictograph/src/canvas.rs:66:4
+   |
+66 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pictograph` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 54s
+     Running `target/debug/examples/backdrop_receipt support/design-studies/backdrops/templates/receipt support/design-studies/backdrops/templates`
+Production surface frames and selection controls passed: support/design-studies/backdrops/templates/receipt

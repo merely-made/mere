@@ -31,6 +31,18 @@ pub struct Projection {
     /// Strategy-specific metadata. Free-form to keep the contract
     /// open to strategies that need to communicate state out-of-band.
     pub metadata: ProjectionMetadata,
+    /// Regions a bounded arrangement draws (Partition's enclosures and
+    /// remainder, Sets' circles and cores), in world coordinates.
+    #[serde(default)]
+    pub regions: Vec<ProjectedRegion>,
+}
+
+/// One region of a solved scene, its members as graph nodes.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ProjectedRegion {
+    pub contour: Vec<PortablePoint>,
+    pub label: Option<String>,
+    pub members: Vec<NodeKey>,
 }
 
 impl Projection {

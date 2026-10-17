@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "source": {
+    "adapter": "fixture.scene",
+    "id": "fretboard"
+  },
+  "revision": "illustrative-v1",
+  "title": "Open C major",
+  "facts": {
+    "kind": "fretboard",
+    "data": {
+      "strings": [
+        {
+          "label": "e",
+          "open_midi": 64
+        },
+        {
+          "label": "B",
+          "open_midi": 59
+        },
+        {
+          "label": "G",
+          "open_midi": 55
+        },
+        {
+          "label": "D",
+          "open_midi": 50
+        },
+        {
+          "label": "A",
+          "open_midi": 45
+        },
+        {
+          "label": "E",
+          "open_midi": 40
+        }
+      ],
+      "frets": 5,
+      "positions": [
+        {
+          "key": "string-1-fret-0",
+          "source": {
+            "adapter": "fixture.pitch-class",
+            "id": "4"
+          },
+          "string_index": 0,
+          "fret": 0,
+          "pitch_class": 4,
+          "label": "E",
+          "role": "third"
+        },
+        {
+          "key": "string-2-fret-1",
+          "source": {
+            "adapter": "fixture.pitch-class",
+            "id": "0"
+          },
+          "string_index": 1,
+          "fret": 1,
+          "pitch_class": 0,
+          "label": "C",
+          "role": "root"
+        },
+        {
+          "key": "string-3-fret-0",
+          "source": {
+            "adapter": "fixture.pitch-class",
+            "id": "7"
+          },
+          "string_index": 2,
+          "fret": 0,
+          "pitch_class": 7,
+          "label": "G",
+          "role": "fifth"
+        },
+        {
+          "key": "string-4-fret-2",
+          "source": {
+            "adapter": "fixture.pitch-class",
+            "id": "4"
+          },
+          "string_index": 3,
+          "fret": 2,
+          "pitch_class": 4,
+          "label": "E",
+          "role": "third"
+        },
+        {
+          "key": "string-5-fret-3",
+          "source": {
+            "adapter": "fixture.pitch-class",
+            "id": "0"
+          },
+          "string_index": 4,
+          "fret": 3,
+          "pitch_class": 0,
+          "label": "C",
+          "role": "root"
+        }
+      ]
+    }
+  }
+}

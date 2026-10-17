@@ -133,8 +133,8 @@ fn profile_graph() -> Graph {
         from_node_id: a.id().to_string(),
         to_node_id: b.id().to_string(),
         families: vec![PersistedEdgeFamily::Semantic],
-        semantic: Some(PersistedSemanticEdgeData {
-            statements: ["resource one", "resource\n二"]
+        assertions: Some(
+            ["resource one", "resource\n二"]
                 .into_iter()
                 .enumerate()
                 .map(|(index, id)| PersistedSemanticStatement {
@@ -150,8 +150,8 @@ fn profile_graph() -> Graph {
                     withdrawn: None,
                 })
                 .collect(),
-            ..Default::default()
-        }),
+        ),
+        semantic: None,
         traversal: None,
         containment: None,
         arrangement: None,

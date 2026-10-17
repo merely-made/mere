@@ -90,6 +90,11 @@ fn projected_signal_buckets_keep_surface_edges_aliases_and_numerical_parity() {
         let mut edge = content.clone();
         edge.from_node_id = graph.get_node(hub).unwrap().id.to_string();
         edge.to_node_id = graph.get_node(target).unwrap().id.to_string();
+        for assertion in edge.retained_assertions_mut() {
+            assertion
+                .statement_id
+                .push_str(&format!("-surface-{}", target.index()));
+        }
         recorded.edges.push(edge);
     }
     recorded.resources.clear();
