@@ -1,0 +1,29 @@
+{
+  "command": [
+    "/Users/markik/.rustup/toolchains/1.99.0-aarch64-apple-darwin/bin/cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "djinn",
+    "--lib",
+    "natal_",
+    "--",
+    "--nocapture"
+  ],
+  "environment": {
+    "TMPDIR": "/tmp",
+    "CARGO_BUILD_JOBS": "2",
+    "RUSTC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustc",
+    "RUSTDOC": "/Users/markik/.rustup/toolchains/1.97.1-aarch64-apple-darwin/bin/rustdoc"
+  },
+  "source": "8c8e048ea520053d32ff788d64cb7d0816dbff08",
+  "started": "2026-10-17T12:49:23.702192+00:00",
+  "inputs": {
+    "Cargo.lock": "4e2da33510eed8a0bd48933bdda0398e0d0abf8bf3be6fb3df575bfd333b240c",
+    "ports/djinn/src/resident_mere.rs": "76f98cb3fd2245e08f20b4b1d4869151a9c33714e7cfb9194852717b0d6f3a7d"
+  },
+  "exit_code": 0,
+  "finished": "2026-10-17T12:49:30.486908+00:00",
+  "log_sha256": "e6c75964e5799b2d57b528fc8554eca99b73e35610129ec937379e4d54f1cd24"
+}
