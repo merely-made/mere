@@ -474,7 +474,8 @@ impl EmbeddedOwner {
             catalog.clone(),
             grants.clone(),
             options.applications.clone(),
-        );
+        )
+        .with_profile_subject_authority(host.clone());
         let routes = configure(routes)
             .await
             .map_err(ReservoirAttachmentError::Embedded)?;

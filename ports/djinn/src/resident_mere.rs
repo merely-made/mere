@@ -103,6 +103,8 @@ pub struct MereRoutes {
     inner: Arc<Routes>,
 }
 
+type ProfileLookup = Arc<dyn Fn(&personae::ProfileId) -> Result<bool, String> + Send + Sync>;
+
 struct Routes {
     shared_root: PathBuf,
     persona: PersonaId,
@@ -110,6 +112,7 @@ struct Routes {
     grants: AppRouteGrants,
     apps: Vec<AppId>,
     validators: BTreeMap<String, pandect::GraphValidator>,
+    profile_lookup: Option<ProfileLookup>,
     /// The dialable projection host's catalog, when one serves these routes
     /// to remote peers (remote mere route admission note, §6).
     remote: Option<graphshell_host::projection_host::SharedCatalog>,
@@ -129,14 +132,32 @@ impl MereRoutes {
                 cleromancy_domain::host::validate_divination_graph(graph)
                     .map_err(|error| error.to_string())
             }),
-        ).with_personal_facts_authority()
+        )
+        .with_personal_facts_authority()
     }
 
     /// Install the same biographical-fact rules in daemon and embedded owners.
     pub fn with_personal_facts_authority(self) -> Self {
         let persona = self.inner.persona.as_uuid().to_string();
-        self.with_domain_validator(personal_facts::DOMAIN, Arc::new(move |graph| personal_facts::validate_for_persona(graph, &persona)))
+        self.with_domain_validator(
+            personal_facts::DOMAIN,
+            Arc::new(move |graph| personal_facts::validate_for_persona(graph, &persona)),
+        )
     }
+    /// Resolve newly introduced profile subjects through the actual owner vault.
+    /// Existing admitted references continue to replay after profile deletion.
+    pub fn with_profile_subject_authority<S: castellan::custody::IdentityStorage + 'static>(
+        mut self,
+        host: Arc<castellan::authority::PersonaeHost<S>>,
+    ) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("set profile authority before serving routes")
+            .profile_lookup = Some(Arc::new(move |id| {
+            Ok(host.with_profile_authority(id, || true).unwrap_or(false))
+        }));
+        self
+    }
+
     /// Routes for `persona`'s meres, registered in `catalog` and granted to
     /// `apps` as each is served.
     pub fn new(
@@ -154,6 +175,7 @@ impl MereRoutes {
                 grants,
                 apps,
                 validators: BTreeMap::new(),
+                profile_lookup: None,
                 remote: None,
                 served: Mutex::new(BTreeMap::new()),
                 access: Mutex::new(BTreeMap::new()),
@@ -285,8 +307,12 @@ impl MereRoutes {
         let domain = mere.domain.to_string();
         // Product records must never be writable under generic graph authority.
         // Both daemon and embedded composition install the same product callback.
-        if matches!(domain.as_str(), "divination" | "personal-facts") && !self.inner.validators.contains_key(&domain) {
-            return Err(format!("{domain} domain authority is not composed into this resident"));
+        if matches!(domain.as_str(), "divination" | "personal-facts")
+            && !self.inner.validators.contains_key(&domain)
+        {
+            return Err(format!(
+                "{domain} domain authority is not composed into this resident"
+            ));
         }
         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
@@ -299,6 +325,18 @@ impl MereRoutes {
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
             validator: self.inner.validators.get(&domain).cloned(),
+            admission_validator: if domain == personal_facts::DOMAIN {
+                let lookup = self.inner.profile_lookup.clone();
+                Some(Arc::new(move |before, after| {
+                    personal_facts::validate_new_profile_subjects(before, after, |id| match &lookup
+                    {
+                        Some(resolve) => resolve(id),
+                        None => Err("profile subjects require the resident vault authority".into()),
+                    })
+                }))
+            } else {
+                None
+            },
             archive: open_mere_archive_backend(
                 &self.inner.shared_root,
                 self.inner.persona,
@@ -324,14 +362,8 @@ impl MereRoutes {
             let mut remote = remote
                 .lock()
                 .map_err(|_| "the remote catalog lock is poisoned".to_string())?;
-            register_mere_routes(
-                &mut remote,
-                &route,
-                &ambient,
-                &shared,
-                &grants,
-            )
-            .map_err(|error| error.to_string())?;
+            register_mere_routes(&mut remote, &route, &ambient, &shared, &grants)
+                .map_err(|error| error.to_string())?;
         }
         for app in &self.inner.apps {
             self.inner.grants.grant(app.clone(), route.clone());
@@ -456,7 +488,11 @@ impl ProjectionSource for AccessEndpoint {
             return Err("ambient routes expose graph material only".into());
         }
         let mut snapshot = self.endpoint.snapshot(request)?;
-        if matches!(self.endpoint.shared.domain.as_str(), "divination" | "personal-facts") && snapshot.session.0 == MERE_GRAPH {
+        if matches!(
+            self.endpoint.shared.domain.as_str(),
+            "divination" | "personal-facts"
+        ) && snapshot.session.0 == MERE_GRAPH
+        {
             for binding in &snapshot.presentation.bindings {
                 if binding.instance != InstanceId(0) {
                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {
@@ -592,6 +628,7 @@ type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 struct MereShared {
     domain: String,
     validator: Option<pandect::GraphValidator>,
+    admission_validator: Option<pandect::GraphAdmissionValidator>,
     backend: DirectoryBackend,
     archive: RedbBackend,
     persona: PersonaId,
@@ -682,6 +719,10 @@ impl MereShared {
         .map_err(|error| error.to_string())?
         .with_projection_session(ProjectionSession(MERE_GRAPH.to_string()))
         .with_session_item();
+        let host = match &self.admission_validator {
+            Some(validator) => host.with_graph_admission_validator(validator.clone()),
+            None => host,
+        };
         let host = Arc::new(Mutex::new(host));
         hosts.insert(id, Arc::clone(&host));
         Ok(host)
@@ -1553,7 +1594,9 @@ impl MereEndpoint {
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
-        if matches!(self.shared.domain.as_str(), "divination" | "personal-facts") && intent.target != InstanceId(0) {
+        if matches!(self.shared.domain.as_str(), "divination" | "personal-facts")
+            && intent.target != InstanceId(0)
+        {
             return Ok(IntentResult::Rejected {
                 reason: "domain writes require a complete journaled session candidate".into(),
             });
@@ -1986,6 +2029,19 @@ mod tests {
             grants.clone(),
             vec![AppId::new("turnstone"), AppId::new("knot-editor")],
         );
+        let storage = castellan::custody::InMemoryStorage::new();
+        let profile = castellan::custody::Profile::new(
+            personae::ProfileId("fixture-profile".into()),
+            "Public fixture profile",
+            personae::Ed25519Keypair::from_seed([0x33; 32]),
+        );
+        castellan::custody::IdentityStorage::save_profile(&storage, &profile).unwrap();
+        let owner = Arc::new(castellan::authority::PersonaeHost::new(
+            castellan::custody::IdentityVault::with_profile(storage, profile),
+            None,
+            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
+        ));
+        let routes = routes.with_profile_subject_authority(owner);
         let routes = if let Some(validator) = validator {
             routes.with_domain_validator(domain, validator)
         } else {
@@ -2544,11 +2600,12 @@ mod tests {
             use transport::PeerID;
             let device_peer =
                 PeerID::from_bytes(&self.device.master_public_key().to_bytes()).unwrap();
-            let host_peer =
-                PeerID::from_bytes(&personae::InMemoryProvider::from_seed([0x66; 32])
+            let host_peer = PeerID::from_bytes(
+                &personae::InMemoryProvider::from_seed([0x66; 32])
                     .master_public_key()
-                    .to_bytes())
-                .unwrap();
+                    .to_bytes(),
+            )
+            .unwrap();
             let (server, client) = transport::memory::MemoryTransport::pair(host_peer, device_peer);
             let hello = graphshell_host::admission::open_session_for(
                 &self.device,
@@ -2605,9 +2662,8 @@ mod tests {
             .dial(&mut host, &request, grant)
             .await
             .expect("the device is admitted");
-        let profile = chirograph::CapabilityProfile::new([
-            chirograph::PresentationCapability::PortableCard,
-        ]);
+        let profile =
+            chirograph::CapabilityProfile::new([chirograph::PresentationCapability::PortableCard]);
         let mut pump = LinePump::new(stream);
         let opened = pump.open(profile.clone()).await.expect("the route opens");
         let mut panel =
@@ -2647,9 +2703,8 @@ mod tests {
             writer.invoke(apply(&start, vec![node(1)])).unwrap(),
             IntentResult::Accepted
         );
-        let profile = chirograph::CapabilityProfile::new([
-            chirograph::PresentationCapability::PortableCard,
-        ]);
+        let profile =
+            chirograph::CapabilityProfile::new([chirograph::PresentationCapability::PortableCard]);
 
         // The grant names knot-editor; the hello asks as turnstone. The chain
         // covers the path no more than it covers the application: refused at
@@ -2665,7 +2720,10 @@ mod tests {
         // A broad grant (every mere) admits nothing here: the leaf must name
         // the application.
         let grant = dialler.grant(mere_overmap::wire::REMOTE_MERE_SERVICE, "connect");
-        let stream = dialler.dial(&mut host, &asked, grant).await.expect("admitted");
+        let stream = dialler
+            .dial(&mut host, &asked, grant)
+            .await
+            .expect("admitted");
         assert!(
             LinePump::new(stream).open(profile.clone()).await.is_err(),
             "a grant that names no application serves no route"
@@ -2682,7 +2740,10 @@ mod tests {
         // An ambient grant for an application the owner has not opted in:
         // admitted, but the route will not open for it.
         let grant = dialler.grant(&ambient.path(), ambient.action());
-        let stream = dialler.dial(&mut host, &ambient, grant).await.expect("admitted");
+        let stream = dialler
+            .dial(&mut host, &ambient, grant)
+            .await
+            .expect("admitted");
         assert!(
             LinePump::new(stream).open(profile.clone()).await.is_err(),
             "ambient needs the owner's opt-in"
@@ -2709,7 +2770,10 @@ mod tests {
             .await
             .unwrap();
         let grant = dialler.grant(&ambient.path(), ambient.action());
-        let stream = dialler.dial(&mut host, &ambient, grant).await.expect("admitted");
+        let stream = dialler
+            .dial(&mut host, &ambient, grant)
+            .await
+            .expect("admitted");
         let opened = LinePump::new(stream)
             .open(profile)
             .await
@@ -2941,7 +3005,12 @@ mod tests {
             None,
             "the route takes Knot's merge into source"
         );
-        let pending = overlay.read().await.unwrap().merge.expect("a pending merge");
+        let pending = overlay
+            .read()
+            .await
+            .unwrap()
+            .merge
+            .expect("a pending merge");
         assert_eq!(pending.source, branch);
         assert_eq!(pending.conflicts.len(), 1, "the title conflicts");
         let key = pending.conflicts[0].key.clone();
@@ -3002,11 +3071,11 @@ mod tests {
     #[tokio::test(flavor = "multi_thread")]
     async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {
         use crate::door::app_broker::serve_app_broker;
-        use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
         };
+        use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;
         use graphshell_endpoint::door::tasks::ResidentTasks;
         use personae::{Ed25519Keypair, ProfileId};
         let fixture = fixture(33, "divination").await;
@@ -3811,29 +3880,99 @@ mod tests {
         let mut candidate = disclosed_graph(&mut first, &start).into_graph().unwrap();
         let edits = Arc::new(std::sync::Mutex::new(Vec::new()));
         let held = edits.clone();
-        candidate.set_recorder(Some(Arc::new(move |d| held.lock().unwrap().push(d.clone()))));
-        let scope = fixture.reservoir.meres().await[0].persona.as_uuid().to_string();
-        let subject = personal_facts::create_contact(&mut candidate, &scope, gaz::LocalId::from_random([3;16]), "Synthetic subject").unwrap();
+        candidate.set_recorder(Some(Arc::new(move |d| {
+            held.lock().unwrap().push(d.clone())
+        })));
+        let scope = fixture.reservoir.meres().await[0]
+            .persona
+            .as_uuid()
+            .to_string();
+        let subject = personal_facts::create_contact(
+            &mut candidate,
+            &scope,
+            gaz::LocalId::from_random([3; 16]),
+            "Synthetic subject",
+        )
+        .unwrap();
         let facts: dramatis::birth::BirthFacts = serde_json::from_value(serde_json::json!({
             "schema":"dramatis.birth-facts/v1", "subject":subject,
             "date":{"year":2000,"month":1,"day":1}, "time":"Unknown",
             "place":null,"timezone":null,"source":{"label":"Public test","reference":null}
-        })).unwrap();
+        }))
+        .unwrap();
         let expected = personal_facts::save_birth(&mut candidate, &facts).unwrap();
         let steps = edits.lock().unwrap().clone();
-        assert_eq!(first.invoke(apply(&start, steps)).unwrap(), IntentResult::Accepted);
+        assert_eq!(
+            first.invoke(apply(&start, steps)).unwrap(),
+            IntentResult::Accepted
+        );
         let shared = graph(&mut second);
         let data = disclosed_graph(&mut second, &shared).into_graph().unwrap();
-        assert_eq!(personal_facts::births(&data).unwrap(), vec![expected.clone()]);
+        assert_eq!(
+            personal_facts::births(&data).unwrap(),
+            vec![expected.clone()]
+        );
         let before = serde_json::to_value(disclosed_graph(&mut second, &shared)).unwrap();
         let id = kernel::graph::Graph::node_namespace_id(&expected.resource.id);
         let mut changed = facts;
         changed.date.day = 2;
-        assert!(matches!(second.invoke(apply(&shared, vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
-            node_id:id.to_string(), facet:personal_facts::BIRTH_FACET.into(), value_json:serde_json::to_string(&changed).unwrap()
-        }])).unwrap(), IntentResult::Rejected{..}));
+        assert!(matches!(
+            second
+                .invoke(apply(
+                    &shared,
+                    vec![pandect::CapturedDelta::ReplaySetNodeFacetById {
+                        node_id: id.to_string(),
+                        facet: personal_facts::BIRTH_FACET.into(),
+                        value_json: serde_json::to_string(&changed).unwrap()
+                    }]
+                ))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
         let after = graph(&mut second);
-        assert_eq!(serde_json::to_value(disclosed_graph(&mut second, &after)).unwrap(), before);
+        assert_eq!(
+            serde_json::to_value(disclosed_graph(&mut second, &after)).unwrap(),
+            before
+        );
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn profile_subject_admission_uses_owner_vault_and_refuses_fabricated_ids() {
+        let fixture = fixture(0x50524f, "personal-facts").await;
+        let mut app = fixture.attach("turnstone").await;
+        let mut other = fixture.attach("knot-editor").await;
+        for (profile, accept) in [("fabricated-profile", false), ("fixture-profile", true)] {
+            let before = graph(&mut app);
+            let envelope = disclosed_graph(&mut app, &before);
+            let mut candidate = envelope.clone().into_graph().unwrap();
+            let edits = Arc::new(std::sync::Mutex::new(Vec::new()));
+            let held = edits.clone();
+            candidate.set_recorder(Some(Arc::new(move |d| {
+                held.lock().unwrap().push(d.clone())
+            })));
+            let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({"schema":"dramatis.birth-facts/v1","subject":{"Profile":{"id":profile}},"date":{"year":2000,"month":1,"day":1},"time":"Unknown","place":null,"timezone":null,"source":{"label":"Public profile-admission fixture","reference":null}})).unwrap();
+            personal_facts::save_birth(&mut candidate, &facts).unwrap();
+            let outcome = app
+                .invoke(apply(&before, edits.lock().unwrap().clone()))
+                .unwrap();
+            if accept {
+                assert_eq!(outcome, IntentResult::Accepted);
+            } else {
+                assert!(matches!(outcome, IntentResult::Rejected { .. }));
+                let after = graph(&mut app);
+                assert_eq!(
+                    serde_json::to_value(disclosed_graph(&mut app, &after)).unwrap(),
+                    serde_json::to_value(envelope).unwrap()
+                );
+            }
+        }
+        let shared = graph(&mut other);
+        assert_eq!(
+            personal_facts::births(&disclosed_graph(&mut other, &shared).into_graph().unwrap())
+                .unwrap()
+                .len(),
+            1
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]
@@ -4619,8 +4758,8 @@ mod tests {
         );
 
         // The model shows the route: the mere, its one session attached, and
-        // that session's graph. Three relations share one pair and stay
-        // apart, each by its family (§7 item 43).
+        // that session's graph. The shared link grammar paints one pair while
+        // its admitted graph retains the three distinct source assertions.
         let first = read_route(&mut knot);
         assert_eq!(first.model.title, "notes");
         assert!(first.model.can_mint);
@@ -4658,14 +4797,34 @@ mod tests {
             .map(|relation| relation.provenance.token())
             .collect();
         kinds.sort();
-        assert_eq!(kinds, ["containment", "semantic", "semantic"]);
+        assert_eq!(kinds, ["link.surface"]);
+        let projected = graph(&mut knot);
+        let material = disclosed_graph(&mut knot, &projected).into_graph().unwrap();
+        let source_kinds: Vec<_> = material.relations().map(|r| r.kind).collect();
+        assert_eq!(source_kinds.len(), 3);
+        assert!(
+            source_kinds.contains(&kernel::graph::RelationKind::Containment(
+                ContainmentSubKind::UserFolder
+            ))
+        );
+        assert!(
+            source_kinds.contains(&kernel::graph::RelationKind::Semantic(
+                SemanticSubKind::Hyperlink
+            ))
+        );
+        assert!(
+            source_kinds.contains(&kernel::graph::RelationKind::Semantic(
+                SemanticSubKind::UserGrouped
+            ))
+        );
         let mut keys: Vec<&str> = relations
             .iter()
             .map(|relation| relation.key.as_str())
             .collect();
         keys.sort();
         keys.dedup();
-        assert_eq!(keys.len(), 3, "each relation keeps its own key");
+        assert_eq!(keys.len(), 1, "the canonical pair keeps one link key");
+        assert!(!keys[0].is_empty());
 
         // Mint, then fork the attached session from the first list, which the
         // mint has moved past (§7 item 33).
@@ -4694,7 +4853,10 @@ mod tests {
             .collect();
         assert_eq!(attached, [fork]);
         assert_eq!(switched.model.graph.nodes.len(), 2);
-        assert_eq!(switched.model.graph.relations.len(), 3);
+        assert_eq!(switched.model.graph.relations.len(), 1);
+        let projected = graph(&mut knot);
+        let fork_graph = disclosed_graph(&mut knot, &projected).into_graph().unwrap();
+        assert_eq!(fork_graph.relations().count(), 3);
 
         // Trash the minted session and restore it. A step its card does not
         // offer now is declined with the route's reason.

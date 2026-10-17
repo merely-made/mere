@@ -1780,3 +1780,22 @@ and the consumer retains an immutable authorized snapshot without moving
 Chatelaine autofill or credential custody. Numerical and native consumer
 qualification stay with Cleromancy. Implementation is in progress; no completion
 is inferred from the plain supplier types or the existing V1-V5 receipts.
+
+### Shared personal facts admission hardening (2026-10-17)
+
+The real daemon and embedded owner now resolve newly introduced profile subjects
+against their vault before journaling. Contact references require their retained
+same-persona contact resource. Historical replay remains structural and permits
+previously admitted facts after profile deletion. The transition hook follows
+staged transactions and forks. Thirteen personal-facts, 327 Pandect and 213 Djinn
+library tests pass; the two-application fresh-owner-process fixture passes, with
+its child entry point intentionally ignored by the direct harness. The owner
+route separately rejects an invented profile without changing its envelope and
+admits the actual stored profile. The library rerun uses TMPDIR=/tmp and updates
+the inherited lifecycle assertion to the canonical link.surface presentation,
+while verifying all three underlying source relations remain distinct. Earlier
+SUN_LEN and stale-link assertion failures remain diagnostic evidence.
+
+See [the bounded software receipt](../receipts/personal-facts-20261017/qualification.json).
+Cleromancy native intake and the daemon's new natal portable-validator intake
+are separate subsequent gates; this does not renew the full shared browser wall.
