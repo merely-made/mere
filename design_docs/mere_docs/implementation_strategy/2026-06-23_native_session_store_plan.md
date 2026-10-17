@@ -1,7 +1,7 @@
 # Mere-native session + storage store
 
 **Date**: 2026-06-23
-**Status (2026-10-06):** the HTTP and durable session layers are live in
+**Status (2026-10-17):** the HTTP and durable session layers are live in
 `crates/system/fetch` (threads 1-5 and the incremental persistence: `2fa18ad`,
 `6bbe6f4`, netfetcher `7c22a65`, `514334c`). Cookie custody and a flush on each
 event-loop drain are in Turnstone (`turnstone/src/cookie_custody.rs`,
@@ -12,6 +12,14 @@ event-loop drain are in Turnstone (`turnstone/src/cookie_custody.rs`,
 is wired in mere, genet or Turnstone, so no script writes reach the jar. Open: a
 script cookie provider, durable `StorageProvider` backing, flip-back SESSION import,
 the per-persona jar registry, and the `Partitioned` / top-level-site refinements.
+
+HTTP acquisition provenance was repaired for Turnstone R1 on 2026-10-17:
+actor page progress now reports netfetcher's actual final URL and exact complete
+body after a successful capped HTTP read. Utility fetch signatures stay the
+same. A same-address new PageLoad request receives a new acquisition time;
+fragments within that request retain its first acquisition time. These are
+transport/load facts, not authority to retain a page body. Turnstone owns its
+explicit capture, Keep, retention policy and save acknowledgement.
 
 Earlier status: Immediate HTTP/session work landed; 2026-07-04 reconciliation found
 the scripted-rung cookie wiring has also landed. Remaining native-session work is
@@ -299,3 +307,21 @@ jar to follow the active persona:
   dated status (fetch layers live, custody and drain flush in Turnstone, the scripted
   cookie wiring retired with meerkat, no script `CookieProvider` wired), meerkat's
   ownership noted gone, and the persist-trigger question left open for this plan's lane.
+
+- **2026-10-17 (Turnstone R1 HTTP source intake).** The first headed app check
+  exposed missing HTTP response provenance: the interactive HTTP path never
+  called its existing progress observer, leaving hosts without the final URL.
+  The observer now receives the complete exact body and final response URL
+  after success and cap checks, before the terminal outcome; network, status
+  and cap failures do not announce a completed source. No requested-address
+  fallback is invented. PageLoad also stops borrowing a previous same-address
+  request's acquisition time while preserving its displayed document until
+  replacement. Qualification is recorded with Turnstone's R1 integration at
+  `turnstone/docs/receipts/r1_source_keep_20261017/`; this does not close the
+  independent cookie/localStorage/session-import tails above.
+
+  The [supplier receipt](../../../validation/http-source-provenance-20261017/receipt.json)
+  records 34 fetch and 12 PageLoad passes, including real actor progress-before-
+  terminal ordering with cookie continuity, redirects, body-cap and attachment
+  controls, and repeated-address context isolation. Manifests and lock stay
+  unchanged; full-workspace and native-host qualification are separate.
