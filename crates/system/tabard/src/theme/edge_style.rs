@@ -50,72 +50,6 @@ pub enum EdgeAccessibilityMode {
     Monochrome,
 }
 
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
-)]
-pub enum EdgeStyleKey {
-    Hidden,
-    Hyperlink,
-    UserGrouped,
-    AgentDerived,
-    TraversalHistory,
-    ContainmentUrlPath,
-    ContainmentDomain,
-    ArrangementFrameMember,
-    ArrangementTileGroup,
-    ArrangementSplitPair,
-    ImportedRelation,
-}
-
-impl EdgeStyleKey {
-    pub fn family(self) -> Option<EdgeStyleFamily> {
-        match self {
-            Self::Hidden => None,
-            Self::Hyperlink | Self::UserGrouped | Self::AgentDerived => {
-                Some(EdgeStyleFamily::Semantic)
-            },
-            Self::TraversalHistory => Some(EdgeStyleFamily::Traversal),
-            Self::ContainmentUrlPath | Self::ContainmentDomain => {
-                Some(EdgeStyleFamily::Containment)
-            },
-            Self::ArrangementFrameMember
-            | Self::ArrangementTileGroup
-            | Self::ArrangementSplitPair => Some(EdgeStyleFamily::Arrangement),
-            Self::ImportedRelation => Some(EdgeStyleFamily::Imported),
-        }
-    }
-
-    pub fn non_color_signature(self) -> Option<(EdgeStrokePattern, EdgeEndpointMarker)> {
-        self.family().map(|_| {
-            let token = EdgeStyleRegistry::default().token_for(self, 0.0);
-            (token.pattern, token.end_marker)
-        })
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct EdgeStyleToken {
-    pub color: Srgb,
-    pub width: f32,
-    pub pattern: EdgeStrokePattern,
-    pub opacity: f32,
-    pub end_marker: EdgeEndpointMarker,
-    pub halo_color: Option<Srgb>,
-    pub halo_width: f32,
-}
-
-impl EdgeStyleToken {
-    pub fn resolved_color(self) -> Srgb {
-        let alpha = ((self.opacity.clamp(0.0, 1.0)) * 255.0).round() as u8;
-        Srgb::rgba(self.color.r, self.color.g, self.color.b, alpha)
-    }
-
-    pub fn luminance(self) -> f32 {
-        let [r, g, b, _] = self.resolved_color().to_array();
-        0.2126 * f32::from(r) + 0.7152 * f32::from(g) + 0.0722 * f32::from(b)
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeEdgeFamilyToken {
     pub color: Srgb,
@@ -123,31 +57,6 @@ pub struct ThemeEdgeFamilyToken {
     pub end_marker: EdgeEndpointMarker,
     pub width: f32,
     pub opacity: f32,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct ThemeEdgeKindToken {
-    pub color_override: Option<Srgb>,
-    pub pattern_override: Option<EdgeStrokePattern>,
-    pub end_marker_override: Option<EdgeEndpointMarker>,
-    pub width_delta: f32,
-    pub opacity_multiplier: f32,
-    pub halo_color: Option<Srgb>,
-    pub halo_width: f32,
-}
-
-impl Default for ThemeEdgeKindToken {
-    fn default() -> Self {
-        Self {
-            color_override: None,
-            pattern_override: None,
-            end_marker_override: None,
-            width_delta: 0.0,
-            opacity_multiplier: 1.0,
-            halo_color: None,
-            halo_width: 0.0,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -172,10 +81,11 @@ pub struct ThemeContract {
     pub require_monochrome_preservation: bool,
 }
 
+/// Generic family styling shared across all relation kinds. Relation-specific
+/// styling is resolved by the owning renderer from source assertion data.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeEdgeTokens {
     pub family_tokens: BTreeMap<EdgeStyleFamily, ThemeEdgeFamilyToken>,
-    pub kind_tokens: BTreeMap<EdgeStyleKey, ThemeEdgeKindToken>,
     pub hover: ThemeEdgeEmphasisToken,
     pub selection: ThemeEdgeEmphasisToken,
 }
@@ -189,9 +99,8 @@ impl Default for ThemeEdgeTokens {
 impl ThemeEdgeTokens {
     pub fn default_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Srgb::rgb(150, 150, 155),
-            grouped: Srgb::rgb(236, 171, 64),
-            agent: Srgb::rgb(180, 140, 220),
+            semantic: Srgb::rgb(150, 150, 155),
+            selection: Srgb::rgb(236, 171, 64),
             traversal: Srgb::rgb(120, 180, 210),
             containment: Srgb::rgb(42, 168, 132),
             arrangement: Srgb::rgb(130, 110, 220),
@@ -203,9 +112,8 @@ impl ThemeEdgeTokens {
 
     pub fn light_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Srgb::rgb(108, 112, 122),
-            grouped: Srgb::rgb(196, 136, 36),
-            agent: Srgb::rgb(148, 112, 196),
+            semantic: Srgb::rgb(108, 112, 122),
+            selection: Srgb::rgb(196, 136, 36),
             traversal: Srgb::rgb(66, 128, 170),
             containment: Srgb::rgb(10, 130, 92),
             arrangement: Srgb::rgb(94, 88, 182),
@@ -217,9 +125,8 @@ impl ThemeEdgeTokens {
 
     pub fn dark_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Srgb::rgb(164, 168, 178),
-            grouped: Srgb::rgb(236, 171, 64),
-            agent: Srgb::rgb(188, 148, 232),
+            semantic: Srgb::rgb(164, 168, 178),
+            selection: Srgb::rgb(236, 171, 64),
             traversal: Srgb::rgb(124, 186, 220),
             containment: Srgb::rgb(52, 176, 140),
             arrangement: Srgb::rgb(142, 124, 236),
@@ -231,9 +138,8 @@ impl ThemeEdgeTokens {
 
     pub fn high_contrast_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Srgb::rgb(255, 255, 255),
-            grouped: Srgb::rgb(255, 230, 0),
-            agent: Srgb::rgb(255, 255, 255),
+            semantic: Srgb::rgb(255, 255, 255),
+            selection: Srgb::rgb(255, 230, 0),
             traversal: Srgb::rgb(0, 255, 255),
             containment: Srgb::rgb(0, 255, 170),
             arrangement: Srgb::rgb(255, 128, 0),
@@ -248,7 +154,7 @@ impl ThemeEdgeTokens {
             (
                 EdgeStyleFamily::Semantic,
                 ThemeEdgeFamilyToken {
-                    color: palette.hyperlink,
+                    color: palette.semantic,
                     pattern: EdgeStrokePattern::Solid,
                     end_marker: EdgeEndpointMarker::Arrow,
                     width: 1.4,
@@ -296,96 +202,8 @@ impl ThemeEdgeTokens {
                 },
             ),
         ]);
-        let kind_tokens = BTreeMap::from([
-            (
-                EdgeStyleKey::Hyperlink,
-                ThemeEdgeKindToken {
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::UserGrouped,
-                ThemeEdgeKindToken {
-                    color_override: Some(palette.grouped),
-                    end_marker_override: Some(EdgeEndpointMarker::None),
-                    width_delta: 1.6,
-                    opacity_multiplier: 1.0 / 0.85,
-                    halo_color: Some(Srgb::rgba(
-                        palette.grouped.r,
-                        palette.grouped.g,
-                        palette.grouped.b,
-                        96,
-                    )),
-                    halo_width: 1.0,
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::AgentDerived,
-                ThemeEdgeKindToken {
-                    color_override: Some(palette.agent),
-                    pattern_override: Some(EdgeStrokePattern::DashDot),
-                    end_marker_override: Some(EdgeEndpointMarker::Diamond),
-                    width_delta: -0.2,
-                    opacity_multiplier: 1.0,
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::TraversalHistory,
-                ThemeEdgeKindToken {
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::ContainmentUrlPath,
-                ThemeEdgeKindToken {
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::ContainmentDomain,
-                ThemeEdgeKindToken {
-                    pattern_override: Some(EdgeStrokePattern::DashedShort),
-                    width_delta: -0.2,
-                    opacity_multiplier: 0.4 / 0.6,
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::ArrangementFrameMember,
-                ThemeEdgeKindToken {
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::ArrangementTileGroup,
-                ThemeEdgeKindToken {
-                    pattern_override: Some(EdgeStrokePattern::Dotted),
-                    width_delta: -1.2,
-                    opacity_multiplier: 0.4 / 0.5,
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::ArrangementSplitPair,
-                ThemeEdgeKindToken {
-                    pattern_override: Some(EdgeStrokePattern::DashedShort),
-                    width_delta: -1.0,
-                    opacity_multiplier: 0.45 / 0.5,
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-            (
-                EdgeStyleKey::ImportedRelation,
-                ThemeEdgeKindToken {
-                    ..ThemeEdgeKindToken::default()
-                },
-            ),
-        ]);
         Self {
             family_tokens,
-            kind_tokens,
             hover: ThemeEdgeEmphasisToken {
                 foreground_color: Srgb::rgb(210, 226, 242),
                 halo_color: palette.hover_halo,
@@ -393,94 +211,10 @@ impl ThemeEdgeTokens {
                 width_delta: 0.5,
             },
             selection: ThemeEdgeEmphasisToken {
-                foreground_color: palette.grouped,
+                foreground_color: palette.selection,
                 halo_color: palette.selection_halo,
                 halo_width: 1.2,
                 width_delta: 1.0,
-            },
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct EdgeStyleRegistry {
-    accessibility_mode: EdgeAccessibilityMode,
-    theme_tokens: ThemeEdgeTokens,
-}
-
-impl Default for EdgeStyleRegistry {
-    fn default() -> Self {
-        Self {
-            accessibility_mode: EdgeAccessibilityMode::ColorAndPattern,
-            theme_tokens: ThemeEdgeTokens::default_theme(),
-        }
-    }
-}
-
-impl EdgeStyleRegistry {
-    pub fn new(accessibility_mode: EdgeAccessibilityMode) -> Self {
-        Self {
-            accessibility_mode,
-            ..Self::default()
-        }
-    }
-
-    pub fn from_theme_tokens(
-        theme_tokens: ThemeEdgeTokens,
-        accessibility_mode: EdgeAccessibilityMode,
-    ) -> Self {
-        Self {
-            accessibility_mode,
-            theme_tokens,
-        }
-    }
-
-    pub fn token_for(&self, key: EdgeStyleKey, decay_progress: f32) -> EdgeStyleToken {
-        if key == EdgeStyleKey::Hidden {
-            return EdgeStyleToken {
-                color: Srgb::TRANSPARENT,
-                width: 0.0,
-                pattern: EdgeStrokePattern::Solid,
-                opacity: 0.0,
-                end_marker: EdgeEndpointMarker::None,
-                halo_color: None,
-                halo_width: 0.0,
-            };
-        }
-
-        let family = key
-            .family()
-            .expect("non-hidden edge styles must resolve to a family");
-        let family_token = self.theme_tokens.family_tokens[&family];
-        let kind_token = self
-            .theme_tokens
-            .kind_tokens
-            .get(&key)
-            .copied()
-            .unwrap_or_default();
-
-        let token = EdgeStyleToken {
-            color: kind_token.color_override.unwrap_or(family_token.color),
-            width: (family_token.width + kind_token.width_delta).max(0.6),
-            pattern: kind_token.pattern_override.unwrap_or(family_token.pattern),
-            opacity: match key {
-                EdgeStyleKey::AgentDerived => lerp(0.55, 0.15, decay_progress.clamp(0.0, 1.0)),
-                _ => {
-                    (family_token.opacity * kind_token.opacity_multiplier.max(0.0)).clamp(0.0, 1.0)
-                },
-            },
-            end_marker: kind_token
-                .end_marker_override
-                .unwrap_or(family_token.end_marker),
-            halo_color: kind_token.halo_color,
-            halo_width: kind_token.halo_width,
-        };
-
-        match self.accessibility_mode {
-            EdgeAccessibilityMode::ColorAndPattern => token,
-            EdgeAccessibilityMode::Monochrome => EdgeStyleToken {
-                color: Srgb::gray(monochrome_value(key)),
-                ..token
             },
         }
     }
@@ -490,27 +224,22 @@ pub fn validate_theme_edge_tokens(
     tokens: &ThemeEdgeTokens,
     contract: &ThemeContract,
 ) -> Result<(), String> {
-    for family in [
+    let families = [
         EdgeStyleFamily::Semantic,
         EdgeStyleFamily::Traversal,
         EdgeStyleFamily::Containment,
         EdgeStyleFamily::Arrangement,
         EdgeStyleFamily::Imported,
-    ] {
+    ];
+    for family in families {
         if !tokens.family_tokens.contains_key(&family) {
             return Err(format!("missing family edge token for {family:?}"));
         }
     }
 
-    if contract.require_non_color_family_distinction {
+    if contract.require_non_color_family_distinction || contract.require_monochrome_preservation {
         let mut signatures = BTreeSet::new();
-        for family in [
-            EdgeStyleFamily::Semantic,
-            EdgeStyleFamily::Traversal,
-            EdgeStyleFamily::Containment,
-            EdgeStyleFamily::Arrangement,
-            EdgeStyleFamily::Imported,
-        ] {
+        for family in families {
             let token = tokens.family_tokens[&family];
             if !signatures.insert((token.pattern, token.end_marker)) {
                 return Err(format!(
@@ -520,13 +249,6 @@ pub fn validate_theme_edge_tokens(
         }
     }
 
-    let families = [
-        EdgeStyleFamily::Semantic,
-        EdgeStyleFamily::Traversal,
-        EdgeStyleFamily::Containment,
-        EdgeStyleFamily::Arrangement,
-        EdgeStyleFamily::Imported,
-    ];
     for (index, family) in families.iter().enumerate() {
         let a = edge_family_luminance(tokens.family_tokens[family]);
         for other in families.iter().skip(index + 1) {
@@ -540,28 +262,6 @@ pub fn validate_theme_edge_tokens(
         }
     }
 
-    if contract.require_monochrome_preservation {
-        let mut signatures = BTreeSet::new();
-        for key in [
-            EdgeStyleKey::Hyperlink,
-            EdgeStyleKey::TraversalHistory,
-            EdgeStyleKey::ContainmentUrlPath,
-            EdgeStyleKey::ArrangementFrameMember,
-            EdgeStyleKey::ImportedRelation,
-        ] {
-            let token = EdgeStyleRegistry::from_theme_tokens(
-                tokens.clone(),
-                EdgeAccessibilityMode::Monochrome,
-            )
-            .token_for(key, 0.0);
-            if !signatures.insert((token.pattern, token.end_marker)) {
-                return Err(format!(
-                    "monochrome preservation failed for {key:?}; non-color signature collision detected"
-                ));
-            }
-        }
-    }
-
     Ok(())
 }
 
@@ -570,26 +270,10 @@ fn edge_family_luminance(token: ThemeEdgeFamilyToken) -> f32 {
     0.2126 * f32::from(r) + 0.7152 * f32::from(g) + 0.0722 * f32::from(b)
 }
 
-fn lerp(start: f32, end: f32, t: f32) -> f32 {
-    start + (end - start) * t
-}
-
-fn monochrome_value(key: EdgeStyleKey) -> u8 {
-    match key.family() {
-        None => 0,
-        Some(EdgeStyleFamily::Semantic) => 232,
-        Some(EdgeStyleFamily::Traversal) => 196,
-        Some(EdgeStyleFamily::Containment) => 164,
-        Some(EdgeStyleFamily::Arrangement) => 128,
-        Some(EdgeStyleFamily::Imported) => 96,
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 struct EdgeThemePalette {
-    hyperlink: Srgb,
-    grouped: Srgb,
-    agent: Srgb,
+    semantic: Srgb,
+    selection: Srgb,
     traversal: Srgb,
     containment: Srgb,
     arrangement: Srgb,

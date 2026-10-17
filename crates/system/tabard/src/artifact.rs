@@ -31,6 +31,7 @@ pub struct ModePalette {
     pub palette: Palette,
     pub syntax: SyntaxPalette,
     pub typography: crate::Typography,
+    pub categories: crate::CategoryOverrides,
 }
 
 impl ModePalette {
@@ -41,7 +42,7 @@ impl ModePalette {
         format!(
             "/* Tabard derived mode: {}; harmony applied; Tinct explicit-mode base and syntax palettes. */\n{}{}",
             self.mode.as_key(),
-            custom_properties(self.palette, self.syntax),
+            custom_properties(self.palette, self.syntax, &self.categories),
             self.typography.css_custom_properties(),
         )
     }
@@ -130,6 +131,7 @@ impl Theme {
             palette: tinct::derive_palette_with(&effective_seeds, profile),
             syntax: tinct::derive_syntax_palette_with(&effective_seeds, profile),
             typography: self.typography.clone(),
+            categories: self.categories,
         })
     }
 

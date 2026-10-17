@@ -70,12 +70,9 @@ impl BoardFootprint {
     /// Local bounds in score units, for overlap.
     pub fn bounds(&self) -> Option<BoardRect> {
         match self {
-            BoardFootprint::Rect { width, height } => Some(BoardRect::new(
-                -width / 2.0,
-                -height / 2.0,
-                *width,
-                *height,
-            )),
+            BoardFootprint::Rect { width, height } => {
+                Some(BoardRect::new(-width / 2.0, -height / 2.0, *width, *height))
+            },
             BoardFootprint::Other { bounds } => *bounds,
         }
     }
@@ -191,7 +188,10 @@ pub struct BoardTransform {
 
 impl BoardTransform {
     pub fn to_viewport(&self, (x, y): (f32, f32)) -> (f32, f32) {
-        (self.origin.0 + x * self.scale, self.origin.1 + y * self.scale)
+        (
+            self.origin.0 + x * self.scale,
+            self.origin.1 + y * self.scale,
+        )
     }
 }
 
@@ -283,7 +283,11 @@ impl BoardScene {
     }
 
     fn framed(&self, fit: BoardFit) -> BoardRect {
-        if fit.frame_edges { self.frame() } else { self.bounds }
+        if fit.frame_edges {
+            self.frame()
+        } else {
+            self.bounds
+        }
     }
 
     /// Each card's body in viewport px, at the board's positions, in card
@@ -440,6 +444,7 @@ struct Fill([f32; 4], [f32; 4]);
 pub struct BoardText {
     text: genet_livery::TextSystem,
     generation: u64,
+    font_roles: String,
 }
 
 impl Default for BoardText {
@@ -453,6 +458,25 @@ impl BoardText {
         Self {
             text: genet_livery::TextSystem::new(),
             generation: 0,
+            font_roles: String::new(),
+        }
+    }
+
+    /// Declarations for the document's root custom properties, such as
+    /// `--tabard-font-interface: "IBM Plex Sans";`, so the titles' `var()`
+    /// resolves. Empty (the default) leaves the sheets as authored; a changed
+    /// value applies on the next paint.
+    pub fn set_font_roles(&mut self, declarations: &str) {
+        self.font_roles = declarations.to_owned();
+    }
+
+    /// `sheet` under the host's root declarations. Each label is its own
+    /// document root (no parent element), so `:root` reaches them.
+    pub(crate) fn rooted(&self, sheet: &str) -> String {
+        if self.font_roles.is_empty() {
+            sheet.to_owned()
+        } else {
+            format!(":root {{ {} }}\n{sheet}", self.font_roles)
         }
     }
 
@@ -467,6 +491,17 @@ impl BoardText {
         cards: &[(String, String, BoardRect)],
         width: u32,
         height: u32,
+    ) -> Option<genet_livery::LiveryPaintList> {
+        self.labels(cards, width, height, TITLE_SHEET)
+    }
+
+    /// Shared label shaping for independent surfaces; appearance belongs to the host.
+    pub(crate) fn labels(
+        &mut self,
+        cards: &[(String, String, BoardRect)],
+        width: u32,
+        height: u32,
+        sheet: &str,
     ) -> Option<genet_livery::LiveryPaintList> {
         use layout_dom_api::{LayoutDom, LayoutDomMut};
         if cards.iter().all(|(_, title, _)| title.is_empty()) {
@@ -491,9 +526,10 @@ impl BoardText {
             dom.append_child(line, words);
             dom.append_child(root, line);
         }
+        let sheet = self.rooted(sheet);
         let styles = genet_livery::resolve_styles(
             &dom,
-            &genet_livery::StyleSet::cambium(&[TITLE_SHEET]),
+            &genet_livery::StyleSet::cambium(&[sheet.as_str()]),
             &genet_livery::Device::screen(width as f32, height as f32),
             &genet_livery::InteractionStates::default(),
         );
@@ -521,9 +557,13 @@ impl BoardText {
 
 /// A title's line height, px; it is centred in its card.
 const TITLE_LINE: f32 = 16.0;
+// The title's family names Tabard's interface role. A host publishes the
+// role through `BoardText::set_font_roles`; until it does, the fallback is
+// the face that renders: Plex Sans where the host lends it (Graphshell),
+// else whatever the generic sans-serif resolves to among the lent faces.
 const TITLE_SHEET: &str = "\
     .board-title { position: absolute; margin: 0; padding: 0 6px; box-sizing: border-box; \
-      font-family: Roboto, sans-serif; font-size: 13px; line-height: 16px; \
+      font-family: var(--tabard-font-interface, IBM Plex Sans), sans-serif; font-size: 13px; line-height: 16px; \
       color: #f0dfb8; text-align: center; white-space: nowrap; overflow: hidden; }";
 
 /// A stable fallback paint for an open backdrop kind: an unfamiliar scene
@@ -585,11 +625,16 @@ mod tests {
         let transform = page_fit().transform(bounds, 1400.0, 900.0);
         // The formula the old page drew with: (W - 100) / w, (H - 180) / h,
         // never above 1; centred in W; hung at 116.
-        let scale = ((1400.0_f32 - 100.0) / 560.0).min((900.0 - 180.0) / 156.0).min(1.0);
+        let scale = ((1400.0_f32 - 100.0) / 560.0)
+            .min((900.0 - 180.0) / 156.0)
+            .min(1.0);
         assert_eq!(transform.scale, scale);
         assert_eq!(
             transform.origin,
-            ((1400.0 - 560.0 * scale) * 0.5 + 140.0 * scale, 116.0 + 78.0 * scale)
+            (
+                (1400.0 - 560.0 * scale) * 0.5 + 140.0 * scale,
+                116.0 + 78.0 * scale
+            )
         );
         // A board wider than the viewport shrinks to fit.
         let wide = page_fit().transform(BoardRect::new(0.0, 0.0, 2600.0, 100.0), 1400.0, 900.0);
@@ -599,7 +644,10 @@ mod tests {
     #[test]
     fn an_empty_board_is_ground_only() {
         let scene = BoardScene::default().paint(&PhysicsBoard::new(), 640, 480, page_fit());
-        assert_eq!(rects(&scene), vec![([0.0, 0.0, 640.0, 480.0], BOARD_GROUND)]);
+        assert_eq!(
+            rects(&scene),
+            vec![([0.0, 0.0, 640.0, 480.0], BOARD_GROUND)]
+        );
     }
 
     #[test]
@@ -615,7 +663,10 @@ mod tests {
         let transform = page_fit().transform(scene_desc.frame(), 1400.0, 900.0);
         let (cx, cy) = transform.to_viewport((140.0, 0.0));
         let body = before.last().unwrap().0;
-        assert_eq!([(body[0] + body[2]) / 2.0, (body[1] + body[3]) / 2.0], [cx, cy]);
+        assert_eq!(
+            [(body[0] + body[2]) / 2.0, (body[1] + body[3]) / 2.0],
+            [cx, cy]
+        );
 
         board.sync(scene_desc.items());
         assert!(board.drag_start("1"));
@@ -644,7 +695,10 @@ mod tests {
         let drawn = rects(&scene_desc.paint(&PhysicsBoard::new(), 1400, 900, page_fit()));
         // Ground, then held edge + shadow + lead body, then shadow + body.
         let colors: Vec<_> = drawn.iter().map(|(_, color)| *color).collect();
-        assert_eq!(colors, vec![BOARD_GROUND, HELD_EDGE, SHADOW, LEAD_CARD, SHADOW, CARD]);
+        assert_eq!(
+            colors,
+            vec![BOARD_GROUND, HELD_EDGE, SHADOW, LEAD_CARD, SHADOW, CARD]
+        );
         let (edge, body) = (drawn[1].0, drawn[3].0);
         assert_eq!(edge[0], body[0] - 3.0);
         assert_eq!(edge[3], body[3] + 3.0);
@@ -671,7 +725,11 @@ mod tests {
         let drawn = rects(&scene_desc.paint(&PhysicsBoard::new(), 1400, 900, page_fit()));
         assert_eq!(drawn.len(), 1 + 5 + 1);
         assert_eq!(drawn[1].1, backdrop_color("shore"));
-        assert!(drawn[2..6].iter().all(|(_, color)| *color == COLLIDABLE_EDGE));
+        assert!(
+            drawn[2..6]
+                .iter()
+                .all(|(_, color)| *color == COLLIDABLE_EDGE)
+        );
         assert_eq!(drawn[6].1, backdrop_color("field"));
         assert_eq!(backdrop_color("shore"), backdrop_color("shore"));
     }
@@ -680,7 +738,11 @@ mod tests {
     fn overlap_counts_shared_area_not_touching_edges() {
         let board = PhysicsBoard::new();
         let touching = BoardScene {
-            cards: vec![card("a", 0.0, 0.0), card("b", 280.0, 0.0), card("c", 900.0, 0.0)],
+            cards: vec![
+                card("a", 0.0, 0.0),
+                card("b", 280.0, 0.0),
+                card("c", 900.0, 0.0),
+            ],
             ..BoardScene::default()
         };
         assert_eq!(touching.overlaps(&board), 0);
@@ -734,19 +796,28 @@ mod tests {
             backdrops: Vec::new(),
             cards: vec![first, second],
         };
-        assert_eq!(scene_desc.frame(), BoardRect::new(-60.0, -40.0, 260.0, 80.0));
+        assert_eq!(
+            scene_desc.frame(),
+            BoardRect::new(-60.0, -40.0, 260.0, 80.0)
+        );
         let fit = BoardFit::new(24.0, 24.0, 24.0, 24.0);
         let rects = scene_desc.card_rects(&PhysicsBoard::new(), 982, 627, fit);
         assert_eq!(rects.len(), 2);
         assert!(
-            rects.iter().all(|(_, _, rect)| (rect.y - 24.0).abs() < 0.01),
+            rects
+                .iter()
+                .all(|(_, _, rect)| (rect.y - 24.0).abs() < 0.01),
             "both cards start at the top margin: {rects:?}"
         );
         assert_eq!(rects[1].1, "Card 1");
         // Framing the bounds alone, as the old page does, the cards cross the
         // top margin by half their height.
         let old = scene_desc.card_rects(&PhysicsBoard::new(), 982, 627, fit.framing_bounds());
-        assert!(old.iter().all(|(_, _, rect)| (rect.y - (24.0 - 40.0)).abs() < 0.01), "{old:?}");
+        assert!(
+            old.iter()
+                .all(|(_, _, rect)| (rect.y - (24.0 - 40.0)).abs() < 0.01),
+            "{old:?}"
+        );
     }
 
     #[test]
@@ -785,6 +856,30 @@ mod tests {
         }
         let untitled = nameless.paint_titled(&board, 800, 400, page_fit(), &mut text);
         assert_eq!(glyphs(&untitled), 0);
+    }
+
+    #[test]
+    fn font_roles_ride_the_root_and_default_leaves_the_sheet_alone() {
+        let mut text = BoardText::new();
+        assert_eq!(text.rooted(TITLE_SHEET), TITLE_SHEET);
+        text.set_font_roles("--tabard-font-interface: \"Probe Sans\";");
+        let rooted = text.rooted(TITLE_SHEET);
+        assert!(rooted.starts_with(":root { --tabard-font-interface: \"Probe Sans\";"));
+        assert!(rooted.ends_with(TITLE_SHEET));
+        text.set_font_roles("");
+        assert_eq!(text.rooted(TITLE_SHEET), TITLE_SHEET);
+        // A title is a root of its own document, so the declaration reaches it.
+        let card = [("0".into(), "t".into(), BoardRect::new(0.0, 0.0, 80.0, 16.0))];
+        let probe = ".board-title { position: absolute; color: var(--probe, #00ff00); }";
+        let paint = |text: &mut BoardText| {
+            format!(
+                "{:?}",
+                text.labels(&card, 80, 16, probe).unwrap().commands()
+            )
+        };
+        let before = paint(&mut text);
+        text.set_font_roles("--probe: #ff0000;");
+        assert_ne!(paint(&mut text), before);
     }
 
     /// A title is one non-wrapping line, centred in its card. Livery ignored

@@ -28,8 +28,10 @@ fn retract_via_delta(
 impl Canvas {
     /// Replace the selection with just `key` (clearing any selected nodes/edges).
     pub(crate) fn select_only(&mut self, key: NodeKey) {
+        self.sync_attention();
         self.selected.clear();
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         self.selected.insert(key);
     }
 
@@ -88,10 +90,12 @@ impl Canvas {
         let Some(key) = self.graph.get_node_key_by_id(member) else {
             return false;
         };
+        self.sync_attention();
         if !self.selected.remove(&key) {
             self.selected.insert(key);
         }
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         true
     }
 
@@ -109,8 +113,10 @@ impl Canvas {
         let id = self.graph.get_node(key)?.id;
         let _ = apply_graph_delta(&mut self.graph, GraphDelta::RemoveNode { key });
         self.pinned_nodes.remove(&key);
+        self.sync_attention();
         self.selected.clear();
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         self.reconcile_derived();
         Some(id)
     }
@@ -121,11 +127,13 @@ impl Canvas {
     /// deactivates instead of its Cartography preview re-activating it.
     /// (Card-system plan, Phase 1.)
     pub fn clear_selection(&mut self) {
-        if self.selected.is_empty() && self.selected_edges.is_empty() {
+        if self.selected.is_empty() && self.selected_links.is_empty() {
             return;
         }
+        self.sync_attention();
         self.selected.clear();
-        self.selected_edges.clear();
+        self.selected_links.clear();
+        self.selected_link_appearances.clear();
         self.reconcile_derived();
     }
 
@@ -299,7 +307,9 @@ impl Canvas {
     /// a true removal, not the display-only [`hide_selected_edges`]. Scoped to the
     /// `Semantic` family, so navigation / provenance history on the same edge
     /// survives; an edge left with no families is garbage-collected by the kernel.
-    /// Returns how many relations were retracted, and clears the edge selection.
+    /// Returns how many pairwise semantic rows were retracted. Selecting a
+    /// link never performs a source mutation; member actions go through the
+    /// source-bound inspector API.
     pub fn retract_selected_relation(&mut self) -> usize {
         let mut removed = 0;
         // Symmetric with `assert_selected_relation`: a two-node selection retracts
@@ -310,12 +320,6 @@ impl Canvas {
             pair.sort_by_key(|k| self.graph.get_node(*k).map(|n| n.id));
             removed += self.retract_semantic_between(pair[0], pair[1]);
             removed += self.retract_semantic_between(pair[1], pair[0]);
-        }
-        // Also retract any directly-selected relation cells (the click-an-edge path).
-        for cell in self.selected_edges.drain().collect::<Vec<_>>() {
-            if matches!(cell.selector, RelationSelector::Semantic(_)) {
-                removed += retract_via_delta(&mut self.graph, cell.from, cell.to, cell.selector);
-            }
         }
         if removed > 0 {
             self.reconcile_derived();
@@ -365,21 +369,21 @@ impl Canvas {
         removed
     }
 
-    /// Whether any relation cell is currently selected (the host routes a `Delete` to edge
-    /// retraction when so, else to node deletion).
+    /// Whether any canonical link is currently selected (the host routes
+    /// inspection to the link, or node actions when no link is selected).
     pub fn has_selected_edges(&self) -> bool {
-        !self.selected_edges.is_empty()
+        !self.selected_links.is_empty()
     }
 
-    /// Derived links selected through the current relation-cell hit path.
-    /// Parallel and antiparallel cells yield one unordered Surface pair;
-    /// no cell index becomes a source assertion or a stored pair identity.
+    /// Compatibility projection for hosts that only support Surface pairs.
+    /// Resource links require `selected_link_keys` plus `link_appearance_pair`.
     pub fn selected_link_pairs(&self) -> Vec<(uuid::Uuid, uuid::Uuid)> {
-        self.selected_edges
+        self.selected_links
             .iter()
-            .filter_map(|cell| {
-                let a = self.graph.get_node(cell.from)?.id;
-                let b = self.graph.get_node(cell.to)?.id;
+            .filter(|key| key.stratum == scenograph::link::LinkStratum::Surface)
+            .filter_map(|key| {
+                let a = key.first.parse::<uuid::Uuid>().ok()?;
+                let b = key.second.parse::<uuid::Uuid>().ok()?;
                 Some((a.min(b), a.max(b)))
             })
             .collect::<std::collections::BTreeSet<_>>()
@@ -387,20 +391,151 @@ impl Canvas {
             .collect()
     }
 
-    /// Hide the currently-selected relation cells, and clear the selection. Relation-cell
-    /// truth persists (display-only); the spring for each newly-hidden cell relaxes in
-    /// this instance only (swatch-primitive P5).
-    pub fn hide_selected_edges(&mut self) -> usize {
-        let mut count = 0;
-        for cell in self.selected_edges.drain().collect::<Vec<_>>() {
-            if self.hidden_edges.insert(cell) {
-                count += 1;
-            }
+    /// Source identities and marks of the current resting stroke appearances.
+    /// Geometry, picking and host-accessible alternates read this same projection.
+    pub fn visible_link_appearances(&self) -> Vec<crate::canvas::LinkAppearance> {
+        crate::canvas::edge_cells::visible_link_appearances_with_assertion_hides(
+            &self.graph,
+            &self.view,
+            &self.hidden_links,
+            &self.hidden_edges,
+            &self.hidden_assertions,
+            |key| self.node_size(key),
+        )
+        .into_iter()
+        .map(|segment| segment.appearance)
+        .collect()
+    }
+
+    /// Canonical identities hit on the canvas. This is the only closed-link
+    /// selection key; displayed Resource appearances can share one key.
+    pub fn selected_link_keys(&self) -> Vec<scenograph::link::LinkKey> {
+        let mut keys: Vec<_> = self.selected_links.iter().cloned().collect();
+        keys.sort();
+        keys
+    }
+
+    /// Resolve a canonical selected link to the displayed Surface appearance
+    /// that was hit. If no appearance was recorded (for example, a restored
+    /// key), choose the first stable current appearance for that key.
+    pub fn link_appearance_pair(
+        &self,
+        key: &scenograph::link::LinkKey,
+    ) -> Option<(uuid::Uuid, uuid::Uuid)> {
+        let pair = self
+            .selected_link_appearances
+            .get(key)
+            .copied()
+            .or_else(|| {
+                crate::canvas::edge_cells::visible_link_appearances_with_assertion_hides(
+                    &self.graph,
+                    &self.view,
+                    &self.hidden_links,
+                    &self.hidden_edges,
+                    &self.hidden_assertions,
+                    |key| self.node_size(key),
+                )
+                .into_iter()
+                .find(|segment| &segment.appearance.key == key)
+                .map(|segment| {
+                    (
+                        segment.appearance.display_from,
+                        segment.appearance.display_to,
+                    )
+                })
+            })?;
+        Some((
+            self.graph.get_node(pair.0)?.id,
+            self.graph.get_node(pair.1)?.id,
+        ))
+    }
+
+    /// Hide selected links as whole canonical targets and clear their selection.
+    pub fn hide_selected_links(&mut self) -> usize {
+        let before = self.hidden_links.len();
+        self.hidden_links.extend(self.selected_links.drain());
+        let hidden = self.hidden_links.len() - before;
+        self.selected_link_appearances.clear();
+        if hidden > 0 {
+            self.resync_edge_springs();
         }
+        hidden
+    }
+
+    /// Replace the canvas' view-local closed-link hides from a host intent.
+    /// Exact legacy directed-cell eligibility filters stay independent.
+    pub fn set_hidden_link_keys(
+        &mut self,
+        keys: impl IntoIterator<Item = scenograph::link::LinkKey>,
+    ) -> bool {
+        let replacement: std::collections::HashSet<_> = keys.into_iter().collect();
+        if replacement == self.hidden_links {
+            return false;
+        }
+        self.hidden_links = replacement;
+        self.resync_edge_springs();
+        true
+    }
+
+    /// Return a stable ordered snapshot for host view-intent persistence.
+    pub fn hidden_link_keys(&self) -> Vec<scenograph::link::LinkKey> {
+        let mut keys: Vec<_> = self.hidden_links.iter().cloned().collect();
+        keys.sort();
+        keys
+    }
+
+    /// Read-only exact assertion hides for consumers that must preserve one
+    /// spring contribution per independently hidden source record.
+    pub fn hidden_assertions(&self) -> &HashSet<String> {
+        &self.hidden_assertions
+    }
+
+    /// Return a stable ordered snapshot for host view-intent persistence.
+    pub fn hidden_assertion_ids(&self) -> Vec<String> {
+        let mut ids: Vec<_> = self.hidden_assertions.iter().cloned().collect();
+        ids.sort();
+        ids
+    }
+
+    /// Replace exact source assertion hides restored from a host view intent.
+    pub fn set_hidden_assertion_ids(&mut self, ids: impl IntoIterator<Item = String>) -> bool {
+        let replacement: HashSet<_> = ids.into_iter().collect();
+        if replacement == self.hidden_assertions {
+            return false;
+        }
+        self.hidden_assertions = replacement;
+        self.resync_edge_springs();
+        true
+    }
+
+    /// Clear only exact assertion hides, preserving whole-link and legacy
+    /// selector visibility state.
+    pub fn show_all_assertions(&mut self) -> usize {
+        let count = self.hidden_assertions.len();
         if count > 0 {
+            self.hidden_assertions.clear();
             self.resync_edge_springs();
         }
         count
+    }
+
+    /// Reveal every closed-link hide and every legacy cell eligibility filter.
+    pub fn show_all_links(&mut self) -> usize {
+        let link_count = self.hidden_links.len();
+        let legacy_count = self.hidden_edges.len();
+        let count = link_count + legacy_count;
+        self.hidden_links.clear();
+        self.hidden_edges.clear();
+        if legacy_count > 0 || link_count > 0 {
+            self.resync_edge_springs();
+        }
+        count
+    }
+
+    /// Compatibility name for host controls. Selection is link-keyed, so this
+    /// now hides the whole selected canonical link.
+    pub fn hide_selected_edges(&mut self) -> usize {
+        self.hide_selected_links()
     }
 
     /// Whether every live relation cell in the endpoint bundle is hidden.
@@ -566,12 +701,7 @@ impl Canvas {
 
     /// Reveal every hidden edge. Returns how many were shown.
     pub fn show_all_edges(&mut self) -> usize {
-        let count = self.hidden_edges.len();
-        self.hidden_edges.clear();
-        if count > 0 {
-            self.resync_edge_springs();
-        }
-        count
+        self.show_all_links()
     }
 
     /// Re-sync the physics spring topology to the current visible relation-cell set and
@@ -582,7 +712,12 @@ impl Canvas {
     fn resync_edge_springs(&mut self) {
         self.physics_view_revision += 1;
         self.physics
-            .sync_edges(visible_relation_edges(&self.graph, &self.hidden_edges));
+            .sync_edges(visible_relation_edges_with_assertion_hides(
+                &self.graph,
+                &self.hidden_edges,
+                &self.hidden_links,
+                &self.hidden_assertions,
+            ));
         self.settle_physics(SETTLE_TICKS / 3);
     }
 

@@ -306,6 +306,7 @@ fn arrangement_projections(
                 coverage: Default::default(),
                 positions,
                 score: None,
+                regions: Vec::new(),
             },
         ));
     }
@@ -333,6 +334,10 @@ const GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("topic", "kanban.default recent_first true", 0x4e390e0f086b4059, 0x0000000000000000),
     ("topic", "kanban.community recent_first true", 0x7d9ec76289cca0bd, 0x0000000000000000),
     ("topic", "timeline.default recent_first true", 0x2812629cb6301615, 0x0000000000000000),
+    ("topic", "partition.default recent_first true", 0x7b458095b46e882d, 0x0000000000000000),
+    ("topic", "sets.default recent_first true", 0x49e9e468381ebb41, 0x0000000000000000),
+    ("topic", "provenance.default recent_first true", 0x5377c7e641ea6949, 0x0000000000000000),
+    ("topic", "mosaic.default recent_first true", 0xe0769c647b4b4079, 0x0000000000000000),
     ("topic", "radial.default focus 0", 0x7b86498e83ab96e0, 0x0000000000000000),
     ("topic", "radial weighted focus 0", 0x143223deca19b751, 0x0000000000000000),
     ("generated 500", "phyllotaxis.default recent_first true", 0xbc5c195c1e3ba247, 0xbf7d39e9cb5455cd),
@@ -344,6 +349,10 @@ const GOLDENS: &[(&str, &str, u64, u64)] = &[
     ("generated 500", "kanban.default recent_first true", 0x8e1d4d588a6c9fb9, 0x0000000000000000),
     ("generated 500", "kanban.community recent_first true", 0x0ef74f7fc29541f7, 0x0000000000000000),
     ("generated 500", "timeline.default recent_first true", 0x9b32cf772f256e3b, 0x0000000000000000),
+    ("generated 500", "partition.default recent_first true", 0x61fe90464231c6a4, 0x0000000000000000),
+    ("generated 500", "sets.default recent_first true", 0x4dde1bdb10f20ea7, 0x0000000000000000),
+    ("generated 500", "provenance.default recent_first true", 0xd982760b9254750c, 0x0000000000000000),
+    ("generated 500", "mosaic.default recent_first true", 0xa97489844611bc0b, 0x0000000000000000),
     ("generated 500", "radial.default focus 0", 0xb5efdbb33d9b168b, 0x0000000000000000),
     ("generated 500", "radial weighted focus 0", 0x401f146407bdb99a, 0x0000000000000000),
 ];

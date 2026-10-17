@@ -13,41 +13,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{PublicSourceRevision, SourceBinding};
 
-/// The store whose assertions form a link.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum LinkStratum {
-    Resource,
-    Surface,
-}
-
-/// Stable endpoint identity within a stratum. Resource endpoints use their
-/// canonical IRI; surface endpoints use their stable source identity.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub struct LinkKey {
-    pub stratum: LinkStratum,
-    pub first: String,
-    pub second: String,
-}
-
-impl LinkKey {
-    pub fn new(stratum: LinkStratum, a: impl Into<String>, b: impl Into<String>) -> Self {
-        let (a, b) = (a.into(), b.into());
-        if a <= b {
-            Self {
-                stratum,
-                first: a,
-                second: b,
-            }
-        } else {
-            Self {
-                stratum,
-                first: b,
-                second: a,
-            }
-        }
-    }
-}
+pub use sceno::{LinkKey, LinkMarks, LinkStratum};
 
 /// Public identity and revision of the store that disclosed this reading.
 /// A missing source is explicit; process-local graph generations are not
@@ -91,7 +57,10 @@ pub struct LinkEndpoint {
     pub address: Option<String>,
 }
 
-/// One exact, independently addressable semantic assertion.
+/// One exact, independently addressable relation assertion. Registered
+/// relation kinds use their canonical predicate IRI; unfamiliar predicates
+/// remain unchanged. `recognized_kind` remains the semantic sub-kind
+/// compatibility field and is absent for other families.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LinkAssertion {
     pub id: String,
@@ -173,6 +142,64 @@ pub struct LinkBucket {
 pub struct LinkReading {
     pub key: LinkKey,
     pub buckets: Vec<LinkBucket>,
+}
+
+/// View-local marks and default additive contribution of eligible held members.
+/// The source reading itself is never mutated by this summary.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct LinkRestSummary {
+    pub marks: LinkMarks,
+    pub strength: f32,
+    pub held_assertions: usize,
+    pub legacy_members: usize,
+}
+
+impl LinkReading {
+    /// Summarize this particular displayed appearance. Resource links can have
+    /// several appearances; original source endpoints remain in each bucket.
+    /// Callers filter view-hidden members before supplying the reading.
+    pub fn rest_summary(&self, displayed_from: &str, displayed_to: &str) -> LinkRestSummary {
+        let mut summary = LinkRestSummary::default();
+        let mut supports = false;
+        let mut contradicts = false;
+        let mut seen = std::collections::BTreeSet::new();
+        for bucket in &self.buckets {
+            let forward =
+                bucket.displayed_from == displayed_from && bucket.displayed_to == displayed_to;
+            let reverse =
+                bucket.displayed_from == displayed_to && bucket.displayed_to == displayed_from;
+            if !forward && !reverse {
+                continue;
+            }
+            let mut eligible = false;
+            for assertion in bucket.assertions.iter().filter(|a| a.withdrawn.is_none()) {
+                eligible = true;
+                supports |= assertion.predicate == "https://mere.computer/ns/rel#supports";
+                contradicts |= assertion.predicate == "https://mere.computer/ns/rel#contradicts";
+                if seen.insert((
+                    assertion.id.clone(),
+                    serde_json::to_string(&assertion.scope).expect("scope serializes"),
+                )) {
+                    summary.held_assertions += 1;
+                }
+            }
+            for member in &bucket.legacy_members {
+                eligible = true;
+                summary.legacy_members += 1;
+                supports |=
+                    member.family == "Semantic" && member.sub_kind.as_deref() == Some("Supports");
+                contradicts |= member.family == "Semantic"
+                    && member.sub_kind.as_deref() == Some("Contradicts");
+            }
+            // legacy_summaries duplicate members for old inspector output and
+            // never add a second strength contribution.
+            summary.marks.forward |= eligible && forward;
+            summary.marks.reverse |= eligible && reverse && !forward;
+        }
+        summary.marks.opposed = supports && contradicts;
+        summary.strength = (summary.held_assertions + summary.legacy_members) as f32;
+        summary
+    }
 }
 
 /// One displayed endpoint pair may resolve to multiple stratum links. Source
@@ -430,6 +457,112 @@ mod tests {
     fn custom_assertion_scope_round_trips_without_normalization() {
         let scope = LinkGraphScope::Custom("urn:scope:review".into());
         let json = serde_json::to_string(&scope).expect("writes");
-        assert_eq!(serde_json::from_str::<LinkGraphScope>(&json).expect("reads"), scope);
+        assert_eq!(
+            serde_json::from_str::<LinkGraphScope>(&json).expect("reads"),
+            scope
+        );
+    }
+    #[test]
+    fn rest_summary_preserves_independent_reasons_and_excludes_withdrawal() {
+        let assertion = |id: &str, predicate: &str, withdrawn: bool| -> LinkAssertion {
+            serde_json::from_value(serde_json::json!({
+                "id":id,"predicate":predicate,"recognized_kind":null,"label":null,
+                "scope":{"kind":"default"},"asserter":null,"asserted_at_ms":null,
+                "withdrawn":if withdrawn {serde_json::json!({"at_ms":7,"by":null})} else {serde_json::Value::Null}
+            })).unwrap()
+        };
+        let bucket = |from: &str, to: &str, assertions| LinkBucket {
+            displayed_from: from.into(),
+            displayed_to: to.into(),
+            source_from: LinkEndpoint {
+                id: format!("source:{from}"),
+                address: None,
+            },
+            source_to: LinkEndpoint {
+                id: format!("source:{to}"),
+                address: None,
+            },
+            assertions,
+            legacy_members: vec![],
+            legacy_summaries: vec![],
+        };
+        let mut reading = LinkReading {
+            key: LinkKey::new(LinkStratum::Resource, "urn:a", "urn:b"),
+            buckets: vec![
+                bucket(
+                    "surface:a",
+                    "surface:b",
+                    vec![
+                        assertion("one", "https://mere.computer/ns/rel#supports", false),
+                        assertion("two", "https://mere.computer/ns/rel#supports", false),
+                    ],
+                ),
+                bucket(
+                    "surface:b",
+                    "surface:a",
+                    vec![assertion(
+                        "ended",
+                        "https://mere.computer/ns/rel#contradicts",
+                        true,
+                    )],
+                ),
+            ],
+        };
+        let before = reading.clone();
+        let summary = reading.rest_summary("surface:a", "surface:b");
+        assert_eq!(summary.held_assertions, 2);
+        assert_eq!(summary.strength, 2.0);
+        assert_eq!(
+            summary.marks,
+            LinkMarks {
+                forward: true,
+                reverse: false,
+                opposed: false
+            }
+        );
+        assert_eq!(
+            reading, before,
+            "rest drawing cannot change assertion history"
+        );
+        reading.buckets[1].assertions.push(assertion(
+            "three",
+            "https://mere.computer/ns/rel#contradicts",
+            false,
+        ));
+        let summary = reading.rest_summary("surface:a", "surface:b");
+        assert_eq!(summary.strength, 3.0);
+        assert_eq!(
+            summary.marks,
+            LinkMarks {
+                forward: true,
+                reverse: true,
+                opposed: true
+            }
+        );
+        assert_eq!(
+            reading.rest_summary("unrelated:a", "unrelated:b"),
+            LinkRestSummary::default()
+        );
+        assert_eq!(
+            reading.rest_summary("surface:b", "surface:a").marks,
+            summary.marks.reversed()
+        );
+        reading.buckets[0].legacy_members.push(LinkLegacyMember {
+            family: "Traversal".into(),
+            sub_kind: None,
+        });
+        reading.buckets[0].legacy_summaries.push(LinkLegacyFamily {
+            family: "Traversal".into(),
+            data: serde_json::json!({}),
+        });
+        let summary = reading.rest_summary("surface:a", "surface:b");
+        assert_eq!(
+            (
+                summary.held_assertions,
+                summary.legacy_members,
+                summary.strength
+            ),
+            (3, 1, 4.0)
+        );
     }
 }

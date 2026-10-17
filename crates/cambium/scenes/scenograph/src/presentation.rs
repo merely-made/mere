@@ -97,6 +97,11 @@ pub enum ViewState {
     LayoutUnlocked,
     Inspected,
     Overview,
+    /// Was forward, then deselected; stays until dismissed (SE91). Supplied
+    /// by [`crate::attention::AttentionBook`].
+    Retained,
+    /// Offered by the scene rather than the person's content.
+    Suggested,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]

@@ -40,7 +40,9 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod gated;
 pub mod syntax;
+pub use gated::{GatedRoles, derive_gated_roles};
 pub use syntax::{SyntaxPalette, SyntaxRole, derive_syntax_palette, derive_syntax_palette_with};
 
 // =============================================================================

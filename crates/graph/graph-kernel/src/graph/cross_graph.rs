@@ -251,7 +251,7 @@ impl Graph {
             .filter(|edge| {
                 key_remap.contains_key(&edge.source()) && key_remap.contains_key(&edge.target())
             })
-            .flat_map(|edge| edge.weight().semantic_statements())
+            .flat_map(|edge| edge.weight().assertions())
             .map(|statement| statement.predicate.clone())
             .chain(
                 key_remap
@@ -267,7 +267,7 @@ impl Graph {
                 if resources.contains(&from.id()) && resources.contains(&to.id()) {
                     predicates.extend(
                         payload
-                            .semantic_statements()
+                            .assertions()
                             .iter()
                             .map(|statement| statement.predicate.clone()),
                     );

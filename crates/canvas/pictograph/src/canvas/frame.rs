@@ -29,7 +29,7 @@ use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
     qual, set_class, set_style,
 };
-use super::edge_cells::{edge_cell_for_relation, relation_cell_overlay, selected_edge_overlay};
+use super::edge_cells::link_overlay_with_assertion_hides;
 use super::fold_projection::FoldProjection;
 use super::{Canvas, FACE_INSET, Face, NodeShape, NodeState, PAN_DECAY};
 
@@ -112,6 +112,8 @@ impl Canvas {
         let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
 
         self.apply_forme_region();
+        self.sync_attention();
+        self.tend_link_suggestions();
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
@@ -230,6 +232,10 @@ impl Canvas {
             .filter(|key| node_visible(*key))
             .collect();
 
+        // The graph grammar, when the host presents by it: who is loud, who is
+        // labelled, each node's category.
+        let grammar = self.grammar_frame();
+
         // Route the underlay through the canvas's forme arrangement — the full
         // read-through Identity arrangement, or a curated arrangement of just the
         // scope. Either way the canvas renders as a Cartography projection of an
@@ -245,15 +251,9 @@ impl Canvas {
             &arrangement,
             |k| positions.get(&k).copied(),
             |k| !on_screen.contains(&k),
-            // Skip relation cells the user has hidden. Platen still projects one pair-level
-            // edge after filtering, so a parallel relation keeps the bundle visible.
-            |rel| {
-                !fold_members.contains(&rel.from)
-                    && !fold_members.contains(&rel.to)
-                    && !self
-                        .hidden_edges
-                        .contains(&edge_cell_for_relation(rel.from, rel.to, rel.kind))
-            },
+            // Link strokes are projected below from canonical LinkReading values.
+            // Suppress Platen's pair fallback so it cannot double-draw a link.
+            |_| false,
             // Each node's face radius (node_size / 2) so straight edges trim to the
             // face and demoted underlay rects draw at the node's true size. (Node-rep
             // Decision 5 — size drives the face geometry.)
@@ -273,24 +273,18 @@ impl Canvas {
             self.hidden_field_ids(),
         ));
         underlay.splice_world_underlay(self.forme_overlay());
-        underlay.splice_world_overlays(relation_cell_overlay(
+        underlay.splice_world_overlays(link_overlay_with_assertion_hides(
             &self.graph,
             &self.view,
+            &self.hidden_links,
             &self.hidden_edges,
+            &self.hidden_assertions,
+            &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
+            |key| self.node_size(key),
+            |from, to| super::grammar_view::link_tone(grammar.as_ref(), from, to),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
-        // Highlight selected edges by splicing thicker strokes inside the
-        // underlay's camera transform (world space — no transform replication).
-        if !self.selected_edges.is_empty() {
-            underlay.splice_world_overlays(selected_edge_overlay(
-                &self.graph,
-                &self.view,
-                &self.hidden_edges,
-                &self.selected_edges,
-                &node_visible,
-            ));
-        }
         // Community rings: a halo per node in its community's colour, spliced into the same
         // world-space transform. (Graph signals — community to a ring.)
         if self.show_community_rings
@@ -348,7 +342,10 @@ impl Canvas {
             // generalizes the old `NODE_HALF * z` (identical at the default
             // size) so the billboard stays centred on its anchor.
             // (Projection proofs — P3, the visible size channel.)
-            let face = self.node_size(key);
+            let face = self.node_size(key)
+                * grammar
+                    .as_ref()
+                    .map_or(1.0, |_| self.grammar_face_scale(key));
             let half = face * 0.5 * z;
             // P3 fake height: raise the gnode above its ground anchor (a stem, drawn under
             // the gnodes, drops back to the ground where the edges meet). Zero unless
@@ -360,7 +357,7 @@ impl Canvas {
             // overlap, so it is a harmless no-op there. (Isometric camera P2 — depth.)
             let (s, c) = self.camera.yaw.sin_cos();
             let depth = (pos.x * s + pos.y * c).round() as i32;
-            let style = format!(
+            let mut style = format!(
                 "transform: translate({}px, {}px) scale({}); z-index: {}; width: {}px; height: {}px;",
                 ax - half,
                 (ay - lift) - half,
@@ -369,6 +366,9 @@ impl Canvas {
                 face,
                 face
             );
+            if let Some(frame) = &grammar {
+                style.push_str(&self.grammar_fill(key, frame));
+            }
             // Selection wins (orange); otherwise color by activation state —
             // green open, red closed, blue idle (the default for an unset node).
             let state_class = if self.selected.contains(&key) {
@@ -395,7 +395,10 @@ impl Canvas {
             // embedded. The open representation tail falls back to Card.
             // (Projection proofs — P3b renderer consumption.)
             let representation_class = self.node_representation_class(key);
-            let class = format!("{state_class}{shape_class}{representation_class}");
+            let class = match &grammar {
+                Some(frame) => format!("{}{representation_class}", self.grammar_class(key, frame)),
+                None => format!("{state_class}{shape_class}{representation_class}"),
+            };
             gnode_updates.push((gnode, style, Some(class)));
         }
         // Each fold's "+N", over the node layer it belongs to: none when the
@@ -451,7 +454,9 @@ impl Canvas {
         // scene orbs, then the underlay edges + demoted rects, then the on-screen node
         // DOM, then any marquee on top.
         let bg_cmds = background_cmds(w, h, self.backdrop);
+        let territory_cmds = self.territory_commands();
         let projection_backdrop_cmds = self.projection_backdrop_commands();
+        let strategy_region_cmds = self.strategy_region_commands();
         // Ambient backdrop: the sim painted as the bottom layer (above the bg fill, below the scene),
         // in its tincture, stretched across the viewport. The sim owns its look (GoL = run-merged
         // cell rects; a continuous sim = dots). (Physics scenes P5.)
@@ -476,8 +481,14 @@ impl Canvas {
         let node_commands = super::cull::visible_commands(nodes_plist.commands(), viewport_bounds);
         observer.mark(8);
         let mut layers = vec![CompositeLayer::commands_only(&bg_cmds)];
+        if !territory_cmds.is_empty() {
+            layers.push(CompositeLayer::commands_only(&territory_cmds));
+        }
         if !projection_backdrop_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&projection_backdrop_cmds));
+        }
+        if !strategy_region_cmds.is_empty() {
+            layers.push(CompositeLayer::commands_only(&strategy_region_cmds));
         }
         if !ambient_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&ambient_cmds));
