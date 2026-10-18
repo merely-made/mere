@@ -92,7 +92,7 @@ pub const MERE_VIEW_CSS: &str = "\
     .mere-view-container .mere-view-archive-steps > button { flex: 1 1 auto; white-space: nowrap; } \
     .mere-view-container-archives { list-style: none; margin: 0; padding: 0; } \
     .mere-view-container .mere-view-archive { display: flex; flex-direction: column; } \
-    .mere-view-tier-rule { position: absolute; left: 0; height: 0; border-top: 1px dashed currentColor; opacity: 0.35; pointer-events: none; } \
+    .mere-view-tier-rule { position: absolute; left: 0; height: 0; border-top: 1px solid currentColor; opacity: 0.35; pointer-events: none; } \
     .mere-view-tier-controls { position: absolute; display: flex; flex-direction: column; gap: 4px; z-index: 2; } \
     .mere-view-card { position: absolute; z-index: 3; border-width: 2px; padding: 8px; box-sizing: border-box; } \
     .mere-view-card > * { flex-shrink: 0; margin: 0; } \

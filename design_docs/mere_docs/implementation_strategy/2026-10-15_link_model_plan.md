@@ -40,7 +40,7 @@ records the separate source, browser, reopen and image-review claims.
 | --- | --- |
 | Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
 | Responsive-path legibility | Qualified for the ordinary 2D square-node cohort on source `487f37096`: bounded corner rounding and face clipping, readable selected stratum cores/direction/opposition marks, and one shared segment handoff for paint/pick/report. See the continuation and receipt below; close crossings can still crowd marks. |
-| Attachment in other presentations | Open presentation limitation from independent source review: world-space square clipping does not match tilted billboard projection, rounded/circular silhouettes, scaled suggestion faces or lifted nodes. Use the existing shared face/camera authority for a later attachment extension; do not create a host-only shape model. |
+| Attachment in other presentations | Qualified on source `0b7454123` through the shared billboard/camera model for tilted/yawed, rounded/circular, scaled suggestion and lifted profiles. Frame/face placement, visual selection, self arches and responsive clipping share the model. See the continuation and receipt below for scripted-profile, visible-stem and cohort limits. |
 | Strength and physical explanation | Deferred to dynamics: held assertion counting is the current default, and endpoint physics retains one spring per visible source row. Weighted policy, one aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance are not part of this continuation. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
@@ -215,6 +215,87 @@ No measured frame-time improvement is claimed: the verified simplification is
 removal of the unused paint/pick report and intermediate maps, filtering before
 provenance cloning, and one joined stroke per centerline. Knot checkpoint
 confidentiality remains in its separate storage lane.
+
+### Shared billboard attachment — 2026-10-18
+
+**Status: qualified on source `0b7454123426578a22d02a8e530b67c0e6f237b0`.** Mark selected the remaining attachment
+limits and authorized orchestration. The integration baseline is refreshed Mere
+`908283728479cf3b9a666a68b9e360418b46301b`, refreshed before qualification onto
+`9b8c161a831aa9615c84a4bbfaea9b15021e3659`. Knot checkpoint confidentiality
+retains its separate storage owner.
+
+**Findings:** the painted outer body is an upright billboard, distinct from the
+inset icon and the physical collider. Its projected center, grammar scale,
+rounded/circular outline and visual lift previously had separate arithmetic in
+frame layout, picking and path attachment. Raised links deliberately join the
+ground foot of the stem. Self-loop arches and node marquee selection also
+assumed square, unrotated geometry; Ring borders enlarged the painted box
+beyond the declared side under CSS content sizing.
+
+The shared Pictograph `NodeBillboard` value resolves these inputs from current
+Canvas and camera state. Frame/body and inset face placement, visual picking,
+screen-space marquee selection and responsive clipping consume that model.
+Borders fit its declared outer size. Link hit tolerance is measured in screen
+pixels; no second path list or persistent geometry cache is introduced.
+Canonical source identity, endpoint forces and physical colliders retain their
+owners. Invalid projections and unsafe paths explicitly retain resting paths.
+
+Done conditions:
+
+- Flat, tilted/yawed, rounded, circular, scaled suggestion and lifted profiles
+  use one projected silhouette. Ordinary attachments meet that silhouette;
+  lifted attachments retain exact stem feet. Self-loop resting arches follow
+  the same presentation contract.
+- Picking and marquee selection follow painted positions and silhouettes,
+  including Glyph corners and projected link tolerances. Focused regressions
+  preserve canonical strata, aliases, source facts and view-local reset.
+- Locked/offline shared and Graphshell checks, product/viewer builds and port
+  boundaries pass on a recorded source. Scripted shared-API profiles run in the
+  normal graph route, with independent body-layout readback, reviewed captures
+  and a fresh OS-process reopen. These profile commands are qualification
+  inputs, not newly exposed ordinary user controls.
+
+**Progress, 2026-10-18:** shared geometry, responsive attachment and the reviewed
+self-loop, marquee, visual-picking and Ring-border corrections are implemented.
+Focused response checks pass. Self-loop construction reuses one shared route;
+raised strata form separate downward arches with exact stem-foot endpoints.
+Final committed-source checks, native/reopen qualification and publication
+remain pending.
+
+**Findings, browser precision follow-through:** the first eight-capture native
+run passed the independent rendered-bounds and 0.05px attachment checks, but
+the circular profile's strict-interior probe reported a crossing. The matching
+CPU cohort reproduced 0.000019073px of inward `f32` round-off, exceeding the
+former fixed 0.00001px predicate. `NodeBillboard` now owns the strict-interior
+predicate and its coordinate-scaled floating-point allowance; responsive paths,
+self-loops and qualification reuse it. Boundary round-trips and an actual
+0.1px intrusion have separate regressions. The visible attachment/readback
+gates are unchanged; the failed native result is retained for comparison.
+
+**Qualification, 2026-10-18:** the [shared-attachment receipt](../../../support/receipts/link-model-shared-attachments-20261018/README.md)
+records 573 library and five integration passes, 312 Graphshell passes, locked
+product WebGPU/viewer builds and port boundaries. The full canvas run used one
+test thread; the existing 2ms wall-clock assertion passed unchanged. Earlier
+fixture and contention failures remain recorded.
+
+Chrome 155 on Apple Metal/WebGPU passed eight seed captures and two captures
+after a verified OS-process restart. Every profile passed actual Livery body
+bounds versus model readback within 0.05px, boundary/foot attachment within
+0.05px, zero strict interior crossings and zero responsive presentation
+fallbacks. Projected Resource picking opened its exact source. All ten images
+were reviewed. The stored graph reopened and its 15,699-byte source reading
+and runtime graph revision 21 matched exactly. Temporary response, camera,
+shape, suggestion and lift settings reset; grammar returns to the host's
+existing enabled default. Correcting that script expectation changed only
+qualification input after compilation.
+
+The native lifted fixture rises 16px, so its foot remains within its 36px body;
+larger exposed stems and separated self arches are covered by CPU regressions.
+Profile commands call real shared Canvas APIs but are scripted inputs, not
+new ordinary Graphshell controls. Conservative overlap refusal, larger cohorts,
+central crossing density and grammar/territory contrast retain their named
+bounds. Physics colliders, endpoint dynamics and Knot checkpoint storage keep
+their separate owners. No frame-time improvement is claimed.
 
 ## Authority and scope
 

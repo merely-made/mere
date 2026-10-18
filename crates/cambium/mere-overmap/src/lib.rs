@@ -33,3 +33,29 @@ pub mod wire;
 pub mod route;
 #[cfg(feature = "view")]
 pub mod route_session;
+
+/// Native, ephemeral resident reads over an admitted application door.
+#[cfg(all(feature = "resident", not(target_arch = "wasm32")))]
+pub mod materialization;
+
+/// Check that disclosed graph material belongs to the requested application
+/// and the exact attached session position. Read-only material is valid.
+pub fn validate_graph_material(
+    envelope: &wire::SessionGraphV1,
+    application: &str,
+    session: pandect::SessionId,
+    epoch: scenotime::SceneEpoch,
+    revision: scenotime::Revision,
+) -> Result<(), String> {
+    if envelope.schema != wire::SESSION_GRAPH_SCHEMA
+        || envelope.application != application
+        || envelope.session != session
+        || envelope.epoch != epoch
+        || envelope.revision != revision
+    {
+        return Err(
+            "The graph material has another application, session or acknowledged position.".into(),
+        );
+    }
+    Ok(())
+}

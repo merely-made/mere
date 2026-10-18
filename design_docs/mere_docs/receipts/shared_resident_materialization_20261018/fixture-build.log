@@ -1,0 +1,16 @@
+error: no bin target named `c1_resident_receipt` in `djinn` package
+help: available bin targets:
+    c1-receipt-host
+    distillery-installed
+    distillery_chronicle_receipt_host
+    djinn
+    djinn-devices
+    djinn-site
+    dr-c-receipt-host
+    dramatis-review-host
+    graphshell_native_host
+    h4_identity_receipt
+    h4d_browser_receipt_host
+    h4e_browser_import_receipt_host
+    persona_switch_receipt
+    tucket-custody-receipt-host

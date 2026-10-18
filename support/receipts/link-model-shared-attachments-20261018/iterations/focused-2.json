@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas",
+    "responsive_links"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "908283728479cf3b9a666a68b9e360418b46301b",
+  "started": "2026-10-18T16:16:19.060987+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas.rs\n M crates/canvas/pictograph/src/canvas/build.rs\n M crates/canvas/pictograph/src/canvas/edge_cells.rs\n M crates/canvas/pictograph/src/canvas/frame.rs\n M crates/canvas/pictograph/src/canvas/input.rs\n M crates/canvas/pictograph/src/canvas/node_presentation.rs\n M crates/canvas/pictograph/src/canvas/responsive_links.rs\n M crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/legibility.rs\n M crates/canvas/pictograph/src/canvas/scene_paint.rs\n M crates/canvas/pictograph/src/canvas/view.rs\n M ports/graphshell/src/web_tree/lane.rs\n?? crates/canvas/pictograph/src/canvas/node_billboard.rs\n?? crates/canvas/pictograph/src/canvas/node_billboard_tests.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links/geometry_tests.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/attachment.rs\n?? ports/graphshell/src/web_tree/lane/link_attachment.rs\n?? ports/graphshell/web/scenarios/p4_tree_link_attachments.scn\n?? ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn\n",
+  "exit_code": 101,
+  "finished": "2026-10-18T16:16:33.101737+00:00",
+  "log_sha256": "171756cad539566864135d4ac2e7613489e844074964f753c1481eca41d26336",
+  "suites": []
+}
