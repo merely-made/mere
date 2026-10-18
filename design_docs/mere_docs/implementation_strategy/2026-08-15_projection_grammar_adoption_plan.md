@@ -2644,10 +2644,22 @@ any manual changes rather than defining a separate content authoring grammar.
 
 > wait, have i used the term aspect before?
 
-Yes: prompt 14 contains Mark's words "if i wanted to apply some structural aspect
-of the arrangement of words from elsewhere, i'd choose that aspect and apply it
-to the words i'm editing". This is ordinary descriptive language. The subsequent
-assistant phrasing does not establish Aspect as a named product term, a UI label,
-a shared entity type or a universal taxonomy. Concrete structure and domain
-terms must carry the next visual examples; technical modeling remains separate.
-No runtime code or qualification claim changes in this review record.
+The assistant initially answered from prompt 14's conversational use and said
+that the word had not been established as a product/model term. Mark clarified:
+
+> oh, i meant before in the stack
+
+The canonical terminology already defines **aspect** as "a way of dividing what a
+mere holds", ruled by Mark on 2026-10-04 in graph-semantics ruling 16. Mark's earlier
+proposal was "Hm. Maybe aspect could distinguish the various senses of graph there
+too, the planes, layers, tiers and whatnot", and the selected ruling was "Umbrella,
+parts keep names (Recommended)". Its existing table covers strata, planes, keeping,
+attention, tiers and coverage. See [TERMINOLOGY](../../TERMINOLOGY.md) and the
+[graph-semantics ruling](2026-10-04_graph_semantics_plan.md), round 4/ruling 16.
+
+The previous assistant answer missed this established stack meaning and is
+corrected here. Prompt 14's descriptive phrase does not automatically classify
+metrical patterns, rhyme schemes or bar grouping as new aspects in that existing
+sense. Check such a mapping against the canonical definition before proposing it;
+use concrete domain terms in the visual examples. No existing terminology ruling,
+new shared entity type or runtime behavior is changed by this clarification.
