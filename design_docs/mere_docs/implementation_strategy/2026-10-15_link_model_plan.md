@@ -23,6 +23,67 @@ commit `339a86c9e` was based on `39035965a` after renderer adoption. The first
 delivery's combined source `4f4678522` also includes published native-fold integration
 `2d0d38f7c`.
 
+## Current backlog and ordinary-graph continuation — 2026-10-17
+
+**Status: ordinary-graph responsive paths in progress.** Mark authorized this
+continuation after reviewing the current backlog. The bounded P1–P7 receipts
+below remain complete on their recorded sources; older sections describing an
+open gate are delivery history and are superseded by their qualification
+continuations. L1–L13 remain settled. The integration baseline is refreshed Mere
+`26a67386fa4c58e7fb7962680eddeb56c2f988c0`.
+
+| Work | Current boundary and owner |
+| --- | --- |
+| Responsive paths on an ordinary graph | Active in this continuation: connect the bounded Numen evaluator and shared link adapter to the normal Graphshell canvas, with explicit view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
+| Strength and physical explanation | Deferred to dynamics: held assertion counting is the current default, and endpoint physics retains one spring per visible source row. Weighted policy, one aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance are not part of this continuation. |
+| Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
+| Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
+| Live source refresh and immutable public revisions | Separate source/receiving work: MereHost public revision availability remains explicit, and Knot's qualified reader is a startup snapshot. Automatic resident refresh/synchronization is not implied. |
+| Promotion in further products or across stores | Separate receiving scope: P7 qualifies Graphshell with one owning source per freeze. Foreign-store aggregate promotion and another host's review UI need their own admission and acceptance. |
+| Historical storage qualification | Pre-P2 binary archives and browser anti-eviction guarantees retain storage/migration owners; JSON and current-source compatibility receipts do not close them. |
+| Compatibility cleanup | `EdgeAssertion::Semantic.decay_progress` is still accepted and discarded by `graph/edge_ops.rs`; retire the unused write surface while preserving required historical readers in a separate bounded cleanup. |
+| Knot checkpoint confidentiality | **Separate Knot storage lane**, recorded in `knot-editor/design_docs/2026-09-30_knot_composition_readings.md`, “Finding and deferred storage work”. Personal checkpoint sealing and existing-checkpoint handling are not implemented by this Mere feature and must not disappear from the backlog. |
+
+Woodshed's Stage/Set P7 is its Looper plan, distinct from link-model P7
+promotion. The intervening exploration, practice-clock, Rehearsal, Looper,
+recording and scroll work was product follow-through, not an extension of the
+link-model phase gate. Its current published CoreAudio and production-scroll
+receipts live in Woodshed; their source-specific qualifications are not copied
+into this plan.
+
+### Feature target: responsive paths on the normal Graphshell canvas
+
+Keep the normal graph, source reading, camera, selection and opened-link flow.
+Responses begin disabled. Explicit view-local controls enable field response and
+compatible-link attraction independently; relationship membership alone never
+installs a force. Temporary path geometry must retain canonical link/stratum,
+displayed occurrence and exact directed assertion correspondence. Ordinary
+fields and declared compatibility must remain inspectable. The existing endpoint
+force law, graph truth, source revision and durable assertion storage keep their
+owners.
+
+Done conditions:
+
+- Paint and picking use the same bounded responsive geometry over current
+  ordinary graph appearances, preserving boundary attachment, self-links,
+  direction/opposition marks, both strata and exact member opening.
+- Field-only, compatibility-only, combined and disabled controls produce
+  attributable, deterministic geometry. Missing/ineligible inputs, hidden links,
+  source changes and finite work limits give explicit outcomes rather than
+  fabricating identity, silently changing truth or displaying stale paths.
+- Source tests cover identity, visibility, geometry/picking, failure and
+  lifecycle controls. A normal-graph browser seed and fresh-page reopen use
+  ordinary controls and reviewed captures, with exact source/assertion and
+  view-local reset or retained-setting behavior recorded separately.
+- Qualification records actual process exits, build/source identity, bounds,
+  reviewed images and limits. No wider physics, cross-product intake, source
+  synchronization, Knot storage fix or physical acceptance is inferred.
+
+**Progress, 2026-10-17:** backlog recorded in the existing plan. Source work uses
+an isolated worktree; the integration owner controls shared API, builds,
+browser/native scheduling, evidence and publication. Disjoint agents first map
+the ordinary rendering/picking seam and the acceptance harness before writes.
+
 ## Authority and scope
 
 The [link model](../technical_architecture/2026-10-15_link_model.md) owns the
