@@ -14,6 +14,30 @@ keep their words as history (stack seams S14 pass, batch 43).
 
 Earlier status (2026-09-04): active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
 
+## Shared graph label placement (2026-10-17)
+
+Status: in progress; source and native qualification pending. Woodshed's
+Related graph exposes collisions in Cambium's shared graph-canvas labels.
+The material projection and node coordinates remain product-owned; screen-space
+label placement belongs to the shared component. Independently choosing a quiet
+axis gives neighboring labels the same space, and the prior optional culling
+computed different rectangles from those emitted into CSS.
+
+The resolver tries alternate anchored sides before suppressing a label, uses
+one bounded box for CSS and collision tests, and avoids node/overlay footprints.
+Collision culling defaults on; the existing explicit opt-out retains a diagnostic
+show-all policy. Selected, focused, then hovered nodes get stable first choice;
+mutual emphasis is no longer an exemption from collision checks. Explicit host
+side overrides remain directional requests; full accessible names and native
+node targets survive omitted visible labels. Offscreen anchors do not leave
+orphaned text clamped to the viewport edge. Font-width estimates choose box size;
+they do not claim intrinsic glyph measurement. Bounded overflow remains clipped.
+
+Done conditions: shared component regressions, real retained-layout geometry
+controls, Woodshed's native default/Fit/zoom/pan/compact/navigation captures, and
+source-bound receipts. Ordinary Pictograph responsive paths are a separate lane.
+Publication requires maintainer approval after local qualification.
+
 ## Cross-domain relationship recipe continuation (2026-10-05)
 
 Status: shared implementation and Knot adoption published and qualified;
