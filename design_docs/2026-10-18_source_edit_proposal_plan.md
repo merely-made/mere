@@ -1,9 +1,10 @@
 # Shared source-edit proposals
 
-**Date:** 2026-10-18. **Status:** shared core and both adapters locally qualified
-with an explicit new-supplier override on Mere `e6250fd1c`, Isocosm `183a2f67`, and Knot `7e196c534`.
-No commit or push is part of this implementation pass. The combined report is
-[retained in testing](/Users/markik/Code/testing/shared-source-edit-20261018/REPORT.md).
+**Date:** 2026-10-18. **Status:** supplier and both adapters published with Git-only receiving qualification. Supplier:
+[Mere `70deef2c8`](https://github.com/merely-made/mere/commit/70deef2c8cf3d3410ae35b496a9396514070b24f).
+Initial local-override evidence is retained in the
+[implementation report](/Users/markik/Code/testing/shared-source-edit-20261018/REPORT.md)
+and [deduplication report](/Users/markik/Code/testing/source-edit-dedup-20261018/REPORT.md).
 
 ## Context and decision
 
@@ -71,14 +72,16 @@ The shared object cannot observe host mutation or create authority.
 
 Workflows and raw receipts live in
 `Code/testing/shared-source-edit-20261018/`, with `core/`, `isocosm/`, and `knot/`
-owners. Consumer manifests keep canonical Mere Git `branch = "main"` source
-identity. Before the new package is published to that branch, explicit local
+owners. Consumer manifests use the canonical Mere Git URL. Initial local
+qualification used `branch = "main"`; the publication continuation below records
+the bounded Knot revision pin. Before the new package was published, explicit local
 Cargo patch configuration may qualify only `mere-source-edit`; it must not
 silently repin other Mere suppliers. The local-override basis, resulting lock
 shape and normal remote-resolution limitation must be recorded.
 
-This pass does not authorize upstream publication, broad supplier updates or
-replacement of live file stores. Fresh-process reopening and automated host
+The subsequent user request authorizes supplier publication followed by scoped
+consumer lock updates, unpatched receiving checks and consumer publication.
+Replacement of live file stores is outside this slice. Fresh-process reopening and automated host
 tests do not by themselves constitute reviewed native GUI qualification.
 
 ## Progress
@@ -160,3 +163,44 @@ net fields removed); three handwritten source comparisons are shared checks.
 Its production workflow shrinks ten lines, but extracted adapter helpers add
 35; this is state/guard consolidation, not an overall LOC reduction. Isocosm
 removes hand-built undo ranges and a second revision computation.
+
+## Published supplier and Git-only intake — 2026-10-18
+
+The user authorized supplier-first publication, then unpatched receiving checks
+and scoped consumer publication. Mere was fetched and the supplier commit
+rebased onto `908283728`; the published implementation is
+[`70deef2c8`](https://github.com/merely-made/mere/commit/70deef2c8cf3d3410ae35b496a9396514070b24f).
+Six tests, strict all-target Clippy and Rust 1.97.1 tests pass on that source.
+The earlier local-override results above are historical qualification stages.
+
+Isocosm's [consumer commit `276157b7`](https://github.com/merely-made/isocosm/commit/276157b776c59394923550b0b42d543b317210d9)
+uses canonical Git main, with the committed lock resolving the new supplier at
+`70deef2c8`. Its 75 feature/58 default tests, all-feature/all-target check,
+scoped Clippy, Rust 1.97.1 binary check and build pass without overrides.
+The real workflow passes 59 commands/five fresh processes and all 64 normalized
+ready/command records match the preceding qualification. Default normal runtime
+dependencies exclude the optional source-edit/Taplo/Rowan tooling.
+
+Knot isolates only the new supplier with the canonical Git URL and exact
+published `rev = "70deef2c8cf3d3410ae35b496a9396514070b24f"`. A common `main`
+source would unify existing Mere dependencies at that revision, requiring a
+broader supplier update and exposing unrelated desktop API changes. The explicit
+remote revision avoids that update without a local override. Cargo generates
+both root and standalone document locks; existing package versions and source
+revisions remain unchanged. This is a deliberate bounded exception to the
+usual first-party main-branch convention.
+
+The [publication report](/Users/markik/Code/testing/source-edit-publication-20261018/REPORT.md)
+retains fresh receiving logs, resolved Git metadata and workflow receipts.
+Old testing evidence is unchanged. The repository-wide documentation audit has
+exactly the same pre-existing diagnostics as the preceding pass, recorded in
+`core/doc-audit-comparison.json`. GUI review and broader compatibility remain
+separate claims.
+
+Knot's [consumer commit `d2d5c32`](https://github.com/merely-made/knot-editor/commit/d2d5c32942d40af47223790ed3e16bc88fa59aa6)
+passes 53 default/66 engine document tests, 53 tests on Rust 1.97.1 (one existing
+ignore in each), 11 link-model cases, four desktop workflow cases, two fresh
+child-process reopens and the menu/layout/focus scenario. Strict library Clippy,
+scoped desktop Clippy, formatting and diff checks pass with baseline warnings
+and the previous strict all-test lint limitation retained. Both consumer commits
+are pushed to their respective origin main branches. Only this work was staged.
