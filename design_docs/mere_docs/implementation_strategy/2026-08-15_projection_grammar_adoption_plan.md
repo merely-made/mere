@@ -2562,7 +2562,47 @@ across reopen, two views with independent selection/navigation and shared conten
 and expansion/collapse restoring original authored coordinates without adding a
 Pool arrangement edit. These are required future checks, not new passing receipts.
 
-The next unresolved ownership interactions are which Pool history exposes undo of
-a cross-Pool Move, and what happens to an open item editor when its membership is
-removed. Prompt these separately; neither follows automatically from the decisions
-above. No runtime code changes are implied by recording these answers.
+Prompts 36–37 below resolve which Pool history exposes undo of a cross-Pool
+Move and what happens to an open item editor when its membership is removed.
+No runtime code changes are implied by recording these answers.
+
+
+#### Pool review: coordinated Move undo and open editors (prompts 36–37)
+
+**Prompt 36 — where a cross-Pool Move can be undone:**
+
+> Either Pool’s history can undo the same Move (Recommended)
+
+The source and destination histories expose the same logical transfer. Invoking
+undo from either side reverses that coordinated Move; the two entries must not
+act as independent transfers or undo the same operation twice. Preserve the
+held item's content identity and its separate editor history. Ordering and stale
+operation checks must respect later changes rather than silently overwriting
+them. The audit's cross-store coordination and restoration proof remain required;
+this answer does not claim that an existing session merge implements item Move.
+
+**Prompt 37 — removing an item while it is open in its usual editor:**
+
+> Keep the editor open; saving updates its content without adding it back to Pool (Recommended)
+
+Pool membership removal does not close the editor or discard its working state.
+Save continues to update the held content through its normal owner/history;
+it does not recreate membership in the former Pool. Pool undo remains able to
+restore membership while content editing retains its separate history. The
+content owner must remain addressable through this lifecycle, including when
+membership has been removed; do not model removal as immediate payload deletion.
+This answer concerns an individual item, distinct from archiving the whole Pool
+and its container under prompt 33.
+
+These answers settle the immediate Pool ownership choices for the first
+integration proof. Required future cases include undoing one transfer from either
+history, coherent source/destination state after failure or reopen, removal while
+an editor has unsaved work, Save without implicit re-addition, and membership
+undo without reverting content edits. No runtime implementation or historical
+qualification changes are made here.
+
+Return next to the outstanding composition decisions: content identity between
+saved alternatives, selecting structural aspects to apply, and resolving template
+update conflicts. Saved alternatives within one composition, separate Insert and
+Apply operations, explicit template updates, preservation of local work and
+conflict disclosure are already agreed and are not reopened.
