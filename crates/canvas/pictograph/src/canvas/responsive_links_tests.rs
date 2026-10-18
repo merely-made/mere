@@ -162,3 +162,36 @@ fn graph_swap_clears_graph_field_and_compatibility_targets() {
     assert!(canvas.link_path_response().selected_fields.is_empty());
     assert!(canvas.link_path_response().view_field.is_none());
 }
+
+#[test]
+fn compatibility_only_keeps_ungrouped_paths_at_exact_rest_geometry() {
+    let mut canvas = Canvas::with_sample_graph();
+    let baseline = canvas.visible_link_paths();
+    let grouped = baseline[0].key.clone();
+    assert!(baseline.iter().any(|path| path.key != grouped));
+    let mut settings = LinkPathResponse::default();
+    settings.compatible_attraction = true;
+    settings.compatible_links.push(grouped.clone());
+    canvas.set_link_path_response(settings);
+    let report = canvas.link_path_response_report();
+    assert_eq!(report.state, LinkPathState::Applied);
+    for before in baseline.iter().filter(|path| path.key != grouped) {
+        let after = report
+            .paths
+            .iter()
+            .find(|path| {
+                path.key == before.key
+                    && path.displayed_from == before.displayed_from
+                    && path.displayed_to == before.displayed_to
+            })
+            .unwrap();
+        assert_eq!(after.points, before.points);
+        assert!(!after.responsive);
+    }
+    assert!(
+        report
+            .paths
+            .iter()
+            .any(|path| path.key == grouped && path.responsive)
+    );
+}
