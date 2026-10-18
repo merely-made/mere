@@ -1,0 +1,936 @@
+Process argv: ["cargo", "--config", "build.build-dir=\"/Users/markik/Code/repos/mere/ports/graphshell/web/target/build\"", "check", "--locked", "--offline", "-j1", "--target-dir", "/Users/markik/Code/repos/mere/ports/graphshell/web/target", "--target", "wasm32-unknown-unknown", "--no-default-features", "--features", "presentation-webgpu"]
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Checking serde_core v1.0.229
+    Checking serde v1.0.229
+    Checking cfg-if v1.0.5
+    Checking once_cell v1.21.4
+    Checking unicode-ident v1.0.26
+    Checking wasm-bindgen-shared v0.2.129
+    Checking wasm-bindgen v0.2.129
+    Checking smallvec v1.16.1
+    Checking libm v0.2.16
+    Checking arrayvec v0.7.8
+    Checking num-traits v0.2.19
+    Checking rand_core v0.10.1
+    Checking getrandom v0.4.3
+    Checking foldhash v0.2.0
+    Checking bytemuck v1.25.2
+    Checking hashbrown v0.17.1
+    Checking itoa v1.0.18
+    Checking stable_deref_trait v1.2.1
+    Checking equivalent v1.0.2
+    Checking pin-project-lite v0.2.17
+    Checking memchr v2.8.3
+    Checking log v0.4.34
+    Checking typenum v1.20.1
+    Checking zerofrom v0.1.8
+    Checking indexmap v2.14.2
+    Checking yoke v0.8.3
+    Checking zmij v1.0.23
+    Checking serde_json v1.0.151
+   Compiling thiserror v2.0.21
+    Checking slab v0.4.12
+    Checking zerovec v0.11.8
+    Checking euclid v0.22.14
+    Checking futures-core v0.3.34
+    Checking scopeguard v1.2.0
+    Checking writeable v0.6.4
+    Checking parking_lot_core v0.9.12
+    Checking lock_api v0.4.14
+    Checking hybrid-array v0.4.15
+    Checking uuid-rng-internal v1.27.0
+    Checking futures-task v0.3.34
+    Checking sha1_smol v1.0.1
+    Checking uuid v1.27.0
+    Checking futures-util v0.3.34
+    Checking parking_lot v0.12.5
+    Checking tinystr v0.8.4
+    Checking litemap v0.8.3
+    Checking bitflags v2.13.2
+    Checking icu_locale_core v2.3.0
+    Checking js-sys v0.3.106
+    Checking potential_utf v0.1.6
+    Checking zerotrie v0.2.5
+    Checking utf8_iter v1.0.4
+    Checking icu_collections v2.2.0
+    Checking icu_provider v2.3.1
+    Checking crypto-common v0.2.2
+    Checking serde_bytes v0.11.19
+    Checking siphasher v1.0.3
+    Checking phf_shared v0.13.1
+    Checking linebender_resource_handle v0.1.1
+    Checking icu_properties_data v2.2.0
+    Checking block-buffer v0.12.1
+    Checking icu_properties v2.2.0
+    Checking icu_normalizer_data v2.2.0
+    Checking phf v0.13.1
+    Checking icu_normalizer v2.2.0
+    Checking tracing-core v0.1.36
+    Checking polycool v0.4.0
+    Checking new_debug_unreachable v1.0.6
+    Checking byteorder v1.5.0
+    Checking const-oid v0.10.2
+    Checking rustc-hash v1.1.0
+    Checking naga-types v30.0.1
+    Checking digest v0.11.3
+    Checking tracing v0.1.44
+    Checking kurbo v0.13.1
+    Checking font-types v0.12.5
+    Checking color v0.3.3
+    Checking static_assertions v1.1.0
+    Checking precomputed-hash v0.1.1
+    Checking simd-adler32 v0.3.10
+    Checking svg_fmt v0.4.5
+    Checking guillotiere v0.7.0
+    Checking string_cache v0.9.0
+    Checking profiling v1.0.18
+    Checking peniko v0.6.1
+    Checking read-fonts v0.41.0
+    Checking idna_adapter v1.2.2
+    Checking web-sys v0.3.106
+    Checking adler2 v2.0.1
+    Checking constant_time_eq v0.4.2
+    Checking raw-window-handle v0.6.2
+    Checking percent-encoding v2.3.2
+    Checking form_urlencoded v1.2.2
+    Checking blake3 v1.8.7
+    Checking accesskit v0.24.1
+    Checking zerocopy v0.8.57
+    Checking idna v1.1.0
+    Checking web_atoms v0.2.6
+    Checking skrifa v0.44.0
+    Checking sha2 v0.11.0
+    Checking tendril v0.5.1
+    Checking wasm-bindgen-futures v0.4.79
+    Checking web-time v1.1.0
+    Checking sceno v0.0.5 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/scenes/sceno)
+    Checking markup5ever v0.39.0
+    Checking url v2.5.8
+    Checking half v2.7.1
+    Checking crc32fast v1.5.2
+    Checking wgpu-types v30.0.1
+    Checking miniz_oxide v0.9.1
+    Checking mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/forme/curation)
+    Checking allocator-api2 v0.2.21
+    Checking hashbrown v0.16.1
+    Checking flate2 v1.1.10
+    Checking wgpu v30.0.1
+    Checking miniz_oxide v0.8.9
+    Checking fdeflate v0.3.7
+    Checking foldhash v0.1.5
+    Checking hashbrown v0.15.5
+    Checking vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking hash32 v0.2.1
+    Checking fixedbitset v0.5.7
+    Checking petgraph v0.8.3
+    Checking ptr_meta v0.3.2
+    Checking zeroize v1.9.1
+    Checking heapless v0.7.17
+    Checking vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking png v0.18.1
+    Checking layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking futures-intrusive v0.5.0
+    Checking cobs v0.3.0
+    Checking font-types v0.11.3
+    Checking unicode-width v0.2.2
+    Checking bit-vec v0.9.1
+    Checking bit-set v0.10.0
+    Checking codespan-reporting v0.13.1
+    Checking read-fonts v0.39.2
+    Checking postcard v1.1.3
+    Checking netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking slotmap v1.1.1
+    Checking rancor v0.1.3
+    Checking paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+    Checking app_units v0.7.8
+    Checking command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/command-menu)
+    Checking simdutf8 v0.1.5
+    Checking fearless_simd v0.7.0
+    Checking dtoa v1.0.11
+    Checking dtoa-short v0.3.5
+    Checking vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking bytecheck v0.8.3
+    Checking genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking naga v30.0.1
+    Checking icu_locale_data v2.2.0
+    Checking xml5ever v0.39.0
+    Checking html5ever v0.39.0
+    Checking workbench v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/workbench)
+    Checking unicode-segmentation v1.13.3
+    Checking genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking encoding_rs v0.8.42
+    Checking cssparser v0.37.0
+    Checking munge v0.4.7
+    Checking libc v0.2.190
+    Checking genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking icu_locale v2.2.0
+    Checking psm v0.1.32
+    Checking vello_gpu_shaders v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking rend v0.5.4
+    Checking glifo v0.4.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking icu_segmenter_data v2.2.0
+    Checking regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking grid v1.0.1
+   Compiling crossbeam-utils v0.8.23
+    Checking parlance v0.1.0
+    Checking memmap2 v0.9.11
+    Checking genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking taffy v0.11.0-experimental-cache-fix.3
+    Checking muniment v0.1.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/eidetic/muniment)
+    Checking rkyv v0.8.18
+    Checking genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking icu_segmenter v2.2.0
+    Checking vello_gpu v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking stacker v0.1.25
+    Checking cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking strum v0.28.0
+    Checking skrifa v0.42.1
+    Checking harfrust v0.8.4
+    Checking netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+    Checking scenograph v0.0.4 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/scenes/scenograph)
+    Checking parley_data v0.10.0
+    Checking approx v0.5.1
+    Checking genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking backstep v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/backstep)
+    Checking fnv v1.0.7
+    Checking cfb v0.7.3
+    Checking scenomise v0.0.5 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/scenes/scenomise)
+warning: unused variable: `time_range`
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+    Checking genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+    Checking numen v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/conatus/numen)
+    Checking livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking chartulary v0.2.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/eidetic/chartulary)
+    Checking mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/forme/forme)
+    Checking inout v0.2.2
+    Checking wide v1.7.1
+    Checking num-integer v0.1.47
+    Checking num-complex v0.4.6
+    Checking cmov v0.5.4
+    Checking powerfmt v0.2.0
+    Checking unicase v2.9.0
+    Checking deranged v0.5.8
+    Checking time-core v0.1.9
+    Checking rawpointer v0.2.1
+    Checking data-url v0.3.2
+    Checking mime v0.3.17
+    Checking num-conv v0.2.2
+    Checking time v0.3.55
+    Checking mime_guess v2.0.5
+    Checking genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking matrixmultiply v0.3.11
+    Checking ctutils v0.4.2
+    Checking simba v0.10.2
+    Checking num-rational v0.4.2
+    Checking crossbeam-channel v0.5.17
+    Checking infer v0.19.0
+    Checking glam v0.33.8
+    Checking scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/scenes/scenotime)
+    Checking signature v3.0.0
+    Checking subtle v2.6.1
+    Checking base64 v0.22.1
+    Checking chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/chirograph)
+    Checking curve25519-dalek v5.0.0
+    Checking ed25519 v3.0.0
+    Checking nalgebra v0.35.0
+    Checking mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `address_from_url`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/node.rs:26:31
+   |
+26 | use crate::address::{Address, address_from_url};
+   |                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:722:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+722 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+748 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+758 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 20 warnings (run `cargo fix --lib -p mere-kernel` to apply 9 suggestions)
+    Checking universal-hash v0.6.1
+    Checking cipher v0.5.2
+    Checking paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+    Checking robust v1.2.0
+    Checking anymore v1.0.0
+    Checking meristem v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/meristem)
+    Checking spade v2.15.1
+    Checking pin-project v1.1.13
+    Checking chacha20 v0.10.2
+    Checking poly1305 v0.9.1
+    Checking glamx v0.3.1
+    Checking ed25519-dalek v3.0.0
+    Checking aead v0.6.1
+    Checking mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/surface-api)
+    Checking sprigging v0.2.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/sprigging)
+    Checking futures-channel v0.3.34
+    Checking ena v0.14.4
+    Checking ordered-float v5.5.0
+    Checking tinct v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/tinct)
+    Checking cursor-icon v1.2.0
+    Checking downcast-rs v2.0.2
+    Checking dpi v0.1.2
+    Checking smol_str v0.2.2
+    Checking either v1.18.0
+    Checking regex-syntax v0.8.11
+    Checking regex-automata v0.4.18
+    Checking parry2d v0.31.1
+    Checking winit v0.30.13
+    Checking thiserror v1.0.69
+    Checking gloo-timers v0.3.0
+    Checking cambium v0.3.3 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium)
+    Checking chacha20poly1305 v0.11.0
+    Checking insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+    Checking getrandom v0.3.4
+    Checking ciborium-io v0.2.2
+    Checking option-ext v0.2.0
+    Checking lazy_static v1.5.0
+    Checking sharded-slab v0.1.7
+    Checking dirs-sys v0.4.1
+    Checking ciborium-ll v0.2.2
+    Checking personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+    Checking cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-winit)
+    Checking genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking rapier2d v0.36.0
+    Checking matchers v0.2.0
+    Checking tabard v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/tabard)
+    Checking genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking inker v0.1.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/inker/inker)
+    Checking armillary v0.1.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/armillary)
+    Checking tracing-log v0.2.0
+    Checking serde_path_to_error v0.1.20
+    Checking thread_local v1.1.10
+    Checking nu-ansi-term v0.50.3
+    Checking tracing-subscriber v0.3.23
+    Checking seiche v0.0.6 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/conatus/seiche)
+    Checking uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/forme/uxtree)
+    Checking cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-rootstock/src/producer/registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-rootstock/src/scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-rootstock/src/host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: `cambium-rootstock` (lib) generated 3 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+    Checking notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#5c89001a)
+    Checking ciborium v0.2.2
+    Checking dirs v5.0.1
+    Checking mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/distillery/alembic)
+    Checking mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/cartography)
+    Checking eidetic v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/eidetic/eidetic-core)
+    Checking esp v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/intel/esp)
+    Checking incipit v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/incipit)
+    Checking emblem v0.2.0
+    Checking hex v0.4.3
+    Checking bitflags v1.3.2
+    Checking png v0.17.16
+    Checking pandect v0.1.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect)
+warning: unused import: `std::io`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `into_graph` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/system/pandect/src/graph_codicil.rs:185:19
+    |
+184 | impl GraphCodicil {
+    | ----------------- method in this implementation
+185 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+    Checking pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph)
+warning: function `build_affinity_spring` is never used
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas.rs:68:4
+   |
+68 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `visible_link_appearances` is never used
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:27:15
+   |
+27 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:423:15
+    |
+423 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_hit_test_with_assertion_hides` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:446:15
+    |
+446 | pub(crate) fn link_hit_test_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:471:15
+    |
+471 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:569:15
+    |
+569 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `links_in_rect_with_assertion_hides` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:590:15
+    |
+590 | pub(crate) fn links_in_rect_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:639:15
+    |
+639 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+warning: function `link_overlay_with_assertion_hides` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/canvas/pictograph/src/canvas/edge_cells.rs:661:15
+    |
+661 | pub(crate) fn link_overlay_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `pictograph` (lib) generated 9 warnings
+    Checking graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graphshell/graphshell-endpoint)
+    Checking graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graphshell/graphshell-client)
+    Checking taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#4733c557)
+    Checking mere-apparatus v0.0.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/domain/apparatus)
+    Checking mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/mesquite)
+    Checking graphshell-host v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graphshell/graphshell-host)
+    Checking mere v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/mere)
+    Checking mere-overmap v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/mere-overmap)
+    Checking platen v0.0.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/platen/platen)
+    Checking graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell)
+warning: method `begin_session` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/src/mere_host.rs:433:19
+    |
+269 | impl<B: Backend + Clone> MereHost<B> {
+    | ------------------------------------ method in this implementation
+...
+433 |     pub(crate) fn begin_session(&mut self, graph: Graph) {
+    |                   ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `relation_kind_label` is never used
+    --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/src/mere_host.rs:1479:4
+     |
+1479 | fn relation_kind_label(kind: RelationKind) -> &'static str {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `codicil_graph` is never used
+    --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/src/product.rs:1091:4
+     |
+1091 | fn codicil_graph(snapshot: GraphSnapshot, facets: NodeFacetStore) -> Result<Graph, ProductError> {
+     |    ^^^^^^^^^^^^^
+
+warning: function `decode_codicil` is never used
+    --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/src/product.rs:1441:15
+     |
+1441 | pub(crate) fn decode_codicil(bytes: &[u8]) -> Result<ProductCodicilV3, ProductError> {
+     |               ^^^^^^^^^^^^^^
+
+warning: `graphshell` (lib) generated 4 warnings
+    Checking cambium-genet-web-host v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-genet-web-host)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-genet-web-host/src/recovery.rs:33:18
+   |
+33 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+33 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+33 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: function `next_frame` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/cambium-genet-web-host/src/presentation/boot.rs:146:21
+    |
+146 | pub(crate) async fn next_frame() -> Result<(), String> {
+    |                     ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `cambium-genet-web-host` (lib) generated 2 warnings (run `cargo fix --lib -p cambium-genet-web-host` to apply 1 suggestion)
+    Checking console_error_panic_hook v0.1.7
+    Checking graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/web)
+warning: unused import: `std::rc::Rc`
+  --> ../src/web_timing.rs:24:5
+   |
+24 | use std::rc::Rc;
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2220:7
+     |
+2220 | #[cfg(feature = "main-page")]
+     |       ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+     = note: `#[warn(unexpected_cfgs)]` on by default
+
+warning: unexpected `cfg` condition value: `main-page`
+    --> ../src/web_tree.rs:2222:11
+     |
+2222 | #[cfg(not(feature = "main-page"))]
+     |           ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: expected values for `feature` are: `applets`, `canvas-gpu`, `default`, `dynamics-receipt`, `image-decode`, `moot-resources`, `presentation-webgl2`, `presentation-webgpu`, `product`, `remote`, and `without-classic-vello`
+     = help: consider adding `main-page` as a feature in `Cargo.toml`
+     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+
+warning: unused import: `FIXTURE_WEB_ADDRESS`
+  --> ../src/web_tree.rs:35:54
+   |
+35 | use graphshell::mere_host::{FIXTURE_PERSONA_ADDRESS, FIXTURE_WEB_ADDRESS, SelectedPersonaRef};
+   |                                                      ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `LayoutDom`
+ --> ../src/web_tree/lane/overlay_observation.rs:9:22
+  |
+9 | use layout_dom_api::{LayoutDom as _, LocalName, Namespace};
+  |                      ^^^^^^^^^
+
+warning: unused variable: `snapshot`
+  --> ../src/web_tree/product_off.rs:52:44
+   |
+52 |     pub(super) fn projection_fields(&self, snapshot: ProbeSnapshot) -> ProbeSnapshot {
+   |                                            ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_snapshot`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `mount` is never used
+  --> ../src/web_appearance.rs:91:15
+   |
+91 | pub(crate) fn mount(root: Element, owned: bool) -> Result<Handle, String> {
+   |               ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `backdrop_theme` is never used
+   --> ../src/web_appearance.rs:220:12
+    |
+174 | impl Session {
+    | ------------ method in this implementation
+...
+220 |     pub fn backdrop_theme(&self) -> mere::canvas::backdrop_surface::SurfaceTheme {
+    |            ^^^^^^^^^^^^^^
+
+warning: function `label` is never used
+   --> ../src/web_speed.rs:313:15
+    |
+313 | pub(crate) fn label(speed: Speed) -> String {
+    |               ^^^^^
+
+warning: function `board_line` is never used
+   --> ../src/web_speed.rs:331:15
+    |
+331 | pub(crate) fn board_line(speed: Speed) -> String {
+    |               ^^^^^^^^^^
+
+warning: field `practice` is never read
+   --> ../src/web_tree.rs:495:5
+    |
+440 | pub(crate) struct TreePage {
+    |                   -------- field in this struct
+...
+495 |     practice: Option<practice::Practice>,
+    |     ^^^^^^^^
+
+warning: field `gestures` is never read
+    --> ../src/web_tree.rs:1092:5
+     |
+1087 | struct Tree {
+     |        ---- field in this struct
+...
+1092 |     gestures: gestures::GestureOwner,
+     |     ^^^^^^^^
+
+warning: method `rebind_host_presenter` is never used
+   --> ../src/web_tree/presenter.rs:134:19
+    |
+109 | impl TreePage {
+    | ------------- method in this implementation
+...
+134 |     pub(super) fn rebind_host_presenter(&mut self, envelope: HostDatasetV1) -> Result<(), String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `role` is never read
+  --> ../src/web_tree/product_off.rs:22:16
+   |
+16 | pub(super) struct SavedProduct {
+   |                   ------------ field in this struct
+...
+22 |     pub(super) role: SelectState,
+   |                ^^^^
+
+warning: methods `inspect_link_history`, `link_source`, `open_detail`, and `save` are never used
+   --> ../src/web_tree/product_off.rs:105:19
+    |
+ 42 | impl SavedProduct {
+    | ----------------- methods in this implementation
+...
+105 |     pub(super) fn inspect_link_history(
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+112 |     pub(super) fn link_source(&self) -> Result<scenograph::link::LinkSource, String> {
+    |                   ^^^^^^^^^^^
+...
+124 |     pub(super) fn open_detail(&mut self, _canvas: &Canvas) {
+    |                   ^^^^^^^^^^^
+...
+128 |     pub(super) fn save(&mut self) {
+    |                   ^^^^
+
+warning: methods `pump` and `form_mut` are never used
+  --> ../src/web_tree/remote_off.rs:88:19
+   |
+73 | impl TreeRemote {
+   | --------------- methods in this implementation
+...
+88 |     pub(super) fn pump(&mut self) {
+   |                   ^^^^
+...
+96 |     pub(super) fn form_mut(&mut self) -> &mut ActionForm {
+   |                   ^^^^^^^^
+
+warning: field `fields` is never read
+   --> ../src/web_tree/remote_off.rs:139:16
+    |
+138 | pub(super) struct DraftControls {
+    |                   ------------- field in this struct
+139 |     pub(super) fields: Vec<SelectState>,
+    |                ^^^^^^
+
+warning: `graphshell-web` (lib) generated 17 warnings (run `cargo fix --lib -p graphshell-web` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 25s

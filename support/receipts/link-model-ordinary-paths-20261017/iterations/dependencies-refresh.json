@@ -1,0 +1,17 @@
+{
+  "command": [
+    "cargo",
+    "fetch",
+    "--locked",
+    "--target",
+    "aarch64-apple-darwin"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "a00cec16a1bb78578d63786cfe32fec65da840d3",
+  "started": "2026-10-18T01:39:31.017514+00:00",
+  "status_before": "",
+  "exit_code": 0,
+  "finished": "2026-10-18T01:40:01.654364+00:00",
+  "log_sha256": "c5ddfe434d1157b5a98bf8e7bfa45e7f2b05d703d9bac488b121d1704888d7a4",
+  "suites": []
+}
