@@ -1,0 +1,25 @@
+    Updating crates.io index
+    Updating git repository `https://github.com/merely-made/netrender.git`
+    Updating git repository `https://github.com/merely-made/genet.git`
+    Updating git repository `https://github.com/merely-made/murm.git`
+    Updating git repository `https://github.com/merely-made/dramatis.git`
+    Updating git repository `https://github.com/mark-ik/vello`
+    Updating git repository `https://github.com/iced-rs/iced`
+    Updating git repository `https://github.com/merely-made/knot-editor.git`
+    Updating git repository `https://github.com/merely-made/mere.git`
+    Updating git repository `https://github.com/iced-rs/cryoglyph.git`
+    Updating git repository `https://github.com/hecrj/cosmic-text.git`
+    Updating git repository `https://github.com/merely-made/mere.git`
+    Updating knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e) -> #88eeb975
+    Updating knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e) -> #88eeb975
+    Updating knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e) -> #88eeb975
+    Updating knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e) -> #88eeb975
+    Updating knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e) -> #88eeb975
+    Updating knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#b6a6222e) -> #88eeb975
+      Adding mere-source-edit v0.1.0 (https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c)
+    Updating mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5) -> #7c2432ab
+    Updating murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5) -> #7c2432ab
+    Updating retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5) -> #7c2432ab
+    Updating selvage v0.1.0 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5) -> #7c2432ab
+    Updating tulle v0.2.0 (https://github.com/merely-made/murm.git?branch=main#bd8fe1e5) -> #7c2432ab
+note: pass `--verbose` to see 147 unchanged dependencies behind latest

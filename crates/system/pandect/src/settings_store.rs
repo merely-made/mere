@@ -177,19 +177,13 @@ pub fn settings_path(session_dir: &Path) -> PathBuf {
     session_dir.join(SETTINGS_FILENAME)
 }
 
-/// Serialise `settings` to pretty JSON and write it atomically (tmp + rename) to
+/// Serialise `settings` to pretty JSON and replace it through the shared recoverable writer at
 /// the sidecar path, creating the session directory if needed.
 pub fn save_settings(session_dir: &Path, settings: &PersistedSettings) -> io::Result<()> {
     let target = settings_path(session_dir);
-    if let Some(parent) = target.parent() {
-        fs::create_dir_all(parent)?;
-    }
     let json = serde_json::to_string_pretty(settings)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    let tmp = target.with_extension("json.tmp");
-    fs::write(&tmp, json)?;
-    fs::rename(&tmp, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Read a session sidecar and expose both its current session policy and any

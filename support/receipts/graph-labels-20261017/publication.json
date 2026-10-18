@@ -1,0 +1,18 @@
+{
+  "status": "published",
+  "published_integration_revision": "c8d316b601c89badb3d051f1d30d037435412818",
+  "preserved_supplier_revision": "d1a200b1877223f5b6ced7f5fbaca3671c10f5dd",
+  "receiving_publication_revision": "8204688db9cace84fcf09cd700ea3a3cf2f75b82",
+  "integration_checks": {
+    "cambium": {
+      "passed": 279,
+      "failed": 0
+    },
+    "cambium-rootstock": {
+      "passed": 120,
+      "failed": 0,
+      "ignored": 3
+    }
+  },
+  "scope": "Integration CPU checks on merged Mere; Woodshed native qualification remains bound to its original d1a200b18 supplier. No new native run."
+}

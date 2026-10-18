@@ -1,0 +1,15 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "cambium-rootstock",
+    "--lib",
+    "--no-default-features"
+  ],
+  "started_utc": "2026-10-18T02:07:08.420900+00:00",
+  "exit_code": 0,
+  "source_revision": "c8d316b601c89badb3d051f1d30d037435412818"
+}

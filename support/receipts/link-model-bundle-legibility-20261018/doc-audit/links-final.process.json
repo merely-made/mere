@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "revision": "487f370966630a5c95f64ce4246d79c3d12cd91b",
+  "state": "final qualification documentation and receipts pending publication",
+  "exit_code": 1,
+  "stdout_sha256": "02da35018e51cc332bd019c2dd4d2182bb8c35b18909bd262fb898278983aad0",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

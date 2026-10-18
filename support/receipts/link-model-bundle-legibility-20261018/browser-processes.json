@@ -1,0 +1,27 @@
+{
+  "seed": {
+    "pid": 87304,
+    "process_start_local": "2026-10-18 03:47:53 EDT",
+    "observation": "ps main Chrome process; native AX one NewTab before task tabs",
+    "origin": "http://127.0.0.1:38118",
+    "observed_utc": "2026-10-18T08:06:41.175248+00:00"
+  },
+  "seed_exit": {
+    "observed_utc": "2026-10-18T08:08:23.353865+00:00",
+    "ps_exit_code": 1,
+    "ps_output": "",
+    "native_action": "Chrome menu Quit Google Chrome; CUA reported App quit"
+  },
+  "reopen": {
+    "pid": 3395,
+    "ps_line": "3395 Sun Oct 18 04:08:29 2026     /Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "observed_utc": "2026-10-18T08:08:46.232158+00:00",
+    "native_action": "cua.getApp com.google.Chrome after observed exit; new tab opens same origin/db"
+  },
+  "reopen_exit": {
+    "observed_utc": "2026-10-18T08:09:34.862313+00:00",
+    "ps_exit_code": 1,
+    "ps_output": "",
+    "native_action": "Chrome menu Quit Google Chrome; CUA reported App quit"
+  }
+}

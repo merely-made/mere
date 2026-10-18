@@ -1,0 +1,85 @@
+{
+  "schema": "ordinary-responsive-links-browser-review/v1",
+  "compiled_source": "aa0392a1ba547a55860a6988db48e2d6ba22ee48",
+  "reviewed_at": "2026-10-18T01:57:13.389486+00:00",
+  "reviewers": [
+    "integration owner",
+    "ordinary_path_review subagent"
+  ],
+  "seed_result": "ok",
+  "reopen_result": "ok",
+  "errors": [],
+  "gate_failures": [],
+  "chrome_main_pid_seed": 30916,
+  "chrome_main_pid_reopen": 38280,
+  "process_exit_verified": "chrome-quit.json",
+  "source_facts_equal": true,
+  "source_facts_bytes": 15699,
+  "source_facts_sha256": "03965fa731bb7b1e362eae187e0a037fd0fd2b4b10d12a240c07bdb209d64bf7",
+  "graph_revision_seed": "21",
+  "graph_revision_reopen": "21",
+  "captures": [
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_attractor_field_only.png",
+      "sha256": "7981f2ef558b683e87820fd31e63c14d72ff8d275a4e47d339eba5216fca8b30",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_baseline.png",
+      "sha256": "14154055832d2fcec398913f5a805d0203a385a76bf41589c6fba9bdf057d4cc",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_both_disabled.png",
+      "sha256": "d7ab77d29aa9e5e72c1c1c969c33b5b0884ab32b9304960540de0d250ce97d7a",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_compatible_only.png",
+      "sha256": "d0a1dd2545658e0f155e3e0ed14d21b421520d106bfaf193be0e8015dfc97dcd",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_field_and_compatible.png",
+      "sha256": "7a0d32a41411328c3c61e23f28b370af06096279ce1d9b829efc4255d8859be9",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_field_only.png",
+      "sha256": "7a4d3aad1b2b30f7df2b4f9c1a5da16aa28a919401529c894524c15b65e06741",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_hidden.png",
+      "sha256": "4f4b89d6bd39e38cca92ecb58aa8a20d3552fd7eb54743071e283d471e8d85e6",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_vortex_field_only.png",
+      "sha256": "6196528366521665969d82bda8de7f27ee33cdd83aefed6b44cad9cb0f5de77c",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths_reopen/ordinary_link_paths_reopened_hidden.png",
+      "sha256": "51f06f8d3e5ad25bb89007449da3214376d9d327e7038ada5392a9a4c31c36f3",
+      "reviewed": true
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths_reopen/ordinary_link_paths_reopened_shown.png",
+      "sha256": "64bc744348022bb7eca6728f194e7c2f64847b05d4a434950dec3744b58bbafa",
+      "reviewed": true
+    }
+  ],
+  "findings": [
+    "Resting, field-only and hidden/reopened views were reviewed without observed canvas-boundary clipping.",
+    "Field presets visibly deform paths while nodes remain stationary in the paused fixture.",
+    "Compatibility-only and combined modes converge the explicitly grouped Resource appearances; exact alias picking and source mapping are scenario assertions, not inferred from screenshots.",
+    "Strong selected bundles have angular bends and overlaps; direction marks and parallel strata are faint at this zoom. Record curve/highlight/stratum legibility as a follow-up.",
+    "Later captures scroll the long tool pane; they do not establish a full viewport or accessibility audit."
+  ],
+  "qualification_limits": [
+    "Ordinary product canvas with a deterministic 4-Surface, 2-Resource graph and 6 displayed link appearances.",
+    "Global vector graph fields are CPU-qualified; the browser graph has no stored vector fields and exercises explicitly temporary local presets.",
+    "No endpoint force changes, persistent response settings, Knot storage changes, browser anti-eviction, physical audio or other-product acceptance."
+  ]
+}

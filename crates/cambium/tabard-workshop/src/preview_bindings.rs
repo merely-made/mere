@@ -17,7 +17,7 @@ use std::{
 };
 
 fn scene_producer<T: PreviewScene>(source: Rc<RefCell<T>>, key: u64) -> SceneProducer<T> {
-    SceneProducer::new(source, key, T::frame, T::revision, |source| {
+    SceneProducer::new_checked(source, key, T::try_frame, T::revision, |source| {
         Some(ProducerSemantics {
             role: Some(ProducerRole::Image),
             name: Some(source.accessible_name().into()),

@@ -266,9 +266,9 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     /// the node that matters without hand-rolling a parallel label layer.
     pub show_labels: bool,
     /// With labels shown, leave out a label whose box would print over one
-    /// already shown: the selected, focused and hovered nodes' first and always,
-    /// then the rest in node order. A node without a shown label keeps its
-    /// accessible name. Defaults off, which keeps every label.
+    /// already shown: selected, focused, then hovered nodes get first choice,
+    /// then the rest in node order. Alternate sides are tried before culling.
+    /// A node without a shown label keeps its accessible name. Defaults on.
     pub cull_labels: bool,
     /// Let captured `Move` events update the model used by the custom leaf
     /// without rebuilding the retained DOM until release. Defaults off because
@@ -306,7 +306,7 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             label: "Related graph".to_string(),
             show_expand: true,
             show_labels: false,
-            cull_labels: false,
+            cull_labels: true,
             defer_drag_rebuild: false,
         }
     }
@@ -653,77 +653,121 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         self.projected_node_region(id, footprint.width, footprint.height)
     }
 
-    /// Put a visible node label across the quieter axis at that node. A
-    /// horizontal lane gets labels above or below it; a vertical lane gets
-    /// labels beside it. This avoids the old failure where every label sat to
-    /// the right and a right-going relation was therefore painted through its
-    /// source label.
-    /// Which nodes' labels show, in node order: all of them unless
-    /// [`Self::cull_labels`] is on. Label boxes are estimated from the label's
-    /// length at the label's 10 px size. A node an app-owned overlay occupies
-    /// ([`Self::node_footprints`]) shows the overlay, never its label as well,
-    /// which would print across the overlay's edge.
-    fn shown_labels(&self) -> Vec<bool> {
-        let count = self.graph.nodes.len();
-        let occupied = |index: usize| {
-            let id = &self.graph.nodes[index].id;
-            self.node_footprints
-                .iter()
-                .any(|footprint| &footprint.id == id)
+    /// Resolve visible labels once, in screen space. Placement, collision tests
+    /// and emitted CSS consume the same bounded boxes. Try the quiet-axis
+    /// preference first, then the other sides before suppressing a label.
+    /// Explicit host placements stay on their requested side.
+    fn resolved_labels(&self) -> Vec<Option<ResolvedGraphLabel>> {
+        let positions = self.projected_positions();
+        let canvas = Size {
+            width: self.width as f32,
+            height: self.height as f32,
         };
-        if !self.cull_labels {
-            return (0..count).map(|index| !occupied(index)).collect();
-        }
-        const HEIGHT: f32 = 14.0;
         let clearance = self.node_radius + 7.0;
-        let canvas_width = self.width as f32;
-        let positions: Vec<(f32, f32)> = self
-            .projected_positions()
-            .into_iter()
-            .map(|(_, at)| at)
-            .collect();
-        // The boxes `GraphLabelPlacement::style` lays out.
-        let rect = |index: usize| {
-            let (x, y) = positions[index];
-            let width = label_text_width(&self.label_text(index));
-            match self.label_placement(index) {
-                placement @ (GraphLabelPlacement::Above | GraphLabelPlacement::Below) => {
-                    let top = if placement == GraphLabelPlacement::Above {
-                        y - clearance - HEIGHT
-                    } else {
-                        y + clearance
-                    };
-                    let left = (x - width * 0.5).clamp(0.0, (canvas_width - width).max(0.0));
-                    (left, top, width, HEIGHT)
-                },
-                GraphLabelPlacement::Left => {
-                    (x - clearance - width, y - HEIGHT * 0.5, width, HEIGHT)
-                },
-                GraphLabelPlacement::Right => (x + clearance, y - HEIGHT * 0.5, width, HEIGHT),
+        let mut result = vec![None; positions.len()];
+        let priority = |index: usize| {
+            let id = &self.graph.nodes[index].id;
+            if self.selected.as_ref() == Some(id) {
+                0
+            } else if self.focus.as_ref() == Some(id) {
+                1
+            } else if self.hovered.as_ref() == Some(id) {
+                2
+            } else {
+                3
             }
         };
-        let overlaps = |a: (f32, f32, f32, f32), b: (f32, f32, f32, f32)| {
-            a.0 < b.0 + b.2 && b.0 < a.0 + a.2 && a.1 < b.1 + b.3 && b.1 < a.1 + a.3
-        };
-        let pinned = |index: usize| {
-            let id = &self.graph.nodes[index].id;
-            [&self.selected, &self.focus, &self.hovered]
-                .into_iter()
-                .any(|marked| marked.as_ref() == Some(id))
-        };
-        let order = (0..count)
-            .filter(|&index| pinned(index))
-            .chain((0..count).filter(|&index| !pinned(index)));
-        let mut shown = vec![false; count];
-        let mut kept = Vec::new();
-        for index in order.filter(|&index| !occupied(index)) {
-            let boxed = rect(index);
-            if pinned(index) || !kept.iter().any(|&other| overlaps(boxed, other)) {
-                shown[index] = true;
-                kept.push(boxed);
+        let mut order: Vec<_> = (0..positions.len()).collect();
+        order.sort_by_key(|&index| (priority(index), index));
+        let mut obstacles: Vec<_> = positions
+            .iter()
+            .map(|&(_, (x, y))| LabelBox {
+                left: x - self.node_radius,
+                top: y - self.node_radius,
+                width: self.node_radius * 2.0,
+                height: self.node_radius * 2.0,
+            })
+            .collect();
+        for footprint in &self.node_footprints {
+            if let Some(region) = self.projected_node_footprint(&footprint.id) {
+                obstacles.push(LabelBox {
+                    left: region.left,
+                    top: region.top,
+                    width: region.width,
+                    height: region.height,
+                });
             }
         }
-        shown
+        let mut kept: Vec<LabelBox> = Vec::new();
+        for index in order {
+            let node = &self.graph.nodes[index];
+            let (_, (x, y)) = positions[index];
+            // An offscreen node must not leave an orphaned label clamped to
+            // the viewport edge. Its accessible target retains its full name.
+            if x < 0.0
+                || x > canvas.width
+                || y < 0.0
+                || y > canvas.height
+                || self
+                    .node_footprints
+                    .iter()
+                    .any(|footprint| footprint.id == node.id)
+            {
+                continue;
+            }
+            let preferred = self.label_placement(index);
+            let explicit = self.label_placements.iter().any(|(id, _)| *id == node.id);
+            let mut candidates = vec![preferred];
+            if !explicit {
+                for side in [
+                    GraphLabelPlacement::Above,
+                    GraphLabelPlacement::Below,
+                    GraphLabelPlacement::Left,
+                    GraphLabelPlacement::Right,
+                ] {
+                    if side != preferred {
+                        candidates.push(side);
+                    }
+                }
+            }
+            let width = label_text_width(&self.label_text(index));
+            let choices: Vec<_> = candidates
+                .into_iter()
+                .filter_map(|placement| {
+                    let bounds = placement.bounds(x, y, clearance, canvas, width);
+                    // Do not silently truncate a short name just to choose the
+                    // preferred side when a different side holds the whole name.
+                    ((explicit || bounds.width >= width.min(canvas.width))
+                        && bounds.width > 0.0
+                        && bounds.height > 0.0)
+                        .then_some(ResolvedGraphLabel { placement, bounds })
+                })
+                .collect();
+            let resolved = choices
+                .iter()
+                .find(|candidate| {
+                    !kept
+                        .iter()
+                        .chain(obstacles.iter())
+                        .any(|other| candidate.bounds.overlaps(*other))
+                })
+                .copied()
+                .or_else(|| {
+                    (!self.cull_labels)
+                        .then(|| choices.first().copied())
+                        .flatten()
+                });
+            if let Some(label) = resolved {
+                kept.push(label.bounds);
+            }
+            result[index] = resolved;
+        }
+        result
+    }
+
+    #[cfg(test)]
+    fn shown_labels(&self) -> Vec<bool> {
+        self.resolved_labels().iter().map(Option::is_some).collect()
     }
 
     fn label_placement(&self, index: usize) -> GraphLabelPlacement {
@@ -1101,41 +1145,87 @@ impl GraphLabelPlacement {
         }
     }
 
-    /// A label box anchored to its node. The box hugs the node without
-    /// relying on `text-align` inside a fixed width, which Genet did not honour
-    /// for these absolutely placed spans: a left label is anchored by its
-    /// right edge, and an above or below label is centred from `text_width`,
-    /// the estimate [`label_text_width`] gives.
-    fn style(self, x: f32, y: f32, clearance: f32, canvas: Size, text_width: f32) -> String {
-        const LABEL_WIDTH: f32 = GRAPH_LABEL_WIDTH;
-        const LABEL_HEIGHT: f32 = 14.0;
-        let centred_left = (x - text_width * 0.5).clamp(0.0, (canvas.width - text_width).max(0.0));
-        let centred_top =
-            (y - LABEL_HEIGHT * 0.5).clamp(0.0, (canvas.height - LABEL_HEIGHT).max(0.0));
+    /// The very same box is used for collision tests and absolute layout.
+    fn bounds(self, x: f32, y: f32, clearance: f32, canvas: Size, text_width: f32) -> LabelBox {
+        let width = text_width.min(canvas.width).max(0.0);
+        let height = 14.0_f32.min(canvas.height).max(0.0);
+        let centred_left = (x - width * 0.5).clamp(0.0, (canvas.width - width).max(0.0));
+        let centred_top = (y - height * 0.5).clamp(0.0, (canvas.height - height).max(0.0));
         match self {
-            Self::Above => format!(
-                "position:absolute;left:{centred_left}px;top:{}px;width:{text_width}px;text-align:center;overflow:hidden;text-overflow:ellipsis;",
-                (y - clearance - LABEL_HEIGHT).max(0.0)
-            ),
-            Self::Below => format!(
-                "position:absolute;left:{centred_left}px;top:{}px;width:{text_width}px;text-align:center;overflow:hidden;text-overflow:ellipsis;",
-                (y + clearance).min((canvas.height - LABEL_HEIGHT).max(0.0))
-            ),
+            Self::Above => LabelBox {
+                left: centred_left,
+                top: (y - clearance - height).max(0.0),
+                width,
+                height,
+            },
+            Self::Below => LabelBox {
+                left: centred_left,
+                top: (y + clearance).min((canvas.height - height).max(0.0)),
+                width,
+                height,
+            },
             Self::Left => {
-                let room = (x - clearance).clamp(0.0, LABEL_WIDTH);
-                format!(
-                    "position:absolute;right:{}px;top:{centred_top}px;max-width:{room}px;text-align:right;overflow:hidden;text-overflow:ellipsis;",
-                    (canvas.width - (x - clearance)).max(0.0)
-                )
+                let room = (x - clearance).clamp(0.0, width);
+                LabelBox {
+                    left: (x - clearance - room).max(0.0),
+                    top: centred_top,
+                    width: room,
+                    height,
+                }
             },
             Self::Right => {
                 let left = (x + clearance).min(canvas.width);
-                let width = (canvas.width - left).clamp(0.0, LABEL_WIDTH);
-                format!(
-                    "position:absolute;left:{left}px;top:{centred_top}px;width:{width}px;text-align:left;overflow:hidden;text-overflow:ellipsis;"
-                )
+                LabelBox {
+                    left,
+                    top: centred_top,
+                    width: (canvas.width - left).clamp(0.0, width),
+                    height,
+                }
             },
         }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+struct LabelBox {
+    left: f32,
+    top: f32,
+    width: f32,
+    height: f32,
+}
+
+impl LabelBox {
+    fn overlaps(self, other: Self) -> bool {
+        const GAP: f32 = 2.0;
+        self.left < other.left + other.width + GAP
+            && other.left < self.left + self.width + GAP
+            && self.top < other.top + other.height + GAP
+            && other.top < self.top + self.height + GAP
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+struct ResolvedGraphLabel {
+    placement: GraphLabelPlacement,
+    bounds: LabelBox,
+}
+
+impl ResolvedGraphLabel {
+    fn style(self) -> String {
+        let LabelBox {
+            left,
+            top,
+            width,
+            height,
+        } = self.bounds;
+        let align = match self.placement {
+            GraphLabelPlacement::Above | GraphLabelPlacement::Below => "center",
+            GraphLabelPlacement::Left => "right",
+            GraphLabelPlacement::Right => "left",
+        };
+        format!(
+            "position:absolute;left:{left}px;top:{top}px;width:{width}px;height:{height}px;text-align:{align};overflow:hidden;text-overflow:ellipsis;"
+        )
     }
 }
 
@@ -1528,15 +1618,15 @@ where
     // aria-hidden (the button already carries the accessible name) and
     // pointer-transparent (they must not steal the node's clicks).
     let labels: Vec<_> = if swatch.show_labels {
-        let shown = swatch.shown_labels();
+        let labels = swatch.resolved_labels();
         swatch
             .graph
             .nodes
             .iter()
             .zip(swatch.projected_positions())
             .enumerate()
-            .filter(|(index, _)| shown[*index])
-            .map(|(index, (node, (_, (x, y))))| {
+            .filter(|(index, _)| labels[*index].is_some())
+            .map(|(index, (node, _))| {
                 // Same state modifiers the node buttons carry. A label layer
                 // that cannot say which node is selected forces a consumer to
                 // keep hand-rolling the whole layer for the sake of one
@@ -1552,21 +1642,13 @@ where
                 if swatch.hovered.as_ref() == Some(&node.id) {
                     class.push_str(" hovered");
                 }
-                let placement = swatch.label_placement(index);
+                let label = labels[index].expect("resolved visible label");
                 el::<_, State, AppAction>("span", swatch.label_text(index).into_owned())
                     .attr("class", class)
                     .attr("aria-hidden", "true")
-                    .attr("data-label-placement", placement.name())
-                    .attr(
-                        "style",
-                        placement.style(
-                            x,
-                            y,
-                            swatch.node_radius + 7.0,
-                            size,
-                            label_text_width(&swatch.label_text(index)),
-                        ),
-                    )
+                    .attr("data-label-placement", label.placement.name())
+                    .attr("data-node-index", index.to_string())
+                    .attr("style", label.style())
             })
             .collect()
     } else {
@@ -2687,9 +2769,9 @@ mod tests {
             width: 280.0,
             height: 400.0,
         };
-        let style = GraphLabelPlacement::Left.style(190.0, 200.0, 12.0, size, 100.0);
-        assert!(style.contains("right:102px"), "{style}");
-        assert!(!style.contains("left:"), "{style}");
+        let bounds = GraphLabelPlacement::Left.bounds(190.0, 200.0, 12.0, size, 100.0);
+        assert_eq!(bounds.left, 78.0);
+        assert_eq!(bounds.width, 100.0);
 
         // Three nodes stacked closer than a label's height: culling keeps the
         // first, and a focused node keeps its label whatever it covers.
@@ -2709,17 +2791,108 @@ mod tests {
             },
         )
         .with_size(280, 400)
-        .with_node_labels(true);
+        .with_node_labels(true)
+        .with_label_culling(false);
         assert_eq!(crowded.shown_labels(), [true, true, true], "culling is off");
         let culled = crowded.with_label_culling(true);
-        assert_eq!(culled.shown_labels(), [true, false, false]);
+        assert!(culled.shown_labels()[0]);
+        assert!(culled.shown_labels().iter().any(|shown| !shown));
         let mut focused = culled;
         focused.focus = Some(3);
-        assert_eq!(focused.shown_labels(), [false, false, true]);
+        assert!(focused.shown_labels()[2]);
         assert!(
             find_attr(&dom.borrow(), root, "data-label-placement", "above").is_some(),
             "a horizontal graph publishes its label-clear placement"
         );
+    }
+
+    #[test]
+    fn radial_labels_share_bounded_collision_free_geometry() {
+        let names = [
+            "Minor Pentatonic",
+            "Minor",
+            "Minor 7",
+            "Quartal Tetrad",
+            "Quartal Triad",
+            "Suspended 4th",
+            "Minor",
+            "Minor 7",
+            "Quartal Tetrad",
+            "Quartal Triad",
+            "Suspended 4th",
+            "Major Pentatonic",
+        ];
+        let nodes = names
+            .iter()
+            .enumerate()
+            .map(|(id, name)| {
+                let angle = (id.saturating_sub(1)) as f32 / 11.0 * std::f32::consts::TAU
+                    - std::f32::consts::FRAC_PI_2;
+                GraphCanvasNode {
+                    id,
+                    kind: "material",
+                    label: (*name).into(),
+                    key: None,
+                    position: if id == 0 {
+                        (0.5, 0.5)
+                    } else {
+                        (0.5 + angle.cos() * 0.42, 0.5 + angle.sin() * 0.42)
+                    },
+                }
+            })
+            .collect();
+        let mut swatch = GraphCanvasSwatch::new(
+            9,
+            GraphCanvasSubgraph {
+                nodes,
+                edges: Vec::<GraphCanvasEdge<usize>>::new(),
+            },
+        )
+        .with_size(300, 210)
+        .with_node_labels(true);
+        swatch.selected = Some(0);
+        for zoom in [1.0, 1.10, 1.25, 0.85] {
+            swatch.viewport.zoom = zoom;
+            let labels = swatch.resolved_labels();
+            assert!(labels[0].is_some(), "selected label at {zoom}");
+            let boxes: Vec<_> = labels.iter().flatten().map(|label| label.bounds).collect();
+            assert!(
+                boxes.len() >= 8,
+                "readable radial disclosure at {zoom}: {}",
+                boxes.len()
+            );
+            for (i, a) in boxes.iter().enumerate() {
+                assert!(
+                    a.left >= 0.0
+                        && a.top >= 0.0
+                        && a.left + a.width <= 300.01
+                        && a.top + a.height <= 210.01
+                );
+                for b in &boxes[i + 1..] {
+                    assert!(!a.overlaps(*b), "{zoom}: {a:?} {b:?}");
+                }
+            }
+            assert_eq!(
+                format!("{:?}", labels),
+                format!("{:?}", swatch.resolved_labels())
+            );
+        }
+    }
+
+    #[test]
+    fn label_priority_does_not_allow_mutual_emphasis_collisions() {
+        let mut swatch = model(Some(1), Some(2)).with_node_labels(true);
+        swatch.graph.nodes[1].position = swatch.graph.nodes[0].position;
+        swatch.selected = Some(1);
+        swatch.focus = Some(2);
+        swatch.hovered = Some(2);
+        let labels = swatch.resolved_labels();
+        assert!(labels[0].is_some());
+        if let (Some(a), Some(b)) = (labels[0], labels[1]) {
+            assert!(!a.bounds.overlaps(b.bounds));
+        }
+        swatch.viewport.pan = (10.0, 10.0);
+        assert!(swatch.resolved_labels().iter().all(Option::is_none));
     }
 
     #[test]

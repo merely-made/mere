@@ -313,6 +313,70 @@ fn axis_readings_are_actor_readings_with_their_inputs() {
 }
 
 #[test]
+fn direct_axis_inputs_reject_invalid_current_and_predecessor_ids() {
+    let (dataset, relationships) = small();
+    let registry = default_graph_reading_registry();
+    let graph = registry.resolve("graph").unwrap();
+    let changes = registry.resolve("changes").unwrap();
+
+    let mut invalid_current = dataset.clone();
+    invalid_current.occurrences[1].occurrence_id =
+        invalid_current.occurrences[0].occurrence_id.clone();
+    let bad_current_axis = ReadingAxis {
+        authority: "live",
+        record: "rev:1",
+        profile: graph,
+        focus: None,
+        dataset: &invalid_current,
+        relationships: &relationships,
+        previous: None,
+        label_field: "label",
+    };
+    let valid_axis = ReadingAxis {
+        authority: "other",
+        record: "rev:1",
+        profile: graph,
+        focus: None,
+        dataset: &dataset,
+        relationships: &relationships,
+        previous: None,
+        label_field: "label",
+    };
+    assert!(matches!(
+        project_two_reading_matrix(&bad_current_axis, &valid_axis),
+        Err(MatrixReadingError::OccurrenceIdentities {
+            axis: MatrixRole::Rows,
+            ref issues,
+        }) if issues.iter().any(|issue| issue.field.starts_with("occurrences."))
+    ));
+
+    let mut invalid_previous = dataset.clone();
+    invalid_previous.occurrences[1].occurrence_id =
+        invalid_previous.occurrences[0].occurrence_id.clone();
+    let predecessor = RevisionView {
+        dataset: &invalid_previous,
+        relationships: &relationships,
+    };
+    let bad_previous_axis = ReadingAxis {
+        authority: "live",
+        record: "rev:2",
+        profile: changes,
+        focus: None,
+        dataset: &dataset,
+        relationships: &relationships,
+        previous: Some(predecessor),
+        label_field: "label",
+    };
+    assert!(matches!(
+        project_two_reading_matrix(&bad_previous_axis, &valid_axis),
+        Err(MatrixReadingError::OccurrenceIdentities {
+            axis: MatrixRole::Rows,
+            ref issues,
+        }) if issues.iter().any(|issue| issue.field.starts_with("previous.occurrences."))
+    ));
+}
+
+#[test]
 fn the_two_reading_profile_sits_beside_the_one_authority_matrix() {
     let registry = default_graph_reading_registry();
     let one = registry.resolve("matrix").unwrap();

@@ -1,0 +1,40 @@
+{
+  "status": "locally qualified; publication pending",
+  "supplier_source_revision": "d1a200b1877223f5b6ced7f5fbaca3671c10f5dd",
+  "native_woodshed_revision": "b8095653f66a718ba5b39fa5b10232b549bce906",
+  "captures": {
+    "labels": {
+      "01_related_default.png": "33ea10dee7bc02cb070051f9a8d283aab667c95f963310a46bdcdfe68f6a2e34",
+      "02_related_fit.png": "d6cb13d4cf27e52dfcfda5f2665eb44ea7d753bc36b0b628a8c9154d70d7759d",
+      "03_related_zoomed.png": "68805acf405b7056d054c6b1e668628c54f9a06807866a51fbdeeba8e58d547d",
+      "04_related_panned.png": "ae8dd0c75863f26b85ee3eec610384f60e7d70781b63dae4d6f4aef9b39fbad0",
+      "05_related_compact.png": "89907a24620517b5b4785e0bb9b25d43034cd4109839c878fd0385e921f4d3f6",
+      "06_related_compact_ui_zoom.png": "ee252f1682e024cab5f825d6c5d3ebc28d90bcde0c476631a5535dc0239bc5a4",
+      "07_related_node_navigation.png": "a45374b8185ad8fb979c25227a535b7bc61c9d01e8f15d934ad08d36b2780368"
+    },
+    "p2": {
+      "01_overview_zoomed.png": "7df1d0e95649dbe0e416bad6291dfaaa51c98f502c468e5627cbf4f74280e8cf",
+      "02_overview_fit.png": "07fc7ece632e5843d55d14f63ea4ee7d86dc72a3798806bc5318faf737fa6cfa",
+      "03_relationship_zoomed.png": "bd957176d6a5efbaac8d610bee986cd781b5b9a3a98786952fdd06e570c297f4",
+      "04_relationship_fit.png": "209d3672a145d9474614c4bd8dc971206ef4f499bffc84d18b027ef8155e94b9",
+      "04b_relationship_wheel.png": "4f7e6939f6878ed3b3d494411bbd7fdca21ee102ca605ffa30c3e0f8746dcd66",
+      "05_related_zoomed.png": "08699c74f02c07b66c8ad4eb4e0445337bd7ea13f4fcce63c020579a2f617087",
+      "06_related_fit.png": "34f5fd6170cb6b6232c7c0e45f169e321bedfcd75541454b62753389ea789c51",
+      "07_related_wheel.png": "a3015bf137782a671a691f255d815896072b5b883ecce44e36fd5834f5499944",
+      "08_overview_wheel.png": "b64808d6187e9a45926a9a14966b3222789ddc33fe7397c7b48547bdc8deaabf"
+    }
+  },
+  "supplier_base": "26a67386f",
+  "shared_passes": 398,
+  "shared_ignored": 3,
+  "receiving_passes": 242,
+  "receiving_receipt": "woodshed/validation/related-labels_20261017/README.md",
+  "known_limits": [
+    "420px toolbar overflow; 125 percent right graph/control clipping remains Woodshed P8 work",
+    "density culling may omit a visible label; accessible targets remain",
+    "some relation strokes pass behind labels",
+    "estimated box allocation is not intrinsic glyph measurement"
+  ],
+  "native_product_sha256": "09c172db4def6110c74fb57fd8cdec068149b92371753f42b1910f41c51242bb",
+  "no_product_specific_label_algorithm": true
+}

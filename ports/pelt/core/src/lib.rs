@@ -719,10 +719,18 @@ impl<F: 'static> PeltController<F> {
         frame
     }
 
+    pub fn try_frame(&mut self, width: u32, height: u32) -> Result<F, String> {
+        self.viewport = (width.max(1), height.max(1));
+        self.framed = None;
+        let frame = self.session.try_frame(self.viewport.0, self.viewport.1)?;
+        self.framed = Some((self.session_identity(), self.viewport));
+        Ok(frame)
+    }
+
     pub(crate) fn prepare_input(&mut self, width: u32, height: u32) {
         let viewport = (width.max(1), height.max(1));
         if self.framed != Some((self.session_identity(), viewport)) {
-            drop(self.frame(viewport.0, viewport.1));
+            drop(self.try_frame(viewport.0, viewport.1));
         }
     }
 

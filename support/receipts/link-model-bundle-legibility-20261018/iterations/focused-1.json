@@ -1,0 +1,35 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas",
+    "responsive_links"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "dd9d5c523c092baf72be31cdbc1d28c4ae179fa0",
+  "started": "2026-10-18T07:59:36.636074+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas/edge_cells.rs\n M crates/canvas/pictograph/src/canvas/responsive_links.rs\n M crates/canvas/pictograph/src/canvas/responsive_links/report.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/geometry.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_tests.rs\n M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n M ports/graphshell/src/web_tree/ordinary_link_paths.rs\n M ports/graphshell/src/web_tree/ordinary_link_paths/observation.rs\n?? crates/canvas/pictograph/src/canvas/edge_cells/\n?? crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/legibility.rs\n",
+  "exit_code": 101,
+  "finished": "2026-10-18T08:00:10.081269+00:00",
+  "log_sha256": "8033a653bcedaafd1ea907c47a5ef6b8633b362ceb75b6b42dbbedb9b8953e77",
+  "suites": [
+    {
+      "result": "FAILED",
+      "passed": 20,
+      "failed": 4,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 539
+    }
+  ]
+}

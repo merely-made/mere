@@ -581,7 +581,11 @@ impl crate::canvas::Canvas {
                 extents,
             );
             return CanvasStrategyProjection {
-                positions: projection.nodes.iter().map(|n| (n.node, n.position)).collect(),
+                positions: projection
+                    .nodes
+                    .iter()
+                    .map(|n| (n.node, n.position))
+                    .collect(),
                 score: None,
                 coverage: projection.metadata.coverage,
                 regions: projection.regions,

@@ -1465,11 +1465,32 @@ async fn serve_trained_model_for_headed_turnstone() {
     let output =
         std::path::PathBuf::from(std::env::var_os("DJINN_HEADED_DIR").expect("DJINN_HEADED_DIR"));
     std::fs::create_dir_all(&output).unwrap();
+    // The default remains the original in-process two-phase receipt. An
+    // explicit phase and private root let a consumer terminate this process,
+    // read offline, and reopen the same custody/library/journal in a new one.
+    let phase = std::env::var("DJINN_HEADED_PHASE").ok().map(|value| {
+        let phase: usize = value.parse().expect("phase is 0 or 1");
+        assert!(phase <= 1);
+        phase
+    });
     let temp = tempfile::tempdir().unwrap();
-    let data_root = temp.path().join("data");
-    let (vault_dir, identity) = open_vault(temp.path());
+    let private_root = std::env::var_os("DJINN_HEADED_ROOT").map(std::path::PathBuf::from);
+    assert!(
+        phase.is_none() || private_root.is_some(),
+        "a process phase needs an explicit private root"
+    );
+    let root = private_root.as_deref().unwrap_or(temp.path());
+    let data_root = root.join("data");
+    let (vault_dir, identity) = open_vault(root);
     write_device_settings(&data_root, Some(lending()));
-    let row = save_pinned_answer_model(&data_root).await;
+    let row_file = output.join("model-row.json");
+    let row = if phase == Some(1) {
+        serde_json::from_slice(&std::fs::read(&row_file).unwrap()).unwrap()
+    } else {
+        let row = save_pinned_answer_model(&data_root).await;
+        std::fs::write(&row_file, serde_json::to_vec(&row).unwrap()).unwrap();
+        row
+    };
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
             recall: distillery::inference::recall::RecallConfig {
@@ -1484,12 +1505,19 @@ async fn serve_trained_model_for_headed_turnstone() {
         }),
         ..owner(Some(lane()))
     };
-    let endpoint = endpoint_name();
-    std::fs::write(output.join("endpoint.txt"), &endpoint).unwrap();
+    let endpoint_file = output.join("endpoint.txt");
+    let endpoint = std::fs::read_to_string(&endpoint_file).unwrap_or_else(|_| endpoint_name());
+    std::fs::write(endpoint_file, &endpoint).unwrap();
     let mut snapshots = vec![];
-    let mut saw_stream = false;
-    let mut saw_pause = false;
-    for phase in 0..2 {
+    if phase == Some(1) {
+        snapshots.push(
+            serde_json::from_slice(&std::fs::read(output.join("snapshot-0.json")).unwrap())
+                .unwrap(),
+        );
+    }
+    let mut saw_stream = output.join("streaming.json").exists();
+    let mut saw_pause = output.join("paused.json").exists();
+    for phase in phase.map(|phase| phase..phase + 1).unwrap_or(0..2) {
         let resident = DjinnResident::open(
             &identity,
             &data_root,
@@ -1627,6 +1655,14 @@ async fn serve_trained_model_for_headed_turnstone() {
                     });
                     evidence.push(serde_json::json!({"record":record,"passages":passages,"checkpoint":checkpoint}));
                 }
+                // Store enumeration order may change across OS processes.
+                // Compare every sealed field under the stable run identity.
+                evidence.sort_by(|a, b| {
+                    a["record"]["run"]
+                        .as_str()
+                        .unwrap()
+                        .cmp(b["record"]["run"].as_str().unwrap())
+                });
                 snapshots.push(serde_json::json!({"phase":phase,"runs":runs,"evidence":evidence}));
                 break;
             }
@@ -1640,6 +1676,22 @@ async fn serve_trained_model_for_headed_turnstone() {
         let _ = server.await;
         drop(catalog);
         resident.shutdown().await.unwrap();
+        std::fs::write(
+            output.join(format!("snapshot-{phase}.json")),
+            serde_json::to_vec_pretty(snapshots.last().unwrap()).unwrap(),
+        )
+        .unwrap();
+        std::fs::write(
+            output.join(format!("process-{phase}.json")),
+            serde_json::to_vec_pretty(
+                &serde_json::json!({"pid":std::process::id(),"phase":phase,"clean_shutdown":true}),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    }
+    if phase == Some(0) {
+        return;
     }
     let receipt = serde_json::json!({"model_row":row,"streaming_observed":saw_stream,"pause_observed":saw_pause,"snapshots":snapshots,"boundary":"real GPU model in test-owned native Djinn resident, separate headed Turnstone process over actual app connection"});
     std::fs::write(

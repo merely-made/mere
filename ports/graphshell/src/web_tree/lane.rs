@@ -6,6 +6,9 @@
 
 //! Product observations and actions for Mesquite on the tree page.
 use super::*;
+#[cfg(feature = "product")]
+mod link_attachment;
+mod link_paths;
 pub(super) mod overlay_observation;
 
 /// The tree page's half of the scenario lane.
@@ -853,6 +856,7 @@ impl Product for TreeLane {
                 "title": product.title.text(), "tags": product.tags.text(),
                 "save_state": product.save_state, "reopened": product.reopened,
                 "owner_observation": owner_receipt(ctx.runner.state()),
+                "link_path_source": link_paths::source_receipt(&self.shared.canvas.borrow()),
             })
         });
         publish(outcome.ok, &lines.join("\n"), &self.shared, saved);
@@ -910,9 +914,10 @@ impl Product for TreeLane {
             .and_then(|(x, y)| {
                 let (px, py) = self.pointer?;
                 let dom = ctx.runner.dom();
-                let leaf = taproot::matching_classes(&dom.borrow(), &Selector::class("tree-canvas"))
-                    .into_iter()
-                    .next()?;
+                let leaf =
+                    taproot::matching_classes(&dom.borrow(), &Selector::class("tree-canvas"))
+                        .into_iter()
+                        .next()?;
                 let (left, top, _, _) = ctx.painted_rect(leaf)?;
                 Some((left + x - px).hypot(top + y - py))
             });
@@ -1259,9 +1264,14 @@ impl Product for TreeLane {
                     .join("|"),
             );
         let snapshot = link_rest_fields(&canvas, snapshot);
+        let snapshot = link_paths::fields(&canvas, snapshot);
         let faces = self.shared.faces.get().unwrap_or_default().fields();
         let snapshot = practice::fields(page, snapshot);
         let snapshot = responsive_links::fields(page, snapshot);
+        #[cfg(feature = "product")]
+        let snapshot = ordinary_link_paths::fields(page, snapshot);
+        #[cfg(feature = "product")]
+        let snapshot = link_attachment::fields(page, snapshot);
         // Host-boundary receipts come from the existing validated loader and
         // Tabard adapter. Missing evidence stays absent, never a passing default.
         let snapshot = [
@@ -1744,6 +1754,12 @@ impl Product for TreeLane {
             // Pick a source-owned P4 appearance through the ordinary canvas
             // pointer route. The stratum offset selects one of the two
             // parallel strokes when both are present on the same surfaces.
+            "click-link-path" => link_paths::click(self, ctx, rest),
+            #[cfg(feature = "product")]
+            "link-attachment-profile" => {
+                let profile = link_attachment::Profile::parse(rest.trim())?;
+                link_attachment::apply(&self.shared, profile)
+            },
             "click-link-rest" => {
                 use graphshell::mere_host::{
                     LINK_REST_A1_ADDRESS, LINK_REST_A2_ADDRESS, LINK_REST_B1_ADDRESS,

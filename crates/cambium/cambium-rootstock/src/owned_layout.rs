@@ -22,6 +22,8 @@ use paint_list_api::{
 };
 
 #[cfg(test)]
+mod graph_label_tests;
+#[cfg(test)]
 mod hidden_panel_tests;
 #[cfg(test)]
 mod incremental_tests;

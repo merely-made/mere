@@ -1,0 +1,36 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "graphshell",
+    "--no-default-features",
+    "--features",
+    "web",
+    "--lib"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "9b8c161a831aa9615c84a4bbfaea9b15021e3659",
+  "started": "2026-10-18T16:25:55.626682+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas.rs\n M crates/canvas/pictograph/src/canvas/build.rs\n M crates/canvas/pictograph/src/canvas/edge_cells.rs\n M crates/canvas/pictograph/src/canvas/frame.rs\n M crates/canvas/pictograph/src/canvas/input.rs\n M crates/canvas/pictograph/src/canvas/node_presentation.rs\n M crates/canvas/pictograph/src/canvas/responsive_links.rs\n M crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/legibility.rs\n M crates/canvas/pictograph/src/canvas/scene_paint.rs\n M crates/canvas/pictograph/src/canvas/view.rs\n M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n M ports/graphshell/src/web_tree/lane.rs\n?? crates/canvas/pictograph/src/canvas/input_tests.rs\n?? crates/canvas/pictograph/src/canvas/node_billboard.rs\n?? crates/canvas/pictograph/src/canvas/node_billboard_tests.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links/geometry_tests.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/attachment.rs\n?? ports/graphshell/src/web_tree/lane/link_attachment.rs\n?? ports/graphshell/web/scenarios/p4_tree_link_attachments.scn\n?? ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn\n?? support/receipts/link-model-shared-attachments-20261018/\n",
+  "exit_code": 0,
+  "finished": "2026-10-18T16:29:23.053030+00:00",
+  "log_sha256": "725a23c15a72677f4b83a038c843643a39f248f1ccbc7b8f6940bc3a3c4554da",
+  "suites": [
+    {
+      "result": "ok",
+      "passed": 312,
+      "failed": 0,
+      "ignored": 6,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ]
+}

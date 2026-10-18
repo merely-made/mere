@@ -1,0 +1,15 @@
+{
+  "command": [
+    "python3",
+    "support/receipts/link-model-ordinary-paths-20261017/verify.py",
+    "/Users/markik/Code/testing/mere/bundle-legibility-20261018"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "487f370966630a5c95f64ce4246d79c3d12cd91b",
+  "started": "2026-10-18T08:09:14.837417+00:00",
+  "status_before": "",
+  "exit_code": 0,
+  "finished": "2026-10-18T08:09:15.139286+00:00",
+  "log_sha256": "1d1938740bb9ed15b5ea46fb026604af27f43e1640135fc45a77a7cbdc00ec54",
+  "suites": []
+}

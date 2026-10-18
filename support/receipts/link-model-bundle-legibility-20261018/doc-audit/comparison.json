@@ -1,0 +1,86 @@
+{
+  "comparison": "final receipt/docs vs clean qualified source487f37096; global pre-existing debt is not green",
+  "reports": {
+    "links": {
+      "new_findings": {},
+      "source_counts": {
+        "active_docs": 289,
+        "indexed_active_docs": 286,
+        "index_orphans": 2,
+        "index_ghosts": 0,
+        "memory_directory_links": 0,
+        "statusless_plans": 1,
+        "broken_relative_links": 33,
+        "historical_broken_relative_links": 245,
+        "planned_broken_relative_links": 0,
+        "ambiguous_known_root_paths": 177,
+        "ignored_known_root_patterns": 24,
+        "reserved_identifier_paths": 31,
+        "missing_known_root_paths": 264,
+        "historical_missing_known_root_paths": 240,
+        "planned_missing_known_root_paths": 9,
+        "invalid_historical_annotations": 0,
+        "stale_historical_annotations": 4,
+        "unheaded_owned_sources": 656,
+        "exhibit_b_sources": 0
+      },
+      "final_counts": {
+        "active_docs": 289,
+        "indexed_active_docs": 286,
+        "index_orphans": 2,
+        "index_ghosts": 0,
+        "memory_directory_links": 0,
+        "statusless_plans": 1,
+        "broken_relative_links": 33,
+        "historical_broken_relative_links": 245,
+        "planned_broken_relative_links": 0,
+        "ambiguous_known_root_paths": 177,
+        "ignored_known_root_patterns": 24,
+        "reserved_identifier_paths": 31,
+        "missing_known_root_paths": 264,
+        "historical_missing_known_root_paths": 240,
+        "planned_missing_known_root_paths": 9,
+        "invalid_historical_annotations": 0,
+        "stale_historical_annotations": 4,
+        "unheaded_owned_sources": 656,
+        "exhibit_b_sources": 0
+      },
+      "source_errors": 0,
+      "final_errors": 0
+    },
+    "judgments": {
+      "new_findings": {},
+      "source_counts": null,
+      "final_counts": null,
+      "source_errors": 19,
+      "final_errors": 19
+    }
+  },
+  "raw_inputs": [
+    {
+      "name": "judgments-final.stdout.json",
+      "sha256": "7004e8193919ed882ea2b91037ada3fdeb5908065e28ab3867947ffb8b539392",
+      "bytes": 12436,
+      "full_report": "/Users/markik/Code/testing/mere/bundle-legibility-20261018/archived-doc-audit-inputs/judgments-final.stdout.json"
+    },
+    {
+      "name": "judgments-source.stdout.json",
+      "sha256": "7004e8193919ed882ea2b91037ada3fdeb5908065e28ab3867947ffb8b539392",
+      "bytes": 12436,
+      "full_report": "/Users/markik/Code/testing/mere/bundle-legibility-20261018/archived-doc-audit-inputs/judgments-source.stdout.json"
+    },
+    {
+      "name": "links-final.stdout.json",
+      "sha256": "02da35018e51cc332bd019c2dd4d2182bb8c35b18909bd262fb898278983aad0",
+      "bytes": 423251,
+      "full_report": "/Users/markik/Code/testing/mere/bundle-legibility-20261018/archived-doc-audit-inputs/links-final.stdout.json"
+    },
+    {
+      "name": "links-source.stdout.json",
+      "sha256": "02da35018e51cc332bd019c2dd4d2182bb8c35b18909bd262fb898278983aad0",
+      "bytes": 423251,
+      "full_report": "/Users/markik/Code/testing/mere/bundle-legibility-20261018/archived-doc-audit-inputs/links-source.stdout.json"
+    }
+  ],
+  "archive_note": "Raw global inventories are retained outside Git; archive keeps actual process exits/hashes/counts and the exact new-finding comparison instead of repeating existing full inventories."
+}

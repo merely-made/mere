@@ -24,6 +24,9 @@ pub const APPLICATION_STRUCTURE: &str = include_str!("../fixtures/application.cs
 /// CSS, layout and paint stays with each existing document component.
 pub trait PreviewScene {
     fn frame(&mut self, width: u32, height: u32) -> Scene;
+    fn try_frame(&mut self, width: u32, height: u32) -> Result<Scene, String> {
+        Ok(self.frame(width, height))
+    }
     fn revision(&self) -> u64;
     fn accessible_name(&self) -> &str;
 }
@@ -31,6 +34,9 @@ pub trait PreviewScene {
 impl PreviewScene for ReaderSpecimen {
     fn frame(&mut self, width: u32, height: u32) -> Scene {
         ReaderSpecimen::frame(self, width, height)
+    }
+    fn try_frame(&mut self, width: u32, height: u32) -> Result<Scene, String> {
+        ReaderSpecimen::try_frame(self, width, height)
     }
     fn revision(&self) -> u64 {
         ReaderSpecimen::revision(self)
@@ -178,24 +184,38 @@ impl StylesheetSpecimen {
         self.document.computed_style(node, property)
     }
 
-    pub fn frame(&mut self, width: u32, height: u32) -> Scene {
+    pub fn try_frame(&mut self, width: u32, height: u32) -> Result<Scene, String> {
         let (width, height) = (width.max(1), height.max(1));
         match self.document.frame(width, height) {
-            Ok(list) => {
-                self.last_error = None;
-                paint_list_render::translate_paint_list(&list)
+            Ok(list) => match paint_list_render::translate_paint_list(&list) {
+                Ok(scene) => {
+                    self.last_error = None;
+                    Ok(scene)
+                },
+                Err(error) => {
+                    self.last_error = Some(error.to_string());
+                    Err(error.to_string())
+                },
             },
             Err(error) => {
                 self.last_error = Some(error.to_string());
-                Scene::new(width, height)
+                Err(error.to_string())
             },
         }
+    }
+
+    pub fn frame(&mut self, width: u32, height: u32) -> Scene {
+        self.try_frame(width, height)
+            .unwrap_or_else(|_| Scene::new(width.max(1), height.max(1)))
     }
 }
 
 impl PreviewScene for StylesheetSpecimen {
     fn frame(&mut self, width: u32, height: u32) -> Scene {
         StylesheetSpecimen::frame(self, width, height)
+    }
+    fn try_frame(&mut self, width: u32, height: u32) -> Result<Scene, String> {
+        StylesheetSpecimen::try_frame(self, width, height)
     }
     fn revision(&self) -> u64 {
         StylesheetSpecimen::revision(self)

@@ -14,6 +14,47 @@ keep their words as history (stack seams S14 pass, batch 43).
 
 Earlier status (2026-09-04): active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
 
+## Shared graph label placement (2026-10-17)
+
+Status: locally qualified; publication pending. Source `d1a200b18`, with
+Woodshed receiving source `b809565`. Woodshed's
+Related graph exposes collisions in Cambium's shared graph-canvas labels.
+The material projection and node coordinates remain product-owned; screen-space
+label placement belongs to the shared component. Independently choosing a quiet
+axis gives neighboring labels the same space, and the prior optional culling
+computed different rectangles from those emitted into CSS.
+
+The resolver tries alternate anchored sides before suppressing a label, uses
+one bounded box for CSS and collision tests, and avoids node/overlay footprints.
+Collision culling defaults on; the existing explicit opt-out retains a diagnostic
+show-all policy. Selected, focused, then hovered nodes get stable first choice;
+mutual emphasis is no longer an exemption from collision checks. Explicit host
+side overrides remain directional requests; full accessible names and native
+node targets survive omitted visible labels. Offscreen anchors do not leave
+orphaned text clamped to the viewport edge. Font-width estimates choose box size;
+they do not claim intrinsic glyph measurement. Bounded overflow remains clipped.
+
+Qualification: 279 Cambium and 119 Rootstock cases pass (three existing
+ignores), including real retained layout/emphasis and an oversized Ahem clip
+control. Woodshed adds 242 view cases, a clean committed desktop build, seven
+native label/navigation images and nine three-surface camera/wheel images.
+Both accepted native scenarios pass with normal exit zero and exact supervised
+executable identity. The first harness trial is excluded for omitting the
+existing key prefix from an expected material title; the corrected repeat uses
+the identical product binary. See
+`woodshed/validation/related-labels_20261017/README.md` and the local
+[shared receipt](../../../support/receipts/graph-labels-20261017/qualification.json).
+The rendered full-name navigation target survives; mutual visible-label
+collisions are absent in the bounded captures. Allocated canvas bounds do not
+prove whole-window visibility: 420px toolbar overflow and 125% right graph/control
+clipping remain Woodshed P8 work. Some edges pass behind text, and dense labels
+can yield. No all-node-name, every-font, fresh-reopen or audio qualification is
+claimed. Ordinary Pictograph responsive paths are a separate lane.
+
+Progress (2026-10-17): shared resolver, component and retained geometry controls
+implemented; Woodshed receiving/native source qualified locally. Maintainer
+publication approval remains separate.
+
 ## Cross-domain relationship recipe continuation (2026-10-05)
 
 Status: shared implementation and Knot adoption published and qualified;
@@ -1918,3 +1959,5 @@ Rust 1.99.1 on macOS, `pictograph` with `canvas` and default features:
 Live tag-edit cache invalidation and headed/GPU acceptance retain separate
 scope; this correction does not change the layout cache. Turnstone's receiving
 scene check must run against the subsequently published supplier revision.
+
+Publication update (2026-10-17): shared label source `d1a200b18` is reachable on main through merge `c8d316b60`; Woodshed adoption and audit closure are published through `8204688`. Merged Mere CPU checks pass 279 Cambium and 120 Rootstock cases, with three existing ignores. Woodshed retains its exact qualified supplier; this integration adds no native claim. See the [publication record](../../../support/receipts/graph-labels-20261017/publication.json).

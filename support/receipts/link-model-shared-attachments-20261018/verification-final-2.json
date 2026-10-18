@@ -1,0 +1,15 @@
+{
+  "command": [
+    "python3",
+    "support/receipts/link-model-shared-attachments-20261018/verify.py",
+    "/Users/markik/Code/testing/mere/shared-link-attachments-20261018"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "started": "2026-10-18T17:02:43.656346+00:00",
+  "status_before": " M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n M ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn\n M support/receipts/link-model-shared-attachments-20261018/verify.py\n?? support/receipts/link-model-shared-attachments-20261018/README.md\n?? support/receipts/link-model-shared-attachments-20261018/bindgen-final-2.json\n?? support/receipts/link-model-shared-attachments-20261018/bindgen-final-2.log\n?? support/receipts/link-model-shared-attachments-20261018/boundaries-final-3.json\n?? support/receipts/link-model-shared-attachments-20261018/boundaries-final-3.log\n?? support/receipts/link-model-shared-attachments-20261018/browser-processes.json\n?? support/receipts/link-model-shared-attachments-20261018/browser-qualified/\n?? support/receipts/link-model-shared-attachments-20261018/browser-review.json\n?? support/receipts/link-model-shared-attachments-20261018/build.json\n?? support/receipts/link-model-shared-attachments-20261018/canvas-final-6.json\n?? support/receipts/link-model-shared-attachments-20261018/canvas-final-6.log\n?? support/receipts/link-model-shared-attachments-20261018/doc-audit/\n?? support/receipts/link-model-shared-attachments-20261018/graphshell-final-3.json\n?? support/receipts/link-model-shared-attachments-20261018/graphshell-final-3.log\n?? support/receipts/link-model-shared-attachments-20261018/iterations/\n?? support/receipts/link-model-shared-attachments-20261018/publication-continuity.json\n?? support/receipts/link-model-shared-attachments-20261018/server-process.json\n?? support/receipts/link-model-shared-attachments-20261018/server.log\n?? support/receipts/link-model-shared-attachments-20261018/source-continuity.json\n?? support/receipts/link-model-shared-attachments-20261018/verification-final.json\n?? support/receipts/link-model-shared-attachments-20261018/verification-final.log\n?? support/receipts/link-model-shared-attachments-20261018/viewer-final-2.json\n?? support/receipts/link-model-shared-attachments-20261018/viewer-final-2.log\n?? support/receipts/link-model-shared-attachments-20261018/wasm-final-3.json\n?? support/receipts/link-model-shared-attachments-20261018/wasm-final-3.log\n",
+  "exit_code": 0,
+  "finished": "2026-10-18T17:02:43.841406+00:00",
+  "log_sha256": "70a3a9497852832dd374e355d65e8ea533ee3da586eb9e6c2cff016fc5986462",
+  "suites": []
+}

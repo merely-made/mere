@@ -1665,3 +1665,28 @@ Stop and record the reason if any of these happen:
     preservation of all 34 unrelated tracked edits. Untracked work remains
     outside the merge paths. Model data and compact evidence stay under
     their existing caps for the remaining I9 gates.
+
+
+### Turnstone R4 process acceptance fixture — 2026-10-18
+
+Qualified on macOS against published runtime `e6250fd1`: the existing ignored
+`serve_trained_model_for_headed_turnstone` fixture accepts explicit
+`DJINN_HEADED_PHASE=0|1` with `DJINN_HEADED_ROOT` for a test-owned private vault,
+model library and journal across two actual OS processes. The default retains
+the original two-composition receipt. Both modes use the existing real GPU
+model, admitted application route, local endpoint stale-owner protection and
+shutdown path; snapshots and process receipts permit independent comparison.
+A consumer can stop the first process, read saved sources without any resident,
+then start the second. Runtime/library contracts and consumer pins are
+unchanged by this test-only follow-up. Turnstone owns the complete research
+workflow and its final acceptance receipt. The supplier build passes and the
+real GPU fixture executes successfully in two distinct OS processes, preserving
+its vault/library/journal and exact live citations. All sealed record fields,
+prompts, passages and checkpoints compare exactly under stable run IDs. The
+outer evidence list is ordered by that identity before comparison; backend
+inventory order across processes is not a storage contract. The first consumer
+run exposed that test assumption, while independently proving every per-run
+record equal; its failed checker remains in the consumer diagnostics. The
+supplier receipt is `support/receipts/turnstone-r4-process-20261018/qualification.json`.
+The consumer continues its own final-source UI/failure checks; this supplier
+receipt does not promote those pending product gates to passes.

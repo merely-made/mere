@@ -1,0 +1,34 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "1e9d95da599322921b96febac1089d1662201849",
+  "started": "2026-10-18T16:41:01.234601+00:00",
+  "status_before": "",
+  "exit_code": 101,
+  "finished": "2026-10-18T16:42:02.556181+00:00",
+  "log_sha256": "a7b913c1b45b7e05d78820aa21ac8052f1ff7580bcafd33051a8dd2c8cfddb35",
+  "suites": [
+    {
+      "result": "FAILED",
+      "passed": 569,
+      "failed": 1,
+      "ignored": 18,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ]
+}
