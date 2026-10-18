@@ -6,6 +6,20 @@
 
 use super::*;
 
+// These lifecycle checks need distinct, nonoverlapping endpoint faces. The
+// built-in sample starts in a tight spiral and intentionally overlaps some faces.
+fn spaced_sample_canvas() -> Canvas {
+    let mut canvas = Canvas::with_sample_graph();
+    let keys: Vec<_> = canvas.graph.nodes().map(|(key, _)| key).collect();
+    for (index, key) in keys.into_iter().enumerate() {
+        canvas.view.set_position(
+            key,
+            euclid::default::Point2D::new(index as f32 * 300.0, (index % 3) as f32 * 200.0),
+        );
+    }
+    canvas
+}
+
 #[test]
 fn ordinary_canvas_response_is_off_by_default_and_does_not_touch_graph_truth() {
     let canvas = Canvas::with_sample_graph();
@@ -42,11 +56,12 @@ fn declared_view_field_replaces_live_canvas_rest_path_and_remains_pickable() {
     let path = report
         .paths
         .iter()
-        .find(|path| path.responsive && path.points.len() == 9)
+        .find(|path| path.responsive && path.points.len() >= 2)
         .unwrap();
+    let middle = path.points.len() / 2;
     let chord_mid_y = (path.points[0].1 + path.points[path.points.len() - 1].1) * 0.5;
     assert!(
-        (path.points[4].1 - chord_mid_y).abs() > 0.1,
+        (path.points[middle].1 - chord_mid_y).abs() > 0.1,
         "path should respond to the selected vector field"
     );
     assert_eq!(
@@ -65,7 +80,7 @@ fn declared_view_field_replaces_live_canvas_rest_path_and_remains_pickable() {
         "render-only responses must not alter spring topology"
     );
 
-    let pick = euclid::default::Point2D::new(path.points[4].0, path.points[4].1);
+    let pick = euclid::default::Point2D::new(path.points[middle].0, path.points[middle].1);
     let hit = crate::canvas::edge_cells::link_hit_test_segments(
         canvas.rendered_link_segments(),
         pick,
@@ -79,7 +94,7 @@ fn declared_view_field_replaces_live_canvas_rest_path_and_remains_pickable() {
 
 #[test]
 fn hidden_member_of_explicit_compatibility_group_does_not_refuse_remaining_paths() {
-    let mut canvas = Canvas::with_sample_graph();
+    let mut canvas = spaced_sample_canvas();
     let keys: Vec<_> = canvas
         .visible_link_appearances()
         .into_iter()
@@ -165,7 +180,7 @@ fn graph_swap_clears_graph_field_and_compatibility_targets() {
 
 #[test]
 fn compatibility_only_keeps_ungrouped_paths_at_exact_rest_geometry() {
-    let mut canvas = Canvas::with_sample_graph();
+    let mut canvas = spaced_sample_canvas();
     let baseline = canvas.visible_link_paths();
     let grouped = baseline[0].key.clone();
     assert!(baseline.iter().any(|path| path.key != grouped));

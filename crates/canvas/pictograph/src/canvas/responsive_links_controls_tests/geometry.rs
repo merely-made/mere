@@ -11,7 +11,7 @@ use kernel::graph::{Graph, GraphStratum, SemanticStatementSpec, SemanticSubKind,
 use kernel::types::AssertionBasis;
 use uuid::Uuid;
 
-fn alias_graph() -> (Graph, [Uuid; 4], Vec<(String, Uuid, Uuid)>) {
+pub(super) fn alias_graph() -> (Graph, [Uuid; 4], Vec<(String, Uuid, Uuid)>) {
     let mut graph = Graph::new();
     graph
         .declare_predicate("urn:test:surface-path", GraphStratum::Surface)
