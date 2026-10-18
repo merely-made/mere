@@ -1,7 +1,7 @@
 # Upstream Candidates Ledger
 
 **Date**: 2026-10-03
-**Status (2026-10-09)**: open; twelve items, none raised. Kept by ruling 46 of
+**Status (2026-10-09)**: open; thirteen items, none raised. Kept by ruling 46 of
 the device pairing plan: noted for a later review, raised only after a
 release passes them by. Item 9 (argon2) comes from the vault lock plan's
 ruling 33; item 12 (parry) from the Conatus engine plan's ruling C4.
@@ -270,6 +270,25 @@ So, for each item:
   parry changes, prompting a re-measure.
 - **Last checked:** parry3d 0.31.1 (through rapier3d 0.36.0).
 
+### 13. personae (dramatis, our own): `Ed25519Keypair::from_seed` takes the seed by value
+
+- **What happens:** `from_seed([u8; 32])` copies the seed onto the caller's
+  stack, and the copy is not cleared. A later, unrelated struct copy can pick
+  those stale bytes up: the audit's castellan residue harness found 16 seed
+  bytes in the uninitialised part of a `None` `Option<String>` inside the
+  `Vec<SlotSummary>` that `public_profile_of` builds (audit plan, R4).
+- **Why it matters:** the seed outlives its owner in dead stack and can reach
+  a long-lived heap block through any bulk copy of a temporary.
+- **Proposal:** `from_seed(&[u8; 32])`, so a caller can keep the seed in
+  zeroizing storage and never move it. A breaking signature change in
+  dramatis, not an upstream issue; it is ledgered here because no dramatis
+  ledger exists and Mark reads this one (R4: "B now, A logged against
+  dramatis"). Nothing is raised or changed in personae.
+- **What we carry:** castellan builds the slot summary field by field into a
+  vector sized up front, which stops this copy. It does not prove the stack
+  is clean.
+- **Last checked:** personae 0.3.0 at dramatis `cf562f4`.
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
@@ -286,3 +305,6 @@ ruling 60), measured apart from iroh's mDNS lookup. Not raised.
 
 **2026-10-09.** Item 12 (parry) added from the Conatus engine plan's ruling
 C4. Not raised.
+
+**2026-10-18.** Item 13 (personae `from_seed`) added from the full-source
+audit plan's ruling R4. Not raised.

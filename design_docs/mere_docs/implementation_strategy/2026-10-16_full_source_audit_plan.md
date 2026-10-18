@@ -3277,3 +3277,21 @@ slot key's `instance: Option<String>` is `None`, and the 16 bytes that `None` le
 uninitialised carry a stale copy of the master seed from a stack temporary on the load path,
 so this is stack residue leaking through padding, layout-dependent, not a missing `Drop`.
 Why the audit's 2026-10-16 run was green is not explained. The fix choice is Mark's (R4).
+
+**2026-10-18 Progress: the residue fix (R4, option B).** Findings: the harness was red
+under 1.99.0 as well as 1.99.1 (control, clean checkout of `26a67386`, `--locked`, own
+build dir), so the toolchain bump was not the cause. The 88-byte block is the one-element
+`Vec<SlotSummary>` built by `public_profile_of` during `switch_profile` (a size-88
+allocation trace in the switch phase shows only that Vec; the hit block's bytes show the
+slot key's `instance: Option<String>` as `None` with 16 bytes of `canary_bytes(0)`, the
+master seed, in the 16 uninitialised bytes beside the niche marker). Fix: castellan's
+`public_profile_of` now pushes into a vector sized up front and rebuilds each key field by
+field, instead of collecting clones. `cargo test -p castellan --features keeper` is green under
+1.99.1 with the residue harness unchanged and its positive control still firing (uncleared
+raw and decimal found, zeroized clean, live found); no other castellan test changed.
+**B alone does not prove the stack is clean.** It stops this one copy of the stale bytes; the
+seed still passes through the stack when a key is built, and another bulk copy could carry it
+into the heap again, with presence depending on code generation. The source fix (A, personae
+`from_seed` taking `&[u8; 32]`) is ledgered as item 13 of the
+[upstream candidates ledger](../research/2026-10-03_upstream_candidates_ledger.md) and is not
+done. Why the audit's 2026-10-16 run was green remains unexplained.
