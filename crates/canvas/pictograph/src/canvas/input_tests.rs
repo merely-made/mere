@@ -105,13 +105,18 @@ fn lifted_billboard_center_remains_marquee_selectable() {
     let key = keys[0];
     canvas
         .graph
+        .declare_predicate(
+            "urn:test:marquee-height",
+            kernel::graph::GraphStratum::Surface,
+        )
+        .unwrap();
+    canvas
+        .graph
         .try_assert_semantic_statement(
             key,
             keys[1],
             kernel::graph::SemanticStatementSpec {
-                predicate: kernel::graph::predicate_iri(kernel::graph::SemanticSubKind::Cites)
-                    .into(),
-                recognized_sub_kind: Some(kernel::graph::SemanticSubKind::Cites),
+                predicate: "urn:test:marquee-height".into(),
                 ..Default::default()
             },
         )
