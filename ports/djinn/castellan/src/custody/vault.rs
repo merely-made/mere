@@ -331,16 +331,26 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for Box<T> {
 
 /// The secret-free view of `profile`.
 pub(crate) fn public_profile_of(profile: &Profile) -> PublicProfile {
-    let mut slots: Vec<SlotSummary> = profile
-        .slots
-        .iter()
-        .map(|(key, slot)| SlotSummary {
-            key: key.clone(),
+    // Pushed one at a time into a vector sized up front, each key rebuilt
+    // field by field. A cloned `Option<String>` that is `None` leaves most
+    // of its 24 bytes uninitialised, and a bulk copy of the temporary would
+    // carry whatever stale stack lay under it (a master seed, once) into a
+    // long-lived heap block.
+    let mut slots: Vec<SlotSummary> = Vec::with_capacity(profile.slots.len());
+    for (key, slot) in profile.slots.iter() {
+        slots.push(SlotSummary {
+            key: ProtocolKey {
+                mod_id: key.mod_id.clone(),
+                instance: match &key.instance {
+                    Some(instance) => Some(instance.clone()),
+                    None => None,
+                },
+            },
             kind: slot.kind().to_string(),
             lineage: slot.lineage(),
             unlock_tier: slot.unlock_tier(),
-        })
-        .collect();
+        });
+    }
     slots.sort_by(|a, b| a.key.cmp(&b.key));
     PublicProfile {
         id: profile.id.clone(),
