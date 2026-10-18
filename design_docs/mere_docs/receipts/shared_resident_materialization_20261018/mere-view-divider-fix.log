@@ -1,0 +1,572 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling syn v2.0.119
+   Compiling smallvec v1.16.1
+   Compiling hashbrown v0.17.1
+   Compiling objc2-core-foundation v0.3.2
+   Compiling parking_lot_core v0.9.12
+   Compiling parking_lot v0.12.5
+   Compiling objc2-foundation v0.3.2
+   Compiling indexmap v2.14.2
+   Compiling zerocopy-derive v0.8.57
+   Compiling zerocopy v0.8.57
+   Compiling profiling-procmacros v1.0.18
+   Compiling profiling v1.0.18
+   Compiling getrandom v0.4.3
+   Compiling objc2-metal v0.3.2
+   Compiling uuid v1.27.0
+   Compiling icu_provider v2.3.1
+   Compiling phf_macros v0.13.1
+   Compiling naga-types v30.0.1
+   Compiling objc2-core-graphics v0.3.2
+   Compiling serde_bytes v0.11.19
+   Compiling linebender_resource_handle v0.1.1
+   Compiling objc2-quartz-core v0.3.2
+   Compiling phf v0.13.1
+   Compiling half v2.7.1
+   Compiling naga v30.0.1
+   Compiling wgpu-types v30.0.1
+   Compiling raw-window-metal v1.1.0
+   Compiling tracing-core v0.1.36
+   Compiling string_cache v0.9.0
+   Compiling icu_properties v2.3.0
+   Compiling num-rational v0.4.2
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling tracing-attributes v0.1.31
+   Compiling kurbo v0.13.1
+   Compiling read-fonts v0.41.0
+   Compiling tracing v0.1.44
+   Compiling icu_normalizer v2.3.0
+   Compiling wgpu-core-deps-apple v30.0.1
+   Compiling web_atoms v0.2.6
+   Compiling peniko v0.6.1
+   Compiling markup5ever v0.39.0
+   Compiling wgpu-core v30.0.1
+   Compiling skrifa v0.44.0
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling equator-macro v0.4.2
+   Compiling equator v0.4.2
+   Compiling wgpu v30.0.1
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling enumn v0.1.14
+   Compiling accesskit v0.24.1
+   Compiling aligned-vec v0.6.4
+   Compiling object v0.39.1
+   Compiling idna_adapter v1.2.2
+   Compiling futures-intrusive v0.5.0
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling ar_archive_writer v0.5.3
+   Compiling idna v1.1.0
+   Compiling v_frame v0.3.9
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling winnow v1.0.4
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling psm v0.1.32
+   Compiling url v2.5.8
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling sceno v0.0.5 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/scenes/sceno)
+   Compiling arg_enum_proc_macro v0.3.4
+   Compiling no_std_io2 v0.9.4
+   Compiling nom v8.0.0
+   Compiling av-scenechange v0.14.1
+   Compiling brotli-decompressor v5.0.3
+   Compiling av1-grain v0.2.5
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling bitstream-io v4.10.0
+   Compiling heapless v0.7.17
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling num-derive v0.4.2
+   Compiling objc2-core-text v0.3.2
+   Compiling bytes v1.12.1
+   Compiling encoding_rs v0.8.42
+   Compiling wuff v0.2.9
+   Compiling rav1e v0.8.1
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+   Compiling cssparser v0.37.0
+   Compiling postcard v1.1.3
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling icu_locale_fallback v2.3.0
+   Compiling crypto-common v0.2.2
+   Compiling core-foundation-sys v0.8.7
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling digest v0.11.3
+   Compiling core-foundation v0.9.4
+   Compiling ravif v0.13.0
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling icu_segmenter v2.3.0
+   Compiling stacker v0.1.25
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling wuff-capi v0.2.0
+   Compiling scenograph v0.0.4 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/scenes/scenograph)
+   Compiling harfrust v0.8.4
+   Compiling parley_data v0.10.0
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling sha2 v0.11.0
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling scenomise v0.0.5 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/scenes/scenomise)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling fontsan v0.7.0
+   Compiling image v0.25.10
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling core-graphics-types v0.1.3
+   Compiling objc2-app-kit v0.2.2
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling core-graphics v0.23.2
+   Compiling winit v0.30.13
+   Compiling blake3 v1.8.7
+   Compiling meristem v0.2.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/meristem)
+   Compiling strum_macros v0.28.0
+   Compiling bytecheck v0.8.3
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=c5efc94f876e93caba20807709189c5f9589492b#c5efc94f)
+   Compiling sprigging v0.2.1 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/sprigging)
+   Compiling nalgebra-macros v0.3.0
+   Compiling munge_macro v0.4.7
+   Compiling petgraph v0.8.3
+   Compiling munge v0.4.7
+   Compiling cambium v0.3.3 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/cambium)
+   Compiling nalgebra v0.35.0
+   Compiling strum v0.28.0
+   Compiling rend v0.5.4
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling cfb v0.7.3
+   Compiling spade v2.15.1
+   Compiling muniment v0.1.2 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/eidetic/muniment)
+   Compiling rkyv v0.8.18
+   Compiling glamx v0.3.1
+   Compiling numen v0.2.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/conatus/numen)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling accesskit_consumer v0.38.0
+   Compiling regex-syntax v0.8.11
+   Compiling regex-automata v0.4.18
+   Compiling futures-util v0.3.34
+   Compiling parry2d v0.31.1
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/cambium-rootstock)
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates/cambium/cambium-rootstock/src/producer/registry.rs:678:13
+    |
+678 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+678 -             drop(renderer);
+678 +             let _ = renderer;
+    |
+
+warning: `cambium-rootstock` (lib) generated 1 warning
+   Compiling accesskit_macos v0.26.3
+   Compiling chartulary v0.2.2 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/eidetic/chartulary)
+   Compiling infer v0.19.0
+   Compiling mere-forme v0.2.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/forme/forme)
+   Compiling lazy_static v1.5.0
+   Compiling sharded-slab v0.1.7
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> crates/graph/graph-kernel/src/graph/mod.rs:722:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+722 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+748 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+758 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> crates/graph/graph-kernel/src/graph/query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling rapier2d v0.36.0
+warning: `mere-kernel` (lib) generated 19 warnings (run `cargo fix --lib -p mere-kernel` to apply 8 suggestions)
+   Compiling matchers v0.2.0
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#7114f91c)
+   Compiling scenotime v0.0.4 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/scenes/scenotime)
+   Compiling armillary v0.1.1 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/armillary)
+   Compiling tracing-log v0.2.0
+   Compiling objc2-core-image v0.3.2
+   Compiling objc2-cloud-kit v0.3.2
+   Compiling objc2-core-data v0.3.2
+   Compiling objc2-core-video v0.3.2
+   Compiling zeroize v1.9.1
+   Compiling esp v0.1.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/intel/esp)
+   Compiling chirograph v0.0.2 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/chirograph)
+   Compiling tracing-subscriber v0.3.23
+   Compiling objc2-app-kit v0.3.2
+   Compiling seiche v0.0.6 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/conatus/seiche)
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/cambium-winit-a11y)
+   Compiling mere-cartography v0.0.2 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/canvas/cartography)
+   Compiling png v0.17.16
+   Compiling mere-apparatus v0.0.1 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/domain/apparatus)
+   Compiling pictograph v0.2.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/canvas/pictograph)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/mesquite)
+warning: function `build_affinity_spring` is never used
+  --> crates/canvas/pictograph/src/canvas.rs:68:4
+   |
+68 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `visible_link_appearances` is never used
+  --> crates/canvas/pictograph/src/canvas/edge_cells.rs:28:15
+   |
+28 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:385:15
+    |
+385 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_hit_test_with_assertion_hides` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:408:15
+    |
+408 | pub(crate) fn link_hit_test_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:433:15
+    |
+433 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:531:15
+    |
+531 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `links_in_rect_with_assertion_hides` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:552:15
+    |
+552 | pub(crate) fn links_in_rect_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:601:15
+    |
+601 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+warning: function `link_overlay_with_assertion_hides` is never used
+   --> crates/canvas/pictograph/src/canvas/edge_cells.rs:623:15
+    |
+623 | pub(crate) fn link_overlay_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling incipit v0.2.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/incipit)
+warning: `pictograph` (lib) generated 9 warnings
+   Compiling mere-view v0.1.0 (/Users/markik/Code/testing/shared-resident-materialization-20261018/mere/crates/cambium/mere-view)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 44s
+     Running unittests src/lib.rs (target/build/debug/deps/mere_view-5c936b757a4a1067)
+
+running 38 tests
+test folds::tests::partial_and_overlapping_records_never_hide_an_uncovered_member ... ok
+test folds::tests::opaque_members_route_between_two_folds_once_and_preserve_source_geometry ... ok
+test tests::a_card_or_popover_closes_when_its_session_or_archive_is_gone ... ok
+test tests::a_layout_switch_moves_nodes_and_keeps_every_key ... ok
+test tests::a_declined_request_is_shown_as_the_host_worded_it ... ok
+test tests::apply_and_lay_out_lays_the_graph_out_again_for_an_open_card ... ok
+test tests::an_empty_sessions_list_leaves_the_full_graph_area_available ... ok
+test tests::branch_sits_beside_fork_and_merge_into_source_on_a_branch ... ok
+test tests::each_session_says_its_state_in_words_and_offers_the_hosts_steps ... ok
+test tests::a_hand_value_is_typed_in_place_and_reported_by_edit_by_hand ... ok
+test tests::hover_and_focus_are_the_views_own_state ... ok
+test tests::a_replanned_merge_names_the_choices_it_dropped ... ok
+test tests::every_node_is_a_labelled_target_with_a_stable_key_and_its_state_in_words ... ok
+test tests::an_open_card_grows_the_tier_and_the_graph_is_laid_out_again_below_it ... ok
+test tests::a_pending_merge_lists_each_conflict_with_its_choices_then_apply ... ok
+test tests::every_node_has_a_kind_the_host_colours_by ... ok
+test tests::empty_unavailable_and_building_say_so_plainly_with_the_hosts_action ... ok
+test tests::minting_heads_the_sessions_list ... ok
+test tests::relations_keep_their_provenance_and_parallel_ones_stay_apart ... ok
+test tests::requests_go_to_the_host_and_change_nothing_themselves ... ok
+test tests::loose_archives_hang_off_the_shelf_which_opens_into_its_card ... ok
+test tests::the_host_sets_how_many_archives_show_before_they_collapse ... ok
+test tests::the_overmap_band_wraps_and_stops_at_its_share ... ok
+test tests::nodes_a_strategy_puts_on_one_point_are_parted ... ok
+test tests::the_layout_tracks_session_area_changes ... ok
+test tests::the_structural_sheet_names_no_colour ... ok
+test tests::the_new_session_action_keeps_the_sessions_area_when_the_list_is_empty ... ok
+test tests::a_session_node_opens_in_place_into_its_card_one_at_a_time ... ok
+test tests::the_sheet_pins_the_rows_a_card_and_a_popover_are_measured_by ... ok
+test tests::tier_labels_show_the_name_and_keep_clear_of_the_tier_controls ... ok
+test tests::the_shared_panel_hides_only_its_duplicate_graph_and_keeps_requests_out ... ok
+test tests::past_a_few_archives_a_session_shows_one_more_node_that_opens_its_card ... ok
+test tests::the_view_is_a_labelled_region_holding_the_hosts_actions_and_layouts ... ok
+test tests::an_archive_node_peeks_on_hover_and_pins_a_popover_on_click ... ok
+test tests::the_view_fits_its_tile_from_the_full_centre_to_a_side_stack ... ok
+test tests::the_tier_puts_sessions_and_archives_on_the_canvas_one_level_up ... ok
+test tests::the_overmap_puts_sessions_in_containers_above_the_graph_with_their_archives_on_them ... ok
+test tests::the_graph_only_layouts_match_their_goldens ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
