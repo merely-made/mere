@@ -1009,3 +1009,5 @@ gate. Native, browser, fresh reopen and publication receipts remain separate.
 Cleromancy natal-aspect resident intake (2026-10-17): [qualification](mere_docs/receipts/natal-aspects-20261017/qualification.json), with exact portable-core source, 230 owner/software passes, committed-source replay/refusal checks and preserved supplier/earlier evidence identities. The reservoir plan records its bounded scope.
 
 Shared resident materialization: [plan](2026-10-18_resident_materialization_plan.md). One verified async sessions/graph/archive reader in mere-overmap, with complete and projection-only modes, adopted separately by Cleromancy and Knot while preserving product validation and catalog/view ownership.
+
+Shared resident materialization [qualification](mere_docs/receipts/shared_resident_materialization_20261018/qualification.json): shared verified reader adopted by Cleromancy and Knot; software/refusal gates, real-broker controls, bounded native archive/reopening, preserved histories and presentation repair. [Read-only verifier](mere_docs/receipts/shared_resident_materialization_20261018/verify.py).

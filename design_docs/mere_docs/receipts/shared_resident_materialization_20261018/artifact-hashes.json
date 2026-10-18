@@ -1,0 +1,18 @@
+{
+  "fixture-build-02.log": "22fb53d6234d9ef2da03a4c75e6a283c670d0e5a1371c383c48d016a3e14c9a3",
+  "fixture-build.log": "00333e2ecbae34d0fd15f896263e0a5b42e1187b5f40cab7592bbc137398d423",
+  "mere-common-panel-final.log": "fbab4b7738826ca29b0fd682788cc3c6f326514e5ba22de4867c1a4b5e4a6804",
+  "mere-knot-broker-final.log": "f0f7a3a6853bf3e92f97454260844fcb57c88feb84debca3cf3859ba53091d4b",
+  "mere-knot-consumer-intake.log": "50447c56d7d7d7fdcf94790e2b35637152ebc05954df563e39f8daf9f5f8672d",
+  "mere-overmap-resident-tests.log": "514761bc155ba238acd3cd6777e7dbde44ac3fddb2d5667de3332a0432fd6999",
+  "mere-overmap-reviewfix-default-tests.log": "1e2cd7190a29f30604e5fb1d04ab8b545125b6f05f6657bc63537005a3bd4603",
+  "mere-overmap-reviewfix-no-default-tests.log": "e509db7d664fcaf87cd51b647322853aad5c1a281d20c551f28b38ca1a06c5d4",
+  "mere-overmap-reviewfix-resident-tests-02.log": "2979ac0b4240b8c59da9c94df1bb9636e45125d71d4067219d0244c144ce9ce7",
+  "mere-overmap-reviewfix-resident-tests.log": "99a76acd5e9b2e566833b08baf5ec42e8bb2931f137bbc98f5f1275b60447e1a",
+  "mere-preservation-before.json": "d4f323405291da7cb0144a40efa0472b07417898103c33d8da5a733f835dfeb3",
+  "mere-view-divider-fix.log": "940f110d7430542d0c7f3797dc6a7a2bc43c3d2167994505fd67a667e638865f",
+  "preservation-current.json": "bce1d636562ff292357c59fb3595f783e5b434c9a0ddf6e2dccd87a9b1296cfd",
+  "preservation-final.json": "3a7a3a1b8da93480951601832ce53ba087a0091740fef1ae06798df61eba1c2b",
+  "qualification.json": "297d469cbe3f4971f13d0271ba961d6a65250f024895c085df228a0704578ba6",
+  "verify.py": "eb9cf692216203af2ce53f32349334e62073762c52b97092880210708619c824"
+}
