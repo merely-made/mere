@@ -23,7 +23,10 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 use sceno::SourceRef;
-use scenomise::projection::{DisclosedRelationship, ProjectionDataset, ProjectionOccurrence};
+use scenomise::host_dataset::occurrence_identity_issues;
+use scenomise::projection::{
+    CompileIssue, DisclosedRelationship, ProjectionDataset, ProjectionOccurrence,
+};
 
 pub use scenomise::matrix::{
     AXIS_INPUT_PROVENANCE, CellReading, MATRIX_CELL_SIZE, MATRIX_DERIVATION_ADAPTER, Matrix,
@@ -94,6 +97,12 @@ pub enum MatrixReadingError {
     /// There is deliberately no fallback (site canvas plan, Ruling 147a): a
     /// host that wants a default focus, as the site does, supplies it.
     MissingFocus { axis: MatrixRole },
+    /// The axis dataset or adjacent predecessor has blank or repeated
+    /// occurrence ids.
+    OccurrenceIdentities {
+        axis: MatrixRole,
+        issues: Vec<CompileIssue>,
+    },
     /// The shared derivation refused the axes.
     Matrix(MatrixError),
 }
@@ -109,6 +118,13 @@ impl fmt::Display for MatrixReadingError {
             },
             Self::MissingFocus { axis } => {
                 write!(f, "the {axis} axis needs a focus that names an occurrence")
+            },
+            Self::OccurrenceIdentities { axis, issues } => {
+                write!(f, "the {axis} axis has invalid occurrence identities:")?;
+                for issue in issues {
+                    write!(f, " {}: {};", issue.field, issue.message)?;
+                }
+                Ok(())
             },
             Self::Matrix(error) => error.fmt(f),
         }
@@ -176,6 +192,12 @@ fn read_axis(input: &ReadingAxis<'_>, role: MatrixRole) -> Result<MatrixAxis, Ma
             reading: input.profile.id.clone(),
         });
     }
+    if input.profile.actor_scope != ActorScope::AdjacentRevision {
+        let issues = occurrence_identity_issues(input.dataset);
+        if !issues.is_empty() {
+            return Err(MatrixReadingError::OccurrenceIdentities { axis: role, issues });
+        }
+    }
     let occurrences = &input.dataset.occurrences;
     let sources = match input.profile.actor_scope {
         // The current actors and then the removed ones, as the changes
@@ -185,7 +207,10 @@ fn read_axis(input: &ReadingAxis<'_>, role: MatrixRole) -> Result<MatrixAxis, Ma
                 dataset: input.dataset,
                 relationships: input.relationships,
             };
-            let changes = classify_revisions(input.previous, current, &Comparison::default());
+            let changes =
+                classify_revisions(input.previous, current, &Comparison::default()).map_err(
+                    |issues| MatrixReadingError::OccurrenceIdentities { axis: role, issues },
+                )?;
             let mut by_id = input
                 .previous
                 .iter()

@@ -379,6 +379,51 @@ fn refuses_oversized_and_malformed_histories() {
 }
 
 #[test]
+fn refuses_blank_or_duplicate_occurrence_ids_in_every_history_revision() {
+    for bad_occurrences in [
+        vec![occurrence("a", "Alpha"), occurrence("a", "Alias")],
+        vec![occurrence("   ", "Blank"), occurrence("b", "Beta")],
+    ] {
+        let mut value = history();
+        // A malformed predecessor must be refused before classification can
+        // collapse its duplicate ids into the predecessor lookup map.
+        value["revisions"][0]["dataset"]["occurrences"] =
+            serde_json::to_value(bad_occurrences).unwrap();
+        assert!(matches!(
+            parse(&value),
+            Err(HostDatasetError::OccurrenceIdentities(issues))
+                if issues.iter().any(|issue| issue.field.starts_with("revisions[0].occurrences."))
+        ));
+    }
+
+    let mut value = history();
+    value["revisions"][1]["dataset"]["occurrences"] =
+        json!([occurrence("a", "Alpha"), occurrence("a", "Alias"),]);
+    assert!(matches!(
+        parse(&value),
+        Err(HostDatasetError::OccurrenceIdentities(issues))
+            if issues.iter().any(|issue| issue.field.starts_with("revisions[1].occurrences."))
+    ));
+}
+
+#[test]
+fn v1_dataset_parser_applies_the_same_occurrence_identity_rule() {
+    let current = &history()["revisions"][1];
+    let mut v1 = json!({
+        "schema": HOST_DATASET_SCHEMA_V1,
+        "dataset": current["dataset"],
+        "relationships": current["relationships"],
+        "revisions": [{ "sequence": 1, "revision": "r2" }],
+    });
+    v1["dataset"]["occurrences"] = json!([occurrence("", "Blank"), occurrence("b", "Beta"),]);
+    assert!(matches!(
+        parse_host_dataset(&v1.to_string()),
+        Err(HostDatasetError::OccurrenceIdentities(issues))
+            if issues.iter().any(|issue| issue.field == "occurrences..occurrence_id")
+    ));
+}
+
+#[test]
 fn refuses_empty_repeated_or_unknown_compared_relationship_fields() {
     for (parts, problem) in [
         (json!([]), "are empty"),

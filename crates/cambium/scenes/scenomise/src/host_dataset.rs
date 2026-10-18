@@ -109,6 +109,8 @@ pub enum HostDatasetError {
     /// Relationships that disagree with the dataset: endpoints, identity,
     /// meaning, or provenance at another source or revision.
     Relationships(Vec<CompileIssue>),
+    /// Occurrence ids that are blank or repeated within a dataset.
+    OccurrenceIdentities(Vec<CompileIssue>),
     /// A history envelope names no schema, or one the history reader does not
     /// know.
     UnknownHistorySchema(Option<String>),
@@ -171,6 +173,13 @@ impl fmt::Display for HostDatasetError {
                 }
                 Ok(())
             },
+            Self::OccurrenceIdentities(issues) => {
+                write!(f, "refused occurrence identities:")?;
+                for issue in issues {
+                    write!(f, " {}: {};", issue.field, issue.message)?;
+                }
+                Ok(())
+            },
             Self::UnknownHistorySchema(Some(schema)) => write!(
                 f,
                 "unknown dataset schema {schema}; expected {HOST_DATASET_SCHEMA_V2} or \
@@ -224,6 +233,10 @@ pub fn parse_host_dataset(json: &str) -> Result<HostDatasetV1, HostDatasetError>
     let envelope: HostDatasetV1 = serde_json::from_value(value)
         .map_err(|error| HostDatasetError::Malformed(error.to_string()))?;
     check_revisions(&envelope)?;
+    let identity_issues = occurrence_identity_issues(&envelope.dataset);
+    if !identity_issues.is_empty() {
+        return Err(HostDatasetError::OccurrenceIdentities(identity_issues));
+    }
     let issues = relationship_disclosure_issues(&envelope.dataset, &envelope.relationships);
     if !issues.is_empty() {
         return Err(HostDatasetError::Relationships(issues));
@@ -486,6 +499,16 @@ fn check_history(history: &HostDatasetV2) -> Result<(), HostDatasetError> {
         if entry.dataset.source != first.dataset.source {
             return Err(HostDatasetError::SourceChanged { index });
         }
+        let identity_issues = occurrence_identity_issues(&entry.dataset)
+            .into_iter()
+            .map(|issue| CompileIssue {
+                field: format!("revisions[{index}].{}", issue.field),
+                message: issue.message,
+            })
+            .collect::<Vec<_>>();
+        if !identity_issues.is_empty() {
+            return Err(HostDatasetError::OccurrenceIdentities(identity_issues));
+        }
         let issues = relationship_disclosure_issues(&entry.dataset, &entry.relationships);
         if !issues.is_empty() {
             return Err(HostDatasetError::Relationships(
@@ -543,6 +566,26 @@ fn check_history(history: &HostDatasetV2) -> Result<(), HostDatasetError> {
         }
     }
     Ok(())
+}
+
+/// Check that occurrence ids are nonblank and unique within this dataset.
+/// Returns one issue for each blank or repeated occurrence id; an empty
+/// vector means identities are valid.
+pub fn occurrence_identity_issues(dataset: &ProjectionDataset) -> Vec<CompileIssue> {
+    let mut issues = Vec::new();
+    let mut seen = HashSet::new();
+    for occurrence in &dataset.occurrences {
+        let prefix = format!("occurrences.{}", occurrence.occurrence_id);
+        if occurrence.occurrence_id.trim().is_empty()
+            || !seen.insert(occurrence.occurrence_id.as_str())
+        {
+            issues.push(CompileIssue {
+                field: format!("{prefix}.occurrence_id"),
+                message: "occurrence ids must be non-empty and unique".into(),
+            });
+        }
+    }
+    issues
 }
 
 fn check_revisions(envelope: &HostDatasetV1) -> Result<(), HostDatasetError> {

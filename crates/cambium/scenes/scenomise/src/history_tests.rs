@@ -249,6 +249,45 @@ fn the_first_revision_adds_everything() {
     assert!(history.changes_at(2).is_none());
 }
 
+#[test]
+fn in_memory_classification_rejects_invalid_current_and_predecessor_ids() {
+    let valid = history(None);
+    let first = RevisionView::from(&valid.revisions[0]);
+    let second = RevisionView::from(&valid.revisions[1]);
+    assert!(classify_revisions(Some(first), second, &Comparison::of(&valid)).is_ok());
+
+    let mut invalid_previous = valid.clone();
+    invalid_previous.revisions[0].dataset.occurrences[1].occurrence_id =
+        invalid_previous.revisions[0].dataset.occurrences[0]
+            .occurrence_id
+            .clone();
+    let previous = RevisionView::from(&invalid_previous.revisions[0]);
+    let current = RevisionView::from(&invalid_previous.revisions[1]);
+    let Err(issues) = classify_revisions(Some(previous), current, &Comparison::of(&valid)) else {
+        panic!("duplicate predecessor identity must be rejected")
+    };
+    assert!(
+        issues
+            .iter()
+            .any(|issue| issue.field.starts_with("previous.occurrences."))
+    );
+    assert!(invalid_previous.changes_at(1).is_none());
+
+    let mut invalid_current = valid.clone();
+    invalid_current.revisions[1].dataset.occurrences[0].occurrence_id = "  ".into();
+    let previous = RevisionView::from(&invalid_current.revisions[0]);
+    let current = RevisionView::from(&invalid_current.revisions[1]);
+    let Err(issues) = classify_revisions(Some(previous), current, &Comparison::of(&valid)) else {
+        panic!("blank current identity must be rejected")
+    };
+    assert!(
+        issues
+            .iter()
+            .any(|issue| issue.field.starts_with("current.occurrences."))
+    );
+    assert!(invalid_current.changes_at(1).is_none());
+}
+
 /// A site graph at one checkpoint as a history revision. Besides the fields
 /// the site's checkpoint slider compares, each occurrence discloses its
 /// position in the site's canonical id order, as the site exporter does, so
