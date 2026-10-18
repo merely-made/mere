@@ -1,0 +1,8 @@
+Process argv: ["python3", "/Users/markik/Code/testing/mere/ordinary-responsive-links-20261017/verify.py", "/Users/markik/Code/testing/mere/ordinary-responsive-links-20261017"]
+ordinary responsive-link evidence verified
+source revision: aa0392a1ba547a55860a6988db48e2d6ba22ee48
+canvas passing tests: 539
+Graphshell passing tests: 312
+seed PNG captures: 8; reopen PNG captures: 2
+browser scenario errors/gate failures: zero
+seed/reopen source facts and graph revision: equal

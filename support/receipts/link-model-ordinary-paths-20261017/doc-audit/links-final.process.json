@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "exit_code": 1,
+  "at": "2026-10-18T02:01:54.588787+00:00"
+}

@@ -25,16 +25,21 @@ delivery's combined source `4f4678522` also includes published native-fold integ
 
 ## Current backlog and ordinary-graph continuation — 2026-10-17
 
-**Status: ordinary-graph responsive paths in progress.** Mark authorized this
+**Status: ordinary-graph responsive paths qualified within the bounds below.** Mark authorized this
 continuation after reviewing the current backlog. The bounded P1–P7 receipts
 below remain complete on their recorded sources; older sections describing an
 open gate are delivery history and are superseded by their qualification
 continuations. L1–L13 remain settled. The integration baseline is refreshed Mere
-`26a67386fa4c58e7fb7962680eddeb56c2f988c0`.
+`26a67386fa4c58e7fb7962680eddeb56c2f988c0`, refreshed onto published render-admission
+source `a2b4222bf` before final qualification. Compiled and tested source is
+`aa0392a1ba547a55860a6988db48e2d6ba22ee48`; the
+[ordinary-path receipt](../../../support/receipts/link-model-ordinary-paths-20261017/README.md)
+records the separate source, browser, reopen and image-review claims.
 
 | Work | Current boundary and owner |
 | --- | --- |
-| Responsive paths on an ordinary graph | Active in this continuation: connect the bounded Numen evaluator and shared link adapter to the normal Graphshell canvas, with explicit view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
+| Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
+| Responsive-path legibility | Open presentation follow-up from reviewed captures: strong selected bundles have angular bends and crossings, and direction/opposition marks and parallel strata are faint at this zoom. Improve curve/highlight/stratum legibility without changing canonical identity, explicit membership or endpoint force authority. |
 | Strength and physical explanation | Deferred to dynamics: held assertion counting is the current default, and endpoint physics retains one spring per visible source row. Weighted policy, one aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance are not part of this continuation. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
@@ -83,6 +88,60 @@ Done conditions:
 an isolated worktree; the integration owner controls shared API, builds,
 browser/native scheduling, evidence and publication. Disjoint agents first map
 the ordinary rendering/picking seam and the acceptance harness before writes.
+
+**Qualification, 2026-10-17:** the ordinary canvas now evaluates temporary paths
+from current canonical readings, preserving exact directed assertion buckets,
+Resource aliases, both strata, whole-link/exact-member hides and self-link
+resting arches. Paint, selected highlight, pointer picking and rectangle
+selection consume the same sampled segments. Response settings clear on graph
+replacement; no path points, compatibility group or temporary field are saved
+as source truth. Disabled controls use the ordinary resting geometry directly.
+
+Field response accepts explicit active **Global Vector** graph-field IDs and
+labeled temporary Attractor/Flow/Vortex presets. Sample dependencies are checked
+for identity, activity, extent, value kind, cycles and expanded depth before
+cloning or evaluation. Missing/retired/scalar/non-global or over-budget inputs
+explicitly refuse while retaining the complete ordinary resting geometry.
+Compatible attraction uses one explicitly populated group of canonical
+`LinkKey`s; ungrouped paths remain exactly at rest in compatibility-only mode.
+Hidden but still valid group members are skipped, not treated as stale targets.
+No predicate-based compatibility or additional endpoint springs are inferred.
+
+The evaluator retains limits of 64 responsive appearances, eight fields, 32
+control points, 48 iterations, two million work units, AST depth 16 and 256 AST
+nodes. The normal controls use 17 points and 24 iterations. Self-link arches and
+offscreen endpoints retain ordinary geometry. Region/scalar-field response,
+animated field clocks, larger-cohort performance and persistent response
+settings are not qualified by this slice.
+
+Final checks on the recorded clean source passed **539 Pictograph tests**
+(19 existing ignores), **312 Graphshell library tests** (six existing ignores),
+the locked/offline product Wasm build, the product-disabled viewer compile and
+port dependency boundaries. Seventeen focused canvas regressions are included
+in the full Pictograph run. The normal `tree.html?app=local&fixture=link-rest`
+route passed field-only, compatibility-only, combined, both-disabled,
+curved-alias picking, source-backed inspection, hide and restoration checks.
+This is the ordinary product canvas with a deterministic graph, not the
+separate fixed-endpoint dynamics page.
+
+Native Chrome 155 on Metal/WebGPU produced eight reviewed seed captures. After
+verified Chrome exit, a distinct Chrome process passed the reopen scenario and
+two further reviewed captures: whole-link hide intent survived, temporary field
+and group reset, both responses were disabled, and ordinary Show hidden links
+restored all six appearances. The exact 15,699-byte source reading and graph
+revision 21 match across processes. That runtime revision is not presented as an
+immutable public revision. Browser graph-field selection is CPU-qualified; this
+browser fixture has no stored vector fields and uses the labeled temporary
+presets. Strong-bundle legibility remains the explicit follow-up above.
+
+The receipt preserves failed fixture/discovery attempts, the initial scenario's
+formatted-zero/already-paused harness errors and a timing-budget failure while
+other jobs were active. The final isolated full canvas suite passed without
+changing its budget or weakening assertions. Qualified source consumes the
+already published Genet `4733c557e4c7e54f9e928116b8008671f69fe4bf` and Netrender
+`c5efc94f876e93caba20807709189c5f9589492b` in the standalone browser as well as the
+root workspace. Knot checkpoint confidentiality remains in its separate storage
+lane, confirmed in published Knot `7e196c534e64b50cf6f00bf4d95e3beb493e5a9f`.
 
 ## Authority and scope
 

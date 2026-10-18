@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "-p",
+    "genet-scripted-dom",
+    "--precise",
+    "4733c557e4c7e54f9e928116b8008671f69fe4bf"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/web",
+  "revision": "a00cec16a1bb78578d63786cfe32fec65da840d3",
+  "started": "2026-10-18T01:40:20.535340+00:00",
+  "status_before": "",
+  "exit_code": 0,
+  "finished": "2026-10-18T01:40:21.911786+00:00",
+  "log_sha256": "4b089e86dab01fd73cc0b30be55c136b4f872ca6efe48df1b6ecceccd9ca4008",
+  "suites": []
+}

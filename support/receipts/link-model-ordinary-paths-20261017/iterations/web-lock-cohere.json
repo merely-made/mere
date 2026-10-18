@@ -1,0 +1,16 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "--workspace"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/web",
+  "revision": "a00cec16a1bb78578d63786cfe32fec65da840d3",
+  "started": "2026-10-18T01:40:36.810990+00:00",
+  "status_before": " M ports/graphshell/web/Cargo.lock\n M ports/graphshell/web/Cargo.toml\n",
+  "exit_code": 0,
+  "finished": "2026-10-18T01:40:38.118652+00:00",
+  "log_sha256": "0be3737798a4dc29712d9bf3a4a7dc5edc63fee875b31393cb44722adbf56529",
+  "suites": []
+}
