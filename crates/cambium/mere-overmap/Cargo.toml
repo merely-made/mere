@@ -19,6 +19,8 @@ default = ["view"]
 # without the view's Cambium cone.
 view = ["dep:mere-view", "dep:graphshell-client", "dep:cartography", "dep:sceno", "dep:uuid"]
 
+resident = ["view", "dep:graphshell-endpoint"]
+
 [dependencies]
 chirograph.workspace = true
 kernel.workspace = true
@@ -29,6 +31,7 @@ serde_json.workspace = true
 # The relation adapter id the graph projection's items name.
 cartography = { workspace = true, optional = true }
 graphshell-client = { workspace = true, optional = true }
+graphshell-endpoint = { workspace = true, optional = true, features = ["door"] }
 mere-view = { workspace = true, optional = true }
 sceno = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
