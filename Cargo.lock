@@ -2754,7 +2754,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4581,7 +4581,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5477,7 +5477,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -8860,7 +8860,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8868,7 +8868,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8888,12 +8888,13 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8"
 dependencies = [
  "cambium",
  "illume",
  "inker",
  "knot-editor-host",
+ "mere-source-edit 0.1.0 (git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f)",
  "mere-surface-api",
  "nematic",
  "same-file",
@@ -8904,7 +8905,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8974,7 +8975,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8987,7 +8988,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#b6a6222ede48bacebbc5a533c5930bcab779cee5"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10042,6 +10043,7 @@ version = "0.1.0"
 dependencies = [
  "chirograph",
  "graphshell-client",
+ "graphshell-endpoint",
  "mere-cartography",
  "mere-kernel",
  "mere-view",
@@ -10171,6 +10173,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "mere-source-edit"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "mere-surface-api"
 version = "0.1.0"
 dependencies = [
@@ -10180,7 +10190,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#bd8fe1e5db9690dbb15b618d0103ce6d97d701a4"
+source = "git+https://github.com/merely-made/murm.git?branch=main#7c2432ab16723daeb8119f21014a66f0a8121ff8"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10590,7 +10600,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#bd8fe1e5db9690dbb15b618d0103ce6d97d701a4"
+source = "git+https://github.com/merely-made/murm.git?branch=main#7c2432ab16723daeb8119f21014a66f0a8121ff8"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11348,7 +11358,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -13606,7 +13616,7 @@ dependencies = [
  "combine",
  "downcast-rs 2.0.2",
  "dyn-clone",
- "hashbrown 0.13.2",
+ "hashbrown 0.17.1",
  "hi_sparse_bitset",
  "indexmap",
  "inventory",
@@ -14273,7 +14283,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -14994,7 +15004,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#bd8fe1e5db9690dbb15b618d0103ce6d97d701a4"
+source = "git+https://github.com/merely-made/murm.git?branch=main#7c2432ab16723daeb8119f21014a66f0a8121ff8"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -15284,7 +15294,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -15352,7 +15362,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -15810,7 +15820,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#bd8fe1e5db9690dbb15b618d0103ce6d97d701a4"
+source = "git+https://github.com/merely-made/murm.git?branch=main#7c2432ab16723daeb8119f21014a66f0a8121ff8"
 
 [[package]]
 name = "semver"
@@ -16423,7 +16433,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -16743,7 +16753,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17229,7 +17239,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17275,7 +17285,7 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8c27177b12a6399ffc08b98f76f7c9a1f4fe9fc967c784c5a071fa8d93cf7e1"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17950,7 +17960,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#bd8fe1e5db9690dbb15b618d0103ce6d97d701a4"
+source = "git+https://github.com/merely-made/murm.git?branch=main#7c2432ab16723daeb8119f21014a66f0a8121ff8"
 dependencies = [
  "selvage",
  "serial2-tokio",
@@ -18049,7 +18059,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -19673,7 +19683,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

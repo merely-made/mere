@@ -18,7 +18,7 @@ use kernel::graph::{
 
 use super::actions::ArrangementAction;
 use super::build::hyperlink;
-use super::edge_cells::{link_hit_test_segments, links_in_rect_segments};
+use super::edge_cells::{link_hit_test_segments_mapped, links_in_rect_segments_mapped};
 use super::seiche_bridge::seed_cluster;
 use super::{
     CLICK_SLOP, Canvas, ContextRequest, Drag, EDGE_PICK_TOL, EmptyPress, ORBIT_TILT_PER_PX,
@@ -156,38 +156,21 @@ impl Canvas {
         true
     }
 
-    /// The node under a screen-px cursor. Under the plain top-down projection this is
-    /// the exact world-space collider pick (`screen_to_world` -> seiche `hit_test`, which
-    /// respects each node's collider shape, including sprite hulls). Under the isometric
-    /// / fake-height projection the gnodes are upright billboards drawn off their ground
-    /// colliders, so instead test the cursor against each node's drawn billboard rect and
-    /// take the front-most (largest projected ground depth). (Isometric camera — picking.)
+    /// The visually rendered node under a screen-px cursor. Test the same rounded
+    /// billboard used for drawing and responsive link attachment, then take the
+    /// front-most node by projected ground depth. Physics colliders remain the
+    /// physics authority and do not define visual selection geometry.
     pub(crate) fn pick_at(&self, cursor: (f32, f32)) -> Option<NodeKey> {
-        if !(self.is_isometric() || self.height_by_degree()) {
-            return self
-                .view
-                .hit_test(self.screen_to_world(cursor))
-                .filter(|&key| self.node_visible_in_canvas(key));
-        }
-        let z = self.camera.zoom;
-        let (s, c) = self.camera.yaw.sin_cos();
-        let mut best: Option<(NodeKey, f32)> = None;
-        for (key, pos) in self
-            .view
+        let point = Point2D::new(cursor.0, cursor.1);
+        self.view
             .positions()
             .filter(|(key, _)| self.node_visible_in_canvas(*key))
-        {
-            let (ax, ay) = self.camera.to_screen(PortablePoint::new(pos.x, pos.y));
-            let lift = self.node_height(key) * z;
-            let half = self.node_size(key) * 0.5 * z;
-            if (cursor.0 - ax).abs() <= half && (cursor.1 - (ay - lift)).abs() <= half {
-                let depth = pos.x * s + pos.y * c;
-                if best.map_or(true, |(_, d)| depth >= d) {
-                    best = Some((key, depth));
-                }
-            }
-        }
-        best.map(|(k, _)| k)
+            .filter_map(|(key, pos)| {
+                let body = self.node_billboard_at(key, PortablePoint::new(pos.x, pos.y))?;
+                body.contains_screen(point).then_some((key, body.depth))
+            })
+            .max_by(|a, b| a.1.total_cmp(&b.1))
+            .map(|(key, _)| key)
     }
 
     /// A pointer button pressed at screen px `(x, y)`. Middle begins a pan; left
@@ -215,16 +198,13 @@ impl Canvas {
                 } else if let Some(appearance) = if self.shift {
                     None
                 } else {
-                    crate::canvas::edge_cells::self_link_hit_test_with_assertion_hides(
-                        &self.graph,
-                        &self.view,
-                        &self.hidden_links,
-                        &self.hidden_edges,
-                        &self.hidden_assertions,
-                        self.screen_to_world(self.cursor),
-                        EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON),
+                    link_hit_test_segments_mapped(
+                        self.rendered_link_segments(),
+                        Point2D::new(self.cursor.0, self.cursor.1),
+                        EDGE_PICK_TOL,
                         |key| self.node_visible_in_canvas(key),
-                        |key| self.node_size(key),
+                        |segment| segment.appearance.display_from == segment.appearance.display_to,
+                        |point| self.project_link_point(point),
                     )
                 } {
                     self.self_link_press = Some((appearance, self.cursor));
@@ -387,20 +367,30 @@ impl Canvas {
 
     /// Select what a marquee from `origin` to the cursor covers (SE23).
     fn rect_select(&mut self, origin: (f32, f32)) {
+        // Preserve center-in-rectangle selection, but evaluate the projected
+        // visible billboard center against the actual screen rectangle. Mapping
+        // only two corners back to world space becomes an over-wide AABB under yaw.
         let region = Box2D::from_points([
-            self.screen_to_world(origin),
-            self.screen_to_world(self.cursor),
+            Point2D::new(origin.0, origin.1),
+            Point2D::new(self.cursor.0, self.cursor.1),
         ]);
-        let sel = self.view.rect_select(region);
-        self.sync_attention();
-        self.selected = sel
-            .nodes
-            .into_iter()
-            .filter(|&key| self.node_visible_in_canvas(key))
+        let sel: std::collections::HashSet<_> = self
+            .view
+            .positions()
+            .filter(|(key, _)| self.node_visible_in_canvas(*key))
+            .filter_map(|(key, pos)| {
+                let body = self.node_billboard_at(key, PortablePoint::new(pos.x, pos.y))?;
+                region.contains(body.center).then_some(key)
+            })
             .collect();
-        let appearances = links_in_rect_segments(self.rendered_link_segments(), region, |key| {
-            self.node_visible_in_canvas(key)
-        });
+        self.sync_attention();
+        self.selected = sel;
+        let appearances = links_in_rect_segments_mapped(
+            self.rendered_link_segments(),
+            region,
+            |key| self.node_visible_in_canvas(key),
+            |point| self.project_link_point(point),
+        );
         self.selected_links = appearances.iter().map(|item| item.key.clone()).collect();
         self.selected_link_appearances = appearances
             .into_iter()
@@ -408,22 +398,26 @@ impl Canvas {
             .collect();
     }
 
+    fn project_link_point(&self, point: Point2D<f32>) -> Point2D<f32> {
+        let (x, y) = self.camera.to_screen(PortablePoint::new(point.x, point.y));
+        Point2D::new(x, y)
+    }
+
     /// A bare empty click clears the selection and may pick an edge under the
     /// cursor. The caller skips it with Shift held, so a multi-select in
     /// progress is preserved.
     fn bare_empty_click(&mut self) {
-        let world = self.screen_to_world(self.cursor);
-        let tol = EDGE_PICK_TOL / self.camera.zoom.max(f32::EPSILON);
         self.sync_attention();
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
-        if let Some(appearance) = link_hit_test_segments(
+        if let Some(appearance) = link_hit_test_segments_mapped(
             self.rendered_link_segments(),
-            world,
-            tol,
+            Point2D::new(self.cursor.0, self.cursor.1),
+            EDGE_PICK_TOL,
             |key| self.node_visible_in_canvas(key),
             |_| true,
+            |point| self.project_link_point(point),
         ) {
             self.selected_links.insert(appearance.key.clone());
             self.selected_link_appearances.insert(
@@ -944,3 +938,7 @@ impl Canvas {
         key
     }
 }
+
+#[cfg(test)]
+#[path = "input_tests.rs"]
+mod tests;

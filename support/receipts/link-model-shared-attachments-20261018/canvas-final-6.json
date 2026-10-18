@@ -1,0 +1,84 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "started": "2026-10-18T16:48:31.683936+00:00",
+  "status_before": "",
+  "exit_code": 0,
+  "finished": "2026-10-18T16:51:53.734864+00:00",
+  "log_sha256": "ee5ee6f2cd51a7a73ccbe7747274647fdefbc449470645f3a850824a247f5249",
+  "suites": [
+    {
+      "result": "ok",
+      "passed": 573,
+      "failed": 0,
+      "ignored": 18,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 1,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ]
+}

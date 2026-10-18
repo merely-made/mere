@@ -71,6 +71,7 @@ pub enum LinkPathFailure {
     FieldDependencyTooLarge,
     StaleCompatibleLink(LinkKey),
     InvalidFieldStrength,
+    InvalidProjection,
     Adapter(String),
     HiddenEndpoint,
 }
@@ -106,7 +107,8 @@ pub struct LinkPathResponseReport {
     pub responsive_paths: usize,
     pub ineligible_self_links: usize,
     pub excluded_endpoints: usize,
-    /// Evaluated paths kept at rest because their node faces cannot be safely attached.
+    /// Evaluated paths kept at rest, or self arches reduced to a finite stem
+    /// foot, because their bodies cannot be safely attached.
     pub presentation_fallbacks: usize,
 }
 
@@ -158,7 +160,7 @@ impl Canvas {
     pub(crate) fn rendered_link_segments(&self) -> Vec<edge_cells::LinkAppearanceSegment> {
         if !self.link_path_response.field_response && !self.link_path_response.compatible_attraction
         {
-            return edge_cells::visible_link_segments_with_assertion_hides(
+            let mut segments = edge_cells::visible_link_segments_with_assertion_hides(
                 &self.graph,
                 &self.view,
                 &self.hidden_links,
@@ -166,6 +168,10 @@ impl Canvas {
                 &self.hidden_assertions,
                 |key| self.node_size(key),
             );
+            edge_cells::attach_self_link_geometry(&mut segments, &self.camera, |key| {
+                self.node_billboard(key)
+            });
+            return segments;
         }
         let (mut segments, readings) = self.link_geometry();
         evaluate_canvas(self, &mut segments, &readings);
@@ -187,6 +193,9 @@ fn evaluate_canvas(
     readings: &[LinkPairReading],
 ) -> EvaluationOutcome {
     let settings = &canvas.link_path_response;
+    let self_fallbacks = edge_cells::attach_self_link_geometry(segments, &canvas.camera, |key| {
+        canvas.node_billboard(key)
+    });
     let mut outcome = EvaluationOutcome {
         state: LinkPathState::Disabled,
         failure: None,
@@ -195,8 +204,12 @@ fn evaluate_canvas(
             .filter(|segment| segment.appearance.display_from == segment.appearance.display_to)
             .count(),
         excluded_endpoints: 0,
-        presentation_fallbacks: 0,
+        presentation_fallbacks: self_fallbacks,
     };
+    if (settings.field_response || settings.compatible_attraction) && !canvas.camera.is_valid() {
+        outcome.presentation_fallbacks += segments.len() - outcome.ineligible_self_links;
+        return refused(outcome, LinkPathFailure::InvalidProjection);
+    }
     let on_screen: std::collections::HashSet<_> = if canvas.generation == 0 {
         canvas.graph.nodes().map(|(key, _)| key).collect()
     } else {
@@ -407,12 +420,12 @@ fn evaluate_canvas(
             path.points.reverse();
         }
         let segment = &mut segments[index];
-        if let Some(points) = geometry::responsive_path_geometry(
-            &path.points,
-            segment,
-            canvas.node_size(pair.0),
-            canvas.node_size(pair.1),
-        ) {
+        let bodies = canvas
+            .node_billboard(pair.0)
+            .zip(canvas.node_billboard(pair.1));
+        if let Some(points) = bodies.and_then(|(from, to)| {
+            geometry::responsive_path_geometry(&path.points, segment, canvas.camera, from, to)
+        }) {
             segment.from = points[0];
             segment.to = points[points.len() - 1];
             segment.points = points;

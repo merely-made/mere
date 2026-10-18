@@ -10,6 +10,12 @@ claims are from the specs. Extends the method of
 family: "when a rule turns up missing, look for its siblings") from one
 family to the whole platform.
 
+**Registry (2026-10-18):** each section's posture is carried as a verdict on
+genet's claims for the specs it names, in the family spec registry
+(`merelyllc.com/content/specs.toml`, source tag
+`mere-w3c-review-2026-07-05#<section>`). Where the standards survey grades
+the same spec later, the survey's grade wins. This brief stays the reasoning.
+
 **The thesis:** the knockout strategy deletes W3C surface for later rebuild.
 Every rebuild should land as the spec's mechanism (the standing rule: fix in
 the engine as the standard's shape, never a host hack), pulled by a named

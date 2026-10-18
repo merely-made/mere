@@ -1,0 +1,5 @@
+Process argv: ["python3", "support/receipts/link-model-shared-attachments-20261018/verify.py", "/Users/markik/Code/testing/mere/shared-link-attachments-20261018"]
+shared attachment evidence verified; source 0b7454123426578a22d02a8e530b67c0e6f237b0
+Pictograph passes: 578; Graphshell passes: 312
+8 seed and 2 reopen PNGs; zero scenario errors/gate failures; source observations equal
+stored graph reopened in a distinct native process; both exits observed

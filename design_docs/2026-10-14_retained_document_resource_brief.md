@@ -6,7 +6,8 @@ bounded DOM batching experiment pass. Isocosm has published a private optional
 pack-authoring CLI with the batched backend and real manifest/full `GenValue`
 schema. Its real-pack CLI workflow passes at `285821ad` without product fixes.
 Durable history remains open. The user has authorized a small shared edit-proposal
-API with Knot and Isocosm; both adapters are locally qualified under
+API with Knot and Isocosm; the supplier and both adapters are published with
+Git-only receiving qualification under
 the [source-edit plan](2026-10-18_source_edit_proposal_plan.md). The earlier
 proofs stay in testing; the private consumer lives in Isocosm.
 
@@ -481,8 +482,19 @@ removes duplicated state/checks, not necessarily total lines: extracted Knot
 helpers and regression coverage grow while the form itself shrinks. Supplier
 publication and normal remote-only receiving checks remain outstanding.
 
-**Next gates.** Publish the shared supplier and qualify normal remote-source
-consumer intake when authorized. Durable identity/history, product retention
+**Publication continuation — 2026-10-18.** The supplier is published at
+[Mere `70deef2c8`](https://github.com/merely-made/mere/commit/70deef2c8cf3d3410ae35b496a9396514070b24f).
+Its six tests, strict all-target Clippy and Rust 1.97.1 tests pass after the
+fetched-main rebase. Git-only consumer receiving qualification is recorded in
+the [publication report](/Users/markik/Code/testing/source-edit-publication-20261018/REPORT.md).
+[Isocosm `276157b7`](https://github.com/merely-made/isocosm/commit/276157b776c59394923550b0b42d543b317210d9)
+and [Knot `d2d5c32`](https://github.com/merely-made/knot-editor/commit/d2d5c32942d40af47223790ed3e16bc88fa59aa6)
+pass the receiving suites and workflows above without local overrides. Isocosm
+locks the canonical main source; Knot selects only the new contract by its exact
+published revision, avoiding unrelated rendering-family updates. Both preserve
+all existing supplier versions/revisions.
+
+**Next gates.** Durable identity/history, product retention
 and memory budgets, wider platform/consumer compatibility, external-writer coordination
 and crash behavior remain open. The private consumer resolves the real-schema
 and existing-format compatibility question within its tested scope. Direct
