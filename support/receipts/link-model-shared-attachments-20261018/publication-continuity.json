@@ -1,10 +1,14 @@
 {
   "compiled_source": "0b7454123426578a22d02a8e530b67c0e6f237b0",
-  "compiled_source_unchanged": true,
   "tracked_changed_paths": [
     "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md",
     "ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn",
     "support/receipts/link-model-shared-attachments-20261018/verify.py"
   ],
-  "qualification_input_change": "Reopen grammar expectation follows existing host default."
+  "qualification_input_change": "Reopen grammar expectation follows existing host default.",
+  "recorded_attachment_source_files_unchanged": true,
+  "integration_revision": "e9be5b852104da9898d9806c8d01781d60267a6e",
+  "unrelated_upstream_compiled_delta": {
+    "crates/cambium/mere-view/src/view.rs": "mere-view-tier-rule border style dashed to solid"
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "revision": "e9be5b852104da9898d9806c8d01781d60267a6e",
+  "exit_code": 1,
+  "stdout_sha256": "c079f78f2676875da4c3574d83f1dd832a12208783dd5d2ab34010ebbdccda98",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

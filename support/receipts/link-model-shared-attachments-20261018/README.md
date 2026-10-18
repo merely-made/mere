@@ -55,7 +55,11 @@ intrusion. The original 0.05px visible attachment/readback gates are unchanged.
 The first reopen correctly restored Graphshell's enabled grammar; its script
 incorrectly expected `false`. Only the reopen input was corrected after build;
 [build.json](build.json) records executed input hashes and the override.
-No compiled product source changed after qualification.
+The attachment implementation and recorded source files are unchanged after
+qualification. Publication also merges upstream standards documentation and
+the unrelated `mere-view-tier-rule` divider from dashed to solid. Its
+[product compile check](publication-check.json) and [log](publication-check.log)
+are separate from the source-specific native image qualification.
 
 The full package, frozen site and raw audit inventories remain at
 `/Users/markik/Code/testing/mere/shared-link-attachments-20261018`.
