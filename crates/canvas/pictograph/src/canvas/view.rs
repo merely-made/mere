@@ -296,10 +296,10 @@ impl Canvas {
             return None;
         }
         let gnode = *self.gnode_of.get(&key)?;
-        let (ax, ay) = self.screen_position_of(key)?;
-        let zoom = self.camera.zoom;
-        let size = self.node_size(key);
-        let anchor = (ax, ay - self.node_height(key) * zoom);
+        let body = self.node_billboard(key)?;
+        let zoom = body.zoom;
+        let size = body.local_side;
+        let anchor = (body.center.x, body.center.y);
         let hits = |x: f32, y: f32| self.node_document.hit_test(x, y) == Some(gnode);
         // Ring by ring outward at a quarter of the drawn side.
         let step = (size * zoom * 0.25).max(0.25);
@@ -340,7 +340,7 @@ impl Canvas {
             return None;
         }
         let world = self.view.position_of(key)?;
-        let rect = self.face_rect_at(key, PortablePoint::new(world.x, world.y));
+        let rect = self.face_rect_at(key, PortablePoint::new(world.x, world.y))?;
         Some((rect.min.x, rect.min.y, rect.max.x, rect.max.y))
     }
 
@@ -351,15 +351,15 @@ impl Canvas {
         &self,
         key: NodeKey,
         pos: PortablePoint,
-    ) -> paint_list_api::LayoutRect {
+    ) -> Option<paint_list_api::LayoutRect> {
         use paint_list_api::{LayoutPoint, LayoutRect};
-        let (cx, cy) = self.camera.to_screen(pos);
-        let side = self.node_size(key) * FACE_INSET * self.camera.zoom;
-        let half = side * 0.5;
-        LayoutRect::new(
-            LayoutPoint::new(cx - half, cy - half),
-            LayoutPoint::new(cx + half, cy + half),
-        )
+        let rect = self
+            .node_billboard_at(key, pos)?
+            .inset_screen_rect(FACE_INSET);
+        Some(LayoutRect::new(
+            LayoutPoint::new(rect.min.x, rect.min.y),
+            LayoutPoint::new(rect.max.x, rect.max.y),
+        ))
     }
 
     /// Map a screen-px point back to world space through the camera projector

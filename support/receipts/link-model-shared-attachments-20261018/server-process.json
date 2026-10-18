@@ -1,0 +1,7 @@
+{
+  "source_revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "origin": "http://127.0.0.1:38129",
+  "stop": "intentional Ctrl-C after accepted seed/reopen and verified Chrome exit",
+  "observed_exit_code": 1,
+  "log_sha256": "71b796af5a68c7c9ee105c71a5b6163f3c93b2ed41ee196a08670765eda5f86d"
+}
