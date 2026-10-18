@@ -60,11 +60,10 @@ fn metre_uses_supplied_stress_and_keeps_mismatches_visible() {
     assert!(
         matches!(out.scene.items[stress.instance.0 as usize].footprint, Footprint::Rect { size } if size.h == 24.0)
     );
-    assert!(!stress.selectable);
-    assert_eq!(
-        out.scene.items[stress.instance.0 as usize].hit,
-        Some(Footprint::Point)
-    );
+    // Placed syllables are span-edit targets (4c4ea11d), so they are selectable
+    // and hit by their own rectangle; stress stays a candidate fact, not authority.
+    assert!(stress.selectable);
+    assert_eq!(out.scene.items[stress.instance.0 as usize].hit, None);
 }
 #[test]
 fn fretboard_shares_pitch_identity_but_keeps_occurrences_distinct() {
@@ -162,7 +161,8 @@ fn ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts() {
         unreachable!()
     };
     grid.lines[1].key = "line-1/syllable/0".into();
-    assert_eq!(input.compile().unwrap_err().path, "marks");
+    // Mark ruled (audit plan R5): input validation refuses first.
+    assert_eq!(input.compile().unwrap_err().path, "metre.occurrences");
 }
 
 #[test]
