@@ -16,7 +16,8 @@ Earlier status (2026-09-04): active: the executable Graphshell authoring proof l
 
 ## Shared graph label placement (2026-10-17)
 
-Status: in progress; source and native qualification pending. Woodshed's
+Status: locally qualified; publication pending. Source `d1a200b18`, with
+Woodshed receiving source `b809565`. Woodshed's
 Related graph exposes collisions in Cambium's shared graph-canvas labels.
 The material projection and node coordinates remain product-owned; screen-space
 label placement belongs to the shared component. Independently choosing a quiet
@@ -33,10 +34,26 @@ node targets survive omitted visible labels. Offscreen anchors do not leave
 orphaned text clamped to the viewport edge. Font-width estimates choose box size;
 they do not claim intrinsic glyph measurement. Bounded overflow remains clipped.
 
-Done conditions: shared component regressions, real retained-layout geometry
-controls, Woodshed's native default/Fit/zoom/pan/compact/navigation captures, and
-source-bound receipts. Ordinary Pictograph responsive paths are a separate lane.
-Publication requires maintainer approval after local qualification.
+Qualification: 279 Cambium and 119 Rootstock cases pass (three existing
+ignores), including real retained layout/emphasis and an oversized Ahem clip
+control. Woodshed adds 242 view cases, a clean committed desktop build, seven
+native label/navigation images and nine three-surface camera/wheel images.
+Both accepted native scenarios pass with normal exit zero and exact supervised
+executable identity. The first harness trial is excluded for omitting the
+existing key prefix from an expected material title; the corrected repeat uses
+the identical product binary. See
+`woodshed/validation/related-labels_20261017/README.md` and the local
+[shared receipt](../../../support/receipts/graph-labels-20261017/qualification.json).
+The rendered full-name navigation target survives; mutual visible-label
+collisions are absent in the bounded captures. Allocated canvas bounds do not
+prove whole-window visibility: 420px toolbar overflow and 125% right graph/control
+clipping remain Woodshed P8 work. Some edges pass behind text, and dense labels
+can yield. No all-node-name, every-font, fresh-reopen or audio qualification is
+claimed. Ordinary Pictograph responsive paths are a separate lane.
+
+Progress (2026-10-17): shared resolver, component and retained geometry controls
+implemented; Woodshed receiving/native source qualified locally. Maintainer
+publication approval remains separate.
 
 ## Cross-domain relationship recipe continuation (2026-10-05)
 
