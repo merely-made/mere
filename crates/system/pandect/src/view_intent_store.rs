@@ -207,7 +207,7 @@ pub fn view_intent_path(session_dir: &Path, frame_id_str: &str, pane_id: u64) ->
         .join(pane_intent_filename(pane_id))
 }
 
-/// Serialise `intent` to JSON and write it atomically (tmp + rename)
+/// Serialise `intent` to JSON and replace it through the shared recoverable writer
 /// to the sidecar path. Creates intermediate directories as needed
 /// — sessions don't usually start with a `views/` folder.
 ///
@@ -222,15 +222,9 @@ pub fn save_view_intent(
     intent: &ViewIntent,
 ) -> io::Result<()> {
     let target = view_intent_path(session_dir, frame_id_str, pane_id);
-    if let Some(parent) = target.parent() {
-        fs::create_dir_all(parent)?;
-    }
     let json = serde_json::to_string_pretty(intent)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    let tmp = target.with_extension("json.tmp");
-    fs::write(&tmp, json)?;
-    fs::rename(&tmp, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Read `<session_dir>/views/<frame_id>/<pane_id>.json` and parse it

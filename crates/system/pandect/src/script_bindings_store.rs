@@ -14,7 +14,7 @@
 //! a distinct, list-shaped concern (installed extensions), not a flat preference.
 //!
 //! Same I/O shape as the other sidecars: typed records + `save` / `load` / `exists`,
-//! atomic write (tmp + rename), `Ok(None)` when absent so the host falls back to no
+//! recoverable replacement, `Ok(None)` when absent so the host falls back to no
 //! bindings. Native-only (filesystem), like the session/frame stores.
 
 use std::fs;
@@ -51,19 +51,13 @@ pub fn script_bindings_path(session_dir: &Path) -> PathBuf {
     session_dir.join(SCRIPT_BINDINGS_FILENAME)
 }
 
-/// Serialise `bindings` to pretty JSON and write atomically (tmp + rename),
+/// Serialise `bindings` to pretty JSON and replace the sidecar through the shared writer,
 /// creating the session directory if needed.
 pub fn save_script_bindings(session_dir: &Path, bindings: &[ScriptBinding]) -> io::Result<()> {
     let target = script_bindings_path(session_dir);
-    if let Some(parent) = target.parent() {
-        fs::create_dir_all(parent)?;
-    }
     let json = serde_json::to_string_pretty(bindings)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    let tmp = target.with_extension("json.tmp");
-    fs::write(&tmp, json)?;
-    fs::rename(&tmp, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Read `<session_dir>/script-bindings.json`. `Ok(None)` when the file doesn't

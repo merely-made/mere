@@ -98,22 +98,17 @@ pub fn load_persona_settings(
     }
 }
 
-/// Serialise `settings` to pretty JSON and write it atomically (tmp + rename) to the
+/// Serialise `settings` to pretty JSON and replace it through the shared writer at the
 /// persona's `ui.json`, creating the persona settings directory if needed.
 pub fn save_persona_settings(
     data_root: &Path,
     persona: PersonaId,
     settings: &PersonaSettings,
 ) -> io::Result<()> {
-    let dir = persona_settings_dir(data_root, persona);
-    fs::create_dir_all(&dir)?;
-    let target = dir.join(PERSONA_UI_FILENAME);
+    let target = persona_settings_path(data_root, persona);
     let json = serde_json::to_string_pretty(settings)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    let tmp = target.with_extension("json.tmp");
-    fs::write(&tmp, json)?;
-    fs::rename(&tmp, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 #[cfg(test)]

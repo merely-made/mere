@@ -134,21 +134,15 @@ pub fn application_settings_path(data_root: &Path) -> PathBuf {
         .join(APPLICATION_SETTINGS_FILENAME)
 }
 
-/// Write application settings atomically.
+/// Replace application settings through the shared recoverable sidecar writer.
 pub fn save_application_settings(
     data_root: &Path,
     settings: &ApplicationSettings,
 ) -> io::Result<()> {
     let target = application_settings_path(data_root);
-    if let Some(parent) = target.parent() {
-        fs::create_dir_all(parent)?;
-    }
     let json = serde_json::to_string_pretty(settings)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    let temporary = target.with_extension("json.tmp");
-    fs::write(&temporary, json)?;
-    fs::rename(&temporary, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Load application settings, returning `None` when the application has not
