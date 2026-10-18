@@ -101,7 +101,21 @@ fn yawed_marquee_uses_screen_rectangle_and_visual_billboard_centers() {
 #[test]
 fn lifted_billboard_center_remains_marquee_selectable() {
     let mut canvas = Canvas::with_sample_graph();
-    let key = canvas.graph.nodes().next().unwrap().0;
+    let keys: Vec<_> = canvas.graph.nodes().map(|(key, _)| key).collect();
+    let key = keys[0];
+    canvas
+        .graph
+        .try_assert_semantic_statement(
+            key,
+            keys[1],
+            kernel::graph::SemanticStatementSpec {
+                predicate: kernel::graph::predicate_iri(kernel::graph::SemanticSubKind::Cites)
+                    .into(),
+                recognized_sub_kind: Some(kernel::graph::SemanticSubKind::Cites),
+                ..Default::default()
+            },
+        )
+        .unwrap();
     park_sample_nodes(&mut canvas, key, Point2D::new(250.0, 180.0));
     canvas.set_height_by_degree(true);
     canvas.set_viewport(Viewport {

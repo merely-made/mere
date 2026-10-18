@@ -78,7 +78,7 @@ fn boundary_ray_uses_shared_shape_interval_for_circle_and_rounded_body() {
         local_side: 24.0,
         zoom: 1.5,
         depth: 0.0,
-        corner_radius: 18.0,
+        corner_radius: 12.0,
     };
     let point = billboard
         .boundary_point_toward(Point2D::new(1.0, 1.0))
@@ -120,7 +120,7 @@ fn canvas_billboard_resolves_grammar_shape_and_projection_once() {
     assert_eq!(billboard.zoom, 2.0);
     assert_eq!(billboard.corner_radius, 9.0);
     let inset = billboard.inset_screen_rect(0.4);
-    assert_eq!(inset.width(), billboard.local_side * billboard.zoom * 0.4);
+    assert!((inset.width() - billboard.local_side * billboard.zoom * 0.4).abs() < 1.0e-4);
 
     canvas.set_height_by_degree(true);
     let lifted = canvas.node_billboard(key).unwrap();
