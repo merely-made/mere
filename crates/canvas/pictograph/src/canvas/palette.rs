@@ -138,6 +138,40 @@ pub fn accent(selected: bool, state: NodeState) -> NodeAccent {
     }
 }
 
+const fn rgb_hex_bytes(rgb: [u8; 3]) -> [u8; 7] {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    [
+        b'#',
+        HEX[(rgb[0] >> 4) as usize],
+        HEX[(rgb[0] & 0x0f) as usize],
+        HEX[(rgb[1] >> 4) as usize],
+        HEX[(rgb[1] & 0x0f) as usize],
+        HEX[(rgb[2] >> 4) as usize],
+        HEX[(rgb[2] & 0x0f) as usize],
+    ]
+}
+
+static SELECTED_BG_HEX: [u8; 7] = rgb_hex_bytes(SELECTED.bg);
+static OPEN_BG_HEX: [u8; 7] = rgb_hex_bytes(OPEN.bg);
+static CLOSED_BG_HEX: [u8; 7] = rgb_hex_bytes(CLOSED.bg);
+static IDLE_BG_HEX: [u8; 7] = rgb_hex_bytes(IDLE.bg);
+
+/// The fill color in hexadecimal CSS form, for callers whose public contract
+/// returns a static string. Its bytes are generated at compile time from the
+/// canonical RGB accents above.
+pub(crate) fn bg_hex(selected: bool, state: NodeState) -> &'static str {
+    let bytes: &'static [u8; 7] = if selected {
+        &SELECTED_BG_HEX
+    } else {
+        match state {
+            NodeState::Open => &OPEN_BG_HEX,
+            NodeState::Closed => &CLOSED_BG_HEX,
+            NodeState::Idle => &IDLE_BG_HEX,
+        }
+    };
+    std::str::from_utf8(bytes).expect("generated hexadecimal CSS colors are UTF-8")
+}
+
 /// The slug naming a node's accent, shared by the CSS custom-property names
 /// (`--node-{slug}-bg`) and by consumers that build a modifier class from it
 /// (`.gloss-outline-dot-{slug}`). Keeps the two vocabularies from drifting.
