@@ -332,6 +332,13 @@ pub(crate) fn evaluate_canvas(
                 return refused(report, LinkPathFailure::StaleCompatibleLink(key.clone()));
             }
         }
+        if !settings.field_response {
+            for reading in &mut eligible_readings {
+                reading
+                    .links
+                    .retain(|link| settings.compatible_links.contains(&link.key));
+            }
+        }
         for (reading_index, reading) in eligible_readings.iter().enumerate() {
             for link in &reading.links {
                 if !settings.compatible_links.contains(&link.key) {
