@@ -1,0 +1,93 @@
+{
+  "schema": "bundle-legibility-image-review/v1",
+  "source_revision": "487f370966630a5c95f64ce4246d79c3d12cd91b",
+  "reviewed_utc": "2026-10-18T08:10:18.580068+00:00",
+  "captures": [
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_attractor_field_only.png",
+      "sha256": "1b06c3ed35f67a7e62e2fa9dd6f69951a2d098388799b77209baaf305221f54a",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Selected gold Surface curve keeps its forward arrow while attractor field response changes the route."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_baseline.png",
+      "sha256": "efaf9aa8cca057f3b71d97feaacb4df470f0641b88855a46a442c7e6028bbf9e",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Six resting appearances; quiet grammar stays faint. Both Surface/Resource offsets remain visible on the paired horizontal appearances."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_both_disabled.png",
+      "sha256": "3726ad10a8f30f7ccfbfe737110009cbe3ea37a423a0642b1099ecf2b969f070",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Resting geometry returns exactly; selection retains source colors and marks instead of painting them opaque orange."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_compatible_only.png",
+      "sha256": "0c52ff730d9e7a6b74e5a70df79c390cb1983bc9b81b9a321ca9d10457aa0770",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Four selected Resource aliases retain blue cores, bidirectional arrows and midpoint opposition ticks above restrained amber halos; paired ungrouped Surface paths remain at exact rest."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_field_and_compatible.png",
+      "sha256": "47962281e2d61073bf4bbd102c0bbd24ae6b46ab11804e46d83678247e182b99",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Combined response has smoother node approaches; blue cores, directional arrows and opposition ticks survive the bundle crossings. Some marks crowd in the close central paths, but remain individually visible in this cohort."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_field_only.png",
+      "sha256": "0b63fd425da485b31113a547a35a087d0219332d810e1d95cee8593d7eb9654b",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Selected Surface path retains gold core and forward arrow above halo; the flow bends without old endpoint double-back."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_hidden.png",
+      "sha256": "e1583e105ea7026981eaa2a04781c55239e59f991b06a2af6e87cde2de128fcf",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Hidden Resource key omits its four aliases; two unselected Surface paths remain with field response. The ordinary save/hide control reports one saved hide."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths/ordinary_link_paths_vortex_field_only.png",
+      "sha256": "1f24d739f58b800b6bc936e9f109ae689ee7a9ae792c7edec0a3441a4759afa7",
+      "width": 2400,
+      "height": 2018,
+      "reviewed": true,
+      "observation": "Selected gold Surface curve and forward arrow remain readable under the stronger vortex preset."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths_reopen/ordinary_link_paths_reopened_hidden.png",
+      "sha256": "6185104ccfd592d354acb747f0cf7380c5d4807d787a3768c69dc9b7ead93489",
+      "width": 2400,
+      "height": 1906,
+      "reviewed": true,
+      "observation": "Reopened IndexedDB shows two resting Surface appearances and the saved hide. Temporary field/group/toggles reset in the new Chrome process."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_paths_reopen/ordinary_link_paths_reopened_shown.png",
+      "sha256": "131d088643a786f6b82cf8c3717b66f2ad15522164a0e5340437807314ee0810",
+      "width": 2400,
+      "height": 1906,
+      "reviewed": true,
+      "observation": "Ordinary Show hidden links restores six resting appearances and clears hide intent."
+    }
+  ],
+  "limits": [
+    "Attachment uses world-space square bounds. Source review found tilted-camera, rounded/circular silhouette, scaled suggestion-face and lifted-node attachment mismatch; those profiles are unqualified and remain named in the plan.",
+    "Dense crossings can still crowd marks. The six-appearance fixture does not qualify larger cohorts or camera/zoom combinations.",
+    "Quiet unselected links keep existing grammar emphasis; this was not a general contrast or accessibility redesign.",
+    "No endpoint force law, strength policy, source storage, Woodshed receiving run, physical/audio qualification or Knot checkpoint storage work is inferred."
+  ]
+}

@@ -1,0 +1,8 @@
+Process argv: ["python3", "support/receipts/link-model-ordinary-paths-20261017/verify.py", "/Users/markik/Code/testing/mere/bundle-legibility-20261018"]
+ordinary responsive-link evidence verified
+source revision: 487f370966630a5c95f64ce4246d79c3d12cd91b
+canvas passing tests: 551
+Graphshell passing tests: 312
+seed PNG captures: 8; reopen PNG captures: 2
+browser scenario errors/gate failures: zero
+seed/reopen source facts and graph revision: equal
