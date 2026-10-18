@@ -113,6 +113,20 @@ impl NodeBillboard {
         distance.is_finite().then_some(distance)
     }
 
+    /// Whether a point is farther inside the silhouette than screen-coordinate
+    /// `f32` rounding can reliably distinguish from its boundary.
+    ///
+    /// The allowance is eight unit-roundoffs at the largest coordinate/extent
+    /// involved. Camera world/screen round trips subtract and add values around
+    /// the projected center, so a fixed pixel epsilon is too small at large
+    /// screen coordinates and unnecessarily large near the origin.
+    pub fn strictly_contains_screen(self, point: Point2D<f32>) -> bool {
+        let Some(distance) = self.signed_distance_screen(point) else {
+            return false;
+        };
+        distance < -self.screen_precision_allowance(point, point)
+    }
+
     /// Inclusive parameter interval where segment `a + t*(b-a)` meets the body.
     /// A tangent may return `Some((t, t))`; callers requiring positive interior
     /// should reject intervals whose length is within their geometric epsilon.
@@ -138,6 +152,44 @@ impl NodeBillboard {
             return None;
         }
         rounded_square_segment_interval(local_a, local_b, half, radius)
+    }
+
+    /// Whether a screen-space segment enters the painted body by more than the
+    /// representable `f32` boundary uncertainty at its coordinates.
+    ///
+    /// The exact rounded-square interval identifies the candidate intersection;
+    /// the interval midpoint's signed distance distinguishes a true crossing
+    /// from a tangent or a boundary point shifted inward by camera round-off.
+    /// An actual intrusion larger than the local several-ULP allowance remains
+    /// a crossing.
+    pub fn segment_crosses_interior(self, a: Point2D<f32>, b: Point2D<f32>) -> bool {
+        let Some((enter, exit)) = self.segment_interior_interval(a, b) else {
+            return false;
+        };
+        if exit <= enter {
+            return false;
+        }
+        let amount = enter + (exit - enter) * 0.5;
+        let midpoint = Point2D::new(a.x + (b.x - a.x) * amount, a.y + (b.y - a.y) * amount);
+        self.signed_distance_screen(midpoint)
+            .is_some_and(|distance| distance < -self.screen_precision_allowance(a, b))
+    }
+
+    fn screen_precision_allowance(self, a: Point2D<f32>, b: Point2D<f32>) -> f32 {
+        let side = self.local_side * self.zoom;
+        let magnitude = [
+            self.center.x.abs(),
+            self.center.y.abs(),
+            a.x.abs(),
+            a.y.abs(),
+            b.x.abs(),
+            b.y.abs(),
+            side,
+            1.0,
+        ]
+        .into_iter()
+        .fold(0.0_f32, f32::max);
+        magnitude * (8.0 * f32::EPSILON)
     }
 
     /// First silhouette boundary point from the body center along `direction`.

@@ -4,6 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 use super::*;
+use crate::canvas::scene_paint::Camera;
 use crate::canvas::{NodeShape, Viewport};
 use std::collections::HashMap;
 
@@ -262,4 +263,63 @@ fn huge_finite_rounded_billboard_rejects_corner_without_squared_overflow() {
     assert!(billboard.is_valid());
     let half = f32::MAX * 0.5;
     assert!(!billboard.contains_screen(Point2D::new(half, half)));
+}
+
+#[test]
+fn camera_round_trip_at_circle_boundary_is_not_a_strict_crossing() {
+    let billboard = NodeBillboard {
+        ground_anchor: Point2D::new(270.0, 279.0),
+        center: Point2D::new(270.0, 279.0),
+        local_side: 36.0,
+        zoom: 1.0,
+        depth: 0.0,
+        corner_radius: 18.0,
+    };
+    let camera = Camera {
+        offset: (450.0, 279.0),
+        zoom: 1.0,
+        yaw: 0.37,
+        tilt: 0.73,
+    };
+    let mut observed_inward_rounding = false;
+    for index in 0..64 {
+        let angle = std::f32::consts::TAU * index as f32 / 64.0;
+        let direction = Point2D::new(angle.cos(), angle.sin());
+        let boundary = billboard.boundary_point_toward(direction).unwrap();
+        let world = camera.to_world((boundary.x, boundary.y));
+        let round_trip = camera.to_screen(world);
+        let projected = Point2D::new(round_trip.0, round_trip.1);
+        let distance = billboard.signed_distance_screen(projected).unwrap();
+        observed_inward_rounding |= distance < 0.0;
+
+        let outside = Point2D::new(
+            billboard.center.x + direction.x * 64.0,
+            billboard.center.y + direction.y * 64.0,
+        );
+        assert!(
+            !billboard.segment_crosses_interior(projected, outside),
+            "boundary round-trip at angle {angle} produced signed distance {distance}"
+        );
+    }
+    assert!(
+        observed_inward_rounding,
+        "fixture should exercise at least one inward f32 round-off"
+    );
+}
+
+#[test]
+fn subpixel_but_real_circle_intrusion_still_counts_as_crossing() {
+    let billboard = NodeBillboard {
+        ground_anchor: Point2D::new(270.0, 279.0),
+        center: Point2D::new(270.0, 279.0),
+        local_side: 36.0,
+        zoom: 1.0,
+        depth: 0.0,
+        corner_radius: 18.0,
+    };
+    let penetration = 0.1;
+    let y = billboard.center.y - 18.0 + penetration;
+    let from = Point2D::new(220.0, y);
+    let to = Point2D::new(320.0, y);
+    assert!(billboard.segment_crosses_interior(from, to));
 }
