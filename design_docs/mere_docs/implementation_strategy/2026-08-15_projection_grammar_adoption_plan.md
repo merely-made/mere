@@ -1864,6 +1864,25 @@ Evidence: [shared/browser receipt](../../../validation/shared-span-intents_20261
 `woodshed/validation/shared-span-intents_20261017/`. The older A5 and unrelated
 portable-grammar gates in this plan remain open.
 
+Findings (2026-10-18, authoring-gate reds after `4c4ea11d`): two
+`tests/backdrop_scenes.rs` cases went red on main with no test edit.
+(1) Metre syllable marks became selectable in `4c4ea11d` (`false` to `true`, in
+the same hunk that sized the mark by its authored span). This is intended: the
+done conditions require native pointer edit over the shared surface,
+`BackdropSurface::occurrence_rect` returns geometry only for `selectable`
+marks, and `SceneInput::span_target` addresses exactly these `line/syllable/n`
+keys. Selectable marks hit by their own footprint, so `hit` is `None` rather
+than the inert `Point`. The metre test now asserts selectable and
+`hit == None`; stress height and role stay candidate facts. The plan states
+this as a done condition, not as a numbered ruling.
+(2) A line key that collides with a syllable key (`line-1/syllable/0`) is now
+refused at `metre.occurrences` (input validation) instead of `marks`
+(compile-time check). `SceneInputError.path` is a free string with no
+documented contract and no consumer in the tree matches on it, so neither path
+is promised. This is genuinely open and is held as a fork for Mark; the
+`ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts` test is
+left unchanged and red until he rules.
+
 
 ### Sets canonical tag admission (2026-10-17)
 
