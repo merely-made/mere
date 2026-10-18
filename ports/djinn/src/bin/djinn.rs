@@ -59,6 +59,8 @@ use graphshell_endpoint::door::app_admission::{
 };
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
+#[cfg(not(windows))]
+use graphshell_endpoint::door::local_endpoint::prepare_unix_endpoint;
 #[cfg(feature = "personal-sync")]
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::door::tasks::ResidentTasks;
@@ -1090,9 +1092,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     }
     let outcome: Result<(), Box<dyn std::error::Error>> = tasks.scope(Box::pin(async {
         #[cfg(not(windows))]
-        prepare_unix_agent_endpoint(match &args.agent {
+        prepare_unix_endpoint(Path::new(match &args.agent {
             AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
-        })
+        }))
         .await?;
 
         let agent_listener = match &args.agent {
@@ -1528,27 +1530,4 @@ fn session_duration_ms() -> u64 {
         .unwrap_or(60 * 60)
         .clamp(60, 24 * 60 * 60);
     seconds * 1_000
-}
-
-#[cfg(not(windows))]
-async fn prepare_unix_agent_endpoint(endpoint: &str) -> Result<(), std::io::Error> {
-    match tokio::net::UnixStream::connect(endpoint).await {
-        Ok(_) => Err(std::io::Error::new(
-            std::io::ErrorKind::AddrInUse,
-            "another SSH agent owns the configured socket",
-        )),
-        Err(error)
-            if matches!(
-                error.kind(),
-                std::io::ErrorKind::NotFound | std::io::ErrorKind::ConnectionRefused
-            ) =>
-        {
-            match std::fs::remove_file(endpoint) {
-                Ok(()) => Ok(()),
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
-                Err(error) => Err(error),
-            }
-        },
-        Err(error) => Err(error),
-    }
 }
