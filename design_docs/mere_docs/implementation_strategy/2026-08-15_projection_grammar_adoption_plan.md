@@ -2606,3 +2606,48 @@ saved alternatives, selecting structural aspects to apply, and resolving templat
 update conflicts. Saved alternatives within one composition, separate Insert and
 Apply operations, explicit template updates, preservation of local work and
 conflict disclosure are already agreed and are not reopened.
+
+
+#### Composition review: independence, structural selection and conflicts (prompts 38–40)
+
+**Prompt 38 — content identity across saved alternatives:**
+
+> independent with the option to link presented when shared. isn't that what we decided before?
+
+Carry independent content forward as the default for saved alternatives. The
+assistant's recommendation to share content by default drifted from the earlier
+independence direction and was rejected. Preserve the option to link as Mark
+words it here. Prompt 17 already defines an inserted copy's source link as
+provenance/navigation while its content remains independent; do not infer a new
+live shared-content binding from this answer. Any further link behavior needed
+for alternatives must be clarified before implementation.
+
+**Prompt 39 — choosing structure to apply:**
+
+> i'd like 1 but don't know what that'd look like on the swatch or the mere's canvas.
+
+Option 1 offered named domain aspects plus direct selection of structure on a
+Swatch/Canvas. Mark prefers both methods but requests a concrete visual account.
+That is direction for a prototype to review, not acceptance of a finished picker,
+interaction or universal structural schema. Use domain language in the examples
+(such as rhyme scheme, metrical pattern and bar grouping).
+
+**Prompt 40 — resolving template-update conflicts:**
+
+> Review conflicts together, with keep-local/use-update choices per affected aspect (Recommended)
+
+Offer a combined conflict review with choices per affected part; retain local
+work and make updates explicit as previously agreed. Reuse normal editing for
+any manual changes rather than defining a separate content authoring grammar.
+
+**Terminology clarification following these answers:**
+
+> wait, have i used the term aspect before?
+
+Yes: prompt 14 contains Mark's words "if i wanted to apply some structural aspect
+of the arrangement of words from elsewhere, i'd choose that aspect and apply it
+to the words i'm editing". This is ordinary descriptive language. The subsequent
+assistant phrasing does not establish Aspect as a named product term, a UI label,
+a shared entity type or a universal taxonomy. Concrete structure and domain
+terms must carry the next visual examples; technical modeling remains separate.
+No runtime code or qualification claim changes in this review record.
