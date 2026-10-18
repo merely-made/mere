@@ -1,0 +1,10 @@
+{
+  "compiled_source": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "compiled_source_unchanged": true,
+  "tracked_changed_paths": [
+    "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md",
+    "ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn",
+    "support/receipts/link-model-shared-attachments-20261018/verify.py"
+  ],
+  "qualification_input_change": "Reopen grammar expectation follows existing host default."
+}

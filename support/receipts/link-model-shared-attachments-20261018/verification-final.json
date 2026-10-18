@@ -1,0 +1,15 @@
+{
+  "command": [
+    "python3",
+    "support/receipts/link-model-shared-attachments-20261018/verify.py",
+    "/Users/markik/Code/testing/mere/shared-link-attachments-20261018"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "started": "2026-10-18T17:00:12.086276+00:00",
+  "status_before": " M ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn\n M support/receipts/link-model-shared-attachments-20261018/verify.py\n",
+  "exit_code": 0,
+  "finished": "2026-10-18T17:00:12.347247+00:00",
+  "log_sha256": "70a3a9497852832dd374e355d65e8ea533ee3da586eb9e6c2cff016fc5986462",
+  "suites": []
+}
