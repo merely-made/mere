@@ -215,6 +215,9 @@ pub struct RemoteSession {
     /// Set by [`RemoteSession::disconnect`], so a closing channel reads
     /// "disconnected" rather than a host that went away.
     closing: bool,
+    /// A later close callback may follow a transport failure already reported
+    /// by the send pump. Keep the first failure visible through that callback.
+    transport_failed: bool,
     rejoins: u32,
     last_resume: String,
     /// The action surface. Public so a host can carry its own form across
@@ -236,6 +239,7 @@ impl RemoteSession {
             status: "discovering".to_string(),
             link_busy: false,
             closing: false,
+            transport_failed: false,
             rejoins: 0,
             last_resume: String::new(),
             form: ActionForm::new("Ready"),
@@ -277,7 +281,8 @@ impl RemoteSession {
 
     /// The authority-emitted generation the mounted scene carries.
     pub fn generation(&self) -> Option<u64> {
-        self.mounted().map(|mounted| mounted.scene.tables.generation)
+        self.mounted()
+            .map(|mounted| mounted.scene.tables.generation)
     }
 
     pub fn pending(&self) -> Option<RemoteOp> {
@@ -393,6 +398,7 @@ impl RemoteSession {
 
     /// The first link is up: discover.
     pub fn joined(&mut self) {
+        self.transport_failed = false;
         self.status = "discovering".to_string();
         self.events.push("remote-joined".to_string());
         self.begin_discovery();
@@ -407,8 +413,8 @@ impl RemoteSession {
     /// a reconnect; the host closes its channel.
     pub fn disconnect(&mut self) {
         self.closing = true;
-        self.pending = None;
-        self.driver.disconnect();
+        self.transport_failed = false;
+        self.terminal_cleanup();
         self.link_busy = true;
         self.status = "disconnecting".to_string();
         self.events.push("remote-disconnect".to_string());
@@ -416,23 +422,30 @@ impl RemoteSession {
 
     /// The channel closed: on our word after a disconnect, or the host's.
     pub fn channel_closed(&mut self) {
-        self.status = if self.closing {
-            "disconnected".to_string()
-        } else {
-            "closed: the host closed the channel".to_string()
-        };
+        self.terminal_cleanup();
+        if !self.transport_failed {
+            self.status = if self.closing {
+                "disconnected".to_string()
+            } else {
+                "closed: the host closed the channel".to_string()
+            };
+        }
         self.link_busy = false;
         self.events.push("remote-channel-closed".to_string());
     }
 
     /// A transport step failed: a read, a rejoin.
     pub fn link_failed(&mut self, error: impl std::fmt::Display) {
-        self.link_busy = false;
-        self.fail(error);
+        self.terminal_cleanup();
+        if !self.transport_failed {
+            self.transport_failed = true;
+            self.fail(error);
+        }
     }
 
     /// A new link to the same endpoint is being built.
     pub fn reconnecting(&mut self) {
+        self.transport_failed = false;
         self.link_busy = true;
         self.status = "reconnecting".to_string();
         self.events.push("remote-reconnect".to_string());
@@ -441,9 +454,11 @@ impl RemoteSession {
     /// The new link is up: rediscover, which keeps the mount, and resume from
     /// whatever bells the poll after it collects.
     pub fn rejoined(&mut self) {
+        self.terminal_cleanup();
         self.closing = false;
-        self.pending = None;
+        self.transport_failed = false;
         self.rejoins += 1;
+        self.last_resume.clear();
         self.link_busy = false;
         self.status = "rediscovering".to_string();
         self.events.push("remote-rejoined".to_string());
@@ -555,6 +570,16 @@ impl RemoteSession {
         self.carry(advance);
     }
 
+    /// End the old transport's work while retaining its mounted scene for
+    /// display. Safe to call from every terminal lifecycle callback.
+    fn terminal_cleanup(&mut self) {
+        self.pending = None;
+        self.resume_before = None;
+        self.link_busy = false;
+        self.outbox.clear();
+        self.driver.disconnect();
+    }
+
     /// Start an operation: hand the driver the core's progress and carry the
     /// first step — a line out, or an answer already at hand.
     fn begin(&mut self, op: RemoteOp, progress: Result<Progress<Outcome>, String>) {
@@ -588,12 +613,16 @@ impl RemoteSession {
             (Some(RemoteOp::Discover), Outcome::Descriptor(descriptor)) => {
                 self.status = format!("discovered · {}", descriptor.label);
                 if self.session.is_some() {
-                    // A rediscovery on a link that already mounted: the
-                    // reconnect. The mount is kept; whatever moved while the
-                    // link was down comes back as bells, which a poll rings.
-                    self.status = "open".to_string();
-                    let progress = self.poll_progress();
-                    self.begin(RemoteOp::Poll, progress);
+                    // A retained mount is disconnected until the endpoint
+                    // confirms its position. Resume directly so an unchanged
+                    // session becomes live even when no bell was queued.
+                    self.status = "resuming".to_string();
+                    self.resume_before = self.revision();
+                    let progress = match (self.driver.core_mut(), self.session.clone()) {
+                        (Some(core), Some(session)) => core.resume_session(&session),
+                        _ => Err("not mounted".to_string()),
+                    };
+                    self.begin(RemoteOp::Resume, progress);
                 } else {
                     let progress = self
                         .driver
@@ -645,17 +674,20 @@ impl RemoteSession {
                 self.drain_bells()
             },
             (Some(RemoteOp::Resume), Outcome::Changed(changed)) => {
+                self.status = "open".to_string();
                 let after = self.revision().unwrap_or_default();
                 let before = self
                     .resume_before
                     .take()
                     .map(|revision| revision.to_string())
                     .unwrap_or_else(|| "?".to_string());
-                self.last_resume = if changed {
-                    format!("updated · {before} → {after}")
-                } else {
-                    format!("already current at {after}")
-                };
+                if changed || self.last_resume.is_empty() {
+                    self.last_resume = if changed {
+                        format!("updated · {before} → {after}")
+                    } else {
+                        format!("already current at {after}")
+                    };
+                }
                 self.drain_bells();
             },
             (op, outcome) => self.fail(format!("unexpected answer to {op:?}: {outcome:?}")),

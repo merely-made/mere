@@ -205,6 +205,7 @@ impl SessionDriver {
     /// session rather than the session discovering it.
     pub fn disconnect(&mut self) {
         self.inflight = None;
+        self.notices.clear();
         if let Some(core) = self.core.as_mut() {
             core.disconnect();
         }
