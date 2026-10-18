@@ -223,6 +223,7 @@ pub use physics_device::{PhysicsDevice, physics_device_for};
 pub mod composition;
 mod dynamics_inspection;
 mod dynamics_record;
+pub mod node_billboard;
 mod node_presentation;
 pub mod relationship_topology;
 pub use dynamics_inspection::{DynamicsInspection, DynamicsTarget, MemberDynamics};
