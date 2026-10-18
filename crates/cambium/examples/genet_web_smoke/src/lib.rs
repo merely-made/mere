@@ -244,7 +244,7 @@ async fn run() -> Result<(), String> {
         H as f32,
         ViewportSizes::uniform(W as f32, H as f32),
         &mut text,
-        &Default::default(),
+        &std::collections::HashMap::<String, Vec<u8>>::new(),
     )
     .map_err(|error| format!("livery layout: {error:?}"))?;
     set_title("stage: emit");
@@ -262,7 +262,8 @@ async fn run() -> Result<(), String> {
         list.commands(),
         list.fonts(),
         list.images(),
-    );
+    )
+    .map_err(|error| format!("paint translation: {error}"))?;
 
     // WebGPU boot through netrender's own async path.
     set_title("stage: boot");

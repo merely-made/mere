@@ -1232,6 +1232,7 @@ struct WorkspaceApp {
     tearout_receipt_started: Option<Instant>,
     workspace_receipt_redraws: u32,
     receipt_error: Option<String>,
+    paint_refusal: Option<String>,
     pending_workspace_assertion: Option<String>,
     workspace_receipt_outcome: Option<WorkspaceReceiptOutcome>,
     workspace_receipt_stage_started: Instant,
@@ -1629,6 +1630,7 @@ impl WorkspaceApp {
             tearout_receipt_started: None,
             workspace_receipt_redraws: 0,
             receipt_error: None,
+            paint_refusal: None,
             pending_workspace_assertion: None,
             workspace_receipt_outcome: None,
             workspace_receipt_stage_started: Instant::now(),
@@ -2545,9 +2547,38 @@ impl WorkspaceApp {
             == Some(WorkspaceReceipt::Chrome)
             && self.receipt_complete;
         let workspace_frame = if capture_stable_workspace {
-            self.workspace.frame_with_cached_surfaces()
+            self.workspace.try_frame_with_cached_surfaces()
         } else {
-            self.workspace.frame()
+            self.workspace.try_frame()
+        };
+        let workspace_frame = match workspace_frame {
+            Ok(frame) => {
+                if let Some(refusal) = self.paint_refusal.take() {
+                    if self.chrome_status == ChromeStatus::Error(refusal) {
+                        self.chrome_status = ChromeStatus::Ready;
+                        self.refresh_chrome();
+                        self.request_redraw();
+                    }
+                    if let Some(window) = &self.window {
+                        window.set_title(&self.window_title());
+                    }
+                }
+                frame
+            },
+            Err(error) => {
+                let message = format!("document paint refused: {error}");
+                self.chrome_status = ChromeStatus::Error(message.clone());
+                self.paint_refusal = Some(message.clone());
+                self.refresh_chrome();
+                if let Some(window) = &self.window {
+                    window.set_title("Pelt document paint refused");
+                }
+                if paint_refusal_ends_receipt(&self.config) {
+                    self.receipt_error = Some(message);
+                    event_loop.exit();
+                }
+                return;
+            },
         };
         // The document engines own retained layout production. Update the
         // composite tree only after this frame has made their completed
@@ -3470,7 +3501,15 @@ impl WorkspaceApp {
             return true;
         };
         self.workspace.set_surface_scale_factor(scale_factor);
-        let Some(mut frame) = self.workspace.frame_tile(tile, *rect) else {
+        let frame = match self.workspace.try_frame_tile(tile, *rect) {
+            Ok(frame) => frame,
+            Err(error) => {
+                self.chrome_status =
+                    ChromeStatus::Error(format!("Tearout document paint refused: {error}"));
+                return true;
+            },
+        };
+        let Some(mut frame) = frame else {
             self.chrome_status = ChromeStatus::Error(
                 "Tearout source no longer owns a live document controller".to_owned(),
             );
@@ -4113,6 +4152,14 @@ fn fail_receipt_for_indeterminate_rehost(config: &WorkspaceViewerConfig) -> bool
     config.tearout_receipt
 }
 
+fn paint_refusal_ends_receipt(config: &WorkspaceViewerConfig) -> bool {
+    config.workspace_receipt.is_some()
+        || config.interaction_receipt
+        || config.capability_receipt
+        || config.tearout_receipt
+        || config.tearout_cancellation_receipt
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum TearoutDisposition {
     Accept,
@@ -4483,7 +4530,7 @@ impl TearoutWindow {
             .set_content_rects(pane.content_rects.iter().copied());
         self.workspace.set_surface_scale_factor(self.scale_factor);
         let more = self.workspace.pump();
-        let mut frame = self.workspace.frame();
+        let mut frame = self.workspace.try_frame()?;
         if let Some(receipt) = self.surface_import.as_mut() {
             receipt.refresh(
                 &mut frame,
@@ -4932,7 +4979,7 @@ impl WorkspaceApp {
             .set_surface_scale_factor(pending.scale_factor);
         let frame = self
             .workspace
-            .frame_tile(pending.tile, *rect)
+            .try_frame_tile(pending.tile, *rect)?
             .ok_or_else(|| "tearout source no longer owns a live document controller".to_owned())?;
         let mut frame = frame;
         if let Some(receipt) = pending.surface_import.as_mut() {

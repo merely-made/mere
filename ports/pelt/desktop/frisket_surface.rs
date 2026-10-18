@@ -823,7 +823,8 @@ impl FrisketSurface {
             .into_iter()
             .find_map(|node| self.document.fragment_rect(node).map(workspace_rect));
         Ok(FrisketFrame {
-            scene: paint_list_render::translate_paint_list(&list),
+            scene: paint_list_render::translate_paint_list(&list)
+                .map_err(|error| format!("could not paint Frisket: {error}"))?,
             content_rects,
             inspector_rect,
             diagnostic_rect,

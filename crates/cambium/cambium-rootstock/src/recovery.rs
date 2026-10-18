@@ -126,6 +126,29 @@ where
                     error,
                 });
             },
+            genet_render_host::RasterizeFailure::SourceError(error) => {
+                let backend = self
+                    .s
+                    .presentation_driver
+                    .as_ref()
+                    .map_or(crate::PresentationBackend::Wgpu, |driver| driver.backend());
+                let generation = self.s.presentation_driver.as_ref().map_or(
+                    crate::ContextGeneration(
+                        self.s
+                            .shared
+                            .render_core
+                            .as_ref()
+                            .map_or(0, |core| core.generation()),
+                    ),
+                    |driver| driver.generation(),
+                );
+                self.refuse_pending_captures(CaptureRefusal::PresentationError {
+                    backend,
+                    generation,
+                    source_key,
+                    error,
+                });
+            },
         }
     }
 

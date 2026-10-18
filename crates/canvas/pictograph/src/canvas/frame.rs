@@ -74,6 +74,11 @@ fn place_fold_badges(
 const FOLD_BADGE_HALF: (f32, f32) = (12.0, 9.0);
 
 impl Canvas {
+    /// Why the most recent frame could not be translated, when applicable.
+    pub fn last_translation_error(&self) -> Option<paint_list_render::TranslationError> {
+        self.last_translation_error
+    }
+
     /// Advance one frame at viewport `(w, h)` and return the composited content
     /// scene plus whether the host should request another frame (sim still
     /// settling, pan still gliding, or a node being dragged). Does not present.
@@ -531,7 +536,16 @@ impl Canvas {
         if let Some(cmds) = marquee_cmds.as_ref() {
             layers.push(CompositeLayer::commands_only(cmds));
         }
-        let scene = composite_paint_layers(viewport, &layers).scene;
+        let scene = match composite_paint_layers(viewport, &layers) {
+            Ok(translated) => {
+                self.last_translation_error = None;
+                translated.scene
+            },
+            Err(error) => {
+                self.last_translation_error = Some(error);
+                Scene::new(w, h)
+            },
+        };
 
         let after_cull = layers
             .iter()
