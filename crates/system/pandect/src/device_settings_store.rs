@@ -249,15 +249,9 @@ pub fn save_device_settings(data_root: &Path, settings: &DeviceSettings) -> io::
             .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
     }
     let target = device_settings_path(data_root);
-    if let Some(parent) = target.parent() {
-        fs::create_dir_all(parent)?;
-    }
     let json = serde_json::to_string_pretty(settings)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    let temporary = target.with_extension("json.tmp");
-    fs::write(&temporary, json)?;
-    fs::rename(&temporary, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 pub fn load_device_settings(data_root: &Path) -> io::Result<Option<DeviceSettings>> {
