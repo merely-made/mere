@@ -30,7 +30,7 @@ pub fn build_remote_auth_enrollment_bundle(
             format!("device {} is revoked", device_id.as_uuid()),
         ));
     }
-    let grant = load_device_grant_set(data_root, device_id)?;
+    let mut grant = load_device_grant_set(data_root, device_id)?;
     if grant.is_empty() {
         return Err(io::Error::new(
             io::ErrorKind::NotFound,
@@ -38,6 +38,25 @@ pub fn build_remote_auth_enrollment_bundle(
         ));
     }
     check_grant_set(&grant, "device grant certificate")?;
+    // The roster is a device-wide index. Signed persona withdrawals must also
+    // gate the key material this bundle distributes.
+    let ledger = load_revocation_ledger(data_root)?;
+    grant
+        .personas
+        .retain(|_, signed| !ledger.revokes(&signed.certificate));
+    if grant
+        .device
+        .as_ref()
+        .is_some_and(|signed| ledger.revokes(&signed.certificate))
+    {
+        grant.device = None;
+    }
+    if grant.is_empty() {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            "all device grant certificates are revoked",
+        ));
+    }
     let granted_personas: Vec<PersonaId> = grant.personas.keys().copied().collect();
     let mut epochs = Vec::new();
     for certificate in grant.personas.values() {

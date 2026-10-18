@@ -535,24 +535,27 @@ impl Graph {
         self.visit_revision = self.visit_revision.wrapping_add(1);
     }
 
-    // Single-write-path boundary (Phase 6.5 — ENFORCED as of the 2026-07-01
-    // write-path migration). Every primitive durable mutator on `Graph` is
-    // `pub(crate)`; external code routes through `apply::apply_graph_delta`
-    // (the one funnel a future recording hook — the event log — instruments).
-    // The four writer classes:
-    //   1. Primitive durable mutations (topology, relations, nav history, tags,
+    // Durable write boundaries. The Phase 6.5 GraphDelta migration covers
+    // ordinary primitive mutations; assertion lifecycle and predicate
+    // declaration APIs also expose public durable writes and emit captures
+    // directly. A host must install a recorder and apply its admission policy
+    // around either entry point; GraphDelta is not the sole public writer.
+    // The writer classes:
+    //   1. Ordinary primitive mutations (topology, relations, nav history, tags,
     //      titles, body, media, classifications, properties, predicates,
     //      fields/couplings, frame hints, import records) — `pub(crate)`,
     //      reached externally only via `GraphDelta`.
-    //   2. Compound kernel operations stay `pub`: `from_snapshot`,
+    //   2. Public native assertion/declaration writes: `assertion_write` and
+    //      `predicate_declarations`, with their own capture emission.
+    //   3. Compound kernel operations stay `pub`: `from_snapshot`,
     //      `cross_graph::copy_*` — kernel-authored multi-step ops over
     //      non-delta-able inputs (`&Graph` donors); the "trusted writers".
-    //   3. Transient/runtime state stays `pub`, exempt by design:
+    //   4. Transient/runtime state stays `pub`, exempt by design:
     //      `set_node_position` / `set_node_projected_position` (physics/view —
     //      positions are not graph truth), `set_current_session` (per-launch
     //      host wiring). Webview runtime state left the kernel entirely
     //      (`BrowserNodeState` sidecar, boundary pass slice C).
-    //   4. Test fixtures: the `fixtures` cargo feature re-exposes the raw
+    //   5. Test fixtures: the `fixtures` cargo feature re-exposes the raw
     //      mutators via `graph::fixtures::GraphFixtures` — dev-dependencies
     //      only, never a production enable.
 

@@ -189,7 +189,9 @@ pub fn load_identity_seed_read_only(data_root: &Path) -> io::Result<Option<[u8; 
     let relative = path
         .strip_prefix(data_root)
         .expect("wallet path under data root");
-    if let Some(store) = wallet_local_secret_store_read_only(data_root)? {
+    if let Some(store) = wallet_local_secret_store_read_only(data_root)?
+        && looks_like_sealed_record(&path)
+    {
         return store
             .load_record::<[u8; 32]>(relative)
             .map_err(io_backend_error);

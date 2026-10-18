@@ -463,7 +463,7 @@ fn collect_entries(
                     group_index: 0,
                 });
             }
-            for (summary_index, summary) in bucket.legacy_summaries.iter().enumerate() {
+            for (summary_index, summary) in bucket.unrepresented_legacy_summaries() {
                 let group = match layout {
                     OpenedLinkLayout::List { group_by, .. } => list_group(
                         *group_by,
@@ -791,6 +791,47 @@ mod tests {
                     count: Some(1),
                 }],
             },
+        }
+    }
+
+    #[test]
+    fn compatibility_summaries_are_not_extra_members() {
+        let mut input = reading();
+        input.links[0].buckets[0]
+            .legacy_summaries
+            .push(scenograph::link::LinkLegacyFamily {
+                family: "old-family".into(),
+                data: serde_json::json!({"details": "inspector only"}),
+            });
+        for layout in [
+            OpenedLinkLayout::List {
+                group_by: scenograph::link::LinkListGroup::Family,
+                stack: Stack::default(),
+            },
+            OpenedLinkLayout::Timeline {
+                lane_by: LinkTimelineLane::Family,
+                timeline: Timeline::default(),
+            },
+        ] {
+            let opened =
+                compile_opened_link(&input, &layout, OpenedLinkOptions::default()).unwrap();
+            assert_eq!(opened.entries.len(), 6);
+            assert_eq!(opened.scene.items.len(), 6);
+            assert_eq!(opened.reading, input, "inspector details stay available");
+            assert!(!opened.entries.iter().any(|entry| matches!(
+                opened.resolve(entry),
+                Some(OpenedLinkMember::LegacySummary(_))
+            )));
+            // Old summary-only readings still have a read-only display row.
+            let mut summary_only = input.clone();
+            summary_only.links[0].buckets[0].legacy_members.clear();
+            let opened =
+                compile_opened_link(&summary_only, &layout, OpenedLinkOptions::default()).unwrap();
+            assert_eq!(opened.entries.len(), 6);
+            assert!(opened.entries.iter().any(|entry| matches!(
+                opened.resolve(entry),
+                Some(OpenedLinkMember::LegacySummary(_))
+            )));
         }
     }
 

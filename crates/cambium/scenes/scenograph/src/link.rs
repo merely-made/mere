@@ -137,6 +137,25 @@ pub struct LinkBucket {
     pub legacy_summaries: Vec<LinkLegacyFamily>,
 }
 
+impl LinkBucket {
+    /// Summaries with no portable member for their family in this bucket.
+    /// Older summary-only readings can still display them; compatibility
+    /// details for an existing member must not become another member.
+    pub fn unrepresented_legacy_summaries(
+        &self,
+    ) -> impl Iterator<Item = (usize, &LinkLegacyFamily)> {
+        self.legacy_summaries
+            .iter()
+            .enumerate()
+            .filter(|(_, summary)| {
+                !self
+                    .legacy_members
+                    .iter()
+                    .any(|member| member.family == summary.family)
+            })
+    }
+}
+
 /// Link reading over the currently available source snapshot.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct LinkReading {
@@ -242,7 +261,8 @@ impl OpenedLinkLayout {
                     members += 1;
                     dated += usize::from(assertion.first_asserted_ms.is_some());
                 }
-                members += bucket.legacy_members.len() + bucket.legacy_summaries.len();
+                members +=
+                    bucket.legacy_members.len() + bucket.unrepresented_legacy_summaries().count();
             }
         }
         if dated > members / 2 {
@@ -385,6 +405,77 @@ pub struct LinkCoverage {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn compatibility_summaries_do_not_change_the_default_layout() {
+        let assertion = |id: &str| {
+            serde_json::from_value(serde_json::json!({
+                "id": id, "predicate": "urn:test:related", "recognized_kind": null,
+                "label": null, "scope": {"kind": "default"}, "asserter": null,
+                "first_asserted_ms": 1, "asserted_at_ms": 1
+            }))
+            .unwrap()
+        };
+        let mut reading = LinkPairReading {
+            source: LinkSource::Unavailable {
+                reason: "fixture".into(),
+            },
+            links: vec![LinkReading {
+                key: LinkKey::new(LinkStratum::Resource, "a", "b"),
+                buckets: vec![LinkBucket {
+                    displayed_from: "a".into(),
+                    displayed_to: "b".into(),
+                    source_from: LinkEndpoint {
+                        id: "a".into(),
+                        address: None,
+                    },
+                    source_to: LinkEndpoint {
+                        id: "b".into(),
+                        address: None,
+                    },
+                    assertions: vec![assertion("one"), assertion("two")],
+                    legacy_members: vec![LinkLegacyMember {
+                        family: "Traversal".into(),
+                        sub_kind: None,
+                    }],
+                    legacy_summaries: vec![],
+                }],
+            }],
+            coverage: LinkCoverage::default(),
+        };
+        let before = OpenedLinkLayout::default_for(&reading);
+        assert!(matches!(before, OpenedLinkLayout::Timeline { .. }));
+        reading.links[0].buckets[0]
+            .legacy_summaries
+            .push(LinkLegacyFamily {
+                family: "Traversal".into(),
+                data: serde_json::json!({}),
+            });
+        assert_eq!(OpenedLinkLayout::default_for(&reading), before);
+        // Real undated members still affect the majority; a tie uses List.
+        reading.links[0].buckets[0]
+            .legacy_members
+            .push(LinkLegacyMember {
+                family: "Traversal".into(),
+                sub_kind: None,
+            });
+        assert!(matches!(
+            OpenedLinkLayout::default_for(&reading),
+            OpenedLinkLayout::List { .. }
+        ));
+        // Summary-only readings retain their original undated contribution.
+        reading.links[0].buckets[0].legacy_members.clear();
+        reading.links[0].buckets[0]
+            .legacy_summaries
+            .push(LinkLegacyFamily {
+                family: "other-family".into(),
+                data: serde_json::json!({}),
+            });
+        assert!(matches!(
+            OpenedLinkLayout::default_for(&reading),
+            OpenedLinkLayout::List { .. }
+        ));
+    }
 
     #[test]
     fn keys_are_unordered_within_their_stratum() {

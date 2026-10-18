@@ -88,6 +88,7 @@ pub(crate) fn cmd_mint(
         .map(|value| value.parse::<u64>().map_err(|_| "--hours wants a number"))
         .transpose()?
         .unwrap_or(12);
+    let valid_for_ms = hours.checked_mul(3_600_000).ok_or("--hours is too large")?;
 
     let private = resolve_ssh_key(profile, slot_key)?;
 
@@ -99,13 +100,15 @@ pub(crate) fn cmd_mint(
             policy.principals.join(", ")
         ));
     }
+    let force_command = restricted_flag(rest, "--force-command", &policy.force_command)?;
+    let source_address = restricted_flag(rest, "--source-address", &policy.source_address)?;
     let ledger = ssh_krl::load_ledger(profile).map_err(str_err)?;
     let provider = InMemoryProvider::from_seed(profile.master.to_seed());
     let grant = personae::ssh_ca::self_grant(
         &provider,
         device_id_for_host(&device_name),
         &policy.action_refs(),
-        hours * 3_600_000,
+        valid_for_ms,
         now_ms(),
     )
     .map_err(|err| format!("issue the ssh grant: {err}"))?;
@@ -116,10 +119,8 @@ pub(crate) fn cmd_mint(
                 grant: &grant,
                 subject: &PublicKey::from(&private),
                 principals: vec![principal.clone()],
-                // The face's own limits outrank the command line: a flag may
-                // narrow a face further, never widen it.
-                force_command: flag(rest, "--force-command").or(policy.force_command.clone()),
-                source_address: flag(rest, "--source-address").or(policy.source_address.clone()),
+                force_command,
+                source_address,
                 ledger: &ledger,
             },
             now_ms(),
@@ -135,13 +136,34 @@ pub(crate) fn cmd_mint(
         },
         None => writeln!(output, "{encoded}").map_err(|error| error.to_string())?,
     }
+    let lifetime_seconds = cert.valid_before().saturating_sub(cert.valid_after());
     writeln!(
         output,
-        "minted for {principal}, held by {device_name}, valid {hours}h, grant {}",
+        "minted for {principal}, held by {device_name}, valid {lifetime_seconds}s, grant {}",
         &personae::ssh_ca::key_id_for(&grant.certificate.id())[..16]
     )
     .map_err(|error| error.to_string())?;
     Ok(())
+}
+
+/// Flags can add a restriction to an unrestricted face or repeat its stored
+/// value. Replacing an existing restriction is refused. In particular, we do
+/// not infer CIDR-list containment from strings; address-subset overrides need
+/// a shared policy evaluator before they can be admitted.
+fn restricted_flag(
+    rest: &[String],
+    name: &str,
+    required: &Option<String>,
+) -> Result<Option<String>, String> {
+    let requested = flag(rest, name);
+    if let (Some(required), Some(requested)) = (required, &requested) {
+        if requested != required {
+            return Err(format!(
+                "{name} cannot replace the face's stored restriction"
+            ));
+        }
+    }
+    Ok(required.clone().or(requested))
 }
 
 pub(crate) fn cmd_enroll_host(

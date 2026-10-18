@@ -28,7 +28,7 @@ use identity::carry::{DeviceGrantSet, WALLET_SCHEMA_VERSION};
 use insigne::delegation::{DelegationId, SignedDelegationCertificate};
 use serde::{Deserialize, Serialize};
 
-use crate::wallet_store::identity_grants_dir;
+use crate::wallet_store::{identity_grants_dir, save_bytes_atomic};
 
 use super::{
     CarryRef, DeviceGrantError, DeviceId, KeyEpochId, WrappedEpochMaterial, blinded_epoch_index,
@@ -139,10 +139,7 @@ pub fn save_device_certificate(
 ) -> io::Result<CarryRef> {
     let bytes = encode_certificate(certificate).map_err(invalid_data)?;
     let path = device_certificate_path(data_root, device, persona);
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    std::fs::write(&path, &bytes)?;
+    save_bytes_atomic(&path, &bytes)?;
     Ok(CarryRef::of(bytes.as_slice()))
 }
 
@@ -167,10 +164,7 @@ pub fn save_wrapped_epoch_record(
 ) -> io::Result<CarryRef> {
     let bytes = encode_epoch_record(record).map_err(invalid_data)?;
     let path = wrapped_epoch_record_path(data_root, record.certificate);
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    std::fs::write(&path, &bytes)?;
+    save_bytes_atomic(&path, &bytes)?;
     Ok(CarryRef::of(bytes.as_slice()))
 }
 
@@ -220,7 +214,9 @@ pub fn device_grant_set_ref(set: &DeviceGrantSet) -> CarryRef {
     CarryRef::of(bytes.as_slice())
 }
 
-/// Persist every certificate in a grant set, returning the set's content ref.
+/// Replace the stored grant set, returning its content ref after every write
+/// and removal succeeds. Omitted certificates are removed from this device's
+/// directory. This changes local membership; signed revocations remain separate.
 pub fn save_device_grant_set(
     data_root: &Path,
     device: DeviceId,
@@ -229,13 +225,33 @@ pub fn save_device_grant_set(
     if let Some(certificate) = &set.device {
         let bytes = encode_certificate(certificate).map_err(invalid_data)?;
         let path = device_scope_certificate_path(data_root, device);
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
-        std::fs::write(&path, &bytes)?;
+        save_bytes_atomic(&path, &bytes)?;
     }
     for (&persona, certificate) in &set.personas {
         save_device_certificate(data_root, device, persona, certificate)?;
+    }
+    let dir = identity_grants_dir(data_root).join(device.as_uuid().to_string());
+    let entries = match std::fs::read_dir(dir) {
+        Ok(entries) => Some(entries),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => None,
+        Err(error) => return Err(error),
+    };
+    for entry in entries.into_iter().flatten() {
+        let path = entry?.path();
+        if path.extension().and_then(|s| s.to_str()) != Some("cert") {
+            continue;
+        }
+        let keep = match path.file_stem().and_then(|s| s.to_str()) {
+            Some("device") => set.device.is_some(),
+            Some(stem) => match stem.parse::<uuid::Uuid>() {
+                Ok(id) => set.personas.contains_key(&PersonaId(id)),
+                Err(_) => continue,
+            },
+            None => continue,
+        };
+        if !keep {
+            std::fs::remove_file(path)?;
+        }
     }
     Ok(device_grant_set_ref(set))
 }

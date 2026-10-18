@@ -162,8 +162,7 @@ fn common_case_semantic_statement_stays_cheap_in_the_snapshot() {
     let mut pre_lifecycle = serde_json::to_value(plain.to_snapshot()).unwrap();
     for edge in pre_lifecycle["resource_edges"].as_array_mut().unwrap() {
         if let Some(statements) = edge
-            .get_mut("semantic")
-            .and_then(|semantic| semantic.get_mut("statements"))
+            .get_mut("assertions")
             .and_then(serde_json::Value::as_array_mut)
         {
             for statement in statements {
@@ -179,6 +178,10 @@ fn common_case_semantic_statement_stays_cheap_in_the_snapshot() {
     let current_value_len = serde_json::to_vec(&serde_json::to_value(plain.to_snapshot()).unwrap())
         .unwrap()
         .len();
+    assert!(
+        current_value_len > pre_lifecycle_len,
+        "the lifecycle comparison must remove the populated timestamp fields"
+    );
 
     let per_statement = (plain_len - bare_len) as f64 / statements as f64;
     println!(

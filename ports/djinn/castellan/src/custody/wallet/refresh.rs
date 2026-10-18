@@ -10,7 +10,7 @@
 use std::io;
 use std::path::Path;
 
-use personae::{InMemoryProvider, PersonaId};
+use personae::{IdentityProvider, InMemoryProvider, PersonaId};
 
 use super::*;
 
@@ -39,6 +39,7 @@ pub(crate) fn refresh_remote_auth_private_read_grants(
                 data_root,
                 &provider,
                 record.device_id,
+                record.device_pubkey,
                 rotated_personas,
             )
         })
@@ -50,6 +51,7 @@ pub(crate) fn refresh_remote_auth_private_read_grant(
     data_root: &Path,
     provider: &InMemoryProvider,
     device_id: DeviceId,
+    holder: DevicePublicKey,
     rotated_personas: &[PersonaId],
 ) -> io::Result<Option<DeviceId>> {
     let Some(wrapping_key) = load_remote_auth_wrapping_key(data_root, device_id)? else {
@@ -63,13 +65,22 @@ pub(crate) fn refresh_remote_auth_private_read_grant(
         &grant,
         &format!("device grant certificates for {}", device_id.as_uuid()),
     )?;
+    let standing = assess_device_grant(
+        data_root,
+        device_id,
+        holder,
+        provider.master_public_key().to_bytes(),
+        unix_time_ms()?,
+    )?;
 
     let mut changed = false;
     for &persona in rotated_personas {
         let Some(certificate) = grant.personas.get(&persona) else {
             continue;
         };
-        if !requires_epoch_material(certificate) {
+        if !requires_epoch_material(certificate)
+            || !standing.personas.get(&persona).is_some_and(Result::is_ok)
+        {
             continue;
         }
         let Some(epoch) = load_current_private_epoch(data_root, persona)? else {

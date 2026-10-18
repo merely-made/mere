@@ -2140,3 +2140,302 @@ its own build directory).
   - the push;
   - then knot-editor and Turnstone turn the feature on in their next
     repins (ruling 97).
+
+### 2026-10-16 authority audit repair batch
+
+**Status: implemented and tested in the working tree, uncommitted.** Main was
+merged through `e43fcee7` in `b567660d`, preserving the local Tucket work and
+upstream Sennet changes. This batch fixes the independently reproduced custody
+and storage findings Q022–Q029. The full-source audit remains open.
+
+**Phases and done-conditions:**
+
+- Grant persistence and distribution: a successful narrowed save reloads the
+  same members and content reference; a signed persona withdrawal prevents
+  new private material reaching that persona's withdrawn certificate.
+- Interrupted operations: invalid enrollment keys refuse before payload writes;
+  an interrupted revocation retains its rotation trigger and succeeds on retry.
+- Stored profiles: new ciphertext authenticates its profile name; malformed
+  nonces return errors; saving a legacy vault migrates every profile and
+  preserves its keys.
+- Migration and compatibility: failed image writes retain thumbnail/favicon
+  pixels for retry; read-only legacy seeds remain readable with an existing
+  OS unlock root.
+
+**Findings, 2026-10-16:**
+
+- `castellan/src/custody/wallet/refresh.rs` now uses Pandect's shared
+  `assess_device_grant` for holder, roots, validity and revocation standing.
+  Bundle export in `pandect/src/wallet_grant/enroll.rs` filters signed
+  withdrawals. Export still uses signature/ledger checks rather than the full
+  refresh evaluator, so these are not yet one complete authorization path.
+- `castellan/src/custody/wallet/revoke.rs` now stores the epoch secret before
+  publishing its head and removes withdrawn carriage only after remaining
+  devices have been refreshed. Failed attempts can rotate again on retry.
+- Enrollment decodes and authenticates the required current epochs before
+  payload writes. Decoded secrets are zeroized on drop. Subsequent filesystem
+  failures can still leave partial writes; this is not a cross-file transaction.
+- `pandect/src/wallet_grant/certificate.rs` replaces local grant membership
+  and reuses the shared per-file atomic writer. Removing local certificates
+  does not issue signed revocations or retract material already distributed.
+- Passphrase format V2 binds the profile name in AEAD associated data. V1
+  remains readable for existing vaults; the next successful save upgrades all
+  entries together. It cannot detect substitutions made to V1 before upgrade.
+- `pandect/src/image_store.rs` clears legacy pixels only after storage succeeds.
+
+**Progress, 2026-10-16:** all done-conditions above passed on Windows at the
+merged base plus this working-tree patch. Receipts live in
+`support/receipts/authority-success-audit/`:
+
+- `repair_castellan_keeper_tests.log`: 292 library and 17 integration tests
+  passed, plus both resident/vault secret-residue harnesses. Includes the
+  wallet, SSH-agent and keeper feature paths.
+- `repair_pandect_tests.log`: 318 library and 27 integration tests passed;
+  one archive child test is intentionally invoked by its passing parent.
+- `repair_image_retry_tests.log`: expanded image refusal/retry regression
+  passed for both thumbnail and favicon paths.
+- `git diff --check` passed. No headed, remote-device or whole-workspace
+  acceptance claim is made. The shared `C:/t/cargo-targets/mere` target was
+  reused; no isolated target, Cargo home or worktree was created.
+
+The audit's `review_notes.json` and `authority_map.json` retain the original
+reproductions alongside repair dispositions and remaining ownership gaps.
+Refreshing source hashes invalidated coverage for changed upstream files;
+older graph findings require revalidation against the merged design.
+
+**Command and stale-open follow-up, 2026-10-16 (Q035–Q039):** the vault command
+now refuses a flag that replaces an existing forced command or source-address
+restriction. A flag may add a previously absent restriction or repeat its exact
+stored value. Differing address lists, including subsets, are refused until a
+shared address-containment evaluator exists. The SSH agent already passes the
+stored restrictions through unchanged. The pinned Personae `FacePolicy::attenuates`
+checks principal/action sets only; it is not a complete evaluator for these
+restriction fields. No upstream dependency code was changed in this batch.
+
+Minting checks duration multiplication and reports the encoded certificate's
+lifetime in seconds, including the signer's twelve-hour cap. Profile commands
+preserve load/list errors instead of calling a locked or unreadable vault empty.
+Passphrase storage checks the file salt against the open handle before profile
+access. A handle opened before another handle's first save must reopen, rather
+than successfully writing ciphertext with an incompatible cached key. The
+constructor documentation now accurately describes its lazy first write.
+
+These are bounded repairs. Coordinating independent writers across a whole
+read/modify/write operation remains a separate ownership task; the salt check
+does not supply file leases or multi-record transactions. CXF's namespace
+binding occurs before all later import validation and its completed-write
+receipt counts items and SSH imports, not every ownership-record write. That
+ordering is a source candidate requiring failure-path qualification, not a
+confirmed data-loss finding.
+
+The current verification and exact source hashes are recorded in
+`support/receipts/authority-success-audit/commands_storage_repair_receipt.json`.
+The earlier passphrase/profile-storage hashes are historical; this follow-up
+receipt supersedes them. The full-source review remains in progress.
+
+**Source-review follow-up, 2026-10-16 (Q040–Q042, not repaired):** all 100
+Castellan source files have now been read at their current hashes. Three
+additional failures have public-API reproductions in
+`support/receipts/authority-success-audit/cxf_admission_diagnostics.rs`, with
+the scoped result in `cxf_admission_receipt.json`. These diagnostics assert
+the broken behavior; their passing result is not a correctness gate.
+
+- **Q040, inconsistent OTP admission:** CXF imports a one-byte decoded seed
+  as a normal Vault item, reports it stored, and accepts a petition. Approval
+  then refuses with the generator's `SecretTooShort`. A normal-length seed
+  imports and releases as a control. The URI path already uses the generator
+  constructor. Quarantine review separately accepts any nonempty OTP seed,
+  so fixing import disposition alone would leave another activation path.
+  Repair should share the generator's payload/configuration admission across
+  import, review and exercise while preserving unsupported source material.
+- **Q041, unreported ownership write:** an SSH import with an invalid comment
+  fails with zero items and zero SSH imports in its receipt, but has already
+  bound the destination namespace to a profile. A corrected retry selecting
+  another existing profile is refused by that retained binding. The same key
+  imports into the other profile under a fresh namespace. Preflight and
+  partial-failure receipts need to include ownership records, not only payloads.
+- **Q042, shared-member deletion:** a valid CXF document can place one OTP
+  item in two collections. The Secret Service projects both collections, even
+  though it does not project the OTP as a secret item. Deleting one collection
+  succeeds, removes the shared item's records, and leaves the other collection
+  pointing to a missing record; its item reads and metadata snapshot then fail.
+  The disjoint-membership control remains readable. Decide shared membership
+  versus destructive collection ownership before changing deletion semantics;
+  this crosses the CXF, generic item store and Secret Service boundaries.
+
+Q042's ownership decision and Q041's transaction/receipt boundary are recorded
+for a separate repair pass because a complete change may exceed the requested
+one-hour audit diversion limit. The full-source audit continues. Linux D-Bus
+source reading also found prompt/session cleanup and publication-order
+candidates; these still need bus-level qualification and are not included in
+the three reproduced findings. No production code changed in this follow-up.
+
+**Resident-door source review, 2026-10-16 (Q043–Q051; Q048/Q051 corrected):**
+installation scripts and all 64 files under `ports/djinn/src` have now been
+read at recorded hashes. Integration-test reading has reached
+`embedded_reservoir_two_process.rs`, including the trainer feature paths.
+This is further reading coverage, not completion of the Mere audit.
+The evidence and qualifications are in
+`support/receipts/authority-success-audit/djinn_door_review_receipt.json`;
+`authority_map.json` entries A039–A047 track the contracts and actual reuse.
+
+- **Q043, endpoint path cleanup:** the resident SSH-agent startup helper and
+  shared app/browser helper both unlink a configured Unix endpoint after
+  `NotFound` or `ConnectionRefused`, without verifying socket type, owner or
+  inode. The Linux installer already has those checks. A native Linux
+  primitive probe demonstrated that connecting to a generated ordinary file
+  returns `ECONNREFUSED`, after which this policy removes it. Live-listener,
+  stale-socket and missing-path controls were also checked. This probe runs
+  Python socket/filesystem operations against the source policy, not the Rust
+  APIs or an installed resident. Unify cleanup ownership and qualify Unix
+  races across callers before treating any one helper as the sole authority.
+- **Q044, readiness before binding:** startup emits `listening` for all doors,
+  then later sets `ready` and emits that event before the app/browser futures
+  are first polled. Those futures bind their endpoints inside their bodies.
+  The status contract says every lane is open and every door served. Later
+  bind errors do fail the process and clear readiness; this finding concerns
+  premature claims, not a successful process exit. The testkit additionally
+  enumerates endpoints and reads status over the app door for the current pid.
+  Add explicit successful-bind acknowledgments before publishing readiness.
+- **Q045, resource disclosure bypass through read-through:** the identity
+  endpoint says an admitted client's knowledge of a hash is insufficient to
+  read unreleased bytes, but `bytes_for` falls through to its reader for any
+  requested hash. Personal sync supplies a direct resident blob-store reader.
+  The release-boundary test omits this reader; the read-through test expects
+  an unstaged hash to succeed. Admission/session checks remain real. No
+  unauthenticated access or vault-secret exposure is established. Define one
+  resource authorization owner covering disclosed card/media dependencies,
+  accepted transfers, cached content and grant retirement before repairing
+  this seam; disabling the reader alone would break receipt captures.
+- **Q046, cache ceiling:** an individual blob larger than 64 MiB empties the
+  eviction queue and is then inserted despite the advertised cache budget.
+  The existing bound test covers quarter-budget blobs only. Choose explicit
+  refusal or uncached serving for oversized content and qualify chunk reads.
+  This concerns retained cache bytes; the reader already allocates the whole
+  blob, so changing eviction alone cannot provide a streaming memory bound.
+- **Q047, acceptance durability:** an accepted transfer decision is pushed
+  into a shared in-memory vector, despite the comment promising immediate
+  durability. The watcher drains the queue and logs/drops failed attempts;
+  the offer remains for another explicit acceptance. Distinguish a queued
+  gesture from durable acceptance and from completed delivery. If durability
+  is the contract, persist before replying and define failure/completion
+  retirement. No fresh-process crash test was run for this source observation.
+- **Q048, unperformed receipt check:** the non-Windows H4 wire receipt emits
+  `standard_endpoint_refused: true` without exercising a refusal, alongside
+  `transport: "not_exercised"`. The Windows arm performs the actual check.
+  Corrected in place to emit `null` for the unexercised refusal. The key and
+  transport marker remain. Source search found no typed boolean consumer of
+  this field; non-Windows transport execution was not performed here.
+- **Q049, catalog lifetime divergence:** daemon composition registers a
+  reservoir factory holding `MereRoutes` in the same catalog that those routes
+  retain. This is a strong-reference cycle. Embedded shutdown already names
+  and breaks it by clearing its catalog after cancelling/joining tasks; daemon
+  shutdown cancels tasks but does not clear the catalog before release checks.
+  The retained factories keep reservoir and published-site borrowers alive,
+  so ordered shutdown can refuse their `Arc::try_unwrap` checks. This requires
+  an open reservoir with composed routes. Main propagates closure errors;
+  no successful-exit or current-process reproduction is claimed. Share the
+  cleanup boundary and qualify ordinary stop plus startup/route failures in
+  both modes. Full `MereRoutes` source reading is now complete; current-process
+  lifecycle qualification remains pending. The two-process integration test's
+  library daemon fixture also clears its catalog explicitly. Its clean-release
+  check cannot qualify the full binary's omitted cleanup.
+- **Q050, pre-key retry claim:** a new group session and its bundle are
+  persisted before initial lane publication. The sync host logs a publication
+  failure and continues, saying the next open retries, but reopening an
+  existing group returns `publish: None` and skips that branch. Preserve the
+  same session/bundle and retry based on missing durable lane evidence rather
+  than minting again or blindly republishing on every restart. Manual public
+  bundle relay remains a separate recovery path. This applies to encoding or
+  pre-commit author failures. A later broadcast error can leave the event
+  durably stored and recoverable through sync. Failure injection is pending;
+  this is a source-confirmed recovery gap, not a claim every startup fails.
+
+Q043's platform ownership and Q045/Q047's authorization/persistence contracts
+may exceed the requested one-hour audit diversion limit; they remain explicit
+repair work rather than an unbounded rewrite during reading. Q044 needs a
+bind-ready handshake and occupied-endpoint controls. Q046 and Q048 are bounded
+follow-ups with their behavior choices and evidence limits recorded above.
+Q048's receipt field and Q051's checkout rule are the contained changes in
+this review pass. Existing repair WIP is retained.
+
+The embedded reservoir path reuses `ResidentReservoir` and `MereRoutes` rather
+than maintaining another graph/store implementation. Its ordinary attachment
+keeps identity creation lazy and refuses fallback after admission errors or
+timeouts. That is positive source evidence of shared ownership machinery,
+not an all-races runtime acceptance claim (A043).
+
+Pairing's comment that pair/unpair are the only settings writers is stale:
+the running resident also persists refreshed dial hints. Both use
+`OwnerSettings`, but the claim that atomic load/modify/save prevents concurrent
+edits from clobbering one another needs whole-operation ownership, not only
+atomic file replacement. A044 records the false exclusive-writer claim;
+controlled lost-update qualification remains pending.
+
+Full settings reading also found a separate publication gap: `save` writes a
+fixed sibling temporary file, deletes the current settings, then performs the
+fallible rename. A crash or rename failure in that gap can leave the file
+absent; `load` interprets absence as defaults. The source comment promising
+preservation of the previous file overstates this implementation. Qualify
+failure/recovery and overlapping writers before promoting a runtime-loss
+receipt. Atomic publication and serialization of a complete edit are separate
+requirements, even when all writers share the same settings type.
+
+Carriage's standalone and attached modes really share their intake and
+admission policy. A046 separately records lifecycle candidates: a reviewed
+purge uses slot names without rechecking a renewed current lease, and the
+retraction index is written after all of a device's slot publications, so a
+later publication failure can leave an earlier published slot unindexed.
+Nominal convergence and immediate-purge tests do not qualify those failure
+paths. Preserve the original-expiry backstop, and test renewal plus partial
+publication/revocation before changing the ownership/transaction contract.
+
+A047 separates the group-session record, its separately stored pre-key bundle,
+and durable/public lane events. A failure saving the second bootstrap record
+can leave the session present with an empty bundle on retry. Key-transition
+rollback also receives a combined result from durable authoring followed by
+publication; a post-commit publication failure needs different qualification
+from the existing pre-author failure injection. These transaction candidates
+remain documented while source reading continues.
+
+**Q051, deterministic fixture checkout:** the first endpoint test run passed
+10 tests and failed its identity-card fixture comparison. The working file's
+2,460 CRLF sequences were the entire difference from the committed LF blob.
+Added an exact `.gitattributes` LF rule and restored the existing committed
+fixture bytes, without regenerating projection contents or changing assertions.
+The same compiled test binary then passed all 11 endpoint tests. This is an
+exact-fixture portability repair, not disclosure or custody acceptance.
+
+Source reading also found that the two-instance directory receipt records
+the approximate disconnection target "about 10 to 18 s" as passed without a
+numeric comparison. The preceding wait still requires disconnection within
+its 120-second patience bound. Keep that actual eventual-state assertion
+distinct from the approximate latency language; the scenario was not run in
+this pass.
+
+**2026-10-16, Knot residue classifier review (Q052, not repaired).**
+
+`ports/djinn/tests/knot_residue.rs` reuses Castellan's allocator tracker, but
+its sync-host attribution is local: it intersects allocation size classes
+across five runs, subtracts any size class seen in any baseline, and collapses
+allocation multiplicity. The final message says Knot leaves no copy of the
+seed beyond what it binds and joins on. The actual gate establishes a
+narrower result.
+
+The exact current `own_blocks` function was compiled in a standalone native
+Rust probe. Its persistent unique-size positive control is detected. Three
+other synthetic observations all return an empty excess set: a copy in one
+of five host runs, a persistent copy matching one baseline observation, and
+additional copies of a baseline size. These demonstrate classifier false
+negatives, not an actual Knot seed leak. Author/session/capture paths reject
+every reported hit and are not subject to this particular classifier.
+
+Keep actual tracker reuse distinct from ownership attribution and the
+success claim (A048). Retain every observed hit and state the heap/arming
+window, repeatability filter, upstream exclusions and attribution limits.
+Proving ownership from more than allocation sizes is a separate qualification
+task. The four diagnostic controls passed while demonstrating the limit;
+Knot, its allocator tracker and its transport were not executed by this
+probe. Evidence is in
+`support/receipts/authority-success-audit/knot_residue_classifier_receipt.json`.
+The generated standalone binary was removed; source and observations remain.

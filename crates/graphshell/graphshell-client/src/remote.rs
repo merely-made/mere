@@ -24,7 +24,7 @@
 //!   written on the next round trip;
 //! - a rejected intent is followed by a resnapshot, so "unchanged" is
 //!   measured rather than assumed — a refusal rings no bell;
-//! - every queued bell drives a resume, which the endpoint answers by diff.
+//! - every queued bell drives a resume, answered by changes or a replacement snapshot.
 //!
 //! ## What the host does
 //!
@@ -205,7 +205,7 @@ pub struct RemoteSession {
     profile: CapabilityProfile,
     pending: Option<RemoteOp>,
     /// The acknowledged revision before the resume in flight, for the
-    /// `diff · a → b` line.
+    /// `updated · a → b` line.
     resume_before: Option<u64>,
     session: Option<ProjectionSession>,
     status: String,
@@ -298,7 +298,7 @@ impl RemoteSession {
         &self.status
     }
 
-    /// How the last resume ended: `diff · a → b` or `already current at r`.
+    /// How the last resume ended: `updated · a → b` or `already current at r`.
     pub fn last_resume(&self) -> &str {
         &self.last_resume
     }
@@ -438,8 +438,8 @@ impl RemoteSession {
         self.events.push("remote-reconnect".to_string());
     }
 
-    /// The new link is up: rediscover, which keeps the mount, and resume by
-    /// diff from whatever bells the poll after it collects.
+    /// The new link is up: rediscover, which keeps the mount, and resume from
+    /// whatever bells the poll after it collects.
     pub fn rejoined(&mut self) {
         self.closing = false;
         self.pending = None;
@@ -652,7 +652,7 @@ impl RemoteSession {
                     .map(|revision| revision.to_string())
                     .unwrap_or_else(|| "?".to_string());
                 self.last_resume = if changed {
-                    format!("diff · {before} → {after}")
+                    format!("updated · {before} → {after}")
                 } else {
                     format!("already current at {after}")
                 };

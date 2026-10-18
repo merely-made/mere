@@ -37,3 +37,66 @@ Scenotime does not yet schedule incremental signal evaluation, maintain
 derived caches, or resolve hits into authorized intents. Those belong to
 later consumer proofs. G2 establishes only the portable identity and history
 contract needed for safe remote replay.
+
+## Source audit checkpoint, 2026-10-16
+
+At Mere `b567660d67c4d900f1d638345c89715e1f36c575`, all 13 Scenotime source,
+manifest and test files have been read at recorded hashes. The current native
+package gate passed 43 library tests and 11 integration tests: six fold,
+three history and two site-projection tests. Six standalone public-API
+diagnostics also passed while establishing one defect and two qualified
+boundary observations. These are not browser, renderer, wasm or user-archive
+receipts. No production code changed in this pass. The detailed record is
+`support/receipts/authority-success-audit/scenotime_review_receipt.json`.
+
+**Q069 / A068: structural validity does not establish wire round-trip
+validity.** `from_dense`, `validate` and trace construction accept nonfinite
+item positions/scales, footprint dimensions and scene bounds. JSON
+serialization succeeds by writing `null` for these numeric values; reading
+the emitted snapshot or trace then fails. A `SetBounds` diff carrying `NaN`
+also commits its revision and builds an accepted trace that cannot reopen
+from its own serialized bytes. A finite trace control reopens identically.
+
+This is a public typed-data admission/serialization mismatch. It does not
+demonstrate a product solver emitting invalid geometry, a user archive being
+lost, or a JSON parser accepting nonstandard `NaN` syntax. Done: shared
+finite-value admission before snapshot/diff commit and trace/capture
+publication, with serialization/reopening controls. Zero and degenerate
+footprints, negative scales and negative dimensions need their actual
+semantics preserved or explicitly decided; silently changing source
+coordinates is not a repair.
+
+**A069: live replay and stored traces intentionally differ.** Live replay
+tolerates repeated/older revisions as no-ops. `SceneTrace` explicitly checks
+epoch, base and forward progress before reusing that same diff application.
+It is an immutable replay record, while the history integration puts complete
+trace values in Backstep. This is a documented ownership split, not another
+hidden undo stack. The site parity test uses the same `apply_diff` primitive
+on both paths, so it checks composition/fixture parity rather than supplying
+an independent proof of the diff algorithm.
+
+**A070: coordinate traversal is still distributed.** Dense `Scene::to_world`,
+sparse `SceneTables::space_to_world` and the host receipt's `world_origin`
+walk parent chains separately. Shared transform and footprint math is real
+reuse; no valid-input divergence was established here. Picking checks
+visibility, fold hiding, explicit order/layer, hit overrides and transforms.
+Its stated linear cost omits ancestor-chain depth: it resolves a chain per
+candidate, while snapshot validation separately walks every space chain.
+This is a source complexity qualification, not a performance measurement.
+
+**A071: clock policy remains a host boundary.** Monotonic repeated timestamps
+add no elapsed time. The diagnostic sequence `[100, 110, 105, 110]` produces
+elapsed `15`: a backward sample resets the delta baseline, so already-seen
+host time is charged again. Ordinary monotonic browser timestamps were not
+exercised. Ignore-out-of-order versus reset-clock behavior needs a consumer
+decision before changing this policy. ReturnMotion remains a local visual
+offset and does not mutate source positions.
+
+Remaining candidates are preserved in the ledger: transitions consider only
+direct item operations; held-placement metadata has no diff update operation;
+honored positions are compared in item-local coordinates; extreme finite
+return-motion tuning has no stability bound; and deserialized schedules bypass
+the spec constructor's validation. A reversed deserialized `LinkKey` also
+passes snapshot validation and produces a different view token from its
+canonical constructor, but no importing/grouping consumer failure was run.
+The next source review is Scenograph's authoring and binding layer.

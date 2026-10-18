@@ -437,11 +437,13 @@ impl Graph {
         })
     }
 
-    /// Rebuild derived containment edges from current node URLs.
-    ///
-    /// Derived relations are additive/read-only and are never persisted.
     /// Derive the containment this one node's address implies, at the moment
     /// the node is created.
+    ///
+    /// Current relation routing stores this assertion on Resources. Ordinary
+    /// snapshot loading separately rebuilds compatibility Surface containment;
+    /// recorded loading preserves stored relations without that rebuild. Both
+    /// strata are included in snapshots.
     ///
     /// The **UrlPath half** of [`rebuild_derived_containment_relations`],
     /// applied to a single node. It exists because that rebuild runs only on
@@ -449,7 +451,7 @@ impl Graph {
     /// containment edge until the session was saved and reloaded. Anything
     /// reading containment live (a graph behavior's watch, which names a
     /// region by its container) saw nothing there. Deriving at creation makes
-    /// containment mean the same thing live and loaded.
+    /// the local relation available before the first save.
     ///
     /// The **Domain half is deliberately not here.** A domain anchor is the
     /// shallowest node on a host, so minting one node can re-anchor every

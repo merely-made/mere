@@ -261,6 +261,6 @@ async fn isolated_wire_receipt(
     Ok(json!({
         "transport": "not_exercised",
         "endpoint_class": "nonstandard_receipt",
-        "standard_endpoint_refused": true
+        "standard_endpoint_refused": null
     }))
 }

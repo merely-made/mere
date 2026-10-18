@@ -296,7 +296,7 @@ fn actions_are_one_per_intent_not_one_per_card() {
 }
 
 #[test]
-fn an_accepted_intent_polls_and_the_bell_resumes_by_diff() {
+fn an_accepted_intent_polls_and_the_bell_resumes_with_a_snapshot() {
     let (mut remote, mut board) = mounted();
     remote.take_events();
     remote.invoke_action(index_of(&remote, APPEND));
@@ -307,7 +307,7 @@ fn an_accepted_intent_polls_and_the_bell_resumes_by_diff() {
     assert_eq!(remote.form.draft, None, "an answered intent closes its draft");
     assert_eq!(remote.revision(), Some(2));
     assert_eq!(cards(&remote), 2);
-    assert_eq!(remote.last_resume(), "diff · 1 → 2");
+    assert_eq!(remote.last_resume(), "updated · 1 → 2");
     assert!(!remote.in_flight());
     let events = remote.take_events();
     assert!(events.contains(&"remote-bell revision 2".to_string()), "{events:?}");
@@ -387,7 +387,7 @@ fn a_stale_position_is_answered_as_stale_and_the_bell_still_resumes() {
 }
 
 #[test]
-fn reconnect_keeps_the_mount_and_resumes_the_missed_change_by_diff() {
+fn reconnect_keeps_the_mount_and_resumes_the_missed_change_with_a_snapshot() {
     let (mut remote, mut board) = mounted();
     remote.invoke_action(index_of(&remote, APPEND));
     pump(&mut remote, &mut board);
@@ -414,7 +414,7 @@ fn reconnect_keeps_the_mount_and_resumes_the_missed_change_by_diff() {
     assert_eq!(remote.status(), "open");
     assert_eq!(remote.revision(), Some(3));
     assert_eq!(cards(&remote), 3);
-    assert_eq!(remote.last_resume(), "diff · 2 → 3");
+    assert_eq!(remote.last_resume(), "updated · 2 → 3");
     assert_eq!(board.count("snapshot"), 1, "the mount was kept, never re-taken");
     assert!(!remote.in_flight());
     let events = remote.take_events();

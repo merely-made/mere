@@ -427,3 +427,237 @@ built):
   `djinn::resident_projection`, not yet started by the binary. Still open:
   push notices (item 2), one client correlator (item 3), and the binary's
   trusted roots.
+
+## Authority audit checkpoint, 2026-10-16
+
+At Mere `b567660d67c4d900f1d638345c89715e1f36c575`, all 24 files in
+`crates/graphshell/graphshell-host` have been read at recorded content hashes.
+This is a source-review checkpoint, not completion of the Mere audit or a
+headed/remote acceptance gate. No production code changed in this pass.
+The detailed findings, authority map, coverage and native diagnostics are in
+[`support/receipts/authority-success-audit`](../../../support/receipts/authority-success-audit/).
+
+- **Q056 / A052, message admission can contradict its reply.** The
+  sans-I/O helper keeps Notochord's reply, then can replace an accepted
+  principal with `ActionNotOffered` when `serves_action` refuses it. A signed
+  hello for an owner-allowed but unimplemented action returns a decoded
+  `Accept` alongside that local error. The WebRTC host sends this reply
+  before testing the error; the peer interprets `Accept` as a successful
+  join. The host still refuses service. Both paths really share
+  `serves_action`; the coordination around it differs. The native stream
+  adapter explicitly documents policy admission followed by a possible
+  service refusal and close, so its two-stage contract needs separate
+  treatment. Done: the message helper's final outcome and peer-visible
+  result agree for supported, policy-refused and service-refused actions.
+- **Q057 / A053, reconnect uniqueness is conditional.** The lifecycle
+  module's unconditional "different id" and "by construction" claims exceed
+  its function-level contract, which correctly assigns nonce freshness to
+  the caller. Two public admissions of the same signed hello produce the
+  same session id; a fresh nonce changes it. The reconnect unit test supplies
+  two different ids rather than proving freshness. Current WebRTC peers do
+  generate fresh random nonces. This is a qualified claim/test defect, not
+  evidence of an ordinary WebRTC reconnect failure or cross-subject access.
+  Done: claims and tests name the actual freshness owner.
+- **Q058 / A054, the N4 policy receipt repeats its own wrong domain.** One
+  helper sets `mere.network` for both Murm and Graphshell, while Graphshell
+  asks for `mere.graphshell`. Its synthetic claims helper repeats the wrong
+  domain, so the test can pass while the rendered stage says Graphshell is
+  open. The exact extracted helper marked `Public` refuses a real Graphshell
+  hello in current public admission; the correct-domain control accepts.
+  The full persistence/headed scenario was not run. Done: service-specific
+  rules are checked against production hello builders, not a repeated local
+  string.
+- **Q059 / A055, default host unit tests do not compile.** A standalone
+  default-feature `cargo test -p graphshell-host --lib --no-run` reaches the
+  package and exits 101 with 36 errors. The unconditional WebRTC door test
+  module imports native-only host definitions and a transport adapter gated
+  by `notochord`; default features enable `webrtc-join`, not `native`.
+  Admission-only library compilation succeeds. No tests ran in the failed
+  gate. Done: fixture gates/imports match their feature owners, with default
+  and native gates qualified independently.
+
+The five bounded admission diagnostic tests passed while establishing the
+stated defects and controls. They use synthetic signed identities and supplied
+authenticated memory-carrier facts, with no network or DTLS join. Existing
+loopback integration sources do exercise ICE/DTLS/SCTP, but reading them is not
+an execution receipt.
+
+Larger follow-ups remain documented rather than expanded into this audit:
+`admit_webrtc_catalog` snapshots a finite session allowance before an awaited
+join, then `serve_admitted` increments the live count without another ceiling
+check. Concurrent joins need reservation/rollback ownership. The same join
+also uses a captured time and revocation snapshot across awaited exchanges;
+carrier lifetime and consumer adoption need tracing before asserting a
+reachable service bypass. Shared catalog factories, common dispatch, the
+codec and the session loop are real reuse; they do not by themselves prove
+every authority boundary is complete.
+
+The same pass subsequently confirmed two more boundaries:
+
+- **Q060 / A056, pushes outlive authority until a request arrives.** The
+  notifying loop polls and writes notices before its authority check; idle
+  timeouts repeat that path. A native public-loop diagnostic starts live,
+  then expires or revokes its signed grant, independently verifies the lapse,
+  and still receives a newly queued notice. The next request is correctly
+  refused and terminates with `Lapsed`. The exposed data is notice
+  session/epoch/revision metadata, not a demonstrated snapshot/resource or
+  intent bypass. Three duplex diagnostics, including a live control, passed.
+  They construct an admitted session; no network admission or installed
+  resident ran. Done: retained-authority checks govern autonomous output and
+  idle polling as well as requests, with a defined quiet-peer lapse signal.
+- **Q061 / A057, the client has two pending-state owners.** Reading the
+  client's core and driver shows `SessionCore.pending` can change before
+  `SessionDriver.inflight` refuses a second send. Start a Close, call
+  `discover` again and receive the expected busy error, then supply the
+  original valid Closed response: it is rejected because the core now
+  expects a descriptor. The existing busy test stops after checking the
+  error. Two public-API diagnostics establish this difference against a
+  successful close control. Done: a refused operation leaves the original
+  operation intact; core mutation and request-slot admission are coordinated
+  for both driver helpers and callers using `core_mut` plus `begin`.
+
+The client package is still being read. These diagnostics used the libraries
+from a successful native host build, recorded in `host_review_receipt.json`.
+
+### Client source checkpoint, 2026-10-16
+
+The next pass completed all 15 files in `graphshell-client` (331,603 source
+characters, including the manifest and tests). The shared endpoint, host and
+client packages are now fully source-read. The rest of Mere remains under
+review. No production code changed; the earlier repair files were preserved.
+
+Eight bounded diagnostics using a freshly built client library passed while
+establishing five findings and three controls. Evidence is recorded in
+`support/receipts/authority-success-audit/client_review_receipt.json` and its
+referenced native probe receipt. These are public-API tests with generated,
+validated snapshots and encoded replies. They do not exercise a browser,
+network, installed resident or OS accessibility bridge. Existing package
+unit/integration tests were read, not executed in this pass.
+
+- **Q062 / A058, cache admission does not correlate a resource reply.**
+  `Pending::Resolve` retains the session/instance but loses the requested hash.
+  Another valid resource advertised in that session is cached and the missing
+  resource requested again. Six repeated wrong-resource replies made no
+  progress; the correct-resource control completed. The blocking adapter adds
+  no progress bound. This does not bypass advertisement or content-address
+  checks. Done: retain and compare the outstanding request before caching or
+  advancing, with the same rule in both adapters. The media-resource path
+  already performs this comparison separately.
+- **Q063 / A059, frozen reading order comes from table slots.** A valid
+  snapshot with explicit item order `[1, 0]` reads `[1, 0]` through remote
+  accessibility and `[0, 1]` through the frozen view. Dense-order control
+  agrees. Sparse identity preservation is real; stable ids and explicit order
+  are compatible. Done: share ordered active-item traversal while retaining
+  instance ids, including tombstones and reordered items.
+- **Q064 / A060, remote accessibility ignores an item's own visibility.**
+  It filters fold hiding but omits the `visible` check. A valid invisible item
+  is absent according to `SceneSnapshot::is_shown` and the frozen view, yet
+  remains in remote accessible children, from which remote actions are also
+  derived. The data was already disclosed, so this is a presentation/action
+  mismatch, not an endpoint authorization bypass. Done: consistent flat-item
+  visibility across readers, with folded-member disclosure precedence stated
+  separately. Shared `FoldReading` is real reuse, but does not supply this
+  final visibility decision.
+- **Q065 / A061, an unexpected close does not perform the disconnect
+  transition.** `channel_closed` updates outer strings and `link_busy`, while
+  intentional `disconnect` also clears pending wire state and marks mounts
+  disconnected. An idle mount remains `Live` after an unexpected close. A
+  lost discovery remains awaited and rejects rediscovery after `rejoined`.
+  Intentional-disconnect control succeeds. Targeted port source routes stream
+  termination to these APIs; actual browser channel teardown was not run.
+  Done: common terminal-link state handling for idle and mid-request close or
+  failure, preserving cached display while retiring operations and traffic
+  from the lost link. This needs coordinated lifecycle ownership, not a status
+  string patch.
+- **Q066 / A063, a snapshot recovery is labelled a diff.** The core reduces
+  successful resume replies to `Changed(true)`; the remote receipt spells
+  this `diff`. A full `ResumeReply::Snapshot` is applied correctly and reports
+  `diff · 1 → 2`. The scripted board test makes the same substitution while
+  naming/asserting diff recovery. Done: preserve the actual recovery mode or
+  use an honest generic update label; test snapshot and diff independently.
+
+**A062 tracks a remaining manual implementation:** `resume_after_notice` and
+`resume_request_for_notice` retain resume/retry logic beside `SessionCore`.
+The compatibility role is explicit; both paths reuse `ClientState.apply_resume`
+and the retry constant. Current repository search found no direct caller of
+`resume_after_notice`, while the request helper remains used by a host test.
+This is a maintenance surface to account for, not proof that external callers
+do not exist or that its current behavior differs.
+
+Further source candidates are preserved in the ledger: delayed resources can
+be admitted after client-side revocation; resume diffs can overwrite a terminal
+status with `Live`; failure paths retain some pending/outbox state; an older
+action draft can survive a failed attempt to open a new one; sparse object
+counts include tombstones; and frozen fold-member order/visibility differs
+from its broader prose. Composing authority and consumer contracts still need
+tracing before promoting these to broader product or security claims.
+
+### Protocol and scene-contract checkpoint, 2026-10-16
+
+All five Chirograph files and all nine Sceno files are now source-read at
+recorded hashes. The package gates passed: 52 Chirograph unit tests and 37
+Sceno unit tests. Five additional public-API diagnostics passed while
+establishing two findings and qualifying chunk-check ownership. No production
+code changed. Evidence and preservation checks are in
+`support/receipts/authority-success-audit/chirograph_review_receipt.json`.
+
+- **Q067 / A064, capture and live presentation admission disagree.** Valid
+  scene tables with absent-item bindings, duplicate bindings or a
+  codec/capability conflict pass both capture versions' validation,
+  encode/decode and resource-availability checks. The same sidecar is refused
+  by the live client. A valid control agrees. `CaptureWire` really shares
+  version/scene/resource plumbing, but the live client's private presentation
+  validator is another invariant owner. Done: shared carrier-independent
+  presentation validation for captures and live snapshots, with session/cache
+  policy handled explicitly at its composing boundary. Current repository
+  searches found these capture APIs in tests, not a production capture
+  consumer; no user-artifact or renderer failure was executed.
+- **Q068 / A065, byte admission differs before shared JSON decoding.** The
+  frame assembler silently replaces invalid UTF-8 in complete lines and EOF
+  tails; the native `LineReader` rejects it with `InvalidData`. A typed
+  descriptor response containing an invalid label byte becomes a successfully
+  decoded response with a replacement character through the assembler. Valid
+  UTF-8 split inside a multibyte character agrees across both readers. Done:
+  fallible, consistent UTF-8 admission, including browser caller error
+  propagation. This was tested through the public assembler and native reader
+  over a duplex; the browser caller was source-traced, not run.
+
+**A066 qualifies chunk authority.** The shared assembler owns offsets and
+hash integrity; it does not own the requested session/hash, stable total size,
+or progress bounds. The native app client already adds all of those checks,
+with explicit fault tests in its source. Raw assembly accepts a validly hashed
+resource switch and non-final empty progress, but that is not evidence of a
+bypass through this stricter app wrapper. Its fault tests were read, not rerun
+in this pass. **A067 qualifies acknowledgments:** `ProjectionAck` describes
+in-memory applied progress; its "durably applied" wording is not a store
+receipt, particularly under default memory-only retention.
+
+Sceno supplies a useful positive boundary: unique, live, disjoint fold
+membership is validated centrally; fold member order is explicit; own
+visibility still counts. Invalid overlapping folds are therefore not evidence
+of a valid-input reader conflict. Score migration is implemented: old
+`Anchored` reads as `Seeded` and is written with the reader's version, while
+newer scores are refused. Source identity and instance identity remain
+separate, and `LinkKey` is explicitly a derived view token, not graph truth.
+
+The ledger retains the remaining questions without inventing policy: default
+scene construction versus validated world spaces; constructor-only ordering
+of deserialized link keys; nested score migration versus capture byte identity;
+version/capability negotiation at `Open`; and message assembly budgets. The
+test named `every_arrangement_round_trips` omits the three current subdivision
+families, so its name is broader than its coverage. Solver behavior and sparse
+scene validation are still ahead in the review.
+
+
+### Audit wording repair, 2026-10-16
+
+Q066's remote resume receipt now reports `updated` rather than inferring `diff`
+from a changed-result boolean. That outcome can represent a complete replacement
+snapshot. The two scripted-board tests now name the Snapshot replies they
+actually supply. This bounded repair makes the label truthful; it does not add
+wire-mode provenance to Outcome or repair the separate unexpected-close and
+resource-correlation findings. The all-feature client gate passes 91 tests,
+including these remote tests, and fails the existing exact-byte trace test
+(Q073), whose default-field reserialization changes are documented separately.
+Native results are recorded in
+the [audit receipt](../../../support/receipts/authority-success-audit/scenograph_review_receipt.json).

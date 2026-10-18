@@ -1,0 +1,42 @@
+{
+  "date_utc": "2026-10-18T00:27:00.621840+00:00",
+  "purpose": "Record the move of the full-source audit record out of the scenograph editor plan into its own plan (ruling R2, 2026-10-17). Content moved byte for byte; no finding, authority entry or receipt changed.",
+  "prior_receipt": {
+    "path": "audit_completion_receipt.json",
+    "sha256": "bded81ba2a230d1ac212fa19fe012cabcd63a8c68f78b1450e8daf58eb4646f4",
+    "document_sha256_at_completion": "0086929dee85f3cf8ef5652fd717275d5d31e9226dcf13f16c1010cb4586fa04"
+  },
+  "old_document": {
+    "path": "design_docs/mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md",
+    "sha256_before": "8801160e77da14e3fbb67277779ff766788262c1100d6d0c4fd980b9ba06a15a",
+    "sha256_after": "e3f8a836fc27f6f59c60bfd32749d94d230e2623193a707a0d92cff2f5c87c29",
+    "removed_lines": [
+      2394,
+      5481
+    ],
+    "lines_before": 5481,
+    "lines_after": 2402,
+    "line_ending": "CRLF",
+    "appended": "pointer section 'Full-source audit record moved, 2026-10-17'"
+  },
+  "new_document": {
+    "path": "design_docs/mere_docs/implementation_strategy/2026-10-16_full_source_audit_plan.md",
+    "sha256": "d5f5ffd94d5242cf6115661a763d8fd997558f3f750c666ad103e4596f7ca0d1",
+    "header_bytes": 4815,
+    "record_offset": 4815,
+    "lines": 3172
+  },
+  "moved_record": {
+    "sha256": "20af8df7e9153f45e74ff7c274353bf89bd3c0ffdfb9168ec4867c029b8b0f43",
+    "bytes": 567867,
+    "lines": 3088,
+    "first_heading": "## Full-source audit and contained repairs, 2026-10-16",
+    "line_ending": "LF",
+    "byte_identical_in_both": true
+  },
+  "receipts_naming_old_path": 235,
+  "relative_links": "unchanged; both plans are in design_docs/mere_docs/implementation_strategy/",
+  "recorder": {
+    "path": "record_audit_record_relocation.py"
+  }
+}
