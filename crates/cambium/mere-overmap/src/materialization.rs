@@ -115,6 +115,10 @@ async fn snapshot(
     if snapshot.session != expected {
         return Err("The snapshot names another projection session.".into());
     }
+    snapshot
+        .scene
+        .validate()
+        .map_err(|error| format!("Invalid projection scene: {error:?}"))?;
     Ok(snapshot)
 }
 
@@ -176,8 +180,38 @@ async fn cards(
     snapshot: &ProjectionSnapshot,
     result: &mut HashMap<ContentHash, Vec<u8>>,
 ) -> Result<(), String> {
+    // Required cards come from the projection's active source items, not its
+    // possibly incomplete presentation sidecar. Keep checking other advertised
+    // bindings too, as before. This function is never called for graph cards
+    // during ProjectionOnly reads.
+    let mut instances: Vec<_> = snapshot
+        .scene
+        .active_items_in_order()
+        .into_iter()
+        .filter_map(|(instance, _)| {
+            let source = source_of(snapshot, instance)?;
+            let required = match snapshot.session.0.as_str() {
+                wire::MERE_SESSIONS => matches!(
+                    source.adapter.as_str(),
+                    wire::SESSIONS_SOURCE | wire::MERGE_SOURCE
+                ),
+                wire::MERE_ARCHIVE => source.adapter == wire::ARCHIVE_SOURCE,
+                wire::MERE_GRAPH => matches!(
+                    source.adapter.as_str(),
+                    wire::SESSION_ITEM_SOURCE | cartography::MERE_GRAPH_ADAPTER
+                ),
+                _ => false,
+            };
+            required.then_some(instance)
+        })
+        .collect();
     for binding in &snapshot.presentation.bindings {
-        let hash = card_hash(snapshot, binding.instance)?;
+        if !instances.contains(&binding.instance) {
+            instances.push(binding.instance);
+        }
+    }
+    for instance in instances {
+        let hash = card_hash(snapshot, instance)?;
         // Fetch in each projection scope, even if another scope offered the same hash.
         let bytes = resource(source, &snapshot.session, hash).await?;
         serde_json::from_slice::<PortableCardV1>(&bytes)
@@ -787,5 +821,90 @@ mod tests {
         );
         fake.snapshots.insert(wire::MERE_GRAPH.into(), graph);
         assert!(read_complete(&mut fake).unwrap().graph_material.is_none());
+    }
+
+    #[test]
+    fn deserialized_dangling_item_source_is_refused_before_enumeration() {
+        for mode in [GraphRead::ProjectionOnly, GraphRead::Complete] {
+            for name in [wire::MERE_SESSIONS, wire::MERE_GRAPH, wire::MERE_ARCHIVE] {
+                let (mut fake, _) = fixture(&envelope());
+                let snapshot = snapshot_fixture(
+                    name,
+                    &[(wire::SESSIONS_SOURCE, "invalid".into(), vec![])],
+                    &mut fake.resources,
+                );
+                let mut serialized = serde_json::to_value(snapshot).unwrap();
+                serialized["scene"]["tables"]["items"][0]["source"] = serde_json::json!(999999);
+                let invalid: ProjectionSnapshot = serde_json::from_value(serialized).unwrap();
+                fake.snapshots.insert(name.into(), invalid);
+                let error = block_on(read(&mut fake, "test", mode)).unwrap_err();
+                assert!(
+                    error.contains("Invalid projection scene"),
+                    "{name}: {error}"
+                );
+                assert!(fake.fetched.is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn required_session_merge_and_archive_cards_must_have_bindings_and_offers() {
+        for mode in [GraphRead::ProjectionOnly, GraphRead::Complete] {
+            for (name, adapter) in [
+                (wire::MERE_SESSIONS, wire::SESSIONS_SOURCE),
+                (wire::MERE_SESSIONS, wire::MERGE_SOURCE),
+                (wire::MERE_ARCHIVE, wire::ARCHIVE_SOURCE),
+            ] {
+                for missing_binding in [true, false] {
+                    let (mut fake, _) = fixture(&envelope());
+                    let mut snapshot = snapshot_fixture(
+                        name,
+                        &[(adapter, "required".into(), vec![])],
+                        &mut fake.resources,
+                    );
+                    if missing_binding {
+                        snapshot.presentation.bindings.clear();
+                    } else {
+                        snapshot.presentation.offers.clear();
+                    }
+                    fake.snapshots.insert(name.into(), snapshot);
+                    let error = block_on(read(&mut fake, "test", mode)).unwrap_err();
+                    assert!(
+                        error.contains(if missing_binding {
+                            "Missing material card binding"
+                        } else {
+                            "Missing material card offer"
+                        }),
+                        "{name}: {error}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn graph_card_binding_is_required_only_for_complete_reads() {
+        for adapter in [wire::SESSION_ITEM_SOURCE, cartography::MERE_GRAPH_ADAPTER] {
+            let (mut fake, _) = fixture(&envelope());
+            let mut graph = snapshot_fixture(
+                wire::MERE_GRAPH,
+                &[(adapter, envelope().session.as_uuid().to_string(), vec![])],
+                &mut fake.resources,
+            );
+            graph.presentation.bindings.clear();
+            fake.snapshots.insert(wire::MERE_GRAPH.into(), graph);
+            assert!(block_on(read(&mut fake, "test", GraphRead::ProjectionOnly)).is_ok());
+            assert!(
+                !fake
+                    .fetched
+                    .iter()
+                    .any(|(session, _)| session.0 == wire::MERE_GRAPH)
+            );
+            assert!(
+                read_complete(&mut fake)
+                    .unwrap_err()
+                    .contains("Missing material card binding")
+            );
+        }
     }
 }
