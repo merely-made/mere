@@ -29,7 +29,7 @@ use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
     qual, set_class, set_style,
 };
-use super::edge_cells::link_overlay_with_assertion_hides;
+use super::edge_cells::link_overlay_from_segments;
 use super::fold_projection::FoldProjection;
 use super::{Canvas, FACE_INSET, Face, NodeShape, NodeState, PAN_DECAY};
 
@@ -74,6 +74,11 @@ fn place_fold_badges(
 const FOLD_BADGE_HALF: (f32, f32) = (12.0, 9.0);
 
 impl Canvas {
+    /// Why the most recent frame could not be translated, when applicable.
+    pub fn last_translation_error(&self) -> Option<paint_list_render::TranslationError> {
+        self.last_translation_error
+    }
+
     /// Advance one frame at viewport `(w, h)` and return the composited content
     /// scene plus whether the host should request another frame (sim still
     /// settling, pan still gliding, or a node being dragged). Does not present.
@@ -273,15 +278,10 @@ impl Canvas {
             self.hidden_field_ids(),
         ));
         underlay.splice_world_underlay(self.forme_overlay());
-        underlay.splice_world_overlays(link_overlay_with_assertion_hides(
-            &self.graph,
-            &self.view,
-            &self.hidden_links,
-            &self.hidden_edges,
-            &self.hidden_assertions,
+        underlay.splice_world_overlays(link_overlay_from_segments(
+            self.rendered_link_segments(),
             &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
-            |key| self.node_size(key),
             |from, to| super::grammar_view::link_tone(grammar.as_ref(), from, to),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
@@ -531,7 +531,16 @@ impl Canvas {
         if let Some(cmds) = marquee_cmds.as_ref() {
             layers.push(CompositeLayer::commands_only(cmds));
         }
-        let scene = composite_paint_layers(viewport, &layers).scene;
+        let scene = match composite_paint_layers(viewport, &layers) {
+            Ok(translated) => {
+                self.last_translation_error = None;
+                translated.scene
+            },
+            Err(error) => {
+                self.last_translation_error = Some(error);
+                Scene::new(w, h)
+            },
+        };
 
         let after_cull = layers
             .iter()

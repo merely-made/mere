@@ -1,0 +1,124 @@
+{
+  "schema": "ordinary-responsive-links-source-continuity/v1",
+  "qualified_source": "aa0392a1ba547a55860a6988db48e2d6ba22ee48",
+  "checked_inputs": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "7ca0a260c7c57d6b9360564ebe0db9a4077aadff62a28ae492640f86063b7f17"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "05987f160a05d6185738281852f3f87d5baa87aee7ee2ec24a7ce9ad9c72e406"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas.rs",
+      "sha256": "8ab9e5a8e29cdbd15041bbc48f761e42a6be74f5f3e6533441ff872f8b767b29"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/cartography_scene.rs",
+      "sha256": "3630acffe36be2a808be34ddd6040abde3385ec0ea6198c54f824d51a6792868"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells.rs",
+      "sha256": "e0b94e835e8728f3e1788c1ba0ef106e0326ddb26387c1bbcab2f5a150351960"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/frame.rs",
+      "sha256": "1a439cd7efab97689eb562e559c74a4ab5369fe157b4a27d749e702e2ecce9ad"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/input.rs",
+      "sha256": "4366ac2dd8d84c1c5afc32cc6646341c4183c23d50c3e67d3a360ad0d949335f"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/lifecycle.rs",
+      "sha256": "38fff2022d163f97343a116512173115e1728f2df34aba45567ab9ca3d2133e8"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links.rs",
+      "sha256": "fb24fa10e958269ebb9a800e7b2d43be725aed7844696c3a7ac0f45f7732c96b"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/fields.rs",
+      "sha256": "e445452662fb2a8f72eda98ac8388f587c5a05d8d2f0ed6fb9541bb574dea5a9"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/report.rs",
+      "sha256": "a891f28dea84be3d53578060c4d1ceba1a9918aa9707499ade34896611222600"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs",
+      "sha256": "0a94e9ffefe7c8aa840d5c7c2326b0b90f45af7d72e22a71850edea510e74af9"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/geometry.rs",
+      "sha256": "68a8cb5bc4ea84bd705af166898ab6b0bd2453f77091c3febedcda82bf03a6f9"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_tests.rs",
+      "sha256": "cb43b91cce9ee7d094930b84a95a0394b30a2d23b94ffab3cb463aeb307d3a63"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/strategy.rs",
+      "sha256": "c79a2a271a72202ca1bc3a2dc43c728d18d1ee1629f2285f2784969919bf3169"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/tests.rs",
+      "sha256": "b551a352dadc400683c79509187f4d04f76f6a58c808594ed32bb0d7304623a5"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree.rs",
+      "sha256": "55c67a4a263976ca7398d0a027e5dd73d54e5d1cfce43edb978905d79fb2b392"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/lane.rs",
+      "sha256": "38f45e19398945a7cfab9955678c7713070a1d79537c009156e38c6489e9b44d"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/lane/link_paths.rs",
+      "sha256": "7d25de7e70611913e42157a0fd5cd95b595f3e3a6524e9f8ff3d73331ac01586"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths.rs",
+      "sha256": "dd48412bbf715ab80cae94d182ff57632468ba644a90b68bdfd77cb10d21b4be"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths/observation.rs",
+      "sha256": "32abce855b299d0e668fe263c83768ec42f2d874687ef540eb6bdcfc3beb834a"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "ce64caa14664410f6198a17e6abfd9ff83b2fb21c1f2405243441b666e31dfda"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.toml",
+      "sha256": "4a537a39cae43a144a908802ff3b97ac7ab2a331a9d1cd5b6e208ba2d9b82cbc"
+    },
+    {
+      "path": "ports/graphshell/web/loader.js",
+      "sha256": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728"
+    },
+    {
+      "path": "ports/graphshell/web/mount.js",
+      "sha256": "46e06335f795fbae21fdbd3deb35d6420dc9b5c5bb9174a1b3f28d065a3d1bbf"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_paths.scn",
+      "sha256": "dde496959a3a974312f297fd0ef0d5454dd6e1199bd7f3b09ca772a65de67b76"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_paths_reopen.scn",
+      "sha256": "7cc88b7f658e9f421015861b89e2ec6cb7be4d4b1e5e055624cec7c74df249fd"
+    },
+    {
+      "path": "ports/graphshell/web/styles.css",
+      "sha256": "544d28e3d8d734d4f9920358ce8276cecc5bcd52fe5b2040c6d581f3f0fd31e6"
+    },
+    {
+      "path": "ports/graphshell/web/tree.html",
+      "sha256": "08e72416e63df14031b7dd0cbf4856fd505f1123e3a107b85412751b00502c7b"
+    }
+  ],
+  "compiled_inputs_unchanged": true,
+  "publication_changes": "Canonical plan/index and receipt archive only after qualification"
+}

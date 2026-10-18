@@ -1,0 +1,7 @@
+error: failed to load source for dependency `genet-scripted-dom`
+
+Caused by:
+  unable to update https://github.com/merely-made/genet.git?branch=main#4733c557
+
+Caused by:
+  can't checkout from 'https://github.com/merely-made/genet.git': you are in the offline mode (--offline)

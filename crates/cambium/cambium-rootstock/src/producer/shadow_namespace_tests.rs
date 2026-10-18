@@ -49,6 +49,7 @@ fn translated(commands: &[PaintCmd]) -> paint_list_render::TranslatedDisplayList
         &[],
         &[],
     )
+    .expect("shadow fixture translation")
 }
 
 fn op_keys(display: &paint_list_render::TranslatedDisplayList) -> Vec<(char, u64)> {

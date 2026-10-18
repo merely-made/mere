@@ -875,6 +875,7 @@ mod namespace_controls {
             &[],
             &[],
         )
+        .expect("producer fixture translation")
     }
 
     fn keys(display: &paint_list_render::TranslatedDisplayList) -> Vec<u64> {

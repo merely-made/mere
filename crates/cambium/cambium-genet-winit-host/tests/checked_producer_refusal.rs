@@ -33,6 +33,7 @@ const HEIGHT: u32 = 24;
 struct Source {
     revision: u64,
     destroy: bool,
+    refuse: bool,
     frames: usize,
     core: Weak<RenderCore>,
 }
@@ -61,6 +62,12 @@ fn frame(source: &mut Source, width: u32, height: u32) -> Scene {
         [0.25, 0.5, 0.75, 1.0],
     );
     scene
+}
+fn checked_frame(source: &mut Source, width: u32, height: u32) -> Result<Scene, String> {
+    if source.refuse {
+        return Err("authored scene refused".into());
+    }
+    Ok(frame(source, width, height))
 }
 fn revision(source: &Source) -> u64 {
     source.revision
@@ -159,6 +166,7 @@ fn host() -> (
     let source = Rc::new(RefCell::new(Source {
         revision: 1,
         destroy: false,
+        refuse: false,
         frames: 0,
         core: Arc::downgrade(&core),
     }));
@@ -183,10 +191,10 @@ fn host() -> (
         .register(
             KEY,
             RejectNext {
-                producer: SceneProducer::new(
+                producer: SceneProducer::new_checked(
                     source.clone(),
                     0x7072_6f64_7265,
-                    frame,
+                    checked_frame,
                     revision,
                     |_| None,
                 ),
@@ -206,6 +214,47 @@ fn host() -> (
     host.attach_shared_recovery(owner);
     host.set_surface_size(WIDTH as f32, HEIGHT as f32);
     (host, core, source, reject, attempts)
+}
+#[test]
+#[ignore = "actual GPU staging; coordinator executes serialized gate"]
+fn checked_scene_source_refuses_all_captures_and_recovers_without_replacement() {
+    let (mut host, core, source, _, attempts) = host();
+    host.redraw();
+    assert_eq!(source.borrow().frames, 1);
+    let generation = core.generation();
+    let captures = arm(&mut host);
+    source.borrow_mut().revision += 1;
+    source.borrow_mut().refuse = true;
+    host.redraw();
+    assert_eq!(source.borrow().frames, 1, "refused source cannot paint");
+    assert_eq!(
+        host.s.shared.producers.error(KEY),
+        Some(ProducerError::RenderRefused)
+    );
+    assert!(
+        !core
+            .renderer()
+            .unregister_external_image(external_image_key(KEY)),
+        "the prior staged image must be removed on refusal"
+    );
+    assert_eq!(captures.borrow().len(), 3);
+    for refusal in captures.borrow().iter() {
+        assert!(matches!(refusal, CaptureRefusal::PresentationError {
+            source_key: Some(KEY), error, ..
+        } if error.contains("authored scene refused")));
+    }
+    assert!(
+        matches!(host.poll_device_recovery(), RecoveryStatus::Ready { generation: g } if g == generation)
+    );
+    assert_eq!(attempts.load(Ordering::SeqCst), 0);
+    assert_authority(&host, &source);
+    source.borrow_mut().refuse = false;
+    host.redraw();
+    assert_eq!(source.borrow().frames, 2);
+    assert_eq!(
+        host.s.last_frame_profile.as_ref().unwrap().producers.stages,
+        1
+    );
 }
 fn arm(host: &mut TestHost) -> Rc<RefCell<Vec<CaptureRefusal>>> {
     let out = Rc::new(RefCell::new(Vec::new()));

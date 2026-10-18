@@ -41,7 +41,7 @@ pub struct SceneProducer<T> {
     source: Rc<RefCell<T>>,
     source_identity: u64,
     raster_key: u64,
-    frame_callback: fn(&mut T, u32, u32) -> Scene,
+    frame_callback: FrameCallback<T>,
     revision_callback: fn(&T) -> u64,
     semantics_callback: fn(&T) -> Option<ProducerSemantics>,
     texture: Option<wgpu::Texture>,
@@ -52,6 +52,11 @@ pub struct SceneProducer<T> {
     generation: u64,
 }
 
+enum FrameCallback<T> {
+    Infallible(fn(&mut T, u32, u32) -> Scene),
+    Checked(fn(&mut T, u32, u32) -> Result<Scene, String>),
+}
+
 impl<T> SceneProducer<T> {
     pub fn new(
         source: Rc<RefCell<T>>,
@@ -60,11 +65,27 @@ impl<T> SceneProducer<T> {
         revision: fn(&T) -> u64,
         semantics: fn(&T) -> Option<ProducerSemantics>,
     ) -> Self {
+        Self::with_callback(
+            source,
+            raster_key,
+            FrameCallback::Infallible(frame),
+            revision,
+            semantics,
+        )
+    }
+
+    fn with_callback(
+        source: Rc<RefCell<T>>,
+        raster_key: u64,
+        frame_callback: FrameCallback<T>,
+        revision: fn(&T) -> u64,
+        semantics: fn(&T) -> Option<ProducerSemantics>,
+    ) -> Self {
         Self {
             source,
             source_identity: source_identity(),
             raster_key,
-            frame_callback: frame,
+            frame_callback,
             revision_callback: revision,
             semantics_callback: semantics,
             texture: None,
@@ -74,6 +95,24 @@ impl<T> SceneProducer<T> {
             revision: 0,
             generation: 0,
         }
+    }
+
+    /// Use this constructor when the source can refuse a frame. The checked
+    /// result reaches portable capture and native presentation admission.
+    pub fn new_checked(
+        source: Rc<RefCell<T>>,
+        raster_key: u64,
+        frame: fn(&mut T, u32, u32) -> Result<Scene, String>,
+        revision: fn(&T) -> u64,
+        semantics: fn(&T) -> Option<ProducerSemantics>,
+    ) -> Self {
+        Self::with_callback(
+            source,
+            raster_key,
+            FrameCallback::Checked(frame),
+            revision,
+            semantics,
+        )
     }
 
     /// Retain the existing output when its source handle is unchanged. A new
@@ -93,8 +132,12 @@ impl<T> SceneProducer<T> {
         (self.revision_callback)(&self.source.borrow())
     }
 
-    fn scene(&mut self, width: u32, height: u32) -> Scene {
-        (self.frame_callback)(&mut self.source.borrow_mut(), width, height)
+    fn scene(&mut self, width: u32, height: u32) -> Result<Scene, String> {
+        let mut source = self.source.borrow_mut();
+        match &self.frame_callback {
+            FrameCallback::Infallible(frame) => Ok(frame(&mut source, width, height)),
+            FrameCallback::Checked(frame) => frame(&mut source, width, height),
+        }
     }
 }
 
@@ -105,7 +148,9 @@ impl<T> TextureProducer for SceneProducer<T> {
     ) -> Result<ProducedScene, PortableProducerError> {
         let width = frame.logical_size.0.round().max(1.0) as u32;
         let height = frame.logical_size.1.round().max(1.0) as u32;
-        let scene = self.scene(width, height);
+        let scene = self
+            .scene(width, height)
+            .map_err(|_| PortableProducerError::InvalidSource)?;
         Ok(ProducedScene {
             scene,
             source_identity: self.source_identity,
@@ -138,7 +183,9 @@ impl<T> TextureProducer for SceneProducer<T> {
         {
             return Ok(None);
         }
-        let scene = self.scene(logical_size.0, logical_size.1);
+        let scene = self
+            .scene(logical_size.0, logical_size.1)
+            .map_err(genet_render_host::RasterizeFailure::SourceError)?;
         let [width, height] = cx.frame.physical_size;
         let (texture, view) = cx.core.try_rasterize_scaled_for(
             self.raster_key,

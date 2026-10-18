@@ -206,10 +206,10 @@ pub use ambient::{AmbientSim, GameOfLife, NBody, ParticleLife, SandFall, Tinctur
 /// the remote board and any other host share one inline/actor implementation.
 use seiche::Physics;
 
+pub mod backdrop_surface;
 /// A board scene: the cards and backdrops of a scene that is not a graph,
 /// painted where the physics board holds them.
 pub mod board_scene;
-pub mod backdrop_surface;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
@@ -381,6 +381,8 @@ struct FoldViewState {
 /// The canvas content-root: the graph, its physics, the camera, and the abs-pos
 /// node-children pool. Window-agnostic — see the module docs.
 pub struct Canvas {
+    /// Refusal from the most recent paint translation, if any.
+    last_translation_error: Option<paint_list_render::TranslationError>,
     graph: Graph,
     /// The force-directed layout backend — in-thread (tests / wasm) or an
     /// off-thread armillary actor (native always-offload). The canvas never reads
@@ -474,6 +476,8 @@ pub struct Canvas {
     /// Exact assertion IDs hidden from this view. This remains narrower than
     /// both canonical-link and selector/cell visibility filters.
     hidden_assertions: HashSet<String>,
+    /// View-local responsive rendered paths; never graph or force state.
+    link_path_response: responsive_links::LinkPathResponse,
     /// Disposable occurrence controllers supply disclosed endpoint pairs
     /// without minting graph assertions. Ordinary graph canvases use `None`.
     occurrence_edges: Option<Vec<(NodeKey, NodeKey)>>,
@@ -841,24 +845,25 @@ mod cartography;
 mod derived_face;
 mod framing;
 mod gloss;
+mod grammar_view;
 mod lifecycle;
 pub mod link_reading;
+pub mod link_suggestions;
+pub mod mosaic;
 mod nodes;
 mod reader;
 pub mod responsive_link_adapter;
+pub mod responsive_links;
 mod roles;
-mod grammar_view;
-pub mod mosaic;
 pub mod scene_axes;
-mod scene_state;
-mod suggestions;
-pub mod link_suggestions;
-pub mod territory;
 mod scene_regions;
+mod scene_state;
 mod selection;
 mod source_time;
 mod strategy;
 mod strategy_inputs;
+mod suggestions;
+pub mod territory;
 mod view;
 
 pub use actions::{
