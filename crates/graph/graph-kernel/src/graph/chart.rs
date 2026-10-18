@@ -27,7 +27,6 @@ use chartulary::{
 };
 use uuid::Uuid;
 
-use super::edge_data::predicate_iri;
 use super::edge_payload::EdgePayload;
 use super::node::Node;
 
@@ -76,19 +75,14 @@ impl GraphBearing for Node {
 
 /// The single predicate IRI a semantic edge projects, or `None` if the edge
 /// carries no semantic relation (an experience-layer edge: Traversal, Containment,
-/// Arrangement, Imported). Precedence matches linked-data: an explicit statement or
-/// open predicate wins, else the first recognized sub-kind's canonical IRI.
+/// Arrangement, Imported). Withdrawn assertions remain in history but do not
+/// project. This single-predicate capability selects the first held semantic
+/// statement; readers needing every statement use the assertion APIs.
 fn edge_predicate(payload: &EdgePayload) -> Option<&str> {
-    let semantic = payload.semantic_data()?;
-    if let Some(statement) = semantic.statements.first() {
-        Some(statement.predicate.as_str())
-    } else if let Some(predicate) = &semantic.predicate {
-        Some(predicate.as_str())
-    } else if let Some(&sub_kind) = semantic.sub_kinds.iter().next() {
-        Some(predicate_iri(sub_kind))
-    } else {
-        None
-    }
+    payload
+        .held_semantic_statements()
+        .next()
+        .map(|statement| statement.predicate.as_str())
 }
 
 impl Predicated for EdgePayload {
@@ -111,6 +105,7 @@ impl Classified for EdgePayload {
 
 #[cfg(test)]
 mod tests {
+    use super::super::edge_data::{SemanticData, SemanticStatementSpec, predicate_iri};
     use super::super::edge_taxonomy::{EdgeAssertion, SemanticSubKind};
     use super::*;
 
@@ -199,5 +194,45 @@ mod tests {
             Classified::class(&experience).predicate().is_none(),
             "an experience edge stays private"
         );
+    }
+
+    #[test]
+    fn generic_projection_uses_only_held_semantic_statements() {
+        let mut data = SemanticData::default();
+        let first = data.assert_statement(SemanticStatementSpec {
+            predicate: "urn:test:first".into(),
+            ..Default::default()
+        });
+        let second = data.assert_statement(SemanticStatementSpec {
+            predicate: "urn:test:second".into(),
+            ..Default::default()
+        });
+        let mut payload = EdgePayload::new();
+        payload.assertions = data;
+        assert_eq!(Predicated::predicate(&payload), Some("urn:test:first"));
+
+        let withdrawal = crate::types::AssertionWithdrawal {
+            at_ms: Some(1),
+            by: None,
+        };
+        assert!(
+            payload
+                .assertions
+                .withdraw_statement(&first.statement_id, withdrawal.clone())
+        );
+        assert_eq!(Predicated::predicate(&payload), Some("urn:test:second"));
+        assert_eq!(
+            Classified::class(&payload).predicate(),
+            Some("urn:test:second")
+        );
+
+        assert!(
+            payload
+                .assertions
+                .withdraw_statement(&second.statement_id, withdrawal)
+        );
+        assert_eq!(payload.semantic_statements().len(), 2, "history survives");
+        assert_eq!(Predicated::predicate(&payload), None);
+        assert_eq!(Classified::class(&payload).predicate(), None);
     }
 }

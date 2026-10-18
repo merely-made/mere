@@ -428,3 +428,70 @@ rulings 85 and 88).
     asking session ends, or after 2 s if the session stays open;
   - `stop_with` records what the stop command said (its exit, stdout and
     stderr) in the assertion's actual.
+
+**2026-10-16, full source audit follow-up (Q053–Q055, not repaired).**
+
+All 14 source/manifests/tests in `crates/system/djinn-testkit` and all 200
+inventoried files under `ports/djinn` have now been read at recorded hashes.
+The historical H1–H3 receipts above retain their original scope; they do not
+qualify these newly exercised boundary and failure cases. The audit remains
+open across the rest of Mere.
+
+- **Q053, Windows environment names:** the guard reads case-sensitive map
+  keys, while Windows process environments merge names without regard to
+  case. Canonical `LOCALAPPDATA` outside the run and `SSH_AUTH_SOCK` naming the
+  standard agent are refused as controls. Lowercase aliases pass the guard;
+  a child built with the same `env_clear`/`envs` composition sees the outside
+  root and standard-agent value through uppercase lookups. The child only
+  reads environment variables. It opens neither a root nor an endpoint, and
+  the outside root is a generated decoy. Validate the same effective map
+  that will reach Windows, including case aliases, before spawning. Unknown
+  variables are currently accepted, despite the guard module's stronger
+  wording; role and askpass helpers intentionally add variables, so a blanket
+  allowlist change would need their contract accounted for (A049).
+- **Q054, receipt publication:** `Run::write` omits evidence whose hash read
+  fails and ignores record/summary write errors. Requesting a missing file
+  produces a passed record with zero evidence; `verify` then correctly checks
+  that empty retained list and returns `ok`, checked zero. Occupying
+  `receipt.json` with a directory makes record publication fail, yet
+  `finish_record` returns passed, prints a passed receipt path and writes a
+  passed summary. In that case `verify` correctly errors because the record
+  cannot be read. The readable-evidence control retains and verifies one
+  file. Requested evidence, retained hashes, successful publication and the
+  outcome need one explicit failure contract. Hash verification alone is
+  not proof that every requested artifact was retained (A050).
+- **Q055, pre-guard writes:** a resident name is joined directly to the run
+  directory. An absolute decoy name selects an outside root. `start` creates
+  that root's application directory and writes `lock.toml` before its guard
+  rejects the resulting environment. The probe confirms refusal and no child
+  spawn, alongside the already-written outside-run file. The outside path
+  stays within the audit's generated fixture tree. Validate root/name
+  ownership and the complete start before any pre-spawn writes (A051).
+
+These are public-API diagnostics against a freshly built testkit on Windows,
+with empty installed-resident walls and generated decoys. Five diagnostic
+parents passed by observing the stated defects and a readable-evidence
+control; the environment-only helper ran explicitly in its child process.
+This is not a repaired-harness gate or installed-resident acceptance. No
+Djinn process, SSH client or real endpoint connection was used. Generated
+native binaries and fixture directories were removed after execution, with
+records and logs preserved under
+`support/receipts/authority-success-audit/testkit_boundary_receipt.json`.
+The first two standalone linking attempts are retained separately from the
+successful diagnostic execution.
+
+The source review also qualifies the sharing claim. Resident/status wire
+readers intentionally avoid dependency cycles and are held to the producer by
+an integration test. D1/D1b and the lock receipts reuse the shared resident
+harness. Other re-exec tests remain separate, as ruling 10 explicitly permits
+until touched. `wait_ready` checks endpoint presence and reads status for the
+current PID; it does not rely only on a log. Unix endpoint enumeration and
+non-Linux Unix process identity are empty/stubbed, so their generic closing
+assertions must not be reported as all-platform protection. Ruling 13's
+accepted empty Unix installed-location list and open H5 work remain explicit.
+
+Further source candidates are recorded separately: assignment to the process
+job happens after spawn, plan/evidence names enter paths without component
+admission, and the binary hash is taken at finalization rather than launch.
+They have not been promoted to runtime findings by these probes. No product
+code changed in this audit continuation.

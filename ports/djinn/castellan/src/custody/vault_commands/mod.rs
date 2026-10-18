@@ -63,7 +63,12 @@ pub(crate) fn execute(
 }
 fn load(storage: &dyn IdentityStorage, id: &ProfileId) -> Result<Profile, String> {
     storage.load_profile(id).map_err(|err| {
-        let known = storage.list_profiles().unwrap_or_default();
+        let known = match storage.list_profiles() {
+            Ok(known) => known,
+            Err(list_err) => {
+                return format!("load profile {:?}: {err}; list profiles: {list_err}", id.0);
+            },
+        };
         if known.iter().any(|summary| &summary.id == id) {
             return format!("load profile {:?}: {err}", id.0);
         }
@@ -467,7 +472,5 @@ fn resolve_key(profile: &Profile, typed: &str) -> Result<ProtocolKey, String> {
     }
 }
 
-// The unit-testable core here is `resolve_key`; everything else is I/O
-// formatting exercised by the end-to-end CLI run recorded in the plan.
 #[cfg(test)]
 mod tests;

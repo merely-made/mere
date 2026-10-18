@@ -905,3 +905,37 @@ public revision for the live MereHost graph. It does not qualify foreign-store
 aggregate promotion, another product's review UI, automatic resident
 synchronization, browser anti-eviction guarantees or physical audio. The broader
 product and storage qualifications retain their named owners and receipts.
+
+## Full-source audit repair continuation, 2026-10-16
+
+On merged main `b567660d67c4d900f1d638345c89715e1f36c575`, the authorized audit
+repairs contained defects while retaining the full-source reading obligation.
+Chartulary batch preflight now accounts for assertions implicitly withdrawn by
+node removal, including remove-and-reinsert sequences (Q006/Q030). Refused
+batches preserve graph state, journal revision and the next assertion identity.
+Kernel generic predicate/class projections now select a held semantic assertion
+instead of exposing withdrawn history (Q011). Chartulary graph deserialization
+rejects duplicate stable node identities (Q004), and N-Quads literals escape
+carriage returns (the bounded Q005 repair).
+
+Source comments now describe the public assertion/declaration capture entry
+points and the distinct Resource/compatibility-Surface containment paths. These
+documentation corrections do not unify the writers or change containment
+placement. Checkpoint binding, import-record ownership and migration reason
+identity remain separately evidenced repair work. Broad repairs that may exceed
+the user's one-hour audit-diversion limit are documented in the
+[audit ledger](../../../support/receipts/authority-success-audit/review_notes.json).
+The [repair receipt](../../../support/receipts/authority-success-audit/quick_repairs_receipt.json)
+records package tests and limits. Historical defect-observation tests remain
+historical evidence; their passing results are not correctness gates. This pass
+does not qualify unread source, whole-workspace behavior or additional products.
+
+Validation: Chartulary and kernel pass **556 library/integration tests**, including
+two fresh-process reopen parents; their two child helpers remain normal-run
+ignores. Pandect passes **345 tests**, with its one subprocess helper ignored by
+the normal runner. A stale snapshot-size comparison was also corrected to read
+canonical `assertions` instead of the retired semantic sidecar (Q033). Its focused
+gate passes and now measures **65 bytes per assertion** of timestamp overhead on
+the recorded 49-assertion fixture, with a positive check that timestamp removal
+actually reduces the comparison payload. The independent total-size ceiling
+remains in force. These are package and fixture receipts, not product acceptance.

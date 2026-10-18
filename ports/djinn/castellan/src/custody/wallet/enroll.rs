@@ -12,6 +12,7 @@ use std::io;
 use std::path::Path;
 
 use personae::PersonaId;
+use zeroize::Zeroizing;
 
 use super::*;
 
@@ -45,15 +46,26 @@ pub(crate) fn install_remote_auth_enrollment_bundle_inner(
     let local = load_local_device_identity(data_root)?;
     validate_remote_auth_enrollment_bundle(bundle, local.as_ref())?;
     let local = local.expect("validation refuses a missing local identity");
-
-    let grant_ref = save_device_grant_set(data_root, local.device_id, &bundle.grant)?;
-    for record in &bundle.epochs {
-        save_wrapped_epoch_record(data_root, record)?;
+    let mut roster = load_device_roster(data_root)?.unwrap_or_else(DeviceRoster::new);
+    if roster.revoked.contains(&local.device_id) {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            format!("device {} is revoked", local.device_id.as_uuid()),
+        ));
     }
-    for wallet in &bundle.persona_wallets {
-        save_persona_wallet(data_root, wallet)?;
+    let ledger = load_revocation_ledger(data_root)?;
+    if bundle
+        .grant
+        .certificates()
+        .any(|signed| ledger.revokes(&signed.certificate))
+    {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            "enrollment contains a revoked certificate",
+        ));
     }
-    if !bundle.epochs.is_empty() {
+    // Decode and authenticate every matching epoch before changing wallet state.
+    let private_epochs = if !bundle.epochs.is_empty() {
         let wrapping_key = wrapping_key.ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::InvalidInput,
@@ -65,15 +77,41 @@ pub(crate) fn install_remote_auth_enrollment_bundle_inner(
             .iter()
             .map(|wallet| (wallet.persona_id, wallet.private_epoch_head))
             .collect();
-        restore_wrapped_private_epochs(data_root, &bundle.epochs, &candidates, wrapping_key)?;
+        decode_wrapped_private_epochs(&bundle.epochs, &candidates, wrapping_key)?
+    } else {
+        Vec::new()
+    };
+    for wallet in &bundle.persona_wallets {
+        if bundle
+            .grant
+            .personas
+            .get(&wallet.persona_id)
+            .is_some_and(requires_epoch_material)
+            && !private_epochs.iter().any(|epoch| {
+                epoch.persona_id == wallet.persona_id && epoch.epoch_id == wallet.private_epoch_head
+            })
+        {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "private.read enrollment is missing the current private epoch or its wrapping key does not match",
+            ));
+        }
     }
 
-    let mut roster = load_device_roster(data_root)?.unwrap_or_else(DeviceRoster::new);
-    if roster.revoked.contains(&local.device_id) {
-        return Err(io::Error::new(
-            io::ErrorKind::PermissionDenied,
-            format!("device {} is revoked", local.device_id.as_uuid()),
-        ));
+    let grant_ref = save_device_grant_set(data_root, local.device_id, &bundle.grant)?;
+    for record in &bundle.epochs {
+        save_wrapped_epoch_record(data_root, record)?;
+    }
+    for wallet in &bundle.persona_wallets {
+        save_persona_wallet(data_root, wallet)?;
+    }
+    for epoch in private_epochs {
+        stage_persona_private_epoch(
+            data_root,
+            epoch.persona_id,
+            epoch.epoch_id,
+            &epoch.epoch_secret,
+        )?;
     }
     upsert_local_remote_auth_record(&mut roster, &local, grant_ref);
     save_device_roster(data_root, &roster)?;
@@ -102,7 +140,13 @@ pub(crate) fn install_remote_auth_enrollment_bundle_inner(
     Ok(())
 }
 
-/// Stage the private epochs an enrollment bundle carries.
+struct DecodedPrivateEpoch {
+    persona_id: PersonaId,
+    epoch_id: KeyEpochId,
+    epoch_secret: Zeroizing<Vec<u8>>,
+}
+
+/// Decode the private epochs an enrollment bundle carries, without writing.
 ///
 /// The records no longer say which persona and epoch each entry serves, so the
 /// installing device resolves them instead of reading them: it already knows
@@ -111,12 +155,12 @@ pub(crate) fn install_remote_auth_enrollment_bundle_inner(
 /// match. An entry that matches no candidate is simply not for this device and
 /// is skipped, which is the correct behaviour for a record that may one day
 /// replicate.
-pub(crate) fn restore_wrapped_private_epochs(
-    data_root: &Path,
+fn decode_wrapped_private_epochs(
     records: &[WrappedEpochRecord],
     candidates: &[(PersonaId, KeyEpochId)],
     wrapping_key: [u8; 32],
-) -> io::Result<()> {
+) -> io::Result<Vec<DecodedPrivateEpoch>> {
+    let mut decoded = Vec::new();
     for wrapped in records.iter().flat_map(|record| &record.epochs) {
         let Some(&(persona_id, epoch_id)) = candidates.iter().find(|(persona, epoch)| {
             wrapped.index == blinded_epoch_index(*persona, *epoch, wrapping_key)
@@ -126,9 +170,13 @@ pub(crate) fn restore_wrapped_private_epochs(
         let epoch_secret =
             unwrap_private_epoch_material(wrapped, persona_id, epoch_id, wrapping_key)
                 .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
-        stage_persona_private_epoch(data_root, persona_id, epoch_id, &epoch_secret)?;
+        decoded.push(DecodedPrivateEpoch {
+            persona_id,
+            epoch_id,
+            epoch_secret: Zeroizing::new(epoch_secret),
+        });
     }
-    Ok(())
+    Ok(decoded)
 }
 
 #[cfg(test)]

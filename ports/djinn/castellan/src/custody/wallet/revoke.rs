@@ -75,6 +75,11 @@ pub fn revoke_remote_auth_device(
     let rotated_personas = revoke_persona_grant_access(data_root, device_id, &grant)?;
     remove_remote_auth_wrapping_key(data_root, device_id)?;
     let refreshed_devices = refresh_remote_auth_private_read_grants(data_root, &rotated_personas)?;
+    // Carriage is the retry trigger. Retire it only after all new heads,
+    // secrets and remaining-device wraps have been stored successfully.
+    for certificate in grant.personas.values() {
+        remove_wrapped_epoch_record(data_root, certificate.certificate.id())?;
+    }
     Ok(RemoteAuthRevocationOutcome {
         device_id,
         already_revoked,
@@ -126,8 +131,8 @@ pub(crate) fn revoke_persona_grant_access(
         //
         // Presence is the right question anyway. Over-rotating on a revocation
         // costs a re-wrap; under-rotating leaves a withdrawn device holding a
-        // live epoch. Idempotence comes from removing the record below rather
-        // than from narrowing the test.
+        // live epoch. The caller removes the record after rotation and refresh
+        // finish, so an interrupted attempt retains its retry trigger.
         let should_rotate = private_read && held.is_some_and(|record| !record.epochs.is_empty());
         let next_epoch = if should_rotate {
             let next_epoch = KeyEpochId::new();
@@ -139,15 +144,11 @@ pub(crate) fn revoke_persona_grant_access(
             None
         };
 
-        // A withdrawn device keeps no carriage. This is also what makes a second
-        // revoke a no-op rather than a second rotation.
-        remove_wrapped_epoch_record(data_root, certificate_id)?;
-
-        if changed {
-            save_persona_wallet(data_root, &wallet)?;
-        }
         if let Some(next_epoch) = next_epoch {
             ensure_persona_epoch_bridge(data_root, persona, next_epoch)?;
+        }
+        if changed {
+            save_persona_wallet(data_root, &wallet)?;
         }
     }
     Ok(rotated_personas)

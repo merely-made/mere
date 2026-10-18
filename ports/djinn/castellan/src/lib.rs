@@ -70,8 +70,8 @@
 //! authority, and [`lock`] is how the vault's lock reaches it. Feature
 //! `secret-service` adds the Linux desktop adapter, and
 //! [`otp::SteamGuard`] is an explicitly nonstandard Valve compatibility shape.
-//! CXF import remains follow-on work; see the castellan OTP plan and the keeper
-//! founding plan in mere's design docs.
+//! Feature `cxf` adds two-step credential import: a memory-only preview, then
+//! an explicit destination per account, with native SSH keys kept in vault slots.
 
 //! [`custody`] is every secret at rest and in hand, moved here in the dramatis
 //! repo plan's DR-B (2026-10-09): personae's vault, storages, unlock ladder

@@ -48,18 +48,15 @@ pub(super) fn bind(
     }
 }
 
-/// Evaluate one script condition: its bool, or an unmatched result whose reason
-/// says why not.
-pub(super) fn run(source: &str, engine: &mut Engine<'_>) -> (bool, String) {
+/// Evaluate one script condition, preserving failure until the rule boundary.
+/// Boolean composition must not turn an engine failure into a match.
+pub(super) fn run(source: &str, engine: &mut Engine<'_>) -> Result<(bool, String), String> {
     match engine {
-        None => (false, "script: no script engine".into()),
+        None => Err("script: no script engine".into()),
         Some(engine) => match engine.eval(source, Budget::Steps(SCRIPT_STEP_BUDGET)) {
-            Ok(ScriptValue::Bool(matched)) => (matched, format!("script: {matched}")),
-            Ok(other) => (
-                false,
-                format!("script: returned {}, wanted a bool", other.kind()),
-            ),
-            Err(error) => (false, format!("script: {error}")),
+            Ok(ScriptValue::Bool(matched)) => Ok((matched, format!("script: {matched}"))),
+            Ok(other) => Err(format!("script: returned {}, wanted a bool", other.kind())),
+            Err(error) => Err(format!("script: {error}")),
         },
     }
 }

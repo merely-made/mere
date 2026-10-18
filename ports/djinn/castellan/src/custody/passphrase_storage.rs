@@ -22,7 +22,9 @@
 //!   Memory-hard; resists GPU-accelerated brute-force.
 //! - **ChaCha20-Poly1305** authenticated encryption per profile. A
 //!   per-profile nonce is generated at save-time. The plaintext is the
-//!   serde JSON of the in-memory profile shape.
+//!   serde JSON of the in-memory profile shape. Version 2 binds the profile id
+//!   as associated data. Version 1 is readable for existing vaults and upgraded
+//!   on the next profile save.
 //! - **The passphrase derives a *KEK* (key-encryption key); all profiles
 //!   in the same file share the KEK.** Using a per-profile passphrase
 //!   would force the user to remember N passphrases — bad UX. If a user
@@ -44,7 +46,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 use argon2::{Argon2, Block};
-use chacha20poly1305::aead::{Aead, KeyInit};
+use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
 
 use serde::{Deserialize, Serialize};
@@ -57,7 +59,7 @@ use personae::{Ed25519Keypair, IdentityError};
 
 const ARGON2_SALT_LEN: usize = 16;
 const NONCE_LEN: usize = 12;
-const FILE_VERSION: u8 = 1;
+const FILE_VERSION: u8 = 2;
 
 /// On-disk file format. JSON-shaped.
 #[derive(Debug, Serialize, Deserialize)]
@@ -130,8 +132,8 @@ struct Inner {
 impl PassphraseEncryptedStorage {
     /// Open or create a passphrase-encrypted vault file at `path`.
     ///
-    /// If the file does not exist, it is created with a fresh random
-    /// salt and zero profiles. If the file exists, the salt is read
+    /// If the file does not exist, a fresh random salt is held in memory;
+    /// the first save creates the file. If the file exists, the salt is read
     /// from it and the supplied passphrase is verified by attempting
     /// to decrypt one of the profiles (or trusted-empty if no
     /// profiles).
@@ -148,7 +150,7 @@ impl PassphraseEncryptedStorage {
                 .map_err(|e| IdentityError::Backend(format!("read vault file: {e}")))?;
             let file: EncryptedFile = serde_json::from_slice(&bytes)
                 .map_err(|e| IdentityError::Backend(format!("parse vault file: {e}")))?;
-            if file.version != FILE_VERSION {
+            if !matches!(file.version, 1 | FILE_VERSION) {
                 return Err(IdentityError::Backend(format!(
                     "unsupported vault file version {}",
                     file.version
@@ -199,8 +201,21 @@ impl PassphraseEncryptedStorage {
         }
         let bytes = std::fs::read(&self.path)
             .map_err(|e| IdentityError::Backend(format!("read vault file: {e}")))?;
-        serde_json::from_slice(&bytes)
-            .map_err(|e| IdentityError::Backend(format!("parse vault file: {e}")))
+        let file: EncryptedFile = serde_json::from_slice(&bytes)
+            .map_err(|e| IdentityError::Backend(format!("parse vault file: {e}")))?;
+        if !matches!(file.version, 1 | FILE_VERSION) {
+            return Err(IdentityError::Backend(format!(
+                "unsupported vault file version {}",
+                file.version
+            )));
+        }
+        if file.salt != self.inner.lock().unwrap().salt {
+            return Err(IdentityError::Backend(
+                "vault file salt changed since open; reopen the vault before accessing profiles"
+                    .into(),
+            ));
+        }
+        Ok(file)
     }
 
     fn save_file(&self, file: &EncryptedFile) -> Result<(), IdentityError> {
@@ -224,18 +239,58 @@ impl PassphraseEncryptedStorage {
 /// Verify a KEK against one stored profile, if any; with none stored, any
 /// passphrase is indistinguishable (see [`PassphraseEncryptedStorage::open`]).
 fn check_kek(kek: &[u8; 32], file: &EncryptedFile) -> Result<(), IdentityError> {
-    if let Some((_, p)) = file.profiles.iter().next() {
+    if let Some((id, p)) = file.profiles.iter().next() {
         let cipher =
             ChaCha20Poly1305::new(&Key::try_from(&kek[..]).expect("fixed-length key material"));
-        let nonce = &Nonce::try_from(&p.nonce[..]).expect("fixed-length key material");
-        // The check's plaintext is the profile itself.
-        let _checked = Zeroizing::new(
-            cipher
-                .decrypt(nonce, p.ciphertext.as_slice())
-                .map_err(|_| IdentityError::Backend("incorrect passphrase".to_string()))?,
-        );
+        let _checked = decrypt_profile(&cipher, file.version, id, p)?;
     }
     Ok(())
+}
+
+fn profile_aad(version: u8, id: &str) -> Vec<u8> {
+    if version == 1 {
+        Vec::new()
+    } else {
+        [b"mere.vault.profile.v2\0".as_slice(), id.as_bytes()].concat()
+    }
+}
+
+fn decrypt_profile(
+    cipher: &ChaCha20Poly1305,
+    version: u8,
+    id: &str,
+    entry: &EncryptedProfile,
+) -> Result<Zeroizing<Vec<u8>>, IdentityError> {
+    let nonce = <&Nonce>::try_from(entry.nonce.as_slice())
+        .map_err(|_| IdentityError::Backend("invalid profile nonce length".into()))?;
+    cipher
+        .decrypt(
+            nonce,
+            Payload {
+                msg: &entry.ciphertext,
+                aad: &profile_aad(version, id),
+            },
+        )
+        .map(Zeroizing::new)
+        .map_err(|_| IdentityError::Backend("incorrect passphrase or corrupt profile".into()))
+}
+
+fn encrypt_profile(
+    cipher: &ChaCha20Poly1305,
+    id: &str,
+    plaintext: &[u8],
+) -> Result<EncryptedProfile, IdentityError> {
+    let nonce = random_bytes(NONCE_LEN);
+    let ciphertext = cipher
+        .encrypt(
+            <&Nonce>::try_from(nonce.as_slice()).expect("generated nonce length"),
+            Payload {
+                msg: plaintext,
+                aad: &profile_aad(FILE_VERSION, id),
+            },
+        )
+        .map_err(|error| IdentityError::Backend(format!("encrypt profile: {error}")))?;
+    Ok(EncryptedProfile { nonce, ciphertext })
 }
 
 fn tempfile_in_dir(dir: &Path) -> Result<PathBuf, IdentityError> {
@@ -264,11 +319,8 @@ impl IdentityStorage for PassphraseEncryptedStorage {
             .profiles
             .get(&id.0)
             .ok_or_else(|| IdentityError::Backend(format!("profile not found: {:?}", id)))?;
-        let nonce = &Nonce::try_from(&entry.nonce[..]).expect("fixed-length key material");
-        let plaintext_bytes = Zeroizing::new(
-            self.with_cipher(|cipher| cipher.decrypt(nonce, entry.ciphertext.as_slice()))?
-                .map_err(|_| IdentityError::Backend("decrypt profile failed".to_string()))?,
-        );
+        let plaintext_bytes =
+            self.with_cipher(|cipher| decrypt_profile(cipher, file.version, &id.0, entry))??;
         let mut plain: PlaintextProfile = serde_json::from_slice(&plaintext_bytes)
             .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
 
@@ -300,20 +352,21 @@ impl IdentityStorage for PassphraseEncryptedStorage {
             .map_err(|e| IdentityError::Backend(format!("encode plaintext: {e}")))?;
         drop(plain);
 
-        let nonce_bytes = random_bytes(NONCE_LEN);
-        let nonce = &Nonce::try_from(&nonce_bytes[..]).expect("fixed-length key material");
-        let ciphertext = self
-            .with_cipher(|cipher| cipher.encrypt(nonce, plaintext_bytes.as_slice()))?
-            .map_err(|e| IdentityError::Backend(format!("encrypt profile: {e}")))?;
-
         let mut file = self.load_file()?;
-        file.profiles.insert(
-            profile.id.0.clone(),
-            EncryptedProfile {
-                nonce: nonce_bytes,
-                ciphertext,
-            },
-        );
+        self.with_cipher(|cipher| -> Result<(), IdentityError> {
+            if file.version == 1 {
+                for (id, entry) in &mut file.profiles {
+                    let plaintext = decrypt_profile(cipher, 1, id, entry)?;
+                    *entry = encrypt_profile(cipher, id, &plaintext)?;
+                }
+                file.version = FILE_VERSION;
+            }
+            file.profiles.insert(
+                profile.id.0.clone(),
+                encrypt_profile(cipher, &profile.id.0, &plaintext_bytes)?,
+            );
+            Ok(())
+        })??;
         self.save_file(&file)
     }
 
@@ -332,11 +385,8 @@ impl IdentityStorage for PassphraseEncryptedStorage {
             // Decrypt to get display_name + slot count. This is N
             // decrypts per list call, fine for the expected profile
             // counts (handful) but worth caching if it ever matters.
-            let nonce = &Nonce::try_from(&entry.nonce[..]).expect("fixed-length key material");
-            let bytes = Zeroizing::new(
-                self.with_cipher(|cipher| cipher.decrypt(nonce, entry.ciphertext.as_slice()))?
-                    .map_err(|_| IdentityError::Backend("decrypt for list failed".to_string()))?,
-            );
+            let bytes =
+                self.with_cipher(|cipher| decrypt_profile(cipher, file.version, id_str, entry))??;
             let mut plain: PlaintextProfile = serde_json::from_slice(&bytes)
                 .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
             out.push(ProfileSummary {
@@ -386,6 +436,64 @@ mod tests {
         CredentialLineage, IdentitySlot, IdentityVault, ProtocolKey, SecretBytes, UnlockTier,
     };
     use tempfile::tempdir;
+
+    #[test]
+    fn saving_a_legacy_vault_upgrades_every_profile_without_changing_keys() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("vault.json");
+        let salt = random_bytes(ARGON2_SALT_LEN);
+        let kek = derive_kek(b"legacy fixture", &salt).unwrap();
+        let cipher = ChaCha20Poly1305::new(<&Key>::try_from(kek.as_slice()).unwrap());
+        let mut profiles = HashMap::new();
+        for (id, seed) in [("first", [0x71; 32]), ("second", [0x72; 32])] {
+            let plain = PlaintextProfile {
+                display_name: id.into(),
+                master_seed: seed,
+                slots: Vec::new(),
+            };
+            let bytes = personae::zeroizing_json::to_vec(&plain).unwrap();
+            let nonce = random_bytes(NONCE_LEN);
+            let ciphertext = cipher
+                .encrypt(
+                    <&Nonce>::try_from(nonce.as_slice()).unwrap(),
+                    bytes.as_slice(),
+                )
+                .unwrap();
+            profiles.insert(id.into(), EncryptedProfile { nonce, ciphertext });
+        }
+        std::fs::write(
+            &path,
+            serde_json::to_vec(&EncryptedFile {
+                version: 1,
+                salt,
+                profiles,
+            })
+            .unwrap(),
+        )
+        .unwrap();
+        let storage = PassphraseEncryptedStorage::open(&path, b"legacy fixture").unwrap();
+        let mut first = storage.load_profile(&ProfileId("first".into())).unwrap();
+        first.display_name = "Renamed".into();
+        storage.save_profile(&first).unwrap();
+        assert_eq!(storage.load_file().unwrap().version, FILE_VERSION);
+        let reopened = PassphraseEncryptedStorage::open(&path, b"legacy fixture").unwrap();
+        assert_eq!(
+            reopened
+                .load_profile(&first.id)
+                .unwrap()
+                .master
+                .public_key(),
+            first.master.public_key()
+        );
+        assert_eq!(
+            reopened
+                .load_profile(&ProfileId("second".into()))
+                .unwrap()
+                .master
+                .public_key(),
+            Ed25519Keypair::from_seed([0x72; 32]).public_key()
+        );
+    }
 
     fn nostr_slot() -> IdentitySlot {
         IdentitySlot::Direct {

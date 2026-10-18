@@ -221,3 +221,141 @@ fn add_ssh_refuses_unsignable_keys_with_the_reason() {
     }
     assert!(load(&storage, &id).unwrap().slots.is_empty());
 }
+
+fn mint_fixture(
+    policy: &personae::ssh_face::FacePolicy,
+) -> (crate::custody::InMemoryStorage, ProfileId) {
+    let (storage, id) = empty_vault();
+    add_ssh_key(&storage, &id, &fixture("ed25519"), UnlockTier::Session).unwrap();
+    let mut profile = load(&storage, &id).unwrap();
+    crate::custody::ssh_face::store_policy(&mut profile, policy).unwrap();
+    storage.save_profile(&profile).unwrap();
+    (storage, id)
+}
+
+fn mint_text(
+    storage: &dyn IdentityStorage,
+    id: &ProfileId,
+    flags: &[&str],
+) -> Result<String, String> {
+    let mut args = vec![
+        "ssh".to_string(),
+        "--principal".to_string(),
+        "t".to_string(),
+    ];
+    args.extend(flags.iter().map(|arg| arg.to_string()));
+    let mut out = Vec::new();
+    execute(storage, id, "InMemory", "mint", &args, &mut out)?;
+    Ok(String::from_utf8(out).unwrap())
+}
+
+#[test]
+fn mint_refuses_replacing_face_restrictions() {
+    let mut policy = personae::ssh_face::FacePolicy::burner("t", "uptime");
+    policy.source_address = Some("192.0.2.0/24".into());
+    let (storage, id) = mint_fixture(&policy);
+    let mut accepted = Vec::new();
+    for flags in [
+        ["--force-command", "/bin/sh"],
+        ["--force-command", ""],
+        ["--source-address", "0.0.0.0/0"],
+        ["--source-address", ""],
+    ] {
+        match mint_text(&storage, &id, &flags) {
+            Ok(_) => accepted.push(flags),
+            Err(err) => assert!(err.contains(flags[0]), "{err}"),
+        }
+    }
+    assert!(
+        accepted.is_empty(),
+        "accepted conflicting restrictions: {accepted:?}"
+    );
+    for flags in [
+        vec![],
+        vec![
+            "--force-command",
+            "uptime",
+            "--source-address",
+            "192.0.2.0/24",
+        ],
+    ] {
+        let text = mint_text(&storage, &id, &flags).unwrap();
+        let cert = ssh_key::Certificate::from_openssh(text.lines().next().unwrap()).unwrap();
+        assert_eq!(
+            cert.critical_options().get("force-command").unwrap(),
+            "uptime"
+        );
+        assert_eq!(
+            cert.critical_options().get("source-address").unwrap(),
+            "192.0.2.0/24"
+        );
+    }
+    let (storage, id) = mint_fixture(&personae::ssh_face::FacePolicy::work("t"));
+    let text = mint_text(
+        &storage,
+        &id,
+        &[
+            "--force-command",
+            "uptime",
+            "--source-address",
+            "192.0.2.0/24",
+        ],
+    )
+    .unwrap();
+    let cert = ssh_key::Certificate::from_openssh(text.lines().next().unwrap()).unwrap();
+    assert_eq!(
+        cert.critical_options().get("force-command").unwrap(),
+        "uptime"
+    );
+    assert_eq!(
+        cert.critical_options().get("source-address").unwrap(),
+        "192.0.2.0/24"
+    );
+}
+
+#[test]
+fn mint_reports_the_encoded_lifetime() {
+    let (storage, id) = mint_fixture(&personae::ssh_face::FacePolicy::work("t"));
+    let mut incorrect = Vec::new();
+    for hours in ["1", "24"] {
+        let text = mint_text(&storage, &id, &["--hours", hours]).unwrap();
+        let cert = ssh_key::Certificate::from_openssh(text.lines().next().unwrap()).unwrap();
+        let lifetime = cert.valid_before() - cert.valid_after();
+        assert!(lifetime <= personae::ssh_ca::MAX_CERT_TTL_MS / 1000);
+        if !text.contains(&format!("valid {lifetime}s")) {
+            incorrect.push((
+                hours.to_string(),
+                lifetime,
+                text.lines().last().unwrap().to_string(),
+            ));
+        }
+    }
+    assert!(
+        incorrect.is_empty(),
+        "incorrect validity reports: {incorrect:?}"
+    );
+}
+
+#[test]
+fn mint_refuses_duration_overflow() {
+    let (storage, id) = mint_fixture(&personae::ssh_face::FacePolicy::work("t"));
+    assert!(
+        mint_text(&storage, &id, &["--hours", &u64::MAX.to_string()])
+            .unwrap_err()
+            .contains("--hours")
+    );
+}
+
+#[test]
+fn load_reports_locked_storage_and_preserves_missing_profile_guidance() {
+    let (memory, id) = empty_vault();
+    let dir = tempfile::tempdir().unwrap();
+    let storage = crate::custody::SealedProfileStorage::open_with_key(dir.path(), [0x63; 32]);
+    storage.save_profile(&load(&memory, &id).unwrap()).unwrap();
+    storage.lock();
+    let err = load(&storage, &id).err().unwrap();
+    assert!(err.contains("locked"), "{err}");
+    assert!(!err.contains("no profiles"), "{err}");
+    let storage = crate::custody::InMemoryStorage::new();
+    assert!(load(&storage, &id).err().unwrap().contains("new-profile"));
+}

@@ -45,8 +45,8 @@ mod scripts {
         Ok(())
     }
 
-    pub(super) fn run(_: &str, _: &mut Engine<'_>) -> (bool, String) {
-        (false, "script: no script engine".into())
+    pub(super) fn run(_: &str, _: &mut Engine<'_>) -> Result<(bool, String), String> {
+        Err("script: no script engine".into())
     }
 }
 
@@ -171,7 +171,8 @@ pub enum Condition {
     },
     /// A script that returns a bool (Scenograph editor plan, SE92). With the
     /// `scripts` feature it runs through a `ValueEngine` under a fixed step
-    /// budget and sees only the globals listed on `RuleSet::resolve_with_scripts`.
+    /// budget with the occurrence globals listed on `RuleSet::resolve_with_scripts`
+    /// and the functions registered by the host.
     /// A script that fails, runs past its budget or returns anything else leaves
     /// its rule unmatched, with the reason in the trace.
     Script {
@@ -448,7 +449,8 @@ impl RuleSet {
                     Ok(())
                 };
                 match bound {
-                    Ok(()) => evaluate(&rule.condition, context, previously_matched, &mut engine),
+                    Ok(()) => evaluate(&rule.condition, context, previously_matched, &mut engine)
+                        .unwrap_or_else(|reason| (false, reason)),
                     Err(error) => (
                         false,
                         format!("script: could not bind the occurrence: {error}"),
@@ -588,8 +590,8 @@ fn evaluate(
     context: &Context,
     previously_matched: bool,
     engine: &mut scripts::Engine<'_>,
-) -> (bool, String) {
-    match condition {
+) -> Result<(bool, String), String> {
+    let result = match condition {
         Condition::Always => (true, "always".into()),
         Condition::State { state } => {
             let matched = context.states.contains(state);
@@ -659,6 +661,9 @@ fn evaluate(
                 .iter()
                 .map(|child| evaluate(child, context, previously_matched, engine))
                 .collect();
+            // Evaluate every child for the same engine/budget behavior as before,
+            // but keep failures distinct from a genuine false condition.
+            let results = results.into_iter().collect::<Result<Vec<_>, _>>()?;
             let all = matches!(condition, Condition::All { .. });
             let matched = if all {
                 results.iter().all(|result| result.0)
@@ -679,11 +684,12 @@ fn evaluate(
             )
         },
         Condition::Not { condition } => {
-            let (matched, reason) = evaluate(condition, context, previously_matched, engine);
+            let (matched, reason) = evaluate(condition, context, previously_matched, engine)?;
             (!matched, format!("not: {reason}"))
         },
-        Condition::Script { source } => scripts::run(source, engine),
-    }
+        Condition::Script { source } => return scripts::run(source, engine),
+    };
+    Ok(result)
 }
 
 fn contains_script(condition: &Condition) -> bool {

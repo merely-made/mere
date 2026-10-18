@@ -1,0 +1,150 @@
+{
+  "date_utc": "2026-10-18T00:50:41.388392+00:00",
+  "purpose": "Re-gate of the audit's uncommitted repair batch (23 repaired findings) on the fast-forwarded shared checkout, per ruling R1 in 2026-10-16_full_source_audit_plan.md, before landing it as one sweep commit.",
+  "working_head": "00db73992b977e3793940fe95af50fca520af172",
+  "toolchain": "1.99.1 (rust-toolchain.toml at HEAD; the audit's gates ran under 1.99.0, bumped upstream in e9df653a on 2026-10-17)",
+  "dirty_tree": {
+    "tracked_modified": 34,
+    "untracked_added": [
+      "crates/system/pandect/tests/image_migration_failure.rs",
+      "design_docs/mere_docs/implementation_strategy/2026-10-16_full_source_audit_plan.md",
+      "ports/djinn/castellan/tests/profile_storage.rs",
+      "ports/djinn/castellan/tests/wallet_authority.rs",
+      "support/receipts/authority-success-audit/audit_record_relocation_receipt.json",
+      "support/receipts/authority-success-audit/record_audit_record_relocation.py"
+    ]
+  },
+  "note_on_flags": "The audit's --offline could not be kept: the fast-forward repinned genet to 917f88e6, absent from the local git cache; --locked was kept. -j 1 was dropped on an otherwise idle machine.",
+  "gates": [
+    {
+      "gate": "chartulary_kernel",
+      "command": "cargo test -p chartulary -p mere-kernel --features mere-kernel/store --lib --tests --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "seconds": 677,
+      "passed": 556,
+      "failed": 0,
+      "ignored": 2,
+      "failed_tests": []
+    },
+    {
+      "gate": "pandect",
+      "command": "cargo test -p pandect --lib --tests --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "seconds": 90,
+      "passed": 354,
+      "failed": 0,
+      "ignored": 1,
+      "failed_tests": []
+    },
+    {
+      "gate": "castellan",
+      "command": "cargo test -p castellan --features keeper --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 1,
+      "seconds": 119,
+      "passed": 309,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": []
+    },
+    {
+      "gate": "scenograph_default",
+      "command": "cargo test -p scenograph --lib --tests --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "seconds": 20,
+      "passed": 48,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": []
+    },
+    {
+      "gate": "scenograph_scripts",
+      "command": "cargo test -p scenograph --features scripts --lib --tests --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "seconds": 21,
+      "passed": 52,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": []
+    },
+    {
+      "gate": "scenomise_authoring",
+      "command": "cargo test -p scenomise --features authoring --lib --tests --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 101,
+      "seconds": 18,
+      "passed": 217,
+      "failed": 2,
+      "ignored": 0,
+      "failed_tests": [
+        "metre_uses_supplied_stress_and_keeps_mismatches_visible",
+        "ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts"
+      ]
+    },
+    {
+      "gate": "rhai",
+      "command": "cargo test -p script-rhai --tests --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "seconds": 26,
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": []
+    },
+    {
+      "gate": "client_all",
+      "command": "cargo test -p graphshell-client --lib --tests --all-features --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 101,
+      "seconds": 55,
+      "passed": 91,
+      "failed": 1,
+      "ignored": 0,
+      "failed_tests": [
+        "a_fold_free_trace_writes_back_byte_identical"
+      ]
+    },
+    {
+      "gate": "djinn_bin",
+      "command": "cargo check -p djinn --features personal-sync --bin h4_identity_receipt --locked --target-dir C:/t/cargo-targets/mere --config build.build-dir=C:/t/cargo-targets/mere/build",
+      "exit_code": 0,
+      "seconds": 121,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "failed_tests": []
+    }
+  ],
+  "reds": {
+    "graphshell-client site_fold_parity::a_fold_free_trace_writes_back_byte_identical": "Q073, recorded by the audit on 2026-10-16 as a pre-existing exact-byte failure (sceno RoutedRelation serialization). Not the batch.",
+    "scenomise backdrop_scenes::metre_uses_supplied_stress_and_keeps_mismatches_visible, ::ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts": "Both tests were in the audit's scenomise gate basis 4523cb6f and passed there (226 green, 2026-10-16T22:13Z). Upstream 4c4ea11d (2026-10-17) added a metre.occurrences uniqueness check in backdrops.rs ahead of the marks check. The batch's only scenomise change is one line in opened_link::collect_entries plus tests. Reproduced on clean HEAD.",
+    "castellan vault_residue (no-residue scenario 'sealed profile storage')": "Deterministic (3/3 on the dirty tree, 1/1 on clean HEAD): freed uncleared master seed (raw) in an 88-byte block, allocated during switch_profile, freed at drop. The audit's castellan gate (commands_storage_repair_receipt.json, 2026-10-16T20:21Z) recorded the residue harness passing with byte-identical batch files; castellan source is unchanged upstream since; switch_profile is not in the batch. Toolchain 1.99.0 -> 1.99.1 is the one relevant change and is the suspect; a 1.99.0 control was not run here."
+  },
+  "residue_output": [
+    "     Running tests\\no_residue.rs (C:/t/cargo-targets/mere/build\\debug\\deps\\no_residue-0c513def2fd0ea43.exe)",
+    "positive control: uncleared raw found / uncleared decimal found / zeroized clean / live found",
+    "residue castellan resident locked: clean",
+    "no-residue: ok",
+    "     Running tests\\vault_residue.rs (C:/t/cargo-targets/mere/build\\debug\\deps\\vault_residue-d124bdcbd5ac1dc8.exe)",
+    "positive control: uncleared raw found / uncleared decimal found / zeroized clean / live found",
+    "residue sealed profile storage: 1 hit(s)",
+    "  freed uncleared master seed (raw) in a 88-byte block, phase drop (allocated in switch)",
+    "residue passphrase storage: clean",
+    "residue sealed vault locked: clean",
+    "residue passphrase vault locked: clean",
+    "residue authoritative store locked: clean",
+    "residue DPAPI root: clean",
+    "residue agent listing: clean",
+    "no-residue: FAILED (1 scenario(s) left key residue)",
+    "error: test failed, to rerun pass `-p castellan --test vault_residue`",
+    "  process didn't exit successfully: `C:/t/cargo-targets/mere/build\\debug\\deps\\vault_residue-d124bdcbd5ac1dc8.exe` (exit code: 1)"
+  ],
+  "clean_head_control": {
+    "method": "git worktree add --detach C:/t/wt-mere-clean HEAD; separate build dir C:/t/cargo-targets/mere-clean-check; both removed afterwards",
+    "results": [
+      "worktree at 00db73992b977e3793940fe95af50fca520af172 dirty=0",
+      "clean residue rc=1 82s residue sealed profile storage: 1 hit(s) no-residue: FAILED (1 scenario(s) left key residue) ",
+      "clean backdrop rc=101 21s test result: FAILED. 5 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s ",
+      "DONE"
+    ]
+  },
+  "verdict": "All three reds reproduce without the batch; the batch introduces no red. 1,665 test executions passed across the nine gates (castellan's 309 library and integration passes included), 3 failed, all pre-existing on main.",
+  "logs_retained": "not copied into the repository; summary and failure excerpts above are the record"
+}

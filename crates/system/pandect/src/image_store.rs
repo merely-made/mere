@@ -95,35 +95,33 @@ pub async fn migrate_legacy_images(
 ) -> Result<usize> {
     let mut written = 0usize;
     for node in &mut snapshot.nodes {
-        if let Some(png) = node.legacy_thumbnail_png.take() {
+        if let Some(png) = node.legacy_thumbnail_png.as_ref() {
             let image = save_image(
                 store,
-                &png,
+                png,
                 node.legacy_thumbnail_width,
                 node.legacy_thumbnail_height,
             )
             .await?;
             node.images.insert(ImageRole::Preview, image);
+            node.legacy_thumbnail_png = None;
             node.legacy_thumbnail_width = 0;
             node.legacy_thumbnail_height = 0;
             written += 1;
         }
         // The legacy favicon is raw RGBA; the store holds PNG.
-        if let Some(rgba) = node.legacy_favicon_rgba.take() {
+        if let Some(rgba) = node.legacy_favicon_rgba.as_ref() {
             let (w, h) = (node.legacy_favicon_width, node.legacy_favicon_height);
-            match encode_rgba_png(&rgba, w, h) {
+            match encode_rgba_png(rgba, w, h) {
                 Some(png) => {
                     let image = save_image(store, &png, w, h).await?;
                     node.images.insert(ImageRole::Favicon, image);
+                    node.legacy_favicon_rgba = None;
                     node.legacy_favicon_width = 0;
                     node.legacy_favicon_height = 0;
                     written += 1;
                 },
-                None => {
-                    // Put it back: an un-encodable favicon is a visible
-                    // leftover, not a silent loss.
-                    node.legacy_favicon_rgba = Some(rgba);
-                },
+                None => {},
             }
         }
     }
