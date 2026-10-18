@@ -1245,6 +1245,9 @@ where
                 {
                     #[cfg(target_os = "macos")]
                     trace_owned_macos_window(window, "unpresented redraw");
+                    if let Some(failure) = &self.s.last_presentation_failure {
+                        eprintln!("[cambium-host] unpresented refusal: {failure}");
+                    }
                     eprintln!(
                         "[cambium-host] unpresented redraw visible={:?} focused={} minimized={:?}",
                         window.is_visible(),
