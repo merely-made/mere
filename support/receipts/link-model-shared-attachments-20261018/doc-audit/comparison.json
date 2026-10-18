@@ -35,8 +35,8 @@
       "ambiguous_known_root_paths": 177,
       "ignored_known_root_patterns": 24,
       "reserved_identifier_paths": 31,
-      "missing_known_root_paths": 264,
-      "historical_missing_known_root_paths": 240,
+      "missing_known_root_paths": 262,
+      "historical_missing_known_root_paths": 239,
       "planned_missing_known_root_paths": 9,
       "invalid_historical_annotations": 0,
       "stale_historical_annotations": 4,
@@ -52,6 +52,5 @@
     "final_counts": {
       "errors": 20
     }
-  },
-  "raw_inventories_external": "/Users/markik/Code/testing/mere/shared-link-attachments-20261018/doc-audit"
+  }
 }
