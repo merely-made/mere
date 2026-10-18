@@ -710,7 +710,7 @@ engine adapters.
   source pair; CEF-enabled consumer, native and foreign accessibility gates
   stay distinct.)
 
-- **Pool workspace utility (2026-10-17):** Graphshell/Knot material-list prototype and the subsequent prompted design audit. The [active plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) records the editable nested-graph Swatch direction. A [mechanism audit](../validation/pool_20261017/mechanism-audit/receipt.json) checks existing nesting, Swatches, hierarchy and durable history (20 focused CPU tests); shared owner/session integration remains open. Prompts 33–35 select whole-Pool archive/undo, always-independent view navigation and temporary expansion reflow. The [original host receipt](../validation/pool_20261017/receipt.json) remains scoped to the prototype.
+- **Pool workspace utility (2026-10-17):** Graphshell/Knot material-list prototype and the subsequent prompted design audit. The [active plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#pool-workspace-utility) records the editable nested-graph Swatch direction. A [mechanism audit](../validation/pool_20261017/mechanism-audit/receipt.json) checks existing nesting, Swatches, hierarchy and durable history (20 focused CPU tests); shared owner/session integration remains open. Prompts 33–37 select whole-Pool archive/undo, always-independent view navigation, temporary expansion reflow, coordinated Move undo from either Pool and open item editors surviving membership removal. The [original host receipt](../validation/pool_20261017/receipt.json) remains scoped to the prototype.
 
 ## nematic_docs/ — the smolweb engine and knot composition
 
