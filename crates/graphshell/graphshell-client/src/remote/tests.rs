@@ -16,8 +16,8 @@ use chirograph::{
     CarrierRequestBody, CarrierResponse, CarrierResponseBody, ContentHash, EndpointDescriptor,
     IntentEffect, IntentReference, NativeGlyphV1, PresentationBinding, PresentationCapability,
     PresentationCodec, PresentationKey, PresentationManifest, PresentationOffer,
-    PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSnapshot,
-    ProtocolVersion, ResumeReply, SemanticRole,
+    PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSnapshot, ProtocolVersion,
+    ResumeReply, SemanticRole, SessionStatus,
 };
 use sceno::score::{Arrangement, Score};
 use sceno::{Footprint, ProjectedItem, Representation, Scene, Size2, SourceRef, Transform2};
@@ -192,11 +192,24 @@ impl Board {
                 };
                 Ok(CarrierResponseBody::Intent(result))
             },
-            CarrierRequestBody::Resume(_) => {
+            CarrierRequestBody::Resume(request) => {
                 self.log.push("resume");
-                Ok(CarrierResponseBody::Resume(ResumeReply::Snapshot(Box::new(
-                    self.snapshot(),
-                ))))
+                if request.session == self.session
+                    && request.epoch == SceneEpoch(1)
+                    && request.revision == Revision(self.revision)
+                {
+                    Ok(CarrierResponseBody::Resume(ResumeReply::Current(
+                        chirograph::ProjectionAck {
+                            session: self.session.clone(),
+                            epoch: SceneEpoch(1),
+                            revision: Revision(self.revision),
+                        },
+                    )))
+                } else {
+                    Ok(CarrierResponseBody::Resume(ResumeReply::Snapshot(
+                        Box::new(self.snapshot()),
+                    )))
+                }
             },
             other => Err(CarrierFailure {
                 message: format!("unsupported {other:?}"),
@@ -247,7 +260,9 @@ fn mounted() -> (RemoteSession, Board) {
 }
 
 fn cards(remote: &RemoteSession) -> usize {
-    remote.mounted().map_or(0, |mounted| mounted.scene.tables.items.len())
+    remote
+        .mounted()
+        .map_or(0, |mounted| mounted.scene.tables.items.len())
 }
 
 fn index_of(remote: &RemoteSession, intent: &str) -> usize {
@@ -271,7 +286,10 @@ fn joining_discovers_then_mounts() {
     assert_eq!(cards(&remote), 1);
     assert!(!remote.in_flight());
     assert_eq!(remote.label(), "Remote projection · 1 objects · revision 1");
-    assert_eq!(remote.selection(), ("Scripted board".into(), "board:one".into()));
+    assert_eq!(
+        remote.selection(),
+        ("Scripted board".into(), "board:one".into())
+    );
     assert_eq!(remote.card_labels(), vec!["Card 0".to_string()]);
     let events = remote.take_events();
     assert_eq!(
@@ -304,15 +322,25 @@ fn an_accepted_intent_polls_and_the_bell_resumes_with_a_snapshot() {
     assert!(remote.in_flight());
     pump(&mut remote, &mut board);
     assert_eq!(remote.form.status, "Accepted · 1 invocation(s)");
-    assert_eq!(remote.form.draft, None, "an answered intent closes its draft");
+    assert_eq!(
+        remote.form.draft, None,
+        "an answered intent closes its draft"
+    );
     assert_eq!(remote.revision(), Some(2));
     assert_eq!(cards(&remote), 2);
     assert_eq!(remote.last_resume(), "updated · 1 → 2");
     assert!(!remote.in_flight());
     let events = remote.take_events();
-    assert!(events.contains(&"remote-bell revision 2".to_string()), "{events:?}");
+    assert!(
+        events.contains(&"remote-bell revision 2".to_string()),
+        "{events:?}"
+    );
     assert_eq!(board.count("resume"), 1);
-    assert_eq!(board.count("discover"), 2, "discovery, then the poll after acceptance");
+    assert_eq!(
+        board.count("discover"),
+        2,
+        "discovery, then the poll after acceptance"
+    );
 }
 
 #[test]
@@ -327,7 +355,11 @@ fn a_rejected_intent_resnapshots_and_rings_no_bell() {
     );
     assert_eq!(remote.revision(), Some(1));
     assert_eq!(cards(&remote), 1);
-    assert_eq!(board.count("snapshot"), 2, "the mount, then the measurement");
+    assert_eq!(
+        board.count("snapshot"),
+        2,
+        "the mount, then the measurement"
+    );
     assert!(
         !remote
             .take_events()
@@ -342,11 +374,18 @@ fn a_bounded_action_waits_for_its_values() {
     let (mut remote, mut board) = mounted();
     remote.invoke_action(index_of(&remote, CHOOSE));
     assert_eq!(remote.form.status, "Choose values · Choose a colour");
-    assert!(remote.take_outgoing().is_empty(), "nothing is sent for a form");
+    assert!(
+        remote.take_outgoing().is_empty(),
+        "nothing is sent for a form"
+    );
     assert!(!remote.in_flight());
 
     remote.form.choose("colour", "green");
-    assert!(remote.form.status.starts_with("Choose values ·"), "{}", remote.form.status);
+    assert!(
+        remote.form.status.starts_with("Choose values ·"),
+        "{}",
+        remote.form.status
+    );
     remote.form.choose("colour", "red");
     assert_eq!(remote.form.status, "Selected colour");
     remote.submit_draft();
@@ -382,7 +421,11 @@ fn a_stale_position_is_answered_as_stale_and_the_bell_still_resumes() {
     remote.submit_draft();
     pump(&mut remote, &mut board);
     assert_eq!(remote.form.status, "Stale · host at 2 · reopen the action");
-    assert_eq!(remote.revision(), Some(2), "the bell after the answer resumed");
+    assert_eq!(
+        remote.revision(),
+        Some(2),
+        "the bell after the answer resumed"
+    );
     assert!(!remote.in_flight());
 }
 
@@ -395,6 +438,7 @@ fn reconnect_keeps_the_mount_and_resumes_the_missed_change_with_a_snapshot() {
     remote.take_events();
 
     remote.disconnect();
+    remote.disconnect(); // Repeated terminal requests leave the retained core safe.
     assert_eq!(remote.status(), "disconnecting");
     assert!(remote.in_flight(), "the close has not landed");
     assert!(!remote.driver().is_awaiting());
@@ -415,11 +459,145 @@ fn reconnect_keeps_the_mount_and_resumes_the_missed_change_with_a_snapshot() {
     assert_eq!(remote.revision(), Some(3));
     assert_eq!(cards(&remote), 3);
     assert_eq!(remote.last_resume(), "updated · 2 → 3");
-    assert_eq!(board.count("snapshot"), 1, "the mount was kept, never re-taken");
+    assert_eq!(
+        board.count("snapshot"),
+        1,
+        "the mount was kept, never re-taken"
+    );
     assert!(!remote.in_flight());
     let events = remote.take_events();
-    assert!(events.contains(&"remote-rejoined".to_string()), "{events:?}");
-    assert!(events.contains(&"remote-bell revision 3".to_string()), "{events:?}");
+    assert!(
+        events.contains(&"remote-rejoined".to_string()),
+        "{events:?}"
+    );
+    assert!(
+        events.contains(&"remote-bell revision 3".to_string()),
+        "{events:?}"
+    );
+}
+
+#[test]
+fn reconnect_confirms_an_unchanged_retained_session_as_live() {
+    let (mut remote, mut board) = mounted();
+    let session = remote.session().unwrap().clone();
+    remote.disconnect();
+    remote.channel_closed();
+
+    remote.reconnecting();
+    remote.rejoined();
+    pump(&mut remote, &mut board);
+
+    assert_eq!(remote.status(), "open");
+    assert_eq!(remote.revision(), Some(1));
+    assert_eq!(
+        remote.client().unwrap().mounted(&session).unwrap().status,
+        SessionStatus::Live
+    );
+    assert!(!remote.in_flight());
+    assert_eq!(
+        board.count("resume"),
+        1,
+        "rediscovery is followed by checked resume"
+    );
+    assert_eq!(
+        board.count("snapshot"),
+        1,
+        "Current needs no replacement snapshot"
+    );
+}
+
+#[test]
+fn transport_termination_clears_wire_work_and_keeps_the_scene_disconnected() {
+    let (mut remote, _board) = mounted();
+    let session = remote.session().unwrap().clone();
+    remote.invoke_action(index_of(&remote, APPEND));
+    assert!(remote.driver().is_awaiting());
+    assert_eq!(
+        remote.outbox.len(),
+        1,
+        "the request is queued for the old channel"
+    );
+    remote.on_line(
+        &serde_json::to_string(&CarrierOutput::Notice(CarrierNotice {
+            session: session.clone(),
+            epoch: SceneEpoch(1),
+            revision: Revision(2),
+        }))
+        .unwrap(),
+    );
+    assert_eq!(remote.driver().queued_notices(), 1);
+
+    remote.channel_closed();
+    remote.channel_closed(); // Terminal cleanup is idempotent.
+    assert!(!remote.in_flight());
+    assert_eq!(remote.pending(), None);
+    assert!(!remote.driver().core().unwrap().is_awaiting());
+    assert_eq!(remote.driver().queued_notices(), 0);
+    let mounted = remote.client().unwrap().mounted(&session).unwrap();
+    assert_eq!(mounted.status, SessionStatus::Disconnected);
+    assert!(
+        !mounted.scene.tables.items.is_empty(),
+        "the retained scene remains visible"
+    );
+    assert!(
+        remote.take_outgoing().is_empty(),
+        "old transport work was discarded"
+    );
+
+    // The same retained core can rediscover on a new link and return to live.
+    let mut board = Board::new();
+    remote.reconnecting();
+    remote.rejoined();
+    pump(&mut remote, &mut board);
+    assert_eq!(remote.status(), "open");
+    assert_eq!(
+        remote.client().unwrap().mounted(&session).unwrap().status,
+        SessionStatus::Live
+    );
+}
+
+#[test]
+fn a_transport_failure_clears_driver_work_and_disconnects_the_mount() {
+    let (mut remote, _board) = mounted();
+    let session = remote.session().unwrap().clone();
+    remote.invoke_action(index_of(&remote, APPEND));
+    assert!(remote.driver().is_awaiting());
+    remote.link_failed("connection reset");
+    assert!(!remote.in_flight());
+    assert_eq!(remote.pending(), None);
+    assert_eq!(remote.status(), "error: connection reset");
+    let mounted = remote.client().unwrap().mounted(&session).unwrap();
+    assert_eq!(mounted.status, SessionStatus::Disconnected);
+    assert!(!mounted.scene.tables.items.is_empty());
+
+    // The sender closes the channel after reporting its failure; the receive
+    // pump's reasonless close callback must not replace that first diagnosis.
+    remote.channel_closed();
+    assert_eq!(remote.status(), "error: connection reset");
+    assert!(!remote.in_flight());
+    assert_eq!(
+        remote.client().unwrap().mounted(&session).unwrap().status,
+        SessionStatus::Disconnected
+    );
+}
+
+#[test]
+fn a_reconnected_transport_can_report_a_new_failure() {
+    let (mut remote, _board) = mounted();
+    remote.link_failed("first connection reset");
+    remote.channel_closed();
+    assert_eq!(remote.status(), "error: first connection reset");
+
+    remote.reconnecting();
+    remote.rejoined();
+    let mut board = Board::new();
+    pump(&mut remote, &mut board);
+    assert_eq!(remote.status(), "open");
+
+    remote.link_failed("second connection reset");
+    remote.channel_closed();
+    assert_eq!(remote.status(), "error: second connection reset");
+    assert!(!remote.in_flight());
 }
 
 #[test]
@@ -504,7 +682,10 @@ fn local_actions_are_listed_and_run_by_the_host_never_the_carrier() {
     impl LocalActions for Viewer {
         fn actions(&self, item: &crate::LocalActionTarget<'_>) -> Vec<AdvertisedAction> {
             if item.instance == InstanceId(0) {
-                vec![action(APPEND, "Append here", false), action("viewer/pin", "Pin", false)]
+                vec![
+                    action(APPEND, "Append here", false),
+                    action("viewer/pin", "Pin", false),
+                ]
             } else {
                 Vec::new()
             }
@@ -528,11 +709,20 @@ fn local_actions_are_listed_and_run_by_the_host_never_the_carrier() {
     };
     let tree = remote.accessibility_tree_with(&viewer).expect("mounted");
     let card = &tree.children[0];
-    let local: Vec<_> = card.local_actions.iter().map(|a| a.intent.0.as_str()).collect();
+    let local: Vec<_> = card
+        .local_actions
+        .iter()
+        .map(|a| a.intent.0.as_str())
+        .collect();
     assert_eq!(local, [APPEND, "viewer/pin"]);
-    assert!(card.actions.iter().any(|a| a.intent.0 == APPEND), "the endpoint's own");
     assert!(
-        remote.accessibility_tree_with(&crate::NoLocalActions).is_some_and(|tree| tree.children[0].local_actions.is_empty()),
+        card.actions.iter().any(|a| a.intent.0 == APPEND),
+        "the endpoint's own"
+    );
+    assert!(
+        remote
+            .accessibility_tree_with(&crate::NoLocalActions)
+            .is_some_and(|tree| tree.children[0].local_actions.is_empty()),
         "without a host, no local actions"
     );
 
@@ -540,16 +730,30 @@ fn local_actions_are_listed_and_run_by_the_host_never_the_carrier() {
         remote.invoke_local(InstanceId(0), &IntentReference(APPEND.into()), &mut viewer),
         Ok(true)
     );
-    assert!(remote.take_outgoing().is_empty(), "nothing written for the endpoint");
+    assert!(
+        remote.take_outgoing().is_empty(),
+        "nothing written for the endpoint"
+    );
     assert!(!remote.in_flight());
-    assert_eq!(viewer.invoked, [(InstanceId(0), APPEND.to_string(), Some("board".into()))]);
+    assert_eq!(
+        viewer.invoked,
+        [(InstanceId(0), APPEND.to_string(), Some("board".into()))]
+    );
     assert_eq!(cards(&remote), 1, "the endpoint did not append");
     assert_eq!(
-        remote.invoke_local(InstanceId(0), &IntentReference("viewer/drag".into()), &mut viewer),
+        remote.invoke_local(
+            InstanceId(0),
+            &IntentReference("viewer/drag".into()),
+            &mut viewer
+        ),
         Err(LocalActionError::NotListed)
     );
     assert_eq!(
-        remote.invoke_local(InstanceId(7), &IntentReference("viewer/pin".into()), &mut viewer),
+        remote.invoke_local(
+            InstanceId(7),
+            &IntentReference("viewer/pin".into()),
+            &mut viewer
+        ),
         Err(LocalActionError::UnknownItem)
     );
     assert_eq!(viewer.invoked.len(), 1, "refusals call no handler");

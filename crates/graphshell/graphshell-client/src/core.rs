@@ -89,6 +89,17 @@ impl<T> Progress<T> {
     }
 }
 
+/// Whether a returned resource is the exact, content-addressed resource the
+/// current operation asked for.
+fn response_matches_resource_request(
+    response: &ResourceResponse,
+    request: &ResourceRequest,
+) -> bool {
+    response.session == request.session
+        && response.resource == request.resource
+        && response.has_valid_address()
+}
+
 /// What an operation produced when it finished.
 ///
 /// One enum rather than a generic, because a driver holds an in-flight
@@ -129,6 +140,7 @@ enum Pending {
     Resolve {
         session: ProjectionSession,
         instance: InstanceId,
+        request: ResourceRequest,
     },
     MediaResource {
         request: ResourceRequest,
@@ -215,6 +227,7 @@ impl SessionCore {
     /// The scene is kept rather than dropped: a host still wants to show what
     /// was there, it just must not offer to save into it.
     pub fn disconnect(&mut self) {
+        self.pending = None;
         for session in self.mounted.iter() {
             self.client.mark_disconnected(session);
         }
@@ -286,6 +299,7 @@ impl SessionCore {
                 Pending::Resolve {
                     session: session.clone(),
                     instance,
+                    request: request.clone(),
                 },
                 CarrierRequestBody::Resource(request),
             )),
@@ -451,6 +465,31 @@ impl SessionCore {
         self.resume_step(notice, 0)
     }
 
+    /// Ask the endpoint to confirm or advance a retained session after a
+    /// reconnect, even when the link delivered no revision notice.
+    pub fn resume_session(
+        &mut self,
+        session: &ProjectionSession,
+    ) -> Result<Progress<Outcome>, String> {
+        let request = self
+            .client
+            .resume_request(session)
+            .ok_or_else(|| format!("Graphshell did not acknowledge {}", session.0))?;
+        let notice = CarrierNotice {
+            session: request.session.clone(),
+            epoch: request.epoch,
+            revision: request.revision,
+        };
+        self.client.mark_stale(session);
+        Ok(self.begin(
+            Pending::Resume {
+                notice,
+                attempts: 0,
+            },
+            CarrierRequestBody::Resume(request),
+        ))
+    }
+
     /// Discover again on a session that already exists.
     ///
     /// A reconnect is a new link to the same endpoint, and the first thing
@@ -516,8 +555,17 @@ impl SessionCore {
                 },
                 other => Err(unexpected("snapshot", &other)),
             },
-            Pending::Resolve { session, instance } => match body {
+            Pending::Resolve {
+                session,
+                instance,
+                request,
+            } => match body {
                 CarrierResponseBody::Resource(response) => {
+                    if !response_matches_resource_request(&response, &request) {
+                        return Err(
+                            "The resource response has another scope or content address.".into(),
+                        );
+                    }
                     self.client
                         .apply_resource(response)
                         .map_err(|error| format!("resource was rejected: {error:?}"))?;
@@ -528,10 +576,7 @@ impl SessionCore {
             },
             Pending::MediaResource { request } => match body {
                 CarrierResponseBody::Resource(response) => {
-                    if response.session != request.session
-                        || response.resource != request.resource
-                        || !response.has_valid_address()
-                    {
+                    if !response_matches_resource_request(&response, &request) {
                         return Err(
                             "The media response has another scope or content address.".into()
                         );
@@ -797,18 +842,32 @@ mod tests {
         });
         presentation.offers.insert(
             key,
-            vec![PresentationOffer {
-                codec: PresentationCodec::PortableCardV1,
-                resource: chirograph::ContentHash::of(&card),
-                byte_size: card.len() as u64,
-                requires: PresentationCapability::PortableCard,
-                semantics: PresentationSemantics {
-                    label: "Session".into(),
-                    role: SemanticRole::Article,
-                    bounds: BoundsRelationship::FillFootprint,
-                    actions: vec![],
+            vec![
+                PresentationOffer {
+                    codec: PresentationCodec::PortableCardV1,
+                    resource: chirograph::ContentHash::of(&card),
+                    byte_size: card.len() as u64,
+                    requires: PresentationCapability::PortableCard,
+                    semantics: PresentationSemantics {
+                        label: "Session".into(),
+                        role: SemanticRole::Article,
+                        bounds: BoundsRelationship::FillFootprint,
+                        actions: vec![],
+                    },
                 },
-            }],
+                PresentationOffer {
+                    codec: PresentationCodec::NativeGlyphV1,
+                    resource: chirograph::ContentHash::of(b"other advertised resource"),
+                    byte_size: b"other advertised resource".len() as u64,
+                    requires: PresentationCapability::NativeGlyph,
+                    semantics: PresentationSemantics {
+                        label: "Other representation".into(),
+                        role: SemanticRole::Graphic,
+                        bounds: BoundsRelationship::FillFootprint,
+                        actions: vec![],
+                    },
+                },
+            ],
         );
         let _ = core.mount(0).unwrap();
         let _ = core
@@ -870,6 +929,77 @@ mod tests {
                 .contains_key(&(session, chirograph::ContentHash::of(&media)))
         );
     }
+
+    #[test]
+    fn resolve_rejects_an_advertised_resource_other_than_the_one_requested() {
+        let (mut core, session, _card, _media) = media_core();
+        let _ = core.resolve(&session, InstanceId(0)).unwrap();
+        let response =
+            ResourceResponse::new(session.clone(), b"other advertised resource".to_vec());
+        let error = core
+            .on_response(CarrierResponseBody::Resource(response))
+            .expect_err("a valid but unrequested resource must be refused");
+        assert!(
+            error.contains("another scope or content address"),
+            "{error}"
+        );
+        assert!(
+            !core.is_awaiting(),
+            "the refusal starts no follow-up request"
+        );
+        assert!(!core.client.resources.contains_key(&(
+            session,
+            chirograph::ContentHash::of(b"other advertised resource")
+        )));
+    }
+
+    #[test]
+    fn resolve_rejects_the_requested_resource_from_another_session() {
+        let (mut core, session, card, _) = media_core();
+        let _ = core.resolve(&session, InstanceId(0)).unwrap();
+        let response = ResourceResponse::new(ProjectionSession("another-session".into()), card);
+
+        let error = core
+            .on_response(CarrierResponseBody::Resource(response))
+            .expect_err("the exact requested resource from another session must be refused");
+        assert!(
+            error.contains("another scope or content address"),
+            "{error}"
+        );
+        assert!(
+            !core.is_awaiting(),
+            "the refusal starts no follow-up request"
+        );
+        assert!(
+            core.client.resources.is_empty(),
+            "wrong-session bytes are never cached"
+        );
+    }
+
+    #[test]
+    fn resolve_rejects_bytes_that_do_not_match_the_requested_content_address() {
+        let (mut core, session, card, _) = media_core();
+        let _ = core.resolve(&session, InstanceId(0)).unwrap();
+        let mut response = ResourceResponse::new(session.clone(), card);
+        response.bytes.push(0);
+
+        let error = core
+            .on_response(CarrierResponseBody::Resource(response))
+            .expect_err("bytes that do not match the requested hash must be refused");
+        assert!(
+            error.contains("another scope or content address"),
+            "{error}"
+        );
+        assert!(
+            !core.is_awaiting(),
+            "the refusal starts no follow-up request"
+        );
+        assert!(
+            core.client.resources.is_empty(),
+            "corrupt bytes are never cached"
+        );
+    }
+
     #[test]
     fn media_refuses_wrong_scope_wrong_hash_and_corrupted_bytes() {
         for failure in 0..3 {
