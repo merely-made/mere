@@ -9,7 +9,8 @@
 //! PaintList lowering. This module retains that packet plus viewport scroll
 //! and exposes the existing session API to Pelt and Mere.
 
-use std::collections::HashMap;
+use document_canvas::{DictionaryBlob, SegmenterDictionaries};
+use std::collections::{HashMap, HashSet};
 use std::io::Cursor;
 use std::sync::Arc;
 
@@ -82,6 +83,8 @@ pub struct SmolwebDocument {
     layout: Option<LaidOutDocument>,
     fonts: Vec<Vec<u8>>,
     generic_fonts: Vec<(String, Vec<u8>)>,
+    /// Segmenter dictionaries the host has loaded; shared, never fetched here.
+    dictionaries: Vec<DictionaryBlob>,
     size: (u32, u32),
     scroll_x: f32,
     scroll_y: f32,
@@ -101,6 +104,8 @@ pub struct SmolwebDocument {
     /// Counts layouts built, so the accessibility projection's revision
     /// changes with every new geometry.
     layout_generation: u64,
+    /// Last paint admission refusal for the infallible document-session API.
+    last_render_error: Option<String>,
 }
 
 /// One in-page activation, queued for the host to drain and reflect in its
@@ -251,6 +256,7 @@ impl SmolwebDocument {
             layout: None,
             fonts: Vec::new(),
             generic_fonts: Vec::new(),
+            dictionaries: Vec::new(),
             size: (0, 0),
             scroll_x: 0.0,
             scroll_y: 0.0,
@@ -260,6 +266,7 @@ impl SmolwebDocument {
             in_page: Vec::new(),
             pending_reveal: None,
             layout_generation: 0,
+            last_render_error: None,
         }
     }
 
@@ -325,11 +332,9 @@ impl SmolwebDocument {
             self.folds = FoldState::default();
             self.focus = None;
         }
-        self.images.retain(|url, _| {
-            document.blocks.iter().any(
-                |block| matches!(block, Block::Image { url: image_url, .. } if image_url == url),
-            )
-        });
+        let retained_images: HashSet<_> = image_urls(&document.blocks).into_iter().collect();
+        self.images
+            .retain(|url, _| retained_images.contains(url.as_str()));
         self.document = Arc::new(document);
         self.pending_reveal = None;
         self.invalidate_layout();
@@ -584,13 +589,9 @@ impl SmolwebDocument {
 
     /// Unresolved inline-image URLs for the host fetch actor.
     pub fn subresources(&self) -> Vec<String> {
-        self.document
-            .blocks
-            .iter()
-            .filter_map(|block| match block {
-                Block::Image { url, .. } if !self.images.contains_key(url) => Some(url.clone()),
-                _ => None,
-            })
+        image_urls(&self.document.blocks)
+            .into_iter()
+            .filter(|url| !self.images.contains_key(url))
             .collect()
     }
 
@@ -642,6 +643,37 @@ impl SmolwebDocument {
         Ok(true)
     }
 
+    /// Replace the host's segmenter dictionaries. The current layout is redone
+    /// only when its text wanted one of them.
+    pub fn set_segmenter_dictionaries(&mut self, dictionaries: Vec<DictionaryBlob>) {
+        let brought = dictionaries
+            .iter()
+            .fold(SegmenterDictionaries::default(), |held, blob| {
+                let carried = blob.dictionaries();
+                SegmenterDictionaries {
+                    southeast_asian: held.southeast_asian || carried.southeast_asian,
+                    chinese_japanese: held.chinese_japanese || carried.chinese_japanese,
+                }
+            });
+        let wanted = self.wanted_segmenter_dictionaries();
+        self.dictionaries = dictionaries;
+        if (wanted.southeast_asian && brought.southeast_asian)
+            || (wanted.chinese_japanese && brought.chinese_japanese)
+        {
+            self.layout = None;
+            self.presented = false;
+        }
+    }
+
+    /// Dictionaries the current layout's text met without: what the host
+    /// should fetch and hand to [`Self::set_segmenter_dictionaries`].
+    pub fn wanted_segmenter_dictionaries(&self) -> SegmenterDictionaries {
+        self.layout
+            .as_ref()
+            .map(|layout| layout.wanted_dictionaries)
+            .unwrap_or_default()
+    }
+
     fn ensure_layout(&mut self, width: u32, height: u32) {
         let size = (width.max(1), height.max(1));
         if self.layout.is_some() && self.size == size {
@@ -660,6 +692,7 @@ impl SmolwebDocument {
                 &self.folds,
                 &self.fonts,
                 &self.generic_fonts,
+                &self.dictionaries,
             )
             .expect("admitted generic font ledger"),
         );
@@ -685,8 +718,13 @@ impl SmolwebDocument {
         (layout.packet.content_bounds.size.height - self.size.1 as f32).max(0.0)
     }
 
+    /// Last paint refusal in this retained session, if any.
+    pub fn last_render_error(&self) -> Option<&str> {
+        self.last_render_error.as_deref()
+    }
+
     /// Paint the visible document band at the retained scroll offset.
-    pub fn frame(&mut self, width: u32, height: u32) -> Scene {
+    pub fn try_frame(&mut self, width: u32, height: u32) -> Result<Scene, String> {
         self.ensure_layout(width, height);
         let layout = self.layout.as_ref().expect("layout built above");
         let packet = layout.packet.window_rect(
@@ -695,8 +733,19 @@ impl SmolwebDocument {
             self.size.0 as f32,
             self.size.1 as f32,
         );
-        let mut scene =
-            scene_from_packet_with_images(&packet, &layout.fonts, &self.style.colors, &self.images);
+        let mut scene = match scene_from_packet_with_images(
+            &packet,
+            &layout.fonts,
+            &self.style.colors,
+            &self.images,
+        ) {
+            Ok(scene) => scene,
+            Err(error) => {
+                self.last_render_error = Some(error.to_string());
+                self.presented = false;
+                return Err(error.to_string());
+            },
+        };
         self.paint_focus(&mut scene);
         scene.push_rect(
             0.0,
@@ -708,7 +757,16 @@ impl SmolwebDocument {
         let background = scene.ops.pop().expect("push_rect appended an op");
         scene.ops.insert(0, background);
         self.presented = true;
-        scene
+        self.last_render_error = None;
+        Ok(scene)
+    }
+
+    /// Compatibility frame for `DocumentSession<Scene>` callers. A refused
+    /// paint is exposed through `last_render_error` and never presented as
+    /// partially translated content.
+    pub fn frame(&mut self, width: u32, height: u32) -> Scene {
+        self.try_frame(width, height)
+            .unwrap_or_else(|_| Scene::new(width, height))
     }
 
     /// Move the single host-owned document viewport.
@@ -902,6 +960,36 @@ impl SmolwebDocument {
             .packet
             .interaction_at(x + self.scroll_x, y + self.scroll_y)
     }
+}
+
+/// Collect image resources from every structural block shape in document
+/// order. Keeping this traversal shared ensures discovery, admission, and
+/// replacement retention agree about which images belong to the document.
+fn image_urls(blocks: &[Block]) -> Vec<String> {
+    fn visit(blocks: &[Block], seen: &mut HashSet<String>, urls: &mut Vec<String>) {
+        for block in blocks {
+            match block {
+                Block::Image { url, .. } => {
+                    if seen.insert(url.clone()) {
+                        urls.push(url.clone());
+                    }
+                },
+                Block::Presented { block, .. } => visit(std::slice::from_ref(block), seen, urls),
+                Block::Quote { blocks } => visit(blocks, seen, urls),
+                Block::List { items, .. } => {
+                    for item in items {
+                        visit(item, seen, urls);
+                    }
+                },
+                _ => {},
+            }
+        }
+    }
+
+    let mut seen = HashSet::new();
+    let mut urls = Vec::new();
+    visit(blocks, &mut seen, &mut urls);
+    urls
 }
 
 /// The scroll offset that brings `start..end` into a viewport of `extent`,
@@ -1201,6 +1289,63 @@ mod tests {
             Some(InteractionKind::Link { url })
                 if url == "gemini://x.test/posts/media/picture.png"
         ));
+    }
+
+    #[test]
+    fn nested_image_resources_are_deduplicated_admitted_and_retained_by_replacement() {
+        let mut doc = SmolwebDocument::parse_with_inline_media(
+            "gemini://x.test/nested",
+            "",
+            SmolwebTheme::Plain,
+            SmolwebInlineMediaPolicy::images(),
+        );
+        let image = |url: &str| Block::Image {
+            url: url.into(),
+            alt: String::new(),
+        };
+        let shared = "gemini://x.test/shared.png";
+        let removed = "gemini://x.test/removed.png";
+        let added = "gemini://x.test/added.png";
+        let mut initial = (*doc.document).clone();
+        initial.blocks = vec![
+            Block::Quote {
+                blocks: vec![image(shared)],
+            },
+            Block::List {
+                ordered: false,
+                items: vec![vec![image(shared), image(removed)]],
+            },
+            Block::Presented {
+                presentation: Default::default(),
+                block: Box::new(image(added)),
+            },
+        ];
+        doc.replace_document(initial);
+
+        assert_eq!(doc.subresources(), [shared, removed, added]);
+        assert!(doc.provide_subresource(shared, &test_png()));
+        assert!(doc.provide_subresource(removed, &test_png()));
+        assert!(!doc.provide_subresource("gemini://x.test/unknown.png", &test_png()));
+
+        let mut replacement = (*doc.document).clone();
+        replacement.blocks = vec![Block::List {
+            ordered: true,
+            items: vec![vec![
+                Block::Presented {
+                    presentation: Default::default(),
+                    block: Box::new(image(shared)),
+                },
+                image(shared),
+                image(added),
+            ]],
+        }];
+        doc.replace_document(replacement);
+
+        assert!(doc.images.contains_key(shared));
+        assert!(!doc.images.contains_key(removed));
+        assert_eq!(doc.subresources(), [added]);
+        assert!(doc.provide_subresource(added, &test_png()));
+        assert!(doc.subresources().is_empty());
     }
 
     #[test]

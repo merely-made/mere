@@ -1,0 +1,104 @@
+{
+  "process_records": [
+    {
+      "record": "bindgen-final.json",
+      "exit_code": 0,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "boundaries-final-2.json",
+      "exit_code": 0,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "boundaries-final.json",
+      "exit_code": 0,
+      "revision": "c8ed74f9b86ff17c5cae8609a842ed88f1534363"
+    },
+    {
+      "record": "canvas-final-1.json",
+      "exit_code": 101,
+      "revision": "0c655b16c31aa10e492fb4b361afb5d2631323da"
+    },
+    {
+      "record": "canvas-final-2.json",
+      "exit_code": 101,
+      "revision": "d571582966855fa26def75ae21a62c6e2ba70bbd"
+    },
+    {
+      "record": "canvas-final-3.json",
+      "exit_code": 0,
+      "revision": "c8ed74f9b86ff17c5cae8609a842ed88f1534363"
+    },
+    {
+      "record": "canvas-final-4.json",
+      "exit_code": 101,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "canvas-final-5.json",
+      "exit_code": 101,
+      "revision": "f9b7ceb8ac8bd2953309f560e9b0f937f51ea52a"
+    },
+    {
+      "record": "focused-1.json",
+      "exit_code": 101,
+      "revision": "908283728479cf3b9a666a68b9e360418b46301b"
+    },
+    {
+      "record": "focused-2.json",
+      "exit_code": 101,
+      "revision": "908283728479cf3b9a666a68b9e360418b46301b"
+    },
+    {
+      "record": "focused-3.json",
+      "exit_code": 101,
+      "revision": "908283728479cf3b9a666a68b9e360418b46301b"
+    },
+    {
+      "record": "focused-4.json",
+      "exit_code": 0,
+      "revision": "908283728479cf3b9a666a68b9e360418b46301b"
+    },
+    {
+      "record": "graphshell-final-2.json",
+      "exit_code": 0,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "graphshell-final.json",
+      "exit_code": 0,
+      "revision": "c8ed74f9b86ff17c5cae8609a842ed88f1534363"
+    },
+    {
+      "record": "graphshell-trial-1.json",
+      "exit_code": 0,
+      "revision": "9b8c161a831aa9615c84a4bbfaea9b15021e3659"
+    },
+    {
+      "record": "precision-focused.json",
+      "exit_code": 0,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "viewer-final.json",
+      "exit_code": 0,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "wasm-final-2.json",
+      "exit_code": 0,
+      "revision": "1e9d95da599322921b96febac1089d1662201849"
+    },
+    {
+      "record": "wasm-final.json",
+      "exit_code": 101,
+      "revision": "c8ed74f9b86ff17c5cae8609a842ed88f1534363"
+    }
+  ],
+  "browser_attempts": [
+    "browser-first/browser-qualified/p4_tree_link_attachments/result.json",
+    "reopen-first/p4_tree_link_attachments_reopen/result.json"
+  ],
+  "large_first_package_retained_external": true
+}

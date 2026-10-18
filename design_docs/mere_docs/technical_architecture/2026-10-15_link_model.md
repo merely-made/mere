@@ -485,6 +485,13 @@ Current implementation boundaries:
   response. Pictograph adapts shared link readings and Graphshell supplies the
   reference host. The implementation plan owns its bounds and visual evidence;
   the declarations alone do not install a response law.
+- **Pictograph's `NodeBillboard` owns projected outer-body geometry**
+  (`crates/canvas/pictograph/src/canvas/node_billboard.rs`). Rendering, visual
+  selection and path attachment use its camera projection, grammar scale,
+  outline and lift. Flat paths meet the body silhouette; raised paths meet the
+  stem's ground foot. The inset icon and physical collider remain distinct
+  geometries with their existing owners. Unsafe attachment retains resting
+  geometry and reports a presentation fallback; it never changes source facts.
 - **One spring per link** can separately replace N spring slots per visible
   row (`seiche_bridge.rs`) when that law is selected. With additive linear
   stiffness contributions and a common rest length, an assertion has an

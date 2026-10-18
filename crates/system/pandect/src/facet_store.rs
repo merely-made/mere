@@ -34,7 +34,7 @@
 //!
 //! Validation (a [`FacetValidator`](chartulary::FacetValidator)) is a write-time
 //! host concern (mere backs it with eidetic schema codicils); persistence here is
-//! schema-agnostic. One JSON document, atomic write, `Ok(None)` when absent —
+//! schema-agnostic. One JSON document, recoverable replacement, `Ok(None)` when absent —
 //! deleting it drops facets, never graph truth.
 
 use std::fs;
@@ -81,18 +81,12 @@ pub fn node_facets_path(session_dir: &Path) -> PathBuf {
     session_dir.join(NODE_FACETS_FILE)
 }
 
-/// Serialize the store to JSON and write atomically (tmp + rename).
+/// Serialize the store to JSON and replace it through the shared recoverable writer.
 pub fn save_node_facets(session_dir: &Path, facets: &NodeFacetStore) -> io::Result<()> {
     let target = node_facets_path(session_dir);
-    if let Some(parent) = target.parent() {
-        fs::create_dir_all(parent)?;
-    }
     let json = serde_json::to_string_pretty(facets)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    let tmp = target.with_extension("json.tmp");
-    fs::write(&tmp, json)?;
-    fs::rename(&tmp, &target)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Copy every facet of every donor node named in `remap` onto its fork

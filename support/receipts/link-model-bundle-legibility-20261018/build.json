@@ -1,0 +1,99 @@
+{
+  "schema": "ordinary-responsive-links-build/v1",
+  "source_revision": "487f370966630a5c95f64ce4246d79c3d12cd91b",
+  "process_records": {
+    "canvas": "canvas-final.json",
+    "graphshell": "graphshell-final.json",
+    "build": "wasm-final.json",
+    "bindgen": "bindgen-final.json"
+  },
+  "artifacts": [
+    {
+      "path": "pkg/graphshell_web.d.ts",
+      "sha256": "53083009f04cfc384369ce685b28e988571e2bb58f302b4da50aef8350791ba4",
+      "bytes": 8123
+    },
+    {
+      "path": "pkg/graphshell_web.js",
+      "sha256": "7e1e72431dab8090163caba79a67048e7d2f907efd462bacb9cb4501ce21524c",
+      "bytes": 150028
+    },
+    {
+      "path": "pkg/graphshell_web_bg.wasm",
+      "sha256": "147fa507b5723b9a3e965714956da9099c225e9d3398de1a631bc6ca55f0778e",
+      "bytes": 191836760
+    },
+    {
+      "path": "pkg/graphshell_web_bg.wasm.d.ts",
+      "sha256": "cca4925a80f073b61e26c0266452c6bf94273a8ee8b4f05d242b9d3740bf5c48",
+      "bytes": 5724
+    },
+    {
+      "path": "pkg/snippets/genet-render-host-3997a73541d04484/inline0.js",
+      "sha256": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee",
+      "bytes": 1369
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells.rs",
+      "sha256": "9bf869ddcd71d15da7ff79028aba179b0091f221b785b97884d9a220f4a234c4"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells/paint.rs",
+      "sha256": "0907929be80cee53dd5f0b724ad9c5786b37741e792bf45e553c38b224e1b9a7"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links.rs",
+      "sha256": "2bf9a593126e8b980a8942b1463b8f7ac8633220a6148712c6c2733e3db85cc5"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs",
+      "sha256": "326548fec1e15120ebf2985b3a2c0177d220704748e0872d6f37f1db7e722112"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/report.rs",
+      "sha256": "8565d594804e1c72ed15ccf5dcc3d46dd2428b7f826dc895aa259001eae1e64c"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs",
+      "sha256": "e287354bdcec72b6ddd5211ec9b459bb7d66aaa8502aad23bdfbf7d052daeeec"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/geometry.rs",
+      "sha256": "2de6b563a25d2660717365481715b30f3bd72f8fd6cb5f6aefb39c3965cf4204"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/legibility.rs",
+      "sha256": "7837b4ae37a9ef2a5b739d6a36e2ea17e60269003d8348966e2812e4edf19636"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_tests.rs",
+      "sha256": "3ccb522943516abdaa1058a80b012e33d18c2e9a876766dd18a0de9c3179ea53"
+    },
+    {
+      "path": "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md",
+      "sha256": "cea1e650dc69286cacbd8b8053f0aa297d43b8e68d7edbab3177e74688aa4e4c"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths.rs",
+      "sha256": "86834de45b567c79f621848a94a540a1ea2001edf29ca608d5c73f344cd85b96"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths/observation.rs",
+      "sha256": "9c83f980da6aac2bff36812d65612e72082cd1ab1b13213f1bf393c3919aec4b"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_paths.scn",
+      "sha256": "03e63bb6a9ed2050e68b0c53836d5ba74fa55aaffbebbded731c4b9b109929a4"
+    }
+  ],
+  "additional_checks": {
+    "viewer": "viewer-final.json",
+    "boundaries": "boundaries-final.json"
+  },
+  "verifier": {
+    "path": "support/receipts/link-model-ordinary-paths-20261017/verify.py",
+    "sha256": "94e0e8047b7e3d4a8f3bf0c86e15aed4bdb06d41a28896a0f949818c55ae82aa"
+  }
+}

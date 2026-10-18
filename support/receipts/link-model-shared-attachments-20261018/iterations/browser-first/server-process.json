@@ -1,0 +1,7 @@
+{
+  "source_revision": "1e9d95da599322921b96febac1089d1662201849",
+  "origin": "http://127.0.0.1:38128",
+  "stop": "Ctrl-C after failed circle gate and verified Chrome exit",
+  "exit_code": 1,
+  "log_sha256": "e58fe4d4fd239d215dbb576e8cb308a9a198757843339784cab36da9ed3722d2"
+}

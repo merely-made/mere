@@ -1,0 +1,35 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas",
+    "responsive_links"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "26a67386fa4c58e7fb7962680eddeb56c2f988c0",
+  "started": "2026-10-18T01:24:07.063773+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas.rs\n M crates/canvas/pictograph/src/canvas/cartography_scene.rs\n M crates/canvas/pictograph/src/canvas/edge_cells.rs\n M crates/canvas/pictograph/src/canvas/frame.rs\n M crates/canvas/pictograph/src/canvas/input.rs\n M crates/canvas/pictograph/src/canvas/lifecycle.rs\n M crates/canvas/pictograph/src/canvas/strategy.rs\n M crates/canvas/pictograph/src/canvas/tests.rs\n M design_docs/DOC_README.md\n M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n M ports/graphshell/src/web_tree.rs\n M ports/graphshell/src/web_tree/lane.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links/\n?? crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links_tests.rs\n?? ports/graphshell/src/web_tree/lane/link_paths.rs\n?? ports/graphshell/src/web_tree/ordinary_link_paths.rs\n?? ports/graphshell/src/web_tree/ordinary_link_paths/\n?? ports/graphshell/web/scenarios/p4_tree_link_paths.scn\n?? ports/graphshell/web/scenarios/p4_tree_link_paths_reopen.scn\n",
+  "exit_code": 101,
+  "finished": "2026-10-18T01:24:36.190242+00:00",
+  "log_sha256": "07e87ccc7c84b062258d30920e723c4a41d0248f4d4cb7c2534053d22176f0b4",
+  "suites": [
+    {
+      "result": "FAILED",
+      "passed": 12,
+      "failed": 3,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 535
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "source_revision": "1e9d95da599322921b96febac1089d1662201849",
+  "origin": "http://127.0.0.1:38128",
+  "observations": [
+    {
+      "phase": "seed-before-navigation",
+      "time": "2026-10-18T16:41:18.714039+00:00",
+      "chrome_pids": [
+        1433
+      ]
+    },
+    {
+      "phase": "failed-seed-exit",
+      "time": "2026-10-18T16:44:40.554947+00:00",
+      "chrome_pids": []
+    }
+  ]
+}

@@ -110,6 +110,22 @@ impl Default for Camera {
 }
 
 impl Camera {
+    /// Whether the ground projection is finite and invertible. Presentation
+    /// geometry must check this before mapping screen attachments back to world.
+    pub fn is_valid(&self) -> bool {
+        let determinant = self.zoom * self.zoom * self.tilt;
+        self.offset.0.is_finite()
+            && self.offset.1.is_finite()
+            && self.zoom.is_finite()
+            && self.zoom >= f32::EPSILON
+            && self.yaw.is_finite()
+            && self.tilt.is_finite()
+            && self.tilt >= f32::EPSILON
+            && self.tilt <= 1.0
+            && determinant.is_finite()
+            && determinant > 0.0
+    }
+
     /// Project a world point to screen px. At `(yaw 0, tilt 1)` this is exactly
     /// `world * zoom + offset`; otherwise it rotates the ground plane by `yaw`,
     /// foreshortens the vertical by `tilt`, scales by `zoom`, and translates by

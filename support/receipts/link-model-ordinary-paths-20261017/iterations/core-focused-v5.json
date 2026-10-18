@@ -1,0 +1,35 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas",
+    "responsive_links"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "7197dd7d0d066c94274a7f513b1e068c5adf523b",
+  "started": "2026-10-18T01:32:47.014809+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas.rs\n M crates/canvas/pictograph/src/canvas/cartography_scene.rs\n M crates/canvas/pictograph/src/canvas/edge_cells.rs\n M crates/canvas/pictograph/src/canvas/frame.rs\n M crates/canvas/pictograph/src/canvas/input.rs\n M crates/canvas/pictograph/src/canvas/lifecycle.rs\n M crates/canvas/pictograph/src/canvas/strategy.rs\n M crates/canvas/pictograph/src/canvas/tests.rs\n M ports/graphshell/src/web_tree.rs\n M ports/graphshell/src/web_tree/lane.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links/\n?? crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs\n?? crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/\n?? crates/canvas/pictograph/src/canvas/responsive_links_tests.rs\n?? ports/graphshell/src/web_tree/lane/link_paths.rs\n?? ports/graphshell/src/web_tree/ordinary_link_paths.rs\n?? ports/graphshell/src/web_tree/ordinary_link_paths/\n?? ports/graphshell/web/scenarios/p4_tree_link_paths.scn\n?? ports/graphshell/web/scenarios/p4_tree_link_paths_reopen.scn\n",
+  "exit_code": 101,
+  "finished": "2026-10-18T01:33:03.312401+00:00",
+  "log_sha256": "3e8a68c64ee9ff8f4c73afaa451883fa5b142b4f9e9526a37dedce4581c3d743",
+  "suites": [
+    {
+      "result": "FAILED",
+      "passed": 15,
+      "failed": 1,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 535
+    }
+  ]
+}

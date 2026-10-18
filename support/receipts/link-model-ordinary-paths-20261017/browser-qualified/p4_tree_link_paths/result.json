@@ -1,0 +1,913 @@
+{
+  "scenario": {
+    "state": "ok",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        900,
+        558
+      ],
+      "canvas_physical_size": [
+        1800,
+        1116
+      ],
+      "log": [
+        "captured ordinary_link_paths_baseline",
+        "captured ordinary_link_paths_field_only",
+        "captured ordinary_link_paths_attractor_field_only",
+        "captured ordinary_link_paths_vortex_field_only",
+        "captured ordinary_link_paths_compatible_only",
+        "captured ordinary_link_paths_field_and_compatible",
+        "captured ordinary_link_paths_both_disabled",
+        "captured ordinary_link_paths_hidden",
+        "Ordinary responsive paths use real source link identities, stable endpoint positions, explicit view-local compatibility, ordinary selection and hide behavior",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "ok",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "link_path_source": {
+          "link-rest-graph-revision": "21",
+          "link-rest-source-facts": "[{\"source\":{\"status\":\"unavailable\",\"reason\":\"isolated fixture graph has no public source revision\"},\"links\":[{\"key\":{\"stratum\":\"resource\",\"first\":\"https://link-rest.fixture/a/first\",\"second\":\"https://link-rest.fixture/b/first\"},\"buckets\":[{\"displayed_from\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"displayed_to\":\"c8174d30-c705-5056-a751-4555b794821c\",\"source_from\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"source_to\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-support-primary\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Primary support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000100,\"asserted_at_ms\":1700000000100,\"withdrawn\":null,\"basis\":{\"note\":\"Primary support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-primary\"]}},{\"id\":\"fixture:p4:link-rest:resource-support-independent\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Independent support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000200,\"asserted_at_ms\":1700000000200,\"withdrawn\":null,\"basis\":{\"note\":\"Independent support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-independent\"]}},{\"id\":\"fixture:p4:link-rest:resource-forward\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level forward citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000500,\"asserted_at_ms\":1700000000500,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level forward citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-forward\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]},{\"displayed_from\":\"c8174d30-c705-5056-a751-4555b794821c\",\"displayed_to\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"source_from\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"source_to\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-contradiction\",\"predicate\":\"https://mere.computer/ns/rel#contradicts\",\"recognized_kind\":\"Contradicts\",\"label\":\"Opposing reading\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000300,\"asserted_at_ms\":1700000000300,\"withdrawn\":null,\"basis\":{\"note\":\"Opposing reading\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-contradiction\"]}},{\"id\":\"fixture:p4:link-rest:resource-reverse\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level reverse citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000600,\"asserted_at_ms\":1700000000600,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level reverse citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-reverse\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]}]},{\"key\":{\"stratum\":\"surface\",\"first\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"second\":\"c8174d30-c705-5056-a751-4555b794821c\"},\"buckets\":[{\"displayed_from\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"displayed_to\":\"c8174d30-c705-5056-a751-4555b794821c\",\"source_from\":{\"id\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"address\":\"https://link-rest.fixture/a/first\"},\"source_to\":{\"id\":\"c8174d30-c705-5056-a751-4555b794821c\",\"address\":\"https://link-rest.fixture/b/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:surface-primary-grouping\",\"predicate\":\"https://mere.computer/ns/rel#user-grouped\",\"recognized_kind\":\"UserGrouped\",\"label\":\"Primary surface grouping\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000450,\"asserted_at_ms\":1700000000450,\"withdrawn\":null,\"basis\":{\"note\":\"Primary surface grouping\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:surface-primary-grouping\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]}]}],\"coverage\":{\"limits\":[]}},{\"source\":{\"status\":\"unavailable\",\"reason\":\"isolated fixture graph has no public source revision\"},\"links\":[{\"key\":{\"stratum\":\"resource\",\"first\":\"https://link-rest.fixture/a/first\",\"second\":\"https://link-rest.fixture/b/first\"},\"buckets\":[{\"displayed_from\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"displayed_to\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"source_from\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"source_to\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-support-primary\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Primary support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000100,\"asserted_at_ms\":1700000000100,\"withdrawn\":null,\"basis\":{\"note\":\"Primary support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-primary\"]}},{\"id\":\"fixture:p4:link-rest:resource-support-independent\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Independent support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000200,\"asserted_at_ms\":1700000000200,\"withdrawn\":null,\"basis\":{\"note\":\"Independent support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-independent\"]}},{\"id\":\"fixture:p4:link-rest:resource-forward\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level forward citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000500,\"asserted_at_ms\":1700000000500,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level forward citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-forward\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]},{\"displayed_from\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"displayed_to\":\"9808db9f-aade-5b9f-9597-e24169848627\",\"source_from\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"source_to\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-contradiction\",\"predicate\":\"https://mere.computer/ns/rel#contradicts\",\"recognized_kind\":\"Contradicts\",\"label\":\"Opposing reading\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000300,\"asserted_at_ms\":1700000000300,\"withdrawn\":null,\"basis\":{\"note\":\"Opposing reading\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-contradiction\"]}},{\"id\":\"fixture:p4:link-rest:resource-reverse\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level reverse citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000600,\"asserted_at_ms\":1700000000600,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level reverse citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-reverse\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]}]}],\"coverage\":{\"limits\":[]}},{\"source\":{\"status\":\"unavailable\",\"reason\":\"isolated fixture graph has no public source revision\"},\"links\":[{\"key\":{\"stratum\":\"resource\",\"first\":\"https://link-rest.fixture/a/first\",\"second\":\"https://link-rest.fixture/b/first\"},\"buckets\":[{\"displayed_from\":\"c8174d30-c705-5056-a751-4555b794821c\",\"displayed_to\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\",\"source_from\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"source_to\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-contradiction\",\"predicate\":\"https://mere.computer/ns/rel#contradicts\",\"recognized_kind\":\"Contradicts\",\"label\":\"Opposing reading\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000300,\"asserted_at_ms\":1700000000300,\"withdrawn\":null,\"basis\":{\"note\":\"Opposing reading\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-contradiction\"]}},{\"id\":\"fixture:p4:link-rest:resource-reverse\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level reverse citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000600,\"asserted_at_ms\":1700000000600,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level reverse citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-reverse\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]},{\"displayed_from\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\",\"displayed_to\":\"c8174d30-c705-5056-a751-4555b794821c\",\"source_from\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"source_to\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-support-primary\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Primary support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000100,\"asserted_at_ms\":1700000000100,\"withdrawn\":null,\"basis\":{\"note\":\"Primary support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-primary\"]}},{\"id\":\"fixture:p4:link-rest:resource-support-independent\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Independent support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000200,\"asserted_at_ms\":1700000000200,\"withdrawn\":null,\"basis\":{\"note\":\"Independent support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-independent\"]}},{\"id\":\"fixture:p4:link-rest:resource-forward\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level forward citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000500,\"asserted_at_ms\":1700000000500,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level forward citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-forward\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]}]}],\"coverage\":{\"limits\":[]}},{\"source\":{\"status\":\"unavailable\",\"reason\":\"isolated fixture graph has no public source revision\"},\"links\":[{\"key\":{\"stratum\":\"resource\",\"first\":\"https://link-rest.fixture/a/first\",\"second\":\"https://link-rest.fixture/b/first\"},\"buckets\":[{\"displayed_from\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"displayed_to\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\",\"source_from\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"source_to\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-contradiction\",\"predicate\":\"https://mere.computer/ns/rel#contradicts\",\"recognized_kind\":\"Contradicts\",\"label\":\"Opposing reading\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000300,\"asserted_at_ms\":1700000000300,\"withdrawn\":null,\"basis\":{\"note\":\"Opposing reading\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-contradiction\"]}},{\"id\":\"fixture:p4:link-rest:resource-reverse\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level reverse citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000600,\"asserted_at_ms\":1700000000600,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level reverse citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-reverse\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]},{\"displayed_from\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\",\"displayed_to\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"source_from\":{\"id\":\"f59af313-43e6-5f20-aae4-647fece47108\",\"address\":\"https://link-rest.fixture/a/first\"},\"source_to\":{\"id\":\"32468b44-37af-5b01-b1c8-5bb8820608c1\",\"address\":\"https://link-rest.fixture/b/first\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:resource-support-primary\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Primary support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000100,\"asserted_at_ms\":1700000000100,\"withdrawn\":null,\"basis\":{\"note\":\"Primary support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-primary\"]}},{\"id\":\"fixture:p4:link-rest:resource-support-independent\",\"predicate\":\"https://mere.computer/ns/rel#supports\",\"recognized_kind\":\"Supports\",\"label\":\"Independent support reason\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000200,\"asserted_at_ms\":1700000000200,\"withdrawn\":null,\"basis\":{\"note\":\"Independent support reason\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-support-independent\"]}},{\"id\":\"fixture:p4:link-rest:resource-forward\",\"predicate\":\"https://mere.computer/ns/rel#cites\",\"recognized_kind\":\"Cites\",\"label\":\"Resource-level forward citation\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000500,\"asserted_at_ms\":1700000000500,\"withdrawn\":null,\"basis\":{\"note\":\"Resource-level forward citation\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:resource-forward\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]}]},{\"key\":{\"stratum\":\"surface\",\"first\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"second\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\"},\"buckets\":[{\"displayed_from\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\",\"displayed_to\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"source_from\":{\"id\":\"cfb962dd-cab2-56f7-a0df-5ea200822d9b\",\"address\":\"https://link-rest.fixture/a/alias\"},\"source_to\":{\"id\":\"abd41cd3-830a-53d0-b367-ab8ebcf83d12\",\"address\":\"https://link-rest.fixture/b/alias\"},\"assertions\":[{\"id\":\"fixture:p4:link-rest:surface-alias-grouping\",\"predicate\":\"https://mere.computer/ns/rel#user-grouped\",\"recognized_kind\":\"UserGrouped\",\"label\":\"Alias surface grouping\",\"scope\":{\"kind\":\"user\"},\"asserter\":\"urn:graphshell:fixture:link-rest\",\"first_asserted_ms\":1700000000400,\"asserted_at_ms\":1700000000400,\"withdrawn\":null,\"basis\":{\"note\":\"Alias surface grouping\",\"method\":null,\"evidence\":[\"urn:graphshell:fixture:link-rest:evidence:fixture:p4:link-rest:surface-alias-grouping\"]}}],\"legacy_members\":[],\"legacy_summaries\":[]}]}],\"coverage\":{\"limits\":[]}}]"
+        },
+        "owner_observation": {
+          "actual_app_present": true,
+          "actual_graph_session": "d7d57fb3-ee4d-4243-918a-f5d730573987",
+          "actual_session_changes": 0,
+          "forme_model_session": "d7d57fb3-ee4d-4243-918a-f5d730573987",
+          "forme_region_id": null,
+          "forme_session_matches": true,
+          "schema": "graphshell.actual-owner-observation/v1"
+        },
+        "reopened": false,
+        "save_state": "idle",
+        "selected": null,
+        "session": "d7d57fb3-ee4d-4243-918a-f5d730573987",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": [
+      {
+        "name": "ordinary_link_paths_baseline",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 494646
+      },
+      {
+        "name": "ordinary_link_paths_field_only",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 563034
+      },
+      {
+        "name": "ordinary_link_paths_attractor_field_only",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 567574
+      },
+      {
+        "name": "ordinary_link_paths_vortex_field_only",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 587046
+      },
+      {
+        "name": "ordinary_link_paths_compatible_only",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 604866
+      },
+      {
+        "name": "ordinary_link_paths_field_and_compatible",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 622874
+      },
+      {
+        "name": "ordinary_link_paths_both_disabled",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 599946
+      },
+      {
+        "name": "ordinary_link_paths_hidden",
+        "width": 2400,
+        "height": 1906,
+        "bytes": 601662
+      }
+    ]
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Graphshell",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "status",
+              "label": "saved graph \u00b7 4 nodes \u00b7 selected: 0 \u00b7 primary: none",
+              "children": []
+            },
+            {
+              "role": "navigation",
+              "label": "Graph controls",
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Pan left",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan right",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan up",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Pan down",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom in",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Zoom out",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit graph",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Fit selection",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Restore arrangement",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Reset",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Set seed",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Foreground pin",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Dismiss retained",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Grow tile",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Shrink tile",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Territory",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Suggestions",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Play physics",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Graph commands",
+                  "expanded": false,
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Hide selected link",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Show hidden links",
+                  "children": []
+                },
+                {
+                  "role": "status",
+                  "label": "Saved 1 whole-link hide(s)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Open selected in workbench",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Show workbench",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "button",
+                  "label": "Undo session",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Redo session",
+                  "children": []
+                },
+                {
+                  "children": [
+                    {
+                      "role": "button",
+                      "label": "Add an object",
+                      "expanded": false,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect selected access",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Inspect fields",
+                  "children": []
+                },
+                {
+                  "role": "button",
+                  "label": "Open details",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Dataspace",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "group",
+                      "label": "4 of 4 shown",
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "A first",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "A alias",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "B first",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "role": "group",
+                          "label": "B alias",
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Drag",
+                              "description": "Drag this item; nothing returns it.",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Pin",
+                              "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Appearance",
+                          "expanded": false,
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Appearance status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "heading",
+                              "label": "Inspector",
+                              "children": []
+                            },
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "role": "status",
+                      "label": "Storage: IndexedDB seeded \u00b7 not persistent, may be evicted",
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "role": "button",
+                              "label": "Arrangement and physics",
+                              "expanded": true,
+                              "children": []
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Arrangement",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply arrangement",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Role",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply role",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Physics law",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "group",
+                                  "label": "Overlays",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "checkbox",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Kinds",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Groups",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Mass",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Depth",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply physics",
+                                  "children": []
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Speed",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "children": [
+                                    {
+                                      "role": "combobox",
+                                      "label": "Profile",
+                                      "expanded": false,
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Apply profile",
+                                  "children": []
+                                },
+                                {
+                                  "role": "status",
+                                  "label": "Physics status",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Find and filter",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Scenes and transfers",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Projection editor",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "role": "button",
+                      "label": "Portable scenes",
+                      "expanded": false,
+                      "children": []
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "History",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Explain selected dynamics",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Responsive link paths",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Disable field response",
+                          "pressed": true,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Disable compatible-link attraction",
+                          "pressed": true,
+                          "children": []
+                        },
+                        {
+                          "role": "heading",
+                          "label": "Temporary local field",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Weaker field",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Stronger field",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Temporary attractor",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Temporary flow",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Temporary vortex",
+                          "children": []
+                        },
+                        {
+                          "role": "heading",
+                          "label": "Active graph vector fields",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "heading",
+                          "label": "This view\u2019s compatible links",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Select a link, then add it to this view\u2019s group",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Clear compatible-link group",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "label": "Curving 2 links",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Presentation rules",
+                          "expanded": false,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Saved query views",
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "New query view",
+                          "children": []
+                        },
+                        {
+                          "role": "status",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Promoted links for review",
+                          "children": []
+                        },
+                        {
+                          "role": "paragraph",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "heading",
+                          "label": "Fields",
+                          "children": []
+                        },
+                        {
+                          "children": [
+                            {
+                              "role": "paragraph",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Unlock forme",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Undo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Redo saved forme change",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Hide forme boundary",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Select forme members",
+                              "children": []
+                            },
+                            {
+                              "role": "button",
+                              "label": "Retry workbench save",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1200,
+      "height": 953
+    }
+  },
+  "collected_at_utc": "2026-10-18T01:53:05.000288+00:00"
+}

@@ -1,0 +1,25 @@
+{
+  "source": "513136dc5ced10665053220cb0a7bbe5847303e2",
+  "incoming_main_merged": "9b01961ab2dd716f2aa928ba27ddf5263c6a72d5",
+  "command": [
+    "cargo",
+    "+1.99.1",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "mere-overmap",
+    "--features",
+    "resident",
+    "--lib"
+  ],
+  "exit": 0,
+  "passed": 21,
+  "failed": 0,
+  "ignored": 0,
+  "log": "mere-postmerge-resident.log",
+  "log_sha256": "faa6aaa4c3175b76458dcc2e1fca24f4d232c6137d6ca614a7a5b1142c690b6f",
+  "qualified_supplier_inputs_unchanged_after_merge": true,
+  "incoming_attachment_receipts_unchanged": true,
+  "scope": "Focused current-main resident regression after preserving incoming attachment work. Consumer native acceptance remains bound to recorded frozen intakes; no native renewal on the merge is inferred."
+}

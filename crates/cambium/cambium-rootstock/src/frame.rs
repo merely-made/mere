@@ -30,6 +30,43 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
 }
 
+#[derive(Debug)]
+pub(crate) enum LeafFragmentAdmissionError {
+    RendererAccess(genet_render_host::RasterizeFailure),
+    Translation {
+        key: u64,
+        epoch: u64,
+        error: paint_list_render::TranslationError,
+    },
+    Retained {
+        key: u64,
+        epoch: u64,
+        error: netrender::RetainedFragmentError,
+    },
+}
+
+impl std::fmt::Display for LeafFragmentAdmissionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::RendererAccess(error) => {
+                write!(f, "retained fragment renderer access refused: {error}")
+            },
+            Self::Translation { key, epoch, error } => {
+                write!(
+                    f,
+                    "leaf {key} epoch {epoch} paint translation refused: {error}"
+                )
+            },
+            Self::Retained { key, epoch, error } => {
+                write!(
+                    f,
+                    "leaf {key} epoch {epoch} retained fragment refused: {error}"
+                )
+            },
+        }
+    }
+}
+
 #[cfg(test)]
 mod gpu_binding_controls {
     use super::*;
@@ -40,6 +77,127 @@ mod gpu_binding_controls {
         items::ExternalTextureItem,
     };
     use std::{cell::RefCell, rc::Rc, sync::Arc};
+
+    struct TestSurface(genet_render_host::RenderCore);
+    impl crate::Surface for TestSurface {
+        fn core(&self) -> &genet_render_host::RenderCore {
+            &self.0
+        }
+        fn format(&self) -> wgpu::TextureFormat {
+            wgpu::TextureFormat::Rgba8Unorm
+        }
+        fn resize(&mut self, _: u32, _: u32) {}
+        fn acquire(&self) -> Option<wgpu::SurfaceTexture> {
+            None
+        }
+    }
+
+    struct TestWindow;
+    impl crate::HostWindow for TestWindow {
+        fn request_redraw(&self) {}
+        fn inner_size(&self) -> (u32, u32) {
+            (8, 6)
+        }
+        fn scale_factor(&self) -> f64 {
+            1.0
+        }
+        fn set_ime_allowed(&self, _: bool) {}
+        fn set_ime_cursor_area(&self, _: f64, _: f64, _: f64, _: f64) {}
+    }
+
+    struct BorderLeaf(Rc<std::cell::Cell<bool>>);
+    impl sprigging::Leaf for BorderLeaf {
+        fn measure(&mut self, _: sprigging::SizeHint, _: sprigging::SizeHint) -> sprigging::Size {
+            sprigging::Size {
+                width: 8.0,
+                height: 6.0,
+            }
+        }
+        fn paint(&mut self, cx: &mut sprigging::PaintCx<'_>) {
+            let bounds = LayoutRect::new(LayoutPoint::new(0.0, 0.0), LayoutPoint::new(8.0, 6.0));
+            if self.0.get() {
+                cx.emit(PaintCmd::DrawBorder(paint_list_api::items::BorderItem {
+                    placement: CommonPlacement::new(bounds),
+                    widths: paint_list_api::LayoutSideOffsets::new(1.0, 1.0, 1.0, 1.0),
+                    details: paint_list_api::items::BorderDetails::Normal(
+                        paint_list_api::NormalBorder {
+                            do_aa: false,
+                            ..Default::default()
+                        },
+                    ),
+                }));
+            } else {
+                cx.emit(PaintCmd::DrawRect(paint_list_api::items::RectItem {
+                    placement: CommonPlacement::new(bounds),
+                    color: paint_list_api::ColorF::new(1.0, 0.0, 0.0, 1.0),
+                }));
+            }
+        }
+        fn paint_dirty(&self) -> bool {
+            true
+        }
+    }
+
+    #[test]
+    fn rejected_leaf_epoch_refuses_presentation_and_recovers_without_replacing_old_fragment() {
+        let bad = Rc::new(std::cell::Cell::new(false));
+        let mut state: HostState<App, Logic, Child> = HostState::new();
+        state.shared.sheet = "custom-leaf { display:block;width:8px;height:6px; }".into();
+        state
+            .shared
+            .leaves
+            .insert(7, Box::new(BorderLeaf(bad.clone())));
+        state.surface = Some(Box::new(TestSurface(
+            genet_render_host::RenderCore::boot(netrender::NetrenderOptions {
+                enable_vello: true,
+                tile_cache_size: Some(32),
+                ..Default::default()
+            })
+            .expect("retained leaf test needs a headless adapter"),
+        )));
+        state.window = Some(Box::new(TestWindow));
+        state.runner = Some(Runner::new(
+            Rc::new(RefCell::new(ScriptedDom::new())),
+            root as Logic,
+            App {
+                draft: String::new(),
+            },
+        ));
+        let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let mut host = Host::new(
+            HostOptions::default(),
+            None,
+            HostHooks::inert(),
+            state,
+            wake,
+        );
+
+        assert!(host.prepare_presentation_frame().unwrap().is_some());
+        let original = host.s.shared.leaf_fragments[&7];
+        bad.set(true);
+        let refusal = Rc::new(RefCell::new(None));
+        let out = refusal.clone();
+        host.s.pending_capture = Some(Box::new(move |result| {
+            *out.borrow_mut() = Some(result.err().expect("capture refused"));
+        }));
+        host.redraw();
+        assert_eq!(host.s.shared.leaf_fragments[&7], original);
+        assert!(matches!(
+            refusal.borrow().as_ref(),
+            Some(CaptureRefusal::PresentationError { error, .. })
+                if error.contains("non-antialiased border geometry")
+        ));
+        assert!(host.s.last_redraw_presentation.is_none());
+
+        bad.set(false);
+        assert!(host.prepare_presentation_frame().unwrap().is_some());
+        let corrected = host.s.shared.leaf_fragments[&7];
+        assert_eq!(
+            corrected.0, original.0,
+            "the old id is updated after recovery"
+        );
+        assert!(corrected.1 > original.1, "only an admitted epoch is cached");
+    }
 
     struct App {
         draft: String,
@@ -127,8 +285,8 @@ mod gpu_binding_controls {
         host.s.pending_presentation_observer = Some(Box::new(|_, _| {
             panic!("refused frame must never be presented")
         }));
-        assert!(host.emit_native_scene(8.0, 6.0).is_none());
-        assert!(host.emit_native_scene(8.0, 6.0).is_none());
+        assert!(host.emit_native_scene(8.0, 6.0).unwrap().is_none());
+        assert!(host.emit_native_scene(8.0, 6.0).unwrap().is_none());
         assert_eq!(*refusals.borrow(), ["image", "stamped", "paint"]);
         assert!(host.s.pending_presentation_observer.is_none());
         assert!(host.s.last_redraw_presentation.is_none());
@@ -454,7 +612,7 @@ where
     /// carrying `DrawExternalTexture` or `DrawShadow` keeps the inline path,
     /// because composite textures and blurred shadow masks are rebuilt per
     /// frame by the host painter and cannot be retained in a lowering.
-    pub(crate) fn sync_leaf_fragments(&mut self) {
+    pub(crate) fn sync_leaf_fragments(&mut self) -> Result<(), LeafFragmentAdmissionError> {
         use paint_list_api::PaintCmd;
 
         let Some(surface) = self.s.surface.as_deref().or_else(|| {
@@ -467,13 +625,12 @@ where
             // renderer lives in the render core, which outlives the surface,
             // so fragments registered before a suspend are still valid after
             // the resume and are kept, not forgotten.
-            return;
+            return Ok(());
         };
         // One operation over this window's leaves; nothing below rasterizes
         // or calls a producer while the browser frame gate is held.
-        let Ok(renderer) = crate::try_renderer(surface.core()) else {
-            return;
-        };
+        let renderer = crate::try_renderer(surface.core())
+            .map_err(LeafFragmentAdmissionError::RendererAccess)?;
 
         let mut seen: Vec<u64> = Vec::new();
         for (key, epoch, splice) in self.s.shared.rendered.path_a_entries() {
@@ -494,17 +651,33 @@ where
                 Some((_, e)) if *e == epoch => {},
                 Some(&(id, _)) => {
                     let fragment =
-                        paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
-                    if renderer.update_fragment(id, fragment) == Some(true) {
-                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
-                    }
+                        paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[])
+                            .map_err(|error| LeafFragmentAdmissionError::Translation {
+                                key,
+                                epoch,
+                                error,
+                            })?;
+                    renderer
+                        .try_update_fragment(id, fragment)
+                        .map_err(|error| LeafFragmentAdmissionError::Retained {
+                            key,
+                            epoch,
+                            error,
+                        })?;
+                    self.s.shared.leaf_fragments.insert(key, (id, epoch));
                 },
                 None => {
                     let fragment =
-                        paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
-                    if let Some(id) = renderer.register_fragment(fragment) {
-                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
-                    }
+                        paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[])
+                            .map_err(|error| LeafFragmentAdmissionError::Translation {
+                                key,
+                                epoch,
+                                error,
+                            })?;
+                    let id = renderer.try_register_fragment(fragment).map_err(|error| {
+                        LeafFragmentAdmissionError::Retained { key, epoch, error }
+                    })?;
+                    self.s.shared.leaf_fragments.insert(key, (id, epoch));
                 },
             }
         }
@@ -523,6 +696,7 @@ where
                 let _ = renderer.remove_fragment(id);
             }
         }
+        Ok(())
     }
 
     /// Where the focused field's caret paints, `(x, y, width, height)`, in the
@@ -703,11 +877,16 @@ where
         &mut self,
         lw: f32,
         lh: f32,
-    ) -> Option<(PaintEnvelope, paint_list_render::TranslatedDisplayList)> {
-        let list = self.emit_paint_list(lw, lh, None)?;
+    ) -> Result<
+        Option<(PaintEnvelope, paint_list_render::TranslatedDisplayList)>,
+        paint_list_render::TranslationError,
+    > {
+        let Some(list) = self.emit_paint_list(lw, lh, None) else {
+            return Ok(None);
+        };
         let envelope = PaintEnvelope::from_list(&list);
         let mut translated =
-            paint_list_render::translate_envelope_with_external_textures(&envelope);
+            paint_list_render::translate_envelope_with_external_textures(&envelope)?;
         if let Err(error) = self
             .s
             .shared
@@ -715,9 +894,9 @@ where
             .remap_gpu_display_list(&mut translated)
         {
             self.refuse_producer_resource(error);
-            return None;
+            return Ok(None);
         }
-        Some((envelope, translated))
+        Ok(Some((envelope, translated)))
     }
 
     pub(crate) fn refuse_producer_resource(&mut self, error: crate::ProducerGpuRemapError) {

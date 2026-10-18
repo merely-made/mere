@@ -29,9 +29,9 @@ use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
     qual, set_class, set_style,
 };
-use super::edge_cells::link_overlay_with_assertion_hides;
+use super::edge_cells::link_overlay_from_segments;
 use super::fold_projection::FoldProjection;
-use super::{Canvas, FACE_INSET, Face, NodeShape, NodeState, PAN_DECAY};
+use super::{Canvas, Face, NodeShape, NodeState, PAN_DECAY};
 
 /// Show one badge element per `(centre, text)`, made as needed and reused,
 /// and hide the rest. Badges sit on the stage above every gnode.
@@ -74,6 +74,11 @@ fn place_fold_badges(
 const FOLD_BADGE_HALF: (f32, f32) = (12.0, 9.0);
 
 impl Canvas {
+    /// Why the most recent frame could not be translated, when applicable.
+    pub fn last_translation_error(&self) -> Option<paint_list_render::TranslationError> {
+        self.last_translation_error
+    }
+
     /// Advance one frame at viewport `(w, h)` and return the composited content
     /// scene plus whether the host should request another frame (sim still
     /// settling, pan still gliding, or a node being dragged). Does not present.
@@ -273,15 +278,10 @@ impl Canvas {
             self.hidden_field_ids(),
         ));
         underlay.splice_world_underlay(self.forme_overlay());
-        underlay.splice_world_overlays(link_overlay_with_assertion_hides(
-            &self.graph,
-            &self.view,
-            &self.hidden_links,
-            &self.hidden_edges,
-            &self.hidden_assertions,
+        underlay.splice_world_overlays(link_overlay_from_segments(
+            self.rendered_link_segments(),
             &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
-            |key| self.node_size(key),
             |from, to| super::grammar_view::link_tone(grammar.as_ref(), from, to),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));
@@ -328,43 +328,20 @@ impl Canvas {
                 continue;
             }
             let pos = positions.get(&key).copied().unwrap_or_default();
-            // Billboard: project the world center to its screen anchor and place the
-            // upright gnode centered there, scaled by zoom. At top-down (tilt 1) the
-            // anchor is exactly `pos*zoom + offset`, so the placement is unchanged.
-            // (Isometric camera P1 — billboards.)
-            let (ax, ay) = self.camera.to_screen(pos);
-            let z = self.camera.zoom;
-            // The face paints at the node's resolved footprint, so every size
-            // channel (per-node override, size-by-degree / -importance /
-            // -recency) is visible on the gnode itself — not only in the
-            // collider, edge trim, and rings. The `.gnode` class keeps 36px as
-            // its default; this inline width/height wins per node. `half`
-            // generalizes the old `NODE_HALF * z` (identical at the default
-            // size) so the billboard stays centred on its anchor.
-            // (Projection proofs — P3, the visible size channel.)
-            let face = self.node_size(key)
-                * grammar
-                    .as_ref()
-                    .map_or(1.0, |_| self.grammar_face_scale(key));
-            let half = face * 0.5 * z;
-            // P3 fake height: raise the gnode above its ground anchor (a stem, drawn under
-            // the gnodes, drops back to the ground where the edges meet). Zero unless
-            // height-by-degree is on. (Isometric camera P3 — fake height.)
-            let lift = self.node_height(key) * z;
-            // Depth-sort front-to-back by the projected ground depth (the post-yaw
-            // "north" coordinate): a node lower on the reclined ground paints over one
-            // behind it. At top-down this is just `y`, and separated nodes rarely
-            // overlap, so it is a harmless no-op there. (Isometric camera P2 — depth.)
-            let (s, c) = self.camera.yaw.sin_cos();
-            let depth = (pos.x * s + pos.y * c).round() as i32;
+            let Some(body) = self.node_billboard_at(key, pos) else {
+                gnode_updates.push((gnode, "display: none;".to_string(), None));
+                continue;
+            };
+            let bounds = body.screen_rect();
             let mut style = format!(
-                "transform: translate({}px, {}px) scale({}); z-index: {}; width: {}px; height: {}px;",
-                ax - half,
-                (ay - lift) - half,
-                z,
-                depth,
-                face,
-                face
+                "transform: translate({}px, {}px) scale({}); z-index: {}; width: {}px; height: {}px; border-radius: {}px;",
+                bounds.min.x,
+                bounds.min.y,
+                body.zoom,
+                body.depth as i32,
+                body.local_side,
+                body.local_side,
+                body.corner_radius,
             );
             if let Some(frame) = &grammar {
                 style.push_str(&self.grammar_fill(key, frame));
@@ -531,7 +508,16 @@ impl Canvas {
         if let Some(cmds) = marquee_cmds.as_ref() {
             layers.push(CompositeLayer::commands_only(cmds));
         }
-        let scene = composite_paint_layers(viewport, &layers).scene;
+        let scene = match composite_paint_layers(viewport, &layers) {
+            Ok(translated) => {
+                self.last_translation_error = None;
+                translated.scene
+            },
+            Err(error) => {
+                self.last_translation_error = Some(error);
+                Scene::new(w, h)
+            },
+        };
 
         let after_cull = layers
             .iter()
@@ -584,13 +570,15 @@ impl Canvas {
                 continue;
             };
             let face = self.node_face(key);
+            let Some(bounds) = self.face_rect_at(key, *pos) else {
+                continue;
+            };
             if face == Face::Derived {
                 let Some(address) = self.graph.get_node(key).map(|node| node.url().to_owned())
                 else {
                     continue;
                 };
-                let side = self.node_size(key) * FACE_INSET * self.camera.zoom;
-                let bounds = self.face_rect_at(key, *pos);
+                let side = bounds.width();
                 let file = self
                     .derived_face_cache
                     .entry((crate::DERIVATION_VERSION, address.clone()))
@@ -646,7 +634,7 @@ impl Canvas {
             // selection must stay readable at a glance once an icon lands
             // (representations carry node identity).
             face_cmds.push(PaintCmd::DrawImage(ImageItem {
-                placement: CommonPlacement::new(self.face_rect_at(key, *pos)),
+                placement: CommonPlacement::new(bounds),
                 image_key: img_key,
                 image_rendering: ImageRendering::Auto,
                 alpha_type: AlphaType::Alpha,
@@ -675,14 +663,16 @@ impl Canvas {
             let Some(pos) = positions.get(&key) else {
                 continue;
             };
-            let lift = self.node_height(key) * self.camera.zoom;
-            if lift < 0.5 {
+            let Some(body) = self.node_billboard_at(key, *pos) else {
+                continue;
+            };
+            if body.ground_anchor.y - body.center.y < 0.5 {
                 continue;
             }
-            let (gx, gy) = self.camera.to_screen(*pos);
+            let (gx, gy) = (body.ground_anchor.x, body.ground_anchor.y);
             stem_cmds.push(PaintCmd::DrawRect(RectItem {
                 placement: CommonPlacement::new(LayoutRect::new(
-                    LayoutPoint::new(gx - 1.0, gy - lift),
+                    LayoutPoint::new(gx - 1.0, body.center.y),
                     LayoutPoint::new(gx + 1.0, gy),
                 )),
                 color: ColorF {

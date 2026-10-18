@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/ports/graphshell/web/target/build\"",
+    "build",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/ports/graphshell/web/target",
+    "--target",
+    "wasm32-unknown-unknown",
+    "--no-default-features",
+    "--features",
+    "product,presentation-webgpu"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/web",
+  "revision": "7efb9774a5e52a85e5b801c0bbcb341c352ad8e0",
+  "started": "2026-10-18T01:41:00.608952+00:00",
+  "status_before": "",
+  "exit_code": 0,
+  "finished": "2026-10-18T01:47:59.360642+00:00",
+  "log_sha256": "7429773e67f00769f83b033a46aa1ee33a63d49d2fc1a1669e3be1c98bae6d49",
+  "suites": []
+}

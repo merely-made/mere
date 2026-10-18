@@ -1,0 +1,9 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "exit_code": 1
+}

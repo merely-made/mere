@@ -10,12 +10,39 @@ impl Canvas {
     pub fn graph_view_epoch(&self) -> u64 {
         self.graph_view_epoch
     }
-    /// Same resolved logical body size and camera zoom used before face paint.
-    /// Caption/occlusion changes cannot feed back into the ladder's size input.
+    /// Current outer body side in screen pixels. Caption/occlusion changes
+    /// cannot feed back into the resolved footprint used by face paint.
     pub fn node_presentation_screen_size(&self, member: uuid::Uuid) -> Option<f64> {
         let key = self.graph.get_node_key_by_id(member)?;
-        let size = f64::from(self.node_size(key) * self.camera.zoom);
+        let billboard = self.node_billboard(key)?;
+        let size = f64::from(billboard.local_side * billboard.zoom);
         (size.is_finite() && size >= 0.).then_some(size)
+    }
+    /// Effective CSS body corner radius in local (pre-camera-zoom) pixels.
+    /// This follows the current stylesheet cascade: grammar body/site/suggestion
+    /// classes are emitted after representation classes and therefore override
+    /// their radius; outside grammar, Glyph's circle rule follows shape rules.
+    pub(crate) fn node_effective_local_corner_radius(&self, key: NodeKey, side: f32) -> f32 {
+        let half = side * 0.5;
+        if self.graph_grammar {
+            let attention = self
+                .graph
+                .get_node(key)
+                .and_then(|node| self.member_attention(node.id));
+            return match attention {
+                Some(scenograph::attention::Attention::Forward)
+                | Some(scenograph::attention::Attention::Suggestion) => half,
+                _ => 2.0_f32.min(half), // `.gnode-site { border-radius: 2px }`
+            };
+        }
+        if self.node_representation_class(key).contains("glyph") {
+            return half;
+        }
+        match self.node_shape(key) {
+            NodeShape::Square => 0.0,
+            NodeShape::Rounded => 9.0_f32.min(half),
+            NodeShape::Circle => half,
+        }
     }
     /// Replace this view's rule face layer atomically. No geometry/physics edits.
     pub fn set_node_rule_faces(

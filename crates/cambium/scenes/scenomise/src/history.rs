@@ -36,8 +36,8 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use sceno::SourceRef;
 use serde::{Deserialize, Serialize};
 
-use crate::host_dataset::{HostDatasetRevisionV2, HostDatasetV2};
-use crate::projection::{DisclosedRelationship, ProjectionDataset, ProjectionValue};
+use crate::host_dataset::{HostDatasetRevisionV2, HostDatasetV2, occurrence_identity_issues};
+use crate::projection::{CompileIssue, DisclosedRelationship, ProjectionDataset, ProjectionValue};
 use scenograph::PublicSourceRevision;
 
 /// How an occurrence or relationship changed between two revisions.
@@ -183,12 +183,36 @@ impl RevisionChanges {
 }
 
 /// Classify `current` against `previous`. With no predecessor every current
-/// occurrence and relationship is added.
+/// occurrence and relationship is added. Both datasets must have nonblank,
+/// unique occurrence ids.
 pub fn classify_revisions(
     previous: Option<RevisionView<'_>>,
     current: RevisionView<'_>,
     comparison: &Comparison,
-) -> RevisionChanges {
+) -> Result<RevisionChanges, Vec<CompileIssue>> {
+    let mut identity_issues = Vec::new();
+    if let Some(previous) = previous {
+        identity_issues.extend(
+            occurrence_identity_issues(previous.dataset)
+                .into_iter()
+                .map(|issue| CompileIssue {
+                    field: format!("previous.{}", issue.field),
+                    message: issue.message,
+                }),
+        );
+    }
+    identity_issues.extend(
+        occurrence_identity_issues(current.dataset)
+            .into_iter()
+            .map(|issue| CompileIssue {
+                field: format!("current.{}", issue.field),
+                message: issue.message,
+            }),
+    );
+    if !identity_issues.is_empty() {
+        return Err(identity_issues);
+    }
+
     let fields = &comparison.fields;
     let signature = |relationship: &DisclosedRelationship| {
         signature(relationship, &comparison.relationship_fields)
@@ -302,33 +326,37 @@ pub fn classify_revisions(
         );
     }
 
-    RevisionChanges {
+    Ok(RevisionChanges {
         previous: previous.map(|view| view.dataset.revision.clone()),
         current: current.dataset.revision.clone(),
         occurrences,
         relationships,
-    }
+    })
 }
 
 impl HostDatasetV2 {
     /// The current revision classified against its predecessor, comparing
-    /// the fields this history declares.
+    /// the fields this history declares. This expects a nonempty, parsed
+    /// history; malformed in-memory revisions violate that precondition.
     pub fn changes(&self) -> RevisionChanges {
         self.changes_at(self.revisions.len() - 1)
             .expect("a parsed history has a current revision")
     }
 
     /// The revision at `index` classified against the one before it.
+    /// Returns `None` when the index is absent or either dataset in the pair
+    /// has blank or duplicate occurrence ids.
     pub fn changes_at(&self, index: usize) -> Option<RevisionChanges> {
         let current = self.revisions.get(index)?;
         let previous = index
             .checked_sub(1)
             .and_then(|previous| self.revisions.get(previous));
-        Some(classify_revisions(
+        classify_revisions(
             previous.map(RevisionView::from),
             current.into(),
             &Comparison::of(self),
-        ))
+        )
+        .ok()
     }
 }
 

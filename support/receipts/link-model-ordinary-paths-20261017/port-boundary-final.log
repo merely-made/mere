@@ -1,0 +1,2 @@
+Process argv: ["env", "CARGO_NET_OFFLINE=true", "python3", "scripts/check_port_boundaries.py"]
+Mere port and Graphshell web dependency boundaries passed

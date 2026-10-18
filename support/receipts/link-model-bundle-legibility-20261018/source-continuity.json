@@ -1,0 +1,67 @@
+{
+  "qualified_revision": "487f370966630a5c95f64ce4246d79c3d12cd91b",
+  "checked_utc": "2026-10-18T08:10:18.582363+00:00",
+  "checked_code_and_scenario_files": [
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells.rs",
+      "sha256": "9bf869ddcd71d15da7ff79028aba179b0091f221b785b97884d9a220f4a234c4"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells/paint.rs",
+      "sha256": "0907929be80cee53dd5f0b724ad9c5786b37741e792bf45e553c38b224e1b9a7"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links.rs",
+      "sha256": "2bf9a593126e8b980a8942b1463b8f7ac8633220a6148712c6c2733e3db85cc5"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs",
+      "sha256": "326548fec1e15120ebf2985b3a2c0177d220704748e0872d6f37f1db7e722112"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/report.rs",
+      "sha256": "8565d594804e1c72ed15ccf5dcc3d46dd2428b7f826dc895aa259001eae1e64c"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs",
+      "sha256": "e287354bdcec72b6ddd5211ec9b459bb7d66aaa8502aad23bdfbf7d052daeeec"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/geometry.rs",
+      "sha256": "2de6b563a25d2660717365481715b30f3bd72f8fd6cb5f6aefb39c3965cf4204"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/legibility.rs",
+      "sha256": "7837b4ae37a9ef2a5b739d6a36e2ea17e60269003d8348966e2812e4edf19636"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_tests.rs",
+      "sha256": "3ccb522943516abdaa1058a80b012e33d18c2e9a876766dd18a0de9c3179ea53"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths.rs",
+      "sha256": "86834de45b567c79f621848a94a540a1ea2001edf29ca608d5c73f344cd85b96"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths/observation.rs",
+      "sha256": "9c83f980da6aac2bff36812d65612e72082cd1ab1b13213f1bf393c3919aec4b"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_paths.scn",
+      "sha256": "03e63bb6a9ed2050e68b0c53836d5ba74fa55aaffbebbded731c4b9b109929a4"
+    }
+  ],
+  "mismatches": [],
+  "publication_changes": "Following commit adds qualification docs and receipts only.",
+  "publication_merge": {
+    "revision": "541210474e274834e2497108b51b4c19ecf16bc0",
+    "upstream": "b38c7df37ed78e5c9280a37cc4f819a8bc0cc6b9",
+    "upstream_changes": [
+      "support/receipts/2026-10-17_render_admission/README.md",
+      "support/receipts/2026-10-18_remaining_render_slices/README.md",
+      "support/receipts/2026-10-18_remaining_render_slices/receipt.json"
+    ],
+    "compiled_input_diff_exit_code": 0,
+    "reason": "Preserve tested source487f37096 as an ancestor while including a concurrent upstream receipts-only publication."
+  }
+}

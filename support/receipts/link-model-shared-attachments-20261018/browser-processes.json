@@ -1,0 +1,42 @@
+{
+  "source_revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "origin": "http://127.0.0.1:38129",
+  "observations": [
+    {
+      "phase": "seed-before-navigation",
+      "time": "2026-10-18T16:54:41.067815+00:00",
+      "chrome_pids": [
+        10950
+      ]
+    },
+    {
+      "phase": "seed-exit",
+      "time": "2026-10-18T16:56:01.441135+00:00",
+      "chrome_pids": []
+    },
+    {
+      "phase": "failed-reopen-before-navigation",
+      "time": "2026-10-18T16:57:08.753065+00:00",
+      "chrome_pids": [
+        11741
+      ]
+    },
+    {
+      "phase": "failed-reopen-exit",
+      "time": "2026-10-18T16:58:59.378480+00:00",
+      "chrome_pids": []
+    },
+    {
+      "phase": "reopen-before-navigation",
+      "time": "2026-10-18T16:59:09.546973+00:00",
+      "chrome_pids": [
+        12379
+      ]
+    },
+    {
+      "phase": "reopen-exit",
+      "time": "2026-10-18T17:00:12.029299+00:00",
+      "chrome_pids": []
+    }
+  ]
+}

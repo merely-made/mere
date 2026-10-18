@@ -225,7 +225,8 @@ fn pixel(
         list.commands(),
         list.fonts(),
         list.images(),
-    );
+    )
+    .expect("producer fixture translation");
     registry.remap_gpu_display_list(&mut translated).unwrap();
     let (texture, _) = surface.core().rasterize(
         &translated.scene,

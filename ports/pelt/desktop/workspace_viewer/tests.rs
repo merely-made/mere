@@ -739,6 +739,23 @@ fn pending_surface_preflight_keeps_the_destination_cache_unclaimed() {
 }
 
 #[test]
+fn document_paint_refusal_keeps_ordinary_workspace_open() {
+    let ordinary = WorkspaceViewerConfig::new(
+        vec!["source.html".to_owned()],
+        WindowingMode::Headed,
+    );
+    assert!(!paint_refusal_ends_receipt(&ordinary));
+    assert!(!paint_refusal_ends_receipt(&ordinary.with_frame_limit(1)));
+
+    let receipt = WorkspaceViewerConfig::new(
+        vec!["source.html".to_owned()],
+        WindowingMode::Headed,
+    )
+    .with_workspace_receipt(WorkspaceReceipt::Chrome, "refusal.png");
+    assert!(paint_refusal_ends_receipt(&receipt));
+}
+
+#[test]
 fn cancellation_receipt_configures_a_separate_bounded_headed_run() {
     let config = WorkspaceViewerConfig::new(
         vec!["source.html".to_owned(), "sibling.html".to_owned()],

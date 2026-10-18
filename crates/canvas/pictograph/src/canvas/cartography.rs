@@ -81,19 +81,18 @@ impl Canvas {
     // remap (tear-out G4-R; turnstone `fork_session_from`). The live layout is
     // `view` (seiche); the durable layout is the facet store.
 
-    /// A node's render color, matching the in-scene gnode's class palette: orange when
+    /// A node's render color, matching the shared node accent palette: amber when
     /// selected, else green open / red closed / blue idle. The host colors the canvas
     /// element's chrome-DOM gnodes with it so they carry node identity without the
     /// in-scene gnode layer. (Canvas-as-element — Phase 2.)
     pub fn node_color(&self, key: NodeKey) -> &'static str {
-        if self.selected.contains(&key) {
-            return "#f7a440";
-        }
-        match self.node_states.get(&key) {
-            Some(NodeState::Open) => "#5fb878",
-            Some(NodeState::Closed) => "#cc5a54",
-            _ => "#5a8fc8",
-        }
+        palette::bg_hex(
+            self.selected.contains(&key),
+            self.node_states
+                .get(&key)
+                .copied()
+                .unwrap_or(NodeState::Idle),
+        )
     }
 
     /// A node's activation-state color WITHOUT the selection override — green open /
@@ -101,11 +100,13 @@ impl Canvas {
     /// selection as a ring + lift instead, so the color channel stays free to carry
     /// activation state. The in-scene gnode path still uses [`node_color`](Self::node_color).
     pub fn node_state_color(&self, key: NodeKey) -> &'static str {
-        match self.node_states.get(&key) {
-            Some(NodeState::Open) => "#5fb878",
-            Some(NodeState::Closed) => "#cc5a54",
-            _ => "#5a8fc8",
-        }
+        palette::bg_hex(
+            false,
+            self.node_states
+                .get(&key)
+                .copied()
+                .unwrap_or(NodeState::Idle),
+        )
     }
 
     /// Whether `key` is in the current selection set, so a node's representation can show
@@ -604,5 +605,50 @@ impl Canvas {
     /// Whether height-by-degree is on. (Isometric camera P3.)
     pub fn height_by_degree(&self) -> bool {
         self.height_by_degree
+    }
+}
+
+#[cfg(test)]
+mod palette_tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    #[test]
+    fn public_node_color_accessors_use_the_canonical_accents() {
+        fn assert_color_matches(color: &str, expected: [u8; 3]) {
+            let hex = color.strip_prefix('#').expect("CSS color starts with #");
+            let actual = [
+                u8::from_str_radix(&hex[0..2], 16).expect("red byte"),
+                u8::from_str_radix(&hex[2..4], 16).expect("green byte"),
+                u8::from_str_radix(&hex[4..6], 16).expect("blue byte"),
+            ];
+            assert_eq!(actual, expected, "{color} should encode {expected:?}");
+        }
+
+        let mut canvas = Canvas::new();
+        let key = canvas.visit("https://palette.example");
+        let id = canvas.graph().get_node(key).expect("visited node").id;
+        canvas.clear_selection();
+
+        for state in [NodeState::Open, NodeState::Closed, NodeState::Idle] {
+            let mut states = HashMap::new();
+            states.insert(id, state);
+            canvas.set_node_states(states);
+            assert_color_matches(
+                canvas.node_state_color(key),
+                palette::accent(false, state).bg,
+            );
+            assert_color_matches(canvas.node_color(key), palette::accent(false, state).bg);
+        }
+
+        assert!(canvas.select_member(id));
+        assert_color_matches(
+            canvas.node_color(key),
+            palette::accent(true, NodeState::Idle).bg,
+        );
+        assert_color_matches(
+            canvas.node_state_color(key),
+            palette::accent(false, NodeState::Idle).bg,
+        );
     }
 }

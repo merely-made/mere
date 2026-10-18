@@ -22,6 +22,7 @@ use sceno::{
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::{ChannelUse, Family, Measure, OptionIssue};
+use crate::host_dataset::occurrence_identity_issues;
 use crate::registry::SolverRegistry;
 
 pub use scenograph::relationship::{
@@ -168,7 +169,9 @@ fn relationship_snapshot(
             ));
         }
     }
-    if dataset.fields.contains_key("__recipe_layout_row") || dataset.fields.contains_key("__recipe_layout_column") {
+    if dataset.fields.contains_key("__recipe_layout_row")
+        || dataset.fields.contains_key("__recipe_layout_column")
+    {
         issues.push(CompileIssue::new(
             "dataset.fields",
             "reserved recipe layout row must not be disclosed as source truth",
@@ -1155,6 +1158,7 @@ fn validation_issues(
         ));
     }
     validate_arrangement(&mut issues, compiler, definition, dataset, target.as_ref());
+    issues.extend(occurrence_identity_issues(dataset));
     validate_occurrences(&mut issues, definition, dataset, target.as_ref());
     issues
 }
@@ -1302,7 +1306,6 @@ fn validate_occurrences(
     target: Option<&Target>,
 ) {
     let channels = target.and_then(Target::channels);
-    let mut seen = HashSet::new();
     let label = definition
         .encoding
         .label
@@ -1315,12 +1318,6 @@ fn validate_occurrences(
         .flatten();
     for occurrence in &dataset.occurrences {
         let prefix = format!("occurrences.{}", occurrence.occurrence_id);
-        if occurrence.occurrence_id.trim().is_empty() || !seen.insert(&occurrence.occurrence_id) {
-            issues.push(CompileIssue::new(
-                format!("{prefix}.occurrence_id"),
-                "occurrence ids must be non-empty and unique",
-            ));
-        }
         if occurrence.source.adapter.trim().is_empty() || occurrence.source.id.trim().is_empty() {
             issues.push(CompileIssue::new(
                 format!("{prefix}.source"),
