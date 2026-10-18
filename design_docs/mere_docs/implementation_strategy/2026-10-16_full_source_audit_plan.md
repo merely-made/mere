@@ -87,6 +87,42 @@ plan's. *Reading, not ruled:* the 1.99.0 control is worth running as the first s
 castellan follow-up, since it is the cheapest way to separate a compiler change from a
 latent zeroization gap in `switch_profile`.
 
+### R4. The castellan residue fix (2026-10-18)
+
+Question as put: the 1.99.0 control is red too, so the toolchain was never the cause. The
+leaking block is the one-element `Vec<SlotSummary>` that `public_profile_of` builds in
+`switch_profile`; its slot key's `Option<String>` is `None`, and the 16 uninitialised bytes
+beside the `None` marker carry a stale master-seed copy from a stack temporary on the load
+path, probably `Ed25519Keypair::from_seed` taking the seed by value. Stack residue through
+padding, layout-dependent. Which fix?
+
+Options: (a) B now, A logged against dramatis: build the slot summary so no uninitialised
+bytes are copied, castellan only, and ledger a personae change so `from_seed` takes
+`&[u8; 32]`; (b) A only, fix at the source in personae; (c) a narrow harness allowance.
+
+Mark: **"B now, A logged against dramatis (Recommended)"**.
+
+What follows: the castellan follow-up session carries out B in castellan and records the
+personae change in the dramatis ledger (no issue or PR upstream; ledger first). B alone does
+not prove the stack is clean; the plan entry says so.
+
+### R5. Which refusal wins for a duplicated occurrence key (2026-10-18)
+
+Question as put: the selectable-stress test was stale (`4c4ea11d` made syllable marks
+selectable on purpose) and is fixed on `fix/scenomise-backdrop-gate` as `d6c82664`. The
+remaining red is which refusal wins for a duplicated occurrence key: the early `validate()`
+check at path `metre.occurrences` or the post-compile check at path `marks`.
+`SceneInputError.path` is a free string; nothing matches on it and no ruling covers it.
+
+Options: (a) keep `metre.occurrences` and fix the test; (b) `marks` wins, drop or reorder
+the early check; (c) keep both and make `path` a documented contract.
+
+Mark: **"Keep metre.occurrences, fix the test (Recommended)"**.
+
+What follows: the scenomise follow-up session updates the test on its branch; the later
+`marks` check stays for what the input check cannot see. *Reading, not ruled:* `path`
+remains a free string.
+
 ## 2. Phases
 
 - **A1, full-source read.** Done-condition: every live source file read contiguously
@@ -3233,3 +3269,11 @@ seals both plans' hashes. Evidence for the gates: the
 [re-gate receipt](../../../support/receipts/authority-success-audit/repair_batch_regate_receipt.json).
 Landed as one sweep commit on main under R1 and R3 (the commit that carries this entry).
 A2's done-conditions are met with the two main reds named as exceptions beside Q073.
+
+**2026-10-18 annotation (the toolchain was not the cause).** The castellan follow-up ran
+the residue harness under 1.99.0 as a control: red, with the identical hit. The block is the
+one-element `Vec<SlotSummary>` that `public_profile_of` builds during `switch_profile`; its
+slot key's `instance: Option<String>` is `None`, and the 16 bytes that `None` leaves
+uninitialised carry a stale copy of the master seed from a stack temporary on the load path,
+so this is stack residue leaking through padding, layout-dependent, not a missing `Drop`.
+Why the audit's 2026-10-16 run was green is not explained. The fix choice is Mark's (R4).
