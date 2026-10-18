@@ -2504,10 +2504,10 @@ to the Swatch in Graphshell, then exercise held metre and real Woodshed progress
 material before extracting common APIs. Done conditions include fresh-process
 membership/undo reopening, normal item-editor save/history isolation, scoped
 identity and source-provenance preservation, failure-before-install behavior,
-and both expansion and entered scope over the same material. Container removal,
-concurrent views and reflow tests depend on the answers below.
+and both expansion and entered scope over the same material. Prompts 33–35
+below now define the container-removal, concurrent-view and reflow policies.
 
-Further product decisions opened by this audit, still pending:
+The audit opened these product questions; their subsequent answers follow:
 
 - **Prompt 33:** removing the Pool container: archive the whole Pool with undo,
   detach its embedding while preserving a separately accessible Pool, or require
@@ -2519,6 +2519,50 @@ Further product decisions opened by this audit, still pending:
   collapse, or adjusted free-canvas coordinates saved as an undoable arrangement
   change. Authored document order and musical timing remain unchanged.
 
-These questions are proposals, not recorded answers. The already agreed personal
+The alternatives above record what was asked, not multiple selected behaviors.
+The answers below select one behavior per question. The already agreed personal
 scope/default, distinct Pools, deliberate capture, independent insertion, default
 Move between Pools, history separation and editor fallback are not reopened.
+
+
+#### Pool review: container lifetime, independent views and reflow (prompts 33–35)
+
+**Prompt 33 — removing the whole Pool container:**
+
+> Archive the Pool with its container; undo restores both (Recommended)
+
+Removing the container archives the entire Pool, including its availability
+through sidecars. Undo must restore the container and child Pool together with
+their identities intact. The existing nested archive/recovery seam is reusable,
+but the audit did not qualify coordinated restoration. An archived or missing
+owner must not be silently replaced with an empty Pool. This decision concerns
+the whole Pool; removing an individual item still uses Pool's own undo history.
+
+**Prompt 34 — selection and navigation across simultaneous views:**
+
+> Views always keep selection and navigation independent
+
+Each pocket, expanded Canvas and other-app view keeps its own selection and
+navigation. Optional following is not selected for Pool. Edits to held material
+and authored Pool arrangement still refer to the same backing material; view
+independence does not create content copies. This consumer policy does not remove
+Scenograph's general reflection/follow capability from other Swatch consumers.
+
+**Prompt 35 — making space for in-place expansion:**
+
+> Use temporary presentation reflow; collapse restores the previous positions (Recommended)
+
+Expansion may temporarily move surrounding presentation to make room. Collapse
+restores the preceding positions; those offsets are not saved as authored Pool
+arrangement edits. Authored document order and musical timing remain unchanged.
+Per-view navigation/expansion state remains distinct from shared authored layout.
+
+Implementation checks now include coordinated container-and-child archive/undo
+across reopen, two views with independent selection/navigation and shared content,
+and expansion/collapse restoring original authored coordinates without adding a
+Pool arrangement edit. These are required future checks, not new passing receipts.
+
+The next unresolved ownership interactions are which Pool history exposes undo of
+a cross-Pool Move, and what happens to an open item editor when its membership is
+removed. Prompt these separately; neither follows automatically from the decisions
+above. No runtime code changes are implied by recording these answers.
