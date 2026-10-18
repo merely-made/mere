@@ -29,7 +29,7 @@ use super::build::{
     background_cmds, bridge_ring_overlay, community_ring_overlay, field_overlay, marquee_rect_cmds,
     qual, set_class, set_style,
 };
-use super::edge_cells::link_overlay_with_assertion_hides;
+use super::edge_cells::link_overlay_from_segments;
 use super::fold_projection::FoldProjection;
 use super::{Canvas, FACE_INSET, Face, NodeShape, NodeState, PAN_DECAY};
 
@@ -278,15 +278,10 @@ impl Canvas {
             self.hidden_field_ids(),
         ));
         underlay.splice_world_underlay(self.forme_overlay());
-        underlay.splice_world_overlays(link_overlay_with_assertion_hides(
-            &self.graph,
-            &self.view,
-            &self.hidden_links,
-            &self.hidden_edges,
-            &self.hidden_assertions,
+        underlay.splice_world_overlays(link_overlay_from_segments(
+            self.rendered_link_segments(),
             &self.selected_links,
             |key| node_visible(key) && !fold_members.contains(&key),
-            |key| self.node_size(key),
             |from, to| super::grammar_view::link_tone(grammar.as_ref(), from, to),
         ));
         underlay.splice_world_overlays(self.fold_overlay(&folds, &positions));

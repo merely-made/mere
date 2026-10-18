@@ -81,6 +81,7 @@ impl Canvas {
         self.hidden_edges.clear();
         self.hidden_links.clear();
         self.hidden_assertions.clear();
+        self.link_path_response = Default::default();
         self.active_field = None;
         self.hidden_fields.clear();
         self.node_states.clear();
@@ -190,6 +191,7 @@ impl Canvas {
             hidden_edges: HashSet::new(),
             hidden_links: HashSet::new(),
             hidden_assertions: HashSet::new(),
+            link_path_response: Default::default(),
             occurrence_edges: None,
             physics_view_revision: 0,
             active_field: None,

@@ -14,7 +14,9 @@ use paint_list_api::{
     ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, StrokeCap,
     StrokeItem, StrokeJoin,
 };
-use scenograph::link::{LinkAssertion, LinkKey, LinkLegacyMember, LinkSource, LinkStratum};
+use scenograph::link::{
+    LinkAssertion, LinkKey, LinkLegacyMember, LinkPairReading, LinkSource, LinkStratum,
+};
 use seiche::LayoutView;
 
 use crate::canvas::{EdgeCell, LinkAppearance};
@@ -47,6 +49,69 @@ pub(crate) fn visible_link_appearances_with_assertion_hides(
     hidden_assertions: &HashSet<String>,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<LinkAppearanceSegment> {
+    visible_link_segments_with_assertion_hides(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        hidden_assertions,
+        node_size,
+    )
+}
+
+/// Build resting appearance geometry without retaining source readings. This
+/// is the ordinary paint/pick path while responsive paths are disabled.
+pub(crate) fn visible_link_segments_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> Vec<LinkAppearanceSegment> {
+    visible_link_geometry_inner(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        hidden_assertions,
+        node_size,
+        false,
+    )
+    .0
+}
+
+/// Canonical visible source readings and their resting geometry. Responsive
+/// paths are evaluated from these exact hide-filtered readings, then replace
+/// only the returned segment points for this frame/pick operation.
+pub(crate) fn visible_link_geometry_with_assertion_hides(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    node_size: impl Fn(NodeKey) -> f32,
+) -> (Vec<LinkAppearanceSegment>, Vec<LinkPairReading>) {
+    visible_link_geometry_inner(
+        graph,
+        view,
+        hidden_links,
+        hidden_legacy_cells,
+        hidden_assertions,
+        node_size,
+        true,
+    )
+}
+
+fn visible_link_geometry_inner(
+    graph: &Graph,
+    view: &LayoutView,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_legacy_cells: &HashSet<EdgeCell>,
+    hidden_assertions: &HashSet<String>,
+    node_size: impl Fn(NodeKey) -> f32,
+    retain_readings: bool,
+) -> (Vec<LinkAppearanceSegment>, Vec<LinkPairReading>) {
     let source = LinkSource::Unavailable {
         reason:
             "Pictograph receives a graph without its owning source authority or public revision"
@@ -57,6 +122,7 @@ pub(crate) fn visible_link_appearances_with_assertion_hides(
         .map(|(_, row)| endpoint_pair(row.from, row.to))
         .collect();
     let mut appearances = std::collections::BTreeMap::new();
+    let mut visible_readings = Vec::new();
     for (a, b) in pairs {
         let (Some(a_node), Some(b_node)) = (graph.get_node(a), graph.get_node(b)) else {
             continue;
@@ -65,12 +131,16 @@ pub(crate) fn visible_link_appearances_with_assertion_hides(
         else {
             continue;
         };
+        let mut visible_pair = LinkPairReading {
+            source: pair.source,
+            links: Vec::new(),
+            coverage: pair.coverage,
+        };
         for mut reading in pair.links {
             if hidden_links.contains(&reading.key) {
                 continue;
             }
-            let mut filtered = reading.clone();
-            filtered.buckets.retain_mut(|bucket| {
+            reading.buckets.retain_mut(|bucket| {
                 let (Ok(from_id), Ok(to_id)) = (
                     bucket.displayed_from.parse::<uuid::Uuid>(),
                     bucket.displayed_to.parse::<uuid::Uuid>(),
@@ -108,10 +178,9 @@ pub(crate) fn visible_link_appearances_with_assertion_hides(
                 });
                 !bucket.assertions.is_empty() || !bucket.legacy_members.is_empty()
             });
-            if filtered.buckets.is_empty() {
+            if reading.buckets.is_empty() {
                 continue;
             }
-            reading.buckets = filtered.buckets;
             for bucket in &reading.buckets {
                 let (Ok(from_id), Ok(to_id)) = (
                     bucket.displayed_from.parse::<uuid::Uuid>(),
@@ -151,6 +220,12 @@ pub(crate) fn visible_link_appearances_with_assertion_hides(
                     appearance,
                 );
             }
+            if retain_readings {
+                visible_pair.links.push(reading);
+            }
+        }
+        if retain_readings && !visible_pair.links.is_empty() {
+            visible_readings.push(visible_pair);
         }
     }
     let mut strata_by_pair = std::collections::BTreeMap::<
@@ -211,7 +286,7 @@ pub(crate) fn visible_link_appearances_with_assertion_hides(
             points,
         });
     }
-    segments
+    (segments, visible_readings)
 }
 
 /// Return a small arch that leaves and rejoins the node's top boundary.
@@ -320,6 +395,17 @@ fn loop_arrowhead(points: &[Point2D<f32>], reverse: bool, color: ColorF) -> Vec<
         return Vec::new();
     }
     arrowhead(path[index], path[index + 1], color)
+}
+
+fn polyline_end_arrowhead(points: &[Point2D<f32>], reverse: bool, color: ColorF) -> Vec<PaintCmd> {
+    let mut path = points.to_vec();
+    if reverse {
+        path.reverse();
+    }
+    if path.len() < 2 {
+        return Vec::new();
+    }
+    arrowhead(path[path.len() - 2], path[path.len() - 1], color)
 }
 
 fn polyline_midpoint_normal(points: &[Point2D<f32>]) -> (Point2D<f32>, Point2D<f32>) {
@@ -442,26 +528,42 @@ fn link_hit_test_where(
     node_size: impl Fn(NodeKey) -> f32,
     include: impl Fn(&LinkAppearanceSegment) -> bool,
 ) -> Option<LinkAppearance> {
-    visible_link_appearances_with_assertion_hides(
-        graph,
-        view,
-        hidden_links,
-        hidden_legacy_cells,
-        hidden_assertions,
-        node_size,
+    link_hit_test_segments(
+        visible_link_appearances_with_assertion_hides(
+            graph,
+            view,
+            hidden_links,
+            hidden_legacy_cells,
+            hidden_assertions,
+            node_size,
+        ),
+        point,
+        tolerance,
+        node_visible,
+        include,
     )
-    .into_iter()
-    .filter(|segment| {
-        include(segment)
-            && node_visible(segment.appearance.display_from)
-            && node_visible(segment.appearance.display_to)
-    })
-    .filter_map(|segment| {
-        let distance = polyline_distance(point, &segment.points);
-        (distance <= tolerance).then_some((segment.appearance, distance))
-    })
-    .min_by(|a, b| a.1.total_cmp(&b.1))
-    .map(|(appearance, _)| appearance)
+}
+
+pub(crate) fn link_hit_test_segments(
+    segments: Vec<LinkAppearanceSegment>,
+    point: Point2D<f32>,
+    tolerance: f32,
+    node_visible: impl Fn(NodeKey) -> bool,
+    include: impl Fn(&LinkAppearanceSegment) -> bool,
+) -> Option<LinkAppearance> {
+    segments
+        .into_iter()
+        .filter(|segment| {
+            include(segment)
+                && node_visible(segment.appearance.display_from)
+                && node_visible(segment.appearance.display_to)
+        })
+        .filter_map(|segment| {
+            let distance = polyline_distance(point, &segment.points);
+            (distance <= tolerance).then_some((segment.appearance, distance))
+        })
+        .min_by(|a, b| a.1.total_cmp(&b.1))
+        .map(|(appearance, _)| appearance)
 }
 
 pub(crate) fn links_in_rect(
@@ -495,31 +597,43 @@ pub(crate) fn links_in_rect_with_assertion_hides(
     node_visible: impl Fn(NodeKey) -> bool,
     node_size: impl Fn(NodeKey) -> f32,
 ) -> Vec<LinkAppearance> {
-    visible_link_appearances_with_assertion_hides(
-        graph,
-        view,
-        hidden_links,
-        hidden_legacy_cells,
-        hidden_assertions,
-        node_size,
+    links_in_rect_segments(
+        visible_link_appearances_with_assertion_hides(
+            graph,
+            view,
+            hidden_links,
+            hidden_legacy_cells,
+            hidden_assertions,
+            node_size,
+        ),
+        region,
+        node_visible,
     )
-    .into_iter()
-    .filter(|segment| {
-        node_visible(segment.appearance.display_from)
-            && node_visible(segment.appearance.display_to)
-            && polyline_intersects_box(&segment.points, region)
-    })
-    .fold(
-        std::collections::BTreeMap::new(),
-        |mut appearances, segment| {
-            appearances
-                .entry(segment.appearance.key.clone())
-                .or_insert(segment.appearance);
-            appearances
-        },
-    )
-    .into_values()
-    .collect()
+}
+
+pub(crate) fn links_in_rect_segments(
+    segments: Vec<LinkAppearanceSegment>,
+    region: Box2D<f32>,
+    node_visible: impl Fn(NodeKey) -> bool,
+) -> Vec<LinkAppearance> {
+    segments
+        .into_iter()
+        .filter(|segment| {
+            node_visible(segment.appearance.display_from)
+                && node_visible(segment.appearance.display_to)
+                && polyline_intersects_box(&segment.points, region)
+        })
+        .fold(
+            std::collections::BTreeMap::new(),
+            |mut appearances, segment| {
+                appearances
+                    .entry(segment.appearance.key.clone())
+                    .or_insert(segment.appearance);
+                appearances
+            },
+        )
+        .into_values()
+        .collect()
 }
 
 pub(crate) fn link_overlay(
@@ -555,34 +669,49 @@ pub(crate) fn link_overlay_with_assertion_hides(
     node_size: impl Fn(NodeKey) -> f32,
     tone: impl Fn(NodeKey, NodeKey) -> f32,
 ) -> Vec<PaintCmd> {
-    visible_link_appearances_with_assertion_hides(
-        graph,
-        view,
-        hidden_links,
-        hidden_legacy_cells,
-        hidden_assertions,
-        node_size,
+    link_overlay_from_segments(
+        visible_link_appearances_with_assertion_hides(
+            graph,
+            view,
+            hidden_links,
+            hidden_legacy_cells,
+            hidden_assertions,
+            node_size,
+        ),
+        selected_links,
+        node_visible,
+        tone,
     )
-    .into_iter()
-    .filter(|segment| {
-        node_visible(segment.appearance.display_from) && node_visible(segment.appearance.display_to)
-    })
-    .flat_map(|segment| {
-        let share = tone(
-            segment.appearance.display_from,
-            segment.appearance.display_to,
-        );
-        let mut strokes = link_strokes(&segment, share);
-        if selected_links.contains(&segment.appearance.key) {
-            strokes.extend(polyline_strokes(
-                &segment.points,
-                ColorF::new(0.91, 0.59, 0.16, 1.0),
-                4.0,
-            ));
-        }
-        strokes
-    })
-    .collect()
+}
+
+pub(crate) fn link_overlay_from_segments(
+    segments: Vec<LinkAppearanceSegment>,
+    selected_links: &HashSet<LinkKey>,
+    node_visible: impl Fn(NodeKey) -> bool,
+    tone: impl Fn(NodeKey, NodeKey) -> f32,
+) -> Vec<PaintCmd> {
+    segments
+        .into_iter()
+        .filter(|segment| {
+            node_visible(segment.appearance.display_from)
+                && node_visible(segment.appearance.display_to)
+        })
+        .flat_map(|segment| {
+            let share = tone(
+                segment.appearance.display_from,
+                segment.appearance.display_to,
+            );
+            let mut strokes = link_strokes(&segment, share);
+            if selected_links.contains(&segment.appearance.key) {
+                strokes.extend(polyline_strokes(
+                    &segment.points,
+                    ColorF::new(0.91, 0.59, 0.16, 1.0),
+                    4.0,
+                ));
+            }
+            strokes
+        })
+        .collect()
 }
 
 /// A link's strokes at `share` of its loud alpha. A quiet link (share below
@@ -604,29 +733,18 @@ fn link_strokes(segment: &LinkAppearanceSegment, share: f32) -> Vec<PaintCmd> {
         strokes.extend(if segment.is_self_link() {
             loop_arrowhead(&segment.points, false, color)
         } else {
-            arrowhead(segment.from, segment.to, color)
+            polyline_end_arrowhead(&segment.points, false, color)
         });
     }
     if marks.reverse {
         strokes.extend(if segment.is_self_link() {
             loop_arrowhead(&segment.points, true, color)
         } else {
-            arrowhead(segment.to, segment.from, color)
+            polyline_end_arrowhead(&segment.points, true, color)
         });
     }
     if marks.opposed {
-        let (midpoint, normal) = if segment.is_self_link() {
-            polyline_midpoint_normal(&segment.points)
-        } else {
-            let midpoint = Point2D::new(
-                (segment.from.x + segment.to.x) * 0.5,
-                (segment.from.y + segment.to.y) * 0.5,
-            );
-            let dx = segment.to.x - segment.from.x;
-            let dy = segment.to.y - segment.from.y;
-            let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
-            (midpoint, Point2D::new(-dy / len, dx / len))
-        };
+        let (midpoint, normal) = polyline_midpoint_normal(&segment.points);
         strokes.push(stroke(
             Point2D::new(midpoint.x - normal.x * 3.0, midpoint.y - normal.y * 3.0),
             Point2D::new(midpoint.x + normal.x * 3.0, midpoint.y + normal.y * 3.0),
