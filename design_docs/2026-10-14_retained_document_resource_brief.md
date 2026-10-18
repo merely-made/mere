@@ -1,11 +1,13 @@
 # Retained document resource brief
 
-**Date:** 2026-10-14. **Revised:** 2026-10-17. **Status:** Rowan remains the
+**Date:** 2026-10-14. **Revised:** 2026-10-18. **Status:** Rowan remains the
 working direction. The parser comparison, isolated document/pack proof, and
 bounded DOM batching experiment pass. Isocosm has published a private optional
 pack-authoring CLI with the batched backend and real manifest/full `GenValue`
 schema. Its real-pack CLI workflow passes at `285821ad` without product fixes.
-Durable history and a shared resource API remain deferred. The earlier
+Durable history remains open. The user has authorized a small shared edit-proposal
+API with Knot and Isocosm; both adapters are locally qualified under
+the [source-edit plan](2026-10-18_source_edit_proposal_plan.md). The earlier
 proofs stay in testing; the private consumer lives in Isocosm.
 
 Use a retained document resource to inspect and revise authored data while
@@ -435,12 +437,53 @@ remain concrete usability friction. This qualifies one scripted task, not
 general semantic editing, automatic merge, durable session recovery, GUI use,
 new performance/memory behavior or crash safety. The report, runner, transcript,
 scratch packs and exact intermediate/final manifests stay in local testing;
-none are copied into Mere. Shared API extraction remains deferred.
+none are copied into Mere. This qualification preceded the shared proposal
+continuation below.
 
-**Next gates.** Keep this consumer private. A second consumer must establish
-common lifecycle needs before extracting a shared API; shared API work remains
-explicitly deferred. Durable identity/history, product retention and memory
-budgets, wider platform/consumer compatibility, external-writer coordination
+**Shared proposal continuation — 2026-10-18.** Inspection found a concrete
+second consumer in Knot's source-authored local links. The user authorized the
+[source-edit implementation plan](2026-10-18_source_edit_proposal_plan.md): a
+small parser-neutral proposal, preview, revision/instance check and candidate
+receipt, adopted by both hosts. This changes the earlier deferral decision.
+Knot retains its one source buffer, undo/IME and file authority; Isocosm keeps
+its format/schema checks and explicit save. The full retained-document session
+API is not being extracted. `mere-source-edit` owns only validated text-edit
+proposals, exact-source/instance/revision checks, previews and candidate receipts.
+The core passes five tests and strict Clippy on the working toolchain, plus
+Rust 1.97.1 tests. Isocosm passes 74 feature/58 default tests and its unchanged
+59-command/five-process workflow. Knot passes 51 default/64 engine document
+tests, ten link-model cases, four two-file UI-harness cases, one workspace
+menu/focus case and explicit child-process reopening. Existing ignored cases
+and strict test-Clippy baseline failures remain documented in the owning plan.
+Knot keeps one editor buffer and one-step selection-edit undo; it refuses
+multi-range application until it has an undo transaction. No parser is imposed
+on Knot and no shared write authority is introduced.
+
+The [qualification report](/Users/markik/Code/testing/shared-source-edit-20261018/REPORT.md)
+records exact source/check/override identities. Both consumer qualifications
+use an explicit local Cargo patch for only the new supplier; existing supplier
+versions are unchanged. Normal remote-only resolution, publication and native
+GUI review are separate and remain unqualified.
+
+**Duplication-removal continuation — 2026-10-18.** One immutable
+`SourceSnapshot` now retains and checks the source observation used to construct
+proposals. Knot removes its form-owned address/text/stamp triple in favor of
+that snapshot, including the handwritten source equality guards. It retains
+host authority/path/target/selection/IME checks and its existing editor. Isocosm
+routes undo through the same shared edit/publication path, consuming the checked
+result revision and ranges rather than building either separately. Six core
+tests, Isocosm 75 feature/58 default tests and unchanged 59-command workflow,
+Knot 53 default/66 engine tests, 11 link-model cases, four two-file harness cases
+and two child reopens pass. Existing ignored/lint cases stay separate. The
+[deduplication report](/Users/markik/Code/testing/source-edit-dedup-20261018/REPORT.md)
+records the changed ownership and exact local-override qualification. This
+removes duplicated state/checks, not necessarily total lines: extracted Knot
+helpers and regression coverage grow while the form itself shrinks. Supplier
+publication and normal remote-only receiving checks remain outstanding.
+
+**Next gates.** Publish the shared supplier and qualify normal remote-source
+consumer intake when authorized. Durable identity/history, product retention
+and memory budgets, wider platform/consumer compatibility, external-writer coordination
 and crash behavior remain open. The private consumer resolves the real-schema
 and existing-format compatibility question within its tested scope. Direct
 structural edits, if introduced, must match parsing of their resulting text
