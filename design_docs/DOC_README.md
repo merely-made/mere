@@ -1,7 +1,8 @@
-Shared graph label placement (2026-10-17, in progress): the [projection grammar
+Shared graph label placement (2026-10-17, locally qualified; publication pending): the [projection grammar
 adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#shared-graph-label-placement-2026-10-17)
-tracks Cambium's screen-space label collision repair and Woodshed Related
-receiving qualification; independent Pictograph path work remains separate.
+records Cambium's shared collision repair, 398 supplier passes and Woodshed
+receiving/native qualification; compact horizontal clipping remains open and
+independent Pictograph path work stays separate.
 
 Document scroll boundary adoption (2026-10-17): the [browser presentation plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md#document-scroll-boundary-adoption--2026-10-17) records the main-based clip-aware document extent and optional retained scroll observation. The 315-case supplier gate, Woodshed scroll/sealed-reopen and P2 receiving lanes pass with 31 captures and exact three-way WAV parity; published through Mere `1eba417eb` and Woodshed `b01c922`.
 
