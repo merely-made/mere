@@ -311,14 +311,17 @@ mod interruptions {
         let certificate = set.personas[&persona].certificate.id();
         let path = persona_wallet_path(root.path(), persona);
         let before = std::fs::read(&path).unwrap();
-        let temporary = path.with_extension("json.tmp");
-        std::fs::write(&temporary, b"fixture obstacle").unwrap();
+        // The persona wallet itself is held open with no sharing. Pandect's shared
+        // atomic writer (atomic_file, since fc5d2f7e) renames a fresh temporary
+        // onto the target, so this is refused before any byte lands. The earlier
+        // obstacle, a locked `.json.tmp`, no longer meets that write path.
         let obstacle = std::fs::OpenOptions::new()
             .read(true)
             .share_mode(0)
-            .open(&temporary)
+            .open(&path)
             .unwrap();
         assert!(revoke_remote_auth_device(root.path(), local.device_id).is_err());
+        drop(obstacle);
         assert_eq!(std::fs::read(&path).unwrap(), before);
         assert!(
             load_wrapped_epoch_record(root.path(), certificate)
@@ -326,8 +329,18 @@ mod interruptions {
                 .is_some(),
             "retry trigger survives refused write"
         );
-        drop(obstacle);
-        std::fs::remove_file(&temporary).unwrap();
+        // The refused rename leaves its temporary behind; clear it so the retry
+        // meets the directory the way a cleaned-up process would.
+        let wallet_name = path.file_name().unwrap().to_os_string();
+        for entry in std::fs::read_dir(path.parent().unwrap()).unwrap() {
+            let entry = entry.unwrap();
+            let name = entry.file_name();
+            if name != wallet_name
+                && name.to_string_lossy().starts_with(&*wallet_name.to_string_lossy())
+            {
+                std::fs::remove_file(entry.path()).unwrap();
+            }
+        }
         let retry = revoke_remote_auth_device(root.path(), local.device_id).unwrap();
         assert!(retry.already_revoked);
         assert_eq!(retry.rotated_personas, vec![persona]);

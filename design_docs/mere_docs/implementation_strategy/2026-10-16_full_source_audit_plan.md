@@ -3295,3 +3295,17 @@ into the heap again, with presence depending on code generation. The source fix 
 `from_seed` taking `&[u8; 32]`) is ledgered as item 13 of the
 [upstream candidates ledger](../research/2026-10-03_upstream_candidates_ledger.md) and is not
 done. Why the audit's 2026-10-16 run was green remains unexplained.
+
+
+### Follow-up branches merged into main, 2026-10-18
+
+Mark: "Just merge." `fix/castellan-slot-summary-padding` (9ccca7b7, R4) and
+`fix/scenomise-backdrop-gate` (7bf3488b, R5) merged into main with plain merges. Re-gate on
+the merged tree: scenomise authoring 232 passed; castellan keeper 313 passed with the residue
+harness green, after one of the audit's own tests was re-aimed. Overnight commit fc5d2f7e
+replaced pandect's write-tmp-then-rename with the shared `atomic_file` writer, so the Q026
+test's locked `.json.tmp` no longer met the write path; it now holds the persona wallet
+itself open with no sharing, which refuses the writer's rename before any byte lands, and
+clears the refused rename's temporary before the retry. The property guarded is unchanged.
+Both fix branches deleted after the merge; the audit's two main reds are closed. Q073 stays
+as recorded.
