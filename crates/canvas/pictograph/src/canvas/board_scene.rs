@@ -400,7 +400,7 @@ impl BoardScene {
         height: u32,
         fit: BoardFit,
         text: &mut BoardText,
-    ) -> Scene {
+    ) -> Result<Scene, paint_list_render::TranslationError> {
         let rects: Vec<PaintCmd> = self
             .fills(board, width, height, fit)
             .into_iter()
@@ -424,7 +424,7 @@ impl BoardScene {
                 images: titles.images(),
             });
         }
-        composite_paint_layers(viewport, &layers).scene
+        composite_paint_layers(viewport, &layers).map(|translated| translated.scene)
     }
 }
 
@@ -838,7 +838,9 @@ mod tests {
         let plain = scene_desc.paint(&board, 800, 400, page_fit());
         assert_eq!(glyphs(&plain), 0);
         let mut text = BoardText::new();
-        let titled = scene_desc.paint_titled(&board, 800, 400, page_fit(), &mut text);
+        let titled = scene_desc
+            .paint_titled(&board, 800, 400, page_fit(), &mut text)
+            .unwrap();
         assert!(glyphs(&titled) >= 2, "one run per title at least");
         // The rectangles underneath are the same ones.
         let rect_count = |scene: &Scene| {
@@ -854,7 +856,9 @@ mod tests {
         for card in &mut nameless.cards {
             card.title.clear();
         }
-        let untitled = nameless.paint_titled(&board, 800, 400, page_fit(), &mut text);
+        let untitled = nameless
+            .paint_titled(&board, 800, 400, page_fit(), &mut text)
+            .unwrap();
         assert_eq!(glyphs(&untitled), 0);
     }
 
@@ -894,7 +898,9 @@ mod tests {
         };
         let board = PhysicsBoard::new();
         let mut text = BoardText::new();
-        let titled = scene_desc.paint_titled(&board, 800, 400, page_fit(), &mut text);
+        let titled = scene_desc
+            .paint_titled(&board, 800, 400, page_fit(), &mut text)
+            .unwrap();
         let glyphs: Vec<(f32, f32)> = titled
             .ops
             .iter()

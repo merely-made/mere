@@ -1,0 +1,8 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_judgment_audit.py",
+    "--json"
+  ],
+  "exit_code": 1
+}

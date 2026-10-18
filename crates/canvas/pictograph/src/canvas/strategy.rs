@@ -69,7 +69,10 @@ impl Canvas {
     /// kanban, Partition and Mosaic read it; unrelated URL edits must not invalidate
     /// the other analytic layouts.
     fn strategy_uses_url_grouping(id: &str) -> bool {
-        matches!(id, "kanban.default" | "partition.default" | "mosaic.default")
+        matches!(
+            id,
+            "kanban.default" | "partition.default" | "mosaic.default"
+        )
     }
 
     /// Whether the active analytic layout must be recomputed: `true` when its inputs — the strategy,

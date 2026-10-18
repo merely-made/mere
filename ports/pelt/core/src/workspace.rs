@@ -947,6 +947,13 @@ impl<F: 'static> PeltWorkspace<F> {
 
     /// Produce one frame for every active document hole, sized to that hole.
     pub fn frame(&mut self) -> PeltWorkspaceFrame<F> {
+        self.try_frame().unwrap_or_else(|_| PeltWorkspaceFrame {
+            tiles: Vec::new(),
+            surfaces: Vec::new(),
+        })
+    }
+
+    pub fn try_frame(&mut self) -> Result<PeltWorkspaceFrame<F>, String> {
         self.frame_with_surface_polling(true)
     }
 
@@ -959,6 +966,14 @@ impl<F: 'static> PeltWorkspace<F> {
     /// so the host reuses its cached imported view instead of advancing an
     /// external producer.
     pub fn frame_with_cached_surfaces(&mut self) -> PeltWorkspaceFrame<F> {
+        self.try_frame_with_cached_surfaces()
+            .unwrap_or_else(|_| PeltWorkspaceFrame {
+                tiles: Vec::new(),
+                surfaces: Vec::new(),
+            })
+    }
+
+    pub fn try_frame_with_cached_surfaces(&mut self) -> Result<PeltWorkspaceFrame<F>, String> {
         self.frame_with_surface_polling(false)
     }
 
@@ -971,27 +986,42 @@ impl<F: 'static> PeltWorkspace<F> {
         tile: TileId,
         rect: WorkspaceRect,
     ) -> Option<PeltWorkspaceFrame<F>> {
+        self.try_frame_tile(tile, rect).ok().flatten()
+    }
+
+    pub fn try_frame_tile(
+        &mut self,
+        tile: TileId,
+        rect: WorkspaceRect,
+    ) -> Result<Option<PeltWorkspaceFrame<F>>, String> {
         let mut tiles = Vec::new();
         let mut surfaces = Vec::new();
         let route = self.routes.get(&tile).cloned();
-        match self
-            .contents
-            .get_mut(&tile)?
-            .frame(rect, self.surface_scale_factor)
-        {
+        let Some(content) = self.contents.get_mut(&tile) else {
+            return Ok(None);
+        };
+        match content.try_frame(rect, self.surface_scale_factor)? {
             PeltLayer::Document(frame) => tiles.push(PeltTileFrame { tile, rect, frame }),
-            PeltLayer::Surface(frame) => surfaces.push(PeltSurfaceLayer {
-                tile,
-                rect,
-                route: route?,
-                frame,
-            }),
+            PeltLayer::Surface(frame) => {
+                let Some(route) = route else {
+                    return Ok(None);
+                };
+                surfaces.push(PeltSurfaceLayer {
+                    tile,
+                    rect,
+                    route,
+                    frame,
+                });
+            },
         }
         self.sync_one_tile_metadata(tile);
-        Some(PeltWorkspaceFrame { tiles, surfaces })
+        Ok(Some(PeltWorkspaceFrame { tiles, surfaces }))
     }
 
-    fn frame_with_surface_polling(&mut self, poll_surfaces: bool) -> PeltWorkspaceFrame<F> {
+    fn frame_with_surface_polling(
+        &mut self,
+        poll_surfaces: bool,
+    ) -> Result<PeltWorkspaceFrame<F>, String> {
         let active = active_tiles(self.workbench.tree());
         let frame_index = self.surface_frame_index;
         if poll_surfaces {
@@ -1033,7 +1063,7 @@ impl<F: 'static> PeltWorkspace<F> {
                         .admits(frame_index, surface_refreshes)
                 {
                     surface_refreshes += 1;
-                    match self.contents.frame(&tile) {
+                    match self.contents.try_frame(&tile)? {
                         None => continue,
                         Some(PeltLayer::Surface(frame)) => frame,
                         Some(PeltLayer::Document(_)) => unreachable!("checked surface lane"),
@@ -1049,12 +1079,12 @@ impl<F: 'static> PeltWorkspace<F> {
                         frame,
                     });
                 }
-            } else if let Some(PeltLayer::Document(frame)) = self.contents.frame(&tile) {
+            } else if let Some(PeltLayer::Document(frame)) = self.contents.try_frame(&tile)? {
                 tiles.push(PeltTileFrame { tile, rect, frame });
             }
         }
         self.sync_tile_metadata();
-        PeltWorkspaceFrame { tiles, surfaces }
+        Ok(PeltWorkspaceFrame { tiles, surfaces })
     }
 
     /// Advance retained sessions, including engine-aware hidden work.

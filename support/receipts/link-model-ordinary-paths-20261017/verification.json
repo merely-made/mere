@@ -1,0 +1,14 @@
+{
+  "schema": "ordinary-responsive-links-verification/v1",
+  "status": "verified",
+  "process_record": "verification-final-v2.json",
+  "verifier_sha256": "94e0e8047b7e3d4a8f3bf0c86e15aed4bdb06d41a28896a0f949818c55ae82aa",
+  "source_revision": "aa0392a1ba547a55860a6988db48e2d6ba22ee48",
+  "source_facts_equal": true,
+  "canvas_passed": 539,
+  "graphshell_passed": 312,
+  "seed_captures": 8,
+  "reopen_captures": 2,
+  "log": "verification-final-v2.log",
+  "log_sha256": "058c4dfb622186d5ff15bce363a4d7ef9ac24055586a9b359a1e9f228a5e6ae3"
+}

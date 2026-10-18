@@ -136,7 +136,13 @@ where
                 ));
             }
             let phase = crate::Instant::now();
-            self.sync_leaf_fragments();
+            self.sync_leaf_fragments().map_err(|error| {
+                failure(
+                    None,
+                    format!("retained leaf admission refused: {error}"),
+                    None,
+                )
+            })?;
             profile.leaf_fragments_us = micros(phase.elapsed());
         }
         let phase = crate::Instant::now();
@@ -146,7 +152,11 @@ where
         let mut native_scene = None;
         let paint = match mode {
             FrameContentMode::NativeTexture => {
-                let Some((envelope, translated)) = self.emit_native_scene(lw, lh) else {
+                let Some((envelope, translated)) =
+                    self.emit_native_scene(lw, lh).map_err(|error| {
+                        failure(None, format!("paint translation refused: {error}"), None)
+                    })?
+                else {
                     return Ok(None);
                 };
                 native_scene = Some(translated);

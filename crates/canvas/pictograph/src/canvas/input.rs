@@ -18,7 +18,7 @@ use kernel::graph::{
 
 use super::actions::ArrangementAction;
 use super::build::hyperlink;
-use super::edge_cells::{link_hit_test_with_assertion_hides, links_in_rect_with_assertion_hides};
+use super::edge_cells::{link_hit_test_segments, links_in_rect_segments};
 use super::seiche_bridge::seed_cluster;
 use super::{
     CLICK_SLOP, Canvas, ContextRequest, Drag, EDGE_PICK_TOL, EmptyPress, ORBIT_TILT_PER_PX,
@@ -398,16 +398,9 @@ impl Canvas {
             .into_iter()
             .filter(|&key| self.node_visible_in_canvas(key))
             .collect();
-        let appearances = links_in_rect_with_assertion_hides(
-            &self.graph,
-            &self.view,
-            &self.hidden_links,
-            &self.hidden_edges,
-            &self.hidden_assertions,
-            region,
-            |key| self.node_visible_in_canvas(key),
-            |key| self.node_size(key),
-        );
+        let appearances = links_in_rect_segments(self.rendered_link_segments(), region, |key| {
+            self.node_visible_in_canvas(key)
+        });
         self.selected_links = appearances.iter().map(|item| item.key.clone()).collect();
         self.selected_link_appearances = appearances
             .into_iter()
@@ -425,16 +418,12 @@ impl Canvas {
         self.selected.clear();
         self.selected_links.clear();
         self.selected_link_appearances.clear();
-        if let Some(appearance) = link_hit_test_with_assertion_hides(
-            &self.graph,
-            &self.view,
-            &self.hidden_links,
-            &self.hidden_edges,
-            &self.hidden_assertions,
+        if let Some(appearance) = link_hit_test_segments(
+            self.rendered_link_segments(),
             world,
             tol,
             |key| self.node_visible_in_canvas(key),
-            |key| self.node_size(key),
+            |_| true,
         ) {
             self.selected_links.insert(appearance.key.clone());
             self.selected_link_appearances.insert(

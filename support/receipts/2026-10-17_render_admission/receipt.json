@@ -1,0 +1,246 @@
+{
+  "date": "2026-10-17",
+  "base_commit": "26a67386fa4c58e7fb7962680eddeb56c2f988c0",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "genet": "4733c557e4c7e54f9e928116b8008671f69fe4bf",
+  "netrender": "c5efc94f876e93caba20807709189c5f9589492b",
+  "source_sha256": {
+    "Cargo.lock": "7ca0a260c7c57d6b9360564ebe0db9a4077aadff62a28ae492640f86063b7f17",
+    "Cargo.toml": "05987f160a05d6185738281852f3f87d5baa87aee7ee2ec24a7ce9ad9c72e406",
+    "crates/cambium/cambium-genet-winit-host/tests/checked_producer_refusal.rs": "f416771f5c7cf1273a767e1486689c60d1cc33a6dd0ffeb14a29fb3ccd1be776",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "d65d7dc538891f082fefa403dca7885fcadd734d04819f0b3c846016e54d8fa5",
+    "crates/cambium/cambium-rootstock/src/presentation/prepare.rs": "8ad349991663cf510e539fcb49a58224916d5d8f8ecb63a1f988776b9f27e6cc",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "027dd42e9bc85805abf052964dbfc1e292a31874a70ca0bea9411b64456d1fdc",
+    "crates/cambium/cambium-rootstock/src/producer/shadow_namespace_tests.rs": "0df23e6625c45c1005f50c68a156dd8885807ff801c8e480671596b23fca7c39",
+    "crates/cambium/cambium-rootstock/src/producer/tests.rs": "b3ef77b9361a4bfc905c352bbe7594bc914fa8969ec49f4f6d3e007de75c8d6c",
+    "crates/cambium/cambium-rootstock/src/recovery.rs": "357717162fa2863f6c74dd017d60b00ab6eef6c1b488781dd5158c3494759efe",
+    "crates/cambium/cambium-rootstock/src/scene_producer.rs": "870e68bb0e1b10908a4ea47fb29aee747b1e8b3447cb8dc98805586ccbf543cf",
+    "crates/cambium/examples/genet_web_smoke/Cargo.toml": "72fdad25f691be6ee655477db6e46b427f4dc88f46f5455e21c48a790439c153",
+    "crates/cambium/examples/genet_web_smoke/src/lib.rs": "284af1a9afd84144bf86b42e53acc8722b382429bc213e10ecdc0a0b76a0dfa1",
+    "crates/cambium/tabard-workshop/src/preview_bindings.rs": "a510e1a07ecb865d85731ee2460f7eeb15c3e4342b030a53487ab2b80ec31c93",
+    "crates/cambium/tabard-workshop/src/reader.rs": "ed25bf8cd331939e527436fb0156e0d63e0e2a893e3dcaa42f0469a77ba6391f",
+    "crates/cambium/tabard-workshop/src/stylesheet.rs": "0f07f848c6d79bd2ff2fe5bfb02745f652c233799e6ab1b3d1d81158d2593f5a",
+    "crates/canvas/pictograph/src/canvas.rs": "b7657587b8043eb30656ef25cd0160e278c56032b1be37f100cccb319ac2d4d4",
+    "crates/canvas/pictograph/src/canvas/backdrop_surface.rs": "ce7345ccc93af9a582f783e7680c85903f1c50c0b06c32e70894797c674eb383",
+    "crates/canvas/pictograph/src/canvas/board_scene.rs": "d03017b106a897acf731009ed6fcc429105d2601e1c6c46624742e03f054c287",
+    "crates/canvas/pictograph/src/canvas/cull/tests.rs": "1f8c16b2bcba0b747aa2ea93e3dc8a9769a6318c303d96394a9c1f766a0f3841",
+    "crates/canvas/pictograph/src/canvas/frame.rs": "d0225dd517c6f2029a995cae27a686e88628bc0200abb258a760d4061c381df1",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "b3b9f1e430cc3dbaa029f7cd9e7eba832e38a9a5fbdd37425c43edf45aa8e423",
+    "crates/inker/document-canvas/src/netrender_backend.rs": "ec5af9d22f4bb8247d848db65ffff6b31a54ef22d418e4da21b9b2e1368b9503",
+    "crates/system/document-lanes/src/session.rs": "e1c86e9450c8a3e93d8afdbfb35a2a52ce550e2f62b4a30a63418780e6214a15",
+    "crates/system/document-lanes/src/smolweb.rs": "9726430247564c8bd4ccca0c74ca6c722a8579346d79c1080f50762b48c36a9a",
+    "ports/graphshell/src/retained_content.rs": "bf6e0a0827ea620133d24efe5e5dd19c82b4541f89071d7b35346785916491a3",
+    "ports/graphshell/src/retained_content/producer.rs": "6e6405d48a524f8e768560d33c15fc167925653745256068e64e5104fb7d7f1d",
+    "ports/graphshell/src/web_tree/producer_scene.rs": "43c2f061a9ab545666a436d46c002c1b6a4adc40a058c60e8a4dc6e02bc5644a",
+    "ports/pelt/core/src/content.rs": "b57238db295a9d1dc99787d9708e7a8ee33b9acbd9f8f9bbe09b0cc4834b079d",
+    "ports/pelt/core/src/lib.rs": "eda37a3467b5eee71b659e36f653312ed2992d9e19d787d5da01f1c89d7120bd",
+    "ports/pelt/core/src/pool.rs": "a2efb85edee9dbdfe21328108fa587cc6b43bdf3d7e4d929548eb83774fe51a8",
+    "ports/pelt/core/src/workspace.rs": "230712e4f2793e0d21284f607f607b9478c1bb6cff7c0cc316942752e7f56f1d",
+    "ports/pelt/core/tests/embedder.rs": "75db645ffc4c6ed989097bc3526e5b93f1df7e8e900ef490ec5c8eec268852a9",
+    "ports/pelt/desktop/frisket_surface.rs": "c96c128ef4380c75bcc5338fe8021198ef2d8b4de830f6c7b287e2bd88e99042",
+    "ports/pelt/desktop/workspace_viewer.rs": "1ddb96b0b74553251b1ffaf9ae443a7161e7bc7d126085b5702b4f2aa773c36f",
+    "ports/pelt/desktop/workspace_viewer/tests.rs": "b105b9301e4145703c8e5ee2df68975187538fc279c2e20b180676fb843945b2",
+    "ports/tabard/desktop/src/reader.rs": "5f258abb2dcbdddbca59207e992089c7b0094a82cc644be881be2ef4062da812",
+    "crates/cambium/examples/genet_web_smoke/Cargo.lock": "2de91411b7ad74fdd5eb232317da277fce9523d133f803bf8522546377e61576"
+  },
+  "resources": {
+    "memory_max": "5G",
+    "swap_max": 0,
+    "cpu_quota": "150%",
+    "jobs": 1,
+    "test_threads": 1,
+    "timeout_seconds": 600,
+    "lock": "/home/markik/Code/testing/machine-heavy.lock"
+  },
+  "gates": [
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-dependencies.log",
+      "sha256": "ddc61470daf0b018083ef83e465fba52a547ef1cb84ba1d78562ad2b63c19575",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo update -p genet-livery --precise 4733c557e4c7e54f9e928116b8008671f69fe4bf"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "535444"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-preserve-murm.log",
+      "sha256": "e914dab3d3eb60f2dd878c28c4f50501d760e9791c7ec067e218d145fbef073f",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo update --offline -p murm-wire --precise bd8fe1e5db9690dbb15b618d0103ce6d97d701a4"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "510936"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-retained.log",
+      "sha256": "f73c509ddaf3040806792a16f060eb64696ed6100175fc7f78a4e4c98b2508de",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p cambium-rootstock -p document-canvas -p mere-document-lanes -p tabard-workshop -p pelt-core -p pictograph --features tabard-workshop/host-previews,pictograph/canvas --lib --test embedder --no-fail-fast -- --test-threads=1"
+      ],
+      "summaries": [
+        "test result: ok. 118 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 88.04s",
+        "test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.11s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "exit_status": [
+        "124"
+      ],
+      "peak_rss_kib": [
+        "1255788"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-render-focused.log",
+      "sha256": "5bd5022db99e2fa2072b513fbfa9637c5ad31131b583db77b26bf9c77730bdd2",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p cambium-rootstock -p document-canvas -p mere-document-lanes -p tabard-workshop -p pelt-core -p pictograph --features tabard-workshop/host-previews,pictograph/canvas --lib --test embedder --no-fail-fast -- --test-threads=1 canvas::cull:: stylesheet:: reader::"
+      ],
+      "summaries": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 89 filtered out; finished in 0.00s",
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.50s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 524 filtered out; finished in 0.80s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.39s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "194184"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-capture-admission.log",
+      "sha256": "c44307da206007c621f27e5a4a779aac38ef766ec1989509a79113e4dbeaa114",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p cambium-genet-winit-host -p pelt-desktop --lib --test checked_producer_refusal -- --test-threads=1 --include-ignored checked_scene_source_refuses_all_captures_and_recovers_without_replacement document_paint_refusal_keeps_ordinary_workspace_open"
+      ],
+      "summaries": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.69s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 78 filtered out; finished in 0.00s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "1233772"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-callers.log",
+      "sha256": "a6219aca4d03678dc35d37422a74567788f4ca2d8b06b8c318108d50bae16726",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo check --offline --locked -j1 -p graphshell -p tabard-desktop --no-default-features --features graphshell/retained-content --lib"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "864316"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-web-smoke.log",
+      "sha256": "de6cb100c2e81fe01233fd05237ddf7fb712fa9e1856e86efab786b68849af13",
+      "command": [],
+      "summaries": [],
+      "exit_status": [],
+      "peak_rss_kib": [],
+      "swaps": []
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-web-dependencies.log",
+      "sha256": "c923e36a8fb9e1a3eb469c3df40dc860b62e1cd7d33513db91197d8bbbf13244",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo update --offline --manifest-path crates/cambium/examples/genet_web_smoke/Cargo.toml -p genet-livery --precise 4733c557e4c7e54f9e928116b8008671f69fe4bf"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "128700"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-web-smoke-final.log",
+      "sha256": "9c10ef986e6b0214770d8d1f1856f17e5e74f5318cb4145a1a0a16fe1e228d93",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo check --offline --locked -j1 --manifest-path crates/cambium/examples/genet_web_smoke/Cargo.toml --target wasm32-unknown-unknown"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "101"
+      ],
+      "peak_rss_kib": [
+        "516784"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261017/render-admission/mere-web-smoke-verified.log",
+      "sha256": "421bdb8eff06e099d68a365c95b4977980af7e8110739baa9bc43801f3d3d5d2",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo check --offline --locked -j1 --manifest-path crates/cambium/examples/genet_web_smoke/Cargo.toml --target wasm32-unknown-unknown"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "217156"
+      ],
+      "swaps": [
+        "0"
+      ]
+    }
+  ],
+  "qualification": [
+    "Rootstock 118 passed, three existing ignores; document-canvas 89 passed; document-lanes 13 passed; Pelt core four passed; embedder three passed. Rootstock leaf rejection preserves prior fragment ID and epoch and refuses capture; corrected content advances the same ID.",
+    "The combined gate timed out in Pictograph spiral simulation after those complete suites. Full Pictograph is not claimed passing. Focused culling/reader tests passed, including GPU pixel comparison, plus four workshop reader tests.",
+    "Explicitly ran ignored checked_scene_source_refuses_all_captures_and_recovers_without_replacement. Actual GPU source staging rejects all three capture forms, removes old staged image, retains authority, and recovers without device replacement. Pelt ordinary-window error policy test passed.",
+    "Graphshell retained-content and Tabard desktop library checks passed. Standalone wasm32 example check passed against the exact published supplier revisions. Browser runtime and headed-window presentation were not exercised.",
+    "The initial standalone offline resolution selected an old cached Genet revision; stopped before qualification, then selected the published commit explicitly. The subsequent check found a stale Default::default() image-source call; explicit empty typed map fixes it, verified by the final locked check.",
+    "Root lock adds genet-events from the published Genet graph; no other package additions/removals or unrelated source/version updates. Unrelated Murm refresh was restored. Cargo normalized existing transitive dependency edges.",
+    "Compatibility frame entrypoints remain. Live migrated presentation/capture paths use checked frames and source errors; unsupported border styles refuse rather than silently become solid."
+  ]
+}

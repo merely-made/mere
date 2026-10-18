@@ -326,17 +326,26 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         })
     }
     pub fn frame(&mut self, id: &P) -> Option<PeltLayer<F>> {
-        let (p, generation) = self
+        self.try_frame(id).ok().flatten()
+    }
+
+    pub fn try_frame(&mut self, id: &P) -> Result<Option<PeltLayer<F>>, String> {
+        let placement = self
             .placements
             .get(id)
-            .map(|p| (p.value.clone(), p.generation))?;
+            .map(|p| (p.value.clone(), p.generation));
+        let Some((p, generation)) = placement else {
+            return Ok(None);
+        };
         if !p.admits() {
-            return None;
+            return Ok(None);
         }
         self.a11y_observe(&p.content);
-        let content = self.contents.get_mut(&p.content)?;
+        let Some(content) = self.contents.get_mut(&p.content) else {
+            return Ok(None);
+        };
         self.prepared.remove(&p.content);
-        let layer = content.frame(p.rect, p.scale_factor);
+        let layer = content.try_frame(p.rect, p.scale_factor)?;
         if !matches!(&layer, PeltLayer::Surface(Err(_))) {
             self.prepared.insert(
                 p.content.clone(),
@@ -348,7 +357,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             );
             self.a11y_after_layout(&p.content);
         }
-        Some(layer)
+        Ok(Some(layer))
     }
     /// Prepare the addressed layout before input or semantic revalidation.
     /// Preparation can change a document projection revision. Accessibility
