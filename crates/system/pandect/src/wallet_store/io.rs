@@ -46,16 +46,42 @@ where
 
 /// Write `bytes` at `path` atomically, creating its directory.
 pub fn save_bytes_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
-    let dir = path.parent().ok_or_else(|| {
-        io::Error::new(
-            io::ErrorKind::InvalidInput,
-            format!("path has no parent: {path:?}"),
-        )
-    })?;
-    fs::create_dir_all(dir)?;
-    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("tmp");
-    let tmp = path.with_extension(format!("{ext}.tmp"));
-    fs::write(&tmp, bytes)?;
-    fs::rename(&tmp, path)?;
-    Ok(())
+    crate::atomic_file::write_bytes_with_backup(path, bytes)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    use super::*;
+
+    #[test]
+    fn save_bytes_atomic_replaces_wallet_bytes_and_cleans_backup() {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock")
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "mere-wallet-store-io-{}-{nonce}",
+            std::process::id()
+        ));
+        let target = directory.join("wallet.bin");
+
+        save_bytes_atomic(&target, b"first wallet payload").expect("first save");
+        save_bytes_atomic(&target, b"replacement wallet payload").expect("replacement save");
+
+        assert_eq!(
+            fs::read(&target).expect("read wallet"),
+            b"replacement wallet payload"
+        );
+        assert!(!target.with_extension("bin.previous").exists());
+        assert_eq!(
+            fs::read_dir(&directory)
+                .expect("list wallet directory")
+                .count(),
+            1,
+            "the successful replacement leaves only the wallet file"
+        );
+        fs::remove_dir_all(directory).expect("remove wallet directory");
+    }
 }
