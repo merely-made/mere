@@ -1,0 +1,96 @@
+{
+  "schema": "mere.shared-resident-materialization/v1",
+  "supplier_source": "500bc78a7fa9e0b9abe8f35d189c465f93d3ccab",
+  "inputs_sha256": {
+    "crates/cambium/mere-overmap/src/materialization.rs": "b288bcaca3aa103b4201a7020f9daccbe17593aa7e98c468b71bbd936a50e0bf",
+    "crates/cambium/mere-overmap/src/lib.rs": "76b129b4958555b0e895276294a420c9d6b19620a9f09c829f78dd742be2f555",
+    "crates/cambium/mere-overmap/src/route_session.rs": "81a4127bcb8deae3e26275f6fb07bdf060f762ad371e57111d1cb60b268b1445",
+    "crates/cambium/mere-overmap/Cargo.toml": "0c2c6de6f8bf7a4767e6d1515484042b3b4a3001c26957c1ad4ed72b0784e5ca",
+    "crates/cambium/mere-view/src/view.rs": "bae005b9f82ec045695b7e666d0f51f8b63a6d2bfe0f60c1bbbf27c5d05315c1",
+    "crates/cambium/cambium-genet-winit-host/src/lib.rs": "62f28175699dba078453256931d1761d56562d009a0214a52634801f602a03da",
+    "Cargo.lock": "d1ee5b5d9bb1f959f6b6d65587fddd3624c2f663909be228f84c5d6b34927fe7"
+  },
+  "reader_identical_to_both_consumer_intakes": true,
+  "gates": [
+    {
+      "name": "resident",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0,
+      "exit": 0,
+      "log": "mere-overmap-reviewfix-resident-tests-02.log"
+    },
+    {
+      "name": "default",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "exit": 0,
+      "log": "mere-overmap-reviewfix-default-tests.log"
+    },
+    {
+      "name": "no-default",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "exit": 0,
+      "log": "mere-overmap-reviewfix-no-default-tests.log"
+    },
+    {
+      "name": "published-knot-real-broker",
+      "source": "84576bafa",
+      "knot": "88eeb9750f2e9a15a2ff9dfe797bb5c1e15d7fd8",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "exit": 0,
+      "log": "mere-knot-broker-final.log"
+    },
+    {
+      "name": "common-panel",
+      "source": "84576bafa",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "exit": 0,
+      "log": "mere-common-panel-final.log"
+    },
+    {
+      "name": "shared-view-divider",
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0,
+      "exit": 0,
+      "log": "mere-view-divider-fix.log"
+    }
+  ],
+  "review_findings_closed": [
+    "Validate received scene tables before enumeration",
+    "Refuse missing bindings and offers for required active source items",
+    "Preserve replacement Knot merge choices across unchanged refreshes"
+  ],
+  "consumer_evidence_homes": {
+    "cleromancy": "cleromancy/receipts/resident-materialization_20261018.json",
+    "knot": "knot-editor/docs/receipts/2026-10-18_shared_resident_materialization/QUALIFICATION.md"
+  },
+  "native_two_consumer_status": "Qualified within recorded consumer scopes",
+  "divider_review": {
+    "status": "independent source review clear",
+    "scope": "One-sided solid-border admission; unchanged layout geometry and strict refusal. Exact DOM attribution and native recovery require final original-scenario execution."
+  },
+  "consumer_sources": {
+    "cleromancy": {
+      "code": "420bcc396a242a9715b528eefbd952a05d2a7b4e",
+      "supplier": "9b8c161a831aa9615c84a4bbfaea9b15021e3659",
+      "published_receipt": "8e54b0bc9492f6c4dce94777b0fe4476aee984a8",
+      "reviewed_captures": 11,
+      "fresh_embedded_owner_reopen": true
+    },
+    "knot": {
+      "code": "d4ac7772692d0e8638ced4417740a10745c06810",
+      "supplier": "500bc78a7fa9e0b9abe8f35d189c465f93d3ccab",
+      "reviewed_captures": 7,
+      "fresh_client_reopen_same_owner": true
+    }
+  }
+}
