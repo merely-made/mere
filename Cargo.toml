@@ -16,6 +16,7 @@ members = [
     "crates/system/framing",
     # The labelled state witness G8 and Isocosm share (F116 to F131).
     "crates/system/state-witness",
+    "crates/system/source-edit",
     "crates/system/content-contract",
     "crates/system/proofs",
     "crates/system/shell-state",
