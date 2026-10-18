@@ -7,3 +7,5 @@ The [receipt](receipt.json) binds source hashes and published dependency revisio
 The combined Mere suite hit its 600-second limit in an unrelated Pictograph simulation after completing Rootstock, document-canvas, document-lanes and Pelt gates. Focused rendering tests passed afterward. The earlier Genet combined gate also timed out in a scripted GC soak; its completed suites and focused admission passes are recorded in Genet's render-admission receipt. Preserve these limits rather than treating the broad runs as green.
 
 All heavy work was serialized with the shared machine lock, a 5 GiB memory cap, zero swap allowance, 150% CPU quota, nice 10 and one Cargo/test job. The isolated example lockfile is generated locally; its hash and precise dependency-update command are recorded in the receipt.
+
+The [2026-10-18 sliced follow-up](../2026-10-18_remaining_render_slices/README.md) completes the previously interrupted Pictograph and scripted coverage, plus the unreached Tabard Workshop suite. The original timeout logs remain historical evidence.

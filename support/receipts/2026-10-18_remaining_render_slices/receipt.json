@@ -1,0 +1,1615 @@
+{
+  "date": "2026-10-18",
+  "tested_commit": "dd9d5c523c092baf72be31cdbc1d28c4ae179fa0",
+  "prior_qualification_commit": "a2b4222bf65b04bf5a7205ba6678c20668dd640e",
+  "scope": "Complete the Pictograph and Tabard Workshop portions interrupted or not reached by the prior combined run. Checkout fast-forwarded and binaries rebuilt on current main before running.",
+  "coverage": {
+    "pictograph": {
+      "total": 553,
+      "passed": 535,
+      "failed": 0,
+      "ignored": 18
+    },
+    "tabard_workshop": {
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "resources": {
+    "memory_max": "5G",
+    "swap_max": 0,
+    "cpu_quota": "150%",
+    "jobs": 1,
+    "test_threads": 1,
+    "timeout_seconds": 600,
+    "lock": "/home/markik/Code/testing/machine-heavy.lock"
+  },
+  "source_sha256": {
+    "Cargo.lock": "7ca0a260c7c57d6b9360564ebe0db9a4077aadff62a28ae492640f86063b7f17",
+    "Cargo.toml": "05987f160a05d6185738281852f3f87d5baa87aee7ee2ec24a7ce9ad9c72e406",
+    "crates/canvas/pictograph/src/canvas.rs": "8ab9e5a8e29cdbd15041bbc48f761e42a6be74f5f3e6533441ff872f8b767b29",
+    "crates/canvas/pictograph/src/canvas/tests/arrangement_roles.rs": "503ea97799eff421ce61a86cd8735b1fe515b39a3578405589889ba2a09314d9",
+    "crates/canvas/pictograph/src/canvas/cull/tests.rs": "1f8c16b2bcba0b747aa2ea93e3dc8a9769a6318c303d96394a9c1f766a0f3841"
+  },
+  "gates": [
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/mere-build.log",
+      "sha256": "aa3c52ebb9d0f1a6ba74462b32380f24a4ff4be4413f25c689074e89fff1174b",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p cambium-rootstock -p document-canvas -p mere-document-lanes -p tabard-workshop -p pelt-core -p pictograph --features tabard-workshop/host-previews,pictograph/canvas --lib --test embedder --no-run"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "1248076"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {}
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-spiral.log",
+      "sha256": "b292a7af52e8f3fc7933d4501360131265528547ed741bfb2e3a7148e079a917",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::arrangement_roles::the_spiral_probe_through_the_canvas --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 552 filtered out; finished in 55.82s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "69920"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::arrangement_roles::the_spiral_probe_through_the_canvas": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-01.log",
+      "sha256": "c5c511ea818ca01da90d0b5b64cbce10769d499f75e53a6c71302260e85c3fd6",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::ambient::game_of_life::tests::advance_paces_generations_and_reseeds_a_dead_field canvas::ambient::game_of_life::tests::blinker_oscillates_with_period_two canvas::ambient::game_of_life::tests::block_is_a_still_life canvas::ambient::game_of_life::tests::empty_grid_stays_dead_and_seeded_grid_lives canvas::ambient::nbody::tests::nbody_stays_bounded_and_finite canvas::ambient::particle_life::tests::particle_life_stays_in_bounds_and_finite canvas::ambient::sand::tests::sand_falls_and_stays_bounded canvas::ambient::sand::tests::water_spreads_sideways_where_sand_piles canvas::ambient::tests::hsv_round_trips_the_hue canvas::area_share::tests::a_lattice_shares_evenly_and_a_gap_is_room canvas::area_share::tests::spearman_reads_order_not_scale_and_averages_ties canvas::backdrop_surface::tests::font_roles_reach_the_label_sheet_only_when_set canvas::backdrop_surface::tests::interaction_geometry_round_trips_across_template_consumers_and_viewports canvas::backdrop_surface::tests::painting_requires_host_fonts_and_valid_viewport canvas::backdrop_surface::tests::picking_and_refused_replacement_preserve_occurrence_identity canvas::backdrop_surface::tests::progression_span_is_pickable_at_its_edge_and_refusal_preserves_attention canvas::backdrop_surface::tests::timeline_rows_use_height_and_stretched_spans_remain_pickable canvas::board_scene::tests::an_empty_board_is_ground_only canvas::board_scene::tests::backdrops_take_their_kind_paint_and_collidable_ones_an_edge canvas::board_scene::tests::cards_are_drawn_where_the_board_holds_them_not_at_their_slots canvas::board_scene::tests::font_roles_ride_the_root_and_default_leaves_the_sheet_alone canvas::board_scene::tests::footprints_convert_from_sceno canvas::board_scene::tests::held_cards_get_an_edge_and_the_lead_its_tone canvas::board_scene::tests::overlap_counts_shared_area_not_touching_edges canvas::board_scene::tests::the_fit_centres_across_and_hangs_from_the_top canvas::board_scene::tests::the_fit_frames_the_cards_edges_so_the_top_margin_holds canvas::board_scene::tests::titled_paint_sets_each_title_and_untitled_paint_sets_none canvas::board_scene::tests::titles_are_centred_in_their_cards canvas::build_tests::closed_link_hides_preserve_controller_rows_in_the_other_stratum canvas::build_tests::content_projection_drives_all_shown_pairs_through_topology_draw_and_hit --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 0.79s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "51020"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::ambient::game_of_life::tests::advance_paces_generations_and_reseeds_a_dead_field": "ok",
+        "canvas::ambient::game_of_life::tests::blinker_oscillates_with_period_two": "ok",
+        "canvas::ambient::game_of_life::tests::block_is_a_still_life": "ok",
+        "canvas::ambient::game_of_life::tests::empty_grid_stays_dead_and_seeded_grid_lives": "ok",
+        "canvas::ambient::nbody::tests::nbody_stays_bounded_and_finite": "ok",
+        "canvas::ambient::particle_life::tests::particle_life_stays_in_bounds_and_finite": "ok",
+        "canvas::ambient::sand::tests::sand_falls_and_stays_bounded": "ok",
+        "canvas::ambient::sand::tests::water_spreads_sideways_where_sand_piles": "ok",
+        "canvas::ambient::tests::hsv_round_trips_the_hue": "ok",
+        "canvas::area_share::tests::a_lattice_shares_evenly_and_a_gap_is_room": "ok",
+        "canvas::area_share::tests::spearman_reads_order_not_scale_and_averages_ties": "ok",
+        "canvas::backdrop_surface::tests::font_roles_reach_the_label_sheet_only_when_set": "ok",
+        "canvas::backdrop_surface::tests::interaction_geometry_round_trips_across_template_consumers_and_viewports": "ok",
+        "canvas::backdrop_surface::tests::painting_requires_host_fonts_and_valid_viewport": "ok",
+        "canvas::backdrop_surface::tests::picking_and_refused_replacement_preserve_occurrence_identity": "ok",
+        "canvas::backdrop_surface::tests::progression_span_is_pickable_at_its_edge_and_refusal_preserves_attention": "ok",
+        "canvas::backdrop_surface::tests::timeline_rows_use_height_and_stretched_spans_remain_pickable": "ok",
+        "canvas::board_scene::tests::an_empty_board_is_ground_only": "ok",
+        "canvas::board_scene::tests::backdrops_take_their_kind_paint_and_collidable_ones_an_edge": "ok",
+        "canvas::board_scene::tests::cards_are_drawn_where_the_board_holds_them_not_at_their_slots": "ok",
+        "canvas::board_scene::tests::font_roles_ride_the_root_and_default_leaves_the_sheet_alone": "ok",
+        "canvas::board_scene::tests::footprints_convert_from_sceno": "ok",
+        "canvas::board_scene::tests::held_cards_get_an_edge_and_the_lead_its_tone": "ok",
+        "canvas::board_scene::tests::overlap_counts_shared_area_not_touching_edges": "ok",
+        "canvas::board_scene::tests::the_fit_centres_across_and_hangs_from_the_top": "ok",
+        "canvas::board_scene::tests::the_fit_frames_the_cards_edges_so_the_top_margin_holds": "ok",
+        "canvas::board_scene::tests::titled_paint_sets_each_title_and_untitled_paint_sets_none": "ok",
+        "canvas::board_scene::tests::titles_are_centred_in_their_cards": "ok",
+        "canvas::build_tests::closed_link_hides_preserve_controller_rows_in_the_other_stratum": "ok",
+        "canvas::build_tests::content_projection_drives_all_shown_pairs_through_topology_draw_and_hit": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-02.log",
+      "sha256": "791b2e105577e60d1a7b21e977218c75496e99e7a6f0c93d0e231ac457d5f6fb",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::build_tests::content_projection_reaches_score_edges_and_fold_boundary_accounting canvas::build_tests::each_gnode_state_class_resolves_its_own_palette_entry canvas::build_tests::gnode_fill_resolves_from_the_palette_custom_properties canvas::build_tests::independent_assertions_group_into_one_drawn_link canvas::build_tests::link_appearances_keep_resource_identity_across_aliases_and_separate_two_strata canvas::build_tests::pool_has_a_gnode_per_node canvas::build_tests::representation_classes_change_caption_density_and_live_emphasis canvas::build_tests::sample_graph_has_nodes_and_edges canvas::build_tests::simulation_has_a_body_per_node_and_the_edge_topology canvas::build_tests::ticking_moves_nodes_from_the_seed canvas::build_tests::visible_relation_edges_keeps_one_tuple_per_cell_and_drops_hidden_ones canvas::camera_host::tests::a_plain_host_zooms_as_the_canvas_does canvas::camera_host::tests::a_plain_hosts_zoom_stays_in_its_range_and_keeps_the_point canvas::camera_host::tests::commands_reach_a_plain_host_through_its_verbs canvas::camera_host::tests::face_alignment_reads_a_plain_hosts_rectangles canvas::camera_host::tests::two_fingers_move_a_plain_host_as_they_move_the_canvas canvas::canvas_search::tests::forget_removes_from_both_index_and_positions canvas::canvas_search::tests::ingest_tracks_both_index_and_position canvas::canvas_search::tests::move_node_updates_position_only canvas::canvas_search::tests::new_surface_is_empty_no_focus canvas::canvas_search::tests::register_focus_field_emits_field_when_query_and_nodes_present canvas::canvas_search::tests::register_focus_field_without_nodes_returns_none canvas::canvas_search::tests::register_focus_field_without_query_returns_none canvas::canvas_search::tests::register_focus_field_works_with_a_sparse_provider canvas::canvas_search::tests::search_focus_returns_none_without_focus_set canvas::canvas_search::tests::search_focus_returns_top_k_when_focus_set canvas::canvas_search::tests::search_focus_works_with_a_sparse_provider canvas::canvas_search::tests::search_independent_of_focus_query canvas::canvas_search::tests::set_and_clear_focus_query canvas::canvas_search::tests::set_sigma_takes_effect_on_subsequent_field_registration --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 0.31s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "46184"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::build_tests::content_projection_reaches_score_edges_and_fold_boundary_accounting": "ok",
+        "canvas::build_tests::each_gnode_state_class_resolves_its_own_palette_entry": "ok",
+        "canvas::build_tests::gnode_fill_resolves_from_the_palette_custom_properties": "ok",
+        "canvas::build_tests::independent_assertions_group_into_one_drawn_link": "ok",
+        "canvas::build_tests::link_appearances_keep_resource_identity_across_aliases_and_separate_two_strata": "ok",
+        "canvas::build_tests::pool_has_a_gnode_per_node": "ok",
+        "canvas::build_tests::representation_classes_change_caption_density_and_live_emphasis": "ok",
+        "canvas::build_tests::sample_graph_has_nodes_and_edges": "ok",
+        "canvas::build_tests::simulation_has_a_body_per_node_and_the_edge_topology": "ok",
+        "canvas::build_tests::ticking_moves_nodes_from_the_seed": "ok",
+        "canvas::build_tests::visible_relation_edges_keeps_one_tuple_per_cell_and_drops_hidden_ones": "ok",
+        "canvas::camera_host::tests::a_plain_host_zooms_as_the_canvas_does": "ok",
+        "canvas::camera_host::tests::a_plain_hosts_zoom_stays_in_its_range_and_keeps_the_point": "ok",
+        "canvas::camera_host::tests::commands_reach_a_plain_host_through_its_verbs": "ok",
+        "canvas::camera_host::tests::face_alignment_reads_a_plain_hosts_rectangles": "ok",
+        "canvas::camera_host::tests::two_fingers_move_a_plain_host_as_they_move_the_canvas": "ok",
+        "canvas::canvas_search::tests::forget_removes_from_both_index_and_positions": "ok",
+        "canvas::canvas_search::tests::ingest_tracks_both_index_and_position": "ok",
+        "canvas::canvas_search::tests::move_node_updates_position_only": "ok",
+        "canvas::canvas_search::tests::new_surface_is_empty_no_focus": "ok",
+        "canvas::canvas_search::tests::register_focus_field_emits_field_when_query_and_nodes_present": "ok",
+        "canvas::canvas_search::tests::register_focus_field_without_nodes_returns_none": "ok",
+        "canvas::canvas_search::tests::register_focus_field_without_query_returns_none": "ok",
+        "canvas::canvas_search::tests::register_focus_field_works_with_a_sparse_provider": "ok",
+        "canvas::canvas_search::tests::search_focus_returns_none_without_focus_set": "ok",
+        "canvas::canvas_search::tests::search_focus_returns_top_k_when_focus_set": "ok",
+        "canvas::canvas_search::tests::search_focus_works_with_a_sparse_provider": "ok",
+        "canvas::canvas_search::tests::search_independent_of_focus_query": "ok",
+        "canvas::canvas_search::tests::set_and_clear_focus_query": "ok",
+        "canvas::canvas_search::tests::set_sigma_takes_effect_on_subsequent_field_registration": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-03.log",
+      "sha256": "eff534b9bc54b9bf6f46d264b366020b472011adf45d4d95a40a6e7d3d2d645d",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::canvas_search::tests::sparse_provider_selects_the_sparse_store_and_index_stays_empty canvas::cartography::palette_tests::public_node_color_accessors_use_the_canonical_accents canvas::cartography_scene::tests::build_projection_request_threads_intent_from_options canvas::cartography_scene::tests::coverage_refreshes_without_recomputing_channels_or_geometry canvas::cartography_scene::tests::kanban_community_groups_each_cluster_into_its_own_column canvas::cartography_scene::tests::options_default_is_canvas_form_factor canvas::cartography_scene::tests::project_canvas_lens_carries_the_community_halos canvas::cartography_scene::tests::project_canvas_strategy_radial_centers_on_focus_and_no_ops_without_one canvas::cartography_scene::tests::project_canvas_subgraph_lays_out_only_the_scope canvas::cartography_scene::tests::project_spiral_uses_the_portable_score_solver canvas::cartography_scene::tests::signal_overlays_builds_halos_in_cluster_order_then_bridge_emphasis canvas::cartography_scene::tests::signal_overlays_empty_without_signals canvas::community_lane::tests::actor_round_trips_a_partition_with_its_revision canvas::controls::tests::set_zoom_lands_exactly_and_keeps_the_centre_world_point canvas::coupling_paint::tests::force_core_response_is_not_a_visual_overlay canvas::coupling_paint::tests::recognized_visual_emits_overlay_scaled_by_field canvas::coupling_paint::tests::target_far_from_field_gets_no_overlay canvas::coupling_paint::tests::unrecognized_visual_iri_is_skipped canvas::coupling_paint::tests::with_visuals_splices_overlay_inside_the_transform canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_camera_changes_membership_neither_by_zoom_nor_pan canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_graph_swap_reinitializes_membership_and_retired_fields_do_not_bind canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_pause_and_reseed_wire_the_ruled_clock_reset canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_query_rebuilds_keep_stable_identity_and_later_entry_actions canvas::coupling_trace::tests::canvas_live_rebuild_keeps_exact_owners_and_clears_retired_binding_trace canvas::cull::tests::a_visible_caption_is_independent_of_its_offscreen_body canvas::cull::tests::crossing_and_grazing_edges_survive_but_distant_edges_do_not canvas::cull::tests::culling_preserves_gpu_pixels_and_detects_a_lost_crossing_edge canvas::cull::tests::filters_can_reach_the_viewport_from_outside canvas::cull::tests::large_offscreen_population_does_not_reach_scene_lowering canvas::cull::tests::nested_transforms_cull_in_screen_space_and_keep_stack_order --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 1.43s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "152256"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::canvas_search::tests::sparse_provider_selects_the_sparse_store_and_index_stays_empty": "ok",
+        "canvas::cartography::palette_tests::public_node_color_accessors_use_the_canonical_accents": "ok",
+        "canvas::cartography_scene::tests::build_projection_request_threads_intent_from_options": "ok",
+        "canvas::cartography_scene::tests::coverage_refreshes_without_recomputing_channels_or_geometry": "ok",
+        "canvas::cartography_scene::tests::kanban_community_groups_each_cluster_into_its_own_column": "ok",
+        "canvas::cartography_scene::tests::options_default_is_canvas_form_factor": "ok",
+        "canvas::cartography_scene::tests::project_canvas_lens_carries_the_community_halos": "ok",
+        "canvas::cartography_scene::tests::project_canvas_strategy_radial_centers_on_focus_and_no_ops_without_one": "ok",
+        "canvas::cartography_scene::tests::project_canvas_subgraph_lays_out_only_the_scope": "ok",
+        "canvas::cartography_scene::tests::project_spiral_uses_the_portable_score_solver": "ok",
+        "canvas::cartography_scene::tests::signal_overlays_builds_halos_in_cluster_order_then_bridge_emphasis": "ok",
+        "canvas::cartography_scene::tests::signal_overlays_empty_without_signals": "ok",
+        "canvas::community_lane::tests::actor_round_trips_a_partition_with_its_revision": "ok",
+        "canvas::controls::tests::set_zoom_lands_exactly_and_keeps_the_centre_world_point": "ok",
+        "canvas::coupling_paint::tests::force_core_response_is_not_a_visual_overlay": "ok",
+        "canvas::coupling_paint::tests::recognized_visual_emits_overlay_scaled_by_field": "ok",
+        "canvas::coupling_paint::tests::target_far_from_field_gets_no_overlay": "ok",
+        "canvas::coupling_paint::tests::unrecognized_visual_iri_is_skipped": "ok",
+        "canvas::coupling_paint::tests::with_visuals_splices_overlay_inside_the_transform": "ok",
+        "canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_camera_changes_membership_neither_by_zoom_nor_pan": "ok",
+        "canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_graph_swap_reinitializes_membership_and_retired_fields_do_not_bind": "ok",
+        "canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_pause_and_reseed_wire_the_ruled_clock_reset": "ok",
+        "canvas::coupling_trace::field_runtime_tests::field_runtime_canvas_query_rebuilds_keep_stable_identity_and_later_entry_actions": "ok",
+        "canvas::coupling_trace::tests::canvas_live_rebuild_keeps_exact_owners_and_clears_retired_binding_trace": "ok",
+        "canvas::cull::tests::a_visible_caption_is_independent_of_its_offscreen_body": "ok",
+        "canvas::cull::tests::crossing_and_grazing_edges_survive_but_distant_edges_do_not": "ok",
+        "canvas::cull::tests::culling_preserves_gpu_pixels_and_detects_a_lost_crossing_edge": "ok",
+        "canvas::cull::tests::filters_can_reach_the_viewport_from_outside": "ok",
+        "canvas::cull::tests::large_offscreen_population_does_not_reach_scene_lowering": "ok",
+        "canvas::cull::tests::nested_transforms_cull_in_screen_space_and_keep_stack_order": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-04.log",
+      "sha256": "5913ef2debf9e95d6c080cec4dd3e84e891843af6988029a63ffe3435c4d4a7b",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::derived_face::tests::host_height_selects_the_embedded_lod_arm canvas::derived_face::tests::one_byte_vector_recolors_at_decode_time canvas::dynamics_inspection::tests::forme_hold_is_separate_from_explicit_pin_and_hidden_boundary canvas::dynamics_inspection::tests::missing_exact_member_cannot_bind_to_new_graph canvas::dynamics_inspection::tests::reading_dynamics_preserves_graph_selection_pose_and_pause canvas::dynamics_recipe::tests::a_fresh_run_repeats_and_preserves_pinned_positions canvas::dynamics_recipe::tests::a_living_law_caps_and_a_schedule_counts_fixed_ticks canvas::dynamics_recipe::tests::a_position_writing_law_is_not_reported_at_rest_from_zero_velocity canvas::dynamics_recipe::tests::host_refuses_unknown_presets_and_conflicting_targets_before_execution canvas::dynamics_recipe::tests::measure_the_catalog_bound_on_a_fixed_arrangement canvas::face_alignment::tests::every_face_in_view_sits_on_its_body canvas::field_bridge::tests::empty_index_yields_zero_field canvas::field_bridge::tests::euclidean_metric_negates_to_attract_close_nodes canvas::field_bridge::tests::missing_node_position_skipped canvas::field_bridge::tests::peak_lies_at_matching_node_position canvas::field_bridge::tests::register_returns_id_and_inserts_field canvas::fold_paint::tests::boundary_bundles_keep_relation_families_and_directions_distinct canvas::fold_paint::tests::member_boundary_cells_bundle_at_both_stand_ins_once canvas::fold_paint::tests::summary_boundary_routes_to_the_other_summary_not_its_hidden_members canvas::fold_projection::tests::collapsing_descendants_follows_only_the_explicit_family_and_direction canvas::fold_projection::tests::fold_projects_members_and_bundles_only_boundary_cells_by_family canvas::fold_projection::tests::hierarchy_closure_keeps_legacy_surface_and_resource_families_distinct canvas::fold_projection::tests::incident_edge_walk_matches_brute_force_closure_on_large_hierarchy canvas::fold_projection::tests::outgoing_and_incoming_from_mid_chain_yield_distinct_correct_sets canvas::fold_projection::tests::stale_member_refuses_partial_fold canvas::forme_region::tests::explicit_pins_win_and_removing_forme_releases_only_its_holds canvas::forme_region::tests::invalid_region_is_atomic_and_graph_switch_clears_view_constraints canvas::forme_region::tests::local_tile_positions_hold_while_unrelated_dynamics_remain_enabled canvas::forme_region::tests::quiet_boundary_reveals_cells_on_hover_and_selection_and_hides_without_unpinning canvas::forme_region::tests::rule_guides_restore_base_without_moving_or_unpinning_members --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 21.65s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "72496"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::derived_face::tests::host_height_selects_the_embedded_lod_arm": "ok",
+        "canvas::derived_face::tests::one_byte_vector_recolors_at_decode_time": "ok",
+        "canvas::dynamics_inspection::tests::forme_hold_is_separate_from_explicit_pin_and_hidden_boundary": "ok",
+        "canvas::dynamics_inspection::tests::missing_exact_member_cannot_bind_to_new_graph": "ok",
+        "canvas::dynamics_inspection::tests::reading_dynamics_preserves_graph_selection_pose_and_pause": "ok",
+        "canvas::dynamics_recipe::tests::a_fresh_run_repeats_and_preserves_pinned_positions": "ok",
+        "canvas::dynamics_recipe::tests::a_living_law_caps_and_a_schedule_counts_fixed_ticks": "ok",
+        "canvas::dynamics_recipe::tests::a_position_writing_law_is_not_reported_at_rest_from_zero_velocity": "ok",
+        "canvas::dynamics_recipe::tests::host_refuses_unknown_presets_and_conflicting_targets_before_execution": "ok",
+        "canvas::dynamics_recipe::tests::measure_the_catalog_bound_on_a_fixed_arrangement": "ok",
+        "canvas::face_alignment::tests::every_face_in_view_sits_on_its_body": "ok",
+        "canvas::field_bridge::tests::empty_index_yields_zero_field": "ok",
+        "canvas::field_bridge::tests::euclidean_metric_negates_to_attract_close_nodes": "ok",
+        "canvas::field_bridge::tests::missing_node_position_skipped": "ok",
+        "canvas::field_bridge::tests::peak_lies_at_matching_node_position": "ok",
+        "canvas::field_bridge::tests::register_returns_id_and_inserts_field": "ok",
+        "canvas::fold_paint::tests::boundary_bundles_keep_relation_families_and_directions_distinct": "ok",
+        "canvas::fold_paint::tests::member_boundary_cells_bundle_at_both_stand_ins_once": "ok",
+        "canvas::fold_paint::tests::summary_boundary_routes_to_the_other_summary_not_its_hidden_members": "ok",
+        "canvas::fold_projection::tests::collapsing_descendants_follows_only_the_explicit_family_and_direction": "ok",
+        "canvas::fold_projection::tests::fold_projects_members_and_bundles_only_boundary_cells_by_family": "ok",
+        "canvas::fold_projection::tests::hierarchy_closure_keeps_legacy_surface_and_resource_families_distinct": "ok",
+        "canvas::fold_projection::tests::incident_edge_walk_matches_brute_force_closure_on_large_hierarchy": "ok",
+        "canvas::fold_projection::tests::outgoing_and_incoming_from_mid_chain_yield_distinct_correct_sets": "ok",
+        "canvas::fold_projection::tests::stale_member_refuses_partial_fold": "ok",
+        "canvas::forme_region::tests::explicit_pins_win_and_removing_forme_releases_only_its_holds": "ok",
+        "canvas::forme_region::tests::invalid_region_is_atomic_and_graph_switch_clears_view_constraints": "ok",
+        "canvas::forme_region::tests::local_tile_positions_hold_while_unrelated_dynamics_remain_enabled": "ok",
+        "canvas::forme_region::tests::quiet_boundary_reveals_cells_on_hover_and_selection_and_hides_without_unpinning": "ok",
+        "canvas::forme_region::tests::rule_guides_restore_base_without_moving_or_unpinning_members": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-05.log",
+      "sha256": "6946d5e9e80355f6c9ff02a2b6b2cdc707940780829b97516b8e430d2493a0ec",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::frame::tests::explicit_face_override_suppresses_the_content_default canvas::frame::tests::favicon_node_emits_an_image_op canvas::frame::tests::game_of_life_backdrop_keeps_redrawing_until_cleared canvas::frame::tests::node_without_favicon_emits_a_derived_path canvas::frame::tests::palette_swap_recolors_the_cached_face_without_rederiving canvas::frame::tests::registered_sprite_scene_prop_emits_an_image_op canvas::frame::tests::unregistered_sprite_scene_prop_emits_no_image_op canvas::frame::tests::visible_cache_miss_requests_the_image_once canvas::gestures::tests::a_pan_at_once_covers_the_glide canvas::gestures::tests::a_pinch_past_the_range_keeps_the_held_point canvas::gestures::tests::a_wheel_zoom_keeps_the_point_under_the_pointer canvas::gestures::tests::one_finger_is_the_pages_unless_it_holds_a_node canvas::gestures::tests::the_wheel_preference_preserves_modified_zoom_in_every_mode canvas::gestures::tests::two_fingers_pan_and_pinch_about_their_centre canvas::link_reading::tests::exact_containment_assertions_keep_direction_ids_and_held_history_projection canvas::link_reading::tests::explicit_history_reads_first_last_withdrawal_and_basis_but_default_is_held_only canvas::link_reading::tests::portable_link_reads_bound_held_work_and_materialize_substantial_history canvas::link_reading::tests::reading_keys_each_stratum_separately_and_preserves_assertion_source_facts canvas::link_reading::tests::summary_free_read_keeps_traversal_members_without_copying_event_history canvas::node_presentation::tests::graph_replacement_clears_faces_and_refuses_old_epoch canvas::node_presentation::tests::rule_faces_preserve_source_pose_selection_pins_and_footprint canvas::node_presentation::tests::unsupported_face_and_missing_member_refuse_without_partial_replacement canvas::palette::tests::declarations_carry_the_palette_values canvas::palette::tests::declarations_define_every_var_the_sheets_reference canvas::palette::tests::derived_face_palette_comes_from_theme_seeds canvas::palette::tests::each_state_maps_to_its_own_accent canvas::palette::tests::resolved_face_palette_keeps_selected_mode_roles_and_alpha canvas::palette::tests::selection_wins_over_every_activation_state canvas::palette::tests::unit_normalizes_to_zero_one canvas::physics_board::tests::charge_separates_overlapping_slots_and_orbit_never_rests --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 5.38s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "283680"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::frame::tests::explicit_face_override_suppresses_the_content_default": "ok",
+        "canvas::frame::tests::favicon_node_emits_an_image_op": "ok",
+        "canvas::frame::tests::game_of_life_backdrop_keeps_redrawing_until_cleared": "ok",
+        "canvas::frame::tests::node_without_favicon_emits_a_derived_path": "ok",
+        "canvas::frame::tests::palette_swap_recolors_the_cached_face_without_rederiving": "ok",
+        "canvas::frame::tests::registered_sprite_scene_prop_emits_an_image_op": "ok",
+        "canvas::frame::tests::unregistered_sprite_scene_prop_emits_no_image_op": "ok",
+        "canvas::frame::tests::visible_cache_miss_requests_the_image_once": "ok",
+        "canvas::gestures::tests::a_pan_at_once_covers_the_glide": "ok",
+        "canvas::gestures::tests::a_pinch_past_the_range_keeps_the_held_point": "ok",
+        "canvas::gestures::tests::a_wheel_zoom_keeps_the_point_under_the_pointer": "ok",
+        "canvas::gestures::tests::one_finger_is_the_pages_unless_it_holds_a_node": "ok",
+        "canvas::gestures::tests::the_wheel_preference_preserves_modified_zoom_in_every_mode": "ok",
+        "canvas::gestures::tests::two_fingers_pan_and_pinch_about_their_centre": "ok",
+        "canvas::link_reading::tests::exact_containment_assertions_keep_direction_ids_and_held_history_projection": "ok",
+        "canvas::link_reading::tests::explicit_history_reads_first_last_withdrawal_and_basis_but_default_is_held_only": "ok",
+        "canvas::link_reading::tests::portable_link_reads_bound_held_work_and_materialize_substantial_history": "ok",
+        "canvas::link_reading::tests::reading_keys_each_stratum_separately_and_preserves_assertion_source_facts": "ok",
+        "canvas::link_reading::tests::summary_free_read_keeps_traversal_members_without_copying_event_history": "ok",
+        "canvas::node_presentation::tests::graph_replacement_clears_faces_and_refuses_old_epoch": "ok",
+        "canvas::node_presentation::tests::rule_faces_preserve_source_pose_selection_pins_and_footprint": "ok",
+        "canvas::node_presentation::tests::unsupported_face_and_missing_member_refuse_without_partial_replacement": "ok",
+        "canvas::palette::tests::declarations_carry_the_palette_values": "ok",
+        "canvas::palette::tests::declarations_define_every_var_the_sheets_reference": "ok",
+        "canvas::palette::tests::derived_face_palette_comes_from_theme_seeds": "ok",
+        "canvas::palette::tests::each_state_maps_to_its_own_accent": "ok",
+        "canvas::palette::tests::resolved_face_palette_keeps_selected_mode_roles_and_alpha": "ok",
+        "canvas::palette::tests::selection_wins_over_every_activation_state": "ok",
+        "canvas::palette::tests::unit_normalizes_to_zero_one": "ok",
+        "canvas::physics_board::tests::charge_separates_overlapping_slots_and_orbit_never_rests": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-06.log",
+      "sha256": "71a8e2bbf23b19db6b572b975ff8ce205cef56c781f2f2d3b467f09807c1c469",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::physics_board::tests::drag_pins_one_item_and_release_returns_toward_its_slot canvas::physics_board::tests::halt_cancels_drag_and_sync_removal_clears_it canvas::physics_board::tests::items_hold_their_slots_and_a_new_one_joins_without_reseeding canvas::physics_board::tests::the_board_takes_a_stage_and_refuses_a_schedule canvas::physics_controls::tests::a_custom_pair_names_no_profile_until_it_matches_again canvas::physics_controls::tests::a_profile_synchronizes_law_and_overlays_and_keeps_sources canvas::physics_controls::tests::a_stop_returns_anchored_items_by_a_transition canvas::physics_controls::tests::free_drops_the_strategy_and_an_analytic_arrangement_restores_it canvas::physics_controls::tests::law_start_reads_rose_and_fell_only_past_the_start canvas::physics_controls::tests::physics_apply_sets_sources_overlays_and_law_together canvas::physics_controls::tests::switches_follow_the_layout_a_pan_or_zoom_stops_it_and_fit_resumes_it canvas::projection_backdrops::tests::concave_contact_geometry_refuses_instead_of_filling_its_hull canvas::projection_backdrops::tests::nested_space_rotation_and_scale_reach_both_paint_and_contact canvas::projection_backdrops::tests::tangible_and_invisible_backdrops_exclude_nodes_with_intangible_control canvas::projection_backdrops::tests::unknown_kinds_paint_and_refusals_preserve_the_bound_layer canvas::projection_dynamics::tests::authored_translation_is_used_as_the_pinned_home_without_rewriting_disclosure canvas::projection_dynamics::tests::binding_refuses_unknown_roles_endpoints_channels_and_legacy_relation_inputs canvas::projection_dynamics::tests::composed_and_scheduled_slots_reopen_without_saving_a_running_stage canvas::projection_dynamics::tests::disclosed_edges_drive_springs_without_graph_assertions_and_keep_source_identity canvas::projection_dynamics::tests::repeated_source_occurrences_take_independent_roles_and_fixed_tick_is_reproducible canvas::relationship_topology::tests::absent_access_refuses_instead_of_retargeting_equal_address canvas::relationship_topology::tests::assertions_preserve_current_projected_row_multiplicity canvas::relationship_topology::tests::closed_surface_link_hide_filters_all_rows_without_merging_their_controller_weight canvas::relationship_topology::tests::directions_strata_and_self_links_do_not_collapse canvas::relationship_topology::tests::exact_same_kind_containment_keeps_independent_hide_handles canvas::relationship_topology::tests::open_predicates_keep_handles_without_recognized_kind_invention canvas::relationship_topology::tests::parallel_buckets_preserve_input_multiplicity_and_assertion_handles canvas::relationship_topology::tests::repeated_accesses_share_owner_but_keep_displayed_pair canvas::relationship_topology::tests::shared_bucket_keeps_every_kind_and_repeated_access_direction canvas::relationship_topology::tests::visibility_and_controller_share_exact_cell_filter --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 2.01s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "55180"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::physics_board::tests::drag_pins_one_item_and_release_returns_toward_its_slot": "ok",
+        "canvas::physics_board::tests::halt_cancels_drag_and_sync_removal_clears_it": "ok",
+        "canvas::physics_board::tests::items_hold_their_slots_and_a_new_one_joins_without_reseeding": "ok",
+        "canvas::physics_board::tests::the_board_takes_a_stage_and_refuses_a_schedule": "ok",
+        "canvas::physics_controls::tests::a_custom_pair_names_no_profile_until_it_matches_again": "ok",
+        "canvas::physics_controls::tests::a_profile_synchronizes_law_and_overlays_and_keeps_sources": "ok",
+        "canvas::physics_controls::tests::a_stop_returns_anchored_items_by_a_transition": "ok",
+        "canvas::physics_controls::tests::free_drops_the_strategy_and_an_analytic_arrangement_restores_it": "ok",
+        "canvas::physics_controls::tests::law_start_reads_rose_and_fell_only_past_the_start": "ok",
+        "canvas::physics_controls::tests::physics_apply_sets_sources_overlays_and_law_together": "ok",
+        "canvas::physics_controls::tests::switches_follow_the_layout_a_pan_or_zoom_stops_it_and_fit_resumes_it": "ok",
+        "canvas::projection_backdrops::tests::concave_contact_geometry_refuses_instead_of_filling_its_hull": "ok",
+        "canvas::projection_backdrops::tests::nested_space_rotation_and_scale_reach_both_paint_and_contact": "ok",
+        "canvas::projection_backdrops::tests::tangible_and_invisible_backdrops_exclude_nodes_with_intangible_control": "ok",
+        "canvas::projection_backdrops::tests::unknown_kinds_paint_and_refusals_preserve_the_bound_layer": "ok",
+        "canvas::projection_dynamics::tests::authored_translation_is_used_as_the_pinned_home_without_rewriting_disclosure": "ok",
+        "canvas::projection_dynamics::tests::binding_refuses_unknown_roles_endpoints_channels_and_legacy_relation_inputs": "ok",
+        "canvas::projection_dynamics::tests::composed_and_scheduled_slots_reopen_without_saving_a_running_stage": "ok",
+        "canvas::projection_dynamics::tests::disclosed_edges_drive_springs_without_graph_assertions_and_keep_source_identity": "ok",
+        "canvas::projection_dynamics::tests::repeated_source_occurrences_take_independent_roles_and_fixed_tick_is_reproducible": "ok",
+        "canvas::relationship_topology::tests::absent_access_refuses_instead_of_retargeting_equal_address": "ok",
+        "canvas::relationship_topology::tests::assertions_preserve_current_projected_row_multiplicity": "ok",
+        "canvas::relationship_topology::tests::closed_surface_link_hide_filters_all_rows_without_merging_their_controller_weight": "ok",
+        "canvas::relationship_topology::tests::directions_strata_and_self_links_do_not_collapse": "ok",
+        "canvas::relationship_topology::tests::exact_same_kind_containment_keeps_independent_hide_handles": "ok",
+        "canvas::relationship_topology::tests::open_predicates_keep_handles_without_recognized_kind_invention": "ok",
+        "canvas::relationship_topology::tests::parallel_buckets_preserve_input_multiplicity_and_assertion_handles": "ok",
+        "canvas::relationship_topology::tests::repeated_accesses_share_owner_but_keep_displayed_pair": "ok",
+        "canvas::relationship_topology::tests::shared_bucket_keeps_every_kind_and_repeated_access_direction": "ok",
+        "canvas::relationship_topology::tests::visibility_and_controller_share_exact_cell_filter": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-07.log",
+      "sha256": "a4dc9a492104f69ed62186c843511dab2e122432fe31ab7ce19ceda653a8ad0d",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::resolved_image_cache::tests::evicts_the_least_recently_used_entry_under_the_byte_bound canvas::resolved_image_cache::tests::shrinking_the_limit_evicts_and_an_oversize_entry_is_not_retained canvas::responsive_link_adapter::tests::cohort_keeps_each_link_appearance_and_reversible_source_identity canvas::responsive_link_adapter::tests::compatibility_is_explicit_and_uses_the_full_appearance_selector canvas::responsive_link_adapter::tests::empty_tombstone_bucket_cannot_become_a_responsive_appearance canvas::responsive_link_adapter::tests::invalid_or_unbounded_source_cohorts_are_refused_before_evaluation canvas::responsive_link_adapter::tests::source_context_must_match_and_each_displayed_endpoint_position_is_resolved_once canvas::responsive_links::controls_tests::active_global_graph_vector_field_is_evaluated_from_its_graph_identity canvas::responsive_links::controls_tests::cyclic_graph_field_samples_refuse_without_replacing_resting_paths canvas::responsive_links::controls_tests::deep_local_expression_refuses_before_geometry_work canvas::responsive_links::controls_tests::geometry::both_strata_and_resource_aliases_keep_exact_display_pairs_and_bucket_direction canvas::responsive_links::controls_tests::geometry::exact_assertion_hide_removes_only_that_reason_from_the_painted_source_bucket canvas::responsive_links::controls_tests::geometry::more_than_numen_appearance_limit_refuses_without_truncating_rest_paths canvas::responsive_links::controls_tests::geometry::self_link_keeps_its_resting_arch_while_other_links_respond canvas::responsive_links::controls_tests::graph_and_local_field_ast_samples_fail_closed_for_missing_retired_or_wrong_kind_targets canvas::responsive_links::controls_tests::sample_chain_depth_is_bounded_across_stored_field_definitions canvas::responsive_links::controls_tests::unrelated_invalid_field_does_not_enter_a_local_response_dependency_closure canvas::responsive_links::controls_tests::unsupported_graph_fields_refuse_and_retain_exact_rest_geometry canvas::responsive_links::tests::compatibility_only_keeps_ungrouped_paths_at_exact_rest_geometry canvas::responsive_links::tests::declared_view_field_replaces_live_canvas_rest_path_and_remains_pickable canvas::responsive_links::tests::graph_swap_clears_graph_field_and_compatibility_targets canvas::responsive_links::tests::hidden_member_of_explicit_compatibility_group_does_not_refuse_remaining_paths canvas::responsive_links::tests::ordinary_canvas_response_is_off_by_default_and_does_not_touch_graph_truth canvas::responsive_links::tests::stale_explicit_compatibility_target_refuses_without_hiding_rest_geometry canvas::scene_axes::tests::sources_stand_left_and_each_derivation_adds_a_column canvas::scene_axes::tests::tags_become_sorted_memberships canvas::scene_paint::tests::camera_isometric_foreshortens_y_and_round_trips canvas::scene_paint::tests::camera_top_down_is_plain_scale_translate canvas::scene_paint::tests::edge_weight_scales_the_stroke_width canvas::scene_paint::tests::edge_with_missing_endpoint_is_skipped --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 1.17s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "46848"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::resolved_image_cache::tests::evicts_the_least_recently_used_entry_under_the_byte_bound": "ok",
+        "canvas::resolved_image_cache::tests::shrinking_the_limit_evicts_and_an_oversize_entry_is_not_retained": "ok",
+        "canvas::responsive_link_adapter::tests::cohort_keeps_each_link_appearance_and_reversible_source_identity": "ok",
+        "canvas::responsive_link_adapter::tests::compatibility_is_explicit_and_uses_the_full_appearance_selector": "ok",
+        "canvas::responsive_link_adapter::tests::empty_tombstone_bucket_cannot_become_a_responsive_appearance": "ok",
+        "canvas::responsive_link_adapter::tests::invalid_or_unbounded_source_cohorts_are_refused_before_evaluation": "ok",
+        "canvas::responsive_link_adapter::tests::source_context_must_match_and_each_displayed_endpoint_position_is_resolved_once": "ok",
+        "canvas::responsive_links::controls_tests::active_global_graph_vector_field_is_evaluated_from_its_graph_identity": "ok",
+        "canvas::responsive_links::controls_tests::cyclic_graph_field_samples_refuse_without_replacing_resting_paths": "ok",
+        "canvas::responsive_links::controls_tests::deep_local_expression_refuses_before_geometry_work": "ok",
+        "canvas::responsive_links::controls_tests::geometry::both_strata_and_resource_aliases_keep_exact_display_pairs_and_bucket_direction": "ok",
+        "canvas::responsive_links::controls_tests::geometry::exact_assertion_hide_removes_only_that_reason_from_the_painted_source_bucket": "ok",
+        "canvas::responsive_links::controls_tests::geometry::more_than_numen_appearance_limit_refuses_without_truncating_rest_paths": "ok",
+        "canvas::responsive_links::controls_tests::geometry::self_link_keeps_its_resting_arch_while_other_links_respond": "ok",
+        "canvas::responsive_links::controls_tests::graph_and_local_field_ast_samples_fail_closed_for_missing_retired_or_wrong_kind_targets": "ok",
+        "canvas::responsive_links::controls_tests::sample_chain_depth_is_bounded_across_stored_field_definitions": "ok",
+        "canvas::responsive_links::controls_tests::unrelated_invalid_field_does_not_enter_a_local_response_dependency_closure": "ok",
+        "canvas::responsive_links::controls_tests::unsupported_graph_fields_refuse_and_retain_exact_rest_geometry": "ok",
+        "canvas::responsive_links::tests::compatibility_only_keeps_ungrouped_paths_at_exact_rest_geometry": "ok",
+        "canvas::responsive_links::tests::declared_view_field_replaces_live_canvas_rest_path_and_remains_pickable": "ok",
+        "canvas::responsive_links::tests::graph_swap_clears_graph_field_and_compatibility_targets": "ok",
+        "canvas::responsive_links::tests::hidden_member_of_explicit_compatibility_group_does_not_refuse_remaining_paths": "ok",
+        "canvas::responsive_links::tests::ordinary_canvas_response_is_off_by_default_and_does_not_touch_graph_truth": "ok",
+        "canvas::responsive_links::tests::stale_explicit_compatibility_target_refuses_without_hiding_rest_geometry": "ok",
+        "canvas::scene_axes::tests::sources_stand_left_and_each_derivation_adds_a_column": "ok",
+        "canvas::scene_axes::tests::tags_become_sorted_memberships": "ok",
+        "canvas::scene_paint::tests::camera_isometric_foreshortens_y_and_round_trips": "ok",
+        "canvas::scene_paint::tests::camera_top_down_is_plain_scale_translate": "ok",
+        "canvas::scene_paint::tests::edge_weight_scales_the_stroke_width": "ok",
+        "canvas::scene_paint::tests::edge_with_missing_endpoint_is_skipped": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-08.log",
+      "sha256": "34e480ac83ac959d727ba074a23a54c18599386a9983c7e762f668b401705e4e",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::scene_paint::tests::empty_projection_is_just_the_camera_frame canvas::scene_paint::tests::ground_transform_matches_to_screen_under_yaw canvas::scene_paint::tests::paints_camera_then_edges_then_nodes canvas::scene_paint::tests::trim_to_faces_pulls_endpoints_to_the_radii canvas::seiche_bridge::assertion_hide_controls::exact_hide_removes_one_reason_spring_without_hiding_its_same_kind_sibling canvas::seiche_bridge::tests::build_simulation_wires_couplings_in canvas::seiche_bridge::tests::coupling_resolves_field_and_selector_targets canvas::seiche_bridge::tests::coupling_selector_narrows_the_target_snapshot canvas::seiche_bridge::tests::coupling_with_unknown_field_resolves_to_none canvas::sprite_hull::tests::opaque_square_traces_to_four_corners canvas::sprite_hull::tests::simplify_decimates_curves_but_keeps_corners canvas::sprite_hull::tests::transparent_image_yields_no_hull canvas::territory::tests::each_domain_claims_its_side_most_clearly_far_from_the_border canvas::territory::tests::runs_merge_along_rows_and_one_domain_holds_everything_clearly --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 539 filtered out; finished in 0.01s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "35532"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::scene_paint::tests::empty_projection_is_just_the_camera_frame": "ok",
+        "canvas::scene_paint::tests::ground_transform_matches_to_screen_under_yaw": "ok",
+        "canvas::scene_paint::tests::paints_camera_then_edges_then_nodes": "ok",
+        "canvas::scene_paint::tests::trim_to_faces_pulls_endpoints_to_the_radii": "ok",
+        "canvas::seiche_bridge::assertion_hide_controls::exact_hide_removes_one_reason_spring_without_hiding_its_same_kind_sibling": "ok",
+        "canvas::seiche_bridge::tests::build_simulation_wires_couplings_in": "ok",
+        "canvas::seiche_bridge::tests::coupling_resolves_field_and_selector_targets": "ok",
+        "canvas::seiche_bridge::tests::coupling_selector_narrows_the_target_snapshot": "ok",
+        "canvas::seiche_bridge::tests::coupling_with_unknown_field_resolves_to_none": "ok",
+        "canvas::sprite_hull::tests::opaque_square_traces_to_four_corners": "ok",
+        "canvas::sprite_hull::tests::simplify_decimates_curves_but_keeps_corners": "ok",
+        "canvas::sprite_hull::tests::transparent_image_yields_no_hull": "ok",
+        "canvas::territory::tests::each_domain_claims_its_side_most_clearly_far_from_the_border": "ok",
+        "canvas::territory::tests::runs_merge_along_rows_and_one_domain_holds_everything_clearly": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-09.log",
+      "sha256": "7a6a074eed0c221c8dbe7fa9a1f322570e23b1f8a071a8a7046336bb34ee6356",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::affinity::affinity_force_refreshes_on_a_topology_change canvas::tests::affinity::blend_affinity_pairs_noisy_ors_shared_weights canvas::tests::affinity::blend_unions_structural_and_content_pairs canvas::tests::affinity::cluster_by_affinity_installs_and_clears_the_affinity_force canvas::tests::affinity::community_cache_fills_and_invalidates_on_topology_change canvas::tests::affinity::content_affinity_reinstalls_after_a_toggle_cycle canvas::tests::affinity::content_affinity_supersedes_structural_and_reverts canvas::tests::affinity::empty_content_affinity_is_authoritative_but_inert --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.55s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "55300"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::affinity::affinity_force_refreshes_on_a_topology_change": "ok",
+        "canvas::tests::affinity::blend_affinity_pairs_noisy_ors_shared_weights": "ok",
+        "canvas::tests::affinity::blend_unions_structural_and_content_pairs": "ok",
+        "canvas::tests::affinity::cluster_by_affinity_installs_and_clears_the_affinity_force": "ok",
+        "canvas::tests::affinity::community_cache_fills_and_invalidates_on_topology_change": "ok",
+        "canvas::tests::affinity::content_affinity_reinstalls_after_a_toggle_cycle": "ok",
+        "canvas::tests::affinity::content_affinity_supersedes_structural_and_reverts": "ok",
+        "canvas::tests::affinity::empty_content_affinity_is_authoritative_but_inert": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-10.log",
+      "sha256": "d1587989f1ea74b88c45b7e03d7d3c6404cec92d42402a27fc56aca2122dca2a",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::arrangement_goldens::every_arrangement_matches_its_golden_on_both_fixtures canvas::tests::arrangement_goldens::resource_and_surface_topologies_have_identical_arrangements canvas::tests::arrangement_roles::a_drag_follows_the_items_role canvas::tests::arrangement_roles::a_drag_follows_the_role_and_scopes_override_in_order canvas::tests::arrangement_roles::a_pick_keeps_play_and_a_stop_returns_by_role canvas::tests::arrangement_roles::an_encoded_axis_stays_fixed_while_the_free_axis_separates canvas::tests::arrangement_roles::an_item_role_overrides_its_group_role canvas::tests::arrangement_roles::an_item_role_overrides_the_recipe_role --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 16.31s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "62124"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::arrangement_goldens::every_arrangement_matches_its_golden_on_both_fixtures": "ok",
+        "canvas::tests::arrangement_goldens::resource_and_surface_topologies_have_identical_arrangements": "ok",
+        "canvas::tests::arrangement_roles::a_drag_follows_the_items_role": "ok",
+        "canvas::tests::arrangement_roles::a_drag_follows_the_role_and_scopes_override_in_order": "ok",
+        "canvas::tests::arrangement_roles::a_pick_keeps_play_and_a_stop_returns_by_role": "ok",
+        "canvas::tests::arrangement_roles::an_encoded_axis_stays_fixed_while_the_free_axis_separates": "ok",
+        "canvas::tests::arrangement_roles::an_item_role_overrides_its_group_role": "ok",
+        "canvas::tests::arrangement_roles::an_item_role_overrides_the_recipe_role": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-11.log",
+      "sha256": "c328d90070980d23992fbf247a534d1f9308e96dbd30b3bd8ac7fdbc02814ce9",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::arrangement_roles::settled_holds_the_last_settle_and_a_living_law_leaves_it canvas::tests::binding::a_composition_opened_from_its_spec_runs_as_the_api_set_one canvas::tests::binding::a_slot_takes_only_its_own_family canvas::tests::binding::a_source_edit_keeps_what_runs_and_a_law_change_replaces_it canvas::tests::binding::every_admitted_choice_round_trips_through_a_spec canvas::tests::binding::every_profile_names_itself_after_a_reopen canvas::tests::binding::roles_ride_the_target_and_a_given_partition_has_no_spec canvas::tests::binding::the_record_keeps_an_opened_spec_and_what_an_edit_does_not_touch --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 36.16s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "54856"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::arrangement_roles::settled_holds_the_last_settle_and_a_living_law_leaves_it": "ok",
+        "canvas::tests::binding::a_composition_opened_from_its_spec_runs_as_the_api_set_one": "ok",
+        "canvas::tests::binding::a_slot_takes_only_its_own_family": "ok",
+        "canvas::tests::binding::a_source_edit_keeps_what_runs_and_a_law_change_replaces_it": "ok",
+        "canvas::tests::binding::every_admitted_choice_round_trips_through_a_spec": "ok",
+        "canvas::tests::binding::every_profile_names_itself_after_a_reopen": "ok",
+        "canvas::tests::binding::roles_ride_the_target_and_a_given_partition_has_no_spec": "ok",
+        "canvas::tests::binding::the_record_keeps_an_opened_spec_and_what_an_edit_does_not_touch": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-12.log",
+      "sha256": "5fced90efae5f14e39bfb861be159b73f71781cf16ac6203be1d5b18a531cbe2",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::binding::the_seed_reaches_kinds canvas::tests::bounded_scenes::a_saved_scene_carries_the_seed_and_the_regions canvas::tests::bounded_scenes::partition_subdivides_the_viewport_by_site canvas::tests::bounded_scenes::provenance_stands_sources_left canvas::tests::bounded_scenes::sets_draw_the_common_tags_and_place_by_membership canvas::tests::bounded_scenes::sets_read_public_resource_tags_without_legacy_surface_tags canvas::tests::bounded_scenes::the_territory_field_claims_ground_by_site_beneath_the_graph canvas::tests::camera::camera_round_trips_and_guards_bad_zoom --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.53s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "55236"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::binding::the_seed_reaches_kinds": "ok",
+        "canvas::tests::bounded_scenes::a_saved_scene_carries_the_seed_and_the_regions": "ok",
+        "canvas::tests::bounded_scenes::partition_subdivides_the_viewport_by_site": "ok",
+        "canvas::tests::bounded_scenes::provenance_stands_sources_left": "ok",
+        "canvas::tests::bounded_scenes::sets_draw_the_common_tags_and_place_by_membership": "ok",
+        "canvas::tests::bounded_scenes::sets_read_public_resource_tags_without_legacy_surface_tags": "ok",
+        "canvas::tests::bounded_scenes::the_territory_field_claims_ground_by_site_beneath_the_graph": "ok",
+        "canvas::tests::camera::camera_round_trips_and_guards_bad_zoom": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-13.log",
+      "sha256": "b3291b7e04e2d19cc62c9e478d6b56b60b1305e3ef788aa4e3cd08961a9b93e0",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::camera::resize_keeps_the_viewport_center_world_point_fixed canvas::tests::camera::screen_to_world_inverts_the_camera canvas::tests::camera::zoom_at_keeps_the_anchor_world_point_fixed canvas::tests::combinators::a_composition_takes_force_laws_only_and_a_pick_replaces_it canvas::tests::combinators::a_weighted_mix_pushes_as_each_pure_law_at_one_and_zero canvas::tests::combinators::a_weighted_mix_runs_as_each_pure_law_at_one_and_zero canvas::tests::combinators::every_catalog_term_is_on_the_common_scale_or_named_outside_it canvas::tests::combinators::every_law_reports_its_currency --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.39s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "45028"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::camera::resize_keeps_the_viewport_center_world_point_fixed": "ok",
+        "canvas::tests::camera::screen_to_world_inverts_the_camera": "ok",
+        "canvas::tests::camera::zoom_at_keeps_the_anchor_world_point_fixed": "ok",
+        "canvas::tests::combinators::a_composition_takes_force_laws_only_and_a_pick_replaces_it": "ok",
+        "canvas::tests::combinators::a_weighted_mix_pushes_as_each_pure_law_at_one_and_zero": "ok",
+        "canvas::tests::combinators::a_weighted_mix_runs_as_each_pure_law_at_one_and_zero": "ok",
+        "canvas::tests::combinators::every_catalog_term_is_on_the_common_scale_or_named_outside_it": "ok",
+        "canvas::tests::combinators::every_law_reports_its_currency": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-14.log",
+      "sha256": "21f8809a572b4ed2de41d2b10672aa26e159ed387efa78e69045b2a709354d12",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::combinators::the_catalog_composes_converts_or_refuses_each_overlay_by_currency canvas::tests::density::density_holds_the_bar_on_fifty_nodes_from_all_sixteen_starts canvas::tests::density::density_holds_the_bar_on_the_generated_graph_from_all_sixteen_starts canvas::tests::density::density_on_the_sample_rises_and_evens_from_all_sixteen_starts canvas::tests::density::density_on_the_sample_rises_and_evens_past_the_settle_budget canvas::tests::density::uniform_mass_spreads_evenly canvas::tests::density_admits::every_overlay_density_admits_holds_its_bar_at_all_sixteen_starts canvas::tests::density_admits::probe_density_with_each_overlay_converted --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 2 passed; 0 failed; 6 ignored; 0 measured; 545 filtered out; finished in 1.76s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "47960"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::combinators::the_catalog_composes_converts_or_refuses_each_overlay_by_currency": "ok",
+        "canvas::tests::density::density_holds_the_bar_on_fifty_nodes_from_all_sixteen_starts": "ignored, release receipt: the module doc's one line runs it",
+        "canvas::tests::density::density_holds_the_bar_on_the_generated_graph_from_all_sixteen_starts": "ignored, release receipt: the module doc's one line runs it",
+        "canvas::tests::density::density_on_the_sample_rises_and_evens_from_all_sixteen_starts": "ignored, release receipt: the module doc's one line runs it",
+        "canvas::tests::density::density_on_the_sample_rises_and_evens_past_the_settle_budget": "ok",
+        "canvas::tests::density::uniform_mass_spreads_evenly": "ignored, release receipt: the module doc's one line runs it",
+        "canvas::tests::density_admits::every_overlay_density_admits_holds_its_bar_at_all_sixteen_starts": "ignored, release receipt: the module doc's one line runs it",
+        "canvas::tests::density_admits::probe_density_with_each_overlay_converted": "ignored, release probe for G3's Density question; prints its table"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-15.log",
+      "sha256": "666b1a5bcf4ab96bdf0de3757a0c461d341377c7b1d1f18cd466e1b14ee55def",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::density_admits::probe_f73_candidates_over_all_sixteen_starts canvas::tests::density_admits::the_bar_holds_to_the_run_s_resolution canvas::tests::density_probe::density_convergence_probe canvas::tests::density_wander::density_anisotropy_checks canvas::tests::density_wander::density_orientation_probe canvas::tests::density_wander::density_sample_stop_against_cap canvas::tests::density_wander::density_start_probe canvas::tests::density_wander::density_start_probe_inequivalent --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 7 ignored; 0 measured; 545 filtered out; finished in 0.00s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "17116"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::density_admits::probe_f73_candidates_over_all_sixteen_starts": "ignored, release probe for F73; prints its table",
+        "canvas::tests::density_admits::the_bar_holds_to_the_run_s_resolution": "ok",
+        "canvas::tests::density_probe::density_convergence_probe": "ignored, convergence probe: prints a per-pass trace",
+        "canvas::tests::density_wander::density_anisotropy_checks": "ignored, wander probe: anisotropy checks and stop against cap",
+        "canvas::tests::density_wander::density_orientation_probe": "ignored, wander probe: rank against the seed's turn over a quarter turn",
+        "canvas::tests::density_wander::density_sample_stop_against_cap": "ignored, wander probe: the sample's stop against its cap over dealt starts",
+        "canvas::tests::density_wander::density_start_probe": "ignored, wander probe: rank at the stop over eight starts",
+        "canvas::tests::density_wander::density_start_probe_inequivalent": "ignored, wander probe: rank at the stop over sixteen inequivalent starts"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-16.log",
+      "sha256": "fef92da118d1634d05b242aed17217d98bed2e61ef443f3d056ce74e049a2baa",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::density_wander::density_stop_variants canvas::tests::density_wander::density_wander_probe canvas::tests::density_wander::density_wander_springs_control canvas::tests::dynamics_spec::density_takes_the_overlays_it_admits_and_refuses_the_rest canvas::tests::dynamics_spec::every_law_and_overlay_is_a_preset_whose_rows_are_the_catalogs canvas::tests::dynamics_spec::every_raw_kind_matches_the_catalog_built_force_row_by_row canvas::tests::dynamics_spec::ids_fail_where_the_catalog_does_not_know_them canvas::tests::dynamics_spec::the_catalogs_compositions_derive_and_a_writing_law_in_a_mix_is_refused --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 5 passed; 0 failed; 3 ignored; 0 measured; 545 filtered out; finished in 0.00s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "30104"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::density_wander::density_stop_variants": "ignored, wander probe: later stops over sixteen dealt starts",
+        "canvas::tests::density_wander::density_wander_probe": "ignored, wander probe: prints per-pass traces",
+        "canvas::tests::density_wander::density_wander_springs_control": "ignored, wander probe: Springs control",
+        "canvas::tests::dynamics_spec::density_takes_the_overlays_it_admits_and_refuses_the_rest": "ok",
+        "canvas::tests::dynamics_spec::every_law_and_overlay_is_a_preset_whose_rows_are_the_catalogs": "ok",
+        "canvas::tests::dynamics_spec::every_raw_kind_matches_the_catalog_built_force_row_by_row": "ok",
+        "canvas::tests::dynamics_spec::ids_fail_where_the_catalog_does_not_know_them": "ok",
+        "canvas::tests::dynamics_spec::the_catalogs_compositions_derive_and_a_writing_law_in_a_mix_is_refused": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-17.log",
+      "sha256": "69f68ed90112eed2d28b20959efc132c4d2c83b4a4355ef8a494b72b703d9307",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::face_on_body::a_click_on_the_drawn_body_picks_its_node_below_zoom_1 canvas::tests::face_on_body::the_body_sits_on_its_anchor_and_carries_the_face_at_every_zoom canvas::tests::fold_and_source_time::a_collapse_absorbs_a_fold_inside_it_and_restore_refuses_stale_or_overlapping_records canvas::tests::fold_and_source_time::fold_selection_projects_a_summary_and_click_expands_without_mutating_graph canvas::tests::fold_and_source_time::restore_refuses_duplicate_fold_identity_even_with_disjoint_members canvas::tests::fold_and_source_time::several_folds_stand_in_as_members_with_badges_and_undo_as_a_set canvas::tests::fold_and_source_time::shared_fold_routes_count_cross_fold_cells_once_in_each_direction canvas::tests::fold_and_source_time::source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journal_prefix --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.88s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "53436"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::face_on_body::a_click_on_the_drawn_body_picks_its_node_below_zoom_1": "ok",
+        "canvas::tests::face_on_body::the_body_sits_on_its_anchor_and_carries_the_face_at_every_zoom": "ok",
+        "canvas::tests::fold_and_source_time::a_collapse_absorbs_a_fold_inside_it_and_restore_refuses_stale_or_overlapping_records": "ok",
+        "canvas::tests::fold_and_source_time::fold_selection_projects_a_summary_and_click_expands_without_mutating_graph": "ok",
+        "canvas::tests::fold_and_source_time::restore_refuses_duplicate_fold_identity_even_with_disjoint_members": "ok",
+        "canvas::tests::fold_and_source_time::several_folds_stand_in_as_members_with_badges_and_undo_as_a_set": "ok",
+        "canvas::tests::fold_and_source_time::shared_fold_routes_count_cross_fold_cells_once_in_each_direction": "ok",
+        "canvas::tests::fold_and_source_time::source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journal_prefix": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-18.log",
+      "sha256": "79d6642c16297b23b8b2a5d3eff9f5c5c67edc9c285efb19c17fda3bc9c934d9",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::fold_and_source_time::source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_truth canvas::tests::framing::a_scope_hides_a_fold_without_losing_its_record_or_partial_members canvas::tests::framing::empty_nonfinite_and_hidden_selection_leave_viewport_unchanged canvas::tests::framing::member_stand_ins_remain_visible_and_selectable_for_framing canvas::tests::framing::selection_fit_frames_all_visible_selected_nodes_without_changing_scope canvas::tests::framing::single_selection_centers_at_natural_size_and_respects_narrow_viewport canvas::tests::framing::visible_fit_frames_every_summary_without_hidden_extents canvas::tests::framing::visible_fit_ignores_scoped_outlier_and_preserves_positions_and_focus --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 2.40s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "61396"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::fold_and_source_time::source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_truth": "ok",
+        "canvas::tests::framing::a_scope_hides_a_fold_without_losing_its_record_or_partial_members": "ok",
+        "canvas::tests::framing::empty_nonfinite_and_hidden_selection_leave_viewport_unchanged": "ok",
+        "canvas::tests::framing::member_stand_ins_remain_visible_and_selectable_for_framing": "ok",
+        "canvas::tests::framing::selection_fit_frames_all_visible_selected_nodes_without_changing_scope": "ok",
+        "canvas::tests::framing::single_selection_centers_at_natural_size_and_respects_narrow_viewport": "ok",
+        "canvas::tests::framing::visible_fit_frames_every_summary_without_hidden_extents": "ok",
+        "canvas::tests::framing::visible_fit_ignores_scoped_outlier_and_preserves_positions_and_focus": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-19.log",
+      "sha256": "0c186c54fa28a57acb46d45eb3dee53976595391cf8dbaa4221e8ed55ee8972e",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::framing::visible_fit_includes_fold_summary_instead_of_hidden_member_extents canvas::tests::framing::visible_fit_uses_rotated_and_foreshortened_positions canvas::tests::gloss::gloss_edges_carry_multiplicity_weight canvas::tests::gloss::gloss_kanban_by_site_lens_always_recomputes canvas::tests::gloss::gloss_lens_assembles_and_caches_independent_positions canvas::tests::gloss::gloss_overlays_resolve_into_rings_at_lens_positions canvas::tests::gloss::gloss_scope_is_part_of_the_lens_cache_key canvas::tests::gloss::gloss_scope_selection_crops_the_lens_to_the_selection --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.31s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "43324"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::framing::visible_fit_includes_fold_summary_instead_of_hidden_member_extents": "ok",
+        "canvas::tests::framing::visible_fit_uses_rotated_and_foreshortened_positions": "ok",
+        "canvas::tests::gloss::gloss_edges_carry_multiplicity_weight": "ok",
+        "canvas::tests::gloss::gloss_kanban_by_site_lens_always_recomputes": "ok",
+        "canvas::tests::gloss::gloss_lens_assembles_and_caches_independent_positions": "ok",
+        "canvas::tests::gloss::gloss_overlays_resolve_into_rings_at_lens_positions": "ok",
+        "canvas::tests::gloss::gloss_scope_is_part_of_the_lens_cache_key": "ok",
+        "canvas::tests::gloss::gloss_scope_selection_crops_the_lens_to_the_selection": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-20.log",
+      "sha256": "b6f053eb43410d9fd96d19f0d0e3fe77620aec0d3c8435579c200b22bb6d3a66",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::gloss::gloss_size_by_importance_scales_nodes_by_the_signal canvas::tests::gloss::gloss_size_by_importance_survives_disabling_main_size_by_importance canvas::tests::gloss::weighted_edges_memo_skips_recompute_on_static_frames canvas::tests::grammar::a_foreground_pin_is_attention_not_position canvas::tests::grammar::a_paused_reset_queues_the_whole_placement_at_the_reset_ease canvas::tests::grammar::deselected_members_are_retained_until_dismissed canvas::tests::grammar::reset_returns_unpinned_nodes_to_their_identity_seeds canvas::tests::grammar::set_seed_then_restore_the_recipe_seed --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.51s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "54608"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::gloss::gloss_size_by_importance_scales_nodes_by_the_signal": "ok",
+        "canvas::tests::gloss::gloss_size_by_importance_survives_disabling_main_size_by_importance": "ok",
+        "canvas::tests::gloss::weighted_edges_memo_skips_recompute_on_static_frames": "ok",
+        "canvas::tests::grammar::a_foreground_pin_is_attention_not_position": "ok",
+        "canvas::tests::grammar::a_paused_reset_queues_the_whole_placement_at_the_reset_ease": "ok",
+        "canvas::tests::grammar::deselected_members_are_retained_until_dismissed": "ok",
+        "canvas::tests::grammar::reset_returns_unpinned_nodes_to_their_identity_seeds": "ok",
+        "canvas::tests::grammar::set_seed_then_restore_the_recipe_seed": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-21.log",
+      "sha256": "1d2b0e8f52ec973af552715b42c4927fbe032358da25ce0dfbda4b869c0e4bdd",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::grammar::suggestions_yield_and_removed_members_are_pruned canvas::tests::grammar::the_active_arrangement_is_the_recipe_seed canvas::tests::grammar::the_foreground_pin_command_toggles_the_selection canvas::tests::grammar_view::forward_bodies_labelled_neighbours_and_quiet_sites canvas::tests::grammar_view::links_are_quiet_until_they_touch_the_foreground canvas::tests::grammar_view::retained_and_suggested_nodes_carry_their_marks canvas::tests::grammar_view::sites_and_territory_take_the_themes_category_colours canvas::tests::grammar_view::suggestions_are_off_until_the_person_turns_them_on --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.47s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "51744"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::grammar::suggestions_yield_and_removed_members_are_pruned": "ok",
+        "canvas::tests::grammar::the_active_arrangement_is_the_recipe_seed": "ok",
+        "canvas::tests::grammar::the_foreground_pin_command_toggles_the_selection": "ok",
+        "canvas::tests::grammar_view::forward_bodies_labelled_neighbours_and_quiet_sites": "ok",
+        "canvas::tests::grammar_view::links_are_quiet_until_they_touch_the_foreground": "ok",
+        "canvas::tests::grammar_view::retained_and_suggested_nodes_carry_their_marks": "ok",
+        "canvas::tests::grammar_view::sites_and_territory_take_the_themes_category_colours": "ok",
+        "canvas::tests::grammar_view::suggestions_are_off_until_the_person_turns_them_on": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-22.log",
+      "sha256": "906727d1b80416f6f393a02a6c0c06d414534054300fae9bf00e646e74ba6172",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::grammar_view::without_the_grammar_the_activation_colours_stand canvas::tests::grouped::a_group_role_reads_the_chosen_groups_channel canvas::tests::grouped::charge_between_meaning_groups_separates_them_on_the_lexical_fallback canvas::tests::grouped::charge_between_topics_and_springs_within_separates_them canvas::tests::grouped::probe_grouped_readings canvas::tests::home_at_budget_end::the_board_finishes_home_at_the_budgets_end canvas::tests::home_at_budget_end::the_canvas_finishes_home_played_and_at_a_budgets_end canvas::tests::layout_and_drag::dragging_a_node_updates_its_active_strategy_slot --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 545 filtered out; finished in 1.46s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "51992"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::grammar_view::without_the_grammar_the_activation_colours_stand": "ok",
+        "canvas::tests::grouped::a_group_role_reads_the_chosen_groups_channel": "ok",
+        "canvas::tests::grouped::charge_between_meaning_groups_separates_them_on_the_lexical_fallback": "ok",
+        "canvas::tests::grouped::charge_between_topics_and_springs_within_separates_them": "ok",
+        "canvas::tests::grouped::probe_grouped_readings": "ignored, a probe beside G3's grouped receipt; prints its table",
+        "canvas::tests::home_at_budget_end::the_board_finishes_home_at_the_budgets_end": "ok",
+        "canvas::tests::home_at_budget_end::the_canvas_finishes_home_played_and_at_a_budgets_end": "ok",
+        "canvas::tests::layout_and_drag::dragging_a_node_updates_its_active_strategy_slot": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-23.log",
+      "sha256": "dc92c44a2b722dec3ed65b9ccdeeb0c254a18ac0493747dbf8fbdcd2eb5c5bf1",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::layout_and_drag::focused_keyboard_nudge_is_local_and_requires_explicit_release canvas::tests::layout_and_drag::layout_strategy_overrides_node_positions_until_reverted canvas::tests::layout_and_drag::persisted_spiral_score_reinstates_the_local_strategy_positions canvas::tests::layout_and_drag::pointer_pull_preserves_an_existing_explicit_pin canvas::tests::layout_and_drag::transition_preview_uses_the_strategy_buffer_until_the_final_snap canvas::tests::link_suggestions::links_become_derived_members_only_while_suggestions_admit_them canvas::tests::link_suggestions::selecting_a_derived_member_keeps_it_and_a_reinstall_mints_again canvas::tests::live_physics::arrangement_pause_freezes_motion_and_restore_is_explicit --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.80s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "53268"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::layout_and_drag::focused_keyboard_nudge_is_local_and_requires_explicit_release": "ok",
+        "canvas::tests::layout_and_drag::layout_strategy_overrides_node_positions_until_reverted": "ok",
+        "canvas::tests::layout_and_drag::persisted_spiral_score_reinstates_the_local_strategy_positions": "ok",
+        "canvas::tests::layout_and_drag::pointer_pull_preserves_an_existing_explicit_pin": "ok",
+        "canvas::tests::layout_and_drag::transition_preview_uses_the_strategy_buffer_until_the_final_snap": "ok",
+        "canvas::tests::link_suggestions::links_become_derived_members_only_while_suggestions_admit_them": "ok",
+        "canvas::tests::link_suggestions::selecting_a_derived_member_keeps_it_and_a_reinstall_mints_again": "ok",
+        "canvas::tests::live_physics::arrangement_pause_freezes_motion_and_restore_is_explicit": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-24.log",
+      "sha256": "a9314ba553c6aeb89297e95d0dbccba68015b90f53217ffc4a8ea55de235ec39",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::live_physics::elapsed_frames_bound_stalls_and_do_not_recount_old_timestamps canvas::tests::live_physics::elapsed_frames_match_motion_across_render_rates canvas::tests::live_physics::elapsed_idle_wake_preserves_the_timestamp_high_water_mark canvas::tests::live_physics::elapsed_pause_resume_suspend_and_restore_never_catch_up canvas::tests::live_physics::elapsed_wake_from_idle_does_not_integrate_the_quiet_interval canvas::tests::live_physics::inline_play_pause_resume_changes_then_holds_then_changes_positions canvas::tests::live_physics::inline_playing_arrangement_holds_a_drag_then_releases_the_body canvas::tests::live_physics::paused_free_layout_accepts_nudge_and_explicit_reseed --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 1.00s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "54940"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::live_physics::elapsed_frames_bound_stalls_and_do_not_recount_old_timestamps": "ok",
+        "canvas::tests::live_physics::elapsed_frames_match_motion_across_render_rates": "ok",
+        "canvas::tests::live_physics::elapsed_idle_wake_preserves_the_timestamp_high_water_mark": "ok",
+        "canvas::tests::live_physics::elapsed_pause_resume_suspend_and_restore_never_catch_up": "ok",
+        "canvas::tests::live_physics::elapsed_wake_from_idle_does_not_integrate_the_quiet_interval": "ok",
+        "canvas::tests::live_physics::inline_play_pause_resume_changes_then_holds_then_changes_positions": "ok",
+        "canvas::tests::live_physics::inline_playing_arrangement_holds_a_drag_then_releases_the_body": "ok",
+        "canvas::tests::live_physics::paused_free_layout_accepts_nudge_and_explicit_reseed": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-25.log",
+      "sha256": "2fb7d67985dd0e67b06759ae1570430345ed5f0f44cc866ba7dc02df06f46eea",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::live_physics::paused_placements_follow_graph_membership_and_replacement canvas::tests::meaning::a_replaced_graph_earns_its_own_run_whatever_its_revision_reads canvas::tests::meaning::a_sliced_run_lands_over_frames_with_the_whole_runs_snapshot canvas::tests::meaning::columns_by_cluster_and_kinds_by_cluster_read_one_computation canvas::tests::meaning::every_channel_id_round_trips_and_resolves_over_every_node canvas::tests::meaning::group_pull_by_cluster_is_the_columns_by_cluster_twin canvas::tests::meaning::meaning_cost_by_graph_size canvas::tests::meaning::one_meaning_snapshot_feeds_kinds_group_pull_affinity_and_groups --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 545 filtered out; finished in 5.03s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "66668"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::live_physics::paused_placements_follow_graph_membership_and_replacement": "ok",
+        "canvas::tests::meaning::a_replaced_graph_earns_its_own_run_whatever_its_revision_reads": "ok",
+        "canvas::tests::meaning::a_sliced_run_lands_over_frames_with_the_whole_runs_snapshot": "ok",
+        "canvas::tests::meaning::columns_by_cluster_and_kinds_by_cluster_read_one_computation": "ok",
+        "canvas::tests::meaning::every_channel_id_round_trips_and_resolves_over_every_node": "ok",
+        "canvas::tests::meaning::group_pull_by_cluster_is_the_columns_by_cluster_twin": "ok",
+        "canvas::tests::meaning::meaning_cost_by_graph_size": "ignored, a timing receipt: run in release",
+        "canvas::tests::meaning::one_meaning_snapshot_feeds_kinds_group_pull_affinity_and_groups": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-26.log",
+      "sha256": "5dea1ee6942a1c41c92ebb4606d64a90b282c761665b657df132821b3f2f65af",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::meaning::the_lexical_fallback_records_its_purity_on_the_arxiv_fixture canvas::tests::meaning::the_partitions_resolution_is_one_by_default_and_moves_the_partition canvas::tests::meaning::the_sparse_lexical_search_matches_the_dense_one canvas::tests::mosaic::a_selected_tile_grows_and_shrinks canvas::tests::mosaic::a_tile_moves_into_another_group_and_groups_reorder canvas::tests::mosaic::dragging_a_group_label_moves_the_group canvas::tests::mosaic::dragging_a_tile_onto_another_files_it_there canvas::tests::mosaic::selection_lifts_without_reflowing --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 14.48s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "55320"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::meaning::the_lexical_fallback_records_its_purity_on_the_arxiv_fixture": "ok",
+        "canvas::tests::meaning::the_partitions_resolution_is_one_by_default_and_moves_the_partition": "ok",
+        "canvas::tests::meaning::the_sparse_lexical_search_matches_the_dense_one": "ok",
+        "canvas::tests::mosaic::a_selected_tile_grows_and_shrinks": "ok",
+        "canvas::tests::mosaic::a_tile_moves_into_another_group_and_groups_reorder": "ok",
+        "canvas::tests::mosaic::dragging_a_group_label_moves_the_group": "ok",
+        "canvas::tests::mosaic::dragging_a_tile_onto_another_files_it_there": "ok",
+        "canvas::tests::mosaic::selection_lifts_without_reflowing": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-27.log",
+      "sha256": "e75d044cb7fb1714c869ec2d4b01061b617d489dd9ab45ee8a5d2a28a29ea991",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::mosaic::the_persons_mosaic_survives_a_saved_scene canvas::tests::mosaic::tiles_group_by_site_and_the_mosaic_outgrows_the_viewport canvas::tests::node_face::face_and_body_are_independent_axes canvas::tests::node_face::node_face_default_tracks_favicon_source_and_takes_a_per_node_override canvas::tests::node_face::node_face_override_round_trips_through_cartography canvas::tests::node_face::node_material_overrides_default_and_round_trips_through_cartography canvas::tests::node_minting::add_field_at_places_a_region_field_at_the_cursor_world_point canvas::tests::node_minting::add_node_at_mints_an_unlinked_node_at_the_cursor_world_point --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.46s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "47312"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::mosaic::the_persons_mosaic_survives_a_saved_scene": "ok",
+        "canvas::tests::mosaic::tiles_group_by_site_and_the_mosaic_outgrows_the_viewport": "ok",
+        "canvas::tests::node_face::face_and_body_are_independent_axes": "ok",
+        "canvas::tests::node_face::node_face_default_tracks_favicon_source_and_takes_a_per_node_override": "ok",
+        "canvas::tests::node_face::node_face_override_round_trips_through_cartography": "ok",
+        "canvas::tests::node_face::node_material_overrides_default_and_round_trips_through_cartography": "ok",
+        "canvas::tests::node_minting::add_field_at_places_a_region_field_at_the_cursor_world_point": "ok",
+        "canvas::tests::node_minting::add_node_at_mints_an_unlinked_node_at_the_cursor_world_point": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-28.log",
+      "sha256": "2e557792fd8bd927afaf542e15293f0e41a85160acfc1d8d928bd52cdac47162",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::node_minting::assert_selected_relation_links_exactly_two_selected_nodes canvas::tests::node_minting::ingest_graph_merges_nodes_and_grows_the_sim canvas::tests::node_minting::member_tagging_shares_content_between_duplicate_urls canvas::tests::node_minting::open_as_new_node_mints_distinct_node_with_navigated_from_edge canvas::tests::node_minting::recover_node_restores_the_original_identity canvas::tests::node_minting::tag_selected_inserts_the_trimmed_tag_on_every_selected_node canvas::tests::node_minting::toggle_select_member_builds_a_multi_selection canvas::tests::node_minting::visit_adds_a_linked_node_and_selects_it --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 1.07s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "51576"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::node_minting::assert_selected_relation_links_exactly_two_selected_nodes": "ok",
+        "canvas::tests::node_minting::ingest_graph_merges_nodes_and_grows_the_sim": "ok",
+        "canvas::tests::node_minting::member_tagging_shares_content_between_duplicate_urls": "ok",
+        "canvas::tests::node_minting::open_as_new_node_mints_distinct_node_with_navigated_from_edge": "ok",
+        "canvas::tests::node_minting::recover_node_restores_the_original_identity": "ok",
+        "canvas::tests::node_minting::tag_selected_inserts_the_trimmed_tag_on_every_selected_node": "ok",
+        "canvas::tests::node_minting::toggle_select_member_builds_a_multi_selection": "ok",
+        "canvas::tests::node_minting::visit_adds_a_linked_node_and_selects_it": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-29.log",
+      "sha256": "567b9f578f71119c5c41e51a9e116d871a25e9af1461ef829a3ebb1a09eb33de",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::node_state::alt_left_drag_orbits_the_camera canvas::tests::node_state::connected_members_joins_surfaces_showing_the_same_resource canvas::tests::node_state::connected_members_reaches_the_whole_trail canvas::tests::node_state::hide_selected_edges_then_show_all_round_trips canvas::tests::node_state::node_size_drives_the_pick_radius canvas::tests::node_state::remove_focused_drops_the_node_and_reports_its_id canvas::tests::node_state::selected_members_reflects_the_selection canvas::tests::node_state::set_node_shapes_resolves_uuids_to_keys --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.65s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "43628"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::node_state::alt_left_drag_orbits_the_camera": "ok",
+        "canvas::tests::node_state::connected_members_joins_surfaces_showing_the_same_resource": "ok",
+        "canvas::tests::node_state::connected_members_reaches_the_whole_trail": "ok",
+        "canvas::tests::node_state::hide_selected_edges_then_show_all_round_trips": "ok",
+        "canvas::tests::node_state::node_size_drives_the_pick_radius": "ok",
+        "canvas::tests::node_state::remove_focused_drops_the_node_and_reports_its_id": "ok",
+        "canvas::tests::node_state::selected_members_reflects_the_selection": "ok",
+        "canvas::tests::node_state::set_node_shapes_resolves_uuids_to_keys": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-30.log",
+      "sha256": "a0375962353e917830150599b20a41ff53820f10d8314cb58acc4210e641ba50",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::node_state::set_node_states_resolves_uuids_to_keys canvas::tests::node_state::size_tiers_step_snap_and_clamp canvas::tests::permitted_actions::a_drag_withdrawn_mid_drag_ends_as_a_release canvas::tests::permitted_actions::a_withdrawn_action_refuses_its_gesture_on_the_canvas canvas::tests::permitted_actions::drag_and_pin_advertise_as_curation_on_both_surfaces canvas::tests::permitted_actions::the_board_advertises_what_its_drags_do canvas::tests::permitted_actions::the_canvas_advertises_what_each_roles_drag_does canvas::tests::physics_catalog::a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.83s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "54668"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::node_state::set_node_states_resolves_uuids_to_keys": "ok",
+        "canvas::tests::node_state::size_tiers_step_snap_and_clamp": "ok",
+        "canvas::tests::permitted_actions::a_drag_withdrawn_mid_drag_ends_as_a_release": "ok",
+        "canvas::tests::permitted_actions::a_withdrawn_action_refuses_its_gesture_on_the_canvas": "ok",
+        "canvas::tests::permitted_actions::drag_and_pin_advertise_as_curation_on_both_surfaces": "ok",
+        "canvas::tests::permitted_actions::the_board_advertises_what_its_drags_do": "ok",
+        "canvas::tests::permitted_actions::the_canvas_advertises_what_each_roles_drag_does": "ok",
+        "canvas::tests::physics_catalog::a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-31.log",
+      "sha256": "a2e8bfed5b76f95e3bdc73abd94de5d8e6c2a60e1eb0cd23dc16a22ad39765af",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::physics_catalog::a_whole_choice_applies_with_one_rebuild_and_reads_back canvas::tests::physics_catalog::coloring_and_island_kinds_read_the_topology canvas::tests::physics_catalog::density_refuses_all_but_its_three_overlays_with_a_reason canvas::tests::physics_catalog::every_law_and_overlay_builds_on_the_sample_graph_without_moving_a_body canvas::tests::physics_catalog::every_law_id_round_trips_and_its_label_is_plain canvas::tests::physics_catalog::every_profile_applies_and_names_itself_back canvas::tests::physics_catalog::from_rest_a_living_law_ticks_on_and_a_resting_one_stops canvas::tests::physics_catalog::layer_and_focus_depths_order_the_graph --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 9.68s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "54692"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::physics_catalog::a_whole_choice_applies_with_one_rebuild_and_reads_back": "ok",
+        "canvas::tests::physics_catalog::coloring_and_island_kinds_read_the_topology": "ok",
+        "canvas::tests::physics_catalog::density_refuses_all_but_its_three_overlays_with_a_reason": "ok",
+        "canvas::tests::physics_catalog::every_law_and_overlay_builds_on_the_sample_graph_without_moving_a_body": "ok",
+        "canvas::tests::physics_catalog::every_law_id_round_trips_and_its_label_is_plain": "ok",
+        "canvas::tests::physics_catalog::every_profile_applies_and_names_itself_back": "ok",
+        "canvas::tests::physics_catalog::from_rest_a_living_law_ticks_on_and_a_resting_one_stops": "ok",
+        "canvas::tests::physics_catalog::layer_and_focus_depths_order_the_graph": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-32.log",
+      "sha256": "e9e1f2ec47829eadf4ef067c062b4380b739ba6fa8b636c3ba7d00e09ad0b2f4",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::physics_catalog::layout_stats_carry_the_laws_signatures canvas::tests::physics_catalog::page_rank_weights_favour_the_linked_to canvas::tests::physics_catalog::skeleton_and_weighted_stress_read_multiplicity canvas::tests::physics_registry::a_raw_terms_input_slot_resolves_against_the_registry_and_running_it_stays_refused canvas::tests::physics_registry::every_hide_and_show_that_changes_the_view_bumps_its_revision canvas::tests::physics_registry::every_physics_channel_runs_once_with_its_readers_live_and_once_more_when_its_key_moves canvas::tests::physics_terms::anneal_lowers_the_energy_it_realizes canvas::tests::physics_terms::every_catalog_term_declares_itself --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 4.62s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "59060"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::physics_catalog::layout_stats_carry_the_laws_signatures": "ok",
+        "canvas::tests::physics_catalog::page_rank_weights_favour_the_linked_to": "ok",
+        "canvas::tests::physics_catalog::skeleton_and_weighted_stress_read_multiplicity": "ok",
+        "canvas::tests::physics_registry::a_raw_terms_input_slot_resolves_against_the_registry_and_running_it_stays_refused": "ok",
+        "canvas::tests::physics_registry::every_hide_and_show_that_changes_the_view_bumps_its_revision": "ok",
+        "canvas::tests::physics_registry::every_physics_channel_runs_once_with_its_readers_live_and_once_more_when_its_key_moves": "ok",
+        "canvas::tests::physics_terms::anneal_lowers_the_energy_it_realizes": "ok",
+        "canvas::tests::physics_terms::every_catalog_term_declares_itself": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-33.log",
+      "sha256": "8a8ee804ac35cc3963c34a3e36138c8136a81fc01b9ec28175acc2eb109d408c",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::physics_terms::kinds_seeded_fails_both_instruments_and_symmetrized_passes_both canvas::tests::physics_terms::the_instruments_agree_with_every_declared_class canvas::tests::pointer_gestures::a_bare_left_click_on_empty_canvas_still_clears_the_selection canvas::tests::pointer_gestures::a_left_drag_on_a_node_still_moves_the_node canvas::tests::pointer_gestures::a_left_drag_on_empty_canvas_pans_and_glides canvas::tests::pointer_gestures::a_right_click_asks_for_the_context_menu_naming_the_node_under_it canvas::tests::pointer_gestures::a_right_drag_selects_what_it_covers canvas::tests::pointer_gestures::pointer_cancel_ends_gestures_without_activating_a_click --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 7.30s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "52016"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::physics_terms::kinds_seeded_fails_both_instruments_and_symmetrized_passes_both": "ok",
+        "canvas::tests::physics_terms::the_instruments_agree_with_every_declared_class": "ok",
+        "canvas::tests::pointer_gestures::a_bare_left_click_on_empty_canvas_still_clears_the_selection": "ok",
+        "canvas::tests::pointer_gestures::a_left_drag_on_a_node_still_moves_the_node": "ok",
+        "canvas::tests::pointer_gestures::a_left_drag_on_empty_canvas_pans_and_glides": "ok",
+        "canvas::tests::pointer_gestures::a_right_click_asks_for_the_context_menu_naming_the_node_under_it": "ok",
+        "canvas::tests::pointer_gestures::a_right_drag_selects_what_it_covers": "ok",
+        "canvas::tests::pointer_gestures::pointer_cancel_ends_gestures_without_activating_a_click": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-34.log",
+      "sha256": "4d676d623c548b00a847deefe9a2d08d91535f873a5c59775dbff1c25d4ac967",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::pointer_gestures::pointer_cancel_releases_a_moved_node_without_changing_selection canvas::tests::reader::a_keyboard_move_nudges_drops_by_role_and_escapes_back canvas::tests::reader::a_pin_by_member_holds_the_item_and_is_refused_when_withdrawn canvas::tests::reader::the_boards_keyboard_move_nudges_drops_and_escapes_back canvas::tests::reader::the_canvas_describes_its_items_on_screen_with_their_actions canvas::tests::reader::the_description_is_capped_and_keeps_the_focused_item canvas::tests::registry_readers::every_fact_runs_once_with_its_readers_live_and_once_more_when_its_key_moves canvas::tests::relations::antiparallel_and_opposed_assertions_become_marks_on_one_resting_stroke --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 1.94s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "60456"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::pointer_gestures::pointer_cancel_releases_a_moved_node_without_changing_selection": "ok",
+        "canvas::tests::reader::a_keyboard_move_nudges_drops_by_role_and_escapes_back": "ok",
+        "canvas::tests::reader::a_pin_by_member_holds_the_item_and_is_refused_when_withdrawn": "ok",
+        "canvas::tests::reader::the_boards_keyboard_move_nudges_drops_and_escapes_back": "ok",
+        "canvas::tests::reader::the_canvas_describes_its_items_on_screen_with_their_actions": "ok",
+        "canvas::tests::reader::the_description_is_capped_and_keeps_the_focused_item": "ok",
+        "canvas::tests::registry_readers::every_fact_runs_once_with_its_readers_live_and_once_more_when_its_key_moves": "ok",
+        "canvas::tests::relations::antiparallel_and_opposed_assertions_become_marks_on_one_resting_stroke": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-35.log",
+      "sha256": "5c85b8c748d64cfadb478f414c8b553f3f970e655b86b5e816f9a3d1b18c6434",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::relations::closing_a_link_hides_all_parallel_assertions_under_one_key canvas::tests::relations::exact_assertion_hides_filter_before_aggregation_and_preserve_other_hide_sets canvas::tests::relations::explicit_member_retraction_removes_only_that_relation canvas::tests::relations::focused_url_is_the_single_selected_nodes_url canvas::tests::relations::legacy_directed_filter_hides_only_that_member_under_one_link canvas::tests::relations::legacy_member_filters_reduce_one_link_summary_without_becoming_link_identity canvas::tests::relations::parallel_assertions_share_one_stroke_and_one_link_key_hit_target canvas::tests::relations::retract_selected_relation_removes_the_user_relation --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 1.31s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "45172"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::relations::closing_a_link_hides_all_parallel_assertions_under_one_key": "ok",
+        "canvas::tests::relations::exact_assertion_hides_filter_before_aggregation_and_preserve_other_hide_sets": "ok",
+        "canvas::tests::relations::explicit_member_retraction_removes_only_that_relation": "ok",
+        "canvas::tests::relations::focused_url_is_the_single_selected_nodes_url": "ok",
+        "canvas::tests::relations::legacy_directed_filter_hides_only_that_member_under_one_link": "ok",
+        "canvas::tests::relations::legacy_member_filters_reduce_one_link_summary_without_becoming_link_identity": "ok",
+        "canvas::tests::relations::parallel_assertions_share_one_stroke_and_one_link_key_hit_target": "ok",
+        "canvas::tests::relations::retract_selected_relation_removes_the_user_relation": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-36.log",
+      "sha256": "3ef3437b97f778edec32804c9e91ead2f32034787689e09758d4c7d524729621",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::relations::selector_hides_classify_exact_nonsemantic_assertions_by_canonical_predicate canvas::tests::relations::self_links_draw_separate_strata_loops_and_select_through_node_pick_area canvas::tests::relations::unrelate_is_symmetric_with_relate_on_a_two_node_selection canvas::tests::relations::visit_dedups_by_url canvas::tests::restore_and_queries::fit_to_content_frames_a_far_restored_graph canvas::tests::restore_and_queries::fit_to_content_on_an_empty_graph_recenters canvas::tests::restore_and_queries::fit_to_content_uses_a_buffered_layout_before_the_first_frame canvas::tests::restore_and_queries::has_nodes_tracks_the_graph --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.77s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "44984"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::relations::selector_hides_classify_exact_nonsemantic_assertions_by_canonical_predicate": "ok",
+        "canvas::tests::relations::self_links_draw_separate_strata_loops_and_select_through_node_pick_area": "ok",
+        "canvas::tests::relations::unrelate_is_symmetric_with_relate_on_a_two_node_selection": "ok",
+        "canvas::tests::relations::visit_dedups_by_url": "ok",
+        "canvas::tests::restore_and_queries::fit_to_content_frames_a_far_restored_graph": "ok",
+        "canvas::tests::restore_and_queries::fit_to_content_on_an_empty_graph_recenters": "ok",
+        "canvas::tests::restore_and_queries::fit_to_content_uses_a_buffered_layout_before_the_first_frame": "ok",
+        "canvas::tests::restore_and_queries::has_nodes_tracks_the_graph": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-37.log",
+      "sha256": "fbd5d803d71f774f87b4adb87b1b1f91e0ce379ba7705eb61add6660dfa04379",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::restore_and_queries::revisit_stamps_the_durable_recency_clock canvas::tests::restore_and_queries::select_by_url_selects_existing_or_reports_missing canvas::tests::restore_and_queries::with_graph_restores_nodes_and_positions canvas::tests::retained_layout::real_camera_size_and_class_changes_invalidate_retained_paint canvas::tests::retained_layout::unchanged_paused_frame_reuses_node_layout_and_paint canvas::tests::rings::arrangement_recompute_is_gated_on_its_inputs canvas::tests::rings::bridge_metric_switch_recomputes_under_the_new_metric canvas::tests::rings::bridge_rings_toggle_computes_the_broker_on_frame --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.63s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "53548"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::restore_and_queries::revisit_stamps_the_durable_recency_clock": "ok",
+        "canvas::tests::restore_and_queries::select_by_url_selects_existing_or_reports_missing": "ok",
+        "canvas::tests::restore_and_queries::with_graph_restores_nodes_and_positions": "ok",
+        "canvas::tests::retained_layout::real_camera_size_and_class_changes_invalidate_retained_paint": "ok",
+        "canvas::tests::retained_layout::unchanged_paused_frame_reuses_node_layout_and_paint": "ok",
+        "canvas::tests::rings::arrangement_recompute_is_gated_on_its_inputs": "ok",
+        "canvas::tests::rings::bridge_metric_switch_recomputes_under_the_new_metric": "ok",
+        "canvas::tests::rings::bridge_rings_toggle_computes_the_broker_on_frame": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-38.log",
+      "sha256": "55234e8d836b12b28cc22d8927ba3811bcb460cde4f2654f9e62800ed35854cc",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::rings::community_rings_toggle_computes_the_partition_on_frame canvas::tests::rings::restored_score_tracks_visible_inputs_and_same_revision_graph_swap_clears_cache canvas::tests::rings::strategy_cache_tracks_exact_assertion_insertions_and_retractions canvas::tests::rings::strategy_cache_tracks_replayed_raw_predicate_edits_with_identical_classifier_rows canvas::tests::rings::strategy_cache_tracks_visible_payload_and_resource_rebinding canvas::tests::schedule::stages_end_at_their_frames_and_at_their_laws_stop canvas::tests::schedule::stress_then_springs_remembering_it_reproduces_the_capture canvas::tests::scope_and_cartography::an_empty_exact_scope_shows_nothing_and_only_clear_scope_shows_all --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 1.22s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "52076"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::rings::community_rings_toggle_computes_the_partition_on_frame": "ok",
+        "canvas::tests::rings::restored_score_tracks_visible_inputs_and_same_revision_graph_swap_clears_cache": "ok",
+        "canvas::tests::rings::strategy_cache_tracks_exact_assertion_insertions_and_retractions": "ok",
+        "canvas::tests::rings::strategy_cache_tracks_replayed_raw_predicate_edits_with_identical_classifier_rows": "ok",
+        "canvas::tests::rings::strategy_cache_tracks_visible_payload_and_resource_rebinding": "ok",
+        "canvas::tests::schedule::stages_end_at_their_frames_and_at_their_laws_stop": "ok",
+        "canvas::tests::schedule::stress_then_springs_remembering_it_reproduces_the_capture": "ok",
+        "canvas::tests::scope_and_cartography::an_empty_exact_scope_shows_nothing_and_only_clear_scope_shows_all": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-39.log",
+      "sha256": "100f308b07213b30912dca0f3c5353611f896f1b54830ff4b6dd34a42fe473f5",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::scope_and_cartography::an_exact_roster_survives_a_graph_swap_and_appears_when_demanded canvas::tests::scope_and_cartography::cartography_geometry_captures_live_positions canvas::tests::scope_and_cartography::cartography_sizing_round_trips_through_the_sidecar canvas::tests::scope_and_cartography::explicit_scope_changes_drop_the_exact_roster canvas::tests::scope_and_cartography::isolate_selection_scopes_the_canvas canvas::tests::scope_and_cartography::park_physics_halts_an_in_progress_settle canvas::tests::scope_and_cartography::scope_to_members_scopes_to_the_given_set canvas::tests::scope_and_cartography::seed_cartography_overrides_node_positions --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.43s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "43400"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::scope_and_cartography::an_exact_roster_survives_a_graph_swap_and_appears_when_demanded": "ok",
+        "canvas::tests::scope_and_cartography::cartography_geometry_captures_live_positions": "ok",
+        "canvas::tests::scope_and_cartography::cartography_sizing_round_trips_through_the_sidecar": "ok",
+        "canvas::tests::scope_and_cartography::explicit_scope_changes_drop_the_exact_roster": "ok",
+        "canvas::tests::scope_and_cartography::isolate_selection_scopes_the_canvas": "ok",
+        "canvas::tests::scope_and_cartography::park_physics_halts_an_in_progress_settle": "ok",
+        "canvas::tests::scope_and_cartography::scope_to_members_scopes_to_the_given_set": "ok",
+        "canvas::tests::scope_and_cartography::seed_cartography_overrides_node_positions": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-40.log",
+      "sha256": "4ed653a3ab0ed16465f54dbf60968258c78578cc3970abb620dea0e1b2c1b93e",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::score_and_physics::a_playing_arrangement_springs_only_its_anchored_items canvas::tests::score_and_physics::a_restored_score_survives_the_hosts_next_recompute_check canvas::tests::score_and_physics::physics_is_global_and_composes_with_any_arrangement canvas::tests::score_and_physics::projection_score_rebinds_representation_and_graph_swap_clears_it canvas::tests::score_and_physics::score_representation_changes_the_class_painted_by_frame canvas::tests::selection::member_addressed_relation_editing_targets_one_relation_cell canvas::tests::sizing::importance_cache_invalidates_on_topology_change canvas::tests::sizing::importance_metric_switches_degree_vs_betweenness --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 0.84s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "51576"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::score_and_physics::a_playing_arrangement_springs_only_its_anchored_items": "ok",
+        "canvas::tests::score_and_physics::a_restored_score_survives_the_hosts_next_recompute_check": "ok",
+        "canvas::tests::score_and_physics::physics_is_global_and_composes_with_any_arrangement": "ok",
+        "canvas::tests::score_and_physics::projection_score_rebinds_representation_and_graph_swap_clears_it": "ok",
+        "canvas::tests::score_and_physics::score_representation_changes_the_class_painted_by_frame": "ok",
+        "canvas::tests::selection::member_addressed_relation_editing_targets_one_relation_cell": "ok",
+        "canvas::tests::sizing::importance_cache_invalidates_on_topology_change": "ok",
+        "canvas::tests::sizing::importance_metric_switches_degree_vs_betweenness": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-41.log",
+      "sha256": "cd39b6daad63deb0f6fc9ba57fec2ff8991dde21ae9a1a6f59c9d56c7f5e50ae",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::sizing::size_by_importance_restore_recomputes_on_a_reused_canvas canvas::tests::sizing::size_by_importance_sizes_nodes_by_the_degree_signal canvas::tests::sizing::size_by_recency_grows_the_newest_node_and_shrinks_the_oldest canvas::tests::speed::every_law_keeps_one_trajectory_at_every_speed canvas::tests::speed::fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed canvas::tests::speed::slow_motion_on_the_canvas_draws_every_frame_and_steps_every_fifth canvas::tests::speed::the_board_runs_at_its_speed canvas::tests::speed::the_canvas_keeps_one_trajectory_at_every_speed --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 545 filtered out; finished in 37.72s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "80104"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::sizing::size_by_importance_restore_recomputes_on_a_reused_canvas": "ok",
+        "canvas::tests::sizing::size_by_importance_sizes_nodes_by_the_degree_signal": "ok",
+        "canvas::tests::sizing::size_by_recency_grows_the_newest_node_and_shrinks_the_oldest": "ok",
+        "canvas::tests::speed::every_law_keeps_one_trajectory_at_every_speed": "ok",
+        "canvas::tests::speed::fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed": "ok",
+        "canvas::tests::speed::slow_motion_on_the_canvas_draws_every_frame_and_steps_every_fifth": "ok",
+        "canvas::tests::speed::the_board_runs_at_its_speed": "ok",
+        "canvas::tests::speed::the_canvas_keeps_one_trajectory_at_every_speed": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-42.log",
+      "sha256": "3b4a46521d6c5536650c0c9b6a6ed24a51fe82f01469ed1f67a22927857e18e6",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::tests::speed::the_display_rate_sets_half_its_frame_as_the_budget --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 552 filtered out; finished in 0.04s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "42248"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::tests::speed::the_display_rate_sets_half_its_frame_as_the_budget": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-43.log",
+      "sha256": "1db185516b6763e1a9f539e30134e1096604adf85857b2c316324cd987b753eb",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact canvas::underlay::tests::canvas_paint_list_composes_nodes_and_a_visual_overlay canvas::underlay::tests::curated_arrangement_projects_only_its_members canvas::underlay::tests::demoted_underlay_draws_only_the_off_screen_nodes canvas::underlay::tests::edge_visibility_predicate_hides_relations canvas::underlay::tests::empty_graph_projects_empty canvas::underlay::tests::identity_arrangement_projects_byte_identically_to_the_whole_graph canvas::underlay::tests::projected_edges_dedup_per_pair_and_weight_by_multiplicity canvas::underlay::tests::projection_from_graph_is_structural_and_dedupes_edges canvas::underlay::tests::projection_from_positions_places_live_nodes_and_parks_the_rest canvas::view::tests::following_eases_the_camera_onto_the_layout_and_a_pan_stops_it canvas::view::tests::layout_framing_counts_centres_off_the_viewport canvas::view::tests::resize_still_recentres canvas::view::tests::swapping_viewports_between_sizes_moves_neither_camera canvas::view::tests::world_and_screen_points_round_trip_through_the_camera signals::registry_tests::an_offered_partition_counts_once_and_goes_stale_with_structure signals::registry_tests::each_producer_runs_once_per_key signals::registry_tests::equal_recency_uses_stable_identity_order signals::registry_tests::live_resource_rebinding_invalidates_cached_topology signals::registry_tests::radial_from_the_registry_matches_the_pre_migration_placement signals::registry_tests::spectral_from_the_registry_matches_the_pre_migration_placement signals::registry_tests::the_enumeration_channel_is_the_order_every_score_ordinal_follows signals::registry_tests::the_recency_values_agree_with_the_former_f32_form signals::registry_tests::topology_producers_combine_resource_and_surface_buckets signals::substrate_tests::structural_signals_run_on_a_generic_chartulary_graph signals::tests::affinity_clusters_within_triangles_not_across signals::tests::affinity_empty_for_an_edgeless_graph signals::tests::affinity_threshold_prunes_weak_pairs signals::tests::articulation_points_empty_for_a_clique signals::tests::articulation_points_empty_for_a_cycle signals::tests::articulation_points_finds_a_paths_interior --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 3.74s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "52388"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "canvas::underlay::tests::canvas_paint_list_composes_nodes_and_a_visual_overlay": "ok",
+        "canvas::underlay::tests::curated_arrangement_projects_only_its_members": "ok",
+        "canvas::underlay::tests::demoted_underlay_draws_only_the_off_screen_nodes": "ok",
+        "canvas::underlay::tests::edge_visibility_predicate_hides_relations": "ok",
+        "canvas::underlay::tests::empty_graph_projects_empty": "ok",
+        "canvas::underlay::tests::identity_arrangement_projects_byte_identically_to_the_whole_graph": "ok",
+        "canvas::underlay::tests::projected_edges_dedup_per_pair_and_weight_by_multiplicity": "ok",
+        "canvas::underlay::tests::projection_from_graph_is_structural_and_dedupes_edges": "ok",
+        "canvas::underlay::tests::projection_from_positions_places_live_nodes_and_parks_the_rest": "ok",
+        "canvas::view::tests::following_eases_the_camera_onto_the_layout_and_a_pan_stops_it": "ok",
+        "canvas::view::tests::layout_framing_counts_centres_off_the_viewport": "ok",
+        "canvas::view::tests::resize_still_recentres": "ok",
+        "canvas::view::tests::swapping_viewports_between_sizes_moves_neither_camera": "ok",
+        "canvas::view::tests::world_and_screen_points_round_trip_through_the_camera": "ok",
+        "signals::registry_tests::an_offered_partition_counts_once_and_goes_stale_with_structure": "ok",
+        "signals::registry_tests::each_producer_runs_once_per_key": "ok",
+        "signals::registry_tests::equal_recency_uses_stable_identity_order": "ok",
+        "signals::registry_tests::live_resource_rebinding_invalidates_cached_topology": "ok",
+        "signals::registry_tests::radial_from_the_registry_matches_the_pre_migration_placement": "ok",
+        "signals::registry_tests::spectral_from_the_registry_matches_the_pre_migration_placement": "ok",
+        "signals::registry_tests::the_enumeration_channel_is_the_order_every_score_ordinal_follows": "ok",
+        "signals::registry_tests::the_recency_values_agree_with_the_former_f32_form": "ok",
+        "signals::registry_tests::topology_producers_combine_resource_and_surface_buckets": "ok",
+        "signals::substrate_tests::structural_signals_run_on_a_generic_chartulary_graph": "ok",
+        "signals::tests::affinity_clusters_within_triangles_not_across": "ok",
+        "signals::tests::affinity_empty_for_an_edgeless_graph": "ok",
+        "signals::tests::affinity_threshold_prunes_weak_pairs": "ok",
+        "signals::tests::articulation_points_empty_for_a_clique": "ok",
+        "signals::tests::articulation_points_empty_for_a_cycle": "ok",
+        "signals::tests::articulation_points_finds_a_paths_interior": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-44.log",
+      "sha256": "e0659389c971c6540b03014f7d41ee212d1d5ac9bc11797e4a73dd176f30ad78",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact signals::tests::articulation_points_finds_the_bowtie_hinge signals::tests::betweenness_marks_the_broker_on_a_path signals::tests::betweenness_rewards_the_bridge_node signals::tests::bridge_nodes_empty_for_a_clique signals::tests::bridge_nodes_picks_the_high_betweenness_broker signals::tests::bridges_dispatch_picks_the_metric signals::tests::clique_pairs_share_equal_affinity signals::tests::community_collapses_a_clique_to_one signals::tests::community_detection_is_deterministic signals::tests::community_edgeless_graph_is_all_singletons signals::tests::community_separates_disconnected_components signals::tests::community_splits_two_triangles_joined_by_a_bridge signals::tests::community_three_triangles_in_a_line_are_three_communities signals::tests::degree_importance_normalizes_to_the_most_connected_node signals::tests::no_edges_yields_all_zero_importance signals::tests::projection::projected_signal_buckets_keep_surface_edges_aliases_and_numerical_parity signals::tests::projection::projected_signal_self_loops_keep_legacy_incident_bucket_count signals::tests::triangle_members_all_share_affinity tests::a_face_is_never_blank tests::different_addresses_generally_give_different_faces tests::each_face_draws_a_simpler_arm_when_small tests::every_fill_resolves_to_a_palette_entry_never_a_literal tests::faces_stay_small tests::independent_regions_sample_each_orbit_once tests::one_face_wears_two_palettes tests::random_addresses_produce_decodable_faces tests::symmetry_holds_for_every_address tests::the_arms_switch_at_the_threshold tests::the_default_height_small_arm_keeps_distinct_coarse_masks tests::the_derivation_matches_its_digest_pinned_fixtures --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 523 filtered out; finished in 0.06s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "32504"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "signals::tests::articulation_points_finds_the_bowtie_hinge": "ok",
+        "signals::tests::betweenness_marks_the_broker_on_a_path": "ok",
+        "signals::tests::betweenness_rewards_the_bridge_node": "ok",
+        "signals::tests::bridge_nodes_empty_for_a_clique": "ok",
+        "signals::tests::bridge_nodes_picks_the_high_betweenness_broker": "ok",
+        "signals::tests::bridges_dispatch_picks_the_metric": "ok",
+        "signals::tests::clique_pairs_share_equal_affinity": "ok",
+        "signals::tests::community_collapses_a_clique_to_one": "ok",
+        "signals::tests::community_detection_is_deterministic": "ok",
+        "signals::tests::community_edgeless_graph_is_all_singletons": "ok",
+        "signals::tests::community_separates_disconnected_components": "ok",
+        "signals::tests::community_splits_two_triangles_joined_by_a_bridge": "ok",
+        "signals::tests::community_three_triangles_in_a_line_are_three_communities": "ok",
+        "signals::tests::degree_importance_normalizes_to_the_most_connected_node": "ok",
+        "signals::tests::no_edges_yields_all_zero_importance": "ok",
+        "signals::tests::projection::projected_signal_buckets_keep_surface_edges_aliases_and_numerical_parity": "ok",
+        "signals::tests::projection::projected_signal_self_loops_keep_legacy_incident_bucket_count": "ok",
+        "signals::tests::triangle_members_all_share_affinity": "ok",
+        "tests::a_face_is_never_blank": "ok",
+        "tests::different_addresses_generally_give_different_faces": "ok",
+        "tests::each_face_draws_a_simpler_arm_when_small": "ok",
+        "tests::every_fill_resolves_to_a_palette_entry_never_a_literal": "ok",
+        "tests::faces_stay_small": "ok",
+        "tests::independent_regions_sample_each_orbit_once": "ok",
+        "tests::one_face_wears_two_palettes": "ok",
+        "tests::random_addresses_produce_decodable_faces": "ok",
+        "tests::symmetry_holds_for_every_address": "ok",
+        "tests::the_arms_switch_at_the_threshold": "ok",
+        "tests::the_default_height_small_arm_keeps_distinct_coarse_masks": "ok",
+        "tests::the_derivation_matches_its_digest_pinned_fixtures": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/pictograph-45.log",
+      "sha256": "8f9a3dd9b7d5262a21bf488f60c03594ed86f6e32e0c9d84e44df5337543ea2a",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/pictograph-dde37b42f1d291ed --exact tests::the_grammar_does_not_collapse_to_one_variant tests::the_same_address_always_gives_the_same_bytes tests::the_two_colours_are_always_distinct --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 550 filtered out; finished in 0.01s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "22432"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "tests::the_grammar_does_not_collapse_to_one_variant": "ok",
+        "tests::the_same_address_always_gives_the_same_bytes": "ok",
+        "tests::the_two_colours_are_always_distinct": "ok"
+      }
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261018/remaining-slices/tabard-workshop.log",
+      "sha256": "9d9b3ff39376ce9691224ac17ac91d036f594d8d5c9e31df0f742c25f1503a19",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s /home/markik/Code/target/debug/deps/tabard_workshop-2f2d8ba8fa14a2ed --test-threads=1 --nocapture"
+      ],
+      "summaries": [
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "37816"
+      ],
+      "swaps": [
+        "0"
+      ],
+      "tests": {
+        "fonts::picker_tests::native_picker_filters_available_families_and_only_stages_the_choice": "ok",
+        "fonts::tests::draft_preserves_unedited_stacks_and_default_is_explicit_apply": "ok",
+        "graph::tests::actual_node_targets_update_selection_focus_and_hover": "ok",
+        "graph::tests::leaf_and_hit_targets_share_fixture_projection": "ok",
+        "graph::tests::shared_leaf_paints_draft_accents_and_mode_feedback_tokens": "ok",
+        "reader::tests::all_profiles_paint_actual_reader_surface_and_foreground": "ok",
+        "reader::tests::font_changes_remeasure_the_existing_source_and_reset_its_defaults": "ok",
+        "reader::tests::mode_changes_preserve_source_and_refresh_the_shared_reader_palette": "ok",
+        "reader::tests::specimen_is_extracted_and_uses_real_shaped_reader_output": "ok",
+        "state::embedded_close_tests::cancelling_discard_exit_restores_the_unsaved_guard_for_an_embedded_session": "ok",
+        "state::embedded_close_tests::cancelling_saved_exit_does_not_skip_guards_after_the_next_edit": "ok",
+        "state::embedded_close_tests::failed_save_of_an_untouched_import_does_not_authorize_exit": "ok",
+        "state::embedded_close_tests::failed_save_of_initial_blank_draft_does_not_authorize_exit": "ok",
+        "typography::tests::role_navigation_keeps_imported_empty_role_data_unchanged": "ok"
+      }
+    }
+  ],
+  "boundaries": [
+    "No Mere source changes were needed. This receipt qualifies these two suites on the recorded commit, not a rerun of all prior suites on newer main.",
+    "The spiral probe passes independently in 55.82 seconds. Actual GPU culling draw/readback and lost-edge control pass.",
+    "All 18 pre-existing ignored probes remain ignored; no headed/browser/platform qualification is added.",
+    "Genet fixture-only corrections and its 117-test coverage were published separately as 6f00922bb422d4449f55713b5c1e2fcd178c5e75. No production dependency pin change is needed."
+  ]
+}
