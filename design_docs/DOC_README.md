@@ -1,4 +1,4 @@
-Shared graph label placement (2026-10-17, locally qualified; publication pending): the [projection grammar
+Shared graph label placement (2026-10-17, published through `c8d316b60`): the [projection grammar
 adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#shared-graph-label-placement-2026-10-17)
 records Cambium's shared collision repair, 398 supplier passes and Woodshed
 receiving/native qualification; compact horizontal clipping remains open and

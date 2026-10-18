@@ -1959,3 +1959,5 @@ Rust 1.99.1 on macOS, `pictograph` with `canvas` and default features:
 Live tag-edit cache invalidation and headed/GPU acceptance retain separate
 scope; this correction does not change the layout cache. Turnstone's receiving
 scene check must run against the subsequently published supplier revision.
+
+Publication update (2026-10-17): shared label source `d1a200b18` is reachable on main through merge `c8d316b60`; Woodshed adoption and audit closure are published through `8204688`. Merged Mere CPU checks pass 279 Cambium and 120 Rootstock cases, with three existing ignores. Woodshed retains its exact qualified supplier; this integration adds no native claim. See the [publication record](../../../support/receipts/graph-labels-20261017/publication.json).
