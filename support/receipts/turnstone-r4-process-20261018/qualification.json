@@ -1,0 +1,73 @@
+{
+  "status": "bounded macOS two-process real-model fixture qualification passed",
+  "date": "2026-10-18",
+  "base": "e6250fd1c460dfbb3d6d2a076ec0fdf6748d35bb",
+  "source": "ports/djinn/tests/inference_route.rs",
+  "source_sha256": "6d1abc305fda289cce1680cda40f9a70ab8a3e13c47dec41bd3b52480e5f29df",
+  "binary_sha256": "3fc1513163d4c92db413f883285eef64cc97045cc9219b4d214b997259d12623",
+  "command": "cargo test --locked --offline -p djinn --features inference-gpu --test inference_route --no-run -j2; run serve_trained_model_for_headed_turnstone --ignored --exact --nocapture with explicit phases 0 and 1",
+  "source_change_scope": "Existing ignored test only; runtime Rust sources, manifests and lock unchanged.",
+  "gpu": "AMD Radeon Pro Vega 56 (Metal)",
+  "model": {
+    "model_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+    "artifacts": [
+      [
+        "config.json",
+        846,
+        "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee"
+      ],
+      [
+        "tokenizer.json",
+        2104556,
+        "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c"
+      ],
+      [
+        "tokenizer_config.json",
+        3764,
+        "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df"
+      ],
+      [
+        "model.safetensors",
+        723674912,
+        "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e"
+      ]
+    ]
+  },
+  "process_receipts": [
+    "process-0.json",
+    "process-1.json"
+  ],
+  "distinct_pids": true,
+  "real_generation_finished_and_cancelled": true,
+  "pause_resume_observed": true,
+  "exact_sealed_evidence_equal_by_run": true,
+  "live_finished_citations_identical_after_os_process_restart": true,
+  "public_consumer_packet": "repos/turnstone/docs/receipts/r4_research_workflow_20261018/",
+  "raw_run": "/Users/markik/Code/output/turnstone-r4-native-02",
+  "consumer_base": "b34a03c60bc242bb53bcac1e6b734283095f1b92",
+  "consumer_binary_sha256": "8c5bf3798dfd0f123c0de978f3fb99c7028c2ea2730901095c3740df7d724d95",
+  "boundary": "Two fresh headed Turnstone processes. Origin/resident exit, saved-source read first, separate resident restart. Consumer workflow qualification remains owned by Turnstone. No installed resident, physical recovery, OS AT or other-platform claim.",
+  "external_evidence": [
+    {
+      "path": "/Users/markik/Code/output/turnstone-r4-native-02/completion.json",
+      "sha256": "329dc9b92885f971ff5653b361bb4dccff3ba503b07e872ec6499c5737c8d39b"
+    },
+    {
+      "path": "/Users/markik/Code/output/turnstone-r4-native-02/verification.json",
+      "sha256": "5b08319477b626421eac4b640665e95b48df3741f5c76c64f0214c2ce4394e64"
+    },
+    {
+      "path": "/Users/markik/Code/output/turnstone-r4-native-02/resident/resident-receipt.json",
+      "sha256": "5cb6a560bec2d5a372456fbeba1bae53ba8e111c687dabe29a1c6c1b2a48006e"
+    },
+    {
+      "path": "/Users/markik/Code/output/turnstone-r4-native-02/resident-0.log",
+      "sha256": "74e0ad5f75ecbc8e8ec7a394077c2c4e755599e29fa9bbafec0e1bb7c10af238"
+    },
+    {
+      "path": "/Users/markik/Code/output/turnstone-r4-native-02/resident-1.log",
+      "sha256": "a61a2be64a12424e3ecdceb5416480bc22868f33a7793d2bf89485e01f5d421c"
+    }
+  ]
+}
