@@ -424,12 +424,19 @@ impl Run {
         if let Some(why) = unfinished {
             record.failures.push(why);
         }
+        let mut failures = record.failures;
         let evidence = record
             .evidence
             .iter()
-            .filter_map(|path| receipt::evidence(&shared.dir, path).ok())
+            .filter_map(|path| match receipt::evidence(&shared.dir, path) {
+                Ok(item) => Some(item),
+                Err(error) => {
+                    failures.push(format!("evidence {}: {error}", path.display()));
+                    None
+                },
+            })
             .collect();
-        let receipt = Receipt {
+        let mut receipt = Receipt {
             schema: RECEIPT_SCHEMA.into(),
             plan: self.config.plan.clone(),
             test: self.config.test.clone(),
@@ -466,16 +473,28 @@ impl Run {
             attended: Vec::<AttendedStep>::new(),
             evidence,
             outcome: Outcome {
-                passed: record.failures.is_empty(),
-                failures: record.failures,
+                passed: failures.is_empty(),
+                failures,
             },
         };
         let dir = &shared.dir;
-        let _ = std::fs::write(
-            dir.join(RECEIPT_FILE),
-            serde_json::to_vec_pretty(&receipt).unwrap_or_default(),
-        );
-        let _ = std::fs::write(dir.join(SUMMARY_FILE), receipt::summary_markdown(&receipt));
+        if let Err(error) = publish_summary(dir, &receipt) {
+            receipt.outcome.failures.push(format!(
+                "summary {}: {error}",
+                dir.join(SUMMARY_FILE).display()
+            ));
+            receipt.outcome.passed = false;
+        }
+        if let Err(error) = publish_receipt(dir, &receipt) {
+            receipt.outcome.failures.push(format!(
+                "receipt {}: {error}",
+                dir.join(RECEIPT_FILE).display()
+            ));
+            receipt.outcome.passed = false;
+            // Best effort: the receipt location may be unavailable, but a
+            // failed summary can still make the publication error visible.
+            let _ = publish_summary(dir, &receipt);
+        }
         println!(
             "RECEIPT {} {} at {}",
             receipt.run,
@@ -499,9 +518,32 @@ impl Drop for Run {
             } else {
                 "the run was dropped without finish"
             };
-            self.write(Some(why.into()));
+            // Drop can run while unwinding from a test panic. Finalization is
+            // best-effort here and must never trigger a second panic.
+            if std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                self.write(Some(why.into()));
+            }))
+            .is_err()
+            {
+                use std::io::Write as _;
+                let _ = writeln!(
+                    std::io::stderr(),
+                    "djinn-testkit: panic while finalizing dropped run {}",
+                    self.id
+                );
+            }
         }
     }
+}
+
+fn publish_receipt(dir: &Path, receipt: &Receipt) -> std::io::Result<()> {
+    let bytes = serde_json::to_vec_pretty(receipt)
+        .map_err(|error| std::io::Error::other(format!("serialize receipt: {error}")))?;
+    std::fs::write(dir.join(RECEIPT_FILE), bytes)
+}
+
+fn publish_summary(dir: &Path, receipt: &Receipt) -> std::io::Result<()> {
+    std::fs::write(dir.join(SUMMARY_FILE), receipt::summary_markdown(receipt))
 }
 
 pub(crate) fn wait_for<T>(

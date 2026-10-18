@@ -10,6 +10,7 @@
 
 use std::io::{BufRead, BufReader};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use djinn_testkit::walls::{CanaryRoot, InstalledProcess, WallSpec};
@@ -19,6 +20,48 @@ const ROLE: &str = "DJINN_TESTKIT_ROLE";
 
 fn config(test: &str) -> RunConfig {
     RunConfig::new("djinn-testkit", test, std::env::current_exe().unwrap())
+}
+
+fn temp_config(test: &str) -> RunConfig {
+    let mut config = config(test);
+    static NEXT_ROOT: AtomicU64 = AtomicU64::new(0);
+    let temp = std::env::temp_dir();
+    loop {
+        let sequence = NEXT_ROOT.fetch_add(1, Ordering::Relaxed);
+        let candidate = temp.join(format!(
+            "djinn-testkit-finalize-{}-{sequence}",
+            std::process::id()
+        ));
+        match std::fs::create_dir(&candidate) {
+            Ok(()) => {
+                config.receipts_root = candidate;
+                break;
+            },
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => panic!(
+                "create isolated receipt root {}: {error}",
+                candidate.display()
+            ),
+        }
+    }
+    config.walls = WallSpec {
+        installed: Vec::new(),
+        standard_endpoints: Vec::new(),
+        canaries: Vec::new(),
+    };
+    config
+}
+
+fn remove_temp_receipts(root: &std::path::Path) {
+    let temp = std::env::temp_dir();
+    assert_eq!(root.parent(), Some(temp.as_path()));
+    assert!(
+        root.file_name()
+            .unwrap()
+            .to_string_lossy()
+            .starts_with("djinn-testkit-finalize-")
+    );
+    std::fs::remove_dir_all(root).unwrap();
 }
 
 /// The re-run roles: a sleeper, and a driver that spawns one and waits.
@@ -79,6 +122,115 @@ fn a_tampered_evidence_file_fails_verification() {
     let tampered = verify(&dir).unwrap();
     assert!(!tampered.ok());
     assert!(tampered.problems[0].contains("evidence/fact.json"));
+}
+
+#[test]
+fn missing_registered_evidence_fails_the_receipt() {
+    if role().is_some() {
+        return;
+    }
+    let config = temp_config("missing-evidence");
+    let root = config.receipts_root.clone();
+    let run = Run::begin(config).unwrap();
+    let dir = run.dir().to_path_buf();
+    let missing = run.dir().join("evidence/missing.json");
+    run.evidence(&missing);
+    let receipt = run.finish_record();
+    assert!(!receipt.outcome.passed);
+    assert!(
+        receipt
+            .outcome
+            .failures
+            .iter()
+            .any(|failure| { failure.contains("evidence") && failure.contains("missing.json") })
+    );
+    assert!(receipt.evidence.is_empty());
+    let receipt_path = dir.join("receipt.json");
+    assert!(
+        receipt_path.is_file(),
+        "finalized receipt missing at {}; run dir exists={}, returned failures={:?}",
+        receipt_path.display(),
+        dir.is_dir(),
+        receipt.outcome.failures
+    );
+    let stored: djinn_testkit::Receipt =
+        serde_json::from_slice(&std::fs::read(&receipt_path).unwrap()).unwrap();
+    assert!(
+        stored
+            .outcome
+            .failures
+            .iter()
+            .any(|failure| { failure.contains("evidence") && failure.contains("missing.json") })
+    );
+    remove_temp_receipts(&root);
+}
+
+#[test]
+fn receipt_path_collision_is_a_failed_finalization() {
+    if role().is_some() {
+        return;
+    }
+    let config = temp_config("receipt-collision");
+    let root = config.receipts_root.clone();
+    let run = Run::begin(config).unwrap();
+    let dir = run.dir().to_path_buf();
+    std::fs::create_dir(dir.join("receipt.json")).unwrap();
+    let receipt = run.finish_record();
+    assert!(!receipt.outcome.passed);
+    assert!(
+        receipt
+            .outcome
+            .failures
+            .iter()
+            .any(|failure| failure.contains("receipt"))
+    );
+    let summary = std::fs::read_to_string(dir.join("summary.md")).unwrap();
+    assert!(summary.contains(": failed"));
+    remove_temp_receipts(&root);
+
+    let config = temp_config("finish-collision");
+    let root = config.receipts_root.clone();
+    let run = Run::begin(config).unwrap();
+    let dir = run.dir().to_path_buf();
+    std::fs::create_dir(dir.join("receipt.json")).unwrap();
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| run.finish()));
+    assert!(
+        result.is_err(),
+        "finish() reported success after receipt failure"
+    );
+    remove_temp_receipts(&root);
+}
+
+#[test]
+fn summary_path_collision_is_recorded_in_durable_receipt() {
+    if role().is_some() {
+        return;
+    }
+    let config = temp_config("summary-collision");
+    let root = config.receipts_root.clone();
+    let run = Run::begin(config).unwrap();
+    let dir = run.dir().to_path_buf();
+    std::fs::create_dir(dir.join("summary.md")).unwrap();
+    let receipt = run.finish_record();
+    assert!(!receipt.outcome.passed);
+    assert!(
+        receipt
+            .outcome
+            .failures
+            .iter()
+            .any(|failure| failure.contains("summary"))
+    );
+    let stored: djinn_testkit::Receipt =
+        serde_json::from_slice(&std::fs::read(dir.join("receipt.json")).unwrap()).unwrap();
+    assert!(!stored.outcome.passed);
+    assert!(
+        stored
+            .outcome
+            .failures
+            .iter()
+            .any(|failure| failure.contains("summary"))
+    );
+    remove_temp_receipts(&root);
 }
 
 /// C1: a guard fed a changed installed identity fails the receipt.
