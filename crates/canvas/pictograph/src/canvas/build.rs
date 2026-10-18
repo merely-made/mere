@@ -37,7 +37,7 @@ use crate::canvas::palette;
 /// The geometry every `.gnode` color class repeats; only the fill/label differ.
 /// The frame's `translate(anchor - half) scale(zoom)` scales about the top-left;
 /// CSS's centre origin would push the body `(size/2)(1 - zoom)` off its anchor.
-const GNODE_BOX: &str = "position: absolute; left: 0; top: 0; width: 36px; height: 36px; \
+const GNODE_BOX: &str = "position: absolute; left: 0; top: 0; width: 36px; height: 36px; box-sizing: border-box; \
      font-size: 15px; transform-origin: 0 0;";
 
 /// Author CSS for the node-children document, built once. `.stage` is the
@@ -77,16 +77,12 @@ fn build_node_sheet() -> Vec<String> {
         format!(
             ".gnode-idle {{ {GNODE_BOX} background-color: var(--node-idle-bg); color: var(--node-idle-fg); }}"
         ),
-        // Content-type silhouettes, layered on the state/color class as a second class
-        // (border-radius only, so they merge with whichever color class is set). Square
-        // is the default (no class); rounded = small-web menu, circle = feed.
-        ".gnode-rounded { border-radius: 9px; }".to_string(),
-        ".gnode-circle { border-radius: 50%; }".to_string(),
+        // The frame emits the shared NodeBillboard corner radius inline, so
+        // painting, visual picking and path attachment use one silhouette.
         // Representation is a face treatment over the measured footprint.
         // Glyph is the terse icon rung. Card is deliberately the established
         // Canvas face. LivePane is framed as the focused/live-capable rung; the
         // renderer does not imply that an embedded document exists yet.
-        ".gnode-representation-glyph { border-radius: 50%; }".to_string(),
         ".gnode-representation-glyph .gcaption { display: none; }".to_string(),
         ".gnode-representation-live-pane { box-shadow: 0 0 0 3px var(--node-caption-fg), 0 0 16px var(--node-caption-fg); }".to_string(),
         ".gnode-representation-live-pane .gcaption { font-weight: 700; }".to_string(),
@@ -94,12 +90,12 @@ fn build_node_sheet() -> Vec<String> {
         // lifted; sites square in their category; retained underlined; suggestions
         // smallest; quiet nodes captionless.
         format!(
-            ".gnode-body {{ {GNODE_BOX} border-radius: 50%; background-color: var(--node-selected-bg); \
+            ".gnode-body {{ {GNODE_BOX} background-color: var(--node-selected-bg); \
              color: var(--node-selected-fg); box-shadow: 0 0 0 2px var(--node-caption-fg), 0 4px 10px rgba(0, 0, 0, 0.35); }}"
         ),
-        format!(".gnode-site {{ {GNODE_BOX} border-radius: 2px; color: rgb(20, 22, 30); }}"),
+        format!(".gnode-site {{ {GNODE_BOX} color: rgb(20, 22, 30); }}"),
         ".gnode-retained { border-bottom: 2px dashed var(--node-caption-fg); }".to_string(),
-        ".gnode-suggestion { border-radius: 50%; opacity: 0.6; }".to_string(),
+        ".gnode-suggestion { opacity: 0.6; }".to_string(),
         ".gnode-quiet .gcaption { display: none; }".to_string(),
         // A suggestion's mark, the person's choice: dot and ring are bare, word keeps
         // its label even when quiet, glyph and face keep the face.

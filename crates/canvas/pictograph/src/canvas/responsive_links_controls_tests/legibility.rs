@@ -8,7 +8,7 @@ use super::geometry::alias_graph;
 use super::*;
 use uuid::Uuid;
 
-fn source_facts(paths: &[EvaluatedLinkPath]) -> Vec<String> {
+pub(super) fn source_facts(paths: &[EvaluatedLinkPath]) -> Vec<String> {
     let mut facts: Vec<_> = paths
         .iter()
         .map(|path| {
@@ -64,7 +64,7 @@ fn point_segment_distance(point: (f32, f32), a: (f32, f32), b: (f32, f32)) -> f3
     (point.0 - (a.0 + t * delta.0)).hypot(point.1 - (a.1 + t * delta.1))
 }
 
-fn polyline_distance(point: (f32, f32), points: &[(f32, f32)]) -> f32 {
+pub(super) fn polyline_distance(point: (f32, f32), points: &[(f32, f32)]) -> f32 {
     points
         .windows(2)
         .map(|pair| point_segment_distance(point, pair[0], pair[1]))

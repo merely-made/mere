@@ -216,6 +216,52 @@ removal of the unused paint/pick report and intermediate maps, filtering before
 provenance cloning, and one joined stroke per centerline. Knot checkpoint
 confidentiality remains in its separate storage lane.
 
+### Shared billboard attachment — 2026-10-18
+
+**Status: implementation in progress.** Mark selected the remaining attachment
+limits and authorized orchestration. The integration baseline is refreshed Mere
+`908283728479cf3b9a666a68b9e360418b46301b`, refreshed before qualification onto
+`9b8c161a831aa9615c84a4bbfaea9b15021e3659`. Knot checkpoint confidentiality
+retains its separate storage owner.
+
+**Findings:** the painted outer body is an upright billboard, distinct from the
+inset icon and the physical collider. Its projected center, grammar scale,
+rounded/circular outline and visual lift previously had separate arithmetic in
+frame layout, picking and path attachment. Raised links deliberately join the
+ground foot of the stem. Self-loop arches and node marquee selection also
+assumed square, unrotated geometry; Ring borders enlarged the painted box
+beyond the declared side under CSS content sizing.
+
+The shared Pictograph `NodeBillboard` value resolves these inputs from current
+Canvas and camera state. Frame/body and inset face placement, visual picking,
+screen-space marquee selection and responsive clipping consume that model.
+Borders fit its declared outer size. Link hit tolerance is measured in screen
+pixels; no second path list or persistent geometry cache is introduced.
+Canonical source identity, endpoint forces and physical colliders retain their
+owners. Invalid projections and unsafe paths explicitly retain resting paths.
+
+Done conditions:
+
+- Flat, tilted/yawed, rounded, circular, scaled suggestion and lifted profiles
+  use one projected silhouette. Ordinary attachments meet that silhouette;
+  lifted attachments retain exact stem feet. Self-loop resting arches follow
+  the same presentation contract.
+- Picking and marquee selection follow painted positions and silhouettes,
+  including Glyph corners and projected link tolerances. Focused regressions
+  preserve canonical strata, aliases, source facts and view-local reset.
+- Locked/offline shared and Graphshell checks, product/viewer builds and port
+  boundaries pass on a recorded source. Scripted shared-API profiles run in the
+  normal graph route, with independent body-layout readback, reviewed captures
+  and a fresh OS-process reopen. These profile commands are qualification
+  inputs, not newly exposed ordinary user controls.
+
+**Progress, 2026-10-18:** shared geometry, responsive attachment and the reviewed
+self-loop, marquee, visual-picking and Ring-border corrections are implemented.
+Focused response checks pass. Self-loop construction reuses one shared route;
+raised strata form separate downward arches with exact stem-foot endpoints.
+Final committed-source checks, native/reopen qualification and publication
+remain pending.
+
 ## Authority and scope
 
 The [link model](../technical_architecture/2026-10-15_link_model.md) owns the
