@@ -1,0 +1,75 @@
+{
+  "source_revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "images": [
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_flat.png",
+      "sha256": "0ca4869ed7210f86e2538ed5b1527d9330e4cbc5689d62d523309169573dbacd",
+      "reviewer": "ordinary_path_acceptance",
+      "reviewed": true,
+      "observation": "Square bounds, centered icons and six stratum paths agree."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_response.png",
+      "sha256": "e77f92dd883aea38a6f0551a5b328238f1083ad3f76493d40aa3290119ae0967",
+      "reviewer": "ordinary_path_acceptance",
+      "reviewed": true,
+      "observation": "Responsive endpoints meet bodies without visible backtracking; stratum marks remain visible."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_tilted.png",
+      "sha256": "764518a18c91d2fc01ddc0e37ecb6de0d361acc6a55c12c78e11b008f3070c11",
+      "reviewer": "ordinary_path_acceptance",
+      "reviewed": true,
+      "observation": "Upright bodies and centered icons under camera projection; strong territory underlay remains visible."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_rounded.png",
+      "sha256": "815a836feaec07d4b8270a26a398dc1361ac34fb6225e6726cf68d9f9bef3284",
+      "reviewer": "ordinary_path_acceptance",
+      "reviewed": true,
+      "observation": "Rounded boundary attachment agrees; icons and stratum marks remain visible."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_circle.png",
+      "sha256": "9684ad82b4399978cab2a0a9d021f2642a772780e92d0f0a7201f323f03e5957",
+      "reviewer": "primary",
+      "reviewed": true,
+      "observation": "Paths meet circular silhouettes; no visible terminal backtracking or gap."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_suggestion.png",
+      "sha256": "6913bb461c63614719dffa47827bf12f35c8379a0817afe1532acf96aa2141e2",
+      "reviewer": "primary",
+      "reviewed": true,
+      "observation": "Scaled Ring body and inset icon align; existing quiet grammar makes unselected paths faint."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_lifted.png",
+      "sha256": "7f2c73db59be04b837b96abf2d06716e702b9acc381042f8ee8407be1683dd7a",
+      "reviewer": "primary",
+      "reviewed": true,
+      "observation": "Bodies and icons move together; paths retain ground-foot policy. Native fixture lift is16px; visible larger stems are CPU-qualified."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments/ordinary_link_attachments_lifted_selected.png",
+      "sha256": "b65f4920e86c69dfdba3a03ea4362f1ee8754678d8cb91d8bcffa5987e21fd79",
+      "reviewer": "primary",
+      "reviewed": true,
+      "observation": "Lifted source-backed Resource selection opens the correct inspector. Orange underlay limits halo contrast; blue/gold cores persist."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments_reopen/ordinary_link_attachments_reopened_default.png",
+      "sha256": "c387eb123d1f6ed4b8b83314c7db34380eba713a8910d32f158a84ca4911ea98",
+      "reviewer": "primary",
+      "reviewed": true,
+      "observation": "Stored IndexedDB graph reopened; normal grammar defaults restored; resting paths and inset icons agree."
+    },
+    {
+      "path": "browser-qualified/p4_tree_link_attachments_reopen/ordinary_link_attachments_reopened_tilted.png",
+      "sha256": "ba95c0adea8e1f43b5606260e3143ab559ab4b1fad3f2ed1f2a138719582b240",
+      "reviewer": "primary",
+      "reviewed": true,
+      "observation": "Responses remain disabled in tilted view; upright bodies and inset icons align with resting paths."
+    }
+  ]
+}

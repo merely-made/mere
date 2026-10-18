@@ -1,0 +1,151 @@
+{
+  "schema": "ordinary-responsive-links-build/v1",
+  "source_revision": "1e9d95da599322921b96febac1089d1662201849",
+  "process_records": {
+    "canvas": "canvas-final-4.json",
+    "graphshell": "graphshell-final-2.json",
+    "build": "wasm-final-2.json",
+    "bindgen": "bindgen-final.json"
+  },
+  "artifacts": [
+    {
+      "path": "pkg/graphshell_web.d.ts",
+      "sha256": "53083009f04cfc384369ce685b28e988571e2bb58f302b4da50aef8350791ba4",
+      "bytes": 8123
+    },
+    {
+      "path": "pkg/graphshell_web.js",
+      "sha256": "5c786d369ab2e8b3298c635bbbba88800fd8e9fa58e39bb0882347838a25ac8b",
+      "bytes": 150514
+    },
+    {
+      "path": "pkg/graphshell_web_bg.wasm",
+      "sha256": "2faa7e52f98bc0f5f324c2007314ada36ef32135d91dada83abae9432f40cf52",
+      "bytes": 188509107
+    },
+    {
+      "path": "pkg/graphshell_web_bg.wasm.d.ts",
+      "sha256": "cca4925a80f073b61e26c0266452c6bf94273a8ee8b4f05d242b9d3740bf5c48",
+      "bytes": 5724
+    },
+    {
+      "path": "pkg/snippets/genet-render-host-3997a73541d04484/inline0.js",
+      "sha256": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee",
+      "bytes": 1369
+    }
+  ],
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "29920a90930f4391bed150826250a4df03720c59588b0dfbdd4dfbe36737df68"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "ed64e09af30e5017e17e8e85fd24dca1995ba195b046533027f27dcca23e3e96"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas.rs",
+      "sha256": "ae8b76f266526d463b67fdf0626a681b3d7ca0e0df1a0cc2ce059671f21ac1ea"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/build.rs",
+      "sha256": "f04fef1182075c34b85b0ae78f6c2fc31246db13ccd48eafb60879c52e0c276d"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells.rs",
+      "sha256": "aac994cb1fbc6e6bc6102bc84da81879a2cb455dc42e824470cae47461fbeee1"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/edge_cells/self_link_tests.rs",
+      "sha256": "7f42e0845538bf724b18fc540fc5c2f36148dd65a214fc89d0807443bfe20853"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/frame.rs",
+      "sha256": "e3b95f9eae6a4b4b632c5070f7ddfa3326cf948a6788dedb8bf6d740b8c58a91"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/input.rs",
+      "sha256": "5efd9fa2d0a6e0b6d5504a6d4c51658298c5d3508a4f0c9f9fa5d266f3daf016"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/input_tests.rs",
+      "sha256": "7ba1e0d7f280557e18e79257ed3477816f355b51bdba207177d74920d38a9dc3"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/node_billboard.rs",
+      "sha256": "bafbbef61473e55d0ec53c5a08370446cc88db30babcafa338f0fee40ecfa6de"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/node_billboard_tests.rs",
+      "sha256": "63c7e330e57c451e1a82dc5511ff7a482a7bda0b58c4ae083030e51977ce9032"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/node_presentation.rs",
+      "sha256": "f39ecb2a536f40304cf86dda92c7d601e1fba7c6080a49ff7e65db25d28ca331"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links.rs",
+      "sha256": "9eba508ae977a9faf2cc1057dff556bbf63aa2cfa432e0f00bddb54c2a92ad5e"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs",
+      "sha256": "9e5e98a23af2562f1adeafad21876b9a3f882c2a8ac3793307b21efd51a662f3"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links/geometry_tests.rs",
+      "sha256": "fc2df18c9e785e70a000b1c2bad309c6f28d53e4391091b61a976a237c88a624"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests.rs",
+      "sha256": "ef67f4734eb19bf9a5f50fa495a6c947516204fb652098395eecfece857fef0a"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/attachment.rs",
+      "sha256": "689eb662d043996c480578f47a70cfaa4cb5107095d0724c07c6e7bdae107caf"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/legibility.rs",
+      "sha256": "55b971d3d1a0ad054c66df83de4f46046e0dfa5d3edf130614444c7e3f376f8d"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/scene_paint.rs",
+      "sha256": "9158421b32758539a67707b4278cf6151d4633c78e3798e5ebd24c4d0f1d7029"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/view.rs",
+      "sha256": "ab96029c693ce798e13c8699493d445577a13ef42299b5ba757d6e51c4754a5a"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/lane.rs",
+      "sha256": "95ec89ff68e9a95113ecca24adc04fb7215bd58f61dcac9489bc12496ebbaae5"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/lane/link_attachment.rs",
+      "sha256": "5a8fd50e330817d1ec3bb21412b5f55303eea2f71191da56843415b1a61d2c6f"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "8a636fd41fc48c45d9637532f492a19ffbf14726bc0ee2ab243d10a2dfc3ae6a"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.toml",
+      "sha256": "4a537a39cae43a144a908802ff3b97ac7ab2a331a9d1cd5b6e208ba2d9b82cbc"
+    },
+    {
+      "path": "ports/graphshell/web/loader.js",
+      "sha256": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_attachments.scn",
+      "sha256": "b2104f00bdc6babd537e6f3e65780b55dd214e792d0bbbce05312e39926e08e1"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p4_tree_link_attachments_reopen.scn",
+      "sha256": "464209b6fa9e6c06a6ea9c3bd9aa1e84ca32343d8ec58d12beaeb4a6cba25ad6"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/ordinary_link_paths.rs",
+      "sha256": "093a5f313776c8ecbc35ce2167c2591a2b47d715b01f58581223087be81f7808"
+    }
+  ]
+}
