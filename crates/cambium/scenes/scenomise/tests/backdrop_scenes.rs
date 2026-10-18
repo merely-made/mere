@@ -161,7 +161,8 @@ fn ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts() {
         unreachable!()
     };
     grid.lines[1].key = "line-1/syllable/0".into();
-    assert_eq!(input.compile().unwrap_err().path, "marks");
+    // Mark ruled (audit plan R5): input validation refuses first.
+    assert_eq!(input.compile().unwrap_err().path, "metre.occurrences");
 }
 
 #[test]

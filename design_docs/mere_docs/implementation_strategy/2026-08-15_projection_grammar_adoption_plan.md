@@ -1879,9 +1879,10 @@ this as a done condition, not as a numbered ruling.
 refused at `metre.occurrences` (input validation) instead of `marks`
 (compile-time check). `SceneInputError.path` is a free string with no
 documented contract and no consumer in the tree matches on it, so neither path
-is promised. This is genuinely open and is held as a fork for Mark; the
-`ambiguous_occurrence_keys_are_refused_and_generation_tracks_facts` test is
-left unchanged and red until he rules.
+is promised. This was open and went to Mark, who ruled (2026-10-18, audit plan R5): "Keep
+metre.occurrences, fix the test (Recommended)". The test now expects
+`metre.occurrences`; the later `marks` check stays as a backstop.
+*Reading, not ruled:* `SceneInputError.path` remains a free string, not a stable code.
 
 
 ### Sets canonical tag admission (2026-10-17)
