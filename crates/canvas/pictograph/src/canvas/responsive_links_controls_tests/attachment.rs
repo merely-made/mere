@@ -451,3 +451,60 @@ fn invalid_camera_fails_closed_without_nonfinite_billboard_or_path_geometry() {
     }));
     assert_eq!(canvas.graph.revision(), revision);
 }
+
+#[test]
+fn ordinary_circle_flow_round_trip_uses_shared_interior_precision() {
+    let (mut canvas, ids, _, _) = attached_canvas();
+    canvas.set_node_shapes(ids.into_iter().map(|id| (id, NodeShape::Circle)).collect());
+    canvas.hidden_links.extend([
+        LinkKey::new(LinkStratum::Surface, ids[0].to_string(), ids[3].to_string()),
+        LinkKey::new(LinkStratum::Surface, ids[1].to_string(), ids[2].to_string()),
+    ]);
+    canvas.set_viewport(Viewport {
+        offset: (450.0, 279.0),
+        zoom: 1.0,
+        yaw: 0.0,
+        tilt: 1.0,
+        pan_velocity: (0.0, 0.0),
+        view: (900, 558),
+    });
+    let mut response = LinkPathResponse::default();
+    response.field_response = true;
+    response.field_strength = 20.0;
+    response.view_field = Some(VectorField::ConstVec { x: 0.0, y: -1.0 }.into());
+    response.config.control_points = 17;
+    response.config.iterations = 24;
+    response.config.field_gain = 0.08;
+    response.config.compatibility_gain = 0.08;
+    response.config.smoothing = 0.08;
+    response.config.max_step = 4.0;
+    canvas.set_link_path_response(response);
+    let report = canvas.link_path_response_report();
+    assert_eq!(report.responsive_paths, 6);
+    assert_eq!(report.presentation_fallbacks, 0);
+    let mut max_raw_depth = 0.0_f32;
+    for path in &report.paths {
+        for id in [path.displayed_from, path.displayed_to] {
+            let key = canvas.graph.get_node_key_by_id(id).unwrap();
+            let body = canvas.node_billboard(key).unwrap();
+            for pair in path.points.windows(2) {
+                let a = screen(&canvas, pair[0]);
+                let b = screen(&canvas, pair[1]);
+                if let Some((enter, exit)) = body.segment_interior_interval(a, b) {
+                    let midpoint = a + (b - a) * ((enter + exit) * 0.5);
+                    max_raw_depth =
+                        max_raw_depth.max(-body.signed_distance_screen(midpoint).unwrap());
+                }
+                assert!(
+                    !body.segment_crosses_interior(a, b),
+                    "actual body crossing: {path:?}"
+                );
+            }
+        }
+    }
+    eprintln!("ordinary circular flow: maximum raw inward round-off {max_raw_depth:.9} px");
+    assert!(
+        max_raw_depth < 0.001,
+        "a measurable body intrusion must not be dismissed as rounding"
+    );
+}

@@ -428,7 +428,6 @@ fn flat_self_link_points(body: NodeBillboard, stratum: LinkStratum) -> Option<Ve
 
 fn raised_self_link_points(body: NodeBillboard, stratum: LinkStratum) -> Option<Vec<Point2D<f32>>> {
     const SAMPLES: usize = 32;
-    const INTERIOR_EPSILON: f32 = 0.05;
     let half = body.local_side * body.zoom * 0.5;
     let lift = body.ground_anchor.y - body.center.y;
     let radius = (half + lift.abs() + 8.0).max(half * 2.0);
@@ -466,9 +465,7 @@ fn raised_self_link_points(body: NodeBillboard, stratum: LinkStratum) -> Option<
     let outside: Vec<_> = points
         .iter()
         .enumerate()
-        .filter_map(|(index, point)| {
-            (body.signed_distance_screen(*point)? >= -INTERIOR_EPSILON).then_some(index)
-        })
+        .filter_map(|(index, point)| (!body.strictly_contains_screen(*point)).then_some(index))
         .collect();
     let first_outside = *outside.first()?;
     let last_outside = *outside.last()?;
@@ -476,20 +473,7 @@ fn raised_self_link_points(body: NodeBillboard, stratum: LinkStratum) -> Option<
         return None;
     }
     for pair in points[first_outside..=last_outside].windows(2) {
-        let Some((enter, exit)) = body.segment_interior_interval(pair[0], pair[1]) else {
-            continue;
-        };
-        if exit - enter <= f32::EPSILON {
-            continue;
-        }
-        let midpoint = Point2D::new(
-            pair[0].x + (pair[1].x - pair[0].x) * (enter + exit) * 0.5,
-            pair[0].y + (pair[1].y - pair[0].y) * (enter + exit) * 0.5,
-        );
-        if body
-            .signed_distance_screen(midpoint)
-            .is_some_and(|distance| distance < -INTERIOR_EPSILON)
-        {
+        if body.segment_crosses_interior(pair[0], pair[1]) {
             return None;
         }
     }

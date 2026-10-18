@@ -19,7 +19,6 @@ const MAX_PRESENTATION_POINTS: usize = 128;
 const MIN_VISIBLE_LENGTH: f32 = 1.0e-3;
 const OFFSET_TOLERANCE: f32 = 1.0e-3;
 const ANCHOR_TOLERANCE: f32 = 1.0e-2;
-const INTERIOR_EPSILON: f32 = 1.0e-5;
 const MIN_TAPER_LENGTH: f32 = 1.0;
 
 /// Smooth and attach one evaluated polyline to the rendered endpoint bodies.
@@ -268,17 +267,10 @@ fn safe_stem_attachment(points: &[Point2D<f32>], body: NodeBillboard) -> bool {
 /// Inspect segment interiors after `skip` leading segments. Boundary contact
 /// and a zero-width tangent do not count as entering the painted silhouette.
 fn has_strict_body_reentry(points: &[Point2D<f32>], body: NodeBillboard, skip: usize) -> bool {
-    points.windows(2).skip(skip).any(|pair| {
-        body.segment_interior_interval(pair[0], pair[1])
-            .is_some_and(|(enter, exit)| {
-                if exit - enter <= INTERIOR_EPSILON {
-                    return false;
-                }
-                let midpoint = interpolate(pair[0], pair[1], (enter + exit) * 0.5);
-                body.signed_distance_screen(midpoint)
-                    .is_some_and(|distance| distance < -INTERIOR_EPSILON)
-            })
-    })
+    points
+        .windows(2)
+        .skip(skip)
+        .any(|pair| body.segment_crosses_interior(pair[0], pair[1]))
 }
 
 fn corner_cut(points: &[Point2D<f32>]) -> Option<Vec<Point2D<f32>>> {

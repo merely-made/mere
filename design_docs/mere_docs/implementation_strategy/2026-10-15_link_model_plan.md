@@ -262,6 +262,16 @@ raised strata form separate downward arches with exact stem-foot endpoints.
 Final committed-source checks, native/reopen qualification and publication
 remain pending.
 
+**Findings, browser precision follow-through:** the first eight-capture native
+run passed the independent rendered-bounds and 0.05px attachment checks, but
+the circular profile's strict-interior probe reported a crossing. The matching
+CPU cohort reproduced 0.000019073px of inward `f32` round-off, exceeding the
+former fixed 0.00001px predicate. `NodeBillboard` now owns the strict-interior
+predicate and its coordinate-scaled floating-point allowance; responsive paths,
+self-loops and qualification reuse it. Boundary round-trips and an actual
+0.1px intrusion have separate regressions. The visible attachment/readback
+gates are unchanged; the failed native result is retained for comparison.
+
 ## Authority and scope
 
 The [link model](../technical_architecture/2026-10-15_link_model.md) owns the
