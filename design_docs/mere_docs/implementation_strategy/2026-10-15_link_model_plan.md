@@ -39,7 +39,7 @@ records the separate source, browser, reopen and image-review claims.
 | Work | Current boundary and owner |
 | --- | --- |
 | Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
-| Responsive-path legibility | Open presentation follow-up from reviewed captures: strong selected bundles have angular bends and crossings, and direction/opposition marks and parallel strata are faint at this zoom. Improve curve/highlight/stratum legibility without changing canonical identity, explicit membership or endpoint force authority. |
+| Responsive-path legibility | In progress, 2026-10-18, on refreshed Mere `dd9d5c523`: strong selected bundles have angular bends and crossings, and direction/opposition marks and parallel strata are faint at this zoom. Improve curve/highlight/stratum legibility without changing canonical identity, explicit membership or endpoint force authority. |
 | Strength and physical explanation | Deferred to dynamics: held assertion counting is the current default, and endpoint physics retains one spring per visible source row. Weighted policy, one aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance are not part of this continuation. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
@@ -142,6 +142,46 @@ already published Genet `4733c557e4c7e54f9e928116b8008671f69fe4bf` and Netrender
 `c5efc94f876e93caba20807709189c5f9589492b` in the standalone browser as well as the
 root workspace. Knot checkpoint confidentiality remains in its separate storage
 lane, confirmed in published Knot `7e196c534e64b50cf6f00bf4d95e3beb493e5a9f`.
+
+### Bundle legibility and one geometry handoff — 2026-10-18
+
+**Status: implementation in progress; browser qualification pending.** Mark
+selected bundle legibility as the next bounded follow-up, with removal of
+unnecessary duplication and Knot checkpoint storage kept in its own lane.
+The baseline is refreshed Mere `dd9d5c523c092baf72be31cdbc1d28c4ae179fa0`.
+
+**Findings:** the old endpoint trim moved only terminal samples along the
+unbent chord, leaving intervening samples behind the attachment and producing
+backtracking near node faces. Selection then painted an opaque orange stroke
+over the stratum colors and directional marks. The paint/pick handoff also
+built a provenance report and two intermediate point maps that these consumers
+did not use, and emitted a stroke command for every control-polygon segment.
+
+The shared Pictograph presentation now rounds evaluated corners with two
+bounded convex passes (at most 128 presentation samples), preserves stratum
+translation, and clips the resulting curve against actual square node faces.
+An unsafe attachment, overlap or endpoint re-entry retains resting geometry and
+is counted explicitly. Numen still owns the same bounded response calculation;
+these extra samples are presentation geometry, not additional force iterations.
+Paint, pick and requested source reports consume the same evaluated segments.
+Reports build their source index only when requested; no cross-frame cache or
+second host evaluator is introduced. Each centerline uses one joined stroke.
+Selection halos precede stratum strokes, selected paths retain their direction
+and opposition marks, and marker positions use path arc length rather than
+sampling density.
+
+Done conditions:
+
+- Strong compatible and combined bundles retain exact directed source buckets,
+  canonical alias selection, both strata and paint/pick correspondence.
+- Curves attach to actual node faces without the former terminal backtracking;
+  finite bounds and explicit resting fallbacks cover degenerate geometry.
+- Normal-graph browser captures visibly retain selected stratum and direction
+  marks, with source/revision invariance, hide/reset behavior and fresh-process
+  reopen qualified separately from CPU checks.
+- Record actual test/build exits and reviewed captures. Keep strength policy,
+  endpoint physics, larger-cohort performance and Knot storage in their existing
+  lanes; this presentation change does not close those backlog items.
 
 ## Authority and scope
 

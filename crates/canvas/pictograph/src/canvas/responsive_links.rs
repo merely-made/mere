@@ -21,6 +21,8 @@ use super::responsive_link_adapter::{
 };
 #[path = "responsive_links/fields.rs"]
 mod fields;
+#[path = "responsive_links/geometry.rs"]
+mod geometry;
 #[path = "responsive_links/report.rs"]
 mod report;
 use super::{Canvas, edge_cells};
@@ -104,6 +106,8 @@ pub struct LinkPathResponseReport {
     pub responsive_paths: usize,
     pub ineligible_self_links: usize,
     pub excluded_endpoints: usize,
+    /// Evaluated paths kept at rest because their node faces cannot be safely attached.
+    pub presentation_fallbacks: usize,
 }
 
 impl Canvas {
@@ -120,15 +124,29 @@ impl Canvas {
     }
 
     pub fn link_path_response_report(&self) -> LinkPathResponseReport {
-        let (segments, readings) = edge_cells::visible_link_geometry_with_assertion_hides(
+        let (mut segments, readings) = self.link_geometry();
+        let outcome = evaluate_canvas(self, &mut segments, &readings);
+        LinkPathResponseReport {
+            state: outcome.state,
+            failure: outcome.failure,
+            settings: self.link_path_response.clone(),
+            responsive_paths: segments.iter().filter(|segment| segment.responsive).count(),
+            paths: report::base_paths(self, &segments, &readings),
+            ineligible_self_links: outcome.ineligible_self_links,
+            excluded_endpoints: outcome.excluded_endpoints,
+            presentation_fallbacks: outcome.presentation_fallbacks,
+        }
+    }
+
+    fn link_geometry(&self) -> (Vec<edge_cells::LinkAppearanceSegment>, Vec<LinkPairReading>) {
+        edge_cells::visible_link_geometry_with_assertion_hides(
             &self.graph,
             &self.view,
             &self.hidden_links,
             &self.hidden_edges,
             &self.hidden_assertions,
             |key| self.node_size(key),
-        );
-        evaluate_canvas(self, &segments, &readings).0
+        )
     }
 
     /// Current evaluated paths for host inspection. This always reads the
@@ -149,59 +167,36 @@ impl Canvas {
                 |key| self.node_size(key),
             );
         }
-        let (mut segments, readings) = edge_cells::visible_link_geometry_with_assertion_hides(
-            &self.graph,
-            &self.view,
-            &self.hidden_links,
-            &self.hidden_edges,
-            &self.hidden_assertions,
-            |key| self.node_size(key),
-        );
-        let (_, paths) = evaluate_canvas(self, &segments, &readings);
-        for segment in &mut segments {
-            let key = (
-                segment.appearance.key.clone(),
-                segment.appearance.display_from,
-                segment.appearance.display_to,
-            );
-            if let Some(points) = paths.get(&key) {
-                segment.points = points
-                    .iter()
-                    .map(|&(x, y)| euclid::default::Point2D::new(x, y))
-                    .collect();
-                if let Some(first) = segment.points.first() {
-                    segment.from = *first;
-                }
-                if let Some(last) = segment.points.last() {
-                    segment.to = *last;
-                }
-            }
-        }
+        let (mut segments, readings) = self.link_geometry();
+        evaluate_canvas(self, &mut segments, &readings);
         segments
     }
 }
 
-pub(crate) type AppearancePathMap = HashMap<(LinkKey, NodeKey, NodeKey), Vec<(f32, f32)>>;
+struct EvaluationOutcome {
+    state: LinkPathState,
+    failure: Option<LinkPathFailure>,
+    ineligible_self_links: usize,
+    excluded_endpoints: usize,
+    presentation_fallbacks: usize,
+}
 
-pub(crate) fn evaluate_canvas(
+fn evaluate_canvas(
     canvas: &Canvas,
-    segments: &[edge_cells::LinkAppearanceSegment],
+    segments: &mut [edge_cells::LinkAppearanceSegment],
     readings: &[LinkPairReading],
-) -> (LinkPathResponseReport, AppearancePathMap) {
-    let settings = canvas.link_path_response.clone();
-    let mut report = LinkPathResponseReport {
+) -> EvaluationOutcome {
+    let settings = &canvas.link_path_response;
+    let mut outcome = EvaluationOutcome {
         state: LinkPathState::Disabled,
         failure: None,
-        settings: settings.clone(),
-        paths: report::base_paths(canvas, segments, readings),
-        responsive_paths: 0,
         ineligible_self_links: segments
             .iter()
             .filter(|segment| segment.appearance.display_from == segment.appearance.display_to)
             .count(),
         excluded_endpoints: 0,
+        presentation_fallbacks: 0,
     };
-    let mut path_map = HashMap::new();
     let on_screen: std::collections::HashSet<_> = if canvas.generation == 0 {
         canvas.graph.nodes().map(|(key, _)| key).collect()
     } else {
@@ -213,7 +208,7 @@ pub(crate) fn evaluate_canvas(
     };
     let node_eligible =
         |key: NodeKey| canvas.node_visible_in_canvas(key) && on_screen.contains(&key);
-    report.excluded_endpoints = segments
+    outcome.excluded_endpoints = segments
         .iter()
         .filter(|segment| {
             !node_eligible(segment.appearance.display_from)
@@ -221,7 +216,7 @@ pub(crate) fn evaluate_canvas(
         })
         .count();
     if !settings.field_response && !settings.compatible_attraction {
-        return (report, path_map);
+        return outcome;
     }
 
     let endpoint_visible = |id: &str| {
@@ -230,43 +225,33 @@ pub(crate) fn evaluate_canvas(
             .and_then(|id| canvas.graph.get_node_key_by_id(id))
             .is_some_and(node_eligible)
     };
-    let mut eligible_readings = readings.to_vec();
-    for reading in &mut eligible_readings {
-        reading.links.retain(|link| {
-            let Some(bucket) = link.buckets.first() else {
-                return false;
-            };
-            if bucket.displayed_from == bucket.displayed_to {
-                return false;
-            }
-            let endpoints = [
-                bucket.displayed_from.parse::<uuid::Uuid>(),
-                bucket.displayed_to.parse::<uuid::Uuid>(),
-            ];
-            let visible = endpoints.iter().all(|id| {
-                id.as_ref()
-                    .is_ok_and(|id| endpoint_visible(&id.to_string()))
-            });
-            visible
-        });
-    }
-    let eligible_segments: Vec<_> = segments
+    // Filter before cloning provenance: offscreen/self appearances are not
+    // evaluator inputs, and empty pairs must not consume its reading budget.
+    let eligible_readings: Vec<_> = readings
         .iter()
-        .filter(|segment| {
-            canvas
-                .graph
-                .get_node(segment.appearance.display_from)
-                .is_some_and(|node| endpoint_visible(&node.id.to_string()))
-                && canvas
-                    .graph
-                    .get_node(segment.appearance.display_to)
-                    .is_some_and(|node| endpoint_visible(&node.id.to_string()))
+        .filter_map(|reading| {
+            let links: Vec<_> = reading
+                .links
+                .iter()
+                .filter(|link| {
+                    let Some(bucket) = link.buckets.first() else {
+                        return false;
+                    };
+                    bucket.displayed_from != bucket.displayed_to
+                        && endpoint_visible(&bucket.displayed_from)
+                        && endpoint_visible(&bucket.displayed_to)
+                        && (settings.field_response
+                            || settings.compatible_links.contains(&link.key))
+                })
+                .cloned()
+                .collect();
+            (!links.is_empty()).then(|| LinkPairReading {
+                source: reading.source.clone(),
+                links,
+                coverage: reading.coverage.clone(),
+            })
         })
         .collect();
-    report.ineligible_self_links = segments
-        .iter()
-        .filter(|segment| segment.appearance.display_from == segment.appearance.display_to)
-        .count();
     let mut selected_vectors = Vec::new();
     for id in settings
         .selected_fields
@@ -274,16 +259,16 @@ pub(crate) fn evaluate_canvas(
         .filter(|_| settings.field_response)
     {
         let Some(field) = canvas.graph.field(*id) else {
-            return refused(report, LinkPathFailure::MissingField(*id));
+            return refused(outcome, LinkPathFailure::MissingField(*id));
         };
         if !field.is_active() {
-            return refused(report, LinkPathFailure::RetiredField(*id));
+            return refused(outcome, LinkPathFailure::RetiredField(*id));
         }
         if !matches!(field.extent, FieldExtent::Global) {
-            return refused(report, LinkPathFailure::UnsupportedExtent(*id));
+            return refused(outcome, LinkPathFailure::UnsupportedExtent(*id));
         }
         let FieldDefinition::Vector(vector) = &field.definition else {
-            return refused(report, LinkPathFailure::ScalarField(*id));
+            return refused(outcome, LinkPathFailure::ScalarField(*id));
         };
         selected_vectors.push(vector);
     }
@@ -296,13 +281,13 @@ pub(crate) fn evaluate_canvas(
         }
         match fields::validate_dependencies(&canvas.graph, &roots) {
             Ok(ids) => ids,
-            Err(failure) => return refused(report, failure),
+            Err(failure) => return refused(outcome, failure),
         }
     } else {
         Vec::new()
     };
     if settings.field_response && !settings.field_strength.is_finite() {
-        return refused(report, LinkPathFailure::InvalidFieldStrength);
+        return refused(outcome, LinkPathFailure::InvalidFieldStrength);
     }
     let mut registry = FieldRegistry::new();
     for id in dependency_ids {
@@ -329,14 +314,7 @@ pub(crate) fn evaluate_canvas(
         let current_keys = canonical_keys(canvas);
         for key in &settings.compatible_links {
             if !current_keys.contains(key) {
-                return refused(report, LinkPathFailure::StaleCompatibleLink(key.clone()));
-            }
-        }
-        if !settings.field_response {
-            for reading in &mut eligible_readings {
-                reading
-                    .links
-                    .retain(|link| settings.compatible_links.contains(&link.key));
+                return refused(outcome, LinkPathFailure::StaleCompatibleLink(key.clone()));
             }
         }
         for (reading_index, reading) in eligible_readings.iter().enumerate() {
@@ -359,7 +337,7 @@ pub(crate) fn evaluate_canvas(
     }
     if settings.field_response && fields.is_empty() {
         return refused(
-            report,
+            outcome,
             LinkPathFailure::Adapter(
                 "field response is enabled without a selected graph field or view field".into(),
             ),
@@ -383,51 +361,32 @@ pub(crate) fn evaluate_canvas(
         },
     ) {
         Ok(batch) => batch,
-        Err(error) => return refused(report, LinkPathFailure::Adapter(format!("{error:?}"))),
+        Err(error) => return refused(outcome, LinkPathFailure::Adapter(format!("{error:?}"))),
     };
 
-    let mut responsive_by_key = HashMap::new();
-    for appearance in &batch.appearances {
-        if let Some(path) = batch
-            .paths
-            .iter()
-            .find(|path| path.id == appearance.evaluator_id)
-        {
-            responsive_by_key.insert(
-                (appearance.reading_index, appearance.link_index),
-                path.points.clone(),
-            );
-        }
-    }
-    let segment_index: HashMap<_, _> = eligible_segments
+    // Numen preserves input order and the adapter creates these handles together.
+    // Resolve each appearance once and move its final geometry into the segment
+    // used by paint, picking and (only when requested) the source report.
+    let segment_index: HashMap<_, _> = segments
         .iter()
-        .map(|s| {
+        .enumerate()
+        .map(|(index, segment)| {
             (
                 (
-                    s.appearance.key.clone(),
-                    s.appearance.display_from,
-                    s.appearance.display_to,
+                    segment.appearance.key.clone(),
+                    segment.appearance.display_from,
+                    segment.appearance.display_to,
                 ),
-                *s,
+                index,
             )
         })
         .collect();
-    for appearance in &batch.appearances {
-        let Some(points) =
-            responsive_by_key.get(&(appearance.reading_index, appearance.link_index))
-        else {
-            continue;
-        };
-        let Some(reading) = eligible_readings.get(appearance.reading_index) else {
-            continue;
-        };
-        let Some(link) = reading.links.get(appearance.link_index) else {
-            continue;
-        };
-        let Ok(first_id) = appearance.displayed_start.parse::<uuid::Uuid>() else {
-            continue;
-        };
-        let Ok(second_id) = appearance.displayed_end.parse::<uuid::Uuid>() else {
+    for (appearance, mut path) in batch.appearances.iter().zip(batch.paths) {
+        debug_assert_eq!(appearance.evaluator_id, path.id);
+        let (Ok(first_id), Ok(second_id)) = (
+            appearance.displayed_start.parse::<uuid::Uuid>(),
+            appearance.displayed_end.parse::<uuid::Uuid>(),
+        ) else {
             continue;
         };
         let (Some(first), Some(second)) = (
@@ -436,60 +395,40 @@ pub(crate) fn evaluate_canvas(
         ) else {
             continue;
         };
-        let (Some(first_node), Some(second_node)) =
-            (canvas.graph.get_node(first), canvas.graph.get_node(second))
-        else {
-            continue;
-        };
-        if first == second {
-            continue;
-        }
-        let pair_key = if first <= second {
+        let pair = if first <= second {
             (first, second)
         } else {
             (second, first)
         };
-        let Some(segment) = segment_index.get(&(link.key.clone(), pair_key.0, pair_key.1)) else {
+        let Some(&index) = segment_index.get(&(appearance.link_key.clone(), pair.0, pair.1)) else {
             continue;
         };
-        let (route_from, route_to) = if first == pair_key.0 {
-            (first_node, second_node)
-        } else {
-            (second_node, first_node)
-        };
-        let oriented: Vec<_> = if first == pair_key.0 {
-            points.clone()
-        } else {
-            points.iter().rev().copied().collect()
-        };
-        let shifted = offset_and_trim(
-            &oriented,
+        if first != pair.0 {
+            path.points.reverse();
+        }
+        let segment = &mut segments[index];
+        if let Some(points) = geometry::responsive_path_geometry(
+            &path.points,
             segment,
-            canvas.node_size(pair_key.0),
-            canvas.node_size(pair_key.1),
-        );
-        path_map.insert((link.key.clone(), pair_key.0, pair_key.1), shifted.clone());
-        if let Some(path) = report.paths.iter_mut().find(|path| {
-            path.key == link.key
-                && path.displayed_from == route_from.id
-                && path.displayed_to == route_to.id
-        }) {
-            path.points = shifted;
-            path.responsive = true;
-            report.responsive_paths += 1;
+            canvas.node_size(pair.0),
+            canvas.node_size(pair.1),
+        ) {
+            segment.from = points[0];
+            segment.to = points[points.len() - 1];
+            segment.points = points;
+            segment.responsive = true;
+        } else {
+            outcome.presentation_fallbacks += 1;
         }
     }
-    report.state = LinkPathState::Applied;
-    (report, path_map)
+    outcome.state = LinkPathState::Applied;
+    outcome
 }
 
-fn refused(
-    mut report: LinkPathResponseReport,
-    failure: LinkPathFailure,
-) -> (LinkPathResponseReport, AppearancePathMap) {
-    report.state = LinkPathState::Refused;
-    report.failure = Some(failure);
-    (report, HashMap::new())
+fn refused(mut outcome: EvaluationOutcome, failure: LinkPathFailure) -> EvaluationOutcome {
+    outcome.state = LinkPathState::Refused;
+    outcome.failure = Some(failure);
+    outcome
 }
 
 fn canonical_keys(canvas: &Canvas) -> std::collections::BTreeSet<LinkKey> {
@@ -508,37 +447,6 @@ fn canonical_keys(canvas: &Canvas) -> std::collections::BTreeSet<LinkKey> {
         })
         .flat_map(|pair| pair.links.into_iter().map(|link| link.key))
         .collect()
-}
-
-fn offset_and_trim(
-    points: &[(f32, f32)],
-    segment: &edge_cells::LinkAppearanceSegment,
-    from_size: f32,
-    to_size: f32,
-) -> Vec<(f32, f32)> {
-    if points.len() < 2 {
-        return segment.points.iter().map(|p| (p.x, p.y)).collect();
-    }
-    let dx = points[points.len() - 1].0 - points[0].0;
-    let dy = points[points.len() - 1].1 - points[0].1;
-    let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
-    let mut out = points.to_vec();
-    // Retain the existing stratum separation by translating every sample by
-    // the resting segment's endpoint offset from the unshifted chord.
-    let ox = segment.from.x - points[0].0;
-    let oy = segment.from.y - points[0].1;
-    for point in &mut out {
-        point.0 += ox;
-        point.1 += oy;
-    }
-    let ux = dx / len;
-    let uy = dy / len;
-    out[0].0 += ux * from_size.max(0.0) * 0.5;
-    out[0].1 += uy * from_size.max(0.0) * 0.5;
-    let last = out.len() - 1;
-    out[last].0 -= ux * to_size.max(0.0) * 0.5;
-    out[last].1 -= uy * to_size.max(0.0) * 0.5;
-    out
 }
 
 #[cfg(test)]

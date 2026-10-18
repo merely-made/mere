@@ -10,16 +10,17 @@ use std::collections::HashSet;
 
 use euclid::default::{Box2D, Point2D};
 use kernel::graph::{EdgeFamily, Graph, NodeKey, RelationKind, RelationSelector};
-use paint_list_api::{
-    ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd, PathCommand, PathData, StrokeCap,
-    StrokeItem, StrokeJoin,
-};
+use paint_list_api::{ColorF, PaintCmd};
 use scenograph::link::{
     LinkAssertion, LinkKey, LinkLegacyMember, LinkPairReading, LinkSource, LinkStratum,
 };
 use seiche::LayoutView;
 
 use crate::canvas::{EdgeCell, LinkAppearance};
+
+#[path = "edge_cells/paint.rs"]
+mod paint;
+pub(crate) use paint::link_overlay_from_segments;
 
 /// Build one geometry item per canonical link appearance. A Resource link may
 /// be routed over more than one displayed surface pair; those appearances
@@ -284,6 +285,7 @@ fn visible_link_geometry_inner(
             from,
             to,
             points,
+            responsive: false,
         });
     }
     (segments, visible_readings)
@@ -357,19 +359,14 @@ pub(crate) struct LinkAppearanceSegment {
     pub from: Point2D<f32>,
     pub to: Point2D<f32>,
     pub points: Vec<Point2D<f32>>,
+    /// Whether this same-frame geometry came from the bounded response evaluator.
+    pub responsive: bool,
 }
 
 impl LinkAppearanceSegment {
     fn is_self_link(&self) -> bool {
         self.appearance.display_from == self.appearance.display_to
     }
-}
-
-fn polyline_strokes(points: &[Point2D<f32>], color: ColorF, width: f32) -> Vec<PaintCmd> {
-    points
-        .windows(2)
-        .map(|pair| stroke(pair[0], pair[1], color, width))
-        .collect()
 }
 
 fn polyline_distance(point: Point2D<f32>, points: &[Point2D<f32>]) -> f32 {
@@ -383,41 +380,6 @@ fn polyline_intersects_box(points: &[Point2D<f32>], region: Box2D<f32>) -> bool 
     points
         .windows(2)
         .any(|pair| segment_intersects_box(pair[0], pair[1], region))
-}
-
-fn loop_arrowhead(points: &[Point2D<f32>], reverse: bool, color: ColorF) -> Vec<PaintCmd> {
-    let mut path = points.to_vec();
-    if reverse {
-        path.reverse();
-    }
-    let index = (path.len().saturating_sub(2) * 2 / 3).min(path.len().saturating_sub(2));
-    if path.len() < 2 {
-        return Vec::new();
-    }
-    arrowhead(path[index], path[index + 1], color)
-}
-
-fn polyline_end_arrowhead(points: &[Point2D<f32>], reverse: bool, color: ColorF) -> Vec<PaintCmd> {
-    let mut path = points.to_vec();
-    if reverse {
-        path.reverse();
-    }
-    if path.len() < 2 {
-        return Vec::new();
-    }
-    arrowhead(path[path.len() - 2], path[path.len() - 1], color)
-}
-
-fn polyline_midpoint_normal(points: &[Point2D<f32>]) -> (Point2D<f32>, Point2D<f32>) {
-    let index = points.len().saturating_sub(2) / 2;
-    let (Some(&from), Some(&to)) = (points.get(index), points.get(index + 1)) else {
-        return (Point2D::new(0.0, 0.0), Point2D::new(0.0, 0.0));
-    };
-    let midpoint = Point2D::new((from.x + to.x) * 0.5, (from.y + to.y) * 0.5);
-    let dx = to.x - from.x;
-    let dy = to.y - from.y;
-    let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
-    (midpoint, Point2D::new(-dy / len, dx / len))
 }
 
 pub(crate) fn link_hit_test(
@@ -684,102 +646,6 @@ pub(crate) fn link_overlay_with_assertion_hides(
     )
 }
 
-pub(crate) fn link_overlay_from_segments(
-    segments: Vec<LinkAppearanceSegment>,
-    selected_links: &HashSet<LinkKey>,
-    node_visible: impl Fn(NodeKey) -> bool,
-    tone: impl Fn(NodeKey, NodeKey) -> f32,
-) -> Vec<PaintCmd> {
-    segments
-        .into_iter()
-        .filter(|segment| {
-            node_visible(segment.appearance.display_from)
-                && node_visible(segment.appearance.display_to)
-        })
-        .flat_map(|segment| {
-            let share = tone(
-                segment.appearance.display_from,
-                segment.appearance.display_to,
-            );
-            let mut strokes = link_strokes(&segment, share);
-            if selected_links.contains(&segment.appearance.key) {
-                strokes.extend(polyline_strokes(
-                    &segment.points,
-                    ColorF::new(0.91, 0.59, 0.16, 1.0),
-                    4.0,
-                ));
-            }
-            strokes
-        })
-        .collect()
-}
-
-/// A link's strokes at `share` of its loud alpha. A quiet link (share below
-/// one) is a hairline without marks; the grammar raises it when it touches
-/// the foreground.
-fn link_strokes(segment: &LinkAppearanceSegment, share: f32) -> Vec<PaintCmd> {
-    let mut color = match segment.appearance.key.stratum {
-        LinkStratum::Surface => ColorF::new(0.93, 0.70, 0.34, 0.76),
-        LinkStratum::Resource => ColorF::new(0.55, 0.72, 0.92, 0.82),
-    };
-    color.a *= share;
-    if share < 1.0 {
-        return polyline_strokes(&segment.points, color, 1.0);
-    }
-    let width = 1.35 + segment.appearance.strength.max(0.0).ln_1p().min(3.0) * 0.55;
-    let mut strokes = polyline_strokes(&segment.points, color, width);
-    let marks = segment.appearance.marks;
-    if marks.forward {
-        strokes.extend(if segment.is_self_link() {
-            loop_arrowhead(&segment.points, false, color)
-        } else {
-            polyline_end_arrowhead(&segment.points, false, color)
-        });
-    }
-    if marks.reverse {
-        strokes.extend(if segment.is_self_link() {
-            loop_arrowhead(&segment.points, true, color)
-        } else {
-            polyline_end_arrowhead(&segment.points, true, color)
-        });
-    }
-    if marks.opposed {
-        let (midpoint, normal) = polyline_midpoint_normal(&segment.points);
-        strokes.push(stroke(
-            Point2D::new(midpoint.x - normal.x * 3.0, midpoint.y - normal.y * 3.0),
-            Point2D::new(midpoint.x + normal.x * 3.0, midpoint.y + normal.y * 3.0),
-            color,
-            2.0,
-        ));
-    }
-    strokes
-}
-
-fn arrowhead(from: Point2D<f32>, to: Point2D<f32>, color: ColorF) -> Vec<PaintCmd> {
-    let dx = to.x - from.x;
-    let dy = to.y - from.y;
-    let len = (dx * dx + dy * dy).sqrt().max(f32::EPSILON);
-    let ux = dx / len;
-    let uy = dy / len;
-    let tip = Point2D::new(from.x + dx * 0.66, from.y + dy * 0.66);
-    let back = Point2D::new(tip.x - ux * 7.0, tip.y - uy * 7.0);
-    let side = Point2D::new(-uy * 3.5, ux * 3.5);
-    vec![
-        stroke(
-            tip,
-            Point2D::new(back.x - side.x, back.y - side.y),
-            color,
-            1.8,
-        ),
-        stroke(
-            tip,
-            Point2D::new(back.x + side.x, back.y + side.y),
-            color,
-            1.8,
-        ),
-    ]
-}
-
 pub(crate) use super::relationship_topology::selector_for_relation_kind;
 
 pub(crate) fn edge_cell_for_relation(from: NodeKey, to: NodeKey, kind: RelationKind) -> EdgeCell {
@@ -792,26 +658,6 @@ pub(crate) fn edge_cell_for_relation(from: NodeKey, to: NodeKey, kind: RelationK
 
 fn endpoint_pair(a: NodeKey, b: NodeKey) -> (NodeKey, NodeKey) {
     if a <= b { (a, b) } else { (b, a) }
-}
-
-fn stroke(from: Point2D<f32>, to: Point2D<f32>, color: ColorF, width: f32) -> PaintCmd {
-    let p0 = LayoutPoint::new(from.x, from.y);
-    let p1 = LayoutPoint::new(to.x, to.y);
-    let bounds = LayoutRect::new(
-        LayoutPoint::new(p0.x.min(p1.x), p0.y.min(p1.y)),
-        LayoutPoint::new(p0.x.max(p1.x), p0.y.max(p1.y)),
-    );
-    PaintCmd::DrawStroke(StrokeItem {
-        placement: CommonPlacement::new(bounds),
-        path: PathData {
-            commands: vec![PathCommand::MoveTo(p0), PathCommand::LineTo(p1)],
-        },
-        color,
-        width,
-        cap: StrokeCap::Round,
-        join: StrokeJoin::Round,
-        dash: None,
-    })
 }
 
 pub(crate) fn relation_family_color(family: EdgeFamily) -> ColorF {

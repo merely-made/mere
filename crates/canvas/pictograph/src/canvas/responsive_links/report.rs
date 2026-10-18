@@ -14,6 +14,23 @@ pub(super) fn base_paths(
     segments: &[edge_cells::LinkAppearanceSegment],
     readings: &[LinkPairReading],
 ) -> Vec<EvaluatedLinkPath> {
+    // Index source correspondence once; paint/picking never build this report.
+    let mut sources = std::collections::HashMap::new();
+    for (reading_index, reading) in readings.iter().enumerate() {
+        for (link_index, link) in reading.links.iter().enumerate() {
+            for bucket in &link.buckets {
+                let (Ok(from), Ok(to)) = (
+                    bucket.displayed_from.parse::<uuid::Uuid>(),
+                    bucket.displayed_to.parse::<uuid::Uuid>(),
+                ) else {
+                    continue;
+                };
+                sources
+                    .entry((link.key.clone(), from.min(to), from.max(to)))
+                    .or_insert((reading_index, reading, link_index, link));
+            }
+        }
+    }
     let mut output = Vec::new();
     for segment in segments {
         let (Some(from), Some(to)) = (
@@ -27,27 +44,11 @@ pub(super) fn base_paths(
         {
             continue;
         }
-        let from_id = from.id.to_string();
-        let to_id = to.id.to_string();
-        let Some((reading_index, reading, link_index, link)) = readings
-            .iter()
-            .enumerate()
-            .find_map(|(reading_index, reading)| {
-                reading
-                    .links
-                    .iter()
-                    .enumerate()
-                    .find(|(_, link)| {
-                        link.key == segment.appearance.key
-                            && link.buckets.iter().any(|bucket| {
-                                (bucket.displayed_from == from_id && bucket.displayed_to == to_id)
-                                    || (bucket.displayed_from == to_id
-                                        && bucket.displayed_to == from_id)
-                            })
-                    })
-                    .map(|(link_index, link)| (reading_index, reading, link_index, link))
-            })
-        else {
+        let Some(&(reading_index, reading, link_index, link)) = sources.get(&(
+            segment.appearance.key.clone(),
+            from.id.min(to.id),
+            from.id.max(to.id),
+        )) else {
             continue;
         };
         let bucket_refs = link
@@ -84,7 +85,7 @@ pub(super) fn base_paths(
                 .iter()
                 .map(|point| (point.x, point.y))
                 .collect(),
-            responsive: false,
+            responsive: segment.responsive,
             source: reading.source.clone(),
             buckets: bucket_refs,
         });

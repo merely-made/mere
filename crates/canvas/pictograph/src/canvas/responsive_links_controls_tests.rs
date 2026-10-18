@@ -128,10 +128,10 @@ fn active_global_graph_vector_field_is_evaluated_from_its_graph_identity() {
     assert_eq!(report.state, LinkPathState::Applied, "{report:?}");
     assert!(report.paths.iter().any(|path| path.responsive));
     assert!(report.paths.iter().any(|path| {
-        path.responsive && path.points.len() == 9 && {
-            let middle = path.points[4];
+        path.responsive && path.points.len() >= 2 && {
+            let middle = path.points[path.points.len() / 2];
             let first = path.points[0];
-            let last = path.points[8];
+            let last = *path.points.last().unwrap();
             let dx = last.0 - first.0;
             let dy = last.1 - first.1;
             ((dx * (first.1 - middle.1) - (first.0 - middle.0) * dy).abs())
@@ -245,6 +245,9 @@ fn graph_and_local_field_ast_samples_fail_closed_for_missing_retired_or_wrong_ki
 
 #[path = "responsive_links_controls_tests/geometry.rs"]
 mod geometry;
+
+#[path = "responsive_links_controls_tests/legibility.rs"]
+mod legibility;
 
 #[test]
 fn deep_local_expression_refuses_before_geometry_work() {
