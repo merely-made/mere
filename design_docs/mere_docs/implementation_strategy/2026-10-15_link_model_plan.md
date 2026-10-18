@@ -39,7 +39,8 @@ records the separate source, browser, reopen and image-review claims.
 | Work | Current boundary and owner |
 | --- | --- |
 | Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
-| Responsive-path legibility | In progress, 2026-10-18, on refreshed Mere `dd9d5c523`: strong selected bundles have angular bends and crossings, and direction/opposition marks and parallel strata are faint at this zoom. Improve curve/highlight/stratum legibility without changing canonical identity, explicit membership or endpoint force authority. |
+| Responsive-path legibility | Qualified for the ordinary 2D square-node cohort on source `487f37096`: bounded corner rounding and face clipping, readable selected stratum cores/direction/opposition marks, and one shared segment handoff for paint/pick/report. See the continuation and receipt below; close crossings can still crowd marks. |
+| Attachment in other presentations | Open presentation limitation from independent source review: world-space square clipping does not match tilted billboard projection, rounded/circular silhouettes, scaled suggestion faces or lifted nodes. Use the existing shared face/camera authority for a later attachment extension; do not create a host-only shape model. |
 | Strength and physical explanation | Deferred to dynamics: held assertion counting is the current default, and endpoint physics retains one spring per visible source row. Weighted policy, one aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance are not part of this continuation. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
@@ -145,7 +146,8 @@ lane, confirmed in published Knot `7e196c534e64b50cf6f00bf4d95e3beb493e5a9f`.
 
 ### Bundle legibility and one geometry handoff — 2026-10-18
 
-**Status: implementation in progress; browser qualification pending.** Mark
+**Status: qualified within the ordinary 2D square-node cohort on source
+`487f370966630a5c95f64ce4246d79c3d12cd91b`.** Mark
 selected bundle legibility as the next bounded follow-up, with removal of
 unnecessary duplication and Knot checkpoint storage kept in its own lane.
 The baseline is refreshed Mere `dd9d5c523c092baf72be31cdbc1d28c4ae179fa0`.
@@ -159,7 +161,7 @@ did not use, and emitted a stroke command for every control-polygon segment.
 
 The shared Pictograph presentation now rounds evaluated corners with two
 bounded convex passes (at most 128 presentation samples), preserves stratum
-translation, and clips the resulting curve against actual square node faces.
+translation, and clips the resulting curve against the ordinary 2D node-square bounds.
 An unsafe attachment, overlap or endpoint re-entry retains resting geometry and
 is counted explicitly. Numen still owns the same bounded response calculation;
 these extra samples are presentation geometry, not additional force iterations.
@@ -182,6 +184,37 @@ Done conditions:
 - Record actual test/build exits and reviewed captures. Keep strength policy,
   endpoint physics, larger-cohort performance and Knot storage in their existing
   lanes; this presentation change does not close those backlog items.
+
+**Qualification, 2026-10-18:** the clean source passed 551 Pictograph tests
+(19 existing ignores), including 28 focused responsive/paint checks, and 312
+Graphshell library tests (six existing ignores), the product Wasm build,
+product-disabled viewer compile and dependency-boundary check. Filtering now
+precedes provenance copying and drops empty pair readings; a 65-pair regression
+confirms one explicitly grouped eligible link does not falsely exhaust Numen's
+64-reading budget. The remaining 64 paths stay exactly at rest.
+
+The existing normal-graph scenario and verifier were reused. Native Chrome 155
+on Metal/WebGPU passed eight seed captures and, after observed OS-process exit,
+two fresh-process reopen captures with zero scenario errors or gate failures.
+All ten images were reviewed: selected Surface gold/Resource blue cores and
+arrows remain visible above the halo; opposing Resource marks survive the close
+bundle, and node approaches no longer have the old terminal double-back. The
+exact 15,699-byte source reading and runtime graph revision 21 match across
+processes. Saved hide intent survives; response toggles, temporary field and
+group reset. The [bundle-legibility receipt](../../../support/receipts/link-model-bundle-legibility-20261018/README.md)
+records process exits, hashes, image review, original failed test assumptions,
+source continuity and the reused fail-closed evidence verifier.
+
+**Remaining limits:** this qualifies the ordinary 2D square-node presentation,
+not all node/camera profiles. Independent review traced a mismatch between the
+world-space square clip and tilted billboard projections, round silhouettes,
+scaled suggestion faces and lifted nodes; the backlog names that work above.
+Close central crossings can still crowd marks, quiet unselected links retain
+the existing grammar, and larger-cohort/zoom qualification remains open.
+No measured frame-time improvement is claimed: the verified simplification is
+removal of the unused paint/pick report and intermediate maps, filtering before
+provenance cloning, and one joined stroke per centerline. Knot checkpoint
+confidentiality remains in its separate storage lane.
 
 ## Authority and scope
 

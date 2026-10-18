@@ -1,0 +1,1 @@
+Process argv: ["/Users/markik/Code/testing/mere/one-tree-product-20261008/toolchain/bin/wasm-bindgen", "--target", "web", "--out-dir", "/Users/markik/Code/testing/mere/bundle-legibility-20261018/pkg", "/Users/markik/Code/repos/mere/ports/graphshell/web/target/wasm32-unknown-unknown/debug/graphshell_web.wasm"]
