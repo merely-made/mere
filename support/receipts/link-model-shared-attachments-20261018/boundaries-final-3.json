@@ -1,0 +1,16 @@
+{
+  "command": [
+    "env",
+    "CARGO_NET_OFFLINE=true",
+    "python3",
+    "scripts/check_port_boundaries.py"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "0b7454123426578a22d02a8e530b67c0e6f237b0",
+  "started": "2026-10-18T16:52:00.512321+00:00",
+  "status_before": "",
+  "exit_code": 0,
+  "finished": "2026-10-18T16:52:06.265475+00:00",
+  "log_sha256": "4d5810c4a17e095dd2a5cc295d2b6495c7740a9abd4df27fd38c3e1c2b8f27a1",
+  "suites": []
+}

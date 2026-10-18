@@ -347,3 +347,6 @@ fn sample_chain_depth_is_bounded_across_stored_field_definitions() {
     assert_eq!(geometry(&canvas), resting);
     assert_eq!(canvas.graph.revision(), revision);
 }
+
+#[path = "responsive_links_controls_tests/attachment.rs"]
+mod attachment;

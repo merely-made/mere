@@ -1,0 +1,56 @@
+{
+  "links": {
+    "new_findings": {},
+    "source_counts": {
+      "active_docs": 291,
+      "indexed_active_docs": 288,
+      "index_orphans": 2,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 2,
+      "broken_relative_links": 33,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 177,
+      "ignored_known_root_patterns": 24,
+      "reserved_identifier_paths": 31,
+      "missing_known_root_paths": 264,
+      "historical_missing_known_root_paths": 240,
+      "planned_missing_known_root_paths": 9,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 4,
+      "unheaded_owned_sources": 657,
+      "exhibit_b_sources": 0
+    },
+    "final_counts": {
+      "active_docs": 291,
+      "indexed_active_docs": 288,
+      "index_orphans": 2,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 2,
+      "broken_relative_links": 33,
+      "historical_broken_relative_links": 245,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 177,
+      "ignored_known_root_patterns": 24,
+      "reserved_identifier_paths": 31,
+      "missing_known_root_paths": 262,
+      "historical_missing_known_root_paths": 239,
+      "planned_missing_known_root_paths": 9,
+      "invalid_historical_annotations": 0,
+      "stale_historical_annotations": 4,
+      "unheaded_owned_sources": 657,
+      "exhibit_b_sources": 0
+    }
+  },
+  "judgments": {
+    "new_findings": {},
+    "source_counts": {
+      "errors": 20
+    },
+    "final_counts": {
+      "errors": 20
+    }
+  }
+}

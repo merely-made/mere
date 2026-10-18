@@ -1,0 +1,62 @@
+Qualification origin: http://127.0.0.1:38129
+127.0.0.1 - - [18/Oct/2026 12:54:34] "GET /qualification-probe.html HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:34] "POST /qualification-probe HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:54:34] code 404, message File not found
+127.0.0.1 - - [18/Oct/2026 12:54:34] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /tree.html?app=local&fixture=link-rest&scenario=scenarios/p4_tree_link_attachments.scn&sink=http://127.0.0.1:38129/scenario-receipt HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /styles.css?h3=1 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /mount.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /pkg/graphshell_web.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /pkg/graphshell_web_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:54] "GET /scenarios/p4_tree_link_attachments.scn HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:54:57] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:54:59] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:01] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:03] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:05] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:07] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:09] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:11] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:13] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:15] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:17] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:19] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:21] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:55:24] "POST /scenario-receipt HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:57:22] "GET /tree.html?app=local&fixture=link-rest&scenario=scenarios/p4_tree_link_attachments_reopen.scn&sink=http://127.0.0.1:38129/scenario-receipt HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:22] "GET /styles.css?h3=1 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:22] "GET /loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:22] "GET /mount.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:22] "GET /pkg/graphshell_web.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:22] "GET /pkg/graphshell_web_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:23] code 404, message File not found
+127.0.0.1 - - [18/Oct/2026 12:57:23] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [18/Oct/2026 12:57:23] "GET /scenarios/p4_tree_link_attachments_reopen.scn HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:57:26] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:57:28] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:57:30] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:57:31] "POST /scenario-receipt HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /tree.html?app=local&fixture=link-rest&scenario=scenarios/p4_tree_link_attachments_reopen.scn&sink=http://127.0.0.1:38129/scenario-receipt HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /styles.css?h3=1 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /mount.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /pkg/graphshell_web.js HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /pkg/graphshell_web_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] code 404, message File not found
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [18/Oct/2026 12:59:23] "GET /scenarios/p4_tree_link_attachments_reopen.scn HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 12:59:27] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:59:28] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:59:31] "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - - [18/Oct/2026 12:59:32] "POST /scenario-receipt HTTP/1.1" 204 -
+Traceback (most recent call last):
+  File "/Users/markik/Code/testing/mere/shared-link-attachments-20261018/site/ports/graphshell/web/scenario_qualification_server.py", line 155, in <module>
+    main()
+  File "/Users/markik/Code/testing/mere/shared-link-attachments-20261018/site/ports/graphshell/web/scenario_qualification_server.py", line 151, in main
+    server.serve_forever()
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 232, in serve_forever
+    ready = selector.select(poll_interval)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/selectors.py", line 416, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

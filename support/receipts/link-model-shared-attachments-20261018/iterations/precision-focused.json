@@ -1,0 +1,77 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "pictograph",
+    "--features",
+    "canvas",
+    "ordinary_circle_flow_round_trip",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "1e9d95da599322921b96febac1089d1662201849",
+  "started": "2026-10-18T16:46:00.152421+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas/edge_cells.rs\n M crates/canvas/pictograph/src/canvas/node_billboard.rs\n M crates/canvas/pictograph/src/canvas/node_billboard_tests.rs\n M crates/canvas/pictograph/src/canvas/responsive_links/geometry.rs\n M crates/canvas/pictograph/src/canvas/responsive_links_controls_tests/attachment.rs\n M ports/graphshell/src/web_tree/lane/link_attachment.rs\n",
+  "exit_code": 0,
+  "finished": "2026-10-18T16:46:27.680890+00:00",
+  "log_sha256": "0b75871f199d29273335e6da155544d265741796767f4d5f3e38243f3e3037f2",
+  "suites": [
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 590
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 5
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ]
+}
