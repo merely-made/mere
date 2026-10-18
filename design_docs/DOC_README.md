@@ -1,3 +1,10 @@
+Turnstone R4 resident process fixture (2026-10-18, bounded macOS qualification passed): the
+[resident inference plan](mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md#turnstone-r4-process-acceptance-fixture--2026-10-18)
+records opt-in independent OS-process phases in the existing real-model headed
+fixture, preserving the same custody/library/journal and admitted route. Two
+distinct real GPU resident processes preserve exact per-run sealed evidence and
+live citations; consumer product gates remain owned by Turnstone.
+
 Shared graph label placement (2026-10-17, published through `c8d316b60`): the [projection grammar
 adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#shared-graph-label-placement-2026-10-17)
 records Cambium's shared collision repair, 398 supplier passes and Woodshed
