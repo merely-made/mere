@@ -36,3 +36,5 @@ Fetch before publication, merge incoming main changes rather than rebasing, and 
 ## Progress
 
 - 2026-10-18: Compared consumer contracts and created isolated Mere/Knot checkouts. Shared reader, refusal tests and product migrations are in progress. Primary source-edit work remains untouched. Supplier begins at published `908283728`; Knot begins at `7e196c5`, and each consumer's older supplier lock retains its historical qualification scope until intake checks complete.
+
+- 2026-10-18: Initial supplier source `e208d85c5`, merged with incoming main at `eacd56508`, passes 18 resident, 6 default and 3 wire-only tests. Independent review then identified missing scene-table validation and incomplete required-card coverage. The corrected reader passes 21 resident tests plus unchanged 6/3 gates, including malformed deserialized scenes and missing required bindings/offers. Earlier lock-refusal and diagnostic compile attempts remain separate logs. Product acceptance remains pending.
