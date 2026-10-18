@@ -176,6 +176,10 @@ impl ReaderSpecimen {
     pub fn frame(&mut self, width: u32, height: u32) -> Scene {
         self.document.frame(width.max(1), height.max(1))
     }
+
+    pub fn try_frame(&mut self, width: u32, height: u32) -> Result<Scene, String> {
+        self.document.try_frame(width.max(1), height.max(1))
+    }
 }
 
 #[cfg(test)]

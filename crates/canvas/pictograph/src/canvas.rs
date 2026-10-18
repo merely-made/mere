@@ -381,6 +381,8 @@ struct FoldViewState {
 /// The canvas content-root: the graph, its physics, the camera, and the abs-pos
 /// node-children pool. Window-agnostic — see the module docs.
 pub struct Canvas {
+    /// Refusal from the most recent paint translation, if any.
+    last_translation_error: Option<paint_list_render::TranslationError>,
     graph: Graph,
     /// The force-directed layout backend — in-thread (tests / wasm) or an
     /// off-thread armillary actor (native always-offload). The canvas never reads

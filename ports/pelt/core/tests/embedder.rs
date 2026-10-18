@@ -33,6 +33,7 @@ impl SessionEngine<String> for FakeEngine {
         Ok(Box::new(FakeSession {
             address: request.address.clone(),
             pumps: self.pumps.clone(),
+            reject_frame: false,
         }))
     }
 }
@@ -40,11 +41,20 @@ impl SessionEngine<String> for FakeEngine {
 struct FakeSession {
     address: String,
     pumps: Arc<Mutex<Vec<f64>>>,
+    reject_frame: bool,
 }
 
 impl DocumentSession<String> for FakeSession {
     fn frame(&mut self, width: u32, height: u32) -> String {
         format!("{}@{width}x{height}", self.address)
+    }
+
+    fn try_frame(&mut self, width: u32, height: u32) -> Result<String, String> {
+        if self.reject_frame {
+            Err("paint refused".to_owned())
+        } else {
+            Ok(self.frame(width, height))
+        }
     }
 
     fn scroll_by(&mut self, _dx: f32, _dy: f32) -> bool {
@@ -122,6 +132,38 @@ fn press(x: f32) -> SessionInput {
         state: SessionButtonState::Pressed,
         modifiers: SessionModifiers::default(),
     }
+}
+
+#[test]
+fn checked_controller_frame_recovers_after_source_refusal() {
+    let mut sessions = SessionRegistry::new();
+    sessions.register(Box::new(FakeEngine {
+        spawns: Arc::new(Mutex::new(Vec::new())),
+        pumps: Arc::new(Mutex::new(Vec::new())),
+    }));
+    let mut controller = PeltController::new(
+        sessions,
+        SurfaceEngineRegistry::new(),
+        PeltControllerConfig::new("fake", "docs/index.html", (800, 600)),
+        TestClock(0.0),
+    )
+    .unwrap();
+
+    assert_eq!(controller.try_frame(800, 600).as_deref(), Ok("docs/index.html@800x600"));
+    controller
+        .session_mut()
+        .as_any()
+        .downcast_mut::<FakeSession>()
+        .unwrap()
+        .reject_frame = true;
+    assert_eq!(controller.try_frame(800, 600), Err("paint refused".to_owned()));
+    controller
+        .session_mut()
+        .as_any()
+        .downcast_mut::<FakeSession>()
+        .unwrap()
+        .reject_frame = false;
+    assert_eq!(controller.try_frame(800, 600).as_deref(), Ok("docs/index.html@800x600"));
 }
 
 #[test]

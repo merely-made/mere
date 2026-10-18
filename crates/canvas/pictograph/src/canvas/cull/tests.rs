@@ -162,6 +162,7 @@ fn culling_preserves_gpu_pixels_and_detects_a_lost_crossing_edge() {
             DeviceIntSize::new(100, 100),
             &[CompositeLayer::commands_only(commands)],
         )
+        .expect("cull fixture translation")
         .scene;
         renderer.render_vello(&scene, &view, ColorLoad::Clear(wgpu::Color::BLACK));
         renderer.wgpu_device.read_rgba8_texture(&target, 100, 100)

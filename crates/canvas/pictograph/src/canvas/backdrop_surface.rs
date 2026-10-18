@@ -478,6 +478,7 @@ impl BackdropSurface {
                 DeviceIntSize::new(width as i32, height as i32),
                 &[CompositeLayer::commands_only(&commands)],
             )
+            .map_err(|error| error.to_string())?
             .scene);
         }
         if !self.font_ready {
@@ -503,7 +504,11 @@ impl BackdropSurface {
                 images: text.images(),
             },
         ];
-        Ok(composite_paint_layers(DeviceIntSize::new(width as i32, height as i32), &layers).scene)
+        Ok(
+            composite_paint_layers(DeviceIntSize::new(width as i32, height as i32), &layers)
+                .map_err(|error| error.to_string())?
+                .scene,
+        )
     }
 }
 fn alpha(mut c: [f32; 4], a: f32) -> [f32; 4] {

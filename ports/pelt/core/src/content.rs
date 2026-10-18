@@ -294,6 +294,20 @@ impl<F: 'static> PeltContent<F> {
         }
     }
 
+    pub fn try_frame(
+        &mut self,
+        rect: WorkspaceRect,
+        scale_factor: f32,
+    ) -> Result<PeltLayer<F>, String> {
+        match &mut self.lane {
+            Lane::Document(controller) => {
+                let (width, height) = rect.viewport();
+                controller.try_frame(width, height).map(PeltLayer::Document)
+            },
+            Lane::Surface(surface) => Ok(PeltLayer::Surface(surface.frame(rect, scale_factor))),
+        }
+    }
+
     /// Prepare only this appearance's layout for input. Surface preparation
     /// updates geometry without acquiring a frame or changing polling policy.
     pub(crate) fn prepare_input(
