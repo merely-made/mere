@@ -662,14 +662,13 @@ impl MereRouteSession {
                             })
                             .and_then(|source| uuid::Uuid::parse_str(&source.id).ok())
                             .ok_or("The material card names no attached session.")?;
-                        if material.schema != crate::wire::SESSION_GRAPH_SCHEMA
-                            || material.application != self.application
-                            || *material.session.as_uuid() != attached
-                            || material.epoch != graph.scene.epoch
-                            || material.revision != graph.scene.revision
-                        {
-                            return Err("The graph material has another application, session or acknowledged position.".into());
-                        }
+                        crate::validate_graph_material(
+                            &material,
+                            &self.application,
+                            pandect::SessionId(attached),
+                            graph.scene.epoch,
+                            graph.scene.revision,
+                        )?;
                         if self
                             .material
                             .as_ref()

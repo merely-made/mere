@@ -1,0 +1,38 @@
+# Shared resident materialization for product consumers
+
+**Status (2026-10-18):** implementation and consumer integration in progress. Mark authorized Mere's shared mechanism and adoption by Cleromancy and Knot, preserving existing source work and qualification artifacts. No new consumer qualification is claimed yet.
+
+## Contract and ownership
+
+`mere-overmap` already owns the sessions/graph/archive route vocabulary and the mapping into `mere-view`. Add one native async materialization mechanism there. The admitted application client remains `graphshell-endpoint`'s; resident persistence, admission, permissions and journal ownership stay with Djinn/Pandect. The materializer owns no store, writes no owner state, and adds no cache independent of a completed reading.
+
+The reader opens a fresh route descriptor on every refresh, resolves the mandatory sessions and graph projections plus optional archive, validates the returned session names and fetched content hashes, and assembles a candidate result. Missing or duplicate mandatory descriptors are refusals. If an advertised card or media resource is missing, malformed or inconsistent with its address, the whole reading fails. Consumers receive either a complete result or an error, never partially published state.
+
+Two explicit graph modes preserve the different consumer contracts. `ProjectionOnly` reads the graph projection only to identify the attached session and does not download its complete domain graph; this suits Knot's overmap above its own file catalog. `Complete` additionally reads the actual session item's disclosed graph material and checks schema, admitted application, attached session, epoch and revision. Cleromancy then applies its existing product-owned replay validator before exposing the result. A valid content hash or generic graph shape is insufficient evidence that a divination graph is valid.
+
+The returned reading holds its owner snapshots, verified card resources, optional complete graph envelope and disclosed pending merge. Its model mapping preserves host-owned layout, actions, status and notices while clearing obsolete archive and merge controls before mapping the new reading. Products retain their own selection, merge choices and curation policy. The shared reader never silently mints, forks, changes focus or keeps material.
+
+The existing event-driven `MereRouteSession` uses `SessionDriver`, whose scheduling and resource acceptance differ from this async application-client path. It may reuse the same envelope-binding guard, but is not replaced by a second event loop or an async wrapper. Removing those scheduling differences is outside this consumer slice.
+
+## Consumer migration
+
+Cleromancy replaces its repeated snapshot/card/media fetching and resource verification with the shared complete reader. It still refuses mismatched attached rows, validates the full divination candidate, restores only `reading-workspace`, and retains read-only transient inspection only for the same attachment. A failed refresh leaves the product unavailable and clears transient inspection; acknowledged owner writes remain distinct from later view-save failures.
+
+Knot replaces its local snapshot and merge-media reading with the shared projection-only reader. The catalog remains its displayed graph. Merge choices stay product-side and are discarded when the pending source changes. Failed refresh invalidates cached action snapshots so the product cannot invoke actions against a stale materialization. Session, archive and merge requests continue through the resident's advertised intents.
+
+## Integration and preservation
+
+Supplier implementation uses the isolated checkout under `testing/shared-resident-materialization-20261018/mere`. Knot also uses a separate checkout because both primary repositories contain active source-edit work. Cleromancy starts at clean main `dcab6e5`. No uncommitted primary source-edit changes are imported, reset or overwritten. Canonical branch source declarations remain; committed Cargo locks identify the tested shared supplier and complete dependency family.
+
+Fetch before publication, merge incoming main changes rather than rebasing, and preserve each repository's existing records. Source implementation, software checks, native capture review, fresh reopening and publication are separate claims. The prior signed Cleromancy package remains frozen and is not relabeled with this implementation's source identity.
+
+## Verification and done conditions
+
+- Shared fake-source tests exercise correct live/read-only readings, optional archive removal, corrupt resource bytes, missing advertised media, duplicate descriptors, mismatched projection/session/application/revision and incomplete reads. No failed reading is returned as usable data.
+- Each product compiles against the published shared mechanism without local path overrides. Its existing focused lifecycle, merge, read-only and domain-validation regressions pass.
+- Real consumer fixtures prove save/archive/view isolation and fresh-process reopening. Native runs are serialized and original captures reviewed. Historical qualification fixtures and receipts remain unchanged; use copied public synthetic profiles where applicable.
+- Both product sources actually call the same shared reader. A supplier helper without two qualified consumers does not complete the phase.
+
+## Progress
+
+- 2026-10-18: Compared consumer contracts and created isolated Mere/Knot checkouts. Shared reader, refusal tests and product migrations are in progress. Primary source-edit work remains untouched. Supplier begins at published `908283728`; Knot begins at `7e196c5`, and each consumer's older supplier lock retains its historical qualification scope until intake checks complete.

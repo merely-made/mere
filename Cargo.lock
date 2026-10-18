@@ -10040,6 +10040,7 @@ version = "0.1.0"
 dependencies = [
  "chirograph",
  "graphshell-client",
+ "graphshell-endpoint",
  "mere-cartography",
  "mere-kernel",
  "mere-view",
