@@ -182,9 +182,8 @@ impl Canvas {
             return None;
         }
         let channel = Channel::Groups(source).id();
-        let inputs = LawInputs::new(
+        let inputs = LawInputs::new_without_relation_edges(
             &self.graph,
-            &self.hidden_edges,
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
         )

@@ -41,7 +41,7 @@ records the separate source, browser, reopen and image-review claims.
 | Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
 | Responsive-path legibility | Qualified for the ordinary 2D square-node cohort on source `487f37096`: bounded corner rounding and face clipping, readable selected stratum cores/direction/opposition marks, and one shared segment handoff for paint/pick/report. See the continuation and receipt below; close crossings can still crowd marks. |
 | Attachment in other presentations | Qualified on source `0b7454123` through the shared billboard/camera model for tilted/yawed, rounded/circular, scaled suggestion and lifted profiles. Frame/face placement, visual selection, self arches and responsive clipping share the model. See the continuation and receipt below for scripted-profile, visible-stem and cohort limits. |
-| Strength and physical explanation | Deferred to dynamics: held assertion counting is the current default, and endpoint physics retains one spring per visible source row. Weighted policy, one aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance are not part of this continuation. |
+| Strength and physical explanation | Counted-topology continuation in progress below: make current unit source-row contributions explicit and share runtime/inspection input while preserving existing force laws. Weighted policy, one globally aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance remain deferred to dynamics. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
 | Live source refresh and immutable public revisions | Separate source/receiving work: MereHost public revision availability remains explicit, and Knot's qualified reader is a startup snapshot. Automatic resident refresh/synchronization is not implied. |
@@ -296,6 +296,67 @@ new ordinary Graphshell controls. Conservative overlap refusal, larger cohorts,
 central crossing density and grammar/territory contrast retain their named
 bounds. Physics colliders, endpoint dynamics and Knot checkpoint storage keep
 their separate owners. No frame-time improvement is claimed.
+
+### Counted endpoint topology and one inspection input — 2026-10-19
+
+**Status: implementation and focused parity complete; broader and native qualification pending.**
+Mark selected strength/physical explanation after shared billboard attachment,
+with direct publication and orchestration authorized. Baseline is refreshed
+Mere `eacbb82dc3e84f3c07af7d0b4047ad701fdd7629`.
+
+**Feature target:** disclose the current unit contributions through the same
+reader that supplies endpoint dynamics. Remove repeated stored endpoint rows
+without changing existing motion, independent reasons, source authority or
+view-local visibility. This continuation does not select a new strength law.
+
+**Implementation:** Pictograph has one eligible-row reader carrying exact
+assertion identity (or Traversal rollup), canonical stratum identity and ordered
+displayed aliases. Runtime initialization, reconciliation, hide/restore and
+inspection consume it. Occurrence-controller input remains an explicit mode;
+an empty occurrence list does not fall back to graph relations. Force/channel
+readers avoid constructing and then discarding a less-filtered topology.
+
+Seiche's `EdgeTopology` retains adjacent equal ordered pairs as nonzero counted
+runs. Simulation, layout view and actor handoff use that representation. The
+public `sync_edges`, legacy `SyncEdges` command, `ForceContext.edges` and
+`Layout.edges` interfaces remain available. A new `SyncEdgeTopology` command
+requires downstream exhaustive command matches to handle that variant; the
+checked Woodshed source has no such match. Custom forces still receive the
+original ordered slice through a transient expansion at the force boundary.
+There is no second persistent expanded topology cache. Diagnostic slices are
+likewise expanded only at their existing read boundary.
+
+Run compression does not merge nonadjacent pairs, reverse endpoints, regroup
+strata, combine displayed aliases or multiply a force by its count. These
+choices preserve floating-point addition order and every law's degree and
+neighbor multiplicity. A run count is storage information, not a unique-link
+count or a force measure. Graphshell's ordinary inspector explains held versus
+visible contributions; run counts and exact row identities remain available
+in its structured report and qualification readback.
+
+**Validation targets:**
+
+- Independent original-slice controls compare force, velocity and position
+  bits over 120 ticks under spring, LinLog, magnetic, Boids, Anneal, Kuramoto
+  and degree/hub overlays. Include split runs, reverse direction, self rows
+  and absent endpoints; compare query multiplicity and pick-tie order.
+- Exercise counted versus legacy actor input, occurrence mode, exact assertion
+  hides, canonical stratum hides and displayed Resource aliases.
+- Run the shared canvas and Graphshell gates, product Wasm build, viewer
+  compile and port-boundary check from recorded committed source.
+- Use the promoted-link fixture to inspect three pair rows, hide one exact
+  reason without changing source facts/revision, restore it, freeze the held
+  assertions, and withdraw it at its source. The independent reason and frozen
+  copy survive. Reopen in a fresh browser process and compare persisted source
+  facts and the two remaining controller rows.
+
+**Remaining bounds:** current unit contributions are made explicit, not
+replaced by arbitrary weights or one globally aggregated physical spring per
+canonical link. No frame-time gain, measured per-assertion force, path-to-node
+feedback, resonance or additional receiving-host qualification is claimed.
+Traversal event count/recency still do not become assertion support. The
+ignored `decay_progress` write-surface cleanup remains separate, as does Knot
+checkpoint confidentiality.
 
 ## Authority and scope
 

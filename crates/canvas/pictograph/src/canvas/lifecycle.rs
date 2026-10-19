@@ -427,7 +427,7 @@ impl Canvas {
             .map(|(key, _node)| (key, Point2D::zero()))
             .collect();
         self.physics.sync_nodes(nodes);
-        self.physics.sync_edges(self.controller_edges());
+        self.physics.sync_edge_topology(self.controller_topology());
         self.pinned_nodes
             .retain(|key| self.graph.get_node(*key).is_some());
         self.grammar

@@ -139,7 +139,9 @@ fn visible_relation_edges_keeps_one_tuple_per_cell_and_drops_hidden_ones() {
 
 #[test]
 fn closed_link_hides_preserve_controller_rows_in_the_other_stratum() {
-    use crate::canvas::seiche_bridge::visible_relation_edges_with_link_hides;
+    use crate::canvas::seiche_bridge::{
+        visible_relation_edges_with_link_hides, visible_relation_topology_with_link_hides,
+    };
     use scenograph::link::{LinkKey, LinkStratum};
     let (graph, [a, alias_a, b, alias_b, _]) = shown_content_graph();
     let surface_key = LinkKey::new(
@@ -149,8 +151,31 @@ fn closed_link_hides_preserve_controller_rows_in_the_other_stratum() {
     );
     let all = visible_relation_edges_with_link_hides(&graph, &HashSet::new(), &HashSet::new());
     assert_eq!(all.len(), 13);
+    let topology =
+        visible_relation_topology_with_link_hides(&graph, &HashSet::new(), &HashSet::new());
+    assert_eq!(topology.len(), 13);
+    assert_eq!(
+        topology.edge_topology().iter().copied().collect::<Vec<_>>(),
+        topology
+            .rows
+            .iter()
+            .map(|row| (row.displayed_from, row.displayed_to))
+            .collect::<Vec<_>>(),
+        "counted controller input expands in the source reader's exact row order"
+    );
+    let surface_rows: Vec<_> = topology
+        .rows
+        .iter()
+        .filter(|row| row.key == surface_key)
+        .collect();
+    assert_eq!(surface_rows.len(), 1);
+    assert_eq!(
+        (surface_rows[0].displayed_from, surface_rows[0].displayed_to),
+        (a, b),
+        "source identity and displayed alias endpoints remain distinct"
+    );
 
-    let hidden_surface = HashSet::from([surface_key]);
+    let hidden_surface = HashSet::from([surface_key.clone()]);
     assert_eq!(
         visible_relation_edges_with_link_hides(&graph, &HashSet::new(), &hidden_surface).len(),
         12,
@@ -163,6 +188,27 @@ fn closed_link_hides_preserve_controller_rows_in_the_other_stratum() {
         LinkStratum::Resource,
         resource_a.canonical_iri(),
         resource_b.canonical_iri(),
+    );
+    let resource_rows: Vec<_> = topology
+        .rows
+        .iter()
+        .filter(|row| row.key == resource_key)
+        .collect();
+    assert_eq!(resource_rows.len(), 12);
+    assert!(
+        resource_rows
+            .iter()
+            .any(|row| { row.displayed_from == alias_a || row.displayed_to == alias_a })
+    );
+    assert!(
+        resource_rows
+            .iter()
+            .any(|row| { row.displayed_from == alias_b || row.displayed_to == alias_b })
+    );
+    assert!(
+        resource_rows
+            .iter()
+            .all(|row| row.key.stratum == LinkStratum::Resource)
     );
     let hidden_resource = HashSet::from([resource_key]);
     assert_eq!(

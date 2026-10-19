@@ -357,9 +357,8 @@ impl Canvas {
     /// and the Meaning snapshot as they stand.
     fn channel_inputs(&mut self) -> LawInputs<'_> {
         self.channels.sites(&self.graph);
-        LawInputs::new(
+        LawInputs::new_without_relation_edges(
             &self.graph,
-            &self.hidden_edges,
             self.channels.community_held(),
             self.channels.sites_fresh(&self.graph),
         )

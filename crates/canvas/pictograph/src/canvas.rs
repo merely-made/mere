@@ -226,7 +226,10 @@ mod dynamics_record;
 pub mod node_billboard;
 mod node_presentation;
 pub mod relationship_topology;
-pub use dynamics_inspection::{DynamicsInspection, DynamicsTarget, MemberDynamics};
+pub use dynamics_inspection::{
+    DynamicsInspection, DynamicsTarget, DynamicsTopologyMode, DynamicsTopologyOrigin,
+    DynamicsTopologyRow, MemberDynamics,
+};
 pub mod dynamics_recipe;
 /// The dynamics spec over this catalog: seiche's portable spec, with the
 /// laws and overlays as its presets. (Dynamics grammar plan, G4a.)

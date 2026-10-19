@@ -25,11 +25,12 @@ use seiche::{Boundary, CouplingForce, EdgeSpring, NodeExclusion, Simulation};
 /// hidden-cell visibility (swatch-primitive P5 — hiding relaxes the spring in that
 /// instance only, never graph truth). Unlike `dedup_edges` (one topology edge per pair,
 /// for graph-algorithm layout strategies that need plain connectivity, not weight), this
-/// keeps one `(NodeKey, NodeKey)` tuple per **visible** relation cell: a pair with three
-/// live cells pulls three times as hard as a pair with one, and hiding one cell drops the
-/// pull by exactly that cell's share. seiche stays relation-taxonomy agnostic — this
+/// keeps one `(NodeKey, NodeKey)` tuple per **visible source row**: each assertion
+/// or Traversal rollup contributes once. Under EdgeSpring, three such rows pull
+/// three times as hard as one; the configured law owns other interpretations. seiche stays relation-taxonomy agnostic — this
 /// multiplicity is how the canvas hands it weight without leaking `RelationSelector` into
 /// seiche's edge type.
+#[cfg(test)]
 pub(crate) fn visible_relation_edges(
     graph: &Graph,
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
@@ -40,6 +41,7 @@ pub(crate) fn visible_relation_edges(
 /// Keep the historical one-spring-per-visible-source-row law. A canonical
 /// link hide removes only rows in its owning stratum; another stratum over the
 /// same displayed pair keeps its own rows and spring multiplicity.
+#[cfg(test)]
 pub(crate) fn visible_relation_edges_with_link_hides(
     graph: &Graph,
     hidden_edges: &HashSet<crate::canvas::EdgeCell>,
@@ -54,6 +56,82 @@ pub(crate) fn visible_relation_edges_with_assertion_hides(
     hidden_links: &HashSet<LinkKey>,
     hidden_assertions: &HashSet<String>,
 ) -> Vec<(NodeKey, NodeKey)> {
+    visible_relation_topology_with_assertion_hides(
+        graph,
+        hidden_edges,
+        hidden_links,
+        hidden_assertions,
+    )
+    .rows
+    .into_iter()
+    .map(|row| (row.displayed_from, row.displayed_to))
+    .collect()
+}
+
+/// The exact visible source rows that feed the ordinary graph controller.
+/// Every row contributes one topology slot. `LinkKey` preserves source stratum
+/// and canonical identity while displayed endpoints preserve routed aliases.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct VisibleRelationTopology {
+    pub rows: Vec<VisibleRelationRow>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct VisibleRelationRow {
+    pub displayed_from: NodeKey,
+    pub displayed_to: NodeKey,
+    pub key: LinkKey,
+    pub origin: VisibleRelationOrigin,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) enum VisibleRelationOrigin {
+    Assertion { statement_id: String },
+    Traversal,
+}
+
+impl VisibleRelationTopology {
+    /// Construct the engine's ordered run representation from these exact rows.
+    /// Adjacent equal ordered pairs compress; row order and total multiplicity
+    /// remain unchanged.
+    pub(crate) fn edge_topology(&self) -> seiche::EdgeTopology {
+        self.rows
+            .iter()
+            .map(|row| (row.displayed_from, row.displayed_to))
+            .collect()
+    }
+
+    pub(crate) fn len(&self) -> usize {
+        self.rows.len()
+    }
+}
+
+pub(crate) fn visible_relation_topology(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+) -> VisibleRelationTopology {
+    visible_relation_topology_with_link_hides(graph, hidden_edges, &HashSet::new())
+}
+
+pub(crate) fn visible_relation_topology_with_link_hides(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+    hidden_links: &HashSet<LinkKey>,
+) -> VisibleRelationTopology {
+    visible_relation_topology_with_assertion_hides(
+        graph,
+        hidden_edges,
+        hidden_links,
+        &HashSet::new(),
+    )
+}
+
+pub(crate) fn visible_relation_topology_with_assertion_hides(
+    graph: &Graph,
+    hidden_edges: &HashSet<crate::canvas::EdgeCell>,
+    hidden_links: &HashSet<LinkKey>,
+    hidden_assertions: &HashSet<String>,
+) -> VisibleRelationTopology {
     let assertions = graph
         .projected_assertions()
         .filter(|(_, _, _, statement)| !hidden_assertions.contains(&statement.statement_id))
@@ -65,14 +143,18 @@ pub(crate) fn visible_relation_edges_with_assertion_hides(
                     to,
                     kind: statement.relation_kind(),
                 },
+                VisibleRelationOrigin::Assertion {
+                    statement_id: statement.statement_id.clone(),
+                },
             )
         });
     let traversals = graph
         .projected_relations()
-        .filter(|(_, relation)| relation.kind == kernel::graph::RelationKind::Traversal);
-    assertions
+        .filter(|(_, relation)| relation.kind == kernel::graph::RelationKind::Traversal)
+        .map(|(key, relation)| (key, relation, VisibleRelationOrigin::Traversal));
+    let rows = assertions
         .chain(traversals)
-        .filter_map(|(relation_key, relation)| {
+        .filter_map(|(relation_key, relation, origin)| {
             let selector = super::relationship_topology::selector_for_relation_kind(relation.kind);
             if hidden_edges.contains(&crate::canvas::EdgeCell {
                 from: relation.from,
@@ -95,13 +177,19 @@ pub(crate) fn visible_relation_edges_with_assertion_hides(
                     LinkKey::new(LinkStratum::Resource, from, to)
                 },
             };
-            (!hidden_links.contains(&key)).then_some((relation.from, relation.to))
+            (!hidden_links.contains(&key)).then_some(VisibleRelationRow {
+                displayed_from: relation.from,
+                displayed_to: relation.to,
+                key,
+                origin,
+            })
         })
-        .collect()
+        .collect::<Vec<_>>();
+    VisibleRelationTopology { rows }
 }
 
 /// Build the force-directed simulation from `graph`: a body per node, one spring
-/// edge per visible relation cell as the topology (see [`visible_relation_edges`]),
+/// edge per visible source row as topology (see [`visible_relation_topology`]),
 /// the standard force trio (exclusion + edge-springs + a centering boundary), seeded
 /// into a tight central spiral so the first settle is visible.
 pub(crate) fn build_simulation(graph: &Graph) -> Simulation {
@@ -109,7 +197,7 @@ pub(crate) fn build_simulation(graph: &Graph) -> Simulation {
     sync_sim_with_graph(&mut sim, graph);
     // No `Canvas` (and so no hidden-cell set) exists yet at construction time; the first
     // real sync happens once session/view-intent restore runs and calls `reconcile_derived`.
-    sim.sync_edges(visible_relation_edges(graph, &HashSet::new()));
+    sim.sync_edge_topology(visible_relation_topology(graph, &HashSet::new()).edge_topology());
 
     sim.add_force(NodeExclusion::default());
     sim.add_force(EdgeSpring::default());
