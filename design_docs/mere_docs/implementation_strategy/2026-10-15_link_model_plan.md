@@ -399,8 +399,18 @@ slot so following entries stay aligned. Snapshot `agent_decay_progress`
 fields and their readers remain unchanged. This compatibility representation
 belongs to capture persistence, not the current write API or graph state.
 
-**Validation:** pending final checks. Frozen fixtures produced by the clean
-baseline include absent and nonzero decay values in JSON, postcard and rkyv,
+The resident Djinn dependency check exposed three old constructors in its
+pinned Cleromancy core. Cleromancy `73dccb6f7db2a49350bf1f15c93983e457351c62`
+migrates them to the existing scoped semantic writer, preserving endpoints,
+kind, label and default scope. Its five authored-spread, fixed-spread and
+reflection/session regressions pass against its existing SDK before Mere
+removes the field. Mere takes that caller revision in its root lock; no other
+package version, source revision or checksum changes. Cargo also reselects
+existing eligible dependency edges. The standalone web lock is unchanged.
+
+**Validation:** pending final checks after caller intake. Frozen fixtures
+produced by the clean baseline include absent and nonzero decay values in
+JSON, postcard and rkyv,
 all five assertion families, and a subsequent title entry. Tests must read
 those bytes, replay the same relation meaning, and reject the old key in live
 commands. Existing journal, snapshot, session, relation and consumer gates
