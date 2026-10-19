@@ -60,7 +60,7 @@ use build::{
     sample_graph, surface_bg,
 };
 use paint_list_api::ColorF;
-use seiche_bridge::{build_simulation, visible_relation_edges_with_assertion_hides};
+use seiche_bridge::build_simulation;
 
 /// Build the seiche [`AffinitySpring`] from a cartography [`AffinityScores`](crate::signals::AffinityScores)
 /// signal: flatten the `((a, b), weight)` pairs into the force's `(a, b, weight)` triples at the
