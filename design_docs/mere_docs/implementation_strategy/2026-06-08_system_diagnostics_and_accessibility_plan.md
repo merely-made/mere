@@ -873,3 +873,13 @@ accessibility states.
   UI itself, adding richer per-operation history/error affordances, and migrating
   node facets / lineage out of the focused-node Inspector into the Roster's
   node-scoped facet view.
+
+
+## Boundary consolidation continuation, 2026-10-19
+
+The [family-promotion boundary scope](2026-10-19_family_promotion_plan.md#boundary-consolidation-scope-2026-10-19)
+records the execution/shutdown consolidation, shared observation/semantic-action
+follow-up and separate Castellan process design. This plan retains its domain
+implementation and acceptance gates. The new scope does not change existing
+custody, event meanings, configured limits or action admission, and supplies no
+new runtime, process-isolation or human accessibility receipt.

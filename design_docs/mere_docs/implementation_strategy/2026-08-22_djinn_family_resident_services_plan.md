@@ -716,3 +716,13 @@ The updated probe builds and selected port/example strict Clippy passes with
 `--no-deps`; a broader invocation separately records unrelated Tabard warnings.
 Public evidence is in `testing/receipts/sennet-directed-custody/`. Murm owns
 protocol construction, peer pinning, nonce allocation and directed/ACK RF proof.
+
+
+## Boundary consolidation continuation, 2026-10-19
+
+The [family-promotion boundary scope](2026-10-19_family_promotion_plan.md#boundary-consolidation-scope-2026-10-19)
+records the execution/shutdown consolidation, shared observation/semantic-action
+follow-up and separate Castellan process design. This plan retains its domain
+implementation and acceptance gates. The new scope does not change existing
+custody, event meanings, configured limits or action admission, and supplies no
+new runtime, process-isolation or human accessibility receipt.

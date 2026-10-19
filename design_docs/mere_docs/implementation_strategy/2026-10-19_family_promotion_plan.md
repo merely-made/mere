@@ -1,10 +1,14 @@
 # Foundation family promotion
 
 **Date:** 2026-10-19
-**Status:** Completed source promotion and consumer cutover. Authorized by the owner after the dependency and ownership review. Source extraction, independent validation and consumer cutover are separate gates.
+**Status:** Source promotion and consumer cutover completed. Boundary-consolidation continuation scoped on 2026-10-19; implementation has not started. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
 **Receipt budget:** 100 MB total across this migration. Keep compact command summaries and source hashes; do not copy model weights, build trees or historical audit receipts.
 
 ## Decision
+
+This section records the completed extraction. The boundary scope below
+supersedes its assumption that Djinn must remain in Mere and leaves the eventual
+repository grouping open until the dependency cuts are qualified.
 
 Mere remains the graph application platform. Graphshell, Djinn, Cambium, Conatus,
 the graph kernel, canvas and application-specific integration stay in Mere.
@@ -186,3 +190,183 @@ The document-judgment check covers this new plan and recognizes moved documents.
 It still fails on the original 19 missing records and an unchanged snapshot
 whose checkout digest differs from the checker constant. The baseline comparison
 records zero newly missing documents; the historic snapshot was not edited.
+
+## Boundary consolidation scope, 2026-10-19
+
+The owner clarified that names and umbrella repositories are secondary. The
+objective is one implementation per shared responsibility, with explicit
+ownership of state, permissions, execution, lifetime and reported outcomes.
+This is a scoped continuation, not implementation or acceptance evidence. The
+completed source promotion above remains its own checkpoint.
+
+### Responsibility boundaries
+
+| Responsibility | Owns | Boundary to preserve |
+|---|---|---|
+| Execution | Actor/thread completion, typed messaging, task scopes, cancellation and shutdown mechanics | The caller supplies resource order, policy, deadlines and domain meaning. Optional Tokio support must not become mandatory for synchronous consumers. |
+| Service supervision | Enabled services, configuration, process/service lifetime, restart policy and dependency order | A supervisor composes domain owners; it does not duplicate their journals, job grammar, authority or retention decisions. |
+| Domain services | Compute/model work, publication, synchronization and their outcomes | Distillery retains its own jobs, leases and scheduling. A job scheduler and a task executor have different responsibilities. |
+| Secret custody | Vault authority, root signing, credential release, scoped derivation, lock and revocation | General workers and diagnostics receive only the operations or material their admitted contract requires. Current mixed derived-key release remains unchanged pending custody design. |
+| Observability | Shared observation envelope, bounded retention, causal references, independent readers, explicit loss and inspection data | Producers own redaction and outcome truth. Ingress buffering and retained history keep their different lifetimes and admission policies. |
+| Application semantics and actions | Domain identities, semantic projections, retained geometry, permitted actions and actual action results | Accessibility, automation and inspectors consume the owner's projection and admission path. Observing an operation does not authorize controlling it. |
+
+Existing homes are implementation starting points: Armillary for execution,
+Djinn for supervision, Distillery for compute, Castellan for custody, Apparatus
+for observations, and Genet/Cambium/Mere adapters for application semantics.
+Repository membership is not an authority boundary. No rename or source-home
+move is required to finish the first behavioral slice.
+
+### First implementation slice: execution and truthful shutdown
+
+Work in the existing Armillary repository and Mere consumer workspace. Give
+Armillary the generic scoped-task implementation currently at
+`crates/graphshell/graphshell-endpoint/src/door/tasks.rs` and the ordered-close
+mechanics currently at `ports/distillery/src/lifecycle.rs`. Keep them modules
+within the existing crate, with Tokio support optional. Update Graphshell doors,
+Djinn and Distillery to use the shared implementation. Each host continues to
+supply its own resource names, close sequence and domain-specific cancellation.
+Do not introduce a general service scheduler in this slice.
+
+Make actor completion and failure observable for dedicated and pooled actors;
+channel closure alone does not establish completion. Propagate relevant failures
+through the consuming close path. Review scoped-task reaping as well: the current
+implementation discards join results while reaping and while cancelling. A drain,
+a cooperative stop request, a completed join, a panic, and forced future
+cancellation must retain their actual meanings. Do not invent successful terminal
+work records from a requested stop or an empty inbox.
+
+The existing task scope can be drained and reused. Before changing that contract,
+list the callers needing reuse and specify a separate terminal-close operation
+if required. Closed scopes must have defined admission behavior under concurrent
+spawn. Never claim that a timeout or dropped handle stopped a Rust thread.
+
+Required acceptance:
+
+1. One maintained task-scope implementation and one ordered-close implementation;
+   old call sites are migrated rather than left with independent copies.
+2. Dedicated and pooled actor completion are distinguishable from panic and
+   disconnection. A blocked actor cannot be reported joined before it exits.
+3. Nested tracked tasks release held resources before a successful close report;
+   the untracked/detached control remains explicitly outside that guarantee.
+4. An early close error does not prevent later resources receiving their close
+   attempt, and all observed errors remain available to the owner.
+5. Focused Graphshell/Djinn task tests, Distillery resident/close tests and an
+   Armillary-only consumer pass against canonical Git sources. The synchronous
+   Armillary feature graph remains free of Tokio and application/custody crates.
+6. Selected failure controls fail on the old behavior and pass after repair.
+   Exact commands, source pins, ignored cases and unresolved baseline failures
+   are recorded. Heavy models, headed rendering and physical-device acceptance
+   are required only if the implementation changes those behaviors.
+
+Pool admission and worker retirement are separate named repairs: Q112's idle
+reservation can strand queued actors, and Q113's workers survive all public pool
+handles. Fix either when it is a prerequisite for this slice's acceptance;
+otherwise retain it as an open pool gate. Do not claim bounded worker lifetime
+from an actor-completion repair. The existing Q217 inference-disconnection
+counterexamples are receiving gates: exposing a join error is insufficient if
+the lane still journals or acknowledges work after its actor has disconnected.
+
+### Second implementation slice: observations and semantic action evidence
+
+Continue the existing
+[diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
+which remains the owner of its detailed implementation and acceptance. Reuse
+Apparatus's implemented bounded store and Mesquite attachment. Inventory the
+registry ingress envelope/correlation and Apparatus metadata, then share only
+contracts that represent the same fact. Keep the registry's nonblocking ingress
+separate from Apparatus's independent-reader retained history. Preserve each
+layer's configured count/byte/age limits, rejection policy and loss accounting.
+No universal event enum, global semantic revision or new diagnostics daemon.
+
+Take one real worker operation and one UI operation through their existing
+owners. Connect source/run/operation identity, action admission, terminal reply
+and optional semantic/frame evidence where the producer can establish them.
+Taproot selectors and Mesquite driving continue to consume the host's retained
+projection and geometry. UxTree's Inker-specific projections and ux-events'
+browser vocabulary remain adapters; generic core users must not inherit them.
+Diagnostics and local automation must continue to work without Djinn running.
+
+Done when the two paths produce bounded, redacted evidence with independent
+inspection/test readers; unsupported, stale, ambiguous, cancelled and failed
+operations retain truthful results; overload/restart gaps stay visible; and
+retry/cancel controls traverse the original owner's admitted command path.
+Presentation stamps retain their qualified meaning of queue submission, with
+separate run/host scope. Exact image/state correlation and human screen-reader
+acceptance remain the existing plan's separate gates.
+
+### Separate design pass: custody process boundary
+
+The intended direction is a narrow Castellan custody process contacted by the
+resident. The present code links Castellan into Djinn; separate crates and
+cargo-deny wrappers do not establish address-space isolation. This design pass
+must produce a reviewable protocol and migration, not a second vault or a
+parallel secret authority. Process separation is not implemented by this scope.
+
+Specify caller authentication and authorization independently: OS-user identity
+alone does not identify the requesting application or authorize key use. Cover
+app/profile/session/key scope, consent, unlock and presence UI, sticky lock and
+revocation, permitted derived-key lifetime, parent/client death, restart and
+reconnection, replay/idempotency, broker ownership and existing SSH/Secret
+Service behavior. Include the exact policy for calls already in flight during
+lock; preserve the existing absence/Locked refusal and prohibition on fallback
+keys. Root material must not cross into the general resident's workers.
+
+The design must identify Djinn's direct vault openings and adapters, including
+`resident_distillery.rs`, and how each becomes a custody operation or a narrowly
+permitted derived-key consumer. Start with a cross-process fixture for one root
+signing operation and one scoped derived-key consumer, using actual authenticated
+IPC. Wrong-app/profile requests, broker loss, lock during use, crash/restart and
+revocation need negative controls. Existing source-formats and credential
+identity stay stable. Packaging, launch policy and per-OS process restrictions
+require explicit acceptance; IPC by itself does not prove complete isolation.
+A trusted resident supervisor's ability to launch or replace the custodian also
+belongs in the stated threat boundary.
+
+### Source-home follow-up and exclusions
+
+After the functional seams are qualified, promote the resident and its custody
+implementation and choose a workspace grouping based on the actual dependency
+graph. Separate public crates can share a repository without acquiring each
+other's runtime dependencies. Preserve history, notices and immutable consumer
+pins as in the completed promotion; qualify one external foundation consumer and
+one real resident consumer. No umbrella name, Armillary relocation or mandatory
+Apparatus promotion is a prerequisite for the first slice.
+
+This continuation excludes a universal transport rewrite, a replacement async
+runtime, new product panes, universal automation protocol, model/backend work,
+new capability algebra, a vault-format migration and new restart/retry defaults.
+Keep Mere's graph ownership migration and wider protocol/admission consolidation
+in their existing plans. Respect the original instruction to document hairy,
+high-impact issues that would consume the bounded audit pass; retain them as
+named follow-ups with evidence instead of expanding this scope silently.
+
+### Source findings and progress
+
+- 2026-10-19: Read Mere `883ccdc4`, Armillary
+  `def985a79f40c255af5c771e37b754b47f73a813`, and the named Genet/Taproot seam
+  at local Genet `2921c95bbbc50841fe35ae993e89e03f7197fb46`. This is a local
+  source review, not a fresh upstream or runtime qualification.
+- 2026-10-19: `ActorHandle::join` discards dedicated-thread panic results;
+  `spawn_named_on` returns a handle without a completion join. The actor-span
+  comment claims a finish on panic, while the explicit finish event follows the
+  run call and is skipped by unwinding. These are source confirmations; this
+  scoping pass did not execute new reproductions.
+- 2026-10-19: Reuse the prior
+  [audit findings register](../../../support/receipts/authority-success-audit/review_notes.json):
+  Q112 (pool reservation), Q113 (pool retirement), Q217 (inference actor loss),
+  and its existing pooled-join/panic-finish follow-up. Their historical source
+  paths predate promotion. Their statuses are not changed by this scope.
+- 2026-10-19: Registry `diagnostics/emit.rs` already describes its queue as
+  nonblocking ingress and explicitly delegates independent retained readers to
+  Apparatus. Their similar limits are not evidence that one queue should replace
+  both. Mesquite already uses Apparatus batches and retained accessibility
+  projection through Taproot; this is an integration continuation.
+- 2026-10-19: Scope recorded; no runtime code, custody process, dependency pins
+  or source homes changed. First delivery is the execution/shutdown slice above.
+
+Receipt budget: 100 MB total retained evidence for this continuation across all
+repositories. Each implementation brief names its subset and cap; keep source
+hashes, compact outcomes and required failure controls. Reuse the approved shared
+Cargo target, preserve unrelated work, and use a worktree only for a real
+collision. This scoping pass needs documentation checks only and creates no build
+output or isolated toolchain home.
