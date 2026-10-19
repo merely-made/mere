@@ -1,0 +1,47 @@
+{
+  "accepted_source": "1cbae9acd9b4cb3470d99d29235701ffc25676ec",
+  "external_root": "/Users/markik/Code/testing/mere/retired-decay-20261019",
+  "precommit_iterations": [
+    {
+      "process": "kernel-focused.json",
+      "accepted": false,
+      "reason": "New adapter needed an explicit rkyv Serialize trait call because both serde and rkyv traits are in scope."
+    },
+    {
+      "process": "kernel-focused-2.json",
+      "accepted": false,
+      "reason": "New archive fixture test needed an explicit AlignedVec alignment const."
+    },
+    {
+      "process": "kernel-focused-3.json",
+      "accepted": true,
+      "scope": "3 focused compatibility tests; superseded by full clean committed-source qualification."
+    }
+  ],
+  "claim": "Original command records and logs retained externally. No failed process is counted as qualification.",
+  "dependency_closure": [
+    {
+      "process": "djinn-check.json",
+      "accepted": false,
+      "reason": "Real transitive Cleromancy core3fa compilation failed at three constructors with the retired field. Owning-repo caller migration73dcc and Mere intake1cbae resolve it; successful retry is djinn-intake.json."
+    }
+  ],
+  "caller_harness_setup": [
+    {
+      "process": "cleromancy-caller-regressions.json",
+      "accepted": false,
+      "reason": "Cargo refused to test a non-workspace dependency package directly."
+    },
+    {
+      "process": "cleromancy-caller-regressions-2.json",
+      "accepted": false,
+      "reason": "Portable harness initially included native-only A15 app test; excluded it."
+    },
+    {
+      "process": "cleromancy-caller-regressions-3.json",
+      "accepted": false,
+      "reason": "Correct A7 test needed a direct serde harness dependency; added it."
+    }
+  ],
+  "lock_generation": "Initial online update and offline retry refreshed Dramatis family pins. Cargo precise update restored cf562f47. Only Cleromancy package identity changes in the accepted generated lock; eligible existing dependency edges are enumerated separately."
+}

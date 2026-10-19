@@ -1,0 +1,166 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "mere",
+    "-p",
+    "mere-linked-data",
+    "-p",
+    "mere-cartography",
+    "-p",
+    "mere-view",
+    "-p",
+    "pictograph",
+    "--no-default-features",
+    "--features",
+    "mere/query,mere/canvas",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "1cbae9acd9b4cb3470d99d29235701ffc25676ec",
+  "started": "2026-10-19T18:58:46.242814+00:00",
+  "status_before": "",
+  "process_started": true,
+  "exit_code": 0,
+  "finished": "2026-10-19T19:01:32.314341+00:00",
+  "log_sha256": "a337aeafaf219c55103faacbd1005e2b909c296da42a14ba742d64651595a090",
+  "suites": [
+    {
+      "result": "ok",
+      "passed": 67,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 58,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 104,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 38,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 575,
+      "failed": 0,
+      "ignored": 18,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 1,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ]
+}

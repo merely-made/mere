@@ -408,14 +408,21 @@ removes the field. Mere takes that caller revision in its root lock; no other
 package version, source revision or checksum changes. Cargo also reselects
 existing eligible dependency edges. The standalone web lock is unchanged.
 
-**Validation:** pending final checks after caller intake. Frozen fixtures
-produced by the clean baseline include absent and nonzero decay values in
-JSON, postcard and rkyv,
-all five assertion families, and a subsequent title entry. Tests must read
-those bytes, replay the same relation meaning, and reject the old key in live
-commands. Existing journal, snapshot, session, relation and consumer gates
-remain required. No native rendering or receiving-host qualification is
-claimed for this source/API cleanup.
+**Validation:** clean Mere `1cbae9acd9b4cb3470d99d29235701ffc25676ec`
+passes **2,008 tests/doctests**, with 29 ignored, across kernel, Pandect,
+Mere/linked-data/cartography/view/Pictograph and Graphshell. Djinn all-targets,
+product WebGPU WebAssembly and port-boundary checks pass. Cleromancy's five
+caller regressions also pass with its existing SDK and harness lock enforced.
+
+The [retired-decay receipt](../../../support/receipts/link-model-retired-decay-20261019/README.md)
+records the actual baseline bytes, None/zero/nonzero legacy values, all five
+assertion families, following-entry alignment, rewritten binary journals,
+relation replay and strict live-command rejection. It preserves the first
+Djinn failure and the owning-repo correction, exact dependency intake and
+review. Final doc/judgment audit findings are identical to baseline; the
+existing nonzero global gates remain debt. No new native rendering, Woodshed
+SDK repin or receiving-host qualification is claimed for this API cleanup.
+Knot checkpoint confidentiality remains in its separate storage lane.
 
 ## Authority and scope
 

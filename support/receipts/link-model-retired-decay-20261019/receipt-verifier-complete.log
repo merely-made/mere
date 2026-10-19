@@ -1,0 +1,3 @@
+Process argv: ["/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3", "support/receipts/link-model-retired-decay-20261019/verify.py", "support/receipts/link-model-retired-decay-20261019"]
+Retired-decay qualification verified at 1cbae9acd9b4cb3470d99d29235701ffc25676ec
+All recorded tests/checks exited successfully from clean source; fixture and preserved-reader hashes match.

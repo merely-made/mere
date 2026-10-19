@@ -1,0 +1,36 @@
+[package]
+name = "retired-decay-caller-regressions"
+version = "0.0.0"
+edition = "2024"
+
+[workspace]
+
+[features]
+default = ["legacy-receipts"]
+legacy-receipts = ["cleromancy/legacy-receipts"]
+
+[dependencies]
+cleromancy = { package = "cleromancy-core-acceptance", path = "/Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/core" }
+mere = { git = "https://github.com/merely-made/mere.git", branch = "main", default-features = false, features = ["graph"] }
+muniment = { git = "https://github.com/merely-made/mere.git", branch = "main", features = ["redb"] }
+graphshell-client = { git = "https://github.com/merely-made/mere.git", branch = "main" }
+tempfile = "3"
+pollster = "0.4"
+serde_json = "1"
+serde = "1"
+
+[patch.crates-io]
+mere-proofs = { git = "https://github.com/merely-made/mere.git", branch = "main" }
+muniment = { git = "https://github.com/merely-made/mere.git", branch = "main" }
+
+[[test]]
+name = "fixed_spread"
+path = "/Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/tests/a8.rs"
+
+[[test]]
+name = "reflections"
+path = "/Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/tests/a7.rs"
+
+[[test]]
+name = "authored_spread_reopen"
+path = "/Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/tests/authored_spread.rs"

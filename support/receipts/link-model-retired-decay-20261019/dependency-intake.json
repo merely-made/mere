@@ -1,0 +1,579 @@
+{
+  "baseline_revision": "20e4a08c4a3c9b5d370cdce6d9245a9f24d1f6e8",
+  "caller_revision": "73dccb6f7db2a49350bf1f15c93983e457351c62",
+  "package_count": 1774,
+  "package_identity_changes": [
+    "cleromancy-core-acceptance@0.1.0"
+  ],
+  "changes": [
+    {
+      "package": "bindgen@0.72.1",
+      "before": {
+        "name": "bindgen",
+        "version": "0.72.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "993776b509cfb49c750f11b8f07a46fa23e0a1386ffc01fb1e7d343efc387895",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "cexpr",
+          "clang-sys",
+          "itertools 0.11.0",
+          "log",
+          "prettyplease 0.2.37",
+          "proc-macro2",
+          "quote",
+          "regex",
+          "rustc-hash 2.1.3",
+          "shlex 1.3.0",
+          "syn 2.0.119"
+        ]
+      },
+      "after": {
+        "name": "bindgen",
+        "version": "0.72.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "993776b509cfb49c750f11b8f07a46fa23e0a1386ffc01fb1e7d343efc387895",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "cexpr",
+          "clang-sys",
+          "itertools 0.12.1",
+          "log",
+          "prettyplease 0.2.37",
+          "proc-macro2",
+          "quote",
+          "regex",
+          "rustc-hash 2.1.3",
+          "shlex 1.3.0",
+          "syn 2.0.119"
+        ]
+      }
+    },
+    {
+      "package": "cap-fs-ext@3.4.6",
+      "before": {
+        "name": "cap-fs-ext",
+        "version": "3.4.6",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "476f0d0003a760918ed4b1e039a59e11769030416f79c8222551d22785f7f70d",
+        "dependencies": [
+          "cap-primitives",
+          "cap-std",
+          "io-lifetimes",
+          "windows-sys 0.59.0"
+        ]
+      },
+      "after": {
+        "name": "cap-fs-ext",
+        "version": "3.4.6",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "476f0d0003a760918ed4b1e039a59e11769030416f79c8222551d22785f7f70d",
+        "dependencies": [
+          "cap-primitives",
+          "cap-std",
+          "io-lifetimes",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "cap-primitives@3.4.6",
+      "before": {
+        "name": "cap-primitives",
+        "version": "3.4.6",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "8e0bf07d379916947be6c4a07f43684153d710a2896c31f9e97781362895596c",
+        "dependencies": [
+          "ambient-authority",
+          "fs-set-times",
+          "io-extras",
+          "io-lifetimes",
+          "ipnet",
+          "maybe-owned",
+          "rustix 1.1.5",
+          "rustix-linux-procfs",
+          "windows-sys 0.59.0",
+          "winx"
+        ]
+      },
+      "after": {
+        "name": "cap-primitives",
+        "version": "3.4.6",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "8e0bf07d379916947be6c4a07f43684153d710a2896c31f9e97781362895596c",
+        "dependencies": [
+          "ambient-authority",
+          "fs-set-times",
+          "io-extras",
+          "io-lifetimes",
+          "ipnet",
+          "maybe-owned",
+          "rustix 1.1.5",
+          "rustix-linux-procfs",
+          "windows-sys 0.52.0",
+          "winx"
+        ]
+      }
+    },
+    {
+      "package": "cleromancy-core-acceptance@0.1.0",
+      "before": {
+        "name": "cleromancy-core-acceptance",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/cleromancy.git?branch=main#3fa5a6db87cfa34df9fc1de0a0877181c9b4526f",
+        "dependencies": [
+          "blake3",
+          "chartulary",
+          "chirograph",
+          "chrono",
+          "chrono-tz",
+          "dramatis",
+          "graphshell-client",
+          "mere",
+          "mere-alembic",
+          "mere-personal-facts",
+          "muniment",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenograph",
+          "scenotime",
+          "seiche",
+          "serde",
+          "serde_json",
+          "servitor",
+          "thiserror 2.0.21",
+          "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b)",
+          "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802)",
+          "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306)"
+        ]
+      },
+      "after": {
+        "name": "cleromancy-core-acceptance",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/cleromancy.git?branch=main#73dccb6f7db2a49350bf1f15c93983e457351c62",
+        "dependencies": [
+          "blake3",
+          "chartulary",
+          "chirograph",
+          "chrono",
+          "chrono-tz",
+          "dramatis",
+          "graphshell-client",
+          "mere",
+          "mere-alembic",
+          "mere-personal-facts",
+          "muniment",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenograph",
+          "scenotime",
+          "seiche",
+          "serde",
+          "serde_json",
+          "servitor",
+          "thiserror 2.0.21",
+          "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b)",
+          "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802)",
+          "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306)"
+        ]
+      }
+    },
+    {
+      "package": "errno@0.3.14",
+      "before": {
+        "name": "errno",
+        "version": "0.3.14",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb",
+        "dependencies": [
+          "libc",
+          "windows-sys 0.60.2"
+        ]
+      },
+      "after": {
+        "name": "errno",
+        "version": "0.3.14",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb",
+        "dependencies": [
+          "libc",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "fs-set-times@0.20.3",
+      "before": {
+        "name": "fs-set-times",
+        "version": "0.20.3",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "94e7099f6313ecacbe1256e8ff9d617b75d1bcb16a6fddef94866d225a01a14a",
+        "dependencies": [
+          "io-lifetimes",
+          "rustix 1.1.5",
+          "windows-sys 0.59.0"
+        ]
+      },
+      "after": {
+        "name": "fs-set-times",
+        "version": "0.20.3",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "94e7099f6313ecacbe1256e8ff9d617b75d1bcb16a6fddef94866d225a01a14a",
+        "dependencies": [
+          "io-lifetimes",
+          "rustix 1.1.5",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "io-extras@0.18.4",
+      "before": {
+        "name": "io-extras",
+        "version": "0.18.4",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "2285ddfe3054097ef4b2fe909ef8c3bcd1ea52a8f0d274416caebeef39f04a65",
+        "dependencies": [
+          "io-lifetimes",
+          "windows-sys 0.59.0"
+        ]
+      },
+      "after": {
+        "name": "io-extras",
+        "version": "0.18.4",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "2285ddfe3054097ef4b2fe909ef8c3bcd1ea52a8f0d274416caebeef39f04a65",
+        "dependencies": [
+          "io-lifetimes",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "oxrdf@0.3.4",
+      "before": {
+        "name": "oxrdf",
+        "version": "0.3.4",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "4be15186205eb60ddbdc2fb47cb25df472c7f399bbe119b68c0972b6b6dd46ea",
+        "dependencies": [
+          "oxilangtag",
+          "oxiri",
+          "oxsdatatypes",
+          "rand 0.8.8",
+          "thiserror 2.0.21"
+        ]
+      },
+      "after": {
+        "name": "oxrdf",
+        "version": "0.3.4",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "4be15186205eb60ddbdc2fb47cb25df472c7f399bbe119b68c0972b6b6dd46ea",
+        "dependencies": [
+          "oxilangtag",
+          "oxiri",
+          "oxsdatatypes",
+          "rand 0.9.5",
+          "thiserror 2.0.21"
+        ]
+      }
+    },
+    {
+      "package": "quinn-udp@0.5.15",
+      "before": {
+        "name": "quinn-udp",
+        "version": "0.5.15",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "35a133f956daabe89a61a685c2649f13d82d5aa4bd5d12d1277e1072a21c0694",
+        "dependencies": [
+          "cfg_aliases",
+          "libc",
+          "once_cell",
+          "socket2",
+          "tracing",
+          "windows-sys 0.60.2"
+        ]
+      },
+      "after": {
+        "name": "quinn-udp",
+        "version": "0.5.15",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "35a133f956daabe89a61a685c2649f13d82d5aa4bd5d12d1277e1072a21c0694",
+        "dependencies": [
+          "cfg_aliases",
+          "libc",
+          "once_cell",
+          "socket2",
+          "tracing",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "rustix@0.38.44",
+      "before": {
+        "name": "rustix",
+        "version": "0.38.44",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "fdb5bc1ae2baa591800df16c9ca78619bf65c0488b41b96ccec5d11220d8c154",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "errno",
+          "libc",
+          "linux-raw-sys 0.4.15",
+          "windows-sys 0.59.0"
+        ]
+      },
+      "after": {
+        "name": "rustix",
+        "version": "0.38.44",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "fdb5bc1ae2baa591800df16c9ca78619bf65c0488b41b96ccec5d11220d8c154",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "errno",
+          "libc",
+          "linux-raw-sys 0.4.15",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "rustix@1.1.5",
+      "before": {
+        "name": "rustix",
+        "version": "1.1.5",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "891efababe418670775f199f0d233d84843c227a0949a883ce15b37c78d6629d",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "errno",
+          "libc",
+          "linux-raw-sys 0.12.1",
+          "windows-sys 0.60.2"
+        ]
+      },
+      "after": {
+        "name": "rustix",
+        "version": "1.1.5",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "891efababe418670775f199f0d233d84843c227a0949a883ce15b37c78d6629d",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "errno",
+          "libc",
+          "linux-raw-sys 0.12.1",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "rustls-platform-verifier@0.7.0",
+      "before": {
+        "name": "rustls-platform-verifier",
+        "version": "0.7.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "26d1e2536ce4f35f4846aa13bff16bd0ff40157cdb14cc056c7b14ba41233ba0",
+        "dependencies": [
+          "core-foundation 0.10.1",
+          "core-foundation-sys",
+          "jni 0.22.4",
+          "log",
+          "once_cell",
+          "rustls",
+          "rustls-native-certs",
+          "rustls-platform-verifier-android",
+          "rustls-webpki",
+          "security-framework",
+          "security-framework-sys",
+          "webpki-root-certs",
+          "windows-sys 0.60.2"
+        ]
+      },
+      "after": {
+        "name": "rustls-platform-verifier",
+        "version": "0.7.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "26d1e2536ce4f35f4846aa13bff16bd0ff40157cdb14cc056c7b14ba41233ba0",
+        "dependencies": [
+          "core-foundation 0.10.1",
+          "core-foundation-sys",
+          "jni 0.22.4",
+          "log",
+          "once_cell",
+          "rustls",
+          "rustls-native-certs",
+          "rustls-platform-verifier-android",
+          "rustls-webpki",
+          "security-framework",
+          "security-framework-sys",
+          "webpki-root-certs",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "spareval@0.2.7",
+      "before": {
+        "name": "spareval",
+        "version": "0.2.7",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "85b51144836ff9ca2f792b7a2422c4170ff04460d86cd8f2f764cf53e339cbec",
+        "dependencies": [
+          "hex",
+          "json-event-parser",
+          "md-5",
+          "oxiri",
+          "oxrdf",
+          "oxsdatatypes",
+          "rand 0.8.8",
+          "regex",
+          "rustc-hash 2.1.3",
+          "sha1 0.11.0",
+          "sha2 0.11.0",
+          "sparesults",
+          "spargebra",
+          "sparopt",
+          "thiserror 2.0.21"
+        ]
+      },
+      "after": {
+        "name": "spareval",
+        "version": "0.2.7",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "85b51144836ff9ca2f792b7a2422c4170ff04460d86cd8f2f764cf53e339cbec",
+        "dependencies": [
+          "hex",
+          "json-event-parser",
+          "md-5",
+          "oxiri",
+          "oxrdf",
+          "oxsdatatypes",
+          "rand 0.9.5",
+          "regex",
+          "rustc-hash 2.1.3",
+          "sha1 0.11.0",
+          "sha2 0.11.0",
+          "sparesults",
+          "spargebra",
+          "sparopt",
+          "thiserror 2.0.21"
+        ]
+      }
+    },
+    {
+      "package": "spargebra@0.4.7",
+      "before": {
+        "name": "spargebra",
+        "version": "0.4.7",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "bef3c186ffb9bf2dde7c5edd5528583f309fcb819b5773cf0e313194a990304f",
+        "dependencies": [
+          "oxilangtag",
+          "oxiri",
+          "oxrdf",
+          "peg",
+          "rand 0.8.8",
+          "thiserror 2.0.21"
+        ]
+      },
+      "after": {
+        "name": "spargebra",
+        "version": "0.4.7",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "bef3c186ffb9bf2dde7c5edd5528583f309fcb819b5773cf0e313194a990304f",
+        "dependencies": [
+          "oxilangtag",
+          "oxiri",
+          "oxrdf",
+          "peg",
+          "rand 0.9.5",
+          "thiserror 2.0.21"
+        ]
+      }
+    },
+    {
+      "package": "sparopt@0.3.7",
+      "before": {
+        "name": "sparopt",
+        "version": "0.3.7",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "973ee503ab3d6c3de66b4b459233cd5b22b44dad0fb7b8d0931daf73d2ede935",
+        "dependencies": [
+          "oxrdf",
+          "rand 0.8.8",
+          "spargebra"
+        ]
+      },
+      "after": {
+        "name": "sparopt",
+        "version": "0.3.7",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "973ee503ab3d6c3de66b4b459233cd5b22b44dad0fb7b8d0931daf73d2ede935",
+        "dependencies": [
+          "oxrdf",
+          "rand 0.9.5",
+          "spargebra"
+        ]
+      }
+    },
+    {
+      "package": "tempfile@3.27.0",
+      "before": {
+        "name": "tempfile",
+        "version": "3.27.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd",
+        "dependencies": [
+          "fastrand",
+          "getrandom 0.4.3",
+          "once_cell",
+          "rustix 1.1.5",
+          "windows-sys 0.60.2"
+        ]
+      },
+      "after": {
+        "name": "tempfile",
+        "version": "3.27.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd",
+        "dependencies": [
+          "fastrand",
+          "getrandom 0.4.3",
+          "once_cell",
+          "rustix 1.1.5",
+          "windows-sys 0.52.0"
+        ]
+      }
+    },
+    {
+      "package": "winx@0.36.4",
+      "before": {
+        "name": "winx",
+        "version": "0.36.4",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "3f3fd376f71958b862e7afb20cfe5a22830e1963462f3a17f49d82a6c1d1f42d",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "windows-sys 0.59.0"
+        ]
+      },
+      "after": {
+        "name": "winx",
+        "version": "0.36.4",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "3f3fd376f71958b862e7afb20cfe5a22830e1963462f3a17f49d82a6c1d1f42d",
+        "dependencies": [
+          "bitflags 2.13.2",
+          "windows-sys 0.52.0"
+        ]
+      }
+    }
+  ],
+  "generation": "cargo update --offline -p cleromancy-core-acceptance --precise 73dccb6f7db2a49350bf1f15c93983e457351c62; then cargo update --offline -p dramatis --precise cf562f47f33ab0b6ad0db1c5ac3123775769979e",
+  "note": "Cargo generated the lock; no other package version, source revision or checksum changed. Cargo also reselected existing eligible dependency edges, enumerated here.",
+  "qualified_revision": "1cbae9acd9b4cb3470d99d29235701ffc25676ec",
+  "baseline_lock_sha256": "b9d140947c82cca090a92f1dbb829623bca399bfad0ee44649701a1eb3eb071e",
+  "qualified_lock_sha256": "8607e281b0620d23aac71bb01cc5208b4f997769b4adde1c777b9592e4151f68",
+  "matching": "Keep full name,version,source identity for every package except the sole intended Cleromancy source replacement. Do not collapse distinct Turquet revisions with the same name/version."
+}

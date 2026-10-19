@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "run",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "--",
+    "/Users/markik/Code/testing/mere/retired-decay-20261019/legacy-fixtures"
+  ],
+  "cwd": "/Users/markik/Code/testing/mere/retired-decay-20261019/legacy-writer",
+  "revision": "904d7391bf75d46c42f6c10698e90a01ab468195",
+  "started": "2026-10-19T18:22:32.865178+00:00",
+  "status_before": "",
+  "process_started": true,
+  "exit_code": 0,
+  "finished": "2026-10-19T18:23:23.987582+00:00",
+  "log_sha256": "c84081ac09bd9396c871e68989284a91261e246e60680bdb55045ac749aa0956",
+  "suites": []
+}
