@@ -975,7 +975,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         );
         let e = graph
@@ -985,7 +984,6 @@ mod tests {
                 EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::Cites,
                     label: None,
-                    decay_progress: None,
                 },
             )
             .expect("edge");
@@ -1012,7 +1010,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
         source.assert_relation(
@@ -1021,7 +1018,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
 
@@ -1830,7 +1826,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         );
         graph.assert_semantic_predicate(a, b, "https://schema.org/citation".to_string());

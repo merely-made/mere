@@ -261,7 +261,7 @@ covers its job. **Keep** means it stays, possibly re-expressed.
 | `EdgeAssertion` (write contract) | Keep, simplified | `assert(spec)` and `withdraw(id)`, the only two writes. |
 | `RelationKey` (pair-bucket handle) | Keep | Internal. Not a link id, not an assertion id. |
 | `StatementId` | Keep | The assertion id, the only member identity. |
-| `decay_progress` (written, then discarded: `edge_ops.rs`:104, snapshot constant 0.0) | Retire | Strength (view rule) and lifecycle (predicate). |
+| `decay_progress` (formerly accepted and discarded by relation writers) | Retired from current writes | Strength (view rule) and lifecycle (predicate). Historical captured-journal slots and snapshot `agent_decay_progress` readers remain compatibility data. |
 | `RelationOrigin` (deferred 2026-05-11, never built); Woodshed `RelationAuthority` {Catalog, Computed, Evidence}; forme member `Provenance`; "explicit / computed / inferred" | Subsume | One derived **origin** reading, a set: `computed` when `basis.method` is set, `evidence` when evidence or occurrences are set, `explicit` when neither is. A claim can be both computed and evidenced. Origin says how a claim arose and grants nothing; edit and withdraw rights come from the source and the predicate's retractability. The asserter tells whose. No stored origin field. |
 | `GraphScope` | Keep | Unchanged. |
 | Journal `Author {kind, id, version, via}` | Keep | Records who recorded the assertion. For Rule, Script and Engine, `id` and `version` are copied into `basis.method` at write time (ruling 5 already keeps the version). |

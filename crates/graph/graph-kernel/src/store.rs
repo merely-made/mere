@@ -94,7 +94,6 @@ mod tests {
             crate::graph::EdgeAssertion::Semantic {
                 sub_kind: crate::graph::SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
         g

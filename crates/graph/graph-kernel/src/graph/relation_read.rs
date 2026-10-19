@@ -247,7 +247,6 @@ mod tests {
                 EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::UserGrouped,
                     label: None,
-                    decay_progress: None,
                 },
             )
             .unwrap();
@@ -299,7 +298,6 @@ mod tests {
                 EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::UserGrouped,
                     label: None,
-                    decay_progress: None,
                 },
             )
             .unwrap()
@@ -337,7 +335,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
         assert_eq!(graph.projected_relations_between(a, b).count(), 1);

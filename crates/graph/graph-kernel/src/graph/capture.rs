@@ -37,6 +37,11 @@ use crate::types::{
     NodeClassification, NodeDerivation, NodeProperty,
 };
 
+mod edge_assertion_compat;
+
+#[cfg(test)]
+mod decay_compat_tests;
+
 /// The stable-id, serializable mirror of the replayable graph deltas.
 #[derive(
     Debug, Clone, PartialEq, Archive, Serialize, Deserialize, serde::Serialize, serde::Deserialize,
@@ -50,6 +55,8 @@ pub enum CapturedDelta {
     ReplayAssertRelationByIds {
         from_id: String,
         to_id: String,
+        #[serde(with = "edge_assertion_compat")]
+        #[rkyv(with = edge_assertion_compat::Rkyv)]
         assertion: EdgeAssertion,
     },
     ReplayRemoveNodeById {
@@ -1112,7 +1119,6 @@ mod tests {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: Some("next".into()),
-                decay_progress: Some(0.25),
             },
         };
         let bytes = postcard::to_allocvec(&delta).expect("encode");

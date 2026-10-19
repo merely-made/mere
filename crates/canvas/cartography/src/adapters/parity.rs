@@ -64,7 +64,6 @@ fn fixture_in_store(legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let hyperlink = || EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Hyperlink,
         label: None,
-        decay_progress: None,
     };
     let mut assert = |from, to| {
         if legacy_surface {

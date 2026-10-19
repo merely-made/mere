@@ -2367,7 +2367,6 @@ mod tests {
             assertion: kernel::graph::EdgeAssertion::Semantic {
                 sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
                 label: Some("held surface".into()),
-                decay_progress: None,
             },
         };
         replay_captured_deltas_onto(&mut baseline, [grouped(1, 2)]);
@@ -3373,7 +3372,6 @@ mod tests {
             assertion: kernel::graph::EdgeAssertion::Semantic {
                 sub_kind: kernel::graph::SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         }
     }

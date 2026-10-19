@@ -674,7 +674,6 @@ fn summary_free_read_keeps_traversal_members_without_copying_event_history() {
         kernel::graph::EdgeAssertion::Semantic {
             sub_kind: kernel::graph::SemanticSubKind::Cites,
             label: Some("exact note".into()),
-            decay_progress: None,
         },
         kernel::graph::EdgeAssertion::Containment {
             sub_kind: ContainmentSubKind::CollectionMember,

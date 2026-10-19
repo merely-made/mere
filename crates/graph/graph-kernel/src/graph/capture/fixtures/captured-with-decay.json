@@ -1,0 +1,104 @@
+[
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Semantic": {
+          "sub_kind": "Cites",
+          "label": "historical reason",
+          "decay_progress": null
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Semantic": {
+          "sub_kind": "Cites",
+          "label": "historical reason",
+          "decay_progress": 0.0
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Semantic": {
+          "sub_kind": "Cites",
+          "label": "historical reason",
+          "decay_progress": 0.25
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Semantic": {
+          "sub_kind": "Cites",
+          "label": "historical reason",
+          "decay_progress": 1.0
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Containment": {
+          "sub_kind": "UrlPath"
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Arrangement": {
+          "sub_kind": "FrameMember"
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Imported": {
+          "sub_kind": "BookmarkFolder"
+        }
+      }
+    }
+  },
+  {
+    "ReplayAssertRelationByIds": {
+      "from_id": "00000000-0000-0000-0000-000000000001",
+      "to_id": "00000000-0000-0000-0000-000000000002",
+      "assertion": {
+        "Provenance": {
+          "sub_kind": "ClippedFrom"
+        }
+      }
+    }
+  },
+  {
+    "ReplaySetNodeTitleById": {
+      "node_id": "00000000-0000-0000-0000-000000000001",
+      "title": "sentinel after old assertion fields"
+    }
+  }
+]

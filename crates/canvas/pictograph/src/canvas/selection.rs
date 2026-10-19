@@ -175,7 +175,6 @@ impl Canvas {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );
@@ -208,7 +207,6 @@ impl Canvas {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );

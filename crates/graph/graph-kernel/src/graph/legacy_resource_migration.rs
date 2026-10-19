@@ -1503,7 +1503,6 @@ mod tests {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::UserGrouped,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );
@@ -2711,7 +2710,6 @@ mod tests {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::Cites,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );
@@ -2769,7 +2767,6 @@ mod tests {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::Cites,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );

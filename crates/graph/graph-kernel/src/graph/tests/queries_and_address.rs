@@ -15,7 +15,6 @@ fn surface_group() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::UserGrouped,
         label: None,
-        decay_progress: None,
     }
 }
 
@@ -166,7 +165,6 @@ fn hop_distances_shortest_path_and_reachability_use_undirected_connectivity() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         )
         .unwrap();

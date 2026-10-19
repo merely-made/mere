@@ -5051,7 +5051,6 @@ mod tests {
         EdgeAssertion::Semantic {
             sub_kind,
             label: None,
-            decay_progress: None,
         }
     }
 

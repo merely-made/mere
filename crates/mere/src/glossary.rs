@@ -343,7 +343,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
         let m = graph_metrics(&g);

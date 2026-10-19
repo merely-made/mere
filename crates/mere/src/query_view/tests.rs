@@ -39,7 +39,6 @@ fn fixture() -> (Graph, Uuid, Uuid, Uuid) {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
             asserter_iri: "https://author.test/root".into(),
         },
@@ -53,7 +52,6 @@ fn fixture() -> (Graph, Uuid, Uuid, Uuid) {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: Some("source citation".into()),
-                decay_progress: None,
             },
             asserter_iri: "https://author.test/root".into(),
         },

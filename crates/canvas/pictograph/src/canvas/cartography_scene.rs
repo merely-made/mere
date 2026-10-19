@@ -448,7 +448,6 @@ pub fn project_canvas_subgraph(
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
     }
@@ -1010,7 +1009,6 @@ mod tests {
                 EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::Hyperlink,
                     label: None,
-                    decay_progress: None,
                 },
             );
         }

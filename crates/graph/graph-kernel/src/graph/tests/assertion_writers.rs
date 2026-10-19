@@ -28,7 +28,6 @@ fn assertion() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Cites,
         label: None,
-        decay_progress: None,
     }
 }
 

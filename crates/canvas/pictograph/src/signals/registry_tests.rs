@@ -43,7 +43,6 @@ fn parity_fixture_in_store(legacy_surface: bool) -> (Graph, Vec<NodeKey>) {
     let hyperlink = || EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Hyperlink,
         label: None,
-        decay_progress: None,
     };
     let mut assert = |from: NodeKey, to: NodeKey| {
         if legacy_surface {
@@ -494,7 +493,6 @@ fn topology_producers_combine_resource_and_surface_buckets() {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::UserGrouped,
             label: None,
-            decay_progress: None,
         },
     );
     graph.assert_relation(
@@ -503,7 +501,6 @@ fn topology_producers_combine_resource_and_surface_buckets() {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::UserGrouped,
             label: None,
-            decay_progress: None,
         },
     );
     let rings = radial_rings(&graph, keys[0]);

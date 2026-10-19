@@ -22,7 +22,6 @@ fn projected_signal_buckets_keep_surface_edges_aliases_and_numerical_parity() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         )
         .unwrap();
@@ -165,7 +164,6 @@ fn projected_signal_self_loops_keep_legacy_incident_bucket_count() {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         }],
     );
@@ -182,7 +180,6 @@ fn projected_signal_self_loops_keep_legacy_incident_bucket_count() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         )
         .unwrap();

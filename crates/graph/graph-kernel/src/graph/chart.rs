@@ -176,7 +176,6 @@ mod tests {
         cites.assert_relation(EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Cites,
             label: None,
-            decay_progress: None,
         });
         assert_eq!(
             Predicated::predicate(&cites),

@@ -360,7 +360,26 @@ fn semantic(kind: SemanticSubKind, label: &str) -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: kind,
         label: Some(label.into()),
-        decay_progress: None,
+    }
+}
+
+#[test]
+fn current_live_relation_commands_reject_the_retired_decay_field() {
+    let command = LiveCommand::AssertRelation {
+        from: Uuid::from_u128(1),
+        to: Uuid::from_u128(2),
+        assertion: semantic(SemanticSubKind::Cites, "independent reason"),
+    };
+    let current = serde_json::to_value(&command).unwrap();
+    assert!(current["AssertRelation"]["assertion"]["Semantic"]
+        .get("decay_progress")
+        .is_none());
+    assert!(serde_json::from_value::<LiveCommand>(current.clone()).is_ok());
+    for retired_value in [serde_json::Value::Null, serde_json::json!(0.25)] {
+        let mut old_command = current.clone();
+        old_command["AssertRelation"]["assertion"]["Semantic"]["decay_progress"] = retired_value;
+        let error = serde_json::from_value::<LiveCommand>(old_command).unwrap_err();
+        assert!(error.to_string().contains("decay_progress"));
     }
 }
 
@@ -819,7 +838,7 @@ fn stale_shown_binding_and_unsupported_unbound_content_refuse() {
 }
 
 #[test]
-fn placement_readonly_validator_and_invalid_commands_do_not_leak_capture() {
+fn placement_readonly_and_validator_refusals_do_not_leak_capture() {
     let (baseline, a, b) = fixture();
     let sessions = MereSessions::new(MemoryBackend::new());
     let mut unqualified = sessions.begin(Author::user(), Some(baseline.clone()));
@@ -870,29 +889,11 @@ fn placement_readonly_validator_and_invalid_commands_do_not_leak_capture() {
             checks,
         }],
     );
-    let mut checks = record_checks(session.graph(), a, true);
-    checks.extend(record_checks(session.graph(), b, true));
-    let invalid = session.edit_live_now(
-        Author::user(),
-        vec![ObservedCommand {
-            command: LiveCommand::AssertRelation {
-                from: a,
-                to: b,
-                assertion: EdgeAssertion::Semantic {
-                    sub_kind: SemanticSubKind::Cites,
-                    label: None,
-                    decay_progress: Some(f32::NAN),
-                },
-            },
-            checks,
-        }],
-    );
     kernel::graph::set_captured_delta_hook(None);
     assert!(matches!(
         refused,
         Err(LiveEditError::Session(SessionError::Validation(_)))
     ));
-    assert!(matches!(invalid, Err(LiveEditError::InvalidCommand(_))));
     assert!(seen.lock().unwrap().is_empty());
     assert_eq!(whole(session.graph()), before);
     assert_eq!(session.journal().live_cursor(), cursor);

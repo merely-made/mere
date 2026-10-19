@@ -130,7 +130,6 @@ impl Graph {
         if let EdgeAssertion::Semantic {
             sub_kind,
             label,
-            decay_progress: _,
         } = assertion
         {
             return self
@@ -646,7 +645,6 @@ impl Graph {
         if let EdgeAssertion::Semantic {
             sub_kind,
             label,
-            decay_progress: _,
         } = assertion
         {
             if !self.inner.contains_node(from) || !self.inner.contains_node(to) {

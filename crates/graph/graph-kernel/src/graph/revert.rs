@@ -1137,7 +1137,6 @@ pub(super) mod tests {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: Some("cites".into()),
-                decay_progress: None,
             },
         }
     }

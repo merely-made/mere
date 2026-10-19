@@ -68,7 +68,6 @@ fn relate(from: Uuid, to: Uuid) -> CapturedDelta {
         assertion: kernel::graph::EdgeAssertion::Semantic {
             sub_kind: kernel::graph::SemanticSubKind::Cites,
             label: None,
-            decay_progress: None,
         },
     }
 }

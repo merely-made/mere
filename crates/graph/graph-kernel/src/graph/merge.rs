@@ -185,7 +185,6 @@ mod tests {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Supports,
                 label: None,
-                decay_progress: None,
             },
         }
     }

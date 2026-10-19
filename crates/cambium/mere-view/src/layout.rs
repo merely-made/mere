@@ -71,7 +71,6 @@ pub fn lay_out(
         let link = EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         };
         assert_relation(&mut scratch, from, to, link);
     }
