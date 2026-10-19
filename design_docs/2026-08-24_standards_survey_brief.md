@@ -1167,8 +1167,8 @@ prior-art catalog. No maintainer contact or generated upstream submission is
 part of this work.
 
 **2026-10-12 inventory-policy continuation:** Stickleback now has an IO-free
-[`inventory` leaf](../crates/stickleback/src/inventory/mod.rs) and a
-[finite comparison harness](../crates/stickleback/examples/inventory_compare/README.md).
+[`inventory` leaf](https://github.com/merely-made/eidetic/tree/main/crates/stickleback/src/inventory/mod.rs) and a
+[finite comparison harness](https://github.com/merely-made/eidetic/tree/main/crates/stickleback/examples/inventory_compare/README.md).
 The retained owner announces whole-record digests, lengths and expiry; it keeps
 payload storage and eviction. The policy has 64-entry/1 MiB/16 KiB ceilings,
 eight aged peer slots, a 1 KiB control ceiling and eight bounded offers per
@@ -1178,10 +1178,10 @@ rebuilt, and saturation selects exact fallback instead of dropping fingerprints.
 Offers rotate across decisions. Read permission, authenticated peer context,
 payload retrieval and operation admission remain with the existing owners.
 
-The [selected report](../crates/stickleback/examples/inventory_compare/results/20261012/comparison.json)
+The [selected report](https://github.com/merely-made/eidetic/tree/main/crates/stickleback/examples/inventory_compare/results/20261012/comparison.json)
 contains 105 finite host runs with byte-identical independent-process replay;
-[source/toolchain provenance](../crates/stickleback/examples/inventory_compare/results/20261012/metadata.json)
-and the [grouped summary](../crates/stickleback/examples/inventory_compare/results/20261012/summary.json)
+[source/toolchain provenance](https://github.com/merely-made/eidetic/tree/main/crates/stickleback/examples/inventory_compare/results/20261012/metadata.json)
+and the [grouped summary](https://github.com/merely-made/eidetic/tree/main/crates/stickleback/examples/inventory_compare/results/20261012/summary.json)
 retain exact assumptions and raw outcomes. Eager push is compared with eager
 plus exact repair and eager plus Cuckoo/periodic exact fallback. The two shared
 receiver opportunities per round, positive repair reservation, control framing,

@@ -1,0 +1,176 @@
+{
+  "muniment": [
+    "eidetic",
+    "crates/eidetic/muniment",
+    "crates/muniment",
+    "0.1.2"
+  ],
+  "chartulary": [
+    "eidetic",
+    "crates/eidetic/chartulary",
+    "crates/chartulary",
+    "0.2.2"
+  ],
+  "eidetic": [
+    "eidetic",
+    "crates/eidetic/eidetic-core",
+    "crates/eidetic-core",
+    "0.0.2"
+  ],
+  "hagiograph": [
+    "eidetic",
+    "crates/eidetic/hagiograph",
+    "crates/hagiograph",
+    "0.0.1"
+  ],
+  "stickleback": [
+    "eidetic",
+    "crates/stickleback",
+    "crates/stickleback",
+    "0.1.1"
+  ],
+  "luggage": [
+    "eidetic",
+    "crates/system/luggage",
+    "crates/luggage",
+    "0.1.0"
+  ],
+  "mere-proofs": [
+    "eidetic",
+    "crates/system/proofs",
+    "crates/proofs",
+    "0.1.0"
+  ],
+  "servitor": [
+    "eidetic",
+    "crates/servitor",
+    "crates/servitor",
+    "0.0.2"
+  ],
+  "armillary": [
+    "armillary",
+    "crates/armillary",
+    "crates/armillary",
+    "0.1.1"
+  ],
+  "esp": [
+    "esp",
+    "crates/intel/esp",
+    "crates/esp",
+    "0.1.0"
+  ],
+  "gemot": [
+    "gemot",
+    "crates/moot/gemot",
+    "crates/gemot",
+    "0.1.1"
+  ],
+  "mooting": [
+    "gemot",
+    "crates/moot/mooting",
+    "crates/mooting",
+    "0.1.0"
+  ],
+  "mien": [
+    "gemot",
+    "crates/moot/mien",
+    "crates/mien",
+    "0.0.1"
+  ],
+  "moothold": [
+    "gemot",
+    "crates/moot/moothold",
+    "crates/moothold",
+    "0.1.0"
+  ],
+  "commons-spine": [
+    "gemot",
+    "crates/moot/commons",
+    "crates/commons",
+    "0.0.1"
+  ],
+  "errand": [
+    "errand",
+    "crates/system/errand",
+    "crates/errand",
+    "0.4.0"
+  ],
+  "dict-protocol": [
+    "errand",
+    "@smolweb/crates/dict-protocol",
+    "crates/dict-protocol",
+    "0.1.0"
+  ],
+  "finger-protocol": [
+    "errand",
+    "@smolweb/crates/finger-protocol",
+    "crates/finger-protocol",
+    "0.1.1"
+  ],
+  "fsp-protocol": [
+    "errand",
+    "@smolweb/crates/fsp-protocol",
+    "crates/fsp-protocol",
+    "0.1.0"
+  ],
+  "gemini-protocol": [
+    "errand",
+    "@smolweb/crates/gemini-protocol",
+    "crates/gemini-protocol",
+    "0.1.7"
+  ],
+  "gopher-protocol": [
+    "errand",
+    "@smolweb/crates/gopher-protocol",
+    "crates/gopher-protocol",
+    "0.2.0"
+  ],
+  "guppy-protocol": [
+    "errand",
+    "@smolweb/crates/guppy-protocol",
+    "crates/guppy-protocol",
+    "0.1.1"
+  ],
+  "kepler-protocol": [
+    "errand",
+    "@smolweb/crates/kepler-protocol",
+    "crates/kepler-protocol",
+    "0.1.0"
+  ],
+  "misfin": [
+    "errand",
+    "@smolweb/crates/misfin",
+    "crates/misfin",
+    "0.0.4"
+  ],
+  "nex-protocol": [
+    "errand",
+    "@smolweb/crates/nex-protocol",
+    "crates/nex-protocol",
+    "0.1.1"
+  ],
+  "scorpion-protocol": [
+    "errand",
+    "@smolweb/crates/scorpion-protocol",
+    "crates/scorpion-protocol",
+    "0.1.0"
+  ],
+  "scroll-protocol": [
+    "errand",
+    "@smolweb/crates/scroll-protocol",
+    "crates/scroll-protocol",
+    "0.1.0"
+  ],
+  "spartan-protocol": [
+    "errand",
+    "@smolweb/crates/spartan-protocol",
+    "crates/spartan-protocol",
+    "0.1.1"
+  ],
+  "text-protocol": [
+    "errand",
+    "@smolweb/crates/text-protocol",
+    "crates/text-protocol",
+    "0.1.0"
+  ]
+}

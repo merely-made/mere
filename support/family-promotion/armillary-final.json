@@ -1,0 +1,21 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--workspace",
+    "--locked"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\armillary",
+  "started": "2026-10-19T21:43:41.624195+00:00",
+  "finished": "2026-10-19T21:44:09.124516+00:00",
+  "exit_code": 0,
+  "results": [
+    "Blocking waiting for file lock on build directory",
+    "Finished `test` profile [unoptimized] target(s) in 27.18s",
+    "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\armillary-8fe9b6d90541c611.exe)",
+    "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on build directory\n    Finished `test` profile [unoptimized] target(s) in 27.18s\n     Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\armillary-8fe9b6d90541c611.exe)\n\nrunning 9 tests\ntest message::tests::request_ids_correlate_updates_without_defining_their_outcome ... ok\ntest boundary::tests::kernel_thread_is_zero_sized ... ok\ntest message::tests::bump_advances_monotonically_and_returns_the_new_value ... ok\ntest message::tests::generations_reject_stale_work ... ok\ntest actor::tests::dropping_the_handle_stops_the_actor ... ok\ntest actor::tests::lifecycle_span_brackets_the_run_with_the_actor_name ... ok\ntest pool::tests::runs_all_jobs_and_grows_for_concurrency ... ok\ntest actor::tests::actor_round_trips_commands_and_wakes_per_update ... ok\ntest pool::tests::reuses_a_worker_for_a_sequential_job ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s\n\n   Doc-tests armillary\n\nrunning 1 test\ntest crates\\armillary\\src\\boundary.rs - boundary::KernelThread (line 33) - compile fail ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

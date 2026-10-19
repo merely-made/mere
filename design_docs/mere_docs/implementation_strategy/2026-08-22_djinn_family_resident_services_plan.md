@@ -519,7 +519,7 @@ bounded, immutable native bytes; it cannot hand a server an arbitrary script
 or mutable editor buffer. That same read-only content contract can support
 both a Knot-owned process lifetime and a later Djinn-owned lifetime.
 
-The [author-offline publication proof](../../moothold_docs/research/2026-09-05_author_offline_publication_proof.md)
+The [author-offline publication proof](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/research/2026-09-05_author_offline_publication_proof.md)
 already demonstrated author exit, retained content, scoped peer transfer and
 ordinary Gemini reading. Its production publication/hosting record ownership
 and cross-machine acceptance are separate gates, not daemon acceptance.
@@ -663,7 +663,7 @@ control, visual Lagrange rendering, public exposure, power-loss testing or clean
 operating-system shutdown. The source files remained ordinary files throughout.
 
 Governed selective hosting follows the production records in the
-[Moot publication plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
+[Moot publication plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
 Its author-offline proof is evidence for the desired behavior, not an implemented
 Djinn service. Production revision/hosting records, historical authority,
 Persona/device binding and two-machine acceptance remain distinct gates.

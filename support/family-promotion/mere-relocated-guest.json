@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--manifest-path",
+    "ports/moot/examples/capsule-library/guest/Cargo.toml",
+    "--target",
+    "wasm32-wasip2",
+    "--locked"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-19T22:24:20.917366+00:00",
+  "finished": "2026-10-19T22:24:35.232118+00:00",
+  "exit_code": 0,
+  "results": [
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Finished `dev` profile [unoptimized] target(s) in 14.26s"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n   Compiling semver v1.0.28\n   Compiling serde v1.0.229\n   Compiling prettyplease v0.2.37\n   Compiling wit-bindgen-rust v0.58.0\n   Compiling wasmparser v0.251.0\n   Compiling serde_core v1.0.229\n   Compiling wit-bindgen-rust-macro v0.58.0\n   Compiling macro-string v0.2.0\n   Compiling zmij v1.0.23\n   Compiling wit-bindgen v0.58.0\n   Compiling serde_json v1.0.151\n    Checking memchr v2.8.3\n    Checking itoa v1.0.18\n    Checking bitflags v2.13.2\n   Compiling wasm-encoder v0.251.0\n   Compiling wit-parser v0.251.0\n   Compiling wasm-metadata v0.251.0\n   Compiling wit-bindgen-core v0.58.0\n   Compiling wit-component v0.251.0\n    Checking capsule-library-guest v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\ports\\moot\\examples\\capsule-library\\guest)\n    Finished `dev` profile [unoptimized] target(s) in 14.26s\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

@@ -1,0 +1,295 @@
+[
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\cleromancy",
+    "lock": "Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "errand",
+      "esp",
+      "finger-protocol",
+      "gemini-protocol",
+      "gopher-protocol",
+      "guppy-protocol",
+      "luggage",
+      "mere-proofs",
+      "misfin",
+      "muniment",
+      "nex-protocol",
+      "scroll-protocol",
+      "servitor",
+      "spartan-protocol",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\cleromancy",
+    "lock": "core/Cargo.lock",
+    "seeded_packages": [
+      "chartulary",
+      "muniment",
+      "servitor"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\knot-editor",
+    "lock": "Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "errand",
+      "esp",
+      "finger-protocol",
+      "gemini-protocol",
+      "gemot",
+      "gopher-protocol",
+      "guppy-protocol",
+      "luggage",
+      "mere-proofs",
+      "mien",
+      "misfin",
+      "mooting",
+      "muniment",
+      "nex-protocol",
+      "scroll-protocol",
+      "servitor",
+      "spartan-protocol",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\mer3ly",
+    "lock": "Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\mer3ly",
+    "lock": "crates/repo-graph/Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "esp",
+      "luggage",
+      "mere-proofs",
+      "muniment",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\mere",
+    "lock": "ports/distillery/probe/Cargo.lock",
+    "seeded_packages": [
+      "chartulary",
+      "eidetic",
+      "esp",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\mere",
+    "lock": "ports/distillery/probe/remote-fixture/Cargo.lock",
+    "seeded_packages": [
+      "chartulary",
+      "eidetic",
+      "esp",
+      "mere-proofs",
+      "muniment",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\mere",
+    "lock": "ports/distillery/probe/session-fixture/Cargo.lock",
+    "seeded_packages": [
+      "eidetic",
+      "esp",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\mere",
+    "lock": "ports/graphshell/web/Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "esp",
+      "gemot",
+      "luggage",
+      "mere-proofs",
+      "mien",
+      "mooting",
+      "muniment",
+      "servitor",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\retinue",
+    "lock": "apps/signalman-desktop/Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\retinue",
+    "lock": "native/Cargo.lock",
+    "seeded_packages": [
+      "luggage",
+      "mere-proofs",
+      "muniment",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\turnstone",
+    "lock": "Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "commons-spine",
+      "eidetic",
+      "errand",
+      "esp",
+      "finger-protocol",
+      "gemini-protocol",
+      "gemot",
+      "gopher-protocol",
+      "guppy-protocol",
+      "luggage",
+      "mere-proofs",
+      "mien",
+      "misfin",
+      "mooting",
+      "muniment",
+      "nex-protocol",
+      "scroll-protocol",
+      "servitor",
+      "spartan-protocol",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\woodshed",
+    "lock": "Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "esp",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\woodshed",
+    "lock": "ports/hocket/Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "luggage",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\woodshed",
+    "lock": "ports/redshank/Cargo.lock",
+    "seeded_packages": [
+      "errand",
+      "finger-protocol",
+      "gemini-protocol",
+      "gopher-protocol",
+      "guppy-protocol",
+      "misfin",
+      "nex-protocol",
+      "scroll-protocol",
+      "spartan-protocol"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\repos\\woodshed",
+    "lock": "validation/relationship-recipe/Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "esp",
+      "muniment"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\worktrees\\isocosm-family-promotion",
+    "lock": "Cargo.lock",
+    "seeded_packages": [
+      "armillary",
+      "chartulary",
+      "eidetic",
+      "gemot",
+      "hagiograph",
+      "luggage",
+      "mere-proofs",
+      "mien",
+      "mooting",
+      "muniment",
+      "servitor",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\worktrees\\isocosm-family-promotion",
+    "lock": "host/Cargo.lock",
+    "seeded_packages": [
+      "hagiograph"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\worktrees\\isocosm-family-promotion",
+    "lock": "shared/isocosm/Cargo.lock",
+    "seeded_packages": [
+      "hagiograph"
+    ],
+    "requires_cargo_validation": true
+  },
+  {
+    "root": "C:\\Users\\mark_\\Code\\worktrees\\isocosm-family-promotion",
+    "lock": "shared/wing-integration/Cargo.lock",
+    "seeded_packages": [
+      "chartulary",
+      "eidetic",
+      "hagiograph",
+      "luggage",
+      "mere-proofs",
+      "muniment",
+      "stickleback"
+    ],
+    "requires_cargo_validation": true
+  }
+]

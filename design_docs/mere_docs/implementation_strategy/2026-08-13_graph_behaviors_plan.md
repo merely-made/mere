@@ -85,14 +85,14 @@ Every site below was read this session, not recalled.
   consumer is a cursor-holding reader of this tail. Wasm-clean by its own
   module doc.
 - **The commit receipt and the consumer discipline exist.**
-  [`chartulary/src/commit.rs`](../../../crates/eidetic/chartulary/src/commit.rs):
+  [`chartulary/src/commit.rs`](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/commit.rs):
   `commit_batch(author, expected, specs) -> Committed { batch: BatchId, .. }`,
   and the test `effects_enqueue_only_after_a_commit_lands` demonstrates the
   post-commit effect pattern (effects carry the batch id, enqueue only after
   a landed commit). The nested-graph (participant world) side of triggering
   follows that discipline as designed.
 - **The gate is built.**
-  [`servitor/src/gate.rs`](../../../crates/servitor/src/gate.rs):
+  [`servitor/src/gate.rs`](https://github.com/merely-made/eidetic/tree/main/crates/servitor/src/gate.rs):
   `Gate::petition(provider, nested, subject, claimed, expected, specs)` runs
   projection-guard, authority (`AuthorityProvider::covers(subject, cap,
   Mode::Write)`), per-node scope containment, then an attributed

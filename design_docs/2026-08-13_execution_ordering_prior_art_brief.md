@@ -140,7 +140,7 @@ topology still.
 ## 3. Where it sits relative to armillary
 
 **Correction to a claim made in conversation before reading either closely.**
-Wavelet is not a counter-position to [armillary](../crates/armillary/src/lib.rs).
+Wavelet is not a counter-position to [armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary/src/lib.rs).
 They answer different questions and compose.
 
 Armillary is a thread-boundary discipline: a single-threaded host kernel owns

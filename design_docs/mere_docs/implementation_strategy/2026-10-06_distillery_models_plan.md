@@ -23,7 +23,7 @@ host's deferred execution guarantees. It owns no Burn migration (the
 no training research beyond what a phase below names.
 
 **Coordination (2026-10-11):** the
-[Eidetic development plan](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p4-build-recall-and-model-work-over-named-evidence)
+[Eidetic development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p4-build-recall-and-model-work-over-named-evidence)
 owns retained encounter/capture evidence, embedding compatibility and durable
 model-run records. Its P4 supplies the evidence contract for M2/M3 here; this
 plan keeps the inference host, work surface and supervised execution. Choose one

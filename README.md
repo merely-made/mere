@@ -12,28 +12,28 @@ built on it.
   <sub>Graphshell, Mere's reference host: a local graph arranged through the product's own search, relation, and scene controls.</sub>
 </p>
 
-## Status (2026-10-04)
+## Status (2026-10-19)
 
 Pre-release, under active development.
 
-- Cargo workspace of 100 members: 87 crates and 13 packages under `ports/`. The `mere` facade crate
-  re-exports members behind capability features (graph, linked-data, canvas,
-  workbench, query).
-- Graph canvas, chrome shell, HTML and smolweb content lanes, session
-  persistence, comms, and SPARQL query are implemented to varying degrees.
-  Peer sync, federation, and local intelligence are partially wired.
-- Milestones through 2026-08-12: mesh substrate and job leases (2026-08-09), wallet carry
-  fold-in and OTP core (2026-08-10), first mesh consumer port running over
-  real peer transport (2026-08-12).
-- Workspace version 0.0.1. A few crates are published individually
-  (muniment, chartulary, seiche, personae, stickleback); the rest set
-  `publish = false`.
-- Sibling repos genet, netrender, and retinue arrive as git dependencies, so
-  portable builds resolve published revisions. Rust pinned at 1.98.1.
+- Cargo workspace of 90 explicit members. The `mere` facade exposes graph,
+  linked-data, canvas, workbench and query capabilities.
+- Graphshell remains the complete reference graph host; Djinn supplies the local
+  resident composition. Cambium and Conatus remain platform components here.
+- [Eidetic](https://github.com/merely-made/eidetic),
+  [Armillary](https://github.com/merely-made/armillary),
+  [ESP](https://github.com/merely-made/esp),
+  [Gemot](https://github.com/merely-made/gemot) and
+  [Errand](https://github.com/merely-made/errand) are independently developed
+  suppliers. Errand continues Smolweb's protocol history and crate identities.
+  The workspace pins one immutable revision per promoted family.
+- Graph canvas, content lanes, session persistence, comms and semantic queries
+  have separate implementation and acceptance boundaries. Promotion does not
+  establish new browser, network, model or physical-device capabilities.
+- Working Rust toolchain: 1.99.1; shared declared minimum: 1.97.1.
 
-Current plans live in [`design_docs/`](design_docs/DOC_README.md): distillery
-follow-on slices, device-grant delegation, castellan sealed credentials, and
-wiring the remaining unconsumed crates into hosts.
+The [family promotion plan](design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md)
+records source ownership, independent test gates and consumer cutover status.
 
 ## Design vocabulary
 
@@ -83,8 +83,6 @@ cargo build
 cargo test
 cargo test -p mere-kernel    # single crate, by package name
 
-# Standalone graph canvas in its own window
-cargo run -p mere-canvas --features native-present --bin canvas
 ```
 
 `ports/graphshell` has no default binary; pick one explicitly (see

@@ -1,0 +1,8 @@
+{
+  "baseline_missing_headers": 658,
+  "current_missing_headers": 658,
+  "new_missing_headers": [],
+  "baseline_exhibit_b": 0,
+  "current_exhibit_b": 0,
+  "scope": "Existing whole-repository header debt; no new missing notices in this migration"
+}

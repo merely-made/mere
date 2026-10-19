@@ -21,7 +21,7 @@ Mere, across the wasm and native targets.
   brief — the compute *marketplace* (offer/ask/receipt, tessera credit, verification). Not re-solved here.
 - [persona model brief](2026-05-14_persona_model_brief.md) — persona-scoped adapters (which corpus an
   adapter trains on). The scope axis the harness reads, does not define.
-- eidetic [`models`](../../../crates/eidetic/eidetic-core/src/models/) (`ModelManifest` /
+- eidetic [`models`](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/models) (`ModelManifest` /
   `ModelComponents` / `ModelLibrary`) — content-addressed model + adapter storage. The harness loads
   from here.
 - [browser model ceiling probe](../../archive_docs/2026-10-06_completed_plans/2026-08-09_browser_model_ceiling_probe_plan.md)

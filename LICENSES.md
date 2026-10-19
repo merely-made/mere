@@ -179,3 +179,8 @@ patterns. That form is not universal: `crates/system/luggage` writes bare
 `Copyright 2019-2023 <holder>` with no parenthesised `(c)`, and was missed by
 the plan's own pattern set on 2026-08-27. Discovery should grep for
 `Copyright` unqualified, then read the hits.
+
+
+## Source promotions (2026-10-19)
+
+Luggage now lives in the Eidetic family; its derivative notices and published-grant record travel in `eidetic/LICENSES.md`. Errand now lives in the continuing Smolweb repository at `errand/LICENSES.md`, alongside the protocol crates and their retained MIT licenses. Historical paths in the rulings above describe their former Mere locations. The move changes no license grant.

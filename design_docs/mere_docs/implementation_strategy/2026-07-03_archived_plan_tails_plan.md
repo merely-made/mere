@@ -555,7 +555,7 @@ Archived as [2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md]
 - **S5's comms and sync** — carried by the
   [Murm peer runtime and Moot domain plan](./2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
   and the
-  [Moot collections plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md),
+  [Moot collections plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md),
   as the plan's Findings route them.
 - **S6's external content re-home** — routed to the scrying tile plan,
   itself archived in this pass; see its tails below.
@@ -1115,7 +1115,7 @@ Archived as [2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_pl
   disabled and opt-in, as Graphshell's policy is) — with the gate, to both
   owners.
 - **Phase 9 federation promotion and consumption** — carried by the
-  [Eidetic development plan P6](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange).
+  [Eidetic development plan P6](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange).
 - **Forget's provenance cleanup** — here.
 - **C3's excerpt, summarize and generated-node cases** — here.
 - **The plan's other open questions**: the legality policy for federating a
@@ -1388,7 +1388,7 @@ Archived as [2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md
   (muniment gained it in `9ba9f790`, defaulting to `NotTransactional`), its
   S14 question: yes, adoption requires it; or the default is acceptable for
   this backend — here, for the pass. The
-  [Eidetic development plan P6](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+  [Eidetic development plan P6](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
   now owns the consumer/backend requirements and retains this transaction
   decision as an explicit checkpoint before adoption.
 

@@ -8,7 +8,7 @@ target/
 Cargo.lock
 !/Cargo.lock
 !/crates/script/app-host/guest/Cargo.lock
-!/crates/moot/gemot/examples/capsule-library/guest/Cargo.lock
+!/ports/moot/examples/capsule-library/guest/Cargo.lock
 !/crates/script/document-host/guest/Cargo.lock
 !/crates/script/document-host/guest-bomb/Cargo.lock
 # The browser viewer's standalone workspace: a host builds the plain viewer
@@ -24,6 +24,13 @@ Cargo.lock
 /crates/probes/
 
 # Backup / swap files
+/support/family-promotion/lock-before/
+/support/family-promotion/consumer-refresh-preservation.json
+/support/family-promotion/isocosm-adoption.patch
+/support/family-promotion/isocosm-isolation.json
+/support/family-promotion/consumer-main-status.json
+/support/family-promotion/__pycache__/
+
 **/*.rs.bk
 *.swp
 *.swo

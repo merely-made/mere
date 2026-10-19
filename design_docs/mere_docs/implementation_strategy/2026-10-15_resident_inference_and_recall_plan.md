@@ -45,7 +45,7 @@ the largest model the reachable hardware can hold: in one device's memory,
 split by layer ranges across devices, or streamed layer by layer from disk.
 This is the [Distillery models plan](2026-10-06_distillery_models_plan.md)'s
 M2 (closed by I5) and the inference-surface half of the
-[Eidetic development plan](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)'s
+[Eidetic development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)'s
 P4, built once in one host.
 
 **Owns:** the djinn inference lane and its route; the bridge from the actor
@@ -65,7 +65,7 @@ processes).
 
 **Related:**
 - [Distillery models plan](2026-10-06_distillery_models_plan.md), M2 to M4
-- [Eidetic development plan](../../eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md), P4 and decision 3
+- [Eidetic development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md), P4 and decision 3
 - [Device resident consolidation plan](2026-08-20_device_resident_consolidation_plan.md), §1, §3, §4
 - [Vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md), rulings 24, 43, 48, 66, 83
 - [Graphshell reference host plan](2026-07-27_graphshell_reference_host_plan.md), §2 and §5 (inference output is a derived facet)

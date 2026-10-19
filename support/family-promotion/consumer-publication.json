@@ -1,0 +1,98 @@
+{
+  "cleromancy": {
+    "before": "73dccb6f7db2a49350bf1f15c93983e457351c62",
+    "adoption_commit": "9157c27fccc5d4d3b1eee976955762fe6c3538dc",
+    "pushed": true,
+    "files": [
+      "Cargo.lock",
+      "Cargo.toml",
+      "core/Cargo.lock",
+      "core/Cargo.toml",
+      "design_docs/DOC_README.md"
+    ]
+  },
+  "knot-editor": {
+    "before": "ceaf41fbd4075a6746c316c46cc66bce976d0546",
+    "adoption_commit": "2a4a2049d56252f477a4e3de24e1a523e0b2dd3f",
+    "pushed": true,
+    "files": [
+      "Cargo.lock",
+      "Cargo.toml",
+      "crates/knot-document/Cargo.toml",
+      "crates/knot-site/Cargo.toml"
+    ]
+  },
+  "mer3ly": {
+    "before": "f64718f53143f5a9eff044fdddf187b2ddebba62",
+    "adoption_commit": "d19cfb4537f253ea4f6fbddb2ca11703c6603549",
+    "pushed": true,
+    "files": [
+      "Cargo.lock",
+      "Cargo.toml",
+      "crates/radio-mirror/Cargo.toml",
+      "crates/repo-graph/Cargo.lock",
+      "crates/repo-graph/Cargo.toml"
+    ]
+  },
+  "retinue": {
+    "before": "7c2432ab16723daeb8119f21014a66f0a8121ff8",
+    "adoption_commit": "e678b714cbbdae40b4753dbfd91e6d761eefe1a1",
+    "pushed": true,
+    "files": [
+      "Cargo.toml",
+      "apps/signalman-desktop/Cargo.lock",
+      "apps/signalman-desktop/Cargo.toml",
+      "design_docs/2026-10-13_murm_family_move_plan.md",
+      "design_docs/DOC_README.md",
+      "native/Cargo.lock",
+      "native/Cargo.toml"
+    ]
+  },
+  "turnstone": {
+    "before": "e3e94ce198c2d129bf5d2886f6e2b70a9481db80",
+    "adoption_commit": "9c8420d5cf79848a693d67775cc1438540670e38",
+    "pushed": true,
+    "files": [
+      "Cargo.lock",
+      "Cargo.toml",
+      "design_docs/DOC_README.md"
+    ]
+  },
+  "woodshed": {
+    "before": "c26ecd204304406a6d465a7677f29359d05eb4b0",
+    "adoption_commit": "565837a44b54204ecfcc8f20543c41132d7b0736",
+    "pushed": true,
+    "files": [
+      "Cargo.lock",
+      "Cargo.toml",
+      "crates/woodshed-core/Cargo.toml",
+      "crates/woodshed-genet/Cargo.toml",
+      "crates/woodshed-graph/Cargo.toml",
+      "design_docs/DOC_README.md",
+      "ports/hocket/Cargo.lock",
+      "ports/hocket/Cargo.toml",
+      "ports/redshank/Cargo.lock",
+      "ports/redshank/Cargo.toml",
+      "validation/relationship-recipe/Cargo.lock",
+      "validation/relationship-recipe/Cargo.toml"
+    ]
+  },
+  "isocosm": {
+    "before": "d10c13847e539a3e04949d3384fa21f6e4e60fdd",
+    "adoption_commit": "c3ad4b97026f2fa54776ac9336e73fe33a32433f",
+    "pushed": true,
+    "files": [
+      "Cargo.lock",
+      "Cargo.toml",
+      "design_docs/DOC_README.md",
+      "host/Cargo.lock",
+      "host/Cargo.toml",
+      "mesocosm/Cargo.toml",
+      "shared/isocosm/Cargo.lock",
+      "shared/isocosm/Cargo.toml",
+      "shared/wing-integration/Cargo.lock",
+      "shared/wing-integration/Cargo.toml"
+    ],
+    "publication_isolated": true
+  }
+}

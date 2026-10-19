@@ -215,7 +215,7 @@ engram, set its privacy.
 
 ## 7. Athanor, the distillation daemon
 
-An [armillary](../../../crates/armillary) actor (the same off-UI-thread
+An [armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary) actor (the same off-UI-thread
 shape as fetch / sync): long-lived, low-priority, continuous. It performs memory
 consolidation in the background:
 

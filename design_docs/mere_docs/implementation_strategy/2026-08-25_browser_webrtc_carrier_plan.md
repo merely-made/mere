@@ -20,7 +20,7 @@ proof before adding public rendezvous infrastructure.
 - [net-media plan](2026-05-26_net_media_plan.md)
 - [Djinn family resident services](2026-08-22_djinn_family_resident_services_plan.md)
 - [auto-update brief](../../2026-07-22_auto-update_brief.md)
-- [Luggage current API](../../../crates/system/luggage/README.md)
+- [Luggage current API](https://github.com/merely-made/eidetic/tree/main/crates/luggage/README.md)
 
 ## 1. Ruling
 

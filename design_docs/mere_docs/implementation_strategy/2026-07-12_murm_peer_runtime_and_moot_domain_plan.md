@@ -1096,7 +1096,7 @@ protocol design.
 ### 2026-10-10: Murm's application read and exact channel addresses
 
 The Comms continuation of the
-[Moot plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10)
+[Moot plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10)
 uses the existing native Murm owner, separately from Commons' Gemot-authorized
 chat. Source inspection found that both Murm's legacy history and its Comms
 adapter sorted by asserted timestamps, and the adapter addressed only the cabal

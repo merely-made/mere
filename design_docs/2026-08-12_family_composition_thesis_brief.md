@@ -924,7 +924,7 @@ parent references and known context, including an unresolved parent outside an
 import range. Followed navigation, links contained in captured content, clipping
 provenance and computed relationships retain their different evidence meanings.
 
-The [Eidetic development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)
+The [Eidetic development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)
 owns the proposed intake and admission work with Chartulary/Stemma, Pandect,
 Inker, Fleece and ESP. It treats dependency capabilities as part of development.
 This direction does not claim that current browser intake preserves those facts
@@ -973,7 +973,7 @@ exports gathered from the applications' various runtimes. The receiving mere
 uses a declared content profile, carrying required bytes and meaningful
 relationships so supported content remains accessible with the source apps
 stopped. Format understanding and complete retained material each need a
-qualified receiving path. The [Eidetic development plan's collection gate](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+qualified receiving path. The [Eidetic development plan's collection gate](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
 now makes this outcome explicit. It preserves the existing distinction between
 portable content and live source authority; general replication remains planned.
 
@@ -1001,7 +1001,7 @@ Mark selected Knot Editor and Redshank as the forcing pair, with a real shared
 host receiving their exports. He settled these four questions in **Assess Mere
 dynamics status** (`01a122a7-f13f-7d11-af4f-0361e1b9492e`). The Eidetic/Fleece
 lane owns the profile, owner-adapter and tag design in the
-[development plan](eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#knotredshank-profile-and-owner-adapters).
+[development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#knotredshank-profile-and-owner-adapters).
 The rulings settle policy, not a wire schema or implementation receipt.
 
 1. **CP1, retained source backing.** Mark: **"Keep selected material plus private
@@ -1091,7 +1091,7 @@ of equivalent behavior in every application.
 Source inspection on 2026-10-11 supports the bounded seams, rather than a
 completed general clip system:
 
-- [`Container`](../crates/eidetic/chartulary/src/container.rs) separates identity,
+- [`Container`](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/container.rs) separates identity,
   addresses and content references, permits inline authored text and nested
   graph references. Payloads can remain outside the graph's individual nodes.
 - [`Graph`](../crates/graph/graph-kernel/src/graph/mod.rs) holds resource and
@@ -1190,9 +1190,9 @@ pass runs documentation checks and establishes no fresh runtime acceptance.
 
 | Existing contract | Established boundary |
 |---|---|
-| [Chartulary capabilities](../crates/eidetic/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](../crates/cambium/scenes/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
-| [Eidetic manifests](../crates/eidetic/eidetic-core/src/manifest.rs), [bundles](../crates/eidetic/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
-| [Schema definitions](../crates/eidetic/eidetic-core/src/schema_def.rs), [opaque facets](../crates/eidetic/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
+| [Chartulary capabilities](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/caps.rs), [reservoir index](../crates/system/pandect/src/reservoir.rs), [scene sources](../crates/cambium/scenes/sceno/src/scene.rs) | Stable domain/node identity, persona/domain-derived mere identity, and separate projected occurrence identity. These do not automatically resolve every foreign source to its current owner. |
+| [Eidetic manifests](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/manifest.rs), [bundles](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/bundle.rs), [portable content references](../crates/chirograph/src/titulus.rs) | Verified bytes, schema references, provenance/privacy metadata and composite members with required flags. Bundle member kinds remain domain vocabulary; required-member verification does not define a recursive clip export or retention policy. |
+| [Schema definitions](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/schema_def.rs), [opaque facets](https://github.com/merely-made/eidetic/tree/main/crates/chartulary/src/facet.rs), [Fleece acquisition and annotation records](../crates/fleece/src/eidetic_bridge.rs) | Versioned interpretation seams, preservation of unfamiliar facet data, and bound source/capture/canonical-text/selector evidence. Validation is distinct from another app understanding a payload. |
 | [Chirograph](../crates/chirograph/src/lib.rs), [Pandect live-view records](../crates/system/pandect/src/live_view.rs) | Advertised actions, payload schemas, scene revision checks, explicit session states and source-owned live/historical cursors. A persisted reference or advertised action supplies no grant. |
 
 The [completed Fleece/Eidetic plan](archive_docs/2026-10-11_completed_plans/2026-10-11_fleece_eidetic_capability_plan.md)
@@ -1293,7 +1293,7 @@ Resource, access and appearance identities remain distinct.
 Murm can exchange disclosed material and references; Gemot governs community
 contributions and collections that refer to that material. Contributions keep
 their own identity and context, as in the
-[Moot ownership model](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-model-and-ownership).
+[Moot ownership model](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-model-and-ownership).
 Sharing material preserves independent encounters. Authored arrangements and
 application-defined coop operations can also be shared under their own scope.
 

@@ -1,0 +1,138 @@
+[
+  {
+    "gate": "armillary-final",
+    "exit_code": 0,
+    "passed": 10,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "eidetic-independent",
+    "exit_code": 0,
+    "passed": 539,
+    "ignored": 3,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "errand-default-features",
+    "exit_code": 0,
+    "passed": 334,
+    "ignored": 1,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "errand-independent",
+    "exit_code": 0,
+    "passed": 416,
+    "ignored": 1,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "esp-canonical-decoder",
+    "exit_code": 0,
+    "passed": 198,
+    "ignored": 5,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "gemot-canonical",
+    "exit_code": 0,
+    "passed": 242,
+    "ignored": 1,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "mere-canonical-online",
+    "exit_code": 0,
+    "passed": 762,
+    "ignored": 10,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "murm-bounded-unit-sweep",
+    "exit_code": 0,
+    "passed": 169,
+    "ignored": 1,
+    "filtered": 1,
+    "kind": "tests"
+  },
+  {
+    "gate": "cleromancy-core-consumer",
+    "exit_code": 0,
+    "passed": 17,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "isocosm-domain-consumer",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  },
+  {
+    "gate": "woodshed-core-consumer",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  },
+  {
+    "gate": "knot-document-consumer",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  },
+  {
+    "gate": "mere-platform-library",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  },
+  {
+    "gate": "graphshell-browser-consumer",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  },
+  {
+    "gate": "mere-relocated-search",
+    "exit_code": 0,
+    "passed": 2,
+    "ignored": 1,
+    "filtered": 0,
+    "kind": "tests"
+  },
+  {
+    "gate": "mere-capsule-signing-feature",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  },
+  {
+    "gate": "mere-relocated-guest",
+    "exit_code": 0,
+    "passed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "kind": "compile/check"
+  }
+]

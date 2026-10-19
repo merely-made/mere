@@ -1,0 +1,16 @@
+{
+  "eidetic": [
+    "crates\\muniment\\README.md",
+    "crates\\chartulary\\README.md",
+    "crates\\stickleback\\README.md",
+    "crates\\stickleback\\examples\\inventory_compare\\README.md",
+    "crates\\luggage\\README.md",
+    "crates\\servitor\\README.md"
+  ],
+  "armillary": [
+    "crates\\armillary\\README.md"
+  ],
+  "esp": [
+    "crates\\esp\\README.md"
+  ]
+}

@@ -36,7 +36,7 @@ this is from-scratch, but the **spine already exists** and most of the early wor
 - **`GraphSnapshot`** — `Graph::to_snapshot` / `from_snapshot`
   ([graph-kernel](../../../crates/graph/graph-kernel/src/graph/snapshot/)), rkyv, already what
   session-runtime persists. The freeze/thaw primitive.
- - **The `Engram` envelope** — [eidetic-core](../../../crates/eidetic/eidetic-core/src/engram.rs) *(historical citation)* <!-- doc-audit: historical-link -->:
+ - **The `Engram` envelope** — [eidetic-core](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core/src/engram.rs) *(historical citation)* <!-- doc-audit: historical-link -->:
   `schema` / `payload` / `content_hash` / `privacy` / `provenance` / `trust` / `bounds` /
   `envelope_version`, with `Engram::new`, `id() -> ManifestId`, `verify_integrity()`. Fully built.
 - **The eidetic store, live in the host.** `eidetic::Store` (trait) + `eidetic_fjall::FjallStore`
@@ -182,7 +182,7 @@ past state crosses into slice A.
 **Code reality (verified 2026-06-24).** Exists: `GraphSnapshot` to/from (the checkpoint primitive);
 `kernel::persistence::NodeAuditEventKind` (a per-node event taxonomy: TitleChanged / Tagged / Pinned /
 Tombstoned / Restored / ..., serde + rkyv) as a partial mutation vocabulary; the **proven
- event-sourcing substrate** in `tessera` ([`gemot/src/tessera/store.rs`](../../../crates/moot/gemot/src/tessera/store.rs) *(historical citation)* <!-- doc-audit: historical-link -->,
+ event-sourcing substrate** in `tessera` ([`gemot/src/tessera/store.rs`](https://github.com/merely-made/gemot/tree/main/crates/gemot/src/tessera/store.rs) *(historical citation)* <!-- doc-audit: historical-link -->,
 a `TesseraStore` implementation) and `cable` (`murmuring/src/cable/{log_store,persistent_store}.rs`) to mirror;
 the kernel graph mutators (`Graph::add_node` / `add_node_with_id` / `remove_node` + edge / field
 methods) as the capture points; the `ViewIntent` sidecar (`session-runtime/view_intent_store.rs`:
@@ -262,7 +262,7 @@ Verification: a unit/integration test that `save → (drop) → open` round-trip
 - [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) — the dock the Alembic pane (B) joins; the Apparatus/Steward axis (D's home).
 - [memory tiers brief](../research/2026-05-11_memory_tiers_brief.md) — the prior two-tier model the seed refined to three levels (C).
 - [statement kernel brief](../technical_architecture/2026-06-19_statement_kernel_brief.md) — short/long-term vs engram framing.
-- eidetic ([eidetic-core](../../../crates/eidetic/eidetic-core/) over Muniment's [`fjall` backend](../../../crates/eidetic/muniment/src/fjall_backend.rs), moved 2026-10-11), [armillary](../../../crates/armillary/), [graph-kernel snapshot](../../../crates/graph/graph-kernel/src/graph/snapshot/).
+- eidetic ([eidetic-core](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core) over Muniment's [`fjall` backend](https://github.com/merely-made/eidetic/tree/main/crates/muniment/src/fjall_backend.rs), moved 2026-10-11), [armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary), [graph-kernel snapshot](../../../crates/graph/graph-kernel/src/graph/snapshot/).
 
 ## Progress
 
