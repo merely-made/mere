@@ -1,0 +1,125 @@
+{
+  "purpose": "Preserve donor versions while Cargo verifies the source-home changes",
+  "changes": [
+    {
+      "package": "armillary",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/armillary.git?rev=6827559937f07f78a6a830dfbfcaa54210dd093c#6827559937f07f78a6a830dfbfcaa54210dd093c"
+    },
+    {
+      "package": "chartulary",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "commons-spine",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5"
+    },
+    {
+      "package": "eidetic",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "errand",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "esp",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/esp.git?rev=a2561b0b9766a4ad4d9924c02194bb414667b9ef#a2561b0b9766a4ad4d9924c02194bb414667b9ef"
+    },
+    {
+      "package": "finger-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "gemini-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "gemot",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5"
+    },
+    {
+      "package": "gopher-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "guppy-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "hagiograph",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "luggage",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "mere-proofs",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "mien",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5"
+    },
+    {
+      "package": "misfin",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "moothold",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5"
+    },
+    {
+      "package": "mooting",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5"
+    },
+    {
+      "package": "muniment",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "nex-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "scroll-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "servitor",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    },
+    {
+      "package": "spartan-protocol",
+      "from": "registry+https://github.com/rust-lang/crates.io-index",
+      "to": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    },
+    {
+      "package": "stickleback",
+      "from": "workspace",
+      "to": "git+https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce75dd6725d72c79b829e4878c7903a381"
+    }
+  ]
+}

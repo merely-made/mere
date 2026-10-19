@@ -27,7 +27,7 @@ two peers may never be online together.
   owns the MC family (compact carriage of p2panda operations) and the MC0
   control case the spike in §7 reuses. Its warning against a second
   replication authority beneath stickleback is honoured by ruling 3.
-- Code: [`crates/stickleback/src/joined_space.rs`](../../../crates/stickleback/src/joined_space.rs)
+- Code: [`crates/stickleback/src/joined_space.rs`](https://github.com/merely-made/eidetic/tree/main/crates/stickleback/src/joined_space.rs)
   (the iroh-bound sync driver), [`murm/native/crates/transport/src/reticulum_transport.rs`](https://github.com/merely-made/murm/blob/b49df894635bac95823284efee6c445885eaf62a/native/crates/transport/src/reticulum_transport.rs)
    (the carrier), `crates/p2panda` *(historical citation)* <!-- doc-audit: historical-path --> under `Code/crates` (the fork surveyed).
 

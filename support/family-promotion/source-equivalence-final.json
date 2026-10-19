@@ -1,0 +1,9 @@
+{
+  "source_revision": "23541321599ee5e46d192f73db5a40091dd8ad6e",
+  "rust_files_verified": 301,
+  "errors": [],
+  "allowed_changes": [
+    "line-ending normalization",
+    "integration target receiving package and WIT path"
+  ]
+}

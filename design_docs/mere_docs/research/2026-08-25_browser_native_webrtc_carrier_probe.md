@@ -130,7 +130,7 @@ signaling envelopes.
 ## Release identity and adoption
 
 The release named by an invitation is a separate authority question from the
-session the invitation admits. [Luggage](../../../crates/system/luggage/README.md)
+session the invitation admits. [Luggage](https://github.com/merely-made/eidetic/tree/main/crates/luggage/README.md)
 owns it.
 
 ```rust

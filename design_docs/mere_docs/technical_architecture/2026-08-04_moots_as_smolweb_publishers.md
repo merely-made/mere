@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-04
 **Status (2026-09-04):** architecture analysis, with community-hosting clarification
-below. Execution is scoped in the [Moot plan continuation](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
+below. Execution is scoped in the [Moot plan continuation](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
 **Companion to:** carrier independence (`smolweb/design_docs/research/2026-08-04_protocol_carrier_independence.md`)
 (which handles the client direction) and the
 smolweb home decision (`smolweb/design_docs/technical_architecture/2026-08-03_smolweb_home_decision.md`).

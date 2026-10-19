@@ -1,0 +1,407 @@
+{
+  "baseline_status": {
+    "cleromancy": "",
+    "dramatis": "",
+    "emblem": "",
+    "genet": "",
+    "isocosm": "",
+    "knot-editor": "",
+    "mer3ly": "",
+    "mere": "M .gitignore\n M crates/intel/eidetic-search/Cargo.toml\n M design_docs/DOC_README.md\n M ports/moot/Cargo.toml\n?? crates/intel/eidetic-search/tests/lexical_ngram_recall.rs\n?? design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md\n?? ports/moot/examples/capsule-library.rs\n?? ports/moot/examples/capsule-library/\n?? support/family-promotion/",
+    "merely-made.github": "",
+    "mora": "",
+    "netrender": "",
+    "pipit": "",
+    "retinue": "",
+    "ringdown": "",
+    "turnstone": "",
+    "turquet": "",
+    "wavicle": "",
+    "wgpu-graft": "",
+    "wgpu-scry": "",
+    "wgpu-weld": "",
+    "woodshed": ""
+  },
+  "changes": [
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\cleromancy\\Cargo.toml",
+      "before_sha256": "29a814a6ecf4b50ada6492992e850efbc36adbd6fcefc06dca6ee9a9ceb57ec9",
+      "after_sha256": "fac0d827d3c164243bda285a7d508dc5e569de1d16ac70d8458f7d72163efa6d"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\cleromancy\\core\\Cargo.toml",
+      "before_sha256": "91228033b6eea9f58a0ae9902f6658a5cb7c064a8b758e76b0131c69dbc91b85",
+      "after_sha256": "0970223bc9bc81bb18411918fbee6920fe0a6325ae182b7fbd64347cab6f6130"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\Cargo.toml",
+      "before_sha256": "ffa09f36a56f92bf46d497dbd905d69068bfdd433f644d44da8b5e02a12522ae",
+      "after_sha256": "b3bdbd1834fea9b9234166e243a9c0050821b96fb2c008db4ca95aba8400daab"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\mesocosm\\Cargo.toml",
+      "before_sha256": "e251e95e2ad74aa8eac8863ddcebbe6cff45270c148bc0915534c512e61efee4",
+      "after_sha256": "3c7de8db843060779db1ce5867996d0170866d86d11ba803894c88e327abc023"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\shared\\isocosm\\Cargo.toml",
+      "before_sha256": "1ac56d6db6fde8234c195009c2dbaebf862ffe5af3281f7261617265464112ee",
+      "after_sha256": "96c1ef3b9ac3f4f3a54db4b6805b7481f85469140b8db216d04d19516f0d19e2"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\shared\\wing-integration\\Cargo.toml",
+      "before_sha256": "afd1714f05fe9ef0b7126ede185431601c05b0e0d811faf7ee8ff57acb062eff",
+      "after_sha256": "1a6d27b5b6c3d2c0944c3c4b30402b2ff2010ed6115b0214b76dddfc422a1122"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\Cargo.toml",
+      "before_sha256": "0d839c211a74eef2a691aecc0455d7481ecc9280557b115397e9b393fb9526ed",
+      "after_sha256": "63b5e2234002a1880f091a752cb0db9bacb7387043c97e7755cea85e7a8100df"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\crates\\knot-site\\Cargo.toml",
+      "before_sha256": "459ffc1afd34fbd464268ae287a28d9b897b2ec499b8d679c4a7ab45ddf3e2d0",
+      "after_sha256": "69a4b7ee6acbbd9bebc9b7896880a6bce6b6687c50f0902650c29a68fed46084"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\Cargo.toml",
+      "before_sha256": "2010320bbc87146086e58566ae6ce4b949e415c347f48aec4827f30d4c77dbce",
+      "after_sha256": "62bb17eb0e69afb8178567a65046df21fed63c35f966ba95c39fe20b7083ddee"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\crates\\radio-mirror\\Cargo.toml",
+      "before_sha256": "df23fa1a8ae56edea8b8d9ccbadbf8cc73996dc93044835aa5454d075b1ad4fe",
+      "after_sha256": "bc9c0c39e10930769d4bd007ce1d8efc0600974eac91ea053892765a151aeccc"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\crates\\repo-graph\\Cargo.toml",
+      "before_sha256": "b6a1297156a51a3ce079c31381c961275f8c0066474aa2d633973146471ff3bf",
+      "after_sha256": "a11437bb4e79bd2f45d5920de7eb1a84ed2d781c3252726510d8b78ebd67acad"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\Cargo.toml",
+      "before_sha256": "4a46495dbd3d61d812bb87452d86c14f5f1f58b38118d6876908ad0d270fdba9",
+      "after_sha256": "6b51556c744bcdade13342469387877939ef5a228bd10f894b3491f7cc9278ba"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\canvas\\pictograph\\Cargo.toml",
+      "before_sha256": "798d41153fb6177f1b7c679c1003be60907e4cfd381f963daefdf5b053c23fc7",
+      "after_sha256": "db8cd6cf8f97d8388d2839e9c88bf32ae3d1cd70c57c47de1a493258ce9b0271"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\conatus\\seiche\\Cargo.toml",
+      "before_sha256": "a9b3d1b3fd7d2232bae81997a125406429d6be31a03fe201dbc8fd69afa9a158",
+      "after_sha256": "5fcdbfb0cf7bf127f38c1b548ab4e5ebdd471e5fb43b6dba06c1fad2908230dd"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\intel\\eidetic-search\\Cargo.toml",
+      "before_sha256": "0bf556085cea263d5f5f73a697c62990f3bd31587c6df0670afc578c78dbb841",
+      "after_sha256": "45fe8aee9b211a5b528e409de5bff3f45832ac897952627d30490ebe972d2b25"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mesh\\mesh\\Cargo.toml",
+      "before_sha256": "61f1cea249b498966f42f97fcf028dbf03fd55ef15b82ae3e5f7825f79b74068",
+      "after_sha256": "e0942488c02050622ef28eb2fa7fbc13d81b09470a1fa3b4ca8fe9e9113c64a9"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\Cargo.toml",
+      "before_sha256": "38842c217bdda4d87b30b0eeeea44499be2f9f10a9737020c04345c9265933a7",
+      "after_sha256": "97b5a8a2cee38727013a6fc9b141ee567c790c9d6fd8e98a231e86a4e443014e"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\native-fixture\\Cargo.toml",
+      "before_sha256": "eae8d68bf7b808bf0cef970686e1005ca8cbbcf35d1eab2982893f7b53346777",
+      "after_sha256": "7847e65dc2fa1b83fdb000e8d2828559e669e07b9ce37366bef11ba8a61e58ab"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\remote-fixture\\Cargo.toml",
+      "before_sha256": "5b8f8b9a5d16d3afc14d0b921f902456524633fa26ba7e9cbac27858e1f2c31e",
+      "after_sha256": "ca12772a694ee65b91ecfd1b2efca1bf6ff9d6f379d01dc0bfe5ec8a58b0a9a8"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\session-fixture\\Cargo.toml",
+      "before_sha256": "b9192bd85670f5bc98ad5ec6d28f4f9a2befb630841d6d1fd4a9ec98d7586d71",
+      "after_sha256": "1399d64677fd4c2c097df93cab01a290e2df3378c6511c74faa3334af3b2f75f"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web\\Cargo.toml",
+      "before_sha256": "68808cca09cacd905a5b94f94eb5413a4fc88744faa7c8ad3fafabe0709c4f1e",
+      "after_sha256": "6596903e5fe27023f81c9393e676bd94f8675efb0acf1c7beed06e6bb6e7b4be"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\muniment-opfs-probe\\Cargo.toml",
+      "before_sha256": "f30e8f096c0586263442550cecf58f8f27c9a4605101f77085c78ad201ec3116",
+      "after_sha256": "186a7f237c82b73849783be1b878ba99bf1398b9f4a0faeab004930e21daecb1"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\Cargo.toml",
+      "before_sha256": "6a32b6b3e184a3a0477c83d63a296c0ac030c91731578493b78d45b9890a153f",
+      "after_sha256": "fa2d693e122d8aeab7f95942dd5040c5950c4058165e55c839a9ed52b7d4a21c"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\apps\\signalman-desktop\\Cargo.toml",
+      "before_sha256": "63cdb22716512a1c6d93d9f7ff4c56b1a6c0828dd72e4a72630f5013cdbe1e19",
+      "after_sha256": "ce4c40e805745a49dc8cd80de78db0a16163fb90be33d7f44ff6cf2aeb384a9f"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\native\\Cargo.toml",
+      "before_sha256": "5533ab1bff5da712a86aa8b36dff8b45c94b7eb3235312a685c4694ac7b0eb73",
+      "after_sha256": "542e70661aee3483935493a2f4a61005f83398a7acfa007fca2663adb8f2f668"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\turnstone\\Cargo.toml",
+      "before_sha256": "a2e68c1edde0eb1106abc72a4d12eacf2cbc0d9bf84eb94c1a5d3258179be8e6",
+      "after_sha256": "98ae1528c25c2e48484282f987415714d58a750e56f7ce4461259a25499bdb15"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\Cargo.toml",
+      "before_sha256": "f794f815e4e8f054e097093a20846178f827636ab0368245405b949a93b3582d",
+      "after_sha256": "35469fbdbc6907d22ebcfdd2b97694d9ee3059a7623d1e17c73505e59301f050"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-core\\Cargo.toml",
+      "before_sha256": "7fe0b8c06a4971e87734e10b96554f7e80da4c143b613685874da05e9b8c48dc",
+      "after_sha256": "aefd251e43832740aa3e279a18e2f802e7f79ee0ab04a2b4b44a5c52e1830a34"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-genet\\Cargo.toml",
+      "before_sha256": "dcbc5848f56415e764f71addc19082a100b913684c4a864f281fb5e757101174",
+      "after_sha256": "4bd66a7ac2228c06329cf18fcabd51be47b68a19698df9232a3cebbfda61a80e"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-graph\\Cargo.toml",
+      "before_sha256": "aa2072d95a44dd642efa063a9d3efb737b0124354301d1b98a5aa3ec88370dbd",
+      "after_sha256": "a22ada457fc21365ee145b32d5aaf0be59ea384c4062d7a841acf10c85571324"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\ports\\hocket\\Cargo.toml",
+      "before_sha256": "196dd0b9a07d78e82c6290b29b65873b3ab4fb4e9b0706b2da9e47770bb60191",
+      "after_sha256": "62ca6cbc55b23886bc93a8c2af7859f8d0917808130a38b16c2b9e34ad8421d2"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\ports\\redshank\\Cargo.toml",
+      "before_sha256": "10838db6456f8c82ad70b8bdc686b1b844b9cfba2e15e7a9e574edc5da041d76",
+      "after_sha256": "9eb57734f785a39ad8b3f3199096450f70291a62ad44b814653e1e039a4bfd38"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\validation\\relationship-recipe\\Cargo.toml",
+      "before_sha256": "373655a345af8242e63004e1f1ced96a8680715faa55e46a1a7ad4764f36cb72",
+      "after_sha256": "9d92bb1cd728f5fff9cff92f48a3ce158b32f6e15cf3e4beb27c471821243445"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\mesocosm\\Cargo.toml",
+      "before_sha256": "3c7de8db843060779db1ce5867996d0170866d86d11ba803894c88e327abc023",
+      "after_sha256": "2d71dd5adb7f981676cf5a12562440b035890654e120bfbbb2374f1a6cbc6654"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\shared\\isocosm\\Cargo.toml",
+      "before_sha256": "96c1ef3b9ac3f4f3a54db4b6805b7481f85469140b8db216d04d19516f0d19e2",
+      "after_sha256": "c4170473bbf625a7967e5a048c30f1dc35a8fde3294194c2591729720c2474e9"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\isocosm\\shared\\wing-integration\\Cargo.toml",
+      "before_sha256": "1a6d27b5b6c3d2c0944c3c4b30402b2ff2010ed6115b0214b76dddfc422a1122",
+      "after_sha256": "48f93aae65c7b43c6711bd49449fe2f9cb22cae7bfefed6c6804ff760b1159e8"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\crates\\knot-site\\Cargo.toml",
+      "before_sha256": "69a4b7ee6acbbd9bebc9b7896880a6bce6b6687c50f0902650c29a68fed46084",
+      "after_sha256": "9aacef81eab6a3c2791c214f5825c121e5b39e367f3048552c8f8f217be19d7a"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\crates\\radio-mirror\\Cargo.toml",
+      "before_sha256": "bc9c0c39e10930769d4bd007ce1d8efc0600974eac91ea053892765a151aeccc",
+      "after_sha256": "821e5704e9f210ec547694dba75cb6d53129fd2049fcf868d26d8827ba8fa1f9"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\crates\\repo-graph\\Cargo.toml",
+      "before_sha256": "a11437bb4e79bd2f45d5920de7eb1a84ed2d781c3252726510d8b78ebd67acad",
+      "after_sha256": "aa0ee43afc0fc3280e34ec83febe716dd6c9ec774cd574bddfd4b919ea965316"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\examples\\genet_web_smoke\\Cargo.toml",
+      "before_sha256": "72fdad25f691be6ee655477db6e46b427f4dc88f46f5455e21c48a790439c153",
+      "after_sha256": "e992a7ac843dc772f71548d69c974cdc442e1853745a0aa4a27b91a796112229"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\moot\\gemot\\examples\\capsule-library\\guest\\Cargo.toml",
+      "before_sha256": "d08470c7975afbf6aef4c2f3305a95c84448411bde464724dbf52bf170ae41d7",
+      "after_sha256": "c0a7ad9bea5dcf4bb6476e7251529b4ea6b90295ba680b3a6a9c18c381d479d9"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\app-host\\guest\\Cargo.toml",
+      "before_sha256": "5e33ef72dbcf9b6b56e920273ce9c909905b1691e6828382fca684b48f48c27c",
+      "after_sha256": "2670814492172e083a3ddd9edf1342f23fa5fb13ca9df3c694ae2e40735c9787"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\guest-bomb\\Cargo.toml",
+      "before_sha256": "f7d6c33b193e31122088f5dd65d423baf631e397618eafded3b77932671d1592",
+      "after_sha256": "2c07e5b0e6be78dcaa8832d340b0ddbe904e3db32d668a2a08a1a49f70fa8476"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\script\\document-host\\guest\\Cargo.toml",
+      "before_sha256": "cfbc79a22f9883039721925aaf01ffa5cada8a40f98fdd1f8f289df18215471a",
+      "after_sha256": "0b9ea147287f3728fa16713023f0997fe990df91398a87c3f786f30b23a9ca6e"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\Cargo.toml",
+      "before_sha256": "97b5a8a2cee38727013a6fc9b141ee567c790c9d6fd8e98a231e86a4e443014e",
+      "after_sha256": "96eef441023871b79920b3572fb88e0c0b10c5e5d5cfb3dcda4b045d4303c885"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\native-fixture\\Cargo.toml",
+      "before_sha256": "7847e65dc2fa1b83fdb000e8d2828559e669e07b9ce37366bef11ba8a61e58ab",
+      "after_sha256": "827ceb73c9b7489f9087ffac6f5036e5a8c297e2e4e5fc40caf85681cb0c2e1b"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\remote-fixture\\Cargo.toml",
+      "before_sha256": "ca12772a694ee65b91ecfd1b2efca1bf6ff9d6f379d01dc0bfe5ec8a58b0a9a8",
+      "after_sha256": "ad409afb29e9e2353ea2b5dd984ca7b3cc9ba455cd2ccf9bb060dbc2513aad96"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\repros\\burn_browser_embedding\\Cargo.toml",
+      "before_sha256": "49d1e024e3ef1631f72c7ef986cf320458cef2f06cc8e7d44ad5df4d896aab5a",
+      "after_sha256": "418d280b41c538fec9904513451ef86c8f61a9e9c92fdac89d28b05dae5bac3c"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\repros\\cubek_browser_extrema\\Cargo.toml",
+      "before_sha256": "6083b1f15d55f9045210c0771fe2c90d12e8480b02e015317d212a3c02648749",
+      "after_sha256": "d8483abce25eb1fcbe24d95f1e9de0565b6ec5bd2d32507bb7193e36789ccd1d"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\distillery\\probe\\session-fixture\\Cargo.toml",
+      "before_sha256": "1399d64677fd4c2c097df93cab01a290e2df3378c6511c74faa3334af3b2f75f",
+      "after_sha256": "efcd36508c6fa336e9e47093cc6e38d8aca0374d081c206759263d576bbc6ca1"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\web\\Cargo.toml",
+      "before_sha256": "6596903e5fe27023f81c9393e676bd94f8675efb0acf1c7beed06e6bb6e7b4be",
+      "after_sha256": "55257c7835e707d06f9102316e3f0746edaf14e7352bddb68f34f8d6a845bcf2"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\muniment-opfs-probe\\Cargo.toml",
+      "before_sha256": "186a7f237c82b73849783be1b878ba99bf1398b9f4a0faeab004930e21daecb1",
+      "after_sha256": "d305ce06d25accd8e9d11643cd2bbc075adcecc9e331f8bcaf5ed6b34e05815e"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\apps\\signalman-desktop\\Cargo.toml",
+      "before_sha256": "ce4c40e805745a49dc8cd80de78db0a16163fb90be33d7f44ff6cf2aeb384a9f",
+      "after_sha256": "b034ea9181536f34c89a7df5304fc436007e8315bb864ac7f0efb91d59ac1ea6"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\native\\Cargo.toml",
+      "before_sha256": "542e70661aee3483935493a2f4a61005f83398a7acfa007fca2663adb8f2f668",
+      "after_sha256": "63dfff03b6b9e0931b876aa34c77b20c2a22d1b094ed4a306e1892c6a0aa37fa"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\ports\\hocket\\Cargo.toml",
+      "before_sha256": "62ca6cbc55b23886bc93a8c2af7859f8d0917808130a38b16c2b9e34ad8421d2",
+      "after_sha256": "4c6fe358e44d55f024ad5c043e39b39a62d0e851690d125a539bdf5f151317ab"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\ports\\redshank\\Cargo.toml",
+      "before_sha256": "9eb57734f785a39ad8b3f3199096450f70291a62ad44b814653e1e039a4bfd38",
+      "after_sha256": "3b76dfe1a88cc323470aa35bb9b0f9b2182af6de99a351db2b070b1516e61992"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\validation\\relationship-recipe\\Cargo.toml",
+      "before_sha256": "9d92bb1cd728f5fff9cff92f48a3ce158b32f6e15cf3e4beb27c471821243445",
+      "after_sha256": "e1423f20a73a9cddd54874c44c742acc07b67f8bb916a5ff7a0f7d4df15ddb67"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\cleromancy\\Cargo.toml",
+      "before_sha256": "29a814a6ecf4b50ada6492992e850efbc36adbd6fcefc06dca6ee9a9ceb57ec9",
+      "after_sha256": "fac0d827d3c164243bda285a7d508dc5e569de1d16ac70d8458f7d72163efa6d"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\cleromancy\\core\\Cargo.toml",
+      "before_sha256": "91228033b6eea9f58a0ae9902f6658a5cb7c064a8b758e76b0131c69dbc91b85",
+      "after_sha256": "0970223bc9bc81bb18411918fbee6920fe0a6325ae182b7fbd64347cab6f6130"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\Cargo.toml",
+      "before_sha256": "610d2f62b10ab98a7fcde576d648f7e304d5d680fc266ec7603435cfa9af0b6f",
+      "after_sha256": "b5f9f80db3c39a7e59c3d024ae5dffe8c4a2b33e6d938b10db7c9b040031818c"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\crates\\knot-document\\Cargo.toml",
+      "before_sha256": "4bd781ac6a9a7972a62756e7f2496c4362886536b2304e63bdba05ef04588b81",
+      "after_sha256": "c9f8e1852b716b582dec6b7339b16bca89d8f3799d59223aee9b7f68cc2a4901"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\crates\\knot-site\\Cargo.toml",
+      "before_sha256": "e0ddadc09c3498726b5adce1bec13b7fb3a0b8ebfd3ec68d9937e1e05b804851",
+      "after_sha256": "837f9a2fd41bb04d3f404fd41b03ad4ffeed4f691894fcc708cf4e97f826337f"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\Cargo.toml",
+      "before_sha256": "2010320bbc87146086e58566ae6ce4b949e415c347f48aec4827f30d4c77dbce",
+      "after_sha256": "62bb17eb0e69afb8178567a65046df21fed63c35f966ba95c39fe20b7083ddee"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\crates\\radio-mirror\\Cargo.toml",
+      "before_sha256": "df23fa1a8ae56edea8b8d9ccbadbf8cc73996dc93044835aa5454d075b1ad4fe",
+      "after_sha256": "821e5704e9f210ec547694dba75cb6d53129fd2049fcf868d26d8827ba8fa1f9"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mer3ly\\crates\\repo-graph\\Cargo.toml",
+      "before_sha256": "0fb1586d9dc52edf8f510f72aa4f92068addcfb6db8fbe281657d11c63543944",
+      "after_sha256": "9aa05481135931d07731d47cf3c1e508bdce832420357ac615a4f3b0775010c7"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\Cargo.toml",
+      "before_sha256": "05b6f76c349535629e165a1b5ae0b231a875f99712e4c23d83cc88af3677c84b",
+      "after_sha256": "88efbb115f621ee8d19cfa5919e99585c65f9bf60b713ef50982fc26daf9dfae"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\apps\\signalman-desktop\\Cargo.toml",
+      "before_sha256": "63cdb22716512a1c6d93d9f7ff4c56b1a6c0828dd72e4a72630f5013cdbe1e19",
+      "after_sha256": "b034ea9181536f34c89a7df5304fc436007e8315bb864ac7f0efb91d59ac1ea6"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\retinue\\native\\Cargo.toml",
+      "before_sha256": "5533ab1bff5da712a86aa8b36dff8b45c94b7eb3235312a685c4694ac7b0eb73",
+      "after_sha256": "63dfff03b6b9e0931b876aa34c77b20c2a22d1b094ed4a306e1892c6a0aa37fa"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\turnstone\\Cargo.toml",
+      "before_sha256": "47d32ad53c52437176b8c90c42caac37ffc075c0edebbb99c6e9de76c98e3f15",
+      "after_sha256": "94b00431490492bf1d7ec52aaaf6cfa2606c879097476b70ba6a6d8e00b27b0a"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\Cargo.toml",
+      "before_sha256": "a64e956b8f2ca79e0cb85b667d2d8816fe0599bd76c99cca2f7092e5bdbdefad",
+      "after_sha256": "e4d3bf0a887f0664d6e610382866a91f3780dbeaae31753af15da35323a7d507"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-core\\Cargo.toml",
+      "before_sha256": "3230295b900cab23ad73240f1141e093744afbb24e1f047244911b4e892d47c6",
+      "after_sha256": "40003d70425aaa743524dc7d28427da6ab61e8f9bc9a0c222ec4a26e33316a5e"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-genet\\Cargo.toml",
+      "before_sha256": "a13f3b6ea8eb66b038ff268c7222939c63a355fdc78068b67c30b11474514bfd",
+      "after_sha256": "c2ba7fee003e275992c41596e850409f47cac917e10943866d56b658c7f42230"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-graph\\Cargo.toml",
+      "before_sha256": "aa2072d95a44dd642efa063a9d3efb737b0124354301d1b98a5aa3ec88370dbd",
+      "after_sha256": "a22ada457fc21365ee145b32d5aaf0be59ea384c4062d7a841acf10c85571324"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\ports\\hocket\\Cargo.toml",
+      "before_sha256": "865d704f2265f7f4f6145dc23571dbec56873e9082662a6faba47deb71443fa6",
+      "after_sha256": "f2912696f0b57a09565cf41d8610b2aa8c6965082f5c00b9118004ef96583aa0"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\ports\\redshank\\Cargo.toml",
+      "before_sha256": "10838db6456f8c82ad70b8bdc686b1b844b9cfba2e15e7a9e574edc5da041d76",
+      "after_sha256": "3b76dfe1a88cc323470aa35bb9b0f9b2182af6de99a351db2b070b1516e61992"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\validation\\relationship-recipe\\Cargo.toml",
+      "before_sha256": "7f613cb50f21b756478b9aa8196aed08dba7251a6a1726c8558f4d0d4f2e6ce8",
+      "after_sha256": "bbf61b12299e259cb9d1a7282bbba61c7ccbada47533c53c1f11caec9ca8c6e2"
+    }
+  ]
+}

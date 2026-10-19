@@ -1,0 +1,26 @@
+{
+  "source_revision": "23541321599ee5e46d192f73db5a40091dd8ad6e",
+  "verified_unchanged_files": 395,
+  "removed_paths": [
+    "crates/armillary",
+    "crates/eidetic/chartulary",
+    "crates/eidetic/eidetic-core",
+    "crates/eidetic/hagiograph",
+    "crates/eidetic/muniment",
+    "crates/intel/esp",
+    "crates/moot/commons",
+    "crates/moot/gemot",
+    "crates/moot/mien",
+    "crates/moot/moothold",
+    "crates/moot/mooting",
+    "crates/servitor",
+    "crates/stickleback",
+    "crates/system/errand",
+    "crates/system/luggage",
+    "crates/system/proofs"
+  ],
+  "documentation_areas": [
+    "eidetic_docs",
+    "armillary_docs"
+  ]
+}

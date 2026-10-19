@@ -1,0 +1,12 @@
+{
+  "rust_files_verified": 301,
+  "errors": [
+    "changed crates/moot/gemot/examples/capsule-library/model.rs",
+    "changed crates/moot/gemot/examples/capsule-library/native.rs"
+  ],
+  "allowed_changes": [
+    "integration target location, command name and receiving-host identity alias",
+    "manifest metadata and explicit test feature requirements",
+    "documentation links and ownership"
+  ]
+}

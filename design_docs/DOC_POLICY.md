@@ -157,8 +157,8 @@ added, moved, or archived; the command must report full current-path coverage.
 
 ### Area roots
 
-Corrected 2026-08-24. The previous list named `platen_docs/`, which has never
-existed, and omitted `eidetic_docs/`, which does.
+Updated 2026-10-19 after the foundation family promotion. Eidetic, Armillary
+and community governance documentation now live with their owning repositories.
 
 ```
 mere/design_docs/
@@ -167,17 +167,13 @@ mere/design_docs/
 ├── TERMINOLOGY.md                 ← canonical terms
 ├── YYYY-MM-DD_<keyword>_brief.md  ← cross-cutting briefs
 ├── mere_docs/                     ← product-level concerns
-├── armillary_docs/                ← the armillary crate
 ├── cambium_docs/                  ← the Cambium desktop-host/scene family
 │                                     (Meristem, Cambium, Sprigging, Workbench)
 ├── dramatis_docs/                 ← castellan's custody (vault lock, Secret
 │                                     Service); the tier itself is in dramatis
-├── eidetic_docs/                  ← the memory stack (Eidetic codicils,
-│                                     muniment journals, chartulary + RDF)
 ├── inker_docs/                    ← the engine controller (inker,
 │                                     document-canvas, the engine adapters)
-├── intel_docs/                    ← embedding and inference (esp)
-├── moothold_docs/                 ← community / federation
+├── intel_docs/                    ← Mere inference integrations (Vates, Sibylla)
 ├── murm_docs/                     ← bilateral comms
 ├── nematic_docs/                  ← the smolweb engine and knot composition
 │                                     (nematic, illume, errand)
@@ -273,3 +269,10 @@ When pulling a donor doc's content into a mere doc:
 - **Mere** — product name (humble; "merely a browser!")
 - **Merely** — parent brand layer (adopted 2026-07-09, was Strophos; confirmed 2026-07-10 after a challenge round, see the lexicon brief's naming history). GitHub org **merely-made**, registered 2026-07-10 (bare `merely` taken).
 - **Crate names**: `mere`, `graphshell`, `verso-tile` (folded into `inker::flip` 2026-09-05; the crates.io name is retired), `inker`, `platen`, `nematic`, `murm`, `murmuring`, `moothold`, `mooting` (all reserved on crates.io 2026-05-04); `eidetic` (2026-05-07), `illume` (2026-06-27), `armillary` (2026-07-03) published at 0.0.x from the workspace; `errand` 0.1.0 published 2026-07-04 from its standalone repo (0.1.1/0.1.2 same day: guppy, then spartan/nex/misfin-send, delegated to the spec crates). Three smolweb protocol crates published 2026-07-04 from standalone repos, misfin-shaped, MIT: `spartan-protocol`, `nex-protocol`, `guppy-protocol` (bare names taken by unrelated projects; qualified per ecosystem convention). `misfin` promoted 2026-07-03 to the standalone [mark-ik/misfin](https://github.com/mark-ik/misfin) repo (spec-complete; name held in stewardship, transfers to the protocol author on request; 0.0.2/0.0.3 published 2026-07-04, MIT; 0.0.3 adds selectable TLS providers). `servitor` reserved 2026-07-17 (0.0.1 placeholder now lives at `crates/servitor`, MIT/Apache; the resident-helper unit per the participant gate + packs plan). `forme` was lost to an unrelated claimant (2026-02) — needs a new name if ever published.
+
+**Foundation documentation moved on 2026-10-19.** Ten Eidetic documents, the
+Armillary founding proposal, and four community authority/publication documents
+with their retained proof receipt followed the code into Eidetic, Armillary and
+Gemot. Mere keeps application integration plans and links to those owners. The
+[family promotion record](mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md)
+records the source cutover and validation boundaries.

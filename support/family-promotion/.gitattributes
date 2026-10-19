@@ -1,0 +1,7 @@
+# Keep provenance and preservation artifacts byte-exact across checkouts.
+*.json -text whitespace=cr-at-eol
+*.patch -text -whitespace
+source-workspace.toml -text -whitespace
+source-Cargo.lock -text -whitespace
+lock-before/** -text -whitespace
+*.py text eol=lf

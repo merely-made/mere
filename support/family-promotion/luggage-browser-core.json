@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "luggage",
+    "--no-default-features",
+    "--target",
+    "wasm32-unknown-unknown"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\eidetic",
+  "started": "2026-10-19T21:44:09.280705+00:00",
+  "finished": "2026-10-19T21:44:17.220429+00:00",
+  "exit_code": 0,
+  "results": [
+    "Finished `dev` profile [unoptimized] target(s) in 7.84s"
+  ],
+  "diagnostic_tail": "warning: patch `p2panda-auth v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph\nhelp: Check that the patched package version and available features are compatible\n      with the dependency requirements. If the patch has a different version from\n      what is locked in the Cargo.lock file, run `cargo update` to use the new\n      version. This may also occur with an optional dependency that is not enabled.\n    Checking stable_deref_trait v1.2.1\n    Checking litemap v0.8.3\n    Checking writeable v0.6.4\n   Compiling syn v3.0.6\n    Checking utf8_iter v1.0.4\n   Compiling icu_properties_data v2.3.0\n   Compiling icu_normalizer_data v2.3.0\n   Compiling serde_core v1.0.229\n    Checking smallvec v1.16.1\n   Compiling serde v1.0.229\n   Compiling zmij v1.0.23\n   Compiling syn v2.0.119\n    Checking percent-encoding v2.3.2\n    Checking form_urlencoded v1.2.2\n   Compiling thiserror v1.0.69\n   Compiling serde_json v1.0.151\n   Compiling synstructure v0.14.0\n    Checking itoa v1.0.18\n    Checking powerfmt v0.2.0\n    Checking time-core v0.1.9\n    Checking num-conv v0.2.2\n    Checking deranged v0.5.8\n    Checking memchr v2.8.3\n   Compiling zerofrom-derive v0.1.8\n   Compiling yoke-derive v0.8.3\n   Compiling zerovec-derive v0.11.6\n   Compiling displaydoc v0.2.7\n    Checking zerofrom v0.1.8\n   Compiling serde_derive v1.0.229\n    Checking yoke v0.8.3\n   Compiling thiserror-impl v1.0.69\n    Checking zerovec v0.11.8\n    Checking zerotrie v0.2.5\n    Checking time v0.3.55\n    Checking tinystr v0.8.4\n    Checking icu_locale_core v2.3.0\n    Checking potential_utf v0.1.6\n    Checking icu_collections v2.3.0\n    Checking icu_provider v2.3.1\n    Checking icu_normalizer v2.3.0\n    Checking icu_properties v2.3.0\n    Checking semver v1.0.28\n    Checking idna_adapter v1.2.2\n    Checking idna v1.1.0\n    Checking url v2.5.8\n    Checking luggage v0.1.0 (C:\\Users\\mark_\\Code\\repos\\eidetic\\crates\\luggage)\n    Finished `dev` profile [unoptimized] target(s) in 7.84s\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "mere-moot",
+    "--example",
+    "capsule-library"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-19T22:29:17.366944+00:00",
+  "finished": "2026-10-19T22:29:50.891638+00:00",
+  "exit_code": 0,
+  "results": [
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Finished `test` profile [unoptimized] target(s) in 33.16s",
+    "Running unittests examples\\capsule-library.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\examples\\capsule_library-3a2686972b3e340a.exe)",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on package cache\nwarning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce)` was not used in the crate graph\nwarning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9)` was not used in the crate graph\nwarning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce)` was not used in the crate graph\nwarning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9)` was not used in the crate graph\nwarning: patch `dict-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `fsp-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce)` was not used in the crate graph\nwarning: patch `kepler-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=6a5023a9ca478ebcc342dd9b7c9e418ccacfc6b5#6a5023a9)` was not used in the crate graph\nwarning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph\nwarning: patch `scorpion-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `text-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nhelp: Check that the patched package version and available features are compatible\n      with the dependency requirements. If the patch has a different version from\n      what is locked in the Cargo.lock file, run `cargo update` to use the new\n      version. This may also occur with an optional dependency that is not enabled.\n    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n   Compiling eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=de6b1dce75dd6725d72c79b829e4878c7903a381#de6b1dce)\n   Compiling mere-moot v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\ports\\moot)\n    Finished `test` profile [unoptimized] target(s) in 33.16s\n     Running unittests examples\\capsule-library.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\examples\\capsule_library-3a2686972b3e340a.exe)\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

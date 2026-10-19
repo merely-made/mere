@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "mere-kernel",
+    "-p",
+    "seiche",
+    "-p",
+    "graphshell-client",
+    "--lib"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-19T21:49:49.627195+00:00",
+  "finished": "2026-10-19T21:53:59.715946+00:00",
+  "exit_code": 4294967295,
+  "results": [
+    "Updating git repository `https://github.com/merely-made/armillary.git`",
+    "Updating git repository `https://github.com/merely-made/eidetic.git`",
+    "Updating git repository `https://github.com/merely-made/gemot.git`",
+    "Updating git repository `https://github.com/merely-made/errand.git`",
+    "Updating git repository `https://github.com/merely-made/esp.git`",
+    "Updating git repository `https://github.com/merely-made/genet.git`"
+  ],
+  "diagnostic_tail": "    Updating git repository `https://github.com/merely-made/armillary.git`\n    Updating git repository `https://github.com/merely-made/eidetic.git`\n    Updating git repository `https://github.com/merely-made/gemot.git`\n    Updating git repository `https://github.com/merely-made/errand.git`\n    Updating git repository `https://github.com/merely-made/esp.git`\n    Updating git repository `https://github.com/merely-made/genet.git`\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

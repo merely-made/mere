@@ -374,7 +374,7 @@ deferred field physics or the layout-lock gesture.
 Moot's capsule-library proof is now on published main (`f22205e4e`, followed by
 `0792da6a9` and `3055ae5af` integration fixes), with an opt-in applet mount in
 `web_tree.rs` and `web_tree/applet.rs`. Its canonical
-continuation is the [Moot plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09).
+continuation is the [Moot plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#capsule-library-composition-proof-2026-10-09).
 Site Rulings 161–162 supersede R160: the nested branch adapts its groups to
 `sceno::Fold`, and the site lane owns `web_tree*`, `host_dataset_view.rs` and
 `web_dataset.rs` during cutover. The branch owner, Moot and the editor S2/B1

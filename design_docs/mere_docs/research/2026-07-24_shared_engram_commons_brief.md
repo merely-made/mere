@@ -7,7 +7,7 @@ Names what a communal graph actually requires and the two decisions the note
 originally found unowned. Both decisions are now answered by executable
 receipts and the [Commons profile](../design/2026-07-27_commons_profile_v1.md).
 
-**2026-09-04 continuation:** the [Moot implementation plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04)
+**2026-09-04 continuation:** the [Moot implementation plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04)
 now scopes captured collections, author-offline community publishing, application
 co-op, and addressed mesh delivery. First gate: an independent volunteer retains a
 signed publication, restarts, and serves a fresh reader while its author is offline.

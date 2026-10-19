@@ -66,7 +66,7 @@ remain behind the default `projection` feature; those placeholders do not
 establish a working inspection interface.
 [Alembic](../../../crates/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
-[Armillary](../../../crates/armillary/README.md) owns actor execution and messaging.
+[Armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary/README.md) owns actor execution and messaging.
 
 Products retain state, permissions, operation completion, persistence, redaction
 and actionable controls. Genet owns computed DOM accessibility semantics; hosts
@@ -111,7 +111,7 @@ unique. Wall clocks do not establish causality. Keep source time, source boot,
 host receipt time and monotonic elapsed time distinct; unavailable values stay
 unavailable. Object, revision and causal links exist only when the producer supplies
 them; absent correlation is explicit, never inferred from timing or matching text.
-[Armillary correlation](../../../crates/armillary/src/message.rs)
+[Armillary correlation](https://github.com/merely-made/armillary/tree/main/crates/armillary/src/message.rs)
 can map into these references without making actors mandatory.
 
 Redshank illustrates why these boundaries matter: its playback worker replaces

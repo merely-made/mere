@@ -1,0 +1,65 @@
+[
+  {
+    "repo": "cleromancy",
+    "before": "6c4c4ecc36c54dfcc172b244d2a479ab1a3865a8",
+    "after": "73dccb6f7db2a49350bf1f15c93983e457351c62",
+    "preserved_files": {
+      "Cargo.toml": "fac0d827d3c164243bda285a7d508dc5e569de1d16ac70d8458f7d72163efa6d",
+      "core/Cargo.toml": "0970223bc9bc81bb18411918fbee6920fe0a6325ae182b7fbd64347cab6f6130"
+    }
+  },
+  {
+    "repo": "knot-editor",
+    "before": "e944fca1def7be96ce7528beecf6b4192cf0a473",
+    "after": "ceaf41fbd4075a6746c316c46cc66bce976d0546",
+    "preserved_files": {
+      "Cargo.toml": "63b5e2234002a1880f091a752cb0db9bacb7387043c97e7755cea85e7a8100df",
+      "crates/knot-site/Cargo.toml": "9aacef81eab6a3c2791c214f5825c121e5b39e367f3048552c8f8f217be19d7a"
+    }
+  },
+  {
+    "repo": "mer3ly",
+    "before": "c94e7dd6d3e4923674b3be767dc709e78dbc7abb",
+    "after": "f64718f53143f5a9eff044fdddf187b2ddebba62",
+    "preserved_files": {
+      "Cargo.toml": "62bb17eb0e69afb8178567a65046df21fed63c35f966ba95c39fe20b7083ddee",
+      "crates/radio-mirror/Cargo.toml": "821e5704e9f210ec547694dba75cb6d53129fd2049fcf868d26d8827ba8fa1f9",
+      "crates/repo-graph/Cargo.toml": "aa0ee43afc0fc3280e34ec83febe716dd6c9ec774cd574bddfd4b919ea965316"
+    }
+  },
+  {
+    "repo": "retinue",
+    "before": "9477ad5562ba4d132332c844fbfb7a1cc80bb29a",
+    "after": "7c2432ab16723daeb8119f21014a66f0a8121ff8",
+    "preserved_files": {
+      "Cargo.toml": "fa2d693e122d8aeab7f95942dd5040c5950c4058165e55c839a9ed52b7d4a21c",
+      "apps/signalman-desktop/Cargo.toml": "b034ea9181536f34c89a7df5304fc436007e8315bb864ac7f0efb91d59ac1ea6",
+      "design_docs/2026-10-13_murm_family_move_plan.md": "b305a4164f13ea306b585cdbafe0599e5d645e3d2c22b9a15f9ae6bcd4cf9d11",
+      "design_docs/DOC_README.md": "0ed16e33fd40ecd89cccbf92ea2df658cac20732b6193446228bf6f10646a934",
+      "native/Cargo.lock": "bc2e03fada1adde600aaee5adb225c2919c4279a2d4a2e2f293f1742f7a34d63",
+      "native/Cargo.toml": "63dfff03b6b9e0931b876aa34c77b20c2a22d1b094ed4a306e1892c6a0aa37fa"
+    }
+  },
+  {
+    "repo": "turnstone",
+    "before": "aaad30d67abc2b7454e70d33e9a84527d28f6f1e",
+    "after": "e3e94ce198c2d129bf5d2886f6e2b70a9481db80",
+    "preserved_files": {
+      "Cargo.toml": "98ae1528c25c2e48484282f987415714d58a750e56f7ce4461259a25499bdb15"
+    }
+  },
+  {
+    "repo": "woodshed",
+    "before": "c08ab27a150f284264c3500c8250bd48f8c50232",
+    "after": "c26ecd204304406a6d465a7677f29359d05eb4b0",
+    "preserved_files": {
+      "Cargo.toml": "35469fbdbc6907d22ebcfdd2b97694d9ee3059a7623d1e17c73505e59301f050",
+      "crates/woodshed-core/Cargo.toml": "aefd251e43832740aa3e279a18e2f802e7f79ee0ab04a2b4b44a5c52e1830a34",
+      "crates/woodshed-genet/Cargo.toml": "4bd66a7ac2228c06329cf18fcabd51be47b68a19698df9232a3cebbfda61a80e",
+      "crates/woodshed-graph/Cargo.toml": "a22ada457fc21365ee145b32d5aaf0be59ea384c4062d7a841acf10c85571324",
+      "ports/hocket/Cargo.toml": "4c6fe358e44d55f024ad5c043e39b39a62d0e851690d125a539bdf5f151317ab",
+      "ports/redshank/Cargo.toml": "3b76dfe1a88cc323470aa35bb9b0f9b2182af6de99a351db2b070b1516e61992",
+      "validation/relationship-recipe/Cargo.toml": "e1423f20a73a9cddd54874c44c742acc07b67f8bb916a5ff7a0f7d4df15ddb67"
+    }
+  }
+]

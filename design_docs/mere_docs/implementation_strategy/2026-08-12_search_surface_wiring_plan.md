@@ -65,7 +65,7 @@ anchor embed's lib.rs cites).
   text enters through the host, never through the search crate. See W6.
 - **W6 — restore page text, rank by behaviour, key by content (ruled
   2026-09-07 by Mark on the
-  [lighter recall brief](../../eidetic_docs/research/2026-09-07_lighter_recall_and_standards_ledger_brief.md)).**
+  [lighter recall brief](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/research/2026-09-07_lighter_recall_and_standards_ledger_brief.md)).**
   Four slices, in this order:
   - **W6a — measure.** Instrument turnstone's `RecallIndex::mint` to report
     trace and event counts, corpus bytes, and lexical and vector mint
@@ -400,7 +400,7 @@ store, not fixtures only.
   says so. W4 remains an independent canvas-field lane.
 
 - **2026-09-07 — W6 ruled.** Mark answered the six questions of the
-  [lighter recall brief](../../eidetic_docs/research/2026-09-07_lighter_recall_and_standards_ledger_brief.md)
+  [lighter recall brief](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/research/2026-09-07_lighter_recall_and_standards_ledger_brief.md)
   yes: measure before choosing the engine, frecency before the engine
   change, restore body text as a stated slice (C5 was lost with meerkat, not
   decided against), found one UAX #29 segmenter in genet, found the
