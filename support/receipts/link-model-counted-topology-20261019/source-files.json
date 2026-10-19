@@ -1,0 +1,126 @@
+{
+  "source_revision": "cfbf750df45a1975c14eaedfd4082510150598b8",
+  "tree": "dc481b3ce84ed19c5bba755834e511994e5878ca",
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "b9d140947c82cca090a92f1dbb829623bca399bfad0ee44649701a1eb3eb071e"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "e08aa6796b2fdea7ba8a7e42238020ab60a7ed863cd0a5b40066c3561867102f"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas.rs",
+      "sha256": "ce2fc62a9b70f351215a1dea6ecadb11527d449c8bf8562104fe831d0975339e"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/build_tests.rs",
+      "sha256": "060eebb51d4900ccb09b4b95d35d0f0028026adf15d5befe8b092b36416bb035"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/channels.rs",
+      "sha256": "e989063f241ec8b55eb20d2d270644984db79047fd946ea0f1b3afcea10255fd"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/dynamics_inspection.rs",
+      "sha256": "a59defd28807d5b7f0d47aa26b6e9f6fc56c6e45ad1aa8c4c25892c448fd85cd"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/dynamics_inspection_tests.rs",
+      "sha256": "b6d80e3aeb4471c987e4833a40a8d3096b27fd0f7bfe77c3ab0b3f6584213e76"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/lifecycle.rs",
+      "sha256": "eee23025163b45b42b277eab3300ee0ac3eb7feb8622aea2390612cb30bc2a80"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/physics_catalog.rs",
+      "sha256": "d62f905ac9317b25c437473359de5e63d4ff18b75ba368e0a7218da36d7bf41c"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/projection_dynamics.rs",
+      "sha256": "809d774465c48739c3bbaee78cc67b59546cbc1d724e625f4c9b0bb0e9e0ab0e"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/roles.rs",
+      "sha256": "5ba5055d143147f1c284c5d5f43a5b4ef54acc779c96450514c989134f96aef2"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/seiche_bridge.rs",
+      "sha256": "1c06137f65f041026b91ac25d13099350af1ec3c78aa1cc3a383a372a42fb422"
+    },
+    {
+      "path": "crates/canvas/pictograph/src/canvas/selection.rs",
+      "sha256": "c5d950dd398b980e7f26046e996ce8854039b4e2ddd4223c8c9aec4d6532e4c6"
+    },
+    {
+      "path": "crates/conatus/seiche/src/edge_topology.rs",
+      "sha256": "41a471f9cfaf9bd317d8ac81918319645f4ae95b0adba76b77d0ab6a793cf322"
+    },
+    {
+      "path": "crates/conatus/seiche/src/edge_topology/tests.rs",
+      "sha256": "2cdb378fbc5386763bd1f8be69a1f6089d15624c141fd4cc512724d75271d77e"
+    },
+    {
+      "path": "crates/conatus/seiche/src/instruments.rs",
+      "sha256": "9ea0129570c5694a4fcc2f189dd4832f78cb4ff33844e62f1f2448b7c42f5f0d"
+    },
+    {
+      "path": "crates/conatus/seiche/src/lib.rs",
+      "sha256": "559db88394441f342ed463c6817f2d4c456b93aa66fb9c006a564eaeb273dc8a"
+    },
+    {
+      "path": "crates/conatus/seiche/src/runtime.rs",
+      "sha256": "d3d0f3fa6651199dc388b0f97594701e9226c834dc24a5cc7eae108f1ec38957"
+    },
+    {
+      "path": "crates/conatus/seiche/src/runtime/actor.rs",
+      "sha256": "99f8907b260123556488abaee98d298498b51f089cff0228ecc5a40cd53d1ce0"
+    },
+    {
+      "path": "crates/conatus/seiche/src/sync.rs",
+      "sha256": "37184ed983721a0ebb2fffea63d42051ca713cff2a7809789cb1e472372e6521"
+    },
+    {
+      "path": "crates/conatus/seiche/src/view.rs",
+      "sha256": "eb8205ded592731e60f76d2c2c201680bbc02f3b14f6167e30a5a770e9840144"
+    },
+    {
+      "path": "design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md",
+      "sha256": "c9fcad9b0de00e195bd4565d2296b2eb86b68f07e5bdb559a21f02ec4a7f1f75"
+    },
+    {
+      "path": "design_docs/mere_docs/technical_architecture/2026-10-15_link_model.md",
+      "sha256": "c30b30d53e5cd31d2660130be7de8ace81673777146b4c0766757a8a334acd70"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/dynamics_inspection.rs",
+      "sha256": "468a8610b34157a31e05c03710bb732db821d81532f11c56472ef098387b4ca8"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "8143ea40047d9447913e50a0f1cb6c5d88f685376da5c3ad6f53a4c462b63c2f"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.toml",
+      "sha256": "4a537a39cae43a144a908802ff3b97ac7ab2a331a9d1cd5b6e208ba2d9b82cbc"
+    },
+    {
+      "path": "ports/graphshell/web/loader.js",
+      "sha256": "120d2f04a755001894d83eb17eb605549194e6df8ce83f3727f4ff5c14144728"
+    },
+    {
+      "path": "ports/graphshell/web/scenario_qualification_server.py",
+      "sha256": "6475b04f58c7a1a0e6fc2f1529694062e60c624210fbcc7febe8fe5fbab05365"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p8_tree_counted_topology.scn",
+      "sha256": "a1bc323b490484e8103bfa3d3ae26f9d6dea7507e9b34c11bb7b8b68feb78ac5"
+    },
+    {
+      "path": "ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn",
+      "sha256": "809bfcf74d03c4a84a52c15e6d97996b5050e5acc2b35f49dbe7fe980d957aa9"
+    }
+  ]
+}

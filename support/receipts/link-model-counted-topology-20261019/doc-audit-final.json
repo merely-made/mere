@@ -1,0 +1,17 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "e5437a382e0fd42335efd846545246697c3417f1",
+  "started": "2026-10-19T18:03:16.353815+00:00",
+  "status_before": " M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n?? support/receipts/link-model-counted-topology-20261019/\n",
+  "process_started": true,
+  "exit_code": 1,
+  "finished": "2026-10-19T18:03:17.315357+00:00",
+  "log_sha256": "d818a6370fe9db9042055d4df26e267db912539e270e1ae9f5dd5f00c0f01428",
+  "suites": []
+}

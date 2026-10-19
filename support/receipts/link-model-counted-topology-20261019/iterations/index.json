@@ -1,0 +1,17 @@
+{
+  "accepted_binary_source": "cfbf750df45a1975c14eaedfd4082510150598b8",
+  "accepted_input_revision": "e5437a382e0fd42335efd846545246697c3417f1",
+  "full_external_qualification_root": "/Users/markik/Code/testing/mere/counted-link-topology-20261019",
+  "retained_iterations": [
+    {
+      "path": "candidate-2bca926df.json",
+      "accepted": false,
+      "full_artifacts": "/Users/markik/Code/testing/mere/counted-link-topology-20261019/iterations/candidate-2bca926df"
+    },
+    {
+      "path": "reopen-cfbf-disclosure-not-opened",
+      "accepted": false,
+      "reason": "Four disclosure snapshots were requested before opening the saved promoted Resource. Graph reopening and pair topology passed. Corrected committed scenario opens that Resource first; compiled source is unchanged."
+    }
+  ]
+}

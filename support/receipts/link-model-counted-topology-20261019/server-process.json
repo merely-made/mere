@@ -1,0 +1,8 @@
+{
+  "bind": "127.0.0.1",
+  "port": 38131,
+  "stop": "intentional Ctrl-C after both browser exits",
+  "exit_code": 1,
+  "observed_at": "2026-10-19T18:02:23.168874+00:00",
+  "claim": "Loopback qualification server stopped; native browser lane released."
+}

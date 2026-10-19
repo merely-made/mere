@@ -1,0 +1,106 @@
+{
+  "images": [
+    {
+      "path": "browser-qualified/p8_tree_counted_topology/p8_pair_topology_initial.png",
+      "sha256": "74e658a4298721828df3171a5c2de36af7025b210362cb8c553ba854a13a2c74",
+      "reviewed": true,
+      "reviews": [
+        {
+          "reviewer": "/root",
+          "finding": "Pair summary is readable: 3 visible relation rows, held 3 / visible 3 / hidden 0, controller inputs 6. Surface foreground and Resource aliases are visible. The lower viewport is black/empty; the relevant content is unobscured.",
+          "disposition": "accepted"
+        },
+        {
+          "reviewer": "/root/ordinary_path_acceptance",
+          "finding": "Pair summary is readable: 3 visible relation rows, held 3 / visible 3 / hidden 0, controller inputs 6. Surface foreground and Resource aliases are visible. Independently viewed actual PNG; relevant graph and summary unobscured.",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "path": "browser-qualified/p8_tree_counted_topology/p8_pair_topology_exact_reason_hidden.png",
+      "sha256": "52676fc5efa7fdf8a2c6f87aa86e0a43638bcaaea9699c17ae3f73d9c88c53a4",
+      "reviewed": true,
+      "reviews": [
+        {
+          "reviewer": "/root",
+          "finding": "Exact-reason hide reduces the visible pair to 2 while held stays 3; summary shows hidden 1 and controller inputs 5. The lower viewport is black/empty; the relevant content is unobscured.",
+          "disposition": "accepted"
+        },
+        {
+          "reviewer": "/root/ordinary_path_acceptance",
+          "finding": "Exact-reason hide reduces the visible pair to 2 while held stays 3; summary shows hidden 1 and controller inputs 5. Independently viewed actual PNG; relevant graph and summary unobscured.",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "path": "browser-qualified/p8_tree_counted_topology/p8_promoted_source_before_withdrawal.png",
+      "sha256": "a30972bfada5fe9f8c62c3fd93706386783fec6c7ef7dd2b099272613a552664",
+      "reviewed": true,
+      "reviews": [
+        {
+          "reviewer": "/root",
+          "finding": "Promoted Resource review is open; frozen two-assertion reading is visible and the live source comparison says unchanged. The lower viewport is black/empty; the relevant content is unobscured.",
+          "disposition": "accepted"
+        },
+        {
+          "reviewer": "/root/ordinary_path_acceptance",
+          "finding": "Promoted Resource review is open; frozen two-assertion reading is visible and the live source comparison says unchanged. Independently viewed actual PNG; relevant graph and summary unobscured.",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "path": "browser-qualified/p8_tree_counted_topology/p8_promoted_copy_after_withdrawal.png",
+      "sha256": "3367c7a4464ab4a168fcb3d97780babca3df2a2316c2cad9a458dfc03faf9d04",
+      "reviewed": true,
+      "reviews": [
+        {
+          "reviewer": "/root",
+          "finding": "Promoted Resource review retains the same frozen assertion reading after source withdrawal; live comparison says changed. The lower viewport is black/empty; the relevant content is unobscured.",
+          "disposition": "accepted"
+        },
+        {
+          "reviewer": "/root/ordinary_path_acceptance",
+          "finding": "Promoted Resource review retains the same frozen assertion reading after source withdrawal; live comparison says changed. Independently viewed actual PNG; relevant graph and summary unobscured.",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "path": "browser-qualified/p8_tree_counted_topology/p8_pair_topology_after_withdrawal.png",
+      "sha256": "f0a40d51de08ee3e57409c233aff8942a75ab617f59a825d0e1f6fb12ec40d94",
+      "reviewed": true,
+      "reviews": [
+        {
+          "reviewer": "/root",
+          "finding": "After withdrawal the pair summary shows held 2 / visible 2 / hidden 0, controller inputs 5; the independent Surface relation and Resource aliases remain. The lower viewport is black/empty; the relevant content is unobscured.",
+          "disposition": "accepted"
+        },
+        {
+          "reviewer": "/root/ordinary_path_acceptance",
+          "finding": "After withdrawal the pair summary shows held 2 / visible 2 / hidden 0, controller inputs 5; the independent Surface relation and Resource aliases remain. Independently viewed actual PNG; relevant graph and summary unobscured.",
+          "disposition": "accepted"
+        }
+      ]
+    },
+    {
+      "path": "browser-qualified/p8_tree_counted_topology_reopen/p8_counted_topology_fresh_reopen.png",
+      "sha256": "348976986be8f238e3dbc5b04e0284203acb6bfe36fa2bd116dce8cd697b0e34",
+      "reviewed": true,
+      "reviews": [
+        {
+          "reviewer": "/root",
+          "finding": "Fresh-process reopened summary shows held 2 / visible 2 / hidden 0, relation rows mode, controller inputs 5; surviving Surface and Resource geometry remain visible. The lower viewport is black/empty; the relevant content is unobscured.",
+          "disposition": "accepted"
+        },
+        {
+          "reviewer": "/root/ordinary_path_acceptance",
+          "finding": "Fresh-process reopened summary shows held 2 / visible 2 / hidden 0, relation rows mode, controller inputs 5; surviving Surface and Resource geometry remain visible. Independently viewed actual PNG; relevant graph and summary unobscured.",
+          "disposition": "accepted"
+        }
+      ]
+    }
+  ]
+}

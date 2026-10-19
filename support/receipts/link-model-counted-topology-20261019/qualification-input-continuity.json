@@ -1,0 +1,9 @@
+{
+  "binary_source_revision": "cfbf750df45a1975c14eaedfd4082510150598b8",
+  "qualification_input_revision": "e5437a382e0fd42335efd846545246697c3417f1",
+  "changed_paths": [
+    "ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn"
+  ],
+  "only_change": "Open saved Resource disclosure before inspecting its details. No compiled product or dependency source changed.",
+  "git_diff": "diff --git a/ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn b/ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn\nindex 64ff4a6d0..7257d8319 100644\n--- a/ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn\n+++ b/ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn\n@@ -7,6 +7,10 @@ assert snap link-rest-ready == true\n assert snap link-rest-hidden-assertion-count == 0\n assert snap link-rest-source-assertion-ids ~ fixture:p7:collection-primary\n assert snap promoted-link-count == 1\n+reveal role:button Open promoted link 1\n+click role:button Open promoted link 1\n+settle 2\n+assert text Review Resource\n assert snap promoted-link-drift == changed\n assert snap promoted-link-withdrawn-ids == fixture:p7:collection-primary\n assert snap promoted-link-frozen-assertion-ids == fixture:p7:collection-independent|fixture:p7:collection-primary\n"
+}
