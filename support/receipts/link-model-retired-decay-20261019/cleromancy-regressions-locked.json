@@ -1,0 +1,53 @@
+{
+  "command": [
+    "cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+    "test",
+    "--manifest-path",
+    "/Users/markik/Code/testing/mere/retired-decay-20261019/caller-regressions/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-j1",
+    "--target-dir",
+    "/Users/markik/Code/repos/mere/target",
+    "-p",
+    "retired-decay-caller-regressions",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/markik/Code/testing/mere/retired-decay-20261019/caller-regressions",
+  "revision": "73dccb6f7db2a49350bf1f15c93983e457351c62",
+  "started": "2026-10-19T19:02:31.764411+00:00",
+  "status_before": "",
+  "process_started": true,
+  "exit_code": 0,
+  "finished": "2026-10-19T19:02:32.762903+00:00",
+  "log_sha256": "f525dd9ef748aaab929a05133c49bf4583ea0171f7ce98b3700d97c3171c7cea",
+  "suites": [
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0
+    }
+  ]
+}

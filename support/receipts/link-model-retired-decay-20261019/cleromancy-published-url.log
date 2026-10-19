@@ -1,0 +1,2 @@
+Process argv: ["git", "ls-remote", "https://github.com/merely-made/cleromancy.git", "refs/heads/main"]
+73dccb6f7db2a49350bf1f15c93983e457351c62	refs/heads/main

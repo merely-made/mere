@@ -1,0 +1,31 @@
+use kernel::graph::{CapturedDelta, EdgeAssertion, SemanticSubKind, ContainmentSubKind, ArrangementSubKind, ImportedSubKind, ProvenanceSubKind};
+use std::{fs, path::Path};
+
+fn main() {
+    let output = std::env::args().nth(1).expect("output directory");
+    let output = Path::new(&output);
+    fs::create_dir_all(output).unwrap();
+    let mut deltas = vec![];
+    for decay in [None, Some(0.0), Some(0.25), Some(1.0)] {
+        deltas.push(CapturedDelta::ReplayAssertRelationByIds {
+            from_id: "00000000-0000-0000-0000-000000000001".into(),
+            to_id: "00000000-0000-0000-0000-000000000002".into(),
+            assertion: EdgeAssertion::Semantic { sub_kind: SemanticSubKind::Cites, label: Some("historical reason".into()), decay_progress: decay },
+        });
+    }
+    for assertion in [
+        EdgeAssertion::Containment { sub_kind: ContainmentSubKind::UrlPath },
+        EdgeAssertion::Arrangement { sub_kind: ArrangementSubKind::FrameMember },
+        EdgeAssertion::Imported { sub_kind: ImportedSubKind::BookmarkFolder },
+        EdgeAssertion::Provenance { sub_kind: ProvenanceSubKind::ClippedFrom },
+    ] {
+        deltas.push(CapturedDelta::ReplayAssertRelationByIds {
+            from_id: "00000000-0000-0000-0000-000000000001".into(),
+            to_id: "00000000-0000-0000-0000-000000000002".into(), assertion,
+        });
+    }
+    deltas.push(CapturedDelta::ReplaySetNodeTitleById { node_id: "00000000-0000-0000-0000-000000000001".into(), title: "sentinel after old assertion fields".into() });
+    fs::write(output.join("captured-with-decay.json"), serde_json::to_vec_pretty(&deltas).unwrap()).unwrap();
+    fs::write(output.join("captured-with-decay.postcard"), postcard::to_allocvec(&deltas).unwrap()).unwrap();
+    fs::write(output.join("captured-with-decay.rkyv"), rkyv::to_bytes::<rkyv::rancor::Error>(&deltas).unwrap()).unwrap();
+}

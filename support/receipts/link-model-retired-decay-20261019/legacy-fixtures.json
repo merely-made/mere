@@ -1,0 +1,26 @@
+{
+  "source_revision": "904d7391bf75d46c42f6c10698e90a01ab468195",
+  "writer": "legacy-writer.rs.txt",
+  "command_record": "legacy-fixture-writer.json",
+  "fixture_contents": "Nine CapturedDelta rows: Semantic decay None, 0.0, 0.25, 1.0; all four other assertion variants; title sentinel after assertions. Produced by the unmodified baseline kernel.",
+  "fixtures": [
+    {
+      "path": "captured-with-decay.json",
+      "bytes": 2508,
+      "sha256": "0c1459d60dfbf76a92a5ff5e2a50b681bb6e1433f3399e87457d97dd344449b5"
+    },
+    {
+      "path": "captured-with-decay.rkyv",
+      "bytes": 1664,
+      "sha256": "07c0e0aa6c998cab77aafe18a540c30adf78f3f38b04494186bf48f18bdce2f6"
+    },
+    {
+      "path": "captured-with-decay.postcard",
+      "bytes": 783,
+      "sha256": "b2fa51fa6cfcc73fbab2d8e23f16384339f7fd9f4bfdcd949513a98b26b89e44"
+    }
+  ],
+  "writer_sha256": "055457f80ba6ccd9bfc7e007ab089e711e0948aa5b377ca66106831e1f60430c",
+  "writer_manifest_sha256": "4003c50a1de9d1adc4b46c2eef353c0fff61bef0d1657acccb3c77d8ea144245",
+  "writer_lock_sha256": "63abb768c471a38f1b3139465ad48b8edc85c05949a6e9ab88afe83b26c3a9d2"
+}

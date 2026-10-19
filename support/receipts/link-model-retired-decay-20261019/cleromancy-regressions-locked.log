@@ -1,0 +1,30 @@
+Process argv: ["cargo", "--config", "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"", "test", "--manifest-path", "/Users/markik/Code/testing/mere/retired-decay-20261019/caller-regressions/Cargo.toml", "--locked", "--offline", "-j1", "--target-dir", "/Users/markik/Code/repos/mere/target", "-p", "retired-decay-caller-regressions", "--", "--test-threads=1"]
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#9b8c161a)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.64s
+     Running /Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/tests/authored_spread.rs (/Users/markik/Code/repos/mere/target/build/debug/deps/authored_spread_reopen-9fff9d3d69583033)
+
+running 2 tests
+test authored_spread_replays_its_template_session_and_relations_after_reopen ... ok
+test authored_template_rejects_unknown_or_repeated_positions ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running /Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/tests/a8.rs (/Users/markik/Code/repos/mere/target/build/debug/deps/fixed_spread-f515c1a938ed9db9)
+
+running 1 test
+test fixed_three_card_spread_is_authored_replayable_and_graph_visible ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running /Users/markik/Code/worktrees/cleromancy-retired-decay-20261019/tests/a7.rs (/Users/markik/Code/repos/mere/target/build/debug/deps/reflections-441ab01e94053362)
+
+running 2 tests
+test repeated_calculated_reads_are_separate_sessions_with_immutable_reflection ... ok
+test session_and_reflection_identity_reject_tampering ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -1,0 +1,354 @@
+Process argv: ["cargo", "--config", "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"", "run", "--offline", "-j1", "--target-dir", "/Users/markik/Code/repos/mere/target", "--", "/Users/markik/Code/testing/mere/retired-decay-20261019/legacy-fixtures"]
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling syn v3.0.6
+   Compiling serde_core v1.0.229
+   Compiling synstructure v0.14.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling yoke v0.8.3
+   Compiling zerovec-derive v0.11.6
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.190
+   Compiling syn v2.0.119
+   Compiling getrandom v0.4.3
+   Compiling tinystr v0.8.4
+   Compiling sha1_smol v1.0.1
+   Compiling writeable v0.6.4
+   Compiling litemap v0.8.3
+   Compiling icu_locale_core v2.3.0
+   Compiling uuid v1.27.0
+   Compiling zerotrie v0.2.5
+   Compiling potential_utf v0.1.6
+   Compiling ptr_meta_derive v0.3.2
+   Compiling utf8_iter v1.0.4
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.14
+   Compiling version_check v0.9.5
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling zmij v1.0.23
+   Compiling slotmap v1.1.1
+   Compiling cc v1.6.0
+   Compiling icu_collections v2.3.0
+   Compiling ptr_meta v0.3.2
+   Compiling icu_provider v2.3.1
+   Compiling serde_json v1.0.151
+   Compiling arrayvec v0.7.8
+   Compiling byteorder v1.5.0
+   Compiling rancor v0.1.3
+   Compiling blake3 v1.8.7
+   Compiling bytecheck_derive v0.8.3
+   Compiling hashbrown v0.17.1
+   Compiling memchr v2.8.3
+   Compiling simdutf8 v0.1.5
+   Compiling autocfg v1.5.1
+   Compiling itoa v1.0.18
+   Compiling semver v1.0.28
+   Compiling smallvec v1.16.1
+   Compiling icu_normalizer v2.3.0
+   Compiling rustc_version v0.4.1
+   Compiling num-traits v0.2.19
+   Compiling bytecheck v0.8.3
+   Compiling icu_properties v2.3.0
+   Compiling munge_macro v0.4.7
+   Compiling crossbeam-utils v0.8.23
+   Compiling heck v0.5.0
+   Compiling unicase v2.9.0
+   Compiling equivalent v1.0.2
+   Compiling foldhash v0.1.5
+   Compiling constant_time_eq v0.4.2
+   Compiling thiserror v2.0.21
+   Compiling hashbrown v0.15.5
+   Compiling indexmap v2.14.2
+   Compiling mime_guess v2.0.5
+   Compiling strum_macros v0.28.0
+   Compiling munge v0.4.7
+   Compiling idna_adapter v1.2.2
+   Compiling rend v0.5.4
+   Compiling heapless v0.7.17
+   Compiling thiserror-impl v2.0.21
+   Compiling async-trait v0.1.92
+   Compiling rkyv_derive v0.8.18
+   Compiling fixedbitset v0.5.7
+   Compiling grid v1.0.1
+   Compiling fnv v1.0.7
+   Compiling percent-encoding v2.3.2
+   Compiling form_urlencoded v1.2.2
+   Compiling cfb v0.7.3
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling petgraph v0.8.3
+   Compiling rkyv v0.8.18
+   Compiling muniment v0.1.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/eidetic/muniment)
+   Compiling idna v1.1.0
+   Compiling strum v0.28.0
+   Compiling hash32 v0.2.1
+   Compiling enumn v0.1.14
+   Compiling mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/forme/curation)
+   Compiling futures-macro v0.3.34
+   Compiling powerfmt v0.2.0
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.34
+   Compiling deranged v0.5.8
+   Compiling time-core v0.1.9
+   Compiling mime v0.3.17
+   Compiling num-conv v0.2.2
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling futures-util v0.3.34
+   Compiling time v0.3.55
+   Compiling mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/forme/forme)
+   Compiling accesskit v0.24.1
+   Compiling numen v0.2.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/conatus/numen)
+   Compiling crossbeam-channel v0.5.17
+   Compiling url v2.5.8
+   Compiling euclid v0.22.14
+   Compiling cobs v0.3.0
+   Compiling chartulary v0.2.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/eidetic/chartulary)
+   Compiling infer v0.19.0
+   Compiling command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/cambium/command-menu)
+   Compiling web-time v1.1.0
+   Compiling mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel)
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/mod.rs:722:19
+    |
+416 | impl Graph {
+    | ---------- methods in this implementation
+...
+722 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+736 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+748 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+758 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/edge_ops.rs:351:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+351 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+422 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+438 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+730 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+827 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+966 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> /Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel/src/graph/query.rs:195:19
+    |
+188 | impl Graph {
+    | ---------- method in this implementation
+...
+195 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 19 warnings (run `cargo fix --lib -p mere-kernel` to apply 8 suggestions)
+   Compiling postcard v1.1.3
+   Compiling retired-decay-legacy-writer v0.0.0 (/Users/markik/Code/testing/mere/retired-decay-20261019/legacy-writer)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 50.68s
+     Running `/Users/markik/Code/repos/mere/target/debug/retired-decay-legacy-writer /Users/markik/Code/testing/mere/retired-decay-20261019/legacy-fixtures`

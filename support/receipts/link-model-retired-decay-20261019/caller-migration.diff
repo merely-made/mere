@@ -1,0 +1,107 @@
+commit 73dccb6f7db2a49350bf1f15c93983e457351c62
+Author:     mark-ik <sgt.mark3@gmail.com>
+AuthorDate: Mon Oct 19 14:48:37 2026 -0400
+Commit:     mark-ik <sgt.mark3@gmail.com>
+CommitDate: Mon Oct 19 14:48:37 2026 -0400
+
+    Use scoped semantic writes without the retired decay constructor field
+---
+ src/host/records.rs | 13 ++++++-------
+ src/host/spreads.rs | 27 ++++++++++++---------------
+ 2 files changed, 18 insertions(+), 22 deletions(-)
+
+diff --git a/src/host/records.rs b/src/host/records.rs
+index f5b2ba4..3956810 100644
+--- a/src/host/records.rs
++++ b/src/host/records.rs
+@@ -4,8 +4,9 @@
+ //! Insertion and recording of contexts, fields, readings, sessions,
+ //! reflections, astrology records, and pattern occasions.
+ 
+-use mere::kernel::graph::apply::assert_relation;
++use mere::kernel::graph::apply::{assert_relation, assert_semantic_relation_in_scope};
+ use mere::kernel::graph::{ContainmentSubKind, EdgeAssertion, ProvenanceSubKind};
++use mere::kernel::types::GraphScope;
+ 
+ use super::*;
+ use crate::{AstrologyChart, Concurrence, Reflection};
+@@ -361,15 +362,13 @@ impl<B: Backend> CleromancyHost<B> {
+             REFLECTION_FACET,
+             serde_json::to_value(reflection).unwrap(),
+         )?;
+-        assert_relation(
++        assert_semantic_relation_in_scope(
+             &mut self.graph,
+             key,
+             session_key,
+-            EdgeAssertion::Semantic {
+-                sub_kind: SemanticSubKind::Elaborates,
+-                label: Some("reflects on".to_string()),
+-                decay_progress: None,
+-            },
++            SemanticSubKind::Elaborates,
++            Some("reflects on".to_string()),
++            GraphScope::Default,
+         );
+         self.changed();
+         Ok(key)
+diff --git a/src/host/spreads.rs b/src/host/spreads.rs
+index d383f9a..2c98ae0 100644
+--- a/src/host/spreads.rs
++++ b/src/host/spreads.rs
+@@ -4,8 +4,9 @@
+ //! Recording and insertion of the fixed three-card layout and authored
+ //! spread templates with their session-bound instances.
+ 
+-use mere::kernel::graph::apply::assert_relation;
++use mere::kernel::graph::apply::{assert_relation, assert_semantic_relation_in_scope};
+ use mere::kernel::graph::{ContainmentSubKind, EdgeAssertion, ProvenanceSubKind};
++use mere::kernel::types::GraphScope;
+ 
+ use super::*;
+ use crate::{Spread, SpreadTemplate, ThreeCardPosition, ThreeCardRelationKind, ThreeCardSpread};
+@@ -289,18 +290,16 @@ impl<B: Backend> CleromancyHost<B> {
+             );
+         }
+         for relation in &spread.relations {
+-            assert_relation(
++            assert_semantic_relation_in_scope(
+                 &mut self.graph,
+                 reading_keys[&relation.from],
+                 reading_keys[&relation.to],
+-                EdgeAssertion::Semantic {
+-                    sub_kind: match relation.kind {
+-                        ThreeCardRelationKind::Questions => SemanticSubKind::Questions,
+-                        ThreeCardRelationKind::NextStep => SemanticSubKind::NextStep,
+-                    },
+-                    label: Some(relation.label.clone()),
+-                    decay_progress: None,
++                match relation.kind {
++                    ThreeCardRelationKind::Questions => SemanticSubKind::Questions,
++                    ThreeCardRelationKind::NextStep => SemanticSubKind::NextStep,
+                 },
++                Some(relation.label.clone()),
++                GraphScope::Default,
+             );
+         }
+         self.changed();
+@@ -416,15 +415,13 @@ impl<B: Backend> CleromancyHost<B> {
+             );
+         }
+         for relation in &template.relations {
+-            assert_relation(
++            assert_semantic_relation_in_scope(
+                 &mut self.graph,
+                 reading_keys[relation.from.as_str()],
+                 reading_keys[relation.to.as_str()],
+-                EdgeAssertion::Semantic {
+-                    sub_kind: semantic_kind(relation.kind),
+-                    label: Some(relation.label.clone()),
+-                    decay_progress: None,
+-                },
++                semantic_kind(relation.kind),
++                Some(relation.label.clone()),
++                GraphScope::Default,
+             );
+         }
+         self.changed();

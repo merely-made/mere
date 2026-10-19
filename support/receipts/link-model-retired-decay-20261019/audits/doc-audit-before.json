@@ -1,0 +1,17 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "904d7391bf75d46c42f6c10698e90a01ab468195",
+  "started": "2026-10-19T18:23:03.499793+00:00",
+  "status_before": "",
+  "process_started": true,
+  "exit_code": 1,
+  "finished": "2026-10-19T18:23:04.539914+00:00",
+  "log_sha256": "d818a6370fe9db9042055d4df26e267db912539e270e1ae9f5dd5f00c0f01428",
+  "suites": []
+}

@@ -1,0 +1,53 @@
+{
+  "source_revision": "1cbae9acd9b4cb3470d99d29235701ffc25676ec",
+  "tests": [
+    {
+      "record": "kernel-intake.json",
+      "packages": [
+        "mere-kernel"
+      ],
+      "passed": 481,
+      "ignored": 3
+    },
+    {
+      "record": "pandect-intake.json",
+      "packages": [
+        "pandect"
+      ],
+      "passed": 359,
+      "ignored": 1
+    },
+    {
+      "record": "consumers-intake.json",
+      "packages": [
+        "mere",
+        "mere-linked-data",
+        "mere-cartography",
+        "mere-view",
+        "pictograph"
+      ],
+      "passed": 848,
+      "ignored": 19
+    },
+    {
+      "record": "graphshell-intake.json",
+      "packages": [
+        "graphshell"
+      ],
+      "passed": 320,
+      "ignored": 6
+    }
+  ],
+  "checks": [
+    {
+      "record": "djinn-intake.json"
+    },
+    {
+      "record": "wasm-intake.json"
+    },
+    {
+      "record": "boundaries-final.json"
+    }
+  ],
+  "scope": "API and stored-history compatibility cleanup, including three owning-repo Cleromancy callers and their Mere dependency intake. No new native rendering or Woodshed receiving-host qualification."
+}

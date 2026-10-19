@@ -1,0 +1,12 @@
+[package]
+name = "retired-decay-legacy-writer"
+version = "0.0.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+mere-kernel = { path = "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/crates/graph/graph-kernel" }
+postcard = { version = "1", features = ["alloc"] }
+rkyv = { version = "=0.8.18", features = ["std"] }
+serde_json = "1"

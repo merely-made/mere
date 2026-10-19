@@ -1,0 +1,22 @@
+[
+  {
+    "path": "crates/graph/graph-kernel/src/persistence_edge.rs",
+    "sha256": "7a33b60a44ff1446fcddb2dc5b97e528d8d175bdfcd50d0cd73f3d27800ae234",
+    "unchanged_from_baseline": true
+  },
+  {
+    "path": "crates/graph/graph-kernel/src/graph/snapshot/from.rs",
+    "sha256": "aaff343b792ab83b4af40b407fb97cd1c069950f662a1d987c518ad56ae3e378",
+    "unchanged_from_baseline": true
+  },
+  {
+    "path": "Cargo.toml",
+    "sha256": "e08aa6796b2fdea7ba8a7e42238020ab60a7ed863cd0a5b40066c3561867102f",
+    "unchanged_from_baseline": true
+  },
+  {
+    "path": "ports/graphshell/web/Cargo.lock",
+    "sha256": "8143ea40047d9447913e50a0f1cb6c5d88f685376da5c3ad6f53a4c462b63c2f",
+    "unchanged_from_baseline": true
+  }
+]

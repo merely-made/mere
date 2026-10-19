@@ -1,0 +1,17 @@
+{
+  "source_revision": "73dccb6f7db2a49350bf1f15c93983e457351c62",
+  "previous_revision": "6c4c4ecc36c54dfcc172b244d2a479ab1a3865a8",
+  "source_repository": "https://github.com/merely-made/cleromancy.git",
+  "sdk_revision": "9b8c161a831aa9615c84a4bbfaea9b15021e3659",
+  "record": "cleromancy-regressions-locked.json",
+  "package": "retired-decay-caller-regressions",
+  "passed": 5,
+  "files": {
+    "caller-regressions.Cargo.toml.txt": "b16fc25763b5c9fefee9095c661da2f396a9e3dc4a781be946d8dda9ef0554b3",
+    "caller-regressions.Cargo.lock.txt": "4936037404684de6c94445132de4ffef45e4cdcf924f517a4cabed43d570b771"
+  },
+  "scope": "Existing authored-spread/reopen, A8 fixed-spread, and A7 reflection/session tests run against real Cleromancy core at this source revision and its existing Mere SDK before publishing the field removal.",
+  "publication_record": "cleromancy-published-url.json",
+  "harness_cwd": "/Users/markik/Code/testing/mere/retired-decay-20261019/caller-regressions",
+  "harness_manifest": "/Users/markik/Code/testing/mere/retired-decay-20261019/caller-regressions/Cargo.toml"
+}
