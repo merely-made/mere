@@ -6997,9 +6997,7 @@ dependencies = [
  "mere-overmap",
  "mere-proofs",
  "mere-transport",
- "mere-view",
  "mere-webrtc-carrier",
- "mesquite",
  "mien",
  "muniment",
  "netrender",
@@ -7021,12 +7019,10 @@ dependencies = [
  "servitor",
  "sha2 0.11.0",
  "signature 2.2.0",
- "sprigging",
  "ssh-agent-lib",
  "ssh-key",
  "stickleback",
  "tabard",
- "taproot",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
@@ -7107,6 +7103,31 @@ dependencies = [
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
+]
+
+[[package]]
+name = "graphshell-mere"
+version = "0.0.2"
+dependencies = [
+ "cambium",
+ "cambium-genet-winit-host",
+ "cambium-rootstock",
+ "chirograph",
+ "graphshell-client",
+ "graphshell-endpoint",
+ "mere",
+ "mere-overmap",
+ "mere-view",
+ "mesquite",
+ "pandect",
+ "sceno",
+ "scenotime",
+ "serde_json",
+ "sprigging",
+ "taproot",
+ "tempfile",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]

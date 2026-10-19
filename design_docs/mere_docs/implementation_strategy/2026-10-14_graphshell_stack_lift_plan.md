@@ -702,6 +702,16 @@ fast-forward of local main; nothing built).**
   `mere_two_process` fails on macOS when `TMPDIR` makes its socket path longer
   than 104 bytes (it passes with a short `TMPDIR`); that predates this change.
   Open: the Turnstone receipt and the Djinn registration (P2a).
+- **2026-10-18 (`graphshell_mere`, its own package):** the native viewer
+  imported only stack crates, but as a `graphshell` binary it still built the
+  whole Graphshell library with `native`, `web` and the package defaults,
+  whose features reached crates it does use (ICU's dictionaries got into it
+  that way). It is now `ports/graphshell/mere` (package `graphshell-mere`,
+  binary still `graphshell_mere`), depending on exactly what it uses; its
+  graph drops from about 1,032 packages to 376 (no document canvas, lanes,
+  Pelt, iroh, reqwest, ring, rustls or ssh-key). Graphshell's `mere-view-host`
+  feature and its `mere-view`, `mesquite`, `sprigging` and `taproot` rows are
+  removed. Build it with `cargo build -p graphshell-mere`; its 15 tests pass.
 - **2026-10-15 (P1, L1 landed):** the app door is
   `graphshell_endpoint::door`, feature `door` (native only; the module is
   compiled out on wasm32). Moved from `ports/graphshell`: `native/`
