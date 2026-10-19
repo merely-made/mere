@@ -42,9 +42,9 @@ use seiche::{
     HubGravity, Kuramoto, LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
 };
 
-use crate::canvas::seiche_bridge::{
-    visible_relation_edges, visible_relation_edges_with_assertion_hides,
-};
+#[cfg(test)]
+use crate::canvas::seiche_bridge::visible_relation_edges;
+use crate::canvas::seiche_bridge::visible_relation_edges_with_assertion_hides;
 use crate::canvas::{Canvas, SETTLE_TICKS};
 use crate::signals::ChannelRegistry;
 use crate::signals::physics::{self, PhysicsView, PhysicsViewKey};
@@ -779,15 +779,41 @@ impl<'a> LawInputs<'a> {
     }
     /// The inputs over `graph`, reading `sites` when the caller's registry
     /// holds them (computing them here otherwise, as a stats reader does).
+    #[cfg(test)]
     pub(crate) fn new(
         graph: &Graph,
         hidden_edges: &HashSet<crate::canvas::EdgeCell>,
         clusters: Option<&'a crate::signals::ClusterSet>,
         sites: Option<&'a HashMap<NodeKey, String>>,
     ) -> Self {
+        Self::new_with_edges(
+            graph,
+            visible_relation_edges(graph, hidden_edges),
+            clusters,
+            sites,
+        )
+    }
+
+    /// Construct graph inputs for Canvas callers that immediately install the
+    /// complete link/assertion-hide-aware topology with `with_link_hides`.
+    /// This avoids materializing and discarding the older cell-only grouping.
+    pub(crate) fn new_without_relation_edges(
+        graph: &Graph,
+        clusters: Option<&'a crate::signals::ClusterSet>,
+        sites: Option<&'a HashMap<NodeKey, String>>,
+    ) -> Self {
+        Self::new_with_edges(graph, Vec::new(), clusters, sites)
+    }
+
+    fn new_with_edges(
+        graph: &Graph,
+        edges: Vec<(NodeKey, NodeKey)>,
+        clusters: Option<&'a crate::signals::ClusterSet>,
+        sites: Option<&'a HashMap<NodeKey, String>>,
+    ) -> Self {
         let mut inputs = Self::from_parts(
             graph.nodes().map(|(key, _)| key).collect(),
-            visible_relation_edges(graph, hidden_edges),
+            edges,
             HashMap::new(),
         );
         inputs.sites = match sites {
@@ -1194,15 +1220,37 @@ impl<'a> LawInputs<'a> {
 }
 
 impl Canvas {
-    pub(crate) fn controller_edges(&self) -> Vec<(NodeKey, NodeKey)> {
-        self.occurrence_edges.clone().unwrap_or_else(|| {
-            visible_relation_edges_with_assertion_hides(
+    pub(crate) fn controller_topology_reading(
+        &self,
+    ) -> Option<super::seiche_bridge::VisibleRelationTopology> {
+        self.occurrence_edges.is_none().then(|| {
+            super::seiche_bridge::visible_relation_topology_with_assertion_hides(
                 &self.graph,
                 &self.hidden_edges,
                 &self.hidden_links,
                 &self.hidden_assertions,
             )
         })
+    }
+
+    /// Exact current topology input submitted to this controller. Occurrence input
+    /// is explicit transient controller state; otherwise rows come from the
+    /// shared hide-filtered graph source reader.
+    pub(crate) fn controller_topology(&self) -> seiche::EdgeTopology {
+        self.controller_topology_reading()
+            .map(|reading| reading.edge_topology())
+            .unwrap_or_else(|| {
+                self.occurrence_edges
+                    .as_ref()
+                    .expect("occurrence topology selected when no relation reading exists")
+                    .iter()
+                    .copied()
+                    .collect()
+            })
+    }
+
+    pub(crate) fn controller_edges(&self) -> Vec<(NodeKey, NodeKey)> {
+        self.controller_topology().iter().copied().collect()
     }
     /// Whether the live law or an overlay snapshots graph structure, so a
     /// topology change must rebuild it.
@@ -1266,9 +1314,8 @@ impl Canvas {
         // The site channel from the registry, once per structure and URL grouping.
         self.channels.sites(&self.graph);
         let forces = {
-            let inputs = LawInputs::new(
+            let inputs = LawInputs::new_without_relation_edges(
                 &self.graph,
-                &self.hidden_edges,
                 if wants_clusters {
                     self.channels.community_held()
                 } else {
@@ -1406,7 +1453,7 @@ impl Canvas {
     /// The attribute builders over the current graph and visible edges,
     /// the physics channels read from the registry.
     fn law_inputs_now(&self) -> LawInputs<'_> {
-        LawInputs::new(&self.graph, &self.hidden_edges, None, None)
+        LawInputs::new_without_relation_edges(&self.graph, None, None)
             .with_link_hides(
                 &self.graph,
                 &self.hidden_edges,

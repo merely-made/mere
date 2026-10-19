@@ -255,7 +255,9 @@ impl ProjectionDynamics {
                 .iter()
                 .map(|(from, to)| (keys[from.0 as usize], keys[to.0 as usize]))
                 .collect();
-            canvas.physics.sync_edges(edges.clone());
+            canvas
+                .physics
+                .sync_edge_topology(edges.iter().copied().collect());
             canvas.occurrence_edges = Some(edges);
         }
         canvas.set_physics_paused(true);

@@ -711,13 +711,7 @@ impl Canvas {
     /// only; graph truth, membership, and every other instance are unaffected.)
     fn resync_edge_springs(&mut self) {
         self.physics_view_revision += 1;
-        self.physics
-            .sync_edges(visible_relation_edges_with_assertion_hides(
-                &self.graph,
-                &self.hidden_edges,
-                &self.hidden_links,
-                &self.hidden_assertions,
-            ));
+        self.physics.sync_edge_topology(self.controller_topology());
         self.settle_physics(SETTLE_TICKS / 3);
     }
 

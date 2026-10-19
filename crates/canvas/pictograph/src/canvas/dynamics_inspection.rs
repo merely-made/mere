@@ -6,9 +6,32 @@
 //! Read current view configuration and topology without advancing its controller.
 use super::relationship_topology::{PairInputs, inspect_pair_with_link_hides};
 use super::*;
+use scenograph::link::LinkKey;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DynamicsTopologyMode {
+    RelationRows,
+    OccurrenceController,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DynamicsTopologyRow {
+    pub key: LinkKey,
+    pub displayed_from: Uuid,
+    pub displayed_to: Uuid,
+    pub origin: DynamicsTopologyOrigin,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum DynamicsTopologyOrigin {
+    Assertion { statement_id: String },
+    Traversal,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
@@ -48,9 +71,13 @@ pub struct DynamicsInspection {
     pub live_stage: Result<Value, String>,
     pub members: Vec<MemberDynamics>,
     pub topology_source: String,
+    pub topology_mode: DynamicsTopologyMode,
     pub pair_inputs: Option<PairInputs>,
     pub pair_controller_edges: Option<usize>,
+    pub pair_controller_edge_runs: Option<usize>,
+    pub pair_topology_rows: Option<Vec<DynamicsTopologyRow>>,
     pub controller_edges: usize,
+    pub controller_edge_runs: usize,
     pub limits: Vec<String>,
 }
 impl Canvas {
@@ -99,18 +126,34 @@ impl Canvas {
                 rule_face: self.node_rule_representation(member).is_some(),
             });
         }
-        let edges = self.controller_edges();
+        let relation_reading = self.controller_topology_reading();
+        let topology_mode = if relation_reading.is_some() {
+            DynamicsTopologyMode::RelationRows
+        } else {
+            DynamicsTopologyMode::OccurrenceController
+        };
+        let topology = relation_reading
+            .as_ref()
+            .map(|reading| reading.edge_topology())
+            .unwrap_or_else(|| {
+                self.occurrence_edges
+                    .as_ref()
+                    .expect("occurrence topology selected when no relation reading exists")
+                    .iter()
+                    .copied()
+                    .collect()
+            });
         let (pair_inputs, pair_controller_edges) = match target {
             DynamicsTarget::Access { .. } => (None, None),
             DynamicsTarget::Pair { first, second } => {
                 let a = self.graph.get_node_key_by_id(first).unwrap();
                 let b = self.graph.get_node_key_by_id(second).unwrap();
-                let count = edges
+                let count = topology
                     .iter()
                     .filter(|(from, to)| (*from == a && *to == b) || (*from == b && *to == a))
                     .count();
                 let inputs = if self.occurrence_edges.is_none() {
-                    Some(inspect_pair_with_link_hides(
+                    let mut inputs = inspect_pair_with_link_hides(
                         &self.graph,
                         first,
                         second,
@@ -118,23 +161,87 @@ impl Canvas {
                         |from, to, selector| {
                             self.hidden_edges.contains(&EdgeCell { from, to, selector })
                         },
-                    )?)
+                    )?;
+                    // This count comes from the exact source rows that feed the
+                    // controller, including assertion hides and withdrawals.
+                    inputs.visible_rows = count;
+                    Some(inputs)
                 } else {
                     None
                 };
                 (inputs, Some(count))
             },
         };
+        let pair_controller_edge_runs = match target {
+            DynamicsTarget::Access { .. } => None,
+            DynamicsTarget::Pair { first, second } => {
+                let a = self.graph.get_node_key_by_id(first).unwrap();
+                let b = self.graph.get_node_key_by_id(second).unwrap();
+                Some(
+                    topology
+                        .runs()
+                        .iter()
+                        .filter(|run| {
+                            let (from, to) = run.endpoints();
+                            (from == a && to == b) || (from == b && to == a)
+                        })
+                        .count(),
+                )
+            },
+        };
+        let pair_topology_rows = match (&relation_reading, target) {
+            (Some(reading), DynamicsTarget::Pair { first, second }) => {
+                let a = self.graph.get_node_key_by_id(first).unwrap();
+                let b = self.graph.get_node_key_by_id(second).unwrap();
+                Some(
+                    reading
+                        .rows
+                        .iter()
+                        .filter(|row| {
+                            (row.displayed_from == a && row.displayed_to == b)
+                                || (row.displayed_from == b && row.displayed_to == a)
+                        })
+                        .filter_map(|row| {
+                            Some(DynamicsTopologyRow {
+                                key: row.key.clone(),
+                                displayed_from: self.graph.get_node(row.displayed_from)?.id,
+                                displayed_to: self.graph.get_node(row.displayed_to)?.id,
+                                origin: match &row.origin {
+                                    super::seiche_bridge::VisibleRelationOrigin::Assertion {
+                                        statement_id,
+                                    } => DynamicsTopologyOrigin::Assertion {
+                                        statement_id: statement_id.clone(),
+                                    },
+                                    super::seiche_bridge::VisibleRelationOrigin::Traversal => {
+                                        DynamicsTopologyOrigin::Traversal
+                                    },
+                                },
+                            })
+                        })
+                        .collect(),
+                )
+            },
+            _ => None,
+        };
         Ok(DynamicsInspection {
             target, paused: self.physics_paused(), arrangement: self.layout_strategy().map(str::to_owned),
             law: self.physics_law.id().into(), law_label: self.physics_law.label().into(), overlays: self.physics_overlays.iter().map(|overlay| overlay.id().into()).collect(),
             record: self.dynamics_spec().and_then(|spec| serde_json::to_value(spec).map_err(|error| error.to_string())),
             live_stage: self.live_stage_spec().and_then(|spec| serde_json::to_value(spec).map_err(|error| error.to_string())),
-            members, topology_source: if self.occurrence_edges.is_some() { "disclosed occurrence controller" } else { "held relation cells" }.into(),
-            pair_inputs, pair_controller_edges, controller_edges: edges.len(),
+            members,
+            topology_source: if topology_mode == DynamicsTopologyMode::OccurrenceController { "disclosed occurrence controller" } else { "visible relation source rows" }.into(),
+            topology_mode,
+            pair_inputs,
+            pair_controller_edges,
+            pair_controller_edge_runs,
+            pair_topology_rows,
+            controller_edges: topology.len(),
+            controller_edge_runs: topology.run_count(),
             limits: vec![
                 "This reads configuration and the current topology input seam; it does not step physics or measure a force vector.".into(),
                 "A visible relation row supplies one topology slot, not one force per assertion. The live law/composition determines how those inputs are used.".into(),
+                "Counted edge runs compress adjacent identical ordered endpoint rows for storage. Logical row count preserves multiplicity; run count is not a unique-link count or force measure.".into(),
+                "For a pair, `pair_topology_rows` are the exact current controller rows, including each assertion ID; traversal rows are identified as rollups without assertion IDs. `pair_inputs` summarizes held-cell groups. Its held row totals include individually hidden source assertions, and its cell hidden flag describes cell or whole-link hiding.".into(),
                 "Role policy, installed arrangement pins, explicit position pins, Forme holds and attention state have separate owners. Anchor presence is configuration, not a measured contribution.".into(),
                 "Per-assertion force attribution, installed coupling target snapshots, derived display-link execution evidence and foreground pins are not available here.".into(),
                 "The record is current Canvas readback, not a storage acknowledgment or source-history snapshot.".into(),

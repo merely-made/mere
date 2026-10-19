@@ -475,6 +475,18 @@ holds: responses must be declared and may be zero.
 
 Current implementation boundaries:
 
+- **Counted topology preserves the current endpoint laws.** Pictograph reads
+  the eligible source rows once through its shared topology reader, retaining
+  exact reason identity, stratum and displayed aliases. Each row contributes
+  one slot; a Traversal row still contributes one irrespective of its event
+  count or recency. Seiche stores only adjacent equal ordered pairs as counted
+  runs (`crates/conatus/seiche/src/edge_topology.rs`). Its public force and
+  diagnostic slice interfaces receive the original ordered rows through a
+  transient expansion. Nonadjacent rows and reversed endpoints stay distinct,
+  preserving addition order, directed laws and degree/neighbor multiplicity.
+  The dynamics inspector reads the same eligible input. This is an explicit
+  representation of the existing unit contributions, not weighted policy,
+  one globally aggregated spring per link, or measured assertion force.
 - **Seiche's `EdgeSpring` acts only along the endpoint line**
   (`crates/conatus/seiche/src/forces.rs`:184). It supplies no lateral path
   state. A field-responsive path needs its own evaluator and response model.
