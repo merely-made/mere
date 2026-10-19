@@ -105,7 +105,6 @@ fn visible_relation_edges_keeps_one_tuple_per_cell_and_drops_hidden_ones() {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         },
     );
     graph.assert_relation(
@@ -478,7 +477,6 @@ pub(super) fn shown_content_graph() -> (Graph, [NodeKey; 5]) {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::UserGrouped,
             label: None,
-            decay_progress: None,
         },
     );
     let ids = keys.map(|key| graph.get_node(key).unwrap().id);

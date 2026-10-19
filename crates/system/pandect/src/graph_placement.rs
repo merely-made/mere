@@ -356,7 +356,6 @@ pub(crate) fn placement_test_graph() -> Graph {
             assertion: kernel::graph::EdgeAssertion::Semantic {
                 sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
                 label: Some("held surface".into()),
-                decay_progress: None,
             },
         }],
     );
@@ -549,7 +548,6 @@ mod tests {
             assertion: kernel::graph::EdgeAssertion::Semantic {
                 sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
                 label: Some("held".into()),
-                decay_progress: None,
             },
         };
         let mut graph = kernel::graph::replay_captured_deltas((1..=3).map(|id| {

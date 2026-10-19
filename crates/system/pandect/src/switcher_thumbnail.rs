@@ -224,7 +224,6 @@ mod tests {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         }
     }
 

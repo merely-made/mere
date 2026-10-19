@@ -182,7 +182,6 @@ mod tests {
         let relation = || EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::UserGrouped,
             label: None,
-            decay_progress: None,
         };
         graph.assert_relation(keys[1], keys[3], relation());
         graph.assert_relation(keys[0], keys[2], relation());
@@ -313,7 +312,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
         let painted = strokes(&canvas);

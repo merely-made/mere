@@ -444,7 +444,6 @@ mod tests {
                 // A Surface relation; the Resource case is the test below.
                 sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
-                decay_progress: None,
             },
         );
         let seed = a.get_node(k1).unwrap().id;
@@ -498,7 +497,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
         // Precondition: the relation lives in the resource stratum only.

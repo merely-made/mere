@@ -97,7 +97,6 @@ fn linked_component_subgraph_derives_and_reconciles_on_drift() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
     };
@@ -151,7 +150,6 @@ fn linked_ego_subgraph_is_radius_bounded() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
     };
@@ -189,7 +187,6 @@ fn reconcile_all_updates_linked_rosters_on_drift() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
     };
@@ -266,7 +263,6 @@ fn toggle_family_selector_narrows_a_linked_subgraphs_derivation() {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         },
     );
     graph.assert_relation(
@@ -326,7 +322,6 @@ fn hyperlink(g: &mut Graph, x: kernel::graph::NodeKey, y: kernel::graph::NodeKey
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         },
     );
 }

@@ -91,7 +91,6 @@ fn legacy_semantic_replay_never_stamps_missing_times() {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
             asserter_iri: "urn:legacy:replay".into(),
         },
@@ -434,7 +433,6 @@ fn asserting_deltas_carry_source_attribution() {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         },
     );

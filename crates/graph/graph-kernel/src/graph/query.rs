@@ -83,7 +83,6 @@ mod projected_relation_tests {
                 EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::UserGrouped,
                     label: None,
-                    decay_progress: None,
                 },
             )
             .unwrap();
@@ -1125,7 +1124,6 @@ mod derivation_tests {
         let sem = || EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         };
         g.assert_relation(a, b, sem());
         g.assert_relation(b, c, sem());
@@ -1179,7 +1177,6 @@ mod derivation_tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
         g.assert_relation(
@@ -1229,7 +1226,6 @@ mod derivation_tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
         assert!(g.append_traversal(n2, n1, NavigationTrigger::LinkClick, Some(1_000_000)));
@@ -1325,7 +1321,6 @@ mod row_family_parity_tests {
         let sem = || EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::Hyperlink,
             label: None,
-            decay_progress: None,
         };
 
         // Open predicate only: Semantic to `has_family`, formerly no rows.

@@ -80,7 +80,6 @@ pub enum LiveEditError {
     Missing(GraphAddress),
     Stale(GraphAddress),
     MissingObservation(GraphAddress),
-    InvalidCommand(String),
     NeedsCompleteOperation,
 }
 impl From<SessionError> for LiveEditError {
@@ -95,7 +94,6 @@ impl std::fmt::Display for LiveEditError {
             Self::Missing(a) => write!(f, "missing graph record: {a:?}"),
             Self::Stale(a) => write!(f, "changed graph observation: {a:?}"),
             Self::MissingObservation(a) => write!(f, "missing graph observation: {a:?}"),
-            Self::InvalidCommand(reason) => write!(f, "invalid live command: {reason}"),
             Self::NeedsCompleteOperation => {
                 write!(f, "operation requires complete graph authority")
             },
@@ -352,9 +350,6 @@ pub(crate) fn preflight(
                     next.push(Operation::Mime(surface, mime_hint));
                 },
                 LiveCommand::AssertRelation { from, to, assertion } => {
-                    if let EdgeAssertion::Semantic { decay_progress: Some(value), .. } = &assertion {
-                        if !value.is_finite() { return Err(LiveEditError::InvalidCommand("non-finite relation decay".into())); }
-                    }
                     for surface in [from, to] {
                         if relation_stratum(&assertion) == GraphStratum::Resource {
                             require_content(scratch, source, &checks, surface)?;

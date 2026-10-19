@@ -708,7 +708,6 @@ mod tests {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         };
         let open = CapturedDelta::ReplayAssertSemanticPredicateByIds {
@@ -885,7 +884,6 @@ mod tests {
                     assertion: EdgeAssertion::Semantic {
                         sub_kind: SemanticSubKind::Cites,
                         label: None,
-                        decay_progress: None,
                     },
                 },
             );
@@ -1277,7 +1275,6 @@ mod tests {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::Cites,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );
@@ -1435,7 +1432,6 @@ mod tests {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         });
         journal.record(CapturedDelta::ReplaySetNodeTitleById {
@@ -1463,7 +1459,6 @@ mod tests {
             assertion: EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         });
 
@@ -1569,7 +1564,6 @@ mod tests {
                 assertion: EdgeAssertion::Semantic {
                     sub_kind: SemanticSubKind::Cites,
                     label: None,
-                    decay_progress: None,
                 },
             },
         );

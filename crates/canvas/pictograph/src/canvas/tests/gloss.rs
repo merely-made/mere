@@ -294,7 +294,6 @@ fn gloss_edges_carry_multiplicity_weight() {
         EdgeAssertion::Semantic {
             sub_kind: SemanticSubKind::UserGrouped,
             label: None,
-            decay_progress: None,
         },
     );
     graph.assert_relation(b, c, crate::canvas::build::hyperlink());

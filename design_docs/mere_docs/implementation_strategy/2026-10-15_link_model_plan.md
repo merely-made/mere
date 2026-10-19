@@ -47,7 +47,7 @@ records the separate source, browser, reopen and image-review claims.
 | Live source refresh and immutable public revisions | Separate source/receiving work: MereHost public revision availability remains explicit, and Knot's qualified reader is a startup snapshot. Automatic resident refresh/synchronization is not implied. |
 | Promotion in further products or across stores | Separate receiving scope: P7 qualifies Graphshell with one owning source per freeze. Foreign-store aggregate promotion and another host's review UI need their own admission and acceptance. |
 | Historical storage qualification | Pre-P2 binary archives and browser anti-eviction guarantees retain storage/migration owners; JSON and current-source compatibility receipts do not close them. |
-| Compatibility cleanup | `EdgeAssertion::Semantic.decay_progress` is still accepted and discarded by `graph/edge_ops.rs`; retire the unused write surface while preserving required historical readers in a separate bounded cleanup. |
+| Compatibility cleanup | Retired the ignored `EdgeAssertion::Semantic.decay_progress` write field below. Historical captured journals retain their old decoding boundary; snapshot compatibility fields remain. |
 | Knot checkpoint confidentiality | **Separate Knot storage lane**, recorded in `knot-editor/design_docs/2026-09-30_knot_composition_readings.md`, “Finding and deferred storage work”. Personal checkpoint sealing and existing-checkpoint handling are not implemented by this Mere feature and must not disappear from the backlog. |
 
 Woodshed's Stage/Set P7 is its Looper plan, distinct from link-model P7
@@ -377,8 +377,35 @@ replaced by arbitrary weights or one globally aggregated physical spring per
 canonical link. No frame-time gain, measured per-assertion force, path-to-node
 feedback, resonance or additional receiving-host qualification is claimed.
 Traversal event count/recency still do not become assertion support. The
-ignored `decay_progress` write-surface cleanup remains separate, as does Knot
-checkpoint confidentiality.
+`decay_progress` write-surface cleanup follows below. Knot checkpoint
+confidentiality remains separate.
+
+### Retired relation decay write surface
+
+**Feature target:** remove an ignored input from current relation commands
+without changing assertion strength, lifecycle or durable historical reads.
+Baseline is Mere `904d7391bf75d46c42f6c10698e90a01ab468195`.
+
+`EdgeAssertion::Semantic` now takes only its recognized kind and optional
+label. Current command JSON rejects the retired key rather than silently
+accepting a value that no writer uses. Pandect's finite-decay validation and
+its sole-purpose error variant are removed; source callers omit the field.
+
+Old `CapturedDelta::ReplayAssertRelationByIds` data reads through one private
+compatibility adapter. Its historical assertion enum retains the old variant
+order and binary slot; decoded decay values are discarded. Current JSON
+journals omit the field, while positional codecs retain the empty historical
+slot so following entries stay aligned. Snapshot `agent_decay_progress`
+fields and their readers remain unchanged. This compatibility representation
+belongs to capture persistence, not the current write API or graph state.
+
+**Validation:** pending final checks. Frozen fixtures produced by the clean
+baseline include absent and nonzero decay values in JSON, postcard and rkyv,
+all five assertion families, and a subsequent title entry. Tests must read
+those bytes, replay the same relation meaning, and reject the old key in live
+commands. Existing journal, snapshot, session, relation and consumer gates
+remain required. No native rendering or receiving-host qualification is
+claimed for this source/API cleanup.
 
 ## Authority and scope
 

@@ -126,7 +126,6 @@ fn old_json_translation_receipt_keeps_checksum_and_reopens_semantic_records() {
             assertion: kernel::graph::EdgeAssertion::Semantic {
                 sub_kind: kernel::graph::SemanticSubKind::UserGrouped,
                 label: Some("legacy direction".into()),
-                decay_progress: None,
             },
         },
     ]);

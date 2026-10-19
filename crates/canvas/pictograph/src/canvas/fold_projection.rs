@@ -322,7 +322,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Hyperlink,
                 label: None,
-                decay_progress: None,
             },
         );
         graph.assert_relation(
@@ -331,7 +330,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         );
         graph.assert_relation(
@@ -340,7 +338,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Quotes,
                 label: None,
-                decay_progress: None,
             },
         );
         graph.assert_relation(
@@ -417,7 +414,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         );
         let source_nodes = graph.nodes().count();
@@ -529,7 +525,6 @@ mod tests {
                     EdgeAssertion::Semantic {
                         sub_kind: SemanticSubKind::Cites,
                         label: None,
-                        decay_progress: None,
                     },
                 );
                 graph.assert_relation(
@@ -688,7 +683,6 @@ mod tests {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::Cites,
                 label: None,
-                decay_progress: None,
             },
         );
         assert_eq!(

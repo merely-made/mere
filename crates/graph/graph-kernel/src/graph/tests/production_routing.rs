@@ -48,7 +48,6 @@ fn semantic(kind: SemanticSubKind) -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: kind,
         label: None,
-        decay_progress: None,
     }
 }
 

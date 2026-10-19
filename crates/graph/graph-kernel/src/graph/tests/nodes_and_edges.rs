@@ -12,7 +12,6 @@ fn hyperlink() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Hyperlink,
         label: None,
-        decay_progress: None,
     }
 }
 
@@ -20,7 +19,6 @@ fn user_grouped(label: Option<&str>) -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::UserGrouped,
         label: label.map(str::to_string),
-        decay_progress: None,
     }
 }
 
@@ -28,7 +26,6 @@ fn cites() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Cites,
         label: None,
-        decay_progress: None,
     }
 }
 
@@ -547,7 +544,6 @@ fn test_assert_relation_preserves_generic_semantic_subkind() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::SameEntityAs,
                 label: Some("identity".to_string()),
-                decay_progress: None,
             },
         )
         .expect("semantic relation should be asserted");

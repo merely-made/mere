@@ -250,11 +250,11 @@ impl ArrangementSubKind {
 #[derive(
     Debug, Clone, PartialEq, Archive, Serialize, Deserialize, serde::Serialize, serde::Deserialize,
 )]
+#[serde(deny_unknown_fields)]
 pub enum EdgeAssertion {
     Semantic {
         sub_kind: SemanticSubKind,
         label: Option<String>,
-        decay_progress: Option<f32>,
     },
     Containment {
         sub_kind: ContainmentSubKind,

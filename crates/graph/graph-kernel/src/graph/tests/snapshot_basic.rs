@@ -23,7 +23,6 @@ fn hyperlink() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Hyperlink,
         label: None,
-        decay_progress: None,
     }
 }
 
@@ -31,7 +30,6 @@ fn user_grouped(label: Option<&str>) -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::UserGrouped,
         label: label.map(str::to_string),
-        decay_progress: None,
     }
 }
 
@@ -39,7 +37,6 @@ fn cites() -> EdgeAssertion {
     EdgeAssertion::Semantic {
         sub_kind: SemanticSubKind::Cites,
         label: None,
-        decay_progress: None,
     }
 }
 
@@ -422,7 +419,6 @@ fn test_snapshot_preserves_generic_semantic_relations() {
             EdgeAssertion::Semantic {
                 sub_kind: SemanticSubKind::CanonicalMirrorOf,
                 label: Some("profile".to_string()),
-                decay_progress: None,
             },
         )
         .expect("canonical mirror relation should be asserted");
