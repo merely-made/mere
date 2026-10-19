@@ -25,10 +25,43 @@ use super::actions::{AdvertisedAction, ArrangementAction};
 /// The most items the canvas describes at once (F67).
 pub const DESCRIBED_ITEMS: usize = 200;
 
+/// Stable action keys for members described to a reader. Keys are never reused
+/// during a canvas lifetime, even when the graph reuses a petgraph slot.
+#[derive(Default)]
+pub(super) struct DescribedKeyRegistry {
+    next: u64,
+    by_member: std::collections::HashMap<uuid::Uuid, u64>,
+    by_key: std::collections::HashMap<u64, uuid::Uuid>,
+}
+
+impl DescribedKeyRegistry {
+    fn key_for(&mut self, member: uuid::Uuid) -> u64 {
+        if let Some(key) = self.by_member.get(&member) {
+            return *key;
+        }
+        // Zero is reserved for the initial/unset value. Exhaustion is not
+        // recoverable without risking stale-action aliasing, so fail closed.
+        self.next = self
+            .next
+            .checked_add(1)
+            .expect("described action key space exhausted");
+        let key = self.next;
+        self.by_member.insert(member, key);
+        self.by_key.insert(key, member);
+        key
+    }
+
+    fn retain_live(&mut self, live: &std::collections::HashSet<uuid::Uuid>) {
+        self.by_member.retain(|member, _| live.contains(member));
+        self.by_key.retain(|_, member| live.contains(member));
+    }
+}
+
 /// One item as a reader is told it.
 #[derive(Clone, Debug, PartialEq)]
 pub struct DescribedItem {
-    /// Stable for the canvas's life, whatever order the items come in.
+    /// Opaque stable identity for the member during this canvas's life. It is
+    /// independent of the graph slot and remains stable across descriptions.
     pub key: u64,
     pub member: uuid::Uuid,
     /// The label its caption shows.
@@ -67,6 +100,12 @@ impl Canvas {
     /// always among them (it takes the last place when the cap would leave it
     /// out), each with its actions.
     pub fn describe_items(&self, cap: usize) -> CanvasDescription {
+        let live: std::collections::HashSet<_> =
+            self.graph.nodes().map(|(_, node)| node.id).collect();
+        self.described_keys
+            .lock()
+            .expect("described action key registry poisoned")
+            .retain_live(&live);
         let focused = self.focused_key();
         let (width, height) = (self.view_w as f32, self.view_h as f32);
         let mut total = 0;
@@ -99,8 +138,13 @@ impl Canvas {
             .into_iter()
             .filter_map(|(key, rect)| {
                 let node = self.graph.get_node(key)?;
+                let action_key = self
+                    .described_keys
+                    .lock()
+                    .expect("described action key registry poisoned")
+                    .key_for(node.id);
                 Some(DescribedItem {
-                    key: key.index() as u64,
+                    key: action_key,
                     member: node.id,
                     name: self.graph.node_display_label(key),
                     rect,
@@ -114,8 +158,14 @@ impl Canvas {
 
     /// The member a described item's key names.
     pub fn member_of_described(&self, key: u64) -> Option<uuid::Uuid> {
-        let key = NodeKey::new(usize::try_from(key).ok()?);
-        self.graph.get_node(key).map(|node| node.id)
+        let member = *self
+            .described_keys
+            .lock()
+            .expect("described action key registry poisoned")
+            .by_key
+            .get(&key)?;
+        self.graph.get_node_key_by_id(member)?;
+        Some(member)
     }
 
     /// Where `key` is drawn, in the canvas's logical px.
