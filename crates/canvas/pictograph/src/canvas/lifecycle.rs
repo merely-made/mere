@@ -152,6 +152,7 @@ impl Canvas {
         );
         let mut canvas = Self {
             graph,
+            described_keys: std::sync::Mutex::new(Default::default()),
             physics,
             #[cfg(feature = "gpu")]
             physics_device: None,
