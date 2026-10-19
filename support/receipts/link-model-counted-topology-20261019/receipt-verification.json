@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python3",
+    "support/receipts/link-model-counted-topology-20261019/verify.py",
+    "/Users/markik/Code/testing/mere/counted-link-topology-20261019"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "e5437a382e0fd42335efd846545246697c3417f1",
+  "started": "2026-10-19T18:03:08.812198+00:00",
+  "status_before": " M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n?? support/receipts/link-model-counted-topology-20261019/\n",
+  "process_started": true,
+  "exit_code": 0,
+  "finished": "2026-10-19T18:03:08.990035+00:00",
+  "log_sha256": "aa3a45e0ce4cfc8c46a09d2ec7bcdc12b29bfbc81bb848dcb8e58929f8ca1606",
+  "suites": []
+}

@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json",
+    "--fail-on-findings"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "eacbb82dc3e84f3c07af7d0b4047ad701fdd7629",
+  "started": "2026-10-19T17:25:19.951242+00:00",
+  "status_before": " M crates/canvas/pictograph/src/canvas.rs\n M crates/canvas/pictograph/src/canvas/build_tests.rs\n M crates/canvas/pictograph/src/canvas/dynamics_inspection.rs\n M crates/canvas/pictograph/src/canvas/dynamics_inspection_tests.rs\n M crates/canvas/pictograph/src/canvas/lifecycle.rs\n M crates/canvas/pictograph/src/canvas/physics_catalog.rs\n M crates/canvas/pictograph/src/canvas/projection_dynamics.rs\n M crates/canvas/pictograph/src/canvas/seiche_bridge.rs\n M crates/canvas/pictograph/src/canvas/selection.rs\n M crates/conatus/seiche/src/instruments.rs\n M crates/conatus/seiche/src/lib.rs\n M crates/conatus/seiche/src/runtime.rs\n M crates/conatus/seiche/src/runtime/actor.rs\n M crates/conatus/seiche/src/sync.rs\n M crates/conatus/seiche/src/view.rs\n M ports/graphshell/src/web_tree/dynamics_inspection.rs\n?? crates/conatus/seiche/src/edge_topology.rs\n?? crates/conatus/seiche/src/edge_topology/\n?? ports/graphshell/web/scenarios/p8_tree_counted_topology.scn\n?? ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn\n",
+  "exit_code": 1,
+  "finished": "2026-10-19T17:25:20.966678+00:00",
+  "log_sha256": "d818a6370fe9db9042055d4df26e267db912539e270e1ae9f5dd5f00c0f01428",
+  "suites": []
+}

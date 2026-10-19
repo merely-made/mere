@@ -1,0 +1,5 @@
+Process argv: ["python3", "support/receipts/link-model-counted-topology-20261019/verify.py", "/Users/markik/Code/testing/mere/counted-link-topology-20261019"]
+counted endpoint topology evidence verified; source cfbf750df45a1975c14eaedfd4082510150598b8
+Seiche passes: 220; Pictograph passes: 580; Graphshell passes: 317
+5 seed and 1 reopen PNGs; zero scenario errors/gate failures; source observations equal
+stored graph reopened in a distinct native process; both exits observed

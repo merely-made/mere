@@ -1,0 +1,50 @@
+{
+  "audits": [
+    {
+      "audit": "doc-audit",
+      "baseline_record": "audits/doc-audit-before.json",
+      "final_record": "doc-audit-final.json",
+      "baseline_log_sha256": "d818a6370fe9db9042055d4df26e267db912539e270e1ae9f5dd5f00c0f01428",
+      "final_log_sha256": "d818a6370fe9db9042055d4df26e267db912539e270e1ae9f5dd5f00c0f01428",
+      "json_equal": true,
+      "errors": null,
+      "changed_fields": [],
+      "baseline_exit_code": 1,
+      "final_exit_code": 1,
+      "finding_counts": {
+        "active_docs": 291,
+        "indexed_active_docs": 288,
+        "index_orphans": 2,
+        "index_ghosts": 0,
+        "memory_directory_links": 0,
+        "statusless_plans": 2,
+        "broken_relative_links": 33,
+        "historical_broken_relative_links": 245,
+        "planned_broken_relative_links": 0,
+        "ambiguous_known_root_paths": 178,
+        "ignored_known_root_patterns": 24,
+        "reserved_identifier_paths": 31,
+        "missing_known_root_paths": 262,
+        "historical_missing_known_root_paths": 239,
+        "planned_missing_known_root_paths": 9,
+        "invalid_historical_annotations": 0,
+        "stale_historical_annotations": 4,
+        "unheaded_owned_sources": 658,
+        "exhibit_b_sources": 0
+      }
+    },
+    {
+      "audit": "judgment",
+      "baseline_record": "audits/judgment-before.json",
+      "final_record": "judgment-final.json",
+      "baseline_log_sha256": "36cec6b1b66ba0619ec4c9d3069da16fb060e5e5a9b7ca4c0ad4374b4ca03c10",
+      "final_log_sha256": "36cec6b1b66ba0619ec4c9d3069da16fb060e5e5a9b7ca4c0ad4374b4ca03c10",
+      "json_equal": true,
+      "errors": 20,
+      "changed_fields": [],
+      "baseline_exit_code": 1,
+      "final_exit_code": 1
+    }
+  ],
+  "claim": "Existing nonzero findings retained; compare actual parsed audit output, not only exit status."
+}

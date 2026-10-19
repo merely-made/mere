@@ -41,7 +41,7 @@ records the separate source, browser, reopen and image-review claims.
 | Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
 | Responsive-path legibility | Qualified for the ordinary 2D square-node cohort on source `487f37096`: bounded corner rounding and face clipping, readable selected stratum cores/direction/opposition marks, and one shared segment handoff for paint/pick/report. See the continuation and receipt below; close crossings can still crowd marks. |
 | Attachment in other presentations | Qualified on source `0b7454123` through the shared billboard/camera model for tilted/yawed, rounded/circular, scaled suggestion and lifted profiles. Frame/face placement, visual selection, self arches and responsive clipping share the model. See the continuation and receipt below for scripted-profile, visible-stem and cohort limits. |
-| Strength and physical explanation | Counted-topology continuation in progress below: make current unit source-row contributions explicit and share runtime/inspection input while preserving existing force laws. Weighted policy, one globally aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance remain deferred to dynamics. |
+| Strength and physical explanation | Counted endpoint storage and shared runtime/inspection input qualified below. Current unit source-row contributions are explicit and existing force laws are preserved. Weighted policy, one globally aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance remain deferred to dynamics. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
 | Live source refresh and immutable public revisions | Separate source/receiving work: MereHost public revision availability remains explicit, and Knot's qualified reader is a startup snapshot. Automatic resident refresh/synchronization is not implied. |
@@ -299,7 +299,7 @@ their separate owners. No frame-time improvement is claimed.
 
 ### Counted endpoint topology and one inspection input — 2026-10-19
 
-**Status: implementation and focused parity complete; broader and native qualification pending.**
+**Status: implemented, tested and qualified in native Chrome, including fresh-process reopen.**
 Mark selected strength/physical explanation after shared billboard attachment,
 with direct publication and orchestration authorized. Baseline is refreshed
 Mere `eacbb82dc3e84f3c07af7d0b4047ad701fdd7629`.
@@ -334,21 +334,43 @@ count or a force measure. Graphshell's ordinary inspector explains held versus
 visible contributions; run counts and exact row identities remain available
 in its structured report and qualification readback.
 
-**Validation targets:**
+**Qualification:** compiled product and automated gates use committed source
+`cfbf750df45a1975c14eaedfd4082510150598b8`. The corrected reopen input is
+committed at `e5437a382e0fd42335efd846545246697c3417f1`; its only change opens
+the saved promoted Resource before reading its disclosure. Product source and
+dependencies are unchanged between those revisions. Exact commands, exits,
+hashes, failed iterations and image observations are in the
+[counted-topology receipt](../../../support/receipts/link-model-counted-topology-20261019/README.md).
+
+- Seiche: 220 passed; Pictograph: 580 passed; Graphshell: 317 passed. Product
+  Wasm build and bindgen, product-disabled viewer compile and port boundaries
+  passed. Existing ignored suites remain separately recorded.
+- Five native seed captures cover initial input, exact-reason hide, restore,
+  frozen copy and source withdrawal. All assertions passed without page or
+  renderer gate errors. Initial pair rows are three; hiding one gives two
+  visible out of three held; withdrawing it gives two visible out of two held.
+- A sixth reviewed capture comes from a distinct native Chrome process using
+  the retained origin/profile. The independent assertion and unchanged frozen
+  copy survive. Source facts and runtime graph revision match the seed's
+  post-withdrawal completion. Both browser exits were observed.
+- Both reviewers inspected all six actual PNGs. The inspector summary is
+  readable; the lower viewport has black empty space, with relevant content
+  unobscured. This is a bounded four-node alias fixture, not density or broad
+  layout qualification.
+
+**Covered invariants:**
 
 - Independent original-slice controls compare force, velocity and position
   bits over 120 ticks under spring, LinLog, magnetic, Boids, Anneal, Kuramoto
-  and degree/hub overlays. Include split runs, reverse direction, self rows
-  and absent endpoints; compare query multiplicity and pick-tie order.
-- Exercise counted versus legacy actor input, occurrence mode, exact assertion
+  and degree/hub overlays. They include split runs, reverse direction, self rows
+  and absent endpoints, query multiplicity and pick-tie order.
+- Tests exercise counted versus legacy actor input, occurrence mode, exact assertion
   hides, canonical stratum hides and displayed Resource aliases.
-- Run the shared canvas and Graphshell gates, product Wasm build, viewer
-  compile and port-boundary check from recorded committed source.
-- Use the promoted-link fixture to inspect three pair rows, hide one exact
-  reason without changing source facts/revision, restore it, freeze the held
-  assertions, and withdraw it at its source. The independent reason and frozen
-  copy survive. Reopen in a fresh browser process and compare persisted source
-  facts and the two remaining controller rows.
+- The promoted-link fixture inspects three pair rows, hides one exact
+  reason without changing source facts/revision, restores it, freezes the held
+  assertions, and withdraws it at its source. The independent reason and frozen
+  copy survive. Fresh-process reopening compares persisted source facts and
+  the two remaining pair input rows.
 
 **Remaining bounds:** current unit contributions are made explicit, not
 replaced by arbitrary weights or one globally aggregated physical spring per

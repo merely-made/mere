@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/Users/markik/Code/testing/mere/one-tree-product-20261008/toolchain/bin/wasm-bindgen",
+    "/Users/markik/Code/repos/mere/ports/graphshell/web/target/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+    "--target",
+    "web",
+    "--out-dir",
+    "/Users/markik/Code/testing/mere/counted-link-topology-20261019/pkg"
+  ],
+  "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+  "revision": "cfbf750df45a1975c14eaedfd4082510150598b8",
+  "started": "2026-10-19T17:53:31.422036+00:00",
+  "status_before": "",
+  "process_started": true,
+  "exit_code": 0,
+  "finished": "2026-10-19T17:53:41.529569+00:00",
+  "log_sha256": "958d3fb6baa23806f88da62d10afd86a959fb7eaeffb6ea38c1a9c577f2c0e2a",
+  "suites": []
+}

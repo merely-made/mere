@@ -1,0 +1,2 @@
+Process argv: ["python3", "support/receipts/link-model-counted-topology-20261019/verify.py", "support/receipts/link-model-counted-topology-20261019"]
+verification failed: missing or empty build artifact: pkg/graphshell_web.d.ts

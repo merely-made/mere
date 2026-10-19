@@ -1,0 +1,20 @@
+{
+  "source_revision": "cfbf750df45a1975c14eaedfd4082510150598b8",
+  "comparison": "post-withdrawal seed completion versus fresh-process reopen completion",
+  "all_equal": true,
+  "fields": [
+    {
+      "field": "link-rest-source-facts",
+      "utf8_bytes": 5864,
+      "sha256": "45c2a4da15ee2132db884ac08551c87c400322ffd5357aa042f9fd07f860d30e",
+      "equal": true
+    },
+    {
+      "field": "link-rest-graph-revision",
+      "utf8_bytes": 2,
+      "sha256": "e29c9c180c6279b0b02abd6a1801c7c04082cf486ec027aa13515e4f3884bb6b",
+      "equal": true
+    }
+  ],
+  "bound": "These are fixture source observations and runtime graph revision. The isolated fixture reports no public source revision."
+}

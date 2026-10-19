@@ -1,0 +1,9 @@
+{
+  "source_revision": "2bca926dffb66f8771532d24aed124530c882720",
+  "native_accepted": false,
+  "reason": "All behavioral source/hide/restore/freeze/withdraw assertions completed, but three expected pair run counts were incorrect: alias rows make two ordered runs, not one. Native captures also showed pair contribution summary below long member report; next source moves it to the top.",
+  "input_correction_before_run": "LinkKey JSON expectation changed from stable_id token to typed strata, no product source changed.",
+  "packaging_iteration": "First bindgen command did not launch because binary was absent from PATH; exact compatible 0.2.129 tool was then used. Failed launch has original log but no fabricated process exit.",
+  "browser_exit": "Native Chrome menu Quit; process list empty before next candidate.",
+  "server_exit": "Intentional Ctrl-C, exit1."
+}
