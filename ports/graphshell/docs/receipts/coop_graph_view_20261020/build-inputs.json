@@ -811,6 +811,9 @@
     "crates/fleece/src/traversal.rs": "1e23e0c0170a4eb5ec5133652c552519aeaa60c808993572c90fc6a5d72b7d81",
     "crates/fleece/src/traversal/tests.rs": "93d3611a332690aea83226d59ec45c1b26b128d7008a8c879e376a3d3cb9c4f2",
     "crates/fleece/tests/eidetic_peer_transfer.rs": "bf3dde7a401fc73fe9620b77c0f5bffcba79ae41509435ebe554d615ca6b9313",
+    "crates/fleece/tests/fixtures/portable_clip/knot.json": "8533d5f98eaafb83a66b24fe04e87fb712431b2b9a1ed943b4f9d1a4848a5fd9",
+    "crates/fleece/tests/fixtures/portable_clip/redshank.json": "f5e662ac2267c4db8f184dcaeeb611df0f91d7467827d7f0f4450a753a32861f",
+    "crates/fleece/tests/fixtures/portable_clip/voice.wav": "9e064a90bf4027d8885894754873864b51d4694c005332b714d3a5b64e029c66",
     "crates/fleece/tests/portable_clip.rs": "1fc5e831a4d107c485bf3d55cb8c035a8cd3c2155c218dc5bedca2e841e7d975",
     "crates/forme/curation/Cargo.toml": "96e3eee2a21a5da07f8b33a956c3b90081ef0924fcb81e774a1928d2a6e1af5f",
     "crates/forme/curation/src/fold.rs": "3df91eb7fa191388366a51c9ae880c5d0db35fce8ec226f94d8517091392086e",
@@ -2000,9 +2003,6 @@
     "ports/graphshell/src/responsive_links.rs": "281fce0f2dcc7f6734817d17d60d3e3c97a8f819b761cad3eecb74e181062061",
     "ports/graphshell/src/responsive_links_tests.rs": "38c3f3cfda0a963ba62ce07bafb3b2a10197e4c225ea27fcd4ad2d22ee77386c",
     "ports/graphshell/src/retained_content.rs": "b522b85b387e670486b4339c3af8589138e6d3361ccfb307258f2d4d5026ef29",
-    "ports/graphshell/src/retained_content/../../../../crates/fleece/tests/fixtures/portable_clip/knot.json": "8533d5f98eaafb83a66b24fe04e87fb712431b2b9a1ed943b4f9d1a4848a5fd9",
-    "ports/graphshell/src/retained_content/../../../../crates/fleece/tests/fixtures/portable_clip/redshank.json": "f5e662ac2267c4db8f184dcaeeb611df0f91d7467827d7f0f4450a753a32861f",
-    "ports/graphshell/src/retained_content/../../../../crates/fleece/tests/fixtures/portable_clip/voice.wav": "9e064a90bf4027d8885894754873864b51d4694c005332b714d3a5b64e029c66",
     "ports/graphshell/src/retained_content/export.rs": "68e8a1b46b884179e250e0f6df4ac72d3647e0b590b80d4d8e1c06413cdc7e49",
     "ports/graphshell/src/retained_content/fixture.rs": "db75193300500baf2298891b1ecdb00bd345b3af28749597788334b2628717ba",
     "ports/graphshell/src/retained_content/producer.rs": "6e6405d48a524f8e768560d33c15fc167925653745256068e64e5104fb7d7f1d",
@@ -3301,5 +3301,6 @@
     "application": "cargo +1.99.1 build --locked --offline -p graphshell-mere",
     "resident": "cargo +1.99.1 build --locked --offline -p djinn --features passphrase-fd --bin djinn",
     "preparation": "cargo +1.99.1 build --locked --offline -p djinn --features passphrase-fd --example coop_existing_graph"
-  }
+  },
+  "input_path_note": "Compiler-declared include paths are canonicalized relative to the repository for Git object verification; original depfiles retain their lexical paths."
 }
