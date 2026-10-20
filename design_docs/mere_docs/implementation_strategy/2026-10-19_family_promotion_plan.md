@@ -508,3 +508,64 @@ The earlier failed source comparison also remains retained. This source-only
 Knot adoption is qualified through Mere's receiving gates, not an unfiltered
 standalone Knot suite. Later receiving reruns have separate
 `execution-*-publish-aligned.json` receipts.
+
+
+### Repaired supplier receiving checkpoints on macOS
+
+The initial promotion table above is historical. The repaired receiving cohort is
+Eidetic `543f5ff3`, Gemot `67ce0ac3`, ESP `af5597c6` and Armillary `68275599`.
+Mere's execution receiver advances the last two to the separately qualified
+ESP `b20ae7db` and Armillary `e67c5def`; consumers without that execution seam
+retain their qualified pins. Source identity is checked within each actual
+consuming graph rather than inferred from declarations or unused patches.
+
+| Consumer | Published receiving checkpoint | Receiving evidence |
+|---|---|---|
+| Cleromancy | `230347a9` | Personal-sync all-targets check; 17 core tests |
+| Knot | `c6a442db` | Root library check; locked root, document and site graphs |
+| Murm | `f9fe8507` | Six session-lane tests; Signalman app check |
+| Isocosm | `028a5ef1` | Seven witnessed-lifecycle tests; five locked roots |
+| merelyllc.com | `9b6bd436` | Site check; one selected repo-graph test; both locked roots |
+| Turnstone | `01658c73` | Published manifest and lock checked; native evidence remains with its owner |
+| Woodshed | `f1f2df08` | 331 core/graph tests; Hocket, Redshank and recipe checks; four locked roots |
+
+Required SDK intake preserves the concurrent Cambium 0.4 requirement. Mere
+`48fd3385` repairs the promoted family source identities; consumers with the new
+GUI bounds use published SDK `4d60510c`. Cargo-generated lock closure changes
+are retained in their receipts. The only receiving adapter changes are removal
+of three obsolete semantic `decay_progress` initializers in Cleromancy and
+explicit anonymous management-geometry fields in Signalman. The latter does not
+invent source-link identity or link-opening authority from a management edge.
+
+Knot's concurrent ESP alignment is preserved: its root resolves ESP `b20ae7db`
+and Armillary `68275599`; the nested document/site supplier patches are unused
+in their actual graphs. The root lock closure was regenerated and checked after
+the alignment. This intake does not include the separate Knot checkpoint repair.
+
+The macOS receiving extension preserves Mere `8f26d962` and its direct Armillary
+imports, deleted local task/close modules, browser qualification and upstream
+receipts. It adds one retained collection of journal failures to the existing
+run table. Lock and close report every observed journal refusal; an explicit
+host lock remains authoritative after actor loss. Failed resume admission
+restores the retained pause instead of leaving a queued continuation. Buffered
+completion, actor panic and repeated close results have deterministic receiving
+controls. The dedicated/pooled controls extend the existing
+`support/fixtures/armillary-consumer` host rather than add another fixture.
+
+Final macOS checks pass: 41 Distillery library tests plus four shutdown/close/
+resident cases; nine Djinn receiving tests with its binary target compiled;
+43 Graphshell endpoint tests; four independent synchronous actor controls; eight
+locked metadata roots; and the port boundary check. Both selected before-repair
+controls fail at their intended assertions, including the durable-lock false
+success on `8f26d962`. The stable final Distillery/Djinn reruns start from a clean
+receiving checkpoint. The synchronous fixture's normal dependency graph excludes
+Tokio. Counts describe their individual configurations, not a combined unique
+suite or new native UI qualification.
+
+Compact records for this receiving extension and the consumer publications are
+`support/family-promotion/consumer-repaired-cohort-publication.json` and
+`support/family-promotion/execution-macos-receiving.json`. They retain source
+hashes, exact commands, exit results and the failed pre-repair controls. These
+are CPU/source checks; native UI, physical audio/radio, heavy models and the
+Knot checkpoint lane keep their own acceptance records. Q112/Q113 pool admission
+and worker lifetime remain open.
