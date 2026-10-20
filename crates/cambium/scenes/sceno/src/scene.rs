@@ -159,15 +159,23 @@ pub struct RoutedRelation {
     /// Stable source pair and stratum shared by the underlying link. This
     /// does not identify a particular assertion/relation kind; `None` is
     /// appropriate for synthetic or source-unbound scene geometry.
-    #[serde(default)]
+    ///
+    /// This and the next two fields are omitted from the wire at their
+    /// defaults, so a relation without link facts serializes exactly as it
+    /// did before they existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub link_key: Option<crate::LinkKey>,
     /// Directional source contribution marks for this resting link stroke.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "unmarked")]
     pub marks: crate::LinkMarks,
     /// Number/strength of contributing source assertions, when the source
     /// adapter can disclose it. This is distinct from render weight.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub strength: Option<f32>,
+}
+
+fn unmarked(marks: &crate::LinkMarks) -> bool {
+    *marks == crate::LinkMarks::default()
 }
 
 /// A region over member instances: a drawn hull, a derived cluster halo, a
