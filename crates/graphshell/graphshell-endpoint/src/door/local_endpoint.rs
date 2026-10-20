@@ -32,6 +32,60 @@ pub trait LocalStream: AsyncRead + AsyncWrite + Unpin + Send + 'static {}
 
 impl<T> LocalStream for T where T: AsyncRead + AsyncWrite + Unpin + Send + 'static {}
 
+/// A bound local endpoint, ready to accept connections.
+///
+/// Keeping the platform listener here lets callers establish that their
+/// endpoint is available before reporting readiness.
+pub struct LocalListener {
+    #[cfg(windows)]
+    endpoint: String,
+    #[cfg(windows)]
+    what: &'static str,
+    #[cfg(windows)]
+    listener: tokio::net::windows::named_pipe::NamedPipeServer,
+    #[cfg(not(windows))]
+    listener: tokio::net::UnixListener,
+}
+
+impl LocalListener {
+    /// Prepare and bind a local endpoint.
+    pub async fn bind(endpoint: &str, what: &'static str) -> Result<Self, std::io::Error> {
+        #[cfg(windows)]
+        let listener = tokio::net::windows::named_pipe::ServerOptions::new()
+            .first_pipe_instance(true)
+            .create(endpoint)?;
+
+        #[cfg(not(windows))]
+        let listener = {
+            use std::os::unix::fs::PermissionsExt;
+
+            prepare_unix_endpoint(std::path::Path::new(endpoint)).await?;
+            let listener = tokio::net::UnixListener::bind(endpoint)?;
+            std::fs::set_permissions(endpoint, std::fs::Permissions::from_mode(0o600))?;
+            listener
+        };
+
+        tracing::info!(endpoint, door = what, "resident endpoint listening");
+
+        Ok(Self {
+            #[cfg(windows)]
+            endpoint: endpoint.to_owned(),
+            #[cfg(windows)]
+            what,
+            listener,
+        })
+    }
+
+    /// Accept owner-only connections forever, handing each to `handle`.
+    pub async fn serve<H, F>(self, handle: H) -> Result<(), std::io::Error>
+    where
+        H: Fn(Box<dyn LocalStream>) -> F + Clone + Send + 'static,
+        F: Future<Output = ()> + Send + 'static,
+    {
+        serve_platform(self, handle).await
+    }
+}
+
 /// How long a client waits out a busy pipe, and how often it tries again.
 #[cfg(windows)]
 const PIPE_BUSY_PATIENCE: std::time::Duration = std::time::Duration::from_secs(2);
@@ -81,29 +135,30 @@ where
     H: Fn(Box<dyn LocalStream>) -> F + Clone + Send + 'static,
     F: Future<Output = ()> + Send + 'static,
 {
-    serve_platform(endpoint, what, handle).await
+    LocalListener::bind(endpoint, what)
+        .await?
+        .serve(handle)
+        .await
 }
 
 #[cfg(windows)]
-async fn serve_platform<H, F>(
-    endpoint: &str,
-    what: &'static str,
-    handle: H,
-) -> Result<(), std::io::Error>
+async fn serve_platform<H, F>(listener: LocalListener, handle: H) -> Result<(), std::io::Error>
 where
     H: Fn(Box<dyn LocalStream>) -> F + Clone + Send + 'static,
     F: Future<Output = ()> + Send + 'static,
 {
     use tokio::net::windows::named_pipe::ServerOptions;
 
-    let mut server = ServerOptions::new()
-        .first_pipe_instance(true)
-        .create(endpoint)?;
-    tracing::info!(endpoint, door = what, "resident endpoint listening");
+    let LocalListener {
+        endpoint,
+        what,
+        listener,
+    } = listener;
+    let mut server = listener;
     loop {
         server.connect().await?;
         let connection = server;
-        server = ServerOptions::new().create(endpoint)?;
+        server = ServerOptions::new().create(&endpoint)?;
         let handle = handle.clone();
         armillary::tasks::spawn_tracked(async move {
             if let Err(error) = verify_same_user(&connection) {
@@ -116,21 +171,12 @@ where
 }
 
 #[cfg(not(windows))]
-async fn serve_platform<H, F>(
-    endpoint: &str,
-    what: &'static str,
-    handle: H,
-) -> Result<(), std::io::Error>
+async fn serve_platform<H, F>(listener: LocalListener, handle: H) -> Result<(), std::io::Error>
 where
     H: Fn(Box<dyn LocalStream>) -> F + Clone + Send + 'static,
     F: Future<Output = ()> + Send + 'static,
 {
-    use std::os::unix::fs::PermissionsExt;
-
-    prepare_unix_endpoint(std::path::Path::new(endpoint)).await?;
-    let listener = tokio::net::UnixListener::bind(endpoint)?;
-    std::fs::set_permissions(endpoint, std::fs::Permissions::from_mode(0o600))?;
-    tracing::info!(endpoint, door = what, "resident endpoint listening");
+    let LocalListener { listener, .. } = listener;
     loop {
         let (connection, _) = listener.accept().await?;
         let handle = handle.clone();
@@ -353,12 +399,40 @@ mod windows_tests {
         server.connect().await.unwrap();
         verify_same_user(&server).unwrap();
     }
+
+    #[tokio::test]
+    async fn a_bound_local_endpoint_is_immediately_connectable() {
+        let endpoint = format!(r"\\.\pipe\graphshell-ready-{}", uuid::Uuid::new_v4());
+        let listener = LocalListener::bind(&endpoint, "test")
+            .await
+            .expect("bind local endpoint");
+
+        let client = ClientOptions::new()
+            .open(&endpoint)
+            .expect("bound endpoint accepts connections immediately");
+        listener.listener.connect().await.expect("accept client");
+
+        drop((client, listener));
+    }
+
+    #[tokio::test]
+    async fn a_live_named_pipe_cannot_be_bound_twice() {
+        let endpoint = format!(r"\\.\pipe\graphshell-conflict-{}", uuid::Uuid::new_v4());
+        let listener = LocalListener::bind(&endpoint, "test")
+            .await
+            .expect("bind initial local endpoint");
+
+        let second = LocalListener::bind(&endpoint, "test").await;
+
+        assert!(second.is_err(), "live pipe instance must not be replaced");
+        drop(listener);
+    }
 }
 
 #[cfg(all(test, unix))]
 mod unix_tests {
     use std::os::unix::{
-        fs::{FileTypeExt, symlink},
+        fs::{FileTypeExt, MetadataExt, PermissionsExt, symlink},
         net::UnixListener,
     };
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -393,6 +467,60 @@ mod unix_tests {
             .expect("missing endpoint needs no cleanup");
 
         assert!(!endpoint.exists());
+        std::fs::remove_dir_all(directory).expect("remove scratch");
+    }
+
+    #[tokio::test]
+    async fn a_bound_listener_is_immediately_connectable_and_owner_only() {
+        let directory = scratch("bound");
+        std::fs::create_dir_all(&directory).expect("create scratch");
+        let endpoint = directory.join("resident.sock");
+
+        let listener = LocalListener::bind(endpoint.to_str().expect("endpoint path"), "test")
+            .await
+            .expect("bind local endpoint");
+        let client = tokio::net::UnixStream::connect(&endpoint)
+            .await
+            .expect("bound endpoint accepts connections immediately");
+        let (server, _) = listener.listener.accept().await.expect("accept client");
+        assert_eq!(
+            std::fs::metadata(&endpoint)
+                .expect("endpoint metadata")
+                .permissions()
+                .mode()
+                & 0o777,
+            0o600
+        );
+        drop((client, server, listener));
+        std::fs::remove_dir_all(directory).expect("remove scratch");
+    }
+
+    #[tokio::test]
+    async fn bind_error_preserves_a_live_endpoint_and_its_security() {
+        let directory = scratch("bind-live");
+        std::fs::create_dir_all(&directory).expect("create scratch");
+        let endpoint = directory.join("resident.sock");
+        let listener = tokio::net::UnixListener::bind(&endpoint).expect("bind live socket");
+        std::fs::set_permissions(&endpoint, std::fs::Permissions::from_mode(0o600))
+            .expect("restrict live socket");
+        let before = std::fs::metadata(&endpoint).expect("live endpoint metadata");
+
+        let error =
+            match LocalListener::bind(endpoint.to_str().expect("endpoint path"), "test").await {
+                Err(error) => error,
+                Ok(_) => panic!("live endpoint must not be replaced"),
+            };
+
+        let after = std::fs::metadata(&endpoint).expect("live endpoint remains");
+        assert_eq!(error.kind(), std::io::ErrorKind::AddrInUse);
+        assert_eq!(before.dev(), after.dev());
+        assert_eq!(before.ino(), after.ino());
+        assert_eq!(after.permissions().mode() & 0o777, 0o600);
+        let _client = tokio::net::UnixStream::connect(&endpoint)
+            .await
+            .expect("original listener still serves endpoint");
+        let _accepted = listener.accept().await.expect("accept original connection");
+        drop(listener);
         std::fs::remove_dir_all(directory).expect("remove scratch");
     }
 

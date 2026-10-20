@@ -23,12 +23,10 @@ use castellan::custody::IdentityVault;
 use castellan::custody::bootstrap;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
 use djinn::door::browser_carrier::AllowedExtensions;
-#[cfg(feature = "personal-sync")]
-use djinn::door::device_broker::serve_browser_broker_with_cards;
 use djinn::door::device_broker::{
-    configured_device_endpoint, default_device_endpoint, serve_browser_broker,
+    configured_device_endpoint, default_device_endpoint, serve_browser_broker_on,
 };
 use djinn::identity_ui::SystemNativeIdentityUi;
 use djinn::keeper::Keeper;
@@ -60,6 +58,7 @@ use graphshell_endpoint::door::app_admission::{
 };
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
+use graphshell_endpoint::door::local_endpoint::LocalListener;
 #[cfg(not(windows))]
 use graphshell_endpoint::door::local_endpoint::prepare_unix_endpoint;
 #[cfg(feature = "personal-sync")]
@@ -1198,18 +1197,6 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(not(feature = "inference"))]
         drop(personal_sync_host);
         works = resident.take_distillery();
-        {
-            let now = status.read();
-            events.emit(
-                "listening",
-                json!({
-                    "agent": now.endpoints.agent,
-                    "browser": now.endpoints.browser,
-                    "app": now.endpoints.app,
-                    "ticket": now.sync.map(|sync| sync.ticket),
-                }),
-            );
-        }
         // Both doors are served from the same surface handle, so an application
         // and a browser on this device see one set of cards rather than two.
         #[cfg(feature = "personal-sync")]
@@ -1315,44 +1302,42 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             djinn::custody::grant(&grants)?;
             (grants, AppEndpointCatalog::default())
         };
-        let apps = serve_app_broker(
-            &args.app_endpoint,
+        // Binding is startup work: a ready resident must already own every
+        // endpoint. Keep serving lazy so the resident loop owns their lifetime.
+        let app_listener = LocalListener::bind(&args.app_endpoint, "first-party")
+            .await
+            .map_err(|error| format!("could not bind app endpoint {}: {error}", args.app_endpoint))?;
+        let browser_listener = LocalListener::bind(&args.browser_endpoint, "browser")
+            .await
+            .map_err(|error| format!("could not bind browser endpoint {}: {error}", args.browser_endpoint))?;
+        {
+            let now = status.read();
+            events.emit(
+                "listening",
+                json!({
+                    "agent": now.endpoints.agent,
+                    "browser": now.endpoints.browser,
+                    "app": now.endpoints.app,
+                    "ticket": now.sync.map(|sync| sync.ticket),
+                }),
+            );
+        }
+        let apps = serve_app_broker_on(
+            app_listener,
             Arc::clone(&keeper),
             allowed_app_routes,
             session_duration_ms(),
             app_surface,
             app_catalog,
         );
-        #[cfg(feature = "personal-sync")]
-        let browser = async {
-            match supplemental_cards {
-                Some(cards) => {
-                    serve_browser_broker_with_cards(
-                        &args.browser_endpoint,
-                        Arc::clone(&keeper),
-                        allowlist,
-                        session_duration_ms(),
-                        cards,
-                    )
-                    .await
-                },
-                None => {
-                    serve_browser_broker(
-                        &args.browser_endpoint,
-                        Arc::clone(&keeper),
-                        allowlist,
-                        session_duration_ms(),
-                    )
-                    .await
-                },
-            }
-        };
         #[cfg(not(feature = "personal-sync"))]
-        let browser = serve_browser_broker(
-            &args.browser_endpoint,
+        let supplemental_cards = None;
+        let browser = serve_browser_broker_on(
+            browser_listener,
             Arc::clone(&keeper),
             allowlist,
             session_duration_ms(),
+            supplemental_cards,
         );
         tokio::pin!(agent);
         tokio::pin!(browser);
