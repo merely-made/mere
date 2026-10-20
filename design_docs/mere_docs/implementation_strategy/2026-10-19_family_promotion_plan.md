@@ -527,6 +527,7 @@ consuming graph rather than inferred from declarations or unused patches.
 | Isocosm | `028a5ef1` | Seven witnessed-lifecycle tests; five locked roots |
 | merelyllc.com | `9b6bd436` | Site check; one selected repo-graph test; both locked roots |
 | Turnstone | `01658c73` | Published manifest and lock checked; native evidence remains with its owner |
+| Woodshed | `f1f2df08` | 331 core/graph tests; Hocket, Redshank and recipe checks; four locked roots |
 
 Required SDK intake preserves the concurrent Cambium 0.4 requirement. Mere
 `48fd3385` repairs the promoted family source identities; consumers with the new
