@@ -310,7 +310,7 @@ impl RecallIndex {
         })
     }
     /// Ordered passage ids from each lane, filtered to the current source
-    /// scope before fusion so unrelated owners cannot change rank positions.
+    /// scope before fusion so out-of-scope hits do not occupy fusion ranks.
     pub fn rankings(
         &self,
         question: &str,
@@ -704,6 +704,9 @@ mod tests {
                 journal: None,
                 actor: Mutex::new(None),
                 bridge: Mutex::new(None),
+                close_result: Mutex::new(None),
+                #[cfg(feature = "inference-embedding")]
+                embedding: Mutex::new(None),
                 max_tokens: 1,
                 caches: Mutex::new(Vec::new()),
                 recall: Mutex::new(None),

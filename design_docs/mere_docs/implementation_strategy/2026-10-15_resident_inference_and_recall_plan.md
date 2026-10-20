@@ -766,6 +766,20 @@ refusal, stale source/chunker refusal and lexical/vector/fused measurements.
 Memory remains sparse or at most 384 dense dimensions, with owner byte bounds.
 This is not yet a completed I10 verdict.
 
+The receiving binary enables `djinn/inference-embedding`. Owner settings add an
+optional `inference.embedding` object to an existing exact library-model lane.
+For a library embedding provider its serialized shape is
+`{"provider":{"kind":"library","model":"blake3:<admitted-model-manifest>"},"max_index_bytes":8388608,"lexical_weight":1,"vector_weight":1,"rrf_k":60}`
+(illustrative identifier). The model is the embedding model artifact, distinct
+from the generation row. The resident resolves its components locally with
+`NoFetcher`; it does not acquire a model on an ask. The sparse alternative is
+`{"kind":"lexical-sparse","dimensions":384,"token_ngram_orders":[1,2]}`.
+Missing identities, incompatible projections and byte-limit failures are errors;
+operators rebuild derived indexes from admitted sources after an intentional
+space/chunker change. Lexical-only settings omit `embedding`. New embedding
+run evidence requires clients built with the extended recall protocol; the
+omitted field preserves the existing lexical-only wire shape.
+
 R4's vector lane behind Eidetic's embedding envelope.
 
 Done when: restart accepts an index whose envelope matches and rejects a
