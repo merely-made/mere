@@ -528,11 +528,17 @@ Done when:
 - the command set's tests cover ranking, recents, adds and removes, and search over every command;
 - a headed check drags to pan, right-drags to select, and right-clicks to a menu whose search finds a command, in Chrome and Firefox.
 
-### C2 — `command-menu`, one home for commands (SE45 to SE47)
+### C2 — `hest::menu`, one home for commands (SE45 to SE47)
+
+**H1 continuation (2026-10-20):** the [Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
+records the accepted pure move from `command-menu` into `hest::menu` and
+`hest::catalogue`, with the old crate retained as a public compatibility
+re-export. The dated SE45–SE50 rulings and C2 landing receipts below retain
+their original package names as history. Push and publication are deferred.
 
 - **The `ActionId` audit (SE48).** Each of the 68 against Graphshell web's commands, Turnstone's catalogue and ux-events' readers: live, stale, or missing; the result is a round before any variant moves.
 - **Map first.** graph-kernel's `ActionId` and its readers, mere-chrome's `CommandPaletteSession`, Turnstone's palette state and Graphshell's web menu state, each set against the set and the session: what each carries, what overlaps, what would be defined twice. What folds in, and how, comes back as a round.
-- **The crate** (`crates/cambium/command-menu`, serde its only dependency): `Command`, `CommandChoices` (serde, the same field names as `CommandMenuView`), `CommandSet` with `menu` returning commands, and a palette session (query, cursor and whatever else the map shows a palette needs). cambium re-exports it and keeps the conversion to `CommandItem`.
+- **The crate** (`crates/cambium/hest`, serde its only dependency): `hest::menu` holds `Command`, `CommandChoices` (serde, the same field names as `CommandMenuView`), `CommandSet` with `menu` returning commands, and `MenuSession`; `hest::catalogue` holds the shared ids and labels. Cambium re-exports the types and catalogue and keeps the conversion to `CommandItem`. `command-menu` 0.1.1 re-exports the old public paths from Hest 0.1.x.
 - **pandect** stores `CommandChoices` where `CommandMenuView` was; Graphshell repoints.
 - **Turnstone** is briefed to store the same type in its sidecar and read its palette state through the session, at its next coordinated repin.
 

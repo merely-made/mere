@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "doc",
+    "--locked",
+    "--offline",
+    "-p",
+    "hest",
+    "-p",
+    "command-menu",
+    "--no-deps"
+  ],
+  "environment": {
+    "RUSTDOCFLAGS": "-D rustdoc::broken_intra_doc_links"
+  },
+  "exit_code": 0,
+  "log_sha256": "280d3f99f36ef34233b2ad26cd9125f42994a7e423c78cfd69bfd199adc2b0ea",
+  "raw_log_sha256": "280d3f99f36ef34233b2ad26cd9125f42994a7e423c78cfd69bfd199adc2b0ea",
+  "log_normalization": "Terminal empty lines removed only; raw hash retained."
+}

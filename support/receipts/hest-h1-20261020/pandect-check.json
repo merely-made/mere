@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "pandect",
+    "--lib",
+    "a_view_set_now_waits_for_the_next_batch"
+  ],
+  "exit_code": 0,
+  "test_results": [
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 331 filtered out; finished in 0.01s"
+  ],
+  "log_sha256": "dd4b52e0c79e53166aff2b61420175f04bca029b300919d21da1dba474a1c04f",
+  "raw_log_sha256": "e0c3234b63473f4dc8dc689acb38ba5d00396743784117131e64783e4a1b376a",
+  "log_normalization": "Terminal empty lines removed only; raw hash retained."
+}

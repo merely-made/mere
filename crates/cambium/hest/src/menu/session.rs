@@ -7,7 +7,7 @@
 //! whether it was expanded to every command. Where it sits and how it is
 //! drawn are the host's.
 
-use crate::{Command, CommandChoices, CommandSet};
+use super::{Command, CommandChoices, CommandSet};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MenuSession {

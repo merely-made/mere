@@ -1,0 +1,26 @@
+{
+  "baseline": "9a173f18b29f5452a7cf4a833d237b7d6c04d775",
+  "files": [
+    {
+      "before": "crates/cambium/command-menu/src/lib.rs",
+      "after": "crates/cambium/hest/src/menu/mod.rs",
+      "before_sha256": "90e1d096884cde4f86494f12d266e30060a98fe0ad50b92b9d36d3e3b76b104e",
+      "after_sha256": "c8ed224fda0422cc81ae7a6e18c8a1ae7b1a86f8be92a2f6183ddbb0464ee86e",
+      "equal_after_module_and_doc_path_changes": true
+    },
+    {
+      "before": "crates/cambium/command-menu/src/session.rs",
+      "after": "crates/cambium/hest/src/menu/session.rs",
+      "before_sha256": "9ac61c21e31ab8b140bca602efc3a3dc0ed841ec79507ecb6072b1c24aeffb9c",
+      "after_sha256": "1bf3cd93ab0eaf6ea8dc570ce5ab6a3f822c2c013c1b9a43209c0aba41247583",
+      "equal_after_module_and_doc_path_changes": true
+    },
+    {
+      "before": "crates/cambium/command-menu/src/catalogue.rs",
+      "after": "crates/cambium/hest/src/catalogue.rs",
+      "before_sha256": "52169e91e36b6c7291f5b397292041c275768b886b22acf9a75597d593a05713",
+      "after_sha256": "2b43216153a0b30a4d890b7b9aa224d92c1185d5842f76cb9520eaf056ce43cb",
+      "equal_after_module_and_doc_path_changes": true
+    }
+  ]
+}

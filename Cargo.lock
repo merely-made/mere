@@ -2127,9 +2127,9 @@ name = "cambium"
 version = "0.4.0"
 dependencies = [
  "backstep",
- "command-menu",
  "genet-scripted-dom",
  "genet-text",
+ "hest",
  "illume",
  "layout-dom-api",
  "mere-surface-api",
@@ -2771,10 +2771,9 @@ dependencies = [
 
 [[package]]
 name = "command-menu"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
- "serde",
- "serde_json",
+ "hest",
 ]
 
 [[package]]
@@ -6939,7 +6938,6 @@ dependencies = [
  "chartulary",
  "chatelaine",
  "chirograph",
- "command-menu",
  "distillery",
  "dramatis",
  "eidetic",
@@ -6950,6 +6948,7 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
+ "hest",
  "illume",
  "image",
  "inker",
@@ -7372,7 +7371,11 @@ checksum = "e17592d60ebacc7d5e169f4663c5f84f9161cc90328abcfe8456f41e4dfcb284"
 
 [[package]]
 name = "hest"
-version = "0.0.1"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "hex"
@@ -9907,10 +9910,10 @@ dependencies = [
  "cbor4ii",
  "chartulary",
  "ciborium",
- "command-menu",
  "crossbeam-channel",
  "euclid",
  "futures-util",
+ "hest",
  "infer",
  "mere-forme",
  "mime_guess",
@@ -10096,7 +10099,7 @@ dependencies = [
 name = "mere-registry"
 version = "0.0.1"
 dependencies = [
- "command-menu",
+ "hest",
  "http",
  "infer",
  "inventory",
@@ -12781,11 +12784,11 @@ dependencies = [
  "chacha20poly1305 0.11.0",
  "chartulary",
  "ciborium",
- "command-menu",
  "dirs 5.0.1",
  "eidetic",
  "euclid",
  "getrandom 0.3.4",
+ "hest",
  "hex",
  "incipit",
  "insigne",

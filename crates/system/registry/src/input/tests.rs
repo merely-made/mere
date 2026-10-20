@@ -8,7 +8,7 @@ use super::action_id;
 use super::binding_id;
 use super::defaults::*;
 use super::*;
-use command_menu::catalogue::{self, ids};
+use hest::catalogue::{self, ids};
 use std::collections::HashMap;
 
 #[test]

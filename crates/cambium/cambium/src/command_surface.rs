@@ -23,8 +23,8 @@ pub struct CommandItem {
 }
 
 /// A registered command drawn as a row.
-impl From<&::command_menu::Command> for CommandItem {
-    fn from(command: &::command_menu::Command) -> Self {
+impl From<&::hest::menu::Command> for CommandItem {
+    fn from(command: &::hest::menu::Command) -> Self {
         let mut item = CommandItem::new(command.label.clone()).with_id(command.id.clone());
         if let Some(shortcut) = &command.shortcut {
             item = item.with_shortcut(shortcut.clone());

@@ -1,7 +1,7 @@
 [package]
 name = "hest"
-version = "0.0.1"
-description = "Name reservation. Hest is the command architecture of the Mere stack: how a host declares a command, offers it, invokes it with arguments, and records the result. It will absorb command-menu (the offer half) as `hest::menu`."
+version = "0.1.0"
+description = "Shared command menus, personal choices, palette sessions, and command ids."
 authors.workspace = true
 edition.workspace = true
 
@@ -14,3 +14,9 @@ publish = true
 
 [lib]
 path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

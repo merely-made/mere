@@ -160,10 +160,10 @@ pub struct ViewIntent {
     #[serde(default)]
     pub mirror_tiles: bool,
     /// A host's command menu as the person keeps it (Scenograph editor plan,
-    /// SE31; the type is `command-menu`'s since SE45). `None` for views that
+    /// SE31; moved from `command-menu` to Hest at H1). `None` for views that
     /// are not a menu; absent from older views.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub commands: Option<command_menu::CommandChoices>,
+    pub commands: Option<hest::menu::CommandChoices>,
 }
 
 impl ViewIntent {

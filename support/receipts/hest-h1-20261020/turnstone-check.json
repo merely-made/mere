@@ -1,0 +1,23 @@
+{
+  "host": "Turnstone",
+  "consumer_revision": "e94e7381b39ebc1927d4bf258d3c92787f9abeca",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "--lib",
+    "app::palette::command_menu_tests"
+  ],
+  "cwd": "/Users/markik/Code/testing/mere/hest-h1-20261020",
+  "exit_code": 0,
+  "test_results": [
+    "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 1107 filtered out; finished in 2.36s"
+  ],
+  "log_sha256": "86ad065f6c8e08a22986c12aaa237acc11a99212121ffd126de6427a708f76b4",
+  "manifest_sha256": "b7229a65bc66589f5c9f8a22a32f7382919e95a4e8ab287bdd8ba73fa15af5cd",
+  "lock_sha256": "56f047a175ef0dfb6b40e34395c740b3c938ea85389ebad7ab49a5ba0da5ee97",
+  "override": "Only command-menu is patched; every unrelated consumer lock entry and every consumer Rust file is unchanged.",
+  "raw_log_sha256": "3f2e0db1a692b51aeef455c1749e44e09a5bd38b477c9177f1462fa6f22a3960",
+  "log_normalization": "Terminal empty lines removed only; raw hash retained."
+}

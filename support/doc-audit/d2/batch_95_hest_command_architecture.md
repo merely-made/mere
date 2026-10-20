@@ -9,7 +9,10 @@ built beyond publishing the `hest` 0.0.1 reservation (`cargo publish --dry-run` 
 ## cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md
 
 - disposition: current
-- status line: "plan; nothing moved" - accurate: yes
+- status line: "plan; nothing moved" — accurate: yes
+
+Only the name reservation was published at this audit snapshot.
+
 - claims checked: 30 - holds: 29, stale: 0, unverifiable: 1
 
 ### Stale claims
