@@ -29,6 +29,7 @@
 use std::path::{Path, PathBuf};
 
 use mesh::KeepBound;
+use pandect::write_bytes_with_backup;
 use personae::ProfileId;
 use serde::{Deserialize, Serialize};
 
@@ -649,28 +650,18 @@ impl OwnerSettings {
         })
     }
 
-    /// Write the settings by rename, so a crash mid-write leaves the previous
-    /// file intact rather than a truncated one.
+    /// Write settings through the shared recoverable replacement path. A
+    /// mid-write failure leaves the previous file intact; interruption during
+    /// its two-rename fallback can leave the old file in `.previous`.
     pub fn save(&self, path: &Path) -> Result<(), OwnerSettingsError> {
         let fail = |message: String| OwnerSettingsError::File {
             path: path.display().to_string(),
             message,
         };
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(|error| fail(error.to_string()))?;
-        }
         let mut text =
             serde_json::to_string_pretty(self).map_err(|error| fail(error.to_string()))?;
         text.push('\n');
-        let temporary = path.with_extension("json.tmp");
-        std::fs::write(&temporary, text.as_bytes()).map_err(|error| fail(error.to_string()))?;
-        // Windows rename fails onto an existing path, so clear the destination
-        // first. The temp file is still complete, so the window where neither
-        // is readable is the rename itself.
-        if path.exists() {
-            std::fs::remove_file(path).map_err(|error| fail(error.to_string()))?;
-        }
-        std::fs::rename(&temporary, path).map_err(|error| fail(error.to_string()))
+        write_bytes_with_backup(path, text.as_bytes()).map_err(|error| fail(error.to_string()))
     }
 }
 
@@ -1049,6 +1040,24 @@ mod tests {
             !path.with_extension("json.tmp").exists(),
             "the temporary file must not survive a successful write"
         );
+    }
+
+    #[test]
+    fn a_stale_legacy_temp_path_does_not_block_or_get_touched_by_save() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("settings").join("work.json");
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        let stale_temp = path.with_extension("json.tmp");
+        std::fs::create_dir(&stale_temp).unwrap();
+        let sentinel = stale_temp.join("preserve-me");
+        std::fs::write(&sentinel, b"stale temp data").unwrap();
+
+        let settings = OwnerSettings::default();
+        settings.save(&path).unwrap();
+
+        assert_eq!(OwnerSettings::load(&path).unwrap(), settings);
+        assert!(std::fs::read(&path).unwrap().ends_with(b"\n"));
+        assert_eq!(std::fs::read(&sentinel).unwrap(), b"stale temp data");
     }
 
     #[test]
