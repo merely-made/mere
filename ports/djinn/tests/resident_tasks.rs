@@ -83,3 +83,57 @@ async fn resident_shutdown_reports_a_panicked_tracked_task() {
     assert!(!report.is_clean());
     assert_eq!(tasks.close_and_join().await, report);
 }
+
+#[tokio::test]
+async fn open_drain_is_reusable_but_terminal_close_refuses_work() {
+    use armillary::tasks::spawn_tracked_with_handle;
+
+    let tasks = ResidentTasks::new();
+    for answer in [1, 2] {
+        let receive = tasks
+            .scope(async { spawn_tracked_with_handle(async move { answer }) })
+            .await;
+        assert_eq!(receive.await.unwrap(), answer);
+        let report = tasks.cancel_and_join().await;
+        assert_eq!(report.completed, 1);
+        assert!(report.is_clean());
+        assert!(!tasks.is_closed());
+    }
+    assert!(tasks.close_and_join().await.is_clean());
+    let held = Arc::new(());
+    let future_hold = held.clone();
+    let receive = tasks
+        .scope(async {
+            spawn_tracked_with_handle(async move {
+                let _held = future_hold;
+                3
+            })
+        })
+        .await;
+    assert!(
+        receive.await.is_err(),
+        "rejected work cannot return a value"
+    );
+    assert_eq!(Arc::strong_count(&held), 1);
+    let report = tasks.close_and_join().await;
+    assert_eq!(report.rejected, 1);
+    assert!(!report.is_clean());
+    assert_eq!(tasks.close_and_join().await, report);
+}
+
+#[tokio::test]
+async fn a_reaped_panic_remains_in_the_resident_shutdown_report() {
+    let tasks = ResidentTasks::new();
+    let (dropped, observed) = tokio::sync::oneshot::channel::<()>();
+    tasks.spawn(async move {
+        let _held_until_unwind = dropped;
+        panic!("controlled resident task failure");
+    });
+    assert!(observed.await.is_err());
+    // Admission reaps completed tasks; doing so must retain their failures.
+    tasks.spawn(async {});
+    let report = tasks.close_and_join().await;
+    assert_eq!(report.panicked, 1);
+    assert!(!report.is_clean());
+    assert_eq!(tasks.close_and_join().await, report);
+}
