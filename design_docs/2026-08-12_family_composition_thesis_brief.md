@@ -1736,16 +1736,44 @@ Servo still pins AccessKit 0.24, so Turnstone's `servo` feature converts each
 Servo tree update into the 0.25 surface contract through serde; 0.25 only adds
 node properties and renames `Tree` to `TreeInfo`. That feature is Windows-only
 and was not compiled on this pass; the conversion was checked in a standalone
-crate holding both versions. A fresh clone passes `cargo +1.97.1 test --locked
---lib` with 1,099 passed and 3 failed. The three failures are layout-geometry
-tests added with Turnstone's chrome polish (`c7b6cad`): a compact header measures
-37 px against a 36 px bound on macOS, and two floating-window transfers land
-48 px lower. They fail identically on the commit before the migration.
+crate holding both versions. The migration left three layout-geometry failures
+from Turnstone's chrome polish (`c7b6cad`), which failed identically before it.
+They are not font metrics: at the default 1.1 UI zoom the pane close button's
+min-height left out its padding, so the compact header measured 37 px against
+36 px, and the lens-to-primary float tests compared pixels across windows whose
+workspaces differ by the primary navigation row. [Turnstone
+`0dd9b1b`](https://github.com/merely-made/turnstone/commit/0dd9b1b) makes the close
+button border-box and has those tests require the same relative float record
+and body inset. A fresh clone then passes `cargo +1.97.1 test --locked` with
+1,102 passed and 0 failed.
 
 [Mere `a316c6b`](https://github.com/merely-made/mere/commit/a316c6b) ports the
 Tabard desktop example `native_shared_recovery` to host-owned captures. It takes
 the presentation stamp from its presentation observer, polls the host's readback
 and refuses pixels whose returned stamp differs.
+
+**Earlier failures resolved (2026-10-20).** The six failures recorded above
+are fixed:
+
+- [Mere `f21bb408`](https://github.com/merely-made/mere/commit/f21bb408) omits routed relations' link facts
+  at their defaults, so a fold-free trace round-trips byte-identical again, and
+  updates the live-board test to the client's "updated" resume wording.
+- [Mere `2528108a`](https://github.com/merely-made/mere/commit/2528108a) overflows a table whose column
+  cannot fit its longest unbroken run. Link adornment prefixes had hidden long
+  labels from the whitespace-only check since `f7c9374f3`.
+- [Mere `4a9f9387`](https://github.com/merely-made/mere/commit/4a9f9387) ignores the testkit's C3 orphan
+  control outside Linux and Windows, which alone provide the parent-death
+  cleanup and start times it needs until H5.
+- [Isocosm `99fdfdc`](https://github.com/merely-made/isocosm/commit/99fdfdc) asserts the side panel's
+  pixel figures on Windows, where they were measured in Segoe UI. Everywhere
+  it asserts the relations they support.
+
+[Mere `079c966d`](https://github.com/merely-made/mere/commit/079c966d) repaired a new MSRV regression:
+`d867b8d1` had Djinn override the workspace's apparatus `default-features`,
+the pattern cargo 1.97.1 rejects. [Murm `814c978`](https://github.com/merely-made/murm/commit/814c978)
+carries the public device name through radio-mirror's local document; existing
+v1 documents parse unchanged. Graphshell-host's lib tests do not compile on
+Mere main after the Graphshell co-op lane's `b48fd8b4`; that lane owns them.
 
 ## Family source convention (2026-10-15)
 
