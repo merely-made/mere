@@ -173,7 +173,7 @@ The port law applies: a piece moves only when a second host exercises it. A pure
   Its desktop requirement and root lock stay fixed at 0.4. In an exact source
   export, 53 default cases pass against the old 0.4 cohort and 66 engine cases
   against local Mere's 0.5 cohort, with one existing ignore per run.
-- Canonical Turnstone `c210fa05b` requires Cambium 0.5 and locks the Mere
+- Canonical Turnstone `9df2f0007` requires Cambium 0.5 and locks the Mere
   branch source to supplier `0151950f8`, with Knot `65a6632`. Its actual palette
   declares the effect/destructive facts through `src/action/command_metadata.rs`;
   only two existing Rust files change plus that new module. 242 existing Rust
@@ -325,3 +325,24 @@ desktop/browser presentation and native restart were not exercised.
 - Push/publication, remote-only delivery qualification and native GUI/human AT
   remain held. H3/H4 remain unstarted; this adoption changes declarations and
   registration, without adding invocation/outcome or execution authority.
+
+- **Final concurrent reconciliation:** preserved published Mere `d95e04bb4`
+  (family promotion ownership notes), Knot `d30dff6` (separate supplier
+  manifests) and Turnstone `1d13185` (retained-renderer pins and geometry
+  fixtures) through merge commits. The qualified local supplier `0151950f8`
+  and active embedded Knot `65a6632` remain unchanged; the unrelated newer
+  Knot supplier-manifest cohort was not repinned into Turnstone.
+- Turnstone merge `8e3e5cb` preserves NetRender `54d864c2` and Genet `6ef3cd37`.
+  Fresh merged-tree checks pass: 14 menu/sidecar, 15 Inspector and 23 embedded
+  Knot authoring cases (5 existing ignores); all-targets; portable metadata;
+  and the complete library with 1103 passed, 15 existing ignores,
+  zero failures. The focused cases overlap the full-library count.
+  Consumer receipt commit `9df2f0007` changes documentation/evidence only
+  after that tested merge. Source and lock preservation are measured against
+  incoming Turnstone `1d13185`: 242 unrelated Rust files and 1,604 unrelated
+  package blocks remain exact.
+- [Final merged qualification](../../../support/receipts/hest-cambium-adoption-20261020/reconciled/qualification.json),
+  [merged command outcomes](../../../support/receipts/hest-cambium-adoption-20261020/reconciled/checks.json)
+  and [merged tested source](../../../support/receipts/hest-cambium-adoption-20261020/reconciled/tested-source.json)
+  retain the final result separately from the first passing cohort. No push
+  or publication occurred. Native GUI/human AT and H3/H4 remain separate.

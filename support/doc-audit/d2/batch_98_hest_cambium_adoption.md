@@ -39,3 +39,8 @@ its source/dependency proofs and command outcomes. Focused host tests overlap
 the full library count and are not added to it. Earlier fixtures and setup
 failures are excluded from this current qualification. Existing global doc
 findings outside this plan are outside the judgment.
+
+Final reconciliation addendum: the current receipt separately records the
+merged Turnstone source, preserved upstream NetRender/geometry changes and
+fresh complete receiving checks. The first passing cohort remains historical.
+Supplier pins are unchanged. Final consumer receipt changes are docs/data only.

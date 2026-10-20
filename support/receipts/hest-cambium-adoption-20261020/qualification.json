@@ -5,7 +5,7 @@
   "reconciled_h2": "60b527b31e3c90b91423b74ee648ba7df1960f14",
   "supplier_commit": "0151950f8407769c977c9d04e4655cb104ebe3ef",
   "knot_compatibility_commit": "65a6632a24b764d04eecf7302a1087342eccbfbe",
-  "consumer_commit": "c210fa05bb6cb7ad4eab93f387d6ea6b8846c101",
+  "consumer_commit": "9df2f000722d3e3f52855930b2f98ad4c07c6855",
   "cambium_version": "0.5.0",
   "hest_version": "0.2.0",
   "legacy_hest_version": "0.1.0",
@@ -60,5 +60,21 @@
     "H3 invocation/outcome",
     "H4 scripting"
   ],
-  "excluded_attempts": "Preliminary dependency discovery, standalone lock setup and unavailable dependency-workspace test attempts are excluded; every admitted check uses its real process exit status."
+  "excluded_attempts": "Preliminary dependency discovery, standalone lock setup and unavailable dependency-workspace test attempts are excluded; every admitted check uses its real process exit status.",
+  "first_qualification": {
+    "consumer_commit": "c210fa05bb6cb7ad4eab93f387d6ea6b8846c101",
+    "consumer_full_library_result": {
+      "passed": 1103,
+      "failed": 0,
+      "ignored": 15
+    },
+    "consumer_focused_passes": 14
+  },
+  "final_reconciliation": "reconciled/qualification.json",
+  "final_reconciled_checks": "reconciled/checks.json",
+  "final_tested_merge_commit": "8e3e5cb1074153c0178cec13ab5cf72dc6cdbeaa",
+  "final_upstream_turnstone": "1d131854bedecc2528fbc9b4cf5d08928fcae5dd",
+  "final_renderer_source": [
+    "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
+  ]
 }
