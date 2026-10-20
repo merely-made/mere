@@ -2,7 +2,8 @@
 
 **Date:** 2026-10-20.
 
-**Status (2026-10-20):** H1 and H2 implemented and qualified locally; push and
+**Status (2026-10-20):** H1/H2 are implemented locally; Cambium 0.5.0 release
+preparation and canonical Turnstone adoption are in progress. Push and
 publication remain explicitly deferred. Hest 0.1.0, its `command-menu` 0.1.1
 shim and the separate Hest 0.2.0 API are local candidates. The actual Turnstone
 receiving patch is qualified in isolation; canonical adoption remains a
@@ -262,3 +263,23 @@ desktop/browser presentation and native restart were not exercised.
 - H3 invocation/outcome and H4 scripting are unstarted. Push, publication,
   facade release preparation, canonical Turnstone adoption and native/browser
   presentation remain explicit delivery or later-phase gates.
+
+- **Canonical adoption continuation (Mark, 2026-10-20):** reconcile, prepare
+  Cambium's breaking version and adopt the qualified declarations in canonical
+  Turnstone. Commit locally, preserve unrelated work and do not push/publish.
+  Mere reconciled cleanly onto fetched `c5db7d691`; H1/H2 are now `f9ff6156d`
+  and `60b527b31`. Turnstone starts clean at fetched `0dd9b1b`.
+- Cambium advances from 0.4.0 to 0.5.0, with the root requirement and six
+  direct wrapper requirements following it. The immutable published-0.4.0
+  compatibility fixture and Hest 0.1/shim versions stay fixed. Canonical
+  Turnstone will keep the canonical Git URL/branch identity and lock to the
+  local supplier commit; local cache seeding supplies the unpublished object
+  for receiving checks. No local-path override becomes its portable contract.
+
+- The embedded `knot-document` requirement was a necessary prerequisite:
+  `^0.4.0` kept a second Cambium family in Mere and could not accompany the
+  canonical 0.5 receiver. Knot `65a6632` permits `>=0.4.0, <0.6.0` for its
+  unchanged widget subset. Its desktop requirement and root lock remain 0.4.
+  Mere follows that small local prerequisite commit; all six Knot package
+  source rows move together. A collateral Murm resolver refresh was
+  discarded; all unrelated lock blocks retain their exact prior contents.
