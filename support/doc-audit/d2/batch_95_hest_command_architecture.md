@@ -9,7 +9,7 @@ built beyond publishing the `hest` 0.0.1 reservation (`cargo publish --dry-run` 
 ## cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md
 
 - disposition: current
-- status line: "plan; nothing moved" - accurate: yes (only the name reservation is published)
+- status line: "plan; nothing moved" - accurate: yes
 - claims checked: 30 - holds: 29, stale: 0, unverifiable: 1
 
 ### Stale claims
@@ -28,6 +28,8 @@ Take rulings 1 to 3 to Mark before H1. Run H1 only as a pure move, with the exis
 `command_menu_compact`, `graph-kernel` action and `registry` input tests as the receipts.
 
 ### Notes
+
+Only the name reservation is published; no existing crate moved.
 
 Unverifiable: whether Turnstone's `Action` at `action.rs:116` is unchanged on its current
 `main` (the clone was read, not a fresh fetch). The count of five dependent manifests of

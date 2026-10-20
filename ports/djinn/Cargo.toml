@@ -69,6 +69,9 @@ path = "src/bin/c1_receipt_host.rs"
 required-features = ["custody-receipt-host"]
 
 [dependencies]
+# Local redacted lifecycle diagnostics, without the projection/rendering feature.
+apparatus = { workspace = true, default-features = false, features = ["registry", "serde"] }
+registry = { workspace = true, features = ["diagnostics"] }
 armillary = { workspace = true, features = ["tokio"] }
 # The personal sync, carriage and transfer staging hosts (`sync`) and the
 # browser door's nonces (`door::browser_host`), moved from Graphshell's

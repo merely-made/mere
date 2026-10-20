@@ -395,8 +395,8 @@ pub trait Accessibility {
 /// AccessKit adapter lowers it to its platform tree; the browser host lowers
 /// it to ARIA. `focus` is the focused node's opaque id, as
 /// [`Accessibility::sync`] receives it.
-pub fn document_projection(
-    dom: &WindowDom<'_>,
+pub fn document_projection<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
+    dom: &D,
     layout: &OwnedLayout,
     focus: Option<u64>,
 ) -> DocumentA11yProjection {
@@ -459,7 +459,7 @@ pub fn document_projection(
         {
             numeric.insert(dom.opaque_id(node));
         }
-        pending.extend(dom.dom_children(node));
+        pending.extend(dom.flat_children(node));
     }
     // Genet supplies semantic names and actions; this host owns the retained
     // scroll planes. Match the rectangles used by paint and pointer hit testing,
@@ -544,12 +544,16 @@ pub fn document_projection(
     )
 }
 
-fn find_opaque(dom: &WindowDom<'_>, node: NodeId, opaque: u64) -> Option<NodeId> {
+fn find_opaque<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+    node: NodeId,
+    opaque: u64,
+) -> Option<NodeId> {
     use layout_dom_api::LayoutDom as _;
     if dom.opaque_id(node) == opaque {
         return Some(node);
     }
-    dom.dom_children(node)
+    dom.flat_children(node)
         .find_map(|child| find_opaque(dom, child, opaque))
 }
 

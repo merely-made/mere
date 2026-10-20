@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
   "basis": "21deb0cb",
-  "status": "six earlier repairs plus contained current-target admission and collector bridge qualified; 237 targeted native passes, seven existing ignores, two Wasm compile gates; wider owner migrations open",
+  "status": "contained shared DOM semantics and explicit resident collector qualified: 191 native passes, seven existing ignores, real client-process receiving and browser-host Wasm compile; broader contribution/lifetime/process-final migrations open",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -97,6 +97,45 @@
       "change": "Use existing web-time Instant rather than std Instant for the advertised portable staging queue; dependency remains diagnostics-only.",
       "status": "repaired; 39 Registry and 24 Apparatus native passes plus collector Wasm compile; browser runtime remains separate",
       "verification": "Registry/collector native tests plus wasm32-unknown-unknown collector compile; browser runtime not claimed"
+    },
+    {
+      "id": "diagnostics-shared-dom-projection",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/lib.rs:document_projection",
+        "crates/cambium/cambium-winit-a11y/src/lib.rs:project_tree_with_actions"
+      ],
+      "change": "Native adapter consumes Rootstock neutral DOM projection through Genet converter; retire separate textbox pruning/value and unconditional numeric marker policy. Native action map contains only projected nodes.",
+      "verification": "existing textbox/nested focus/session controls and fresh disabled-numeric and host-scroll parity controls",
+      "status": "repaired and qualified by diagnostics-shared-projection.json and diagnostics-shared-wasm.json"
+    },
+    {
+      "id": "diagnostics-flat-tree-routing",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/lib.rs:document_projection/find_opaque",
+        "crates/cambium/cambium-winit-a11y/src/lib.rs:walk",
+        "crates/cambium/cambium-genet-web-host/src/a11y.rs:walk"
+      ],
+      "change": "Use supplier flat_children rather than light-only dom_children for semantic markers, focus and platform route maps, matching the Genet projection.",
+      "verification": "actual shadow control focus, numeric marker and native action routing regression; browser target compile separately",
+      "status": "repaired and qualified by diagnostics-shared-projection.json and diagnostics-shared-wasm.json"
+    },
+    {
+      "id": "diagnostics-resident-collector",
+      "source": [
+        "ports/djinn/src/resident_events/diagnostics.rs",
+        "ports/djinn/src/resident_status.rs",
+        "ports/djinn/src/bin/djinn.rs"
+      ],
+      "change": "Explicit CLI configuration wires fixed lifecycle phases through local Registry sampling and a dedicated nonblocking sender into Apparatus readers. Optional owner-only status resource and dedicated client preserve independent receipt cursors. Raw private fields excluded before ingress.",
+      "verification": "real lifecycle source, independent readers, sampling/retention/disable/restart, broker admission and real native CLI consumer",
+      "status": "repaired and qualified by diagnostics-product-owner.json and diagnostics-product-receiving.json"
+    },
+    {
+      "id": "diagnostics-event-file-authority",
+      "source": "ports/djinn/src/resident_events.rs:emit",
+      "change": "Caller fields cannot overwrite owner schema, event name, PID or receipt time in event-file records.",
+      "verification": "forged reserved fields plus preserved ordinary field regression",
+      "status": "repaired and qualified by diagnostics-product-owner.json and diagnostics-product-receiving.json"
     }
   ],
   "ownership_migrations": [
@@ -111,8 +150,8 @@
       "audit_ids": [
         "A1154"
       ],
-      "state": "default-policy duplication repaired; distinct roles retained",
-      "decision": "Descriptor supplies initial defaults. Existing config survives registration/replacement. Downstream ingress/history still enforce their own bounds. Current Mere has no production gate caller or global sender installation. This does not install sampling into nonblocking ingress."
+      "state": "descriptor/config defaults repaired; one explicit product sampling consumer added",
+      "decision": "Djinn lifecycle has its own local Registry policy and dedicated sender. Global policy snapshots do not describe this source. Other emitters and invariants are not implicitly wired."
     },
     {
       "audit_ids": [
@@ -120,8 +159,8 @@
         "A870",
         "A872"
       ],
-      "state": "separate owners joined by an opt-in product-projected adapter; startup adoption remains open",
-      "decision": "Registry ingress rejects newest; Apparatus history evicts oldest. RegistryCollector exposes independent readers and separate queue context/counters. It does not install a sender, sampling/invariant policy, exporter or per-product scheduling."
+      "state": "separate owners joined by shared bridge; one resident source/reader wired",
+      "decision": "Djinn config bounds ingress/history separately and uses independent readers. Source phases are redacted before ingress and sampling policy refusals have separate counters. Final exported process-close evidence remains open."
     },
     {
       "audit_ids": [
@@ -168,8 +207,8 @@
     },
     {
       "owner": "Registry collector adapters and product sources",
-      "gap": "A qualified optional RegistryCollector joins the real emitter to Apparatus readers after product projection. No production global sender or registry sampling/invariant gate is installed; scheduling, redaction, sink/thread/window lifetime and final old-sender counter custody remain product-owned. Process-wide uninstalled loss is not assigned to an unrelated queue.",
-      "gate": "Adopt bridge through a product startup/teardown and bounded inspection/receipt consumer; qualify actual thread routing, registry policy and privacy scope. Preserve queue versus retained identities and final disconnect losses."
+      "gap": "Djinn lifecycle is explicitly wired to the shared collector and admitted status/native CLI reader, with private fields excluded before ingress and local Registry sampling applied. No global sender, arbitrary tracing/mod-loader capture or invariant installation is added. Other sources/products, IO-lock independence, durable recovery and final stopped/disconnect receipt custody remain open.",
+      "gate": "Supplier-qualified product receiving lanes for additional sources and thread/window lifetimes. Installed-process startup/termination, crash and final evidence gates are separate from the in-process source/broker and client-process fixture."
     },
     {
       "owner": "Presentation producers and receipt adapters",
@@ -188,7 +227,7 @@
         "crates/cambium/cambium-rootstock/src/lib.rs:document_projection",
         "crates/cambium/cambium-genet-web-host/src/a11y.rs:sync"
       ],
-      "gap": "Winit starts from the Genet AccessKit projection; Rootstock/browser start from neutral document semantics. Textbox/numeric overrides and leaf contributions are still lowered separately. Leaf admission consults the existing AccessKit callback without turning it into a neutral projection. Context-sensitive callback behavior and full action catalogue parity remain unqualified.",
+      "gap": "Native and browser now consume the same Rootstock DOM projection, using supplier flat traversal for routes/focus/markers. Existing AccessKit-shaped Sprigging callbacks and producer action nodes still lower separately; browser leaf lowering retains only a small role/name subset, omitting numeric role/value/action contributions. Context-sensitive leaf callback equivalence and action catalogue parity remain unqualified.",
       "gate": "One supplier-qualified semantic contribution model with current geometry/clipping and native/browser receiving controls; retire duplicated lowering and markers where practical."
     }
   ],
@@ -204,5 +243,12 @@
     "diagnostics-collector-clock.json",
     "diagnostics-browser-compile.json",
     "diagnostics-collector-wasm.json"
+  ],
+  "shared_projection_product_basis": "6394e931",
+  "shared_projection_product_receipts": [
+    "diagnostics-shared-projection.json",
+    "diagnostics-product-owner.json",
+    "diagnostics-product-receiving.json",
+    "diagnostics-shared-wasm.json"
   ]
 }

@@ -234,21 +234,31 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
 ) {
     let root = dom.document();
     let id_of = |d: &D, n: NodeId| A11yNodeId(d.opaque_id(n));
-    let focused = focus.and_then(|opaque| find_opaque(dom, root, opaque));
-    let mut tree = genet_render::accesskit_tree_with_style(
-        dom,
-        layout.fragments(),
-        focused,
-        &genet_render::A11yStyleQueries {
-            generated: &|node| layout.generated_text(dom, node),
-            rendered: &|node| layout.rendered_visible(dom, node),
-        },
-    );
+    let projection = cambium_rootstock::document_projection(dom, layout, focus);
+    let multiline: std::collections::HashSet<_> = projection
+        .nodes()
+        .iter()
+        .filter(|node| {
+            node.role == document_session_api::DocumentA11yRole::TextField && node.state.multiline
+        })
+        .map(|node| A11yNodeId(node.id.get()))
+        .collect();
+    let mut tree = genet_render::accesskit_tree_from_projection(projection);
+    // Genet's converter currently lowers every TextField to TextInput. The
+    // platform-specific role comes from shared state, never a second DOM walk.
+    for (id, node) in &mut tree.nodes {
+        if multiline.contains(id) {
+            node.set_role(Role::MultilineTextInput);
+        }
+    }
+    let projected: std::collections::HashSet<_> = tree.nodes.iter().map(|(id, _)| *id).collect();
     let mut action_map = HashMap::new();
     let mut produced = Vec::new();
-    let mut app_textboxes = Vec::new();
     walk(dom, root, &mut |node| {
         let id = id_of(dom, node);
+        if !projected.contains(&id) {
+            return;
+        }
         action_map.insert(id, node);
         if let Some(key) = custom_leaf_key(dom, node)
             && let Some(leaf) = leaves.get_mut(&key)
@@ -264,105 +274,12 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
         {
             produced.push((id, key, semantics));
         }
-        if dom
-            .attribute(node, &Namespace::default(), &LocalName::from("role"))
-            .is_some_and(|role| role.trim().eq_ignore_ascii_case("textbox"))
-            && let Some(value) = dom.attribute(
-                node,
-                &Namespace::default(),
-                &LocalName::from("data-cambium-text-value"),
-            )
-            && let Some((_, access)) = tree
-                .nodes
-                .iter_mut()
-                .find(|(candidate, _)| *candidate == id)
-        {
-            app_textboxes.push(id);
-            // Cambium paints committed text alongside ephemeral preedit,
-            // ghost and caret nodes. The owner marker carries only the model
-            // value, so platform accessibility never mistakes painted
-            // decoration for the field's editable contents.
-            let multiline = dom.attribute(
-                node,
-                &Namespace::default(),
-                &LocalName::from("aria-multiline"),
-            ) == Some("true");
-            access.set_role(if multiline {
-                Role::MultilineTextInput
-            } else {
-                Role::TextInput
-            });
-            access.set_value(value.to_owned());
-        }
-        if dom.attribute(
-            node,
-            &Namespace::default(),
-            &LocalName::from("data-cambium-set-value"),
-        ) == Some("true")
-            && let Some((_, access)) = tree
-                .nodes
-                .iter_mut()
-                .find(|(candidate, _)| *candidate == id)
-        {
-            access.add_action(Action::SetValue);
-        }
     });
     let mut produced_map = HashMap::new();
     for (slot, key, semantics) in produced {
         add_producer_semantics(&mut tree, slot, key, semantics, &mut produced_map);
     }
-    prune_app_textbox_descendants(
-        dom,
-        &mut tree,
-        &mut action_map,
-        &mut produced_map,
-        &app_textboxes,
-    );
     (tree, action_map, produced_map)
-}
-
-/// App textboxes expose their committed value as a leaf. Decoration and
-/// painted text remain in the drawing DOM, while their accessibility rows and
-/// routes are removed after all producer semantics have been added.
-fn prune_app_textbox_descendants(
-    dom: &impl LayoutDom<NodeId = NodeId>,
-    tree: &mut TreeUpdate,
-    action_map: &mut HashMap<A11yNodeId, NodeId>,
-    produced_map: &mut HashMap<A11yNodeId, ProducedAction>,
-    textboxes: &[A11yNodeId],
-) {
-    let children: HashMap<_, Vec<_>> = tree
-        .nodes
-        .iter()
-        .map(|(id, node)| (*id, node.children().to_vec()))
-        .collect();
-    let mut hidden = HashMap::new();
-    for textbox in textboxes {
-        if let Some(owner) = find_opaque(dom, dom.document(), textbox.0) {
-            let mut pending: Vec<_> = dom.dom_children(owner).collect();
-            while let Some(child) = pending.pop() {
-                hidden
-                    .entry(A11yNodeId(dom.opaque_id(child)))
-                    .or_insert(*textbox);
-                pending.extend(dom.dom_children(child));
-            }
-        }
-        let mut pending = children.get(textbox).cloned().unwrap_or_default();
-        while let Some(child) = pending.pop() {
-            hidden.entry(child).or_insert(*textbox);
-            pending.extend(children.get(&child).into_iter().flatten().copied());
-        }
-        if let Some((_, node)) = tree.nodes.iter_mut().find(|(id, _)| id == textbox) {
-            node.set_children(Vec::new());
-        }
-    }
-    if let Some(owner) = hidden.get(&tree.focus) {
-        tree.focus = *owner;
-    }
-    let hidden_ids: std::collections::HashSet<_> = hidden.keys().copied().collect();
-    tree.nodes.retain(|(id, _)| !hidden_ids.contains(id));
-    action_map.retain(|id, _| !hidden_ids.contains(id));
-    produced_map.retain(|id, _| !hidden_ids.contains(id));
 }
 
 /// Write a producer's own semantics onto its slot's node, and what it draws
@@ -489,21 +406,9 @@ pub fn scale_tree_to_window<D: LayoutDom<NodeId = NodeId>>(
 
 fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl FnMut(NodeId)) {
     visit(node);
-    for child in dom.dom_children(node) {
+    for child in dom.flat_children(node) {
         walk(dom, child, visit);
     }
-}
-
-fn find_opaque<D: LayoutDom<NodeId = NodeId>>(
-    dom: &D,
-    node: NodeId,
-    opaque: u64,
-) -> Option<NodeId> {
-    if dom.opaque_id(node) == opaque {
-        return Some(node);
-    }
-    dom.dom_children(node)
-        .find_map(|child| find_opaque(dom, child, opaque))
 }
 
 fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
@@ -843,5 +748,100 @@ mod dpi_tests {
         }));
         // A producer without semantics leaves its slot alone.
         assert_eq!(producers.semantics(2), None);
+    }
+    #[test]
+    fn native_projection_uses_shared_bounds_and_disabled_numeric_policy() {
+        use layout_dom_api::{LayoutDom as _, LocalName, Namespace};
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(root, "<button aria-label='Off' disabled data-cambium-set-value='true' style='display:block;width:80px;height:30px'>Off</button><button aria-label='On' data-cambium-set-value='true' style='display:block;width:80px;height:30px'>On</button><div style='height:600px'></div>");
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &HashMap::new());
+        let projection = cambium_rootstock::document_projection(&dom, &layout, None);
+        let (tree, map, _) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut ProducerRegistry::new(),
+            None,
+        );
+        for semantic in projection.nodes() {
+            let (_, native) = tree
+                .nodes
+                .iter()
+                .find(|(id, _)| id.0 == semantic.id.get())
+                .unwrap();
+            if let Some(bounds) = semantic.bounds {
+                let native = native.bounds().unwrap();
+                assert_eq!(
+                    (native.x0, native.y0, native.width(), native.height()),
+                    (
+                        f64::from(bounds.x),
+                        f64::from(bounds.y),
+                        f64::from(bounds.width),
+                        f64::from(bounds.height)
+                    )
+                );
+            }
+            assert_eq!(
+                native.supports_action(Action::SetValue),
+                semantic
+                    .actions
+                    .contains(&document_session_api::DocumentA11yAction::SetValue)
+            );
+        }
+        let disabled = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| node.label() == Some("Off"))
+            .unwrap();
+        assert!(!disabled.1.supports_action(Action::SetValue));
+        assert!(map.values().all(|node| dom.attribute(
+            *node,
+            &Namespace::default(),
+            &LocalName::from("aria-hidden")
+        ) != Some("true")));
+    }
+    #[test]
+    fn native_routes_and_shared_overrides_follow_the_supplier_flat_tree() {
+        use layout_dom_api::{LayoutDom as _, ShadowRootInit};
+        let mut dom = ScriptedDom::new();
+        let document = dom.document();
+        dom.set_inner_html(
+            document,
+            "<main style='display:block;width:100px;height:100px'></main>",
+        );
+        let host = dom
+            .dom_children(document)
+            .find(|node| dom.kind(*node) == NodeKind::Element)
+            .unwrap();
+        let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+        dom.set_inner_html(shadow, "<button aria-label='Shadow' data-cambium-set-value='true' style='display:block;width:80px;height:30px'>Shadow</button>");
+        let button = dom
+            .dom_children(shadow)
+            .find(|node| dom.kind(*node) == NodeKind::Element)
+            .unwrap();
+        let opaque = dom.opaque_id(button);
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &HashMap::new());
+        let projection = cambium_rootstock::document_projection(&dom, &layout, Some(opaque));
+        let semantic = projection
+            .nodes()
+            .iter()
+            .find(|node| node.id.get() == opaque)
+            .expect("shadow button projects");
+        assert!(semantic.state.focused);
+        assert!(
+            semantic
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::SetValue)
+        );
+        let (tree, map, _) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut ProducerRegistry::new(),
+            Some(opaque),
+        );
+        assert_eq!(map.get(&A11yNodeId(opaque)), Some(&button));
+        assert_eq!(tree.focus, A11yNodeId(opaque));
     }
 }
