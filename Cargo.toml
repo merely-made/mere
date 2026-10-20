@@ -110,6 +110,7 @@ members = [
     "crates/cambium/tabard-workshop",
     "crates/cambium/cambium-genet-web-host",
     "crates/cambium/command-menu",
+    "crates/cambium/hest",
     "crates/cambium/backstep",
     "crates/cambium/meristem",
     "crates/cambium/sprigging",
