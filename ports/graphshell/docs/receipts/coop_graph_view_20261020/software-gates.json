@@ -1,6 +1,6 @@
 {
   "result": "ok",
-  "runtime_source": "051b7eb9e5016901e8544055bcaf16c0cb7379dd",
+  "runtime_source": "98cbafad6d02ac199c8b2ced8836560b9a895904",
   "environment": {
     "CARGO_TARGET_DIR": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts",
     "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/repos/mere/target/build",

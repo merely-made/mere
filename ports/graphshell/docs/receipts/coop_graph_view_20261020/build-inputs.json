@@ -1,9 +1,9 @@
 {
-  "source_commit": "051b7eb9e5016901e8544055bcaf16c0cb7379dd",
+  "source_commit": "98cbafad6d02ac199c8b2ced8836560b9a895904",
   "files": {
     ".cargo/config.toml": "af174c7f9ac5ae8e0536a8fd2fa0251e680f23edab3ffbb5098aa914a48cdb01",
-    "Cargo.lock": "207443b15a3e1e25a7e80ccd757c7ab1bd4778af4777302e6cce8955fcfbfa48",
-    "Cargo.toml": "2db5042a42577d809ebc765ddbb17f9430f8030e223f43c72f1fc4ead2634053",
+    "Cargo.lock": "07f79b6068a8e7d631959837eac136057560025e58523d3e14ec523bda0e4ded",
+    "Cargo.toml": "b6dfe70504f482e9cea7d0c885b7cb66031597d0b0d416747f96e923fa7d30f3",
     "crates/cambium/backstep/Cargo.toml": "eda71b1726b42fd4a933aa738b28eee963676de2ff58431e883841435da8a1ae",
     "crates/cambium/backstep/src/lib.rs": "be552a519506a54cf2136642429ccc57b662348f9b5b934675d6e1dbf300f518",
     "crates/cambium/cambium-genet-web-host/Cargo.toml": "9a19f5054cc61c0569e9ee3ceab1b71d0b669120bc6da647b744027ee37ff56e",
@@ -793,6 +793,9 @@
     "crates/domain/personal-facts/Cargo.toml": "bbe08d9b16e8e399e6765507db3af59183a8992d348e6891bf9bbf0e13bb41ca",
     "crates/domain/personal-facts/src/lib.rs": "736600de8f9c2dfc53d0c3e0b48b91f2acd1ec2d076f3f749e821037f4ac605e",
     "crates/domain/personal-facts/src/tests.rs": "8c64a8f03145848f298384934772ace39758f67d431ad2304424901c09ea4bdf",
+    "crates/domain/site/Cargo.toml": "bd1b5c926809005faa393ba3a580e736b332463f056f5eb57020a82d4bd7bd26",
+    "crates/domain/site/src/lib.rs": "0baa14ba70f0095316c6c902fa0a89207180dd1e9e9a946ba67dfb60edfc3a3c",
+    "crates/domain/site/tests/compatibility.rs": "b067295678684802ad6d8b1a8e514d124358c58702bfd5ed5044cc0a3f64f3d7",
     "crates/dramatis/persona-picker/Cargo.toml": "8958768f548903f2d482aaa846469c687b28cdc25fde15aa1e8f18f31a438456",
     "crates/dramatis/persona-picker/src/lib.rs": "df26f17d6e877187528d1b9cbed20a16af4226bd70f004d0a23de10c614f4cf9",
     "crates/fleece/Cargo.toml": "51c5a6bb73fddf77bfb19edb0b834aa686f0173fbb28a48de99a020f9ce71bf5",
@@ -1641,7 +1644,7 @@
     "ports/distillery/tests/trainer.rs": "e5d19dfac5aa10150c4c0c5f61b5568d6f83f3df9f4c14304ba7838bea8609b3",
     "ports/distillery/tests/transport_residue.rs": "d3be2a5182518c9e186bf44061bbf8c8de21b50d0b46027365360754864bb303",
     "ports/distillery/tests/walk_fixtures.rs": "a0ad1be7ea515f6a46d77f7f8f0ad414eab901c05ea7f35185847e5780599917",
-    "ports/djinn/Cargo.toml": "5713ed5aca393689b85744524d5acb638d51981475e528cd95277f4b5dcab947",
+    "ports/djinn/Cargo.toml": "46177e7fff2b082cdd8f5a7fb3f816580dcfef9c329605da001e341e1bb92ecf",
     "ports/djinn/castellan/Cargo.toml": "fd5ddae0469f67c1d27daf824af2b599c2cb720488dd20140c1fb720fd0149be",
     "ports/djinn/castellan/src/authority.rs": "2055425bbc217fa15b31d4964b7481dbd085994b786ba6b45a8e970b2454695e",
     "ports/djinn/castellan/src/authority_lock_tests.rs": "053150ab6b7108efaa6d805ee445358ba8f4b4e97ed18c95505ea62e7bd7fcc6",
@@ -3287,13 +3290,13 @@
     "testing/receipts/tucket-custody/tucket-authority-clean.rs": "082a3c434d615b3c4c702d29170adacd5c8c080f049076736049808eea55eb6c"
   },
   "harness": {
-    "ports/graphshell/docs/receipts/coop_graph_view_20261020/run_native.py": "d1a83ae698799b117836ed6f56c2b1f1cd3109920cb81ef5fcc4821a6491cd6d",
+    "ports/graphshell/docs/receipts/coop_graph_view_20261020/run_native.py": "db5cacf17f4749c14620f990c01a71f7b3564411b236b52df541c9c1d2beadc7",
     "ports/graphshell/docs/receipts/coop_20261020/resident.py": "08db6c8ba66bc07981c7e71fad629e14f87c3edfa5d5206581d19260e3a40192"
   },
   "binaries": {
     "graphshell_mere": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1",
-    "djinn": "e59843b98be01ea5fca133264a94a8a473dfcefaf58d1ebb49c3df6016f14e14",
-    "coop_existing_graph": "3a0fb4f58735097fb31d3ddd39e01cdcda6a031198107f48ac2ccfe74904f42d"
+    "djinn": "d74d31162a31cddb0ec832851a1f85e1f7146b07885f68bd5adb2a282d21d703",
+    "coop_existing_graph": "773a47dd9c0715138d10867007b370a3ffdf2cc1fe45191e626856260a295e5f"
   },
   "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
   "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",

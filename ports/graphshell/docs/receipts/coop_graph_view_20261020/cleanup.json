@@ -2,13 +2,13 @@
   "result": "ok",
   "accepted_test_owned_processes_stopped": true,
   "native_processes": [
-    8028,
-    8117,
-    8183,
-    8229,
-    8250,
-    8253,
-    8262
+    8992,
+    9006,
+    9040,
+    9092,
+    9107,
+    9114,
+    9143
   ],
   "custodian_launches": 4,
   "diagnostic_app_copies_removed": "Only the stopped owner/guest .app copies from attempts 02, 03 and 04 were removed to recover build space. Diagnostic evidence and isolated stores were retained.",
@@ -20,5 +20,17 @@
     "live grants",
     "contact files",
     "executables"
-  ]
+  ],
+  "additional_owned_copy_cleanup": {
+    "removed_stopped_owned_app_and_duplicate_build_copies": [
+      "/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner.app",
+      "/Users/markik/Code/output/gs-coop-view-20261020-05/private/guest.app",
+      "/Users/markik/Code/output/gs-coop-view-20261020-06/private/owner.app",
+      "/Users/markik/Code/output/gs-coop-view-20261020-06/private/guest.app",
+      "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts/debug/graphshell_mere",
+      "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts/debug/djinn",
+      "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts/debug/examples/coop_existing_graph"
+    ],
+    "frozen_executables_and_evidence_preserved": true
+  }
 }

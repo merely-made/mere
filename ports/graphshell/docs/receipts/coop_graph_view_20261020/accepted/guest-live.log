@@ -1,13 +1,13 @@
 [cambium-winit] accessibility Installed, 20 nodes projected
 graphshell-mere: waited 0 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-joined.png
-graphshell-mere: waited 4 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-added.png
-graphshell-mere: waited 16 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-still-scoped.png
-graphshell-mere: waited 20 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-push.png
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-joined.png
+graphshell-mere: waited 3 frames
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-added.png
+graphshell-mere: waited 18 frames
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-still-scoped.png
+graphshell-mere: waited 22 frames
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-push.png
 graphshell-mere: waited 0 frames
 graphshell-mere: waited 1 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-renamed.png
-graphshell-mere: RESULT ok (90 frames, 5 captures)
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-renamed.png
+graphshell-mere: RESULT ok (93 frames, 5 captures)

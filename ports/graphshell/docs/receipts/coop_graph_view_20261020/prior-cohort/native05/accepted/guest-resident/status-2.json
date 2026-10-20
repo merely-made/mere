@@ -1,0 +1,17 @@
+{
+  "schema": "djinn.resident-status/v1",
+  "pid": 8246,
+  "started_ms": 1792532096139,
+  "installed": false,
+  "ready": true,
+  "startup_unlock": "passphrase",
+  "protection": "passphrase",
+  "lock": "unlocked",
+  "endpoints": {
+    "agent": "/Users/markik/Code/output/gs-coop-view-20261020-05/private/guest/agent.sock",
+    "agent_listener": "receipt",
+    "browser": "/Users/markik/Code/output/gs-coop-view-20261020-05/private/guest/browser.sock",
+    "app": "/Users/markik/Code/output/gs-coop-view-20261020-05/private/guest/app.sock"
+  },
+  "sync": null
+}

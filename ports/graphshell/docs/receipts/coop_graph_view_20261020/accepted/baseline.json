@@ -1,10 +1,10 @@
 {
   "captures": [
     {
-      "digest": "c92eaac979f7aa0a",
+      "digest": "3506e6ee17303d2e",
       "fields": {
         "archives": "0",
-        "attached": "ba6130a6-93ec-41ba-95ab-28f968351ee7",
+        "attached": "fe497426-e141-4914-99ec-0fb4e000233a",
         "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Choose the graph in Sessions, then enable its co-op controls.\"}",
         "coop-access": "",
         "coop-available": "false",
@@ -16,7 +16,7 @@
         "layout": "spectral.default",
         "nodes": "1",
         "notice": "",
-        "pid": "8028",
+        "pid": "8992",
         "read-only": "false",
         "record": "",
         "record-data": "",
@@ -28,16 +28,16 @@
         "view-saved": "false"
       },
       "height": 1600,
-      "name": "/Users/markik/Code/output/gs-coop-view-20261020-05/evidence/private-before.png",
-      "path": "/Users/markik/Code/output/gs-coop-view-20261020-05/evidence/private-before.png",
+      "name": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/private-before.png",
+      "path": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/private-before.png",
       "viewport": null,
       "width": 2200
     },
     {
-      "digest": "66468bb5f9847e94",
+      "digest": "f876568d0cc00ac6",
       "fields": {
         "archives": "0",
-        "attached": "308dc931-c12a-4b83-ad09-dac8ae659d43",
+        "attached": "910ceb8c-a928-4cff-9981-ecdf2e3979db",
         "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Choose the graph in Sessions, then enable its co-op controls.\"}",
         "coop-access": "",
         "coop-available": "false",
@@ -49,7 +49,7 @@
         "layout": "spectral.default",
         "nodes": "1",
         "notice": "",
-        "pid": "8028",
+        "pid": "8992",
         "read-only": "false",
         "record": "",
         "record-data": "",
@@ -61,8 +61,8 @@
         "view-saved": "false"
       },
       "height": 1600,
-      "name": "/Users/markik/Code/output/gs-coop-view-20261020-05/evidence/existing-graph.png",
-      "path": "/Users/markik/Code/output/gs-coop-view-20261020-05/evidence/existing-graph.png",
+      "name": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/existing-graph.png",
+      "path": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/existing-graph.png",
       "viewport": null,
       "width": 2200
     }
@@ -89,38 +89,38 @@
       },
       "frame": 1,
       "times_us": {
-        "a11y_us": 4085,
-        "acquire_us": 1172,
+        "a11y_us": 4017,
+        "acquire_us": 1613,
         "capture_us": 0,
-        "clear_us": 687,
-        "compose_us": 134469,
+        "clear_us": 530,
+        "compose_us": 129343,
         "content_extent_us": 0,
         "dirty_tile_rebuild_us": 1,
-        "emit_scene_us": 3206,
-        "excluding_acquire_present_capture_us": 170168,
-        "frame_hook_us": 75,
+        "emit_scene_us": 2742,
+        "excluding_acquire_present_capture_us": 163538,
+        "frame_hook_us": 70,
         "ime_us": 0,
         "layout_apply_us": 0,
         "layout_rebuild_us": 0,
         "layout_tick_us": 0,
-        "layout_update_us": 144,
+        "layout_update_us": 104,
         "layout_with_text_us": 0,
-        "leaf_boxes_us": 190,
-        "leaf_fragments_us": 30,
-        "leaf_render_us": 17,
-        "master_compose_us": 54,
+        "leaf_boxes_us": 150,
+        "leaf_fragments_us": 28,
+        "leaf_render_us": 15,
+        "master_compose_us": 41,
         "pointer_us": 0,
-        "present_us": 131,
+        "present_us": 135,
         "producer_render_us": 0,
         "producer_stage_us": 0,
-        "raster_total_us": 5602,
-        "raster_us": 27172,
-        "relayout_us": 355,
+        "raster_total_us": 5241,
+        "raster_us": 26454,
+        "relayout_us": 272,
         "shadows_us": 0,
         "style_resolve_us": 0,
-        "tile_invalidate_us": 233,
-        "total_us": 171471,
-        "vello_render_us": 5299
+        "tile_invalidate_us": 230,
+        "total_us": 165286,
+        "vello_render_us": 4948
       },
       "valid": true
     },
@@ -140,7 +140,7 @@
   "errors": [],
   "final": {
     "archives": "0",
-    "attached": "308dc931-c12a-4b83-ad09-dac8ae659d43",
+    "attached": "910ceb8c-a928-4cff-9981-ecdf2e3979db",
     "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Choose the graph in Sessions, then enable its co-op controls.\"}",
     "coop-access": "",
     "coop-available": "false",
@@ -152,7 +152,7 @@
     "layout": "spectral.default",
     "nodes": "1",
     "notice": "",
-    "pid": "8028",
+    "pid": "8992",
     "read-only": "false",
     "record": "",
     "record-data": "",
@@ -168,14 +168,14 @@
   "ok": true,
   "pixel_checks": [],
   "product_log": [],
-  "redraws": 22,
+  "redraws": 24,
   "scenario": true,
   "scenario_log": [
     "waited 0 frames",
     "waited 0 frames",
-    "captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/private-before.png",
+    "captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/private-before.png",
     "waited 0 frames",
-    "captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/existing-graph.png"
+    "captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/existing-graph.png"
   ],
-  "unpresented_redraws": 3
+  "unpresented_redraws": 5
 }

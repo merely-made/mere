@@ -77,7 +77,7 @@ synthetic addresses, public test identities, process observations and captures.
 
 ## Qualified result, 2026-10-20
 
-The accepted `gs-coop-view-20261020-05` cohort passes all seven phases with
+The accepted `gs-coop-view-20261020-07` cohort passes all seven phases with
 21 reviewed captures, seven distinct native processes and four custodian
 launches. Two different graphs and the first source exist before co-op starts.
 The owner invites one editor to the chosen graph, the guest adds a source and
@@ -96,9 +96,9 @@ a fresh guest is refused as `Delegation(Revoked)`. Re-exporting connection
 information retains the byte-identical original invitation, so this tests the
 old grant against current authority rather than silently replacing it.
 
-The frozen runtime source is `051b7eb9e5016901e8544055bcaf16c0cb7379dd`,
-including current main `ac8797289` and its updated storage/transport suppliers.
-`build-inputs.json` records 3,284 repository source and compiler-declared input
+The frozen runtime source is `98cbafad6d02ac199c8b2ced8836560b9a895904`,
+including current main `c25c2d441` and its updated storage/transport suppliers.
+`build-inputs.json` records 3,287 repository source and compiler-declared input
 hashes, the three executable hashes, runner hashes and Rust/Cargo 1.99.1.
 The application/resident dependency trees and supplier audit separately check
 18 resolved Git checkouts against their pinned commits. That audit covers
@@ -111,7 +111,7 @@ focused custody-policy test. Changed-file formatting and port boundaries pass.
 Both selected Clippy runs complete with existing warnings retained in their
 logs. These are bounded package/module checks, not a full-workspace or CI run.
 `software-gates.json` records commands and compressed logs;
-`diagnostic-attempts.json` preserves the four rejected headed attempts and fixes.
+`diagnostic-attempts.json` preserves the five rejected headed attempts and fixes.
 `capture-review.json` records inspection of every accepted capture, with
 individual full-capture inspection for the critical editing and cold-refusal
 states in addition to the three review contact sheets.
@@ -120,4 +120,18 @@ Verify the packet and the exact committed publication tree:
 
 ```sh
 python3 ports/graphshell/docs/receipts/coop_graph_view_20261020/verify.py --commit HEAD
+```
+
+The earlier complete `native05` packet remains frozen in
+`prior-cohort/native05`. Publication caught the subsequent shared site model
+extraction on main; the ordinary-view executable stayed byte-identical, while
+the resident and preparation executables changed. The final `native07` cohort
+repeats the complete headed and cold-reopen workflow with those new executables.
+The current source hashes also cover that new shared model. Verify the retained
+cohort against its original committed source:
+
+```sh
+python3 ports/graphshell/docs/receipts/coop_graph_view_20261020/verify.py \
+  --packet ports/graphshell/docs/receipts/coop_graph_view_20261020/prior-cohort/native05 \
+  --commit 1197db034
 ```

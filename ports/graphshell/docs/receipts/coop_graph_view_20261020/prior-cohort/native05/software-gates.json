@@ -1,0 +1,69 @@
+{
+  "result": "ok",
+  "runtime_source": "051b7eb9e5016901e8544055bcaf16c0cb7379dd",
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts",
+    "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/repos/mere/target/build",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "gates": [
+    {
+      "gate": "resident-tests",
+      "command": "cargo +1.99.1 test --locked --offline -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "passed": 30,
+      "failed": 0,
+      "ignored": 0,
+      "log": "software/resident-tests.log.gz"
+    },
+    {
+      "gate": "ui-tests",
+      "command": "cargo +1.99.1 test --locked --offline -p graphshell-mere",
+      "passed": 16,
+      "failed": 0,
+      "ignored": 0,
+      "log": "software/ui-tests.log.gz"
+    },
+    {
+      "gate": "core-tests",
+      "command": "cargo +1.99.1 test --locked --offline -p graphshell --no-default-features --features coop --lib",
+      "passed": 339,
+      "failed": 0,
+      "ignored": 6,
+      "log": "software/core-tests.log.gz"
+    },
+    {
+      "gate": "custody-tests",
+      "command": "cargo +1.99.1 test --locked --offline -p djinn --features passphrase-fd --lib custody::tests::the_default_policy_releases_named_namespaces_and_never_the_master",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": "software/custody-tests.log.gz"
+    },
+    {
+      "gate": "ui-clippy",
+      "command": "cargo +1.99.1 clippy --locked --offline -p graphshell-mere",
+      "result": "completed with existing warnings",
+      "log": "software/ui-clippy.log.gz"
+    },
+    {
+      "gate": "resident-clippy",
+      "command": "cargo +1.99.1 clippy --locked --offline -p djinn --features passphrase-fd --lib",
+      "result": "completed with existing warnings",
+      "log": "software/resident-clippy.log.gz"
+    },
+    {
+      "gate": "changed source formatting",
+      "result": "ok",
+      "command": "rustfmt +1.99.1 --edition 2024 --check (12 changed library/native/helper source files; daemon entrypoint retains its existing formatting)",
+      "log": "software/format.log.gz"
+    },
+    {
+      "gate": "port boundaries",
+      "result": "ok",
+      "command": "python3 scripts/check_port_boundaries.py",
+      "log": "software/boundaries.log.gz"
+    }
+  ],
+  "limits": "Selected package and resident module gates only. Existing warnings and six existing ignores are retained in logs; no full workspace or CI verdict."
+}
