@@ -59,6 +59,16 @@ fn actor_loss_fails_pending_work_and_refuses_later_commands() {
         Some(journal.clone()),
     )
     .unwrap();
+    let mut observations = lane
+        .enable_observations(
+            "actor-loss".into(),
+            apparatus::RetentionLimits {
+                max_records: 16,
+                max_bytes: 4096,
+                max_age: Duration::from_secs(60),
+            },
+        )
+        .unwrap();
     lane.ask(ask("pending")).unwrap();
     release.send(()).unwrap();
     await_disconnect(&lane);
@@ -80,6 +90,18 @@ fn actor_loss_fails_pending_work_and_refuses_later_commands() {
     let first = lane.close().unwrap_err();
     assert!(first.contains("actor"));
     assert_eq!(lane.close().unwrap_err(), first);
+    let evidence = lane.read_observations(&mut observations, 16).unwrap();
+    assert_eq!(
+        evidence
+            .records
+            .iter()
+            .map(|record| record.payload)
+            .collect::<Vec<_>>(),
+        [
+            distillery::inference::InferenceObservation::Queued,
+            distillery::inference::InferenceObservation::RunFailed,
+        ]
+    );
 
     let mut paused = saved[0].clone();
     paused["view"]["state"] = "paused".into();

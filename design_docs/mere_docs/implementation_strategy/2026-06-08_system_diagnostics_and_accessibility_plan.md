@@ -1,5 +1,124 @@
 # System Diagnostics and Accessibility Plan
 
+## Observations and semantic action continuation, 2026-10-20
+
+**Status:** contained continuation qualified on 2026-10-20; broader owner
+migrations remain open. Continues the second boundary slice in the family
+promotion plan; the completed September and October receipts below retain their
+original scope. Main refreshed to `21deb0cb` before implementation.
+
+Receipt cap: 10 MB for this continuation, within the family programme's 100 MB
+total. Reuse `C:\t\cargo-targets\mere`. Keep the sealed full-source audit
+registers unchanged; dated successor findings and qualification belong under
+`support/family-promotion/`.
+
+Read the ingress, retained store, UX mapper, scenario driver and their consumers
+before changing shared contracts. First reproduce and repair Q326 (wheel surface
+scope), Q386 (descriptor/config defaults) and Q391 (emitted channel catalogue).
+Preserve configured overrides, queue/store lifetimes and producer redaction.
+Follow one worker operation and one host-driven UI operation through admitted
+dispatch and actual owner outcome, using independent bounded readers. Record
+remaining owner migrations separately from individual defects; do not infer
+terminal success, presentation or pixel causality from acceptance or quiescence.
+
+Done when the contained regressions and selected receiving gates pass, the
+worker/UI evidence and its limits are recorded, and remaining architectural
+forks have named owners and concrete follow-ups. The graph/history and receipt
+repair sessions in the ownership repair plan remain separate work.
+
+### Findings and ownership, 2026-10-20
+
+The dated successor review is
+[`diagnostics-ownership-review.json`](../../../support/family-promotion/diagnostics-ownership-review.json).
+It preserves the sealed audit and separately tracks individual repairs and
+unfinished owner migrations. Q326 routes wheel selectors through Taproot's
+surface-enforcing resolver. Q386 derives new-channel defaults from descriptors
+without replacing existing configuration. Q391 generates emitted surface
+channels and their catalogue from one exhaustive declaration. Further contained
+repairs refuse nonfinite sampling settings, preserve fractional sampling rates,
+and prevent stale inference replies from reviving or re-journaling terminal work.
+
+| Responsibility | Current continuation | Remaining boundary |
+|---|---|---|
+| UX channel vocabulary (A1168) | One exhaustive declaration supplies emission and registration, including Inspector/Steward. | Browser-specific SurfaceId remains an adapter vocabulary. |
+| Descriptor/config policy (A1154) | Descriptor defaults seed sampling/KeepRecent count; existing configuration retains precedence. | Registry metadata does not enforce a collector's retention. |
+| Ingress and history (A1156, A870, A872) | Existing newest-rejecting ingress and oldest-evicting retained store keep their different lifetimes; inspection and receipt readers remain independent. | A collector must preserve source/boot scope and unsequenced contention/no-sink loss; ingress numbers cannot be invented as retained causal references. |
+| Inference outcomes (A869, A1155) | An explicit opt-in adapter records fixed phases and generated execution IDs through the real actor and receiving run table. Worker reply, accepted outcome and journal refusal remain distinct. | Consumers choose run identity, count/byte/age limits and export policy. This does not bound the domain run table/token transport or backfill unobserved commands. |
+| UI delivery | A retained-host fixture drives the actual wheel path and records its application callback, then samples the existing Mesquite attachment independently. | This is windowless CPU qualification, not a headed product or human AT receipt. |
+
+`InferenceLane::enable_observations` adds no automatic export or daemon.
+`observation_cursor` and `read_observations` use the existing Apparatus contract;
+`set_observation_limits` changes retention without resetting identity or loss.
+The payload omits prompts, answers, caller run names and error strings. The
+producer supplies neither a semantic revision nor a presented frame it cannot
+establish. Enabling twice refuses instead of silently discarding reader coverage.
+
+The broader semantic-action migration remains open. `A11yHost::map_parts`
+resolves against the last synced maps, while `Host::apply_a11y_requests` dispatches
+node/producer actions without a fresh semantic admission/result boundary.
+Finishing it requires current-target and supported-action checks across platform,
+local automation and producer lifetimes, with attributable refusal/outcome tests.
+This is a separate API/receiving migration, beyond the contained repair pass.
+
+Mesquite also restates Taproot's private selector grammar in `wheel::parse_selector`,
+and key/input-text verbs take the narrower runner route (A961). Product `act`
+and click booleans remain dispatch-handling facts, not unique-target or terminal
+success receipts. The Apparatus skeleton and real inspection coexist (A873).
+Presentation ordinals still require their run/host/context scope; attaching a
+batch does not establish pixel correlation. These are named follow-ups, not
+claims that the shared semantic application migration is finished.
+
+The Registry gate remains an explicit API, not an installed process-wide filter.
+Current Mere source has no production caller of `should_emit_and_observe` or
+`should_emit_channel`, and no production `install_global_sender` call. The
+nonblocking emitter does not consult the mutable registry automatically. The
+sampling repairs therefore qualify that owner API; connecting producer policy,
+bounded ingress and retained readers is still a host/collector migration.
+
+A further source-confirmed failure-contract gap remains in
+`descriptor::registry::legacy_violations`: an invariant clock error is mapped to
+an empty violation vector. The keyed API exposes its typed error. Promoting that
+truthful result through the legacy FIFO/public caller contract belongs with the
+invariant adapter migration (A1155); an empty vector must not be treated as proof
+that a valid inspection found no violation. No runtime reproduction of that
+additional candidate is claimed by this pass.
+
+The inference table also assumes its mutex is never poisoned while invoking
+owner journal callbacks under that guard. A panicking journal can violate that
+assumption; recovering a guard alone cannot establish whether an external write
+committed. This remains a source candidate for the journal/lifecycle owner,
+requiring panic and durable-recovery controls. The qualified controls here use
+returned journal errors and actor panic outside that guarded callback.
+
+### Qualification and progress, 2026-10-20
+
+178 targeted native tests pass on the current Windows/Rust 1.99.1 source:
+Apparatus core/serde 18, registry diagnostics 39, UX events 38, Mesquite 35,
+Distillery library 42, inference observations 4, inference shutdown 1 and
+lifecycle 1. The actor controls cover real threaded dispatch/replies using
+deterministic providers, journal refusal after successful generation, cancellation,
+actor loss and stale/unknown replies through the actual bridge. The retained-host
+wheel control preserves request errors and observes the callback's real effect.
+
+The three command receipts are `diagnostics-core-online.json`,
+`diagnostics-mesquite-current.json` and `diagnostics-inference-current.json` under
+`support/family-promotion/`. The
+[qualification index](../../../support/family-promotion/diagnostics-qualification.json)
+retains their exact source, lock and eight executed binary hashes. Setup attempts
+remain distinct: early interrupted
+Genet materialization, package-cache waits and missing offline sources executed
+no qualifying tests. The completed Cargo-owned checkout is retained. All builds
+reuse `C:\t\cargo-targets\mere`; this pass creates no isolated target, Cargo home
+or worktree.
+
+The selected gates all use `--locked`. `diagnostics-lock-inventory.json` records
+one canonical source for each of 22 promoted packages in the lockfile; its only
+task change is the Distillery-to-Apparatus edge. This is a locked-source inventory,
+not all-target runtime qualification. A separate all-target metadata attempt
+could not download uncached `accesskit_ios` in offline mode and is retained as
+preparation evidence. Model/GPU, headed product, browser and human AT acceptance
+remain separate, as do full command-refusal coverage and the migrations above.
+
 ## Current design: shared observations, 2026-09-29
 
 **Status:** first diagnostics implementation qualified by focused Mere tests.

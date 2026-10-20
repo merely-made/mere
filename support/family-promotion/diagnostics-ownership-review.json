@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-20",
+  "basis": "21deb0cb",
+  "status": "six contained repairs and bounded worker/UI evidence qualified by 178 targeted native tests; broader migrations open",
+  "retained_byte_cap": 10000000,
+  "sealed_registers_edited": false,
+  "findings": [
+    {
+      "id": "Q326",
+      "authority": "Taproot scope resolver over host retained geometry",
+      "source": "crates/cambium/mesquite/src/probe.rs",
+      "change": "Wheel selectors use AutomatableExt::resolve rather than bypassing its surface gate.",
+      "verification": "actual Probe and retained host wheel callback regression",
+      "status": "repaired and qualified by named targeted native regressions"
+    },
+    {
+      "id": "Q386",
+      "authority": "descriptor defaults, then existing explicit channel config",
+      "source": "crates/system/registry/src/diagnostics/descriptor/registry.rs",
+      "change": "Static and runtime registration seed sampling and KeepRecent count from one conversion, preserving existing settings. Session still uses collector count policy, not an unlimited-history promise.",
+      "verification": "public default/runtime/preconfigured/replace controls",
+      "status": "repaired and qualified by named targeted native regressions"
+    },
+    {
+      "id": "Q391",
+      "authority": "one exhaustive UX channel mapping",
+      "source": "crates/system/ux-events/src/ux_diagnostics.rs",
+      "change": "Generate emitted and enumerated surface channel names together; Inspector and Steward emissions are included.",
+      "verification": "mapping/catalogue parity and uniqueness",
+      "status": "repaired and qualified by named targeted native regressions"
+    },
+    {
+      "id": "diagnostics-nonfinite-sampling",
+      "source": "crates/system/registry/src/diagnostics/descriptor.rs",
+      "change": "Nonfinite explicit sampling settings refuse emission rather than converting NaN to an admit-all gate.",
+      "verification": "NaN and both infinities",
+      "status": "repaired and qualified by named targeted native regressions"
+    },
+    {
+      "id": "diagnostics-fractional-sampling",
+      "source": "crates/system/registry/src/diagnostics/descriptor/registry.rs",
+      "change": "Bounded fractional credit replaces reciprocal rounding and a saturating lifetime counter; 0.75 no longer becomes 0.5.",
+      "verification": "observed admission counts at 0.25, 0.5 and 0.75",
+      "status": "repaired and qualified by named targeted native regressions"
+    },
+    {
+      "id": "diagnostics-stale-worker-reply",
+      "source": "ports/distillery/src/inference.rs",
+      "change": "Ignore stale updates to terminal work before execution flags change; discarded terminal replies do not append to the journal.",
+      "verification": "real actor terminal outcome followed by stale replies through the actual bridge",
+      "status": "repaired and qualified by named targeted native regressions"
+    },
+    {
+      "id": "diagnostics-legacy-invariant-clock",
+      "status": "documented source-confirmed result loss; runtime reproduction remains open",
+      "source": "crates/system/registry/src/diagnostics/descriptor/registry.rs:legacy_violations",
+      "evidence": "Result::Err maps to Vec::new, unlike the typed keyed API. The legacy caller cannot distinguish an invalid clock from a valid no-violation result.",
+      "why_deferred": "Promote a truthful fallible result through legacy public and adapter callers rather than invent a violation or silently change clock semantics."
+    },
+    {
+      "id": "diagnostics-journal-panic-poisoning",
+      "status": "source candidate; runtime reproduction and recovery semantics remain open",
+      "source": [
+        "ports/distillery/src/inference.rs:Shared::table",
+        "ports/distillery/src/inference.rs:checkpoint journal callback"
+      ],
+      "evidence": "External journal callbacks run under the run-table guard; table acquisition expects no poisoning. A panicking callback can break that assumption. The actor-panic control does not exercise journal panic under this guard.",
+      "why_deferred": "Recovering the mutex does not establish whether an external write committed. Requires fallible lifecycle and durable-recovery qualification rather than silently clearing poison."
+    }
+  ],
+  "ownership_migrations": [
+    {
+      "audit_ids": [
+        "A1168"
+      ],
+      "state": "consolidated in this change",
+      "decision": "UX surface emission and catalogue share one exhaustive declaration; graph-specific SurfaceId remains an adapter vocabulary."
+    },
+    {
+      "audit_ids": [
+        "A1154"
+      ],
+      "state": "default-policy duplication repaired; distinct roles retained",
+      "decision": "Descriptor supplies initial defaults. Existing config survives registration/replacement. Downstream ingress/history still enforce their own bounds. Current Mere has no production gate caller or global sender installation. This does not install sampling into nonblocking ingress."
+    },
+    {
+      "audit_ids": [
+        "A1156",
+        "A870",
+        "A872"
+      ],
+      "state": "intentionally separate owners",
+      "decision": "Registry staging rejects newest on overflow; Apparatus retained history evicts oldest and supplies independent readers. Display truncation is neither ingress loss nor retention loss."
+    },
+    {
+      "audit_ids": [
+        "A869",
+        "A1155"
+      ],
+      "state": "one bounded worker adapter added; whole-app wiring remains open",
+      "decision": "Distillery owns admitted work, worker replies and journal acceptance. Apparatus stores optional fixed redacted observations keyed by generated execution id. Registry correlation and Apparatus envelopes are not made a universal event enum."
+    },
+    {
+      "audit_ids": [
+        "A873"
+      ],
+      "state": "open consumer migration",
+      "decision": "Legacy project_skeleton and real batch inspection coexist; settings/inspection consumers have not all migrated. A skeleton is not proof of functioning diagnostics."
+    },
+    {
+      "audit_ids": [
+        "A961"
+      ],
+      "state": "open input-route migration",
+      "decision": "Scenario key/input-text call the runner directly while native input has host intercept/default routing. The wheel repair does not declare keyboard/native parity."
+    }
+  ],
+  "large_effect_followups": [
+    {
+      "owner": "Cambium host plus platform/producer adapters",
+      "source": [
+        "crates/cambium/cambium-winit-a11y/src/lib.rs:map_parts",
+        "crates/cambium/cambium-rootstock/src/frame.rs:apply_a11y_requests"
+      ],
+      "gap": "Last-synced action maps and direct node dispatch do not establish fresh semantic admission at execution. Review disabled/removed/reused targets and producer/session lifetimes before adding attributed results.",
+      "gate": "One owner current-target/admission path, platform and local automation receiving regressions, and explicit foreign/stale/unsupported results. Human AT remains separate.",
+      "why_deferred": "Requires API and cross-host/producer lifetime qualification, beyond the contained repair pass."
+    },
+    {
+      "owner": "Taproot grammar and Mesquite adapter",
+      "source": [
+        "crates/cambium/mesquite/src/wheel.rs:parse_selector",
+        "crates/cambium/mesquite/src/lib.rs:Product::act"
+      ],
+      "gap": "Wheel restates a private upstream selector parser. Product act/click booleans express dispatch handling, not terminal outcomes or uniqueness. Do not invent successful operation receipts from them.",
+      "gate": "Export/adopt shared parser when supplier-qualified; owner-provided admitted operation identity and explicit completion where actual applications need it."
+    },
+    {
+      "owner": "Registry collector adapters and product sources",
+      "gap": "A channel sequence is scoped to an ingress queue, while Apparatus sequences belong to a retained run/source. Contention/no-sink losses have no sequence. An adapter must preserve source boot/scope and unsequenced loss rather than fabricate cause references or record gaps. Current Mere has no production call to should_emit_and_observe/should_emit_channel or install_global_sender. API qualification is not a wired host pipeline.",
+      "gate": "Actual producer-to-retained-reader adapter with overload/restart controls and explicit unsequenced counters; no universal envelope rewrite."
+    },
+    {
+      "owner": "Presentation producers and receipt adapters",
+      "gap": "Apparatus optional frame ordinal alone is not Mesquite run/host/context submission identity or pixel correlation. New inference observations leave absent frame/revision facts absent.",
+      "gate": "Existing presentation plan exact-scope/image qualification, separately from observation attachment."
+    },
+    {
+      "owner": "Distillery integration consumers",
+      "gap": "The worker observation copy is opt-in and samples selected owner boundaries, without backfill, all-command refusal coverage or automatic UI/export wiring. Existing worker token transport and domain run-table retention are not newly bounded by the diagnostic store.",
+      "gate": "Consumers choose nonsecret fresh run identity, limits/export policy and full command/outcome coverage they need; qualify actual model/GPU and headed uses separately."
+    }
+  ],
+  "qualification_receipts": [
+    "diagnostics-core-online.json",
+    "diagnostics-mesquite-current.json",
+    "diagnostics-inference-current.json"
+  ]
+}
