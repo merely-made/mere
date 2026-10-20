@@ -12,36 +12,8 @@ use std::process::Command;
 
 const SOURCES: &[(&str, &[u8])] = &[
     (
-        "crates/stickleback/Cargo.toml",
-        include_bytes!("../../../../stickleback/Cargo.toml"),
-    ),
-    (
-        "crates/stickleback/src/lib.rs",
-        include_bytes!("../../../../stickleback/src/lib.rs"),
-    ),
-    (
-        "crates/murm/transport/src/transport.rs",
-        include_bytes!("../../../../murm/transport/src/transport.rs"),
-    ),
-    (
         "crates/mesh/mesh/examples/retained_receive/carrier.rs",
         include_bytes!("carrier.rs"),
-    ),
-    (
-        "crates/stickleback/src/object_stream.rs",
-        include_bytes!("../../../../stickleback/src/object_stream.rs"),
-    ),
-    (
-        "crates/murm/transport/src/p2panda_transport.rs",
-        include_bytes!("../../../../murm/transport/src/p2panda_transport.rs"),
-    ),
-    (
-        "crates/murm/transport/src/accepted.rs",
-        include_bytes!("../../../../murm/transport/src/accepted.rs"),
-    ),
-    (
-        "crates/murm/transport/src/peer_route.rs",
-        include_bytes!("../../../../murm/transport/src/peer_route.rs"),
     ),
     ("Cargo.lock", include_bytes!("../../../../../Cargo.lock")),
     ("Cargo.toml", include_bytes!("../../../../../Cargo.toml")),
@@ -66,6 +38,10 @@ const SOURCES: &[(&str, &[u8])] = &[
         include_bytes!("identity.rs"),
     ),
     (
+        "crates/mesh/mesh/examples/support/provenance.rs",
+        include_bytes!("../support/provenance.rs"),
+    ),
+    (
         "crates/mesh/mesh/src/store.rs",
         include_bytes!("../../src/store.rs"),
     ),
@@ -80,30 +56,6 @@ const SOURCES: &[(&str, &[u8])] = &[
     (
         "crates/mesh/mesh/src/spec.rs",
         include_bytes!("../../src/spec.rs"),
-    ),
-    (
-        "crates/stickleback/src/processor.rs",
-        include_bytes!("../../../../stickleback/src/processor.rs"),
-    ),
-    (
-        "crates/stickleback/src/store.rs",
-        include_bytes!("../../../../stickleback/src/store.rs"),
-    ),
-    (
-        "crates/stickleback/src/drop_io.rs",
-        include_bytes!("../../../../stickleback/src/drop_io.rs"),
-    ),
-    (
-        "crates/stickleback/src/drop.rs",
-        include_bytes!("../../../../stickleback/src/drop.rs"),
-    ),
-    (
-        "crates/eidetic/muniment/src/redb_backend.rs",
-        include_bytes!("../../../../eidetic/muniment/src/redb_backend.rs"),
-    ),
-    (
-        "crates/eidetic/muniment/src/backend.rs",
-        include_bytes!("../../../../eidetic/muniment/src/backend.rs"),
     ),
 ];
 
@@ -123,6 +75,16 @@ pub fn file_digest(path: &Path) -> Result<String> {
 
 pub fn mere_identity() -> Result<Value> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+    let lock = include_bytes!("../../../../../Cargo.lock");
+    let selected_external_dependencies = crate::provenance::selected_git_packages(
+        lock,
+        &[
+            "mere-p2panda-net",
+            "mere-transport",
+            "muniment",
+            "stickleback",
+        ],
+    )?;
     let mut digest = blake3::Hasher::new();
     let mut sources = Vec::new();
     for (path, bytes) in SOURCES {
@@ -134,9 +96,12 @@ pub fn mere_identity() -> Result<Value> {
             "blake3":blake3::hash(bytes).to_hex().as_str()}));
     }
     Ok(json!({
-        "scope":"compile_time_probe_and_selected_owner_and_carrier_sources",
+        "identity_schema":"mere.mesh.retained_receive_identity/v2",
+        "scope":"locally_owned_sources_and_selected_external_lock_packages",
         "source_manifest_blake3":digest.finalize().to_hex().as_str(),
         "sources":sources,
+        "selected_external_dependencies":selected_external_dependencies,
+        "compiled_lock_blake3":blake3::hash(lock).to_hex().as_str(),
         "executable_blake3":file_digest(&std::env::current_exe()?)?,
         "observed_git_head":git(&root, &["rev-parse","HEAD"]),
         "observed_git_status_porcelain":git(&root, &["status","--porcelain=v1"]),
