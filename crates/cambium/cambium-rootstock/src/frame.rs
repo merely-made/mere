@@ -1139,7 +1139,6 @@ where
         request: &crate::A11yRequest,
     ) -> Result<crate::NodeId, crate::A11yRejection> {
         use crate::A11yRejection as Refusal;
-        use document_session_api::DocumentA11yAction as Action;
         use layout_dom_api::LayoutDom as _;
         if matches!(request.action, A11yAction::SetValue(value) if !value.is_finite()) {
             return Err(Refusal::InvalidValue);
@@ -1150,89 +1149,63 @@ where
         let dom = runner.dom();
         let dom = dom.borrow();
         let view = crate::WindowDom::new(&dom, runner.mount());
-        let projection = crate::document_projection(
+        if let crate::A11yTarget::Node(node) = request.target {
+            if !view.contains(node) {
+                return Err(Refusal::TargetAbsent);
+            }
+        }
+        let projection = crate::project_semantics(
             &view,
             layout,
+            &mut self.s.shared.leaves,
+            &mut self.s.shared.producers,
             runner.focus().map(|node| view.opaque_id(node)),
         );
         let node = match &request.target {
             crate::A11yTarget::Node(node) => *node,
-            crate::A11yTarget::Produced(produced) => layout
-                .custom_leaf_nodes(&view)
-                .into_iter()
-                .find_map(|(key, node)| (key == produced.slot).then_some(node))
+            crate::A11yTarget::Produced(produced) => *projection
+                .producer_slots
+                .get(&produced.slot)
                 .ok_or(Refusal::TargetAbsent)?,
         };
-        // Find membership before asking the DOM for an opaque id. A foreign or
-        // removed NodeId must never be dereferenced through this window's DOM.
-        if !view.contains(node) {
+        let id = accesskit::NodeId(view.opaque_id(node));
+        if !projection.dom_targets.contains_key(&id) {
             return Err(Refusal::TargetAbsent);
         }
         let semantic = projection
-            .nodes()
+            .tree
+            .nodes
             .iter()
-            .find(|semantic| semantic.id.get() == view.opaque_id(node) && !semantic.state.hidden)
+            .find(|(candidate, _)| *candidate == id)
+            .map(|(_, node)| node)
+            .filter(|node| !node.is_hidden())
             .ok_or(Refusal::TargetAbsent)?;
-        if semantic.state.disabled {
+        if semantic.is_disabled() {
             return Err(Refusal::Disabled);
         }
-        if let crate::A11yTarget::Produced(produced) = &request.target {
-            if !matches!(request.action, A11yAction::Click | A11yAction::Focus) {
-                return Err(Refusal::Unsupported);
-            }
-            let semantics = self
-                .s
-                .shared
-                .producers
-                .semantics(produced.slot)
-                .ok_or(Refusal::TargetAbsent)?;
-            if !semantics.children.iter().any(|child| {
-                child.key == produced.key
-                    && child.actions.iter().any(|action| action.id == produced.id)
-            }) {
-                return Err(Refusal::Unsupported);
-            }
+        let action = match request.action {
+            A11yAction::Click => accesskit::Action::Click,
+            A11yAction::Focus => accesskit::Action::Focus,
+            A11yAction::SetValue(_) => accesskit::Action::SetValue,
+        };
+        let semantic = if let crate::A11yTarget::Produced(produced) = &request.target {
+            let id = projection
+                .produced_targets
+                .iter()
+                .find_map(|(id, target)| (target == produced).then_some(*id))
+                .ok_or(Refusal::Unsupported)?;
+            projection
+                .tree
+                .nodes
+                .iter()
+                .find(|(candidate, _)| *candidate == id)
+                .map(|(_, node)| node)
+                .ok_or(Refusal::TargetAbsent)?
         } else {
-            let action = match request.action {
-                A11yAction::Click => Action::Click,
-                A11yAction::Focus => Action::Focus,
-                A11yAction::SetValue(_) => Action::SetValue,
-            };
-            if action == Action::SetValue && semantic.state.read_only {
-                return Err(Refusal::Unsupported);
-            }
-            let mut supported = semantic.actions.contains(&action);
-            // Sprigging's existing contribution is still AccessKit-shaped.
-            // Consult that current owner too, as both platform adapters do;
-            // the neutral projection alone does not yet include leaf actions.
-            if let Some((key, _)) = layout
-                .custom_leaf_nodes(&view)
-                .into_iter()
-                .find(|(_, candidate)| *candidate == node)
-                && let Some(leaf) = self.s.shared.leaves.get_mut(&key)
-            {
-                let requested = match request.action {
-                    A11yAction::Click => accesskit::Action::Click,
-                    A11yAction::Focus => accesskit::Action::Focus,
-                    A11yAction::SetValue(_) => accesskit::Action::SetValue,
-                };
-                let mut access = accesskit::Node::new(accesskit::Role::Unknown);
-                if supported {
-                    access.add_action(requested);
-                }
-                leaf.accessibility(&mut access);
-                if access.is_disabled() {
-                    return Err(Refusal::Disabled);
-                }
-                if access.is_hidden() {
-                    return Err(Refusal::TargetAbsent);
-                }
-                supported = access.supports_action(requested)
-                    && !(requested == accesskit::Action::SetValue && access.is_read_only());
-            }
-            if !supported {
-                return Err(Refusal::Unsupported);
-            }
+            semantic
+        };
+        if !semantic.supports_action(action) {
+            return Err(Refusal::Unsupported);
         }
         Ok(node)
     }

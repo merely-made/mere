@@ -2162,6 +2162,7 @@ dependencies = [
  "paint_list_render",
  "serde_json",
  "sha2 0.11.0",
+ "sprigging",
  "tabard",
  "tabard-workshop",
  "wasm-bindgen",

@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
   "basis": "21deb0cb",
-  "status": "contained shared DOM semantics and explicit resident collector qualified: 191 native passes, seven existing ignores, real client-process receiving and browser-host Wasm compile; broader contribution/lifetime/process-final migrations open",
+  "status": "shared leaf/producer host composition under receiving qualification; mutable contributors, target lifetimes, action-catalogue coverage and process-final diagnostics remain open",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -112,10 +112,9 @@
       "id": "diagnostics-flat-tree-routing",
       "source": [
         "crates/cambium/cambium-rootstock/src/lib.rs:document_projection/find_opaque",
-        "crates/cambium/cambium-winit-a11y/src/lib.rs:walk",
-        "crates/cambium/cambium-genet-web-host/src/a11y.rs:walk"
+        "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics"
       ],
-      "change": "Use supplier flat_children rather than light-only dom_children for semantic markers, focus and platform route maps, matching the Genet projection.",
+      "change": "Use supplier flat_children rather than light-only dom_children for semantic markers, focus and platform route maps, matching the Genet projection. The later shared contribution pass retires both platform-specific route walks and consumes the shared host maps.",
       "verification": "actual shadow control focus, numeric marker and native action routing regression; browser target compile separately",
       "status": "repaired and qualified by diagnostics-shared-projection.json and diagnostics-shared-wasm.json"
     },
@@ -136,6 +135,72 @@
       "change": "Caller fields cannot overwrite owner schema, event name, PID or receipt time in event-file records.",
       "verification": "forged reserved fields plus preserved ordinary field regression",
       "status": "repaired and qualified by diagnostics-product-owner.json and diagnostics-product-receiving.json"
+    },
+    {
+      "id": "diagnostics-contribution-composition",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics",
+        "crates/cambium/cambium-winit-a11y/src/lib.rs:project_tree_with_actions",
+        "crates/cambium/cambium-genet-web-host/src/mirror.rs:plan",
+        "crates/cambium/cambium-rootstock/src/frame.rs:admit_a11y_request"
+      ],
+      "change": "One host composition replaces three different leaf callback seeds and two producer child/action-ID implementations. ARIA now retains real Knob slider and numeric properties. A current producer description takes precedence over co-registered Sprigging semantics in both publication and admission.",
+      "verification": "actual registered contributors and current-target dispatch controls, native receiving, ARIA source-ID/action preservation, Wasm compilation",
+      "status": "qualification pending"
+    },
+    {
+      "id": "diagnostics-contributor-restrictions",
+      "source": "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics/restrict_actions",
+      "change": "Author label policy, host bounds/transforms/edges and restrictive state survive leaf callbacks. Disabled/hidden actions and read-only numeric mutations are removed. Producer action children inherit disabled/hidden state and blocked targets are absent from maps.",
+      "verification": "seed-dependent callback through real host dispatch; adversarial contributor geometry/edge/state changes; disabled producer regression",
+      "status": "qualification pending"
+    },
+    {
+      "id": "diagnostics-producer-geometry",
+      "source": "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics",
+      "change": "Missing slot geometry no longer becomes a fabricated zero origin. Nonfinite and negative-size producer rectangles have no published bounds.",
+      "verification": "missing-slot-origin and invalid-rectangle controls plus real producer placement/scaling receiving",
+      "status": "qualification pending"
+    },
+    {
+      "id": "diagnostics-contributed-route-membership",
+      "source": "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics",
+      "change": "DOM and produced action maps contain only reachable nodes outside hidden contributed subtrees; current-target admission checks that same route membership. A focused node hidden by its contributor falls back to the document root, matching absence from platform routes.",
+      "verification": "actual hidden-leaf projection, route removal and root-focus fallback; current hidden/removed target and platform controls",
+      "status": "qualification pending"
+    },
+    {
+      "id": "diagnostics-dom-only-selector-observation",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
+        "crates/cambium/cambium-genet-winit-host/src/harness.rs:Harness::a11y_projection",
+        "crates/cambium/mesquite/src/probe.rs:selector_target"
+      ],
+      "status": "source-confirmed consumer migration; receiving reproduction and API decision open",
+      "evidence": "AppCtx/Harness expose the neutral DOM projection through &self. Mesquite selector matching consumes that projection; leaf roles/values and generated producer action targets are absent, despite richer platform/admission composition. AppCtx already documents its custom-leaf exclusion.",
+      "why_deferred": "Reading mutable provider callbacks from a read-only selector API requires an explicit observation/lifetime contract or an owner-published snapshot, not another scratch lowering or hidden mutation."
+    },
+    {
+      "id": "diagnostics-ambiguous-producer-dom-owner",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics",
+        "crates/cambium/cambium-rootstock/src/producer/registry.rs:prepare"
+      ],
+      "change": "Shared semantic composition refuses producer contributions and action targets when the current window has multiple DOM slots for one producer key, matching the renderer's existing DuplicateDomKey refusal. It does not arbitrarily choose the last slot. The custom-leaf key parser is reused from OwnedLayout.",
+      "verification": "real duplicated DOM slots and registered producer; no generated children, bound owner or produced action routes",
+      "status": "qualification pending"
+    },
+    {
+      "id": "diagnostics-render-projection-tree-and-coordinate-gap",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/owned_layout.rs:walk",
+        "crates/cambium/cambium-rootstock/src/owned_layout/producer.rs:custom_leaf_nodes/local_coordinates",
+        "crates/cambium/cambium-rootstock/src/producer/registry.rs:prepare",
+        "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics"
+      ],
+      "status": "source-confirmed boundary gaps; rendered shadow/padding/transform reproduction open",
+      "evidence": "Producer render discovery still uses a light-DOM walk while semantic discovery is flattened. Render/input use Genet ElementGeometry content size/origin with transforms and clips, while generated semantic child bounds still offset the projected slot rectangle. Padded/transformed/clipped receiving equivalence is not established by this consolidation.",
+      "why_deferred": "Qualify one Genet placement/paint mapping across renderer, native AccessKit and browser ARIA, plus shadow/slotted producer ownership and retirement; a new offset or traversal shim alone would leave the other authority gaps intact."
     }
   ],
   "ownership_migrations": [
@@ -183,6 +248,11 @@
       ],
       "state": "open input-route migration",
       "decision": "Scenario key/input-text call the runner directly while native input has host intercept/default routing. The wheel repair does not declare keyboard/native parity."
+    },
+    {
+      "audit_ids": [],
+      "state": "contained host composition centralized; neutral provider contract and lifetimes open",
+      "decision": "Rootstock composes existing AccessKit-shaped contributors for native publication, browser lowering and current-target admission. Genet owns DOM projection; products own contributor meaning and actual effects. No new universal semantic revision or outcome authority."
     }
   ],
   "large_effect_followups": [
@@ -223,12 +293,15 @@
     {
       "owner": "Genet projection, Sprigging and Cambium adapters",
       "source": [
-        "crates/cambium/cambium-winit-a11y/src/lib.rs:project_tree_with_actions",
-        "crates/cambium/cambium-rootstock/src/lib.rs:document_projection",
-        "crates/cambium/cambium-genet-web-host/src/a11y.rs:sync"
+        "crates/cambium/cambium-rootstock/src/semantics.rs",
+        "crates/cambium/sprigging/src/lib.rs:Leaf::accessibility",
+        "crates/cambium/cambium-rootstock/src/producer.rs:TextureProducer::semantics/act",
+        "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
+        "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "Native and browser now consume the same Rootstock DOM projection, using supplier flat traversal for routes/focus/markers. Existing AccessKit-shaped Sprigging callbacks and producer action nodes still lower separately; browser leaf lowering retains only a small role/name subset, omitting numeric role/value/action contributions. Context-sensitive leaf callback equivalence and action catalogue parity remain unqualified.",
-      "gate": "One supplier-qualified semantic contribution model with current geometry/clipping and native/browser receiving controls; retire duplicated lowering and markers where practical."
+      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped and mutable; separate publication/admission reads are not pure, atomic, cached or presentation-revision scoped. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Cross-window producer owners, reused provider/child keys, duplicate action IDs and generated hash collisions remain unqualified. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness and Mesquite selectors still expose DOM-only observations through read-only APIs; they are not a complete contributed semantic catalogue. Render discovery is still light-DOM while semantics are flattened; generated child bounds do not consume the full content-origin/transform/clip placement authority.",
+      "gate": "Supplier-qualified neutral contributor contract, explicit observation/effect and target-lifetime rules, Hest-coordinated catalogue/invocation/result migration, and actual native/browser runtime receiving.",
+      "why_deferred": "A supplier API and target lifecycle migration crosses products, platform adapters and command ownership; do not silently choose new identity or completion semantics in this repair slice."
     }
   ],
   "qualification_receipts": [
@@ -250,5 +323,12 @@
     "diagnostics-product-owner.json",
     "diagnostics-product-receiving.json",
     "diagnostics-shared-wasm.json"
+  ],
+  "contribution_basis": "c25c2d441",
+  "contribution_receipts": [
+    "diagnostics-contributed-source-reviewed.json",
+    "diagnostics-contributed-native-final.json",
+    "diagnostics-contributed-wasm.json",
+    "diagnostics-contributed-qualification.json"
   ]
 }
