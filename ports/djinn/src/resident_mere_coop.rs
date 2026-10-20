@@ -46,7 +46,7 @@ struct Activity {
     identity: Arc<graphshell_endpoint::door::custody_identity::CustodyIdentity>,
     contact: network::Card,
     ledger: Arc<std::sync::RwLock<notochord::RevocationLedger>>,
-    _server: tokio::task::JoinHandle<()>,
+    _stop: tokio::sync::oneshot::Sender<()>,
 }
 // Lifetime follows the resident, not the window; reconnect never opens another writer.
 #[derive(Default)]
@@ -106,11 +106,13 @@ impl Activities {
             let contact = run(network::card(&*identity, graph, &transport))?;
             let mut host = network::host(owner.clone())?;
             let ledger = host.revocations().clone();
-            let server = tokio::spawn(async move {
+            let (stop, mut stopped) = tokio::sync::oneshot::channel();
+            if !armillary::tasks::spawn_tracked(async move {
                 loop {
-                    match host.accept_one(&*transport, coop::now_ms).await {
+                    let incoming = tokio::select! {_=&mut stopped=>break,incoming=host.accept_one(&*transport,coop::now_ms)=>incoming};
+                    match incoming {
                         Ok(Ok(session)) => {
-                            tokio::spawn(async move {
+                            armillary::tasks::spawn_tracked(async move {
                                 let _ = session.finished().await;
                             });
                         },
@@ -118,13 +120,15 @@ impl Activities {
                         Err(_) => break,
                     }
                 }
-            });
+            }) {
+                return Err("resident is stopping".into());
+            }
             entry.insert(Activity {
                 owner,
                 identity,
                 contact,
                 ledger,
-                _server: server,
+                _stop: stop,
             });
         }
         let activity = activities.get(&graph).unwrap();
