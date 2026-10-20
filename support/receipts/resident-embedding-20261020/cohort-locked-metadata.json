@@ -1,0 +1,204 @@
+{
+  "knot": {
+    "locked_metadata": true,
+    "offline_after_dependency_fetch": true,
+    "packages": [
+      {
+        "name": "chartulary",
+        "version": "0.2.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "eidetic",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "esp",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0"
+      },
+      {
+        "name": "luggage",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "mere-proofs",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "muniment",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "servitor",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "stickleback",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      }
+    ],
+    "scope": "dependency resolution; no standalone full-suite claim"
+  },
+  "gemot": {
+    "locked_metadata": true,
+    "offline_after_dependency_fetch": true,
+    "packages": [
+      {
+        "name": "chartulary",
+        "version": "0.2.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "eidetic",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "mere-proofs",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "muniment",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "servitor",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "stickleback",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      }
+    ],
+    "scope": "dependency resolution; no standalone full-suite claim"
+  },
+  "cleromancy": {
+    "locked_metadata": true,
+    "offline_after_dependency_fetch": true,
+    "packages": [
+      {
+        "name": "chartulary",
+        "version": "0.2.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "eidetic",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "esp",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0"
+      },
+      {
+        "name": "luggage",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "mere-proofs",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "muniment",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "servitor",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "stickleback",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      }
+    ],
+    "scope": "dependency resolution; no standalone full-suite claim"
+  },
+  "cleromancy-core": {
+    "locked_metadata": true,
+    "offline_after_dependency_fetch": true,
+    "packages": [
+      {
+        "name": "chartulary",
+        "version": "0.2.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "muniment",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "servitor",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      }
+    ],
+    "scope": "dependency resolution; no standalone full-suite claim"
+  },
+  "murm-native": {
+    "locked_metadata": true,
+    "offline_after_dependency_fetch": true,
+    "packages": [
+      {
+        "name": "luggage",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "mere-proofs",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "muniment",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "stickleback",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      }
+    ],
+    "scope": "dependency resolution; no standalone full-suite claim"
+  },
+  "murm-signalman": {
+    "locked_metadata": true,
+    "offline_after_dependency_fetch": true,
+    "packages": [
+      {
+        "name": "chartulary",
+        "version": "0.2.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "eidetic",
+        "version": "0.0.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      },
+      {
+        "name": "muniment",
+        "version": "0.1.2",
+        "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+      }
+    ],
+    "scope": "dependency resolution; no standalone full-suite claim"
+  }
+}

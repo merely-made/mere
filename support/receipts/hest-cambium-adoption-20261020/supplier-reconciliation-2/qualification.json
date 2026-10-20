@@ -1,0 +1,84 @@
+{
+  "schema": "hest-supplier-reconciliation/v1",
+  "date": "2026-10-20",
+  "status": "qualified-locally-delivery-held",
+  "tested_tree_before_evidence": "5001ceea010871273203fbd22cea5ac919d9e48f",
+  "local_parent": "eafee8a3afc6000226c13b9ee68248aaab8c3cb2",
+  "incoming_parent": "d4756e0fb6a759746e97d71b3e9a8eb8c2d0e9cf",
+  "checks": "checks.json",
+  "preservation": "preservation.json",
+  "dependency_summary": "dependency-summary.json",
+  "supplier_test_executions": 405,
+  "lock_resolution": {
+    "knot_revision": "65a6632a24b764d04eecf7302a1087342eccbfbe",
+    "reason": "Preserve the qualified Cambium 0.5 widget compatibility prerequisite instead of replacing it with an incompatible incoming Knot revision.",
+    "required_older_dependency_records_added": 7,
+    "added_records": [
+      "chartulary",
+      "eidetic",
+      "esp",
+      "mere-proofs",
+      "muniment",
+      "servitor",
+      "stickleback"
+    ],
+    "unrelated_versions_upgraded": 0,
+    "dependency_disambiguation": "Cargo qualifies dependency names where the retained Knot source requires older Git cohorts. Incoming package versions and source revisions remain present."
+  },
+  "knot_reconciliation": {
+    "head": "2b118e3893049b52435fe28eb70fa9c9b2fefed8",
+    "incoming": "3a7f9a9307d70bae0c5dddcbec65e12f7ba68393",
+    "rust_sources_match_incoming": true,
+    "root_manifest_and_lock_match_incoming": true,
+    "check": [
+      "cargo",
+      "metadata",
+      "--locked",
+      "--format-version",
+      "1"
+    ],
+    "exit_code": 0,
+    "metadata_sha256": "41df81aac0bfcda5b2e872b7ba7618c77c4bce4fea158d88b4b52ce081f64872"
+  },
+  "turnstone": {
+    "head": "9df2f000722d3e3f52855930b2f98ad4c07c6855",
+    "changed_this_reconciliation": false,
+    "prior_receiving_qualification": "../reconciled/qualification.json",
+    "full_library_result": {
+      "passed": 1103,
+      "ignored": 15,
+      "failed": 0
+    },
+    "full_library_rerun_this_reconciliation": false
+  },
+  "preflight_notes": [
+    "Initial offline metadata lacked fetched incoming Git objects; online locked fetch obtained them.",
+    "The combined Mere lock needed seven retained Knot dependency records; Cargo generated the additions and the final locked offline metadata check passed.",
+    "An exploratory Graphshell library filter matched zero tests and is excluded; the existing command_declarations integration target passed one test."
+  ],
+  "whitespace": {
+    "against_local_parent": "Five incoming resident embedding log files contain existing blank EOF lines; preserved unchanged.",
+    "intended_delta_against_incoming": "checked separately before commit"
+  },
+  "limits": {
+    "pushed": false,
+    "published": false,
+    "h3_started": false,
+    "remote_only_new_version_receiving": false,
+    "native_gui_acceptance": false
+  },
+  "documentation": {
+    "scoped_actionable_findings": 0,
+    "informational_exclusions": {
+      "ambiguous_known_root_paths": [
+        {
+          "source": "cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md",
+          "subject": "src/action/command_metadata.rs",
+          "detail": "bare src/tests/examples path has no crate context"
+        }
+      ]
+    },
+    "global_audit_clean": false,
+    "global_report_sha256": "4f21c6c59f0c1e6f071357c571e52dbc71041b1e952e2f9592cb9edba1b5547b"
+  }
+}

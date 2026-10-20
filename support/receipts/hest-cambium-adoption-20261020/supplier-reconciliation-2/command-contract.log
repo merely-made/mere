@@ -1,0 +1,80 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.74s
+     Running unittests src/lib.rs (target/build/debug/deps/chirograph-76a9452adafae46c)
+
+running 53 tests
+test line::tests::a_blank_line_decodes_to_nothing ... ok
+test command_effect::tests::every_effect_round_trips_without_changing_the_wire_representation ... ok
+test line::tests::a_line_split_across_two_pushes_arrives_once ... ok
+test line::tests::an_empty_line_is_a_line ... ok
+test line::tests::crlf_reads_the_same_as_lf ... ok
+test line::tests::two_lines_in_one_push_come_out_as_two ... ok
+test line::tests::a_value_round_trips_through_one_line ... ok
+test line::tests::the_unterminated_tail_is_taken_only_on_request ... ok
+test tests::a_damaged_or_misordered_chunk_is_refused_rather_than_assembled ... ok
+test tests::a_cleared_selection_is_not_an_absent_one ... ok
+test tests::a_chunk_reply_round_trips_through_the_carrier_envelope ... ok
+test tests::a_selection_round_trips_and_keeps_its_source ... ok
+test tests::action_form_composes_exact_selected_values_under_its_schema ... ok
+test tests::action_form_refuses_missing_unknown_and_unadvertised_values ... ok
+test tests::an_accepted_session_asserts_no_endpoint_key ... ok
+test tests::an_action_without_input_form_keeps_the_existing_empty_payload_path ... ok
+test tests::an_empty_resource_completes_in_one_chunk ... ok
+test tests::an_open_negotiates_capabilities_and_carries_no_principal ... ok
+test capture::tests::v1_lifts_to_v2_without_score_or_authority ... ok
+test tests::clause_removal_restores_the_unfiltered_reading ... ok
+test capture::tests::v1_bytes_still_read_as_v1_and_v1_refuses_v2 ... ok
+test tests::a_revision_notice_is_distinct_from_a_keyed_response ... ok
+test tests::crossfilter_applies_foreign_clauses_and_excludes_the_consuming_view ... ok
+test tests::coordinated_selection_wire_is_deterministic ... ok
+test capture::tests::generation_mismatch_is_refused ... ok
+test capture::tests::a_score_newer_than_the_reader_is_refused ... ok
+test tests::discovery_and_requests_share_one_framed_vocabulary ... ok
+test capture::tests::v2_round_trips_with_score_and_authority ... ok
+test tests::editable_text_and_save_payloads_are_versioned_and_strict ... ok
+test tests::foreignness_is_answerable_which_is_why_source_is_mandatory ... ok
+test tests::diff_replay_round_trips_as_a_carrier_neutral_message ... ok
+test capture::tests::unknown_keys_and_versions_are_refused ... ok
+test tests::opaque_live_view_reference_round_trips_without_source_disclosure ... ok
+test tests::resource_address_detects_changed_bytes ... ok
+test tests::request_serializes_a_product_free_score ... ok
+test tests::resynchronize_is_resume_not_snapshot ... ok
+test tests::projection_capture_replays_same_tables_bounds_and_presentation_addresses ... ok
+test tests::snapshot_keeps_presentation_beside_the_scene ... ok
+test titulus::tests::a_content_hash_addresses_bytes_and_prints_as_hex ... ok
+test titulus::tests::a_value_outside_the_offered_choices_is_refused ... ok
+test titulus::tests::a_card_round_trips_and_carries_only_what_a_host_may_render ... ok
+test titulus::tests::a_missing_required_value_and_an_unknown_name_are_both_refused ... ok
+test titulus::tests::a_form_composes_only_the_exact_values_the_endpoint_offered ... ok
+test titulus::tests::named_information_matches_the_rfc_6920_hello_world_vector ... ok
+test titulus::tests::an_optional_field_may_be_omitted ... ok
+test titulus::tests::named_information_parser_rejects_private_or_noncanonical_spellings ... ok
+test titulus::tests::schema_is_a_reserved_field_name_because_the_form_writes_it_itself ... ok
+test titulus::tests::the_form_must_match_the_schema_it_is_composed_against ... ok
+test titulus::tests::portable_and_transport_conflicts_fail_closed ... ok
+test titulus::tests::portable_content_reference_uses_canonical_ni_and_blake3_spellings ... ok
+test tests::base64_keeps_a_full_chunk_inside_the_native_message_frame ... ok
+test tests::a_resource_larger_than_one_frame_arrives_whole_and_verified ... ok
+test tests::a_client_request_is_clamped_rather_than_trusted ... ok
+
+test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running unittests src/lib.rs (target/build/debug/deps/hest-eeb8431cbddb44da)
+
+running 15 tests
+test menu::session::tests::the_highlight_wraps_and_starts_over_when_the_rows_change ... ok
+test catalogue::tests::offered_shared_commands_preserve_the_catalogues_effect_and_destructive_facts ... ok
+test catalogue::tests::malformed_ids_are_refused ... ok
+test menu::session::tests::a_fresh_session_asks_for_focus_and_shows_its_context_first ... ok
+test menu::tests::a_disabled_command_shows_its_reason ... ok
+test catalogue::tests::a_shared_id_registers_under_its_namespace ... ok
+test menu::session::tests::enter_runs_the_highlight_else_the_first_available ... ok
+test menu::session::tests::expanded_shows_every_command_until_a_query_searches ... ok
+test menu::tests::a_query_searches_every_command ... ok
+test catalogue::tests::every_id_is_well_formed_unique_and_labelled ... ok
+test menu::tests::adds_and_removes_change_what_is_kept ... ok
+test menu::tests::choices_read_what_the_older_stores_wrote ... ok
+test menu::tests::recent_ones_are_capped_and_most_recent_first ... ok
+test menu::tests::search_and_disabled_rows_preserve_the_hosts_effect_and_destructive_declarations ... ok
+test menu::tests::the_surfaces_commands_lead_then_kept_then_recent ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

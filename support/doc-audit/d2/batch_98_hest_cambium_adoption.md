@@ -44,3 +44,13 @@ Final reconciliation addendum: the current receipt separately records the
 merged Turnstone source, preserved upstream NetRender/geometry changes and
 fresh complete receiving checks. The first passing cohort remains historical.
 Supplier pins are unchanged. Final consumer receipt changes are docs/data only.
+
+Further supplier reconciliation addendum: current Mere includes incoming
+`d4756e0fb`; Knot includes `3a7f9a9`. The new receipt records byte preservation,
+405 fresh supplier test executions and the seven older dependency records
+required by the retained qualified Knot pin. The earlier 1,761-block supplier
+preservation count applies to its named historical baseline, not this new
+combined dependency cohort. Canonical Turnstone source/pins and its recorded
+1,103-pass receiving result are unchanged; that suite was not rerun here.
+H3/H4 and delivery remain held. The current twelve claims still hold with
+these explicit source and cohort boundaries.

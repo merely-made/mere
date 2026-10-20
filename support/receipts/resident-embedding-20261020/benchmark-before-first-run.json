@@ -1,0 +1,11 @@
+{
+  "file": "ports/djinn/tests/fixtures/embedding/retained-paraphrases-v1.json",
+  "sha256": "b3dbc99cdfb62695d1624ae6c5e2b659da09d116bbcaaee75612fdf38c15bada",
+  "documents": 16,
+  "queries": 12,
+  "fusion": {
+    "lexical_weight": 1,
+    "vector_weight": 1,
+    "rrf_k": 60
+  }
+}

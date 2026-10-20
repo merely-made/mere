@@ -2363,7 +2363,7 @@ dependencies = [
  "credential-exchange-format",
  "dramatis",
  "ed25519-dalek 2.2.0",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "futures-util",
  "gaz",
  "gazette",
@@ -2371,7 +2371,7 @@ dependencies = [
  "hex",
  "hmac 0.13.0",
  "insigne",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "notochord",
  "p256",
  "p384",
@@ -2551,9 +2551,23 @@ dependencies = [
 [[package]]
 name = "chartulary"
 version = "0.2.2"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+dependencies = [
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "petgraph 0.8.3",
+ "rkyv",
+ "serde",
+ "serde_json",
+ "slotmap",
+ "uuid",
+]
+
+[[package]]
+name = "chartulary"
+version = "0.2.2"
 source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
 dependencies = [
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "petgraph 0.8.3",
  "rkyv",
  "serde",
@@ -2673,10 +2687,10 @@ dependencies = [
 [[package]]
 name = "cleromancy-core-acceptance"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#c94f7039e4cadcabb0f20dc971e2e62a8e28ebdb"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#69ed4554285a0fcc6b9d5dfd550eb3481aa1c9c2"
 dependencies = [
  "blake3",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "chirograph",
  "chrono",
  "chrono-tz",
@@ -2685,7 +2699,7 @@ dependencies = [
  "mere",
  "mere-alembic",
  "mere-personal-facts",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "rand_core 0.6.4",
  "sceno",
  "scenograph",
@@ -2693,7 +2707,7 @@ dependencies = [
  "seiche",
  "serde",
  "serde_json",
- "servitor",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "thiserror 2.0.21",
  "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b)",
  "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802)",
@@ -2780,21 +2794,21 @@ dependencies = [
 [[package]]
 name = "commons-spine"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/gemot.git?rev=692674ca66728f5b0dbb2fc7e756acaa83626f5c#692674ca66728f5b0dbb2fc7e756acaa83626f5c"
+source = "git+https://github.com/merely-made/gemot.git?rev=4342aed4bd101e68b1e71d24e010190d81765201#4342aed4bd101e68b1e71d24e010190d81765201"
 dependencies = [
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "gemot",
  "insigne",
  "mere-p2panda-net",
- "mere-proofs",
- "muniment",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "p2panda-core",
  "p2panda-encryption",
  "p2panda-store",
  "personae",
  "serde",
- "servitor",
- "stickleback",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "thiserror 1.0.69",
 ]
 
@@ -4615,9 +4629,9 @@ dependencies = [
  "cambium",
  "chacha20poly1305 0.11.0",
  "chirograph",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "eidetic-search",
- "esp",
+ "esp 0.1.0 (git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0)",
  "esp-test-support",
  "gemot",
  "genet-scripted-dom",
@@ -4628,12 +4642,12 @@ dependencies = [
  "layout-dom-api",
  "mere-apparatus",
  "mere-mesh",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "mere-surface-api",
  "mere-transport",
  "mien",
  "mooting",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "notochord",
  "p2panda-core",
  "p2panda-store",
@@ -4648,7 +4662,7 @@ dependencies = [
  "scenotime",
  "serde",
  "serde_json",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
@@ -4663,7 +4677,7 @@ dependencies = [
  "base64 0.22.1",
  "blake3",
  "castellan",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "chatelaine",
  "chirograph",
  "chrono",
@@ -4672,7 +4686,7 @@ dependencies = [
  "djinn",
  "djinn-testkit",
  "dramatis",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "futures-util",
  "gaz",
  "gemini-protocol",
@@ -4694,10 +4708,11 @@ dependencies = [
  "mere-p2panda-net",
  "mere-personal-facts",
  "mere-registry",
+ "mere-site",
  "mere-transport",
  "mere-view",
  "mere-webrtc-carrier",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "notochord",
  "p2panda-core",
  "p2panda-store",
@@ -4718,7 +4733,7 @@ dependencies = [
  "signature 2.2.0",
  "ssh-agent-lib",
  "ssh-key",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
@@ -4796,7 +4811,7 @@ dependencies = [
  "layout-dom-api",
  "mere-registry",
  "pollster 0.4.0",
- "servitor",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tokio",
  "wasmtime",
  "wasmtime-wasi",
@@ -5090,14 +5105,30 @@ dependencies = [
 [[package]]
 name = "eidetic"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+dependencies = [
+ "async-trait",
+ "blake3",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "jsonschema",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "personae",
+ "serde",
+ "serde_json",
+ "url",
+ "zeroize",
+]
+
+[[package]]
+name = "eidetic"
+version = "0.0.2"
 source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
 dependencies = [
  "async-trait",
  "blake3",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "jsonschema",
- "muniment",
- "personae",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "serde",
  "serde_json",
  "url",
@@ -5108,10 +5139,10 @@ dependencies = [
 name = "eidetic-search"
 version = "0.0.1"
 dependencies = [
- "eidetic",
- "esp",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "esp 0.1.0 (git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0)",
  "genet-text",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "pollster 0.4.0",
  "serde",
  "serde_json",
@@ -5190,7 +5221,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "az",
  "byteorder",
@@ -5202,7 +5233,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "az",
  "byteorder",
@@ -5469,11 +5500,11 @@ checksum = "d817e038c30374a4bcb22f94d0a8a0e216958d4c3dcde369b1439fec4bdda6e6"
 [[package]]
 name = "esp"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a#809deb6be341d3b6eeaad9534d9d162bd3105f4a"
+source = "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0"
 dependencies = [
  "armillary",
  "burn",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "getrandom 0.4.3",
  "half",
  "pollster 0.4.0",
@@ -5487,9 +5518,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "esp"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a#809deb6be341d3b6eeaad9534d9d162bd3105f4a"
+dependencies = [
+ "serde",
+ "zeroize",
+]
+
+[[package]]
 name = "esp-test-support"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/esp.git?rev=0ce20bf76542df8c4c1b0875b1cb04c9c2fa98af#0ce20bf76542df8c4c1b0875b1cb04c9c2fa98af"
+source = "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0"
 dependencies = [
  "safetensors 0.4.5",
 ]
@@ -6080,7 +6120,7 @@ version = "0.0.2"
 source = "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3"
 dependencies = [
  "insigne",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "serde",
  "uuid",
 ]
@@ -6239,13 +6279,13 @@ dependencies = [
 [[package]]
 name = "gemot"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/gemot.git?rev=692674ca66728f5b0dbb2fc7e756acaa83626f5c#692674ca66728f5b0dbb2fc7e756acaa83626f5c"
+source = "git+https://github.com/merely-made/gemot.git?rev=4342aed4bd101e68b1e71d24e010190d81765201#4342aed4bd101e68b1e71d24e010190d81765201"
 dependencies = [
  "insigne",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "mien",
  "mooting",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "p2panda-auth",
  "p2panda-core",
  "p2panda-encryption",
@@ -6253,8 +6293,8 @@ dependencies = [
  "personae",
  "redb 2.6.3",
  "serde",
- "servitor",
- "stickleback",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "thiserror 1.0.69",
 ]
 
@@ -6936,12 +6976,12 @@ dependencies = [
  "cambium-genet-winit-host",
  "cambium-rootstock",
  "cambium-winit-a11y",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "chatelaine",
  "chirograph",
  "distillery",
  "dramatis",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "gemot",
  "genet-render-host",
  "genet-scripted-dom",
@@ -6962,11 +7002,11 @@ dependencies = [
  "mere-mesh",
  "mere-moot",
  "mere-overmap",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "mere-transport",
  "mere-webrtc-carrier",
  "mien",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "netrender",
  "notochord",
  "p2panda-core",
@@ -6983,12 +7023,12 @@ dependencies = [
  "scenotime",
  "serde",
  "serde_json",
- "servitor",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "sha2 0.11.0",
  "signature 2.2.0",
  "ssh-agent-lib",
  "ssh-key",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tabard",
  "tempfile",
  "thiserror 1.0.69",
@@ -7032,7 +7072,7 @@ dependencies = [
  "chatelaine",
  "chirograph",
  "dramatis",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "insigne",
  "libc",
  "pandect",
@@ -8885,10 +8925,10 @@ source = "git+https://github.com/merely-made/knot-editor.git?branch=main#65a6632
 dependencies = [
  "base64 0.22.1",
  "blake3",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "chirograph",
- "eidetic",
- "esp",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
+ "esp 0.1.0 (git+https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a)",
  "fleece",
  "graphshell-endpoint",
  "inker",
@@ -8901,12 +8941,12 @@ dependencies = [
  "mere-fetch",
  "mere-overmap",
  "mere-p2panda-net",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "mere-transport",
  "mere-view",
  "mora",
  "mora-cmudict",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "nematic",
  "notify",
  "notochord",
@@ -8923,10 +8963,10 @@ dependencies = [
  "script-rhai",
  "serde",
  "serde_json",
- "servitor",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "sha2 0.11.0",
  "similar",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "thiserror 1.0.69",
  "tokio",
  "tracing",
@@ -8953,7 +8993,7 @@ name = "knot-file-catalog"
 version = "0.0.1"
 source = "git+https://github.com/merely-made/knot-editor.git?branch=main#65a6632a24b764d04eecf7302a1087342eccbfbe"
 dependencies = [
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "pollster 0.4.0",
  "serde",
  "serde_json",
@@ -9520,7 +9560,7 @@ dependencies = [
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9723,7 +9763,7 @@ dependencies = [
 name = "mere-alembic"
 version = "0.0.1"
 dependencies = [
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "euclid",
  "mere-kernel",
  "serde",
@@ -9747,12 +9787,12 @@ name = "mere-athanor"
 version = "0.0.1"
 dependencies = [
  "async-trait",
- "chartulary",
- "eidetic",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "euclid",
  "mere-alembic",
  "mere-kernel",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "pandect",
  "pollster 0.4.0",
  "serde_json",
@@ -9810,7 +9850,7 @@ dependencies = [
  "bytes",
  "document-canvas",
  "document-session-api",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "errand",
  "genet-host-api",
  "genet-static-dom",
@@ -9838,7 +9878,7 @@ dependencies = [
  "armillary",
  "async-trait",
  "bytes",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "errand",
  "futures-util",
  "genet-host-api",
@@ -9865,7 +9905,7 @@ name = "mere-fleece"
 version = "0.0.1"
 dependencies = [
  "armillary",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "fleece",
  "genet-host-api",
  "genet-static-dom",
@@ -9875,7 +9915,7 @@ dependencies = [
  "mere-fetch",
  "mere-linked-data",
  "mere-transport",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "nematic",
  "oxjsonld",
  "oxrdf",
@@ -9916,7 +9956,7 @@ version = "0.0.2"
 dependencies = [
  "accesskit 0.25.1",
  "cbor4ii",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "ciborium",
  "crossbeam-channel",
  "euclid",
@@ -9926,7 +9966,7 @@ dependencies = [
  "mere-forme",
  "mime_guess",
  "minicbor-serde",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "numen",
  "petgraph 0.8.3",
  "pollster 0.4.0",
@@ -9967,19 +10007,19 @@ name = "mere-mesh"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "esp",
+ "esp 0.1.0 (git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0)",
  "insigne",
  "mere-p2panda-net",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "mere-transport",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "notochord",
  "p2panda-core",
  "p2panda-store",
  "personae",
  "serde",
  "serde_json",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
@@ -9993,9 +10033,9 @@ dependencies = [
  "app-host",
  "blake3",
  "cambium",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "commons-spine",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "eidetic-search",
  "gemot",
  "genet-scripted-dom",
@@ -10005,16 +10045,16 @@ dependencies = [
  "layout-dom-api",
  "mere-comms",
  "mere-fleece",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "mere-transport",
  "mien",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "p2panda-core",
  "personae",
  "serde",
  "serde_json",
- "servitor",
- "stickleback",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tempfile",
  "tokio",
  "wasmtime",
@@ -10084,13 +10124,23 @@ name = "mere-personal-facts"
 version = "0.1.0"
 dependencies = [
  "blake3",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "dramatis",
  "gaz",
  "mere-kernel",
  "personae",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "mere-proofs"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+dependencies = [
+ "blake3",
+ "serde",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -10150,6 +10200,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "mere-site"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "language-tags",
+ "serde",
+ "serde_json",
+ "time",
+]
+
+[[package]]
 name = "mere-source-edit"
 version = "0.1.0"
 dependencies = [
@@ -10175,7 +10236,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#814c978462b42276d1be7bec0b07430b655ccd7b"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10183,14 +10244,14 @@ dependencies = [
  "iroh-blobs",
  "iroh-tickets",
  "mere-p2panda-net",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "n0-future",
  "notochord",
  "p2panda-core",
  "personae",
  "sha2 0.11.0",
  "snow",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "thiserror 1.0.69",
  "tokio",
  "tracing",
@@ -10221,7 +10282,7 @@ dependencies = [
 [[package]]
 name = "mere-webrtc-carrier"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -10269,15 +10330,15 @@ checksum = "c3c8dda44ff03a2f238717214da50f65d5a53b45cd213a7370424ffdb6fae815"
 [[package]]
 name = "mien"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/gemot.git?rev=692674ca66728f5b0dbb2fc7e756acaa83626f5c#692674ca66728f5b0dbb2fc7e756acaa83626f5c"
+source = "git+https://github.com/merely-made/gemot.git?rev=4342aed4bd101e68b1e71d24e010190d81765201#4342aed4bd101e68b1e71d24e010190d81765201"
 dependencies = [
  "insigne",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "p2panda-core",
  "p2panda-store",
  "personae",
  "serde",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "thiserror 1.0.69",
 ]
 
@@ -10449,7 +10510,7 @@ dependencies = [
 [[package]]
 name = "mooting"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/gemot.git?rev=692674ca66728f5b0dbb2fc7e756acaa83626f5c#692674ca66728f5b0dbb2fc7e756acaa83626f5c"
+source = "git+https://github.com/merely-made/gemot.git?rev=4342aed4bd101e68b1e71d24e010190d81765201#4342aed4bd101e68b1e71d24e010190d81765201"
 dependencies = [
  "p2panda-core",
  "serde",
@@ -10508,7 +10569,7 @@ dependencies = [
 [[package]]
 name = "muniment"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
 dependencies = [
  "async-trait",
  "blake3",
@@ -10524,22 +10585,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "muniment"
+version = "0.1.2"
+source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
+dependencies = [
+ "async-trait",
+ "blake3",
+ "redb 2.6.3",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "murm"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "async-trait",
  "blake3",
  "hex",
- "mere-proofs",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "mere-transport",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "p2panda-core",
  "p2panda-encryption",
  "personae",
  "serde",
  "serde_bytes",
- "stickleback",
+ "stickleback 0.1.1 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "thiserror 1.0.69",
  "tokio",
  "tokio-stream",
@@ -10549,7 +10622,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#814c978462b42276d1be7bec0b07430b655ccd7b"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "bytes",
  "futures-util",
@@ -10981,7 +11054,7 @@ dependencies = [
 [[package]]
 name = "netrender"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
 dependencies = [
  "glifo 0.4.0",
  "log",
@@ -11023,7 +11096,7 @@ dependencies = [
 [[package]]
 name = "netrender_device"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
 dependencies = [
  "log",
  "pollster 1.0.1",
@@ -12270,7 +12343,7 @@ dependencies = [
 [[package]]
 name = "outrider"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "hkdf 0.13.0",
  "retinue",
@@ -12733,7 +12806,7 @@ dependencies = [
 [[package]]
 name = "paint_list_api"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
 dependencies = [
  "euclid",
  "serde",
@@ -12742,7 +12815,7 @@ dependencies = [
 [[package]]
 name = "paint_list_render"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
 dependencies = [
  "log",
  "netrender",
@@ -12790,10 +12863,10 @@ dependencies = [
  "async-trait",
  "blake3",
  "chacha20poly1305 0.11.0",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "ciborium",
  "dirs 5.0.1",
- "eidetic",
+ "eidetic 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "euclid",
  "getrandom 0.3.4",
  "hest 0.2.0",
@@ -12803,14 +12876,14 @@ dependencies = [
  "mere-alembic",
  "mere-curation",
  "mere-kernel",
- "muniment",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "notochord",
  "personae",
  "pollster 0.4.0",
  "sceno",
  "serde",
  "serde_json",
- "servitor",
+ "servitor 0.0.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "tabard",
  "tempfile",
  "uuid",
@@ -13406,10 +13479,10 @@ name = "pictograph"
 version = "0.2.0"
 dependencies = [
  "armillary",
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
  "chirograph",
  "emblem",
- "esp",
+ "esp 0.1.0 (git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0)",
  "euclid",
  "genet-livery",
  "genet-scripted-dom",
@@ -13789,7 +13862,7 @@ dependencies = [
 [[package]]
 name = "postilion"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
@@ -14264,7 +14337,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "embedded-graphics",
 ]
@@ -14272,7 +14345,7 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "heapless 0.9.3",
  "hmac 0.13.0",
@@ -14928,7 +15001,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#814c978462b42276d1be7bec0b07430b655ccd7b"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -15724,7 +15797,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#814c978462b42276d1be7bec0b07430b655ccd7b"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 
 [[package]]
 name = "semver"
@@ -15745,7 +15818,7 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 [[package]]
 name = "seneschal"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#660606eae824a76b50a910bb4d86dfc46599e850"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
@@ -15923,9 +15996,19 @@ dependencies = [
 [[package]]
 name = "servitor"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+dependencies = [
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "insigne",
+ "personae",
+]
+
+[[package]]
+name = "servitor"
+version = "0.0.2"
 source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
 dependencies = [
- "chartulary",
+ "chartulary 0.2.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "insigne",
  "personae",
 ]
@@ -16675,6 +16758,30 @@ checksum = "33ae9eec00137a8eed469fb4148acd9fc6ac8c3f9b110f52cd34698c8b5bfa0e"
 [[package]]
 name = "stickleback"
 version = "0.1.1"
+source = "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+dependencies = [
+ "blake3",
+ "futures-util",
+ "hex",
+ "insigne",
+ "mere-p2panda-net",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000)",
+ "p2panda-core",
+ "p2panda-encryption",
+ "p2panda-store",
+ "p2panda-sync",
+ "personae",
+ "serde",
+ "serde_bytes",
+ "thiserror 1.0.69",
+ "tokio",
+ "tokio-stream",
+]
+
+[[package]]
+name = "stickleback"
+version = "0.1.1"
 source = "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
 dependencies = [
  "blake3",
@@ -16682,8 +16789,8 @@ dependencies = [
  "hex",
  "insigne",
  "mere-p2panda-net",
- "mere-proofs",
- "muniment",
+ "mere-proofs 0.1.0 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
+ "muniment 0.1.2 (git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e)",
  "p2panda-core",
  "p2panda-encryption",
  "p2panda-store",
@@ -17851,7 +17958,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#814c978462b42276d1be7bec0b07430b655ccd7b"
+source = "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
 dependencies = [
  "selvage",
  "serial2-tokio",

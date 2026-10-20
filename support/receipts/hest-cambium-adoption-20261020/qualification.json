@@ -76,5 +76,6 @@
   "final_upstream_turnstone": "1d131854bedecc2528fbc9b4cf5d08928fcae5dd",
   "final_renderer_source": [
     "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
-  ]
+  ],
+  "latest_supplier_reconciliation": "supplier-reconciliation-2/qualification.json"
 }

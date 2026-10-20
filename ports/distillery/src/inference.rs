@@ -42,6 +42,8 @@ pub use observations::InferenceObservation;
 pub mod durable;
 #[cfg(feature = "inference-model")]
 pub mod recall;
+#[cfg(feature = "inference-embedding")]
+pub mod recall_embedding;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
@@ -393,6 +395,8 @@ struct Shared {
     caches: Mutex<Vec<std::sync::Weak<Mutex<Option<(Vec<u8>, Vec<u8>)>>>>>,
     #[cfg(feature = "inference-model")]
     recall: Mutex<Option<RecallBinding>>,
+    #[cfg(feature = "inference-embedding")]
+    embedding: Mutex<Option<Arc<recall_embedding::RecallEmbedding>>>,
     #[cfg(feature = "inference-model")]
     published: Mutex<PublishedRecall>,
 }
@@ -472,6 +476,19 @@ impl Shared {
         } else {
             Ok(())
         }
+    }
+
+    #[cfg(feature = "inference-model")]
+    fn build_recall(
+        &self,
+        corpus: Arc<dyn recall::RecallCorpus>,
+        config: recall::RecallConfig,
+    ) -> Result<recall::RecallIndex, String> {
+        #[cfg(feature = "inference-embedding")]
+        if let Some(runtime) = self.embedding.lock().unwrap().as_ref() {
+            return recall::RecallIndex::build_with_embedding(corpus, config, runtime);
+        }
+        recall::RecallIndex::build(corpus, config)
     }
 
     #[cfg(feature = "inference-model")]
@@ -698,6 +715,8 @@ impl InferenceLane {
             caches: Mutex::new(Vec::new()),
             #[cfg(feature = "inference-model")]
             recall: Mutex::new(None),
+            #[cfg(feature = "inference-embedding")]
+            embedding: Mutex::new(None),
             #[cfg(feature = "inference-model")]
             published: Mutex::new(PublishedRecall::default()),
         });
@@ -762,6 +781,25 @@ impl InferenceLane {
         )
     }
 
+    #[cfg(feature = "inference-embedding")]
+    pub fn configure_embedding_recall(
+        &self,
+        runtime: Arc<recall_embedding::RecallEmbedding>,
+    ) -> Result<(), String> {
+        let mut table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        if self.shared.recall.lock().unwrap().is_some()
+            || !self.shared.published.lock().unwrap().owners.is_empty()
+        {
+            return Err("configure the embedding space before attaching retained sources".into());
+        }
+        *self.shared.embedding.lock().unwrap() = Some(runtime);
+        table.generation += 1;
+        Ok(())
+    }
+
     /// Borrow a retained corpus from its owner and build a disposable BM25 index.
     #[cfg(feature = "inference-model")]
     pub fn configure_recall(
@@ -773,7 +811,7 @@ impl InferenceLane {
         if table.locked {
             return Err("inference.ask is locked".into());
         }
-        let index = recall::RecallIndex::build(corpus.clone(), config.clone())?;
+        let index = self.shared.build_recall(corpus.clone(), config.clone())?;
         *self.shared.recall.lock().unwrap() = Some(RecallBinding {
             corpus,
             config,
@@ -781,6 +819,26 @@ impl InferenceLane {
         });
         table.generation += 1;
         Ok(())
+    }
+
+    /// Explain the local retained-source ranking through the same scoped,
+    /// current-version and provider-bound path used for prompt assembly.
+    #[cfg(feature = "inference-model")]
+    pub fn recall_rankings(
+        &self,
+        question: &str,
+        scope: &[eidetic::models::recall::RecallSourceId],
+    ) -> Result<recall::RecallRankings, String> {
+        let table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        let binding = self.shared.recall.lock().unwrap();
+        binding
+            .as_ref()
+            .and_then(|b| b.index.as_ref())
+            .ok_or("no retained recall index is attached")?
+            .rankings(question, scope)
     }
 
     #[cfg(feature = "inference-model")]
@@ -903,7 +961,8 @@ impl InferenceLane {
             };
             if binding.index.is_none() {
                 binding.index = Some(
-                    recall::RecallIndex::build(binding.corpus.clone(), binding.config.clone())
+                    self.shared
+                        .build_recall(binding.corpus.clone(), binding.config.clone())
                         .map_err(InferenceLaneError::Recall)?,
                 );
             }
@@ -1566,7 +1625,10 @@ impl InferenceAskEndpoint {
         let corpus: Arc<dyn recall::RecallCorpus> =
             Arc::new(recall::PublishedCorpus(request.sources));
         let config = published.config.clone();
-        let index = recall::RecallIndex::build(corpus.clone(), config.clone())
+        let index = self
+            .lane
+            .shared
+            .build_recall(corpus.clone(), config.clone())
             .map_err(InferenceLaneError::Recall)?;
         self.publication = Some(request.owner.clone());
         published.owners.insert(

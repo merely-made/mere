@@ -96,6 +96,7 @@ async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
     });
     let mut settings = owner(Some(trains));
     settings.inference = Some(InferenceLaneSettings {
+        embedding: None,
         recall: Default::default(),
         model: InferenceModelSettings::Library {
             row: row.to_string(),

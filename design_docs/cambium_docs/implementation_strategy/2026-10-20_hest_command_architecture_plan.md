@@ -346,3 +346,21 @@ desktop/browser presentation and native restart were not exercised.
   and [merged tested source](../../../support/receipts/hest-cambium-adoption-20261020/reconciled/tested-source.json)
   retain the final result separately from the first passing cohort. No push
   or publication occurred. Native GUI/human AT and H3/H4 remain separate.
+
+- **Further supplier reconciliation:** merged incoming Mere `d4756e0fb` and
+  Knot `3a7f9a9`, preserving the unrelated retained-rendering, site-model and
+  embedding work. Before this evidence appendix, all 52 incoming-only files
+  and 151 local-only files match their respective parents byte for byte.
+  Hest, the frozen shim source, Cambium, Chirograph and ux-events code remain
+  unchanged from the qualified local parent. The six Knot lock entries retain
+  `65a6632`; Cargo consequently retains seven older embedding dependency
+  records alongside the incoming cohort and qualifies ambiguous dependency
+  names. Final locked offline metadata and 405 supplier test executions pass.
+  Knot merge `2b118e3` preserves incoming root dependencies and Rust sources;
+  its locked metadata passes. Turnstone `9df2f0007`, its source and its active
+  supplier pins remain unchanged: the prior 1103-pass full-library result is
+  retained, without representing it as a fresh rerun.
+  [Supplier reconciliation receipt](../../../support/receipts/hest-cambium-adoption-20261020/supplier-reconciliation-2/qualification.json)
+  records the exact tree, checks, preservation and dependency consequence.
+  H3/H4 are unstarted. Push, publication, remote-only new-version receiving
+  and native GUI/human AT remain held or separate.

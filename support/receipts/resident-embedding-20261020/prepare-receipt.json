@@ -1,0 +1,3752 @@
+{
+  "model": "blake3:47ddb75d69cea2108e9f248e263593a710a88f9f33bf77ab9307780e56fe94bb",
+  "phase": "prepare",
+  "pid": 4775,
+  "rows": [
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 14,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 15,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        }
+      ],
+      "query": {
+        "expected": "bicycle",
+        "kind": "paraphrase",
+        "question": "How does a person-powered two-wheeler move?"
+      },
+      "rank": 1,
+      "ranking_micros": 620752,
+      "rankings": {
+        "fused": [
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc"
+        ],
+        "lexical": [
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520"
+        ],
+        "vector": [
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 6,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/bicycle",
+        "https://retained.test/battery",
+        "https://retained.test/guitar",
+        "https://retained.test/radio",
+        "https://retained.test/bearing",
+        "https://retained.test/refrigerator",
+        "https://retained.test/rust",
+        "https://retained.test/camera",
+        "https://retained.test/cloud",
+        "https://retained.test/calendar",
+        "https://retained.test/compost",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/eclipse",
+        "https://retained.test/recipe",
+        "https://retained.test/sourdough"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 14,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 15,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        }
+      ],
+      "query": {
+        "expected": "refrigerator",
+        "kind": "paraphrase",
+        "question": "Which appliance prevents food from getting warm?"
+      },
+      "rank": 2,
+      "ranking_micros": 659788,
+      "rankings": {
+        "fused": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f"
+        ],
+        "lexical": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207"
+        ],
+        "vector": [
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207"
+        ]
+      },
+      "ranks": {
+        "fused": 2,
+        "lexical": null,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/rainbarrel",
+        "https://retained.test/refrigerator",
+        "https://retained.test/sourdough",
+        "https://retained.test/battery",
+        "https://retained.test/bearing",
+        "https://retained.test/recipe",
+        "https://retained.test/guitar",
+        "https://retained.test/compost",
+        "https://retained.test/camera",
+        "https://retained.test/bicycle",
+        "https://retained.test/observatory",
+        "https://retained.test/eclipse",
+        "https://retained.test/calendar",
+        "https://retained.test/cloud",
+        "https://retained.test/rust"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        }
+      ],
+      "query": {
+        "expected": "eclipse",
+        "kind": "paraphrase",
+        "question": "Why can daylight vanish behind our natural satellite?"
+      },
+      "rank": 2,
+      "ranking_micros": 611978,
+      "rankings": {
+        "fused": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789"
+        ],
+        "lexical": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207"
+        ],
+        "vector": [
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789"
+        ]
+      },
+      "ranks": {
+        "fused": 2,
+        "lexical": null,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/rainbarrel",
+        "https://retained.test/eclipse",
+        "https://retained.test/observatory",
+        "https://retained.test/camera",
+        "https://retained.test/compost",
+        "https://retained.test/sourdough",
+        "https://retained.test/calendar",
+        "https://retained.test/bearing",
+        "https://retained.test/guitar",
+        "https://retained.test/refrigerator",
+        "https://retained.test/radio",
+        "https://retained.test/cloud",
+        "https://retained.test/bicycle"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        }
+      ],
+      "query": {
+        "expected": "rainbarrel",
+        "kind": "paraphrase",
+        "question": "How can I save rooftop precipitation for my vegetables?"
+      },
+      "rank": 1,
+      "ranking_micros": 614376,
+      "rankings": {
+        "fused": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc"
+        ],
+        "lexical": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b"
+        ],
+        "vector": [
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 1,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/rainbarrel",
+        "https://retained.test/recipe",
+        "https://retained.test/cloud",
+        "https://retained.test/compost",
+        "https://retained.test/refrigerator",
+        "https://retained.test/battery",
+        "https://retained.test/rust",
+        "https://retained.test/eclipse",
+        "https://retained.test/calendar",
+        "https://retained.test/camera",
+        "https://retained.test/observatory",
+        "https://retained.test/guitar",
+        "https://retained.test/sourdough"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 14,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 15,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 16,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        }
+      ],
+      "query": {
+        "expected": "sourdough",
+        "kind": "paraphrase",
+        "question": "What makes a naturally fermented loaf expand?"
+      },
+      "rank": 11,
+      "ranking_micros": 628764,
+      "rankings": {
+        "fused": [
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047"
+        ],
+        "lexical": [
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520"
+        ],
+        "vector": [
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520"
+        ]
+      },
+      "ranks": {
+        "fused": 11,
+        "lexical": null,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/guitar",
+        "https://retained.test/bicycle",
+        "https://retained.test/refrigerator",
+        "https://retained.test/battery",
+        "https://retained.test/calendar",
+        "https://retained.test/rust",
+        "https://retained.test/bearing",
+        "https://retained.test/camera",
+        "https://retained.test/cloud",
+        "https://retained.test/eclipse",
+        "https://retained.test/sourdough",
+        "https://retained.test/radio",
+        "https://retained.test/compost",
+        "https://retained.test/recipe",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/observatory"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 14,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 15,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        }
+      ],
+      "query": {
+        "expected": "guitar",
+        "kind": "paraphrase",
+        "question": "Why does winding the tuner make a plucked note sound higher?"
+      },
+      "rank": 1,
+      "ranking_micros": 635589,
+      "rankings": {
+        "fused": [
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29"
+        ],
+        "lexical": [
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc"
+        ],
+        "vector": [
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 3,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/guitar",
+        "https://retained.test/sourdough",
+        "https://retained.test/calendar",
+        "https://retained.test/bicycle",
+        "https://retained.test/eclipse",
+        "https://retained.test/observatory",
+        "https://retained.test/bearing",
+        "https://retained.test/camera",
+        "https://retained.test/rust",
+        "https://retained.test/battery",
+        "https://retained.test/radio",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/recipe",
+        "https://retained.test/cloud",
+        "https://retained.test/refrigerator"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 14,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        }
+      ],
+      "query": {
+        "expected": "bearing",
+        "kind": "paraphrase",
+        "question": "How do little spheres help a wheel turn smoothly?"
+      },
+      "rank": 3,
+      "ranking_micros": 615797,
+      "rankings": {
+        "fused": [
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc"
+        ],
+        "lexical": [
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520"
+        ],
+        "vector": [
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f"
+        ]
+      },
+      "ranks": {
+        "fused": 3,
+        "lexical": 9,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/guitar",
+        "https://retained.test/bicycle",
+        "https://retained.test/bearing",
+        "https://retained.test/battery",
+        "https://retained.test/calendar",
+        "https://retained.test/refrigerator",
+        "https://retained.test/camera",
+        "https://retained.test/rust",
+        "https://retained.test/eclipse",
+        "https://retained.test/radio",
+        "https://retained.test/compost",
+        "https://retained.test/cloud",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/sourdough"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        }
+      ],
+      "query": {
+        "expected": "observatory",
+        "kind": "paraphrase",
+        "question": "What password lets the night visitor enter the astronomical station?"
+      },
+      "rank": 1,
+      "ranking_micros": 622010,
+      "rankings": {
+        "fused": [
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc"
+        ],
+        "lexical": [
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e"
+        ],
+        "vector": [
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 1,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/observatory",
+        "https://retained.test/eclipse",
+        "https://retained.test/guitar",
+        "https://retained.test/camera",
+        "https://retained.test/sourdough",
+        "https://retained.test/calendar",
+        "https://retained.test/radio",
+        "https://retained.test/cloud",
+        "https://retained.test/battery",
+        "https://retained.test/bicycle",
+        "https://retained.test/refrigerator",
+        "https://retained.test/rust",
+        "https://retained.test/bearing"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        }
+      ],
+      "query": {
+        "expected": "rust",
+        "kind": "lexical_control",
+        "question": "Rust ownership borrowing"
+      },
+      "rank": 1,
+      "ranking_micros": 498288,
+      "rankings": {
+        "fused": [
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc"
+        ],
+        "lexical": [
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f"
+        ],
+        "vector": [
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 1,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/rust",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/compost",
+        "https://retained.test/cloud",
+        "https://retained.test/battery",
+        "https://retained.test/refrigerator",
+        "https://retained.test/sourdough",
+        "https://retained.test/guitar",
+        "https://retained.test/recipe",
+        "https://retained.test/observatory",
+        "https://retained.test/camera",
+        "https://retained.test/bicycle",
+        "https://retained.test/bearing"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        }
+      ],
+      "query": {
+        "expected": "recipe",
+        "kind": "lexical_control",
+        "question": "lentil soup cumin carrots"
+      },
+      "rank": 1,
+      "ranking_micros": 617707,
+      "rankings": {
+        "fused": [
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e"
+        ],
+        "lexical": [
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b"
+        ],
+        "vector": [
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 1,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/recipe",
+        "https://retained.test/refrigerator",
+        "https://retained.test/cloud",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/compost",
+        "https://retained.test/calendar",
+        "https://retained.test/bicycle",
+        "https://retained.test/guitar",
+        "https://retained.test/rust",
+        "https://retained.test/sourdough",
+        "https://retained.test/observatory",
+        "https://retained.test/camera"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 75,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/calendar"
+            },
+            "text": "A calendar reminder sends a notification before a scheduled meeting begins.",
+            "text_hash": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642",
+            "version": "blake3:2d277c6a3a02604ba1b74173e7e118e492278d387b8065de5f648a3fe8023642"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/cloud"
+            },
+            "text": "A cloud service bills users monthly for virtual storage and computing resources.",
+            "text_hash": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448",
+            "version": "blake3:2650fc6c818c4d4e7a20cf4e65fe224afaf9efa88db360ed1f6c3aa7f1198448"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 70,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/guitar"
+            },
+            "text": "Tightening a guitar string increases its tension and raises the pitch.",
+            "text_hash": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7",
+            "version": "blake3:0b10badc817405ca4264b9a7cd1f9e2c2f38e70d3836938207db19ea903b57a7"
+          }
+        }
+      ],
+      "query": {
+        "expected": "radio",
+        "kind": "lexical_control",
+        "question": "packet radio error correction"
+      },
+      "rank": 1,
+      "ranking_micros": 514872,
+      "rankings": {
+        "fused": [
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624"
+        ],
+        "lexical": [
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45"
+        ],
+        "vector": [
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:ac83364a832245bdfadb6a25b6dab1753802540d7560fa396e262e1219cce624",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:544b289b14865b2effd7cb00910eca3a7c6afb677c25a2625e5b8c1c057e9920",
+          "blake3:04f2b1ae942cd1caedd5a359f16a924b8e49b811da01fd01917d8c3640c0e624"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 1,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/radio",
+        "https://retained.test/observatory",
+        "https://retained.test/rust",
+        "https://retained.test/calendar",
+        "https://retained.test/eclipse",
+        "https://retained.test/camera",
+        "https://retained.test/bicycle",
+        "https://retained.test/battery",
+        "https://retained.test/recipe",
+        "https://retained.test/cloud",
+        "https://retained.test/guitar"
+      ]
+    },
+    {
+      "embedding": {
+        "cache": "built",
+        "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+        "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+        "lexical_weight": 1,
+        "persisted_bytes": 81349,
+        "rrf_k": 60,
+        "vector_bytes": 24576,
+        "vector_weight": 1
+      },
+      "passages": [
+        {
+          "handle": 1,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 92,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/compost"
+            },
+            "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition.",
+            "text_hash": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3",
+            "version": "blake3:5485f9b26f23199f259555642ce5a7053d58abade7eadfcdd33c0309030a9fc3"
+          }
+        },
+        {
+          "handle": 2,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 84,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/battery"
+            },
+            "text": "A rechargeable battery stores electrical energy using reversible chemical reactions.",
+            "text_hash": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd",
+            "version": "blake3:a9cef0db49eba5d659104983a03360e2706e60197a6fe42d2c82bb00ea792fbd"
+          }
+        },
+        {
+          "handle": 3,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 90,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bearing"
+            },
+            "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces.",
+            "text_hash": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878",
+            "version": "blake3:703b79cbfcfdd254f27dbed5c438ce6a2d2f6a2386a7dcecf9003a3a97b28878"
+          }
+        },
+        {
+          "handle": 4,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 85,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rust"
+            },
+            "text": "Rust ownership and borrowing prevent dangling references without a garbage collector.",
+            "text_hash": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8",
+            "version": "blake3:9644688cfc323ebb0544779580e4fa88cf7278517a88e174fbb4bf03f6eaebb8"
+          }
+        },
+        {
+          "handle": 5,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 88,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/rainbarrel"
+            },
+            "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather.",
+            "text_hash": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91",
+            "version": "blake3:4cf53aca5217c8892818e590a35377b04f0d44f2f8e6425784385161151d6f91"
+          }
+        },
+        {
+          "handle": 6,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 80,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/sourdough"
+            },
+            "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture.",
+            "text_hash": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e",
+            "version": "blake3:e9083d4ebb32042af076c3a85bc07071d67c5ea1b5fedf8b57b508b2d86e716e"
+          }
+        },
+        {
+          "handle": 7,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 76,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/bicycle"
+            },
+            "text": "A bicycle converts pedalling effort into motion through its chain and gears.",
+            "text_hash": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78",
+            "version": "blake3:f22ef3d1b3d9760056aebcb51b734cff6b88eceee415e0992b243a468845bd78"
+          }
+        },
+        {
+          "handle": 8,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 79,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/recipe"
+            },
+            "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes.",
+            "text_hash": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de",
+            "version": "blake3:6eb41275236db67a69721f74674a6d019c6d97a96789f1a900d4fc936dff30de"
+          }
+        },
+        {
+          "handle": 9,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 98,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/observatory"
+            },
+            "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log.",
+            "text_hash": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11",
+            "version": "blake3:e2407ba95a9536b51afe4e71d1fc34ec953046ec0cbc062a6393f19338525e11"
+          }
+        },
+        {
+          "handle": 10,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 89,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/eclipse"
+            },
+            "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight.",
+            "text_hash": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28",
+            "version": "blake3:2bf750e304d7bf88776878dcd433fc0a199d1cd6a13a69fe441fab343fc88b28"
+          }
+        },
+        {
+          "handle": 11,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 83,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/refrigerator"
+            },
+            "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment.",
+            "text_hash": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789",
+            "version": "blake3:8c6c2daed7354cf972e0d2d126f5df84b8b8b58905edcc1021622784a27da789"
+          }
+        },
+        {
+          "handle": 12,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 91,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/radio"
+            },
+            "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel.",
+            "text_hash": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150",
+            "version": "blake3:6411b67518b7c574208afc8a6aed2f75cba9a1520e5621f9fce26f118a0ce150"
+          }
+        },
+        {
+          "handle": 13,
+          "passage": {
+            "chunker": "mere.unicode-chunks/v1/512",
+            "selector": {
+              "end": 81,
+              "start": 0
+            },
+            "source": {
+              "kind": "page_text",
+              "source": "https://retained.test/camera"
+            },
+            "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens.",
+            "text_hash": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b",
+            "version": "blake3:628b5bf6ca578e48925041194d07ebcef4352cb54c6cc65694f52282a68b736b"
+          }
+        }
+      ],
+      "query": {
+        "expected": "compost",
+        "kind": "lexical_control",
+        "question": "compost kitchen scraps garden waste"
+      },
+      "rank": 1,
+      "ranking_micros": 606784,
+      "rankings": {
+        "fused": [
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e"
+        ],
+        "lexical": [
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713"
+        ],
+        "vector": [
+          "blake3:5f593c7644f84eb092a41b0252c3cc7cc8bed14cb5ed3a5d92bf95044b571713",
+          "blake3:09b6ee89000c89568200499a6e9c7ccba7d176c133405618bc4d02cc6365a66e",
+          "blake3:278d88ddefc51acfc30aa47a4b8650ac3ecd6119326f601f7e129c46bfadb3fc",
+          "blake3:d2af3f20a70f0ba692135dd8e9a621e5907a80a4d89e0a9d5746da1e3cd48d3f",
+          "blake3:7faac2c0db2cfd79b22ceb0dee598d3033f22d858cbe91325ecf6603972b0207",
+          "blake3:2d552c5707e0f8c363cd5475e4dd918052bac48b2c4a86d65050ae1ed1cbcafc",
+          "blake3:1698c751726ea9378eee6479cbb68b3d6dd437d099fca792f4ff4da97b525789",
+          "blake3:4ad91b0de298fc6eb4114b8bc77c718746c9cc2aa1200e5db1841c003787d86b",
+          "blake3:ab8f7aaa9943717d6981ef856084d858128a72f87693c4c6a46f32cc96173047",
+          "blake3:49e499ea70d5ea84339e8100f2eae18bf781d99f10b141dd484f121b8855e520",
+          "blake3:c4a9a6f9888d5c08fa0a1fb2d45925e2bc5cf8f984c1590b94f2c2ab905e4e29",
+          "blake3:0f80b720072230d6b64ebf886ac7479ac47d2fbf94f5c5b03918d07d6c294f45",
+          "blake3:84054d53486f7b024391192863f10a10f925b0f8d45940ec60ca94c2e633a02e"
+        ]
+      },
+      "ranks": {
+        "fused": 1,
+        "lexical": 1,
+        "vector": 1
+      },
+      "sources": [
+        "https://retained.test/compost",
+        "https://retained.test/battery",
+        "https://retained.test/bearing",
+        "https://retained.test/rust",
+        "https://retained.test/rainbarrel",
+        "https://retained.test/sourdough",
+        "https://retained.test/bicycle",
+        "https://retained.test/recipe",
+        "https://retained.test/observatory",
+        "https://retained.test/eclipse",
+        "https://retained.test/refrigerator",
+        "https://retained.test/radio",
+        "https://retained.test/camera"
+      ]
+    }
+  ]
+}

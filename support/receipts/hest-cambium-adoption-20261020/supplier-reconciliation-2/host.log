@@ -1,0 +1,144 @@
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling sprigging v0.2.2 (/Users/markik/Code/repos/mere/crates/cambium/sprigging)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+   Compiling cambium v0.5.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-winit)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/cambium/cambium-rootstock/src/producer/registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/cambium/cambium-rootstock/src/scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates/cambium/cambium-rootstock/src/host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: unused import: `LayoutDom`
+   --> crates/cambium/cambium-rootstock/src/lib.rs:403:26
+    |
+403 |     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+    |                          ^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `layout_dom_api::LayoutDom`
+   --> crates/cambium/cambium-rootstock/src/lib.rs:552:9
+    |
+552 |     use layout_dom_api::LayoutDom as _;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates/cambium/cambium-rootstock/src/producer/registry.rs:678:13
+    |
+678 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+678 -             drop(renderer);
+678 +             let _ = renderer;
+    |
+
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-winit-a11y)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/mesquite)
+warning: `cambium-rootstock` (lib) generated 6 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.48s
+     Running tests/accessibility.rs (target/build/debug/deps/accessibility-bb07c8ba4847d0b6)
+
+running 8 tests
+test raw_requests_map_to_their_own_actions ... ok
+test a_screen_reader_wakes_an_idle_application ... ok
+test native_harness_exposes_current_target_refusal ... ok
+test a_click_request_activates_the_control ... ok
+test a_focus_request_focuses_without_activating ... ok
+test a_set_value_request_updates_a_numeric_control ... ok
+test the_projection_carries_roles_names_and_boxes ... ok
+test native_and_neutral_projections_share_the_hosts_scrolled_bounds ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.34s
+
+     Running tests/command_menu_compact.rs (target/build/debug/deps/command_menu_compact-9d7c72bc38f00349)
+
+running 1 test
+test nested_compact_menu_and_back_stay_in_one_popup_at_320_by_175 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.07s
