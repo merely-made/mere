@@ -21,7 +21,7 @@
     "crates/cambium/examples/genet_web_smoke/Cargo.toml": "2da48f9f1bff5f7661f0d29d4ce18afeb395aae428f8f4930e6d09de4c63dda2",
     "crates/canvas/pictograph/Cargo.toml": "1b5ae0de54c4b53f0b9e527d24e62c4976ac344f884162c2915217f3fdd0d667",
     "crates/intel/eidetic-search/Cargo.toml": "c128a16d692f6412a851306e7457f68e3895bfca00ba24c6703068e327c887f1",
-    "crates/mesh/mesh/Cargo.toml": "a544553dea9b77282981553103275f06e1422df55338042e6b15ab7a6b38b957",
+    "crates/mesh/mesh/Cargo.toml": "0f6f40e07eb37b6f33eea63e4b4ca74dba5ab07ac4e2e4ffffd2cdb01aa333be",
     "ports/distillery/probe/Cargo.toml": "d4e8fb343f2a9899f9a11211f1c641a6b83d2004e8ded86dd004ca9daece35f9",
     "ports/distillery/probe/native-fixture/Cargo.toml": "3ed2f6dfad687aa0c498494b68e08eef2711d7668d0cef1fe6deb0d9da9b510b",
     "ports/distillery/probe/remote-fixture/Cargo.toml": "96f47ce856b7a634d0cedb0125f86ac321b2f25c3851a7ddd786abf93984c643",
@@ -30,6 +30,11 @@
     "ports/distillery/probe/session-fixture/Cargo.toml": "10887c7768379319c35e712dc2887f6abab4374acc0020bbeab42d42ea8a8ae5",
     "ports/graphshell/web/Cargo.toml": "c0f4d202d481a907c552c8cfefe006b58443b6de3b443fb24133de59d8e81f20",
     "ports/muniment-opfs-probe/Cargo.toml": "15b548d6d6b8553e677495301d2d9874966304cb0e12ba5463048c1aa8b05717"
+  },
+  "mesh_receipt_fixture": {
+    "path": "crates/mesh/mesh/tests/lease_receipts.rs",
+    "sha256": "7b57f1268eb06fc53d4c2bdcbf437a908db1db665a67d35245c6a7ab9ad7084a",
+    "repair": "Use paused Tokio time and explicit resource step timing so cancellation precedes completion; no production code changes"
   },
   "workspace_inheritance": [
     "crates/canvas/pictograph: chartulary, optional",
@@ -181,7 +186,7 @@
   "initial_mesh_gate": {
     "exit_code": 101,
     "result": "2 passed; 1 failed",
-    "diagnosis": "Existing zero-delay fixture completed before its wall-clock cancellation; deterministic fixture repair is a separate follow-up commit."
+    "diagnosis": "Existing zero-delay fixture completed before its wall-clock cancellation; replaced by paused-clock in-flight assertion"
   },
   "validation": {
     "toolchain": "1.99.1-x86_64-apple-darwin",
@@ -207,6 +212,23 @@
         "seconds": 377.74,
         "test_results": [
           "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.19s"
+        ]
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "mere-mesh",
+          "--test",
+          "lease_receipts"
+        ],
+        "cwd": ".",
+        "exit_code": 0,
+        "seconds": 5.52,
+        "test_results": [
+          "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
         ]
       },
       {
@@ -289,7 +311,7 @@
   "qualification_limits": [
     "Focused native consumer tests and browser Wasm compilation; no full Mere or Gemot suite.",
     "No headed browser, GPU/model inference, physical-device or end-to-end network qualification.",
-    "App-host guest build warned that wasm32-wasip2 core is unavailable; guest-loading tests were outside these gates.",
-    "Mesh lease fixture repair and passing three-test receipt are recorded in the separate fixture commit."
-  ]
+    "App-host guest build warned that wasm32-wasip2 core is unavailable; guest-loading tests were outside these gates."
+  ],
+  "supplier_adoption_commit": "32134452dd197956b7a17b1a4b67b805f3affc84"
 }
