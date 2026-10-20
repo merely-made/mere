@@ -94,7 +94,25 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         AppId::new("turnstone"),
         ResidentEndpointRoute::new("identity", Duration::from_millis(50)).unwrap(),
     )]));
-    let status = ResidentStatusSource::new(fixture());
+    let events = djinn::resident_events::EventLog::open(
+        None,
+        Some(djinn::resident_events::DiagnosticsConfig {
+            ingress_records: 8,
+            ingress_bytes: 16384,
+            ingress_age_secs: 60,
+            retained_records: 8,
+            retained_bytes: 16384,
+            retained_age_secs: 60,
+            sample_rate: 1.0,
+        }),
+    )
+    .unwrap();
+    let mut receipt = events.diagnostic_cursor().unwrap().unwrap();
+    events.emit(
+        "ready",
+        serde_json::json!({"profile":"private", "error":"private"}),
+    );
+    let status = ResidentStatusSource::new(fixture()).with_events(events.clone());
     let stop = StopSignal::default();
     let route = catalog
         .update(|catalog| ResidentStatusEndpoint::register(status.clone(), catalog))
@@ -138,6 +156,50 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         fixture()
     );
     client.close().await.unwrap();
+    let mut inspector = open(&endpoint, RESIDENT_APP, RESIDENT_STATUS_ROUTE)
+        .await
+        .unwrap();
+    let diagnostic = resident_status::read_diagnostics(&mut inspector)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        diagnostic["observations"]["records"][0]["payload"]["phase"],
+        "ready"
+    );
+    assert!(!diagnostic.to_string().contains("private"));
+    inspector.close().await.unwrap();
+    let cli_endpoint = endpoint.clone();
+    let output = tokio::task::spawn_blocking(move || {
+        std::process::Command::new(env!("CARGO_BIN_EXE_djinn"))
+            .args(["--resident-diagnostics", "--app-endpoint", &cli_endpoint])
+            .output()
+            .unwrap()
+    })
+    .await
+    .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let from_cli: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        from_cli["observations"]["records"][0]["payload"]["phase"],
+        "ready"
+    );
+    assert!(!String::from_utf8_lossy(&output.stdout).contains("private"));
+    assert_eq!(
+        events
+            .read_diagnostics(&mut receipt, 8)
+            .unwrap()
+            .unwrap()
+            .observations
+            .records
+            .len(),
+        1,
+        "the admitted inspector did not consume the receipt reader"
+    );
 
     // The status moves under the route, and the next read sees it.
     status.update(|status| status.ready = false);

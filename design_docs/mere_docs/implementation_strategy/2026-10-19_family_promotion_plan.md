@@ -279,6 +279,15 @@ ignores, plus browser-host and collector Wasm compilation. Product startup
 wiring, target lifetime tokens and
 shared semantic construction remain open.
 
+Shared DOM semantics/product continuation (2026-10-20, qualified):
+Winit consumes Rootstock's DOM projection, and Djinn's lifecycle source wires
+an opt-in product-projected collector into its admitted status reader. 191
+targeted native passes/seven existing ignores and browser-host Wasm compilation
+qualify the bounded supplier and product paths, including a real CLI client
+process against the admitted fixture broker. Shared
+leaf/producer semantics, target lifetimes and process-final evidence remain
+separately tracked in the diagnostics plan.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse

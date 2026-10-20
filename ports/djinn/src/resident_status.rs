@@ -143,11 +143,21 @@ pub struct ResidentStatusV1 {
 
 /// The status the resident keeps current and the route reads.
 #[derive(Clone)]
-pub struct ResidentStatusSource(Arc<RwLock<ResidentStatusV1>>);
+pub struct ResidentStatusSource(
+    Arc<RwLock<ResidentStatusV1>>,
+    crate::resident_events::EventLog,
+);
 
 impl ResidentStatusSource {
     pub fn new(status: ResidentStatusV1) -> Self {
-        Self(Arc::new(RwLock::new(status)))
+        Self(Arc::new(RwLock::new(status)), Default::default())
+    }
+
+    /// The same lifecycle owner used by the running process. Disabled logs
+    /// contribute no diagnostics resource to the status route.
+    pub fn with_events(mut self, events: crate::resident_events::EventLog) -> Self {
+        self.1 = events;
+        self
     }
 
     pub fn read(&self) -> ResidentStatusV1 {
@@ -290,7 +300,7 @@ fn card_snapshot(session: &str, label: &str, card_bytes: &[u8]) -> ProjectionSna
 /// resources it names stay servable while the status moves.
 pub struct ResidentStatusEndpoint {
     source: ResidentStatusSource,
-    current: Option<(Vec<u8>, Vec<u8>)>,
+    current: Option<Vec<Vec<u8>>>,
 }
 
 impl ResidentStatusEndpoint {
@@ -337,6 +347,14 @@ impl ProjectionSource for ResidentStatusEndpoint {
             label: label.into(),
             value,
         };
+        let diagnostics = match self.source.1.diagnostic_snapshot() {
+            Ok(snapshot) => snapshot,
+            Err(error) => Some(serde_json::json!({"schema":"djinn.lifecycle-diagnostics/v1", "available":false, "error":error})),
+        }.map(|snapshot| serde_json::to_vec(&snapshot).map_err(|error| error.to_string())).transpose()?;
+        let mut media = vec![ContentHash::of(&status_bytes)];
+        if let Some(bytes) = &diagnostics {
+            media.push(ContentHash::of(bytes));
+        }
         let card = PortableCardV1 {
             title: "Resident".into(),
             values: vec![
@@ -346,11 +364,13 @@ impl ProjectionSource for ResidentStatusEndpoint {
                 value("agent", status.endpoints.agent.clone()),
             ],
             badges: Vec::new(),
-            media: vec![ContentHash::of(&status_bytes)],
+            media,
         };
         let card_bytes = serde_json::to_vec(&card).map_err(|error| error.to_string())?;
         let snapshot = card_snapshot(STATUS_SESSION, "Resident status", &card_bytes);
-        self.current = Some((status_bytes, card_bytes));
+        let mut resources = vec![status_bytes, card_bytes];
+        resources.extend(diagnostics);
+        self.current = Some(resources);
         Ok(snapshot)
     }
 }
@@ -362,11 +382,11 @@ impl PresentationSource for ResidentStatusEndpoint {
         if request.session.0 != STATUS_SESSION {
             return Err("resident-status resource names another session".into());
         }
-        let Some((status, card)) = self.current.as_ref() else {
+        let Some(resources) = self.current.as_ref() else {
             return Err("request a resident-status snapshot first".into());
         };
-        let bytes = [card, status]
-            .into_iter()
+        let bytes = resources
+            .iter()
             .find(|bytes| ContentHash::of(bytes) == request.resource)
             .ok_or("that resource is not in the current resident-status snapshot")?
             .clone();
@@ -530,7 +550,9 @@ fn refused(what: &str) -> IntentResult {
 }
 
 /// Read the status through an open `resident-status-v1` route.
-pub async fn read_status(client: &mut AppBrokerClient) -> Result<ResidentStatusV1, AppClientError> {
+async fn status_card(
+    client: &mut AppBrokerClient,
+) -> Result<(ProjectionSession, PortableCardV1), AppClientError> {
     client.open_session().await?;
     let snapshot = client.snapshot(request(STATUS_SESSION)).await?;
     let offer = snapshot
@@ -545,13 +567,37 @@ pub async fn read_status(client: &mut AppBrokerClient) -> Result<ResidentStatusV
             .resource(snapshot.session.clone(), offer.resource)
             .await?,
     )?;
+    Ok((snapshot.session, card))
+}
+
+pub async fn read_status(client: &mut AppBrokerClient) -> Result<ResidentStatusV1, AppClientError> {
+    let (session, card) = status_card(client).await?;
     let resource = *card
         .media
         .first()
         .ok_or_else(|| AppClientError::Refused("the status card has no typed resource".into()))?;
     Ok(serde_json::from_slice(
-        &client.resource(snapshot.session, resource).await?,
+        &client.resource(session, resource).await?,
     )?)
+}
+
+/// Read the optional redacted lifecycle resource on the same admitted status
+/// route. Absence is disabled coverage, never a successful empty observation.
+pub async fn read_diagnostics(
+    client: &mut AppBrokerClient,
+) -> Result<Option<serde_json::Value>, AppClientError> {
+    let (session, card) = status_card(client).await?;
+    let Some(resource) = card.media.get(1) else {
+        return Ok(None);
+    };
+    let bytes = client.resource(session, *resource).await?;
+    let value: serde_json::Value = serde_json::from_slice(&bytes)?;
+    if value.get("schema").and_then(|v| v.as_str()) != Some("djinn.lifecycle-diagnostics/v1") {
+        return Err(AppClientError::Refused(
+            "unsupported resident diagnostics schema".into(),
+        ));
+    }
+    Ok(Some(value))
 }
 
 /// Ask the resident to stop through an open `resident-control-v1` route.

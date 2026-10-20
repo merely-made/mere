@@ -1,5 +1,123 @@
 # System Diagnostics and Accessibility Plan
 
+## Shared DOM semantics and resident collector, 2026-10-20
+
+**Status:** contained shared DOM projection and resident collector qualified
+on 2026-10-20, based on main `6394e931`. The five intervening upstream commits cover recoverable settings
+writes, Chronicle request binding, supplier inference fixtures and Mesh
+provenance; they are preserved. The earlier 237-test and 178-test cohorts below
+retain their original source identities. Receipt budget remains 10 MB for the
+diagnostics continuation, using `C:\t\cargo-targets\mere` without isolation.
+
+### Scope and done-conditions
+
+Retire the native adapter's independent textbox/numeric DOM policy and consume
+Rootstock's existing neutral projection through Genet's existing AccessKit
+converter. Preserve native roles, focus, pruning and retained geometry. Wire one
+real product lifecycle source through product sampling, bounded ingress,
+redacted retained history and its existing admitted inspection route. Done when
+the owner, platform/session and product receiving controls pass with source,
+lock, binary and explicit remaining-gate evidence. Do not turn this into a
+universal semantic or process-wide diagnostics model.
+
+### Findings and repairs
+
+Winit now lowers `document_projection`, the same DOM observation the browser
+uses. Its separate app-textbox value/pruning implementation and unconditional
+numeric marker override are retired. Routing maps contain only projected nodes.
+Genet's converter currently maps multiline text fields to its single-line
+AccessKit role; Winit derives the platform role from the shared `multiline`
+state rather than rescanning DOM markers. Existing Sprigging and producer
+contributions still follow, owned by those contributors.
+
+The old native and browser ID walks used `dom_children`, while Genet projects
+`flat_children`. This could announce a shadow control without a route to it;
+Rootstock's marker and focus walks could also miss that control. All four now
+use the supplier's flattened-child API. Scope membership still belongs to
+`WindowDom`; traversal does not grant a foreign window's node authority.
+
+Djinn's existing `EventLog` now accepts explicit optional diagnostic bounds.
+The real executable reads `--diagnostics-config <path>` before starting its
+vault/lifecycle, using the existing event source rather than a new authority.
+It creates separate random nonsecret run/queue boot IDs, a local Registry
+sampling policy, one explicit sender/receiver and an Apparatus collector.
+No global sender or thread-local scope captures unrelated product logs.
+Recognized owner phases are projected to fixed labels before queue admission;
+profile, vault, endpoints, stop reasons, private fields and raw errors never
+enter this diagnostic queue. A stopped event distinguishes explicit `ok=true`,
+`ok=false` and absent/nonboolean outcome. Sampling refusals and unrecognized
+events have separate counters, not inferred retained gaps. Zero bounds retain
+the queue/store's existing disabled behavior.
+
+Collection runs synchronously on that low-volume source, under its existing
+serialization lock. Each inspection or receipt reader has its own cursor;
+queue/history counters and identities remain separate. The existing owner-only
+status route carries an optional second, content-addressed diagnostic resource,
+with its original status resource first. The native `--resident-diagnostics`
+client reads it through the same admission route. Off coverage is explicit;
+diagnostic read failure produces an unavailable diagnostic resource without
+breaking the resident's ordinary status. This does not alter vault access or
+stop permissions. The original event-file persistence remains a distinct path,
+not proof of diagnostic durability or successful application work.
+
+A further contained authority bug was found in `EventLog::emit`: arbitrary
+caller fields could overwrite schema, PID, receipt time and even event name.
+Reserved fields now retain their owner values. Other event fields keep their
+existing file behavior; the diagnostic copy retains only the fixed allowlist.
+
+### Remaining ownership migrations
+
+- **Contributed semantics:** Sprigging callbacks remain AccessKit-shaped;
+  native, browser and admission still seed/lower their contributions differently.
+  Browser leaf lowering currently keeps only a small role/name subset, losing
+  numeric roles, values and actions. Producer semantics and generated action
+  IDs are also lowered separately. A shared neutral contribution model needs
+  supplier and native/browser receiving qualification, including read-only,
+  disabled, labels, clipping and action lifetime. Shared DOM semantics do not
+  complete that migration.
+- **Targets and outcomes:** requests still lack document/window/session/revision
+  lifetime tokens, and producer semantic reads and activation remain separate.
+  Current projection membership and routing results do not establish terminal
+  success or presentation/pixel causality. The new Hest command architecture
+  plan owns the wider declaration/invocation/result consolidation; target and
+  operation lifetime work should coordinate with that owner.
+- **Product diagnostics:** this source covers only named resident lifecycle
+  events. Unlock subevents, inference/workers, arbitrary tracing/mod-loader
+  emitters and other products are not silently included. The source already
+  serializes with event-file IO; adding a nonblocking ingress does not make
+  that owner API nonblocking. Mutex/panic and durable recovery contracts remain
+  open. History and final stopped/disconnect evidence are in memory; after
+  process exit they are not available through the status route or exported by
+  default. Installed-process, abrupt termination and final receipt custody
+  remain separate receiving work.
+- **Other owners:** A873 inspection skeleton retirement, A961 input routing,
+  private selector grammar, legacy invariant-clock result loss and journal
+  recovery remain open as recorded below. The sealed audit registers remain
+  unchanged; the successor ledger carries new repairs and remaining migrations.
+
+### Qualification
+
+191 targeted native tests pass, with seven existing ignores: Rootstock 126,
+native host 19/four ignores, native accessibility receiving eight, browser-host
+native plan tests 17, Winit adapter seven, joined-session controls six,
+resident lifecycle owner four and admitted status receiving four. Rootstock's
+126 passes include three existing ignores outside that passing count. The
+receiving test launches the actual compiled Djinn CLI as a separate process,
+reads the redacted phase from the fixture broker, checks owner-only admission,
+and verifies that inspector reads leave the independent receipt cursor intact.
+The browser host compiles for `wasm32-unknown-unknown` with the flattened-tree
+route walk. The source ledger and
+[qualification index](../../../support/family-promotion/diagnostics-shared-qualification.json)
+retain exact commands, source/lock basis and executed binaries.
+
+The first compile checks caught a redundant `.into()` inference error and a
+fixture using a private scroll setter. Both were corrected; scroll parity now
+runs through the host's public wheel path. Failed development receipts remain
+separate from final gates. Installed resident/vault startup and termination,
+browser runtime, human AT and broader contributed semantics remain unqualified.
+A client-process fixture is not an installed-resident acceptance receipt.
+
+
 ## Current-target admission and collector bridge, 2026-10-20
 
 **Status:** contained host admission and collector bridge qualified on main
@@ -76,8 +194,8 @@ compilation does not establish browser runtime acceptance.
   producer-key reuse across lifetimes. Producer semantic reads and activation
   also remain separate callbacks. Qualify an owner-issued target lifetime and
   atomic admission contract before claiming those guarantees.
-- **Projection ownership:** Winit still builds from Genet's AccessKit projection
-  while Rootstock/browser consume the neutral document projection, with local
+- **Projection ownership at `65adff84`:** Winit built from Genet's AccessKit projection
+  while Rootstock/browser consumed the neutral document projection, with local
   textbox/numeric/leaf overrides. This slice shares admission, not all semantic
   construction. Move the existing contributions into one supplier-qualified
   semantic model, preserving geometry, clipping, disabled/read-only behavior,
@@ -85,8 +203,9 @@ compilation does not establish browser runtime acceptance.
   callbacks also receive differently seeded nodes across these paths;
   context-sensitive callback equivalence remains unqualified.
 - **Collector installation and policy (A1154/A1156):** the bridge is callable and
-  fixture-wired; no production `install_global_sender`, `should_emit_channel`
-  or `should_emit_and_observe` caller is added. Products must choose redaction,
+  fixture-wired; that cohort added no production `install_global_sender`, `should_emit_channel`
+  or `should_emit_and_observe` caller. The continuation above adds an explicitly
+  injected product sender and local sampling gate, without a global sink. Products must choose redaction,
   sink lifetime/thread routing, drain scheduling, registry policy/invariants and
   final-counter custody. A process-global OnceLock is not a per-window collector.
   Projection callbacks must not panic; panic/durable recovery is not supplied.
@@ -188,8 +307,10 @@ batch does not establish pixel correlation. These are named follow-ups, not
 claims that the shared semantic application migration is finished.
 
 The Registry gate remains an explicit API, not an installed process-wide filter.
-Current Mere source has no production caller of `should_emit_and_observe` or
-`should_emit_channel`, and no production `install_global_sender` call. The
+At that earlier source, Mere had no production caller of
+`should_emit_and_observe` or `should_emit_channel`, and no production
+`install_global_sender` call. Djinn's new explicitly injected lifecycle source
+and local sampling gate are recorded in the continuation above. The
 nonblocking emitter does not consult the mutable registry automatically. The
 sampling repairs therefore qualify that owner API; connecting producer policy,
 bounded ingress and retained readers is still a host/collector migration.
