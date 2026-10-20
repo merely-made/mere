@@ -1,0 +1,15 @@
+{
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6",
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "cpu": "Apple M4",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.1\nBuildVersion:\t\t25F80",
+  "architecture": "arm64",
+  "rustflags": "-C target-cpu=native",
+  "timing_allocator": "System (uninstrumented)",
+  "allocation_allocator": "System with requested-size counters in a separate executable",
+  "timing_runs": 3,
+  "samples_per_run": 15,
+  "measurement": "warm resident source buffers; parse operations include destruction; retained operations exclude initial parse",
+  "memory_excludes": "source buffers, allocator metadata, process RSS, OS mappings; warmed parser caches are already resident",
+  "lockfile": "Cargo.lock"
+}

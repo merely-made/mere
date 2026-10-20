@@ -23,6 +23,7 @@
 //! a line on stdin. Knot's receipt `docs/receipts/2026-10-15_mere_overmap_live/`
 //! has the commands.
 
+use armillary::tasks::ResidentTasks;
 use std::{path::PathBuf, sync::Arc, time::Duration};
 
 use castellan::{
@@ -42,7 +43,6 @@ use djinn::{
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppRouteGrants},
     identity::VaultProtectionView,
-    tasks::ResidentTasks,
 };
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use graphshell_host::{
@@ -340,6 +340,9 @@ async fn main() {
         result = &mut server => { println!("FIXTURE_SERVER_ENDED {:?}", result.map(|r| r.map_err(|e| e.to_string()))); },
         _ = stop => { server.abort(); let _ = server.await; },
     }
-    tasks.cancel_and_join().await;
+    assert!(
+        tasks.close_and_join().await.is_clean(),
+        "task shutdown failed"
+    );
     println!("FIXTURE_STOPPED pid={}", std::process::id());
 }

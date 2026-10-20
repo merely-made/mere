@@ -1,0 +1,7 @@
+{
+  "new_plan_covered": true,
+  "preexisting_missing_count": 18,
+  "all_missing_paths_exist_in_HEAD": true,
+  "snapshot_matches_HEAD": true,
+  "snapshot_sha256": "8aab8eccd5f724577dabd435627e9ae174a10d1474cb4f0a8e5d65001437eeb0"
+}

@@ -1,0 +1,16 @@
+{
+  "supplier_commit": "70deef2c8cf3d3410ae35b496a9396514070b24f",
+  "source_sha256": {
+    "crates/system/source-edit/Cargo.toml": "d8c3ec38355a20067ba4b85f0c47bed2243664017c2a414870ce26c8c7c48b0d",
+    "crates/system/source-edit/src/lib.rs": "297999dda2bea43b10a50e37a72780526d11ed5c56b5bb2433daf5788ec2cb7b",
+    "crates/system/source-edit/src/tests.rs": "7c011b25910907cfd9f939b555139886046edbc512b79554627489132b902f89"
+  },
+  "tests": 6,
+  "strict_all_target_clippy": true,
+  "rust_1_97_1_tests": 6,
+  "logs": {
+    "msrv.log": "69014fc1b408cbffc8853d650dfca6052a68ac09669ea3f3d90412eb41832449",
+    "clippy.log": "4d514ae5f6162c8d20d48771abb6753a1d321cda0fd6b28c371d220e7922f1d9",
+    "tests.log": "abf1bea885563582b66582e3cebf5c58b62eb85b4946fd6a766e90f08c7cea69"
+  }
+}

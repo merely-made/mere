@@ -22,6 +22,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use armillary::tasks::ResidentTasks;
 use castellan::authority::PersonaeHost;
 use castellan::custody::IdentityStorage;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
@@ -29,7 +30,6 @@ use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
-use graphshell_endpoint::door::tasks::ResidentTasks;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
 use personae::{PersonaId, ProfileId};
@@ -513,7 +513,14 @@ impl EmbeddedOwner {
                     _ = lock.changed() => Err("selected identity changed lock state; embedded reservoir stopped".into()),
                 }
             }).await;
-            tasks.cancel_and_join().await;
+            let ended = tasks.close_and_join().await;
+            let result = if ended.is_clean() {
+                result
+            } else {
+                Err(format!(
+                    "embedded task failures: {ended:?}; endpoint result: {result:?}"
+                ))
+            };
             // Catalog factories retain the route map which retains the catalog.
             // Break that ownership cycle before releasing the reservoir lock.
             catalog

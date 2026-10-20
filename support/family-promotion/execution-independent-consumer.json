@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "run",
+    "--manifest-path",
+    "support/fixtures/armillary-consumer/Cargo.toml",
+    "--offline"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T01:50:02.494098+00:00",
+  "finished": "2026-10-20T01:53:34.166908+00:00",
+  "exit_code": 0,
+  "results": [
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Blocking waiting for file lock on package cache",
+    "Finished `dev` profile [unoptimized] target(s) in 3m 31s",
+    "Running `C:\\t\\cargo-targets\\mere\\debug\\armillary-consumer-fixture.exe`"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n   Compiling tracing v0.1.44\n   Compiling armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=5d8754dc2a00be02d82b075441ac9ea44aa4f135#5d8754dc)\n   Compiling armillary-consumer-fixture v0.0.0 (C:\\Users\\mark_\\Code\\repos\\mere\\support\\fixtures\\armillary-consumer)\n    Finished `dev` profile [unoptimized] target(s) in 3m 31s\n     Running `C:\\t\\cargo-targets\\mere\\debug\\armillary-consumer-fixture.exe`\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

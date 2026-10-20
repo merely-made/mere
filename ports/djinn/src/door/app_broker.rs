@@ -28,6 +28,7 @@
 use std::sync::Arc;
 use std::sync::RwLock as StdRwLock;
 
+use armillary::tasks::spawn_tracked_with_handle;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, ResumeRequest};
 use graphshell_endpoint::door::app_admission::{
     APP_IDENTITY_ROUTE, AllowedAppRoutes, AppAdmissionError, AppHello, AppId, AppRouteGrants,
@@ -36,7 +37,6 @@ use graphshell_endpoint::door::app_admission::{
 use graphshell_endpoint::door::custody::CUSTODY_ROUTE;
 use graphshell_endpoint::door::local_endpoint::{LocalStream, connect_local, serve_local};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
-use graphshell_endpoint::door::tasks::spawn_tracked_with_handle;
 use graphshell_endpoint::door::wire::{
     APP_CONNECT_SCHEMA, AppHostMessage, AppMessage, BrowserChallenge,
 };

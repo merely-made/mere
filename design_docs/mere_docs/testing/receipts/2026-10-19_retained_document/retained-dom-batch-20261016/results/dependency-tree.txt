@@ -1,0 +1,49 @@
+retained-document-proof v0.1.0 (/Users/markik/Code/testing/retained-dom-batch-20261016)
+├── logos v0.12.1
+│   └── logos-derive v0.12.1 (proc-macro)
+├── serde v1.0.229
+│   ├── serde_core v1.0.229
+│   └── serde_derive v1.0.229 (proc-macro)
+├── serde_json v1.0.151
+│   ├── itoa v1.0.18
+│   ├── memchr v2.8.3
+│   ├── serde_core v1.0.229
+│   └── zmij v1.0.23
+├── sha2 v0.10.9
+│   ├── cfg-if v1.0.5
+│   ├── cpufeatures v0.2.17
+│   └── digest v0.10.7
+├── taplo-optimized v0.14.0 (/Users/markik/Code/testing/retained-dom-batch-20261016/vendor/taplo-optimized)
+│   ├── ahash v0.8.12
+│   │   [build-dependencies]
+│   ├── arc-swap v1.9.2
+│   ├── either v1.19.0
+│   ├── globset v0.4.19
+│   ├── itertools v0.10.5
+│   ├── logos v0.12.1 (*)
+│   ├── once_cell v1.21.4
+│   ├── rowan v0.17.0
+│   ├── serde v1.0.229 (*)
+│   ├── serde_json v1.0.151 (*)
+│   ├── thiserror v1.0.69
+│   ├── time v0.3.41
+│   └── tracing v0.1.44
+├── taplo-rowan17 v0.14.0 (/Users/markik/Code/testing/retained-dom-batch-20261016/vendor/taplo-rowan17)
+│   ├── ahash v0.8.12 (*)
+│   ├── arc-swap v1.9.2 (*)
+│   ├── either v1.19.0
+│   ├── globset v0.4.19 (*)
+│   ├── itertools v0.10.5 (*)
+│   ├── logos v0.12.1 (*)
+│   ├── once_cell v1.21.4
+│   ├── rowan v0.17.0 (*)
+│   ├── serde v1.0.229 (*)
+│   ├── serde_json v1.0.151 (*)
+│   ├── thiserror v1.0.69 (*)
+│   ├── time v0.3.41 (*)
+│   └── tracing v0.1.44 (*)
+└── toml v0.8.23
+    ├── serde v1.0.229 (*)
+    ├── serde_spanned v0.6.9
+    ├── toml_datetime v0.6.11
+    └── toml_edit v0.22.27

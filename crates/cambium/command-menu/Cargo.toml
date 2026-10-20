@@ -10,9 +10,7 @@ license = "MPL-2.0"
 repository.workspace = true
 keywords = ["commands", "palette", "menu"]
 categories = ["gui"]
-# Unclaimed on crates.io; publishing is a separate decision (Scenograph editor
-# plan, SE13, SE46).
-publish = false
+publish = true
 
 [lib]
 path = "src/lib.rs"

@@ -1,0 +1,43 @@
+{
+  "status": "passed",
+  "command_count": 59,
+  "source_state": "uncommitted Isocosm consumer of published Git supplier",
+  "baseline": "183a2f67223662bd820110027dc41db611665ee9",
+  "source_pack_hashes": {
+    "isometry-pack.toml": "23ac63a565fe38454d898440208cf451b47630ef463909714f3b3dea6a9f3ade",
+    "fixtures/forge_item.json": "8ed607b3536dd86eb138acc0637890be8f4e30c7b84832c98d9c5b9dc081b31f",
+    "fixtures/local_map.json": "15a2b20bb38e69d24bcbf72196368d45d08a67b45a5fa3b3648f5b294f732389",
+    "generators/campaign.lua": "de557b68b40f94950a3a2a294cf76f9673fc3ec87669ca3ecd185d4120b2da9e",
+    "generators/local_map.lua": "7c8cc91a9ac9da9f0742ff21f26728781e8ee0e03fcd047de5912c77dd96085b",
+    "generators/forge_item.lua": "6a6c299f4e922e0118895726103fd062220ab77dae87b4af87631dfed5f52c3e",
+    "generators/npc.lua": "c5559958836593a843dde991b3bd87e1d29d20b55274a56e0615c8c3ab984213"
+  },
+  "annotated_sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c",
+  "final_sha256": "86970256abc09a352f5ebb9466ec6bfab13a33f1fcba146e52aab45103095032",
+  "sessions": 5,
+  "blockers": [],
+  "product_changes": true,
+  "shared_api": true,
+  "admitted": false,
+  "native_gui_qualified": false,
+  "source_hashes": {
+    "crates/isometry-system/src/pack_author/cli.rs": "ea42939ff278c1d5c6f4c3c0844b4d27302c5aa7c05abddc3b58eb99461c4dc0",
+    "crates/isometry-system/src/pack_author/mod.rs": "4fd38d10ce8b9e3bdef3ed400d6426ef755a81b2a3b0c077042e7b305c967a60",
+    "crates/isometry-system/src/pack_author/preset.rs": "456954f91cb6b1519cf6bdf474b384f07dd241f2e71eced14b616edbf7d38966",
+    "crates/isometry-system/src/pack_author/preset_tests.rs": "f119b2dcb8807e334d43c928fd58cd693b619d4c943aa592761494ff214ad976",
+    "crates/isometry-system/src/pack_author/save.rs": "3b181d4edbed2778ef337fd5d45023836bc1fca420fdea701a899e8db2e13c54",
+    "crates/isometry-system/src/pack_author/shared_tests.rs": "3f6c61c8d7d7d56c670e4260b1503f48241573bf661071bb213608c07db732ce",
+    "crates/isometry-system/src/pack_author/syntax.rs": "8b5da675249e528a7747fe79edf99b9d8e4a6d9d49791235bd592fb6e38700aa",
+    "crates/isometry-system/src/pack_author/tests.rs": "8aa45f933083de1d719401ba08839d6c5d54ac7cc1d7baeac4c467e721e19097"
+  },
+  "supplier_hashes": {
+    "Cargo.toml": "d8c3ec38355a20067ba4b85f0c47bed2243664017c2a414870ce26c8c7c48b0d",
+    "src/lib.rs": "297999dda2bea43b10a50e37a72780526d11ed5c56b5bb2433daf5788ec2cb7b",
+    "src/tests.rs": "7c011b25910907cfd9f939b555139886046edbc512b79554627489132b902f89"
+  },
+  "supplier_source": "git+https://github.com/merely-made/mere.git?branch=main#70deef2c8cf3d3410ae35b496a9396514070b24f",
+  "publication": "supplier published; consumer uncommitted/unpushed; no local overrides",
+  "runner_sha256": "c10c7a1903ed73759c228d4f24fe16d1203e083932962dff27b3a0b989d1801e",
+  "cli_sha256": "46d1797d5fb7afc91d5b36846afe27ef9baeea335acec7eba070574f512a6824",
+  "fixture_runner_sha256": "27619f5a34ee5167b5439c73f0b7bed32997539f4e9634d68a3e5a851646b619"
+}

@@ -1,0 +1,26 @@
+
+running 4 tests
+test source_document::tests::source_owner_outlives_caller_and_ids_survive_edits ... ok
+test source_document::tests::escaped_unicode_and_out_of_order_edits ... ok
+test source_document::tests::retained_ids_and_overlay_preserve_untouched_bytes ... ok
+test source_document::tests::rejects_invalid_documents_and_invalid_edit_targets ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+test toml_retains_source_and_comments_through_structural_edits ... ok
+test sonic_retains_data_after_source_drop_and_supports_structural_edits ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

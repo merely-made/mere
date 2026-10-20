@@ -1,0 +1,43 @@
+{
+  "compared": [
+    "syntax text/kinds/ranges/tokens",
+    "syntax and semantic errors",
+    "ordered DOM paths",
+    "per-key primary/additional source ranges",
+    "node and descendant source ranges",
+    "full JSON values",
+    "formatter output"
+  ],
+  "edits": 360,
+  "named_cases": [
+    "real",
+    "annotated",
+    "unicode_crlf",
+    "duplicate_root",
+    "duplicate_inline",
+    "pseudo_merge",
+    "pseudo_duplicate",
+    "table_conflict",
+    "value_table_conflict",
+    "table_array_conflict",
+    "array_value_conflict",
+    "implicit_table",
+    "inline_sealed",
+    "array_associations",
+    "inline_dotted",
+    "comments_order",
+    "incomplete_header",
+    "incomplete_string",
+    "replace",
+    "insert_preset"
+  ],
+  "prefixes": 3075,
+  "status": "passed",
+  "wide_keys": [
+    256,
+    512,
+    1024,
+    2048,
+    4096
+  ]
+}

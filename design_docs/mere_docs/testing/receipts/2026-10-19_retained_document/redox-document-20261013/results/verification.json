@@ -1,0 +1,109 @@
+{
+  "checks": [
+    {
+      "backend": "serde_dom",
+      "dataset": "srd_monsters",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "source_identical_noop": false,
+      "unknown_fields_preserved": true
+    },
+    {
+      "backend": "sonic_dom",
+      "dataset": "srd_monsters",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "source_identical_noop": false,
+      "unknown_fields_preserved": true
+    },
+    {
+      "backend": "raw_overlay",
+      "dataset": "srd_monsters",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "source_identical_noop": true,
+      "unknown_fields_preserved": true
+    },
+    {
+      "backend": "raw_overlay",
+      "dataset": "srd_monsters",
+      "pending_edits_after_replacement": 1,
+      "repeated_edits": 2000,
+      "restored_original_semantics": true
+    },
+    {
+      "backend": "serde_dom",
+      "dataset": "json_edge_cases",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "source_identical_noop": false,
+      "unknown_fields_preserved": true
+    },
+    {
+      "backend": "sonic_dom",
+      "dataset": "json_edge_cases",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "source_identical_noop": false,
+      "unknown_fields_preserved": true
+    },
+    {
+      "backend": "raw_overlay",
+      "dataset": "json_edge_cases",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "source_identical_noop": true,
+      "unknown_fields_preserved": true
+    },
+    {
+      "backend": "raw_overlay",
+      "dataset": "json_edge_cases",
+      "pending_edits_after_replacement": 1,
+      "repeated_edits": 2000,
+      "restored_original_semantics": true
+    },
+    {
+      "backend": "toml_value",
+      "comments_preserved": true,
+      "dataset": "demo_pack",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "unknown_fields_preserved": true,
+      "untouched_lines_preserved": false
+    },
+    {
+      "backend": "toml_edit",
+      "comments_preserved": true,
+      "dataset": "demo_pack",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "unknown_fields_preserved": true,
+      "untouched_lines_preserved": true
+    },
+    {
+      "backend": "toml_value",
+      "comments_preserved": false,
+      "dataset": "annotated_pack",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "unknown_fields_preserved": true,
+      "untouched_lines_preserved": false
+    },
+    {
+      "backend": "toml_edit",
+      "comments_preserved": true,
+      "dataset": "annotated_pack",
+      "reopened": true,
+      "semantic_roundtrip": true,
+      "unknown_fields_preserved": true,
+      "untouched_lines_preserved": true
+    },
+    {
+      "dataset": "unpaired_surrogate",
+      "note": "RawValue syntax validation is not full scalar semantic validation; do not use this prototype as admission authority",
+      "raw_overlay_accepts_syntax": true,
+      "serde_dom_rejects": true
+    }
+  ],
+  "status": "passed"
+}

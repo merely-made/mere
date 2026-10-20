@@ -19,6 +19,7 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use armillary::tasks::ResidentTasks;
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{
@@ -33,7 +34,6 @@ use djinn::resident_reservoir::ResidentReservoir;
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
-use graphshell_endpoint::door::tasks::ResidentTasks;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId, GraphValidator, MereId, mere_dir};
@@ -550,7 +550,10 @@ async fn child_serves_the_registered_domain() {
     if let Some((server, tasks, catalog, reservoir)) = daemon {
         server.abort();
         let _ = server.await;
-        tasks.cancel_and_join().await;
+        assert!(
+            tasks.close_and_join().await.is_clean(),
+            "task shutdown failed"
+        );
         catalog
             .update(|catalog| *catalog = ResidentEndpointCatalog::new())
             .await;

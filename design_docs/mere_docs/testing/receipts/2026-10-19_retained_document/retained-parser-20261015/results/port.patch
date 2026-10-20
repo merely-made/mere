@@ -1,0 +1,29 @@
+--- upstream/Cargo.toml
++++ ported/Cargo.toml
+@@ -12,7 +12,7 @@
+ [package]
+ edition = "2021"
+ rust-version = "1.74"
+-name = "taplo"
++name = "taplo-rowan17"
+ version = "0.14.0"
+ authors = ["tamasfe"]
+ build = false
+@@ -51,7 +51,7 @@
+ schema = ["schemars"]
+ 
+ [lib]
+-name = "taplo"
++name = "taplo_rowan17"
+ path = "src/lib.rs"
+ 
+ [[example]]
+@@ -90,7 +90,7 @@
+ version = "1.4"
+ 
+ [dependencies.rowan]
+-version = "0.15.3"
++version = "=0.17.0"
+ 
+ [dependencies.schemars]
+ version = "0.8.3"
