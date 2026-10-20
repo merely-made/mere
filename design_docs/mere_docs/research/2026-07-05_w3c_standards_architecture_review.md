@@ -22,6 +22,11 @@ the engine as the standard's shape, never a host hack), pulled by a named
 consumer, with WPT subsets as the done-condition. Each family below gets one
 of three postures:
 
+**Reading this review (2026-10-19):** the postures and recommendations record
+the reasoning at their dates. They identify useful shapes, costs and dependencies;
+they do not assign future work. The quoted September PULL definition remains a
+historical ruling, not a schedule. Current evidence can change its relevance.
+
 - **ADOPT**: use the standard's shape as internal architecture now, even
   before any content-facing API exists.
 - **PULL**: designed for now, implemented in order: the named consumer's
@@ -87,20 +92,19 @@ when this family is cheap.
   cross-platform-parallelism brief already hit one consequence (COOP/COEP
   forking the PWA lane from the open-web lane); this is the general form.
 - **CSP enforcement points come free if S1 landed**: CSP is specified as a
-  Fetch patch plus parser/eval hooks. Put the hook points in even while
-  the policy is "allow all".
+  Fetch patch plus parser/eval hooks. Those are the integration points even
+  for an implementation whose initial policy is "allow all".
 - Secure-contexts gating as a bit on the environment, because half of all
   new APIs are spec-gated on it (WebGPU, storage, workers...).
 - Permissions as one spine (the capability-gate catalogue is mere's richer
   superset; the W3C Permissions model should be a projection of it, not a
   second registry), with Permissions Policy as the per-frame delegation
   shape when iframes arrive.
-- Trusted Types + Sanitizer: now Baseline/near-Baseline. When the scripted
-  DOM lands, `setHTML` + sanitizer semantics should be the *first* sink
-  API implemented, not the last; it is the modern default and it is
-  drastically simpler to make `innerHTML` the legacy alias than the
-  reverse.
-- SRI and referrer policy: small, land with the loader.
+- Trusted Types + Sanitizer: now Baseline/near-Baseline. The scripted-DOM
+  connection is the choice of sink semantics: a sanitized `setHTML` surface
+  offers a different default from `innerHTML`. Their exact contracts need
+  checking against the current specs; neither is simply an alias of the other.
+- SRI and referrer policy connect directly to the loader hooks.
 
 ## S3. HTML parsing — ADOPT (mostly solved-by-crate, two shapes to keep)
 
@@ -165,9 +169,10 @@ Chrome 137+/Firefox 139+, Safari open); WebIDL.
   runner (see C7): tasks, microtask checkpoint, then a rendering
   opportunity. Cheap discipline now, mandatory when pages share the loop
   with chrome.
-- Workers before iframes on the script roadmap: the agent model (worker =
-  own event loop, own realm, message-passing) matches armillary's actor
-  shape, and most modern pages assume workers exist.
+- Workers have their own event loop and realm, with message passing. That
+  boundary matches armillary's actor shape and offers a useful comparison
+  when examining worker or iframe execution; it does not require one feature
+  to precede the other.
 - **The wasm64 receipt:** memory64 is now everywhere but Safari. The vano
   fork's wasm64 + snapshot-clone identity is aligned with where the
   platform actually went; note it as a validated bet, and track JSPI
@@ -186,9 +191,9 @@ A service worker is specified as a Fetch interceptor running in a worker:
 if S1 and S5 land as recommended, SW is a composition, not a subsystem.
 
 **Recommendations:**
-- Ordering: Cache API before Service Workers (it is a plain
-  request/response store and useful to the engine's own HTTP cache
-  discipline), SW only when the PWA lane demands offline.
+- Cache API is a request/response store that can be useful independently.
+  Service Workers add worker execution and Fetch interception. These are
+  separable capabilities with a shared request/response model.
 - The browser/PWA split already governs scripting doctrine; extend it
   here: the *open-web* lane treats SW as a page capability to implement
   faithfully; the *product's own* offline story (mere as a PWA, moot
@@ -234,11 +239,11 @@ desktop 130+); WebAudio; EME; WebRTC; WebGPU (W3C) / WebGL.
   codec-string capability queries. Then exposing the API to content later
   is a projection, the burn/field lanes get frames in a uniform type, and
   Strophe's audio pressure-vessel can share the seam's vocabulary.
-- Image pipeline first (already exists in part): async decode off the
+- Image pipeline (already exists in part): async decode off the
   layout thread, `decoding`/`loading` attribute semantics,
   `contain-intrinsic-size` interplay with C5's rendering skip.
-- `<video>` playback: pull when a live-card consumer demands it, in
-  stages: basic playback → MSE. **EME/DRM is SKIP-for-now on the record**:
+- `<video>` playback has a basic playback surface; MSE adds a separate
+  media-source surface. Live cards were the consumer identified here. **EME/DRM is SKIP-for-now on the record**:
   it is a licensing program (Widevine/PlayReady) more than a spec; a
   knockout browser without DRM video is a coherent product stance until
   proven otherwise.
@@ -495,7 +500,7 @@ twice.
 
 ## Method: WPT and WebDriver BiDi — ADOPT
 
-- **WPT subsets are the done-condition currency** for every PULL above
+- **WPT subsets provide evidence for the claimed slice** for every PULL above
   (the viewport scope doc's V3 harness, generalized). A knockout is
   "deferred, on the record"; a rebuild is "these WPT directories pass on
   the claimed slice".
@@ -519,29 +524,23 @@ twice.
 - WebGL: deferred in favor of WebGPU-first identity (S8).
 - MathML Core: defer; Baseline exists, so a future pull has a clean target.
 
-## Priority order (consumer-pulled)
+## Connections worth recovering
 
-Spine first where it is retrofit-expensive, chrome where the consumer is
-already waiting:
+These connections were identified in the July review. They describe why a
+standard might matter and what it interacts with, without prescribing an order.
+Implementation and consumer claims remain dated observations.
 
-1. **S1 + S2 skeleton** (Fetch-shaped loader, origin type, partition key,
-   hook points): pre-content is the only cheap moment.
-2. **C2 style substrate** (LOD, identity, layers): unblocks canvas forms
-   and theming; mostly Stylo plumbing.
-3. **C3 top layer + anchor + highlight painting**: palette, menus,
-   find-in-page, selection (the §5 pitfall exit).
-4. **C1 moveBefore alignment**: names and tests splice survival; cheap.
-5. **C5 content-visibility + C7 freeze/throttle** (with S12): the
-   live-card churn whale, spec-shaped.
-6. **C4 UA widgets as views** (+ S10 validation/submission): the form
-   controls lane already queued for woodshed pressure.
-7. **S4 navigable/history model**: before iframes or scripted navigation,
-   so the frametree never needs a rewrite.
-8. **S5 script lane** (WebIDL-first bindings, event loop, modules,
-   workers; wasm64/JSPI tracking): the long pole; start with the binding
-   codegen decision.
-9. **S8 media seams** (WebCodecs-shaped codec API, image pipeline), S6
-   Cache API, S11 transports, C8 observers: as consumers arrive.
+| Cue | Connection or dependency |
+|---|---|
+| Loading or origin-policy changes | S1 Fetch request shapes provide hooks for S2 security policy. Origin types and partition keys reach into stored state, so their representation affects later migrations. |
+| Canvas forms or theming | C2 connects style layers, identity and level of detail to those consumers. The original Stylo references describe the July architecture. |
+| Palettes, menus, find or selection | C3 top-layer, anchor and highlight semantics offer vocabulary for positioning and painting. |
+| Moving a live subtree | C1 moveBefore makes preservation of state and identity an explicit behavior to test. |
+| Many live cards | C5 containment/content visibility, C7 freeze/throttle and S12 timing interact with layout and execution cost. |
+| Native form controls | C4 UA widget views connect to S10 value, validation and submission behavior. |
+| Nested navigation or history | S4 navigables model ownership and joint history; the representation affects iframe and scripted-navigation behavior. |
+| Script bindings or execution | S5 WebIDL, the event loop, realms, modules and workers supply connected models. Worker event loops also resemble the actor boundary described in armillary. |
+| Media, offline data or notifications | S8 codec/frame types, S6 request/response storage and worker interception, S11 transports and C8 observations offer separable surfaces with different consumers. |
 
 ## Verified-status sources (2026-07-05)
 
