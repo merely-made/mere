@@ -1,0 +1,907 @@
+{
+  "cases": [
+    {
+      "accepted": true,
+      "bytes": 850,
+      "case": "demo",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 1115,
+      "case": "annotated",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 1155,
+      "case": "unicode_crlf",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": false,
+      "bytes": 1109,
+      "case": "incomplete_string",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 127,
+          "message": "invalid character in string",
+          "start": 127
+        },
+        {
+          "end": 142,
+          "message": "expected new line",
+          "start": 139
+        },
+        {
+          "end": 143,
+          "message": "expected new line",
+          "start": 142
+        },
+        {
+          "end": 144,
+          "message": "expected new line",
+          "start": 143
+        },
+        {
+          "end": 168,
+          "message": "expected new line",
+          "start": 144
+        },
+        {
+          "end": 178,
+          "message": "expected new line",
+          "start": 168
+        },
+        {
+          "end": 188,
+          "message": "expected new line",
+          "start": 178
+        },
+        {
+          "end": 193,
+          "message": "expected new line",
+          "start": 188
+        },
+        {
+          "end": 198,
+          "message": "expected new line",
+          "start": 194
+        },
+        {
+          "end": 225,
+          "message": "expected new line",
+          "start": 198
+        },
+        {
+          "end": 229,
+          "message": "expected new line",
+          "start": 225
+        },
+        {
+          "end": 241,
+          "message": "expected new line",
+          "start": 229
+        },
+        {
+          "end": 246,
+          "message": "expected new line",
+          "start": 241
+        },
+        {
+          "end": 260,
+          "message": "expected new line",
+          "start": 246
+        },
+        {
+          "end": 270,
+          "message": "expected new line",
+          "start": 260
+        },
+        {
+          "end": 271,
+          "message": "unexpected token",
+          "start": 270
+        },
+        {
+          "end": 281,
+          "message": "expected new line",
+          "start": 271
+        },
+        {
+          "end": 282,
+          "message": "expected new line",
+          "start": 281
+        },
+        {
+          "end": 285,
+          "message": "expected new line",
+          "start": 282
+        },
+        {
+          "end": 300,
+          "message": "expected new line",
+          "start": 285
+        },
+        {
+          "end": 308,
+          "message": "expected new line",
+          "start": 300
+        },
+        {
+          "end": 309,
+          "message": "unexpected token",
+          "start": 308
+        },
+        {
+          "end": 319,
+          "message": "expected new line",
+          "start": 309
+        },
+        {
+          "end": 320,
+          "message": "expected new line",
+          "start": 319
+        },
+        {
+          "end": 324,
+          "message": "expected new line",
+          "start": 320
+        },
+        {
+          "end": 363,
+          "message": "expected new line",
+          "start": 324
+        },
+        {
+          "end": 370,
+          "message": "expected new line",
+          "start": 363
+        },
+        {
+          "end": 381,
+          "message": "expected new line",
+          "start": 370
+        },
+        {
+          "end": 391,
+          "message": "expected new line",
+          "start": 381
+        },
+        {
+          "end": 399,
+          "message": "expected new line",
+          "start": 392
+        },
+        {
+          "end": 419,
+          "message": "expected new line",
+          "start": 399
+        },
+        {
+          "end": 423,
+          "message": "expected new line",
+          "start": 419
+        },
+        {
+          "end": 435,
+          "message": "expected new line",
+          "start": 423
+        },
+        {
+          "end": 446,
+          "message": "expected new line",
+          "start": 435
+        },
+        {
+          "end": 472,
+          "message": "expected new line",
+          "start": 446
+        },
+        {
+          "end": 481,
+          "message": "expected new line",
+          "start": 472
+        },
+        {
+          "end": 491,
+          "message": "expected new line",
+          "start": 481
+        },
+        {
+          "end": 496,
+          "message": "expected new line",
+          "start": 491
+        },
+        {
+          "end": 500,
+          "message": "expected new line",
+          "start": 497
+        },
+        {
+          "end": 527,
+          "message": "expected new line",
+          "start": 500
+        },
+        {
+          "end": 531,
+          "message": "expected new line",
+          "start": 527
+        },
+        {
+          "end": 543,
+          "message": "expected new line",
+          "start": 531
+        },
+        {
+          "end": 548,
+          "message": "expected new line",
+          "start": 543
+        },
+        {
+          "end": 562,
+          "message": "expected new line",
+          "start": 548
+        },
+        {
+          "end": 572,
+          "message": "expected new line",
+          "start": 562
+        },
+        {
+          "end": 573,
+          "message": "unexpected token",
+          "start": 572
+        },
+        {
+          "end": 582,
+          "message": "expected new line",
+          "start": 573
+        },
+        {
+          "end": 583,
+          "message": "expected new line",
+          "start": 582
+        },
+        {
+          "end": 586,
+          "message": "expected new line",
+          "start": 583
+        },
+        {
+          "end": 601,
+          "message": "expected new line",
+          "start": 586
+        },
+        {
+          "end": 609,
+          "message": "expected new line",
+          "start": 601
+        },
+        {
+          "end": 610,
+          "message": "unexpected token",
+          "start": 609
+        },
+        {
+          "end": 619,
+          "message": "expected new line",
+          "start": 610
+        },
+        {
+          "end": 620,
+          "message": "expected new line",
+          "start": 619
+        },
+        {
+          "end": 624,
+          "message": "expected new line",
+          "start": 620
+        },
+        {
+          "end": 649,
+          "message": "expected new line",
+          "start": 624
+        },
+        {
+          "end": 657,
+          "message": "expected new line",
+          "start": 649
+        },
+        {
+          "end": 667,
+          "message": "expected new line",
+          "start": 657
+        },
+        {
+          "end": 672,
+          "message": "expected new line",
+          "start": 667
+        },
+        {
+          "end": 681,
+          "message": "expected new line",
+          "start": 673
+        },
+        {
+          "end": 708,
+          "message": "expected new line",
+          "start": 681
+        },
+        {
+          "end": 712,
+          "message": "expected new line",
+          "start": 708
+        },
+        {
+          "end": 724,
+          "message": "expected new line",
+          "start": 712
+        },
+        {
+          "end": 729,
+          "message": "expected new line",
+          "start": 724
+        },
+        {
+          "end": 743,
+          "message": "expected new line",
+          "start": 729
+        },
+        {
+          "end": 753,
+          "message": "expected new line",
+          "start": 743
+        },
+        {
+          "end": 754,
+          "message": "unexpected token",
+          "start": 753
+        },
+        {
+          "end": 762,
+          "message": "expected new line",
+          "start": 754
+        },
+        {
+          "end": 763,
+          "message": "expected new line",
+          "start": 762
+        },
+        {
+          "end": 766,
+          "message": "expected new line",
+          "start": 763
+        },
+        {
+          "end": 804,
+          "message": "expected new line",
+          "start": 766
+        },
+        {
+          "end": 807,
+          "message": "expected new line",
+          "start": 804
+        },
+        {
+          "end": 817,
+          "message": "expected new line",
+          "start": 807
+        },
+        {
+          "end": 826,
+          "message": "expected new line",
+          "start": 817
+        },
+        {
+          "end": 830,
+          "message": "expected new line",
+          "start": 827
+        },
+        {
+          "end": 857,
+          "message": "expected new line",
+          "start": 830
+        },
+        {
+          "end": 861,
+          "message": "expected new line",
+          "start": 857
+        },
+        {
+          "end": 873,
+          "message": "expected new line",
+          "start": 861
+        },
+        {
+          "end": 878,
+          "message": "expected new line",
+          "start": 873
+        },
+        {
+          "end": 892,
+          "message": "expected new line",
+          "start": 878
+        },
+        {
+          "end": 902,
+          "message": "expected new line",
+          "start": 892
+        },
+        {
+          "end": 903,
+          "message": "unexpected token",
+          "start": 902
+        },
+        {
+          "end": 906,
+          "message": "expected new line",
+          "start": 903
+        },
+        {
+          "end": 907,
+          "message": "expected new line",
+          "start": 906
+        },
+        {
+          "end": 910,
+          "message": "expected new line",
+          "start": 907
+        },
+        {
+          "end": 1040,
+          "message": "expected new line",
+          "start": 910
+        },
+        {
+          "end": 1047,
+          "message": "expected new line",
+          "start": 1040
+        },
+        {
+          "end": 1053,
+          "message": "expected new line",
+          "start": 1048
+        },
+        {
+          "end": 1054,
+          "message": "unexpected token",
+          "start": 1053
+        },
+        {
+          "end": 1056,
+          "message": "expected new line",
+          "start": 1055
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 1113,
+      "case": "incomplete_header",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 360,
+          "message": "expected \"]]\"",
+          "start": 359
+        },
+        {
+          "end": 363,
+          "message": "expected new line",
+          "start": 360
+        },
+        {
+          "end": 364,
+          "message": "expected new line",
+          "start": 363
+        },
+        {
+          "end": 365,
+          "message": "expected new line",
+          "start": 364
+        },
+        {
+          "end": 366,
+          "message": "expected new line",
+          "start": 365
+        },
+        {
+          "end": 375,
+          "message": "expected new line",
+          "start": 366
+        },
+        {
+          "end": 382,
+          "message": "expected \"=\"",
+          "start": 381
+        },
+        {
+          "end": 383,
+          "message": "expected new line",
+          "start": 382
+        },
+        {
+          "end": 384,
+          "message": "expected new line",
+          "start": 383
+        },
+        {
+          "end": 404,
+          "message": "expected new line",
+          "start": 384
+        },
+        {
+          "end": 411,
+          "message": "expected \"=\"",
+          "start": 410
+        },
+        {
+          "end": 412,
+          "message": "expected new line",
+          "start": 411
+        },
+        {
+          "end": 413,
+          "message": "expected new line",
+          "start": 412
+        },
+        {
+          "end": 414,
+          "message": "expected new line",
+          "start": 413
+        },
+        {
+          "end": 415,
+          "message": "expected new line",
+          "start": 414
+        },
+        {
+          "end": 419,
+          "message": "expected new line",
+          "start": 415
+        },
+        {
+          "end": 420,
+          "message": "expected new line",
+          "start": 419
+        },
+        {
+          "end": 421,
+          "message": "expected new line",
+          "start": 420
+        },
+        {
+          "end": 422,
+          "message": "expected new line",
+          "start": 421
+        },
+        {
+          "end": 428,
+          "message": "expected new line",
+          "start": 422
+        },
+        {
+          "end": 429,
+          "message": "expected new line",
+          "start": 428
+        },
+        {
+          "end": 430,
+          "message": "expected new line",
+          "start": 429
+        },
+        {
+          "end": 435,
+          "message": "expected new line",
+          "start": 430
+        },
+        {
+          "end": 436,
+          "message": "expected new line",
+          "start": 435
+        },
+        {
+          "end": 437,
+          "message": "expected new line",
+          "start": 436
+        },
+        {
+          "end": 438,
+          "message": "expected new line",
+          "start": 437
+        },
+        {
+          "end": 451,
+          "message": "expected new line",
+          "start": 438
+        },
+        {
+          "end": 452,
+          "message": "expected new line",
+          "start": 451
+        },
+        {
+          "end": 453,
+          "message": "expected new line",
+          "start": 452
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 1113,
+      "case": "incomplete_inline",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 254,
+          "message": "newline is not allowed in an inline table",
+          "start": 253
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 1128,
+      "case": "unexpected_token",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 1117,
+          "message": "unexpected token",
+          "start": 1116
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 1134,
+      "case": "duplicate_key",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [
+        "ConflictingKeys { key: Key { inner: KeyInner { errors: Shared(ArcSwapAny(Some([]))), syntax: Some(Token(IDENT@108..112 \"name\")), is_valid: true, value: OnceCell(\"name\"), additional_syntaxes: Shared(ArcSwapAny(Some([]))) } }, other: Key { inner: KeyInner { errors: Shared(ArcSwapAny(Some([]))), syntax: Some(Token(IDENT@0..4 \"name\")), is_valid: true, value: OnceCell(\"name\"), additional_syntaxes: Shared(ArcSwapAny(Some([]))) } } }"
+      ],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 1107,
+      "case": "replacement",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 1216,
+      "case": "insert_nested_preset",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 992,
+      "case": "remove_nested_preset",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 29,
+      "case": "toml10_datetime",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": false,
+      "bytes": 13,
+      "case": "toml11_escape_e",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 9,
+          "message": "invalid escape sequence",
+          "start": 9
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 15,
+      "case": "toml11_escape_x",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 9,
+          "message": "invalid escape sequence",
+          "start": 9
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 38,
+      "case": "toml11_multiline_inline",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 10,
+          "message": "newline is not allowed in an inline table",
+          "start": 9
+        },
+        {
+          "end": 17,
+          "message": "expected new line",
+          "start": 16
+        },
+        {
+          "end": 35,
+          "message": "expected new line",
+          "start": 34
+        },
+        {
+          "end": 37,
+          "message": "expected identifier",
+          "start": 36
+        }
+      ]
+    },
+    {
+      "accepted": false,
+      "bytes": 14,
+      "case": "toml11_time_no_seconds",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 10,
+          "message": "zero-padded integers are not allowed",
+          "start": 8
+        },
+        {
+          "end": 11,
+          "message": "unexpected token",
+          "start": 10
+        },
+        {
+          "end": 13,
+          "message": "expected new line",
+          "start": 11
+        }
+      ]
+    }
+  ],
+  "deterministic_edit_cases": 360,
+  "prefix_cases": 3075,
+  "snapshots": {
+    "ported": {
+      "new_nodes": 152,
+      "old_snapshot_unchanged": true,
+      "revisions": 64,
+      "shared_nodes_across_full_reparse": 0
+    },
+    "unchanged": {
+      "new_nodes": 152,
+      "old_snapshot_unchanged": true,
+      "revisions": 64,
+      "shared_nodes_across_full_reparse": 0
+    }
+  },
+  "spec_spot_checks": [
+    {
+      "case": "toml10_datetime",
+      "diagnostics": [],
+      "taplo_accepts": true,
+      "toml_1_1_oracle_accepts": true
+    },
+    {
+      "case": "toml11_escape_e",
+      "diagnostics": [
+        {
+          "end": 9,
+          "message": "invalid escape sequence",
+          "start": 9
+        }
+      ],
+      "taplo_accepts": false,
+      "toml_1_1_oracle_accepts": true
+    },
+    {
+      "case": "toml11_escape_x",
+      "diagnostics": [
+        {
+          "end": 9,
+          "message": "invalid escape sequence",
+          "start": 9
+        }
+      ],
+      "taplo_accepts": false,
+      "toml_1_1_oracle_accepts": true
+    },
+    {
+      "case": "toml11_multiline_inline",
+      "diagnostics": [
+        {
+          "end": 10,
+          "message": "newline is not allowed in an inline table",
+          "start": 9
+        },
+        {
+          "end": 17,
+          "message": "expected new line",
+          "start": 16
+        },
+        {
+          "end": 35,
+          "message": "expected new line",
+          "start": 34
+        },
+        {
+          "end": 37,
+          "message": "expected identifier",
+          "start": 36
+        }
+      ],
+      "taplo_accepts": false,
+      "toml_1_1_oracle_accepts": true
+    },
+    {
+      "case": "toml11_time_no_seconds",
+      "diagnostics": [
+        {
+          "end": 10,
+          "message": "zero-padded integers are not allowed",
+          "start": 8
+        },
+        {
+          "end": 11,
+          "message": "unexpected token",
+          "start": 10
+        },
+        {
+          "end": 13,
+          "message": "expected new line",
+          "start": 11
+        }
+      ],
+      "taplo_accepts": false,
+      "toml_1_1_oracle_accepts": true
+    }
+  ],
+  "status": "passed",
+  "typed_lowering": "probe-local pack projection compared with toml 1.1; not product admission"
+}

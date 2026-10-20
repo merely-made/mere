@@ -1,0 +1,127 @@
+[
+  {
+    "check": "feature-tests",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/local-source-edit.toml",
+      "test",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring"
+    ],
+    "exit_code": 0,
+    "seconds": 12.874
+  },
+  {
+    "check": "default-tests",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/local-source-edit.toml",
+      "test",
+      "--locked",
+      "-p",
+      "isometry-system"
+    ],
+    "exit_code": 0,
+    "seconds": 0.968
+  },
+  {
+    "check": "build",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/local-source-edit.toml",
+      "build",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--bin",
+      "pack-author",
+      "--example",
+      "pack_fixture"
+    ],
+    "exit_code": 0,
+    "seconds": 0.578
+  },
+  {
+    "check": "all-targets",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/local-source-edit.toml",
+      "check",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--all-features",
+      "--all-targets"
+    ],
+    "exit_code": 0,
+    "seconds": 14.016
+  },
+  {
+    "check": "scoped-clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--config",
+      "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/local-source-edit.toml",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--all-targets",
+      "--no-deps"
+    ],
+    "exit_code": 0,
+    "seconds": 2.611
+  },
+  {
+    "check": "msrv-1-97-1",
+    "command": [
+      "cargo",
+      "+1.97.1",
+      "--config",
+      "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/local-source-edit.toml",
+      "check",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--bin",
+      "pack-author"
+    ],
+    "exit_code": 0,
+    "seconds": 6.01
+  },
+  {
+    "check": "format",
+    "command": [
+      "rustfmt",
+      "--edition",
+      "2021",
+      "--check",
+      "crates/isometry-system/src/bin/pack_author.rs"
+    ],
+    "exit_code": 0,
+    "seconds": 0.035
+  },
+  {
+    "check": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.019
+  }
+]

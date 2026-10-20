@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-18",
+  "repository": "/Users/markik/Code/repos/knot-editor",
+  "base_revision": "7e196c534e64b50cf6f00bf4d95e3beb493e5a9f",
+  "baseline": "prior uncommitted shared source-edit slice; complete baseline files captured locally",
+  "changed_paths_incremental": [
+    "apps/desktop/src/link_workflow.rs",
+    "crates/knot-document/src/lib.rs",
+    "crates/knot-document/src/source_edit.rs",
+    "design_docs/2026-09-29_knot_document_links_slice.md",
+    "design_docs/README.md"
+  ],
+  "changes": {
+    "apps/desktop/src/link_workflow.rs": {
+      "baseline_lines": 815,
+      "final_lines": 828,
+      "added_lines": 31,
+      "removed_lines": 18,
+      "sha256": "79b6310f4c879c20b3be0cb77185bdbd0a6b8575b8fbe0b99f7edb92c4d79d12",
+      "production_lines_delta": -10
+    },
+    "crates/knot-document/src/lib.rs": {
+      "baseline_lines": 42,
+      "final_lines": 42,
+      "added_lines": 1,
+      "removed_lines": 1,
+      "sha256": "becba7651aeb7f64b6865d526a93dee49b3d18b9dec4550833434df186c01536",
+      "production_lines_delta": 0
+    },
+    "crates/knot-document/src/source_edit.rs": {
+      "baseline_lines": 357,
+      "final_lines": 483,
+      "added_lines": 153,
+      "removed_lines": 27,
+      "sha256": "3eaaf4f875f302a06496c784421f877569e6f846dc4da9f10a1da0bbe07ee49c",
+      "production_lines_delta": 35
+    },
+    "design_docs/2026-09-29_knot_document_links_slice.md": {
+      "baseline_lines": 195,
+      "final_lines": 239,
+      "added_lines": 44,
+      "removed_lines": 0,
+      "sha256": "f8bd7c79ff814488f15e20a1d69131794401de12564e02b38cd3d878e8883c0e"
+    },
+    "design_docs/README.md": {
+      "baseline_lines": 86,
+      "final_lines": 86,
+      "added_lines": 1,
+      "removed_lines": 1,
+      "sha256": "a2686197308db2f678c8154bbee32687bbe03947f58c29b0fbf382d0e8943760"
+    }
+  },
+  "baseline_paths_unchanged": [
+    "Cargo.lock",
+    "apps/desktop/tests/document_links_ui.rs",
+    "crates/knot-document/Cargo.toml",
+    "crates/knot-document/src/document_surface.rs",
+    "crates/knot-document/src/document_view.rs"
+  ],
+  "retained_source_fields": {
+    "removed": [
+      "address:String",
+      "text:String",
+      "stamp:SourceStamp"
+    ],
+    "added": [
+      "base:SourceSnapshot"
+    ],
+    "net_field_count": -2
+  },
+  "incremental_production_rust_lines": 25,
+  "incremental_test_rust_lines": 114,
+  "incremental_total_rust_lines": 139,
+  "source_guard": "SourceSnapshot.check current stamp and exact source; selected source and proposal retain original captured base",
+  "checks": {
+    "document-tests": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "document-engine-tests": [
+      {
+        "passed": 66,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "document-msrv-tests": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "link-tests": [
+      {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "link-ui-tests": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "workspace-link-ui-test": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  "strict_library_clippy": "passed",
+  "publication": "uncommitted; only mere-source-edit explicit local patch qualifies; normal Git resolution not qualified until supplier publication",
+  "locks": "unchanged from prior slice, no package source or version changes",
+  "supplier_source_sha256": "297999dda2bea43b10a50e37a72780526d11ed5c56b5bb2433daf5788ec2cb7b",
+  "fresh_process_reopens": 2,
+  "native_gui_observed": false,
+  "other_repositories_edited": false,
+  "commits_or_pushes": false,
+  "desktop_clippy": "passed scoped lib and document_links_ui target with existing warnings, none in changed source files",
+  "formatting_and_diff_check": "passed",
+  "log_sha256": {
+    "desktop-clippy.log": "a6354f3527519e292c1660356d85463c94739b41b065b2812d2f19ccc16e4cc5",
+    "document-engine-tests.log": "9ff1fe9db0d9a732b2fc9d39450eebde6fe050f43b77a088c2b09503441be41f",
+    "document-lib-clippy.log": "c2c0b9e57b708dc8ccb2d945506f964d2d686bcfc185696524aa8cef592afe7a",
+    "document-msrv-tests.log": "97d23ab692cc848cf4df6885a9515b9aad90a5a4ae0c17a872d55553245780ee",
+    "document-tests.log": "257e6c51acf358b34c5015467b39b9e96e9c509a9f4503eafed35c82850616aa",
+    "link-tests.log": "47b2ca01a4c41be1ab0713863d2806e4a160e3f755b56cb5f076712a1a8f3ad1",
+    "link-ui-tests.log": "af96fef64b29667c8d5e08a21423b3e88248bd5847685f32cc6ab4ff232868c5",
+    "workspace-link-ui-test.log": "64123c48b130a0524e680e299371dc349e8b05d2befb7d64a6d6f31690fa3118"
+  },
+  "ignored_standalone_lock_sha256": "a67ce5ad355fa5fa5f25c5e342df02159be31b2e789b7b94e4107a3e8dba11ab"
+}

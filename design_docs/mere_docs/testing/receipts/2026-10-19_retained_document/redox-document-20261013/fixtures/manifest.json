@@ -1,0 +1,40 @@
+{
+  "sources": [
+    {
+      "file": "monsters.json",
+      "source_repo": "https://github.com/merely-made/isocosm",
+      "revision": "e5f8deb60049e7622206ef2fa32cbe12e4bf822d",
+      "source_path": "crates/isometry-system/data/monsters.json",
+      "bytes": 319322,
+      "sha256": "135380bdd4ef9d42008483bc1f490c970e51784929951762f7259728ecae650b"
+    },
+    {
+      "file": "demo-pack.toml",
+      "source_repo": "https://github.com/merely-made/isocosm",
+      "revision": "e5f8deb60049e7622206ef2fa32cbe12e4bf822d",
+      "source_path": "crates/isometry-system/examples/packs/demo/isometry-pack.toml",
+      "bytes": 850,
+      "sha256": "23ac63a565fe38454d898440208cf451b47630ef463909714f3b3dea6a9f3ade"
+    },
+    {
+      "file": "monsters-32x.json",
+      "bytes": 10218307,
+      "sha256": "477229acf017f54eb8ce66347bbac29783fdfce2b6c1e6ff9004bf1eab69dd09",
+      "synthetic": true,
+      "construction": "repeat the exact raw array contents 32 times",
+      "records": 10688,
+      "note": "duplicate identities; size-only workload, not an admissible game pack"
+    },
+    {
+      "file": "annotated-pack.toml",
+      "bytes": 1115,
+      "sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c",
+      "synthetic": true,
+      "construction": "demo pack plus comments and foreign extension table"
+    }
+  ],
+  "original_monster_records": 334,
+  "redox_reference_revision": "b60dd4d099bcfbb8062e238306ee2063138765cd",
+  "mere_reference_revision": "5b3442ddd39084231b83d9d175161293f1c5cefd",
+  "scope": "Rust technique probe; does not execute REDox or introduce DOX"
+}

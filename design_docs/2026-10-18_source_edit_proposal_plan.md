@@ -3,8 +3,8 @@
 **Date:** 2026-10-18. **Status:** supplier and both adapters published with Git-only receiving qualification. Supplier:
 [Mere `70deef2c8`](https://github.com/merely-made/mere/commit/70deef2c8cf3d3410ae35b496a9396514070b24f).
 Initial local-override evidence is retained in the
-[implementation report](/Users/markik/Code/testing/shared-source-edit-20261018/REPORT.md)
-and [deduplication report](/Users/markik/Code/testing/source-edit-dedup-20261018/REPORT.md).
+[implementation report](mere_docs/testing/receipts/2026-10-19_retained_document/shared-source-edit-20261018/REPORT.md)
+and [deduplication report](mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-dedup-20261018/REPORT.md).
 
 ## Context and decision
 
@@ -71,7 +71,8 @@ The shared object cannot observe host mutation or create authority.
 ## Qualification and publication boundaries
 
 Workflows and raw receipts live in
-`Code/testing/shared-source-edit-20261018/`, with `core/`, `isocosm/`, and `knot/`
+`Code/testing/shared-source-edit-20261018/` on the M4 host (reports and small
+receipts copied to [receipts](mere_docs/testing/receipts/2026-10-19_retained_document/README.md)), with `core/`, `isocosm/`, and `knot/`
 owners. Consumer manifests use the canonical Mere Git URL. Initial local
 qualification used `branch = "main"`; the publication continuation below records
 the bounded Knot revision pin. Before the new package was published, explicit local
@@ -190,7 +191,7 @@ both root and standalone document locks; existing package versions and source
 revisions remain unchanged. This is a deliberate bounded exception to the
 usual first-party main-branch convention.
 
-The [publication report](/Users/markik/Code/testing/source-edit-publication-20261018/REPORT.md)
+The [publication report](mere_docs/testing/receipts/2026-10-19_retained_document/source-edit-publication-20261018/REPORT.md)
 retains fresh receiving logs, resolved Git metadata and workflow receipts.
 Old testing evidence is unchanged. The repository-wide documentation audit has
 exactly the same pre-existing diagnostics as the preceding pass, recorded in

@@ -1,0 +1,1482 @@
+{
+  "bounded_history_released": true,
+  "comment_and_format_domain_equivalence": true,
+  "domain_hash": "af52d5fec138779aff7e4e72464f411fa32a044fb033102753b8f1022dbf61bf",
+  "external_conflict_refused": true,
+  "failed_save_preserved_disk_and_marker": true,
+  "insertion": {
+    "base": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 2
+    },
+    "changes": [
+      {
+        "base_end": 449,
+        "base_start": 449,
+        "result_end": 550,
+        "result_start": 449
+      }
+    ],
+    "operation": "edit",
+    "result": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 3
+    }
+  },
+  "invalid_edit": {
+    "base": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 4
+    },
+    "changes": [
+      {
+        "base_end": 109,
+        "base_start": 89,
+        "result_end": 108,
+        "result_start": 89
+      }
+    ],
+    "operation": "edit",
+    "result": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 5
+    }
+  },
+  "overlapping_save_receipt": {
+    "dirty": true,
+    "saved": {
+      "document": "races",
+      "instance": 27,
+      "revision": 2
+    },
+    "source_hash": "3519ab925c25fb7c8ca1f57a4b96cd874c371de84f8089730d6223ea8aaacd9a"
+  },
+  "policy": "probe-toml10-pack-v1",
+  "policy_rejections": [
+    {
+      "case": "float",
+      "diagnostics": [
+        {
+          "end": 8,
+          "message": "policy excludes floats and date/time values",
+          "phase": "policy",
+          "stamp": {
+            "document": "float",
+            "instance": 6,
+            "revision": 1
+          },
+          "start": 0
+        }
+      ],
+      "retained": true
+    },
+    {
+      "case": "datetime",
+      "diagnostics": [
+        {
+          "end": 25,
+          "message": "policy excludes floats and date/time values",
+          "phase": "policy",
+          "stamp": {
+            "document": "datetime",
+            "instance": 7,
+            "revision": 1
+          },
+          "start": 0
+        }
+      ],
+      "retained": true
+    },
+    {
+      "case": "escape_e",
+      "diagnostics": [
+        {
+          "end": 5,
+          "message": "invalid escape sequence",
+          "phase": "syntax",
+          "stamp": {
+            "document": "escape_e",
+            "instance": 8,
+            "revision": 1
+          },
+          "start": 5
+        }
+      ],
+      "retained": true
+    },
+    {
+      "case": "escape_x",
+      "diagnostics": [
+        {
+          "end": 5,
+          "message": "invalid escape sequence",
+          "phase": "syntax",
+          "stamp": {
+            "document": "escape_x",
+            "instance": 9,
+            "revision": 1
+          },
+          "start": 5
+        }
+      ],
+      "retained": true
+    },
+    {
+      "case": "multiline_inline",
+      "diagnostics": [
+        {
+          "end": 6,
+          "message": "newline is not allowed in an inline table",
+          "phase": "syntax",
+          "stamp": {
+            "document": "multiline_inline",
+            "instance": 10,
+            "revision": 1
+          },
+          "start": 5
+        },
+        {
+          "end": 13,
+          "message": "expected new line",
+          "phase": "syntax",
+          "stamp": {
+            "document": "multiline_inline",
+            "instance": 10,
+            "revision": 1
+          },
+          "start": 12
+        },
+        {
+          "end": 15,
+          "message": "expected identifier",
+          "phase": "syntax",
+          "stamp": {
+            "document": "multiline_inline",
+            "instance": 10,
+            "revision": 1
+          },
+          "start": 14
+        }
+      ],
+      "retained": true
+    },
+    {
+      "case": "time_no_seconds",
+      "diagnostics": [
+        {
+          "end": 6,
+          "message": "zero-padded integers are not allowed",
+          "phase": "syntax",
+          "stamp": {
+            "document": "time_no_seconds",
+            "instance": 11,
+            "revision": 1
+          },
+          "start": 4
+        },
+        {
+          "end": 7,
+          "message": "unexpected token",
+          "phase": "syntax",
+          "stamp": {
+            "document": "time_no_seconds",
+            "instance": 11,
+            "revision": 1
+          },
+          "start": 6
+        },
+        {
+          "end": 9,
+          "message": "expected new line",
+          "phase": "syntax",
+          "stamp": {
+            "document": "time_no_seconds",
+            "instance": 11,
+            "revision": 1
+          },
+          "start": 7
+        }
+      ],
+      "retained": true
+    }
+  ],
+  "receipts": [
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 1
+      },
+      "changes": [
+        {
+          "base_end": 116,
+          "base_start": 97,
+          "result_end": 108,
+          "result_start": 97
+        }
+      ],
+      "operation": "edit",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 2
+      }
+    },
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 2
+      },
+      "changes": [
+        {
+          "base_end": 449,
+          "base_start": 449,
+          "result_end": 550,
+          "result_start": 449
+        }
+      ],
+      "operation": "edit",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 3
+      }
+    },
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 3
+      },
+      "changes": [
+        {
+          "base_end": 550,
+          "base_start": 449,
+          "result_end": 449,
+          "result_start": 449
+        }
+      ],
+      "operation": "edit",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 4
+      }
+    },
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 4
+      },
+      "changes": [
+        {
+          "base_end": 109,
+          "base_start": 89,
+          "result_end": 108,
+          "result_start": 89
+        }
+      ],
+      "operation": "edit",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      }
+    },
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "changes": [
+        {
+          "base_end": 1106,
+          "base_start": 0,
+          "result_end": 1115,
+          "result_start": 0
+        }
+      ],
+      "operation": "undo",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 6
+      }
+    },
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 6
+      },
+      "changes": [
+        {
+          "base_end": 1059,
+          "base_start": 1046,
+          "result_end": 1066,
+          "result_start": 1046
+        }
+      ],
+      "operation": "edit",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 7
+      }
+    },
+    {
+      "base": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 7
+      },
+      "changes": [
+        {
+          "base_end": 1122,
+          "base_start": 0,
+          "result_end": 1115,
+          "result_start": 0
+        }
+      ],
+      "operation": "undo",
+      "result": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 8
+      }
+    }
+  ],
+  "removal": {
+    "base": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 3
+    },
+    "changes": [
+      {
+        "base_end": 550,
+        "base_start": 449,
+        "result_end": 449,
+        "result_start": 449
+      }
+    ],
+    "operation": "edit",
+    "result": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 4
+    }
+  },
+  "replacement": {
+    "base": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 1
+    },
+    "changes": [
+      {
+        "base_end": 116,
+        "base_start": 97,
+        "result_end": 108,
+        "result_start": 97
+      }
+    ],
+    "operation": "edit",
+    "result": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 2
+    }
+  },
+  "retained_invalid_diagnostics": [
+    {
+      "end": 124,
+      "message": "invalid character in string",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 124
+    },
+    {
+      "end": 139,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 136
+    },
+    {
+      "end": 140,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 139
+    },
+    {
+      "end": 141,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 140
+    },
+    {
+      "end": 165,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 141
+    },
+    {
+      "end": 175,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 165
+    },
+    {
+      "end": 185,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 175
+    },
+    {
+      "end": 190,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 185
+    },
+    {
+      "end": 195,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 191
+    },
+    {
+      "end": 222,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 195
+    },
+    {
+      "end": 226,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 222
+    },
+    {
+      "end": 238,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 226
+    },
+    {
+      "end": 243,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 238
+    },
+    {
+      "end": 257,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 243
+    },
+    {
+      "end": 267,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 257
+    },
+    {
+      "end": 268,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 267
+    },
+    {
+      "end": 278,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 268
+    },
+    {
+      "end": 279,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 278
+    },
+    {
+      "end": 282,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 279
+    },
+    {
+      "end": 297,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 282
+    },
+    {
+      "end": 305,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 297
+    },
+    {
+      "end": 306,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 305
+    },
+    {
+      "end": 316,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 306
+    },
+    {
+      "end": 317,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 316
+    },
+    {
+      "end": 321,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 317
+    },
+    {
+      "end": 360,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 321
+    },
+    {
+      "end": 367,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 360
+    },
+    {
+      "end": 378,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 367
+    },
+    {
+      "end": 388,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 378
+    },
+    {
+      "end": 396,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 389
+    },
+    {
+      "end": 416,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 396
+    },
+    {
+      "end": 420,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 416
+    },
+    {
+      "end": 432,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 420
+    },
+    {
+      "end": 443,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 432
+    },
+    {
+      "end": 469,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 443
+    },
+    {
+      "end": 478,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 469
+    },
+    {
+      "end": 488,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 478
+    },
+    {
+      "end": 493,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 488
+    },
+    {
+      "end": 497,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 494
+    },
+    {
+      "end": 524,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 497
+    },
+    {
+      "end": 528,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 524
+    },
+    {
+      "end": 540,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 528
+    },
+    {
+      "end": 545,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 540
+    },
+    {
+      "end": 559,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 545
+    },
+    {
+      "end": 569,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 559
+    },
+    {
+      "end": 570,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 569
+    },
+    {
+      "end": 579,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 570
+    },
+    {
+      "end": 580,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 579
+    },
+    {
+      "end": 583,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 580
+    },
+    {
+      "end": 598,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 583
+    },
+    {
+      "end": 606,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 598
+    },
+    {
+      "end": 607,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 606
+    },
+    {
+      "end": 616,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 607
+    },
+    {
+      "end": 617,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 616
+    },
+    {
+      "end": 621,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 617
+    },
+    {
+      "end": 646,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 621
+    },
+    {
+      "end": 654,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 646
+    },
+    {
+      "end": 664,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 654
+    },
+    {
+      "end": 669,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 664
+    },
+    {
+      "end": 678,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 670
+    },
+    {
+      "end": 705,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 678
+    },
+    {
+      "end": 709,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 705
+    },
+    {
+      "end": 721,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 709
+    },
+    {
+      "end": 726,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 721
+    },
+    {
+      "end": 740,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 726
+    },
+    {
+      "end": 750,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 740
+    },
+    {
+      "end": 751,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 750
+    },
+    {
+      "end": 759,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 751
+    },
+    {
+      "end": 760,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 759
+    },
+    {
+      "end": 763,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 760
+    },
+    {
+      "end": 801,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 763
+    },
+    {
+      "end": 804,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 801
+    },
+    {
+      "end": 814,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 804
+    },
+    {
+      "end": 823,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 814
+    },
+    {
+      "end": 827,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 824
+    },
+    {
+      "end": 854,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 827
+    },
+    {
+      "end": 858,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 854
+    },
+    {
+      "end": 870,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 858
+    },
+    {
+      "end": 875,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 870
+    },
+    {
+      "end": 889,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 875
+    },
+    {
+      "end": 899,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 889
+    },
+    {
+      "end": 900,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 899
+    },
+    {
+      "end": 903,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 900
+    },
+    {
+      "end": 904,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 903
+    },
+    {
+      "end": 907,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 904
+    },
+    {
+      "end": 1037,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 907
+    },
+    {
+      "end": 1044,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 1037
+    },
+    {
+      "end": 1050,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 1045
+    },
+    {
+      "end": 1051,
+      "message": "unexpected token",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 1050
+    },
+    {
+      "end": 1053,
+      "message": "expected new line",
+      "phase": "syntax",
+      "stamp": {
+        "document": "demo-pack",
+        "instance": 1,
+        "revision": 5
+      },
+      "start": 1052
+    }
+  ],
+  "revision_and_handle_fences": true,
+  "saved_cases": [
+    {
+      "diagnostic_count": 0,
+      "domain_hash": "af52d5fec138779aff7e4e72464f411fa32a044fb033102753b8f1022dbf61bf",
+      "file": "annotated.toml",
+      "name": "annotated",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "annotated",
+          "instance": 19,
+          "revision": 2
+        },
+        "source_hash": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c"
+      },
+      "sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c"
+    },
+    {
+      "diagnostic_count": 0,
+      "domain_hash": "8399077f9192336f1093162151e0610e5700098e17df055c425072153f17dbb9",
+      "file": "unicode-crlf.toml",
+      "name": "unicode-crlf",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "unicode-crlf",
+          "instance": 21,
+          "revision": 2
+        },
+        "source_hash": "15504c7f5dd9b205294b420a8ddc11511cd97b16cf74679ccaa1086d9f4851bb"
+      },
+      "sha256": "15504c7f5dd9b205294b420a8ddc11511cd97b16cf74679ccaa1086d9f4851bb"
+    },
+    {
+      "diagnostic_count": 90,
+      "domain_hash": null,
+      "file": "incomplete.toml",
+      "name": "incomplete",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "incomplete",
+          "instance": 23,
+          "revision": 2
+        },
+        "source_hash": "7a4a4a8e70d9c5546de9c354889f2f3ded87ad23dd3f7fbafcce6e47a9ccd3df"
+      },
+      "sha256": "7a4a4a8e70d9c5546de9c354889f2f3ded87ad23dd3f7fbafcce6e47a9ccd3df"
+    },
+    {
+      "diagnostic_count": 0,
+      "domain_hash": "61b4f314c3e37df39f9c190b1706de2e4d3254d4341b36eb0389a4cdca0cf892",
+      "file": "edited.toml",
+      "name": "edited",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "edited",
+          "instance": 25,
+          "revision": 2
+        },
+        "source_hash": "cf171677f34bae93ea0e7557eb3951b0a920e75a629632cc3e2be360b8d2e011"
+      },
+      "sha256": "cf171677f34bae93ea0e7557eb3951b0a920e75a629632cc3e2be360b8d2e011"
+    }
+  ],
+  "status": "passed",
+  "typed_pack_generators": 4,
+  "undo": {
+    "base": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 5
+    },
+    "changes": [
+      {
+        "base_end": 1106,
+        "base_start": 0,
+        "result_end": 1115,
+        "result_start": 0
+      }
+    ],
+    "operation": "undo",
+    "result": {
+      "document": "demo-pack",
+      "instance": 1,
+      "revision": 6
+    }
+  },
+  "unknown_content_hashed": true,
+  "worker_snapshot": true
+}

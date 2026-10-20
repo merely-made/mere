@@ -1,7 +1,7 @@
 # Foundation family promotion
 
 **Date:** 2026-10-19
-**Status:** Source promotion and consumer cutover completed. Boundary-consolidation continuation scoped on 2026-10-19; implementation has not started. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
+**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19; observations/action evidence, custody process design and source-home follow-up remain scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
 **Receipt budget:** 100 MB total across this migration. Keep compact command summaries and source hashes; do not copy model weights, build trees or historical audit receipts.
 
 ## Decision
@@ -196,7 +196,8 @@ records zero newly missing documents; the historic snapshot was not edited.
 The owner clarified that names and umbrella repositories are secondary. The
 objective is one implementation per shared responsibility, with explicit
 ownership of state, permissions, execution, lifetime and reported outcomes.
-This is a scoped continuation, not implementation or acceptance evidence. The
+The scope below defines separate acceptance gates. Execution/shutdown progress
+and qualification are recorded at the end; the other lanes remain scoped. The
 completed source promotion above remains its own checkpoint.
 
 ### Responsibility boundaries
@@ -370,3 +371,201 @@ hashes, compact outcomes and required failure controls. Reuse the approved share
 Cargo target, preserve unrelated work, and use a worktree only for a real
 collision. This scoping pass needs documentation checks only and creates no build
 output or isolated toolchain home.
+
+
+### Execution slice progress, 2026-10-19
+
+- Armillary published `5d8754dc2a00be02d82b075441ac9ea44aa4f135`: shared
+  ordered-close mechanics, optional Tokio task scopes, observable dedicated and
+  pooled actor completion, distinct panic traces, reusable draining and terminal
+  admission fencing. Cancelling a drain future leaves ownership/results in the
+  scope. A pooled-join regression fails on the former source and passes after
+  repair. Eighteen focused unit/integration/doc tests pass with Tokio; fourteen
+  pass without the feature, and normal synchronous dependencies contain no Tokio.
+- ESP published `ddb5037bae30bd89f9e558c7dd5c9065eedfb162`, incorporating the
+  concurrent repaired-Eidetic source adoption. Its actor/persistence receiving
+  configuration passes 105 tests with one existing ignore.
+- Mere refreshed onto `d5c26e08` before receiving qualification; unrelated
+  renderer, Djot, keyboard, standards and comms work is preserved. Its two former
+  generic implementations are removed, and callers use Armillary directly.
+  Receiving changes fold inference actor loss into failed run records, refuse
+  late commands, preserve unrequested retained user pauses and collect close
+  failures while attempting both actor and bridge joins. Native receiving gates
+  pass on the final supplier cohort recorded below.
+- The upstream ESP change requires its repaired Eidetic cohort across actual
+  storage-sharing suppliers. Source-only cohort alignment is part of integration;
+  the historical promotion receipts and pins are retained rather than rewritten.
+
+New compact command receipts use the `execution-` prefix under
+`support/family-promotion/`; they belong to this continuation's 100 MB total
+budget. Pool Q112/Q113, custody process separation and later observation/action
+work remain separately scoped. No success claim for those gates is implied.
+
+
+### Execution/shutdown qualification, 2026-10-19
+
+The first implementation slice is qualified. The final immutable execution
+supplier is Armillary `e67c5def1c735be047492a867bcdc8b41fba22b8`, and ESP
+`b20ae7db257dae83493031efd92da3a102c44a48` adopts it. The later Armillary
+refinements preserve the existing handle's `Sync` property and retain cumulative
+terminal task failures across repeated/concurrent closes. Reusable drains still
+consume their own reports; they do not reopen a terminally closed scope.
+
+The old task and ordered-close modules are removed from Graphshell and Distillery.
+Callers import Armillary directly, with no parallel implementation or forwarding
+module left behind. Host-specific close order and domain cancellation remain
+with their owners. Djinn's real resident and embedded-host close paths surface
+tracked-task failures while continuing resource cleanup. The receiving tests
+also assert clean fixture teardown rather than discard its report.
+
+Q217's two public counterexamples are repaired in the bounded receiving lane:
+actor update EOF is processed only after draining already emitted updates;
+unfinished active work becomes Failed and is written to its journal, or a journal
+refusal is surfaced. Late ask/cancel/pause/resume commands refuse a disconnected
+actor. An already-disconnected actor cannot append a queued continuation to an
+unchanged retained user pause. Close attempts both joins, reports their failures,
+and preserves the result for repeated/concurrent callers. These are native
+synthetic-provider/journal receipts, not large-model or GPU qualification.
+
+| Final gate | Observed result |
+|---|---|
+| Armillary with optional Tokio | 19 unit/integration/doc tests pass, including interrupted close, repeated failure reporting, pooled cleanup and panic outcomes |
+| ESP actor/persistence receiver | 105 tests pass; one existing scale case ignored |
+| Distillery inference library, actor-loss receiver and resident teardown | 40 tests pass |
+| Graphshell endpoint with door | 35 tests pass after upstream custody integration |
+| Djinn resident-task integration | Two tests pass, including retained panic reporting and the detached-work control |
+| Fleece actor API adoption | One selected no-network-acquisition test passes; 36 unrelated tests filtered |
+| Independent synchronous Git consumer | Runs against the final Armillary pin; normal dependency tree has no Tokio |
+| Graphshell browser target | Wasm compile check passes; browser runtime and human acceptance are not claimed |
+| Canonical Mere source graph | 22 consumed promoted packages each resolve one expected source; root registry package versions unchanged |
+| Affected standalone lockfiles | Eight roots resolve and revalidate with `--locked`; this is not runtime qualification of every probe |
+
+Compact final command receipts are the `execution-*-qualified.json` files and
+`execution-armillary-final.json`, `execution-esp-final.json`,
+`execution-fleece-adoption.json`, `execution-browser-compile.json`,
+`execution-standalone-locks-qualified.json` and
+`execution-source-graph-qualified.json` under `support/family-promotion/`.
+Earlier passes and the failing pre-repair pooled-join control remain alongside
+them. The independent consumer is `support/fixtures/armillary-consumer`.
+
+Supplier alignment preserved the concurrently published Eidetic repair at
+`543f5ff38f87a09afc04dbc59f57c2dfbc6a9943` and Gemot's adoption at
+`67ce0ac3e2b48be951a677a9eca245eaabd56d63`. Murm's native source-only adoption is
+published at `da453213ccce1768783ffd77e47e1bce18e80550`; its native graph passes
+locked resolution and its code is compiled/used by the receiving resident gates.
+No unfiltered Murm transport-suite or physical-radio pass is claimed.
+
+**Deferred standalone renderer root:** `crates/cambium/examples/genet_web_smoke`
+needed a moving Genet/renderer source refresh while resolving its historical
+standalone graph. The offline failure is retained, and the later online probe
+was stopped to keep this unrelated renderer work outside the execution slice.
+This slice leaves that manifest untouched; later upstream supplier-cohort edits
+remain preserved. See
+`execution-standalone-smoke-deferred.json`; the fresh Cargo-owned partial Genet
+checkout is retained, not deleted. The maintained browser target passes its own
+separate compile gate. This is not a full renderer-prototype adoption receipt.
+
+Q112/Q113 pool admission and worker retirement remain open. This work does not
+establish bounded pool-worker lifetime. The previously recorded full-tree
+license-header and document-judgment debt is not repaired by this slice.
+Observability/action evidence, custody process separation and repository grouping
+retain their scoped gates. All builds reused `C:\t\cargo-targets\mere`; no
+isolated Cargo home, target or worktree was created for this implementation.
+
+
+Final upstream integration (2026-10-19): rebased the receiving change onto Mere
+`48fd3385` and preserved the concurrent coherent-supplier adoption, deterministic
+Mesh receipts and `e122a071` custodian-bound payload sealing. Upstream manifest
+policy, including Eidetic's disabled default features, remains intact; execution
+suppliers stay pinned to the tested Armillary/ESP cohort above. The combined
+Graphshell door gate passes 35 tests. Djinn passes both task tests and the admitted
+custody/profile-rotation case; its separate child receipt-host fixture remains
+ignored by the parent test runner. Distillery again passes all 40 selected tests,
+and the maintained browser target again compiles. The integrated source graph
+still contains 22 canonical promoted packages and all eight selected standalone
+locks revalidate. `execution-*-integrated.json` and
+`execution-integration-basis.json` retain this later receiving evidence without
+overwriting the earlier qualification receipts.
+
+Publishing integration also preserves `4d60510c`, the concurrent Cambium
+publishing-version changes. After aligning the three local package-version rows,
+Cargo regenerated the root lock and validated the full offline locked graph;
+the 22 promoted supplier sources remain unchanged. See
+`execution-publish-lock-qualified.json`. The earlier unseeded resolution was
+stopped after sustained resolver work, and a seeded locked attempt correctly
+refused the still-incomplete lock; both preparation receipts are retained.
+
+The initial publishing graph exposed another unfinished consumer migration:
+Knot's older Cambium/Illume requirements selected parallel Git and local
+versions. The resulting Djinn compile failure is retained in
+`execution-djinn-publish.json`; successful metadata alone did not establish
+receiving compatibility. Adopted Knot's published GUI requirement correction,
+then aligned its ESP intake with this slice's tested supplier in Knot
+`9832691735ed63a1bbb5f65dc0f5857e6f121dbc`. Cargo regenerated and validated the
+full locked graph with one local Cambium, one local Illume and the same 22
+canonical promoted supplier sources. See `execution-knot-cohort-qualified.json`.
+The earlier failed source comparison also remains retained. This source-only
+Knot adoption is qualified through Mere's receiving gates, not an unfiltered
+standalone Knot suite. Later receiving reruns have separate
+`execution-*-publish-aligned.json` receipts.
+
+
+### Repaired supplier receiving checkpoints on macOS
+
+The initial promotion table above is historical. The repaired receiving cohort is
+Eidetic `543f5ff3`, Gemot `67ce0ac3`, ESP `af5597c6` and Armillary `68275599`.
+Mere's execution receiver advances the last two to the separately qualified
+ESP `b20ae7db` and Armillary `e67c5def`; consumers without that execution seam
+retain their qualified pins. Source identity is checked within each actual
+consuming graph rather than inferred from declarations or unused patches.
+
+| Consumer | Published receiving checkpoint | Receiving evidence |
+|---|---|---|
+| Cleromancy | `230347a9` | Personal-sync all-targets check; 17 core tests |
+| Knot | `c6a442db` | Root library check; locked root, document and site graphs |
+| Murm | `f9fe8507` | Six session-lane tests; Signalman app check |
+| Isocosm | `028a5ef1` | Seven witnessed-lifecycle tests; five locked roots |
+| merelyllc.com | `9b6bd436` | Site check; one selected repo-graph test; both locked roots |
+| Turnstone | `01658c73` | Published manifest and lock checked; native evidence remains with its owner |
+| Woodshed | `f1f2df08` | 331 core/graph tests; Hocket, Redshank and recipe checks; four locked roots |
+
+Required SDK intake preserves the concurrent Cambium 0.4 requirement. Mere
+`48fd3385` repairs the promoted family source identities; consumers with the new
+GUI bounds use published SDK `4d60510c`. Cargo-generated lock closure changes
+are retained in their receipts. The only receiving adapter changes are removal
+of three obsolete semantic `decay_progress` initializers in Cleromancy and
+explicit anonymous management-geometry fields in Signalman. The latter does not
+invent source-link identity or link-opening authority from a management edge.
+
+Knot's concurrent ESP alignment is preserved: its root resolves ESP `b20ae7db`
+and Armillary `68275599`; the nested document/site supplier patches are unused
+in their actual graphs. The root lock closure was regenerated and checked after
+the alignment. This intake does not include the separate Knot checkpoint repair.
+
+The macOS receiving extension preserves Mere `8f26d962` and its direct Armillary
+imports, deleted local task/close modules, browser qualification and upstream
+receipts. It adds one retained collection of journal failures to the existing
+run table. Lock and close report every observed journal refusal; an explicit
+host lock remains authoritative after actor loss. Failed resume admission
+restores the retained pause instead of leaving a queued continuation. Buffered
+completion, actor panic and repeated close results have deterministic receiving
+controls. The dedicated/pooled controls extend the existing
+`support/fixtures/armillary-consumer` host rather than add another fixture.
+
+Final macOS checks pass: 41 Distillery library tests plus four shutdown/close/
+resident cases; nine Djinn receiving tests with its binary target compiled;
+43 Graphshell endpoint tests; four independent synchronous actor controls; eight
+locked metadata roots; and the port boundary check. Both selected before-repair
+controls fail at their intended assertions, including the durable-lock false
+success on `8f26d962`. The stable final Distillery/Djinn reruns start from a clean
+receiving checkpoint. The synchronous fixture's normal dependency graph excludes
+Tokio. Counts describe their individual configurations, not a combined unique
+suite or new native UI qualification.
+
+Compact records for this receiving extension and the consumer publications are
+`support/family-promotion/consumer-repaired-cohort-publication.json` and
+`support/family-promotion/execution-macos-receiving.json`. They retain source
+hashes, exact commands, exit results and the failed pre-repair controls. These
+are CPU/source checks; native UI, physical audio/radio, heavy models and the
+Knot checkpoint lane keep their own acceptance records. Q112/Q113 pool admission
+and worker lifetime remain open.

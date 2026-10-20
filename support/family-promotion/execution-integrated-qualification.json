@@ -1,0 +1,15 @@
+{
+  "integrated_base": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+  "required_gates": [
+    "execution-armillary-final",
+    "execution-esp-final",
+    "execution-distillery-integrated",
+    "execution-door-integrated",
+    "execution-djinn-integrated",
+    "execution-fleece-adoption",
+    "execution-independent-qualified",
+    "execution-browser-integrated"
+  ],
+  "later_lanes": "remain scoped",
+  "pool_findings": "Q112/Q113 open"
+}

@@ -1,0 +1,84 @@
+[
+  {
+    "name": "feature-tests",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+      "test",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-tests",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+      "test",
+      "--locked",
+      "-p",
+      "isometry-system"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "build",
+    "command": [
+      "cargo",
+      "--config",
+      "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+      "build",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--bin",
+      "pack-author",
+      "--example",
+      "pack_fixture"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--config",
+      "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--all-targets",
+      "--no-deps"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "msrv",
+    "command": [
+      "cargo",
+      "+1.97.1",
+      "--config",
+      "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+      "check",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--bin",
+      "pack-author"
+    ],
+    "exit_code": 0
+  }
+]

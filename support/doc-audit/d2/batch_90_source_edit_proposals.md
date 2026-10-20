@@ -16,7 +16,9 @@ None. Published commits and Git-only receiving checks are linked separately from
 ### Contradictions
 
 None. The plan records the user's new authorization for a shared proposal API;
-the brief continuation supersedes its earlier blanket deferral.
+the brief's 2026-10-18 shared proposal continuation supersedes its earlier
+blanket deferral. That continuation moved on 2026-10-19 to the
+[retained document evidence log](../../../design_docs/mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md#shared-proposal-continuation--2026-10-18).
 
 ### Recommended action
 

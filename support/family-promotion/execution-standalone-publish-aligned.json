@@ -1,0 +1,46 @@
+{
+  "base": "4d60510c",
+  "knot": "9832691",
+  "results": [
+    {
+      "manifest": "ports\\distillery\\probe\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\distillery\\probe\\native-fixture\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\distillery\\probe\\remote-fixture\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\distillery\\probe\\repros\\burn_browser_embedding\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\distillery\\probe\\repros\\cubek_browser_extrema\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\distillery\\probe\\session-fixture\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\graphshell\\web\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    },
+    {
+      "manifest": "ports\\muniment-opfs-probe\\Cargo.toml",
+      "exit_code": 0,
+      "locked_exit_code": 0
+    }
+  ]
+}

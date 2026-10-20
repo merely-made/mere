@@ -1,0 +1,2 @@
+    Checking retained-document-probe v0.1.0 (/Users/markik/Code/testing/redox-document-20261013)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s

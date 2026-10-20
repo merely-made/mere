@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "diagnostic_count": 0,
+      "domain_hash": "af52d5fec138779aff7e4e72464f411fa32a044fb033102753b8f1022dbf61bf",
+      "file": "annotated.toml",
+      "name": "annotated",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "annotated",
+          "instance": 19,
+          "revision": 2
+        },
+        "source_hash": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c"
+      },
+      "sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c"
+    },
+    {
+      "diagnostic_count": 0,
+      "domain_hash": "8399077f9192336f1093162151e0610e5700098e17df055c425072153f17dbb9",
+      "file": "unicode-crlf.toml",
+      "name": "unicode-crlf",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "unicode-crlf",
+          "instance": 21,
+          "revision": 2
+        },
+        "source_hash": "15504c7f5dd9b205294b420a8ddc11511cd97b16cf74679ccaa1086d9f4851bb"
+      },
+      "sha256": "15504c7f5dd9b205294b420a8ddc11511cd97b16cf74679ccaa1086d9f4851bb"
+    },
+    {
+      "diagnostic_count": 90,
+      "domain_hash": null,
+      "file": "incomplete.toml",
+      "name": "incomplete",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "incomplete",
+          "instance": 23,
+          "revision": 2
+        },
+        "source_hash": "7a4a4a8e70d9c5546de9c354889f2f3ded87ad23dd3f7fbafcce6e47a9ccd3df"
+      },
+      "sha256": "7a4a4a8e70d9c5546de9c354889f2f3ded87ad23dd3f7fbafcce6e47a9ccd3df"
+    },
+    {
+      "diagnostic_count": 0,
+      "domain_hash": "61b4f314c3e37df39f9c190b1706de2e4d3254d4341b36eb0389a4cdca0cf892",
+      "file": "edited.toml",
+      "name": "edited",
+      "receipt": {
+        "dirty": false,
+        "saved": {
+          "document": "edited",
+          "instance": 25,
+          "revision": 2
+        },
+        "source_hash": "cf171677f34bae93ea0e7557eb3951b0a920e75a629632cc3e2be360b8d2e011"
+      },
+      "sha256": "cf171677f34bae93ea0e7557eb3951b0a920e75a629632cc3e2be360b8d2e011"
+    }
+  ],
+  "fresh_process": true,
+  "status": "passed"
+}
