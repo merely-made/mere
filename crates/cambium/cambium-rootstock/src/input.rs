@@ -580,6 +580,11 @@ where
             self.move_focused_text_visual(press, base);
         }
         self.after_dispatch();
+        // Key handlers and after-dispatch hooks can change the DOM. Apply
+        // those mutations before hover/focus restyling walks the new tree;
+        // inserted nodes have no computed style until layout consumes them.
+        let (width, height) = self.s.layout_size;
+        self.relayout(width, height);
         // Focus may have moved (Tab, or a handler's `set_focus`): refresh the
         // `:hover` / `:focus` restyle. Cheap — it returns early unless the
         // hovered/focused pair actually changed.
@@ -712,5 +717,69 @@ where
                 window.request_redraw();
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod key_layout_regression {
+    use crate::HostTree as _;
+    use cambium::{AnyView, GenetCtx, GenetElement, PointerClick, button, el};
+    use std::{cell::RefCell, rc::Rc, sync::Arc};
+
+    struct App {
+        reveal: bool,
+    }
+    type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
+    type Logic = fn(&App) -> Child;
+
+    fn view(app: &App) -> Child {
+        let first = button("first", |_: &mut App, _: PointerClick| {});
+        if app.reveal {
+            Box::new(el(
+                "main",
+                (first, button("inserted", |_: &mut App, _: PointerClick| {})),
+            ))
+        } else {
+            Box::new(el("main", first))
+        }
+    }
+
+    #[test]
+    fn key_dispatch_relayouts_inserted_focused_control_before_focus_restyle() {
+        let mut state: crate::HostState<App, Logic, Child> = crate::HostState::new();
+        state.shared.sheet = "main { display:block; } button { display:block; width:100px; height:30px; } button:focus { height:80px; }".into();
+        state.runner = Some(crate::Runner::new(
+            Rc::new(RefCell::new(crate::ScriptedDom::new())),
+            view as Logic,
+            App { reveal: false },
+        ));
+        let mut hooks: crate::HostHooks<App, Logic, Child> = crate::HostHooks::inert();
+        hooks.after_dispatch = Box::new(|ctx| {
+            ctx.runner.update(|app| app.reveal = true);
+            let inserted = ctx.runner.focusables().last().copied();
+            ctx.runner.set_focus(inserted);
+        });
+        let wake = crate::HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+        let mut host = crate::Host::new(crate::HostOptions::default(), None, hooks, state, wake);
+        host.relayout(320.0, 180.0);
+        let first = host.s.runner.as_ref().unwrap().focusables()[0];
+        host.s.runner.as_mut().unwrap().set_focus(Some(first));
+
+        host.key(&crate::KeyPress::named(crate::NamedKey::Enter));
+
+        let runner = host.s.runner.as_ref().unwrap();
+        let inserted = *runner.focusables().last().unwrap();
+        assert_eq!(runner.focus(), Some(inserted));
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let window = crate::WindowDom::new(&dom, runner.mount());
+        let rect = host
+            .s
+            .layout
+            .as_ref()
+            .unwrap()
+            .painted_rect(&window, inserted)
+            .unwrap();
+        assert_eq!(rect.3, 80.0);
     }
 }

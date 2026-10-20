@@ -17,6 +17,8 @@ Sets tag-axis correction (2026-10-17): the [projection grammar adoption plan](me
 
 Metre editing continuation (2026-10-17): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#metre-editing-and-shared-span-intents-2026-10-17) records qualified shared span intents after concrete Knot/Woodshed consumers, explicit Graphshell copy editing, and Knot native sealed save/reopen evidence.
 
+Portable scene-document supplier (2026-10-19): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#portable-scene-document-supplier-2026-10-19) records the canonical opt-in Djot transport, free-metre and unknown-stress presentation, and focused Mere/Rootstock checks. Woodshed receiving and native playback remain separate qualification gates.
+
 Template scene framing follow-up (2026-10-16): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#template-scene-vertical-framing-2026-10-16) records qualified shared vertical framing and inverse picking for long template timelines, with five surface checks and three reviewed native Woodshed captures.
 
 # Mere Documentation Index

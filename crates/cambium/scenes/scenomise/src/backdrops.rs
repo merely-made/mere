@@ -100,6 +100,17 @@ pub struct VerseLine {
 pub struct Syllable {
     pub text: String,
     pub stressed: bool,
+    /// False when the source supplied a syllable but no stress judgment.
+    /// Legacy records keep their historical known-stress interpretation.
+    #[serde(default = "stress_is_known", skip_serializing_if = "is_true")]
+    pub stress_known: bool,
+}
+
+fn stress_is_known() -> bool {
+    true
+}
+fn is_true(value: &bool) -> bool {
+    *value
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -349,7 +360,7 @@ impl SceneInput {
         match &self.facts {
             SceneFacts::MetreGrid(grid) => {
                 check(
-                    (1..=32).contains(&grid.feet)
+                    (0..=32).contains(&grid.feet)
                         && (1..=8).contains(&grid.positions_per_foot)
                         && grid.lines.len() <= 256,
                     "metre",
@@ -874,7 +885,16 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
             .collect(),
     };
     draw_template(out, src, &template);
-    let right = template.x(max_syllables as f32) + 38.0;
+    // Free verse retains source text without inventing syllable positions.
+    // Caption width reserves presentation space only.
+    let caption_width = |line: &VerseLine| line.text.chars().count() as f32 * 11.0;
+    let text_right = grid
+        .lines
+        .iter()
+        .filter(|line| line.syllables.is_empty())
+        .map(|line| 48.0 + caption_width(line) + 38.0)
+        .fold(0.0_f32, f32::max);
+    let right = (template.x(max_syllables as f32) + 38.0).max(text_right);
     out.scene.bounds = Rect::new(
         Vec2::ZERO,
         Size2::new(right + 90.0, 42.0 + row * grid.lines.len().max(1) as f32),
@@ -882,12 +902,20 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
     let mut rows = Vec::new();
     for (i, line) in grid.lines.iter().enumerate() {
         let y = template.y(i as u16);
-        let detail = format!(
-            "{} syllables / {} expected; rhyme {}",
-            line.syllables.len(),
-            n,
-            line.rhyme_group.as_deref().unwrap_or("unspecified")
-        );
+        let detail = if n == 0 {
+            format!(
+                "{} supplied units; form unspecified; rhyme {}",
+                line.syllables.len(),
+                line.rhyme_group.as_deref().unwrap_or("unspecified")
+            )
+        } else {
+            format!(
+                "{} syllables / {} expected; rhyme {}",
+                line.syllables.len(),
+                n,
+                line.rhyme_group.as_deref().unwrap_or("unspecified")
+            )
+        };
         let id = mark(
             out,
             line.key.clone(),
@@ -904,6 +932,12 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
             size: Size2::new(36.0, 44.0),
         });
         rows.push(id);
+        if line.syllables.is_empty() {
+            out.guides.push(GuideLabel {
+                at: Vec2::new(48.0 + caption_width(line) / 2.0, y + 17.0),
+                text: line.text.clone(),
+            });
+        }
         for (j, syllable) in line.syllables.iter().enumerate() {
             let Some(span) = grid.placement(i, j) else {
                 out.unplaced.push(Unplaced {
@@ -915,20 +949,34 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
                 continue;
             };
             let sx = template.centre(i as u16, span).x;
-            let h = if syllable.stressed { 24.0 } else { 7.0 };
+            let h = if !syllable.stress_known {
+                12.0
+            } else if syllable.stressed {
+                24.0
+            } else {
+                7.0
+            };
             mark(
                 out,
                 format!("{}/syllable/{j}", line.key),
                 &line.source,
                 syllable.text.clone(),
                 format!(
-                    "{} candidate stress · syllable {} · start {} / span {} metrical positions",
-                    if syllable.stressed { "strong" } else { "weak" },
+                    "{} stress · syllable {} · start {} / span {} metrical positions",
+                    if !syllable.stress_known {
+                        "unknown"
+                    } else if syllable.stressed {
+                        "strong"
+                    } else {
+                        "weak"
+                    },
                     j + 1,
                     span.start,
                     span.length
                 ),
-                if syllable.stressed {
+                if !syllable.stress_known {
+                    MarkRole::Node
+                } else if syllable.stressed {
                     MarkRole::StrongStress
                 } else {
                     MarkRole::WeakStress
@@ -947,7 +995,7 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
                 text: group.clone(),
             });
         }
-        if line.syllables.len() != n {
+        if n != 0 && line.syllables.len() != n {
             out.diagnostics.push(format!(
                 "{}: {} syllables, template expects {n}",
                 line.key,

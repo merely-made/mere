@@ -20,6 +20,23 @@ fn document() -> SceneDocument {
         }],
     )
 }
+
+#[cfg(feature = "djot")]
+#[test]
+fn attributed_djot_and_json_share_the_same_document_facts() {
+    let d = document();
+    let source = d.to_djot("progression").unwrap();
+    assert_eq!(SceneDocument::from_djot(&source).unwrap(), d);
+    assert_eq!(SceneDocument::parse_text(&source).unwrap(), d);
+    assert_eq!(
+        SceneDocument::parse_text(&serde_json::to_string(&d).unwrap()).unwrap(),
+        d
+    );
+    assert!(SceneDocument::from_djot(&format!("{source}\n{source}")).is_err());
+    assert!(SceneDocument::from_djot("```json\n{}\n```\n").is_err());
+    let with_context = format!("Before\n\n{{#outer}}\n:::: container\n{source}::::\n\nAfter\n");
+    assert_eq!(SceneDocument::from_djot(&with_context).unwrap(), d);
+}
 #[test]
 fn linked_reading_is_selected_by_occurrence_and_round_trips() {
     let d = document();
