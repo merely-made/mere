@@ -43,6 +43,12 @@ async fn open(route: &str) -> (AppBrokerClient, EndpointDescriptor) {
     (c, d)
 }
 async fn attach(c: &mut AppBrokerClient, d: &EndpointDescriptor, id: pandect::SessionId) {
+    let current = c.snapshot(d.projections[1].request.clone()).await.unwrap();
+    if current.scene.tables.sources.iter().flatten().any(|source| {
+        source.adapter == SESSION_ITEM_SOURCE && source.id == id.as_uuid().to_string()
+    }) {
+        return;
+    }
     let s = c.snapshot(d.projections[0].request.clone()).await.unwrap();
     let Some(intent) = mere_overmap::route::intent(
         &mere_view::MereViewRequest::Session(id, mere_view::SessionStep::Switch),
@@ -111,6 +117,18 @@ async fn main() {
                     r,
                     CarrierResponseBody::Intent(IntentResult::Accepted)
                 ));
+                let listed = c.snapshot(d.projections[0].request.clone()).await.unwrap();
+                let minted = listed
+                    .scene
+                    .tables
+                    .sources
+                    .iter()
+                    .flatten()
+                    .filter(|source| source.adapter == SESSIONS_SOURCE)
+                    .filter_map(|source| uuid::Uuid::parse_str(&source.id).ok())
+                    .find(|id| !ids.contains(id))
+                    .expect("mint disclosed a new session");
+                attach(&mut c, &d, pandect::SessionId(minted)).await;
             }
             let s = c.snapshot(d.projections[1].request.clone()).await.unwrap();
             let session_item = s
@@ -140,6 +158,10 @@ async fn main() {
             )
             .await;
         }
+        assert_ne!(
+            ids[0], ids[1],
+            "the private and chosen graphs must be distinct"
+        );
         println!("{}", json!({"private":ids[0],"chosen":ids[1]}));
     } else if args[0] == "read" {
         let id = pandect::SessionId(uuid::Uuid::parse_str(&args[2]).unwrap());
