@@ -171,26 +171,9 @@ impl Graph {
                 // installed by `add_node_with_id` while importing that ordinal.
                 graph.set_node_last_session_visited(key, pnode.last_session_visited);
             }
-            // The node's restored current page comes from the shared nav history.
-            if let Some(current_url) = graph.nav.current_url(node_id)
-                && !current_url.is_empty()
-            {
-                let preserve_route_identity = graph.inner.node(key).is_some_and(|node| {
-                    node.primary_address().address_kind() == AddressKind::GraphshellClip
-                });
-                if !preserve_route_identity {
-                    // Recompute MIME hint and Primary address from the
-                    // restored URL. update_node_url then reindexes the
-                    // url_to_nodes map.
-                    if let Some(node) = graph.inner.node_mut(key) {
-                        node.media_type = detect_mime(&current_url, None);
-                        if let Some(primary) = node.addresses.first_mut() {
-                            *primary = address_from_url(&current_url);
-                        }
-                    }
-                    let _ = graph.update_node_url(key, current_url);
-                }
-            }
+            // The saved node address is the owner of the current address. The
+            // navigation cursor is only a history position and never rewrites it
+            // (SetNodeUrl changes the address without a visit).
         }
 
         let mut surface_pair_ordinals = BTreeMap::new();
