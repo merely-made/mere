@@ -29,7 +29,7 @@ image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
 [dependencies]
 # The stock this is grafted onto. Everything below is what a browser adds.
 cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
-cambium = { version = "0.3.3", path = "../cambium" }
+cambium = { version = "0.4.0", path = "../cambium" }
 genet-render-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
 netrender = { workspace = true }

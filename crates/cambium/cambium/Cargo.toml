@@ -1,6 +1,6 @@
 [package]
 name = "cambium"
-version = "0.3.3"
+version = "0.4.0"
 description = "A Meristem backend and application toolkit for Genet"
 edition.workspace = true
 
@@ -18,7 +18,7 @@ backstep = { workspace = true }
 # The command set, the person's choices and a palette's state (SE45 to SE48).
 command-menu = { workspace = true }
 meristem = { version = "0.2.0", path = "../meristem" }
-sprigging = { version = "0.2.0", path = "../sprigging" }
+sprigging = { version = "0.2.2", path = "../sprigging" }
 sceno = { workspace = true }
 scenograph = { workspace = true }
 scenomise = { workspace = true }
