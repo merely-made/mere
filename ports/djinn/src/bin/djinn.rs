@@ -96,11 +96,14 @@ struct Args {
     log_filter: String,
     /// The lifecycle event file (`resident_events`).
     events_file: Option<PathBuf>,
+    /// Opt-in bounded lifecycle diagnostics configuration.
+    diagnostics_config: Option<PathBuf>,
     /// The installer launched this process: it alone may bind the default
     /// endpoints.
     installed: bool,
     /// Print a running resident's status from its app door, and exit.
     resident_status: bool,
+    resident_diagnostics: bool,
     /// Ask a running resident to stop through its app door, and exit.
     stop_resident: bool,
     /// Receipt control: leave one blob-store holder outside the task scope,
@@ -180,7 +183,7 @@ async fn main() {
     }
     // Status, stop and unlock talk to a running resident; this process hosts
     // nothing.
-    if args.resident_status || args.stop_resident || args.unlock {
+    if args.resident_status || args.resident_diagnostics || args.stop_resident || args.unlock {
         match resident_client(&args).await {
             Ok(message) => {
                 println!("{message}");
@@ -223,10 +226,26 @@ async fn main() {
         eprintln!("djinn: {refusal}");
         std::process::exit(2);
     }
-    let events = match EventLog::open(args.events_file.as_deref()) {
+    let diagnostics = match args
+        .diagnostics_config
+        .as_deref()
+        .map(|path| {
+            let file = std::fs::File::open(path)?;
+            serde_json::from_reader::<_, djinn::resident_events::DiagnosticsConfig>(file)
+                .map_err(std::io::Error::other)
+        })
+        .transpose()
+    {
+        Ok(config) => config,
+        Err(error) => {
+            eprintln!("djinn: diagnostic configuration: {error}");
+            std::process::exit(2);
+        },
+    };
+    let events = match EventLog::open(args.events_file.as_deref(), diagnostics) {
         Ok(events) => events,
         Err(error) => {
-            eprintln!("djinn: open the event file: {error}");
+            eprintln!("djinn: initialize resident events: {error}");
             std::process::exit(1);
         },
     };
@@ -323,6 +342,16 @@ async fn resident_client(args: &Args) -> Result<String, String> {
         let _ = client.close().await;
         return Ok("stop accepted".into());
     }
+    if args.resident_diagnostics {
+        let diagnostics = resident_status::read_diagnostics(&mut client).await;
+        let _ = client.close().await;
+        let diagnostics = diagnostics
+            .map_err(|error| error.to_string())?
+            .unwrap_or_else(
+                || json!({ "schema":"djinn.lifecycle-diagnostics/v1", "enabled":false }),
+            );
+        return serde_json::to_string_pretty(&diagnostics).map_err(|error| error.to_string());
+    }
     let status = resident_status::read_status(&mut client)
         .await
         .map_err(|error| error.to_string())?;
@@ -341,8 +370,10 @@ fn parse_args() -> Result<Args, String> {
     let mut log_file = None;
     let mut log_filter = DEFAULT_LOG_FILTER.to_string();
     let mut events_file = None;
+    let mut diagnostics_config = None;
     let mut installed = false;
     let mut resident_status = false;
+    let mut resident_diagnostics = false;
     let mut stop_resident = false;
     let mut control_unjoined_holder = false;
     let mut enroll_passphrase = false;
@@ -426,6 +457,11 @@ fn parse_args() -> Result<Args, String> {
             "--log-filter" => {
                 log_filter = argv.next().ok_or("--log-filter needs directives")?;
             },
+            "--diagnostics-config" => {
+                diagnostics_config = Some(PathBuf::from(
+                    argv.next().ok_or("--diagnostics-config needs a path")?,
+                ));
+            },
             "--events-file" => {
                 events_file = Some(PathBuf::from(
                     argv.next().ok_or("--events-file needs a value")?,
@@ -433,6 +469,7 @@ fn parse_args() -> Result<Args, String> {
             },
             "--installed" => installed = true,
             "--resident-status" => resident_status = true,
+            "--resident-diagnostics" => resident_diagnostics = true,
             "--stop-resident" => stop_resident = true,
             "--control-unjoined-holder" => control_unjoined_holder = true,
             "--enroll-passphrase" => enroll_passphrase = true,
@@ -571,8 +608,10 @@ fn parse_args() -> Result<Args, String> {
         log_file,
         log_filter,
         events_file,
+        diagnostics_config,
         installed,
         resident_status,
+        resident_diagnostics,
         stop_resident,
         control_unjoined_holder,
         enroll_passphrase,
@@ -730,7 +769,7 @@ fn usage() -> &'static str {
     "usage: djinn [--dir <vault-dir>] [--profile <name>] \
      [--agent-endpoint <standard-endpoint>] \
      [--browser-endpoint <private-endpoint>] [--data-root <dir>] \
-     [--log-file <path>] [--log-filter <directives>] [--events-file <path>] \
+     [--log-file <path>] [--log-filter <directives>] [--events-file <path>] [--diagnostics-config <path>] [--resident-diagnostics] \
      [--installed]\n\
      personal sync: [--sync-graph <name>] [--sync-store <path>] \
      [--sync-root <64-hex-public-root>] [--sync-peer-node <64-hex-node-id>] \
@@ -910,7 +949,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             app: args.app_endpoint.clone(),
         },
         sync: None,
-    });
+    })
+    .with_events(events.clone());
     let stop = StopSignal::default();
     let personae = Arc::new(
         PersonaeHost::new(

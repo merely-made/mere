@@ -327,7 +327,7 @@ fn walk(
     {
         leaves.insert(id, key);
     }
-    for child in dom.dom_children(node) {
+    for child in dom.flat_children(node) {
         walk(dom, child, targets, leaves);
     }
 }

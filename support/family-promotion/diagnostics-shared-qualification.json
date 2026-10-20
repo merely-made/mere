@@ -1,0 +1,134 @@
+{
+  "basis": "6394e931a0e1df386d10472755babfb45bcf9a5d",
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "target": "C:\\t\\cargo-targets\\mere",
+  "gates": {
+    "diagnostics-shared-projection": {
+      "receipt": "diagnostics-shared-projection.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "-p",
+        "cambium-genet-web-host",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "e1a_sessions"
+      ],
+      "exit_code": 0
+    },
+    "diagnostics-product-owner": {
+      "receipt": "diagnostics-product-owner.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--no-default-features",
+        "--features",
+        "personal-sync",
+        "--lib",
+        "resident_events"
+      ],
+      "exit_code": 0
+    },
+    "diagnostics-product-receiving": {
+      "receipt": "diagnostics-product-receiving.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--no-default-features",
+        "--features",
+        "personal-sync",
+        "--test",
+        "resident_status"
+      ],
+      "exit_code": 0
+    },
+    "diagnostics-shared-wasm": {
+      "receipt": "diagnostics-shared-wasm.json",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    }
+  },
+  "passed_counts": [
+    17,
+    19,
+    8,
+    126,
+    7,
+    6,
+    4,
+    4
+  ],
+  "passed_total": 191,
+  "existing_ignores": 7,
+  "gate_lock_sha256": "5b526a934cdacbcff3e679de61629a328baac59a61473ec81be4300e71631c73",
+  "source_hash_convention": "sha256 after CRLF-to-LF normalization",
+  "source_sha256": {
+    "Cargo.lock": "5b526a934cdacbcff3e679de61629a328baac59a61473ec81be4300e71631c73",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "005b1e71f8d6f206b3ef15709048951b85b178d6e08f17134f9921f028110470",
+    "crates/cambium/cambium-genet-winit-host/tests/accessibility.rs": "ea64791453c142d6842b82b428368fa1be5b14a399fb553ccd2e7677313bd42f",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "8efe9d5da22f95a615ee5cab741c0b55c16670389877dc323e9a90533a82443d",
+    "crates/cambium/cambium-winit-a11y/Cargo.toml": "62040559ca5fb1111f707f5882675de8109dcf71fe515ae33e4001590ee3a205",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "e3be24c8acb3ec5b9cdc33e8417626cbe0122e7d5d3aefd2c7454b3dc397feb0",
+    "ports/djinn/Cargo.toml": "6c86818de4ebb4169aa6d0bbe260069ee46fc9280615c31b0a52e86e6b5c8c1f",
+    "ports/djinn/src/bin/djinn.rs": "624ba20f4fbe5d7a8832742e9ee047676111345d87a857f3c2134a64c26fc6cb",
+    "ports/djinn/src/resident_events.rs": "c62fe59b97b23f168bea9ae7511f7a8629484290733650bbfede35ff56d7ff26",
+    "ports/djinn/src/resident_status.rs": "d09ac860d7f413e1aebdb2d29f796d90e3d25f0805d548ccca639244789e14c4",
+    "ports/djinn/tests/resident_status.rs": "15ba30b7d147da480520cb40c362d02082e84d213d6fe230fe0790fcb8d1a1c9",
+    "ports/djinn/src/resident_events/diagnostics.rs": "d050cdb00ebbd242cb7690e05cbcdd5011f71409b9b356dbcafa381614c807d4",
+    "Cargo.toml": "dace8b708089312e69139aa613322bded65917db66ece17b20a4042a39452cde",
+    "rust-toolchain.toml": "70b1451554546366dd35c01225416776cfb8c0e3a73da440def1bed6de93808e"
+  },
+  "artifact_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-fe2d4c79ae96c8a7.exe": "f023506adadc67d42cd7f27b3e1ff737a563dc80bba96271fb1d662a23c5456d",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-5bb3a5a69c56797f.exe": "00ea6f8700d133f51c13760af4307f0a69f69e22d57c16b3d0684aae0fa4ef04",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-022159218a43d3b0.exe": "09fc807975c97c25091a7853abad4abb87061479f361baf5aa65f90ad8f9f7d2",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-8b25c190f29dac71.exe": "e1e80810cfacc52b0a803bee37fa20d59f4bceac93d9edd3e8001d24aeefffee",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-050af75c619ddc6e.exe": "541e067d3b23fc5cc9e32b6187f598e258d16282d9e7babc47f5068b976d0d94",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\djinn-5e0664fdb794f082.exe": "a163ff9936c051ded706d4072dbd7380a38349bf46b69bb655ac8a1b4183b3af",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c7c01089b2309d35.exe": "e9366636ef265eee4f7c4498fae6b80bd5fdde0805f529922e97be1fdee90be0",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\resident_status-d1ff034aa4f8cabb.exe": "be0df1dcbd0f9e6cc9f3ccf462fe5532ef7baa5327f7cd2b151066bdc305a382",
+    "C:\\t\\cargo-targets\\mere\\debug\\djinn.exe": "60086da3c897e34b46f45658e81657d15059ad586efb10e84e38d170247abf9d"
+  },
+  "actual_client_process": {
+    "path": "C:\\t\\cargo-targets\\mere\\debug\\djinn.exe",
+    "arguments": [
+      "--resident-diagnostics",
+      "--app-endpoint",
+      "fixture-scoped pipe/socket"
+    ],
+    "evidence": "only_djinn_reads_the_status_and_stops_the_resident launches the compiled CLI, asserts successful exit, correct phase and redaction, and independent receipt cursor."
+  },
+  "locked_package_identities_unchanged": true,
+  "limits": [
+    "native CPU source/broker fixture and actual CLI client; not installed resident/vault startup or shutdown",
+    "browser-host compile; not browser runtime or human AT",
+    "shared DOM projection only; AccessKit leaf contributions and producer lowering remain separate",
+    "current node admission is not target/session/revision lifetime proof",
+    "local resident lifecycle copy only; no global capture, all-command coverage or final durable export"
+  ],
+  "isolated_outputs_created": []
+}

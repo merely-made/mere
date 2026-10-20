@@ -1,0 +1,10 @@
+{
+  "passed_total": 191,
+  "existing_ignores": 7,
+  "artifact_count": 9,
+  "changed_plan_d2_errors": [],
+  "whole_tree_d2_error_count": 39,
+  "new_rust_header_ok": true,
+  "retained_diagnostics_json_bytes": 281507,
+  "isolated_outputs_created": []
+}

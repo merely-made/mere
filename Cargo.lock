@@ -2248,6 +2248,7 @@ dependencies = [
  "cambium",
  "cambium-rootstock",
  "cambium-winit",
+ "document-session-api",
  "genet-render",
  "genet-scripted-dom",
  "genet-winit-host",
@@ -4686,11 +4687,13 @@ dependencies = [
  "knot-site",
  "libc",
  "light-file-dialog",
+ "mere-apparatus",
  "mere-kernel",
  "mere-mesh",
  "mere-overmap",
  "mere-p2panda-net",
  "mere-personal-facts",
+ "mere-registry",
  "mere-transport",
  "mere-view",
  "mere-webrtc-carrier",
@@ -6947,9 +6950,11 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
+ "illume",
  "image",
  "inker",
  "insigne",
+ "knot-editor-host",
  "layout-dom-api",
  "mere",
  "mere-document-lanes",
@@ -6993,6 +6998,7 @@ dependencies = [
  "url",
  "uuid",
  "wgpu",
+ "woodshedding",
  "workbench",
  "zeroize",
 ]
@@ -7363,6 +7369,10 @@ name = "hermit-abi"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e17592d60ebacc7d5e169f4663c5f84f9161cc90328abcfe8456f41e4dfcb284"
+
+[[package]]
+name = "hest"
+version = "0.0.1"
 
 [[package]]
 name = "hex"
@@ -20136,6 +20146,15 @@ dependencies = [
  "thiserror 2.0.21",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "woodshedding"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/woodshed.git?rev=a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61#a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61"
+dependencies = [
+ "roxmltree 0.21.1",
+ "serde",
 ]
 
 [[package]]

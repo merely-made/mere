@@ -29,6 +29,10 @@ name = "moot_resources_reopen"
 required-features = ["moot-resources"]
 
 [features]
+# One holder-owned graph with an explicitly invited guest.
+coop = ["native", "web", "muniment/redb", "dep:pollster", "graphshell-client/pump"]
+coop-window = ["coop", "dep:cambium-genet-winit-host", "dep:mien", "dep:genet-scripted-dom", "dep:layout_dom_api", "dep:image"]
+editable-blocks = ["web", "dep:knot-editor-host", "dep:illume", "dep:woodshedding"]
 query-views = ["web", "mere/query", "dep:cambium"]
 caller-owned-toolkit-bench = ["retained-content", "cambium-rootstock/embedding-egui", "cambium-rootstock/embedding-iced", "dep:image"]
 moot-resources = ["web", "webrtc-join", "dep:cambium", "dep:moot", "dep:gemot", "dep:eidetic", "dep:muniment"]
@@ -164,6 +168,10 @@ personal-sync = [
 ]
 
 [dependencies]
+knot-editor-host = { workspace = true, optional = true }
+illume = { workspace = true, optional = true }
+# Canonical sibling owner; no dependency on Woodshed application or native host.
+woodshedding = { git = "https://github.com/merely-made/woodshed.git", rev = "a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61", optional = true }
 genet-render-host = { workspace = true, optional = true }
 cambium = { workspace = true, optional = true }
 moot = { package = "mere-moot", path = "../moot", features = ["resource-view", "presentation"], optional = true }
@@ -389,3 +397,8 @@ required-features = ["native"]
 [[test]]
 name = "c4_host_signaling"
 required-features = ["webrtc-session"]
+
+[[bin]]
+name = "graphshell-coop"
+path = "src/bin/graphshell_coop.rs"
+required-features = ["coop-window"]

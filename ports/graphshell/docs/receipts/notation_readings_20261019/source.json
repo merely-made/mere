@@ -1,0 +1,62 @@
+{
+  "mere": {
+    "root": "/Users/markik/Code/repos/mere",
+    "head": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+    "files": {
+      "Cargo.lock": "b4383d26637c72a080ca65056aedb1ff0b9830b2043da52ae7c8cee47f4a5df1",
+      "crates/nematic/illume/src/blocks.rs": "4d6d7edc62e78905d2fd20102e311248e59bd11997b544eeffdb7380e169eb15",
+      "crates/nematic/illume/src/lib.rs": "06f01791d4f70fe6c3cb468837d134aa540e89a93996a1da17f26b1bb3e05c25",
+      "ports/graphshell/Cargo.toml": "4df753e95adec6854cea10e50b425561b82c20b2494f93eb206c380d3fdffe19",
+      "ports/graphshell/src/block_editing/bars.rs": "2a1cc617e8b27ad8efd5040fa277f3770a97bcb276db5330440dcb3c23abef39",
+      "ports/graphshell/src/block_editing/rhyme.rs": "2eb36bce80bbb1289bfe34c8c652532c5262256fa9eb29cd13369c5b02ccde99",
+      "ports/graphshell/src/block_editing/store.rs": "78cbde3485dea1cb297fb61f0d0bf59152b22a90ec5a25c482e624b267a7519c",
+      "ports/graphshell/src/block_editing.rs": "c8ea4b0707e01ac201bbe04c8bc270d4fe96606e642aca4790fff0b899111a07",
+      "ports/graphshell/src/lib.rs": "d743b27d4cc0ce8664e9dd0bfb1590b30a99bf29f00feae2677e060377fa69d1",
+      "ports/graphshell/src/web_tree/backdrop.rs": "f25508cc223d4692dc479b283f1d024454faf5cd98e006888d0428bbfdb7595d",
+      "ports/graphshell/src/web_tree/blocks.rs": "a092f48490ebe0f52a811ea6dd8ec01fca7790c1898abaa75209ce3ba9c34acd",
+      "ports/graphshell/src/web_tree/controls.rs": "8765f2e40f7c54bdf7be387ccbf6d9678daa24827fecbeb4b5eea853d1f4cdfb",
+      "ports/graphshell/src/web_tree/lane.rs": "5cdfbf51eb6695a519781d78f4167a2db8fd9d26978de8198dc80b663d30e415",
+      "ports/graphshell/src/web_tree.rs": "52e33f298daaa7d9d4ed4f1db97e05875141071e112e349e2a79782dc8e86d17",
+      "ports/graphshell/support/woodshed-block-example.json": "669af1781c646c8a153b7b84c31961166beeefa14cbcb14e0cbe3391e63fa35a",
+      "ports/graphshell/web/Cargo.lock": "fb8d4af22209af795542594f7b598b18d594a7f1980e9a7920573400b48056a8",
+      "ports/graphshell/web/Cargo.toml": "d20ae7a2fc8256bf775e828c903e953b93f1c544364b0a24ec3985560058dc5c",
+      "ports/graphshell/web/scenarios/notation_readings.scn": "d43b1baa0373660a5e78ebc148bd9a937d1662f7f33c3f81e02b2741ea2929aa",
+      "ports/graphshell/web/scenarios/notation_readings_reopen.scn": "e90d4089b9696e0aa9f5dad5d95bd29afdd6f541d7aee96f51ab84cca9066374"
+    }
+  },
+  "woodshed": {
+    "root": "/Users/markik/Code/repos/woodshed",
+    "head": "9ab3f6be29027321725b385961e8b323a2bba2c0",
+    "files": {
+      "Cargo.lock": "35c84ea9685a21198bc35129313c35b77cccd3e2bdc440e30585eab5d5134ea5",
+      "Cargo.toml": "479a5e0d04095de8515aa74ac1ae671b9ebecc8661105427e8b4b7e692be990e",
+      "crates/woodshed-core/src/arrangement_scene.rs": "2647f785262fd335bb7d420e20e4ca04b278b7eceff3ab948e29e2fabde0f650",
+      "crates/woodshed-core/src/bin/woodshed-arrangement-scene.rs": "049f9e98a7811d7cf9ff89b7b6d6b69e804e328acad21f4bef8be303ff1db622",
+      "crates/woodshed-core/src/card_shapes.rs": "77aec51c8ef965fe44b9dddbe1b563c760ab4ef8e6b3e8704b4acba760ad1c8f",
+      "crates/woodshed-core/src/lib.rs": "f3746f3b2f954aa30e34a83697a178b3a2837bbc02618307aac17e58a321f3f9",
+      "crates/woodshed-core/src/music.rs": "18af308b2c0d0d79a39e3e55751f31a543e0ce0036a42e6b2bc2f78c292d7f0a",
+      "crates/woodshed-core/src/saved_arrangements.rs": "388e74036cdd559ec97599b9b2aa75592a5d5ecea57cb91f51ece2ead9769151",
+      "crates/woodshed-core/tests/saved_arrangements.rs": "058299952cf5f6285609a3b6b813fb9c447149d17e72fd7cb4bcf97bfdb14006",
+      "crates/woodshed-genet/src/leaves.rs": "4415c4991d2713ca5308af78bebf7ba147abb9c4b8444b02e30caa5eb1e4075d",
+      "crates/woodshed-genet/src/shared.rs": "5dc1edd46dbbc7d378fb428ee0e6528e55d50697811cff73936a3fa503264915",
+      "crates/woodshed-notation/Cargo.toml": "6dc844758ccb84f9e23ad97157bb333da745ca7caf19ea1afbe53b4baf86805d",
+      "crates/woodshed-notation/assets/bravura/Bravura.otf": "cdf0f893ee1fdb64b7f6713d71ee0dcfc349c0ac01429a8e451b01a9e79f5f3b",
+      "crates/woodshed-notation/assets/bravura/OFL.txt": "bdca252186865f3b2c0e76da4a4e335c14ba1d37f80194fca254ddfa88e84fbf",
+      "crates/woodshed-notation/assets/bravura/README.md": "2d1f3f78da66acdaa50b2ca186f1080b56d4de644503d75f5675d788f29dbb14",
+      "crates/woodshed-notation/src/lib.rs": "101193bc3f836af5e5e2568b09fca276ebfc45dfe1616c1b4290baab10061e0e",
+      "crates/woodshed-views/Cargo.toml": "01ff4158a8a51912da78615b89d6982f4f6f5c1a62fa56fedeb51aea859d68cc",
+      "crates/woodshed-views/src/lib.rs": "7a40bf57d17575b6dc1d07c1509736d1d4493f57eb39755d1413ab1c6b3521aa",
+      "crates/woodshed-views/src/stage/arrangement_editor.rs": "58eb7fe5a147edda4f836c4d5d78b725af218ce9bdfb632d4b3240c9b502fbe3",
+      "crates/woodshed-views/src/stage/notation_reading.rs": "e3432ea2411523d46edfcae8ad8fea3a1944b19d28bebf0c727061ccebe39d54",
+      "crates/woodshed-views/src/stage.rs": "60f3ca89a6d8ae6f8f3ed750bb4172d923a74199db629f830099c9bc0dfceb51",
+      "crates/woodshedding/Cargo.toml": "8ef121af3d3fb9812f6c33c36bd000309a407d369695b83ab559ce38330575b0",
+      "crates/woodshedding/src/card_shapes.rs": "f68b3cae37258d4c1d3661d235ad0cdc30f3950aba98c94393f85147da16de9a",
+      "crates/woodshedding/src/lib.rs": "98f832ab4099aaac69cb9bcf3f513319e81a661fc9b63c9c5a45480a08953bec",
+      "crates/woodshedding/src/notation/draft.rs": "2fd9b155bb1701fc2a6c4294498e136f2a6cc8b1b790fcf4f9d1c56d054fa0ef",
+      "crates/woodshedding/src/notation.rs": "cb2bdcf8f1acddee23bb264ca803ac40d452c05120e810a4322c24a6b7d631ba",
+      "crates/woodshedding/src/rehearsal/arrangement/bars.rs": "9a6f67291eee162f284397258b4ef13b4ba6854487aa90f5c393bce5753c2248",
+      "crates/woodshedding/src/rehearsal/arrangement.rs": "5c491075b5834464956398c16269a464b2e4a2c1e0cdd8ef9cd021bfe0452f07",
+      "crates/woodshedding/src/rehearsal.rs": "429dbf95f232d74e8d0e2d61d6e4963a7f2d44059ccbe84b474026dddf2972dd"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "captures": 4,
+  "frames": 125,
+  "pid": 81006,
+  "result": "ok",
+  "state": {
+    "data": null,
+    "root": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+    "status": "Unavailable: session stream failed: connection lost"
+  }
+}
