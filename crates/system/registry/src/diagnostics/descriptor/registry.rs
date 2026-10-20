@@ -28,10 +28,30 @@ impl Default for ChannelConfig {
     }
 }
 
+impl ChannelConfig {
+    /// Descriptor policy seeds a new channel; an existing configured value
+    /// takes precedence, including configuration installed before registration.
+    /// Session retention keeps the collector's ordinary count setting. This
+    /// registry describes policy, not the downstream collector's enforced bound.
+    fn from_descriptor(descriptor: &RuntimeChannelDescriptor) -> Self {
+        Self {
+            sample_rate: match descriptor.sampling {
+                SamplingPolicy::All => 1.0,
+                SamplingPolicy::SampleRate(rate) => rate,
+            },
+            retention_count: match descriptor.retention {
+                RetentionPolicy::KeepRecent(count) => count,
+                RetentionPolicy::Session => Self::default().retention_count,
+            },
+            ..Self::default()
+        }
+    }
+}
+
 pub struct DiagnosticsRegistry {
     channels: HashMap<String, RuntimeChannelDescriptor>,
     configs: HashMap<String, ChannelConfig>,
-    sample_counters: HashMap<String, u64>,
+    sample_credit: HashMap<String, f64>,
     orphan_channels: HashMap<String, u64>,
     pub(crate) invariants: HashMap<String, DiagnosticsInvariant>,
     pending_invariants: InvariantTracker,
@@ -42,7 +62,7 @@ impl Default for DiagnosticsRegistry {
         let mut registry = Self {
             channels: HashMap::new(),
             configs: HashMap::new(),
-            sample_counters: HashMap::new(),
+            sample_credit: HashMap::new(),
             orphan_channels: HashMap::new(),
             invariants: HashMap::new(),
             pending_invariants: InvariantTracker::default(),
@@ -61,7 +81,9 @@ impl Default for DiagnosticsRegistry {
 impl DiagnosticsRegistry {
     pub fn register(&mut self, descriptor: DiagnosticChannelDescriptor) {
         let runtime = RuntimeChannelDescriptor::from_contract(descriptor);
-        self.configs.entry(runtime.channel_id.clone()).or_default();
+        self.configs
+            .entry(runtime.channel_id.clone())
+            .or_insert_with(|| ChannelConfig::from_descriptor(&runtime));
         self.channels.insert(runtime.channel_id.clone(), runtime);
     }
 
@@ -151,13 +173,13 @@ impl DiagnosticsRegistry {
             }
         }
 
+        self.configs
+            .entry(normalized_descriptor.channel_id.clone())
+            .or_insert_with(|| ChannelConfig::from_descriptor(&normalized_descriptor));
         self.channels.insert(
             normalized_descriptor.channel_id.clone(),
             normalized_descriptor.clone(),
         );
-        self.configs
-            .entry(normalized_descriptor.channel_id)
-            .or_default();
         Ok(true)
     }
 
@@ -240,10 +262,17 @@ impl DiagnosticsRegistry {
             return false;
         }
 
-        let counter = self.sample_counters.entry(normalized).or_insert(0);
-        *counter = counter.saturating_add(1);
-        let gate = (1.0f32 / config.sample_rate.max(0.0001)).ceil() as u64;
-        gate <= 1 || (*counter % gate == 0)
+        // Accumulate the configured fraction rather than rounding its
+        // reciprocal: SampleRate(0.75) must not silently become 0.5. Credit
+        // stays bounded below one, without a saturating lifetime counter.
+        let credit = self.sample_credit.entry(normalized).or_insert(0.0);
+        *credit += f64::from(config.sample_rate);
+        if *credit >= 1.0 {
+            *credit -= 1.0;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn register_invariant(

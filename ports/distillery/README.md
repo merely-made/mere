@@ -28,6 +28,16 @@ later, behind its own plan: training is one more job the works runs.
 
 ## Current slice
 
+The `inference` feature also offers explicitly enabled, bounded observations via
+`InferenceLane::enable_observations`, independent `observation_cursor` readers and
+`read_observations`. The owner supplies a fresh nonsecret observation-run identity
+and count/byte/age limits. Records contain fixed phases and generated execution
+IDs, excluding prompts, answers, caller run names and error strings. Worker
+completion and accepted run outcome are separate facts; journal failure cannot
+become a successful outcome. This installs no exporter or runtime policy. See
+the [diagnostics continuation](../../design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md#observations-and-semantic-action-continuation-2026-10-20)
+for qualification and remaining owner migrations.
+
 `Distillery<B>` composes a `MeshHost<B>`, drives its non-blocking supervisor
 ticks, and owns an explicit maintenance operation. Maintenance authors an
 owner-governed retention checkpoint, asks the mesh store which blob references

@@ -1,0 +1,5 @@
+{
+  "exit_code": 101,
+  "diagnostics": "error: failed to download `accesskit_ios v0.2.1`\n\nCaused by:\n  attempting to make an HTTP request, but --offline was specified\n",
+  "lock_sha256": "62f8e92afef293731addeaa4811cc0df0f84c22467232a8da9fe8d96ab49d6b6"
+}

@@ -40,7 +40,11 @@ fn normalize_channel_id(channel_id: &str) -> String {
 fn normalize_channel_config(config: ChannelConfig) -> ChannelConfig {
     ChannelConfig {
         enabled: config.enabled,
-        sample_rate: config.sample_rate.clamp(0.0, 1.0),
+        sample_rate: if config.sample_rate.is_finite() {
+            config.sample_rate.clamp(0.0, 1.0)
+        } else {
+            0.0
+        },
         retention_count: config.retention_count,
     }
 }

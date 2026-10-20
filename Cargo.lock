@@ -4623,6 +4623,7 @@ dependencies = [
  "insigne",
  "iroh",
  "layout-dom-api",
+ "mere-apparatus",
  "mere-mesh",
  "mere-proofs",
  "mere-surface-api",

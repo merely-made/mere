@@ -1,0 +1,8 @@
+{
+  "qualified_source_hashes_match": true,
+  "changed_plan_d2_errors": [],
+  "existing_whole_tree_d2_error_count": 39,
+  "new_rust_header_issues": [],
+  "retained_diagnostics_json_bytes": 70611,
+  "isolated_outputs_created": []
+}

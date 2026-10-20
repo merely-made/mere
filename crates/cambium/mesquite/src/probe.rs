@@ -11,9 +11,16 @@
 //! `zoom`, `opacity`, `resize`, `input-text`, `wheel`, `cost-begin`/`cost-end`).
 
 use cambium_rootstock::{HostPointer, WindowCommand};
-use taproot::{Automatable, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector, SelectorTarget};
+use taproot::{
+    Automatable, AutomatableExt, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector,
+    SelectorTarget,
+};
 
 use crate::{Checkpoints, Ctx, Lane, Product, pixels};
+
+#[cfg(test)]
+#[path = "probe_tests.rs"]
+mod owner_tests;
 
 pub(crate) struct Probe<'a, 'c, P: Product> {
     pub(crate) ctx: &'a mut Ctx<'c, P>,
@@ -174,10 +181,9 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                 let (x, y) = match &step.at {
                     crate::wheel::WheelAt::Point(x, y) => (*x, *y),
                     crate::wheel::WheelAt::Selector(selector) => {
-                        match self.selector_target(selector) {
-                            SelectorTarget::Hit(hit) => hit.point,
-                            _ => return Err(format!("no current DOM target for {selector:?}")),
-                        }
+                        self.resolve(selector)
+                            .ok_or_else(|| format!("no current DOM target for {selector:?}"))?
+                            .point
                     },
                 };
                 self.ctx.pointer.push(step.at_point(x, y));
@@ -374,7 +380,10 @@ mod text_tests {
             view as Logic,
             TextInput::new("previous"),
         );
-        let node = taproot::matching_estimated_fixture(&*runner.dom().borrow(), &Selector::role("textbox"))[0];
+        let node = taproot::matching_estimated_fixture(
+            &*runner.dom().borrow(),
+            &Selector::role("textbox"),
+        )[0];
         runner.set_focus(Some(node));
         state.runner = Some(runner);
         let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
