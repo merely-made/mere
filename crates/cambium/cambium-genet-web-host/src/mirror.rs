@@ -365,6 +365,7 @@ fn placement(role: DocumentA11yRole, aria: Option<&str>) -> Placement {
         | R::TabPanel
         | R::Tree
         | R::Menu
+        | R::MenuBar
         | R::Toolbar
         | R::RadioGroup
         | R::ProgressIndicator
@@ -405,6 +406,7 @@ pub fn aria_role(role: DocumentA11yRole) -> Option<&'static str> {
         R::Dialog => "dialog",
         R::Alert => "alert",
         R::Menu => "menu",
+        R::MenuBar => "menubar",
         R::MenuItem => "menuitem",
         R::MenuItemCheckBox => "menuitemcheckbox",
         R::MenuItemRadio => "menuitemradio",
