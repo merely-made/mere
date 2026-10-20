@@ -36,6 +36,8 @@ use chirograph::{
 use esp::infer::actor::spawn_inference_actor_with_checkpoints;
 pub use esp::infer::provider::GenerationCheckpoint;
 use esp::infer::{GenerationRequest, InferCommand, InferUpdate};
+mod observations;
+pub use observations::InferenceObservation;
 #[cfg(feature = "inference-model")]
 pub mod durable;
 #[cfg(feature = "inference-model")]
@@ -222,6 +224,7 @@ pub trait RunJournal: Send + Sync {
 
 #[derive(Default)]
 struct RunTable {
+    observations: Option<observations::Observations>,
     weight_format: Option<String>,
     model: Option<String>,
     session: Option<esp::infer::provider::SessionIdentity>,
@@ -249,6 +252,11 @@ fn capability_weight_format(capability: &esp::infer::ModelCapability) -> Option<
 }
 
 impl RunTable {
+    fn observe(&mut self, id: u64, phase: InferenceObservation) {
+        if let Some(observations) = &mut self.observations {
+            observations.note(id, phase);
+        }
+    }
     fn view(&self) -> InferenceRunsV1 {
         InferenceRunsV1 {
             schema: INFERENCE_RUNS_SCHEMA.into(),
@@ -278,7 +286,26 @@ impl RunTable {
 
     /// Fold one actor update. Updates for a run that has already ended are
     /// dropped, so nothing reaches a cancelled run after its cancel lands.
-    fn apply(&mut self, update: InferUpdate) {
+    /// Returns admission to this run table, not successful domain completion.
+    fn apply(&mut self, update: InferUpdate) -> bool {
+        let id = match &update {
+            InferUpdate::Started { id }
+            | InferUpdate::Paused { id }
+            | InferUpdate::Checkpoint { id, .. }
+            | InferUpdate::Fragment { id, .. }
+            | InferUpdate::Finished { id, .. }
+            | InferUpdate::Cancelled { id }
+            | InferUpdate::Failed { id, .. } => Some(*id),
+            _ => None,
+        };
+        if let Some(id) = id {
+            let Some(&index) = self.by_actor_id.get(&id) else {
+                return false;
+            };
+            if self.runs[index].view.state.is_terminal() {
+                return false;
+            }
+        }
         match update {
             InferUpdate::Ready { capability } => {
                 self.weight_format = capability_weight_format(&capability);
@@ -352,6 +379,7 @@ impl RunTable {
             },
         }
         self.generation += 1;
+        true
     }
 }
 
@@ -424,6 +452,9 @@ impl Shared {
                         record.view.error = Some(error.clone());
                         table.journal_failures.push(error);
                     }
+                }
+                if let Some(observations) = &mut table.observations {
+                    observations.note(record.actor_id, InferenceObservation::RunFailed);
                 }
             }
         }
@@ -949,6 +980,7 @@ impl InferenceLane {
         }
         table.by_actor_id.insert(actor_id, index);
         if recall_failure.is_some() {
+            table.observe(actor_id, InferenceObservation::RunFailed);
             table.generation += 1;
             return Ok(());
         }
@@ -967,6 +999,7 @@ impl InferenceLane {
         if !actor.command(command) {
             return Err(InferenceLaneError::Closed);
         }
+        table.observe(actor_id, InferenceObservation::Queued);
         table.generation += 1;
         Ok(())
     }
@@ -997,6 +1030,8 @@ impl InferenceLane {
                 journal.append(&next).map_err(InferenceLaneError::Journal)?;
             }
             *record = next;
+            let id = record.actor_id;
+            table.observe(id, InferenceObservation::RunCancelled);
             table.generation += 1;
         } else if !record.view.state.is_terminal() {
             if !actor.command(InferCommand::Cancel {
@@ -1004,6 +1039,8 @@ impl InferenceLane {
             }) {
                 return Err(InferenceLaneError::Closed);
             }
+            let id = record.actor_id;
+            table.observe(id, InferenceObservation::CancelRequested);
         }
         Ok(())
     }
@@ -1406,6 +1443,7 @@ impl InferenceLane {
 /// Fold updates until the actor is gone and its channel closes.
 fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
     while let Ok(update) = updates.recv() {
+        let observed = observations::worker_update(&update);
         let changed = match &update {
             InferUpdate::Paused { id }
             | InferUpdate::Cancelled { id }
@@ -1414,8 +1452,11 @@ fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
             _ => None,
         };
         let mut table = shared.table();
-        table.apply(update);
-        if let (Some(id), Some(journal)) = (changed, &shared.journal) {
+        if let Some((id, phase)) = observed {
+            table.observe(id, phase);
+        }
+        let accepted = table.apply(update);
+        if let (Some(id), Some(journal), true) = (changed, &shared.journal, accepted) {
             if let Some(index) = table.by_actor_id.get(&id).copied() {
                 if let Err(error) = journal.append(&table.runs[index]) {
                     table
@@ -1425,6 +1466,19 @@ fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
                     table.runs[index].view.error =
                         Some(format!("checkpoint commit failed: {error}"));
                 }
+            }
+        }
+        if let Some((id, _)) = observed {
+            if accepted {
+                if let Some(phase) = table
+                    .by_actor_id
+                    .get(&id)
+                    .and_then(|&index| observations::accepted_state(&table.runs[index].view.state))
+                {
+                    table.observe(id, phase);
+                }
+            } else {
+                table.observe(id, InferenceObservation::UpdateDiscarded);
             }
         }
     }

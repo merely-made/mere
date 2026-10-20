@@ -21,6 +21,8 @@ embedding-egui = ["embedding", "dep:egui", "dep:egui-wgpu", "dep:epaint"]
 embedding-iced = ["embedding", "dep:iced_wgpu"]
 
 [dependencies]
+# Existing Sprigging leaf contributions use AccessKit even in portable hosts.
+accesskit = { workspace = true }
 egui-wgpu = { version = "=0.36.2", default-features = false, optional = true }
 egui = { version = "=0.36.2", default-features = false, optional = true }
 epaint = { version = "=0.36.2", default-features = false, optional = true }

@@ -80,7 +80,7 @@ pub fn event_channel(event: &UxEvent) -> ChannelEmission {
             note: Some(format!("reason={}", dismiss_reason_label(*reason))),
         },
         UxEvent::ActionDispatched { action_id, target } => ChannelEmission {
-            channel_id: "ux.action.dispatched",
+            channel_id: ACTION_CHANNEL,
             severity: DiagnosticsSeverity::Info,
             note: Some(match target {
                 Some(_) => format!("action={};targeted=true", action_id.key()),
@@ -88,64 +88,56 @@ pub fn event_channel(event: &UxEvent) -> ChannelEmission {
             }),
         },
         UxEvent::OpenNodeDispatched { .. } => ChannelEmission {
-            channel_id: "ux.open_node.dispatched",
+            channel_id: OPEN_NODE_CHANNEL,
             severity: DiagnosticsSeverity::Info,
             note: None,
         },
     }
 }
 
-/// Stable channel-id mapping for `SurfaceOpened` events. One static
-/// `&'static str` per surface so the channel registry can register
-/// these at startup.
-fn surface_open_channel(surface: SurfaceId) -> &'static str {
-    match surface {
-        SurfaceId::Omnibar => "ux.omnibar.opened",
-        SurfaceId::CommandPalette => "ux.command_palette.opened",
-        SurfaceId::NodeFinder => "ux.node_finder.opened",
-        SurfaceId::ContextMenu => "ux.context_menu.opened",
-        SurfaceId::ConfirmDialog => "ux.confirm_dialog.opened",
-        SurfaceId::NodeCreate => "ux.node_create.opened",
-        SurfaceId::FrameRename => "ux.frame_rename.opened",
-        SurfaceId::StatusBar => "ux.status_bar.opened",
-        SurfaceId::TreeSpine => "ux.tree_spine.opened",
-        SurfaceId::NavigatorHost => "ux.navigator_host.opened",
-        SurfaceId::TilePane => "ux.tile_pane.opened",
-        SurfaceId::CanvasPane => "ux.canvas_pane.opened",
-        SurfaceId::BaseLayer => "ux.base_layer.opened",
-        SurfaceId::RosterPane => "ux.roster_pane.opened",
-        SurfaceId::InspectorPane => "ux.inspector_pane.opened",
-        SurfaceId::StewardPane => "ux.steward_pane.opened",
-        SurfaceId::GlossPane => "ux.gloss_pane.opened",
-        SurfaceId::ApparatusPane => "ux.apparatus_pane.opened",
-        SurfaceId::CommsPane => "ux.comms_pane.opened",
-        SurfaceId::WorkbenchPane => "ux.workbench_pane.opened",
-    }
+// This exhaustive mapping generates both emission and registration. Adding a
+// SurfaceId forces its channels to be supplied here instead of updating a
+// second catalogue by hand.
+macro_rules! surface_channels {
+    ($($surface:ident => ($opened:literal, $dismissed:literal)),+ $(,)?) => {
+        fn surface_open_channel(surface: SurfaceId) -> &'static str {
+            match surface { $(SurfaceId::$surface => $opened,)+ }
+        }
+        fn surface_dismiss_channel(surface: SurfaceId) -> &'static str {
+            match surface { $(SurfaceId::$surface => $dismissed,)+ }
+        }
+        /// Every channel this mapper emits, for host pre-registration.
+        pub fn all_channel_ids() -> &'static [&'static str] {
+            &[$($opened,)+ $($dismissed,)+ ACTION_CHANNEL, OPEN_NODE_CHANNEL]
+        }
+        #[cfg(test)]
+        const CHANNEL_SURFACES: &[SurfaceId] = &[$(SurfaceId::$surface,)+];
+    };
 }
+const ACTION_CHANNEL: &str = "ux.action.dispatched";
+const OPEN_NODE_CHANNEL: &str = "ux.open_node.dispatched";
 
-fn surface_dismiss_channel(surface: SurfaceId) -> &'static str {
-    match surface {
-        SurfaceId::Omnibar => "ux.omnibar.dismissed",
-        SurfaceId::CommandPalette => "ux.command_palette.dismissed",
-        SurfaceId::NodeFinder => "ux.node_finder.dismissed",
-        SurfaceId::ContextMenu => "ux.context_menu.dismissed",
-        SurfaceId::ConfirmDialog => "ux.confirm_dialog.dismissed",
-        SurfaceId::NodeCreate => "ux.node_create.dismissed",
-        SurfaceId::FrameRename => "ux.frame_rename.dismissed",
-        SurfaceId::StatusBar => "ux.status_bar.dismissed",
-        SurfaceId::TreeSpine => "ux.tree_spine.dismissed",
-        SurfaceId::NavigatorHost => "ux.navigator_host.dismissed",
-        SurfaceId::TilePane => "ux.tile_pane.dismissed",
-        SurfaceId::CanvasPane => "ux.canvas_pane.dismissed",
-        SurfaceId::BaseLayer => "ux.base_layer.dismissed",
-        SurfaceId::RosterPane => "ux.roster_pane.dismissed",
-        SurfaceId::InspectorPane => "ux.inspector_pane.dismissed",
-        SurfaceId::StewardPane => "ux.steward_pane.dismissed",
-        SurfaceId::GlossPane => "ux.gloss_pane.dismissed",
-        SurfaceId::ApparatusPane => "ux.apparatus_pane.dismissed",
-        SurfaceId::CommsPane => "ux.comms_pane.dismissed",
-        SurfaceId::WorkbenchPane => "ux.workbench_pane.dismissed",
-    }
+surface_channels! {
+    Omnibar => ("ux.omnibar.opened", "ux.omnibar.dismissed"),
+    CommandPalette => ("ux.command_palette.opened", "ux.command_palette.dismissed"),
+    NodeFinder => ("ux.node_finder.opened", "ux.node_finder.dismissed"),
+    ContextMenu => ("ux.context_menu.opened", "ux.context_menu.dismissed"),
+    ConfirmDialog => ("ux.confirm_dialog.opened", "ux.confirm_dialog.dismissed"),
+    NodeCreate => ("ux.node_create.opened", "ux.node_create.dismissed"),
+    FrameRename => ("ux.frame_rename.opened", "ux.frame_rename.dismissed"),
+    StatusBar => ("ux.status_bar.opened", "ux.status_bar.dismissed"),
+    TreeSpine => ("ux.tree_spine.opened", "ux.tree_spine.dismissed"),
+    NavigatorHost => ("ux.navigator_host.opened", "ux.navigator_host.dismissed"),
+    TilePane => ("ux.tile_pane.opened", "ux.tile_pane.dismissed"),
+    CanvasPane => ("ux.canvas_pane.opened", "ux.canvas_pane.dismissed"),
+    BaseLayer => ("ux.base_layer.opened", "ux.base_layer.dismissed"),
+    RosterPane => ("ux.roster_pane.opened", "ux.roster_pane.dismissed"),
+    InspectorPane => ("ux.inspector_pane.opened", "ux.inspector_pane.dismissed"),
+    StewardPane => ("ux.steward_pane.opened", "ux.steward_pane.dismissed"),
+    GlossPane => ("ux.gloss_pane.opened", "ux.gloss_pane.dismissed"),
+    ApparatusPane => ("ux.apparatus_pane.opened", "ux.apparatus_pane.dismissed"),
+    CommsPane => ("ux.comms_pane.opened", "ux.comms_pane.dismissed"),
+    WorkbenchPane => ("ux.workbench_pane.opened", "ux.workbench_pane.dismissed"),
 }
 
 fn dismiss_reason_label(reason: DismissReason) -> &'static str {
@@ -155,56 +147,6 @@ fn dismiss_reason_label(reason: DismissReason) -> &'static str {
         DismissReason::Superseded => "superseded",
         DismissReason::Programmatic => "programmatic",
     }
-}
-
-/// Enumerate every channel id this module emits to. Hosts use this
-/// to pre-register the channel descriptors at startup so the
-/// "registered channels" tab in the diagnostics pane lists every
-/// UX channel even if none have fired yet.
-pub fn all_channel_ids() -> &'static [&'static str] {
-    &[
-        // SurfaceOpened
-        "ux.omnibar.opened",
-        "ux.command_palette.opened",
-        "ux.node_finder.opened",
-        "ux.context_menu.opened",
-        "ux.confirm_dialog.opened",
-        "ux.node_create.opened",
-        "ux.frame_rename.opened",
-        "ux.status_bar.opened",
-        "ux.tree_spine.opened",
-        "ux.navigator_host.opened",
-        "ux.tile_pane.opened",
-        "ux.canvas_pane.opened",
-        "ux.base_layer.opened",
-        "ux.roster_pane.opened",
-        "ux.gloss_pane.opened",
-        "ux.apparatus_pane.opened",
-        "ux.comms_pane.opened",
-        "ux.workbench_pane.opened",
-        // SurfaceDismissed
-        "ux.omnibar.dismissed",
-        "ux.command_palette.dismissed",
-        "ux.node_finder.dismissed",
-        "ux.context_menu.dismissed",
-        "ux.confirm_dialog.dismissed",
-        "ux.node_create.dismissed",
-        "ux.frame_rename.dismissed",
-        "ux.status_bar.dismissed",
-        "ux.tree_spine.dismissed",
-        "ux.navigator_host.dismissed",
-        "ux.tile_pane.dismissed",
-        "ux.canvas_pane.dismissed",
-        "ux.base_layer.dismissed",
-        "ux.roster_pane.dismissed",
-        "ux.gloss_pane.dismissed",
-        "ux.apparatus_pane.dismissed",
-        "ux.comms_pane.dismissed",
-        "ux.workbench_pane.dismissed",
-        // Action / OpenNode
-        "ux.action.dispatched",
-        "ux.open_node.dispatched",
-    ]
 }
 
 // ---------------------------------------------------------------------------
@@ -419,10 +361,37 @@ mod tests {
     #[test]
     fn all_channel_ids_covers_every_surface_and_dispatch_kind() {
         let ids = all_channel_ids();
+        for surface in [SurfaceId::InspectorPane, SurfaceId::StewardPane] {
+            for event in [
+                UxEvent::SurfaceOpened { surface },
+                UxEvent::SurfaceDismissed {
+                    surface,
+                    reason: DismissReason::Cancelled,
+                },
+            ] {
+                assert!(ids.contains(&event_channel(&event).channel_id));
+            }
+        }
         // Every SurfaceId variant has both an opened and dismissed
         // channel (2 each), plus action.dispatched and
-        // open_node.dispatched. 18 surfaces x 2 + 2 = 38.
-        assert_eq!(ids.len(), 38);
+        // open_node.dispatched. Exhaustiveness is enforced by the mapping.
+        assert_eq!(ids.len(), CHANNEL_SURFACES.len() * 2 + 2);
+        assert_eq!(
+            ids.iter().collect::<std::collections::HashSet<_>>().len(),
+            ids.len()
+        );
+        for &surface in CHANNEL_SURFACES {
+            assert!(ids.contains(&event_channel(&UxEvent::SurfaceOpened { surface }).channel_id));
+            assert!(
+                ids.contains(
+                    &event_channel(&UxEvent::SurfaceDismissed {
+                        surface,
+                        reason: DismissReason::Cancelled
+                    })
+                    .channel_id
+                )
+            );
+        }
         assert!(ids.contains(&"ux.command_palette.opened"));
         assert!(ids.contains(&"ux.command_palette.dismissed"));
         assert!(ids.contains(&"ux.node_create.opened"));

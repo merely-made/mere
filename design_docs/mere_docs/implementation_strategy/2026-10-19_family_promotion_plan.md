@@ -1,7 +1,7 @@
 # Foundation family promotion
 
 **Date:** 2026-10-19
-**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19; observations/action evidence, custody process design and source-home follow-up remain scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
+**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19. A contained observations/action-evidence continuation qualified on 2026-10-20 in the diagnostics plan; broader semantic/collector migrations remain open. Custody process design and source-home follow-up remain scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
 **Receipt budget:** 100 MB total across this migration. Keep compact command summaries and source hashes; do not copy model weights, build trees or historical audit receipts.
 
 ## Decision
@@ -197,7 +197,9 @@ The owner clarified that names and umbrella repositories are secondary. The
 objective is one implementation per shared responsibility, with explicit
 ownership of state, permissions, execution, lifetime and reported outcomes.
 The scope below defines separate acceptance gates. Execution/shutdown progress
-and qualification are recorded at the end; the other lanes remain scoped. The
+and qualification are recorded at the end; the diagnostics plan records the
+2026-10-20 contained observations/action-evidence continuation and remaining
+owner migrations. Custody/process and source-home lanes remain scoped. The
 completed source promotion above remains its own checkpoint.
 
 ### Responsibility boundaries
@@ -268,6 +270,14 @@ counterexamples are receiving gates: exposing a join error is insufficient if
 the lane still journals or acknowledges work after its actor has disconnected.
 
 ### Second implementation slice: observations and semantic action evidence
+
+Current-target/collector continuation (2026-10-20, qualified): the
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#current-target-admission-and-collector-bridge-2026-10-20)
+records fresh host admission and explicit routing results, plus the opt-in
+Registry-to-Apparatus bridge: 237 targeted native tests pass with seven existing
+ignores, plus browser-host and collector Wasm compilation. Product startup
+wiring, target lifetime tokens and
+shared semantic construction remain open.
 
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),

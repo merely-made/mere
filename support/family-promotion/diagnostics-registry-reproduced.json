@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "mere-registry",
+    "--no-default-features",
+    "--features",
+    "diagnostics",
+    "diagnostics::descriptor::tests"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T16:50:40.735451+00:00",
+  "finished": "2026-10-20T16:54:40.460265+00:00",
+  "exit_code": 4294967295,
+  "results": [
+    "Blocking waiting for file lock on package cache"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on package cache\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}
