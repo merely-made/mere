@@ -1,0 +1,146 @@
+warning: skipping duplicate package `mere-surface-api v0.1.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/surface-api/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/system/surface-api/Cargo.toml
+
+warning: skipping duplicate package `workbench v0.1.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/workbench/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/cambium/workbench/Cargo.toml
+
+warning: skipping duplicate package `meristem v0.2.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/meristem/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/cambium/meristem/Cargo.toml
+
+warning: skipping duplicate package `cambium-winit v0.3.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/cambium/cambium-winit/Cargo.toml
+
+warning: skipping duplicate package `mere-apparatus v0.0.1 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/domain/apparatus/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/domain/apparatus/Cargo.toml
+
+warning: skipping duplicate package `mere-kernel v0.0.2 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/graph/graph-kernel/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/graph/graph-kernel/Cargo.toml
+
+warning: skipping duplicate package `numen v0.2.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/conatus/numen/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/conatus/numen/Cargo.toml
+
+warning: skipping duplicate package `document-canvas v0.1.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/document-canvas/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/inker/document-canvas/Cargo.toml
+
+warning: skipping duplicate package `inker v0.1.1 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/inker/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/inker/inker/Cargo.toml
+
+warning: skipping duplicate package `mere-document-lanes v0.1.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/document-lanes/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/system/document-lanes/Cargo.toml
+
+warning: skipping duplicate package `pandect v0.1.1 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/pandect/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/system/pandect/Cargo.toml
+
+warning: skipping duplicate package `mere-alembic v0.0.1 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/distillery/alembic/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/distillery/alembic/Cargo.toml
+
+warning: skipping duplicate package `incipit v0.2.0 (https://github.com/merely-made/mere.git?branch=main#4d5632de)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/incipit/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/4d5632d/crates/incipit/Cargo.toml
+
+warning: patch `armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=6827559937f07f78a6a830dfbfcaa54210dd093c#68275599)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/merely-made/armillary.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=af5597c670da111713dd306f4feba8db892a86d2#af5597c6)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/merely-made/esp.git
+warning: patch `armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=6827559937f07f78a6a830dfbfcaa54210dd093c#68275599)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/merely-made/armillary.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=af5597c670da111713dd306f4feba8db892a86d2#af5597c6)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/merely-made/esp.git
+warning: patch `armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=6827559937f07f78a6a830dfbfcaa54210dd093c#68275599)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/merely-made/armillary.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=af5597c670da111713dd306f4feba8db892a86d2#af5597c6)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://github.com/merely-made/esp.git
+warning: patch `commons-spine v0.0.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `dict-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `finger-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `fsp-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `gemot v0.1.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `gopher-protocol v0.2.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `guppy-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `kepler-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `mien v0.0.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `misfin v0.0.4 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `mooting v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `nex-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `scorpion-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `scroll-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `spartan-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `text-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `commons-spine v0.0.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `gemot v0.1.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#f9fe8507)` was not used in the crate graph
+warning: patch `mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#f9fe8507)` was not used in the crate graph
+warning: patch `mien v0.0.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `mooting v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `commons-spine v0.0.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `gemot v0.1.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `mien v0.0.1 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `mooting v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling woodshed-notation v0.1.0 (/Users/markik/Code/worktrees/woodshed-arrangement-playback/crates/woodshed-notation)
+    Finished `test` profile [unoptimized] target(s) in 5.77s
+     Running unittests src/lib.rs (target/build/debug/deps/woodshed_notation-d24ba45eeff5e477)
+
+running 10 tests
+test tests::arbitrary_string_count_and_extreme_ledger_space_are_measured ... ok
+test tests::complete_measures_wrap_and_event_hitboxes_stay_inside ... ok
+test tests::instrument_clefs_and_written_octaves_match_conventional_staves ... ok
+test tests::bundled_font_has_real_music_outlines ... ok
+test tests::actual_tab_digit_outlines_fit_between_adjacent_strings ... ok
+test tests::score_measures_share_staff_lines_within_each_wrapped_row ... ok
+test tests::chord_chart_uses_authored_meter_beat_count ... ok
+test tests::invalid_playback_positions_are_ignored_and_default_has_no_cursor ... ok
+test tests::each_view_emits_native_paint_commands ... ok
+test tests::playback_cursor_is_separate_from_selection_in_all_views_and_rests ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

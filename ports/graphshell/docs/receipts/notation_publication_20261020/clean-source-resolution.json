@@ -1,0 +1,15 @@
+{
+  "result": "pass",
+  "provider_packages": [
+    {
+      "name": "woodshed-notation",
+      "source": "git+https://github.com/merely-made/woodshed.git?rev=a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61#a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61"
+    },
+    {
+      "name": "woodshedding",
+      "source": "git+https://github.com/merely-made/woodshed.git?rev=a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61#a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61"
+    }
+  ],
+  "all_local_packages_inside_export": true,
+  "mode": "locked offline metadata; no clean compilation claimed"
+}

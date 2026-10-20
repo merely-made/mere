@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-20",
+  "provider_implementation": "a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61",
+  "provider_branch": "codex/woodshed-timing-integration",
+  "consumer_branch": "codex/graphshell-notation-readings",
+  "local_override": false,
+  "document_tests": 26,
+  "web_product_build": "pass",
+  "port_boundaries": "pass",
+  "viewer_excludes_music": "pass",
+  "clean_source_dependency_resolution": "pass",
+  "clean_compilation_claimed": false,
+  "browser": [
+    {
+      "path": "browser/notation_readings_reopen/result.json",
+      "state": "ok"
+    },
+    {
+      "path": "browser/notation_tempo/result.json",
+      "state": "ok"
+    }
+  ],
+  "source_inputs": 37,
+  "package_files": 5
+}
