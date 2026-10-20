@@ -552,6 +552,16 @@ completion, actor panic and repeated close results have deterministic receiving
 controls. The dedicated/pooled controls extend the existing
 `support/fixtures/armillary-consumer` host rather than add another fixture.
 
+Final macOS checks pass: 41 Distillery library tests plus four shutdown/close/
+resident cases; nine Djinn receiving tests with its binary target compiled;
+43 Graphshell endpoint tests; four independent synchronous actor controls; eight
+locked metadata roots; and the port boundary check. Both selected before-repair
+controls fail at their intended assertions, including the durable-lock false
+success on `8f26d962`. The stable final Distillery/Djinn reruns start from a clean
+receiving checkpoint. The synchronous fixture's normal dependency graph excludes
+Tokio. Counts describe their individual configurations, not a combined unique
+suite or new native UI qualification.
+
 Compact records for this receiving extension and the consumer publications are
 `support/family-promotion/consumer-repaired-cohort-publication.json` and
 `support/family-promotion/execution-macos-receiving.json`. They retain source
