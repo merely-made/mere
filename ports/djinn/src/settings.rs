@@ -143,6 +143,10 @@ pub struct OwnerSettings {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct InferenceLaneSettings {
+    /// Optional guarded vector projection over retained sources. Requires the
+    /// inference-embedding build feature; it never acquires a model or source.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub embedding: Option<distillery::inference_protocol::recall::EmbeddingRecallSettings>,
     /// Owner bounds for retained-source publications and prompt assembly.
     #[serde(default)]
     pub recall: distillery::inference_protocol::recall::RecallConfig,

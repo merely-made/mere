@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "description": "Fixed retained-source corpus and held-out questions; no fitting or post-result corpus/weight changes. Neutral source addresses and no titles.",
+  "documents": [
+    {
+      "id": "bicycle",
+      "text": "A bicycle converts pedalling effort into motion through its chain and gears."
+    },
+    {
+      "id": "refrigerator",
+      "text": "A refrigerator keeps groceries cold by moving heat out of an insulated compartment."
+    },
+    {
+      "id": "eclipse",
+      "text": "A solar eclipse occurs when the Moon passes between Earth and the Sun, blocking sunlight."
+    },
+    {
+      "id": "rainbarrel",
+      "text": "Rain barrels collect runoff from roofs so gardeners can water plants during dry weather."
+    },
+    {
+      "id": "sourdough",
+      "text": "Sourdough bread rises because wild yeast and bacteria ferment the flour mixture."
+    },
+    {
+      "id": "guitar",
+      "text": "Tightening a guitar string increases its tension and raises the pitch."
+    },
+    {
+      "id": "bearing",
+      "text": "A ball bearing reduces friction by allowing metal balls to roll between rotating surfaces."
+    },
+    {
+      "id": "observatory",
+      "text": "The Pelican observatory access word is amberstone. The night keeper wrote café in the visitor log."
+    },
+    {
+      "id": "rust",
+      "text": "Rust ownership and borrowing prevent dangling references without a garbage collector."
+    },
+    {
+      "id": "recipe",
+      "text": "Lentil soup simmers with carrots, cumin and vegetable stock for thirty minutes."
+    },
+    {
+      "id": "radio",
+      "text": "A packet radio link uses error correction and retries to deliver data over a noisy channel."
+    },
+    {
+      "id": "compost",
+      "text": "Compost turns kitchen scraps and garden waste into nutrient-rich soil through decomposition."
+    },
+    {
+      "id": "cloud",
+      "text": "A cloud service bills users monthly for virtual storage and computing resources."
+    },
+    {
+      "id": "calendar",
+      "text": "A calendar reminder sends a notification before a scheduled meeting begins."
+    },
+    {
+      "id": "camera",
+      "text": "A camera lens focuses incoming light onto an image sensor when the shutter opens."
+    },
+    {
+      "id": "battery",
+      "text": "A rechargeable battery stores electrical energy using reversible chemical reactions."
+    }
+  ],
+  "queries": [
+    {
+      "question": "How does a person-powered two-wheeler move?",
+      "expected": "bicycle",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "Which appliance prevents food from getting warm?",
+      "expected": "refrigerator",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "Why can daylight vanish behind our natural satellite?",
+      "expected": "eclipse",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "How can I save rooftop precipitation for my vegetables?",
+      "expected": "rainbarrel",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "What makes a naturally fermented loaf expand?",
+      "expected": "sourdough",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "Why does winding the tuner make a plucked note sound higher?",
+      "expected": "guitar",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "How do little spheres help a wheel turn smoothly?",
+      "expected": "bearing",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "What password lets the night visitor enter the astronomical station?",
+      "expected": "observatory",
+      "kind": "paraphrase"
+    },
+    {
+      "question": "Rust ownership borrowing",
+      "expected": "rust",
+      "kind": "lexical_control"
+    },
+    {
+      "question": "lentil soup cumin carrots",
+      "expected": "recipe",
+      "kind": "lexical_control"
+    },
+    {
+      "question": "packet radio error correction",
+      "expected": "radio",
+      "kind": "lexical_control"
+    },
+    {
+      "question": "compost kitchen scraps garden waste",
+      "expected": "compost",
+      "kind": "lexical_control"
+    }
+  ],
+  "fusion": {
+    "lexical_weight": 1,
+    "vector_weight": 1,
+    "rrf_k": 60
+  }
+}
