@@ -134,13 +134,15 @@ async fn main() {
         attach(&mut c, &d, id).await;
         let s = c.snapshot(d.projections[1].request.clone()).await.unwrap();
         let mut cards = vec![];
-        let mut graphs=vec![];
+        let mut graphs = vec![];
         for offer in s.presentation.offers.values().flatten() {
             let bytes = c.resource(s.session.clone(), offer.resource).await.unwrap();
-            let card=serde_json::from_slice::<PortableCardV1>(&bytes).unwrap();
+            let card = serde_json::from_slice::<PortableCardV1>(&bytes).unwrap();
             for media in &card.media {
-                let bytes=c.resource(s.session.clone(),*media).await.unwrap();
-                if let Ok(graph)=serde_json::from_slice::<SessionGraphV1>(&bytes){graphs.push(graph);}
+                let bytes = c.resource(s.session.clone(), *media).await.unwrap();
+                if let Ok(graph) = serde_json::from_slice::<SessionGraphV1>(&bytes) {
+                    graphs.push(graph);
+                }
             }
             cards.push(card);
         }
@@ -161,6 +163,17 @@ async fn main() {
                     .map(|_| instance)
             })
             .unwrap();
+        let from = s
+            .scene
+            .tables
+            .sources
+            .iter()
+            .flatten()
+            .find(|source| source.adapter == "mere.graph")
+            .unwrap()
+            .id
+            .clone();
+        let added = uuid::Uuid::new_v4();
         invoke(
             &mut c,
             &s,
