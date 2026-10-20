@@ -106,6 +106,7 @@ pub struct MereRoutes {
 type ProfileLookup = Arc<dyn Fn(&personae::ProfileId) -> Result<bool, String> + Send + Sync>;
 
 struct Routes {
+    custody_endpoint: Option<String>,
     shared_root: PathBuf,
     persona: PersonaId,
     catalog: AppEndpointCatalog,
@@ -169,6 +170,7 @@ impl MereRoutes {
     ) -> Self {
         Self {
             inner: Arc::new(Routes {
+                custody_endpoint: None,
                 shared_root,
                 persona,
                 catalog,
@@ -182,6 +184,16 @@ impl MereRoutes {
                 access_loaded: AtomicBool::new(false),
             }),
         }
+    }
+
+    /// The daemon's own custody door. Embedded compositions that do not
+    /// serve custody leave co-op controls absent rather than borrowing another
+    /// resident's identity from process-global configuration.
+    pub fn with_custody_endpoint(mut self, endpoint: String) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("compose custody before serving")
+            .custody_endpoint = Some(endpoint);
+        self
     }
 
     /// Load the durable decisions before serving routes. This is mandatory
@@ -324,6 +336,7 @@ impl MereRoutes {
             .map_err(|error| error.to_string())?;
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
+            custody_endpoint: self.inner.custody_endpoint.clone(),
             validator: self.inner.validators.get(&domain).cloned(),
             admission_validator: if domain == personal_facts::DOMAIN {
                 let lookup = self.inner.profile_lookup.clone();
@@ -346,6 +359,7 @@ impl MereRoutes {
             backend,
             persona: self.inner.persona,
             hosts: Mutex::new(HashMap::new()),
+            coop: Default::default(),
             lifecycle: AtomicU64::new(1),
             codicil_sessions: Mutex::new(HashMap::new()),
             pending_merges: Mutex::new(BTreeMap::new()),
@@ -364,6 +378,20 @@ impl MereRoutes {
                 .map_err(|_| "the remote catalog lock is poisoned".to_string())?;
             register_mere_routes(&mut remote, &route, &ambient, &shared, &grants)
                 .map_err(|error| error.to_string())?;
+        }
+        if self.inner.custody_endpoint.is_some() {
+            let coop_route = ResidentEndpointRoute::new(format!("coop/{domain}"), MERE_NOTICE_POLL)
+                .map_err(|e| e.to_string())?;
+            let coop_shared = shared.clone();
+            let coop_grants = self.inner.grants.clone();
+            self.inner
+                .catalog
+                .update(|catalog| coop::register(catalog, coop_shared, coop_grants))
+                .await
+                .map_err(|e| e.to_string())?;
+            self.inner
+                .grants
+                .grant(AppId::new("graphshell"), coop_route);
         }
         for app in &self.inner.apps {
             self.inner.grants.grant(app.clone(), route.clone());
@@ -621,11 +649,15 @@ impl ResumableProjectionSource for AccessEndpoint {
     }
 }
 
+#[path = "resident_mere_coop.rs"]
+mod coop;
+
 type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 
 /// One mere's store, and the host of each of its sessions an application has
 /// attached to.
 struct MereShared {
+    custody_endpoint: Option<String>,
     domain: String,
     validator: Option<pandect::GraphValidator>,
     admission_validator: Option<pandect::GraphAdmissionValidator>,
@@ -633,6 +665,7 @@ struct MereShared {
     archive: RedbBackend,
     persona: PersonaId,
     hosts: Mutex<HashMap<SessionId, SharedHost>>,
+    coop: coop::Activities,
     /// The sessions projection's revision: it moves with every lifecycle step.
     lifecycle: AtomicU64,
     /// The sessions each codicil was saved from, by codicil id. A codicil
@@ -1961,6 +1994,53 @@ mod tests {
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     };
 
+    #[tokio::test(flavor = "multi_thread")]
+    async fn coop_owner_controls_are_local_and_do_not_follow_the_remote_mere_catalog() {
+        let remote = Arc::new(std::sync::Mutex::new(ResidentEndpointCatalog::new()));
+        let fixture = fixture_serving(0xc00f, "coop-scope", None, Some(remote.clone())).await;
+        let route = "coop/coop-scope";
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&AppRequest {
+                    app: AppId::new("graphshell"),
+                    route: AppRouteId::new(route).unwrap()
+                })
+                .is_ok()
+        );
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&AppRequest {
+                    app: AppId::new("turnstone"),
+                    route: AppRouteId::new(route).unwrap()
+                })
+                .is_err()
+        );
+        assert!(
+            remote
+                .lock()
+                .unwrap()
+                .open(route, &context("graphshell"))
+                .is_err()
+        );
+        assert!(
+            fixture
+                .catalog
+                .update(|catalog| catalog.open(route, &context("turnstone")))
+                .await
+                .is_err()
+        );
+        let endpoint = fixture
+            .catalog
+            .update(|catalog| catalog.open(route, &context("graphshell")))
+            .await
+            .unwrap();
+        assert_eq!(endpoint.describe().projections.len(), 1);
+    }
+
     fn persona(n: u128) -> PersonaId {
         PersonaId::from_uuid(Uuid::from_u128(n))
     }
@@ -2041,7 +2121,9 @@ mod tests {
             None,
             graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
         ));
-        let routes = routes.with_profile_subject_authority(owner);
+        let routes = routes
+            .with_custody_endpoint("unused-in-unit-tests".into())
+            .with_profile_subject_authority(owner);
         let routes = if let Some(validator) = validator {
             routes.with_domain_validator(domain, validator)
         } else {

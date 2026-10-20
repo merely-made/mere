@@ -1269,6 +1269,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                     grants.clone(),
                     first_party.clone(),
                 )
+                .with_custody_endpoint(args.app_endpoint.clone())
                 .with_profile_subject_authority(personae.clone())
                 .with_divination_authority()
             });

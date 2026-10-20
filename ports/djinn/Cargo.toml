@@ -102,7 +102,7 @@ incipit.workspace = true
 # `trainer` feature is on: `remote` would pull the burn stack into the desktop
 # resident, and `trainer` pulls it deliberately and by the owner's request.
 distillery = { workspace = true, features = ["inference-wire"] }
-graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
 graphshell-endpoint = { workspace = true, features = ["door"] }
@@ -275,7 +275,7 @@ insigne = { workspace = true, features = ["verify"] }
 graphshell-client = { workspace = true, features = ["pump"] }
 # The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
-graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint.workspace = true
 pollster = "0.4"
