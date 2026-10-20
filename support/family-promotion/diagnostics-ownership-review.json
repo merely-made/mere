@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
   "basis": "21deb0cb",
-  "status": "six contained repairs and bounded worker/UI evidence qualified by 178 targeted native tests; broader migrations open",
+  "status": "six earlier repairs plus contained current-target admission and collector bridge qualified; 237 targeted native passes, seven existing ignores, two Wasm compile gates; wider owner migrations open",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -66,6 +66,37 @@
       ],
       "evidence": "External journal callbacks run under the run-table guard; table acquisition expects no poisoning. A panicking callback can break that assumption. The actor-panic control does not exercise journal panic under this guard.",
       "why_deferred": "Recovering the mutex does not establish whether an external write committed. Requires fallible lifecycle and durable-recovery qualification rather than silently clearing poison."
+    },
+    {
+      "id": "diagnostics-current-target-admission",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/frame.rs:admit_a11y_request",
+        "crates/cambium/cambium-rootstock/src/window_dom.rs:contains"
+      ],
+      "change": "Revalidate window membership, current semantics and contributed action before each request; refuse nonfinite/read-only values and absent slots; expose routing refusals and producer declines.",
+      "verification": "host batch callback, detached/unsupported target, actual sibling window, current producer action/slot and leaf contribution controls",
+      "status": "repaired and qualified by diagnostics-admission-final.json and native receiving controls"
+    },
+    {
+      "id": "diagnostics-producer-decline-focus",
+      "source": "crates/cambium/cambium-rootstock/src/frame.rs:apply_a11y_requests",
+      "change": "A declined producer activation is returned distinctly and does not move focus; post-dispatch hooks still run after a real producer invocation.",
+      "verification": "actual producer false return, focus and callback count control",
+      "status": "repaired and qualified by diagnostics-admission-final.json and native receiving controls"
+    },
+    {
+      "id": "diagnostics-collector-bridge",
+      "source": "crates/domain/apparatus/src/collector.rs",
+      "change": "Optional diagnostics-only Registry dependency; explicit product redaction into bounded retained readers; preserve queue boot/sequence/time separately, product metadata unchanged, no fabricated ingress-to-retained gaps.",
+      "verification": "24 core/collector tests with actual emitter route, independent readers, filtering, overload, metadata, no-sink accounting, invalid clock and replacement queue boundary",
+      "status": "qualified by diagnostics-collector-clock.json and diagnostics-collector-wasm.json"
+    },
+    {
+      "id": "diagnostics-browser-clock",
+      "source": "crates/system/registry/src/diagnostics/emit/queue.rs:diagnostic_channel",
+      "change": "Use existing web-time Instant rather than std Instant for the advertised portable staging queue; dependency remains diagnostics-only.",
+      "status": "repaired; 39 Registry and 24 Apparatus native passes plus collector Wasm compile; browser runtime remains separate",
+      "verification": "Registry/collector native tests plus wasm32-unknown-unknown collector compile; browser runtime not claimed"
     }
   ],
   "ownership_migrations": [
@@ -89,8 +120,8 @@
         "A870",
         "A872"
       ],
-      "state": "intentionally separate owners",
-      "decision": "Registry staging rejects newest on overflow; Apparatus retained history evicts oldest and supplies independent readers. Display truncation is neither ingress loss nor retention loss."
+      "state": "separate owners joined by an opt-in product-projected adapter; startup adoption remains open",
+      "decision": "Registry ingress rejects newest; Apparatus history evicts oldest. RegistryCollector exposes independent readers and separate queue context/counters. It does not install a sender, sampling/invariant policy, exporter or per-product scheduling."
     },
     {
       "audit_ids": [
@@ -122,9 +153,9 @@
         "crates/cambium/cambium-winit-a11y/src/lib.rs:map_parts",
         "crates/cambium/cambium-rootstock/src/frame.rs:apply_a11y_requests"
       ],
-      "gap": "Last-synced action maps and direct node dispatch do not establish fresh semantic admission at execution. Review disabled/removed/reused targets and producer/session lifetimes before adding attributed results.",
-      "gate": "One owner current-target/admission path, platform and local automation receiving regressions, and explicit foreign/stale/unsupported results. Human AT remains separate.",
-      "why_deferred": "Requires API and cross-host/producer lifetime qualification, beyond the contained repair pass."
+      "gap": "Current subtree/semantic/leaf/producer admission and routing results are implemented. Requests still lack originating document/window/session/revision tokens, producer semantic admission and activation are separate callbacks, and reused keys lack lifetime qualification. Native/browser event loops may discard the returned routing results.",
+      "gate": "Owner-issued target lifetimes and attributable operation results across actual platform and automation consumers; explicit stale/foreign-document alias/reuse controls. Human AT remains separate.",
+      "why_deferred": "Cross-host identity, producer atomicity and operation lifetimes require a broader API/consumer migration; current checks do not establish presentation freshness or terminal success."
     },
     {
       "owner": "Taproot grammar and Mesquite adapter",
@@ -137,8 +168,8 @@
     },
     {
       "owner": "Registry collector adapters and product sources",
-      "gap": "A channel sequence is scoped to an ingress queue, while Apparatus sequences belong to a retained run/source. Contention/no-sink losses have no sequence. An adapter must preserve source boot/scope and unsequenced loss rather than fabricate cause references or record gaps. Current Mere has no production call to should_emit_and_observe/should_emit_channel or install_global_sender. API qualification is not a wired host pipeline.",
-      "gate": "Actual producer-to-retained-reader adapter with overload/restart controls and explicit unsequenced counters; no universal envelope rewrite."
+      "gap": "A qualified optional RegistryCollector joins the real emitter to Apparatus readers after product projection. No production global sender or registry sampling/invariant gate is installed; scheduling, redaction, sink/thread/window lifetime and final old-sender counter custody remain product-owned. Process-wide uninstalled loss is not assigned to an unrelated queue.",
+      "gate": "Adopt bridge through a product startup/teardown and bounded inspection/receipt consumer; qualify actual thread routing, registry policy and privacy scope. Preserve queue versus retained identities and final disconnect losses."
     },
     {
       "owner": "Presentation producers and receipt adapters",
@@ -149,11 +180,29 @@
       "owner": "Distillery integration consumers",
       "gap": "The worker observation copy is opt-in and samples selected owner boundaries, without backfill, all-command refusal coverage or automatic UI/export wiring. Existing worker token transport and domain run-table retention are not newly bounded by the diagnostic store.",
       "gate": "Consumers choose nonsecret fresh run identity, limits/export policy and full command/outcome coverage they need; qualify actual model/GPU and headed uses separately."
+    },
+    {
+      "owner": "Genet projection, Sprigging and Cambium adapters",
+      "source": [
+        "crates/cambium/cambium-winit-a11y/src/lib.rs:project_tree_with_actions",
+        "crates/cambium/cambium-rootstock/src/lib.rs:document_projection",
+        "crates/cambium/cambium-genet-web-host/src/a11y.rs:sync"
+      ],
+      "gap": "Winit starts from the Genet AccessKit projection; Rootstock/browser start from neutral document semantics. Textbox/numeric overrides and leaf contributions are still lowered separately. Leaf admission consults the existing AccessKit callback without turning it into a neutral projection. Context-sensitive callback behavior and full action catalogue parity remain unqualified.",
+      "gate": "One supplier-qualified semantic contribution model with current geometry/clipping and native/browser receiving controls; retire duplicated lowering and markers where practical."
     }
   ],
   "qualification_receipts": [
     "diagnostics-core-online.json",
     "diagnostics-mesquite-current.json",
     "diagnostics-inference-current.json"
+  ],
+  "continuation_basis": "4e4a2c8c",
+  "continuation_qualification_receipts": [
+    "diagnostics-admission-final.json",
+    "diagnostics-platform-native.json",
+    "diagnostics-collector-clock.json",
+    "diagnostics-browser-compile.json",
+    "diagnostics-collector-wasm.json"
   ]
 }

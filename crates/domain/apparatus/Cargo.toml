@@ -19,9 +19,12 @@ path = "src/lib.rs"
 default = ["projection"]
 projection = ["dep:accesskit", "dep:tracing", "dep:uxtree"]
 serde = ["dep:serde"]
+registry = ["dep:registry"]
 
 [dependencies]
 accesskit = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 uxtree = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
+
+registry = { workspace = true, default-features = false, features = ["diagnostics"], optional = true }

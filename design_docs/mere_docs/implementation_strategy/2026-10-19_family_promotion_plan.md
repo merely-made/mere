@@ -271,6 +271,14 @@ the lane still journals or acknowledges work after its actor has disconnected.
 
 ### Second implementation slice: observations and semantic action evidence
 
+Current-target/collector continuation (2026-10-20, qualified): the
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#current-target-admission-and-collector-bridge-2026-10-20)
+records fresh host admission and explicit routing results, plus the opt-in
+Registry-to-Apparatus bridge: 237 targeted native tests pass with seven existing
+ignores, plus browser-host and collector Wasm compilation. Product startup
+wiring, target lifetime tokens and
+shared semantic construction remain open.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse

@@ -747,10 +747,17 @@ where
     /// Route a screen-reader request through the host's accessibility path —
     /// the same routing [`Host::sync_a11y`] performs on a drained request,
     /// minus the OS adapter no test can supply.
-    pub fn a11y_request(&mut self, action: A11yAction, node: NodeId) {
-        self.host
-            .apply_a11y_requests(&[A11yRequest::node(action, node)]);
+    pub fn a11y_request(
+        &mut self,
+        action: A11yAction,
+        node: NodeId,
+    ) -> cambium_rootstock::A11yDispatch {
+        let result = self
+            .host
+            .apply_a11y_requests(&[A11yRequest::node(action, node)])
+            .remove(0);
         self.relayout();
+        result
     }
 
     /// The drawn nodes' action buttons in this frame's projected tree: each
@@ -780,15 +787,18 @@ where
         &mut self,
         action: A11yAction,
         produced: cambium_rootstock::ProducedAction,
-    ) {
-        self.host
-            .apply_a11y_requests(&[A11yRequest::produced(action, produced)]);
+    ) -> cambium_rootstock::A11yDispatch {
+        let result = self
+            .host
+            .apply_a11y_requests(&[A11yRequest::produced(action, produced)])
+            .remove(0);
         self.relayout();
+        result
     }
 
     /// Route a finite AccessKit numeric value request through the host seam.
-    pub fn a11y_set_value(&mut self, node: NodeId, value: f64) {
-        self.a11y_request(A11yAction::SetValue(value), node);
+    pub fn a11y_set_value(&mut self, node: NodeId, value: f64) -> cambium_rootstock::A11yDispatch {
+        self.a11y_request(A11yAction::SetValue(value), node)
     }
 
     /// The AccessKit tree as the accessibility host would publish it: projected
