@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "cambium-rootstock",
+    "--lib",
+    "accessibility_tests"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T17:51:50.136149+00:00",
+  "finished": "2026-10-20T17:52:34.821176+00:00",
+  "exit_code": 101,
+  "results": [
+    "error[E0608]: cannot index into a value of type `impl Iterator<Item = genet_scripted_dom::NodeId> + '_`",
+    "error[E0608]: cannot index into a value of type `impl Iterator<Item = genet_scripted_dom::NodeId> + '_`",
+    "error: could not compile `cambium-rootstock` (lib test) due to 2 previous errors; 3 warnings emitted"
+  ],
+  "diagnostic_tail": "warning: unused variable: `time_range`\n   --> crates\\cambium\\scenes\\scenomise\\src\\opened_link.rs:599:9\n    |\n599 |     let time_range = timeline_range(pending);\n    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`\n    |\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)\n   Compiling cambium-rootstock v0.1.0 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium-rootstock)\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> crates\\cambium\\cambium-rootstock\\src\\producer\\registry.rs:47:10\n   |\n47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {\n   |          ^^^^^^^^^^^^\n   |\n   = note: `#[warn(deprecated)]` on by default\nhelp: replace the use of the deprecated method\n   |\n47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {\n47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {\n   |\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> crates\\cambium\\cambium-rootstock\\src\\scene_producer.rs:25:10\n   |\n25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {\n   |          ^^^^^^^^^^^^\n   |\nhelp: replace the use of the deprecated method\n   |\n25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {\n25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {\n   |\n\nerror[E0608]: cannot index into a value of type `impl Iterator<Item = genet_scripted_dom::NodeId> + '_`\n   --> crates\\cambium\\cambium-rootstock\\src\\accessibility_tests.rs:267:57\n    |\n267 |     let plain = dom.dom_children(dom.dom_children(mount)[0])[1];\n    |                                                         ^^^\n\nerror[E0608]: cannot index into a value of type `impl Iterator<Item = genet_scripted_dom::NodeId> + '_`\n   --> crates\\cambium\\cambium-rootstock\\src\\accessibility_tests.rs:267:61\n    |\n267 |     let plain = dom.dom_children(dom.dom_children(mount)[0])[1];\n    |                                                             ^^^\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency\n   --> crates\\cambium\\cambium-rootstock\\src\\host.rs:116:10\n    |\n116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n    |          ^^^^^^^^^^^^\n    |\nhelp: replace the use of the deprecated method\n    |\n116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n    |\n\nFor more information about this error, try `rustc --explain E0608`.\nwarning: `cambium-rootstock` (lib test) generated 3 warnings\nerror: could not compile `cambium-rootstock` (lib test) due to 2 previous errors; 3 warnings emitted\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

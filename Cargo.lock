@@ -2206,6 +2206,7 @@ dependencies = [
 name = "cambium-rootstock"
 version = "0.1.0"
 dependencies = [
+ "accesskit 0.25.1",
  "cambium",
  "cambium-winit",
  "document-session-api",
@@ -4624,6 +4625,7 @@ dependencies = [
  "insigne",
  "iroh",
  "layout-dom-api",
+ "mere-apparatus",
  "mere-mesh",
  "mere-proofs",
  "mere-surface-api",
@@ -9713,6 +9715,7 @@ name = "mere-apparatus"
 version = "0.0.1"
 dependencies = [
  "accesskit 0.25.1",
+ "mere-registry",
  "serde",
  "tracing",
  "uxtree",
@@ -10100,6 +10103,7 @@ dependencies = [
  "toml 0.8.23",
  "tower",
  "url",
+ "web-time",
 ]
 
 [[package]]

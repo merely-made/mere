@@ -49,9 +49,9 @@ pub use presentation::{
 };
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
-pub mod producer;
 #[cfg(feature = "embedding")]
 pub mod embedding;
+pub mod producer;
 mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
@@ -290,6 +290,24 @@ pub enum A11yAction {
     SetValue(f64),
 }
 
+/// Host routing result, not a promise that application work completed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum A11yDispatch {
+    Dispatched,
+    Rejected(A11yRejection),
+    /// The current producer advertised the action but declined to handle it.
+    ProducerDeclined,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum A11yRejection {
+    Unavailable,
+    TargetAbsent,
+    Disabled,
+    Unsupported,
+    InvalidValue,
+}
+
 /// One drained screen-reader request: which action, on what.
 #[derive(Clone, Debug, PartialEq)]
 pub struct A11yRequest {
@@ -402,6 +420,7 @@ pub fn document_projection(
     // marked app textboxes accessible leaves with their app-owned value.
     let mut markers = std::collections::HashMap::new();
     let mut painted = std::collections::HashMap::new();
+    let mut numeric = std::collections::HashSet::new();
     let mut pending = vec![dom.document()];
     while let Some(node) = pending.pop() {
         if let Some((x, y, width, height)) = layout.painted_rect(dom, node) {
@@ -432,6 +451,14 @@ pub fn document_projection(
             ) == Some("true");
             markers.insert(dom.opaque_id(node), (value.to_owned(), multiline));
         }
+        if dom.attribute(
+            node,
+            &Namespace::default(),
+            &LocalName::from("data-cambium-set-value"),
+        ) == Some("true")
+        {
+            numeric.insert(dom.opaque_id(node));
+        }
         pending.extend(dom.dom_children(node));
     }
     // Genet supplies semantic names and actions; this host owns the retained
@@ -441,6 +468,19 @@ pub fn document_projection(
     // actions remain independent of the current cursor or scroll offset.
     let mut nodes = projection.nodes().to_vec();
     for node in &mut nodes {
+        if numeric.contains(&node.id.get())
+            && node
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::Click)
+            && !node.state.disabled
+            && !node.state.read_only
+            && !node
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::SetValue)
+        {
+            node.actions
+                .push(document_session_api::DocumentA11yAction::SetValue);
+        }
         if node.bounds.is_some()
             && let Some(bounds) = painted.get(&node.id.get())
         {
@@ -1149,12 +1189,12 @@ mod spatial_tests {
 
 #[cfg(test)]
 mod accessibility_tests;
-#[cfg(test)]
-mod mount_probe_tests;
 mod capture;
 mod frame;
 mod host;
 mod input;
+#[cfg(test)]
+mod mount_probe_tests;
 mod multi_host;
 #[cfg(test)]
 mod multi_host_tests;
@@ -1185,13 +1225,13 @@ pub use capture::{
     start_presentation_readback,
 };
 pub use host::{
-    HOST_WHEEL_LINE_PX, AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
+    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
-    FrameProfile, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage, HostOptions,
-    HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
+    FrameProfile, HOST_WHEEL_LINE_PX, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage,
+    HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
     PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
-    StampedCaptureFn, StampedCaptureFrame, WindowFrame, WheelUnit, ZOOM_LADDER, env_size,
-    fit_zoom, ladder_step,
+    StampedCaptureFn, StampedCaptureFrame, WheelUnit, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+    ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;

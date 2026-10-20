@@ -75,6 +75,26 @@ original admission accounting when adapting a batch to a receipt payload.
 No action dispatcher, terminal-outcome matcher, ingress queue, exporter or durable
 storage is installed. Products retain operation and persistence authority.
 
+## Optional Registry collector
+
+Feature `registry` connects the existing Registry staging receiver to an
+Apparatus store. `collector::RegistryCollector<P>` requires caller-chosen run,
+source, queue boot and retention limits; construction never locks or drains the
+queue. Install and schedule it in the owning product. Each `collect` call must
+project packets to an already-redacted `DiagnosticProjection<P>` or filter them.
+No raw event or producer correlation is retained automatically.
+
+Queue boot/sequence/time stay in `CollectedDiagnostic<P>`; the retained envelope
+keeps its own run/source/sequence. Product metadata remains product-owned.
+`read` returns an independent cursor batch plus the latest queue statistics,
+absent until a successful drain. Queue losses and retained gaps are distinct;
+process-global no-sink counters must be queried separately. After retiring a
+collector, sample final disconnect/discard counters through its old sender if
+required. A replacement queue needs a fresh run and boot; old cursors then
+report a run boundary. Identity freshness, panic policy and export remain the
+product's responsibility. This feature installs neither a global sender nor
+registry sampling/invariant policy into the emitter.
+
 ## Skeleton node shape
 
 The current `inspect_batch` interface is independent of the legacy skeleton.
@@ -104,7 +124,8 @@ The storage core uses only `std`. Disable default features for core-only consume
 `projection` enables `accesskit`, `uxtree`, `tracing` and `project_skeleton`;
 it is enabled by default to preserve the earlier API. Optional `serde` enables
 envelope, metadata, payload batch, statistics and cursor serialization; opaque
-cursors cannot be deserialized/restored into another store.
+cursors cannot be deserialized/restored into another store. Optional `registry`
+adds the diagnostics-only `mere-registry` dependency for the collector bridge.
 
 ## Status
 

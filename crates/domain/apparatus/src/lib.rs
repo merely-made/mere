@@ -17,6 +17,9 @@
 
 mod observation;
 pub use observation::*;
+#[cfg(feature = "registry")]
+pub mod collector;
+
 mod inspection;
 pub use inspection::*;
 

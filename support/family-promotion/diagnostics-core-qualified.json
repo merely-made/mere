@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "mere-registry",
+    "-p",
+    "ux-events",
+    "-p",
+    "mere-apparatus",
+    "--no-default-features",
+    "--features",
+    "mere-registry/diagnostics,mere-apparatus/serde",
+    "--lib"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T17:02:00.781176+00:00",
+  "finished": "2026-10-20T17:05:05.303631+00:00",
+  "exit_code": 4294967295,
+  "results": [],
+  "diagnostic_tail": "",
+  "target": "C:\\t\\cargo-targets\\mere"
+}
