@@ -70,7 +70,7 @@ required-features = ["custody-receipt-host"]
 
 [dependencies]
 # Local redacted lifecycle diagnostics, without the projection/rendering feature.
-apparatus = { workspace = true, default-features = false, features = ["registry", "serde"] }
+apparatus = { workspace = true, features = ["registry", "serde"] }
 registry = { workspace = true, features = ["diagnostics"] }
 armillary = { workspace = true, features = ["tokio"] }
 # The personal sync, carriage and transfer staging hosts (`sync`) and the
