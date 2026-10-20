@@ -39,6 +39,7 @@ use personae::{Ed25519Keypair, IdentityError, IdentityProvider, InMemoryProvider
 use zeroize::Zeroizing;
 
 use crate::keeper::Keeper;
+pub(crate) mod payload;
 
 /// The applications the custody route is granted to: the first-party apps
 /// that call djinn instead of opening a vault (D5), and the two command-line
@@ -298,6 +299,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         }
     }
     match call {
+        CustodyCall::Payload(request) => payload::answer(&keeper, &app, request),
         CustodyCall::LockVault => {
             keeper.host().lock_vault().map_err(refused)?;
             Ok(CustodyAnswer::Done)
@@ -556,6 +558,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
 
 fn call_name(call: &CustodyCall) -> &'static str {
     match call {
+        CustodyCall::Payload(_) => "retained_payload",
         CustodyCall::VaultCommand { .. } => "vault_command",
         CustodyCall::UnlockNative => "unlock_native",
         CustodyCall::UnassignedImports => "unassigned_imports",

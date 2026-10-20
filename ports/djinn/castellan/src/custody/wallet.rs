@@ -57,7 +57,7 @@ pub use issue::{
 };
 pub use migrate::reissue_legacy_grant;
 pub use revoke::revoke_remote_auth_device;
-pub use sealer::epoch_sealer_for_persona;
+pub use sealer::{epoch_sealer_for_persona, unseal_persona_payload};
 pub use secrets::{
     identity_seed_locked_at_startup, load_identity_seed, load_identity_seed_read_only,
     relock_wallet_after_manual_unlock, save_identity_seed, unlock_wallet_with_auto_os,

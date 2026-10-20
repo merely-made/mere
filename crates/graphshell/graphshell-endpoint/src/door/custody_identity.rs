@@ -216,8 +216,10 @@ impl CustodyIdentity {
         if certificate.issuer != self.master.to_bytes() {
             return Err(DelegationError::WrongIssuer);
         }
-        let (signer, signature) =
-            self.sign_scoped(&delegation_signing_salt(&certificate.scope), &certificate.signing_bytes())?;
+        let (signer, signature) = self.sign_scoped(
+            &delegation_signing_salt(&certificate.scope),
+            &certificate.signing_bytes(),
+        )?;
         Ok(SignedDelegationCertificate::from_parts(
             certificate,
             signer,
@@ -236,8 +238,10 @@ impl CustodyIdentity {
         if revocation.issuer != self.master.to_bytes() {
             return Err(DelegationError::WrongIssuer);
         }
-        let (signer, signature) =
-            self.sign_scoped(&delegation_signing_salt(&revocation.scope), &revocation.signing_bytes())?;
+        let (signer, signature) = self.sign_scoped(
+            &delegation_signing_salt(&revocation.scope),
+            &revocation.signing_bytes(),
+        )?;
         Ok(SignedDelegationRevocation::from_parts(
             revocation, signer, signature,
         ))
@@ -256,7 +260,9 @@ impl CustodyIdentity {
         let signer = self
             .attest_derived_key(salt)
             .map_err(|_| DelegationError::Identity)?;
-        let (public_key, signature) = self.sign(salt, message).map_err(|_| DelegationError::Identity)?;
+        let (public_key, signature) = self
+            .sign(salt, message)
+            .map_err(|_| DelegationError::Identity)?;
         match signer.check(salt) {
             Ok(checked) if checked.derived() == &public_key => Ok((signer, signature)),
             _ => Err(DelegationError::Identity),
@@ -359,7 +365,12 @@ impl IdentityProvider for CustodyIdentity {
     /// while pending, and an error naming the refusal for a salt djinn keeps.
     fn derive_keypair(&self, salt: &[u8]) -> Result<Ed25519Keypair, IdentityError> {
         self.pending()?;
-        if let Some(keys) = self.held.lock().unwrap_or_else(|e| e.into_inner()).get(salt) {
+        if let Some(keys) = self
+            .held
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .get(salt)
+        {
             return keys.derive_keypair(salt);
         }
         let asked = salt.to_vec();
@@ -384,7 +395,12 @@ impl IdentityProvider for CustodyIdentity {
     /// The master's attestation for `salt`'s key, signed inside djinn.
     fn attest_derived_key(&self, salt: &[u8]) -> Result<DerivedKeyAttestation, IdentityError> {
         self.pending()?;
-        if let Some(keys) = self.held.lock().unwrap_or_else(|e| e.into_inner()).get(salt) {
+        if let Some(keys) = self
+            .held
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .get(salt)
+        {
             return keys.attest_derived_key(salt);
         }
         let asked = salt.to_vec();
@@ -412,6 +428,88 @@ fn done(answer: CustodyAnswer) -> Result<(), CustodyClientError> {
 
 fn closed() -> CustodyClientError {
     CustodyClientError::Transport(AppClientError::Closed)
+}
+
+impl eidetic::PayloadSealer for CustodyIdentity {
+    fn seal(
+        &self,
+        hash: &eidetic::Hash,
+        cleartext: &[u8],
+    ) -> eidetic::Result<(Vec<u8>, eidetic::SealedBlobRef)> {
+        use super::custody_payload::{PayloadBytes, PayloadOperation, PayloadResult};
+        if cleartext.len() > super::custody_payload::MAX_PAYLOAD_BYTES {
+            return Err(eidetic::Error::new(
+                "retained payload exceeds custody budget",
+            ));
+        }
+        match self.retained_payload(
+            hash,
+            PayloadOperation::Seal {
+                bytes: PayloadBytes(cleartext.to_vec()),
+            },
+        )? {
+            PayloadResult::Sealed { bytes, marker } => Ok((bytes.0, marker)),
+            _ => Err(eidetic::Error::new(
+                "custody returned a different retained-payload operation",
+            )),
+        }
+    }
+
+    fn unseal(
+        &self,
+        hash: &eidetic::Hash,
+        marker: &eidetic::SealedBlobRef,
+        sealed: &[u8],
+    ) -> eidetic::Result<Vec<u8>> {
+        use super::custody_payload::{PayloadBytes, PayloadOperation, PayloadResult};
+        if sealed.len() > super::custody_payload::MAX_PAYLOAD_BYTES + 40 {
+            return Err(eidetic::Error::new(
+                "retained payload exceeds custody budget",
+            ));
+        }
+        match self.retained_payload(
+            hash,
+            PayloadOperation::Unseal {
+                bytes: PayloadBytes(sealed.to_vec()),
+                marker: marker.clone(),
+            },
+        )? {
+            PayloadResult::Clear { bytes } if eidetic::Hash::of(&bytes.0) == *hash => Ok(bytes.0),
+            _ => Err(eidetic::Error::new(
+                "custody returned invalid retained-payload bytes",
+            )),
+        }
+    }
+}
+
+impl CustodyIdentity {
+    fn retained_payload(
+        &self,
+        hash: &eidetic::Hash,
+        operation: super::custody_payload::PayloadOperation,
+    ) -> eidetic::Result<super::custody_payload::PayloadResult> {
+        self.pending()
+            .map_err(|e| eidetic::Error::new(e.to_string()))?;
+        let request = super::custody_payload::PayloadRequest {
+            profile: self.profile().cloned().ok_or_else(|| {
+                eidetic::Error::new("custody disclosed no retained-content profile")
+            })?,
+            master: self.master.to_bytes(),
+            content_hash: *hash,
+            operation,
+        };
+        request.validate().map_err(eidetic::Error::new)?;
+        self.ask(
+            move |client| match client.call(CustodyCall::Payload(request))? {
+                CustodyAnswer::Payload { result } => Ok(result),
+                _ => Err(CustodyClientError::UnexpectedAnswer {
+                    asked: "retained payload",
+                    got: "another operation",
+                }),
+            },
+        )
+        .map_err(|e| eidetic::Error::new(e.to_string()))
+    }
 }
 
 /// A pending identity reads as Locked; anything else keeps its reason.

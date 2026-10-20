@@ -51,6 +51,7 @@ pub struct WalletEpochSealer {
     persona: PersonaId,
     current: SealEpochId,
     keys: HashMap<SealEpochId, [u8; 32]>,
+    scope: Option<Vec<u8>>,
 }
 
 impl WalletEpochSealer {
@@ -64,6 +65,7 @@ impl WalletEpochSealer {
             persona,
             current,
             keys,
+            scope: None,
         }
     }
 
@@ -74,12 +76,25 @@ impl WalletEpochSealer {
         self
     }
 
+    /// Bind a host purpose in addition to the canonical content hash, persona
+    /// and epoch. Both writing and reading must supply the identical scope.
+    /// Unscoped sealers retain their original persisted associated data.
+    pub fn with_scope(mut self, scope: Vec<u8>) -> Self {
+        self.scope = Some(scope);
+        self
+    }
+
     fn aad(&self, content_hash: &Hash, epoch: &SealEpochId) -> Vec<u8> {
         let mut aad = Vec::with_capacity(27 + 64 + 16 + 16);
         aad.extend_from_slice(b"mere.eidetic.engram-seal.v1");
         aad.extend_from_slice(content_hash.to_hex().as_bytes());
         aad.extend_from_slice(self.persona.as_uuid().as_bytes());
         aad.extend_from_slice(&epoch.0);
+        if let Some(scope) = &self.scope {
+            aad.extend_from_slice(b"\0scope.v1");
+            aad.extend_from_slice(&(scope.len() as u64).to_le_bytes());
+            aad.extend_from_slice(scope);
+        }
         aad
     }
 }
@@ -158,6 +173,29 @@ mod tests {
 
     fn epoch(byte: u8) -> KeyEpochId {
         KeyEpochId(uuid::Uuid::from_bytes([byte; 16]))
+    }
+
+    #[test]
+    fn a_host_scope_keeps_the_canonical_hash_and_refuses_other_lanes() {
+        let persona = PersonaId::new();
+        let make = || WalletEpochSealer::from_epoch(persona, epoch(1), b"scope fixture");
+        let scoped = make().with_scope(b"retained fixture".to_vec());
+        let clear = b"private scope bytes";
+        let hash = Hash::of(clear);
+        let (sealed, marker) = scoped.seal(&hash, clear).unwrap();
+        assert_eq!(scoped.unseal(&hash, &marker, &sealed).unwrap(), clear);
+        assert!(make().unseal(&hash, &marker, &sealed).is_err());
+        assert!(
+            make()
+                .with_scope(b"other".to_vec())
+                .unseal(&hash, &marker, &sealed)
+                .is_err()
+        );
+        assert!(
+            scoped
+                .unseal(&Hash::of(b"other content"), &marker, &sealed)
+                .is_err()
+        );
     }
 
     #[test]

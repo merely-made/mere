@@ -41,6 +41,7 @@ pub struct Keeper<S: IdentityStorage + 'static> {
     ui: Arc<dyn NativeIdentityUi>,
     wallet_root: Option<PathBuf>,
     policy: ReleasePolicy,
+    payload_custody: std::sync::OnceLock<crate::custody::payload::PayloadCustody>,
     #[cfg(feature = "cxf")]
     credentials: std::sync::OnceLock<castellan::resident::CastellanResident>,
     #[cfg(feature = "cxf")]
@@ -58,6 +59,7 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
             ui: Arc::new(UnavailableNativeIdentityUi),
             wallet_root: None,
             policy: ReleasePolicy::default(),
+            payload_custody: std::sync::OnceLock::new(),
             #[cfg(feature = "cxf")]
             credentials: std::sync::OnceLock::new(),
             #[cfg(feature = "cxf")]
@@ -76,6 +78,22 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
     pub fn with_wallet_root(mut self, root: Option<PathBuf>) -> Self {
         self.wallet_root = root;
         self
+    }
+
+    /// Bind retained-content custody to the owner's explicit wallet namespace.
+    /// This does not create a wallet, epoch or secret. Configure before serving.
+    pub fn configure_payload_custody(
+        &self,
+        profile: personae::ProfileId,
+        persona: personae::PersonaId,
+        root: PathBuf,
+    ) -> Result<(), String> {
+        self.payload_custody.set(crate::custody::payload::PayloadCustody { profile, persona, root })
+            .map_err(|_| "retained-content custody is already configured".into())
+    }
+
+    pub(crate) fn payload_custody(&self) -> Option<&crate::custody::payload::PayloadCustody> {
+        self.payload_custody.get()
     }
 
     /// Replace which salts may be released (D11).

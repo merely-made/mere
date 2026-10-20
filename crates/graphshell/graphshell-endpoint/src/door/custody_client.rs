@@ -387,6 +387,7 @@ impl BlockingCustodyClient {
 
 fn answer_name(answer: &CustodyAnswer) -> &'static str {
     match answer {
+        CustodyAnswer::Payload { .. } => "a retained payload",
         CustodyAnswer::VaultOutput { .. } => "vault output",
         CustodyAnswer::VaultEnrollment { .. } => "vault enrollment",
         CustodyAnswer::Quarantine { .. } => "quarantine cards",

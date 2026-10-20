@@ -990,6 +990,23 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         vault.storage().load_profile(profile)?;
         Ok(act())
     }
+
+    /// A bounded content operation admitted to the currently selected profile.
+    /// Lock and profile switching wait for the operation to finish. The callback
+    /// must not call back into this host, prompt, or perform network operations.
+    pub fn with_current_profile_authority<R>(
+        &self,
+        profile: &ProfileId,
+        expected_master: &[u8; 32],
+        act: impl FnOnce() -> R,
+    ) -> Result<R, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        let current = vault.current_profile()?;
+        if vault.profile_id() != profile || current.master.public_key().to_bytes() != *expected_master {
+            return Err(IdentityError::Backend("retained-content profile changed".into()));
+        }
+        Ok(act())
+    }
     /// The persona currently spoken as.
     pub fn current_profile_id(&self) -> ProfileId {
         self.vault.lock().unwrap().profile_id().clone()

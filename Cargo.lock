@@ -7010,6 +7010,7 @@ dependencies = [
  "chatelaine",
  "chirograph",
  "dramatis",
+ "eidetic",
  "insigne",
  "libc",
  "pandect",
