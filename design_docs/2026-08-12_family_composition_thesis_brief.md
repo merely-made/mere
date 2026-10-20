@@ -1726,12 +1726,26 @@ timing-dependent transport probe that its own message calls inconclusive.
 [Murm `3d330d1`](https://github.com/merely-made/murm/commit/3d330d1) sets `LocalStatus::device_name` where
 the root had not compiled since 2026-10-16.
 
-**Open.** Turnstone keeps its Mere lock at `48fd3385`, so it still names
-`543f5ff38` and does not resolve on cargo 1.97.1. Its Servo pin uses accesskit
-0.24, while Mere's accessibility cohort is now on 0.25, so moving that lock means
-adopting the AccessKit 0.25 migration. The Tabard desktop example
-`native_shared_recovery` has not compiled since Mere `427fa4f`; it still reads
-fields of the replaced capture struct.
+**Turnstone and Tabard follow-up (2026-10-20).** [Turnstone
+`c889038`](https://github.com/merely-made/turnstone/commit/c889038) locks current
+Mere and adopts its AccessKit 0.25 cohort. Under 0.25 every platform adapter
+shares `accesskit_consumer` 0.39.1, so Turnstone's three per-platform consumer
+pins collapse to one. Its supplier pins follow Mere's (Eidetic `738ef15`, Gemot
+`692674c`, Armillary `e67c5de`, esp `809deb6`, netrender on `main`). Upstream
+Servo still pins AccessKit 0.24, so Turnstone's `servo` feature converts each
+Servo tree update into the 0.25 surface contract through serde; 0.25 only adds
+node properties and renames `Tree` to `TreeInfo`. That feature is Windows-only
+and was not compiled on this pass; the conversion was checked in a standalone
+crate holding both versions. A fresh clone passes `cargo +1.97.1 test --locked
+--lib` with 1,099 passed and 3 failed. The three failures are layout-geometry
+tests added with Turnstone's chrome polish (`c7b6cad`): a compact header measures
+37 px against a 36 px bound on macOS, and two floating-window transfers land
+48 px lower. They fail identically on the commit before the migration.
+
+[Mere `a316c6b`](https://github.com/merely-made/mere/commit/a316c6b) ports the
+Tabard desktop example `native_shared_recovery` to host-owned captures. It takes
+the presentation stamp from its presentation observer, polls the host's readback
+and refuses pixels whose returned stamp differs.
 
 ## Family source convention (2026-10-15)
 
