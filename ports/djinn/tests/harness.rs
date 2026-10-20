@@ -212,6 +212,119 @@ fn one_resident_is_killed_stopped_and_restarted_on_the_same_roots() {
     println!("RECEIPT verified {} evidence files", checked.checked);
 }
 
+/// A ready event is a usable boundary: the resident must already accept a
+/// connection on each endpoint, with no endpoint-existence retry in between.
+#[test]
+#[cfg(unix)]
+#[ignore = "runs a real djinn resident"]
+fn ready_follows_listener_binding_and_each_door_accepts_immediately() {
+    let run = begin(
+        "djinn-harness",
+        "ready_follows_listener_binding_and_each_door_accepts_immediately",
+    );
+    let mut r = resident(&run, "ready", "ready", PASSPHRASE);
+    r.start(&[]).unwrap();
+
+    let ready = run
+        .wait_for("the resident ready event", READY, || {
+            r.events().into_iter().find(|event| event.event == "ready")
+        })
+        .0;
+    let endpoints = ["agent", "browser", "app"].map(|door| (door, r.endpoint(door)));
+    for (door, endpoint) in endpoints {
+        let connected = std::os::unix::net::UnixStream::connect(&endpoint).is_ok();
+        run.require(
+            &format!("{door} accepts immediately after ready"),
+            Bound::State,
+            true,
+            json!({ "connected": connected, "endpoint": endpoint, "ready_pid": ready.pid }),
+            connected,
+        );
+    }
+    let status = r.status().expect("the app door answers after ready");
+    assert!(status.ready && status.pid == ready.pid);
+
+    r.stop(STOP);
+    run.finish();
+}
+
+/// The app door binds first. A regular file at the browser endpoint forces a
+/// deterministic second-listener bind failure, which must not report either
+/// listening or ready.
+#[test]
+#[cfg(unix)]
+#[ignore = "runs a real djinn resident"]
+fn browser_listener_bind_failure_never_reports_listening_or_ready() {
+    assert_bind_failure_never_reports_readiness("browser");
+}
+
+/// The first application-door bind can fail too; startup must not publish a
+/// listening or ready event after this earlier failure.
+#[test]
+#[cfg(unix)]
+#[ignore = "runs a real djinn resident"]
+fn app_listener_bind_failure_never_reports_listening_or_ready() {
+    assert_bind_failure_never_reports_readiness("app");
+}
+
+#[cfg(unix)]
+fn assert_bind_failure_never_reports_readiness(door: &str) {
+    let test_name = format!("{door}_listener_bind_failure_never_reports_listening_or_ready");
+    let run = begin("djinn-harness", &test_name);
+    let mut r = resident(&run, "blocked", "blocked", PASSPHRASE);
+    let endpoint = std::path::PathBuf::from(r.endpoint(door));
+    std::fs::create_dir_all(endpoint.parent().expect("endpoint has a parent")).unwrap();
+    std::fs::write(&endpoint, "occupied by a regular file").unwrap();
+    r.start(&[]).unwrap();
+
+    let stopped = run
+        .wait_for("the failed resident stopped event", READY, || {
+            r.events()
+                .into_iter()
+                .find(|event| event.event == "stopped")
+        })
+        .0;
+    let events = r.events();
+    let names: Vec<&str> = events.iter().map(|event| event.event.as_str()).collect();
+    let no_success_readiness = !names
+        .iter()
+        .any(|event| *event == "listening" || *event == "ready");
+    let failed = stopped.other.get("ok").and_then(serde_json::Value::as_bool) == Some(false);
+    let bind_error = stopped
+        .other
+        .get("error")
+        .and_then(serde_json::Value::as_str)
+        .is_some_and(|error| error.contains("endpoint path exists and is not a Unix socket"));
+    assert_eq!(
+        std::fs::read_to_string(&endpoint).unwrap(),
+        "occupied by a regular file"
+    );
+    if door == "browser" {
+        use std::os::unix::fs::FileTypeExt;
+        assert!(
+            std::fs::symlink_metadata(r.endpoint("app"))
+                .unwrap()
+                .file_type()
+                .is_socket(),
+            "the browser failure follows a successful app bind"
+        );
+    }
+    let starts_and_stops = names.first() == Some(&"started") && names.last() == Some(&"stopped");
+    run.require(
+        &format!("{door} bind failure exits without readiness"),
+        Bound::State,
+        json!({ "first_event": "started", "last_event": "stopped", "stopped_ok": false }),
+        json!({ "events": names, "stopped": stopped.other }),
+        starts_and_stops && no_success_readiness && failed && bind_error,
+    );
+    assert!(
+        r.status().is_none(),
+        "a failed resident has no status route"
+    );
+    drop(r); // Reap the stopped child before checking the run's process walls.
+    run.finish();
+}
+
 /// F1: with personal sync on, a graceful stop cancels and joins every task
 /// that borrows the blob store or the published-site route, and exits 0. The
 /// control leaves one holder outside the task scope, and the shutdown's
