@@ -4694,6 +4694,7 @@ dependencies = [
  "mere-p2panda-net",
  "mere-personal-facts",
  "mere-registry",
+ "mere-site",
  "mere-transport",
  "mere-view",
  "mere-webrtc-carrier",
@@ -10138,6 +10139,17 @@ dependencies = [
  "tokio",
  "uuid",
  "zeroize",
+]
+
+[[package]]
+name = "mere-site"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "language-tags",
+ "serde",
+ "serde_json",
+ "time",
 ]
 
 [[package]]
