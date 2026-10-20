@@ -1,0 +1,1246 @@
+{
+  "environment": {
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6",
+    "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+    "cpu": "Apple M4",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.1\nBuildVersion:\t\t25F80",
+    "architecture": "arm64",
+    "rustflags": "-C target-cpu=native",
+    "timing_allocator": "System (uninstrumented)",
+    "allocation_allocator": "System with requested-size counters in a separate executable",
+    "timing_runs": 3,
+    "samples_per_run": 15,
+    "measurement": "warm resident source buffers; parse operations include destruction; retained operations exclude initial parse",
+    "memory_excludes": "source buffers, allocator metadata, process RSS, OS mappings; warmed parser caches are already resident",
+    "lockfile": "Cargo.lock"
+  },
+  "fixture_manifest": {
+    "sources": [
+      {
+        "file": "monsters.json",
+        "source_repo": "https://github.com/merely-made/isocosm",
+        "revision": "e5f8deb60049e7622206ef2fa32cbe12e4bf822d",
+        "source_path": "crates/isometry-system/data/monsters.json",
+        "bytes": 319322,
+        "sha256": "135380bdd4ef9d42008483bc1f490c970e51784929951762f7259728ecae650b"
+      },
+      {
+        "file": "demo-pack.toml",
+        "source_repo": "https://github.com/merely-made/isocosm",
+        "revision": "e5f8deb60049e7622206ef2fa32cbe12e4bf822d",
+        "source_path": "crates/isometry-system/examples/packs/demo/isometry-pack.toml",
+        "bytes": 850,
+        "sha256": "23ac63a565fe38454d898440208cf451b47630ef463909714f3b3dea6a9f3ade"
+      },
+      {
+        "file": "monsters-32x.json",
+        "bytes": 10218307,
+        "sha256": "477229acf017f54eb8ce66347bbac29783fdfce2b6c1e6ff9004bf1eab69dd09",
+        "synthetic": true,
+        "construction": "repeat the exact raw array contents 32 times",
+        "records": 10688,
+        "note": "duplicate identities; size-only workload, not an admissible game pack"
+      },
+      {
+        "file": "annotated-pack.toml",
+        "bytes": 1115,
+        "sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c",
+        "synthetic": true,
+        "construction": "demo pack plus comments and foreign extension table"
+      }
+    ],
+    "original_monster_records": 334,
+    "redox_reference_revision": "b60dd4d099bcfbb8062e238306ee2063138765cd",
+    "mere_reference_revision": "5b3442ddd39084231b83d9d175161293f1c5cefd",
+    "scope": "Rust technique probe; does not execute REDox or introduce DOX"
+  },
+  "source_and_binary_sha256": {
+    "Cargo.toml": "196b6405894f12261bd7f46b036d4421a7ea602944441715a448c86ffeeb9f5a",
+    "Cargo.lock": "fbdc1fcb083b90f1a0cfbf9510214403b5a639d9b29d0e23f7a3376551700695",
+    "prepare.py": "85ec5191f938d46de38f9ecb2d7fd01c03af31bc5c5ba366b74a4c88c838f0cc",
+    "run.py": "f6fd2a0ddffd8d8bda9ad2a400df9615c3029dff9da96bd800b9d738773032af",
+    "summarize.py": "3d4bbdc591f6f06f34d57ed31b6a4d00706905e6da615670dd9bfa22ac78af5e",
+    "src/lib.rs": "c5898b4f8946c736109134889a8405ca2b4dd05e156a4a10e9fc0d102180fae3",
+    "src/main.rs": "ecbc0f53a2e8802837fcf75276a2d98d11c2c66789701363877a9e37d37f6835",
+    "src/meter.rs": "1352dcd000c1d86ab7ea91d4306b5e7971852a0d3b557471178ad915ca2d447e",
+    "src/source_document.rs": "bc9a73d762b78fb47be7e383464b6eb2eca2a1ac6a03523c4b26f61b1656a3d5",
+    "tests/retained_backends.rs": "e67c3074174ed7930ee473efdaab3ae1b80067ae421a71deb9ceccdf0a8c100c",
+    "target/release/retained-document-probe": "12a779c2ba8bd03e50b87ff047febabbba6b7f352ca97e612b54fc2a75135d43",
+    "target-meter/release/retained-document-probe": "0523de5225700edd47cb3b2e3a29b571bea88474ab2b512a2501e0832102d80c"
+  },
+  "verification": {
+    "checks": [
+      {
+        "backend": "serde_dom",
+        "dataset": "srd_monsters",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "source_identical_noop": false,
+        "unknown_fields_preserved": true
+      },
+      {
+        "backend": "sonic_dom",
+        "dataset": "srd_monsters",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "source_identical_noop": false,
+        "unknown_fields_preserved": true
+      },
+      {
+        "backend": "raw_overlay",
+        "dataset": "srd_monsters",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "source_identical_noop": true,
+        "unknown_fields_preserved": true
+      },
+      {
+        "backend": "raw_overlay",
+        "dataset": "srd_monsters",
+        "pending_edits_after_replacement": 1,
+        "repeated_edits": 2000,
+        "restored_original_semantics": true
+      },
+      {
+        "backend": "serde_dom",
+        "dataset": "json_edge_cases",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "source_identical_noop": false,
+        "unknown_fields_preserved": true
+      },
+      {
+        "backend": "sonic_dom",
+        "dataset": "json_edge_cases",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "source_identical_noop": false,
+        "unknown_fields_preserved": true
+      },
+      {
+        "backend": "raw_overlay",
+        "dataset": "json_edge_cases",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "source_identical_noop": true,
+        "unknown_fields_preserved": true
+      },
+      {
+        "backend": "raw_overlay",
+        "dataset": "json_edge_cases",
+        "pending_edits_after_replacement": 1,
+        "repeated_edits": 2000,
+        "restored_original_semantics": true
+      },
+      {
+        "backend": "toml_value",
+        "comments_preserved": true,
+        "dataset": "demo_pack",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "unknown_fields_preserved": true,
+        "untouched_lines_preserved": false
+      },
+      {
+        "backend": "toml_edit",
+        "comments_preserved": true,
+        "dataset": "demo_pack",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "unknown_fields_preserved": true,
+        "untouched_lines_preserved": true
+      },
+      {
+        "backend": "toml_value",
+        "comments_preserved": false,
+        "dataset": "annotated_pack",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "unknown_fields_preserved": true,
+        "untouched_lines_preserved": false
+      },
+      {
+        "backend": "toml_edit",
+        "comments_preserved": true,
+        "dataset": "annotated_pack",
+        "reopened": true,
+        "semantic_roundtrip": true,
+        "unknown_fields_preserved": true,
+        "untouched_lines_preserved": true
+      },
+      {
+        "dataset": "unpaired_surrogate",
+        "note": "RawValue syntax validation is not full scalar semantic validation; do not use this prototype as admission authority",
+        "raw_overlay_accepts_syntax": true,
+        "serde_dom_rejects": true
+      }
+    ],
+    "status": "passed"
+  },
+  "fresh_reopen": {
+    "json_semantics_preserved": true,
+    "pid": 39985,
+    "scope": "fresh process reopening of edited files; no native host or power-loss qualification",
+    "status": "passed",
+    "toml_comments_preserved": true,
+    "toml_semantics_preserved": true
+  },
+  "rows": [
+    {
+      "dataset": "annotated_pack",
+      "operation": "parse_edit_encode",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 20307.78125,
+      "process_median_min_ns": 20165.8515625,
+      "process_median_max_ns": 20428.22265625,
+      "speedup_over_baseline": 0.8754157696634142,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 71768,
+        "allocation_calls": 416,
+        "peak_live_extra_bytes": 49062,
+        "retained_extra_bytes": 28299
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "parse_edit_encode",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 17777.751953125,
+      "process_median_min_ns": 17698.73046875,
+      "process_median_max_ns": 17928.05859375,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 67167,
+        "allocation_calls": 296,
+        "peak_live_extra_bytes": 39496,
+        "retained_extra_bytes": 12051
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "parse_query",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 15437.98828125,
+      "process_median_min_ns": 15298.666015625,
+      "process_median_max_ns": 15461.75,
+      "speedup_over_baseline": 0.640457095866148,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 63411,
+        "allocation_calls": 322,
+        "peak_live_extra_bytes": 49062,
+        "retained_extra_bytes": 26217
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "parse_query",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 9887.369140625,
+      "process_median_min_ns": 9790.771484375,
+      "process_median_max_ns": 10211.994140625,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 57564,
+        "allocation_calls": 150,
+        "peak_live_extra_bytes": 39496,
+        "retained_extra_bytes": 10108
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "retained_edit100",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 8985.9619140625,
+      "process_median_min_ns": 8939.453125,
+      "process_median_max_ns": 9001.87109375,
+      "speedup_over_baseline": 0.33919959789711057,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 2800,
+        "allocation_calls": 400,
+        "peak_live_extra_bytes": 24,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "retained_edit100",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 3048.03466796875,
+      "process_median_min_ns": 3023.03076171875,
+      "process_median_max_ns": 3072.2451171875,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 700,
+        "allocation_calls": 100,
+        "peak_live_extra_bytes": 7,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "retained_encode",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 4586.22216796875,
+      "process_median_min_ns": 4579.16259765625,
+      "process_median_max_ns": 4623.9013671875,
+      "speedup_over_baseline": 1.628394872848076,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 8326,
+        "allocation_calls": 90,
+        "peak_live_extra_bytes": 2680,
+        "retained_extra_bytes": 2112
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "retained_encode",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 7468.1806640625,
+      "process_median_min_ns": 7452.06640625,
+      "process_median_max_ns": 7492.9609375,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 9404,
+        "allocation_calls": 145,
+        "peak_live_extra_bytes": 5336,
+        "retained_extra_bytes": 1856
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "retained_read1000",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 21534.50390625,
+      "process_median_min_ns": 21475.5859375,
+      "process_median_max_ns": 21741.046875,
+      "speedup_over_baseline": 0.8277693157039221,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "annotated_pack",
+      "operation": "retained_read1000",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 17825.6015625,
+      "process_median_min_ns": 17481.52734375,
+      "process_median_max_ns": 17897.4609375,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "parse_edit_encode",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 17343.587890625,
+      "process_median_min_ns": 17165.283203125,
+      "process_median_max_ns": 17425.9453125,
+      "speedup_over_baseline": 0.8677914444470596,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 57854,
+        "allocation_calls": 360,
+        "peak_live_extra_bytes": 39778,
+        "retained_extra_bytes": 23099
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "parse_edit_encode",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 15050.6171875,
+      "process_median_min_ns": 15006.998046875,
+      "process_median_max_ns": 15062.5,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 52195,
+        "allocation_calls": 254,
+        "peak_live_extra_bytes": 31048,
+        "retained_extra_bytes": 8975
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "parse_query",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 13055.419921875,
+      "process_median_min_ns": 12955.73046875,
+      "process_median_max_ns": 13080.892578125,
+      "speedup_over_baseline": 0.6357705843852267,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 52039,
+        "allocation_calls": 276,
+        "peak_live_extra_bytes": 39778,
+        "retained_extra_bytes": 22105
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "parse_query",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 8300.251953125,
+      "process_median_min_ns": 8296.7529296875,
+      "process_median_max_ns": 8304.0361328125,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 45174,
+        "allocation_calls": 130,
+        "peak_live_extra_bytes": 31048,
+        "retained_extra_bytes": 8008
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "retained_edit100",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 6991.943359375,
+      "process_median_min_ns": 6972.900390625,
+      "process_median_max_ns": 7013.9560546875,
+      "speedup_over_baseline": 0.43674709312475996,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 1200,
+        "allocation_calls": 300,
+        "peak_live_extra_bytes": 8,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "retained_edit100",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 3053.7109375,
+      "process_median_min_ns": 2986.5927734375,
+      "process_median_max_ns": 3108.68310546875,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 700,
+        "allocation_calls": 100,
+        "peak_live_extra_bytes": 7,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "retained_encode",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 4035.2373046875,
+      "process_median_min_ns": 4007.5888671875,
+      "process_median_max_ns": 4050.10986328125,
+      "speedup_over_baseline": 1.5802158378716014,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 5800,
+        "allocation_calls": 81,
+        "peak_live_extra_bytes": 1912,
+        "retained_extra_bytes": 1024
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "retained_encode",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 6376.5458984375,
+      "process_median_min_ns": 6330.97265625,
+      "process_median_max_ns": 6436.6455078125,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 6918,
+        "allocation_calls": 123,
+        "peak_live_extra_bytes": 3960,
+        "retained_extra_bytes": 928
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "retained_read1000",
+      "backend": "toml_edit",
+      "median_of_process_medians_ns": 21381.01953125,
+      "process_median_min_ns": 21338.21484375,
+      "process_median_max_ns": 21964.35546875,
+      "speedup_over_baseline": 0.8175732126606889,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "demo_pack",
+      "operation": "retained_read1000",
+      "backend": "toml_value",
+      "median_of_process_medians_ns": 17480.548828125,
+      "process_median_min_ns": 17280.029296875,
+      "process_median_max_ns": 18054.849609375,
+      "speedup_over_baseline": 1.0,
+      "baseline": "toml_value",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_all_names",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 380312.5,
+      "process_median_min_ns": 378890.625,
+      "process_median_max_ns": 381010.4375,
+      "speedup_over_baseline": 1.8097508627773213,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 37672,
+        "allocation_calls": 341,
+        "peak_live_extra_bytes": 26896,
+        "retained_extra_bytes": 18704
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_all_names",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 688270.875,
+      "process_median_min_ns": 679599.0,
+      "process_median_max_ns": 693942.75,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1656854,
+        "allocation_calls": 15497,
+        "peak_live_extra_bytes": 1591978,
+        "retained_extra_bytes": 1590298
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_all_names",
+      "backend": "serde_typed_names",
+      "median_of_process_medians_ns": 182054.6875,
+      "process_median_min_ns": 179660.15625,
+      "process_median_max_ns": 182242.1875,
+      "speedup_over_baseline": 3.780572115178303,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 24488,
+        "allocation_calls": 9,
+        "peak_live_extra_bytes": 12296,
+        "retained_extra_bytes": 12288
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_all_names",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 112570.3125,
+      "process_median_min_ns": 111352.21875,
+      "process_median_max_ns": 113020.1875,
+      "speedup_over_baseline": 6.114141994586717,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 843066,
+        "allocation_calls": 12,
+        "peak_live_extra_bytes": 843066,
+        "retained_extra_bytes": 843066
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_edit2000_long",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 227938.78125,
+      "process_median_min_ns": 227151.03125,
+      "process_median_max_ns": 229931.0,
+      "speedup_over_baseline": 3.530118901168776,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 117408,
+        "allocation_calls": 2013,
+        "peak_live_extra_bytes": 26896,
+        "retained_extra_bytes": 19113
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_edit2000_long",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 804651.0,
+      "process_median_min_ns": 796427.0,
+      "process_median_max_ns": 805291.625,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1746854,
+        "allocation_calls": 19497,
+        "peak_live_extra_bytes": 1591978,
+        "retained_extra_bytes": 1590327
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_edit2000_long",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 340851.5625,
+      "process_median_min_ns": 336960.9375,
+      "process_median_max_ns": 346966.125,
+      "speedup_over_baseline": 2.360707969469848,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1243450,
+        "allocation_calls": 8017,
+        "peak_live_extra_bytes": 849640,
+        "retained_extra_bytes": 849443
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_edit_encode",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 182549.46875,
+      "process_median_min_ns": 182152.34375,
+      "process_median_max_ns": 184386.71875,
+      "speedup_over_baseline": 4.955363640300925,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 354868,
+        "allocation_calls": 16,
+        "peak_live_extra_bytes": 338532,
+        "retained_extra_bytes": 338404
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_edit_encode",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 904599.0,
+      "process_median_min_ns": 898276.0,
+      "process_median_max_ns": 907109.375,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 2550331,
+        "allocation_calls": 15511,
+        "peak_live_extra_bytes": 2037272,
+        "retained_extra_bytes": 2037272
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_edit_encode",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 260001.3125,
+      "process_median_min_ns": 259510.4375,
+      "process_median_max_ns": 260306.0,
+      "speedup_over_baseline": 3.4792093597604437,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 2008158,
+        "allocation_calls": 31,
+        "peak_live_extra_bytes": 1429962,
+        "retained_extra_bytes": 1429962
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_select3",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 180766.9375,
+      "process_median_min_ns": 180147.125,
+      "process_median_max_ns": 181509.125,
+      "speedup_over_baseline": 3.732217347544542,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 35056,
+        "allocation_calls": 14,
+        "peak_live_extra_bytes": 26896,
+        "retained_extra_bytes": 18704
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_select3",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 674661.5,
+      "process_median_min_ns": 673166.625,
+      "process_median_max_ns": 684682.25,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1656854,
+        "allocation_calls": 15497,
+        "peak_live_extra_bytes": 1591978,
+        "retained_extra_bytes": 1590298
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_select3",
+      "backend": "serde_typed_names",
+      "median_of_process_medians_ns": 182354.1875,
+      "process_median_min_ns": 181998.6875,
+      "process_median_max_ns": 183194.0,
+      "speedup_over_baseline": 3.6997313264330716,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 24488,
+        "allocation_calls": 9,
+        "peak_live_extra_bytes": 12296,
+        "retained_extra_bytes": 12288
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "parse_select3",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 107183.59375,
+      "process_median_min_ns": 106854.171875,
+      "process_median_max_ns": 107217.453125,
+      "speedup_over_baseline": 6.294447465286636,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 843066,
+        "allocation_calls": 12,
+        "peak_live_extra_bytes": 843066,
+        "retained_extra_bytes": 843066
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_edit100",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 2309.92626953125,
+      "process_median_min_ns": 2247.782470703125,
+      "process_median_max_ns": 2317.87109375,
+      "speedup_over_baseline": 2.121642562911551,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 700,
+        "allocation_calls": 100,
+        "peak_live_extra_bytes": 7,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_edit100",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 4900.837890625,
+      "process_median_min_ns": 4877.583984375,
+      "process_median_max_ns": 4934.4482421875,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1100,
+        "allocation_calls": 200,
+        "peak_live_extra_bytes": 11,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_edit100",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 7705.5263671875,
+      "process_median_min_ns": 7696.5732421875,
+      "process_median_max_ns": 7963.0537109375,
+      "speedup_over_baseline": 0.6360159782846599,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 10800,
+        "allocation_calls": 200,
+        "peak_live_extra_bytes": 108,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_encode",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 4723.9990234375,
+      "process_median_min_ns": 4694.64111328125,
+      "process_median_max_ns": 4863.8515625,
+      "speedup_over_baseline": 44.158382593865475,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 319450,
+        "allocation_calls": 2,
+        "peak_live_extra_bytes": 319450,
+        "retained_extra_bytes": 319322
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_encode",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 208604.15625,
+      "process_median_min_ns": 207328.125,
+      "process_median_max_ns": 210169.25,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 893463,
+        "allocation_calls": 12,
+        "peak_live_extra_bytes": 446976,
+        "retained_extra_bytes": 446976
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_encode",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 149763.03125,
+      "process_median_min_ns": 149366.53125,
+      "process_median_max_ns": 150266.265625,
+      "speedup_over_baseline": 1.3928948586903018,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1158600,
+        "allocation_calls": 12,
+        "peak_live_extra_bytes": 580608,
+        "retained_extra_bytes": 580608
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_read1000",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 11148.11328125,
+      "process_median_min_ns": 10776.85546875,
+      "process_median_max_ns": 11499.267578125,
+      "speedup_over_baseline": 2.306975640847299,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_read1000",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 25718.42578125,
+      "process_median_min_ns": 25514.8125,
+      "process_median_max_ns": 25847.328125,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters",
+      "operation": "retained_read1000",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 49332.03125,
+      "process_median_min_ns": 49309.25,
+      "process_median_max_ns": 49476.2421875,
+      "speedup_over_baseline": 0.5213332013619447,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_all_names",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 12166167.0,
+      "process_median_min_ns": 12099250.0,
+      "process_median_max_ns": 12224875.0,
+      "speedup_over_baseline": 1.9355418185530413,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1207240,
+        "allocation_calls": 10576,
+        "peak_live_extra_bytes": 860672,
+        "retained_extra_bytes": 598528
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_all_names",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 23548125.0,
+      "process_median_min_ns": 23494708.0,
+      "process_median_max_ns": 23732417.0,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 52932156,
+        "allocation_calls": 495568,
+        "peak_live_extra_bytes": 50891216,
+        "retained_extra_bytes": 50889536
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_all_names",
+      "backend": "serde_typed_names",
+      "median_of_process_medians_ns": 5876833.0,
+      "process_median_min_ns": 5855958.0,
+      "process_median_max_ns": 5937417.0,
+      "speedup_over_baseline": 4.006941323668718,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 786344,
+        "allocation_calls": 14,
+        "peak_live_extra_bytes": 393224,
+        "retained_extra_bytes": 393216
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_all_names",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 3734375.0,
+      "process_median_min_ns": 3722104.0,
+      "process_median_max_ns": 3792875.0,
+      "speedup_over_baseline": 6.305774058577406,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 108741403,
+        "allocation_calls": 19,
+        "peak_live_extra_bytes": 108741403,
+        "retained_extra_bytes": 26994899
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_edit2000_long",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 5794417.0,
+      "process_median_min_ns": 5751584.0,
+      "process_median_max_ns": 5807791.0,
+      "speedup_over_baseline": 3.959033669823901,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1205136,
+        "allocation_calls": 2018,
+        "peak_live_extra_bytes": 860672,
+        "retained_extra_bytes": 598937
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_edit2000_long",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 22940292.0,
+      "process_median_min_ns": 22584541.0,
+      "process_median_max_ns": 23138708.0,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 53022156,
+        "allocation_calls": 499568,
+        "peak_live_extra_bytes": 50891216,
+        "retained_extra_bytes": 50889570
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_edit2000_long",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 3807958.5,
+      "process_median_min_ns": 3804270.5,
+      "process_median_max_ns": 3821125.0,
+      "speedup_over_baseline": 6.024301998039107,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 109307451,
+        "allocation_calls": 8024,
+        "peak_live_extra_bytes": 108741403,
+        "retained_extra_bytes": 27166940
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_edit_encode",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 7306125.0,
+      "process_median_min_ns": 7303917.0,
+      "process_median_max_ns": 7539541.0,
+      "speedup_over_baseline": 4.3159108282434255,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 31778195,
+        "allocation_calls": 22,
+        "peak_live_extra_bytes": 21035520,
+        "retained_extra_bytes": 21035520
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_edit_encode",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 31532584.0,
+      "process_median_min_ns": 31035125.0,
+      "process_median_max_ns": 31741834.0,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 81538145,
+        "allocation_calls": 495587,
+        "peak_live_extra_bytes": 65192771,
+        "retained_extra_bytes": 65192771
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_edit_encode",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 9137875.0,
+      "process_median_min_ns": 8980917.0,
+      "process_median_max_ns": 9207875.0,
+      "speedup_over_baseline": 3.450756767848105,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 146069855,
+        "allocation_calls": 43,
+        "peak_live_extra_bytes": 108741403,
+        "retained_extra_bytes": 45746307
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_select3",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 5795833.0,
+      "process_median_min_ns": 5784291.0,
+      "process_median_max_ns": 5798750.0,
+      "speedup_over_baseline": 3.9360319733160014,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1122784,
+        "allocation_calls": 19,
+        "peak_live_extra_bytes": 860672,
+        "retained_extra_bytes": 598528
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_select3",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 22812584.0,
+      "process_median_min_ns": 22762250.0,
+      "process_median_max_ns": 22950750.0,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 52932156,
+        "allocation_calls": 495568,
+        "peak_live_extra_bytes": 50891216,
+        "retained_extra_bytes": 50889536
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_select3",
+      "backend": "serde_typed_names",
+      "median_of_process_medians_ns": 5810417.0,
+      "process_median_min_ns": 5761792.0,
+      "process_median_max_ns": 5828584.0,
+      "speedup_over_baseline": 3.926152632418637,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 786344,
+        "allocation_calls": 14,
+        "peak_live_extra_bytes": 393224,
+        "retained_extra_bytes": 393216
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "parse_select3",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 3514312.5,
+      "process_median_min_ns": 3501354.0,
+      "process_median_max_ns": 3514625.0,
+      "speedup_over_baseline": 6.491336214408935,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 108741403,
+        "allocation_calls": 19,
+        "peak_live_extra_bytes": 108741403,
+        "retained_extra_bytes": 26994899
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_edit100",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 2272.918701171875,
+      "process_median_min_ns": 2207.600830078125,
+      "process_median_max_ns": 2309.14306640625,
+      "speedup_over_baseline": 2.1633658883712186,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 700,
+        "allocation_calls": 100,
+        "peak_live_extra_bytes": 7,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_edit100",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 4917.15478515625,
+      "process_median_min_ns": 4873.6572265625,
+      "process_median_max_ns": 4979.9404296875,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 1100,
+        "allocation_calls": 200,
+        "peak_live_extra_bytes": 11,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_edit100",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 7827.5146484375,
+      "process_median_min_ns": 7462.076171875,
+      "process_median_max_ns": 8177.1640625,
+      "speedup_over_baseline": 0.6281885127021506,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 10800,
+        "allocation_calls": 200,
+        "peak_live_extra_bytes": 108,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_encode",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 219873.6875,
+      "process_median_min_ns": 217733.0625,
+      "process_median_max_ns": 222502.59375,
+      "speedup_over_baseline": 39.29889064147341,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 10218435,
+        "allocation_calls": 2,
+        "peak_live_extra_bytes": 10218435,
+        "retained_extra_bytes": 10218307
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_encode",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 8640792.0,
+      "process_median_min_ns": 8369666.0,
+      "process_median_max_ns": 8712125.0,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 28605975,
+        "allocation_calls": 17,
+        "peak_live_extra_bytes": 14303232,
+        "retained_extra_bytes": 14303232
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_encode",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 5319666.0,
+      "process_median_min_ns": 5318667.0,
+      "process_median_max_ns": 5383125.0,
+      "speedup_over_baseline": 1.6243109999763143,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 37156296,
+        "allocation_calls": 17,
+        "peak_live_extra_bytes": 18579456,
+        "retained_extra_bytes": 18579456
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_read1000",
+      "backend": "raw_overlay",
+      "median_of_process_medians_ns": 11329.18359375,
+      "process_median_min_ns": 11260.41796875,
+      "process_median_max_ns": 11555.826171875,
+      "speedup_over_baseline": 2.2739685360437005,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_read1000",
+      "backend": "serde_dom",
+      "median_of_process_medians_ns": 25762.20703125,
+      "process_median_min_ns": 25408.04296875,
+      "process_median_max_ns": 26002.28125,
+      "speedup_over_baseline": 1.0,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    },
+    {
+      "dataset": "srd_monsters_32x_synthetic",
+      "operation": "retained_read1000",
+      "backend": "sonic_dom",
+      "median_of_process_medians_ns": 49439.125,
+      "process_median_min_ns": 49305.3359375,
+      "process_median_max_ns": 49615.8828125,
+      "speedup_over_baseline": 0.5210894616611843,
+      "baseline": "serde_dom",
+      "allocation": {
+        "allocated_bytes": 0,
+        "allocation_calls": 0,
+        "peak_live_extra_bytes": 0,
+        "retained_extra_bytes": 0
+      }
+    }
+  ]
+}

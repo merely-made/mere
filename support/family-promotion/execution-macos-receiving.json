@@ -1,0 +1,634 @@
+{
+  "kind": "macOS incremental execution receiving qualification",
+  "qualified_code_revision": "df6ea0a6ca1435a3fc655361e061321313eafe84",
+  "upstream_execution_base": "8f26d962957a7f72cbc6aa2dbff418c3cca9751e",
+  "suppliers": {
+    "armillary": "e67c5def1c735be047492a867bcdc8b41fba22b8",
+    "esp": "b20ae7db257dae83493031efd92da3a102c44a48",
+    "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+    "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63"
+  },
+  "source_sha256": {
+    "Cargo.lock": "581f50e01d3f95afe59c2bf54bfbdb477effb8bb6bfd139eb6282236f22c74c6",
+    "Cargo.toml": "b3eab6000d749634f2a86c84eeaad872182af709528539cd4a1ebe15906d6691",
+    "ports/distillery/src/inference.rs": "2572ac99cd67023fb47412bb9a940cb7d07c48927d68921737cb8dd6d1efca18",
+    "ports/distillery/tests/lifecycle.rs": "c91ff3243d330047b302eca6a4187a9ff54aac28046c33d3e7e5c41dbf0608cb",
+    "ports/djinn/tests/resident_tasks.rs": "2c92b619316f822b356bdbd08606797f15b740f630254b85c95de098ec830439",
+    "support/fixtures/armillary-consumer/src/main.rs": "8bc69fee014ca4668f8208ee2657c9830671e9791ebfe7cd31242bf27ab602ed",
+    "support/fixtures/armillary-consumer/Cargo.toml": "9637ffea6d6e5aeef54842ece4fbe584638385f019e61bd5b8664388d471a55e",
+    "support/fixtures/armillary-consumer/Cargo.lock": "ef9da5d9fcf250a7f6fc7965226020d1193afbab1b2ac88c3033cb4834305572"
+  },
+  "passing_gates": [
+    {
+      "label": "mere-final-inference",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "distillery",
+        "--features",
+        "inference",
+        "--lib",
+        "--test",
+        "inference_shutdown",
+        "--test",
+        "lifecycle",
+        "--test",
+        "resident"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "df6ea0a6ca1435a3fc655361e061321313eafe84",
+      "started": "2026-10-20T03:07:23.112672+00:00",
+      "status_before": "",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-20T03:07:28.634500+00:00",
+      "log_sha256": "5ad3797cafa14e6e1496b968f25438fcdeed65c6453e6115c6049a6399022478",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 41,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    {
+      "label": "mere-final-djinn",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "djinn",
+        "--bin",
+        "djinn",
+        "--test",
+        "resident_tasks",
+        "--test",
+        "distillery_lane"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "df6ea0a6ca1435a3fc655361e061321313eafe84",
+      "started": "2026-10-20T03:07:23.112672+00:00",
+      "status_before": "",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-20T03:07:30.144722+00:00",
+      "log_sha256": "a8a0e9417e0ab9b8cadf7d7bcb9593ca2a911f8f833310d9d3805159c6810b88",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    {
+      "label": "mere-qualified-endpoint",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "door",
+        "--lib"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "1fcfe4609ce931f09108797347f5b061ee6d1774",
+      "started": "2026-10-20T03:00:40.485742+00:00",
+      "status_before": "",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-20T03:04:37.438365+00:00",
+      "log_sha256": "d5df7ec8c4aba51e1c5f86bc66f5c3e7fc271926bf9c1c71337fa72c1d55865d",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 43,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    {
+      "label": "mere-integrated-armillary",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/support/fixtures/armillary-consumer",
+      "revision": "1fcfe4609ce931f09108797347f5b061ee6d1774",
+      "started": "2026-10-20T02:59:44.398688+00:00",
+      "status_before": "",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-20T02:59:57.703735+00:00",
+      "log_sha256": "65419765de36ebd6ea88babec67c8730d392d7c51ab72895f75e92b4a2083728",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    {
+      "label": "mere-final-synchronous-tree",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "tree",
+        "--locked",
+        "--offline",
+        "--edges",
+        "normal"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/support/fixtures/armillary-consumer",
+      "revision": "ec588111228c0929d113eae1a0d8af4a8a6d3fce",
+      "started": "2026-10-20T03:04:20.813840+00:00",
+      "status_before": "?? ports/distillery/tests/q217_integrated_before.rs\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-20T03:04:20.994509+00:00",
+      "log_sha256": "c2a9f4f8221730b8293b0ba946ced43ebbe7e56d00f65567215cc484ce494b84",
+      "suites": []
+    },
+    {
+      "label": "mere-final-port-boundaries",
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "ec588111228c0929d113eae1a0d8af4a8a6d3fce",
+      "started": "2026-10-20T03:04:32.093980+00:00",
+      "status_before": "?? ports/distillery/tests/q217_integrated_before.rs\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-20T03:04:35.864762+00:00",
+      "log_sha256": "24393869caf3ee5857aefd29b1e0f04c91d614b71d72b7cc8f849bcf3238b494",
+      "suites": []
+    }
+  ],
+  "expected_before_repair_assertions": [
+    {
+      "label": "q217-before-control",
+      "baseline_source": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+      "classification": "expected assertion failure on before-repair source",
+      "assertion_marker": "left: Queued",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "distillery",
+        "--features",
+        "inference",
+        "--test",
+        "q217_before",
+        "a_crashed_actor_must_terminalize_its_admitted_run_and_fail_close"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+      "started": "2026-10-20T02:19:55.440801+00:00",
+      "status_before": " M Cargo.lock\n M Cargo.toml\n M crates/cambium/examples/genet_web_smoke/Cargo.toml\n M crates/conatus/seiche/Cargo.toml\n M crates/graphshell/graphshell-endpoint/Cargo.toml\n M crates/graphshell/graphshell-endpoint/src/door/tasks.rs\n M ports/distillery/Cargo.toml\n M ports/distillery/probe/Cargo.lock\n M ports/distillery/probe/Cargo.toml\n M ports/distillery/probe/native-fixture/Cargo.toml\n M ports/distillery/probe/remote-fixture/Cargo.lock\n M ports/distillery/probe/remote-fixture/Cargo.toml\n M ports/distillery/probe/repros/burn_browser_embedding/Cargo.lock\n M ports/distillery/probe/repros/burn_browser_embedding/Cargo.toml\n M ports/distillery/probe/repros/cubek_browser_extrema/Cargo.lock\n M ports/distillery/probe/repros/cubek_browser_extrema/Cargo.toml\n M ports/distillery/probe/session-fixture/Cargo.lock\n M ports/distillery/probe/session-fixture/Cargo.toml\n M ports/distillery/src/inference.rs\n M ports/distillery/src/lifecycle.rs\n M ports/djinn/src/bin/djinn.rs\n M ports/djinn/src/embedded_reservoir.rs\n M ports/djinn/tests/resident_tasks.rs\n M ports/graphshell/web/Cargo.lock\n M ports/graphshell/web/Cargo.toml\n M ports/muniment-opfs-probe/Cargo.toml\n?? ports/distillery/tests/lifecycle.rs\n?? ports/distillery/tests/q217_before.rs\n?? support/fixtures/\n",
+      "process_started": true,
+      "exit_code": 101,
+      "finished": "2026-10-20T02:52:18.566770+00:00",
+      "log_sha256": "62875154ca445c26ee2c24a122d34d54d1ce96593693276b2c9acef80e1717b4",
+      "suites": [
+        {
+          "result": "FAILED",
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    {
+      "label": "q217-integrated-before-control-retry1",
+      "baseline_source": "8f26d962957a7f72cbc6aa2dbff418c3cca9751e",
+      "classification": "expected assertion failure on before-repair source",
+      "assertion_marker": "called `Result::unwrap_err()` on an `Ok` value",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "distillery",
+        "--features",
+        "inference",
+        "--test",
+        "q217_integrated_before",
+        "close_retains_every_terminal_journal_failure"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "ec588111228c0929d113eae1a0d8af4a8a6d3fce",
+      "started": "2026-10-20T03:06:49.489187+00:00",
+      "status_before": "?? ports/distillery/tests/q217_integrated_before.rs\n",
+      "process_started": true,
+      "exit_code": 101,
+      "finished": "2026-10-20T03:06:56.137287+00:00",
+      "log_sha256": "d61a6f350e3d1ee33c5925d4c1df15a3c2705f80fad166aa8fcd1aea317b9cad",
+      "suites": [
+        {
+          "result": "FAILED",
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 9
+        }
+      ]
+    }
+  ],
+  "locked_root_metadata": [
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:39.819625+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:47.589814+00:00",
+      "metadata_sha256": "b9b35eed0d1917a3a53abd6126b330cef75bcad42bc90a727373afc56f7fea0e",
+      "supplier_sources": {
+        "armillary": {
+          "git+https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def1c735be047492a867bcdc8b41fba22b8": [
+            "armillary"
+          ]
+        },
+        "eidetic": {
+          "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943": [
+            "chartulary",
+            "eidetic",
+            "luggage",
+            "mere-proofs",
+            "muniment",
+            "servitor",
+            "stickleback"
+          ]
+        },
+        "gemot": {
+          "git+https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3e2b48be951a677a9eca245eaabd56d63": [
+            "commons-spine",
+            "gemot",
+            "mien",
+            "mooting"
+          ]
+        },
+        "esp": {
+          "git+https://github.com/merely-made/esp.git?rev=b20ae7db257dae83493031efd92da3a102c44a48#b20ae7db257dae83493031efd92da3a102c44a48": [
+            "esp"
+          ]
+        }
+      },
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/distillery/probe",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:47.678709+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:49.942839+00:00",
+      "metadata_sha256": "342366077ee54d4f749b3a857bbe0267f56086daa8d06cf885b4fba61bd1e59f",
+      "supplier_sources": {},
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/distillery/probe/native-fixture",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:49.955684+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:50.407228+00:00",
+      "metadata_sha256": "9ff5ef4a821708eed4197d17ce6d9df5d9cce1a51446a9acf0d2368a63573bfe",
+      "supplier_sources": {
+        "esp": {
+          "git+https://github.com/merely-made/esp.git?rev=b20ae7db257dae83493031efd92da3a102c44a48#b20ae7db257dae83493031efd92da3a102c44a48": [
+            "esp"
+          ]
+        }
+      },
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/distillery/probe/remote-fixture",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:50.429233+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:51.903700+00:00",
+      "metadata_sha256": "fc4b2b5404d04d4b06deafc470127db8dbb1c991dea6fd067ebb822fbc05206a",
+      "supplier_sources": {
+        "armillary": {
+          "git+https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def1c735be047492a867bcdc8b41fba22b8": [
+            "armillary"
+          ]
+        },
+        "eidetic": {
+          "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943": [
+            "chartulary",
+            "eidetic",
+            "mere-proofs",
+            "muniment",
+            "stickleback"
+          ]
+        },
+        "esp": {
+          "git+https://github.com/merely-made/esp.git?rev=b20ae7db257dae83493031efd92da3a102c44a48#b20ae7db257dae83493031efd92da3a102c44a48": [
+            "esp"
+          ]
+        }
+      },
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/distillery/probe/session-fixture",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:51.943832+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:52.495387+00:00",
+      "metadata_sha256": "f680cd1d477d212d73ce473180b07ecee98200fe6083b37979c481a52be5ba6e",
+      "supplier_sources": {
+        "eidetic": {
+          "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943": [
+            "chartulary",
+            "eidetic",
+            "muniment"
+          ]
+        },
+        "esp": {
+          "git+https://github.com/merely-made/esp.git?rev=b20ae7db257dae83493031efd92da3a102c44a48#b20ae7db257dae83493031efd92da3a102c44a48": [
+            "esp"
+          ]
+        }
+      },
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/distillery/probe/repros/burn_browser_embedding",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:52.566554+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:53.071939+00:00",
+      "metadata_sha256": "d7c50b70db02a31461b39f14659f177e003963bc17d78bdc6c5dbd5ab169dec5",
+      "supplier_sources": {},
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/distillery/probe/repros/cubek_browser_extrema",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:53.097771+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:53.471723+00:00",
+      "metadata_sha256": "8b84f0e628e9ab4e2bb50f74342943a041dd55254a33b445716d5addfa8b5c51",
+      "supplier_sources": {},
+      "local_overrides": []
+    },
+    {
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/ports/graphshell/web",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--format-version",
+        "1",
+        "--locked",
+        "--offline",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "started": "2026-10-20T03:02:53.477235+00:00",
+      "revision": "9973039006dc6e73be04593bc1590258d677629c",
+      "exit_code": 0,
+      "finished": "2026-10-20T03:02:55.864968+00:00",
+      "metadata_sha256": "86db4ce5680c6c97798a930db3c19a22518e06e896d037bb7c0f1202412b6418",
+      "supplier_sources": {
+        "armillary": {
+          "git+https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def1c735be047492a867bcdc8b41fba22b8": [
+            "armillary"
+          ]
+        },
+        "eidetic": {
+          "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943": [
+            "chartulary",
+            "eidetic",
+            "luggage",
+            "muniment"
+          ]
+        },
+        "esp": {
+          "git+https://github.com/merely-made/esp.git?rev=b20ae7db257dae83493031efd92da3a102c44a48#b20ae7db257dae83493031efd92da3a102c44a48": [
+            "esp"
+          ]
+        }
+      },
+      "local_overrides": []
+    }
+  ],
+  "preparation_attempts": [
+    {
+      "label": "mere-djinn-lifecycle-gate",
+      "classification": "intentionally cancelled obsolete pre-Cambium integration checkpoint; superseded",
+      "exit_code": -2,
+      "log_sha256": "7c3b92010fb398cd69bf23cd4c74a734fd6e55679d5f043e7648e9fbd062b399"
+    },
+    {
+      "label": "mere-integrated-inference",
+      "classification": "unseeded offline Knot983 source; corrected by locked online cache seed",
+      "exit_code": 101,
+      "log_sha256": "f4c34f995213b17fecd9e8afa6c96c91ff164ea1ae54c7a7e13217169bd3d829"
+    },
+    {
+      "label": "mere-integrated-djinn",
+      "classification": "unseeded offline Knot983 source; corrected by locked online cache seed",
+      "exit_code": 101,
+      "log_sha256": "a1a21795ab8781e70e0640b040f45a35045c5122acaf9b6692d1553dde881388"
+    },
+    {
+      "label": "q217-integrated-before-control",
+      "classification": "temporary before-repair harness lacked gpu re-export; corrected before assertion qualification",
+      "exit_code": 101,
+      "log_sha256": "d881dac3ed2301d1049f2575eb6acc58f8242a9e64575c3ff4129e2c0c5accd1"
+    }
+  ],
+  "qualification_limits": [
+    "CPU and source qualification only; no new native UI, acoustic, physical radio, heavy-model or GPU acceptance.",
+    "Upstream8f26d962 execution implementation and its evidence are preserved; no task/close forwarding modules reintroduced.",
+    "Q112 pool admission and Q113 worker retirement remain open.",
+    "Knot checkpoint repair remains in its own lane."
+  ],
+  "receipt_policy": "Only compact command summaries and source hashes are stored in Git; raw logs and temporary before-repair harnesses are retained outside the repository.",
+  "synchronous_consumer_without_tokio": true
+}

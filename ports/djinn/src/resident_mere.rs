@@ -3161,15 +3161,15 @@ mod tests {
         fixture: &Fixture,
     ) -> (
         String,
-        graphshell_endpoint::door::tasks::ResidentTasks,
+        armillary::tasks::ResidentTasks,
         tokio::task::JoinHandle<Result<(), crate::door::app_broker::AppBrokerError>>,
     ) {
         use crate::door::app_broker::serve_app_broker;
+        use armillary::tasks::ResidentTasks;
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
         };
-        use graphshell_endpoint::door::tasks::ResidentTasks;
         use personae::{Ed25519Keypair, ProfileId};
         let host = Arc::new(PersonaeHost::new(
             IdentityVault::with_profile(
@@ -3309,7 +3309,10 @@ mod tests {
                 .is_some(),
             "an unadvertised compose is declined before it reaches the route"
         );
-        tasks.cancel_and_join().await;
+        assert!(
+            tasks.close_and_join().await.is_clean(),
+            "task shutdown failed"
+        );
         server.abort();
     }
 
@@ -3431,19 +3434,22 @@ mod tests {
             Some("Branch"),
             "the branch's title wins, as chosen"
         );
-        tasks.cancel_and_join().await;
+        assert!(
+            tasks.close_and_join().await.is_clean(),
+            "task shutdown failed"
+        );
         server.abort();
     }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn resident_proxy_forwards_one_graph_and_resume_then_refuses_revoked_grants() {
         use crate::door::app_broker::serve_app_broker;
+        use armillary::tasks::ResidentTasks;
         use castellan::{
             authority::PersonaeHost,
             custody::{IdentityVault, InMemoryStorage, Profile},
         };
         use graphshell_endpoint::door::resident_mere_proxy::ResidentMereProxy;
-        use graphshell_endpoint::door::tasks::ResidentTasks;
         use personae::{Ed25519Keypair, ProfileId};
         let fixture = fixture(33, "divination").await;
         fixture
@@ -3613,7 +3619,10 @@ mod tests {
         drop(proxy);
         server.abort();
         let _ = server.await;
-        tasks.cancel_and_join().await;
+        assert!(
+            tasks.close_and_join().await.is_clean(),
+            "task shutdown failed"
+        );
     }
 
     fn drive_common_panel(

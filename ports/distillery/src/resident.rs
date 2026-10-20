@@ -11,8 +11,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
-use crate::lifecycle::{CloseAction, CloseFuture, close_all};
 use crate::mesh_host::{MeshHost, Step, TransportBlobSpace};
+use armillary::lifecycle::{CloseAction, CloseFuture, close_all};
 use mesh::JobBoard;
 use mesh::ingress::{IngressConfig, IngressHandle, IngressStats, RecordIngress};
 use muniment::Backend;

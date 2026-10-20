@@ -1,0 +1,106 @@
+{
+  "state": "uncommitted consolidated edit/undo publication qualified with explicit local supplier override",
+  "baseline": "183a2f67223662bd820110027dc41db611665ee9",
+  "checks": [
+    {
+      "name": "feature-tests",
+      "command": [
+        "cargo",
+        "--config",
+        "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+        "test",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "default-tests",
+      "command": [
+        "cargo",
+        "--config",
+        "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+        "test",
+        "--locked",
+        "-p",
+        "isometry-system"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "cargo",
+        "--config",
+        "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+        "build",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring",
+        "--bin",
+        "pack-author",
+        "--example",
+        "pack_fixture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--config",
+        "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring",
+        "--all-targets",
+        "--no-deps"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "msrv",
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "--config",
+        "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/local-source-edit.toml",
+        "check",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring",
+        "--bin",
+        "pack-author"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "counts": {
+    "feature-tests": 75,
+    "default-tests": 58
+  },
+  "workflow_commands": 59,
+  "workflow_processes": 5,
+  "protocol_identical": true,
+  "source_sha256": {
+    "Cargo.lock": "81c669dce2c3d589a6f3fd5eb841c008db2f5323ee79768a115c639e1d3d8452",
+    "crates/isometry-system/Cargo.toml": "8b7778228e17dfb6cba1a78f5909b947bd602269d7e27146c122956ddd2daf73",
+    "crates/isometry-system/src/pack_author/mod.rs": "4fd38d10ce8b9e3bdef3ed400d6426ef755a81b2a3b0c077042e7b305c967a60",
+    "crates/isometry-system/src/pack_author/preset.rs": "456954f91cb6b1519cf6bdf474b384f07dd241f2e71eced14b616edbf7d38966",
+    "crates/isometry-system/src/pack_author/tests.rs": "8aa45f933083de1d719401ba08839d6c5d54ac7cc1d7baeac4c467e721e19097",
+    "design_docs/2026-10-17_private_pack_authoring_plan.md": "0a4fcc84977585478819a82328882094dc9b797ea38022443da186e216075557",
+    "design_docs/DOC_README.md": "219500c8dd581c4066d8e78255b160fdf5a9ba092cc30332044a64fea3af5b3c",
+    "crates/isometry-system/src/pack_author/shared_tests.rs": "3f6c61c8d7d7d56c670e4260b1503f48241573bf661071bb213608c07db732ce"
+  },
+  "publication": false
+}

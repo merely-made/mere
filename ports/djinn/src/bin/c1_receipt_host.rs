@@ -7,6 +7,7 @@
 //! Explicit public synthetic resident for the Cleromancy C1 headed lane.
 //! This executable never selects or opens an installed user identity.
 
+use armillary::tasks::ResidentTasks;
 use castellan::{
     authority::PersonaeHost,
     custody::{
@@ -26,7 +27,6 @@ use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
     app_client::AppBrokerClient,
     identity::VaultProtectionView,
-    tasks::ResidentTasks,
 };
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{self as session_item, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
@@ -581,7 +581,10 @@ async fn main() {
         std::io::stdin().read_line(&mut line).unwrap();
     });
     tokio::select! { result = &mut server => { result.unwrap().unwrap(); }, _ = stop => { server.abort(); let _ = server.await; } }
-    tasks.cancel_and_join().await;
+    assert!(
+        tasks.close_and_join().await.is_clean(),
+        "task shutdown failed"
+    );
     catalog
         .update(|catalog| *catalog = ResidentEndpointCatalog::new())
         .await;

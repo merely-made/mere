@@ -1,0 +1,16 @@
+{
+  "original_proof_unchanged": true,
+  "changed_copied_files": [
+    "src/lib.rs",
+    "src/main.rs",
+    "vendor/taplo-rowan17/Cargo.toml",
+    "vendor/taplo-rowan17/src/dom/mod.rs"
+  ],
+  "added_source": "src/profile.rs",
+  "counter_only_vendor_changes": [
+    "vendor/taplo-rowan17/Cargo.toml",
+    "vendor/taplo-rowan17/src/dom/mod.rs"
+  ],
+  "timing_build_counters_enabled": false,
+  "no_algorithm_optimization": true
+}

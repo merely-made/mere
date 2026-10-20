@@ -1,0 +1,21 @@
+{
+  "source_probe": "/Users/markik/Code/testing/redox-document-20261013",
+  "fixtures": [
+    {
+      "file": "demo-pack.toml",
+      "source_repo": "https://github.com/merely-made/isocosm",
+      "revision": "e5f8deb60049e7622206ef2fa32cbe12e4bf822d",
+      "source_path": "crates/isometry-system/examples/packs/demo/isometry-pack.toml",
+      "bytes": 850,
+      "sha256": "23ac63a565fe38454d898440208cf451b47630ef463909714f3b3dea6a9f3ade"
+    },
+    {
+      "file": "annotated-pack.toml",
+      "bytes": 1115,
+      "sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c",
+      "synthetic": true,
+      "construction": "demo pack plus comments and foreign extension table"
+    }
+  ],
+  "verified_original_with_git_show": true
+}

@@ -69,6 +69,7 @@ path = "src/bin/c1_receipt_host.rs"
 required-features = ["custody-receipt-host"]
 
 [dependencies]
+armillary = { workspace = true, features = ["tokio"] }
 # The personal sync, carriage and transfer staging hosts (`sync`) and the
 # browser door's nonces (`door::browser_host`), moved from Graphshell's
 # `native` with the stack lift plan's P5.

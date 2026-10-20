@@ -1,0 +1,30 @@
+{
+  "cache": "fresh internal builder cache per parse; dropped before publication",
+  "includes": "text, parse roots, diagnostics, hashes, receipts, history",
+  "measurements": [
+    {
+      "after_document_drop_bytes": 0,
+      "after_history_release_bytes": 13718,
+      "edits": 1,
+      "peak_incremental_requested_bytes": 55076,
+      "retained_requested_bytes": 26796,
+      "retained_revisions": 2
+    },
+    {
+      "after_document_drop_bytes": 0,
+      "after_history_release_bytes": 15254,
+      "edits": 16,
+      "peak_incremental_requested_bytes": 253526,
+      "retained_requested_bytes": 224742,
+      "retained_revisions": 17
+    },
+    {
+      "after_document_drop_bytes": 0,
+      "after_history_release_bytes": 21398,
+      "edits": 64,
+      "peak_incremental_requested_bytes": 887990,
+      "retained_requested_bytes": 859206,
+      "retained_revisions": 65
+    }
+  ]
+}

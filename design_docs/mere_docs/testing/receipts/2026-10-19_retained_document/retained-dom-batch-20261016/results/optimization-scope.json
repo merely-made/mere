@@ -1,0 +1,10 @@
+{
+  "vendor_changed_files": [
+    "Cargo.toml",
+    "src/dom/from_syntax.rs",
+    "src/dom/node/nodes.rs"
+  ],
+  "algorithm": "batch consecutive ROOT ENTRY nodes and inline-table entries; stop at headers; retain original per-entry conflict helper",
+  "Shared_update_unchanged": true,
+  "ordering_and_association_logic_unchanged": true
+}

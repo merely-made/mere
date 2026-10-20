@@ -1,0 +1,10 @@
+{
+  "root": {
+    "only_source_change": "mere-source-edit local patch -> canonical Git rev70deef",
+    "other_existing_package_versions_and_sources": "unchanged"
+  },
+  "standalone": {
+    "only_source_change": "mere-source-edit local patch -> canonical Git rev70deef",
+    "other_existing_package_versions_and_sources": "unchanged"
+  }
+}

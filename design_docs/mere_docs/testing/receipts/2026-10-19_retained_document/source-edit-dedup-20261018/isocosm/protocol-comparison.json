@@ -1,0 +1,8 @@
+{
+  "baseline": "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/workflow/transcript.json",
+  "candidate": "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/workflow/transcript.json",
+  "normalization": "scratch-pack absolute directory only",
+  "baseline_records": 64,
+  "candidate_records": 64,
+  "identical": true
+}
