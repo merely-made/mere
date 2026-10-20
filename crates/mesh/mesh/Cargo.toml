@@ -37,7 +37,7 @@ proofs.workspace = true
 p2panda-store = { version = "0.7.0", default-features = false }
 # Shared muniment-backed store and LogSync drain.
 stickleback = { workspace = true }
-muniment = { features = ["redb"], git = "https://github.com/merely-made/eidetic.git", rev = "de6b1dce75dd6725d72c79b829e4878c7903a381" }
+muniment = { workspace = true, features = ["redb"] }
 # The sync lane (`sync::SyncedMesh`): `stickleback::JoinedSpace` over the
 # store. `p2panda-net` stays for the `Endpoint`/`Gossip` the host injects
 # (endpoint-decoupled), so the lib never builds a `P2pandaTransport`.
