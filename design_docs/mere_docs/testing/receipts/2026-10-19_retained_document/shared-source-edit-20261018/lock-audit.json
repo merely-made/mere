@@ -1,0 +1,35 @@
+{
+  "mere": {
+    "removed_packages": [],
+    "added_packages": [
+      [
+        "mere-source-edit",
+        "0.1.0",
+        ""
+      ]
+    ],
+    "existing_versions_and_sources_preserved": true
+  },
+  "isocosm": {
+    "removed_packages": [],
+    "added_packages": [
+      [
+        "mere-source-edit",
+        "0.1.0",
+        ""
+      ]
+    ],
+    "existing_versions_and_sources_preserved": true
+  },
+  "knot-editor": {
+    "removed_packages": [],
+    "added_packages": [
+      [
+        "mere-source-edit",
+        "0.1.0",
+        ""
+      ]
+    ],
+    "existing_versions_and_sources_preserved": true
+  }
+}

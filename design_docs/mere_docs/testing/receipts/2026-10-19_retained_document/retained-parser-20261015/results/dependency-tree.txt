@@ -1,0 +1,45 @@
+retained-parser-evaluation v0.1.0 (/Users/markik/Code/testing/retained-parser-20261015)
+├── serde v1.0.229
+│   ├── serde_core v1.0.229
+│   └── serde_derive v1.0.229 (proc-macro)
+├── serde_json v1.0.151
+│   ├── itoa v1.0.18
+│   ├── memchr v2.8.3
+│   ├── serde_core v1.0.229
+│   └── zmij v1.0.23
+├── taplo v0.14.0 (/Users/markik/Code/testing/retained-parser-20261015/upstream/taplo-0.14.0)
+│   ├── ahash v0.8.12
+│   │   [build-dependencies]
+│   ├── arc-swap v1.9.2
+│   ├── either v1.19.0
+│   ├── globset v0.4.19
+│   ├── itertools v0.10.5
+│   ├── logos v0.12.1
+│   ├── once_cell v1.21.4
+│   ├── rowan v0.15.19
+│   ├── serde v1.0.229 (*)
+│   ├── serde_json v1.0.151 (*)
+│   ├── thiserror v1.0.69
+│   ├── time v0.3.41
+│   └── tracing v0.1.44
+├── taplo-rowan17 v0.14.0 (/Users/markik/Code/testing/retained-parser-20261015/vendor/taplo-rowan17)
+│   ├── ahash v0.8.12 (*)
+│   ├── arc-swap v1.9.2 (*)
+│   ├── either v1.19.0
+│   ├── globset v0.4.19 (*)
+│   ├── itertools v0.10.5 (*)
+│   ├── logos v0.12.1 (*)
+│   ├── once_cell v1.21.4
+│   ├── rowan v0.17.0
+│   ├── serde v1.0.229 (*)
+│   ├── serde_json v1.0.151 (*)
+│   ├── thiserror v1.0.69 (*)
+│   ├── time v0.3.41 (*)
+│   └── tracing v0.1.44 (*)
+└── toml v1.1.6+spec-1.1.0
+    ├── serde_core v1.0.229
+    ├── serde_spanned v1.1.2
+    ├── toml_datetime v1.1.2+spec-1.1.0
+    ├── toml_parser v1.1.5+spec-1.1.0
+    ├── toml_writer v1.1.3+spec-1.1.0
+    └── winnow v1.0.4

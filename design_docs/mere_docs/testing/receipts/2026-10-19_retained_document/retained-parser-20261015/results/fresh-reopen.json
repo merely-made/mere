@@ -1,0 +1,493 @@
+{
+  "cases": [
+    {
+      "accepted": true,
+      "bytes": 1115,
+      "case": "annotated",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": true,
+      "bytes": 1155,
+      "case": "unicode_crlf",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    },
+    {
+      "accepted": false,
+      "bytes": 1109,
+      "case": "incomplete_string",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": [
+        {
+          "end": 127,
+          "message": "invalid character in string",
+          "start": 127
+        },
+        {
+          "end": 142,
+          "message": "expected new line",
+          "start": 139
+        },
+        {
+          "end": 143,
+          "message": "expected new line",
+          "start": 142
+        },
+        {
+          "end": 144,
+          "message": "expected new line",
+          "start": 143
+        },
+        {
+          "end": 168,
+          "message": "expected new line",
+          "start": 144
+        },
+        {
+          "end": 178,
+          "message": "expected new line",
+          "start": 168
+        },
+        {
+          "end": 188,
+          "message": "expected new line",
+          "start": 178
+        },
+        {
+          "end": 193,
+          "message": "expected new line",
+          "start": 188
+        },
+        {
+          "end": 198,
+          "message": "expected new line",
+          "start": 194
+        },
+        {
+          "end": 225,
+          "message": "expected new line",
+          "start": 198
+        },
+        {
+          "end": 229,
+          "message": "expected new line",
+          "start": 225
+        },
+        {
+          "end": 241,
+          "message": "expected new line",
+          "start": 229
+        },
+        {
+          "end": 246,
+          "message": "expected new line",
+          "start": 241
+        },
+        {
+          "end": 260,
+          "message": "expected new line",
+          "start": 246
+        },
+        {
+          "end": 270,
+          "message": "expected new line",
+          "start": 260
+        },
+        {
+          "end": 271,
+          "message": "unexpected token",
+          "start": 270
+        },
+        {
+          "end": 281,
+          "message": "expected new line",
+          "start": 271
+        },
+        {
+          "end": 282,
+          "message": "expected new line",
+          "start": 281
+        },
+        {
+          "end": 285,
+          "message": "expected new line",
+          "start": 282
+        },
+        {
+          "end": 300,
+          "message": "expected new line",
+          "start": 285
+        },
+        {
+          "end": 308,
+          "message": "expected new line",
+          "start": 300
+        },
+        {
+          "end": 309,
+          "message": "unexpected token",
+          "start": 308
+        },
+        {
+          "end": 319,
+          "message": "expected new line",
+          "start": 309
+        },
+        {
+          "end": 320,
+          "message": "expected new line",
+          "start": 319
+        },
+        {
+          "end": 324,
+          "message": "expected new line",
+          "start": 320
+        },
+        {
+          "end": 363,
+          "message": "expected new line",
+          "start": 324
+        },
+        {
+          "end": 370,
+          "message": "expected new line",
+          "start": 363
+        },
+        {
+          "end": 381,
+          "message": "expected new line",
+          "start": 370
+        },
+        {
+          "end": 391,
+          "message": "expected new line",
+          "start": 381
+        },
+        {
+          "end": 399,
+          "message": "expected new line",
+          "start": 392
+        },
+        {
+          "end": 419,
+          "message": "expected new line",
+          "start": 399
+        },
+        {
+          "end": 423,
+          "message": "expected new line",
+          "start": 419
+        },
+        {
+          "end": 435,
+          "message": "expected new line",
+          "start": 423
+        },
+        {
+          "end": 446,
+          "message": "expected new line",
+          "start": 435
+        },
+        {
+          "end": 472,
+          "message": "expected new line",
+          "start": 446
+        },
+        {
+          "end": 481,
+          "message": "expected new line",
+          "start": 472
+        },
+        {
+          "end": 491,
+          "message": "expected new line",
+          "start": 481
+        },
+        {
+          "end": 496,
+          "message": "expected new line",
+          "start": 491
+        },
+        {
+          "end": 500,
+          "message": "expected new line",
+          "start": 497
+        },
+        {
+          "end": 527,
+          "message": "expected new line",
+          "start": 500
+        },
+        {
+          "end": 531,
+          "message": "expected new line",
+          "start": 527
+        },
+        {
+          "end": 543,
+          "message": "expected new line",
+          "start": 531
+        },
+        {
+          "end": 548,
+          "message": "expected new line",
+          "start": 543
+        },
+        {
+          "end": 562,
+          "message": "expected new line",
+          "start": 548
+        },
+        {
+          "end": 572,
+          "message": "expected new line",
+          "start": 562
+        },
+        {
+          "end": 573,
+          "message": "unexpected token",
+          "start": 572
+        },
+        {
+          "end": 582,
+          "message": "expected new line",
+          "start": 573
+        },
+        {
+          "end": 583,
+          "message": "expected new line",
+          "start": 582
+        },
+        {
+          "end": 586,
+          "message": "expected new line",
+          "start": 583
+        },
+        {
+          "end": 601,
+          "message": "expected new line",
+          "start": 586
+        },
+        {
+          "end": 609,
+          "message": "expected new line",
+          "start": 601
+        },
+        {
+          "end": 610,
+          "message": "unexpected token",
+          "start": 609
+        },
+        {
+          "end": 619,
+          "message": "expected new line",
+          "start": 610
+        },
+        {
+          "end": 620,
+          "message": "expected new line",
+          "start": 619
+        },
+        {
+          "end": 624,
+          "message": "expected new line",
+          "start": 620
+        },
+        {
+          "end": 649,
+          "message": "expected new line",
+          "start": 624
+        },
+        {
+          "end": 657,
+          "message": "expected new line",
+          "start": 649
+        },
+        {
+          "end": 667,
+          "message": "expected new line",
+          "start": 657
+        },
+        {
+          "end": 672,
+          "message": "expected new line",
+          "start": 667
+        },
+        {
+          "end": 681,
+          "message": "expected new line",
+          "start": 673
+        },
+        {
+          "end": 708,
+          "message": "expected new line",
+          "start": 681
+        },
+        {
+          "end": 712,
+          "message": "expected new line",
+          "start": 708
+        },
+        {
+          "end": 724,
+          "message": "expected new line",
+          "start": 712
+        },
+        {
+          "end": 729,
+          "message": "expected new line",
+          "start": 724
+        },
+        {
+          "end": 743,
+          "message": "expected new line",
+          "start": 729
+        },
+        {
+          "end": 753,
+          "message": "expected new line",
+          "start": 743
+        },
+        {
+          "end": 754,
+          "message": "unexpected token",
+          "start": 753
+        },
+        {
+          "end": 762,
+          "message": "expected new line",
+          "start": 754
+        },
+        {
+          "end": 763,
+          "message": "expected new line",
+          "start": 762
+        },
+        {
+          "end": 766,
+          "message": "expected new line",
+          "start": 763
+        },
+        {
+          "end": 804,
+          "message": "expected new line",
+          "start": 766
+        },
+        {
+          "end": 807,
+          "message": "expected new line",
+          "start": 804
+        },
+        {
+          "end": 817,
+          "message": "expected new line",
+          "start": 807
+        },
+        {
+          "end": 826,
+          "message": "expected new line",
+          "start": 817
+        },
+        {
+          "end": 830,
+          "message": "expected new line",
+          "start": 827
+        },
+        {
+          "end": 857,
+          "message": "expected new line",
+          "start": 830
+        },
+        {
+          "end": 861,
+          "message": "expected new line",
+          "start": 857
+        },
+        {
+          "end": 873,
+          "message": "expected new line",
+          "start": 861
+        },
+        {
+          "end": 878,
+          "message": "expected new line",
+          "start": 873
+        },
+        {
+          "end": 892,
+          "message": "expected new line",
+          "start": 878
+        },
+        {
+          "end": 902,
+          "message": "expected new line",
+          "start": 892
+        },
+        {
+          "end": 903,
+          "message": "unexpected token",
+          "start": 902
+        },
+        {
+          "end": 906,
+          "message": "expected new line",
+          "start": 903
+        },
+        {
+          "end": 907,
+          "message": "expected new line",
+          "start": 906
+        },
+        {
+          "end": 910,
+          "message": "expected new line",
+          "start": 907
+        },
+        {
+          "end": 1040,
+          "message": "expected new line",
+          "start": 910
+        },
+        {
+          "end": 1047,
+          "message": "expected new line",
+          "start": 1040
+        },
+        {
+          "end": 1053,
+          "message": "expected new line",
+          "start": 1048
+        },
+        {
+          "end": 1054,
+          "message": "unexpected token",
+          "start": 1053
+        },
+        {
+          "end": 1056,
+          "message": "expected new line",
+          "start": 1055
+        }
+      ]
+    },
+    {
+      "accepted": true,
+      "bytes": 1216,
+      "case": "insert_nested_preset",
+      "equivalent_tree_tokens_diagnostics_dom": true,
+      "lossless": true,
+      "semantic_errors": [],
+      "syntax_diagnostics": []
+    }
+  ],
+  "fresh_process": true,
+  "status": "passed"
+}

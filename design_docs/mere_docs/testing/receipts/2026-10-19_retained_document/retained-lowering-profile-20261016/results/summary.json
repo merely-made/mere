@@ -1,0 +1,946 @@
+{
+  "status": "passed",
+  "timing_processes": 3,
+  "timing_build_counters_enabled": false,
+  "rows": [
+    {
+      "fixture": "real",
+      "bytes": 850,
+      "output_equivalent": true,
+      "repetitions_per_process": 12,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 22416.5,
+          "process_medians_ns": [
+            24541.5,
+            22416.5,
+            21604.0
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 312.5,
+          "process_medians_ns": [
+            354.0,
+            292.0,
+            312.5
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 3833.0,
+          "process_medians_ns": [
+            4125.0,
+            3833.0,
+            3604.0
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 18458.0,
+          "process_medians_ns": [
+            19500.0,
+            18458.0,
+            16937.5
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 4271.0,
+          "process_medians_ns": [
+            4708.5,
+            4271.0,
+            4021.0
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 1334.0,
+          "process_medians_ns": [
+            1562.5,
+            1334.0,
+            1312.5
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 1458.0,
+          "process_medians_ns": [
+            1729.0,
+            1458.0,
+            1417.0
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 333.0,
+          "process_medians_ns": [
+            375.0,
+            333.0,
+            292.0
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 7833.0,
+          "process_medians_ns": [
+            8479.0,
+            7833.0,
+            7312.5
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 958.5,
+          "process_medians_ns": [
+            1104.5,
+            958.5,
+            917.0
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 1834.0,
+          "process_medians_ns": [
+            1979.5,
+            1834.0,
+            1750.0
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 16375.0,
+          "process_medians_ns": [
+            17562.5,
+            16375.0,
+            15458.5
+          ]
+        },
+        "result_drop": {
+          "median_ns": 1375.0,
+          "process_medians_ns": [
+            1520.5,
+            1375.0,
+            1333.0
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 81500.0,
+          "process_medians_ns": [
+            89166.5,
+            81500.0,
+            76812.5
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.27552510476604075,
+      "uninstrumented_lower_median_ns": 80479.5,
+      "warm_dom_validate_median_ns": 125,
+      "warm_dom_to_json_median_ns": 4875
+    },
+    {
+      "fixture": "annotated",
+      "bytes": 1115,
+      "output_equivalent": true,
+      "repetitions_per_process": 12,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 26729.0,
+          "process_medians_ns": [
+            26750.0,
+            26729.0,
+            23020.5
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 520.5,
+          "process_medians_ns": [
+            520.5,
+            542.0,
+            500.0
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 4417.0,
+          "process_medians_ns": [
+            4417.0,
+            4458.0,
+            3895.5
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 22729.0,
+          "process_medians_ns": [
+            22729.0,
+            23187.5,
+            19812.5
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 5187.5,
+          "process_medians_ns": [
+            5271.0,
+            5187.5,
+            4417.0
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 1666.0,
+          "process_medians_ns": [
+            1708.0,
+            1666.0,
+            1375.0
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 1729.0,
+          "process_medians_ns": [
+            1729.0,
+            1771.0,
+            1500.0
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 333.0,
+          "process_medians_ns": [
+            333.0,
+            333.0,
+            291.5
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 9792.0,
+          "process_medians_ns": [
+            9833.0,
+            9792.0,
+            8500.0
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 1166.5,
+          "process_medians_ns": [
+            1166.5,
+            1166.5,
+            1000.0
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 2208.5,
+          "process_medians_ns": [
+            2208.5,
+            2229.0,
+            1958.0
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 20417.0,
+          "process_medians_ns": [
+            20541.5,
+            20417.0,
+            18145.5
+          ]
+        },
+        "result_drop": {
+          "median_ns": 1584.0,
+          "process_medians_ns": [
+            1604.0,
+            1584.0,
+            1395.5
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 99500.0,
+          "process_medians_ns": [
+            99500.0,
+            99854.0,
+            86458.0
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.26831814091538286,
+      "uninstrumented_lower_median_ns": 98542.0,
+      "warm_dom_validate_median_ns": 292,
+      "warm_dom_to_json_median_ns": 5875
+    },
+    {
+      "fixture": "wide_256",
+      "bytes": 4494,
+      "output_equivalent": true,
+      "repetitions_per_process": 5,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 439291,
+          "process_medians_ns": [
+            421833,
+            481666,
+            439291
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 5792,
+          "process_medians_ns": [
+            5333,
+            8916,
+            5792
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 38792,
+          "process_medians_ns": [
+            38792,
+            76958,
+            38584
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 208833,
+          "process_medians_ns": [
+            201417,
+            232750,
+            208833
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 41500,
+          "process_medians_ns": [
+            41500,
+            43375,
+            41125
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 7625,
+          "process_medians_ns": [
+            7792,
+            7416,
+            7625
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 7041,
+          "process_medians_ns": [
+            7250,
+            6666,
+            7041
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 958,
+          "process_medians_ns": [
+            1000,
+            791,
+            958
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 101875,
+          "process_medians_ns": [
+            102625,
+            100167,
+            101875
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 7042,
+          "process_medians_ns": [
+            7167,
+            7000,
+            7042
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 9750,
+          "process_medians_ns": [
+            9750,
+            9709,
+            11166
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 105833,
+          "process_medians_ns": [
+            105833,
+            110375,
+            104208
+          ]
+        },
+        "result_drop": {
+          "median_ns": 5416,
+          "process_medians_ns": [
+            5416,
+            5709,
+            5250
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 1005458,
+          "process_medians_ns": [
+            1005458,
+            1106708,
+            986166
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.44327593006441435,
+      "uninstrumented_lower_median_ns": 990750,
+      "warm_dom_validate_median_ns": 4666,
+      "warm_dom_to_json_median_ns": 44083
+    },
+    {
+      "fixture": "wide_512",
+      "bytes": 8078,
+      "output_equivalent": true,
+      "repetitions_per_process": 5,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 1641916,
+          "process_medians_ns": [
+            1462542,
+            1866458,
+            1641916
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 12166,
+          "process_medians_ns": [
+            11209,
+            12458,
+            12166
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 89333,
+          "process_medians_ns": [
+            79917,
+            92416,
+            89333
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 438875,
+          "process_medians_ns": [
+            466583,
+            438875,
+            437958
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 88500,
+          "process_medians_ns": [
+            82833,
+            90292,
+            88500
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 15000,
+          "process_medians_ns": [
+            15000,
+            16000,
+            14292
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 13583,
+          "process_medians_ns": [
+            12375,
+            13583,
+            21083
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 1708,
+          "process_medians_ns": [
+            1834,
+            1708,
+            1208
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 220459,
+          "process_medians_ns": [
+            269667,
+            220333,
+            220459
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 13667,
+          "process_medians_ns": [
+            14083,
+            13667,
+            13084
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 19208,
+          "process_medians_ns": [
+            18958,
+            19792,
+            19208
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 198875,
+          "process_medians_ns": [
+            191666,
+            198875,
+            205167
+          ]
+        },
+        "result_drop": {
+          "median_ns": 9959,
+          "process_medians_ns": [
+            9958,
+            10042,
+            9959
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 2769791,
+          "process_medians_ns": [
+            2600917,
+            3022833,
+            2769791
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.5834471560066085,
+      "uninstrumented_lower_median_ns": 2643333,
+      "warm_dom_validate_median_ns": 9667,
+      "warm_dom_to_json_median_ns": 99333
+    },
+    {
+      "fixture": "wide_1024",
+      "bytes": 15294,
+      "output_equivalent": true,
+      "repetitions_per_process": 5,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 7015541,
+          "process_medians_ns": [
+            8663791,
+            7015541,
+            6920750
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 23625,
+          "process_medians_ns": [
+            23125,
+            23625,
+            23958
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 174292,
+          "process_medians_ns": [
+            193625,
+            169834,
+            174292
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 803875,
+          "process_medians_ns": [
+            1034791,
+            803875,
+            780625
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 176584,
+          "process_medians_ns": [
+            194959,
+            176584,
+            170833
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 25292,
+          "process_medians_ns": [
+            32708,
+            25292,
+            24375
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 20250,
+          "process_medians_ns": [
+            20708,
+            20250,
+            20250
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 1583,
+          "process_medians_ns": [
+            1584,
+            1583,
+            1583
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 451541,
+          "process_medians_ns": [
+            507375,
+            451541,
+            436208
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 23500,
+          "process_medians_ns": [
+            22000,
+            23500,
+            24959
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 34916,
+          "process_medians_ns": [
+            35166,
+            34916,
+            33708
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 371125,
+          "process_medians_ns": [
+            388250,
+            371125,
+            359333
+          ]
+        },
+        "result_drop": {
+          "median_ns": 17167,
+          "process_medians_ns": [
+            18459,
+            17167,
+            16791
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 9041750,
+          "process_medians_ns": [
+            11468500,
+            9041750,
+            8981125
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.7554423856650826,
+      "uninstrumented_lower_median_ns": 9320292,
+      "warm_dom_validate_median_ns": 16334,
+      "warm_dom_to_json_median_ns": 186709
+    },
+    {
+      "fixture": "wide_2048",
+      "bytes": 31678,
+      "output_equivalent": true,
+      "repetitions_per_process": 5,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 28731375,
+          "process_medians_ns": [
+            28731375,
+            28872292,
+            27542042
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 44292,
+          "process_medians_ns": [
+            44292,
+            46458,
+            44250
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 340667,
+          "process_medians_ns": [
+            337084,
+            340667,
+            367792
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 1875833,
+          "process_medians_ns": [
+            1875833,
+            1754250,
+            1887708
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 418167,
+          "process_medians_ns": [
+            418167,
+            376041,
+            427417
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 44292,
+          "process_medians_ns": [
+            44292,
+            47250,
+            42417
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 33917,
+          "process_medians_ns": [
+            33917,
+            36709,
+            33667
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 1875,
+          "process_medians_ns": [
+            1875,
+            2083,
+            1666
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 1057916,
+          "process_medians_ns": [
+            912375,
+            1057916,
+            1411625
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 39250,
+          "process_medians_ns": [
+            38417,
+            39250,
+            40167
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 70792,
+          "process_medians_ns": [
+            66875,
+            70792,
+            78250
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 751417,
+          "process_medians_ns": [
+            875833,
+            722334,
+            751417
+          ]
+        },
+        "result_drop": {
+          "median_ns": 33583,
+          "process_medians_ns": [
+            33583,
+            32375,
+            36875
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 33527875,
+          "process_medians_ns": [
+            33527875,
+            33658959,
+            32911625
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.8590272257769979,
+      "uninstrumented_lower_median_ns": 33654333,
+      "warm_dom_validate_median_ns": 32542,
+      "warm_dom_to_json_median_ns": 341625
+    },
+    {
+      "fixture": "wide_4096",
+      "bytes": 64446,
+      "output_equivalent": true,
+      "repetitions_per_process": 3,
+      "stages": {
+        "dom_construct": {
+          "median_ns": 116302750,
+          "process_medians_ns": [
+            111374834,
+            116302750,
+            116474084
+          ]
+        },
+        "dom_validate": {
+          "median_ns": 86291,
+          "process_medians_ns": [
+            86291,
+            93375,
+            83416
+          ]
+        },
+        "dom_to_json": {
+          "median_ns": 702875,
+          "process_medians_ns": [
+            720500,
+            668291,
+            702875
+          ]
+        },
+        "independent_parse": {
+          "median_ns": 3099833,
+          "process_medians_ns": [
+            3099833,
+            3041791,
+            3578625
+          ]
+        },
+        "independent_json_compare_drop": {
+          "median_ns": 668041,
+          "process_medians_ns": [
+            662708,
+            668041,
+            686666
+          ]
+        },
+        "schema_input_clone": {
+          "median_ns": 80167,
+          "process_medians_ns": [
+            88208,
+            80167,
+            76000
+          ]
+        },
+        "schema_deserialize": {
+          "median_ns": 61833,
+          "process_medians_ns": [
+            60541,
+            61833,
+            62750
+          ]
+        },
+        "manifest_validate": {
+          "median_ns": 1958,
+          "process_medians_ns": [
+            1833,
+            2042,
+            1958
+          ]
+        },
+        "canonicalize": {
+          "median_ns": 1694958,
+          "process_medians_ns": [
+            1644708,
+            1781292,
+            1694958
+          ]
+        },
+        "canonical_encode": {
+          "median_ns": 68875,
+          "process_medians_ns": [
+            68875,
+            73625,
+            68459
+          ]
+        },
+        "prefix_sha256": {
+          "median_ns": 134083,
+          "process_medians_ns": [
+            128917,
+            142667,
+            134083
+          ]
+        },
+        "result_and_local_cleanup": {
+          "median_ns": 1527209,
+          "process_medians_ns": [
+            1369541,
+            1626667,
+            1527209
+          ]
+        },
+        "result_drop": {
+          "median_ns": 75042,
+          "process_medians_ns": [
+            65875,
+            92333,
+            75042
+          ]
+        },
+        "profile_wall_total": {
+          "median_ns": 124425542,
+          "process_medians_ns": [
+            120036000,
+            124425542,
+            125977708
+          ]
+        }
+      },
+      "dom_construct_fraction": 0.9278452630877403,
+      "uninstrumented_lower_median_ns": 125461750,
+      "warm_dom_validate_median_ns": 70833,
+      "warm_dom_to_json_median_ns": 729667
+    }
+  ],
+  "clone_counts": {
+    "counter_build_separate_from_timing": true,
+    "counts": [
+      {
+        "after_validate_and_json": {
+          "clone_calls": 307,
+          "cloned_pairs": 32737
+        },
+        "dom_construct": {
+          "clone_calls": 307,
+          "cloned_pairs": 32737,
+          "max_width": 255
+        },
+        "keys": 256,
+        "wide_table_theoretical_pairs": 32640
+      },
+      {
+        "after_validate_and_json": {
+          "clone_calls": 563,
+          "cloned_pairs": 130913
+        },
+        "dom_construct": {
+          "clone_calls": 563,
+          "cloned_pairs": 130913,
+          "max_width": 511
+        },
+        "keys": 512,
+        "wide_table_theoretical_pairs": 130816
+      },
+      {
+        "after_validate_and_json": {
+          "clone_calls": 1075,
+          "cloned_pairs": 523873
+        },
+        "dom_construct": {
+          "clone_calls": 1075,
+          "cloned_pairs": 523873,
+          "max_width": 1023
+        },
+        "keys": 1024,
+        "wide_table_theoretical_pairs": 523776
+      },
+      {
+        "after_validate_and_json": {
+          "clone_calls": 2099,
+          "cloned_pairs": 2096225
+        },
+        "dom_construct": {
+          "clone_calls": 2099,
+          "cloned_pairs": 2096225,
+          "max_width": 2047
+        },
+        "keys": 2048,
+        "wide_table_theoretical_pairs": 2096128
+      },
+      {
+        "after_validate_and_json": {
+          "clone_calls": 4147,
+          "cloned_pairs": 8386657
+        },
+        "dom_construct": {
+          "clone_calls": 4147,
+          "cloned_pairs": 8386657,
+          "max_width": 4095
+        },
+        "keys": 4096,
+        "wide_table_theoretical_pairs": 8386560
+      }
+    ],
+    "status": "passed"
+  }
+}

@@ -1,0 +1,217 @@
+--- proof/src/lib.rs
++++ profile/src/lib.rs
+@@ -510,4 +510,5 @@
+ pub fn range(start: usize, end: usize) -> TextRange {
+     TextRange::new(TextSize::from(start as u32), TextSize::from(end as u32))
+ }
++pub mod profile;
+ pub mod scenario;
+--- proof/src/main.rs
++++ profile/src/main.rs
+@@ -1,138 +1,16 @@
+-#[cfg(feature = "alloc-meter")]
+-mod meter {
+-    use std::alloc::{GlobalAlloc, Layout, System};
+-    use std::sync::atomic::{AtomicUsize, Ordering::Relaxed};
+-    pub static LIVE: AtomicUsize = AtomicUsize::new(0);
+-    pub static PEAK: AtomicUsize = AtomicUsize::new(0);
+-    pub struct Alloc;
+-    unsafe impl GlobalAlloc for Alloc {
+-        unsafe fn alloc(&self, l: Layout) -> *mut u8 {
+-            let p = unsafe { System.alloc(l) };
+-            if !p.is_null() {
+-                let n = LIVE.fetch_add(l.size(), Relaxed) + l.size();
+-                PEAK.fetch_max(n, Relaxed);
+-            }
+-            p
+-        }
+-        unsafe fn dealloc(&self, p: *mut u8, l: Layout) {
+-            unsafe { System.dealloc(p, l) };
+-            LIVE.fetch_sub(l.size(), Relaxed);
+-        }
+-        unsafe fn realloc(&self, p: *mut u8, l: Layout, n: usize) -> *mut u8 {
+-            let q = unsafe { System.realloc(p, l, n) };
+-            if !q.is_null() {
+-                let now = if n >= l.size() {
+-                    LIVE.fetch_add(n - l.size(), Relaxed) + n - l.size()
+-                } else {
+-                    LIVE.fetch_sub(l.size() - n, Relaxed) - (l.size() - n)
+-                };
+-                PEAK.fetch_max(now, Relaxed);
+-            }
+-            q
+-        }
++fn main() {
++    #[cfg(feature = "clone-counters")]
++    if std::env::args().any(|a| a == "count") {
++        println!(
++            "{}",
++            serde_json::to_string_pretty(&retained_document_proof::profile::count_clones())
++                .unwrap()
++        );
++        return;
+     }
++    let reverse = std::env::args().any(|a| a == "reverse");
++    println!(
++        "{}",
++        serde_json::to_string_pretty(&retained_document_proof::profile::run(reverse)).unwrap()
++    );
+ }
+-#[cfg(feature = "alloc-meter")]
+-#[global_allocator]
+-static ALLOC: meter::Alloc = meter::Alloc;
+-
+-use retained_document_proof::{Document, scenario};
+-use serde_json::json;
+-use std::{hint::black_box, path::Path, time::Instant};
+-fn main() {
+-    let args = std::env::args().collect::<Vec<_>>();
+-    let output = match args.get(1).map(String::as_str).unwrap_or("verify") {
+-        "verify" => scenario::run(Path::new(
+-            args.get(2).map(String::as_str).unwrap_or("results/saved"),
+-        )),
+-        "reopen" => scenario::reopen(Path::new(
+-            args.get(2).map(String::as_str).unwrap_or("results/saved"),
+-        )),
+-        #[cfg(feature = "alloc-meter")]
+-        "memory" => {
+-            use std::sync::atomic::Ordering::Relaxed;
+-            // Warm lazy library state outside the measured document lifetime.
+-            drop(Document::open("warm", scenario::ANNOTATED.as_bytes(), 4).unwrap());
+-            let mut rows = vec![];
+-            for count in [1usize, 16, 64] {
+-                let baseline = meter::LIVE.load(Relaxed);
+-                meter::PEAK.store(baseline, Relaxed);
+-                let mut d =
+-                    Document::open("memory", scenario::ANNOTATED.as_bytes(), count + 1).unwrap();
+-                let original = std::sync::Arc::downgrade(d.current());
+-                for i in 0..count {
+-                    let from = if i == 0 {
+-                        "Demo Generator Pack".to_string()
+-                    } else {
+-                        format!("Revision {}", i - 1)
+-                    };
+-                    d.replace_once(
+-                        &format!("name = \"{from}\""),
+-                        &format!("name = \"Revision {i}\""),
+-                    )
+-                    .unwrap();
+-                }
+-                let retained = meter::LIVE.load(Relaxed) - baseline;
+-                let peak = meter::PEAK.load(Relaxed) - baseline;
+-                let retained_revisions = d.history_len();
+-                assert!(original.upgrade().is_some());
+-                d.release_history();
+-                assert!(original.upgrade().is_none());
+-                drop(original);
+-                let after_release = meter::LIVE.load(Relaxed) - baseline;
+-                drop(d);
+-                let after_drop = meter::LIVE.load(Relaxed) as i64 - baseline as i64;
+-                rows.push(json!({"edits":count,"retained_revisions":retained_revisions,"retained_requested_bytes":retained,"peak_incremental_requested_bytes":peak,"after_history_release_bytes":after_release,"after_document_drop_bytes":after_drop}));
+-                assert_eq!(after_drop, 0);
+-            }
+-            json!({"measurements":rows,"includes":"text, parse roots, diagnostics, hashes, receipts, history","cache":"fresh internal builder cache per parse; dropped before publication"})
+-        }
+-        "bench" => {
+-            let wide = format!(
+-                "{}\n[vendor.wide]\n{}",
+-                scenario::ANNOTATED,
+-                (0..4096)
+-                    .map(|i| format!("key_{i} = {i}\n"))
+-                    .collect::<String>()
+-            );
+-            let mut rows = vec![];
+-            for (name, source, n) in [
+-                ("real", scenario::DEMO, 500),
+-                ("annotated", scenario::ANNOTATED, 500),
+-                ("wide4096", wide.as_str(), 15),
+-            ] {
+-                for (position, target) in if name == "wide4096" {
+-                    vec![
+-                        ("beginning", "key_0"),
+-                        ("middle", "key_2048"),
+-                        ("end", "key_4095"),
+-                    ]
+-                } else {
+-                    vec![("name", "Demo Generator Pack")]
+-                } {
+-                    let mut d = Document::open(name, source.as_bytes(), 4).unwrap();
+-                    let start = Instant::now();
+-                    for i in 0..n {
+-                        let from = if i == 0 {
+-                            target.to_string()
+-                        } else {
+-                            format!("{target}{}", i - 1)
+-                        };
+-                        d.replace_once(&from, &format!("{target}{i}")).unwrap();
+-                        black_box(&d.current());
+-                    }
+-                    let ns = start.elapsed().as_nanos() as f64 / n as f64;
+-                    let start = Instant::now();
+-                    for _ in 0..n {
+-                        black_box(d.current().lower().unwrap());
+-                    }
+-                    let lower_ns = start.elapsed().as_nanos() as f64 / n as f64;
+-                    rows.push(json!({"fixture":name,"bytes":source.len(),"position":position,"iterations":n,"edit_publish_ns":ns,"lower_validate_hash_ns":lower_ns,"history_limit":4}));
+-                }
+-            }
+-            json!({"measurements":rows})
+-        }
+-        _ => panic!("unknown mode"),
+-    };
+-    println!("{}", serde_json::to_string_pretty(&output).unwrap());
+-}
+--- proof/vendor/taplo-rowan17/Cargo.toml
++++ profile/vendor/taplo-rowan17/Cargo.toml
+@@ -47,6 +47,7 @@
+ ]
+ 
+ [features]
++clone-counters = []
+ default = ["serde"]
+ schema = ["schemars"]
+ 
+--- proof/vendor/taplo-rowan17/src/dom/mod.rs
++++ profile/vendor/taplo-rowan17/src/dom/mod.rs
+@@ -243,10 +243,30 @@
+     }
+ }
+ 
+-#[derive(Debug, Clone, Default)]
++#[derive(Debug, Default)]
++#[cfg_attr(not(feature = "clone-counters"), derive(Clone))]
+ pub struct Entries {
+     pub(crate) lookup: HashMap<Key, Node>,
+     pub(crate) all: Vec<(Key, Node)>,
++}
++
++
++// Isolated profiling counters; the feature-off build keeps the derived Clone.
++#[cfg(feature = "clone-counters")]
++pub static ENTRY_CLONE_CALLS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
++#[cfg(feature = "clone-counters")]
++pub static ENTRY_CLONED_PAIRS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
++#[cfg(feature = "clone-counters")]
++pub static ENTRY_MAX_CLONE_WIDTH: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
++#[cfg(feature = "clone-counters")]
++impl Clone for Entries {
++    fn clone(&self) -> Self {
++        use std::sync::atomic::Ordering::Relaxed;
++        ENTRY_CLONE_CALLS.fetch_add(1, Relaxed);
++        ENTRY_CLONED_PAIRS.fetch_add(self.all.len() as u64, Relaxed);
++        ENTRY_MAX_CLONE_WIDTH.fetch_max(self.all.len() as u64, Relaxed);
++        Self { lookup: self.lookup.clone(), all: self.all.clone() }
++    }
+ }
+ 
+ impl Entries {
+--- proof/Cargo.toml
++++ profile/Cargo.toml
+@@ -11,6 +11,7 @@
+ sha2 = "=0.10.9"
+ logos = "=0.12.1"
+ [features]
++clone-counters = ["taplo-rowan17/clone-counters"]
+ alloc-meter = []
+ [workspace]
+ [profile.release]

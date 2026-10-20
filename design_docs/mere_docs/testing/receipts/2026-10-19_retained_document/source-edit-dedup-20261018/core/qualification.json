@@ -1,0 +1,55 @@
+{
+  "state": "uncommitted shared source snapshot qualified",
+  "baseline": "dd9d5c523c092baf72be31cdbc1d28c4ae179fa0",
+  "tests_passed": 6,
+  "checks": [
+    {
+      "name": "tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "mere-source-edit"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "-p",
+        "mere-source-edit",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "msrv",
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "mere-source-edit"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": {
+    "crates/system/source-edit/Cargo.toml": "d8c3ec38355a20067ba4b85f0c47bed2243664017c2a414870ce26c8c7c48b0d",
+    "crates/system/source-edit/README.md": "601315759f3e6e8f3d5318bbc397d2fad6220be327136dd65ba9419b37901f0b",
+    "crates/system/source-edit/src/lib.rs": "297999dda2bea43b10a50e37a72780526d11ed5c56b5bb2433daf5788ec2cb7b",
+    "crates/system/source-edit/src/tests.rs": "7c011b25910907cfd9f939b555139886046edbc512b79554627489132b902f89"
+  },
+  "publication": false
+}

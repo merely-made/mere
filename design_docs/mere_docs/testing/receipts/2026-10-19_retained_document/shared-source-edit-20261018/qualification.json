@@ -1,0 +1,20 @@
+{
+  "state": "core and two adapters qualified with explicit local new-supplier patches; uncommitted/unpushed",
+  "core_tests": 5,
+  "isocosm_feature_tests": 74,
+  "isocosm_default_tests": 58,
+  "isocosm_workflow_commands": 59,
+  "isocosm_workflow_processes": 5,
+  "isocosm_protocol_identical": true,
+  "knot_default_tests": 51,
+  "knot_engine_tests": 64,
+  "knot_model_tests": 10,
+  "knot_ui_harness_tests": 4,
+  "knot_child_reopens": 2,
+  "knot_workspace_focus_test": 1,
+  "native_gui_reviewed": false,
+  "remote_only_resolution_qualified": false,
+  "source_fingerprints_verified": true,
+  "consumer_scopes_verified": true,
+  "nothing_staged": true
+}

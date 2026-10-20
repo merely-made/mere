@@ -1,0 +1,60 @@
+{
+  "ported": [
+    {
+      "after_history_clear_bytes": 0,
+      "builder_cache": "fresh internal cache per parse",
+      "history_capacity_excluded": true,
+      "peak_incremental_requested_bytes": 17714,
+      "retained_requested_bytes": 11664,
+      "revisions": 1,
+      "source_buffers_dropped": true
+    },
+    {
+      "after_history_clear_bytes": 0,
+      "builder_cache": "fresh internal cache per parse",
+      "history_capacity_excluded": true,
+      "peak_incremental_requested_bytes": 192675,
+      "retained_requested_bytes": 186624,
+      "revisions": 16,
+      "source_buffers_dropped": true
+    },
+    {
+      "after_history_clear_bytes": 0,
+      "builder_cache": "fresh internal cache per parse",
+      "history_capacity_excluded": true,
+      "peak_incremental_requested_bytes": 752547,
+      "retained_requested_bytes": 746496,
+      "revisions": 64,
+      "source_buffers_dropped": true
+    }
+  ],
+  "unchanged": [
+    {
+      "after_history_clear_bytes": 0,
+      "builder_cache": "fresh internal cache per parse",
+      "history_capacity_excluded": true,
+      "peak_incremental_requested_bytes": 17714,
+      "retained_requested_bytes": 11664,
+      "revisions": 1,
+      "source_buffers_dropped": true
+    },
+    {
+      "after_history_clear_bytes": 0,
+      "builder_cache": "fresh internal cache per parse",
+      "history_capacity_excluded": true,
+      "peak_incremental_requested_bytes": 192675,
+      "retained_requested_bytes": 186624,
+      "revisions": 16,
+      "source_buffers_dropped": true
+    },
+    {
+      "after_history_clear_bytes": 0,
+      "builder_cache": "fresh internal cache per parse",
+      "history_capacity_excluded": true,
+      "peak_incremental_requested_bytes": 752547,
+      "retained_requested_bytes": 746496,
+      "revisions": 64,
+      "source_buffers_dropped": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "taplo": {
+    "max_stable_version": "0.14.0",
+    "max_version": "0.14.0",
+    "checked_at": "2026-10-16T03:35:55.544606+00:00",
+    "api": "https://crates.io/api/v1/crates/taplo",
+    "archive_sha256": "c221a50eef1a5493074f11ca1ed62bef28c05a4d925002944cc686b2e783a5b3"
+  },
+  "rowan": {
+    "max_stable_version": "0.17.0",
+    "max_version": "0.18.0-alpha.1",
+    "checked_at": "2026-10-16T03:35:55.749431+00:00",
+    "api": "https://crates.io/api/v1/crates/rowan"
+  }
+}
