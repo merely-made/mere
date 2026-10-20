@@ -316,11 +316,6 @@ impl MereRoutes {
         {
             return Err("mere does not belong to this reservoir persona/domain".into());
         }
-        let catalog = self
-            .inner
-            .catalog
-            .upgrade()
-            .ok_or("the mere's application catalog is closed")?;
         let domain = mere.domain.to_string();
         // Product records must never be writable under generic graph authority.
         // Both daemon and embedded composition install the same product callback.
@@ -331,6 +326,11 @@ impl MereRoutes {
                 "{domain} domain authority is not composed into this resident"
             ));
         }
+        let catalog = self
+            .inner
+            .catalog
+            .upgrade()
+            .ok_or("the mere's application catalog is closed")?;
         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
         let mut served = self.inner.served.lock().await;
