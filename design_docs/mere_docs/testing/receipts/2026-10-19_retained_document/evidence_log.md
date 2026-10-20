@@ -403,3 +403,37 @@ without caller byte offsets.
 workspace: Eidetic's chartulary manifest uses a cargo 1.98+ form while
 declaring `rust-version` 1.97.1. The gates compiled and tested with rustc and
 rustdoc 1.97.1, driven by cargo 1.99.1. Eidetic was not changed.
+
+## Isocosm follow-ups — 2026-10-20
+
+**Reused PIDs** ([`11299761`](https://github.com/merely-made/isocosm/commit/11299761)). A lease also records the boot
+identity and the holder's process start time: on Linux `/proc` boot_id and
+starttime, on macOS `kern.boottime` and `proc_pidinfo`. A lease from an
+earlier boot, or whose PID now names a process with a different start time, is
+reclaimed. A matching live holder still blocks. Leases without these fields keep
+the earlier dead-PID rule. A test uses a live stand-in process for a reused PID
+and for an earlier boot, and checks that reclaim never signals that process.
+
+**Inline-table layout** ([taplo `205c299`](https://github.com/merely-made/taplo/commit/205c299), Isocosm
+[`044370c0`](https://github.com/merely-made/isocosm/commit/044370c0)). The fork's formatter had pasted a multiline inline
+table's raw newlines into one comment slot. A second comment tripped a debug
+assertion, and release builds dropped every comment inside the table. It now
+writes one entry or comment per line, indented a level. Blank lines are capped
+by `allowed_blank_lines`, a comment after the opening brace stays on that line,
+and the trailing comma follows `array_trailing_comma`. Single-line inline tables
+and TOML 1.0 documents format as before. The fork passes 108 tests. The
+3,460-document TOML 1.0 corpus still matches the unchanged control, formatter
+output included. The TOML 1.1 differential is unchanged: 167 accepted with equal
+values, 780 rejected by both, and no disagreements.
+
+**Toolchain caveat resolved.** Eidetic `738ef15` moves `default-features = false`
+for muniment into the workspace entry, which cargo 1.97.1 accepts. Isocosm
+[`94d4421`](https://github.com/merely-made/isocosm/commit/94d4421) locks the repinned cohort described in the
+[Rust policy](../../../../2026-08-12_family_composition_thesis_brief.md#msrv-cohort-repin-2026-10-20).
+A fresh clone passes cargo 1.97.1 `--locked` in all four roots. Tests on cargo
+1.97.1: the root (`--all-features`) passes 205 and fails 2, host passes 51,
+shared/isocosm 700 and shared/wing-integration 9. The two failures are
+`isometry-genet` `host_zoom` layout-figure tests. They fail identically at
+`044370c0`, before the repin, so they are recorded and not caused by it. The
+pack-author package passes 86 feature-enabled and 58 default tests on rustc
+1.97.1.
