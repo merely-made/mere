@@ -191,7 +191,9 @@ Mark's rulings from the 2026-10-19 review:
 history is the default: at 65 revisions it retains 98,944 bytes against 849,544
 for full trees and 537,240 for the shared `NodeCache`, and publishes within
 noise of full. The cache mode shares 90 of 152 green nodes and remains
-available behind `--history`. Details are in the
+available behind `--history`. On 2026-10-20, leases also reclaim reused PIDs
+and earlier boots, the fork lays out TOML 1.1 multiline inline tables, and
+Isocosm resolves on cargo 1.97.1. Details are in the
 [evidence log](mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md#isocosm-continuation--2026-10-19).
 
 ## Open decisions
@@ -207,14 +209,10 @@ available behind `--history`. Details are in the
 
 ## Next gates
 
-- Reclaim a stale lease whose PID was reused by a live process (for example
-  after a reboot); today that case still needs manual removal.
-- Lay out TOML 1.1 multiline inline tables in the fork's formatter; it
-  preserves their comments and values but does not format them.
 - Upstreaming the fork means rebasing onto upstream's newer master.
   Packaging a tool distribution requires qualifying the fork's packaging.
-- Isocosm's workspace does not resolve under cargo 1.97.1 because Eidetic's
-  chartulary manifest needs cargo 1.98+ while declaring `rust-version` 1.97.1.
+- Two `isometry-genet` `host_zoom` layout-figure tests fail on Isocosm main;
+  they predate the 2026-10-20 repin.
 - Wider platform and consumer compatibility, peak memory/RSS, and native GUI
   acceptance remain unqualified.
 - Direct structural edits, if introduced, must match parsing of their
