@@ -1,0 +1,302 @@
+{
+  "scenario": {
+    "state": "running",
+    "errors": [],
+    "gate_failures": [],
+    "result": null,
+    "captures": [
+      {
+        "name": "chart",
+        "width": 910,
+        "height": 2440,
+        "bytes": 358046
+      },
+      {
+        "name": "tab_rest",
+        "width": 910,
+        "height": 2440,
+        "bytes": 206242
+      },
+      {
+        "name": "score_rest",
+        "width": 910,
+        "height": 2440,
+        "bytes": 274622
+      }
+    ]
+  },
+  "title": "Graphshell, one tree",
+  "hidden": false,
+  "semantic": {
+    "role": "region",
+    "label": "Graphshell, one tree",
+    "children": [
+      {
+        "role": "main",
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "role": "heading",
+                        "label": "Graphshell",
+                        "children": []
+                      },
+                      {
+                        "role": "paragraph",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "role": "button",
+                        "label": "Return to graph",
+                        "children": []
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "button",
+                            "label": "Save document",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Undo document edit",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Redo document edit",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Export document",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "role": "button",
+                        "label": "Insert Woodshed example",
+                        "children": []
+                      },
+                      {
+                        "role": "button",
+                        "label": "Apply bar grouping\u2026",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "role": "heading",
+                            "label": "Composition",
+                            "children": []
+                          },
+                          {
+                            "role": "button",
+                            "label": "Create verse block from selected lines",
+                            "children": []
+                          },
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          },
+                          {
+                            "role": "status",
+                            "label": "Document saved",
+                            "children": []
+                          },
+                          {
+                            "children": [
+                              {
+                                "role": "textbox",
+                                "label": "Document source",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "verse",
+                                "pressed": false,
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Woodshed progression 2",
+                                "pressed": true,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "children": [
+                              {
+                                "role": "button",
+                                "label": "Bar 1 \u00b7 4 quarter-note beats",
+                                "pressed": true,
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Bar 2 \u00b7 4 quarter-note beats",
+                                "pressed": true,
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Bar 3 \u00b7 4 quarter-note beats",
+                                "pressed": true,
+                                "children": []
+                              },
+                              {
+                                "role": "button",
+                                "label": "Bar 4 \u00b7 4 quarter-note beats",
+                                "pressed": true,
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "children": [
+                              {
+                                "role": "textbox",
+                                "label": "Bar grouping",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "children": [
+                              {
+                                "role": "textbox",
+                                "label": "Search block commands",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "role": "button",
+                            "label": "Export bar-line plaintext",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "children": [
+                          {
+                            "role": "paragraph",
+                            "children": []
+                          },
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "role": "button",
+                                    "label": "Arrangement",
+                                    "pressed": false,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Chart",
+                                    "pressed": false,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Tab",
+                                    "pressed": false,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Score",
+                                    "pressed": true,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "role": "graphics-object",
+                                    "label": "Score notation \u00b7 Saved practice passage",
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Bar 1, event 1 \u00b7 Whole \u00b7 string 4 fret 0, string 3 fret 2, string 2 fret 1, string 1 fret 1",
+                                    "pressed": false,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Bar 2, event 1 \u00b7 Half \u00b7 string 6 fret 3, string 5 fret 2, string 4 fret 3, string 2 fret 3",
+                                    "pressed": false,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Bar 2, event 2 \u00b7 Half \u00b7 Rest",
+                                    "pressed": true,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Bar 3, event 1 \u00b7 Whole \u00b7 string 5 fret 3, string 4 fret 2, string 3 fret 0, string 2 fret 0",
+                                    "pressed": false,
+                                    "children": []
+                                  },
+                                  {
+                                    "role": "button",
+                                    "label": "Bar 4, event 1 \u00b7 Whole \u00b7 string 5 fret 3, string 3 fret 0, string 2 fret 0, string 1 fret 0",
+                                    "pressed": false,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "role": "status",
+                                "label": "Selected bar 2, event 2 \u00b7 Half rest",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "log": "",
+  "collected_at_utc": "2026-10-20T03:41:19.051460+00:00"
+}

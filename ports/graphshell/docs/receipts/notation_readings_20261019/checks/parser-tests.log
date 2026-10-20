@@ -1,0 +1,36 @@
+    Blocking waiting for file lock on package cache
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `dict-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `fsp-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph
+warning: patch `kepler-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `scorpion-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+warning: patch `text-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+   Compiling fnv v1.0.7
+   Compiling syn v2.0.119
+   Compiling logos-codegen v0.16.1
+   Compiling logos-derive v0.16.1
+   Compiling logos v0.16.1
+   Compiling illume v0.0.2 (/Users/markik/Code/repos/mere/crates/nematic/illume)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.21s
+     Running unittests src/lib.rs (target/build/debug/deps/illume-ea2a10c8e9a5c450)
+
+running 5 tests
+test blocks::tests::nested_divs_keep_exact_source_ranges ... ok
+test blocks::tests::update_rejects_forged_target_and_multiline_attributes ... ok
+test blocks::tests::update_inserts_prefixed_attrs_without_rewriting_quote_body ... ok
+test blocks::tests::update_keeps_a_list_div_inside_its_parent_item ... ok
+test blocks::tests::update_uses_parser_range_for_json_braces_and_keeps_body_and_unknown_attrs ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 32 filtered out; finished in 0.00s
+

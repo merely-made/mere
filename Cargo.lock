@@ -6950,9 +6950,11 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
+ "illume",
  "image",
  "inker",
  "insigne",
+ "knot-editor-host",
  "layout-dom-api",
  "mere",
  "mere-document-lanes",
@@ -6996,6 +6998,7 @@ dependencies = [
  "url",
  "uuid",
  "wgpu",
+ "woodshedding",
  "workbench",
  "zeroize",
 ]
@@ -20143,6 +20146,15 @@ dependencies = [
  "thiserror 2.0.21",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "woodshedding"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/woodshed.git?rev=a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61#a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61"
+dependencies = [
+ "roxmltree 0.21.1",
+ "serde",
 ]
 
 [[package]]

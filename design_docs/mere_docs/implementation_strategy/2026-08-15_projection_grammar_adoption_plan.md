@@ -2000,3 +2000,60 @@ claim Woodshed receiving qualification or native playback. Current command
 output is recorded in the local
 `/Users/markik/Code/output/woodshed-arrangement-playback-20261019` evidence
 directory.
+
+### Woodshed notation readings on canonical main (2026-10-19)
+
+Graphshell's editable progression blocks now consume the pure `woodshedding`
+notation model/conversion and the Woodshed-owned `woodshed-notation` leaf.
+Chart, Tab and Score read saved Set MusicXML; absent music requires an explicit
+Write notation action, which is one ordinary document edit. Hosts retain their
+own commands, attention, labels and persistence. The accepted boundary and
+trade-offs live once in
+`woodshed/design_docs/2026-07-11_stage_set_tools_plan.md`, section
+“ADR: shared notation readings in Graphshell (2026-10-19)”.
+
+Evidence and coverage limits:
+`ports/graphshell/docs/receipts/notation_readings_20261019/`. The local source
+integration uses canonical sibling checkouts; publication and a portable family
+source pin remain separate.
+
+#### Current-host reconciliation (2026-10-20)
+
+The maintainer confirmed selectable Chart/Tab/Score readings with linked event
+selection, keeping MusicXML as source, and an explicit **Write notation** action
+when a progression has no music. This does not add Graphshell note editing or
+practice playback. Reading and selection changes do not author; notation creation
+uses the ordinary document history and save/reopen path.
+
+The published Woodshed provider is now `a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61`
+on `codex/woodshed-timing-integration` (superseding `111da595`).
+Current Mere uses AccessKit 0.25, while that provider's native fallback adapter
+names 0.24. The provider refinement makes the renderer's fallback
+`accessibility` feature optional and default-on. Graphshell disables it and owns
+the notation label and focusable musical-event buttons; Woodshed retains its
+existing default labels and playback description. Paint, glyphs, layout, label
+positions and event rectangles are shared unchanged across the two hosts.
+
+Initial development qualification used an explicit local provider override;
+the consumer now pins the published provider without that override. No sibling
+path is committed in the consumer manifests. Current-host evidence is kept separately
+from the historical packet at
+`ports/graphshell/docs/receipts/notation_readings_20261020/`; raw development
+attempts remain under `Code/output/graphshell-notation-20261020`.
+
+The current read path consumes saved MusicXML independently of legacy
+Card/arrangement validation. Those commands keep their own admission checks;
+invalid legacy metadata does not prevent displaying otherwise valid music.
+
+The maintainer confirmed whole-number 1–400 BPM for notation creation as well
+as the existing MusicXML score profile. The local converter and Graphshell
+command accept that full range; practice tempo remains separately controlled.
+The follow-up evidence is in
+`ports/graphshell/docs/receipts/notation_tempo_20261020/`; the earlier packet
+preserves the initial qualification and its then-pending range decision.
+
+Publication qualification uses the immutable `a0ae58f` supplier without the
+development override, with both consumer lockfiles refreshed. Its published
+provider resolution, locked checks and browser evidence are recorded at
+`ports/graphshell/docs/receipts/notation_publication_20261020/`. The read-only
+viewer continues to exclude the musical packages.
