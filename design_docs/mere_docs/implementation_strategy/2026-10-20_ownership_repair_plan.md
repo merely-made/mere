@@ -143,7 +143,29 @@ slice lands.
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they
   are a sizing aid, not an assignment. 98 of the 147 graph-and-session findings sit in
   graph-kernel, chartulary, graphshell and the canvas crates.
+- 2026-10-20 (L6): a read of all 465 findings replaced the keyword count of 57 for the
+  misleading-success class: **95 in class**, 30 production code in mere, 39 tooling in mere,
+  11 in the vendored GPU patches, 15 whose source has since left mere (eidetic-core, luggage and
+  stickleback now in `repos/eidetic`; esp in `repos/esp`; mien in `repos/gemot`; errand), plus 12
+  related findings whose fix needs an owner choice and belong to L1 to L5. The register holds 39
+  findings under `support/patches` (Q424 to Q462), not the fourteen named in §5.4; the eleven in
+  the class include burn-remote, cubecl-runtime and cubecl-wgpu, which the ruling's list did not
+  name. Q054 (djinn-testkit) was already repaired on main by `2e683fcfc`. List and receipt:
+  [`l6/2026-10-20_l6_receipt.json`](../../../support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json).
 
 ## 7. Progress
 
 - 2026-10-20: drafted after Mark's answer; first round answered the same day (§5); L1 (kernel and chartulary) and L6 (receipts class) briefed as sessions, each in its own worktree, with the bar in §5.3.
+- 2026-10-20 (L6): Mark's card round, his words: first crate **"djinn-testkit first
+  (Recommended)"**; moved code **"Record and hand off (Recommended)"**; historical dated
+  scripts **"Re-document, keep bytes (Recommended)"**; GPU patches **"Ledger all 11
+  (Recommended)"**; Q052 **"Narrow claim, report all (Recommended)"**. First crate landed on
+  branch `l6/misleading-success` (not merged): Q052 repaired (verdict extracted to
+  `ports/djinn/tests/residue_verdict`, unjudged host blocks printed with their reason, regression
+  `residue_verdict_classifier` 5 tests, mutation control fails 4 of 5, the audit's probe rerun 5
+  passed), Q054 verified in the worktree (djinn-testkit 14 passed), GPU findings added to the
+  upstream ledger as item 14. Receipt: `support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json`.
+  Remaining by consumer risk: support/testing runners (Q422, Q463 to Q465), script-host
+  build.rs (Q371), cambium-genet-winit-host receipts, pelt and graphshell receipt paths, the 30
+  production findings, probes. Not run: the full `knot_residue` run (heavy); its verdict is
+  unchanged, only its reporting.

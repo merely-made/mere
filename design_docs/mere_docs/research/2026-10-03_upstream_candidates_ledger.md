@@ -1,7 +1,7 @@
 # Upstream Candidates Ledger
 
 **Date**: 2026-10-03
-**Status (2026-10-09)**: open; thirteen items, none raised. Kept by ruling 46 of
+**Status (2026-10-20)**: open; fourteen items, none raised. Kept by ruling 46 of
 the device pairing plan: noted for a later review, raised only after a
 release passes them by. Item 9 (argon2) comes from the vault lock plan's
 ruling 33; item 12 (parry) from the Conatus engine plan's ruling C4.
@@ -289,6 +289,38 @@ So, for each item:
   is clean.
 - **Last checked:** personae 0.3.0 at dramatis `cf562f4`.
 
+### 14. Burn and CubeCL (carried patches): success claimed without the check
+
+- **What happens:** the full-source audit found eleven places in the copies
+  carried under `support/patches/` where a test, gate, benchmark or
+  validation reports success it did not check (register
+  `support/receipts/authority-success-audit/review_notes.json`, evidence in
+  each finding's `verification` receipt):
+  - burn-remote Q427: the server-survival test's `finishes_within` swallows
+    a failed read or value assertion and still reports completion.
+  - cubecl-runtime Q432: roofline helpers admit negative and tiny peaks their
+    docs say are refused; Q433: throughput ranking narrows the iteration
+    count to `u32` and reports a wrong per-iteration time; Q435: autotune
+    calls a refused, never-run candidate the settled winner.
+  - cubecl-wgpu Q440: a write-only `flush` returns `Ok` without submitting
+    the queued writes.
+  - cubek-matmul Q445: benchmark column layouts time a different physical
+    layout than correctness checked; Q453: the split-cube correctness gate
+    passes NaN output; Q454: the atomic split-cube benchmark accumulates
+    across warmups and samples; Q456: broadcast helpers skip silently on a
+    wrong numeric baseline.
+  - cubek-reduce Q458: axis validation admits `axis == rank`; Q462: zero
+    top-k is admitted, then panics.
+- **Why it matters:** each makes a green run or an `Ok` stand for a check
+  that did not happen; Q453 lets a NaN matmul be timed as proved.
+- **What we carry:** the patches as they are. Not yet split between upstream
+  source and our own carried edits; that split comes before anything is
+  raised. Ruled ledger-only by the ownership repair plan (§5.4); on
+  2026-10-20 Mark extended it to all six patch directories: "Ledger all 11
+  (Recommended)".
+- **Last checked:** audit basis `7c718105`; `support/patches` unchanged
+  through main `c25c2d441`.
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
@@ -308,3 +340,7 @@ C4. Not raised.
 
 **2026-10-18.** Item 13 (personae `from_seed`) added from the full-source
 audit plan's ruling R4. Not raised.
+
+**2026-10-20.** Item 14 (Burn and CubeCL carried patches, eleven
+misleading-success findings) added from the ownership repair plan's lane L6.
+Not raised.
