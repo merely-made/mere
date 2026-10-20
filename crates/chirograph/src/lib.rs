@@ -622,6 +622,13 @@ impl ResourceResponse {
     pub fn has_valid_address(&self) -> bool {
         ContentHash::of(&self.bytes) == self.resource
     }
+
+    /// Whether this is the content-addressed reply to the exact request.
+    pub fn matches_request(&self, request: &ResourceRequest) -> bool {
+        self.session == request.session
+            && self.resource == request.resource
+            && self.has_valid_address()
+    }
 }
 
 /// Most raw bytes one resource chunk carries before encoding.

@@ -89,17 +89,6 @@ impl<T> Progress<T> {
     }
 }
 
-/// Whether a returned resource is the exact, content-addressed resource the
-/// current operation asked for.
-fn response_matches_resource_request(
-    response: &ResourceResponse,
-    request: &ResourceRequest,
-) -> bool {
-    response.session == request.session
-        && response.resource == request.resource
-        && response.has_valid_address()
-}
-
 /// What an operation produced when it finished.
 ///
 /// One enum rather than a generic, because a driver holds an in-flight
@@ -561,7 +550,7 @@ impl SessionCore {
                 request,
             } => match body {
                 CarrierResponseBody::Resource(response) => {
-                    if !response_matches_resource_request(&response, &request) {
+                    if !response.matches_request(&request) {
                         return Err(
                             "The resource response has another scope or content address.".into(),
                         );
@@ -576,7 +565,7 @@ impl SessionCore {
             },
             Pending::MediaResource { request } => match body {
                 CarrierResponseBody::Resource(response) => {
-                    if !response_matches_resource_request(&response, &request) {
+                    if !response.matches_request(&request) {
                         return Err(
                             "The media response has another scope or content address.".into()
                         );
