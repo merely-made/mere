@@ -27,7 +27,7 @@ use crate::door::browser_host::{BrowserHostError, serve_identity_native_messages
 use crate::door::identity_endpoint::{SupplementalCard, TransferDecisions};
 use crate::door::resident_identity::ResidentIdentity;
 use chirograph::ContentHash;
-use graphshell_endpoint::door::local_endpoint::{LocalStream, connect_local, serve_local};
+use graphshell_endpoint::door::local_endpoint::{LocalListener, LocalStream, connect_local};
 
 pub const DEVICE_ENDPOINT_ENV: &str = "GRAPHSHELL_DEVICE_ENDPOINT";
 const BROKER_HELLO_SCHEMA: &str = "mere.graphshell/device-broker-hello/v1";
@@ -260,27 +260,43 @@ async fn serve<A>(
 where
     A: ResidentIdentity,
 {
-    serve_local(endpoint, "browser", move |stream: Box<dyn LocalStream>| {
-        let personae = Arc::clone(&personae);
-        let allowlist = allowlist.clone();
-        let surface = surface.clone();
-        async move {
-            let (mut reader, mut writer) = tokio::io::split(stream);
-            if let Err(error) = serve_connection(
-                &mut reader,
-                &mut writer,
-                personae,
-                &allowlist,
-                session_duration_ms,
-                surface,
-            )
-            .await
-            {
-                tracing::warn!(%error, "browser device session failed");
+    let listener = LocalListener::bind(endpoint, "browser").await?;
+    serve_browser_broker_on(listener, personae, allowlist, session_duration_ms, surface).await
+}
+
+/// Serve browser relays on an already bound owner-only listener.
+pub async fn serve_browser_broker_on<A>(
+    listener: LocalListener,
+    personae: Arc<A>,
+    allowlist: AllowedExtensions,
+    session_duration_ms: u64,
+    surface: Option<DeviceSurfaceHandle>,
+) -> Result<(), DeviceBrokerError>
+where
+    A: ResidentIdentity,
+{
+    listener
+        .serve(move |stream: Box<dyn LocalStream>| {
+            let personae = Arc::clone(&personae);
+            let allowlist = allowlist.clone();
+            let surface = surface.clone();
+            async move {
+                let (mut reader, mut writer) = tokio::io::split(stream);
+                if let Err(error) = serve_connection(
+                    &mut reader,
+                    &mut writer,
+                    personae,
+                    &allowlist,
+                    session_duration_ms,
+                    surface,
+                )
+                .await
+                {
+                    tracing::warn!(%error, "browser device session failed");
+                }
             }
-        }
-    })
-    .await?;
+        })
+        .await?;
     Ok(())
 }
 
