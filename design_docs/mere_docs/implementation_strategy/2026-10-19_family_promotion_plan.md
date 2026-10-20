@@ -613,3 +613,25 @@ hashes, exact commands, exit results and the failed pre-repair controls. These
 are CPU/source checks; native UI, physical audio/radio, heavy models and the
 Knot checkpoint lane keep their own acceptance records. Q112/Q113 pool admission
 and worker lifetime remain open.
+
+
+### Embedding compatibility receiving cohort (2026-10-20)
+
+The resident I10 receiving build exposed parallel exact-revision Eidetic and
+Chartulary types through older Knot, Cleromancy, Gemot and Murm manifests. A
+root-only pin change could resolve metadata but could not compile the actual
+consumer interfaces. The retained schema is Eidetic `34105d63`; the guarded
+ESP implementation is `6d371901`. The manifest intakes were published first,
+then Mere `fb56a2ae1` supplied the receiving SDK, followed by standalone lock
+refreshes. No local Cargo overrides remain in the qualified graph.
+
+The canonical receipt is
+`support/receipts/resident-embedding-20261020/qualification.json`; its
+`qualified_git_graph` records exact tested inputs and
+`supplier_lock_receiving_heads` records the subsequent lock closure. Six roots
+(Knot, Gemot, Cleromancy root/core, Murm native/Signalman) pass locked metadata
+with one Eidetic source per package. Those checks establish source resolution;
+the compiled behavioral qualification is the resident I10 gate. They do not
+assert unfiltered standalone application suites. Later manifest/lock commits
+carry the same code and SDK/artifact revisions as the qualified receiving
+closure. Frozen earlier promotion and native receipts remain unchanged.

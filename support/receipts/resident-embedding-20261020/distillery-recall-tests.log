@@ -1,0 +1,17 @@
+running 13 tests
+test inference::recall::tests::retained_blob_corruption_is_an_error_instead_of_a_new_version ... ok
+test inference::recall::tests::absent_source_owner_never_turns_a_marker_into_a_citation ... ok
+test inference::recall::tests::budgets_never_clip_a_citable_passage ... ok
+test inference::recall::tests::stub_cannot_satisfy_a_retained_ask ... ok
+test inference::recall::tests::unicode_selectors_and_passage_ids_bind_exact_retained_bytes ... ok
+test inference::recall::tests::scopes_filter_passage_handles_and_ties_are_stable ... ok
+test inference::recall::tests::changed_page_is_reported_stale_without_substituting_or_citing_it ... ok
+test inference::recall_embedding::tests::a_sparse_provider_does_not_admit_an_oversized_stored_dense_representation ... ok
+test inference::recall::tests::exact_quote_annotations_are_distinct_from_model_markers_and_partial_matches ... ok
+test inference::recall::tests::short_accidental_matches_do_not_become_quote_citations ... ok
+test inference::recall::tests::source_changes_advance_projection_revision_without_rewriting_the_run ... ok
+test inference::recall_embedding::tests::matching_projection_reopens_scopes_before_fusion_and_observes_each_head_once ... ok
+test inference::recall_embedding::tests::private_cache_failure_and_byte_limits_do_not_silently_fall_back_to_lexical ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.00s
+
