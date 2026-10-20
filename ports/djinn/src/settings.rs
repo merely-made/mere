@@ -410,6 +410,10 @@ pub fn parse_keep_bound(value: &str, field: &str) -> Result<KeepBound, String> {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(default, deny_unknown_fields)]
 pub struct ResidentContentSettings {
+    /// Explicit wallet namespace for Turnstone retained-content custody.
+    /// Absent disables this operation; no wallet or epoch is created implicitly.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retained_persona: Option<personae::PersonaId>,
     /// Override the physical iroh store root. Normally left unset.
     pub root: Option<PathBuf>,
     /// How often unleased bytes are considered for collection.
@@ -425,6 +429,7 @@ impl ResidentContentSettings {
 impl Default for ResidentContentSettings {
     fn default() -> Self {
         Self {
+            retained_persona: None,
             root: None,
             gc_interval_seconds: 300,
         }

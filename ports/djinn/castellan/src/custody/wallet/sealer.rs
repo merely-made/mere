@@ -14,23 +14,77 @@ use std::path::Path;
 
 use pandect::{PersonaId, WalletEpochSealer};
 
-use super::load_current_private_epoch;
+use super::load_persona_epoch_bridge;
 
 /// Build a sealer from a persona's current private epoch, or `None` when the
-/// persona has no staged epoch yet (nothing to seal under, so writes stay
-/// cleartext: the host's degraded-but-honest posture).
+/// persona has no staged epoch yet. The caller chooses the refusal policy;
+/// private retained-content custody requires a sealer and refuses `None`.
 pub fn epoch_sealer_for_persona(
     data_root: &Path,
     persona: PersonaId,
 ) -> io::Result<Option<WalletEpochSealer>> {
-    let Some(epoch) = load_current_private_epoch(data_root, persona)? else {
+    sealer_at_epoch(data_root, persona, None)
+}
+
+/// Read one retained epoch without choosing it as the wallet's writing head.
+/// The caller still owns vault-lock and profile admission.
+pub fn unseal_persona_payload(
+    data_root: &Path,
+    persona: PersonaId,
+    hash: &eidetic::Hash,
+    scope: &[u8],
+    marker: &eidetic::SealedBlobRef,
+    bytes: &[u8],
+) -> io::Result<Option<Vec<u8>>> {
+    use eidetic::PayloadSealer;
+    let epoch = pandect::KeyEpochId(uuid::Uuid::from_bytes(marker.epoch.0));
+    sealer_at_epoch(data_root, persona, Some(epoch))?
+        .map(|sealer| {
+            sealer
+                .with_scope(scope.to_vec())
+                .unseal(hash, marker, bytes)
+                .map_err(io::Error::other)
+        })
+        .transpose()
+}
+
+fn sealer_at_epoch(
+    data_root: &Path,
+    persona: PersonaId,
+    requested: Option<pandect::KeyEpochId>,
+) -> io::Result<Option<WalletEpochSealer>> {
+    let Some(wallet) = pandect::wallet_store::load_persona_wallet(data_root, persona)? else {
         return Ok(None);
     };
-    Ok(Some(WalletEpochSealer::from_epoch(
-        persona,
-        epoch.epoch_id,
-        &epoch.epoch_secret,
-    )))
+    let Some(mut bridge) = load_persona_epoch_bridge(data_root, persona)? else {
+        return Ok(None);
+    };
+    if wallet.persona_id != persona || bridge.persona_id != persona {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "wallet epoch namespace differs",
+        ));
+    }
+    let target = requested.unwrap_or(wallet.private_epoch_head);
+    let Some(epoch) = bridge.epochs.iter().find(|epoch| epoch.epoch_id == target) else {
+        return Ok(None);
+    };
+    let mut sealer = WalletEpochSealer::from_epoch(persona, epoch.epoch_id, &epoch.epoch_secret);
+    let mut ids = std::collections::HashSet::new();
+    for previous in &mut bridge.epochs {
+        if !ids.insert(previous.epoch_id.0) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "duplicate wallet epoch",
+            ));
+        }
+        if previous.epoch_id != target {
+            sealer = sealer.with_epoch(previous.epoch_id, &previous.epoch_secret);
+        }
+        use zeroize::Zeroize;
+        previous.epoch_secret.zeroize();
+    }
+    Ok(Some(sealer))
 }
 
 #[cfg(test)]
@@ -40,8 +94,7 @@ mod tests {
 
     #[test]
     fn for_persona_is_none_without_a_staged_epoch() {
-        // No wallet state on this path, so there is no epoch to seal under and
-        // the host stays in the cleartext lane rather than erroring.
+        // No wallet state on this path, so there is no epoch to seal under.
         let dir = std::env::temp_dir().join("mere-codicil-seal-none-probe");
         let _ = std::fs::remove_dir_all(&dir);
         let sealer = epoch_sealer_for_persona(&dir, PersonaId::new()).unwrap();

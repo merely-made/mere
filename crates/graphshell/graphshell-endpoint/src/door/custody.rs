@@ -52,6 +52,9 @@ pub enum KeySource {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "call", rename_all = "snake_case")]
 pub enum CustodyCall {
+    /// Retained-content encryption through the current profile's custodian.
+    /// No epoch key is released. The resident checks app and profile binding.
+    Payload(super::custody_payload::PayloadRequest),
     /// Ask the resident to render its own native unlock prompt.
     UnlockNative,
     /// Older imports requiring an explicit profile association.
@@ -275,6 +278,9 @@ impl Drop for ReleasedKey {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "answer", rename_all = "snake_case")]
 pub enum CustodyAnswer {
+    Payload {
+        result: super::custody_payload::PayloadResult,
+    },
     Quarantine {
         cards: Vec<crate::door::quarantine::QuarantineCard>,
     },
@@ -346,7 +352,7 @@ pub enum CustodyRefusal {
     Failed { reason: String },
 }
 
-mod b64 {
+pub(super) mod b64 {
     use base64::Engine;
     use base64::engine::general_purpose::URL_SAFE_NO_PAD;
     use serde::{Deserialize, Deserializer, Serializer};

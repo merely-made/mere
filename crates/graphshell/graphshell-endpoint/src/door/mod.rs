@@ -25,6 +25,7 @@ pub mod app_client;
 pub mod custody;
 pub mod custody_client;
 pub mod custody_identity;
+pub mod custody_payload;
 pub mod frame;
 pub mod identity;
 pub mod local_endpoint;
