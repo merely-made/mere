@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "baseline": "285821ad6663e75a289ea047769aa9dfb226195c",
+  "source_pack_hashes": {
+    "isometry-pack.toml": "23ac63a565fe38454d898440208cf451b47630ef463909714f3b3dea6a9f3ade",
+    "fixtures/forge_item.json": "8ed607b3536dd86eb138acc0637890be8f4e30c7b84832c98d9c5b9dc081b31f",
+    "fixtures/local_map.json": "15a2b20bb38e69d24bcbf72196368d45d08a67b45a5fa3b3648f5b294f732389",
+    "generators/campaign.lua": "de557b68b40f94950a3a2a294cf76f9673fc3ec87669ca3ecd185d4120b2da9e",
+    "generators/local_map.lua": "7c8cc91a9ac9da9f0742ff21f26728781e8ee0e03fcd047de5912c77dd96085b",
+    "generators/forge_item.lua": "6a6c299f4e922e0118895726103fd062220ab77dae87b4af87631dfed5f52c3e",
+    "generators/npc.lua": "c5559958836593a843dde991b3bd87e1d29d20b55274a56e0615c8c3ab984213"
+  },
+  "annotated_sha256": "40cac2d5314dcbf410562199c873df0c4e574d967c097d12a61535d93f31467c",
+  "final_sha256": "b995c1b68dc4afd581dce24ce7a1768d853ca18940fcc3d24dba4468b2ab1c32",
+  "sessions": 5,
+  "blockers": [],
+  "product_changes": false,
+  "shared_api": false,
+  "admitted": false,
+  "native_gui_qualified": false,
+  "runner_sha256": "bc69b2e2f3d390cd48f389ca9c1373b0aad4fa1e86fb80d54cd1f72b6b147497",
+  "cli_sha256": "6360f7c1431d8bca7e65a8fac1fc9327bd5f8234ca28e966c217f146011afa8a",
+  "fixture_runner_sha256": "0ef8df334a2d87da161799c15dc24cf895d8a909487da2adcdd87b5a868c29a8"
+}

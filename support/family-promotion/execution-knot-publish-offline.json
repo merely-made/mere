@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "-p",
+    "knot-document",
+    "--precise",
+    "806ae90f8a136acaaad9fc398fa879550f73c40d"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T02:34:01.616415+00:00",
+  "finished": "2026-10-20T02:36:04.783183+00:00",
+  "exit_code": 4294967295,
+  "results": [],
+  "diagnostic_tail": "",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

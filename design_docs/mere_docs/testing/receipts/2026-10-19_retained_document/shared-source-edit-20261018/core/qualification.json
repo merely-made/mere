@@ -1,0 +1,12 @@
+{
+  "baseline": "e6250fd1c460dfbb3d6d2a076ec0fdf6748d35bb",
+  "state": "uncommitted shared supplier",
+  "tests_passed": 5,
+  "native_gui_qualified": false,
+  "source_sha256": {
+    "crates/system/source-edit/src/lib.rs": "bf762313a09acf8e859684df40f064d1225173e9d23b1cfa7e6590dcb39241a2",
+    "crates/system/source-edit/src/tests.rs": "befcf38f5d7cdef90c0c0029a67f6feb4d97bbba01729b74e8a77318c1e92853",
+    "crates/system/source-edit/Cargo.toml": "d8c3ec38355a20067ba4b85f0c47bed2243664017c2a414870ce26c8c7c48b0d",
+    "crates/system/source-edit/README.md": "3b273873d53fda7299e7810106226634d14ad3786bed8eba3470ce35b923614c"
+  }
+}

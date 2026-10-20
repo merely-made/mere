@@ -1,0 +1,23 @@
+{
+  "execution_test_base": "4d60510c",
+  "later_integration": "19658cf0 contains documentation and retained evidence changes only",
+  "knot": "9832691735ed63a1bbb5f65dc0f5857e6f121dbc",
+  "gates": [
+    "execution-armillary-final",
+    "execution-esp-final",
+    "execution-door-publish",
+    "execution-djinn-publish-aligned",
+    "execution-distillery-publish-aligned",
+    "execution-browser-publish-aligned",
+    "execution-fleece-adoption",
+    "execution-independent-qualified"
+  ],
+  "canonical_sources": "execution-knot-cohort-qualified.json",
+  "standalone_locks": "execution-standalone-publish-aligned.json",
+  "open": [
+    "Q112/Q113 pool admission and worker retirement",
+    "historical renderer smoke qualification",
+    "later observability, custody-process and repository grouping lanes"
+  ],
+  "retained_receipt_bytes": 363514
+}

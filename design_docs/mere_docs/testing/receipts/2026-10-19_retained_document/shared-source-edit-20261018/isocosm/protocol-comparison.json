@@ -1,0 +1,9 @@
+{
+  "baseline": "/Users/markik/Code/testing/pack-author-preset-20261017/final-run/transcript.json",
+  "candidate": "/Users/markik/Code/testing/shared-source-edit-20261018/isocosm/workflow/transcript.json",
+  "normalization": "replace each scratch-pack absolute directory with <scratch-pack>; compare full ready and command records",
+  "baseline_records": 64,
+  "candidate_records": 64,
+  "mismatched_records": [],
+  "identical": true
+}

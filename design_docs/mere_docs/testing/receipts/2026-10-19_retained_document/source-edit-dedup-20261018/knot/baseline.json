@@ -1,0 +1,42 @@
+{
+  "Cargo.lock": {
+    "lines": 14686,
+    "sha256": "4acbce4b733c633454487668cb412c47bb8c3db2921e86f364af07b226fceab4"
+  },
+  "apps/desktop/src/link_workflow.rs": {
+    "lines": 815,
+    "sha256": "77fcf9405e43919328f40406311d66e89857ad1849a22abaa59b6914b9a9339f"
+  },
+  "apps/desktop/tests/document_links_ui.rs": {
+    "lines": 423,
+    "sha256": "823d804c0b2fc66a11b6ce23a9f45a6e4cd1e80631420536dd93f7c1d6b41017"
+  },
+  "crates/knot-document/Cargo.toml": {
+    "lines": 79,
+    "sha256": "05c4bfa27e6f58eb81830f390178509f9d20dfb802bbb53a0fa833a6001f2c85"
+  },
+  "crates/knot-document/src/document_surface.rs": {
+    "lines": 1369,
+    "sha256": "e3b54fddb63b5a907f3dfb9ea6550b8a365217be61b587144f4889007c3cd48f"
+  },
+  "crates/knot-document/src/document_view.rs": {
+    "lines": 502,
+    "sha256": "de976f25cb22823a58f02c91fafeb3590d113ed4d20c910ec6dc0320d8b16a6d"
+  },
+  "crates/knot-document/src/lib.rs": {
+    "lines": 42,
+    "sha256": "ddb60f7cacb8033af35e8cf4acbe50ebad5eadb15d2382b850fcd1f1db0c65d0"
+  },
+  "crates/knot-document/src/source_edit.rs": {
+    "lines": 357,
+    "sha256": "550271fe21c200ad9e715740f7a6eb1e11d99ebe66e41610e8c9dbafae0bf5df"
+  },
+  "design_docs/2026-09-29_knot_document_links_slice.md": {
+    "lines": 195,
+    "sha256": "d878127c2d5ce89b95328b47a6d44af487b8061bd919135d40d50f904d51b6f3"
+  },
+  "design_docs/README.md": {
+    "lines": 86,
+    "sha256": "6c83319efb8d354e05cc368fbecf651ba77875feb5897f81645710d4ed5dd365"
+  }
+}

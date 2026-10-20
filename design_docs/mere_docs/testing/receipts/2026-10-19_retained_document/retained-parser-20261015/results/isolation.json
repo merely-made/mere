@@ -1,0 +1,17 @@
+{
+  "scope": "All authored probe files under /Users/markik/Code/testing/retained-parser-20261015; no product edits",
+  "repos": {
+    "mere": {
+      "before": "",
+      "after": "",
+      "status_unchanged": true,
+      "head_after": "cd795487b5aa8f34db10eb09df744d2ca2c02cb9"
+    },
+    "isocosm": {
+      "before": "",
+      "after": "",
+      "status_unchanged": true,
+      "head_after": "20cb030fcc982db8fc89fa557918b8de5961543c"
+    }
+  }
+}

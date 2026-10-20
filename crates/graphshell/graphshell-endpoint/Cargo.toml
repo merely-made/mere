@@ -19,6 +19,8 @@ stdio = ["dep:serde_json"]
 # tracked tasks (Graphshell stack lift plan, L1, ruling R3). Native only; the
 # module is not compiled for wasm32 even with the feature on.
 door = [
+    "dep:armillary",
+    "armillary/tokio",
     "dep:base64",
     "dep:chatelaine",
     "dep:dramatis",
@@ -42,6 +44,7 @@ door = [
 ]
 
 [dependencies]
+armillary = { workspace = true, optional = true }
 chirograph.workspace = true
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }

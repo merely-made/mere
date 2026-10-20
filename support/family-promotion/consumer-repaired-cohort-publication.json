@@ -1,0 +1,586 @@
+{
+  "kind": "cross-consumer supplier cohort publication summary",
+  "as_of": "2026-10-19",
+  "remote_source": "GitHub REST API repos/{owner}/{repo}/commits/main",
+  "ancestry_method": "Each current remote main SHA was fetched from the GitHub API and equals the recorded checkpoint SHA; equality proves checkpoint ancestry (zero commits ahead).",
+  "supplier_cohort": {
+    "phase1": {
+      "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+      "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+      "esp": "af5597c670da111713dd306f4feba8db892a86d2",
+      "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c"
+    },
+    "knot_root_exception": {
+      "esp": "b20ae7db257dae83493031efd92da3a102c44a48",
+      "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c",
+      "nested_roots": "Eidetic/Gemot/ESP/Armillary supplier patches are unused in current nested document/site metadata graphs; their phase1 declarations remain, and nested Cargo locks are validated."
+    }
+  },
+  "consumers": [
+    {
+      "repository": "merely-made/isocosm",
+      "checkpoint": "028a5ef193d3936878b1fd87f94c930aaea5412c",
+      "current_remote_main": "028a5ef193d3936878b1fd87f94c930aaea5412c",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "phase1",
+      "gates": [
+        "cargo +1.99.1 metadata --locked --offline --filter-platform aarch64-apple-darwin: root, host, shared/isocosm, shared/wing-integration, mesocosm passed",
+        "cargo +1.99.1 test --locked --offline -p isocosm --test witnessed_lifecycle: 7 passed, 0 failed"
+      ],
+      "receipt": "audit/isocosm-phase1-publication.json"
+    },
+    {
+      "repository": "merely-made/murm",
+      "checkpoint": "f9fe8507cf157e46cfcea059133e55a37acf92e9",
+      "current_remote_main": "f9fe8507cf157e46cfcea059133e55a37acf92e9",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "phase1",
+      "sdk_intake": "Mere 4d60510c40a985aa88ddde381c9f56105dbd9f9a for Signalman cambium 0.4.0 compatibility",
+      "gates": [
+        "locked offline metadata passed for native and apps/signalman-desktop on aarch64-apple-darwin",
+        "cargo +1.99.1 test --manifest-path native/Cargo.toml --locked --offline -p murm --features session-lane --test session_lane: 6 passed, 0 failed",
+        "cargo +1.99.1 check --locked --offline --bin signalman-desktop -j2: passed"
+      ],
+      "receipt": "audit/murm-phase1-publication.json",
+      "qualification_note": "These are CPU checks; no native UI acceptance is claimed."
+    },
+    {
+      "repository": "merely-made/cleromancy",
+      "checkpoint": "230347a907c9efe5fe10f9ac90168cd057f72662",
+      "current_remote_main": "230347a907c9efe5fe10f9ac90168cd057f72662",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "phase1",
+      "sdk_intake": "Mere SDK compatibility adaptation included at this checkpoint",
+      "gates": [
+        "cargo +1.99.1 check --locked --offline --features personal-sync --all-targets -j2: passed",
+        "cargo +1.99.1 test --manifest-path core/Cargo.toml --locked --offline --lib: 17 passed"
+      ],
+      "receipt": "audit/knot-cleromancy-phase1-validation.json"
+    },
+    {
+      "repository": "merely-made/knot-editor",
+      "checkpoint": "c6a442dbca906d9fdd1a6bc69303ff3ee2db7f39",
+      "current_remote_main": "c6a442dbca906d9fdd1a6bc69303ff3ee2db7f39",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "knot_root_exception",
+      "sdk_intake": "Mere 4d60510c40a985aa88ddde381c9f56105dbd9f9a; Genet 17635c3596d1a08370a93867863eff724bb4b3b0; Dramatis 0c537848dbd2ba3f29810555eaa4df716050c2f3; Netrender d92050146768357ead4e4e42967866be7061262e",
+      "gates": [
+        "locked offline Cargo metadata passed for workspace root, crates/knot-document, and crates/knot-site",
+        "cargo +1.99.1 check --manifest-path Cargo.toml --locked --offline -p knot-editor --lib -j2: passed"
+      ],
+      "nested_supplier_status": "Nested document/site roots retain phase1 declarations, but supplier packages are unused in those metadata graphs.",
+      "receipt": "audit/knot-cleromancy-phase1-validation.json",
+      "qualification_note": "The 53-pass document test was run at older revision 47879b2 and is not attributed to this published checkpoint."
+    },
+    {
+      "repository": "merely-made/merelyllc.com",
+      "checkpoint": "9b6bd4369c6a662615f597ed56f36ff6e3eb9336",
+      "current_remote_main": "9b6bd4369c6a662615f597ed56f36ff6e3eb9336",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "phase1",
+      "gates": [
+        "cargo metadata --locked --offline --filter-platform aarch64-apple-darwin: root and crates/repo-graph passed",
+        "cargo check --locked --offline --bin site -j2: passed",
+        "focused repo-graph arrangement test: 1 passed, 0 failed"
+      ],
+      "receipt": "merelyllc-consumer-intake.json"
+    },
+    {
+      "repository": "merely-made/turnstone",
+      "checkpoint": "01658c739dd1f566b0317578ff5c94efa74720fe",
+      "current_remote_main": "01658c739dd1f566b0317578ff5c94efa74720fe",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "phase1",
+      "supplier_evidence": "Saved published Cargo.lock resolves Eidetic 543f5ff, Gemot 67ce0ac, ESP af5597c, Armillary 6827559937; Mere SDK source is 48fd33851ed0e9386ea06b511acb0a3b5f33bc04.",
+      "gates": [
+        "Root-verified published Cargo.toml and Cargo.lock were saved read-only; no build/test result is included in the available evidence."
+      ],
+      "saved_artifacts": {
+        "manifest": "turnstone-readonly/published-Cargo.toml",
+        "manifest_sha256": "1fa6927ae41c1da0ef3ebfdf178c6e208e673fb1e41eb8ab41b658af6023df4f",
+        "lock": "turnstone-readonly/published-Cargo.lock",
+        "lock_sha256": "8210ac38946356047ef118716345391e2e79efcec45374cee4087b18a633334c"
+      },
+      "qualification_note": "Publication/source evidence only; no compile, test, native, or UI acceptance is claimed."
+    },
+    {
+      "repository": "merely-made/woodshed",
+      "checkpoint": "f1f2df08d4ccd60e6a7e881eb1beeac436ffd9e0",
+      "current_remote_main": "f1f2df08d4ccd60e6a7e881eb1beeac436ffd9e0",
+      "checkpoint_is_ancestor": true,
+      "published": true,
+      "cohort": "phase1",
+      "gates": {
+        "root_core_graph": {
+          "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' test --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 -p woodshed-core -p woodshed-graph --lib",
+          "result": "pass",
+          "suites_passed": 331,
+          "receipt": "woodshed-phase1-integrated-root-core-graph-retry1.json"
+        },
+        "hocket_workspace": {
+          "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' check --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 --manifest-path ports/hocket/Cargo.toml --workspace",
+          "result": "pass",
+          "receipt": "woodshed-phase1-integrated-hocket-workspace.json"
+        },
+        "redshank_workspace": {
+          "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' check --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 --workspace",
+          "result": "pass",
+          "cwd": "ports/redshank",
+          "receipt": "woodshed-phase1-integrated-redshank-workspace.json"
+        },
+        "relationship_recipe_workspace": {
+          "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' check --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 --workspace",
+          "result": "pass",
+          "cwd": "validation/relationship-recipe",
+          "receipt": "woodshed-phase1-integrated-recipe-workspace.json"
+        }
+      },
+      "metadata": {
+        "command": "cargo +1.99.1 metadata --format-version 1 --locked --offline --filter-platform aarch64-apple-darwin",
+        "result": "all four workspaces passed; one source per active supplier family; no local path overrides",
+        "receipt": "woodshed-phase1-final.json",
+        "mere_identity_by_graph": {
+          "root": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+          "hocket": "4d60510c40a985aa88ddde381c9f56105dbd9f9a",
+          "redshank": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+          "relationship_recipe": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04"
+        }
+      },
+      "in_repo_receipt": "validation/stack-family_20261011/supplier-intake-20261019.json"
+    }
+  ],
+  "evidence_records": {
+    "isocosm": {
+      "sha256": "dffb6e0f25ec0102d112ffa3e445b549b4159b39e78c98c6e3829017807504be",
+      "record": {
+        "repo": "merely-made/isocosm",
+        "worktree": "/Users/markik/Code/worktrees/isocosm-supplier-execution-20261019",
+        "branch": "main",
+        "head": "028a5ef193d3936878b1fd87f94c930aaea5412c",
+        "published_head": "028a5ef193d3936878b1fd87f94c930aaea5412c",
+        "publish_verified": true,
+        "supplier_pins": {
+          "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+          "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+          "esp": "af5597c670da111713dd306f4feba8db892a86d2",
+          "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c"
+        },
+        "checks": {
+          "locked_offline_metadata": {
+            "root": "pass",
+            "host": "pass",
+            "shared/isocosm": "pass",
+            "shared/wing-integration": "pass",
+            "mesocosm": "pass",
+            "platform": "aarch64-apple-darwin",
+            "tool": "cargo +1.99.1"
+          },
+          "cpu_test": {
+            "command": "cargo +1.99.1 test --locked --offline -p isocosm --test witnessed_lifecycle",
+            "exit_code": 0,
+            "passed": 7,
+            "failed": 0,
+            "log_sha256": "363e1a602b5869fbf66fe6199daa20e3cc682e23d9de99214144b7e3d30d4909"
+          }
+        },
+        "notes": [
+          "Root Cargo metadata selected Armillary 682 and Eidetic 543. Other relevant graphs selected only Eidetic 543. Gemot 67 and ESP af patches are declared but unused by current-platform graphs.",
+          "Mesocosm/Cargo.lock was generated by Cargo metadata, is ignored by mesocosm/.gitignore:3, and is not committed. It contains the same Eidetic 543 selection.",
+          "No Mere SDK pins changed. No package source duplicates or local overrides in checked graphs."
+        ],
+        "metadata_receipts": [
+          "isocosm-supplier-intake-0.metadata.json",
+          "isocosm-host-0.metadata.json",
+          "isocosm-shared-0.metadata.json",
+          "isocosm-shared-1.metadata.json",
+          "isocosm-mesocosm-0.metadata.json"
+        ],
+        "files": {
+          "Cargo.toml": "9436e69c03fe3fcb047d6419e0da636f239c8dc0ac7aead17c76c9890f870cf5",
+          "Cargo.lock": "cbd1e2e48688fd050dee17e9f5380f97a2d494c75f618ff3e5f27c60d228a3ee",
+          "host/Cargo.toml": "37a35f01fbfc426e94dbbec2c58dd8e87cbaff35d398804c6f8f6bdc7a1c2f34",
+          "host/Cargo.lock": "505af46db0f7786cf8b6f58f2d565db1787acac3f5541c9bb515528bb8cdd116",
+          "mesocosm/Cargo.toml": "438ef4fbbcc37e70e70a1b36fc7f7cf98309c15cdf70b19f33a338401b3e4b66",
+          "shared/isocosm/Cargo.toml": "cd0308a19736c8aa13f8549b49e2a10a417f43a82b6f49d59e759ac5abd9da80",
+          "shared/isocosm/Cargo.lock": "6599681ceda72e0b1b490ee5544ec3e108349ba6d344c3d473858daaf336439c",
+          "shared/wing-integration/Cargo.toml": "a30796f04580eab49530197f1c80d3e537ce96ce6b859b996f57e2010d167da0",
+          "shared/wing-integration/Cargo.lock": "9dc7bc99768d6c6e6a2de64a9845599c20217f1fab3f72cbc0659206aee31787"
+        },
+        "uncommitted_status": []
+      }
+    },
+    "murm": {
+      "sha256": "6449125b9b69db17b44bc519fa59749ed8c082fe7e24e72322cd5a7dcf155ad8",
+      "record": {
+        "repo": "merely-made/murm",
+        "worktree": "/Users/markik/Code/worktrees/murm-supplier-execution-20261019-r1",
+        "branch": "main",
+        "head": "f9fe8507cf157e46cfcea059133e55a37acf92e9",
+        "published_head": "f9fe8507cf157e46cfcea059133e55a37acf92e9",
+        "publish_verified": true,
+        "supplier_pins": {
+          "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+          "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+          "esp": "af5597c670da111713dd306f4feba8db892a86d2",
+          "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c"
+        },
+        "sdk_intake": {
+          "mere": "4d60510c40a985aa88ddde381c9f56105dbd9f9a",
+          "reason": "rebased Signalman manifest requires cambium 0.4.0",
+          "adapter": "network.rs emits anonymous management geometry with link_key None, default marks, strength 1.0; no opening authority inferred"
+        },
+        "checks": {
+          "locked_offline_metadata": {
+            "native": "pass",
+            "signalman_desktop": "pass",
+            "platform": "aarch64-apple-darwin",
+            "tool": "cargo +1.99.1",
+            "metadata_receipt": "murm-final-supplier.json"
+          },
+          "native_session_lane": {
+            "command": "cargo +1.99.1 test --manifest-path native/Cargo.toml --locked --offline -p murm --features session-lane --test session_lane",
+            "exit_code": 0,
+            "passed": 6,
+            "failed": 0,
+            "log_sha256": "bbb42f5efe7679c81395c420a752ade68362bb516956a21209a682ccd7fea369"
+          },
+          "signalman_app_cambium04": {
+            "command": "cargo +1.99.1 check --locked --offline --bin signalman-desktop -j2",
+            "exit_code": 0,
+            "log_sha256": "9247ae2496a018440c3e533ac0be8b1c64b95171feb32191aead80738d288d47"
+          }
+        },
+        "resolved_collateral": {
+          "mere_git_main": "4d60510c40a985aa88ddde381c9f56105dbd9f9a",
+          "genet_git_main": "17635c3596d1a08370a93867863eff724bb4b3b0",
+          "dramatis_lock_commits": {
+            "0c537848": [
+              "chatelaine",
+              "dramatis",
+              "insigne",
+              "notochord",
+              "personae"
+            ],
+            "2f27f1a9": [
+              "gaz"
+            ]
+          },
+          "dramatis_metadata_source": "2f27f1a939aa2e046b78f7db18dcd8f81e0d7c59",
+          "vello": "276b46648c08f3d2062e70559afa999842e1873c"
+        },
+        "notes": [
+          "App lock uses Cargo-generated resolver output; no lock hand edits. One direct Cambium precise update moved the Mere and Genet branch packages to the compatible published revisions; cargo output also reports platform/renderer dependency updates/removals.",
+          "An initial featureless session-lane target ran zero tests; final feature-gated run passed 6.",
+          "Untracked native/target build artifacts remain outside the commit."
+        ],
+        "metadata_receipts": [
+          "murm-rebased-native-0.metadata.json",
+          "murm-final-supplier-0.metadata.json",
+          "murm-final-supplier-1.metadata.json"
+        ],
+        "files": {
+          "native/Cargo.toml": "2341d4d4a2068298f0a3723b0892bd218ea140d72ec4414c68163875f487cb70",
+          "native/Cargo.lock": "bfe02fb5d46859f9adc7940d303a2c133be7c93f32c1e7f3c39eab4947177dc0",
+          "apps/signalman-desktop/Cargo.toml": "04f057931245ca1dc07eca76e8b531c74ea163c3f12877306b41fce0363a26aa",
+          "apps/signalman-desktop/Cargo.lock": "3e1cce1df610c457504b5a062c19ae715afa24edc8e5378406329ca2b3ebdb9d",
+          "apps/signalman-desktop/src/network.rs": "2983e79b7eff5dc70f5f936730e5c1c33a8e1868ac9c389bef8518639ffd6a43"
+        },
+        "uncommitted_status": [
+          "?? native/target/"
+        ]
+      }
+    },
+    "knot_cleromancy": {
+      "sha256": "d0f69d2acd1bf5c2c003c01d737c8be28c4be3d31658ee8e431ba68a2fa72e4c",
+      "record": {
+        "date": "2026-10-19",
+        "receipts": [
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "d0bf622b20a18073584cee738a099a79fe094e56",
+            "command": "cargo +1.99.1 metadata --manifest-path Cargo.toml --format-version 1 --locked --offline",
+            "status": "passed; exit 0",
+            "source_cohort": {
+              "mere_main": "4d60510c40a985aa88ddde381c9f56105dbd9f9a",
+              "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+              "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+              "esp": "af5597c670da111713dd306f4feba8db892a86d2",
+              "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c"
+            }
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "d0bf622b20a18073584cee738a099a79fe094e56",
+            "command": "cargo +1.99.1 metadata --manifest-path crates/knot-document/Cargo.toml --format-version 1 --locked --offline",
+            "status": "passed; exit 0"
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "d0bf622b20a18073584cee738a099a79fe094e56",
+            "command": "cargo +1.99.1 metadata --manifest-path crates/knot-site/Cargo.toml --format-version 1 --locked --offline",
+            "status": "passed; exit 0"
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "47879b2d14b4c44cbb9e69622c29ad466af54dac",
+            "command": "cargo +1.99.1 test --manifest-path crates/knot-document/Cargo.toml --locked --offline",
+            "status": "passed; exit 0; 53 passed, 1 ignored"
+          },
+          {
+            "repo": "cleromancy",
+            "worktree": "/Users/markik/Code/worktrees/cleromancy-supplier-phase1-20261019",
+            "revision": "5ff501357848a8b683669b528d720c2840c281c8",
+            "command": "cargo +1.99.1 metadata --manifest-path Cargo.toml --format-version 1 --locked --offline",
+            "status": "passed; exit 0"
+          },
+          {
+            "repo": "cleromancy",
+            "worktree": "/Users/markik/Code/worktrees/cleromancy-supplier-phase1-20261019",
+            "revision": "5ff501357848a8b683669b528d720c2840c281c8",
+            "command": "cargo +1.99.1 metadata --manifest-path core/Cargo.toml --format-version 1 --locked --offline",
+            "status": "passed; exit 0"
+          },
+          {
+            "repo": "cleromancy",
+            "worktree": "/Users/markik/Code/worktrees/cleromancy-supplier-phase1-20261019",
+            "revision": "5ff501357848a8b683669b528d720c2840c281c8",
+            "command": "cargo +1.99.1 test --manifest-path core/Cargo.toml --locked --offline --lib",
+            "status": "passed; exit 0; 17 passed"
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "d0bf622b20a18073584cee738a099a79fe094e56",
+            "command": "cargo +1.99.1 check --manifest-path Cargo.toml --locked --offline -p knot-editor --lib -j2",
+            "status": "passed; exit 0; existing unused path warning in crates/knot-editor/src/directory.rs:53"
+          },
+          {
+            "repo": "cleromancy",
+            "worktree": "/Users/markik/Code/worktrees/cleromancy-supplier-phase1-20261019",
+            "revision": "230347a907c9efe5fe10f9ac90168cd057f72662",
+            "command": "cargo +1.99.1 check --manifest-path Cargo.toml --locked --offline --features personal-sync --all-targets -j2",
+            "status": "passed; exit 0"
+          },
+          {
+            "repo": "cleromancy",
+            "worktree": "/Users/markik/Code/worktrees/cleromancy-supplier-phase1-20261019",
+            "revision": "230347a907c9efe5fe10f9ac90168cd057f72662",
+            "command": "cargo +1.99.1 test --manifest-path core/Cargo.toml --locked --offline --lib",
+            "status": "passed; exit 0; 17 passed"
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "c6a442dbca906d9fdd1a6bc69303ff3ee2db7f39",
+            "command": "cargo +1.99.1 update --manifest-path Cargo.toml -p esp --precise b20ae7db257dae83493031efd92da3a102c44a48 --offline",
+            "status": "passed; exit 0; Cargo-generated lock closure contains b20 ESP; explicit Eidetic543/Gemot67/Armillary682 retained"
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "c6a442dbca906d9fdd1a6bc69303ff3ee2db7f39",
+            "command": "cargo +1.99.1 metadata --manifest-path Cargo.toml --format-version 1 --locked --offline; cargo +1.99.1 metadata --manifest-path crates/knot-document/Cargo.toml --format-version 1 --locked --offline; cargo +1.99.1 metadata --manifest-path crates/knot-site/Cargo.toml --format-version 1 --locked --offline",
+            "status": "passed; exit 0 for all three roots"
+          },
+          {
+            "repo": "knot-editor",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "revision": "c6a442dbca906d9fdd1a6bc69303ff3ee2db7f39",
+            "command": "cargo +1.99.1 check --manifest-path Cargo.toml --locked --offline -p knot-editor --lib -j2",
+            "status": "passed; exit 0; existing unused path warning in crates/knot-editor/src/directory.rs:53"
+          }
+        ],
+        "notes": [
+          "Knot Cargo.lock was refreshed with selective `cargo update -p cambium --precise 4d60510c40a985aa88ddde381c9f56105dbd9f9a --offline`; Cargo also advanced branch-locked Mere packages to that commit, genet to 17635c3596d1a08370a93867863eff724bb4b3b0, Dramatis to 0c537848dbd2ba3f29810555eaa4df716050c2f3, and Netrender to d92050146768357ead4e4e42967866be7061262e. Eidetic/Gemot/ESP/Armillary source identities remain the phase-one refs above.",
+          "Knot commits are local only; no push.",
+          "After Cl\u00e9ro rebased onto origin/main 619e56a430c2103c566fa980c1ec98022c2062e9, the SDK compatibility intake removes only three obsolete Semantic decay_progress initializers in src/sync/export.rs. Cl\u00e9ro source/lock update is local commit 230347a907c9efe5fe10f9ac90168cd057f72662; no push.",
+          "Published Knot root includes upstream 9832691 ESP alignment: root active dependency ESP b20ae7db, with Eidetic543/Gemot67/Armillary682 and Mere SDK lock 4d60510c. Nested document/site roots keep phase1 af ESP patch declarations, but these suppliers are unused in the nested metadata package graphs. Main lock closure commit c6a442d contains the Cargo-generated b20 ESP dependency closure."
+        ],
+        "publication": [
+          {
+            "repo": "knot-editor",
+            "branch": "main",
+            "worktree": "/Users/markik/Code/worktrees/knot-supplier-phase1-20261019",
+            "published_head": "c6a442dbca906d9fdd1a6bc69303ff3ee2db7f39",
+            "commits": [
+              "a938776 Align Knot nested Eidetic sources with repaired supplier",
+              "a40857a Refresh Knot root lock for current Mere branch",
+              "c6a442d Lock Knot root to aligned ESP supplier"
+            ],
+            "command": "git push origin HEAD:refs/heads/main; git ls-remote origin refs/heads/main",
+            "status": "published; remote main equals local HEAD after fetch; clean",
+            "upstream_commit_included": "9832691 Align ESP intake with qualified execution supplier"
+          },
+          {
+            "repo": "cleromancy",
+            "branch": "main",
+            "worktree": "/Users/markik/Code/worktrees/cleromancy-supplier-phase1-20261019",
+            "published_head": "230347a907c9efe5fe10f9ac90168cd057f72662",
+            "commits": [
+              "8c7817f Adopt repaired suppliers in Cleromancy workspaces",
+              "230347a Adapt Cleromancy sync export to current Mere SDK"
+            ],
+            "command": "git push origin HEAD:refs/heads/main; git ls-remote origin refs/heads/main",
+            "status": "published; remote main equals local HEAD; fetch confirmed clean"
+          }
+        ]
+      }
+    },
+    "site": {
+      "sha256": "c0f6ded7ee070c9657d46f371dc6716aaf43408629d36dbc94e821a2dff26c73",
+      "record": {
+        "consumer_checkout": "/Users/markik/Code/worktrees/site-consumer-intake-20261019/merelyllc.com",
+        "starting_main": "437ce9f1e3e34266f3236ccac441ea9123e79909",
+        "commit": "9b6bd4369c6a662615f597ed56f36ff6e3eb9336",
+        "files": {
+          "Cargo.toml": "5b45a9973f1a4639d44fd04908436240031ddac685a364419a9fb61817219525",
+          "Cargo.lock": "bf43322707a4c834211952198a7aa82d1692181bcdce8f19ec4d2d7ba140bfea",
+          "crates/repo-graph/Cargo.toml": "6aca3aabbe11f6e938665eb584e195c38cd97ced610f23c712f92681e5bb0b3f",
+          "crates/repo-graph/Cargo.lock": "f9c62d5156653d1de1bac813c4c10dbab1df59eae356768073b7d5d0320b51e1"
+        },
+        "selected_source_ids": {
+          "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+          "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+          "esp": "af5597c670da111713dd306f4feba8db892a86d2",
+          "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c"
+        },
+        "commands": [
+          {
+            "command": "cargo metadata --format-version 1 --locked",
+            "result": "exit 0"
+          },
+          {
+            "command": "cargo metadata --format-version 1 --locked --offline --filter-platform aarch64-apple-darwin",
+            "result": "exit 0; 270 package records"
+          },
+          {
+            "command": "cargo metadata --manifest-path crates/repo-graph/Cargo.toml --format-version 1 --locked --offline --filter-platform aarch64-apple-darwin",
+            "result": "exit 0; 765 package records"
+          },
+          {
+            "command": "cargo check --locked --offline --bin site -j2",
+            "result": "exit 0"
+          },
+          {
+            "command": "cargo test --locked --offline --manifest-path crates/repo-graph/Cargo.toml --lib arrangement::tests::layers_follow_the_longest_path_not_the_shortest -j2",
+            "result": "exit 0; test profile finished in 36m59s; 1 passed, 0 failed, 31 filtered out"
+          }
+        ],
+        "identity_audit": {
+          "root": {
+            "eidetic": [
+              "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+            ],
+            "armillary": [
+              "6827559937f07f78a6a830dfbfcaa54210dd093c"
+            ]
+          },
+          "repo_graph": {
+            "eidetic": [
+              "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+            ],
+            "esp": [
+              "af5597c670da111713dd306f4feba8db892a86d2"
+            ],
+            "armillary": [
+              "6827559937f07f78a6a830dfbfcaa54210dd093c"
+            ]
+          }
+        },
+        "publication": {
+          "fetch_before_push": "exit 0; origin/main was 437ce9f1e3e34266f3236ccac441ea9123e79909",
+          "rebase": "not needed; fetched origin/main was ancestor of checkpoint",
+          "push_command": "git push origin main",
+          "push_result": "exit 0; main advanced from 437ce9f to 9b6bd43",
+          "post_push_verification": "fetch exit 0; origin/main equals 9b6bd4369c6a662615f597ed56f36ff6e3eb9336; ancestry check exit 0",
+          "final_worktree": "clean and synchronized"
+        }
+      }
+    },
+    "woodshed": {
+      "sha256": "1b3e4a27652500112e021774d8dec48c1960b568403af47716383bec4f3d9228",
+      "record": {
+        "repo": "merely-made/woodshed",
+        "worktree": "/Users/markik/Code/worktrees/woodshed-repaired-suppliers-20261019",
+        "branch": "codex/repaired-supplier-cohort-20261019",
+        "base": "fd9fb821381af950b5dd052402a0e53d24fcec80",
+        "commits": [
+          "79c2b908a7a3ea0dfc45fd6d6c4cf7bbbc375ebf",
+          "f1f2df08d4ccd60e6a7e881eb1beeac436ffd9e0"
+        ],
+        "published_main": "f1f2df08d4ccd60e6a7e881eb1beeac436ffd9e0",
+        "publication": {
+          "method": "git fetch origin main; verify origin/main is the recorded base; verify base is ancestor; git push origin HEAD:main; git fetch origin main",
+          "force_push": false,
+          "remote_verification": "HEAD equals fetched origin/main at f1f2df08d4ccd60e6a7e881eb1beeac436ffd9e0",
+          "final_worktree": "clean"
+        },
+        "suppliers": {
+          "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+          "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+          "esp": "af5597c670da111713dd306f4feba8db892a86d2",
+          "armillary": "6827559937f07f78a6a830dfbfcaa54210dd093c",
+          "mere_hocket_only": "4d60510c40a985aa88ddde381c9f56105dbd9f9a"
+        },
+        "lock_delta": "Hocket lock regenerated with Cargo metadata; 34 Mere package source identities moved from 48fd3385 to 4d60510c and the constrained Cambium/Sprigging versions resolve to 0.4.0/0.2.2.",
+        "metadata": {
+          "command": "cargo +1.99.1 metadata --format-version 1 --locked --offline --filter-platform aarch64-apple-darwin",
+          "result": "all four workspaces passed; one source per active supplier family; no local path overrides",
+          "receipt": "woodshed-phase1-final.json",
+          "mere_identity_by_graph": {
+            "root": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+            "hocket": "4d60510c40a985aa88ddde381c9f56105dbd9f9a",
+            "redshank": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04",
+            "relationship_recipe": "48fd33851ed0e9386ea06b511acb0a3b5f33bc04"
+          }
+        },
+        "checks": {
+          "root_core_graph": {
+            "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' test --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 -p woodshed-core -p woodshed-graph --lib",
+            "result": "pass",
+            "suites_passed": 331,
+            "receipt": "woodshed-phase1-integrated-root-core-graph-retry1.json"
+          },
+          "hocket_workspace": {
+            "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' check --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 --manifest-path ports/hocket/Cargo.toml --workspace",
+            "result": "pass",
+            "receipt": "woodshed-phase1-integrated-hocket-workspace.json"
+          },
+          "redshank_workspace": {
+            "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' check --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 --workspace",
+            "result": "pass",
+            "cwd": "ports/redshank",
+            "receipt": "woodshed-phase1-integrated-redshank-workspace.json"
+          },
+          "relationship_recipe_workspace": {
+            "command": "cargo +1.99.1 --config 'build.build-dir=\"/Users/markik/Code/repos/woodshed/target/build\"' check --locked --offline --target-dir /Users/markik/Code/repos/woodshed/target -j2 --workspace",
+            "result": "pass",
+            "cwd": "validation/relationship-recipe",
+            "receipt": "woodshed-phase1-integrated-recipe-workspace.json"
+          }
+        },
+        "in_repo_receipt": "validation/stack-family_20261011/supplier-intake-20261019.json"
+      }
+    }
+  },
+  "turnstone_published_files": {
+    "manifest": {
+      "sha256": "1fa6927ae41c1da0ef3ebfdf178c6e208e673fb1e41eb8ab41b658af6023df4f",
+      "bytes": 41582
+    },
+    "lock": {
+      "sha256": "8210ac38946356047ef118716345391e2e79efcec45374cee4087b18a633334c",
+      "bytes": 471889
+    }
+  }
+}

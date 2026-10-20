@@ -1,0 +1,27 @@
+{
+  "product_implementation": "qualified execution/shutdown slice",
+  "required_gates": [
+    "execution-armillary-final",
+    "execution-esp-final",
+    "execution-distillery-qualified",
+    "execution-door-qualified",
+    "execution-djinn-qualified",
+    "execution-fleece-adoption",
+    "execution-independent-qualified",
+    "execution-browser-compile"
+  ],
+  "document_audit_exit": 1,
+  "existing_missing_records": 19,
+  "new_document_errors": [],
+  "retained_build_target": "C:\\t\\cargo-targets\\mere",
+  "isolated_cargo_homes": [],
+  "created_worktrees": [],
+  "open_gates": [
+    "Q112 pool admission",
+    "Q113 pool worker retirement",
+    "historical genet_web_smoke standalone renderer adoption",
+    "observations and semantic action evidence",
+    "custody process design",
+    "source-home follow-up"
+  ]
+}

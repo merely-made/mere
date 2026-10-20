@@ -34,7 +34,7 @@ eidetic-search = { workspace = true, optional = true }
 # The decoder half is named by the features that need it (`trainer`,
 # `flora`), so `inference` can carry the actor without the Burn stack.
 esp = { workspace = true, optional = true }
-armillary = { workspace = true, optional = true }
+armillary.workspace = true
 safetensors = { version = "0.4", optional = true }
 pollster = { version = "0.4", optional = true }
 notochord = { workspace = true, features = ["tokio"], optional = true }
@@ -69,7 +69,7 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 # The resident inference lane (resident inference and recall plan, I1): esp's
 # actor and provider seam, the run table and the `inference.ask` endpoint. No
 # model runtime: the host supplies the provider.
-inference = ["dep:esp", "esp/actor", "dep:armillary"]
+inference = ["dep:esp", "esp/actor"]
 inference-gpu = ["inference-model", "esp/decoder-wgpu"]
 inference-stages = ["inference-model", "dep:notochord", "tokio/io-util"]
 inference-wire = ["dep:eidetic"]

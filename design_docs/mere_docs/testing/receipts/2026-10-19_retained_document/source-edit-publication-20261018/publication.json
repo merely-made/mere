@@ -1,0 +1,19 @@
+{
+  "mere": {
+    "head": "1d71736d7b69ffb1ea3ce7ba0640edf412d6b7cd",
+    "origin_main": "1d71736d7b69ffb1ea3ce7ba0640edf412d6b7cd",
+    "tracked_and_untracked_status": ""
+  },
+  "isocosm": {
+    "head": "276157b776c59394923550b0b42d543b317210d9",
+    "origin_main": "276157b776c59394923550b0b42d543b317210d9",
+    "tracked_and_untracked_status": ""
+  },
+  "knot-editor": {
+    "head": "d2d5c32942d40af47223790ed3e16bc88fa59aa6",
+    "origin_main": "d2d5c32942d40af47223790ed3e16bc88fa59aa6",
+    "tracked_and_untracked_status": ""
+  },
+  "supplier_implementation": "70deef2c8cf3d3410ae35b496a9396514070b24f",
+  "no_local_overrides": true
+}

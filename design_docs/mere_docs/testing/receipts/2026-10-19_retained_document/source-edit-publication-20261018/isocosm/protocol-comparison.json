@@ -1,0 +1,7 @@
+{
+  "baseline": "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/workflow/transcript.json",
+  "candidate": "/Users/markik/Code/testing/source-edit-publication-20261018/isocosm/workflow/transcript.json",
+  "normalization": "replace only absolute scratch-pack directory paths",
+  "records": 64,
+  "identical": true
+}

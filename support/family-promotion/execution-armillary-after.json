@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "armillary",
+    "--features",
+    "tokio"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\armillary",
+  "started": "2026-10-20T01:21:19.946451+00:00",
+  "finished": "2026-10-20T01:21:29.437656+00:00",
+  "exit_code": 0,
+  "results": [
+    "Finished `test` profile [unoptimized] target(s) in 8.56s",
+    "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\armillary-197120617a050277.exe)",
+    "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+    "Running tests\\completion.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\completion-45c679fea52d5a45.exe)",
+    "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s",
+    "Running tests\\tasks.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\tasks-a73a3294fb38a964.exe)",
+    "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s"
+  ],
+  "diagnostic_tail": "    Updating crates.io index\n     Locking 3 packages to highest compatible versions\n      Adding syn v3.0.9\n      Adding tokio v1.54.0\n      Adding tokio-macros v2.7.2\n   Compiling syn v3.0.9\n   Compiling tokio-macros v2.7.2\n   Compiling tokio v1.54.0\n   Compiling armillary v0.1.1 (C:\\Users\\mark_\\Code\\repos\\armillary\\crates\\armillary)\n    Finished `test` profile [unoptimized] target(s) in 8.56s\n     Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\armillary-197120617a050277.exe)\n\nrunning 10 tests\ntest boundary::tests::kernel_thread_is_zero_sized ... ok\ntest message::tests::request_ids_correlate_updates_without_defining_their_outcome ... ok\ntest message::tests::generations_reject_stale_work ... ok\ntest lifecycle::tests::empty_report_is_clean ... ok\ntest actor::tests::actor_round_trips_commands_and_wakes_per_update ... ok\ntest actor::tests::lifecycle_span_brackets_the_run_with_the_actor_name ... ok\ntest actor::tests::dropping_the_handle_stops_the_actor ... ok\ntest message::tests::bump_advances_monotonically_and_returns_the_new_value ... ok\ntest pool::tests::runs_all_jobs_and_grows_for_concurrency ... ok\ntest pool::tests::reuses_a_worker_for_a_sequential_job ... ok\n\ntest result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s\n\n     Running tests\\completion.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\completion-45c679fea52d5a45.exe)\n\nrunning 3 tests\ntest ordered_close_releases_captures_and_retains_every_failure ... ok\ntest panic_is_reported_by_dedicated_and_pooled_actors ... ok\ntest pooled_join_waits_for_actor_cleanup ... ok\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s\n\n     Running tests\\tasks.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\tasks-a73a3294fb38a964.exe)\n\nrunning 3 tests\ntest closed_scope_rejects_awaited_work_with_a_closed_reply ... ok\ntest close_joins_nested_work_and_fences_admission ... ok\ntest reaped_panics_survive_until_report_and_drain_remains_reusable ... ok\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n   Doc-tests armillary\n\nrunning 1 test\ntest crates\\armillary\\src\\boundary.rs - boundary::KernelThread (line 33) - compile fail ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s\n\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

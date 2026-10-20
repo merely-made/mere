@@ -1,0 +1,39 @@
+{
+  "mere": {
+    "existing_versions_and_sources_preserved": true,
+    "added_packages": [
+      [
+        "mere-source-edit",
+        "0.1.0",
+        null
+      ]
+    ],
+    "dependency_changes": []
+  },
+  "isocosm": {
+    "existing_versions_and_sources_preserved": true,
+    "added_packages": [
+      [
+        "mere-source-edit",
+        "0.1.0",
+        null
+      ]
+    ],
+    "dependency_changes": [
+      "isometry-system"
+    ]
+  },
+  "knot-editor": {
+    "existing_versions_and_sources_preserved": true,
+    "added_packages": [
+      [
+        "mere-source-edit",
+        "0.1.0",
+        null
+      ]
+    ],
+    "dependency_changes": [
+      "knot-document"
+    ]
+  }
+}
