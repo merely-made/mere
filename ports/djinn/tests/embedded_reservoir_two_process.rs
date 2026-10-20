@@ -17,6 +17,7 @@ use std::sync::Arc;
 use std::sync::mpsc::{Receiver, channel};
 use std::time::Duration;
 
+use armillary::tasks::ResidentTasks;
 use castellan::authority::PersonaeHost;
 use castellan::custody::{
     IdentityStorage, IdentityVault, InMemoryStorage, Profile, SealedProfileStorage,
@@ -31,7 +32,6 @@ use djinn::resident_reservoir::ResidentReservoir;
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
-use graphshell_endpoint::door::tasks::ResidentTasks;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId};
@@ -541,7 +541,10 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
     std::io::stdin().read_line(&mut line).unwrap();
     server.abort();
     let _ = server.await;
-    tasks.cancel_and_join().await;
+    assert!(
+        tasks.close_and_join().await.is_clean(),
+        "task shutdown failed"
+    );
     catalog
         .update(|catalog| *catalog = ResidentEndpointCatalog::new())
         .await;

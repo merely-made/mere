@@ -1,0 +1,55 @@
+[
+  {
+    "manifest": "crates\\cambium\\examples\\genet_web_smoke\\Cargo.toml",
+    "exit_code": 101,
+    "diagnostics": "error: failed to get `paint_list_api` as a dependency of package `genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6186c81a)`\n    ... which satisfies git dependency `genet-livery` of package `genet-web-smoke v0.1.0 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\examples\\genet_web_smoke)`\n\nCaused by:\n  failed to load source for dependency `paint_list_api`\n\nCaused by:\n  unable to update https://github.com/merely-made/netrender.git?branch=main\n\nCaused by:\n  failed to lookup reference in preexisting repository, and can't check for updates in offline mode (--offline)\n\nCaused by:\n  failed to find branch `main`\n\nCaused by:\n  cannot locate remote-tracking branch 'origin/main'; class=Reference (4); code=NotFound (-3)\n"
+  },
+  {
+    "manifest": "ports\\distillery\\probe\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\distillery\\probe\\native-fixture\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\distillery\\probe\\remote-fixture\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\distillery\\probe\\repros\\burn_browser_embedding\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\distillery\\probe\\repros\\cubek_browser_extrema\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\distillery\\probe\\session-fixture\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\graphshell\\web\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  },
+  {
+    "manifest": "ports\\muniment-opfs-probe\\Cargo.toml",
+    "exit_code": 0,
+    "diagnostics": "",
+    "locked_exit_code": 0
+  }
+]

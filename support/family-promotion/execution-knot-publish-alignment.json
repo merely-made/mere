@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "-p",
+    "knot-document",
+    "--precise",
+    "806ae90"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T02:32:07.923508+00:00",
+  "finished": "2026-10-20T02:33:48.340244+00:00",
+  "exit_code": 4294967295,
+  "results": [
+    "Updating git repository `https://github.com/merely-made/netrender.git`",
+    "Updating git repository `https://github.com/merely-made/genet.git`"
+  ],
+  "diagnostic_tail": "    Updating crates.io index\n    Updating git repository `https://github.com/merely-made/netrender.git`\n    Updating git repository `https://github.com/merely-made/genet.git`\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

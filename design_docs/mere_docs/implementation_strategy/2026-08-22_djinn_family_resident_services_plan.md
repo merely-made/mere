@@ -724,5 +724,7 @@ The [family-promotion boundary scope](2026-10-19_family_promotion_plan.md#bounda
 records the execution/shutdown consolidation, shared observation/semantic-action
 follow-up and separate Castellan process design. This plan retains its domain
 implementation and acceptance gates. The new scope does not change existing
-custody, event meanings, configured limits or action admission, and supplies no
+custody, event meanings, configured limits or action admission, and, at the scoping checkpoint, supplied no
 new runtime, process-isolation or human accessibility receipt.
+
+Execution/shutdown qualification (2026-10-19): the [owning continuation](2026-10-19_family_promotion_plan.md#executionshutdown-qualification-2026-10-19) records the shared mechanics and native receiving gates. Observation/action and custody-process gates remain open in their respective lanes.

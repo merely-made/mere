@@ -226,6 +226,9 @@ struct RunTable {
     model: Option<String>,
     session: Option<esp::infer::provider::SessionIdentity>,
     load_error: Option<String>,
+    disconnected: bool,
+    closing: bool,
+    actor_failure: Option<String>,
     runs: Vec<RunRecord>,
     by_actor_id: HashMap<u64, usize>,
     next_actor_id: u64,
@@ -356,6 +359,7 @@ struct Shared {
     journal: Option<Arc<dyn RunJournal>>,
     actor: Mutex<Option<ActorHandle<InferCommand>>>,
     bridge: Mutex<Option<JoinHandle<()>>>,
+    close_result: Mutex<Option<Result<(), String>>>,
     max_tokens: usize,
     caches: Mutex<Vec<std::sync::Weak<Mutex<Option<(Vec<u8>, Vec<u8>)>>>>>,
     #[cfg(feature = "inference-model")]
@@ -393,6 +397,51 @@ enum RecallSelection {
 }
 
 impl Shared {
+    // The update stream closing is a transport/lifetime fact, never a successful
+    // completion for unfinished domain work. Keep retained user pauses intact.
+    fn record_disconnect(&self, table: &mut RunTable) {
+        if table.disconnected {
+            return;
+        }
+        table.disconnected = true;
+        let message = "inference actor disconnected before completing work";
+        if !table.closing {
+            table.load_error.get_or_insert_with(|| message.into());
+            table.actor_failure.get_or_insert_with(|| message.into());
+        }
+        for record in &mut table.runs {
+            if record.executing
+                || matches!(record.view.state, RunStateV1::Queued | RunStateV1::Running)
+            {
+                record.executing = false;
+                record.view.state = RunStateV1::Failed;
+                record.view.error = Some(message.into());
+                table.actor_failure.get_or_insert_with(|| message.into());
+                if let Some(journal) = &self.journal {
+                    if let Err(error) = journal.append(record) {
+                        let error = format!("actor disconnect checkpoint failed: {error}");
+                        record.view.error = Some(error.clone());
+                        table.actor_failure = Some(error);
+                    }
+                }
+            }
+        }
+        table.generation += 1;
+    }
+    fn require_actor(
+        &self,
+        actor: &ActorHandle<InferCommand>,
+        table: &RunTable,
+    ) -> Result<(), InferenceLaneError> {
+        if table.disconnected || actor.is_finished() {
+            // Only the bridge adjudicates domain termination, after draining all
+            // updates already emitted before the actor exited.
+            Err(InferenceLaneError::Closed)
+        } else {
+            Ok(())
+        }
+    }
+
     #[cfg(feature = "inference-model")]
     fn observe_recall(&self, table: &mut RunTable) -> recall::ObservedSources {
         let mut observed = recall::ObservedSources::default();
@@ -594,6 +643,7 @@ impl InferenceLane {
             journal,
             actor: Mutex::new(Some(actor)),
             bridge: Mutex::new(None),
+            close_result: Mutex::new(None),
             max_tokens,
             caches: Mutex::new(Vec::new()),
             #[cfg(feature = "inference-model")]
@@ -743,6 +793,7 @@ impl InferenceLane {
             .expect("the actor slot is never poisoned");
         let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
         let mut table = self.shared.table();
+        self.shared.require_actor(actor, &table)?;
         if table.locked {
             return Err(InferenceLaneError::Locked);
         }
@@ -905,6 +956,7 @@ impl InferenceLane {
             .expect("the actor slot is never poisoned");
         let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
         let mut table = self.shared.table();
+        self.shared.require_actor(actor, &table)?;
         if table.locked {
             return Err(InferenceLaneError::Locked);
         }
@@ -922,9 +974,11 @@ impl InferenceLane {
             *record = next;
             table.generation += 1;
         } else if !record.view.state.is_terminal() {
-            actor.command(InferCommand::Cancel {
+            if !actor.command(InferCommand::Cancel {
                 id: record.actor_id,
-            });
+            }) {
+                return Err(InferenceLaneError::Closed);
+            }
         }
         Ok(())
     }
@@ -934,6 +988,7 @@ impl InferenceLane {
         let actor = self.shared.actor.lock().unwrap();
         let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
         let mut table = self.shared.table();
+        self.shared.require_actor(actor, &table)?;
         if table.locked && reason != "lock" && reason != "shutdown" {
             return Err(InferenceLaneError::Locked);
         }
@@ -944,9 +999,11 @@ impl InferenceLane {
             .ok_or_else(|| InferenceLaneError::UnknownRun(run.into()))?;
         if !record.view.state.is_terminal() {
             record.pause_reason = Some(reason.into());
-            actor.command(InferCommand::Pause {
+            if !actor.command(InferCommand::Pause {
                 id: record.actor_id,
-            });
+            }) {
+                return Err(InferenceLaneError::Closed);
+            }
         }
         Ok(())
     }
@@ -956,6 +1013,7 @@ impl InferenceLane {
         let actor = self.shared.actor.lock().unwrap();
         let actor = actor.as_ref().ok_or(InferenceLaneError::Closed)?;
         let mut table = self.shared.table();
+        self.shared.require_actor(actor, &table)?;
         if table.locked {
             return Err(InferenceLaneError::Locked);
         }
@@ -987,11 +1045,13 @@ impl InferenceLane {
         next.pause_reason = None;
         journal.append(&next).map_err(InferenceLaneError::Journal)?;
         *record = next;
-        actor.command(InferCommand::Checkpointed {
+        if !actor.command(InferCommand::Checkpointed {
             id: record.actor_id,
             request: record.request.clone(),
             resume: record.checkpoint.clone(),
-        });
+        }) {
+            return Err(InferenceLaneError::Closed);
+        }
         table.generation += 1;
         Ok(())
     }
@@ -1166,6 +1226,16 @@ impl InferenceLane {
     /// Cancel every unfinished run, stop the actor and wait for both of the
     /// lane's threads. Idempotent.
     pub fn close(&self) -> Result<(), String> {
+        let mut closed = self
+            .shared
+            .close_result
+            .lock()
+            .expect("close result mutex poisoned");
+        if let Some(result) = &*closed {
+            return result.clone();
+        }
+        let mut failures = Vec::new();
+        self.shared.table().closing = true;
         let actor = self
             .shared
             .actor
@@ -1194,7 +1264,9 @@ impl InferenceLane {
                     actor.command(InferCommand::Cancel { id });
                 }
             }
-            actor.join();
+            if let Err(error) = actor.join() {
+                failures.push(error.to_string());
+            }
         }
         let bridge = self
             .shared
@@ -1203,11 +1275,20 @@ impl InferenceLane {
             .expect("the bridge slot is never poisoned")
             .take();
         if let Some(bridge) = bridge {
-            bridge
-                .join()
-                .map_err(|_| "the inference bridge thread panicked".to_string())?;
+            if bridge.join().is_err() {
+                failures.push("the inference bridge thread panicked".into());
+            }
         }
-        Ok(())
+        if let Some(error) = &self.shared.table().actor_failure {
+            failures.push(error.clone());
+        }
+        let result = if failures.is_empty() {
+            Ok(())
+        } else {
+            Err(failures.join("; "))
+        };
+        *closed = Some(result.clone());
+        result
     }
 
     /// The route endpoint for one admitted session.
@@ -1256,6 +1337,7 @@ fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
             }
         }
     }
+    shared.record_disconnect(&mut shared.table());
 }
 
 /// The `inference.ask` endpoint for one session.

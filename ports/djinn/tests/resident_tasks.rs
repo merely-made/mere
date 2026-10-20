@@ -15,19 +15,21 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use graphshell_endpoint::door::tasks::{ResidentTasks, spawn_tracked};
+use armillary::tasks::{ResidentTasks, spawn_tracked};
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn cancel_and_join_releases_what_scoped_tasks_hold() {
     let held = Arc::new(());
     let tasks = ResidentTasks::new();
     let outer = Arc::clone(&held);
+    let (ready, started) = tokio::sync::oneshot::channel();
     tasks
         .scope(async move {
             spawn_tracked(async move {
                 let inner = Arc::clone(&outer);
                 spawn_tracked(async move {
                     let _inner = inner;
+                    ready.send(()).unwrap();
                     std::future::pending::<()>().await;
                 });
                 let _outer = outer;
@@ -35,21 +37,49 @@ async fn cancel_and_join_releases_what_scoped_tasks_hold() {
             });
         })
         .await;
-    tokio::time::sleep(Duration::from_millis(50)).await;
+    tokio::time::timeout(Duration::from_secs(5), started)
+        .await
+        .unwrap()
+        .unwrap();
     assert_eq!(Arc::strong_count(&held), 3, "both tasks hold it");
-    assert_eq!(tasks.cancel_and_join().await, 2);
+    assert_eq!(tasks.cancel_and_join().await.joined(), 2);
     assert_eq!(Arc::strong_count(&held), 1, "both let go");
 
     let loose = Arc::clone(&held);
+    let (ready, started) = tokio::sync::oneshot::channel();
     spawn_tracked(async move {
         let _loose = loose;
+        ready.send(()).unwrap();
         std::future::pending::<()>().await;
     });
-    tokio::time::sleep(Duration::from_millis(50)).await;
-    assert_eq!(tasks.cancel_and_join().await, 0);
+    tokio::time::timeout(Duration::from_secs(5), started)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(tasks.cancel_and_join().await.joined(), 0);
     assert_eq!(
         Arc::strong_count(&held),
         2,
         "an untracked task keeps its hold"
     );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn resident_shutdown_reports_a_panicked_tracked_task() {
+    let tasks = ResidentTasks::new();
+    let (send, receive) = tokio::sync::oneshot::channel();
+    tasks
+        .scope(async {
+            spawn_tracked(async move {
+                send.send(()).unwrap();
+                panic!("synthetic resident task failure");
+            });
+        })
+        .await;
+    receive.await.unwrap();
+    tokio::task::yield_now().await;
+    let report = tasks.close_and_join().await;
+    assert_eq!(report.panicked, 1);
+    assert!(!report.is_clean());
+    assert_eq!(tasks.close_and_join().await, report);
 }
