@@ -1,0 +1,49 @@
+[
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-created.png",
+    "set": [
+      "https://shared.invalid/owner",
+      "Owner source"
+    ],
+    "click": "add",
+    "nodes": 1,
+    "status": "Saved"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-invited.png",
+    "set": [
+      "",
+      "",
+      "",
+      "/Users/markik/Code/output/graphshell-coop-native-20261020-04/private/guest-handoff/identity.json",
+      "/Users/markik/Code/output/graphshell-coop-native-20261020-04/private/owner-handoff/invitation.json"
+    ],
+    "click": "invite-editor",
+    "nodes": 1,
+    "status": "Invitation saved"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-saw-guest.png",
+    "wait_file": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-added.json",
+    "click": "refresh",
+    "nodes": 2
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-live-append.png",
+    "set": [
+      "https://shared.invalid/owner-live",
+      "Owner live source"
+    ],
+    "click": "add",
+    "nodes": 3,
+    "status": "Saved"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-ended-access.png",
+    "wait_file": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/revoke-now.json",
+    "click": "revoke",
+    "nodes": 3,
+    "access": "revoked",
+    "status": "Guest access ended"
+  }
+]

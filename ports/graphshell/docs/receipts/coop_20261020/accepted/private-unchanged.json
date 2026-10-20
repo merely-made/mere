@@ -1,0 +1,39 @@
+{
+  "colors": 1586,
+  "frames": 8,
+  "pid": 81659,
+  "presentation": "PresentedFrame { context_generation: ContextGeneration(1), host: 1, sequence: 5, width: 2200, height: 1700, layout_scale: 2.0 }",
+  "state": {
+    "data": {
+      "access": "uninvited",
+      "authors": [
+        {
+          "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell"
+        },
+        {
+          "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        }
+      ],
+      "epoch": 2,
+      "graph": "4dbefb09-7adf-4ea5-b6bb-7893231c171c",
+      "guest": null,
+      "nodes": [
+        {
+          "address": "https://private.invalid/owner-only",
+          "id": "1fa50dd9-3f5b-42e1-aaa0-a7dcef0078f9",
+          "title": "Private sentinel"
+        }
+      ],
+      "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+      "revision": 5
+    },
+    "root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+    "status": "Ready"
+  }
+}

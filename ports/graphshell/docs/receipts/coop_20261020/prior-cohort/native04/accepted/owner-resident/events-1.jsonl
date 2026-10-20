@@ -1,0 +1,7 @@
+{"at_ms":1792523976524,"event":"started","installed":false,"pid":80935,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792523976525,"creating":true,"event":"waiting-for-unlock","pid":80935,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792523976937,"event":"vault-created","pid":80935,"schema":"djinn.resident-events/v1"}
+{"agent":"/Users/markik/Code/output/graphshell-coop-native-20261020-04/private/owner/agent.sock","app":"/Users/markik/Code/output/graphshell-coop-native-20261020-04/private/owner/app.sock","at_ms":1792523977080,"browser":"/Users/markik/Code/output/graphshell-coop-native-20261020-04/private/owner/browser.sock","event":"listening","pid":80935,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792523977080,"event":"ready","pid":80935,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792524028769,"event":"stopping","pid":80935,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792524028826,"event":"stopped","ok":true,"pid":80935,"reason":"stop intent","schema":"djinn.resident-events/v1"}

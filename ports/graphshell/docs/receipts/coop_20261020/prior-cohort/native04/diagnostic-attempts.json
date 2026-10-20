@@ -1,0 +1,22 @@
+[
+  {
+    "run": "native-01",
+    "result": "not accepted",
+    "reason": "Invite did not complete. Source audit found no signing-only custody act for mere.graphshell. Added that act without granting key release and added the policy regression."
+  },
+  {
+    "run": "native-02",
+    "result": "not accepted",
+    "reason": "Warm edits, reopen and revocation completed. The harness then attempted Refresh after automatic withdrawal had removed that control. Corrected the sequence to observe automatic withdrawal; connection failure is labelled Unavailable."
+  },
+  {
+    "run": "native-03",
+    "result": "not accepted",
+    "reason": "All 18 phases captures completed, but the final private-scope assertion exposed a process-local notification counter being used as wire revision. Switched to stored journal position with a separate fresh epoch and added cold-position regression."
+  },
+  {
+    "run": "native-04",
+    "result": "accepted",
+    "reason": "Complete headed and cold sequence, all scope and attribution assertions, both custodians restarted, revoked guest denied, sibling unchanged."
+  }
+]

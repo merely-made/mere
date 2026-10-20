@@ -1,0 +1,12 @@
+[
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/private-baseline.png",
+    "set": [
+      "https://private.invalid/owner-only",
+      "Private sentinel"
+    ],
+    "click": "add",
+    "nodes": 1,
+    "status": "Saved"
+  }
+]

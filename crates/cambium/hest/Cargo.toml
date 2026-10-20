@@ -1,0 +1,16 @@
+[package]
+name = "hest"
+version = "0.0.1"
+description = "Name reservation. Hest is the command architecture of the Mere stack: how a host declares a command, offers it, invokes it with arguments, and records the result. It will absorb command-menu (the offer half) as `hest::menu`."
+authors.workspace = true
+edition.workspace = true
+
+rust-version = "1.97.1"
+license = "MPL-2.0"
+repository.workspace = true
+keywords = ["commands", "palette", "menu", "intents"]
+categories = ["gui"]
+publish = true
+
+[lib]
+path = "src/lib.rs"

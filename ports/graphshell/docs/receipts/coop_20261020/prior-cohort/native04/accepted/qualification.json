@@ -1,0 +1,331 @@
+{
+  "result": "ok",
+  "binary_sha256": "e9e0bc5791ca178fa20038ba05c9522f175b717c86825f26851013b2bd91b131",
+  "djinn_sha256": "16584c11878c64eab36cefc0bcc03f443b0a38dc273ba4945d340e37e3277dd6",
+  "chosen_graph": "66faf6ff-72d3-4a8e-b3d8-d52a0be74187",
+  "private_graph": "93f54f9b-9bbf-459c-abe4-ae10dfdda0a1",
+  "owner_root": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+  "guest_root": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+  "phases": [
+    {
+      "name": "private-baseline",
+      "captures": 1,
+      "frames": 9,
+      "pid": 80953,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "uninvited",
+          "authors": [
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 1,
+          "graph": "93f54f9b-9bbf-459c-abe4-ae10dfdda0a1",
+          "guest": null,
+          "nodes": [
+            {
+              "address": "https://private.invalid/owner-only",
+              "id": "41eba5d1-184e-4c49-a278-c8edff2460ea",
+              "title": "Private sentinel"
+            }
+          ],
+          "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "revision": 5
+        },
+        "root": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+        "status": "Saved"
+      }
+    },
+    {
+      "name": "guest-live",
+      "captures": 3,
+      "frames": 134,
+      "pid": 80965,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "editor",
+          "authors": [
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 1,
+          "graph": "66faf6ff-72d3-4a8e-b3d8-d52a0be74187",
+          "guest": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+          "nodes": [
+            {
+              "address": "https://shared.invalid/owner",
+              "id": "e9fb8f7d-3509-43ac-87e2-0d85e7fc19e7",
+              "title": "Owner source"
+            },
+            {
+              "address": "https://shared.invalid/guest",
+              "id": "d8741e9e-fe05-4d1d-a5af-f87e817354c7",
+              "title": "Guest source"
+            },
+            {
+              "address": "https://shared.invalid/owner-live",
+              "id": "757b2ac7-9047-42df-938b-f57f326095da",
+              "title": "Owner live source"
+            }
+          ],
+          "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "revision": 15
+        },
+        "root": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+        "status": "Saved by holder"
+      }
+    },
+    {
+      "name": "owner-live",
+      "captures": 5,
+      "frames": 503,
+      "pid": 80959,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "revoked",
+          "authors": [
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 1,
+          "graph": "66faf6ff-72d3-4a8e-b3d8-d52a0be74187",
+          "guest": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+          "nodes": [
+            {
+              "address": "https://shared.invalid/owner",
+              "id": "e9fb8f7d-3509-43ac-87e2-0d85e7fc19e7",
+              "title": "Owner source"
+            },
+            {
+              "address": "https://shared.invalid/guest",
+              "id": "d8741e9e-fe05-4d1d-a5af-f87e817354c7",
+              "title": "Guest source revised"
+            },
+            {
+              "address": "https://shared.invalid/owner-live",
+              "id": "757b2ac7-9047-42df-938b-f57f326095da",
+              "title": "Owner live source"
+            }
+          ],
+          "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "revision": 16
+        },
+        "root": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+        "status": "Guest access ended"
+      }
+    },
+    {
+      "name": "guest-return",
+      "captures": 4,
+      "frames": 125,
+      "pid": 81006,
+      "result": "ok",
+      "state": {
+        "data": null,
+        "root": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+        "status": "Unavailable: session stream failed: connection lost"
+      }
+    },
+    {
+      "name": "guest-cold",
+      "captures": 1,
+      "frames": 9,
+      "pid": 81021,
+      "result": "ok",
+      "state": {
+        "data": null,
+        "root": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+        "status": "Unavailable: admission refused: Delegation(Revoked)"
+      }
+    },
+    {
+      "name": "owner-cold",
+      "captures": 3,
+      "frames": 21,
+      "pid": 81017,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "revoked",
+          "authors": [
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 2,
+          "graph": "66faf6ff-72d3-4a8e-b3d8-d52a0be74187",
+          "guest": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+          "nodes": [
+            {
+              "address": "https://shared.invalid/owner",
+              "id": "e9fb8f7d-3509-43ac-87e2-0d85e7fc19e7",
+              "title": "Owner source"
+            },
+            {
+              "address": "https://shared.invalid/guest",
+              "id": "d8741e9e-fe05-4d1d-a5af-f87e817354c7",
+              "title": "Guest source revised"
+            },
+            {
+              "address": "https://shared.invalid/owner-live",
+              "id": "757b2ac7-9047-42df-938b-f57f326095da",
+              "title": "Owner live source"
+            },
+            {
+              "address": "https://shared.invalid/after-revoke",
+              "id": "d7a47ad1-109f-44a1-91ca-be89d33ecd48",
+              "title": "Owner after revoke"
+            }
+          ],
+          "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "revision": 21
+        },
+        "root": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+        "status": "Saved"
+      }
+    },
+    {
+      "name": "private-return",
+      "captures": 1,
+      "frames": 8,
+      "pid": 81029,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "uninvited",
+          "authors": [
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 2,
+          "graph": "93f54f9b-9bbf-459c-abe4-ae10dfdda0a1",
+          "guest": null,
+          "nodes": [
+            {
+              "address": "https://private.invalid/owner-only",
+              "id": "41eba5d1-184e-4c49-a278-c8edff2460ea",
+              "title": "Private sentinel"
+            }
+          ],
+          "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "revision": 5
+        },
+        "root": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+        "status": "Ready"
+      }
+    }
+  ],
+  "cold_reopen": {
+    "native_processes_stopped": true,
+    "residents_stopped": true,
+    "same_owner": true,
+    "revoked_guest_refused": true,
+    "private_sibling_unchanged": true
+  }
+}
