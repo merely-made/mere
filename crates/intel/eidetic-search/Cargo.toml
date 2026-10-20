@@ -25,7 +25,7 @@ thiserror = "1"
 [dev-dependencies]
 sha2.workspace = true
 # The example's store is a muniment backend (2026-07-12).
-muniment = { version = "0.1.0", features = ["fjall"], git = "https://github.com/merely-made/eidetic.git", rev = "de6b1dce75dd6725d72c79b829e4878c7903a381" }
+muniment = { workspace = true, features = ["fjall"] }
 pollster = "0.4"
 tempfile = "3"
 # The eidetic-recall example (the browsing-derivation rehearsal bin, moved

@@ -8,9 +8,9 @@
 //!
 //! Two workers, one job, a real registry running a real adapter with real
 //! cooperative cancellation — and an explicit clock. Every lease timestamp here
-//! is an *authored* value, so these receipts are deterministic: nothing sleeps,
-//! nothing races, and re-running produces the same board. That is the whole
-//! point of keeping "now" out of the fold.
+//! is an *authored* value; the adapter's delay runs under Tokio's paused clock,
+//! so there is no wall-clock wait. Re-running produces the same board. That is
+//! the whole point of keeping "now" out of the fold.
 //!
 //! An integration test on purpose: it may only touch the crate's public API, so
 //! it also checks that a host can actually drive a lease without reaching into
@@ -94,7 +94,7 @@ fn offer<'a>(
 /// The plan's receipt, steps 1-5: two workers race, one wins the lease and makes
 /// observable progress, its owner takes the device back mid-run, and the other
 /// worker picks the job up under a fresh epoch and finishes it.
-#[tokio::test]
+#[tokio::test(start_paused = true)]
 async fn owner_reclaim_hands_the_job_to_a_second_worker() {
     let mut asker = Device::new(1);
     let mut first = Device::new(2);
@@ -159,7 +159,10 @@ async fn owner_reclaim_hands_the_job_to_a_second_worker() {
     let spec = board.job(id).unwrap().spec.clone().unwrap();
     let (control_handle, control) = JobControl::new();
     let run = {
-        let registry = ResourceRegistry::builtin();
+        let mut registry = ResourceRegistry::new();
+        registry
+            .register(Arc::new(DelayedResource::new(16, 10)))
+            .unwrap();
         let space = Arc::new(space);
         let running_space = space.clone();
         let spec = spec.clone();
@@ -168,9 +171,14 @@ async fn owner_reclaim_hands_the_job_to_a_second_worker() {
             run_job(&registry, &spec, &*running_space, &*running_space, &control).await
         })
     };
-    // Let it get somewhere, then heartbeat whatever it actually reported.
+    // Advance 50ms of paused time; 16 ten-ms units cannot finish before
+    // cancellation.
     tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     let progress = control_handle.progress();
+    assert!(
+        progress.done > 0 && progress.done < progress.total,
+        "expected the reclaimed worker to be in flight: {progress:?}"
+    );
     log.push(winner.author(&MeshEvent::LeaseHeartbeat {
         job: id.0,
         lease: lease.0,

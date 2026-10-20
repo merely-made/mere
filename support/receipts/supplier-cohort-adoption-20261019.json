@@ -1,0 +1,317 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-20T01:23:48.228038+00:00",
+  "base_mere_commit": "d5c26e08687cbd44f88e91048a55746a40506b8e",
+  "suppliers": {
+    "eidetic": {
+      "repository": "https://github.com/merely-made/eidetic.git",
+      "revision": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    },
+    "gemot": {
+      "repository": "https://github.com/merely-made/gemot.git",
+      "revision": "67ce0ac3e2b48be951a677a9eca245eaabd56d63"
+    },
+    "esp": {
+      "repository": "https://github.com/merely-made/esp.git",
+      "revision": "af5597c670da111713dd306f4feba8db892a86d2"
+    }
+  },
+  "manifest_sha256": {
+    "Cargo.toml": "a753108f9fff6b0c68d2871a830601310761e04a2e6172159e4ccfd2a040915d",
+    "crates/cambium/examples/genet_web_smoke/Cargo.toml": "2da48f9f1bff5f7661f0d29d4ce18afeb395aae428f8f4930e6d09de4c63dda2",
+    "crates/canvas/pictograph/Cargo.toml": "1b5ae0de54c4b53f0b9e527d24e62c4976ac344f884162c2915217f3fdd0d667",
+    "crates/intel/eidetic-search/Cargo.toml": "c128a16d692f6412a851306e7457f68e3895bfca00ba24c6703068e327c887f1",
+    "crates/mesh/mesh/Cargo.toml": "0f6f40e07eb37b6f33eea63e4b4ca74dba5ab07ac4e2e4ffffd2cdb01aa333be",
+    "ports/distillery/probe/Cargo.toml": "d4e8fb343f2a9899f9a11211f1c641a6b83d2004e8ded86dd004ca9daece35f9",
+    "ports/distillery/probe/native-fixture/Cargo.toml": "3ed2f6dfad687aa0c498494b68e08eef2711d7668d0cef1fe6deb0d9da9b510b",
+    "ports/distillery/probe/remote-fixture/Cargo.toml": "96f47ce856b7a634d0cedb0125f86ac321b2f25c3851a7ddd786abf93984c643",
+    "ports/distillery/probe/repros/burn_browser_embedding/Cargo.toml": "feb00b1b9b5cc67726d98ed2ad48e2ec5e2e9745fb357cd7868acc819f7f518c",
+    "ports/distillery/probe/repros/cubek_browser_extrema/Cargo.toml": "676a4898223e1bfa6a5cadda9a2ac5b54f2fec75b73beae02bbf0d3efcb708f6",
+    "ports/distillery/probe/session-fixture/Cargo.toml": "10887c7768379319c35e712dc2887f6abab4374acc0020bbeab42d42ea8a8ae5",
+    "ports/graphshell/web/Cargo.toml": "c0f4d202d481a907c552c8cfefe006b58443b6de3b443fb24133de59d8e81f20",
+    "ports/muniment-opfs-probe/Cargo.toml": "15b548d6d6b8553e677495301d2d9874966304cb0e12ba5463048c1aa8b05717"
+  },
+  "mesh_receipt_fixture": {
+    "path": "crates/mesh/mesh/tests/lease_receipts.rs",
+    "sha256": "7b57f1268eb06fc53d4c2bdcbf437a908db1db665a67d35245c6a7ab9ad7084a",
+    "repair": "Use paused Tokio time and explicit resource step timing so cancellation precedes completion; no production code changes"
+  },
+  "workspace_inheritance": [
+    "crates/canvas/pictograph: chartulary, optional",
+    "crates/mesh/mesh: muniment, redb",
+    "crates/intel/eidetic-search: muniment, fjall (dev)"
+  ],
+  "resolver": {
+    "workspaces": [
+      {
+        "root": ".",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "chartulary",
+          "commons-spine",
+          "eidetic",
+          "esp",
+          "gemot",
+          "luggage",
+          "mere-proofs",
+          "mien",
+          "mooting",
+          "muniment",
+          "servitor",
+          "stickleback"
+        ],
+        "lock_sha256": "2c8d8681ea088f3f594e8c86423c2031ec6ecba803fc0745c0d1caa7fcc449f6"
+      },
+      {
+        "root": "crates/cambium/examples/genet_web_smoke",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [],
+        "lock_sha256": "84cdab47c5a8a52f758b302b1675c7a24ccbc19cadff27cd5ff503980faf448a"
+      },
+      {
+        "root": "ports/distillery/probe",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "chartulary",
+          "eidetic",
+          "esp",
+          "muniment"
+        ],
+        "lock_sha256": "7ea46053bd3dadebaa6bb161c9f92234943662ff1390c73158b906729ed236a1"
+      },
+      {
+        "root": "ports/distillery/probe/native-fixture",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "esp"
+        ],
+        "lock_sha256": "be9231b933024b7d6905dd4748ad17f576a4a3f4bd22da896deeb75000658e05"
+      },
+      {
+        "root": "ports/distillery/probe/remote-fixture",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "chartulary",
+          "eidetic",
+          "esp",
+          "mere-proofs",
+          "muniment",
+          "stickleback"
+        ],
+        "lock_sha256": "4b9980e0e304d0adcda031855ad38ff5ce4138de4e7f13a6a73f1c74687309d8"
+      },
+      {
+        "root": "ports/distillery/probe/repros/burn_browser_embedding",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [],
+        "lock_sha256": "53660b8cd57a1e5fbd211dbb72337f6cc8da2d1daf6bc9b1f586868e6f0e626f"
+      },
+      {
+        "root": "ports/distillery/probe/repros/cubek_browser_extrema",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [],
+        "lock_sha256": "3c9fe9ef85f967b82d1d8d6a81a31eb05f266c0cc2d9fb08c757a39c95569aa0"
+      },
+      {
+        "root": "ports/distillery/probe/session-fixture",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "chartulary",
+          "eidetic",
+          "esp",
+          "muniment"
+        ],
+        "lock_sha256": "3debccb620ac31fefbb707c3c47731cb54be9babe49278a111433043f9dd388a"
+      },
+      {
+        "root": "ports/graphshell/web",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "chartulary",
+          "eidetic",
+          "esp",
+          "luggage",
+          "muniment"
+        ],
+        "lock_sha256": "00262f74c36fc51b4ef20abe10a131ddf00515bb865448822be6bdbf47d408e5"
+      },
+      {
+        "root": "ports/muniment-opfs-probe",
+        "locked_metadata_exit_code": 0,
+        "canonical_packages": [
+          "muniment"
+        ],
+        "lock_sha256": "7aea7f83daa39edab6a1f184cc5d3aa87ab384a3d65530e4266ec9d1aa5a77e4"
+      }
+    ],
+    "canonical_package_names_checked": 14,
+    "duplicate_or_registry_supplier_identities": false,
+    "package_version_upgrades": false,
+    "pruned_unused_package": {
+      "lock": "ports/graphshell/web/Cargo.lock",
+      "name": "windows-sys",
+      "version": "0.59.0"
+    },
+    "lock_sha256": {
+      "Cargo.lock": "2c8d8681ea088f3f594e8c86423c2031ec6ecba803fc0745c0d1caa7fcc449f6",
+      "ports/distillery/probe/Cargo.lock": "7ea46053bd3dadebaa6bb161c9f92234943662ff1390c73158b906729ed236a1",
+      "ports/distillery/probe/remote-fixture/Cargo.lock": "4b9980e0e304d0adcda031855ad38ff5ce4138de4e7f13a6a73f1c74687309d8",
+      "ports/distillery/probe/repros/burn_browser_embedding/Cargo.lock": "53660b8cd57a1e5fbd211dbb72337f6cc8da2d1daf6bc9b1f586868e6f0e626f",
+      "ports/distillery/probe/repros/cubek_browser_extrema/Cargo.lock": "3c9fe9ef85f967b82d1d8d6a81a31eb05f266c0cc2d9fb08c757a39c95569aa0",
+      "ports/distillery/probe/session-fixture/Cargo.lock": "3debccb620ac31fefbb707c3c47731cb54be9babe49278a111433043f9dd388a",
+      "ports/graphshell/web/Cargo.lock": "00262f74c36fc51b4ef20abe10a131ddf00515bb865448822be6bdbf47d408e5"
+    },
+    "dramatis": {
+      "Cargo.lock": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#cf562f47f33ab0b6ad0db1c5ac3123775769979e"
+      ],
+      "ports/distillery/probe/Cargo.lock": [],
+      "ports/distillery/probe/remote-fixture/Cargo.lock": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+      ],
+      "ports/distillery/probe/repros/burn_browser_embedding/Cargo.lock": [],
+      "ports/distillery/probe/repros/cubek_browser_extrema/Cargo.lock": [],
+      "ports/distillery/probe/session-fixture/Cargo.lock": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3"
+      ],
+      "ports/graphshell/web/Cargo.lock": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#5c89001a6ff1aac3f6105ed50b6ae5f09c9f27e2"
+      ]
+    },
+    "reconciliation_notes": [
+      "Cargo recomputed semver-compatible dependency edges using already locked package versions; no manual lock edits retained.",
+      "Two fixture locks now follow preexisting Netrender d92050146768357ead4e4e42967866be7061262e requirements: four Netrender packages in probe and paint_list_api in remote-fixture. No Netrender manifest requirements changed."
+    ]
+  },
+  "initial_mesh_gate": {
+    "exit_code": 101,
+    "result": "2 passed; 1 failed",
+    "diagnosis": "Existing zero-delay fixture completed before its wall-clock cancellation; replaced by paused-clock in-flight assertion"
+  },
+  "validation": {
+    "toolchain": "1.99.1-x86_64-apple-darwin",
+    "dev_debug": 0,
+    "test_debug": 0,
+    "incremental": false,
+    "build_jobs": 4,
+    "gates": [
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "mere-moot",
+          "--test",
+          "resource_owner",
+          "--features",
+          "resource-owner,resource-view"
+        ],
+        "cwd": ".",
+        "exit_code": 0,
+        "seconds": 377.74,
+        "test_results": [
+          "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.19s"
+        ]
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "mere-mesh",
+          "--test",
+          "lease_receipts"
+        ],
+        "cwd": ".",
+        "exit_code": 0,
+        "seconds": 5.52,
+        "test_results": [
+          "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+        ]
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "eidetic-search",
+          "--test",
+          "lexical_ngram_recall"
+        ],
+        "cwd": ".",
+        "exit_code": 0,
+        "seconds": 190.51,
+        "test_results": [
+          "test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+        ]
+      },
+      {
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "-p",
+          "pictograph",
+          "--features",
+          "signals",
+          "--lib"
+        ],
+        "cwd": ".",
+        "exit_code": 0,
+        "seconds": 26.84,
+        "test_results": []
+      },
+      {
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--no-default-features",
+          "--features",
+          "remote,presentation-webgl2,without-classic-vello"
+        ],
+        "cwd": "ports/graphshell/web",
+        "exit_code": 0,
+        "seconds": 67.86,
+        "test_results": []
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "--offline",
+          "-p",
+          "esp",
+          "--lib",
+          "--no-default-features"
+        ],
+        "cwd": "ESP supplier workspace",
+        "exit_code": 0,
+        "test_results": [
+          "82 passed; 0 failed"
+        ]
+      },
+      {
+        "command": [
+          "python3",
+          "scripts/check_port_boundaries.py"
+        ],
+        "cwd": ".",
+        "exit_code": 0
+      }
+    ]
+  },
+  "historical_checkpoint": "support/family-promotion (unchanged; original revision-bound evidence)",
+  "qualification_limits": [
+    "Focused native consumer tests and browser Wasm compilation; no full Mere or Gemot suite.",
+    "No headed browser, GPU/model inference, physical-device or end-to-end network qualification.",
+    "App-host guest build warned that wasm32-wasip2 core is unavailable; guest-loading tests were outside these gates."
+  ],
+  "supplier_adoption_commit": "32134452dd197956b7a17b1a4b67b805f3affc84"
+}
