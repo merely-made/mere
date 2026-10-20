@@ -298,13 +298,38 @@ separate from Apparatus's independent-reader retained history. Preserve each
 layer's configured count/byte/age limits, rejection policy and loss accounting.
 No universal event enum, global semantic revision or new diagnostics daemon.
 
-Take one real worker operation and one UI operation through their existing
-owners. Connect source/run/operation identity, action admission, terminal reply
-and optional semantic/frame evidence where the producer can establish them.
-Taproot selectors and Mesquite driving continue to consume the host's retained
-projection and geometry. UxTree's Inker-specific projections and ux-events'
-browser vocabulary remain adapters; generic core users must not inherit them.
-Diagnostics and local automation must continue to work without Djinn running.
+The selected worker/UI evidence paths have already been qualified in the
+[observations continuation](2026-06-08_system_diagnostics_and_accessibility_plan.md#observations-and-semantic-action-continuation-2026-10-20):
+Distillery records real actor replies and journal refusals, and the retained-host
+wheel fixture records its application callback. Continue from those paths and
+the later DOM/collector repairs rather than repeat their initial implementation.
+Their CPU receipts do not establish headed product completion or pixel causality.
+
+**Command-contract owner:** the
+[Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
+owns shared declaration, invocation and outcome vocabulary. Its H1/H2 and
+Cambium 0.5 receiving work are a separate, locally committed delivery cohort;
+H3 remains the invocation/result gate. This diagnostics continuation consumes
+that owner instead of defining another command catalogue or outcome protocol.
+Keep Hest independent of Chirograph, Apparatus and application runtimes.
+
+Hosts and Chirograph retain authorization, confirmation, current-target and
+session/document/revision lifetime validation, dispatch and execution. Hest's
+effect/destructive declarations describe commands; they do not grant permission.
+An accepted invocation or handled input establishes admission/dispatch only.
+A terminal completion requires the executing owner's actual reply; the current
+Chirograph `IntentResult::Accepted` must not convert to terminal `Done`.
+Apparatus records a redacted copy of those facts using producer-supplied
+operation/source scope, with its existing independent readers and loss bounds.
+
+The remaining action migration must carry that distinction through the Hest
+owner's two-host and Chirograph round-trip gates, then through a selected current
+target's automation/platform adapters. Replaced or expired targets must refuse;
+unsupported, stale, ambiguous, cancelled and failed operations must retain their
+actual results. Taproot and Mesquite consume the host's retained projection and
+geometry. UxTree's Inker-specific projections and ux-events' browser vocabulary
+remain adapters; generic users must not inherit them. Diagnostics and local
+automation must continue to work without Djinn running.
 
 Done when the two paths produce bounded, redacted evidence with independent
 inspection/test readers; unsupported, stale, ambiguous, cancelled and failed
