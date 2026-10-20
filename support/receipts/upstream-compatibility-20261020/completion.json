@@ -1,0 +1,93 @@
+{
+  "pass": "completion",
+  "date": "2026-10-20",
+  "mere_base": "81dd41681581a1e7b94e6284bb66081088daba6c",
+  "toolchain": "1.99.1-x86_64-apple-darwin",
+  "debug_info": 0,
+  "incremental": 0,
+  "jobs": 4,
+  "gates": {
+    "completion-distillery": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "distillery",
+        "--features",
+        "inference",
+        "--lib",
+        "--test",
+        "inference_shutdown",
+        "--test",
+        "lifecycle",
+        "--test",
+        "resident"
+      ],
+      "exit": 0,
+      "seconds": 128.5,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "260e39fdd74b549a2cad8799564b3c8b57f4a50ec59b632d67d56bea46789bb2",
+      "test_results": [
+        "ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.74s",
+        "ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.88s"
+      ]
+    },
+    "completion-djinn": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--bin",
+        "djinn",
+        "--test",
+        "resident_tasks",
+        "--test",
+        "distillery_lane"
+      ],
+      "exit": 0,
+      "seconds": 298.14,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "922351a96c2a2827d160c8e854ecb5efc4dd6784cf21d38191e496e81ed7d53d",
+      "test_results": [
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.03s",
+        "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    }
+  },
+  "changed_source_sha256": {},
+  "description": "Completion repair already present on refreshed upstream; source matches its historical qualification and passes fresh current-graph tests. No duplicate implementation.",
+  "qualified_mere_commit": "a05e4b275b1c99354496439c2d49a5902ce02ef6",
+  "implementation_verification": {
+    "pass": 2,
+    "base_commit": "81dd41681581a1e7b94e6284bb66081088daba6c",
+    "status": "already implemented on refreshed upstream; verify current graph after AccessKit",
+    "source_sha256": {
+      "ports/distillery/src/inference.rs": "2572ac99cd67023fb47412bb9a940cb7d07c48927d68921737cb8dd6d1efca18",
+      "ports/distillery/tests/lifecycle.rs": "c91ff3243d330047b302eca6a4187a9ff54aac28046c33d3e7e5c41dbf0608cb",
+      "ports/djinn/tests/resident_tasks.rs": "2c92b619316f822b356bdbd08606797f15b740f630254b85c95de098ec830439",
+      "support/fixtures/armillary-consumer/src/main.rs": "8bc69fee014ca4668f8208ee2657c9830671e9791ebfe7cd31242bf27ab602ed"
+    },
+    "existing_receipt": "support/family-promotion/execution-macos-receiving.json",
+    "armillary_revision": "e67c5def1c735be047492a867bcdc8b41fba22b8",
+    "esp_revision": "b20ae7db257dae83493031efd92da3a102c44a48",
+    "behavior": "Record actor join failure, still join bridge, reconcile durable state, aggregate and memoize errors; existing panic/idempotence/lifecycle tests."
+  },
+  "lock_sha256": "e0a991aa17d70728725466c24b064e5bd0914792ad34d9c2d26e1452d6cd84da",
+  "tests_passed": 54
+}
