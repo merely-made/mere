@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-19",
+  "base_commit": "84494317133293811519cf84ec7ffdd154e9b5ba",
+  "resources": {
+    "memory_max": "5G",
+    "swap_max": 0,
+    "cpu_quota": "150%",
+    "jobs": 1,
+    "test_threads": 1,
+    "timeout_seconds": 600,
+    "lock": "/home/markik/Code/testing/machine-heavy.lock"
+  },
+  "source_sha256": {
+    "Cargo.lock": "434147a8cda1640a510aee2c2e76a4396e83dd86c34fac6cd34a7714ae29db30",
+    "Cargo.toml": "606f10d98fe6fb62b743467aa2da43f28b9e902bcebb1c09cb664bec99a9819c",
+    "crates/cambium/examples/genet_web_smoke/Cargo.toml": "6e4d81e202fc633d80e0485e5de574eaedd0170fedb52d0ee185bdded2b64e9e",
+    "ports/graphshell/web/Cargo.lock": "b583c2f6ff0919078ffead0a7e70eba29a09a2f2f81c7da928d3f7079de45a21",
+    "ports/graphshell/web/Cargo.toml": "abe8f78f3020aebeb8da5acf7004a1088217a6b53de1768aba02791677e82a4b",
+    "crates/cambium/examples/genet_web_smoke/Cargo.lock": "0ceec12ac66f017e4bb8abfcd78e2295ec2570a35b87850564645f3a3f213c11"
+  },
+  "gates": [
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261019/image-lookup/mere-document.log",
+      "sha256": "fee5cb0681f7aca8d0285a6334d4087f0b3bcf036901323cbbbba6d6d7b3e437",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p document-canvas --features netrender --lib -- --test-threads=1"
+      ],
+      "summaries": [
+        "test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.08s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "675252"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261019/image-lookup/mere-canvas.log",
+      "sha256": "d153f6acafb864724bf00ca94c6367b6f7eeecbd861e7d06858b438bda8ffeab",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p pictograph --features canvas --lib canvas::cull:: -- --test-threads=1"
+      ],
+      "summaries": [
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 587 filtered out; finished in 0.99s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "1264752"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261019/image-lookup/mere-smoke-wasm.log",
+      "sha256": "dc995d397ec2ce600d90199d898f1d491facca47368e10b0cb174daa098ad078",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo check --offline --locked -j1 --target wasm32-unknown-unknown"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "101"
+      ],
+      "peak_rss_kib": [
+        "56640"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261019/image-lookup/mere-smoke-resolve.log",
+      "sha256": "d40099b1aecc22a7a8226426049468b427d35b5c70a08d3a4db89e3bb0e5a306",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo metadata --offline --format-version 1"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "86264"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261019/image-lookup/mere-smoke-wasm-final.log",
+      "sha256": "9fd1fa39fccb64e000b729080bd13abf6d308974fa6f161c8362dfef1a5e368d",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo check --offline --locked -j1 --target wasm32-unknown-unknown"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "516756"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/genet-architecture-20261019/image-lookup/mere-graphshell-wasm.log",
+      "sha256": "de7f93ae3b4b30a027d24df1686e5be5268c4a890ed649303255a554759287b2",
+      "commands": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo check --offline --locked -j1 --target wasm32-unknown-unknown"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "0"
+      ],
+      "peak_rss_kib": [
+        "1340432"
+      ],
+      "swaps": [
+        "0"
+      ]
+    }
+  ],
+  "assessment": {
+    "native": "89 document-canvas tests with netrender enabled and 6 canvas culling tests passed; includes actual GPU pixel comparison.",
+    "wasm": "Genet smoke and Graphshell default features passed locked Wasm checks; no browser runtime qualification.",
+    "lock_refresh": "Initial smoke check rejected a stale ignored lock; offline metadata refreshed it before the successful locked check. Unrelated tracked lock entries were preserved.",
+    "concurrent_update": "Tests began on 883ccdc4c3a2dc36524920f2c85a56fad4b0955a; fast-forward to 84494317133293811519cf84ec7ffdd154e9b5ba changed documentation only."
+  },
+  "lock_sources": {
+    "Cargo.lock": [
+      "git+https://github.com/merely-made/genet.git?branch=main#83114ac2d3dd323e6d9af8bb5e763a39ffd7f41e",
+      "git+https://github.com/merely-made/netrender.git?rev=d92050146768357ead4e4e42967866be7061262e#d92050146768357ead4e4e42967866be7061262e"
+    ],
+    "ports/graphshell/web/Cargo.lock": [
+      "git+https://github.com/merely-made/genet.git?branch=main#83114ac2d3dd323e6d9af8bb5e763a39ffd7f41e",
+      "git+https://github.com/merely-made/netrender.git?rev=d92050146768357ead4e4e42967866be7061262e#d92050146768357ead4e4e42967866be7061262e"
+    ],
+    "crates/cambium/examples/genet_web_smoke/Cargo.lock": [
+      "git+https://github.com/merely-made/genet.git?branch=main#83114ac2d3dd323e6d9af8bb5e763a39ffd7f41e",
+      "git+https://github.com/merely-made/netrender.git?rev=d92050146768357ead4e4e42967866be7061262e#d92050146768357ead4e4e42967866be7061262e"
+    ]
+  }
+}
