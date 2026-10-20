@@ -1,10 +1,10 @@
-2026-10-20T21:34:55.488120Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-coop-view-20261020-05/private/owner/vault/vault.json
-2026-10-20T21:34:55.490552Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
-2026-10-20T21:34:55.586412Z  INFO djinn: resident reservoir open persona=4e06c98a-1aa6-465b-b5a8-1489d420200d
-2026-10-20T21:34:55.586888Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner/agent.sock"
-2026-10-20T21:34:55.587061Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner/local/graphshell/settings/GraphViewOwner.json configured=false
-2026-10-20T21:34:55.630452Z  INFO djinn: mere route open route="mere/coop-acceptance"
-2026-10-20T21:34:58.261429Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
-2026-10-20T21:35:06.818274Z  INFO djinn: stop requested on the control route
-2026-10-20T21:35:06.819395Z ERROR iroh::socket: Endpoint dropped without calling `Endpoint::close`. Aborting ungracefully.
-2026-10-20T21:35:07.044959Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 14, cancelled: 3, panicked: 0, rejected: 0 }
+2026-10-20T21:43:33.871642Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/vault/vault.json
+2026-10-20T21:43:33.873870Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-20T21:43:33.960821Z  INFO djinn: resident reservoir open persona=6a322190-228a-427d-b887-4b768362bab9
+2026-10-20T21:43:33.961569Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/agent.sock"
+2026-10-20T21:43:33.961742Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/local/graphshell/settings/GraphViewOwner.json configured=false
+2026-10-20T21:43:34.008928Z  INFO djinn: mere route open route="mere/coop-acceptance"
+2026-10-20T21:43:36.813107Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-20T21:43:45.277534Z  INFO djinn: stop requested on the control route
+2026-10-20T21:43:45.278542Z ERROR iroh::socket: Endpoint dropped without calling `Endpoint::close`. Aborting ungracefully.
+2026-10-20T21:43:45.433952Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 14, cancelled: 3, panicked: 0, rejected: 0 }

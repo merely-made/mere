@@ -1,7 +1,7 @@
-{"at_ms":1792532094843,"event":"started","installed":false,"pid":8244,"schema":"djinn.resident-events/v1","version":"0.0.2"}
-{"at_ms":1792532094844,"creating":false,"event":"waiting-for-unlock","pid":8244,"schema":"djinn.resident-events/v1"}
-{"at_ms":1792532095487,"event":"unlocked-at-start","pid":8244,"schema":"djinn.resident-events/v1"}
-{"agent":"/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner/app.sock","at_ms":1792532095631,"browser":"/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner/browser.sock","event":"listening","pid":8244,"schema":"djinn.resident-events/v1","ticket":null}
-{"at_ms":1792532095631,"event":"ready","pid":8244,"schema":"djinn.resident-events/v1"}
-{"at_ms":1792532106818,"event":"stopping","pid":8244,"reason":"stop intent","schema":"djinn.resident-events/v1"}
-{"at_ms":1792532107367,"event":"stopped","ok":true,"pid":8244,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792532613450,"event":"started","installed":false,"pid":9102,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792532613450,"creating":false,"event":"waiting-for-unlock","pid":9102,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792532613871,"event":"unlocked-at-start","pid":9102,"schema":"djinn.resident-events/v1"}
+{"agent":"/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/app.sock","at_ms":1792532614009,"browser":"/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/browser.sock","event":"listening","pid":9102,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792532614010,"event":"ready","pid":9102,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792532625277,"event":"stopping","pid":9102,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792532625659,"event":"stopped","ok":true,"pid":9102,"reason":"stop intent","schema":"djinn.resident-events/v1"}

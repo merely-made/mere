@@ -1,5 +1,5 @@
 {
-  "accepted": "gs-coop-view-20261020-05",
+  "accepted": "gs-coop-view-20261020-07",
   "rejected": [
     {
       "run": "01",
@@ -20,10 +20,21 @@
       "run": "04",
       "reason": "All warm phases passed, but populated resident shutdown reported active borrowers and exited unsuccessfully. Cold phases were not accepted.",
       "fix": "Break the catalog/registrar ownership cycle with a weak catalog reference and use resident tracked tasks for co-op listeners/session waiters. Add a populated reservoir release regression."
+    },
+    {
+      "run": "06",
+      "reason": "Warm phases passed, then activation raced the owner window closing and open returned an error. Cold phases were not accepted.",
+      "fix": "Remove redundant owner activations after the guest finishing barriers; finishing the phase validates its receipt and process exit directly."
     }
   ],
   "software_regression": {
     "reason": "The weak-catalog acquisition preceded the missing product-authority check, changing its error.",
     "fix": "Validate product authority first; rerun all 30 resident Mere tests, which pass."
+  },
+  "prior_accepted": {
+    "cohort": "gs-coop-view-20261020-05",
+    "packet": "prior-cohort/native05",
+    "source_commit_for_verification": "1197db034",
+    "reason_repeated": "Main advanced to c25c2d441 with the new shared site model dependency; the ordinary view binary stayed identical but resident and preparation binary hashes changed."
   }
 }

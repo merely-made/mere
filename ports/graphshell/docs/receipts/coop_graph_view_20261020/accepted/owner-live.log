@@ -1,22 +1,22 @@
 [cambium-winit] accessibility Installed, 20 nodes projected
 graphshell-mere: waited 0 frames
+graphshell-mere: waited 1 frames
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-existing.png
 graphshell-mere: waited 2 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-existing.png
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-invited.png
+graphshell-mere: waited 198 frames
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-saw-guest.png
 graphshell-mere: waited 0 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-invited.png
-graphshell-mere: waited 160 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-saw-guest.png
-graphshell-mere: waited 0 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-private-during-coop.png
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-private-during-coop.png
 graphshell-mere: waited 0 frames
 graphshell-mere: waited 0 frames
 graphshell-mere: waited 1 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-returned-to-chosen.png
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-returned-to-chosen.png
 graphshell-mere: waited 0 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-ordinary-push.png
-graphshell-mere: waited 46 frames
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-ordinary-push.png
+graphshell-mere: waited 48 frames
 graphshell-mere: waited 0 frames
 graphshell-mere: waited 0 frames
-graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/owner-revoked.png
+graphshell-mere: captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-revoked.png
 graphshell-mere: waited 0 frames
-graphshell-mere: RESULT ok (285 frames, 7 captures)
+graphshell-mere: RESULT ok (326 frames, 7 captures)

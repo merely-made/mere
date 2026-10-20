@@ -1,24 +1,24 @@
 {
   "result": "ok",
   "native_processes": [
-    8028,
-    8117,
-    8183,
-    8229,
-    8250,
-    8253,
-    8262
+    8992,
+    9006,
+    9040,
+    9092,
+    9107,
+    9114,
+    9143
   ],
-  "original_invitation_sha256": "de22d84ca1a1c8ade886d8cf4eb9244064792b2235dfa00a1952b41fd265b44b",
-  "cold_invitation_sha256": "de22d84ca1a1c8ade886d8cf4eb9244064792b2235dfa00a1952b41fd265b44b",
+  "original_invitation_sha256": "077af3052fef33f64b32f962b40fff990b37b1a0ca1b8ac49684bf78724454ef",
+  "cold_invitation_sha256": "077af3052fef33f64b32f962b40fff990b37b1a0ca1b8ac49684bf78724454ef",
   "binary_sha256": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1",
-  "djinn_sha256": "e59843b98be01ea5fca133264a94a8a473dfcefaf58d1ebb49c3df6016f14e14",
-  "prepare_sha256": "3a0fb4f58735097fb31d3ddd39e01cdcda6a031198107f48ac2ccfe74904f42d",
+  "djinn_sha256": "d74d31162a31cddb0ec832851a1f85e1f7146b07885f68bd5adb2a282d21d703",
+  "prepare_sha256": "773a47dd9c0715138d10867007b370a3ffdf2cc1fe45191e626856260a295e5f",
   "graphs": {
-    "chosen": "308dc931-c12a-4b83-ad09-dac8ae659d43",
-    "private": "ba6130a6-93ec-41ba-95ab-28f968351ee7"
+    "chosen": "910ceb8c-a928-4cff-9981-ecdf2e3979db",
+    "private": "fe497426-e141-4914-99ec-0fb4e000233a"
   },
-  "existing_surface": "7aef18f3-d547-414d-acce-ad958c494885",
+  "existing_surface": "8769d672-fab2-4638-b738-72cee9e37daa",
   "phases": [
     "baseline",
     "owner-live",

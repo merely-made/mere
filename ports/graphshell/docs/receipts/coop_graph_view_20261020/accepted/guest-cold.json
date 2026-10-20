@@ -1,7 +1,7 @@
 {
   "captures": [
     {
-      "digest": "9cca2ea1efbfadea",
+      "digest": "63f8b56fbb2bfb2a",
       "fields": {
         "archives": "0",
         "attached": "",
@@ -16,7 +16,7 @@
         "layout": "",
         "nodes": "0",
         "notice": "",
-        "pid": "8253",
+        "pid": "9114",
         "read-only": "false",
         "record": "",
         "record-data": "",
@@ -28,8 +28,8 @@
         "view-saved": "false"
       },
       "height": 1600,
-      "name": "/Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-cold-denied.png",
-      "path": "/Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-cold-denied.png",
+      "name": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-cold-denied.png",
+      "path": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-cold-denied.png",
       "viewport": null,
       "width": 2200
     }
@@ -56,38 +56,38 @@
       },
       "frame": 1,
       "times_us": {
-        "a11y_us": 1585,
-        "acquire_us": 1053,
+        "a11y_us": 1597,
+        "acquire_us": 1051,
         "capture_us": 0,
-        "clear_us": 503,
-        "compose_us": 5954,
-        "content_extent_us": 49,
-        "dirty_tile_rebuild_us": 170,
-        "emit_scene_us": 999,
-        "excluding_acquire_present_capture_us": 40871,
+        "clear_us": 494,
+        "compose_us": 6315,
+        "content_extent_us": 48,
+        "dirty_tile_rebuild_us": 161,
+        "emit_scene_us": 1003,
+        "excluding_acquire_present_capture_us": 40947,
         "frame_hook_us": 51,
         "ime_us": 0,
         "layout_apply_us": 0,
-        "layout_rebuild_us": 10329,
+        "layout_rebuild_us": 10232,
         "layout_tick_us": 0,
-        "layout_update_us": 10452,
-        "layout_with_text_us": 7715,
+        "layout_update_us": 10335,
+        "layout_with_text_us": 7624,
         "leaf_boxes_us": 20,
-        "leaf_fragments_us": 4,
-        "leaf_render_us": 2,
+        "leaf_fragments_us": 3,
+        "leaf_render_us": 1,
         "master_compose_us": 17,
         "pointer_us": 0,
-        "present_us": 173,
+        "present_us": 212,
         "producer_render_us": 0,
         "producer_stage_us": 0,
-        "raster_total_us": 5556,
-        "raster_us": 21211,
-        "relayout_us": 10479,
+        "raster_total_us": 5902,
+        "raster_us": 21040,
+        "relayout_us": 10362,
         "shadows_us": 0,
-        "style_resolve_us": 2484,
-        "tile_invalidate_us": 68,
-        "total_us": 42097,
-        "vello_render_us": 5291
+        "style_resolve_us": 2486,
+        "tile_invalidate_us": 66,
+        "total_us": 42210,
+        "vello_render_us": 5648
       },
       "valid": true
     },
@@ -119,7 +119,7 @@
     "layout": "",
     "nodes": "0",
     "notice": "",
-    "pid": "8253",
+    "pid": "9114",
     "read-only": "false",
     "record": "",
     "record-data": "",
@@ -139,7 +139,7 @@
   "scenario": true,
   "scenario_log": [
     "waited 0 frames",
-    "captured /Users/markik/Code/output/gs-coop-view-20261020-05/evidence/guest-cold-denied.png"
+    "captured /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-cold-denied.png"
   ],
   "unpresented_redraws": 3
 }
