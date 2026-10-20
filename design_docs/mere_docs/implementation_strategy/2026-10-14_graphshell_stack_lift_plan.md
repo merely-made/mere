@@ -1517,3 +1517,36 @@ fast-forward of local main; nothing built).**
   consumer proof, not L13/P8 removal of the port or new native acceptance.
   `cleromancy/receipts/family-intake_20261015.json` records the software intake
   and preserves the original C1/C2 qualification identities.
+- **2026-10-19 (the Cambium publish chain, done):** Mark chose to keep the name
+  `command-menu` (the name `alembic` is held on crates.io by a third party, a
+  placeholder for the Alembic VFX bindings; `mere-alembic` 0.0.1 stays ours) and to
+  publish the vello fork's pieces under our names. Published, in order:
+  `netrender-vello-encoding` 0.11.0, `netrender-vello-shaders` 0.11.0 and
+  `netrender-vello` 0.11.0 (from `mark-ik/vello` branch `mark-ik/all-vellos`,
+  `ada4ed86`; the fork's `vello_encoding` and `vello_shaders` research crates
+  renamed by package, library names unchanged, because upstream's 0.11.0 lacks
+  `MAX_FLATTEN_LINES` and `FLATTEN_QUALITY_FAILED`, which the dry run showed);
+  `mere-surface-api` 0.1.0, `command-menu` 0.1.0, `meristem` 0.2.0, `tinct` 0.2.0,
+  `illume` 0.0.3, `sprigging` 0.2.2, `mere-curation` 0.1.1, `sceno` 0.0.6,
+  `scenograph` 0.0.5, `scenomise` 0.0.6 and `cambium` 0.4.0 (minor, because the
+  `nematic` feature removal breaks 0.3.3). Every crate differed from its published
+  version, which is why the published three and the scene crates bumped; the first
+  cambium dry run failed against crates.io's scene crates (`sceno::LinkKey`,
+  `scenograph::link`, `scenomise::backdrops` were not published), so they went
+  first. Verified from crates.io alone: a project depending on `cambium` 0.4.0 with
+  the `highlight` feature builds with no patches. The family's version requirements
+  moved with the bumps (cambium 0.4.0, illume 0.0.3, sceno 0.0.6, scenograph 0.0.5,
+  scenomise 0.0.6: Mere, Knot, Woodshed hocket, Cleromancy, Murm signalman) and
+  each lock was refreshed: Knot `bde6f94`, Woodshed `18ef512`, Cleromancy `d932acc`
+  (built from a fresh clone; its `ResidentTasks` import moved to `armillary`),
+  Murm `50c2e56b`, Genet `4987cdf` and Mere `4d5632de` (netrender back on
+  `branch = "main"`; the Genet lane had moved those rows to `rev`, which kept a
+  second netrender source in every consumer). Knot's and signalman's tests moved off
+  `taproot::matching` (Genet removed it), and Knot's metre scene sets
+  `stress_known`. Known red, not caused by the chain: Mere's `djinn` integration
+  tests read files under `crates/intel/esp` that the ESP extraction removed; Knot's
+  `command_chrome` `title_is_draggable_but_menu_and_document_are_not` (the harness
+  finds no `menubar` role) and `scroll_site`'s
+  `a_micron_submission_redraw_keeps_the_scrolled_preview...`. The fork keeps rev
+  `276b4664` in the family's `[patch]` rows (same code, old package names); they
+  move to the renamed fork revision at the next vello repin.
