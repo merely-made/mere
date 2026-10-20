@@ -1,0 +1,75 @@
+{
+  "status": "bounded canonical-main source integration qualified",
+  "decisions": {
+    "scope": "selectable readings; no note editing",
+    "authority": "Set-owned saved MusicXML; explicit Write notation when absent",
+    "renderer_owner": "woodshed-notation",
+    "checkout": "canonical main in Mere and Woodshed"
+  },
+  "tests": {
+    "model": 201,
+    "model_docs": 4,
+    "graphshell_document": 24,
+    "source_parser": 5,
+    "shape_resolution": 11,
+    "notation_conversion": 4,
+    "shared_renderer": 8,
+    "woodshed_reading": 1,
+    "arrangement_metadata_retention": 1
+  },
+  "browser": {
+    "notation_readings": {
+      "state": "ok",
+      "viewport": {
+        "width": 455,
+        "height": 1220
+      },
+      "renderer": "BrowserWebGpu",
+      "captures": [
+        "chart",
+        "tab_rest",
+        "score_rest"
+      ]
+    },
+    "notation_readings_reopen": {
+      "state": "ok",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "renderer": "BrowserWebGpu",
+      "captures": [
+        "reopened_score",
+        "reopened_tab"
+      ]
+    }
+  },
+  "checks": {
+    "canonical_web_product_build": "pass",
+    "woodshed_native_host_check": "pass",
+    "port_boundaries": "pass",
+    "source_seal_after_browser": "unchanged"
+  },
+  "reviewed_captures": 5,
+  "limits": [
+    "Uncommitted local main working checkouts; no push, merge or deployment.",
+    "Canonical sibling Woodshed path dependencies need publication/source pin for standalone Mere checkout portability.",
+    "Woodshed native source/tests/check passed; no new native window or hardware/audio acceptance run.",
+    "Browser coverage is Chromium IAB WebGPU on macOS with the recorded adapter, DPR and two viewport sizes; no other browser or presenter qualification.",
+    "Bounded fretted, single-voice notation profile; no general MusicXML import, arbitrary polyphony, advanced engraving, Graphshell note editing or score-driven playback."
+  ],
+  "superseded_attempts": [
+    {
+      "directory": "/Users/markik/Code/output/graphshell-notation-20261019/browser/attempt1_clipped",
+      "reason": "Narrow preview controls were clipped; corrected responsive reading order and removed redundant overflow container."
+    },
+    {
+      "directory": "/Users/markik/Code/output/graphshell-notation-20261019/browser/attempt2_before_tab_metrics",
+      "reason": "Behavior passed before visual review found crowded TAB digits; replaced by final font-metric sizing."
+    },
+    {
+      "directory": "/Users/markik/Code/output/graphshell-notation-20261019/browser/attempt2_reopen_existing_origin",
+      "reason": "Reused failed-test storage included an intermediate block, invalidating the fixture index; final seed/reopen used fresh origin 8929 without clearing storage."
+    }
+  ]
+}
