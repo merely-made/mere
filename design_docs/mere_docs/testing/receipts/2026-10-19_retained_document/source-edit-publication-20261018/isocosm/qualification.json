@@ -1,0 +1,244 @@
+{
+  "date": "2026-10-18",
+  "status": "passed, Git-only published supplier; consumer uncommitted/unpushed",
+  "baseline": "183a2f67223662bd820110027dc41db611665ee9",
+  "supplier": {
+    "name": "mere-source-edit",
+    "version": "0.1.0",
+    "id": "git+https://github.com/merely-made/mere.git?branch=main#mere-source-edit@0.1.0",
+    "source": "git+https://github.com/merely-made/mere.git?branch=main#70deef2c8cf3d3410ae35b496a9396514070b24f",
+    "manifest_path": "/Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/70deef2/crates/system/source-edit/Cargo.toml"
+  },
+  "metadata_sha256": "965598d4874d6e5f9223456371320671dffe6f8319d900f9f6f6f336a0d23102",
+  "checks": [
+    {
+      "check": "feature-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring"
+      ],
+      "exit_code": 0,
+      "seconds": 51.645
+    },
+    {
+      "check": "default-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "isometry-system"
+      ],
+      "exit_code": 0,
+      "seconds": 7.678
+    },
+    {
+      "check": "build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring",
+        "--bin",
+        "pack-author",
+        "--example",
+        "pack_fixture"
+      ],
+      "exit_code": 0,
+      "seconds": 2.329
+    },
+    {
+      "check": "all-targets",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--all-features",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "seconds": 1.647
+    },
+    {
+      "check": "scoped-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring",
+        "--all-targets",
+        "--no-deps"
+      ],
+      "exit_code": 0,
+      "seconds": 1.557
+    },
+    {
+      "check": "msrv-1-97-1",
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "check",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "--features",
+        "pack-authoring",
+        "--bin",
+        "pack-author"
+      ],
+      "exit_code": 0,
+      "seconds": 2.378
+    },
+    {
+      "check": "format",
+      "command": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "crates/isometry-system/src/bin/pack_author.rs"
+      ],
+      "exit_code": 0,
+      "seconds": 0.03
+    },
+    {
+      "check": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.014
+    },
+    {
+      "check": "metadata",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1",
+        "--features",
+        "pack-authoring"
+      ],
+      "exit_code": 0,
+      "seconds": 1.154
+    },
+    {
+      "check": "default-tree",
+      "command": [
+        "cargo",
+        "tree",
+        "--locked",
+        "-p",
+        "isometry-system",
+        "-e",
+        "normal",
+        "--no-default-features"
+      ],
+      "exit_code": 0,
+      "seconds": 0.622
+    }
+  ],
+  "feature_groups": [
+    49,
+    15,
+    2,
+    2,
+    2,
+    5,
+    0
+  ],
+  "feature_total": 75,
+  "default_groups": [
+    49,
+    2,
+    2,
+    0,
+    5,
+    0
+  ],
+  "default_total": 58,
+  "workflow": {
+    "receipt": "workflow/qualification.json",
+    "sha256": "5e213e61a31428d4ce8f3f48e2b9c14c6026c0fb45d21ba5a4607f6aeef4154f",
+    "command_count": 59,
+    "processes": 5
+  },
+  "protocol_comparison": {
+    "baseline": "/Users/markik/Code/testing/source-edit-dedup-20261018/isocosm/workflow/transcript.json",
+    "candidate": "/Users/markik/Code/testing/source-edit-publication-20261018/isocosm/workflow/transcript.json",
+    "normalization": "replace only absolute scratch-pack directory paths",
+    "records": 64,
+    "identical": true
+  },
+  "default_dependency_absence": {
+    "tree": "default-tree.log",
+    "packages": [
+      "mere-source-edit",
+      "taplo",
+      "rowan"
+    ],
+    "absent": true
+  },
+  "lock_delta": {
+    "added_package_source": "git+https://github.com/merely-made/mere.git?branch=main#70deef2c8cf3d3410ae35b496a9396514070b24f",
+    "changed_existing_packages": [
+      "isometry-system"
+    ],
+    "all_existing_versions_sources_preserved": true,
+    "broader_coupling_required": false,
+    "scoped_update_failed": "prior patched package not selectable without override; normal unpatched Cargo check generated lock"
+  },
+  "no_config_or_environment_overrides": true,
+  "ambient_environment": {
+    "CARGO_HOME": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "RUSTUP_TOOLCHAIN": null
+  },
+  "changed_paths": [
+    "Cargo.lock",
+    "crates/isometry-system/Cargo.toml",
+    "crates/isometry-system/src/pack_author/mod.rs",
+    "crates/isometry-system/src/pack_author/preset.rs",
+    "crates/isometry-system/src/pack_author/shared_tests.rs",
+    "crates/isometry-system/src/pack_author/tests.rs",
+    "design_docs/2026-10-17_private_pack_authoring_plan.md",
+    "design_docs/DOC_README.md"
+  ],
+  "source_sha256": {
+    "Cargo.lock": "86d7cd62cb708ca53d062ab1b83a4170041314dfa761333da5e3413a592533a8",
+    "crates/isometry-system/Cargo.toml": "cce2702884bd538f6b7b8613998e49ae08c14b5d90c1488eba1c9a4db35c4a3e",
+    "crates/isometry-system/src/pack_author/mod.rs": "4fd38d10ce8b9e3bdef3ed400d6426ef755a81b2a3b0c077042e7b305c967a60",
+    "crates/isometry-system/src/pack_author/preset.rs": "456954f91cb6b1519cf6bdf474b384f07dd241f2e71eced14b616edbf7d38966",
+    "crates/isometry-system/src/pack_author/shared_tests.rs": "3f6c61c8d7d7d56c670e4260b1503f48241573bf661071bb213608c07db732ce",
+    "crates/isometry-system/src/pack_author/tests.rs": "8aa45f933083de1d719401ba08839d6c5d54ac7cc1d7baeac4c467e721e19097",
+    "design_docs/2026-10-17_private_pack_authoring_plan.md": "dbf339a363e3c9d1cc1a196a746fd961f11ec852afe356eca16d906409860ebf",
+    "design_docs/DOC_README.md": "b19e11496d23de1fe39f8796b1059525738ee8de562bf5d42f158e540fe6322e"
+  },
+  "git_supplier_sha256": {
+    "Cargo.toml": "d8c3ec38355a20067ba4b85f0c47bed2243664017c2a414870ce26c8c7c48b0d",
+    "src/lib.rs": "297999dda2bea43b10a50e37a72780526d11ed5c56b5bb2433daf5788ec2cb7b",
+    "src/tests.rs": "7c011b25910907cfd9f939b555139886046edbc512b79554627489132b902f89"
+  },
+  "limits": [
+    "Consumer not committed or pushed; parent owns publication",
+    "No new GUI/crash recovery/admission qualification; earlier local-source evidence unchanged"
+  ]
+}

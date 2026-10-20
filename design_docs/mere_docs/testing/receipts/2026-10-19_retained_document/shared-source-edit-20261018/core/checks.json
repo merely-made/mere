@@ -1,0 +1,40 @@
+{
+  "tests": {
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "mere-source-edit"
+    ],
+    "exit_code": 0
+  },
+  "clippy": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--locked",
+      "--offline",
+      "-p",
+      "mere-source-edit",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0
+  },
+  "msrv": {
+    "command": [
+      "cargo",
+      "+1.97.1",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "mere-source-edit"
+    ],
+    "exit_code": 0
+  }
+}

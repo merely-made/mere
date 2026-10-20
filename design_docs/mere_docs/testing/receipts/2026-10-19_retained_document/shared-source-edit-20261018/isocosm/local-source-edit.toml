@@ -1,0 +1,3 @@
+# Explicit qualification override: only the unpublished new supplier package.
+[patch."https://github.com/merely-made/mere.git"]
+mere-source-edit = { path = "/Users/markik/Code/repos/mere/crates/system/source-edit" }

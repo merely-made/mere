@@ -1,0 +1,30 @@
+{
+  "original_profile_sources_unchanged": true,
+  "product_operations": "read-only HEAD/status observations; no writes",
+  "product_repositories": {
+    "mere": {
+      "before": {
+        "head": "623e21bf1db3c068323b3c31e3e9647d02de1cad",
+        "status": ""
+      },
+      "after": {
+        "head": "623e21bf1db3c068323b3c31e3e9647d02de1cad",
+        "status": ""
+      },
+      "status_unchanged": true,
+      "head_unchanged": true
+    },
+    "isocosm": {
+      "before": {
+        "head": "20cb030fcc982db8fc89fa557918b8de5961543c",
+        "status": ""
+      },
+      "after": {
+        "head": "20cb030fcc982db8fc89fa557918b8de5961543c",
+        "status": ""
+      },
+      "status_unchanged": true,
+      "head_unchanged": true
+    }
+  }
+}

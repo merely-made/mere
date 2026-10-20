@@ -1,0 +1,71 @@
+{
+  "counter_build_separate_from_timing": true,
+  "counts": [
+    {
+      "after_validate_and_json": {
+        "clone_calls": 307,
+        "cloned_pairs": 32737
+      },
+      "dom_construct": {
+        "clone_calls": 307,
+        "cloned_pairs": 32737,
+        "max_width": 255
+      },
+      "keys": 256,
+      "wide_table_theoretical_pairs": 32640
+    },
+    {
+      "after_validate_and_json": {
+        "clone_calls": 563,
+        "cloned_pairs": 130913
+      },
+      "dom_construct": {
+        "clone_calls": 563,
+        "cloned_pairs": 130913,
+        "max_width": 511
+      },
+      "keys": 512,
+      "wide_table_theoretical_pairs": 130816
+    },
+    {
+      "after_validate_and_json": {
+        "clone_calls": 1075,
+        "cloned_pairs": 523873
+      },
+      "dom_construct": {
+        "clone_calls": 1075,
+        "cloned_pairs": 523873,
+        "max_width": 1023
+      },
+      "keys": 1024,
+      "wide_table_theoretical_pairs": 523776
+    },
+    {
+      "after_validate_and_json": {
+        "clone_calls": 2099,
+        "cloned_pairs": 2096225
+      },
+      "dom_construct": {
+        "clone_calls": 2099,
+        "cloned_pairs": 2096225,
+        "max_width": 2047
+      },
+      "keys": 2048,
+      "wide_table_theoretical_pairs": 2096128
+    },
+    {
+      "after_validate_and_json": {
+        "clone_calls": 4147,
+        "cloned_pairs": 8386657
+      },
+      "dom_construct": {
+        "clone_calls": 4147,
+        "cloned_pairs": 8386657,
+        "max_width": 4095
+      },
+      "keys": 4096,
+      "wide_table_theoretical_pairs": 8386560
+    }
+  ],
+  "status": "passed"
+}

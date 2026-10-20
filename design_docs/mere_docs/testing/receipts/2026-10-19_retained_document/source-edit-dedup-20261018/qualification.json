@@ -1,0 +1,23 @@
+{
+  "state": "qualified with explicit new-supplier override; uncommitted and unpushed",
+  "core_tests": 6,
+  "isocosm_feature_tests": 75,
+  "isocosm_default_tests": 58,
+  "isocosm_workflow": {
+    "commands": 59,
+    "processes": 5,
+    "normalized_ready_and_command_records": 64,
+    "identical": true
+  },
+  "knot_document_default_tests": 53,
+  "knot_document_engine_tests": 66,
+  "knot_model_tests": 11,
+  "knot_ui_harness_tests": 4,
+  "knot_child_process_reopens": 2,
+  "knot_workspace_focus_tests": 1,
+  "knot_net_retained_fields_removed": 2,
+  "knot_production_loc_delta": 25,
+  "native_gui_observed": false,
+  "remote_only_resolution_qualified": false,
+  "nothing_staged": true
+}

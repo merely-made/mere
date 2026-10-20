@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-18",
+  "repository": "/Users/markik/Code/repos/knot-editor",
+  "consumer_base": "7e196c534e64b50cf6f00bf4d95e3beb493e5a9f",
+  "supplier_commit": "70deef2c8cf3d3410ae35b496a9396514070b24f",
+  "supplier_url": "https://github.com/merely-made/mere/commit/70deef2c8cf3d3410ae35b496a9396514070b24f",
+  "intake": "canonical Git exact revision for new contract only, explicitly authorized exception to branch-main convention",
+  "local_config_or_environment_override": false,
+  "metadata_evidence": {
+    "root": {
+      "source": "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f",
+      "manifest_path": "/Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/70deef2/crates/system/source-edit/Cargo.toml"
+    },
+    "document": {
+      "source": "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f",
+      "manifest_path": "/Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/70deef2/crates/system/source-edit/Cargo.toml"
+    }
+  },
+  "package_source_delta": {
+    "root": "only mere-source-edit local patch -> published Git rev; all other package names/versions/sources unchanged",
+    "standalone": "only mere-source-edit local patch -> published Git rev; all other package names/versions/sources unchanged"
+  },
+  "checks": {
+    "document-tests": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "document-engine-tests": [
+      {
+        "passed": 66,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "document-msrv-tests": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "link-tests": [
+      {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "link-ui-tests": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "workspace-link-ui-test": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  "strict_library_clippy": "passed",
+  "scoped_desktop_clippy": "passed with existing warnings",
+  "strict_all_test_clippy": "pre-existing hard_wrap.rs useless_format and writer.rs items_after_test_module limitation retained; no unrelated cleanup",
+  "formatting_and_diff": "passed",
+  "fresh_process_reopen_helpers_passed": 2,
+  "native_gui_observed": false,
+  "incremental_publication_tracked_paths": [
+    "Cargo.lock",
+    "crates/knot-document/Cargo.toml",
+    "design_docs/2026-09-29_knot_document_links_slice.md",
+    "design_docs/README.md"
+  ],
+  "ignored_lock_changed": "crates/knot-document/Cargo.lock",
+  "all_accumulated_changed_paths": [
+    "Cargo.lock",
+    "apps/desktop/src/link_workflow.rs",
+    "apps/desktop/tests/document_links_ui.rs",
+    "crates/knot-document/Cargo.toml",
+    "crates/knot-document/src/document_surface.rs",
+    "crates/knot-document/src/document_view.rs",
+    "crates/knot-document/src/lib.rs",
+    "crates/knot-document/src/source_edit.rs",
+    "design_docs/2026-09-29_knot_document_links_slice.md",
+    "design_docs/README.md"
+  ],
+  "sha256": {
+    "Cargo.lock": "bce6b1507bd61b38ae2f6f9b823362dddea84c66d18461b81e84192bb0dc17f5",
+    "apps/desktop/src/link_workflow.rs": "79b6310f4c879c20b3be0cb77185bdbd0a6b8575b8fbe0b99f7edb92c4d79d12",
+    "apps/desktop/tests/document_links_ui.rs": "823d804c0b2fc66a11b6ce23a9f45a6e4cd1e80631420536dd93f7c1d6b41017",
+    "crates/knot-document/Cargo.toml": "4bd781ac6a9a7972a62756e7f2496c4362886536b2304e63bdba05ef04588b81",
+    "crates/knot-document/src/document_surface.rs": "e3b54fddb63b5a907f3dfb9ea6550b8a365217be61b587144f4889007c3cd48f",
+    "crates/knot-document/src/document_view.rs": "de976f25cb22823a58f02c91fafeb3590d113ed4d20c910ec6dc0320d8b16a6d",
+    "crates/knot-document/src/lib.rs": "becba7651aeb7f64b6865d526a93dee49b3d18b9dec4550833434df186c01536",
+    "crates/knot-document/src/source_edit.rs": "3eaaf4f875f302a06496c784421f877569e6f846dc4da9f10a1da0bbe07ee49c",
+    "design_docs/2026-09-29_knot_document_links_slice.md": "bd4e70172c0f229b9a6f333dd5321b8afd22215d42f7ad62ca4b0190b93f78e3",
+    "design_docs/README.md": "f86120f28d2f42458cc8208010002af4e3ac59cb91244c8c3244cf0e68842221"
+  },
+  "ignored_standalone_lock_sha256": "b6a76516608436cc4dc7fecb1ba0de0ea286a783e91510d80f77598acf3d45e9",
+  "prior_dedup_source_unchanged": true,
+  "publication_state": "supplier published and Git-only consumer receiving qualified; consumer commit/push intentionally left to parent",
+  "diagnostics_excluded_from_qualification": [
+    "branch-main-old-genet-failed.log",
+    "branch-main-link-tests-failed.log",
+    "preserve-mere.log"
+  ],
+  "other_repo_edits": false,
+  "log_sha256": {
+    "branch-main-link-tests-failed.log": "8604d1e3776c4c1db98df0481827c58d9c0278db9d8d41c94ca702a51c351d61",
+    "branch-main-old-genet-failed.log": "23be61149eadd1cfd23deeee378928ff8e641006995c4619b86db121e89e0869",
+    "desktop-clippy.log": "80b18edf4cbf0b1114c88e144a36f29d06d2cb5a107d4093e2b579835d978cf3",
+    "document-check-resolution.log": "f3601f8575ffa4e0f8f2c39d394a7e74ffd8d47fb20e5584003ee612053e1541",
+    "document-engine-tests.log": "e3de1da7b5f6091cc494972b79844a4c30d1859d5c211018827bc503498c8a52",
+    "document-lib-clippy.log": "f08ddd9d94e71645e32a20fcba3085ae498712545dddb04bd82435f8fab26ffd",
+    "document-metadata.log": "a0c632726cf80b8a3652cb2ac493334643e2e609e2f645c5f22cef11f5c7bf5b",
+    "document-msrv-tests.log": "e3f12ab9acc6ed59e6baceeab477bd522d653bf5e10de6778c493cb275932abf",
+    "document-preserve-genet.log": "3c61788b48fe9e92880d02f7d95c8d5396b47b7865e5af2e546c2dbf2ff31a30",
+    "document-tests.log": "230cafd291b1caf3cdb8a5c4e4767e7c359242a7680b5d0bd7da844cdc0f6557",
+    "document-update.log": "df11769f4cea18559f3db8e45ea7b9858e9e833704a57050979dae5bacb4ee78",
+    "link-tests.log": "3faf5a2e881d67451b3a30f7f20e976e8adf32f6ef71d394376b02006b589835",
+    "link-ui-tests.log": "fb7bfb15cbd9011d9c09b01356f19269093b967bde0abc279f0f76cfb97f1f8e",
+    "preserve-dramatis-final.log": "11a51d28db19efd129c744f9d3ccce02bbe7a87314c2c0a96607bcd7e42d41da",
+    "preserve-dramatis.log": "15e98b91bbf8a01c1ef5e85ff7a9815d68a9a3636d41ecc8edadba3a3a96052b",
+    "preserve-genet.log": "372c4f6012784b023fe555b2ce716f8b07d51c15bdde314c6ec9a8a7e5055836",
+    "preserve-mere.log": "a8e6deb6eaa2075a2ec6b07b427056220e77d2c33cdaf5e82205895512ed5ebe",
+    "preserve-murm-wire.log": "d168e971f3be60ec4dac4dc4b777d8f13f5e018c5273a0fe8b49469a5a01eec8",
+    "preserve-murm.log": "3d049fc831807ce1e9d5975f996e6b29c3d7d5d72111c4d941c32ec2a9fb5b0d",
+    "preserve-netrender.log": "322f85cfb7e6948ff49194d1e0b7a4a8029d20297e0c4245556ae92bca78c73e",
+    "root-check-resolution.log": "3b899d296c640768235b65f3c05c413d13cf2274382c9e2461a5427df7e84dfa",
+    "root-metadata.log": "4f24ef3d588dc6fd97f38ec5d936ad283bc86ac12f510207fcebdb52668f19ac",
+    "root-required-genet.log": "634cda28c92a04bae815a4f1dd04b3f9099d2d72b20c71d530857df729b4b707",
+    "root-update.log": "f0b0ed0b981ac029409ce7562cbdee46fd1dcdc2e542174ce1bf3d34b6b96c26",
+    "workspace-link-ui-test.log": "57ea4fc359dd6d8c7fb4fe25a7213d1855c4a1bdbb7fa320493b21f592a34a05"
+  }
+}

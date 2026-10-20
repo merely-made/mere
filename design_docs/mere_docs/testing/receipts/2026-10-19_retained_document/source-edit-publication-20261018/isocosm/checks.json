@@ -1,0 +1,144 @@
+[
+  {
+    "check": "feature-tests",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring"
+    ],
+    "exit_code": 0,
+    "seconds": 51.645
+  },
+  {
+    "check": "default-tests",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "isometry-system"
+    ],
+    "exit_code": 0,
+    "seconds": 7.678
+  },
+  {
+    "check": "build",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--bin",
+      "pack-author",
+      "--example",
+      "pack_fixture"
+    ],
+    "exit_code": 0,
+    "seconds": 2.329
+  },
+  {
+    "check": "all-targets",
+    "command": [
+      "cargo",
+      "check",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--all-features",
+      "--all-targets"
+    ],
+    "exit_code": 0,
+    "seconds": 1.647
+  },
+  {
+    "check": "scoped-clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--all-targets",
+      "--no-deps"
+    ],
+    "exit_code": 0,
+    "seconds": 1.557
+  },
+  {
+    "check": "msrv-1-97-1",
+    "command": [
+      "cargo",
+      "+1.97.1",
+      "check",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "--features",
+      "pack-authoring",
+      "--bin",
+      "pack-author"
+    ],
+    "exit_code": 0,
+    "seconds": 2.378
+  },
+  {
+    "check": "format",
+    "command": [
+      "rustfmt",
+      "--edition",
+      "2021",
+      "--check",
+      "crates/isometry-system/src/bin/pack_author.rs"
+    ],
+    "exit_code": 0,
+    "seconds": 0.03
+  },
+  {
+    "check": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.014
+  },
+  {
+    "check": "metadata",
+    "command": [
+      "cargo",
+      "metadata",
+      "--locked",
+      "--format-version",
+      "1",
+      "--features",
+      "pack-authoring"
+    ],
+    "exit_code": 0,
+    "seconds": 1.154
+  },
+  {
+    "check": "default-tree",
+    "command": [
+      "cargo",
+      "tree",
+      "--locked",
+      "-p",
+      "isometry-system",
+      "-e",
+      "normal",
+      "--no-default-features"
+    ],
+    "exit_code": 0,
+    "seconds": 0.622
+  }
+]
