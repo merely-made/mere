@@ -181,9 +181,17 @@ async fn main() {
             APPLY_EDITS_INTENT,
             serde_json::to_vec(&ApplyEditsV1::new(vec![
                 CapturedDelta::ReplayAddNodeWithIdIfMissing {
-                    id: uuid::Uuid::new_v4().to_string(),
+                    id: added.to_string(),
                     url: args[3].clone(),
                     position: [150., 150.],
+                },
+                CapturedDelta::ReplayAssertRelationByIds {
+                    from_id: from,
+                    to_id: added.to_string(),
+                    assertion: kernel::graph::EdgeAssertion::Semantic {
+                        sub_kind: kernel::graph::SemanticSubKind::Cites,
+                        label: None,
+                    },
                 },
             ]))
             .unwrap(),
