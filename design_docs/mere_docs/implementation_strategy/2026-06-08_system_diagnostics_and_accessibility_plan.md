@@ -117,6 +117,15 @@ separate from final gates. Installed resident/vault startup and termination,
 browser runtime, human AT and broader contributed semantics remain unqualified.
 A client-process fixture is not an installed-resident acceptance receipt.
 
+After qualification, upstream's Hest reservation and architecture plan
+(`2fead114`, `9a173f18`) were integrated. Its reserved crate has no dependencies;
+only workspace membership and the local Hest lock entry differ from the tested
+manifest basis. Tested source hashes match, and locked offline no-dependency
+metadata passes; the [integration receipt](../../../support/family-promotion/diagnostics-shared-integration.json)
+records this separately without overwriting the original qualification. The
+[Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
+owns broader command declaration, invocation and result consolidation.
+
 
 ## Current-target admission and collector bridge, 2026-10-20
 

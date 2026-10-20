@@ -31,6 +31,9 @@ tests. The new continuation passes 237 targeted native tests (seven existing
 ignores) plus browser-host and collector Wasm compilation. The next source-frozen
 cohort passes 191 targeted native tests/seven existing ignores, including a real
 CLI process against the admitted broker fixture and browser-host Wasm compile.
+The later Hest reservation/plan integration changes only workspace membership
+and its lock entry; a separate receipt verifies unchanged tested sources and
+locked offline no-dependency metadata without replacing the original gate basis.
 Preparation failures are retained separately from actual test outcomes; the
 sealed audit registers are unchanged. Lock inventory is distinguished from the
 offline all-target metadata preparation failure, and broader acceptance stays open.
