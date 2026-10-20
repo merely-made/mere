@@ -342,6 +342,27 @@ fn current_producer_action_requires_a_present_slot_and_advertised_action() {
             &[],
         )
         .unwrap();
+    host.s.shared.leaves.insert(
+        7,
+        Box::new(sprigging::Knob::new(sprigging::Size {
+            width: 80.0,
+            height: 30.0,
+        })),
+    );
+    let runner = host.s.runner.as_ref().unwrap();
+    let dom = runner.dom();
+    let slot = host
+        .s
+        .layout
+        .as_ref()
+        .unwrap()
+        .custom_leaf_nodes(&WindowDom::new(&dom.borrow(), runner.mount()))[0]
+        .1;
+    assert_eq!(
+        host.apply_a11y_requests(&[A11yRequest::node(A11yAction::SetValue(8.0), slot)]),
+        [A11yDispatch::Rejected(A11yRejection::Unsupported)]
+    );
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
     let request = A11yRequest::produced(
         A11yAction::Click,
         ProducedAction {
@@ -415,6 +436,62 @@ fn current_leaf_contribution_can_admit_a_numeric_action() {
     assert_eq!(
         host.apply_a11y_requests(&[A11yRequest::node(A11yAction::SetValue(8.0), slot)]),
         [A11yDispatch::Rejected(crate::A11yRejection::Unsupported)]
+    );
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 4);
+}
+
+#[test]
+fn action_admission_gives_context_sensitive_leaf_the_published_seed() {
+    use crate::{A11yAction, A11yDispatch, A11yRejection};
+    use layout_dom_api::LayoutDomMut as _;
+    struct Seeded;
+    impl sprigging::Leaf for Seeded {
+        fn measure(&mut self, _: sprigging::SizeHint, _: sprigging::SizeHint) -> sprigging::Size {
+            sprigging::Size {
+                width: 80.0,
+                height: 30.0,
+            }
+        }
+        fn paint(&mut self, _: &mut sprigging::PaintCx<'_>) {}
+        fn paint_dirty(&self) -> bool {
+            false
+        }
+        fn accessibility(&mut self, node: &mut accesskit::Node) {
+            assert_eq!(node.label(), Some("Gain"));
+            assert!(node.bounds().is_some());
+            node.set_role(accesskit::Role::Slider);
+            node.add_action(accesskit::Action::SetValue);
+        }
+    }
+    let mut host = counter_host();
+    host.s.shared.leaves.insert(7, Box::new(Seeded));
+    let runner = host.s.runner.as_ref().unwrap();
+    let dom = runner.dom();
+    let slot = host
+        .s
+        .layout
+        .as_ref()
+        .unwrap()
+        .custom_leaf_nodes(&WindowDom::new(&dom.borrow(), runner.mount()))[0]
+        .1;
+    dom.borrow_mut()
+        .set_attribute(slot, cambium::attr_qual("aria-label"), "Gain");
+    assert_eq!(
+        host.apply_a11y_requests(&[A11yRequest::node(A11yAction::SetValue(4.0), slot)]),
+        [A11yDispatch::Dispatched]
+    );
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 4);
+    dom.borrow_mut()
+        .set_attribute(slot, cambium::attr_qual("aria-disabled"), "true");
+    assert_eq!(
+        host.apply_a11y_requests(&[A11yRequest::node(A11yAction::SetValue(8.0), slot)]),
+        [A11yDispatch::Rejected(A11yRejection::Disabled)]
+    );
+    dom.borrow_mut()
+        .set_attribute(slot, cambium::attr_qual("aria-hidden"), "true");
+    assert_eq!(
+        host.apply_a11y_requests(&[A11yRequest::node(A11yAction::SetValue(8.0), slot)]),
+        [A11yDispatch::Rejected(A11yRejection::TargetAbsent)]
     );
     assert_eq!(*host.s.runner.as_ref().unwrap().state(), 4);
 }

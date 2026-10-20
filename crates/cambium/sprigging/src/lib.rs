@@ -233,8 +233,11 @@ pub trait Leaf: std::any::Any {
         None
     }
 
-    /// Fill this node's AccessKit node during the host's retained-tree walk (a
-    /// knob still announces as a slider). Default: no semantics.
+    /// Contribute to the host-seeded AccessKit node (a knob announces as a
+    /// slider). Rootstock uses this for publication and current-target admission;
+    /// separate reads may occur between frames. Host geometry, tree edges,
+    /// authored labels and restrictive state retain host policy. Default: no
+    /// contribution. A callback read is not an activation transaction.
     fn accessibility(&mut self, _node: &mut accesskit::Node) {}
 
     /// Retention gate: has paint output changed since last frame?

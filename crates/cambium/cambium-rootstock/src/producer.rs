@@ -158,8 +158,10 @@ pub trait TextureProducer {
 
     /// What the slot means to an assistive technology: a role and name for
     /// the slot itself, and the things drawn in it as child nodes with their
-    /// rectangles. Read when the host publishes its accessibility tree, not
-    /// per frame. `None`, the default, leaves the slot's DOM semantics alone.
+    /// rectangles. Read for host semantic publication and current-target action
+    /// admission; separate reads may occur between frames. `None`, the default,
+    /// leaves the slot's DOM/Sprigging semantics alone. Reading and activation
+    /// are separate calls, without a snapshot or transaction guarantee.
     fn semantics(&mut self) -> Option<ProducerSemantics> {
         None
     }
