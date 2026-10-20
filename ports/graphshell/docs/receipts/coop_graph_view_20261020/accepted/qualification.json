@@ -1,0 +1,33 @@
+{
+  "result": "ok",
+  "native_processes": [
+    8028,
+    8117,
+    8183,
+    8229,
+    8250,
+    8253,
+    8262
+  ],
+  "original_invitation_sha256": "de22d84ca1a1c8ade886d8cf4eb9244064792b2235dfa00a1952b41fd265b44b",
+  "cold_invitation_sha256": "de22d84ca1a1c8ade886d8cf4eb9244064792b2235dfa00a1952b41fd265b44b",
+  "binary_sha256": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1",
+  "djinn_sha256": "e59843b98be01ea5fca133264a94a8a473dfcefaf58d1ebb49c3df6016f14e14",
+  "prepare_sha256": "3a0fb4f58735097fb31d3ddd39e01cdcda6a031198107f48ac2ccfe74904f42d",
+  "graphs": {
+    "chosen": "308dc931-c12a-4b83-ad09-dac8ae659d43",
+    "private": "ba6130a6-93ec-41ba-95ab-28f968351ee7"
+  },
+  "existing_surface": "7aef18f3-d547-414d-acce-ad958c494885",
+  "phases": [
+    "baseline",
+    "owner-live",
+    "guest-live",
+    "guest-return",
+    "owner-cold",
+    "guest-cold",
+    "private-return"
+  ],
+  "custodian_launches": 4,
+  "all_owned_processes_stopped": true
+}
