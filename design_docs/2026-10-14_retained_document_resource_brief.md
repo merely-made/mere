@@ -1,11 +1,14 @@
 # Retained document resource brief
 
-**Date:** 2026-10-14. **Revised:** 2026-10-19.
+**Date:** 2026-10-14. **Revised:** 2026-10-20.
 
 **Status:**
 
 - Rowan 0.17 is the working direction for retained authored documents.
-- Isocosm has a private, optional `pack-author` CLI on a batched taplo fork.
+- Isocosm has a private, optional `pack-author` CLI on the
+  [merely-made/taplo](https://github.com/merely-made/taplo) fork (Rowan 0.17,
+  batched DOM, opt-in TOML 1.1), with text-only history by default,
+  PID-checked lease reclaim and structure-aware commands.
   It uses the real pack schema and passes a real-pack workflow.
 - The shared [`mere-source-edit`](2026-10-18_source_edit_proposal_plan.md)
   proposal crate is published, and Isocosm and Knot both consume it.
@@ -156,7 +159,7 @@ document must not change domain identity.
 | Piece | Intended role |
 |---|---|
 | Rowan 0.17 | Lossless authored syntax and structurally shared revisions. A format parser must build the tree, including unknown and erroneous input. |
-| TOML parser | The taplo 0.14 (MIT) fork on Rowan 0.17 with batched DOM construction, currently vendored in Isocosm and moving to its own repository. It builds lossless trees and collects syntax errors; DOM validation checks semantics such as duplicate keys. It does not yet parse the TOML 1.1 additions; product typed decoding remains authoritative. |
+| TOML parser | The taplo 0.14 (MIT) fork at [merely-made/taplo](https://github.com/merely-made/taplo), branch `merely/rowan-0.17`: Rowan 0.17, batched DOM construction, `parse_with_cache`, and opt-in TOML 1.1 (TOML 1.0 stays its default). Isocosm pins it by exact revision. It builds lossless trees and collects syntax errors; DOM validation checks semantics such as duplicate keys. Product typed decoding remains authoritative. |
 | `toml_edit` | Existing comment- and format-preserving editing for documents that parse. Existing uses remain. |
 | `mere-source-edit` | Parser-neutral UTF-8 edit proposals with instance/revision/exact-source checks, previews and candidate receipts. Hosts keep their buffers, undo, save and admission. See the [source-edit plan](2026-10-18_source_edit_proposal_plan.md). |
 | Sonic | JSON ingestion and typed deserialization of machine interchange; not part of the authored-syntax slice. `OwnedLazyValue` remains an unmeasured candidate for deferred materialization. |
@@ -183,6 +186,14 @@ Mark's rulings from the 2026-10-19 review:
    `mere-source-edit` proposals. Callers no longer have to work out offsets
    and TOML ownership themselves.
 
+**Outcome, 2026-10-20.** All four landed in Isocosm
+[`2389818c`](https://github.com/merely-made/isocosm/commit/2389818c). Text-only
+history is the default: at 65 revisions it retains 98,944 bytes against 849,544
+for full trees and 537,240 for the shared `NodeCache`, and publishes within
+noise of full. The cache mode shares 90 of 152 green nodes and remains
+available behind `--history`. Details are in the
+[evidence log](mere_docs/testing/receipts/2026-10-19_retained_document/evidence_log.md#isocosm-continuation--2026-10-19).
+
 ## Open decisions
 
 - Durable document identity and history across processes.
@@ -196,16 +207,14 @@ Mark's rulings from the 2026-10-19 review:
 
 ## Next gates
 
-- Measure text-only history against a document-scoped `NodeCache`, with the
-  cache included in retained-memory totals, under the byte budget and count cap.
-- Implement and test PID-checked stale-lease reclaim, including a live holder,
-  a dead holder and a reused PID.
-- Move the taplo fork to its own repository and qualify TOML 1.1 there across
-  lexer, escape decoding, grammar and DOM, starting with the four tested
-  additions (`\e`, `\xHH`, multiline inline tables, omitted time seconds).
+- Reclaim a stale lease whose PID was reused by a live process (for example
+  after a reboot); today that case still needs manual removal.
+- Lay out TOML 1.1 multiline inline tables in the fork's formatter; it
+  preserves their comments and values but does not format them.
+- Upstreaming the fork means rebasing onto upstream's newer master.
   Packaging a tool distribution requires qualifying the fork's packaging.
-- Add structure-aware pack-author commands that emit `mere-source-edit`
-  proposals and pass the existing real-pack workflow.
+- Isocosm's workspace does not resolve under cargo 1.97.1 because Eidetic's
+  chartulary manifest needs cargo 1.98+ while declaring `rust-version` 1.97.1.
 - Wider platform and consumer compatibility, peak memory/RSS, and native GUI
   acceptance remain unqualified.
 - Direct structural edits, if introduced, must match parsing of their
