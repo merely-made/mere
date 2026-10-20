@@ -13,7 +13,7 @@
 #![cfg(feature = "inference")]
 
 mod common;
-#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
+#[path = "fixtures/esp/decoder.rs"]
 mod decoder_fixture;
 
 use std::sync::Arc;
@@ -79,7 +79,7 @@ async fn save_library(data_root: &std::path::Path) -> eidetic::ManifestId {
     .await
     .unwrap();
     let mut template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+        "fixtures/esp/smollm2-instruct-v1.json"
     ))
     .unwrap();
     template.system_prompt.clear();
@@ -655,15 +655,19 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
             .unwrap()
             .to_seed(),
     );
-    let sibling_operation = journal_b
+    // The journal rejects an operation whose checkpoint parent it has not
+    // seen, so carry the sibling's whole chain in order, not only its tip.
+    let sibling_operations: Vec<_> = journal_b
         .operations()
         .await
         .unwrap()
         .into_iter()
         .filter(|op| op.header.verifying_key == sibling_key.verifying_key())
-        .last()
-        .unwrap();
-    journal_a.accept(&sibling_operation).await.unwrap();
+        .collect();
+    assert!(!sibling_operations.is_empty(), "the sibling wrote nothing");
+    for operation in &sibling_operations {
+        journal_a.accept(operation).await.unwrap();
+    }
     host_a.set_roster(roster.clone()).await;
 
     wait_run(
@@ -1386,7 +1390,7 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     let directory =
         std::path::PathBuf::from(std::env::var_os("ESP_SMOLLM2_DIR").expect("ESP_SMOLLM2_DIR"));
     let reference: serde_json::Value = serde_json::from_slice(include_bytes!(
-        "../../../crates/intel/esp/tests/smollm2_360m_reference.json"
+        "fixtures/esp/smollm2_360m_reference.json"
     ))
     .unwrap();
     let read = |name: &str| {
@@ -1427,7 +1431,7 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     .unwrap();
     drop(weights);
     let template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+        "fixtures/esp/smollm2-instruct-v1.json"
     ))
     .unwrap();
     let template = save_typed(
