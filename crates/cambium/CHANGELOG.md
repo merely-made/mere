@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Publish the Cambium chain (Mark, 2026-10-19): `command-menu` 0.1.0 (the name
+  is free on crates.io and stays; `alembic` is held by a third party), `mere-surface-api`
+  0.1.0, `meristem` 0.2.0, `tinct` 0.2.0, `illume` 0.0.3, `sprigging` 0.2.2 and
+  `cambium` 0.4.0. `cambium` takes a minor bump because the `nematic` feature
+  removal below is breaking for the published 0.3.3. The published
+  `netrender-vello` 0.11.0 sits on `netrender-vello-encoding` and
+  `netrender-vello-shaders` 0.11.0, the vello fork's renamed `vello_encoding` and
+  `vello_shaders` (library names unchanged), because upstream's 0.11.0 lacks the
+  device-pixel curve quality bounds the fork's renderer uses.
 - Rename the `edit-history` crate to `backstep` (`crates/cambium/backstep`, lib
   `backstep`; Mark, 2026-10-15). `cambium::History` is unchanged, re-exported
   from the renamed crate; only a direct `edit_history::` import changes, to
