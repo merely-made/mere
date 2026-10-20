@@ -18,7 +18,9 @@ def git_files(files,commit):
     assert proc.returncode==0
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--commit');args=parser.parse_args()
+    global HERE
+    parser=argparse.ArgumentParser();parser.add_argument('--commit');parser.add_argument('--packet',type=Path,default=HERE);args=parser.parse_args()
+    HERE=args.packet.resolve()
     manifest=read(HERE/'artifact-sha256.json')
     for name,expected in manifest.items():
         path=(HERE/name).resolve();assert path.is_relative_to(HERE);assert sha(path)==expected,name
