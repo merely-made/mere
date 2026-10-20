@@ -5,8 +5,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #![cfg(feature = "inference-model")]
-#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
-mod fixture;
 use distillery::inference::durable::PersonaRunJournal;
 use distillery::inference::*;
 use eidetic::typed::TypedPayload;
@@ -15,6 +13,7 @@ use esp::infer::prompt::{PromptTemplate, SessionProvider};
 use esp::infer::provider::{GenerationCheckpoint, SessionIdentity};
 use esp::infer::{BoundModelSession, ModelSession};
 use esp::infer::{GenerationRequest, InferError};
+use esp_test_support::decoder as fixture;
 use muniment::{MemoryBackend, RedbBackend};
 use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
 use std::ops::ControlFlow;
@@ -32,10 +31,7 @@ fn provider(changed: bool) -> Box<dyn InferenceProvider> {
         &DecoderDevice::ndarray(),
     )
     .unwrap();
-    let mut template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
-    ))
-    .unwrap();
+    let mut template = PromptTemplate::from_bytes(esp_test_support::SMOLLM2_INSTRUCT_V1).unwrap();
     template.bos.clear();
     template.eos.clear();
     template.system_prompt.clear();

@@ -6,8 +6,7 @@
 
 #![cfg(feature = "inference-model")]
 
-#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
-mod fixture;
+use esp_test_support::decoder as fixture;
 
 use distillery::inference::{AskRequestV1, RunStateV1, open_library_lane_with_journal};
 use eidetic::typed::save_typed;
@@ -37,7 +36,7 @@ fn resident_lane_reads_selected_experts_through_the_library_owner() {
 fn exercise_layer_owner(half: bool, moe: bool) {
     let directory = tempfile::tempdir().unwrap();
     let mut config: serde_json::Value = serde_json::from_str(if moe {
-        include_str!("../../../crates/intel/esp/tests/support/architectures/qwen2_moe/config.json")
+        esp_test_support::QWEN2_MOE_CONFIG_JSON
     } else {
         fixture::CONFIG_JSON
     })
@@ -56,10 +55,7 @@ fn exercise_layer_owner(half: bool, moe: bool) {
     std::fs::write(
         directory.path().join("model.safetensors"),
         if moe {
-            include_bytes!(
-                "../../../crates/intel/esp/tests/support/architectures/qwen2_moe/model.safetensors"
-            )
-            .to_vec()
+            esp_test_support::QWEN2_MOE_WEIGHTS.to_vec()
         } else {
             fixture::weights_bytes()
         },
@@ -90,10 +86,7 @@ fn exercise_layer_owner(half: bool, moe: bool) {
             .await
             .unwrap()
         };
-        let template = PromptTemplate::from_bytes(include_bytes!(
-            "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
-        ))
-        .unwrap();
+        let template = PromptTemplate::from_bytes(esp_test_support::SMOLLM2_INSTRUCT_V1).unwrap();
         let template = save_typed(
             &mut store,
             &template,
@@ -167,12 +160,10 @@ fn exercise_layer_owner(half: bool, moe: bool) {
                     &mut || false,
                 )
                 .unwrap();
-            let rendered = PromptTemplate::from_bytes(include_bytes!(
-                "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
-            ))
-            .unwrap()
-            .render("t3 t7", "")
-            .unwrap();
+            let rendered = PromptTemplate::from_bytes(esp_test_support::SMOLLM2_INSTRUCT_V1)
+                .unwrap()
+                .render("t3 t7", "")
+                .unwrap();
             let qualification = FormatQualification {
                 baseline_model: model,
                 baseline_loader: provider.capability().loader.clone(),
