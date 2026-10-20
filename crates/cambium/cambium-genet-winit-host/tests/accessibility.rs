@@ -249,3 +249,35 @@ fn native_harness_exposes_current_target_refusal() {
     );
     assert!(h.state().activated.is_empty());
 }
+
+#[test]
+fn native_and_neutral_projections_share_the_hosts_scrolled_bounds() {
+    let mut h = harness();
+    h.layout_at(300.0, 100.0);
+    h.wheel(0.0, 20.0);
+    assert!(h.viewport_scroll().1 > 0.0);
+    let neutral = h.a11y_projection();
+    let (native, _) = h.a11y_tree();
+    let semantic = neutral
+        .nodes()
+        .iter()
+        .find(|node| node.name.as_deref() == Some("Cancel"))
+        .unwrap();
+    let (_, platform) = node_named(&native, "Cancel").unwrap();
+    let bounds = semantic.bounds.unwrap();
+    let native = platform.bounds().unwrap();
+    assert_eq!(
+        (
+            native.x0,
+            native.y0,
+            native.x1 - native.x0,
+            native.y1 - native.y0
+        ),
+        (
+            f64::from(bounds.x),
+            f64::from(bounds.y),
+            f64::from(bounds.width),
+            f64::from(bounds.height)
+        )
+    );
+}
