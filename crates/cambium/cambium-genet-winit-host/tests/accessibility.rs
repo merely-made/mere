@@ -132,7 +132,10 @@ fn a_click_request_activates_the_control() {
         .a11y_dom_node(install)
         .expect("the projected node resolves to a DOM node");
 
-    h.a11y_request(A11yAction::Click, dom_node);
+    assert_eq!(
+        h.a11y_request(A11yAction::Click, dom_node),
+        cambium_rootstock::A11yDispatch::Dispatched
+    );
     assert_eq!(h.state().activated, vec!["install"]);
 }
 
@@ -149,7 +152,10 @@ fn a_focus_request_focuses_without_activating() {
         .a11y_dom_node(cancel)
         .expect("Cancel resolves to a DOM node");
 
-    h.a11y_request(A11yAction::Focus, dom_node);
+    assert_eq!(
+        h.a11y_request(A11yAction::Focus, dom_node),
+        cambium_rootstock::A11yDispatch::Dispatched
+    );
     assert_eq!(
         h.state().activated,
         Vec::<&str>::new(),
@@ -176,7 +182,10 @@ fn a_set_value_request_updates_a_numeric_control() {
         .a11y_dom_node(strength)
         .expect("Strength resolves to a DOM node");
 
-    h.a11y_set_value(dom_node, 7.4);
+    assert_eq!(
+        h.a11y_set_value(dom_node, 7.4),
+        cambium_rootstock::A11yDispatch::Dispatched
+    );
     assert_eq!(h.state().value, 7.0, "the shared step policy quantizes");
 }
 
@@ -221,4 +230,22 @@ fn a_screen_reader_wakes_an_idle_application() {
         IdlePolicy::Wait,
         "and the wake is consumed once, not re-triggered every idle turn",
     );
+}
+
+#[test]
+fn native_harness_exposes_current_target_refusal() {
+    use cambium_rootstock::{A11yDispatch, A11yRejection};
+    let mut h = harness();
+    let (tree, _) = h.a11y_tree();
+    let (id, _) = node_named(&tree, "Install").unwrap();
+    let node = h.a11y_dom_node(id).unwrap();
+    assert_eq!(
+        h.a11y_set_value(node, 2.0),
+        A11yDispatch::Rejected(A11yRejection::Unsupported)
+    );
+    assert_eq!(
+        h.a11y_set_value(node, f64::NAN),
+        A11yDispatch::Rejected(A11yRejection::InvalidValue)
+    );
+    assert!(h.state().activated.is_empty());
 }

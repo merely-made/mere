@@ -784,3 +784,30 @@ fn queued_secondary_release_and_cancel_follow_host_capture_routing() {
         ]
     );
 }
+
+#[test]
+fn accessibility_action_admission_refuses_a_sibling_windows_live_node() {
+    use crate::{A11yAction, A11yDispatch, A11yRejection, A11yRequest};
+    let (mut multi, a, b) = multi();
+    layout_at(&mut multi, a, 400.0, 300.0);
+    layout_at(&mut multi, b, 300.0, 600.0);
+    let dom = multi.dom();
+    let button = find(&dom.borrow(), multi.window_root(b).unwrap(), "count").unwrap();
+    let result = multi
+        .with_window(a, |h| {
+            h.apply_a11y_requests(&[A11yRequest::node(A11yAction::Click, button)])
+        })
+        .unwrap();
+    assert_eq!(
+        result,
+        [A11yDispatch::Rejected(A11yRejection::TargetAbsent)]
+    );
+    assert_eq!(multi.state().clicks, 0);
+    let result = multi
+        .with_window(b, |h| {
+            h.apply_a11y_requests(&[A11yRequest::node(A11yAction::Click, button)])
+        })
+        .unwrap();
+    assert_eq!(result, [A11yDispatch::Dispatched]);
+    assert_eq!(multi.state().clicks, 1);
+}

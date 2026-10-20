@@ -3,7 +3,7 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Contained continuation qualified on 2026-10-20; broader owner migrations remain open" - accurate: yes
+- status line: "Contained host admission and collector bridge qualified on 2026-10-20; wider owner migrations open" - accurate: yes
 - claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -18,13 +18,16 @@ Apparatus retains observations, and host submission is distinct from pixels.
 
 ### Recommended action
 
-Retain the current-target/action-admission, collector scope/loss, selector grammar,
-keyboard route and presentation correlation migrations. Qualify only the named
-worker and retained-host cases; do not generalize to all products or providers.
+Host current-target admission and the optional collector bridge are now qualified.
+Retain target/session/lifetime identity, shared projection construction, product
+collector startup/policy, selector grammar, keyboard route and presentation
+correlation migrations. Qualify only the named owner and receiving cases.
 
 ### Notes
 
-Checked owner seams, successor review and 178 targeted native passing tests.
+Checked owner seams, successor review and the earlier 178 targeted native passing
+tests. The new continuation passes 237 targeted native tests (seven existing
+ignores) plus browser-host and collector Wasm compilation.
 Preparation failures are retained separately from actual test outcomes; the
 sealed audit registers are unchanged. Lock inventory is distinguished from the
 offline all-target metadata preparation failure, and broader acceptance stays open.
@@ -52,4 +55,6 @@ historical renderer smoke gate outside this contained repair pass.
 ### Notes
 
 The updated status and diagnostics continuation distinguish qualified source,
-exact native evidence and deferred ownership migrations.
+237 targeted native passes/seven existing ignores, two Wasm compile gates and
+deferred lifetime/projection/startup ownership migrations. Browser runtime and
+human AT are not claimed.

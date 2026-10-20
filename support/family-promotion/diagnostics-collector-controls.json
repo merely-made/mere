@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "mere-apparatus",
+    "--no-default-features",
+    "--features",
+    "registry,serde",
+    "--lib"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T17:53:19.264521+00:00",
+  "finished": "2026-10-20T17:53:28.180744+00:00",
+  "exit_code": 101,
+  "results": [
+    "error[E0308]: arguments to this method are incorrect",
+    "error: could not compile `mere-apparatus` (lib test) due to 1 previous error"
+  ],
+  "diagnostic_tail": "   Compiling mere-registry v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\registry)\nwarning: unused import: `crate::diagnostics::channels::*`\n  --> crates\\system\\registry\\src\\diagnostics\\descriptor\\catalog.rs:10:5\n   |\n10 | use crate::diagnostics::channels::*;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused import: `crate::diagnostics::channels::*`\n  --> crates\\system\\registry\\src\\diagnostics\\descriptor\\registry.rs:12:5\n   |\n12 | use crate::diagnostics::channels::*;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> crates\\system\\registry\\src\\diagnostics\\emit\\queue.rs:88:31\n   |\n88 |         let _ = self.0[index].fetch_update(Ordering::Relaxed, Ordering::Relaxed, |old| {\n   |                               ^^^^^^^^^^^^\n   |\n   = note: `#[warn(deprecated)]` on by default\nhelp: replace the use of the deprecated method\n   |\n88 -         let _ = self.0[index].fetch_update(Ordering::Relaxed, Ordering::Relaxed, |old| {\n88 +         let _ = self.0[index].try_update(Ordering::Relaxed, Ordering::Relaxed, |old| {\n   |\n\nwarning: `mere-registry` (lib) generated 3 warnings (run `cargo fix --lib -p mere-registry` to apply 3 suggestions)\n   Compiling mere-apparatus v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\domain\\apparatus)\nerror[E0308]: arguments to this method are incorrect\n   --> crates\\domain\\apparatus\\src\\collector.rs:172:38\n    |\n172 |             observations: self.store.read(cursor, max_records, now)?,\n    |                                      ^^^^         -----------  --- expected `usize`, found `std::time::Duration`\n    |                                                   |\n    |                                                   expected `std::time::Duration`, found `usize`\n    |\nnote: method defined here\n   --> crates\\domain\\apparatus\\src\\observation.rs:471:12\n    |\n471 |     pub fn read(\n    |            ^^^^\nhelp: swap these arguments\n    |\n172 -             observations: self.store.read(cursor, max_records, now)?,\n172 +             observations: self.store.read(cursor, now, max_records)?,\n    |\n\nFor more information about this error, try `rustc --explain E0308`.\nerror: could not compile `mere-apparatus` (lib test) due to 1 previous error\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}
