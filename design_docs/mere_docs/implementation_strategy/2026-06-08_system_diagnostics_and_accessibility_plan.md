@@ -2,8 +2,10 @@
 
 ## Shared leaf and producer composition, 2026-10-20
 
-**Status:** contained implementation under qualification, following main
-`ac8797289` and the concurrent `c25c2d441` portable-site extraction. Receipt
+**Status:** contained host composition qualified on 2026-10-20 at integrated
+main `67964c3ea`, implementation `3798e0c2d`. The refresh preserves resident
+recall/readiness, portable-site extraction and Graphshell co-op work, plus
+Netrender's borrowed-lowering supplier update (`ec15eb26`). Receipt
 budget remains 10 MB across the diagnostics continuation; builds reuse
 `C:\t\cargo-targets\mere`. Earlier cohorts below keep their original basis.
 
@@ -39,7 +41,8 @@ state survive callbacks. Disabled contributions cannot reintroduce actions;
 read-only leaves cannot reintroduce numeric mutation. Producer action buttons
 inherit disabled/hidden slot restrictions and have no admitted target map entry
 when blocked. Hidden contributed subtrees lose route entries; a focused node
-hidden by its contributor falls back to the document root. Missing slot geometry no longer invents an origin at `(0,0)`;
+hidden by its contributor falls back to the document root. Missing slot geometry
+no longer invents an origin at `(0,0)`;
 nonfinite or negative producer rectangles produce no accessibility bounds.
 
 ### Remaining ownership migrations
@@ -56,8 +59,8 @@ nonfinite or negative producer rectangles produce no accessibility bounds.
   a defined read-only observation/snapshot contract instead of hidden mutation.
 - Requests still lack originating document/window/session/revision lifetime
   tokens. Within-window duplicate producer DOM bindings now refuse; cross-window
-  producer ownership, reused registry/child keys, duplicate semantic keys/action IDs and
-  generated hash collisions need explicit supplier/consumer rules.
+  producer ownership, reused registry/child keys, duplicate semantic keys/action
+  IDs and generated hash collisions need explicit supplier/consumer rules.
 - The existing host request enum routes only Click, Focus and numeric SetValue.
   An advertised Increment, Decrement or ScrollIntoView is not thereby routed.
   Broader command declaration/invocation/result migration belongs with Hest;
@@ -82,8 +85,27 @@ Rootstock 133/three ignores, native host 19/four ignores, native accessibility
 receiving eight, browser mirror 17, Winit adapter seven and joined sessions six.
 Its exact pre-integration source and binary hashes remain in
 `support/family-promotion/diagnostics-contributed-pre-integration.json` and the
-native gate. Browser compilation and newer-main receiving qualification remain
-pending. Development compile/fixture failures are retained separately.
+native gate. After merging main, 70 focused native receiving tests pass with
+four existing ignores: contributor owner six, host admission seven, browser
+mirror 17, native host 19/four ignores, native accessibility receiving eight,
+Winit adapter seven and joined sessions six. The browser host compiles for
+`wasm32-unknown-unknown` with default features disabled. No browser runtime or
+human AT acceptance is claimed.
+
+The [qualification index](../../../support/family-promotion/diagnostics-contributed-qualification.json)
+records exact source/lock basis, executed binaries, gate commands, the four
+upstream Netrender package-source changes and unchanged sealed registers. The
+one local lock dependency addition is the existing Sprigging crate for actual
+browser contributor tests. Current source hashes match the integrated seal.
+Development compile failures and the fixture correction to reuse one DOM for
+reordered producer IDs remain separate from passing gates. An initial
+fast-forward refusal left the local lock patch intact; the tested implementation
+was committed and main merged normally. The intermediate platform gate is
+retained but excluded from the separately sealed 70-test current-main count.
+
+The D2 audit reports no errors for the two updated plans and 40 existing
+whole-tree errors. No isolated target, Cargo home or worktree was created;
+receipts remain under the diagnostics continuation's 10 MB cap.
 
 ## Shared DOM semantics and resident collector, 2026-10-20
 

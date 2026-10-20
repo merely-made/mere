@@ -3,7 +3,7 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Shared DOM/resident cohort qualified; shared leaf/producer composition under qualification; wider owner migrations open" - accurate: yes
+- status line: "Shared leaf/producer host composition qualified; wider owner migrations open" - accurate: yes
 - claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -21,7 +21,7 @@ Apparatus retains observations, and host submission is distinct from pixels.
 Host current-target admission, the optional collector bridge, shared DOM
 construction and one explicitly sampled resident lifecycle source/reader are
 qualified in their named historical cohorts. Shared leaf/producer host composition
-now has one implementation under receiving qualification. Retain neutral provider
+now has one qualified host implementation. Retain neutral provider
 contracts, target/session/lifetime identity, mutable read/act boundaries, broader
 command routing, other product sources, final process evidence, selector grammar,
 keyboard route and presentation correlation migrations.
@@ -77,6 +77,9 @@ are retired; real Knob numeric properties, author names, host geometry/edges and
 restrictive states have one host policy. Missing/invalid producer bounds remain
 absent. This is AccessKit-shaped composition, not the completed neutral provider,
 pure observation, atomic activation or target-generation migration. The source
-seal and final receiving gates will be recorded separately from development
-failures. Whole-tree D2 had 40 pre-existing errors at this refreshed basis;
+seal and final receiving gates are recorded separately from development
+failures: the broad pre-repin cohort passes 190 tests/seven existing ignores;
+70 affected current-main receiving tests pass/four existing ignores and Wasm
+compilation succeeds. Read-only selectors and renderer placement/discovery
+remain explicit owner migrations. Whole-tree D2 had 40 pre-existing errors at this refreshed basis;
 this pass owns only the two named plan records.

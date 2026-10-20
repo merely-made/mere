@@ -288,12 +288,15 @@ process against the admitted fixture broker. Shared
 leaf/producer semantics, target lifetimes and process-final evidence were
 separately tracked for that historical cohort.
 
-Shared leaf/producer continuation (2026-10-20, under qualification): native,
+Shared leaf/producer continuation (2026-10-20, qualified): native,
 browser and admission now consume one Rootstock host composition over the
 existing AccessKit-shaped provider contracts. The
 [diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#shared-leaf-and-producer-composition-2026-10-20)
 tracks repairs to numeric leaf lowering, producer IDs/action maps, restrictive
-state and missing/invalid geometry. Neutral contributor contracts, mutable
+state, hidden focus, duplicate producer DOM bindings and missing/invalid geometry.
+Seventy affected native receiving tests pass on integrated main, with four
+existing ignores, plus browser-host Wasm compilation. The earlier broad cohort
+has 190 passes/seven existing ignores on its preserved pre-repin basis. Neutral contributor contracts, mutable
 read/act boundaries, target lifetimes, broader Hest action routing and
 process-final diagnostic evidence remain open.
 

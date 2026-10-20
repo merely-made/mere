@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
   "basis": "21deb0cb",
-  "status": "shared leaf/producer host composition under receiving qualification; mutable contributors, target lifetimes, action-catalogue coverage and process-final diagnostics remain open",
+  "status": "contained shared leaf/producer host composition qualified: 70 current-main native receiving passes/four existing ignores and Wasm compile; broader 190-test cohort preserved; provider/selector/geometry/lifetime migrations open",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -146,28 +146,28 @@
       ],
       "change": "One host composition replaces three different leaf callback seeds and two producer child/action-ID implementations. ARIA now retains real Knob slider and numeric properties. A current producer description takes precedence over co-registered Sprigging semantics in both publication and admission.",
       "verification": "actual registered contributors and current-target dispatch controls, native receiving, ARIA source-ID/action preservation, Wasm compilation",
-      "status": "qualification pending"
+      "status": "repaired and qualified by diagnostics-contributed-qualification.json; broader limits retained"
     },
     {
       "id": "diagnostics-contributor-restrictions",
       "source": "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics/restrict_actions",
       "change": "Author label policy, host bounds/transforms/edges and restrictive state survive leaf callbacks. Disabled/hidden actions and read-only numeric mutations are removed. Producer action children inherit disabled/hidden state and blocked targets are absent from maps.",
       "verification": "seed-dependent callback through real host dispatch; adversarial contributor geometry/edge/state changes; disabled producer regression",
-      "status": "qualification pending"
+      "status": "repaired and qualified by diagnostics-contributed-qualification.json; broader limits retained"
     },
     {
       "id": "diagnostics-producer-geometry",
       "source": "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics",
       "change": "Missing slot geometry no longer becomes a fabricated zero origin. Nonfinite and negative-size producer rectangles have no published bounds.",
       "verification": "missing-slot-origin and invalid-rectangle controls plus real producer placement/scaling receiving",
-      "status": "qualification pending"
+      "status": "repaired and qualified by diagnostics-contributed-qualification.json; broader limits retained"
     },
     {
       "id": "diagnostics-contributed-route-membership",
       "source": "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics",
       "change": "DOM and produced action maps contain only reachable nodes outside hidden contributed subtrees; current-target admission checks that same route membership. A focused node hidden by its contributor falls back to the document root, matching absence from platform routes.",
       "verification": "actual hidden-leaf projection, route removal and root-focus fallback; current hidden/removed target and platform controls",
-      "status": "qualification pending"
+      "status": "repaired and qualified by diagnostics-contributed-qualification.json; broader limits retained"
     },
     {
       "id": "diagnostics-dom-only-selector-observation",
@@ -188,7 +188,7 @@
       ],
       "change": "Shared semantic composition refuses producer contributions and action targets when the current window has multiple DOM slots for one producer key, matching the renderer's existing DuplicateDomKey refusal. It does not arbitrarily choose the last slot. The custom-leaf key parser is reused from OwnedLayout.",
       "verification": "real duplicated DOM slots and registered producer; no generated children, bound owner or produced action routes",
-      "status": "qualification pending"
+      "status": "repaired and qualified by diagnostics-contributed-qualification.json; broader limits retained"
     },
     {
       "id": "diagnostics-render-projection-tree-and-coordinate-gap",
@@ -324,10 +324,13 @@
     "diagnostics-product-receiving.json",
     "diagnostics-shared-wasm.json"
   ],
-  "contribution_basis": "c25c2d441",
+  "contribution_basis": "67964c3eab5c063fc0bcd87563b0aa268ffb4851",
   "contribution_receipts": [
-    "diagnostics-contributed-source-reviewed.json",
-    "diagnostics-contributed-native-final.json",
+    "diagnostics-contributed-pre-integration.json",
+    "diagnostics-contributed-source-integrated.json",
+    "diagnostics-contributed-current-owner.json",
+    "diagnostics-contributed-current-admission.json",
+    "diagnostics-contributed-current-platform.json",
     "diagnostics-contributed-wasm.json",
     "diagnostics-contributed-qualification.json"
   ]
