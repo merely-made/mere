@@ -39,6 +39,7 @@ fn metre_uses_supplied_stress_and_keeps_mismatches_visible() {
     grid.lines[0].syllables.push(Syllable {
         text: "extra".into(),
         stressed: false,
+        stress_known: true,
     });
     let out = input.compile().unwrap();
     assert_eq!(out.scene.relations.len(), 2);
@@ -64,6 +65,35 @@ fn metre_uses_supplied_stress_and_keeps_mismatches_visible() {
     // and hit by their own rectangle; stress stays a candidate fact, not authority.
     assert!(stress.selectable);
     assert_eq!(out.scene.items[stress.instance.0 as usize].hit, None);
+}
+
+#[test]
+fn free_metre_retains_text_without_inventing_stress() {
+    let mut input = SceneInput::parse(METRE).unwrap();
+    let SceneFacts::MetreGrid(grid) = &mut input.facts else {
+        unreachable!()
+    };
+    grid.feet = 0;
+    grid.lines[0].syllables[0].stress_known = false;
+    grid.lines[1].syllables.clear();
+    grid.lines[1].text = "A line without supplied scansion".into();
+    let compiled = input.compile().unwrap();
+    let mark = compiled
+        .marks
+        .iter()
+        .find(|m| m.key == "line-1/syllable/0")
+        .unwrap();
+    assert_eq!(mark.role, MarkRole::Node);
+    assert!(mark.detail.contains("unknown"));
+    assert!(
+        compiled
+            .guides
+            .iter()
+            .any(|g| g.text == "A line without supplied scansion")
+    );
+    assert!(!compiled.diagnostics.iter().any(|s| s.contains("expects 0")));
+    let reopened = SceneInput::parse(&serde_json::to_string(&input).unwrap()).unwrap();
+    assert_eq!(reopened, input);
 }
 #[test]
 fn fretboard_shares_pitch_identity_but_keeps_occurrences_distinct() {

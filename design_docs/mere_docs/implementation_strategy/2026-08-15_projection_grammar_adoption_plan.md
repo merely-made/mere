@@ -1981,3 +1981,22 @@ scope; this correction does not change the layout cache. Turnstone's receiving
 scene check must run against the subsequently published supplier revision.
 
 Publication update (2026-10-17): shared label source `d1a200b18` is reachable on main through merge `c8d316b60`; Woodshed adoption and audit closure are published through `8204688`. Merged Mere CPU checks pass 279 Cambium and 120 Rootstock cases, with three existing ignores. Woodshed retains its exact qualified supplier; this integration adds no native claim. See the [publication record](../../../support/receipts/graph-labels-20261017/publication.json).
+
+### Portable scene-document supplier (2026-10-19)
+
+The canonical `scenomise` crate now carries the opt-in `djot` feature for an
+inert transport of the existing `SceneDocument` JSON facts in one attributed
+Djot block. JSON remains the canonical payload; the codec admits one declared
+block and does not interpret other document content or write to its source.
+Free metre admits zero expected feet, retains full line text when scansion is
+absent, and exposes explicitly unknown stress without converting it to weak
+stress. Rootstock now applies pending DOM mutations and relayout after keyboard
+dispatch before focus restyling.
+
+Focused canonical checks: `scenomise` scene-document tests with `djot` (4
+passed), backdrop-scene tests (8 passed), and the Rootstock inserted/focused
+control regression (1 passed). These are supplier-level checks; they do not
+claim Woodshed receiving qualification or native playback. Current command
+output is recorded in the local
+`/Users/markik/Code/output/woodshed-arrangement-playback-20261019` evidence
+directory.

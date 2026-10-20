@@ -16,6 +16,8 @@ categories = ["visualization", "algorithms"]
 # a panel workbench. It carries state between calls, which the closed-form
 # solvers do not, so a consumer that only places scenes does not take it.
 authoring = ["dep:backstep", "dep:workbench"]
+# Inert attributed-block transport for portable scene documents.
+djot = ["dep:jotdown"]
 
 [dependencies]
 sceno = { version = "0.0.5", path = "../sceno" }
@@ -27,6 +29,7 @@ serde_json = "1.0.140"
 # The solvers' transcendentals (`math`): the same bits on every target, so an
 # arrangement does not depend on the machine that solved it (ruling S4).
 libm = { workspace = true }
+jotdown = { version = "0.10", optional = true }
 backstep = { version = "0.1.0", path = "../../backstep", optional = true }
 workbench = { version = "0.1.0", path = "../../workbench", optional = true }
 

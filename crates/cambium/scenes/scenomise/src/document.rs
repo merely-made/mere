@@ -6,6 +6,9 @@ use crate::backdrops::{MAX_SCENE_INPUT_BYTES, SceneInput, strict_core_records};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
+#[cfg(feature = "djot")]
+mod djot;
+
 pub const SCENE_DOCUMENT_FORMAT: &str = "mere.scene-document";
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
