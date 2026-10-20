@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-20",
+  "status": "local current-host source and browser qualification passed",
+  "mere_base": "427fa4ff88cc93ece5db0c39f44d16f1154e0ea8",
+  "woodshed_base": "111da595ec5720d04f0dccd7fb775b81fa634874",
+  "reused_consumer_commit": "30ab2c35dd3f029e0a13a5bb083f7827f0923369",
+  "mode": "published musical model plus local renderer refinement through explicit provider-local.toml",
+  "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+  "wasm_bindgen": "0.2.129",
+  "tests": {
+    "document": 25,
+    "parser": 5,
+    "renderer_default": 10,
+    "renderer_host_controls": 10
+  },
+  "checks": {
+    "web_product_build": "pass",
+    "port_boundaries": "pass",
+    "viewer_has_no_music_dependencies": "pass",
+    "source_inputs_unchanged": 36
+  },
+  "browser": [
+    {
+      "path": "browser/narrow/notation_readings_reopen/result.json",
+      "state": "ok",
+      "captures": [
+        {
+          "name": "reopened_score",
+          "width": 455,
+          "height": 1220,
+          "bytes": 124614
+        },
+        {
+          "name": "reopened_tab",
+          "width": 455,
+          "height": 1220,
+          "bytes": 78410
+        }
+      ]
+    },
+    {
+      "path": "browser/wide/notation_readings/result.json",
+      "state": "ok",
+      "captures": [
+        {
+          "name": "chart",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 487474
+        },
+        {
+          "name": "tab_rest",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 462690
+        },
+        {
+          "name": "score_rest",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 508478
+        }
+      ]
+    },
+    {
+      "path": "browser/wide/notation_readings_reopen/result.json",
+      "state": "ok",
+      "captures": [
+        {
+          "name": "reopened_score",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 497342
+        },
+        {
+          "name": "reopened_tab",
+          "width": 2560,
+          "height": 1440,
+          "bytes": 439674
+        }
+      ]
+    }
+  ],
+  "reviewed_captures": 7,
+  "decisions": {
+    "views": "Chart/Tab/Score with linked event selection",
+    "source": "saved MusicXML; views do not author",
+    "creation": "explicit Write notation; one ordinary document undo step",
+    "creation_tempo": "existing 20-400 BPM pending maintainer range answer"
+  },
+  "limits": [
+    "Local uncommitted integration; no push or deployment.",
+    "Renderer refinement must be published before consumer Git repinning and clean-checkout qualification.",
+    "Existing fretted single-voice MusicXML profile; no Graphshell note editing or playback.",
+    "Browser WebGPU only; no new native window or physical audio/MIDI run.",
+    "Narrow workflow used one page with earlier test pages closed; no multi-page concurrency qualification."
+  ]
+}

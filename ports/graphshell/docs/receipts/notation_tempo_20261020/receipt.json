@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-20",
+  "status": "local follow-up qualification passed",
+  "decision": "whole-number notation creation tempo 1-400 BPM",
+  "tests": {
+    "woodshedding": 210,
+    "new_converter_tests": 2,
+    "graphshell_document": 26
+  },
+  "checks": {
+    "web_product": "pass",
+    "port_boundaries": "pass",
+    "scoped_formatting": "pass",
+    "source_inputs_unchanged": 37
+  },
+  "browser": [
+    {
+      "path": "browser/notation_readings_reopen/result.json",
+      "state": "ok"
+    },
+    {
+      "path": "browser/notation_tempo/result.json",
+      "state": "ok"
+    }
+  ],
+  "reopened_musicxml_per_minute_one_observed": true,
+  "limits": [
+    "Local provider override; publication and immutable consumer repinning remain separate.",
+    "No new native, physical-device or practice-speed qualification."
+  ]
+}
