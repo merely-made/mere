@@ -1,13 +1,13 @@
-await {"status": "ready", "attached": "910ceb8c-a928-4cff-9981-ecdf2e3979db"}
+await {"status": "ready", "attached": "4f1f88bf-30dc-4cf6-9f6d-0f3971b75b1f"}
 wait 30000
 click role:button @id=coop-use
 await {"coop-nodes": "3", "coop-access": "revoked", "coop": "~Guest revised existing source"}
 wait 30000
 wheel 0 -10000 px on .coop-panel
 settle 2
-capture /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-cold-retained.png
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/owner-cold-retained.png
 click role:textbox @id=coop-field-3
-input-text /Users/markik/Code/output/gs-coop-view-20261020-07/private/invitation
+input-text /Users/markik/Code/output/gs-coop-view-20261020-08/private/invitation
 click role:button @id=coop-export
 await {"coop-nodes": "3"}
 wait 30000
@@ -20,9 +20,9 @@ await {"coop-nodes": "4"}
 wait 30000
 wheel 0 -10000 px on .coop-panel
 settle 2
-capture /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-cold-edited.png
-await {"file": "/Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-cold-denied.png"}
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/owner-cold-edited.png
+await {"file": "/Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-cold-denied.png"}
 wait 30000
 wheel 0 -10000 px on .coop-panel
 settle 2
-capture /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/owner-cold-refused.png
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/owner-cold-refused.png

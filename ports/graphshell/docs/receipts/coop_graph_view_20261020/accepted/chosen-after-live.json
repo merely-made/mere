@@ -4,45 +4,45 @@
       "badges": [],
       "media": [
         [
-          30,
-          91,
-          85,
-          168,
-          193,
-          204,
-          167,
-          253,
-          108,
-          146,
-          149,
-          65,
-          64,
-          48,
-          97,
-          113,
-          139,
-          15,
-          112,
-          181,
-          129,
-          253,
-          28,
-          160,
+          122,
+          47,
+          213,
+          216,
+          47,
+          74,
+          79,
           103,
-          72,
-          151,
-          240,
-          39,
-          225,
-          203,
-          225
+          217,
+          102,
+          180,
+          88,
+          6,
+          211,
+          126,
+          233,
+          18,
+          241,
+          162,
+          214,
+          232,
+          36,
+          206,
+          198,
+          194,
+          162,
+          181,
+          226,
+          73,
+          207,
+          241,
+          175
         ]
       ],
       "title": "Session",
       "values": [
         {
           "label": "Session",
-          "value": "910ceb8c-a928-4cff-9981-ecdf2e3979db"
+          "value": "4f1f88bf-30dc-4cf6-9f6d-0f3971b75b1f"
         },
         {
           "label": "Changes",
@@ -53,11 +53,11 @@
     {
       "badges": [],
       "media": [],
-      "title": "https://shared.invalid/ordinary-owner",
+      "title": "Guest source",
       "values": [
         {
           "label": "Address",
-          "value": "https://shared.invalid/ordinary-owner"
+          "value": "https://shared.invalid/guest"
         },
         {
           "label": "Kind",
@@ -91,11 +91,11 @@
     {
       "badges": [],
       "media": [],
-      "title": "Guest source",
+      "title": "https://shared.invalid/ordinary-owner",
       "values": [
         {
           "label": "Address",
-          "value": "https://shared.invalid/guest"
+          "value": "https://shared.invalid/ordinary-owner"
         },
         {
           "label": "Kind",
@@ -114,22 +114,22 @@
       "epoch": 2,
       "facets": {
         "nodes": {
-          "426802a6-4a1c-4e0f-96d5-5407ff10b8f4": {
+          "12d08fcb-ca9c-4d53-9e56-305224f0dbea": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792532606640
+              "last_visited_ms": 1792532981578
             }
           },
-          "8769d672-fab2-4638-b738-72cee9e37daa": {
+          "1867d2d5-6bf8-4c72-9610-2b6fd7950296": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792532576990
+              "last_visited_ms": 1792532947144
             }
           },
-          "8d561c81-94e0-429a-82c5-26a619492690": {
+          "66e6f2d5-0f2f-4d82-b430-8b7849c0378b": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792532603061
+              "last_visited_ms": 1792532985297
             }
           }
         }
@@ -143,20 +143,20 @@
             "assertions": [
               {
                 "predicate": "https://mere.computer/ns/rel#cites",
-                "provenance_iri": "https://mere.computer/ns/agent#person/6a322190-228a-427d-b887-4b768362bab9",
+                "provenance_iri": "https://mere.computer/ns/agent#person/8a2ca5f1-b3e1-4fc8-b210-e7bfd49f2784",
                 "recognized_sub_kind": "Cites",
-                "statement_id": "01a15b44eeb0-894aa44e7c43cff8-0000000000000001"
+                "statement_id": "01a15b4ab5d1-634dcebfacd5fd68-0000000000000001"
               }
             ],
             "containment": null,
             "families": [
               "Semantic"
             ],
-            "from_node_id": "8d561c81-94e0-429a-82c5-26a619492690",
+            "from_node_id": "12d08fcb-ca9c-4d53-9e56-305224f0dbea",
             "imported": null,
             "provenance": null,
             "semantic": null,
-            "to_node_id": "426802a6-4a1c-4e0f-96d5-5407ff10b8f4",
+            "to_node_id": "66e6f2d5-0f2f-4d82-b430-8b7849c0378b",
             "traversal": null
           }
         ],
@@ -185,7 +185,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "8769d672-fab2-4638-b738-72cee9e37daa",
+            "node_id": "1867d2d5-6bf8-4c72-9610-2b6fd7950296",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -216,7 +216,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "8d561c81-94e0-429a-82c5-26a619492690",
+            "node_id": "12d08fcb-ca9c-4d53-9e56-305224f0dbea",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -247,7 +247,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "426802a6-4a1c-4e0f-96d5-5407ff10b8f4",
+            "node_id": "66e6f2d5-0f2f-4d82-b430-8b7849c0378b",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -274,7 +274,7 @@
         "shown_resources": [
           {
             "resource_id": "c3909d3b-4b6d-5ba0-8c6f-e15c0d2cc02e",
-            "surface_id": "8d561c81-94e0-429a-82c5-26a619492690"
+            "surface_id": "12d08fcb-ca9c-4d53-9e56-305224f0dbea"
           }
         ],
         "timestamp_secs": 0
@@ -282,7 +282,7 @@
       "read_only": false,
       "revision": 5,
       "schema": "mere.session.graph/v1",
-      "session": "910ceb8c-a928-4cff-9981-ecdf2e3979db",
+      "session": "4f1f88bf-30dc-4cf6-9f6d-0f3971b75b1f",
       "views": {}
     }
   ],
@@ -296,60 +296,60 @@
       "bindings": [
         {
           "instance": 0,
-          "key": "mere.session:910ceb8c-a928-4cff-9981-ecdf2e3979db"
+          "key": "mere.session:4f1f88bf-30dc-4cf6-9f6d-0f3971b75b1f"
         },
         {
           "instance": 1,
-          "key": "mere:426802a6-4a1c-4e0f-96d5-5407ff10b8f4"
+          "key": "mere:66e6f2d5-0f2f-4d82-b430-8b7849c0378b"
         },
         {
           "instance": 2,
-          "key": "mere:8d561c81-94e0-429a-82c5-26a619492690"
+          "key": "mere:12d08fcb-ca9c-4d53-9e56-305224f0dbea"
         },
         {
           "instance": 3,
-          "key": "mere:8769d672-fab2-4638-b738-72cee9e37daa"
+          "key": "mere:1867d2d5-6bf8-4c72-9610-2b6fd7950296"
         }
       ],
       "offers": {
-        "mere.session:910ceb8c-a928-4cff-9981-ecdf2e3979db": [
+        "mere.session:4f1f88bf-30dc-4cf6-9f6d-0f3971b75b1f": [
           {
-            "byte_size": 270,
+            "byte_size": 271,
             "codec": "PortableCardV1",
             "requires": "PortableCard",
             "resource": [
-              28,
-              10,
               95,
-              202,
-              207,
-              53,
-              184,
-              55,
-              207,
-              132,
-              171,
-              249,
+              236,
+              38,
+              254,
+              147,
+              31,
+              183,
+              224,
+              168,
+              161,
+              231,
+              83,
+              219,
+              25,
+              66,
+              61,
+              87,
+              178,
+              0,
+              154,
+              85,
               170,
-              123,
-              175,
-              250,
-              27,
-              249,
-              20,
-              118,
-              94,
-              247,
-              63,
-              33,
-              150,
-              133,
-              39,
-              60,
-              20,
-              47,
-              22,
-              84
+              53,
+              213,
+              162,
+              35,
+              252,
+              158,
+              52,
+              98,
+              17,
+              44
             ],
             "semantics": {
               "actions": [
@@ -388,54 +388,54 @@
             }
           }
         ],
-        "mere:426802a6-4a1c-4e0f-96d5-5407ff10b8f4": [
+        "mere:12d08fcb-ca9c-4d53-9e56-305224f0dbea": [
           {
-            "byte_size": 215,
+            "byte_size": 181,
             "codec": "PortableCardV1",
             "requires": "PortableCard",
             "resource": [
-              107,
-              133,
-              88,
-              174,
-              220,
-              44,
-              110,
-              173,
-              199,
-              43,
-              225,
-              171,
-              40,
-              69,
-              116,
-              25,
-              114,
-              238,
-              99,
-              132,
-              217,
+              51,
+              4,
+              156,
+              53,
+              98,
+              139,
+              128,
+              242,
+              89,
+              108,
+              72,
+              160,
+              118,
+              244,
+              70,
+              135,
+              12,
+              112,
+              67,
               233,
-              124,
-              86,
-              6,
-              90,
-              184,
-              42,
-              71,
-              254,
-              6,
-              174
+              173,
+              56,
+              212,
+              123,
+              38,
+              134,
+              87,
+              22,
+              109,
+              62,
+              67,
+              176
             ],
             "semantics": {
               "actions": [],
               "bounds": "FillFootprint",
-              "label": "https://shared.invalid/ordinary-owner",
+              "label": "Guest source",
               "role": "Article"
             }
           }
         ],
-        "mere:8769d672-fab2-4638-b738-72cee9e37daa": [
+        "mere:1867d2d5-6bf8-4c72-9610-2b6fd7950296": [
           {
             "byte_size": 201,
             "codec": "PortableCardV1",
@@ -482,49 +482,49 @@
             }
           }
         ],
-        "mere:8d561c81-94e0-429a-82c5-26a619492690": [
+        "mere:66e6f2d5-0f2f-4d82-b430-8b7849c0378b": [
           {
-            "byte_size": 181,
+            "byte_size": 215,
             "codec": "PortableCardV1",
             "requires": "PortableCard",
             "resource": [
-              51,
-              4,
-              156,
-              53,
-              98,
-              139,
-              128,
-              242,
-              89,
-              108,
-              72,
-              160,
-              118,
-              244,
-              70,
-              135,
-              12,
-              112,
-              67,
-              233,
+              107,
+              133,
+              88,
+              174,
+              220,
+              44,
+              110,
               173,
-              56,
-              212,
-              123,
-              38,
-              134,
-              87,
-              22,
-              109,
-              62,
-              67,
-              176
+              199,
+              43,
+              225,
+              171,
+              40,
+              69,
+              116,
+              25,
+              114,
+              238,
+              99,
+              132,
+              217,
+              233,
+              124,
+              86,
+              6,
+              90,
+              184,
+              42,
+              71,
+              254,
+              6,
+              174
             ],
             "semantics": {
               "actions": [],
               "bounds": "FillFootprint",
-              "label": "Guest source",
+              "label": "https://shared.invalid/ordinary-owner",
               "role": "Article"
             }
           }
@@ -662,8 +662,8 @@
             "from": 2,
             "kind": "link.surface",
             "link_key": {
-              "first": "426802a6-4a1c-4e0f-96d5-5407ff10b8f4",
-              "second": "8d561c81-94e0-429a-82c5-26a619492690",
+              "first": "12d08fcb-ca9c-4d53-9e56-305224f0dbea",
+              "second": "66e6f2d5-0f2f-4d82-b430-8b7849c0378b",
               "stratum": "surface"
             },
             "marks": {
@@ -690,19 +690,19 @@
         "sources": [
           {
             "adapter": "mere.session",
-            "id": "910ceb8c-a928-4cff-9981-ecdf2e3979db"
+            "id": "4f1f88bf-30dc-4cf6-9f6d-0f3971b75b1f"
           },
           {
             "adapter": "mere.graph",
-            "id": "426802a6-4a1c-4e0f-96d5-5407ff10b8f4"
+            "id": "66e6f2d5-0f2f-4d82-b430-8b7849c0378b"
           },
           {
             "adapter": "mere.graph",
-            "id": "8d561c81-94e0-429a-82c5-26a619492690"
+            "id": "12d08fcb-ca9c-4d53-9e56-305224f0dbea"
           },
           {
             "adapter": "mere.graph",
-            "id": "8769d672-fab2-4638-b738-72cee9e37daa"
+            "id": "1867d2d5-6bf8-4c72-9610-2b6fd7950296"
           }
         ],
         "spaces": [

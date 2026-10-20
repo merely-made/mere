@@ -77,7 +77,7 @@ synthetic addresses, public test identities, process observations and captures.
 
 ## Qualified result, 2026-10-20
 
-The accepted `gs-coop-view-20261020-07` cohort passes all seven phases with
+The accepted `gs-coop-view-20261020-08` cohort passes all seven phases with
 21 reviewed captures, seven distinct native processes and four custodian
 launches. Two different graphs and the first source exist before co-op starts.
 The owner invites one editor to the chosen graph, the guest adds a source and
@@ -96,41 +96,39 @@ a fresh guest is refused as `Delegation(Revoked)`. Re-exporting connection
 information retains the byte-identical original invitation, so this tests the
 old grant against current authority rather than silently replacing it.
 
-The frozen runtime source is `98cbafad6d02ac199c8b2ced8836560b9a895904`,
-including current main `c25c2d441` and its updated storage/transport suppliers.
-`build-inputs.json` records 3,287 repository source and compiler-declared input
-hashes, the three executable hashes, runner hashes and Rust/Cargo 1.99.1.
-The application/resident dependency trees and supplier audit separately check
-18 resolved Git checkouts against their pinned commits. That audit covers
-tracked Rust/TOML/lock/WGSL/C/C++ code, including resolved but uncompiled
-packages; it excludes untracked and asset-only changes.
+The frozen source is `523a86808d18ef85eb434570410931f8d370c780`, incorporating
+main `d4756e0fb`, the shared site-model extraction and current native renderer.
+`build-inputs.json` records 3,287 repository source and compiler-declared
+input hashes, three executable hashes, runner hashes and Rust/Cargo 1.99.1.
+Application/resident dependency trees and the supplier audit check
+18 resolved Git checkouts against their pinned commits, including netrender
+`ec15eb269855c798467c93a6d10031100fdfdf65`. The audit covers tracked
+Rust/TOML/lock/WGSL/C/C++ code, including resolved but uncompiled packages;
+it excludes untracked and asset-only changes.
 
 The final selected software gates pass: 339 Graphshell library tests with six
-existing ignores, 16 ordinary-view tests, all 30 resident Mere tests, and the
-focused custody-policy test. Changed-file formatting and port boundaries pass.
-Both selected Clippy runs complete with existing warnings retained in their
-logs. These are bounded package/module checks, not a full-workspace or CI run.
+existing ignores, 16 ordinary-view tests, all 30 resident Mere tests and the
+focused custody-policy regression. Changed-file formatting and port boundaries
+pass. Both selected Clippy runs complete with existing warnings retained in
+logs. These are bounded package/module checks, not full-workspace or CI runs.
 `software-gates.json` records commands and compressed logs;
 `diagnostic-attempts.json` preserves the five rejected headed attempts and fixes.
-`capture-review.json` records inspection of every accepted capture, with
-individual full-capture inspection for the critical editing and cold-refusal
-states in addition to the three review contact sheets.
+`capture-review.json` records inspection of every accepted capture through three
+contact sheets, supplemented by individual full captures for the existing-node
+edit and cold guest refusal. The review sheets are retained in `review/`.
 
-Verify the packet and the exact committed publication tree:
+Earlier complete cohorts remain recoverable: `native05` is frozen in
+`prior-cohort/native05`; the complete `native07` packet is retained at commit
+`55c8d0f4db70368860222318dbb75945048faa39`. Main advanced during publication,
+first adding a shared site-model dependency and then changing the renderer.
+Each change produced new executable hashes, so complete headed and cold-reopen
+qualification was repeated rather than transferring the earlier result.
+
+Verify the current packet against the exact publication tree, and the retained
+native05 packet against its original committed source:
 
 ```sh
 python3 ports/graphshell/docs/receipts/coop_graph_view_20261020/verify.py --commit HEAD
-```
-
-The earlier complete `native05` packet remains frozen in
-`prior-cohort/native05`. Publication caught the subsequent shared site model
-extraction on main; the ordinary-view executable stayed byte-identical, while
-the resident and preparation executables changed. The final `native07` cohort
-repeats the complete headed and cold-reopen workflow with those new executables.
-The current source hashes also cover that new shared model. Verify the retained
-cohort against its original committed source:
-
-```sh
 python3 ports/graphshell/docs/receipts/coop_graph_view_20261020/verify.py \
   --packet ports/graphshell/docs/receipts/coop_graph_view_20261020/prior-cohort/native05 \
   --commit 1197db034

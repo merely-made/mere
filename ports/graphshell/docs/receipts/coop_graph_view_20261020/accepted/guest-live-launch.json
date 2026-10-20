@@ -1,6 +1,6 @@
 {
-  "launcher_pid": 9039,
+  "launcher_pid": 9638,
   "role": "guest",
-  "binary_sha256": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1",
+  "binary_sha256": "5ad9690bd7c2d288f3a3cf7054d47ff092cc8b4b27d0735729ee1ddd00cc889d",
   "scenario": "guest-live.scn"
 }

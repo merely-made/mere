@@ -1,8 +1,8 @@
 {
-  "source_commit": "98cbafad6d02ac199c8b2ced8836560b9a895904",
+  "source_commit": "523a86808d18ef85eb434570410931f8d370c780",
   "files": {
     ".cargo/config.toml": "af174c7f9ac5ae8e0536a8fd2fa0251e680f23edab3ffbb5098aa914a48cdb01",
-    "Cargo.lock": "07f79b6068a8e7d631959837eac136057560025e58523d3e14ec523bda0e4ded",
+    "Cargo.lock": "6c56390c3edcafc975122cc70c36d434a044e6112b500e52c424c904b7507d45",
     "Cargo.toml": "b6dfe70504f482e9cea7d0c885b7cb66031597d0b0d416747f96e923fa7d30f3",
     "crates/cambium/backstep/Cargo.toml": "eda71b1726b42fd4a933aa738b28eee963676de2ff58431e883841435da8a1ae",
     "crates/cambium/backstep/src/lib.rs": "be552a519506a54cf2136642429ccc57b662348f9b5b934675d6e1dbf300f518",
@@ -2100,8 +2100,8 @@
     "ports/graphshell/tests/moot_resources_reopen.rs": "bad7497eb5ce387ce985b5130b5ac6796e22043d4ae0096e18fc9545a62c413a",
     "ports/graphshell/tests/n4_owner_policy_receipt.rs": "1334d5be418fa7040062be27fd57251e54387e400a06b93dae4b9ebc5171eceb",
     "ports/graphshell/web/.cargo/config.toml": "c6bf09ef1bb45419b2236805510350727e3aadfc9e64c6096a048091d43c4b71",
-    "ports/graphshell/web/Cargo.lock": "4abc5aadac2e2e502eaaae3910fd7cd4308b0e20fd02d07e8270f54851520223",
-    "ports/graphshell/web/Cargo.toml": "8ac00c08871245e3b2b5043986e970780169959372ac537abaa86f396eb3b3ba",
+    "ports/graphshell/web/Cargo.lock": "8fb908682dd452d9386cbde2f30646bea951fdc8c6a5154b342035df65cfb5b5",
+    "ports/graphshell/web/Cargo.toml": "05b5866ffa467ba79166ed1357006200a116777107ab785ed0f53235dc832b27",
     "ports/graphshell/web/co_op.css": "a0402ff506c7a8b8170389a9d165d5882508d642e0bcbc7446b42e8db1a9d925",
     "ports/graphshell/web/co_op.html": "bda4bef733274f5851d658e126e8fde601305096bcce4868bedf0afbaa8ddb3a",
     "ports/graphshell/web/co_op.js": "b077b6e593f06b726f79fe5d12f2226f75c6ad06028547e06da2766f1ee8c146",
@@ -3294,14 +3294,14 @@
     "ports/graphshell/docs/receipts/coop_20261020/resident.py": "08db6c8ba66bc07981c7e71fad629e14f87c3edfa5d5206581d19260e3a40192"
   },
   "binaries": {
-    "graphshell_mere": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1",
-    "djinn": "d74d31162a31cddb0ec832851a1f85e1f7146b07885f68bd5adb2a282d21d703",
-    "coop_existing_graph": "773a47dd9c0715138d10867007b370a3ffdf2cc1fe45191e626856260a295e5f"
+    "graphshell_mere": "5ad9690bd7c2d288f3a3cf7054d47ff092cc8b4b27d0735729ee1ddd00cc889d",
+    "djinn": "becbce31db2b973ac5942544e018ec6dbbccd35c1209849dceec760fc8467dfb",
+    "coop_existing_graph": "482f7f49358cca7932d633de6f75850e6557d33ae86026f10f1e6ae9a45413db"
   },
   "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
   "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
   "commands": {
-    "application": "cargo +1.99.1 build --locked --offline -p graphshell-mere",
+    "application": "cargo +1.99.1 build --locked -p graphshell-mere",
     "resident": "cargo +1.99.1 build --locked --offline -p djinn --features passphrase-fd --bin djinn",
     "preparation": "cargo +1.99.1 build --locked --offline -p djinn --features passphrase-fd --example coop_existing_graph"
   },
